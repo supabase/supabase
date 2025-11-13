@@ -10,7 +10,11 @@
     "id": "installing",
     "slug": "installing",
     "type": "markdown",
-    "excludes": ["reference_javascript_v1", "reference_kotlin_v1", "reference_swift_v1"]
+    "excludes": [
+      "reference_javascript_v1",
+      "reference_kotlin_v1",
+      "reference_swift_v1"
+    ]
   },
   {
     "title": "Initializing",
@@ -332,6 +336,14 @@
             "product": "database",
             "parent": "filters",
             "type": "function"
+          },
+          {
+            "id": "constructor",
+            "title": "TODO: Add description for constructor",
+            "slug": "constructor",
+            "product": "database",
+            "type": "function",
+            "parent": "filters"
           }
         ]
       },
@@ -431,8 +443,88 @@
             "product": "database",
             "parent": "modifiers",
             "type": "function"
+          },
+          {
+            "id": "constructor",
+            "title": "TODO: Add description for constructor",
+            "slug": "constructor",
+            "product": "database",
+            "type": "function",
+            "parent": "modifiers"
+          },
+          {
+            "id": "maxaffected",
+            "title": "Set the maximum number of rows that can be affected by the query",
+            "slug": "maxaffected",
+            "product": "database",
+            "type": "function",
+            "parent": "modifiers"
+          },
+          {
+            "id": "rollback",
+            "title": "Rollback the query",
+            "slug": "rollback",
+            "product": "database",
+            "type": "function",
+            "parent": "modifiers"
           }
         ]
+      },
+      {
+        "id": "constructor",
+        "title": "TODO: Add description for constructor",
+        "slug": "constructor",
+        "product": "database",
+        "type": "function"
+      },
+      {
+        "id": "setheader",
+        "title": "Set an HTTP header for the request",
+        "slug": "setheader",
+        "product": "database",
+        "type": "function"
+      },
+      {
+        "id": "then",
+        "title": "Attaches callbacks for the resolution and/or rejection of the Promise",
+        "slug": "then",
+        "product": "database",
+        "type": "function"
+      },
+      {
+        "id": "throwonerror",
+        "title": "If there's an error with the query, throwOnError will reject the promise by",
+        "slug": "throwonerror",
+        "product": "database",
+        "type": "function"
+      },
+      {
+        "id": "constructor",
+        "title": "Creates a PostgREST client",
+        "slug": "constructor",
+        "product": "database",
+        "type": "function"
+      },
+      {
+        "id": "from",
+        "title": "Perform a query on a table or a view",
+        "slug": "from",
+        "product": "database",
+        "type": "function"
+      },
+      {
+        "id": "schema",
+        "title": "Select a schema to query or perform an function (rpc) call",
+        "slug": "schema",
+        "product": "database",
+        "type": "function"
+      },
+      {
+        "id": "constructor",
+        "title": "TODO: Add description for constructor",
+        "slug": "constructor",
+        "product": "database",
+        "type": "function"
       }
     ]
   },
@@ -485,20 +577,6 @@
         "id": "sign-in-with-otp",
         "title": "Sign in a user through OTP",
         "slug": "auth-signinwithotp",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "sign-in-with-whatsapp-otp",
-        "title": "Sign in a user through WhatsApp",
-        "slug": "auth-signinwithwhatsappotp",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "sign-in-with-apple",
-        "title": "Sign in with Apple",
-        "slug": "sign-in-with-apple",
         "product": "auth",
         "type": "function"
       },
@@ -767,8 +845,169 @@
             "slug": "auth-admin-mfa-deletefactor",
             "product": "auth-admin",
             "type": "function"
+          },
+          {
+            "id": "constructor",
+            "title": "TODO: Add description for constructor",
+            "slug": "auth-constructor",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "createuser",
+            "title": "Creates a new user",
+            "slug": "auth-createuser",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "deleteuser",
+            "title": "Delete a user. Requires a  key",
+            "slug": "auth-deleteuser",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "generatelink",
+            "title": "Generates email links and OTPs to be sent via a custom email provider",
+            "slug": "auth-generatelink",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "getuserbyid",
+            "title": "Get user by id",
+            "slug": "auth-getuserbyid",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "inviteuserbyemail",
+            "title": "Sends an invite link to an email address",
+            "slug": "auth-inviteuserbyemail",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "listusers",
+            "title": "Get a list of users",
+            "slug": "auth-listusers",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "signout",
+            "title": "Removes a logged-in session",
+            "slug": "auth-signout",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "updateuserbyid",
+            "title": "Updates the user data",
+            "slug": "auth-updateuserbyid",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "constructor",
+            "title": "TODO: Add description for constructor",
+            "slug": "auth-constructor",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "signout",
+            "title": "Removes a logged-in session",
+            "slug": "auth-signout",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "createclient",
+            "title": "Creates a new OAuth client",
+            "slug": "auth-createclient",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "deleteclient",
+            "title": "Deletes an OAuth client",
+            "slug": "auth-deleteclient",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "getclient",
+            "title": "Gets details of a specific OAuth client",
+            "slug": "auth-getclient",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "listclients",
+            "title": "Lists all OAuth clients with optional pagination",
+            "slug": "auth-listclients",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "regenerateclientsecret",
+            "title": "Regenerates the secret for an OAuth client",
+            "slug": "auth-regenerateclientsecret",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "updateclient",
+            "title": "Updates an existing OAuth client",
+            "slug": "auth-updateclient",
+            "product": "auth-admin",
+            "type": "function"
           }
         ]
+      },
+      {
+        "id": "constructor",
+        "title": "Create a new client for use in the browser",
+        "slug": "auth-constructor",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "initialize",
+        "title": "Initializes the client session either from the url or from storage",
+        "slug": "auth-initialize",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "isthrowonerrorenabled",
+        "title": "Returns whether error throwing mode is enabled for this client",
+        "slug": "auth-isthrowonerrorenabled",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "approveauthorization",
+        "title": "Approves an OAuth authorization request",
+        "slug": "auth-approveauthorization",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "denyauthorization",
+        "title": "Denies an OAuth authorization request",
+        "slug": "auth-denyauthorization",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "getauthorizationdetails",
+        "title": "Retrieves details about an OAuth authorization request",
+        "slug": "auth-getauthorizationdetails",
+        "product": "auth",
+        "type": "function"
       }
     ]
   },
@@ -782,6 +1021,20 @@
         "slug": "functions-invoke",
         "product": "functions",
         "type": "function"
+      },
+      {
+        "id": "constructor",
+        "title": "TODO: Add description for constructor",
+        "slug": "functions-constructor",
+        "product": "functions",
+        "type": "function"
+      },
+      {
+        "id": "setauth",
+        "title": "Updates the authorization header",
+        "slug": "functions-setauth",
+        "product": "functions",
+        "type": "function"
       }
     ]
   },
@@ -789,12 +1042,6 @@
     "type": "category",
     "title": "Realtime",
     "items": [
-      {
-        "id": "realtime-api",
-        "title": "Overview",
-        "slug": "realtime-api",
-        "type": "function"
-      },
       {
         "id": "subscribe",
         "title": "Subscribe to channel",
@@ -827,6 +1074,258 @@
         "id": "broadcast-message",
         "title": "Broadcast a message",
         "slug": "broadcastmessage",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "constructor",
+        "title": "TODO: Add description for constructor",
+        "slug": "constructor",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "httpsend",
+        "title": "Sends a broadcast message explicitly via REST API",
+        "slug": "httpsend",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "presencestate",
+        "title": "TODO: Add description for presenceState",
+        "slug": "presencestate",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "teardown",
+        "title": "Teardown the channel",
+        "slug": "teardown",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "track",
+        "title": "TODO: Add description for track",
+        "slug": "track",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "unsubscribe",
+        "title": "Leaves the channel",
+        "slug": "unsubscribe",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "untrack",
+        "title": "TODO: Add description for untrack",
+        "slug": "untrack",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "updatejoinpayload",
+        "title": "TODO: Add description for updateJoinPayload",
+        "slug": "updatejoinpayload",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "constructor",
+        "title": "Initializes the Socket",
+        "slug": "constructor",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "channel",
+        "title": "TODO: Add description for channel",
+        "slug": "channel",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "connect",
+        "title": "Connects the socket, unless already connected",
+        "slug": "connect",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "connectionstate",
+        "title": "Returns the current state of the socket",
+        "slug": "connectionstate",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "disconnect",
+        "title": "Disconnects the socket",
+        "slug": "disconnect",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "endpointurl",
+        "title": "Returns the URL of the websocket",
+        "slug": "endpointurl",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "flushsendbuffer",
+        "title": "Flushes send buffer",
+        "slug": "flushsendbuffer",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "getchannels",
+        "title": "Returns all created channels",
+        "slug": "getchannels",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "isconnected",
+        "title": "Returns  is the connection is open",
+        "slug": "isconnected",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "isconnecting",
+        "title": "Returns  if the connection is currently connecting",
+        "slug": "isconnecting",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "isdisconnecting",
+        "title": "Returns  if the connection is currently disconnecting",
+        "slug": "isdisconnecting",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "log",
+        "title": "Logs the message",
+        "slug": "log",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "onheartbeat",
+        "title": "TODO: Add description for onHeartbeat",
+        "slug": "onheartbeat",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "push",
+        "title": "Push out a message if the socket is connected",
+        "slug": "push",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "removeallchannels",
+        "title": "Unsubscribes and removes all channels",
+        "slug": "removeallchannels",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "removechannel",
+        "title": "Unsubscribes and removes a single channel",
+        "slug": "removechannel",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "sendheartbeat",
+        "title": "Sends a heartbeat message if the socket is connected",
+        "slug": "sendheartbeat",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "setauth",
+        "title": "Sets the JWT access token used for channel subscription authorization and Realtime RLS",
+        "slug": "setauth",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "constructor",
+        "title": "Initializes the Presence",
+        "slug": "constructor",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "constructor",
+        "title": "TODO: Add description for constructor",
+        "slug": "constructor",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "createwebsocket",
+        "title": "TODO: Add description for createWebSocket",
+        "slug": "createwebsocket",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "getwebsocketconstructor",
+        "title": "TODO: Add description for getWebSocketConstructor",
+        "slug": "getwebsocketconstructor",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "iswebsocketsupported",
+        "title": "TODO: Add description for isWebSocketSupported",
+        "slug": "iswebsocketsupported",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "addeventlistener",
+        "title": "TODO: Add description for addEventListener",
+        "slug": "addeventlistener",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "close",
+        "title": "TODO: Add description for close",
+        "slug": "close",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "removeeventlistener",
+        "title": "TODO: Add description for removeEventListener",
+        "slug": "removeeventlistener",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "send",
+        "title": "TODO: Add description for send",
+        "slug": "send",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "constructor",
+        "title": "TODO: Add description for constructor",
+        "slug": "constructor",
         "product": "realtime",
         "type": "function"
       }
@@ -996,6 +1495,237 @@
         "slug": "storage-deletevectors",
         "product": "storage",
         "type": "function"
+      },
+      {
+        "id": "constructor",
+        "title": "TODO: Add description for constructor",
+        "slug": "storage-constructor",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "from",
+        "title": "Access operations for a specific vector bucket",
+        "slug": "storage-from",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "constructor",
+        "title": "Creates a new VectorBucketApi instance",
+        "slug": "storage-constructor",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "createbucket",
+        "title": "Creates a new vector bucket",
+        "slug": "storage-createbucket",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "deletebucket",
+        "title": "Deletes a vector bucket",
+        "slug": "storage-deletebucket",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "getbucket",
+        "title": "Retrieves metadata for a specific vector bucket",
+        "slug": "storage-getbucket",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "listbuckets",
+        "title": "Lists vector buckets with optional filtering and pagination",
+        "slug": "storage-listbuckets",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "throwonerror",
+        "title": "Enable throwing errors instead of returning them in the response",
+        "slug": "storage-throwonerror",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "constructor",
+        "title": "TODO: Add description for constructor",
+        "slug": "storage-constructor",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "createindex",
+        "title": "Creates a new vector index in this bucket",
+        "slug": "storage-createindex",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "deleteindex",
+        "title": "Deletes an index from this bucket",
+        "slug": "storage-deleteindex",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "getindex",
+        "title": "Retrieves metadata for a specific index in this bucket",
+        "slug": "storage-getindex",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "index",
+        "title": "Access operations for a specific index within this bucket",
+        "slug": "storage-index",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "listindexes",
+        "title": "Lists indexes in this bucket",
+        "slug": "storage-listindexes",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "constructor",
+        "title": "TODO: Add description for constructor",
+        "slug": "storage-constructor",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "throwonerror",
+        "title": "Enable throwing errors instead of returning them in the response",
+        "slug": "storage-throwonerror",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "constructor",
+        "title": "TODO: Add description for constructor",
+        "slug": "storage-constructor",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "createindex",
+        "title": "Creates a new vector index within a bucket",
+        "slug": "storage-createindex",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "deleteindex",
+        "title": "Deletes a vector index and all its data",
+        "slug": "storage-deleteindex",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "getindex",
+        "title": "Retrieves metadata for a specific vector index",
+        "slug": "storage-getindex",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "listindexes",
+        "title": "Lists vector indexes within a bucket with optional filtering and pagination",
+        "slug": "storage-listindexes",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "throwonerror",
+        "title": "Enable throwing errors instead of returning them in the response",
+        "slug": "storage-throwonerror",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "constructor",
+        "title": "TODO: Add description for constructor",
+        "slug": "storage-constructor",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "constructor",
+        "title": "TODO: Add description for constructor",
+        "slug": "storage-constructor",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "from",
+        "title": "Perform file operation in a bucket",
+        "slug": "storage-from",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "constructor",
+        "title": "TODO: Add description for constructor",
+        "slug": "storage-constructor",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "throwonerror",
+        "title": "Enable throwing errors instead of returning them",
+        "slug": "storage-throwonerror",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "constructor",
+        "title": "TODO: Add description for constructor",
+        "slug": "storage-constructor",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "exists",
+        "title": "Checks the existence of a file",
+        "slug": "storage-exists",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "info",
+        "title": "Retrieves the details of an existing file",
+        "slug": "storage-info",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "listv2",
+        "title": "this method signature might change in the future",
+        "slug": "storage-listv2",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "throwonerror",
+        "title": "Enable throwing errors instead of returning them",
+        "slug": "storage-throwonerror",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "tobase64",
+        "title": "TODO: Add description for toBase64",
+        "slug": "storage-tobase64",
+        "product": "storage",
+        "type": "function"
       }
     ]
   },
@@ -1021,6 +1751,223 @@
         "slug": "release-notes",
         "isFunc": false,
         "type": "markdown"
+      },
+      {
+        "id": "constructor",
+        "title": "TODO: Add description for constructor",
+        "slug": "constructor",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "httpsend",
+        "title": "Sends a broadcast message explicitly via REST API",
+        "slug": "httpsend",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "on",
+        "title": "Creates an event handler that listens to changes",
+        "slug": "on",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "presencestate",
+        "title": "TODO: Add description for presenceState",
+        "slug": "presencestate",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "send",
+        "title": "Sends a message into the channel",
+        "slug": "send",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "teardown",
+        "title": "Teardown the channel",
+        "slug": "teardown",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "track",
+        "title": "TODO: Add description for track",
+        "slug": "track",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "unsubscribe",
+        "title": "Leaves the channel",
+        "slug": "unsubscribe",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "untrack",
+        "title": "TODO: Add description for untrack",
+        "slug": "untrack",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "updatejoinpayload",
+        "title": "TODO: Add description for updateJoinPayload",
+        "slug": "updatejoinpayload",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "constructor",
+        "title": "Initializes the Socket",
+        "slug": "constructor",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "channel",
+        "title": "TODO: Add description for channel",
+        "slug": "channel",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "connect",
+        "title": "Connects the socket, unless already connected",
+        "slug": "connect",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "connectionstate",
+        "title": "Returns the current state of the socket",
+        "slug": "connectionstate",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "disconnect",
+        "title": "Disconnects the socket",
+        "slug": "disconnect",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "endpointurl",
+        "title": "Returns the URL of the websocket",
+        "slug": "endpointurl",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "flushsendbuffer",
+        "title": "Flushes send buffer",
+        "slug": "flushsendbuffer",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "getchannels",
+        "title": "Returns all created channels",
+        "slug": "getchannels",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "isconnected",
+        "title": "Returns  is the connection is open",
+        "slug": "isconnected",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "isconnecting",
+        "title": "Returns  if the connection is currently connecting",
+        "slug": "isconnecting",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "isdisconnecting",
+        "title": "Returns  if the connection is currently disconnecting",
+        "slug": "isdisconnecting",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "log",
+        "title": "Logs the message",
+        "slug": "log",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "onheartbeat",
+        "title": "TODO: Add description for onHeartbeat",
+        "slug": "onheartbeat",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "push",
+        "title": "Push out a message if the socket is connected",
+        "slug": "push",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "removeallchannels",
+        "title": "Unsubscribes and removes all channels",
+        "slug": "removeallchannels",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "removechannel",
+        "title": "Unsubscribes and removes a single channel",
+        "slug": "removechannel",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "sendheartbeat",
+        "title": "Sends a heartbeat message if the socket is connected",
+        "slug": "sendheartbeat",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "setauth",
+        "title": "Sets the JWT access token used for channel subscription authorization and Realtime RLS",
+        "slug": "setauth",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "channel",
+        "title": "Creates a Realtime channel with Broadcast, Presence, and Postgres Changes",
+        "slug": "channel",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "from",
+        "title": "Perform a query on a table or a view",
+        "slug": "from",
+        "product": "misc",
+        "type": "function"
+      },
+      {
+        "id": "schema",
+        "title": "Select a schema to query or perform an function (rpc) call",
+        "slug": "schema",
+        "product": "misc",
+        "type": "function"
       }
     ]
   }
