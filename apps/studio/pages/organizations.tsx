@@ -50,7 +50,7 @@ const OrganizationsPage: NextPageWithLayout = () => {
           (x) => x.name.toLowerCase().includes(search) || x.slug.toLowerCase().includes(search)
         )
 
-  const isPageLoading = isOrgsLoading || isProfileLoading
+  const isPageLoading = isOrgsLoading && isProfileLoading
 
   useEffect(() => {
     // If there are no organizations and the user has a profile, force the user to create one
