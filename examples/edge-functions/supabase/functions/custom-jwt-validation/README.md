@@ -14,7 +14,7 @@ that can be found at [`_shared/jwt/`](https://github.com/supabase/supabase/tree/
 1. Copy/download the JWT template, then import and use it inside your edge function.
 
 ```bash
-wget https://raw.githubusercontent.com/supabase/supabase/refs/heads/main/examples/edge-functions/supabase/functions/_shared/jwt/<template>.ts
+wget https://raw.githubusercontent.com/supabase/supabase/refs/heads/master/examples/edge-functions/supabase/functions/_shared/jwt/<template>.ts
 ```
 
 2. Add any required Environment-Variable to a `.env` file, see inside of the
