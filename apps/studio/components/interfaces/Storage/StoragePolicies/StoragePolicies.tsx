@@ -93,44 +93,33 @@ export const StoragePolicies = () => {
    * - Filter buckets by name matching the search string
    * - Show all policies for filtered buckets (policies are not filtered)
    */
-  const { filteredBucketsWithPolicies, filteredUngroupedPolicies, filteredBucketPolicies } =
-    useMemo(() => {
-      const searchFilter = deferredSearchString?.toLowerCase() || ''
-      const bucketsList = data ?? []
+  const filteredBucketsWithPolicies = useMemo(() => {
+    const searchFilter = deferredSearchString?.toLowerCase() || ''
+    const bucketsList = data ?? []
 
-      // Filter buckets by name if search filter is present
-      const filteredBucketsList = searchFilter
-        ? bucketsList.filter((bucket) => bucket.name.toLowerCase().includes(searchFilter))
-        : bucketsList
+    // Filter buckets by name if search filter is present
+    const filteredBucketsList = searchFilter
+      ? bucketsList.filter((bucket) => bucket.name.toLowerCase().includes(searchFilter))
+      : bucketsList
 
-      // Get policies for filtered buckets (show all policies, don't filter them)
-      // Show all filtered buckets, even if they don't have policies (similar to auth/policies.tsx)
-      const filteredBucketsWithPoliciesList = filteredBucketsList.map((bucket) => {
-        const bucketPolicies = get(
-          find(formattedStorageObjectPolicies, { name: bucket.name }),
-          ['policies'],
-          []
-        )
+    // Get policies for filtered buckets (show all policies, don't filter them)
+    // Show all filtered buckets, even if they don't have policies (similar to auth/policies.tsx)
+    const filteredBucketsWithPoliciesList = filteredBucketsList.map((bucket) => {
+      const bucketPolicies = get(
+        find(formattedStorageObjectPolicies, { name: bucket.name }),
+        ['policies'],
+        []
+      )
 
-        return {
-          bucket,
-          policies: bucketPolicies.sort((a: any, b: any) => a.name.localeCompare(b.name)),
-        }
-      })
-
-      // Schema-level policies should always be shown, unaffected by search filter
       return {
-        filteredBucketsWithPolicies: filteredBucketsWithPoliciesList,
-        filteredUngroupedPolicies: ungroupedPolicies,
-        filteredBucketPolicies: storageBucketPolicies,
+        bucket,
+        policies: bucketPolicies.sort((a: any, b: any) => a.name.localeCompare(b.name)),
       }
-    }, [
-      data,
-      deferredSearchString,
-      formattedStorageObjectPolicies,
-      ungroupedPolicies,
-      storageBucketPolicies,
-    ])
+    })
+
+    // Schema-level policies should always be shown, unaffected by search filter
+    return filteredBucketsWithPoliciesList
+  }, [data, deferredSearchString, formattedStorageObjectPolicies])
 
   const onSelectPolicyAdd = (bucketName = '', table = '') => {
     setSelectedPolicyToEdit({})
@@ -306,7 +295,7 @@ export const StoragePolicies = () => {
               <StoragePoliciesBucketRow
                 table="objects"
                 label="Other policies under storage.objects"
-                policies={filteredUngroupedPolicies}
+                policies={ungroupedPolicies}
                 onSelectPolicyAdd={onSelectPolicyAdd}
                 onSelectPolicyEdit={onSelectPolicyEdit}
                 onSelectPolicyDelete={onSelectPolicyDelete}
@@ -316,7 +305,7 @@ export const StoragePolicies = () => {
               <StoragePoliciesBucketRow
                 table="buckets"
                 label="Policies under storage.buckets"
-                policies={filteredBucketPolicies}
+                policies={storageBucketPolicies}
                 onSelectPolicyAdd={onSelectPolicyAdd}
                 onSelectPolicyEdit={onSelectPolicyEdit}
                 onSelectPolicyDelete={onSelectPolicyDelete}
