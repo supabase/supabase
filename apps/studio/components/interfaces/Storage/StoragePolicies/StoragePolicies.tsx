@@ -1,8 +1,9 @@
+import { PostgresPolicy } from '@supabase/postgres-meta'
 import { useParams } from 'common'
-import { filter, find, get, isEmpty } from 'lodash'
+import { isEmpty } from 'lodash'
 import { Search, X } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useDeferredValue, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import PolicyEditorModal from 'components/interfaces/Auth/Policies/PolicyEditorModal'
@@ -27,24 +28,24 @@ import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 
 export const StoragePolicies = () => {
-  const { data: project } = useSelectedProjectQuery()
   const { ref: projectRef } = useParams()
+  const { data: project } = useSelectedProjectQuery()
 
+  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()
+  const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<PostgresPolicy>()
+  const [isEditingPolicyForBucket, setIsEditingPolicyForBucket] = useState<{
+    bucket: string
+    table: string
+  }>()
   const [searchString, setSearchString] = useQueryState(
     'search',
     parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true })
   )
-  const deferredSearchString = useDeferredValue(searchString)
 
-  const { data, isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef })
-  const buckets = data ?? []
-
-  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<any>({})
-  const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<any>({})
-  const [isEditingPolicyForBucket, setIsEditingPolicyForBucket] = useState<any>({})
+  const { data: buckets = [], isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef })
 
   const {
-    data: policiesData,
+    data: policies = [],
     refetch,
     isLoading: isLoadingPolicies,
   } = useDatabasePoliciesQuery({
@@ -52,7 +53,6 @@ export const StoragePolicies = () => {
     connectionString: project?.connectionString,
     schema: 'storage',
   })
-  const policies = policiesData ?? []
 
   const isLoading = isLoadingBuckets || isLoadingPolicies
 
@@ -64,7 +64,7 @@ export const StoragePolicies = () => {
     onSuccess: async () => {
       await refetch()
       toast.success('Successfully deleted policy!')
-      setSelectedPolicyToDelete({})
+      setSelectedPolicyToDelete(undefined)
     },
   })
 
@@ -72,21 +72,22 @@ export const StoragePolicies = () => {
   const showStoragePolicyEditor =
     isEmpty(selectedPolicyToEdit) &&
     !isEmpty(isEditingPolicyForBucket) &&
-    get(isEditingPolicyForBucket, ['bucket'], '').length > 0
+    (isEditingPolicyForBucket.bucket ?? '').length > 0
 
   const showGeneralPolicyEditor = !isEmpty(isEditingPolicyForBucket) && !showStoragePolicyEditor
 
   // Policies under storage.objects
-  const storageObjectsPolicies = filter(policies, { table: 'objects' })
-  const formattedStorageObjectPolicies = formatPoliciesForStorage(buckets, storageObjectsPolicies)
-  const ungroupedPolicies = get(
-    find(formattedStorageObjectPolicies, { name: 'Ungrouped' }),
-    ['policies'],
-    []
+  const storageObjectsPolicies = policies.filter(
+    (x) => x.schema === 'storage' && x.table === 'objects'
   )
+  const formattedStorageObjectPolicies = formatPoliciesForStorage(buckets, storageObjectsPolicies)
+  const ungroupedPolicies =
+    formattedStorageObjectPolicies.find((x) => x.name === 'Ungrouped')?.policies ?? []
 
   // Policies under storage.buckets
-  const storageBucketPolicies = filter(policies, { table: 'buckets' })
+  const storageBucketPolicies = policies.filter(
+    (x) => x.schema === 'storage' && x.table === 'buckets'
+  )
 
   /**
    * Filter buckets based on search string
@@ -94,35 +95,27 @@ export const StoragePolicies = () => {
    * - Show all policies for filtered buckets (policies are not filtered)
    */
   const filteredBucketsWithPolicies = useMemo(() => {
-    const searchFilter = deferredSearchString?.toLowerCase() || ''
-    const bucketsList = data ?? []
+    const searchFilter = searchString?.toLowerCase() || ''
 
     // Filter buckets by name if search filter is present
     const filteredBucketsList = searchFilter
-      ? bucketsList.filter((bucket) => bucket.name.toLowerCase().includes(searchFilter))
-      : bucketsList
+      ? buckets.filter((bucket) => bucket.name.toLowerCase().includes(searchFilter))
+      : buckets
 
     // Get policies for filtered buckets (show all policies, don't filter them)
     // Show all filtered buckets, even if they don't have policies (similar to auth/policies.tsx)
     const filteredBucketsWithPoliciesList = filteredBucketsList.map((bucket) => {
-      const bucketPolicies = get(
-        find(formattedStorageObjectPolicies, { name: bucket.name }),
-        ['policies'],
-        []
-      )
-
-      return {
-        bucket,
-        policies: bucketPolicies.sort((a: any, b: any) => a.name.localeCompare(b.name)),
-      }
+      const policies =
+        formattedStorageObjectPolicies.find((x) => x.name === bucket.name)?.policies ?? []
+      return { bucket, policies }
     })
 
     // Schema-level policies should always be shown, unaffected by search filter
     return filteredBucketsWithPoliciesList
-  }, [data, deferredSearchString, formattedStorageObjectPolicies])
+  }, [buckets, searchString, formattedStorageObjectPolicies])
 
   const onSelectPolicyAdd = (bucketName = '', table = '') => {
-    setSelectedPolicyToEdit({})
+    setSelectedPolicyToEdit(undefined)
     setIsEditingPolicyForBucket({ bucket: bucketName, table })
   }
 
@@ -132,11 +125,11 @@ export const StoragePolicies = () => {
   }
 
   const onCancelPolicyEdit = () => {
-    setIsEditingPolicyForBucket({})
+    setIsEditingPolicyForBucket(undefined)
   }
 
   const onSelectPolicyDelete = (policy: any) => setSelectedPolicyToDelete(policy)
-  const onCancelPolicyDelete = () => setSelectedPolicyToDelete({})
+  const onCancelPolicyDelete = () => setSelectedPolicyToDelete(undefined)
 
   const onSavePolicySuccess = async () => {
     toast.success('Successfully saved policy!')
@@ -198,6 +191,10 @@ export const StoragePolicies = () => {
       console.error('Project is required')
       return true
     }
+    if (!selectedPolicyToEdit) {
+      console.error('Unable to find policy')
+      return true
+    }
 
     try {
       await updateDatabasePolicy({
@@ -215,6 +212,8 @@ export const StoragePolicies = () => {
 
   const onDeletePolicy = async () => {
     if (!project) return console.error('Project is required')
+    if (!selectedPolicyToDelete) return console.error('Unable to find policy')
+
     deleteDatabasePolicy({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -318,7 +317,7 @@ export const StoragePolicies = () => {
       {/* Only used for adding policies to buckets */}
       <StoragePoliciesEditPolicyModal
         visible={showStoragePolicyEditor}
-        bucketName={isEditingPolicyForBucket.bucket}
+        bucketName={isEditingPolicyForBucket?.bucket}
         onSelectCancel={onCancelPolicyEdit}
         onCreatePolicies={onCreatePolicies}
         onSaveSuccess={onSavePolicySuccess}
@@ -328,7 +327,7 @@ export const StoragePolicies = () => {
       <PolicyEditorModal
         schema="storage"
         visible={showGeneralPolicyEditor}
-        table={isEditingPolicyForBucket.table}
+        table={isEditingPolicyForBucket?.table ?? ''}
         selectedPolicyToEdit={selectedPolicyToEdit}
         onSelectCancel={onCancelPolicyEdit}
         onCreatePolicy={onCreatePolicy}
@@ -340,7 +339,7 @@ export const StoragePolicies = () => {
         danger
         visible={!isEmpty(selectedPolicyToDelete)}
         title="Confirm to delete policy"
-        description={`This is permanent! Are you sure you want to delete the policy "${selectedPolicyToDelete.name}"`}
+        description={`This is permanent! Are you sure you want to delete the policy "${selectedPolicyToDelete?.name}"`}
         buttonLabel="Delete"
         buttonLoadingLabel="Deleting"
         onSelectCancel={onCancelPolicyDelete}
