@@ -18,11 +18,6 @@ functions:
   - id: initializing
     title: 'Initializing'
     $ref: '@supabase/supabase-js.SupabaseClient.constructor'
-    description: |
-      You can initialize a new Supabase client using the `createClient()` method.
-
-      The Supabase client is your entrypoint to the rest of the Supabase functionality
-      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
 
     examples:
       - id: create-client
@@ -186,6 +181,20 @@ functions:
           - You keep the `expo-secure-storage`, `aes-js` and `react-native-get-random-values` libraries up-to-date.
           - Choose the correct [`SecureStoreOptions`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestoreoptions) for your app's needs. E.g. [`SecureStore.WHEN_UNLOCKED`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestorewhen_unlocked) regulates when the data can be accessed.
           - Carefully consider optimizations or other modifications to the above example, as those can lead to introducing subtle security vulnerabilities.
+      - id: initializing-typedoc-example-1
+        name: Example 8
+        code: >-
+          ```ts
+
+          import { createClient } from '@supabase/supabase-js'
+
+
+          const supabase = createClient('https://xyzcompany.supabase.co',
+          'public-anon-key')
+
+          const { data } = await supabase.from('profiles').select('*')
+
+          ```
 
   - id: auth-api
     title: 'Overview'
@@ -798,7 +807,9 @@ functions:
       - id: sign-in-with-email
         name: Sign in with email
         isSpotlight: true
-        description: The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
+        description: The user will be sent an email which contains either a magiclink or
+          a OTP or both. By default, a given user can only request a OTP once
+          every 60 seconds.
         code: |
           ```js
           const { data, error } = await supabase.auth.signInWithOtp({
@@ -821,7 +832,8 @@ functions:
       - id: sign-in-with-sms-otp
         name: Sign in with SMS OTP
         isSpotlight: false
-        description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
+        description: The user will be sent a SMS which contains a OTP. By default, a
+          given user can only request a OTP once every 60 seconds.
         code: |
           ```js
           const { data, error } = await supabase.auth.signInWithOtp({
@@ -831,7 +843,10 @@ functions:
       - id: sign-in-with-whatsapp-otp
         name: Sign in with WhatsApp OTP
         isSpotlight: false
-        description: The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
+        description: The user will be sent a WhatsApp message which contains a OTP. By
+          default, a given user can only request a OTP once every 60 seconds.
+          Note that a user will need to have a valid WhatsApp account that is
+          linked to Twilio in order to use this feature.
         code: |
           ```js
           const { data, error } = await supabase.auth.signInWithOtp({
@@ -1835,7 +1850,8 @@ functions:
     examples:
       - id: set-the-session
         name: Set the session
-        description: Sets the session data from an access_token and refresh_token, then returns an auth response or error.
+        description: Sets the session data from an access_token and refresh_token, then
+          returns an auth response or error.
         isSpotlight: true
         code: |
           ```js
@@ -2942,7 +2958,8 @@ functions:
         type: GenerateLinkParams
         subContent:
           - name: type
-            type: 'signup | invite | magiclink | recovery | email_change_current | email_change_new'
+            type: 'signup | invite | magiclink | recovery | email_change_current |
+              email_change_new'
           - name: email
             type: string
           - name: password
@@ -2952,7 +2969,8 @@ functions:
           - name: newEmail
             type: string
             isOptional: true
-            description: Only required if type is `email_change_current` or `email_change_new`.
+            description: Only required if type is `email_change_current` or
+              `email_change_new`.
           - name: options
             type: object
             isOptional: true
@@ -2960,12 +2978,14 @@ functions:
               - name: data
                 type: object
                 description: >
-                  Custom JSON object containing user metadata, to be stored in the `raw_user_meta_data` column.
-                  Only accepted if type is `signup`, `invite`, or `magiclink`.
+                  Custom JSON object containing user metadata, to be stored in
+                  the `raw_user_meta_data` column. Only accepted if type is
+                  `signup`, `invite`, or `magiclink`.
               - name: redirectTo
                 type: string
                 description: >
-                  A redirect URL which will be appended to the generated email link.
+                  A redirect URL which will be appended to the generated email
+                  link.
     examples:
       - id: generate-a-signup-link
         name: Generate a signup link
@@ -4458,17 +4478,6 @@ functions:
 
   - id: rpc
     title: 'Postgres functions: rpc()'
-    description: |
-      You can call Postgres functions as _Remote Procedure Calls_, logic in your database that you can execute from anywhere.
-      Functions are useful when the logic rarely changes—like for password resets and updates.
-
-      ```sql
-      create or replace function hello_world() returns text as $$
-        select 'Hello world';
-      $$ language sql;
-      ```
-
-      To call Postgres functions on [Read Replicas](/docs/guides/platform/read-replicas), use the `get: true` option.
     $ref: '@supabase/postgrest-js.PostgrestClient.rpc'
     examples:
       - id: call-a-postgres-function-without-arguments
@@ -5818,7 +5827,6 @@ functions:
           can filter on range columns using the string representation of range
           values.
         hideCodeBlock: true
-  # TODO: schema & result
   - id: text-search
     title: textSearch()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.textSearch'
@@ -6882,18 +6890,26 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+      - id: overrideTypes-typedoc-example-1
+        name: Example 5
+        code: |-
+          ```typescript
+          // Merge with existing types (default behavior)
+          const query = supabase
+            .from('users')
+            .select()
+            .overrideTypes<{ custom_field: string }>()
+
+          // Replace existing types completely
+          const replaceQuery = supabase
+            .from('users')
+            .select()
+            .overrideTypes<{ id: number; name: string }, { merge: false }>()
+          ```
 
   - id: explain
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.explain'
     title: Using Explain
-    description: |
-      For debugging slow queries, you can get the [Postgres `EXPLAIN` execution plan](https://www.postgresql.org/docs/current/sql-explain.html) of a query
-      using the `explain()` method. This works on any query, even for `rpc()` or writes.
-
-      Explain is not enabled by default as it can reveal sensitive information about your database.
-      It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
-
-      Follow the [Performance Debugging Guide](/docs/guides/database/debugging-performance) to enable the functionality on your project.
     examples:
       - id: get-execution-plan
         name: Get the execution plan
@@ -7051,8 +7067,6 @@ functions:
 
   - id: invoke
     title: invoke()
-    description: |
-      Invoke a Supabase Edge Function.
     $ref: '@supabase/functions-js.FunctionsClient.invoke'
     notes: |
       - Requires an Authorization header.
@@ -7165,6 +7179,14 @@ functions:
               "my-custom-header": 'my-custom-header-value'
             },
             method: 'GET'
+          })
+          ```
+      - id: invoke-typedoc-example-1
+        name: Example 7
+        code: |-
+          ```ts
+          const { data, error } = await functions.invoke('hello-world', {
+            body: { name: 'Ada' },
           })
           ```
 
@@ -7317,7 +7339,8 @@ functions:
           ```
       - id: listen-to-multiple-events
         name: Listen to multiple events
-        description: You can chain listeners if you want to listen to multiple events for each table.
+        description: You can chain listeners if you want to listen to multiple events
+          for each table.
         code: |
           ```js
           supabase
@@ -7328,7 +7351,9 @@ functions:
           ```
       - id: listening-to-row-level-changes
         name: Listen to row level changes
-        description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+        description: You can listen to individual rows using the format
+          `{table}:{col}=eq.{val}` - where `{col}` is the column name, and
+          `{val}` is the value which you want to match.
         notes: |
           - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
         code: |
@@ -7340,8 +7365,6 @@ functions:
           ```
   - id: broadcast-message
     title: broadcastMessage()
-    description: |
-      Broadcast a message to all connected clients to a channel.
     notes: |
       - When using REST you don't need to subscribe to the channel
       - REST calls are only available from 2.37.0 onwards
@@ -8113,26 +8136,18 @@ functions:
   - id: supabase-js-supabaseclient-channel
     title: SupabaseClient.channel()
     $ref: '@supabase/supabase-js.SupabaseClient.channel'
-    description: Creates a Realtime channel with Broadcast, Presence, and Postgres Changes.
   - id: supabase-js-supabaseclient-from
     title: SupabaseClient.from()
     $ref: '@supabase/supabase-js.SupabaseClient.from'
-    description: Perform a query on a table or a view.
   - id: supabase-js-supabaseclient-rpc
     title: SupabaseClient.rpc()
     $ref: '@supabase/supabase-js.SupabaseClient.rpc'
-    description: Perform a function call.
   - id: supabase-js-supabaseclient-schema
     title: SupabaseClient.schema()
     $ref: '@supabase/supabase-js.SupabaseClient.schema'
-    description: |-
-      Select a schema to query or perform an function (rpc) call.
-
-      The schema needs to be on the list of exposed schemas inside Supabase.
   - id: auth-js-gotrueadminapi-constructor
     title: new GoTrueAdminApi()
     $ref: '@supabase/auth-js.GoTrueAdminApi.constructor'
-    description: Creates an admin API client that can be used to manage users and OAuth clients.
     examples:
       - id: auth-js-gotrueadminapi-constructor-example-1
         name: Example 1
@@ -8148,11 +8163,9 @@ functions:
   - id: auth-js-gotrueadminapi-signout
     title: GoTrueAdminApi.signOut()
     $ref: '@supabase/auth-js.GoTrueAdminApi.signOut'
-    description: Removes a logged-in session.
   - id: auth-js-gotrueclient-constructor
     title: new GoTrueClient()
     $ref: '@supabase/auth-js.GoTrueClient.constructor'
-    description: Create a new client for use in the browser.
     examples:
       - id: auth-js-gotrueclient-constructor-example-1
         name: Example 1
@@ -8169,93 +8182,42 @@ functions:
   - id: auth-js-gotrueclient-initialize
     title: GoTrueClient.initialize()
     $ref: '@supabase/auth-js.GoTrueClient.initialize'
-    description: |-
-      Initializes the client session either from the url or from storage.
-      This method is automatically called when instantiating the client, but should also be called
-      manually when checking for an error from an auth redirect (oauth, magiclink, password recovery, etc).
   - id: auth-js-gotrueclient-isthrowonerrorenabled
     title: GoTrueClient.isThrowOnErrorEnabled()
     $ref: '@supabase/auth-js.GoTrueClient.isThrowOnErrorEnabled'
-    description: Returns whether error throwing mode is enabled for this client.
   - id: auth-js-authoauthserverapi-approveauthorization
     title: AuthOAuthServerApi.approveAuthorization()
     $ref: '@supabase/auth-js.AuthOAuthServerApi.approveAuthorization'
-    description: |-
-      Approves an OAuth authorization request.
-      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
   - id: auth-js-authoauthserverapi-denyauthorization
     title: AuthOAuthServerApi.denyAuthorization()
     $ref: '@supabase/auth-js.AuthOAuthServerApi.denyAuthorization'
-    description: |-
-      Denies an OAuth authorization request.
-      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
   - id: auth-js-authoauthserverapi-getauthorizationdetails
     title: AuthOAuthServerApi.getAuthorizationDetails()
     $ref: '@supabase/auth-js.AuthOAuthServerApi.getAuthorizationDetails'
-    description: |-
-      Retrieves details about an OAuth authorization request.
-      Used to display consent information to the user.
-      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
-
-      This method returns authorization details including client info, scopes, and user information.
-      If the response includes a redirect_uri, it means consent was already given - the caller
-      should handle the redirect manually if needed.
   - id: auth-js-gotrueadminoauthapi-createclient
     title: GoTrueAdminOAuthApi.createClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.createClient'
-    description: |-
-      Creates a new OAuth client.
-      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
-
-      This function should only be called on a server. Never expose your  key in the browser.
   - id: auth-js-gotrueadminoauthapi-deleteclient
     title: GoTrueAdminOAuthApi.deleteClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.deleteClient'
-    description: |-
-      Deletes an OAuth client.
-      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
-
-      This function should only be called on a server. Never expose your  key in the browser.
   - id: auth-js-gotrueadminoauthapi-getclient
     title: GoTrueAdminOAuthApi.getClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.getClient'
-    description: |-
-      Gets details of a specific OAuth client.
-      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
-
-      This function should only be called on a server. Never expose your  key in the browser.
   - id: auth-js-gotrueadminoauthapi-listclients
     title: GoTrueAdminOAuthApi.listClients()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.listClients'
-    description: |-
-      Lists all OAuth clients with optional pagination.
-      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
-
-      This function should only be called on a server. Never expose your  key in the browser.
   - id: auth-js-gotrueadminoauthapi-regenerateclientsecret
     title: GoTrueAdminOAuthApi.regenerateClientSecret()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.regenerateClientSecret'
-    description: |-
-      Regenerates the secret for an OAuth client.
-      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
-
-      This function should only be called on a server. Never expose your  key in the browser.
   - id: auth-js-gotrueadminoauthapi-updateclient
     title: GoTrueAdminOAuthApi.updateClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.updateClient'
-    description: |-
-      Updates an existing OAuth client.
-      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
-
-      This function should only be called on a server. Never expose your  key in the browser.
   - id: auth-js-gotruemfaapi-listfactors
     title: GoTrueMFAApi.listFactors()
     $ref: '@supabase/auth-js.GoTrueMFAApi.listFactors'
-    description: Returns the list of MFA factors enabled for this user.
   - id: postgrest-js-postgrestbuilder-constructor
     title: new PostgrestBuilder()
     $ref: '@supabase/postgrest-js.PostgrestBuilder.constructor'
-    description: Creates a builder configured for a specific PostgREST request.
     examples:
       - id: postgrest-js-postgrestbuilder-constructor-example-1
         name: Example 1
@@ -8271,25 +8233,18 @@ functions:
   - id: postgrest-js-postgrestbuilder-returns
     title: PostgrestBuilder.returns()
     $ref: '@supabase/postgrest-js.PostgrestBuilder.returns'
-    description: Override the type of the returned .
   - id: postgrest-js-postgrestbuilder-setheader
     title: PostgrestBuilder.setHeader()
     $ref: '@supabase/postgrest-js.PostgrestBuilder.setHeader'
-    description: Set an HTTP header for the request.
   - id: postgrest-js-postgrestbuilder-then
     title: PostgrestBuilder.then()
     $ref: '@supabase/postgrest-js.PostgrestBuilder.then'
-    description: Attaches callbacks for the resolution and/or rejection of the Promise.
   - id: postgrest-js-postgrestbuilder-throwonerror
     title: PostgrestBuilder.throwOnError()
     $ref: '@supabase/postgrest-js.PostgrestBuilder.throwOnError'
-    description: |-
-      If there's an error with the query, throwOnError will reject the promise by
-      throwing the error instead of returning it as part of a successful response.
   - id: postgrest-js-postgrestclient-constructor
     title: new PostgrestClient()
     $ref: '@supabase/postgrest-js.PostgrestClient.constructor'
-    description: Creates a PostgREST client.
     examples:
       - id: postgrest-js-postgrestclient-constructor-example-1
         name: Example 1
@@ -8305,18 +8260,12 @@ functions:
   - id: postgrest-js-postgrestclient-from
     title: PostgrestClient.from()
     $ref: '@supabase/postgrest-js.PostgrestClient.from'
-    description: Perform a query on a table or a view.
   - id: postgrest-js-postgrestclient-schema
     title: PostgrestClient.schema()
     $ref: '@supabase/postgrest-js.PostgrestClient.schema'
-    description: |-
-      Select a schema to query or perform an function (rpc) call.
-
-      The schema needs to be on the list of exposed schemas inside Supabase.
   - id: postgrest-js-postgrestfilterbuilder-constructor
     title: new PostgrestFilterBuilder()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.constructor'
-    description: Creates a builder configured for a specific PostgREST request.
     examples:
       - id: postgrest-js-postgrestfilterbuilder-constructor-example-1
         name: Example 1
@@ -8332,23 +8281,18 @@ functions:
   - id: postgrest-js-postgrestfilterbuilder-ilikeallof
     title: PostgrestFilterBuilder.ilikeAllOf()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilikeAllOf'
-    description: Match only rows where  matches all of  case-insensitively.
   - id: postgrest-js-postgrestfilterbuilder-ilikeanyof
     title: PostgrestFilterBuilder.ilikeAnyOf()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilikeAnyOf'
-    description: Match only rows where  matches any of  case-insensitively.
   - id: postgrest-js-postgrestfilterbuilder-likeallof
     title: PostgrestFilterBuilder.likeAllOf()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.likeAllOf'
-    description: Match only rows where  matches all of  case-sensitively.
   - id: postgrest-js-postgrestfilterbuilder-likeanyof
     title: PostgrestFilterBuilder.likeAnyOf()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.likeAnyOf'
-    description: Match only rows where  matches any of  case-sensitively.
   - id: postgrest-js-postgrestquerybuilder-constructor
     title: new PostgrestQueryBuilder()
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.constructor'
-    description: Creates a query builder scoped to a Postgres table or view.
     examples:
       - id: postgrest-js-postgrestquerybuilder-constructor-example-1
         name: Example 1
@@ -8364,7 +8308,6 @@ functions:
   - id: postgrest-js-postgresttransformbuilder-constructor
     title: new PostgrestTransformBuilder()
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.constructor'
-    description: Creates a builder configured for a specific PostgREST request.
     examples:
       - id: postgrest-js-postgresttransformbuilder-constructor-example-1
         name: Example 1
@@ -8380,86 +8323,28 @@ functions:
   - id: postgrest-js-postgresttransformbuilder-geojson
     title: PostgrestTransformBuilder.geojson()
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.geojson'
-    description: Return  as an object in [GeoJSON](https://geojson.org) format.
   - id: postgrest-js-postgresttransformbuilder-maxaffected
     title: PostgrestTransformBuilder.maxAffected()
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.maxAffected'
-    description: |-
-      Set the maximum number of rows that can be affected by the query.
-      Only available in PostgREST v13+ and only works with PATCH and DELETE methods.
   - id: postgrest-js-postgresttransformbuilder-rollback
     title: PostgrestTransformBuilder.rollback()
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.rollback'
-    description: |-
-      Rollback the query.
-
-       will still be returned, but the query is not committed.
-  - id: realtime-js-realtimechannel-constructor
-    title: new RealtimeChannel()
-    $ref: '@supabase/realtime-js.RealtimeChannel.constructor'
-    description: 'TODO: Add description for constructor'
-    examples:
-      - id: realtime-js-realtimechannel-constructor-example-1
-        name: Example 1
-        code: |-
-          ```ts
-          import RealtimeClient from '@supabase/realtime-js'
-
-          const client = new RealtimeClient('https://xyzcompany.supabase.co/realtime/v1', {
-            params: { apikey: 'public-anon-key' },
-          })
-          const channel = new RealtimeChannel('realtime:public:messages', { config: {} }, client)
-          ```
   - id: realtime-js-realtimechannel-httpsend
     title: RealtimeChannel.httpSend()
     $ref: '@supabase/realtime-js.RealtimeChannel.httpSend'
-    description: |-
-      Sends a broadcast message explicitly via REST API.
 
-      This method always uses the REST API endpoint regardless of WebSocket connection state.
-      Useful when you want to guarantee REST delivery or when gradually migrating from implicit REST fallback.
-  - id: realtime-js-realtimechannel-presencestate
-    title: RealtimeChannel.presenceState()
-    $ref: '@supabase/realtime-js.RealtimeChannel.presenceState'
-    description: 'TODO: Add description for presenceState'
   - id: realtime-js-realtimechannel-subscribe
     title: RealtimeChannel.subscribe()
     $ref: '@supabase/realtime-js.RealtimeChannel.subscribe'
-    description: Subscribe registers your client with the server
   - id: realtime-js-realtimechannel-teardown
     title: RealtimeChannel.teardown()
     $ref: '@supabase/realtime-js.RealtimeChannel.teardown'
-    description: |-
-      Teardown the channel.
-
-      Destroys and stops related timers.
-  - id: realtime-js-realtimechannel-track
-    title: RealtimeChannel.track()
-    $ref: '@supabase/realtime-js.RealtimeChannel.track'
-    description: 'TODO: Add description for track'
   - id: realtime-js-realtimechannel-unsubscribe
     title: RealtimeChannel.unsubscribe()
     $ref: '@supabase/realtime-js.RealtimeChannel.unsubscribe'
-    description: |-
-      Leaves the channel.
-
-      Unsubscribes from server events, and instructs channel to terminate on server.
-      Triggers onClose() hooks.
-
-      To receive leave acknowledgements, use the a  hook to bind to the server ack, ie:
-      channel.unsubscribe().receive("ok", () => alert("left!") )
-  - id: realtime-js-realtimechannel-untrack
-    title: RealtimeChannel.untrack()
-    $ref: '@supabase/realtime-js.RealtimeChannel.untrack'
-    description: 'TODO: Add description for untrack'
-  - id: realtime-js-realtimechannel-updatejoinpayload
-    title: RealtimeChannel.updateJoinPayload()
-    $ref: '@supabase/realtime-js.RealtimeChannel.updateJoinPayload'
-    description: 'TODO: Add description for updateJoinPayload'
   - id: realtime-js-realtimeclient-constructor
     title: new RealtimeClient()
     $ref: '@supabase/realtime-js.RealtimeClient.constructor'
-    description: Initializes the Socket.
     examples:
       - id: realtime-js-realtimeclient-constructor-example-1
         name: Example 1
@@ -8472,108 +8357,54 @@ functions:
           })
           client.connect()
           ```
-  - id: realtime-js-realtimeclient-channel
-    title: RealtimeClient.channel()
-    $ref: '@supabase/realtime-js.RealtimeClient.channel'
-    description: 'TODO: Add description for channel'
   - id: realtime-js-realtimeclient-connect
     title: RealtimeClient.connect()
     $ref: '@supabase/realtime-js.RealtimeClient.connect'
-    description: Connects the socket, unless already connected.
   - id: realtime-js-realtimeclient-connectionstate
     title: RealtimeClient.connectionState()
     $ref: '@supabase/realtime-js.RealtimeClient.connectionState'
-    description: Returns the current state of the socket.
   - id: realtime-js-realtimeclient-disconnect
     title: RealtimeClient.disconnect()
     $ref: '@supabase/realtime-js.RealtimeClient.disconnect'
-    description: Disconnects the socket.
   - id: realtime-js-realtimeclient-endpointurl
     title: RealtimeClient.endpointURL()
     $ref: '@supabase/realtime-js.RealtimeClient.endpointURL'
-    description: Returns the URL of the websocket.
   - id: realtime-js-realtimeclient-flushsendbuffer
     title: RealtimeClient.flushSendBuffer()
     $ref: '@supabase/realtime-js.RealtimeClient.flushSendBuffer'
-    description: Flushes send buffer
   - id: realtime-js-realtimeclient-getchannels
     title: RealtimeClient.getChannels()
     $ref: '@supabase/realtime-js.RealtimeClient.getChannels'
-    description: Returns all created channels
   - id: realtime-js-realtimeclient-isconnected
     title: RealtimeClient.isConnected()
     $ref: '@supabase/realtime-js.RealtimeClient.isConnected'
-    description: Returns  is the connection is open.
   - id: realtime-js-realtimeclient-isconnecting
     title: RealtimeClient.isConnecting()
     $ref: '@supabase/realtime-js.RealtimeClient.isConnecting'
-    description: Returns  if the connection is currently connecting.
   - id: realtime-js-realtimeclient-isdisconnecting
     title: RealtimeClient.isDisconnecting()
     $ref: '@supabase/realtime-js.RealtimeClient.isDisconnecting'
-    description: Returns  if the connection is currently disconnecting.
   - id: realtime-js-realtimeclient-log
     title: RealtimeClient.log()
     $ref: '@supabase/realtime-js.RealtimeClient.log'
-    description: |-
-      Logs the message.
-
-      For customized logging,  can be overridden.
-  - id: realtime-js-realtimeclient-onheartbeat
-    title: RealtimeClient.onHeartbeat()
-    $ref: '@supabase/realtime-js.RealtimeClient.onHeartbeat'
-    description: 'TODO: Add description for onHeartbeat'
   - id: realtime-js-realtimeclient-push
     title: RealtimeClient.push()
     $ref: '@supabase/realtime-js.RealtimeClient.push'
-    description: |-
-      Push out a message if the socket is connected.
-
-      If the socket is not connected, the message gets enqueued within a local buffer, and sent out when a connection is next established.
   - id: realtime-js-realtimeclient-removeallchannels
     title: RealtimeClient.removeAllChannels()
     $ref: '@supabase/realtime-js.RealtimeClient.removeAllChannels'
-    description: Unsubscribes and removes all channels
   - id: realtime-js-realtimeclient-removechannel
     title: RealtimeClient.removeChannel()
     $ref: '@supabase/realtime-js.RealtimeClient.removeChannel'
-    description: Unsubscribes and removes a single channel
   - id: realtime-js-realtimeclient-sendheartbeat
     title: RealtimeClient.sendHeartbeat()
     $ref: '@supabase/realtime-js.RealtimeClient.sendHeartbeat'
-    description: Sends a heartbeat message if the socket is connected.
   - id: realtime-js-realtimeclient-setauth
     title: RealtimeClient.setAuth()
     $ref: '@supabase/realtime-js.RealtimeClient.setAuth'
-    description: |-
-      Sets the JWT access token used for channel subscription authorization and Realtime RLS.
-
-      If param is null it will use the  callback function or the token set on the client.
-
-      On callback used, it will set the value of the token internal to the client.
-  - id: realtime-js-realtimepresence-constructor
-    title: new RealtimePresence()
-    $ref: '@supabase/realtime-js.RealtimePresence.constructor'
-    description: 'TODO: Add description for constructor'
-    examples:
-      - id: realtime-js-realtimepresence-constructor-example-1
-        name: Example 1
-        code: |-
-          ```ts
-          const presence = new RealtimePresence(channel)
-
-          channel.on('presence', ({ event, key }) => {
-            console.log(`Presence ${event} on ${key}`)
-          })
-          ```
-  - id: realtime-js-websocketfactory-constructor
-    title: new WebSocketFactory()
-    $ref: '@supabase/realtime-js.WebSocketFactory.constructor'
-    description: 'TODO: Add description for constructor'
   - id: realtime-js-websocketfactory-createwebsocket
     title: WebSocketFactory.createWebSocket()
     $ref: '@supabase/realtime-js.WebSocketFactory.createWebSocket'
-    description: Creates a WebSocket using the detected constructor.
     examples:
       - id: realtime-js-websocketfactory-createwebsocket-example-1
         name: Example 1
@@ -8584,7 +8415,6 @@ functions:
   - id: realtime-js-websocketfactory-getwebsocketconstructor
     title: WebSocketFactory.getWebSocketConstructor()
     $ref: '@supabase/realtime-js.WebSocketFactory.getWebSocketConstructor'
-    description: Returns the best available WebSocket constructor for the current runtime.
     examples:
       - id: realtime-js-websocketfactory-getwebsocketconstructor-example-1
         name: Example 1
@@ -8596,7 +8426,6 @@ functions:
   - id: realtime-js-websocketfactory-iswebsocketsupported
     title: WebSocketFactory.isWebSocketSupported()
     $ref: '@supabase/realtime-js.WebSocketFactory.isWebSocketSupported'
-    description: Detects whether the runtime can establish WebSocket connections.
     examples:
       - id: realtime-js-websocketfactory-iswebsocketsupported-example-1
         name: Example 1
@@ -8606,30 +8435,9 @@ functions:
             console.warn('Falling back to long polling')
           }
           ```
-  - id: realtime-js-websocketlike-addeventlistener
-    title: WebSocketLike.addEventListener()
-    $ref: '@supabase/realtime-js.WebSocketLike.addEventListener'
-    description: 'TODO: Add description for addEventListener'
-  - id: realtime-js-websocketlike-close
-    title: WebSocketLike.close()
-    $ref: '@supabase/realtime-js.WebSocketLike.close'
-    description: 'TODO: Add description for close'
-  - id: realtime-js-websocketlike-removeeventlistener
-    title: WebSocketLike.removeEventListener()
-    $ref: '@supabase/realtime-js.WebSocketLike.removeEventListener'
-    description: 'TODO: Add description for removeEventListener'
-  - id: realtime-js-websocketlike-send
-    title: WebSocketLike.send()
-    $ref: '@supabase/realtime-js.WebSocketLike.send'
-    description: 'TODO: Add description for send'
-  - id: realtime-js-websocketlikeconstructor-constructor
-    title: new WebSocketLikeConstructor()
-    $ref: '@supabase/realtime-js.WebSocketLikeConstructor.constructor'
-    description: 'TODO: Add description for constructor'
   - id: functions-js-functionsclient-constructor
     title: new FunctionsClient()
     $ref: '@supabase/functions-js.FunctionsClient.constructor'
-    description: Creates a new Functions client bound to an Edge Functions URL.
     examples:
       - id: functions-js-functionsclient-constructor-example-1
         name: Example 1
@@ -8645,7 +8453,6 @@ functions:
   - id: functions-js-functionsclient-setauth
     title: FunctionsClient.setAuth()
     $ref: '@supabase/functions-js.FunctionsClient.setAuth'
-    description: Updates the authorization header
     examples:
       - id: functions-js-functionsclient-setauth-example-1
         name: Example 1
@@ -8657,7 +8464,6 @@ functions:
   - id: storage-js-storageclient-constructor
     title: new StorageClient()
     $ref: '@supabase/storage-js.StorageClient.constructor'
-    description: Creates a client for Storage buckets, files, analytics, and vectors.
     examples:
       - id: storage-js-storageclient-constructor-example-1
         name: Example 1
@@ -8673,17 +8479,9 @@ functions:
   - id: storage-js-storageclient-from
     title: StorageClient.from()
     $ref: '@supabase/storage-js.StorageClient.from'
-    description: Perform file operation in a bucket.
-  - id: storage-js-storagevectorsclient-constructor
-    title: new StorageVectorsClient()
-    $ref: '@supabase/storage-js.StorageVectorsClient.constructor'
-    description: 'TODO: Add description for constructor'
   - id: storage-js-storagevectorsclient-from
     title: StorageVectorsClient.from()
     $ref: '@supabase/storage-js.StorageVectorsClient.from'
-    description: |-
-      Access operations for a specific vector bucket
-      Returns a scoped client for index and vector operations within the bucket
     examples:
       - id: storage-js-storagevectorsclient-from-example-1
         name: Example 1
@@ -8705,13 +8503,9 @@ functions:
   - id: storage-js-vectorbucketapi-constructor
     title: new VectorBucketApi()
     $ref: '@supabase/storage-js.VectorBucketApi.constructor'
-    description: Creates a new VectorBucketApi instance
   - id: storage-js-vectorbucketapi-createbucket
     title: VectorBucketApi.createBucket()
     $ref: '@supabase/storage-js.VectorBucketApi.createBucket'
-    description: |-
-      Creates a new vector bucket
-      Vector buckets are containers for vector indexes and their data
     examples:
       - id: storage-js-vectorbucketapi-createbucket-example-1
         name: Example 1
@@ -8725,9 +8519,6 @@ functions:
   - id: storage-js-vectorbucketapi-deletebucket
     title: VectorBucketApi.deleteBucket()
     $ref: '@supabase/storage-js.VectorBucketApi.deleteBucket'
-    description: |-
-      Deletes a vector bucket
-      Bucket must be empty before deletion (all indexes must be removed first)
     examples:
       - id: storage-js-vectorbucketapi-deletebucket-example-1
         name: Example 1
@@ -8742,9 +8533,6 @@ functions:
   - id: storage-js-vectorbucketapi-getbucket
     title: VectorBucketApi.getBucket()
     $ref: '@supabase/storage-js.VectorBucketApi.getBucket'
-    description: |-
-      Retrieves metadata for a specific vector bucket
-      Returns bucket configuration including encryption settings and creation time
     examples:
       - id: storage-js-vectorbucketapi-getbucket-example-1
         name: Example 1
@@ -8758,9 +8546,6 @@ functions:
   - id: storage-js-vectorbucketapi-listbuckets
     title: VectorBucketApi.listBuckets()
     $ref: '@supabase/storage-js.VectorBucketApi.listBuckets'
-    description: |-
-      Lists vector buckets with optional filtering and pagination
-      Supports prefix-based filtering and paginated results
     examples:
       - id: storage-js-vectorbucketapi-listbuckets-example-1
         name: Example 1
@@ -8779,9 +8564,6 @@ functions:
   - id: storage-js-vectorbucketapi-throwonerror
     title: VectorBucketApi.throwOnError()
     $ref: '@supabase/storage-js.VectorBucketApi.throwOnError'
-    description: |-
-      Enable throwing errors instead of returning them in the response
-      When enabled, failed operations will throw instead of returning { data: null, error }
     examples:
       - id: storage-js-vectorbucketapi-throwonerror-example-1
         name: Example 1
@@ -8791,16 +8573,9 @@ functions:
           client.throwOnError()
           const { data } = await client.createBucket('my-bucket') // throws on error
           ```
-  - id: storage-js-vectorbucketscope-constructor
-    title: new VectorBucketScope()
-    $ref: '@supabase/storage-js.VectorBucketScope.constructor'
-    description: 'TODO: Add description for constructor'
   - id: storage-js-vectorbucketscope-createindex
     title: VectorBucketScope.createIndex()
     $ref: '@supabase/storage-js.VectorBucketScope.createIndex'
-    description: |-
-      Creates a new vector index in this bucket
-      Convenience method that automatically includes the bucket name
     examples:
       - id: storage-js-vectorbucketscope-createindex-example-1
         name: Example 1
@@ -8820,9 +8595,6 @@ functions:
   - id: storage-js-vectorbucketscope-deleteindex
     title: VectorBucketScope.deleteIndex()
     $ref: '@supabase/storage-js.VectorBucketScope.deleteIndex'
-    description: |-
-      Deletes an index from this bucket
-      Convenience method that automatically includes the bucket name
     examples:
       - id: storage-js-vectorbucketscope-deleteindex-example-1
         name: Example 1
@@ -8834,9 +8606,6 @@ functions:
   - id: storage-js-vectorbucketscope-getindex
     title: VectorBucketScope.getIndex()
     $ref: '@supabase/storage-js.VectorBucketScope.getIndex'
-    description: |-
-      Retrieves metadata for a specific index in this bucket
-      Convenience method that automatically includes the bucket name
     examples:
       - id: storage-js-vectorbucketscope-getindex-example-1
         name: Example 1
@@ -8849,9 +8618,6 @@ functions:
   - id: storage-js-vectorbucketscope-listindexes
     title: VectorBucketScope.listIndexes()
     $ref: '@supabase/storage-js.VectorBucketScope.listIndexes'
-    description: |-
-      Lists indexes in this bucket
-      Convenience method that automatically includes the bucket name
     examples:
       - id: storage-js-vectorbucketscope-listindexes-example-1
         name: Example 1
@@ -8860,16 +8626,9 @@ functions:
           const bucket = client.bucket('embeddings-prod')
           const { data } = await bucket.listIndexes({ prefix: 'documents-' })
           ```
-  - id: storage-js-vectordataapi-constructor
-    title: new VectorDataApi()
-    $ref: '@supabase/storage-js.VectorDataApi.constructor'
-    description: 'TODO: Add description for constructor'
   - id: storage-js-vectordataapi-deletevectors
     title: VectorDataApi.deleteVectors()
     $ref: '@supabase/storage-js.VectorDataApi.deleteVectors'
-    description: |-
-      Deletes vectors by their keys in batch
-      Accepts 1-500 keys per request
     examples:
       - id: storage-js-vectordataapi-deletevectors-example-1
         name: Example 1
@@ -8887,10 +8646,6 @@ functions:
   - id: storage-js-vectordataapi-getvectors
     title: VectorDataApi.getVectors()
     $ref: '@supabase/storage-js.VectorDataApi.getVectors'
-    description: |-
-      Retrieves vectors by their keys in batch
-      Optionally includes vector data and/or metadata in response
-      Additional permissions required when returning data or metadata
     examples:
       - id: storage-js-vectordataapi-getvectors-example-1
         name: Example 1
@@ -8910,10 +8665,6 @@ functions:
   - id: storage-js-vectordataapi-listvectors
     title: VectorDataApi.listVectors()
     $ref: '@supabase/storage-js.VectorDataApi.listVectors'
-    description: |-
-      Lists/scans vectors in an index with pagination
-      Supports parallel scanning via segment configuration for high-throughput scenarios
-      Additional permissions required when returning data or metadata
     examples:
       - id: storage-js-vectordataapi-listvectors-example-1
         name: Example 1
@@ -8950,9 +8701,6 @@ functions:
   - id: storage-js-vectordataapi-putvectors
     title: VectorDataApi.putVectors()
     $ref: '@supabase/storage-js.VectorDataApi.putVectors'
-    description: |-
-      Inserts or updates vectors in batch (upsert operation)
-      Accepts 1-500 vectors per request. Larger batches should be split
     examples:
       - id: storage-js-vectordataapi-putvectors-example-1
         name: Example 1
@@ -8978,10 +8726,6 @@ functions:
   - id: storage-js-vectordataapi-queryvectors
     title: VectorDataApi.queryVectors()
     $ref: '@supabase/storage-js.VectorDataApi.queryVectors'
-    description: |-
-      Queries for similar vectors using approximate nearest neighbor (ANN) search
-      Returns top-K most similar vectors based on the configured distance metric
-      Supports optional metadata filtering (requires GetVectors permission)
     examples:
       - id: storage-js-vectordataapi-queryvectors-example-1
         name: Example 1
@@ -9010,9 +8754,6 @@ functions:
   - id: storage-js-vectordataapi-throwonerror
     title: VectorDataApi.throwOnError()
     $ref: '@supabase/storage-js.VectorDataApi.throwOnError'
-    description: |-
-      Enable throwing errors instead of returning them in the response
-      When enabled, failed operations will throw instead of returning { data: null, error }
     examples:
       - id: storage-js-vectordataapi-throwonerror-example-1
         name: Example 1
@@ -9022,16 +8763,9 @@ functions:
           client.throwOnError()
           const { data } = await client.putVectors(options) // throws on error
           ```
-  - id: storage-js-vectorindexapi-constructor
-    title: new VectorIndexApi()
-    $ref: '@supabase/storage-js.VectorIndexApi.constructor'
-    description: 'TODO: Add description for constructor'
   - id: storage-js-vectorindexapi-createindex
     title: VectorIndexApi.createIndex()
     $ref: '@supabase/storage-js.VectorIndexApi.createIndex'
-    description: |-
-      Creates a new vector index within a bucket
-      Defines the schema for vectors including dimensionality, distance metric, and metadata config
     examples:
       - id: storage-js-vectorindexapi-createindex-example-1
         name: Example 1
@@ -9051,9 +8785,6 @@ functions:
   - id: storage-js-vectorindexapi-deleteindex
     title: VectorIndexApi.deleteIndex()
     $ref: '@supabase/storage-js.VectorIndexApi.deleteIndex'
-    description: |-
-      Deletes a vector index and all its data
-      This operation removes the index schema and all vectors stored in the index
     examples:
       - id: storage-js-vectorindexapi-deleteindex-example-1
         name: Example 1
@@ -9068,9 +8799,6 @@ functions:
   - id: storage-js-vectorindexapi-getindex
     title: VectorIndexApi.getIndex()
     $ref: '@supabase/storage-js.VectorIndexApi.getIndex'
-    description: |-
-      Retrieves metadata for a specific vector index
-      Returns index configuration including dimension, distance metric, and metadata settings
     examples:
       - id: storage-js-vectorindexapi-getindex-example-1
         name: Example 1
@@ -9085,9 +8813,6 @@ functions:
   - id: storage-js-vectorindexapi-listindexes
     title: VectorIndexApi.listIndexes()
     $ref: '@supabase/storage-js.VectorIndexApi.listIndexes'
-    description: |-
-      Lists vector indexes within a bucket with optional filtering and pagination
-      Supports prefix-based filtering and paginated results
     examples:
       - id: storage-js-vectorindexapi-listindexes-example-1
         name: Example 1
@@ -9112,9 +8837,6 @@ functions:
   - id: storage-js-vectorindexapi-throwonerror
     title: VectorIndexApi.throwOnError()
     $ref: '@supabase/storage-js.VectorIndexApi.throwOnError'
-    description: |-
-      Enable throwing errors instead of returning them in the response
-      When enabled, failed operations will throw instead of returning { data: null, error }
     examples:
       - id: storage-js-vectorindexapi-throwonerror-example-1
         name: Example 1
@@ -9124,16 +8846,9 @@ functions:
           client.throwOnError()
           const { data } = await client.createIndex(options) // throws on error
           ```
-  - id: storage-js-vectorindexscope-constructor
-    title: new VectorIndexScope()
-    $ref: '@supabase/storage-js.VectorIndexScope.constructor'
-    description: 'TODO: Add description for constructor'
   - id: storage-js-vectorindexscope-deletevectors
     title: VectorIndexScope.deleteVectors()
     $ref: '@supabase/storage-js.VectorIndexScope.deleteVectors'
-    description: |-
-      Deletes vectors by keys from this index
-      Convenience method that automatically includes bucket and index names
     examples:
       - id: storage-js-vectorindexscope-deletevectors-example-1
         name: Example 1
@@ -9147,9 +8862,6 @@ functions:
   - id: storage-js-vectorindexscope-getvectors
     title: VectorIndexScope.getVectors()
     $ref: '@supabase/storage-js.VectorIndexScope.getVectors'
-    description: |-
-      Retrieves vectors by keys from this index
-      Convenience method that automatically includes bucket and index names
     examples:
       - id: storage-js-vectorindexscope-getvectors-example-1
         name: Example 1
@@ -9164,9 +8876,6 @@ functions:
   - id: storage-js-vectorindexscope-listvectors
     title: VectorIndexScope.listVectors()
     $ref: '@supabase/storage-js.VectorIndexScope.listVectors'
-    description: |-
-      Lists vectors in this index with pagination
-      Convenience method that automatically includes bucket and index names
     examples:
       - id: storage-js-vectorindexscope-listvectors-example-1
         name: Example 1
@@ -9181,9 +8890,6 @@ functions:
   - id: storage-js-vectorindexscope-putvectors
     title: VectorIndexScope.putVectors()
     $ref: '@supabase/storage-js.VectorIndexScope.putVectors'
-    description: |-
-      Inserts or updates vectors in this index
-      Convenience method that automatically includes bucket and index names
     examples:
       - id: storage-js-vectorindexscope-putvectors-example-1
         name: Example 1
@@ -9203,9 +8909,6 @@ functions:
   - id: storage-js-vectorindexscope-queryvectors
     title: VectorIndexScope.queryVectors()
     $ref: '@supabase/storage-js.VectorIndexScope.queryVectors'
-    description: |-
-      Queries for similar vectors in this index
-      Convenience method that automatically includes bucket and index names
     examples:
       - id: storage-js-vectorindexscope-queryvectors-example-1
         name: Example 1
@@ -9220,3 +8923,81 @@ functions:
             returnMetadata: true
           })
           ```
+
+  - id: realtime-js-realtimechannel-constructor
+    title: new RealtimeChannel()
+    $ref: '@supabase/realtime-js.RealtimeChannel.constructor'
+    examples:
+      - id: realtime-js-realtimechannel-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import RealtimeClient from '@supabase/realtime-js'
+
+          const client = new RealtimeClient('https://xyzcompany.supabase.co/realtime/v1', {
+            params: { apikey: 'public-anon-key' },
+          })
+          const channel = new RealtimeChannel('realtime:public:messages', { config: {} }, client)
+          ```
+  - id: realtime-js-realtimechannel-presencestate
+    title: RealtimeChannel.presenceState()
+    $ref: '@supabase/realtime-js.RealtimeChannel.presenceState'
+  - id: realtime-js-realtimechannel-track
+    title: RealtimeChannel.track()
+    $ref: '@supabase/realtime-js.RealtimeChannel.track'
+  - id: realtime-js-realtimechannel-untrack
+    title: RealtimeChannel.untrack()
+    $ref: '@supabase/realtime-js.RealtimeChannel.untrack'
+  - id: realtime-js-realtimechannel-updatejoinpayload
+    title: RealtimeChannel.updateJoinPayload()
+    $ref: '@supabase/realtime-js.RealtimeChannel.updateJoinPayload'
+  - id: realtime-js-realtimeclient-channel
+    title: RealtimeClient.channel()
+    $ref: '@supabase/realtime-js.RealtimeClient.channel'
+  - id: realtime-js-realtimeclient-onheartbeat
+    title: RealtimeClient.onHeartbeat()
+    $ref: '@supabase/realtime-js.RealtimeClient.onHeartbeat'
+  - id: realtime-js-realtimepresence-constructor
+    title: new RealtimePresence()
+    $ref: '@supabase/realtime-js.RealtimePresence.constructor'
+    examples:
+      - id: realtime-js-realtimepresence-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          const presence = new RealtimePresence(channel)
+
+          channel.on('presence', ({ event, key }) => {
+            console.log(`Presence ${event} on ${key}`)
+          })
+          ```
+  - id: realtime-js-websocketlike-addeventlistener
+    title: WebSocketLike.addEventListener()
+    $ref: '@supabase/realtime-js.WebSocketLike.addEventListener'
+  - id: realtime-js-websocketlike-close
+    title: WebSocketLike.close()
+    $ref: '@supabase/realtime-js.WebSocketLike.close'
+  - id: realtime-js-websocketlike-removeeventlistener
+    title: WebSocketLike.removeEventListener()
+    $ref: '@supabase/realtime-js.WebSocketLike.removeEventListener'
+  - id: realtime-js-websocketlike-send
+    title: WebSocketLike.send()
+    $ref: '@supabase/realtime-js.WebSocketLike.send'
+  - id: storage-js-storagevectorsclient-constructor
+    title: new StorageVectorsClient()
+    $ref: '@supabase/storage-js.StorageVectorsClient.constructor'
+  - id: storage-js-vectorbucketscope-constructor
+    title: new VectorBucketScope()
+    $ref: '@supabase/storage-js.VectorBucketScope.constructor'
+  - id: storage-js-vectordataapi-constructor
+    title: new VectorDataApi()
+    $ref: '@supabase/storage-js.VectorDataApi.constructor'
+  - id: storage-js-vectorindexapi-constructor
+    title: new VectorIndexApi()
+    $ref: '@supabase/storage-js.VectorIndexApi.constructor'
+  - id: storage-js-vectorindexscope-constructor
+    title: new VectorIndexScope()
+    $ref: '@supabase/storage-js.VectorIndexScope.constructor'
+  - id: realtime-js-websocketlikeconstructor-constructor
+    title: new WebSocketLikeConstructor()
+    $ref: '@supabase/realtime-js.WebSocketLikeConstructor.constructor'

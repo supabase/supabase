@@ -10,7 +10,11 @@
     "id": "installing",
     "slug": "installing",
     "type": "markdown",
-    "excludes": ["reference_javascript_v1", "reference_kotlin_v1", "reference_swift_v1"]
+    "excludes": [
+      "reference_javascript_v1",
+      "reference_kotlin_v1",
+      "reference_swift_v1"
+    ]
   },
   {
     "title": "Initializing",
@@ -1007,23 +1011,9 @@
         "product": "realtime"
       },
       {
-        "id": "realtime-js-realtimechannel-constructor",
-        "title": "new RealtimeChannel()",
-        "slug": "realtime-js-realtimechannel-constructor",
-        "type": "function",
-        "product": "realtime"
-      },
-      {
         "id": "realtime-js-realtimechannel-httpsend",
         "title": "RealtimeChannel.httpSend()",
         "slug": "realtime-js-realtimechannel-httpsend",
-        "type": "function",
-        "product": "realtime"
-      },
-      {
-        "id": "realtime-js-realtimechannel-presencestate",
-        "title": "RealtimeChannel.presenceState()",
-        "slug": "realtime-js-realtimechannel-presencestate",
         "type": "function",
         "product": "realtime"
       },
@@ -1042,13 +1032,6 @@
         "product": "realtime"
       },
       {
-        "id": "realtime-js-realtimechannel-track",
-        "title": "RealtimeChannel.track()",
-        "slug": "realtime-js-realtimechannel-track",
-        "type": "function",
-        "product": "realtime"
-      },
-      {
         "id": "realtime-js-realtimechannel-unsubscribe",
         "title": "RealtimeChannel.unsubscribe()",
         "slug": "realtime-js-realtimechannel-unsubscribe",
@@ -1056,30 +1039,9 @@
         "product": "realtime"
       },
       {
-        "id": "realtime-js-realtimechannel-untrack",
-        "title": "RealtimeChannel.untrack()",
-        "slug": "realtime-js-realtimechannel-untrack",
-        "type": "function",
-        "product": "realtime"
-      },
-      {
-        "id": "realtime-js-realtimechannel-updatejoinpayload",
-        "title": "RealtimeChannel.updateJoinPayload()",
-        "slug": "realtime-js-realtimechannel-updatejoinpayload",
-        "type": "function",
-        "product": "realtime"
-      },
-      {
         "id": "realtime-js-realtimeclient-constructor",
         "title": "new RealtimeClient()",
         "slug": "realtime-js-realtimeclient-constructor",
-        "type": "function",
-        "product": "realtime"
-      },
-      {
-        "id": "realtime-js-realtimeclient-channel",
-        "title": "RealtimeClient.channel()",
-        "slug": "realtime-js-realtimeclient-channel",
         "type": "function",
         "product": "realtime"
       },
@@ -1154,13 +1116,6 @@
         "product": "realtime"
       },
       {
-        "id": "realtime-js-realtimeclient-onheartbeat",
-        "title": "RealtimeClient.onHeartbeat()",
-        "slug": "realtime-js-realtimeclient-onheartbeat",
-        "type": "function",
-        "product": "realtime"
-      },
-      {
         "id": "realtime-js-realtimeclient-push",
         "title": "RealtimeClient.push()",
         "slug": "realtime-js-realtimeclient-push",
@@ -1196,20 +1151,6 @@
         "product": "realtime"
       },
       {
-        "id": "realtime-js-realtimepresence-constructor",
-        "title": "new RealtimePresence()",
-        "slug": "realtime-js-realtimepresence-constructor",
-        "type": "function",
-        "product": "realtime"
-      },
-      {
-        "id": "realtime-js-websocketfactory-constructor",
-        "title": "new WebSocketFactory()",
-        "slug": "realtime-js-websocketfactory-constructor",
-        "type": "function",
-        "product": "realtime"
-      },
-      {
         "id": "realtime-js-websocketfactory-createwebsocket",
         "title": "WebSocketFactory.createWebSocket()",
         "slug": "realtime-js-websocketfactory-createwebsocket",
@@ -1227,6 +1168,62 @@
         "id": "realtime-js-websocketfactory-iswebsocketsupported",
         "title": "WebSocketFactory.isWebSocketSupported()",
         "slug": "realtime-js-websocketfactory-iswebsocketsupported",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimechannel-constructor",
+        "title": "new RealtimeChannel()",
+        "slug": "realtime-js-realtimechannel-constructor",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimechannel-presencestate",
+        "title": "RealtimeChannel.presenceState()",
+        "slug": "realtime-js-realtimechannel-presencestate",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimechannel-track",
+        "title": "RealtimeChannel.track()",
+        "slug": "realtime-js-realtimechannel-track",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimechannel-untrack",
+        "title": "RealtimeChannel.untrack()",
+        "slug": "realtime-js-realtimechannel-untrack",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimechannel-updatejoinpayload",
+        "title": "RealtimeChannel.updateJoinPayload()",
+        "slug": "realtime-js-realtimechannel-updatejoinpayload",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-channel",
+        "title": "RealtimeClient.channel()",
+        "slug": "realtime-js-realtimeclient-channel",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-onheartbeat",
+        "title": "RealtimeClient.onHeartbeat()",
+        "slug": "realtime-js-realtimeclient-onheartbeat",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimepresence-constructor",
+        "title": "new RealtimePresence()",
+        "slug": "realtime-js-realtimepresence-constructor",
         "type": "function",
         "product": "realtime"
       },
@@ -1412,13 +1409,6 @@
         "product": "storage"
       },
       {
-        "id": "storage-js-storagevectorsclient-constructor",
-        "title": "new StorageVectorsClient()",
-        "slug": "storage-js-storagevectorsclient-constructor",
-        "type": "function",
-        "product": "storage"
-      },
-      {
         "id": "storage-js-storagevectorsclient-from",
         "title": "StorageVectorsClient.from()",
         "slug": "storage-js-storagevectorsclient-from",
@@ -1468,13 +1458,6 @@
         "product": "storage"
       },
       {
-        "id": "storage-js-vectorbucketscope-constructor",
-        "title": "new VectorBucketScope()",
-        "slug": "storage-js-vectorbucketscope-constructor",
-        "type": "function",
-        "product": "storage"
-      },
-      {
         "id": "storage-js-vectorbucketscope-createindex",
         "title": "VectorBucketScope.createIndex()",
         "slug": "storage-js-vectorbucketscope-createindex",
@@ -1499,13 +1482,6 @@
         "id": "storage-js-vectorbucketscope-listindexes",
         "title": "VectorBucketScope.listIndexes()",
         "slug": "storage-js-vectorbucketscope-listindexes",
-        "type": "function",
-        "product": "storage"
-      },
-      {
-        "id": "storage-js-vectordataapi-constructor",
-        "title": "new VectorDataApi()",
-        "slug": "storage-js-vectordataapi-constructor",
         "type": "function",
         "product": "storage"
       },
@@ -1552,13 +1528,6 @@
         "product": "storage"
       },
       {
-        "id": "storage-js-vectorindexapi-constructor",
-        "title": "new VectorIndexApi()",
-        "slug": "storage-js-vectorindexapi-constructor",
-        "type": "function",
-        "product": "storage"
-      },
-      {
         "id": "storage-js-vectorindexapi-createindex",
         "title": "VectorIndexApi.createIndex()",
         "slug": "storage-js-vectorindexapi-createindex",
@@ -1594,13 +1563,6 @@
         "product": "storage"
       },
       {
-        "id": "storage-js-vectorindexscope-constructor",
-        "title": "new VectorIndexScope()",
-        "slug": "storage-js-vectorindexscope-constructor",
-        "type": "function",
-        "product": "storage"
-      },
-      {
         "id": "storage-js-vectorindexscope-deletevectors",
         "title": "VectorIndexScope.deleteVectors()",
         "slug": "storage-js-vectorindexscope-deletevectors",
@@ -1632,6 +1594,41 @@
         "id": "storage-js-vectorindexscope-queryvectors",
         "title": "VectorIndexScope.queryVectors()",
         "slug": "storage-js-vectorindexscope-queryvectors",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-storagevectorsclient-constructor",
+        "title": "new StorageVectorsClient()",
+        "slug": "storage-js-storagevectorsclient-constructor",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorbucketscope-constructor",
+        "title": "new VectorBucketScope()",
+        "slug": "storage-js-vectorbucketscope-constructor",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectordataapi-constructor",
+        "title": "new VectorDataApi()",
+        "slug": "storage-js-vectordataapi-constructor",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorindexapi-constructor",
+        "title": "new VectorIndexApi()",
+        "slug": "storage-js-vectorindexapi-constructor",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorindexscope-constructor",
+        "title": "new VectorIndexScope()",
+        "slug": "storage-js-vectorindexscope-constructor",
         "type": "function",
         "product": "storage"
       }
