@@ -122,15 +122,19 @@ const EntityListItem = ({
   }
 
   const { exportCsv, confirmationModal: exportCsvConfirmationModal } = useExportAllRowsAsCsv({
+    enabled: true,
     projectRef,
     connectionString: project?.connectionString ?? null,
     entity,
+    type: 'fetch_all',
   })
 
   const { exportSql, confirmationModal: exportSqlConfirmationModal } = useExportAllRowsAsSql({
+    enabled: true,
     projectRef,
     connectionString: project?.connectionString ?? null,
     entity,
+    type: 'fetch_all',
   })
 
   return (
