@@ -59,12 +59,12 @@ For troubleshooting common issues, see:
 
 Self-hosted Supabase is community-supported. Get help and connect with other users:
 
-- **[Discord](https://discord.supabase.com)** - Real-time chat and community support
-- **[Reddit](https://www.reddit.com/r/Supabase/)** - Community forum
+- [Discord](https://discord.supabase.com) - Real-time chat and community support
+- [Reddit](https://www.reddit.com/r/Supabase/) - Community forum
 
 Share your self-hosting experience and read what's working for other users:
 
-- **[GitHub Discussions](https://github.com/orgs/supabase/discussions/39820)** - Self-hosting: What's working (and what's not)?)
+- [GitHub Discussions](https://github.com/orgs/supabase/discussions/39820) - Self-hosting: What's working (and what's not)?)
 
 ## Important Notes
 
