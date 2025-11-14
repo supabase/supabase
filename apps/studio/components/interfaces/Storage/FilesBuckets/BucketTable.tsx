@@ -10,7 +10,7 @@ import { formatBytes } from 'lib/helpers'
 import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import type React from 'react'
-import { Badge, cn, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Badge, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 type BucketTableMode = 'standard' | 'virtualized'
 
@@ -100,7 +100,18 @@ export const BucketTableRow = ({
   }
 
   return (
-    <BucketTableRow key={bucket.id} className="relative cursor-pointer h-16">
+    <BucketTableRow
+      key={bucket.id}
+      className="relative cursor-pointer h-16 group inset-focus"
+      onClick={(event) => handleBucketNavigation(bucket.id, event)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          handleBucketNavigation(bucket.id, event)
+        }
+      }}
+      tabIndex={0}
+    >
       <BucketTableCell className="w-2 pr-1">
         <BucketIcon size={16} className="text-foreground-muted" />
       </BucketTableCell>
@@ -109,12 +120,6 @@ export const BucketTableRow = ({
           <p className="whitespace-nowrap max-w-[512px] truncate">{bucket.id}</p>
           {bucket.public && <Badge variant="warning">Public</Badge>}
         </div>
-        <button
-          className={cn('absolute inset-0', 'inset-focus')}
-          onClick={(event) => handleBucketNavigation(bucket.id, event)}
-        >
-          <span className="sr-only">Go to bucket details</span>
-        </button>
       </BucketTableCell>
 
       <BucketTableCell>
