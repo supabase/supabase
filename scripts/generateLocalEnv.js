@@ -40,3 +40,17 @@ fs.writeFileSync(
     .map((key) => `${key}=${environment[key]}`)
     .join('\n')
 )
+
+const e2eTestEnv = {
+  STUDIO_URL: NEXT_PUBLIC_SITE_URL,
+  API_URL,
+  IS_PLATFORM: 'false',
+  WEB_SERVER_PORT: new URL(NEXT_PUBLIC_SITE_URL).port ?? undefined,
+}
+
+fs.writeFileSync(
+  './e2e/studio/.env.local',
+  Object.keys(e2eTestEnv)
+    .map((key) => `${key}=${e2eTestEnv[key]}`)
+    .join('\n')
+)
