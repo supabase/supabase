@@ -54,16 +54,19 @@ export function getTableEditorSql(id?: number) {
     primary_keys as (
         select 
             i.indrelid as table_id,
-            jsonb_agg(jsonb_build_object(
-                'schema', n.nspname,
-                'table_name', c.relname,
-                'table_id', i.indrelid::int8,
-                'name', a.attname
-            )) as primary_keys
+            jsonb_agg(
+				jsonb_build_object(
+					'schema', n.nspname,
+					'table_name', c.relname,
+					'table_id', i.indrelid::int8,
+					'name', a.attname
+				)
+				order by array_position(i.indkey, a.attnum)
+			) as primary_keys
         from pg_index i
         join pg_class c on i.indrelid = c.oid
-        join pg_attribute a on (a.attrelid = c.oid and a.attnum = any(i.indkey))
         join pg_namespace n on c.relnamespace = n.oid
+		join pg_attribute a on a.attrelid = c.oid and a.attnum = any(i.indkey)
         where i.indisprimary
         group by i.indrelid
     ),

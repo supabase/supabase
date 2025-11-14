@@ -230,7 +230,6 @@ type RowHeaderProps = {
 }
 
 const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
-  debugger
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
