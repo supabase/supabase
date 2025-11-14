@@ -13,7 +13,6 @@ import {
   Badge,
   Button,
   Card,
-  cn,
   Table,
   TableBody,
   TableCell,
@@ -163,18 +162,23 @@ export const AnalyticsBuckets = () => {
                     </TableRow>
                   )}
                   {analyticsBuckets.map((bucket) => (
-                    <TableRow key={bucket.id} className="relative cursor-pointer h-16">
+                    <TableRow
+                      key={bucket.id}
+                      className="relative cursor-pointer h-16 inset-focus"
+                      onClick={(event) => handleBucketNavigation(bucket.id, event)}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault()
+                          handleBucketNavigation(bucket.id, event)
+                        }
+                      }}
+                      tabIndex={0}
+                    >
                       <TableCell className="w-2 pr-1">
                         <BucketIcon size={16} className="text-foreground-muted" />
                       </TableCell>
                       <TableCell>
                         <p className="whitespace-nowrap max-w-[512px] truncate">{bucket.id}</p>
-                        <button
-                          className={cn('absolute inset-0', 'inset-focus')}
-                          onClick={(event) => handleBucketNavigation(bucket.id, event)}
-                        >
-                          <span className="sr-only">Go to table details</span>
-                        </button>
                       </TableCell>
 
                       <TableCell>

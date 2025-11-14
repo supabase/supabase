@@ -1,14 +1,16 @@
 import { ChevronDown, FolderOpen, Settings, Shield, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { DeleteBucketModal } from 'components/interfaces/Storage/DeleteBucketModal'
 import { EditBucketModal } from 'components/interfaces/Storage/EditBucketModal'
 import { EmptyBucketModal } from 'components/interfaces/Storage/EmptyBucketModal'
+import { useSelectedBucket } from 'components/interfaces/Storage/FilesBuckets/useSelectedBucket'
 import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
 import { StorageExplorer } from 'components/interfaces/Storage/StorageExplorer/StorageExplorer'
-import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer/useSelectedBucket'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
@@ -29,29 +31,29 @@ import {
 } from 'ui'
 
 const BucketPage: NextPageWithLayout = () => {
+  const router = useRouter()
   const { bucketId, ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { projectRef } = useStorageExplorerStateSnapshot()
-  const { bucket, error, isSuccess, isError } = useSelectedBucket()
+  const { data: bucket, error, isSuccess, isError } = useSelectedBucket()
   const [modal, setModal] = useState<'edit' | 'empty' | 'delete' | null>(null)
 
   const { getPolicyCount } = useStoragePolicyCounts(bucket ? [bucket as Bucket] : [])
   const policyCount = bucket ? getPolicyCount(bucket.id) : 0
+
+  useEffect(() => {
+    if (isSuccess && !bucket) {
+      toast.info(`Bucket "${bucketId}" does not exist in your project`)
+      router.push(`/project/${ref}/storage/files`)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess])
 
   // [Joshen] Checking against projectRef from storage explorer to check if the store has initialized
   if (!project || !projectRef || !isSuccess) return null
 
   if (isError) {
     return <StorageBucketsError error={error as any} />
-  }
-
-  // If the bucket is not found or the bucket type is ANALYTICS or VECTOR, show an error message
-  if (!bucket || ('type' in bucket && bucket.type !== 'STANDARD')) {
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        <p className="text-sm text-foreground-light">Bucket "{bucketId}" cannot be found</p>
-      </div>
-    )
   }
 
   return (
@@ -67,8 +69,8 @@ const BucketPage: NextPageWithLayout = () => {
         className="[&>div:first-child]:!border-b-0" // Override the border-b from ScaffoldContainer
         title={
           <div className="flex items-center gap-2 min-w-0 flex-1">
-            <span className="truncate">{bucket.name}</span>
-            {bucket.public && (
+            <span className="truncate">{bucketId}</span>
+            {bucket?.public && (
               <Badge variant="warning" size="small" className="flex-shrink-0">
                 Public
               </Badge>
@@ -98,7 +100,11 @@ const BucketPage: NextPageWithLayout = () => {
                 ) : undefined
               }
             >
-              <Link href={`/project/${ref}/storage/files/policies`}>Policies</Link>
+              <Link
+                href={`/project/${ref}/storage/files/policies?search=${encodeURIComponent(bucket?.name ?? '')}`}
+              >
+                Policies
+              </Link>
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -134,9 +140,11 @@ const BucketPage: NextPageWithLayout = () => {
           </>
         }
       >
-        <div className="flex-1 min-h-0 px-6 pb-6">
-          <StorageExplorer bucket={bucket} />
-        </div>
+        {!!bucket && (
+          <div className="flex-1 min-h-0 px-6 pb-6">
+            <StorageExplorer bucket={bucket} />
+          </div>
+        )}
       </PageLayout>
 
       {bucket && (

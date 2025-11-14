@@ -49,10 +49,13 @@ import { DeleteVectorTableModal } from './DeleteVectorTableModal'
 import { getVectorBucketFDWSchemaName } from './VectorBuckets.utils'
 import { useS3VectorsWrapperExtension } from './useS3VectorsWrapper'
 import { useS3VectorsWrapperInstance } from './useS3VectorsWrapperInstance'
+import { useSelectedVectorBucket } from './useSelectedVectorBuckets'
 
 export const VectorBucketDetails = () => {
   const router = useRouter()
   const { ref: projectRef, bucketId } = useParams()
+  // [Joshen] Use the list buckets to verify that the bucket exists first before fetching bucket details
+  const { data: _bucket, isSuccess } = useSelectedVectorBucket()
 
   const [filterString, setFilterString] = useState('')
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -63,7 +66,10 @@ export const VectorBucketDetails = () => {
     error: bucketError,
     isSuccess: isSuccessBucket,
     isError: isErrorBucket,
-  } = useVectorBucketQuery({ projectRef, vectorBucketName: bucketId })
+  } = useVectorBucketQuery(
+    { projectRef, vectorBucketName: bucketId },
+    { enabled: isSuccess && !!_bucket }
+  )
 
   const { data, isLoading: isLoadingIndexes } = useVectorBucketsIndexesQuery({
     projectRef,
