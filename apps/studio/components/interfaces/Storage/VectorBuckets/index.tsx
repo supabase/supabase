@@ -13,7 +13,6 @@ import {
   Badge,
   Button,
   Card,
-  cn,
   Table,
   TableBody,
   TableCell,
@@ -159,7 +158,7 @@ export const VectorsBuckets = () => {
                     return (
                       <TableRow
                         key={id}
-                        className={cn('relative cursor-pointer h-16', 'inset-focus')}
+                        className="relative cursor-pointer h-16 inset-focus"
                         onClick={(event) => handleBucketNavigation(name, event)}
                         onKeyDown={(event) => {
                           if (event.key === 'Enter' || event.key === ' ') {

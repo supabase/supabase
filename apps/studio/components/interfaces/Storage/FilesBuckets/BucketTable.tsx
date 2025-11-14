@@ -10,7 +10,7 @@ import { formatBytes } from 'lib/helpers'
 import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import type React from 'react'
-import { Badge, cn, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Badge, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 type BucketTableMode = 'standard' | 'virtualized'
 
@@ -102,7 +102,7 @@ export const BucketTableRow = ({
   return (
     <BucketTableRow
       key={bucket.id}
-      className={cn('relative cursor-pointer h-16 group', 'inset-focus')}
+      className="relative cursor-pointer h-16 group inset-focus"
       onClick={(event) => handleBucketNavigation(bucket.id, event)}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {

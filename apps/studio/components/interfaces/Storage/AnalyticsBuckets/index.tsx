@@ -13,7 +13,6 @@ import {
   Badge,
   Button,
   Card,
-  cn,
   Table,
   TableBody,
   TableCell,
@@ -165,7 +164,7 @@ export const AnalyticsBuckets = () => {
                   {analyticsBuckets.map((bucket) => (
                     <TableRow
                       key={bucket.id}
-                      className={cn('relative cursor-pointer h-16', 'inset-focus')}
+                      className="relative cursor-pointer h-16 inset-focus"
                       onClick={(event) => handleBucketNavigation(bucket.id, event)}
                       onKeyDown={(event) => {
                         if (event.key === 'Enter' || event.key === ' ') {
