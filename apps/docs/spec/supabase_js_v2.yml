@@ -2250,7 +2250,7 @@ functions:
       Learn more about implementing MFA in your application [in the MFA guide](https://supabase.com/docs/guides/auth/auth-mfa#overview).
   - id: mfa-enroll
     title: 'mfa.enroll()'
-    $ref: '@supabase/auth-js.GoTrueClient.mfa.enroll'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.enroll'
     notes: |
       - Use `totp` or `phone` as the `factorType` and use the returned `id` to create a challenge.
       - To create a challenge, see [`mfa.challenge()`](/docs/reference/javascript/auth-mfa-challenge).
@@ -2324,7 +2324,7 @@ functions:
           ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
-    $ref: '@supabase/auth-js.GoTrueClient.mfa.challenge'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.challenge'
     notes: |
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before creating a challenge.
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify).
@@ -2392,7 +2392,7 @@ functions:
           ```
   - id: mfa-verify
     title: 'mfa.verify()'
-    $ref: '@supabase/auth-js.GoTrueClient.mfa.verify'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.verify'
     notes: |
       - To verify a challenge, please [create a challenge](/docs/reference/javascript/auth-mfa-challenge) first.
     examples:
@@ -2468,7 +2468,7 @@ functions:
           ```
   - id: mfa-challenge-and-verify
     title: 'mfa.challengeAndVerify()'
-    $ref: '@supabase/auth-js.GoTrueClient.mfa.challengeAndVerify'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.challengeAndVerify'
     notes: |
       - Intended for use with only TOTP factors.
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
@@ -2545,7 +2545,7 @@ functions:
           ```
   - id: mfa-unenroll
     title: 'mfa.unenroll()'
-    $ref: '@supabase/auth-js.GoTrueClient.mfa.unenroll'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.unenroll'
     examples:
       - id: unenroll-a-factor
         name: Unenroll a factor
@@ -2567,7 +2567,7 @@ functions:
           ```
   - id: mfa-get-authenticator-assurance-level
     title: 'mfa.getAuthenticatorAssuranceLevel()'
-    $ref: '@supabase/auth-js.GoTrueClient.mfa.getAuthenticatorAssuranceLevel'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel'
     notes: |
       - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
       - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP) or Phone factor.
@@ -8108,4 +8108,548 @@ functions:
               sortBy: { column: 'name', order: 'asc' },
               search: 'jon'
             })
+          ```
+
+  - id: supabase-js-supabaseclient-channel
+    title: SupabaseClient.channel()
+    $ref: '@supabase/supabase-js.SupabaseClient.channel'
+    description: Creates a Realtime channel with Broadcast, Presence, and Postgres Changes.
+  - id: supabase-js-supabaseclient-from
+    title: SupabaseClient.from()
+    $ref: '@supabase/supabase-js.SupabaseClient.from'
+    description: Perform a query on a table or a view.
+  - id: supabase-js-supabaseclient-rpc
+    title: SupabaseClient.rpc()
+    $ref: '@supabase/supabase-js.SupabaseClient.rpc'
+    description: Perform a function call.
+  - id: supabase-js-supabaseclient-schema
+    title: SupabaseClient.schema()
+    $ref: '@supabase/supabase-js.SupabaseClient.schema'
+    description: |-
+      Select a schema to query or perform an function (rpc) call.
+
+      The schema needs to be on the list of exposed schemas inside Supabase.
+  - id: auth-js-gotrueadminapi-constructor
+    title: new GoTrueAdminApi()
+    $ref: '@supabase/auth-js.GoTrueAdminApi.constructor'
+    description: Creates an admin API client that can be used to manage users and OAuth clients.
+    examples:
+      - id: auth-js-gotrueadminapi-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import { GoTrueAdminApi } from '@supabase/auth-js'
+
+          const admin = new GoTrueAdminApi({
+            url: 'https://xyzcompany.supabase.co/auth/v1',
+            headers: { Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}` },
+          })
+          ```
+  - id: auth-js-gotrueadminapi-signout
+    title: GoTrueAdminApi.signOut()
+    $ref: '@supabase/auth-js.GoTrueAdminApi.signOut'
+    description: Removes a logged-in session.
+  - id: auth-js-gotrueclient-constructor
+    title: new GoTrueClient()
+    $ref: '@supabase/auth-js.GoTrueClient.constructor'
+    description: Create a new client for use in the browser.
+    examples:
+      - id: auth-js-gotrueclient-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import { GoTrueClient } from '@supabase/auth-js'
+
+          const auth = new GoTrueClient({
+            url: 'https://xyzcompany.supabase.co/auth/v1',
+            headers: { apikey: 'public-anon-key' },
+            storageKey: 'supabase-auth',
+          })
+          ```
+  - id: auth-js-gotrueclient-initialize
+    title: GoTrueClient.initialize()
+    $ref: '@supabase/auth-js.GoTrueClient.initialize'
+    description: |-
+      Initializes the client session either from the url or from storage.
+      This method is automatically called when instantiating the client, but should also be called
+      manually when checking for an error from an auth redirect (oauth, magiclink, password recovery, etc).
+  - id: auth-js-gotrueclient-isthrowonerrorenabled
+    title: GoTrueClient.isThrowOnErrorEnabled()
+    $ref: '@supabase/auth-js.GoTrueClient.isThrowOnErrorEnabled'
+    description: Returns whether error throwing mode is enabled for this client.
+  - id: auth-js-authoauthserverapi-approveauthorization
+    title: AuthOAuthServerApi.approveAuthorization()
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.approveAuthorization'
+    description: |-
+      Approves an OAuth authorization request.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+  - id: auth-js-authoauthserverapi-denyauthorization
+    title: AuthOAuthServerApi.denyAuthorization()
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.denyAuthorization'
+    description: |-
+      Denies an OAuth authorization request.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+  - id: auth-js-authoauthserverapi-getauthorizationdetails
+    title: AuthOAuthServerApi.getAuthorizationDetails()
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.getAuthorizationDetails'
+    description: |-
+      Retrieves details about an OAuth authorization request.
+      Used to display consent information to the user.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+
+      This method returns authorization details including client info, scopes, and user information.
+      If the response includes a redirect_uri, it means consent was already given - the caller
+      should handle the redirect manually if needed.
+  - id: auth-js-gotrueadminoauthapi-createclient
+    title: GoTrueAdminOAuthApi.createClient()
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.createClient'
+    description: |-
+      Creates a new OAuth client.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+
+      This function should only be called on a server. Never expose your  key in the browser.
+  - id: auth-js-gotrueadminoauthapi-deleteclient
+    title: GoTrueAdminOAuthApi.deleteClient()
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.deleteClient'
+    description: |-
+      Deletes an OAuth client.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+
+      This function should only be called on a server. Never expose your  key in the browser.
+  - id: auth-js-gotrueadminoauthapi-getclient
+    title: GoTrueAdminOAuthApi.getClient()
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.getClient'
+    description: |-
+      Gets details of a specific OAuth client.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+
+      This function should only be called on a server. Never expose your  key in the browser.
+  - id: auth-js-gotrueadminoauthapi-listclients
+    title: GoTrueAdminOAuthApi.listClients()
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.listClients'
+    description: |-
+      Lists all OAuth clients with optional pagination.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+
+      This function should only be called on a server. Never expose your  key in the browser.
+  - id: auth-js-gotrueadminoauthapi-regenerateclientsecret
+    title: GoTrueAdminOAuthApi.regenerateClientSecret()
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.regenerateClientSecret'
+    description: |-
+      Regenerates the secret for an OAuth client.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+
+      This function should only be called on a server. Never expose your  key in the browser.
+  - id: auth-js-gotrueadminoauthapi-updateclient
+    title: GoTrueAdminOAuthApi.updateClient()
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.updateClient'
+    description: |-
+      Updates an existing OAuth client.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+
+      This function should only be called on a server. Never expose your  key in the browser.
+  - id: auth-js-gotruemfaapi-listfactors
+    title: GoTrueMFAApi.listFactors()
+    $ref: '@supabase/auth-js.GoTrueMFAApi.listFactors'
+    description: Returns the list of MFA factors enabled for this user.
+  - id: postgrest-js-postgrestbuilder-constructor
+    title: new PostgrestBuilder()
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.constructor'
+    description: Creates a builder configured for a specific PostgREST request.
+    examples:
+      - id: postgrest-js-postgrestbuilder-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import PostgrestQueryBuilder from '@supabase/postgrest-js'
+
+          const builder = new PostgrestQueryBuilder(
+            new URL('https://xyzcompany.supabase.co/rest/v1/users'),
+            { headers: new Headers({ apikey: 'public-anon-key' }) }
+          )
+          ```
+  - id: postgrest-js-postgrestbuilder-returns
+    title: PostgrestBuilder.returns()
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.returns'
+    description: Override the type of the returned .
+  - id: postgrest-js-postgrestbuilder-setheader
+    title: PostgrestBuilder.setHeader()
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.setHeader'
+    description: Set an HTTP header for the request.
+  - id: postgrest-js-postgrestbuilder-then
+    title: PostgrestBuilder.then()
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.then'
+    description: Attaches callbacks for the resolution and/or rejection of the Promise.
+  - id: postgrest-js-postgrestbuilder-throwonerror
+    title: PostgrestBuilder.throwOnError()
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.throwOnError'
+    description: |-
+      If there's an error with the query, throwOnError will reject the promise by
+      throwing the error instead of returning it as part of a successful response.
+  - id: postgrest-js-postgrestclient-constructor
+    title: new PostgrestClient()
+    $ref: '@supabase/postgrest-js.PostgrestClient.constructor'
+    description: Creates a PostgREST client.
+    examples:
+      - id: postgrest-js-postgrestclient-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import PostgrestClient from '@supabase/postgrest-js'
+
+          const postgrest = new PostgrestClient('https://xyzcompany.supabase.co/rest/v1', {
+            headers: { apikey: 'public-anon-key' },
+            schema: 'public',
+          })
+          ```
+  - id: postgrest-js-postgrestclient-from
+    title: PostgrestClient.from()
+    $ref: '@supabase/postgrest-js.PostgrestClient.from'
+    description: Perform a query on a table or a view.
+  - id: postgrest-js-postgrestclient-schema
+    title: PostgrestClient.schema()
+    $ref: '@supabase/postgrest-js.PostgrestClient.schema'
+    description: |-
+      Select a schema to query or perform an function (rpc) call.
+
+      The schema needs to be on the list of exposed schemas inside Supabase.
+  - id: postgrest-js-postgrestfilterbuilder-constructor
+    title: new PostgrestFilterBuilder()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.constructor'
+    description: Creates a builder configured for a specific PostgREST request.
+    examples:
+      - id: postgrest-js-postgrestfilterbuilder-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import PostgrestQueryBuilder from '@supabase/postgrest-js'
+
+          const builder = new PostgrestQueryBuilder(
+            new URL('https://xyzcompany.supabase.co/rest/v1/users'),
+            { headers: new Headers({ apikey: 'public-anon-key' }) }
+          )
+          ```
+  - id: postgrest-js-postgrestfilterbuilder-ilikeallof
+    title: PostgrestFilterBuilder.ilikeAllOf()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilikeAllOf'
+    description: Match only rows where  matches all of  case-insensitively.
+  - id: postgrest-js-postgrestfilterbuilder-ilikeanyof
+    title: PostgrestFilterBuilder.ilikeAnyOf()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilikeAnyOf'
+    description: Match only rows where  matches any of  case-insensitively.
+  - id: postgrest-js-postgrestfilterbuilder-likeallof
+    title: PostgrestFilterBuilder.likeAllOf()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.likeAllOf'
+    description: Match only rows where  matches all of  case-sensitively.
+  - id: postgrest-js-postgrestfilterbuilder-likeanyof
+    title: PostgrestFilterBuilder.likeAnyOf()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.likeAnyOf'
+    description: Match only rows where  matches any of  case-sensitively.
+  - id: postgrest-js-postgrestquerybuilder-constructor
+    title: new PostgrestQueryBuilder()
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.constructor'
+    description: Creates a query builder scoped to a Postgres table or view.
+    examples:
+      - id: postgrest-js-postgrestquerybuilder-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import PostgrestQueryBuilder from '@supabase/postgrest-js'
+
+          const query = new PostgrestQueryBuilder(
+            new URL('https://xyzcompany.supabase.co/rest/v1/users'),
+            { headers: { apikey: 'public-anon-key' } }
+          )
+          ```
+  - id: postgrest-js-postgresttransformbuilder-constructor
+    title: new PostgrestTransformBuilder()
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.constructor'
+    description: Creates a builder configured for a specific PostgREST request.
+    examples:
+      - id: postgrest-js-postgresttransformbuilder-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import PostgrestQueryBuilder from '@supabase/postgrest-js'
+
+          const builder = new PostgrestQueryBuilder(
+            new URL('https://xyzcompany.supabase.co/rest/v1/users'),
+            { headers: new Headers({ apikey: 'public-anon-key' }) }
+          )
+          ```
+  - id: postgrest-js-postgresttransformbuilder-geojson
+    title: PostgrestTransformBuilder.geojson()
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.geojson'
+    description: Return  as an object in [GeoJSON](https://geojson.org) format.
+  - id: postgrest-js-postgresttransformbuilder-maxaffected
+    title: PostgrestTransformBuilder.maxAffected()
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.maxAffected'
+    description: |-
+      Set the maximum number of rows that can be affected by the query.
+      Only available in PostgREST v13+ and only works with PATCH and DELETE methods.
+  - id: postgrest-js-postgresttransformbuilder-rollback
+    title: PostgrestTransformBuilder.rollback()
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.rollback'
+    description: |-
+      Rollback the query.
+
+       will still be returned, but the query is not committed.
+  - id: realtime-js-realtimechannel-constructor
+    title: new RealtimeChannel()
+    $ref: '@supabase/realtime-js.RealtimeChannel.constructor'
+    description: 'TODO: Add description for constructor'
+    examples:
+      - id: realtime-js-realtimechannel-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import RealtimeClient from '@supabase/realtime-js'
+
+          const client = new RealtimeClient('https://xyzcompany.supabase.co/realtime/v1', {
+            params: { apikey: 'public-anon-key' },
+          })
+          const channel = new RealtimeChannel('realtime:public:messages', { config: {} }, client)
+          ```
+  - id: realtime-js-realtimechannel-httpsend
+    title: RealtimeChannel.httpSend()
+    $ref: '@supabase/realtime-js.RealtimeChannel.httpSend'
+    description: |-
+      Sends a broadcast message explicitly via REST API.
+
+      This method always uses the REST API endpoint regardless of WebSocket connection state.
+      Useful when you want to guarantee REST delivery or when gradually migrating from implicit REST fallback.
+  - id: realtime-js-realtimechannel-presencestate
+    title: RealtimeChannel.presenceState()
+    $ref: '@supabase/realtime-js.RealtimeChannel.presenceState'
+    description: 'TODO: Add description for presenceState'
+  - id: realtime-js-realtimechannel-subscribe
+    title: RealtimeChannel.subscribe()
+    $ref: '@supabase/realtime-js.RealtimeChannel.subscribe'
+    description: Subscribe registers your client with the server
+  - id: realtime-js-realtimechannel-teardown
+    title: RealtimeChannel.teardown()
+    $ref: '@supabase/realtime-js.RealtimeChannel.teardown'
+    description: |-
+      Teardown the channel.
+
+      Destroys and stops related timers.
+  - id: realtime-js-realtimechannel-track
+    title: RealtimeChannel.track()
+    $ref: '@supabase/realtime-js.RealtimeChannel.track'
+    description: 'TODO: Add description for track'
+  - id: realtime-js-realtimechannel-unsubscribe
+    title: RealtimeChannel.unsubscribe()
+    $ref: '@supabase/realtime-js.RealtimeChannel.unsubscribe'
+    description: |-
+      Leaves the channel.
+
+      Unsubscribes from server events, and instructs channel to terminate on server.
+      Triggers onClose() hooks.
+
+      To receive leave acknowledgements, use the a  hook to bind to the server ack, ie:
+      channel.unsubscribe().receive("ok", () => alert("left!") )
+  - id: realtime-js-realtimechannel-untrack
+    title: RealtimeChannel.untrack()
+    $ref: '@supabase/realtime-js.RealtimeChannel.untrack'
+    description: 'TODO: Add description for untrack'
+  - id: realtime-js-realtimechannel-updatejoinpayload
+    title: RealtimeChannel.updateJoinPayload()
+    $ref: '@supabase/realtime-js.RealtimeChannel.updateJoinPayload'
+    description: 'TODO: Add description for updateJoinPayload'
+  - id: realtime-js-realtimeclient-constructor
+    title: new RealtimeClient()
+    $ref: '@supabase/realtime-js.RealtimeClient.constructor'
+    description: Initializes the Socket.
+    examples:
+      - id: realtime-js-realtimeclient-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import RealtimeClient from '@supabase/realtime-js'
+
+          const client = new RealtimeClient('https://xyzcompany.supabase.co/realtime/v1', {
+            params: { apikey: 'public-anon-key' },
+          })
+          client.connect()
+          ```
+  - id: realtime-js-realtimeclient-channel
+    title: RealtimeClient.channel()
+    $ref: '@supabase/realtime-js.RealtimeClient.channel'
+    description: 'TODO: Add description for channel'
+  - id: realtime-js-realtimeclient-connect
+    title: RealtimeClient.connect()
+    $ref: '@supabase/realtime-js.RealtimeClient.connect'
+    description: Connects the socket, unless already connected.
+  - id: realtime-js-realtimeclient-connectionstate
+    title: RealtimeClient.connectionState()
+    $ref: '@supabase/realtime-js.RealtimeClient.connectionState'
+    description: Returns the current state of the socket.
+  - id: realtime-js-realtimeclient-disconnect
+    title: RealtimeClient.disconnect()
+    $ref: '@supabase/realtime-js.RealtimeClient.disconnect'
+    description: Disconnects the socket.
+  - id: realtime-js-realtimeclient-endpointurl
+    title: RealtimeClient.endpointURL()
+    $ref: '@supabase/realtime-js.RealtimeClient.endpointURL'
+    description: Returns the URL of the websocket.
+  - id: realtime-js-realtimeclient-flushsendbuffer
+    title: RealtimeClient.flushSendBuffer()
+    $ref: '@supabase/realtime-js.RealtimeClient.flushSendBuffer'
+    description: Flushes send buffer
+  - id: realtime-js-realtimeclient-getchannels
+    title: RealtimeClient.getChannels()
+    $ref: '@supabase/realtime-js.RealtimeClient.getChannels'
+    description: Returns all created channels
+  - id: realtime-js-realtimeclient-isconnected
+    title: RealtimeClient.isConnected()
+    $ref: '@supabase/realtime-js.RealtimeClient.isConnected'
+    description: Returns  is the connection is open.
+  - id: realtime-js-realtimeclient-isconnecting
+    title: RealtimeClient.isConnecting()
+    $ref: '@supabase/realtime-js.RealtimeClient.isConnecting'
+    description: Returns  if the connection is currently connecting.
+  - id: realtime-js-realtimeclient-isdisconnecting
+    title: RealtimeClient.isDisconnecting()
+    $ref: '@supabase/realtime-js.RealtimeClient.isDisconnecting'
+    description: Returns  if the connection is currently disconnecting.
+  - id: realtime-js-realtimeclient-log
+    title: RealtimeClient.log()
+    $ref: '@supabase/realtime-js.RealtimeClient.log'
+    description: |-
+      Logs the message.
+
+      For customized logging,  can be overridden.
+  - id: realtime-js-realtimeclient-onheartbeat
+    title: RealtimeClient.onHeartbeat()
+    $ref: '@supabase/realtime-js.RealtimeClient.onHeartbeat'
+    description: 'TODO: Add description for onHeartbeat'
+  - id: realtime-js-realtimeclient-push
+    title: RealtimeClient.push()
+    $ref: '@supabase/realtime-js.RealtimeClient.push'
+    description: |-
+      Push out a message if the socket is connected.
+
+      If the socket is not connected, the message gets enqueued within a local buffer, and sent out when a connection is next established.
+  - id: realtime-js-realtimeclient-removeallchannels
+    title: RealtimeClient.removeAllChannels()
+    $ref: '@supabase/realtime-js.RealtimeClient.removeAllChannels'
+    description: Unsubscribes and removes all channels
+  - id: realtime-js-realtimeclient-removechannel
+    title: RealtimeClient.removeChannel()
+    $ref: '@supabase/realtime-js.RealtimeClient.removeChannel'
+    description: Unsubscribes and removes a single channel
+  - id: realtime-js-realtimeclient-sendheartbeat
+    title: RealtimeClient.sendHeartbeat()
+    $ref: '@supabase/realtime-js.RealtimeClient.sendHeartbeat'
+    description: Sends a heartbeat message if the socket is connected.
+  - id: realtime-js-realtimeclient-setauth
+    title: RealtimeClient.setAuth()
+    $ref: '@supabase/realtime-js.RealtimeClient.setAuth'
+    description: |-
+      Sets the JWT access token used for channel subscription authorization and Realtime RLS.
+
+      If param is null it will use the  callback function or the token set on the client.
+
+      On callback used, it will set the value of the token internal to the client.
+  - id: realtime-js-realtimepresence-constructor
+    title: new RealtimePresence()
+    $ref: '@supabase/realtime-js.RealtimePresence.constructor'
+    description: 'TODO: Add description for constructor'
+    examples:
+      - id: realtime-js-realtimepresence-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          const presence = new RealtimePresence(channel)
+
+          channel.on('presence', ({ event, key }) => {
+            console.log(`Presence ${event} on ${key}`)
+          })
+          ```
+  - id: realtime-js-websocketfactory-constructor
+    title: new WebSocketFactory()
+    $ref: '@supabase/realtime-js.WebSocketFactory.constructor'
+    description: 'TODO: Add description for constructor'
+  - id: realtime-js-websocketfactory-createwebsocket
+    title: WebSocketFactory.createWebSocket()
+    $ref: '@supabase/realtime-js.WebSocketFactory.createWebSocket'
+    description: Creates a WebSocket using the detected constructor.
+    examples:
+      - id: realtime-js-websocketfactory-createwebsocket-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          const socket = WebSocketFactory.createWebSocket('wss://realtime.supabase.co/socket')
+          ```
+  - id: realtime-js-websocketfactory-getwebsocketconstructor
+    title: WebSocketFactory.getWebSocketConstructor()
+    $ref: '@supabase/realtime-js.WebSocketFactory.getWebSocketConstructor'
+    description: Returns the best available WebSocket constructor for the current runtime.
+    examples:
+      - id: realtime-js-websocketfactory-getwebsocketconstructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          const WS = WebSocketFactory.getWebSocketConstructor()
+          const socket = new WS('wss://realtime.supabase.co/socket')
+          ```
+  - id: realtime-js-websocketfactory-iswebsocketsupported
+    title: WebSocketFactory.isWebSocketSupported()
+    $ref: '@supabase/realtime-js.WebSocketFactory.isWebSocketSupported'
+    description: Detects whether the runtime can establish WebSocket connections.
+    examples:
+      - id: realtime-js-websocketfactory-iswebsocketsupported-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          if (!WebSocketFactory.isWebSocketSupported()) {
+            console.warn('Falling back to long polling')
+          }
+          ```
+  - id: realtime-js-websocketlike-addeventlistener
+    title: WebSocketLike.addEventListener()
+    $ref: '@supabase/realtime-js.WebSocketLike.addEventListener'
+    description: 'TODO: Add description for addEventListener'
+  - id: realtime-js-websocketlike-close
+    title: WebSocketLike.close()
+    $ref: '@supabase/realtime-js.WebSocketLike.close'
+    description: 'TODO: Add description for close'
+  - id: realtime-js-websocketlike-removeeventlistener
+    title: WebSocketLike.removeEventListener()
+    $ref: '@supabase/realtime-js.WebSocketLike.removeEventListener'
+    description: 'TODO: Add description for removeEventListener'
+  - id: realtime-js-websocketlike-send
+    title: WebSocketLike.send()
+    $ref: '@supabase/realtime-js.WebSocketLike.send'
+    description: 'TODO: Add description for send'
+  - id: realtime-js-websocketlikeconstructor-constructor
+    title: new WebSocketLikeConstructor()
+    $ref: '@supabase/realtime-js.WebSocketLikeConstructor.constructor'
+    description: 'TODO: Add description for constructor'
+  - id: functions-js-functionsclient-constructor
+    title: new FunctionsClient()
+    $ref: '@supabase/functions-js.FunctionsClient.constructor'
+    description: Creates a new Functions client bound to an Edge Functions URL.
+    examples:
+      - id: functions-js-functionsclient-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import { FunctionsClient, FunctionRegion } from '@supabase/functions-js'
+
+          const functions = new FunctionsClient('https://xyzcompany.supabase.co/functions/v1', {
+            headers: { apikey: 'public-anon-key' },
+            region: FunctionRegion.UsEast1,
+          })
+          ```
+  - id: functions-js-functionsclient-setauth
+    title: FunctionsClient.setAuth()
+    $ref: '@supabase/functions-js.FunctionsClient.setAuth'
+    description: Updates the authorization header
+    examples:
+      - id: functions-js-functionsclient-setauth-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          functions.setAuth(session.access_token)
           ```
