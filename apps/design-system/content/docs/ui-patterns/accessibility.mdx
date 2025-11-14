@@ -25,7 +25,7 @@ All interactive page elements should be reachable by keyboard. Browsers such as 
 
 Interactive page elements should also provide visual feedback upon selection via a `focus-visible` state. We use consistent focus styles such as `inset-focus` so users recognize this state instantly.
 
-[Button](../components/button) has all of the above built-in. Any bespoke interactive elements, such as the below button-like [TableRow](../components/table) require these props to be manually added:
+[Button](../components/button) has all of the above built-in. Bespoke interactive elements however, such as the below clickable [TableRow](../components/table), require these props to be added manually:
 
 ```tsx showLineNumbers {3, 5-11}
 <TableRow
@@ -46,7 +46,7 @@ Interactive page elements should also provide visual feedback upon selection via
 </TableRow>
 ```
 
-Consider also affordances like `ctrl` and `meta` key support for opening in a new tab. Anything that you can do with a mouse input should be replicable by keyboard.
+The TableRow itself must be made interactive (rather than an absolutely0positioned button inside) for it to work reliably in all browsers. Consider also affordances like `ctrl` and `meta` key support for opening in a new tab. Anything that you can do with a mouse input should be replicable by keyboard.
 
 ## Screen reader support
 
