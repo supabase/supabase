@@ -2,7 +2,7 @@
 /packages/shared-data/pricing.ts @roryw10 @supabase/billing
 /packages/shared-data/plans.ts @roryw10 @supabase/billing
 /packages/common/telemetry-constants.ts @supabase/growth-eng
-/packages/pg-meta @supabase/postgres
+/packages/pg-meta @supabase/postgres @avallete
 
 /apps/studio/ @supabase/Dashboard
 
