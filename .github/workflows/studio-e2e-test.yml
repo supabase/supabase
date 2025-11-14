@@ -66,7 +66,7 @@ jobs:
         uses: daun/playwright-report-comment@5b72497e81ed11f0d0d7f1d375ef0a0c76d5e6fb # v3.10.0
         if: always() && github.event_name == 'pull_request'
         with:
-          report-file: e2e/studio/playwright-report
+          report-file: e2e/studio/test-results/test-results.json
           comment-title: '🎭 Playwright Test Results'
 
       - name: Fail job if tests failed
