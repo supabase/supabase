@@ -233,6 +233,14 @@ export function parseTypeSpec() {
   return modules as Array<ModuleTypes>
 }
 
+function normalizeRefPath(path: string) {
+  return path.replace(/\.index(?=\.|$)/g, '').replace(/\.+/g, '.')
+}
+
+function buildRefPath(segments: Array<string>) {
+  return normalizeRefPath(segments.filter(Boolean).join('.'))
+}
+
 // Reading the type spec happens in several layers. The first layer is the
 // module: this corresponds roughly to the JS libraries for each product:
 // database, auth, storage, etc.
@@ -246,8 +254,9 @@ function parseMod(mod: (typeof typeSpec)['children'][number]) {
   // Build a map of nodes by their IDs for easy cross-referencing.
   const targetMap = new Map<number, any>()
   buildMap(mod, targetMap)
+  const processingRefs = new Set<number>()
 
-  parseModInternal(mod, targetMap, [], res)
+  parseModInternal(mod, targetMap, [], res, processingRefs)
 
   return res
 }
@@ -269,24 +278,31 @@ function parseModInternal(
   node: any,
   map: Map<number, any>,
   currentPath: Array<string>,
-  res: ModuleTypes
+  res: ModuleTypes,
+  processingRefs: Set<number>
 ) {
   let updatedPath: Array<string>
 
   switch ((node.kindString ?? node.variant)?.toLowerCase()) {
     case 'module':
       updatedPath = [...currentPath, node.name]
-      node.children?.forEach((child: any) => parseModInternal(child, map, updatedPath, res))
+      node.children?.forEach((child: any) =>
+        parseModInternal(child, map, updatedPath, res, processingRefs)
+      )
       return
     // Some libraries have undefined where others have Project or declaration // for the same type of top-level node.
     case 'project':
     case undefined:
       updatedPath = [...currentPath, node.name]
-      node.children?.forEach((child: any) => parseModInternal(child, map, updatedPath, res))
+      node.children?.forEach((child: any) =>
+        parseModInternal(child, map, updatedPath, res, processingRefs)
+      )
       return
     case 'class':
       updatedPath = [...currentPath, node.name]
-      node.children?.forEach((child: any) => parseModInternal(child, map, updatedPath, res))
+      node.children?.forEach((child: any) =>
+        parseModInternal(child, map, updatedPath, res, processingRefs)
+      )
       return
     case 'constructor':
       return parseConstructor(node, map, currentPath, res)
@@ -294,32 +310,77 @@ function parseModInternal(
       return parseMethod(node, map, currentPath, res)
     case 'interface':
       updatedPath = [...currentPath, node.name]
-      node.children?.forEach((child: any) => parseModInternal(child, map, updatedPath, res))
+      node.children?.forEach((child: any) =>
+        parseModInternal(child, map, updatedPath, res, processingRefs)
+      )
       return
     case 'declaration':
       if (node.kind === KIND_CLASS || node.kind === KIND_MODULE) {
         updatedPath = [...currentPath, node.name]
-        node.children?.forEach((child: any) => parseModInternal(child, map, updatedPath, res))
+        node.children?.forEach((child: any) =>
+          parseModInternal(child, map, updatedPath, res, processingRefs)
+        )
+      } else if (node.kind === KIND_INTERFACE) {
+        updatedPath = [...currentPath, node.name]
+        node.children?.forEach((child: any) =>
+          parseModInternal(child, map, updatedPath, res, processingRefs)
+        )
       } else if (node.kind === KIND_CONSTRUCTOR) {
         parseConstructor(node, map, currentPath, res)
       } else if (node.kind === KIND_METHOD) {
         return parseMethod(node, map, currentPath, res)
       } else if (node.kind === KIND_PROPERTY) {
-        if (node.type?.type === 'reference') {
-          const referent = map.get(node.type.target)
-          if (referent?.variant === 'declaration' && referent?.kind === KIND_INTERFACE) {
-            const children = referent?.children ?? []
-            updatedPath = [...currentPath, node.name]
-            children.forEach((child: any) => parseModInternal(child, map, updatedPath, res))
-          }
-        }
+        parsePropertyReference(node, map, currentPath, res, processingRefs)
       }
       return
     case 'property':
+      parsePropertyReference(node, map, currentPath, res, processingRefs)
+      return
     case 'reference':
     default:
       return
   }
+}
+
+function parsePropertyReference(
+  node: any,
+  map: Map<number, any>,
+  currentPath: Array<string>,
+  res: ModuleTypes,
+  processingRefs: Set<number>
+) {
+  const refType = node.type
+  if (refType?.type !== 'reference') {
+    return
+  }
+
+  const referent = map.get(refType.target ?? refType.id)
+  if (!referent) {
+    return
+  }
+
+  if (processingRefs.has(referent.id)) {
+    return
+  }
+
+  const isForwardedNamespace =
+    referent?.variant === 'declaration' &&
+    (referent.kind === KIND_INTERFACE ||
+      referent.kind === KIND_CLASS ||
+      referent.kind === KIND_MODULE)
+
+  if (!isForwardedNamespace) {
+    return
+  }
+
+  const parentPath =
+    currentPath.length > 0 && currentPath[currentPath.length - 1]?.startsWith('@supabase/')
+      ? currentPath
+      : currentPath.slice(0, -1)
+
+  processingRefs.add(referent.id)
+  parseModInternal(referent, map, parentPath, res, processingRefs)
+  processingRefs.delete(referent.id)
 }
 
 /**
@@ -347,7 +408,7 @@ function parseConstructor(
   currentPath: Array<string>,
   res: ModuleTypes
 ) {
-  const $ref = `${currentPath.join('.')}.constructor`
+  const $ref = buildRefPath([...currentPath, 'constructor'])
 
   const signature = node.signatures[0]
   if (!signature) return
@@ -370,7 +431,7 @@ function parseMethod(
   currentPath: Array<string>,
   res: ModuleTypes
 ) {
-  const $ref = `${currentPath.join('.')}.${node.name}`
+  const $ref = buildRefPath([...currentPath, node.name])
 
   const signature = node.signatures[0]
   if (!signature) return

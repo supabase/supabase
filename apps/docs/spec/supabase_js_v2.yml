@@ -18,11 +18,6 @@ functions:
   - id: initializing
     title: 'Initializing'
     $ref: '@supabase/supabase-js.SupabaseClient.constructor'
-    description: |
-      You can initialize a new Supabase client using the `createClient()` method.
-
-      The Supabase client is your entrypoint to the rest of the Supabase functionality
-      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
 
     examples:
       - id: create-client
@@ -186,6 +181,20 @@ functions:
           - You keep the `expo-secure-storage`, `aes-js` and `react-native-get-random-values` libraries up-to-date.
           - Choose the correct [`SecureStoreOptions`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestoreoptions) for your app's needs. E.g. [`SecureStore.WHEN_UNLOCKED`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestorewhen_unlocked) regulates when the data can be accessed.
           - Carefully consider optimizations or other modifications to the above example, as those can lead to introducing subtle security vulnerabilities.
+      - id: initializing-typedoc-example-1
+        name: Example 8
+        code: >-
+          ```ts
+
+          import { createClient } from '@supabase/supabase-js'
+
+
+          const supabase = createClient('https://xyzcompany.supabase.co',
+          'public-anon-key')
+
+          const { data } = await supabase.from('profiles').select('*')
+
+          ```
 
   - id: auth-api
     title: 'Overview'
@@ -798,7 +807,9 @@ functions:
       - id: sign-in-with-email
         name: Sign in with email
         isSpotlight: true
-        description: The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
+        description: The user will be sent an email which contains either a magiclink or
+          a OTP or both. By default, a given user can only request a OTP once
+          every 60 seconds.
         code: |
           ```js
           const { data, error } = await supabase.auth.signInWithOtp({
@@ -821,7 +832,8 @@ functions:
       - id: sign-in-with-sms-otp
         name: Sign in with SMS OTP
         isSpotlight: false
-        description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
+        description: The user will be sent a SMS which contains a OTP. By default, a
+          given user can only request a OTP once every 60 seconds.
         code: |
           ```js
           const { data, error } = await supabase.auth.signInWithOtp({
@@ -831,7 +843,10 @@ functions:
       - id: sign-in-with-whatsapp-otp
         name: Sign in with WhatsApp OTP
         isSpotlight: false
-        description: The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
+        description: The user will be sent a WhatsApp message which contains a OTP. By
+          default, a given user can only request a OTP once every 60 seconds.
+          Note that a user will need to have a valid WhatsApp account that is
+          linked to Twilio in order to use this feature.
         code: |
           ```js
           const { data, error } = await supabase.auth.signInWithOtp({
@@ -1835,7 +1850,8 @@ functions:
     examples:
       - id: set-the-session
         name: Set the session
-        description: Sets the session data from an access_token and refresh_token, then returns an auth response or error.
+        description: Sets the session data from an access_token and refresh_token, then
+          returns an auth response or error.
         isSpotlight: true
         code: |
           ```js
@@ -2250,7 +2266,7 @@ functions:
       Learn more about implementing MFA in your application [in the MFA guide](https://supabase.com/docs/guides/auth/auth-mfa#overview).
   - id: mfa-enroll
     title: 'mfa.enroll()'
-    $ref: '@supabase/auth-js.GoTrueClient.mfa.enroll'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.enroll'
     notes: |
       - Use `totp` or `phone` as the `factorType` and use the returned `id` to create a challenge.
       - To create a challenge, see [`mfa.challenge()`](/docs/reference/javascript/auth-mfa-challenge).
@@ -2324,7 +2340,7 @@ functions:
           ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
-    $ref: '@supabase/auth-js.GoTrueClient.mfa.challenge'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.challenge'
     notes: |
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before creating a challenge.
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify).
@@ -2392,7 +2408,7 @@ functions:
           ```
   - id: mfa-verify
     title: 'mfa.verify()'
-    $ref: '@supabase/auth-js.GoTrueClient.mfa.verify'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.verify'
     notes: |
       - To verify a challenge, please [create a challenge](/docs/reference/javascript/auth-mfa-challenge) first.
     examples:
@@ -2468,7 +2484,7 @@ functions:
           ```
   - id: mfa-challenge-and-verify
     title: 'mfa.challengeAndVerify()'
-    $ref: '@supabase/auth-js.GoTrueClient.mfa.challengeAndVerify'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.challengeAndVerify'
     notes: |
       - Intended for use with only TOTP factors.
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
@@ -2545,7 +2561,7 @@ functions:
           ```
   - id: mfa-unenroll
     title: 'mfa.unenroll()'
-    $ref: '@supabase/auth-js.GoTrueClient.mfa.unenroll'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.unenroll'
     examples:
       - id: unenroll-a-factor
         name: Unenroll a factor
@@ -2567,7 +2583,7 @@ functions:
           ```
   - id: mfa-get-authenticator-assurance-level
     title: 'mfa.getAuthenticatorAssuranceLevel()'
-    $ref: '@supabase/auth-js.GoTrueClient.mfa.getAuthenticatorAssuranceLevel'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel'
     notes: |
       - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
       - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP) or Phone factor.
@@ -2942,7 +2958,8 @@ functions:
         type: GenerateLinkParams
         subContent:
           - name: type
-            type: 'signup | invite | magiclink | recovery | email_change_current | email_change_new'
+            type: 'signup | invite | magiclink | recovery | email_change_current |
+              email_change_new'
           - name: email
             type: string
           - name: password
@@ -2952,7 +2969,8 @@ functions:
           - name: newEmail
             type: string
             isOptional: true
-            description: Only required if type is `email_change_current` or `email_change_new`.
+            description: Only required if type is `email_change_current` or
+              `email_change_new`.
           - name: options
             type: object
             isOptional: true
@@ -2960,12 +2978,14 @@ functions:
               - name: data
                 type: object
                 description: >
-                  Custom JSON object containing user metadata, to be stored in the `raw_user_meta_data` column.
-                  Only accepted if type is `signup`, `invite`, or `magiclink`.
+                  Custom JSON object containing user metadata, to be stored in
+                  the `raw_user_meta_data` column. Only accepted if type is
+                  `signup`, `invite`, or `magiclink`.
               - name: redirectTo
                 type: string
                 description: >
-                  A redirect URL which will be appended to the generated email link.
+                  A redirect URL which will be appended to the generated email
+                  link.
     examples:
       - id: generate-a-signup-link
         name: Generate a signup link
@@ -4458,17 +4478,6 @@ functions:
 
   - id: rpc
     title: 'Postgres functions: rpc()'
-    description: |
-      You can call Postgres functions as _Remote Procedure Calls_, logic in your database that you can execute from anywhere.
-      Functions are useful when the logic rarely changes—like for password resets and updates.
-
-      ```sql
-      create or replace function hello_world() returns text as $$
-        select 'Hello world';
-      $$ language sql;
-      ```
-
-      To call Postgres functions on [Read Replicas](/docs/guides/platform/read-replicas), use the `get: true` option.
     $ref: '@supabase/postgrest-js.PostgrestClient.rpc'
     examples:
       - id: call-a-postgres-function-without-arguments
@@ -5818,7 +5827,6 @@ functions:
           can filter on range columns using the string representation of range
           values.
         hideCodeBlock: true
-  # TODO: schema & result
   - id: text-search
     title: textSearch()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.textSearch'
@@ -6882,18 +6890,26 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+      - id: overrideTypes-typedoc-example-1
+        name: Example 5
+        code: |-
+          ```typescript
+          // Merge with existing types (default behavior)
+          const query = supabase
+            .from('users')
+            .select()
+            .overrideTypes<{ custom_field: string }>()
+
+          // Replace existing types completely
+          const replaceQuery = supabase
+            .from('users')
+            .select()
+            .overrideTypes<{ id: number; name: string }, { merge: false }>()
+          ```
 
   - id: explain
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.explain'
     title: Using Explain
-    description: |
-      For debugging slow queries, you can get the [Postgres `EXPLAIN` execution plan](https://www.postgresql.org/docs/current/sql-explain.html) of a query
-      using the `explain()` method. This works on any query, even for `rpc()` or writes.
-
-      Explain is not enabled by default as it can reveal sensitive information about your database.
-      It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
-
-      Follow the [Performance Debugging Guide](/docs/guides/database/debugging-performance) to enable the functionality on your project.
     examples:
       - id: get-execution-plan
         name: Get the execution plan
@@ -7051,8 +7067,6 @@ functions:
 
   - id: invoke
     title: invoke()
-    description: |
-      Invoke a Supabase Edge Function.
     $ref: '@supabase/functions-js.FunctionsClient.invoke'
     notes: |
       - Requires an Authorization header.
@@ -7165,6 +7179,14 @@ functions:
               "my-custom-header": 'my-custom-header-value'
             },
             method: 'GET'
+          })
+          ```
+      - id: invoke-typedoc-example-1
+        name: Example 7
+        code: |-
+          ```ts
+          const { data, error } = await functions.invoke('hello-world', {
+            body: { name: 'Ada' },
           })
           ```
 
@@ -7317,7 +7339,8 @@ functions:
           ```
       - id: listen-to-multiple-events
         name: Listen to multiple events
-        description: You can chain listeners if you want to listen to multiple events for each table.
+        description: You can chain listeners if you want to listen to multiple events
+          for each table.
         code: |
           ```js
           supabase
@@ -7328,7 +7351,9 @@ functions:
           ```
       - id: listening-to-row-level-changes
         name: Listen to row level changes
-        description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+        description: You can listen to individual rows using the format
+          `{table}:{col}=eq.{val}` - where `{col}` is the column name, and
+          `{val}` is the value which you want to match.
         notes: |
           - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
         code: |
@@ -7340,8 +7365,6 @@ functions:
           ```
   - id: broadcast-message
     title: broadcastMessage()
-    description: |
-      Broadcast a message to all connected clients to a channel.
     notes: |
       - When using REST you don't need to subscribe to the channel
       - REST calls are only available from 2.37.0 onwards
@@ -8109,3 +8132,879 @@ functions:
               search: 'jon'
             })
           ```
+
+  - id: supabase-js-supabaseclient-channel
+    title: SupabaseClient.channel()
+    $ref: '@supabase/supabase-js.SupabaseClient.channel'
+  - id: supabase-js-supabaseclient-from
+    title: SupabaseClient.from()
+    $ref: '@supabase/supabase-js.SupabaseClient.from'
+  - id: supabase-js-supabaseclient-rpc
+    title: SupabaseClient.rpc()
+    $ref: '@supabase/supabase-js.SupabaseClient.rpc'
+  - id: supabase-js-supabaseclient-schema
+    title: SupabaseClient.schema()
+    $ref: '@supabase/supabase-js.SupabaseClient.schema'
+  - id: auth-js-gotrueadminapi-constructor
+    title: new GoTrueAdminApi()
+    $ref: '@supabase/auth-js.GoTrueAdminApi.constructor'
+    examples:
+      - id: auth-js-gotrueadminapi-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import { GoTrueAdminApi } from '@supabase/auth-js'
+
+          const admin = new GoTrueAdminApi({
+            url: 'https://xyzcompany.supabase.co/auth/v1',
+            headers: { Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}` },
+          })
+          ```
+  - id: auth-js-gotrueadminapi-signout
+    title: GoTrueAdminApi.signOut()
+    $ref: '@supabase/auth-js.GoTrueAdminApi.signOut'
+  - id: auth-js-gotrueclient-constructor
+    title: new GoTrueClient()
+    $ref: '@supabase/auth-js.GoTrueClient.constructor'
+    examples:
+      - id: auth-js-gotrueclient-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import { GoTrueClient } from '@supabase/auth-js'
+
+          const auth = new GoTrueClient({
+            url: 'https://xyzcompany.supabase.co/auth/v1',
+            headers: { apikey: 'public-anon-key' },
+            storageKey: 'supabase-auth',
+          })
+          ```
+  - id: auth-js-gotrueclient-initialize
+    title: GoTrueClient.initialize()
+    $ref: '@supabase/auth-js.GoTrueClient.initialize'
+  - id: auth-js-gotrueclient-isthrowonerrorenabled
+    title: GoTrueClient.isThrowOnErrorEnabled()
+    $ref: '@supabase/auth-js.GoTrueClient.isThrowOnErrorEnabled'
+  - id: auth-js-authoauthserverapi-approveauthorization
+    title: AuthOAuthServerApi.approveAuthorization()
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.approveAuthorization'
+  - id: auth-js-authoauthserverapi-denyauthorization
+    title: AuthOAuthServerApi.denyAuthorization()
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.denyAuthorization'
+  - id: auth-js-authoauthserverapi-getauthorizationdetails
+    title: AuthOAuthServerApi.getAuthorizationDetails()
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.getAuthorizationDetails'
+  - id: auth-js-gotrueadminoauthapi-createclient
+    title: GoTrueAdminOAuthApi.createClient()
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.createClient'
+  - id: auth-js-gotrueadminoauthapi-deleteclient
+    title: GoTrueAdminOAuthApi.deleteClient()
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.deleteClient'
+  - id: auth-js-gotrueadminoauthapi-getclient
+    title: GoTrueAdminOAuthApi.getClient()
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.getClient'
+  - id: auth-js-gotrueadminoauthapi-listclients
+    title: GoTrueAdminOAuthApi.listClients()
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.listClients'
+  - id: auth-js-gotrueadminoauthapi-regenerateclientsecret
+    title: GoTrueAdminOAuthApi.regenerateClientSecret()
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.regenerateClientSecret'
+  - id: auth-js-gotrueadminoauthapi-updateclient
+    title: GoTrueAdminOAuthApi.updateClient()
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.updateClient'
+  - id: auth-js-gotruemfaapi-listfactors
+    title: GoTrueMFAApi.listFactors()
+    $ref: '@supabase/auth-js.GoTrueMFAApi.listFactors'
+  - id: postgrest-js-postgrestbuilder-constructor
+    title: new PostgrestBuilder()
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.constructor'
+    examples:
+      - id: postgrest-js-postgrestbuilder-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import PostgrestQueryBuilder from '@supabase/postgrest-js'
+
+          const builder = new PostgrestQueryBuilder(
+            new URL('https://xyzcompany.supabase.co/rest/v1/users'),
+            { headers: new Headers({ apikey: 'public-anon-key' }) }
+          )
+          ```
+  - id: postgrest-js-postgrestbuilder-returns
+    title: PostgrestBuilder.returns()
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.returns'
+  - id: postgrest-js-postgrestbuilder-setheader
+    title: PostgrestBuilder.setHeader()
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.setHeader'
+  - id: postgrest-js-postgrestbuilder-then
+    title: PostgrestBuilder.then()
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.then'
+  - id: postgrest-js-postgrestbuilder-throwonerror
+    title: PostgrestBuilder.throwOnError()
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.throwOnError'
+  - id: postgrest-js-postgrestclient-constructor
+    title: new PostgrestClient()
+    $ref: '@supabase/postgrest-js.PostgrestClient.constructor'
+    examples:
+      - id: postgrest-js-postgrestclient-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import PostgrestClient from '@supabase/postgrest-js'
+
+          const postgrest = new PostgrestClient('https://xyzcompany.supabase.co/rest/v1', {
+            headers: { apikey: 'public-anon-key' },
+            schema: 'public',
+          })
+          ```
+  - id: postgrest-js-postgrestclient-from
+    title: PostgrestClient.from()
+    $ref: '@supabase/postgrest-js.PostgrestClient.from'
+  - id: postgrest-js-postgrestclient-schema
+    title: PostgrestClient.schema()
+    $ref: '@supabase/postgrest-js.PostgrestClient.schema'
+  - id: postgrest-js-postgrestfilterbuilder-constructor
+    title: new PostgrestFilterBuilder()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.constructor'
+    examples:
+      - id: postgrest-js-postgrestfilterbuilder-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import PostgrestQueryBuilder from '@supabase/postgrest-js'
+
+          const builder = new PostgrestQueryBuilder(
+            new URL('https://xyzcompany.supabase.co/rest/v1/users'),
+            { headers: new Headers({ apikey: 'public-anon-key' }) }
+          )
+          ```
+  - id: postgrest-js-postgrestfilterbuilder-ilikeallof
+    title: PostgrestFilterBuilder.ilikeAllOf()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilikeAllOf'
+  - id: postgrest-js-postgrestfilterbuilder-ilikeanyof
+    title: PostgrestFilterBuilder.ilikeAnyOf()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilikeAnyOf'
+  - id: postgrest-js-postgrestfilterbuilder-likeallof
+    title: PostgrestFilterBuilder.likeAllOf()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.likeAllOf'
+  - id: postgrest-js-postgrestfilterbuilder-likeanyof
+    title: PostgrestFilterBuilder.likeAnyOf()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.likeAnyOf'
+  - id: postgrest-js-postgrestquerybuilder-constructor
+    title: new PostgrestQueryBuilder()
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.constructor'
+    examples:
+      - id: postgrest-js-postgrestquerybuilder-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import PostgrestQueryBuilder from '@supabase/postgrest-js'
+
+          const query = new PostgrestQueryBuilder(
+            new URL('https://xyzcompany.supabase.co/rest/v1/users'),
+            { headers: { apikey: 'public-anon-key' } }
+          )
+          ```
+  - id: postgrest-js-postgresttransformbuilder-constructor
+    title: new PostgrestTransformBuilder()
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.constructor'
+    examples:
+      - id: postgrest-js-postgresttransformbuilder-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import PostgrestQueryBuilder from '@supabase/postgrest-js'
+
+          const builder = new PostgrestQueryBuilder(
+            new URL('https://xyzcompany.supabase.co/rest/v1/users'),
+            { headers: new Headers({ apikey: 'public-anon-key' }) }
+          )
+          ```
+  - id: postgrest-js-postgresttransformbuilder-geojson
+    title: PostgrestTransformBuilder.geojson()
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.geojson'
+  - id: postgrest-js-postgresttransformbuilder-maxaffected
+    title: PostgrestTransformBuilder.maxAffected()
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.maxAffected'
+  - id: postgrest-js-postgresttransformbuilder-rollback
+    title: PostgrestTransformBuilder.rollback()
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.rollback'
+  - id: realtime-js-realtimechannel-httpsend
+    title: RealtimeChannel.httpSend()
+    $ref: '@supabase/realtime-js.RealtimeChannel.httpSend'
+
+  - id: realtime-js-realtimechannel-subscribe
+    title: RealtimeChannel.subscribe()
+    $ref: '@supabase/realtime-js.RealtimeChannel.subscribe'
+  - id: realtime-js-realtimechannel-teardown
+    title: RealtimeChannel.teardown()
+    $ref: '@supabase/realtime-js.RealtimeChannel.teardown'
+  - id: realtime-js-realtimechannel-unsubscribe
+    title: RealtimeChannel.unsubscribe()
+    $ref: '@supabase/realtime-js.RealtimeChannel.unsubscribe'
+  - id: realtime-js-realtimeclient-constructor
+    title: new RealtimeClient()
+    $ref: '@supabase/realtime-js.RealtimeClient.constructor'
+    examples:
+      - id: realtime-js-realtimeclient-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import RealtimeClient from '@supabase/realtime-js'
+
+          const client = new RealtimeClient('https://xyzcompany.supabase.co/realtime/v1', {
+            params: { apikey: 'public-anon-key' },
+          })
+          client.connect()
+          ```
+  - id: realtime-js-realtimeclient-connect
+    title: RealtimeClient.connect()
+    $ref: '@supabase/realtime-js.RealtimeClient.connect'
+  - id: realtime-js-realtimeclient-connectionstate
+    title: RealtimeClient.connectionState()
+    $ref: '@supabase/realtime-js.RealtimeClient.connectionState'
+  - id: realtime-js-realtimeclient-disconnect
+    title: RealtimeClient.disconnect()
+    $ref: '@supabase/realtime-js.RealtimeClient.disconnect'
+  - id: realtime-js-realtimeclient-endpointurl
+    title: RealtimeClient.endpointURL()
+    $ref: '@supabase/realtime-js.RealtimeClient.endpointURL'
+  - id: realtime-js-realtimeclient-flushsendbuffer
+    title: RealtimeClient.flushSendBuffer()
+    $ref: '@supabase/realtime-js.RealtimeClient.flushSendBuffer'
+  - id: realtime-js-realtimeclient-getchannels
+    title: RealtimeClient.getChannels()
+    $ref: '@supabase/realtime-js.RealtimeClient.getChannels'
+  - id: realtime-js-realtimeclient-isconnected
+    title: RealtimeClient.isConnected()
+    $ref: '@supabase/realtime-js.RealtimeClient.isConnected'
+  - id: realtime-js-realtimeclient-isconnecting
+    title: RealtimeClient.isConnecting()
+    $ref: '@supabase/realtime-js.RealtimeClient.isConnecting'
+  - id: realtime-js-realtimeclient-isdisconnecting
+    title: RealtimeClient.isDisconnecting()
+    $ref: '@supabase/realtime-js.RealtimeClient.isDisconnecting'
+  - id: realtime-js-realtimeclient-log
+    title: RealtimeClient.log()
+    $ref: '@supabase/realtime-js.RealtimeClient.log'
+  - id: realtime-js-realtimeclient-push
+    title: RealtimeClient.push()
+    $ref: '@supabase/realtime-js.RealtimeClient.push'
+  - id: realtime-js-realtimeclient-removeallchannels
+    title: RealtimeClient.removeAllChannels()
+    $ref: '@supabase/realtime-js.RealtimeClient.removeAllChannels'
+  - id: realtime-js-realtimeclient-removechannel
+    title: RealtimeClient.removeChannel()
+    $ref: '@supabase/realtime-js.RealtimeClient.removeChannel'
+  - id: realtime-js-realtimeclient-sendheartbeat
+    title: RealtimeClient.sendHeartbeat()
+    $ref: '@supabase/realtime-js.RealtimeClient.sendHeartbeat'
+  - id: realtime-js-realtimeclient-setauth
+    title: RealtimeClient.setAuth()
+    $ref: '@supabase/realtime-js.RealtimeClient.setAuth'
+  - id: realtime-js-websocketfactory-createwebsocket
+    title: WebSocketFactory.createWebSocket()
+    $ref: '@supabase/realtime-js.WebSocketFactory.createWebSocket'
+    examples:
+      - id: realtime-js-websocketfactory-createwebsocket-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          const socket = WebSocketFactory.createWebSocket('wss://realtime.supabase.co/socket')
+          ```
+  - id: realtime-js-websocketfactory-getwebsocketconstructor
+    title: WebSocketFactory.getWebSocketConstructor()
+    $ref: '@supabase/realtime-js.WebSocketFactory.getWebSocketConstructor'
+    examples:
+      - id: realtime-js-websocketfactory-getwebsocketconstructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          const WS = WebSocketFactory.getWebSocketConstructor()
+          const socket = new WS('wss://realtime.supabase.co/socket')
+          ```
+  - id: realtime-js-websocketfactory-iswebsocketsupported
+    title: WebSocketFactory.isWebSocketSupported()
+    $ref: '@supabase/realtime-js.WebSocketFactory.isWebSocketSupported'
+    examples:
+      - id: realtime-js-websocketfactory-iswebsocketsupported-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          if (!WebSocketFactory.isWebSocketSupported()) {
+            console.warn('Falling back to long polling')
+          }
+          ```
+  - id: functions-js-functionsclient-constructor
+    title: new FunctionsClient()
+    $ref: '@supabase/functions-js.FunctionsClient.constructor'
+    examples:
+      - id: functions-js-functionsclient-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import { FunctionsClient, FunctionRegion } from '@supabase/functions-js'
+
+          const functions = new FunctionsClient('https://xyzcompany.supabase.co/functions/v1', {
+            headers: { apikey: 'public-anon-key' },
+            region: FunctionRegion.UsEast1,
+          })
+          ```
+  - id: functions-js-functionsclient-setauth
+    title: FunctionsClient.setAuth()
+    $ref: '@supabase/functions-js.FunctionsClient.setAuth'
+    examples:
+      - id: functions-js-functionsclient-setauth-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          functions.setAuth(session.access_token)
+          ```
+
+  - id: storage-js-storageclient-constructor
+    title: new StorageClient()
+    $ref: '@supabase/storage-js.StorageClient.constructor'
+    examples:
+      - id: storage-js-storageclient-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import { StorageClient } from '@supabase/storage-js'
+
+          const storage = new StorageClient('https://xyzcompany.supabase.co/storage/v1', {
+            apikey: 'public-anon-key',
+          })
+          const avatars = storage.from('avatars')
+          ```
+  - id: storage-js-storageclient-from
+    title: StorageClient.from()
+    $ref: '@supabase/storage-js.StorageClient.from'
+  - id: storage-js-storagevectorsclient-from
+    title: StorageVectorsClient.from()
+    $ref: '@supabase/storage-js.StorageVectorsClient.from'
+    examples:
+      - id: storage-js-storagevectorsclient-from-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const bucket = client.bucket('embeddings-prod')
+
+          // Create an index in this bucket
+          await bucket.createIndex({
+            indexName: 'documents-openai',
+            dataType: 'float32',
+            dimension: 1536,
+            distanceMetric: 'cosine'
+          })
+
+          // List indexes in this bucket
+          const { data } = await bucket.listIndexes()
+          ```
+  - id: storage-js-vectorbucketapi-constructor
+    title: new VectorBucketApi()
+    $ref: '@supabase/storage-js.VectorBucketApi.constructor'
+    examples:
+      - id: storage-js-vectorbucketapi-constructor-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const client = new VectorBucketApi(url, headers)
+          ```
+  - id: storage-js-vectorbucketapi-createbucket
+    title: VectorBucketApi.createBucket()
+    $ref: '@supabase/storage-js.VectorBucketApi.createBucket'
+    examples:
+      - id: storage-js-vectorbucketapi-createbucket-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const { data, error } = await client.createBucket('embeddings-prod')
+          if (error) {
+            console.error('Failed to create bucket:', error.message)
+          }
+          ```
+  - id: storage-js-vectorbucketapi-deletebucket
+    title: VectorBucketApi.deleteBucket()
+    $ref: '@supabase/storage-js.VectorBucketApi.deleteBucket'
+    examples:
+      - id: storage-js-vectorbucketapi-deletebucket-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          // Delete all indexes first, then delete bucket
+          const { error } = await client.deleteBucket('old-bucket')
+          if (error?.statusCode === 'S3VectorBucketNotEmpty') {
+            console.error('Must delete all indexes first')
+          }
+          ```
+  - id: storage-js-vectorbucketapi-getbucket
+    title: VectorBucketApi.getBucket()
+    $ref: '@supabase/storage-js.VectorBucketApi.getBucket'
+    examples:
+      - id: storage-js-vectorbucketapi-getbucket-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const { data, error } = await client.getBucket('embeddings-prod')
+          if (data) {
+            console.log('Bucket created at:', new Date(data.vectorBucket.creationTime! * 1000))
+          }
+          ```
+  - id: storage-js-vectorbucketapi-listbuckets
+    title: VectorBucketApi.listBuckets()
+    $ref: '@supabase/storage-js.VectorBucketApi.listBuckets'
+    examples:
+      - id: storage-js-vectorbucketapi-listbuckets-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          // List all buckets with prefix 'prod-'
+          const { data, error } = await client.listBuckets({ prefix: 'prod-' })
+          if (data) {
+            console.log('Found buckets:', data.buckets.length)
+            // Fetch next page if available
+            if (data.nextToken) {
+              const next = await client.listBuckets({ nextToken: data.nextToken })
+            }
+          }
+          ```
+  - id: storage-js-vectorbucketapi-throwonerror
+    title: VectorBucketApi.throwOnError()
+    $ref: '@supabase/storage-js.VectorBucketApi.throwOnError'
+    examples:
+      - id: storage-js-vectorbucketapi-throwonerror-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const client = new VectorBucketApi(url, headers)
+          client.throwOnError()
+          const { data } = await client.createBucket('my-bucket') // throws on error
+          ```
+  - id: storage-js-vectorbucketscope-createindex
+    title: VectorBucketScope.createIndex()
+    $ref: '@supabase/storage-js.VectorBucketScope.createIndex'
+    examples:
+      - id: storage-js-vectorbucketscope-createindex-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const bucket = client.bucket('embeddings-prod')
+          await bucket.createIndex({
+            indexName: 'documents-openai',
+            dataType: 'float32',
+            dimension: 1536,
+            distanceMetric: 'cosine',
+            metadataConfiguration: {
+              nonFilterableMetadataKeys: ['raw_text']
+            }
+          })
+          ```
+  - id: storage-js-vectorbucketscope-deleteindex
+    title: VectorBucketScope.deleteIndex()
+    $ref: '@supabase/storage-js.VectorBucketScope.deleteIndex'
+    examples:
+      - id: storage-js-vectorbucketscope-deleteindex-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const bucket = client.bucket('embeddings-prod')
+          await bucket.deleteIndex('old-index')
+          ```
+  - id: storage-js-vectorbucketscope-getindex
+    title: VectorBucketScope.getIndex()
+    $ref: '@supabase/storage-js.VectorBucketScope.getIndex'
+    examples:
+      - id: storage-js-vectorbucketscope-getindex-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const bucket = client.bucket('embeddings-prod')
+          const { data } = await bucket.getIndex('documents-openai')
+          console.log('Dimension:', data?.index.dimension)
+          ```
+  - id: storage-js-vectorbucketscope-listindexes
+    title: VectorBucketScope.listIndexes()
+    $ref: '@supabase/storage-js.VectorBucketScope.listIndexes'
+    examples:
+      - id: storage-js-vectorbucketscope-listindexes-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const bucket = client.bucket('embeddings-prod')
+          const { data } = await bucket.listIndexes({ prefix: 'documents-' })
+          ```
+  - id: storage-js-vectordataapi-deletevectors
+    title: VectorDataApi.deleteVectors()
+    $ref: '@supabase/storage-js.VectorDataApi.deleteVectors'
+    examples:
+      - id: storage-js-vectordataapi-deletevectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const { error } = await client.deleteVectors({
+            vectorBucketName: 'embeddings-prod',
+            indexName: 'documents-openai-small',
+            keys: ['doc-1', 'doc-2', 'doc-3']
+          })
+          if (!error) {
+            console.log('Vectors deleted successfully')
+          }
+          ```
+  - id: storage-js-vectordataapi-getvectors
+    title: VectorDataApi.getVectors()
+    $ref: '@supabase/storage-js.VectorDataApi.getVectors'
+    examples:
+      - id: storage-js-vectordataapi-getvectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const { data, error } = await client.getVectors({
+            vectorBucketName: 'embeddings-prod',
+            indexName: 'documents-openai-small',
+            keys: ['doc-1', 'doc-2', 'doc-3'],
+            returnData: false,     // Don't return embeddings
+            returnMetadata: true   // Return metadata only
+          })
+          if (data) {
+            data.vectors.forEach(v => console.log(v.key, v.metadata))
+          }
+          ```
+  - id: storage-js-vectordataapi-listvectors
+    title: VectorDataApi.listVectors()
+    $ref: '@supabase/storage-js.VectorDataApi.listVectors'
+    examples:
+      - id: storage-js-vectordataapi-listvectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          // Simple pagination
+          let nextToken: string | undefined
+          do {
+            const { data, error } = await client.listVectors({
+              vectorBucketName: 'embeddings-prod',
+              indexName: 'documents-openai-small',
+              maxResults: 500,
+              nextToken,
+              returnMetadata: true
+            })
+            if (error) break
+            console.log('Batch:', data.vectors.length)
+            nextToken = data.nextToken
+          } while (nextToken)
+
+          // Parallel scanning (4 concurrent workers)
+          const workers = [0, 1, 2, 3].map(async (segmentIndex) => {
+            const { data } = await client.listVectors({
+              vectorBucketName: 'embeddings-prod',
+              indexName: 'documents-openai-small',
+              segmentCount: 4,
+              segmentIndex,
+              returnMetadata: true
+            })
+            return data?.vectors || []
+          })
+          const results = await Promise.all(workers)
+          ```
+  - id: storage-js-vectordataapi-putvectors
+    title: VectorDataApi.putVectors()
+    $ref: '@supabase/storage-js.VectorDataApi.putVectors'
+    examples:
+      - id: storage-js-vectordataapi-putvectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const { data, error } = await client.putVectors({
+            vectorBucketName: 'embeddings-prod',
+            indexName: 'documents-openai-small',
+            vectors: [
+              {
+                key: 'doc-1',
+                data: { float32: [0.1, 0.2, 0.3, ...] }, // 1536 dimensions
+                metadata: { title: 'Introduction', page: 1 }
+              },
+              {
+                key: 'doc-2',
+                data: { float32: [0.4, 0.5, 0.6, ...] },
+                metadata: { title: 'Conclusion', page: 42 }
+              }
+            ]
+          })
+          ```
+  - id: storage-js-vectordataapi-queryvectors
+    title: VectorDataApi.queryVectors()
+    $ref: '@supabase/storage-js.VectorDataApi.queryVectors'
+    examples:
+      - id: storage-js-vectordataapi-queryvectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          // Semantic search with filtering
+          const { data, error } = await client.queryVectors({
+            vectorBucketName: 'embeddings-prod',
+            indexName: 'documents-openai-small',
+            queryVector: { float32: [0.1, 0.2, 0.3, ...] }, // 1536 dimensions
+            topK: 5,
+            filter: {
+              category: 'technical',
+              published: true
+            },
+            returnDistance: true,
+            returnMetadata: true
+          })
+          if (data) {
+            data.matches.forEach(match => {
+              console.log(`${match.key}: distance=${match.distance}`)
+              console.log('Metadata:', match.metadata)
+            })
+          }
+          ```
+  - id: storage-js-vectordataapi-throwonerror
+    title: VectorDataApi.throwOnError()
+    $ref: '@supabase/storage-js.VectorDataApi.throwOnError'
+    examples:
+      - id: storage-js-vectordataapi-throwonerror-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const client = new VectorDataApi(url, headers)
+          client.throwOnError()
+          const { data } = await client.putVectors(options) // throws on error
+          ```
+  - id: storage-js-vectorindexapi-createindex
+    title: VectorIndexApi.createIndex()
+    $ref: '@supabase/storage-js.VectorIndexApi.createIndex'
+    examples:
+      - id: storage-js-vectorindexapi-createindex-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const { data, error } = await client.createIndex({
+            vectorBucketName: 'embeddings-prod',
+            indexName: 'documents-openai-small',
+            dataType: 'float32',
+            dimension: 1536,
+            distanceMetric: 'cosine',
+            metadataConfiguration: {
+              nonFilterableMetadataKeys: ['raw_text', 'internal_id']
+            }
+          })
+          ```
+  - id: storage-js-vectorindexapi-deleteindex
+    title: VectorIndexApi.deleteIndex()
+    $ref: '@supabase/storage-js.VectorIndexApi.deleteIndex'
+    examples:
+      - id: storage-js-vectorindexapi-deleteindex-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          // Delete an index and all its vectors
+          const { error } = await client.deleteIndex('embeddings-prod', 'old-index')
+          if (!error) {
+            console.log('Index deleted successfully')
+          }
+          ```
+  - id: storage-js-vectorindexapi-getindex
+    title: VectorIndexApi.getIndex()
+    $ref: '@supabase/storage-js.VectorIndexApi.getIndex'
+    examples:
+      - id: storage-js-vectorindexapi-getindex-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const { data, error } = await client.getIndex('embeddings-prod', 'documents-openai-small')
+          if (data) {
+            console.log('Index dimension:', data.index.dimension)
+            console.log('Distance metric:', data.index.distanceMetric)
+          }
+          ```
+  - id: storage-js-vectorindexapi-listindexes
+    title: VectorIndexApi.listIndexes()
+    $ref: '@supabase/storage-js.VectorIndexApi.listIndexes'
+    examples:
+      - id: storage-js-vectorindexapi-listindexes-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          // List all indexes in a bucket
+          const { data, error } = await client.listIndexes({
+            vectorBucketName: 'embeddings-prod',
+            prefix: 'documents-'
+          })
+          if (data) {
+            console.log('Found indexes:', data.indexes.map(i => i.indexName))
+            // Fetch next page if available
+            if (data.nextToken) {
+              const next = await client.listIndexes({
+                vectorBucketName: 'embeddings-prod',
+                nextToken: data.nextToken
+              })
+            }
+          }
+          ```
+  - id: storage-js-vectorindexapi-throwonerror
+    title: VectorIndexApi.throwOnError()
+    $ref: '@supabase/storage-js.VectorIndexApi.throwOnError'
+    examples:
+      - id: storage-js-vectorindexapi-throwonerror-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const client = new VectorIndexApi(url, headers)
+          client.throwOnError()
+          const { data } = await client.createIndex(options) // throws on error
+          ```
+  - id: storage-js-vectorindexscope-deletevectors
+    title: VectorIndexScope.deleteVectors()
+    $ref: '@supabase/storage-js.VectorIndexScope.deleteVectors'
+    examples:
+      - id: storage-js-vectorindexscope-deletevectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const index = client.bucket('embeddings-prod').index('documents-openai')
+          await index.deleteVectors({
+            keys: ['doc-1', 'doc-2', 'doc-3']
+          })
+          ```
+  - id: storage-js-vectorindexscope-getvectors
+    title: VectorIndexScope.getVectors()
+    $ref: '@supabase/storage-js.VectorIndexScope.getVectors'
+    examples:
+      - id: storage-js-vectorindexscope-getvectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const index = client.bucket('embeddings-prod').index('documents-openai')
+          const { data } = await index.getVectors({
+            keys: ['doc-1', 'doc-2'],
+            returnMetadata: true
+          })
+          ```
+  - id: storage-js-vectorindexscope-listvectors
+    title: VectorIndexScope.listVectors()
+    $ref: '@supabase/storage-js.VectorIndexScope.listVectors'
+    examples:
+      - id: storage-js-vectorindexscope-listvectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const index = client.bucket('embeddings-prod').index('documents-openai')
+          const { data } = await index.listVectors({
+            maxResults: 500,
+            returnMetadata: true
+          })
+          ```
+  - id: storage-js-vectorindexscope-putvectors
+    title: VectorIndexScope.putVectors()
+    $ref: '@supabase/storage-js.VectorIndexScope.putVectors'
+    examples:
+      - id: storage-js-vectorindexscope-putvectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const index = client.bucket('embeddings-prod').index('documents-openai')
+          await index.putVectors({
+            vectors: [
+              {
+                key: 'doc-1',
+                data: { float32: [0.1, 0.2, ...] },
+                metadata: { title: 'Introduction', page: 1 }
+              }
+            ]
+          })
+          ```
+  - id: storage-js-vectorindexscope-queryvectors
+    title: VectorIndexScope.queryVectors()
+    $ref: '@supabase/storage-js.VectorIndexScope.queryVectors'
+    examples:
+      - id: storage-js-vectorindexscope-queryvectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const index = client.bucket('embeddings-prod').index('documents-openai')
+          const { data } = await index.queryVectors({
+            queryVector: { float32: [0.1, 0.2, ...] },
+            topK: 5,
+            filter: { category: 'technical' },
+            returnDistance: true,
+            returnMetadata: true
+          })
+          ```
+
+  - id: realtime-js-realtimechannel-constructor
+    title: new RealtimeChannel()
+    $ref: '@supabase/realtime-js.RealtimeChannel.constructor'
+    examples:
+      - id: realtime-js-realtimechannel-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import RealtimeClient from '@supabase/realtime-js'
+
+          const client = new RealtimeClient('https://xyzcompany.supabase.co/realtime/v1', {
+            params: { apikey: 'public-anon-key' },
+          })
+          const channel = new RealtimeChannel('realtime:public:messages', { config: {} }, client)
+          ```
+  - id: realtime-js-realtimechannel-presencestate
+    title: RealtimeChannel.presenceState()
+    $ref: '@supabase/realtime-js.RealtimeChannel.presenceState'
+  - id: realtime-js-realtimechannel-track
+    title: RealtimeChannel.track()
+    $ref: '@supabase/realtime-js.RealtimeChannel.track'
+  - id: realtime-js-realtimechannel-untrack
+    title: RealtimeChannel.untrack()
+    $ref: '@supabase/realtime-js.RealtimeChannel.untrack'
+  - id: realtime-js-realtimechannel-updatejoinpayload
+    title: RealtimeChannel.updateJoinPayload()
+    $ref: '@supabase/realtime-js.RealtimeChannel.updateJoinPayload'
+  - id: realtime-js-realtimeclient-channel
+    title: RealtimeClient.channel()
+    $ref: '@supabase/realtime-js.RealtimeClient.channel'
+  - id: realtime-js-realtimeclient-onheartbeat
+    title: RealtimeClient.onHeartbeat()
+    $ref: '@supabase/realtime-js.RealtimeClient.onHeartbeat'
+  - id: realtime-js-realtimepresence-constructor
+    title: new RealtimePresence()
+    $ref: '@supabase/realtime-js.RealtimePresence.constructor'
+    examples:
+      - id: realtime-js-realtimepresence-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          const presence = new RealtimePresence(channel)
+
+          channel.on('presence', ({ event, key }) => {
+            console.log(`Presence ${event} on ${key}`)
+          })
+          ```
+  - id: realtime-js-websocketlike-addeventlistener
+    title: WebSocketLike.addEventListener()
+    $ref: '@supabase/realtime-js.WebSocketLike.addEventListener'
+  - id: realtime-js-websocketlike-close
+    title: WebSocketLike.close()
+    $ref: '@supabase/realtime-js.WebSocketLike.close'
+  - id: realtime-js-websocketlike-removeeventlistener
+    title: WebSocketLike.removeEventListener()
+    $ref: '@supabase/realtime-js.WebSocketLike.removeEventListener'
+  - id: realtime-js-websocketlike-send
+    title: WebSocketLike.send()
+    $ref: '@supabase/realtime-js.WebSocketLike.send'
+  - id: storage-js-storagevectorsclient-constructor
+    title: new StorageVectorsClient()
+    $ref: '@supabase/storage-js.StorageVectorsClient.constructor'
+  - id: storage-js-vectorbucketscope-constructor
+    title: new VectorBucketScope()
+    $ref: '@supabase/storage-js.VectorBucketScope.constructor'
+  - id: storage-js-vectordataapi-constructor
+    title: new VectorDataApi()
+    $ref: '@supabase/storage-js.VectorDataApi.constructor'
+  - id: storage-js-vectorindexapi-constructor
+    title: new VectorIndexApi()
+    $ref: '@supabase/storage-js.VectorIndexApi.constructor'
+  - id: storage-js-vectorindexscope-constructor
+    title: new VectorIndexScope()
+    $ref: '@supabase/storage-js.VectorIndexScope.constructor'
+  - id: realtime-js-websocketlikeconstructor-constructor
+    title: new WebSocketLikeConstructor()
+    $ref: '@supabase/realtime-js.WebSocketLikeConstructor.constructor'

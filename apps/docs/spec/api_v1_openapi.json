@@ -5708,7 +5708,18 @@
       "V1ProjectWithDatabaseResponse": {
         "type": "object",
         "properties": {
-          "id": { "type": "string", "description": "Id of your project" },
+          "id": {
+            "type": "string",
+            "deprecated": true,
+            "description": "Deprecated: Use `ref` instead."
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 20,
+            "pattern": "^[a-z]+$",
+            "description": "Project ref"
+          },
           "organization_id": { "type": "string", "description": "Slug of your organization" },
           "name": { "type": "string", "description": "Name of your project" },
           "region": {
@@ -5752,7 +5763,16 @@
             "required": ["host", "version", "postgres_engine", "release_channel"]
           }
         },
-        "required": ["id", "organization_id", "name", "region", "created_at", "status", "database"]
+        "required": [
+          "id",
+          "ref",
+          "organization_id",
+          "name",
+          "region",
+          "created_at",
+          "status",
+          "database"
+        ]
       },
       "V1CreateProjectBody": {
         "type": "object",
@@ -5899,7 +5919,18 @@
       "V1ProjectResponse": {
         "type": "object",
         "properties": {
-          "id": { "type": "string", "description": "Id of your project" },
+          "id": {
+            "type": "string",
+            "deprecated": true,
+            "description": "Deprecated: Use `ref` instead."
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 20,
+            "pattern": "^[a-z]+$",
+            "description": "Project ref"
+          },
           "organization_id": { "type": "string", "description": "Slug of your organization" },
           "name": { "type": "string", "description": "Name of your project" },
           "region": {
@@ -5933,7 +5964,7 @@
             ]
           }
         },
-        "required": ["id", "organization_id", "name", "region", "created_at", "status"]
+        "required": ["id", "ref", "organization_id", "name", "region", "created_at", "status"]
       },
       "RegionsInfo": {
         "type": "object",

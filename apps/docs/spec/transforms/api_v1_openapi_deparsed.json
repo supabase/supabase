@@ -862,7 +862,15 @@
                     "properties": {
                       "id": {
                         "type": "string",
-                        "description": "Id of your project"
+                        "deprecated": true,
+                        "description": "Deprecated: Use `ref` instead."
+                      },
+                      "ref": {
+                        "type": "string",
+                        "minLength": 20,
+                        "maxLength": 20,
+                        "pattern": "^[a-z]+$",
+                        "description": "Project ref"
                       },
                       "organization_id": {
                         "type": "string",
@@ -927,6 +935,7 @@
                     },
                     "required": [
                       "id",
+                      "ref",
                       "organization_id",
                       "name",
                       "region",
@@ -1135,7 +1144,15 @@
                   "properties": {
                     "id": {
                       "type": "string",
-                      "description": "Id of your project"
+                      "deprecated": true,
+                      "description": "Deprecated: Use `ref` instead."
+                    },
+                    "ref": {
+                      "type": "string",
+                      "minLength": 20,
+                      "maxLength": 20,
+                      "pattern": "^[a-z]+$",
+                      "description": "Project ref"
                     },
                     "organization_id": {
                       "type": "string",
@@ -1176,7 +1193,15 @@
                       ]
                     }
                   },
-                  "required": ["id", "organization_id", "name", "region", "created_at", "status"]
+                  "required": [
+                    "id",
+                    "ref",
+                    "organization_id",
+                    "name",
+                    "region",
+                    "created_at",
+                    "status"
+                  ]
                 }
               }
             }
@@ -5836,7 +5861,15 @@
                   "properties": {
                     "id": {
                       "type": "string",
-                      "description": "Id of your project"
+                      "deprecated": true,
+                      "description": "Deprecated: Use `ref` instead."
+                    },
+                    "ref": {
+                      "type": "string",
+                      "minLength": 20,
+                      "maxLength": 20,
+                      "pattern": "^[a-z]+$",
+                      "description": "Project ref"
                     },
                     "organization_id": {
                       "type": "string",
@@ -5901,6 +5934,7 @@
                   },
                   "required": [
                     "id",
+                    "ref",
                     "organization_id",
                     "name",
                     "region",
@@ -19594,7 +19628,15 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Id of your project"
+            "deprecated": true,
+            "description": "Deprecated: Use `ref` instead."
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 20,
+            "pattern": "^[a-z]+$",
+            "description": "Project ref"
           },
           "organization_id": {
             "type": "string",
@@ -19657,7 +19699,16 @@
             "required": ["host", "version", "postgres_engine", "release_channel"]
           }
         },
-        "required": ["id", "organization_id", "name", "region", "created_at", "status", "database"]
+        "required": [
+          "id",
+          "ref",
+          "organization_id",
+          "name",
+          "region",
+          "created_at",
+          "status",
+          "database"
+        ]
       },
       "V1CreateProjectBody": {
         "type": "object",
@@ -19824,7 +19875,15 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Id of your project"
+            "deprecated": true,
+            "description": "Deprecated: Use `ref` instead."
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 20,
+            "pattern": "^[a-z]+$",
+            "description": "Project ref"
           },
           "organization_id": {
             "type": "string",
@@ -19865,7 +19924,7 @@
             ]
           }
         },
-        "required": ["id", "organization_id", "name", "region", "created_at", "status"]
+        "required": ["id", "ref", "organization_id", "name", "region", "created_at", "status"]
       },
       "RegionsInfo": {
         "type": "object",
