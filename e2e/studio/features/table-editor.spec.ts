@@ -196,14 +196,21 @@ test.describe.serial('table editor', () => {
     // change schema from public to auth
     await page.getByTestId('schema-selector').click()
     await page.getByPlaceholder('Find schema...').fill('auth')
+
+    // Set up the waiter BEFORE clicking to avoid race condition
+    const tableLoadPromise = waitForTableToLoad(page, ref, 'auth')
     await page.getByRole('option', { name: 'auth' }).click()
-    await waitForTableToLoad(page, ref, 'auth') // load auth tables
+    await tableLoadPromise // wait for auth tables to load
+
     await expect(page.getByLabel(`View ${authTableSso}`)).toBeVisible()
     await expect(page.getByLabel(`View ${authTableMfa}`)).toBeVisible()
 
-    // can find auth tables
+    // Search is client-side filtering - no API call needed
     await page.getByRole('textbox', { name: 'Search tables...' }).fill('mfa')
-    await waitForTableToLoad(page, ref, 'auth') // load tables
+
+    // Wait for the UI to update after search (allow debounce to complete)
+    await page.waitForTimeout(300)
+
     await expect(page.getByLabel(`View ${authTableSso}`)).not.toBeVisible()
     await expect(page.getByLabel(`View ${authTableMfa}`)).toBeVisible()
   })
