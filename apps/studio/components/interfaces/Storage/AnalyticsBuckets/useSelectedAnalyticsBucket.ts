@@ -6,15 +6,13 @@ export const useSelectedAnalyticsBucket = () => {
   const { ref, bucketId } = useParams()
   const hasIcebergEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
 
-  const {
-    data = [],
-    error,
-    isLoading,
-    isSuccess,
-    isError,
-  } = useAnalyticsBucketsQuery({ projectRef: ref }, { enabled: hasIcebergEnabled })
-
-  const bucket = data.find((x) => x.id === bucketId)
-
-  return { data: bucket, isLoading, isSuccess, isError, error }
+  return useAnalyticsBucketsQuery(
+    { projectRef: ref },
+    {
+      enabled: hasIcebergEnabled,
+      select(data) {
+        return data.find((x) => x.id === bucketId)
+      },
+    }
+  )
 }
