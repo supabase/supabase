@@ -201,6 +201,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
     const { generateReadingTime } = await import('lib/helpers')
     const blogPost = {
       ...parsedContent.data,
+      slug,
       readingTime: generateReadingTime(content),
     }
 
@@ -228,6 +229,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
       relatedPosts,
       blog: {
         ...(blogPost as any),
+        slug,
         content: mdxSource,
         toc: {
           ...tocResult,
@@ -268,6 +270,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
         relatedPosts: [],
         blog: {
           ...publishedPost,
+          slug: publishedPost.slug ?? slug,
           tags: publishedPost.tags || [],
           authors: publishedPost.authors || [],
           isCMS: true,
@@ -312,6 +315,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
     relatedPosts: [],
     blog: {
       ...cmsPost,
+      slug: cmsPost.slug ?? slug,
       tags: cmsPost.tags || [],
       authors: cmsPost.authors || [],
       isCMS: true,
