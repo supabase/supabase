@@ -195,7 +195,6 @@ export const CreateAnalyticsBucketModal = ({
           className={buttonClassName}
           icon={<Plus size={14} />}
           disabled={isDisabled}
-          tabIndex={isDisabled ? -1 : 0}
           style={{ justifyContent: 'start' }}
           onClick={() => setVisible(true)}
           tooltip={{
