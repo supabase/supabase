@@ -852,6 +852,16 @@
         "parameters": [
           {
             "schema": { "type": "string" },
+            "examples": {
+              "filename.jpg": { "value": "filename.jpg" },
+              "example2": { "value": null }
+            },
+            "in": "query",
+            "name": "download",
+            "required": false
+          },
+          {
+            "schema": { "type": "string" },
             "example": "avatars",
             "in": "path",
             "name": "bucketName",
@@ -1629,6 +1639,16 @@
         "summary": "Retrieve an object from a public bucket",
         "tags": ["object"],
         "parameters": [
+          {
+            "schema": { "type": "string" },
+            "examples": {
+              "filename.jpg": { "value": "filename.jpg" },
+              "example2": { "value": null }
+            },
+            "in": "query",
+            "name": "download",
+            "required": false
+          },
           {
             "schema": { "type": "string" },
             "example": "avatars",
