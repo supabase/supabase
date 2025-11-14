@@ -9,16 +9,16 @@
 
 [Supabase](https://supabase.com) è un'alternativa open source a Firebase. Stiamo costruendo le funzionalità di Firebase utilizzando strumenti open source di livello enterprise.
 
-- Database Postgres ospitato. [Documenti](https://supabase.com/docs/guides/database)
-- [x] Autenticazione e autorizzazione. [Documenti](https://supabase.com/docs/guides/auth)
+- Database Postgres ospitato. [Documentazione](https://supabase.com/docs/guides/database)
+- [x] Autenticazione e autorizzazione. [Documentazione](https://supabase.com/docs/guides/auth)
 - [x] API generate automaticamente.
-  - [x] REST. [Documenti](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Documenti](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Sottoscrizioni in tempo reale. [Documenti](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Documentazione](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Documentazione](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Sottoscrizioni in tempo reale. [Documentazione](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funzioni.
-  - [x] Funzioni di database. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Funzioni Edge [Docs](https://supabase.com/docs/guides/functions)
-- [x] Memorizzazione dei file. [Docs](https://supabase.com/docs/guides/storage)
+  - [x] Funzioni di database. [Documentazione](https://supabase.com/docs/guides/database/functions)
+  - [x] Funzioni Edge. [Documentazione](https://supabase.com/docs/guides/functions)
+- [x] Memorizzazione dei file. [Documentazione](https://supabase.com/docs/guides/storage)
 - [x] Cruscotto
 
 ![Cruscotto Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
@@ -27,7 +27,7 @@
 
 Per la documentazione completa, visitate [supabase.com/docs](https://supabase.com/docs)
 
-Per vedere come contribuire, visitate [Getting Started](../DEVELOPERS.md)
+Per vedere come contribuire, visitate [Iniziare](../DEVELOPERS.md)
 
 ## Comunità e supporto
 
@@ -38,10 +38,10 @@ Per vedere come contribuire, visitate [Getting Started](../DEVELOPERS.md)
 
 ## Stato
 
-- [Alfa: Stiamo testando Supabase con un gruppo chiuso di clienti
-- [x] Alfa pubblica: Chiunque può iscriversi all'indirizzo [supabase.com/dashboard](https://supabase.com/dashboard). Ma andateci piano, ci sono alcuni problemi
-- [x] Beta pubblica: Abbastanza stabile per la maggior parte degli usi non aziendali
-- [ ] Pubblico: Disponibilità generale [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [x] Alfa: Stiamo testando Supabase con un gruppo chiuso di clienti.
+- [x] Alfa pubblica: Chiunque può iscriversi all'indirizzo [supabase.com/dashboard](https://supabase.com/dashboard). Ma andateci piano, ci sono alcuni problemi.
+- [x] Beta pubblica: Abbastanza stabile per la maggior parte degli usi non aziendali.
+- [ ] Pubblico: Disponibilità generale [[stato](https://supabase.com/docs/guides/getting-started/features#feature-status)].
 
 Siamo attualmente in Beta pubblica. Guardate i "rilasci" di questo repo per essere avvisati dei principali aggiornamenti.
 
@@ -55,15 +55,14 @@ Supabase è una combinazione di strumenti open source. Stiamo costruendo le funz
 
 **Architettura**
 
-Supabase è una [piattaforma hosted](https://supabase.com/dashboard). È possibile registrarsi e iniziare a usare Supabase senza installare nulla.
-È anche possibile fare [self-hosting](https://supabase.com/docs/guides/hosting/overview) e [sviluppare localmente](https://supabase.com/docs/guides/local-development).
+Supabase è una [piattaforma hosted](https://supabase.com/dashboard). È possibile registrarsi e iniziare a usare Supabase senza installare nulla. È anche possibile fare [self-hosting](https://supabase.com/docs/guides/hosting/overview) e [sviluppare localmente](https://supabase.com/docs/guides/local-development).
 
 ![Architettura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/) è un sistema di database relazionale a oggetti con oltre 30 anni di sviluppo attivo con una solida reputazione in termini di affidabilità, robustezza e prestazioni.
 - [Realtime](https://github.com/supabase/realtime) è un server Elixir che consente di ascoltare gli inserimenti, gli aggiornamenti e le cancellazioni di PostgreSQL tramite websocket. Realtime controlla la funzionalità di replica integrata di Postgres per le modifiche al database, converte le modifiche in JSON e trasmette il JSON tramite websocket ai client autorizzati.
-- [PostgREST](http://postgrest.org/) è un server web che trasforma il database PostgreSQL direttamente in un'API REST
-- [pg_graphql](http://github.com/supabase/pg_graphql/) un'estensione di PostgreSQL che espone un'API GraphQL
+- [PostgREST](http://postgrest.org/) è un server web che trasforma il database PostgreSQL direttamente in un'API REST.
+- [pg_graphql](http://github.com/supabase/pg_graphql/) è un'estensione di PostgreSQL che espone un'API GraphQL.
 - [Storage](https://github.com/supabase/storage-api) fornisce un'interfaccia RESTful per la gestione dei file memorizzati in S3, utilizzando Postgres per gestire i permessi.
 - [postgres-meta](https://github.com/supabase/postgres-meta) è un'API RESTful per la gestione di Postgres, che consente di recuperare tabelle, aggiungere ruoli, eseguire query, ecc.
 - [GoTrue](https://github.com/netlify/gotrue) è un'API basata su SWT per la gestione degli utenti e l'emissione di token SWT.
@@ -178,83 +177,4 @@ Il nostro approccio alle librerie client è modulare. Ogni sotto-libreria è un'
     <td>-</td>
     <td>-</td>
   </tr>
-  <tr>
-    <td>Rust</td>
-    <td>-</td>
-    <td><a href="https://github.com/supabase-community/postgrest-rs" target="_blank" rel="noopener noreferrer">postgrest-rs</a></td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Swift</td>
-    <td><a href="https://github.com/supabase-community/supabase-swift" target="_blank" rel="noopener noreferrer">supabase-swift</a></td>
-    <td><a href="https://github.com/supabase-community/postgrest-swift" target="_blank" rel="noopener noreferrer">postgrest-swift</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">gotrue-swift</a></td>
-    <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">realtime-swift</a></td>
-    <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">storage-swift</a></td>
-    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">functions-swift</a></td>
-  </tr>
-  <tr>
-    <td>Godot Engine (GDScript)</td>
-    <td><a href="https://github.com/supabase-community/godot-engine.supabase" target="_blank" rel="noopener noreferrer">supabase-gdscript</a></td>
-    <td><a href="https://github.com/supabase-community/postgrest-gdscript" target="_blank" rel="noopener noreferrer">postgrest-gdscript</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-gdscript" target="_blank" rel="noopener noreferrer">gotrue-gdscript</a></td>
-    <td><a href="https://github.com/supabase-community/realtime-gdscript" target="_blank" rel="noopener noreferrer">realtime-gdscript</a></td>
-    <td><a href="https://github.com/supabase-community/storage-gdscript" target="_blank" rel="noopener noreferrer">storage-gdscript</a></td>
-    <td><a href="https://github.com/supabase-community/functions-gdscript" target="_blank" rel="noopener noreferrer">functions-gdscript</a></td>
-  </tr>
-  
 </table>
-
-<!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
-<!--- Keep only the link to the list of translation files-->
-
-## Traduzioni
-
-- [Arabo | العربية](/i18n/README.ar.md)
-- [Albanese / Shqip](/i18n/README.sq.md)
-- [Bangla / বাংলা](/i18n/README.bn.md)
-- [Bulgaro / Български](/i18n/README.bg.md)
-- [Catalano / Català](/i18n/README.ca.md)
-- [Danese / Dansk](/i18n/README.da.md)
-- [Olandese / Nederlands](/i18n/README.nl.md)
-- [Inglese](https://github.com/supabase/supabase)
-- [Finlandese / Suomalainen](/i18n/README.fi.md)
-- [Francese / Français](/i18n/README.fr.md)
-- [Tedesco / Deutsch](/i18n/README.de.md)
-- [Greco / Ελληνικά](/i18n/README.gr.md)
-- [Ebraico / עברית](/i18n/README.he.md)
-- [Hindi / हिंदी](/i18n/README.hi.md)
-- [Ungherese / Magyar](/i18n/README.hu.md)
-- [Nepali / नेपाली](/i18n/README.ne.md)
-- [Indonesiano / Bahasa Indonesia](/i18n/README.id.md)
-- [Italiano / Italiano](/i18n/README.it.md)
-- [Giapponese / 日本語](/i18n/README.jp.md)
-- [Coreano / 한국어](/i18n/README.ko.md)
-- [Malese / Bahasa Malaysia](/i18n/README.ms.md)
-- [Norvegese (Bokmål) / Norsk (Bokmål)](/i18n/README.nb-no.md)
-- [Persiano / فارسی](/i18n/README.fa.md)
-- [Polacco / Polski](/i18n/README.pl.md)
-- [Portoghese / Português](/i18n/README.pt.md)
-- [Portoghese (brasiliano) / Português Brasileiro](/i18n/README.pt-br.md)
-- [Rumeno / Română](/i18n/README.ro.md)
-- [Russo / Pусский](/i18n/README.ru.md)
-- [Serbo / Srpski](/i18n/README.sr.md)
-- [Sinhala / සිංහල](/i18n/README.si.md)
-- [Spagnolo / Español](/i18n/README.es.md)
-- [Cinese semplificato / 简体中文](/i18n/README.zh-cn.md)
-- [Svedese / Svenska](/i18n/README.sv.md)
-- [Thai / ไทย](/i18n/README.th.md)
-- [Cinese tradizionale / 繁體中文](/i18n/README.zh-tw.md)
-- [Turco / Türkçe](/i18n/README.tr.md)
-- [Ucraino / Українська](/i18n/README.uk.md)
-- [Vietnamita / Tiếng Việt](/i18n/README.vi-vn.md)
-- [Elenco delle traduzioni](/i18n/languages.md) <!--- Keep only this -->
-
----
-
-## Sponsor
-
-[![Nuovo sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
