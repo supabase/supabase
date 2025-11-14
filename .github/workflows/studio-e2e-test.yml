@@ -27,7 +27,7 @@ permissions:
 jobs:
   test:
     timeout-minutes: 60
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     # Require approval only for pull requests from forks
     environment: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork && 'Studio E2E Tests' || '' }}
 
