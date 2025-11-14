@@ -19,12 +19,18 @@ interface ApiKeysVisibilityState {
  */
 export function useApiKeysVisibility(): ApiKeysVisibilityState {
   const { ref: projectRef } = useParams()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.READ, 'api_keys')
+  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.SECRETS_READ,
+    '*'
+  )
 
-  const { data: apiKeysData, isLoading } = useAPIKeysQuery({
-    projectRef,
-    reveal: false,
-  })
+  const { data: apiKeysData, isLoading: isLoadingApiKeys } = useAPIKeysQuery(
+    {
+      projectRef,
+      reveal: false,
+    },
+    { enabled: canReadAPIKeys }
+  )
 
   const publishableApiKeys = useMemo(
     () => apiKeysData?.filter(({ type }) => type === 'publishable') ?? [],
@@ -36,14 +42,14 @@ export function useApiKeysVisibility(): ApiKeysVisibilityState {
   const hasApiKeys = publishableApiKeys.length > 0
 
   // Can initialize API keys when in rollout, has permissions, not loading, and no API keys yet
-  const canInitApiKeys = canReadAPIKeys && !isLoading && !hasApiKeys
+  const canInitApiKeys = canReadAPIKeys && !isLoadingApiKeys && !hasApiKeys
 
   // Disable UI for publishable keys and secrets keys if flag is not enabled OR no API keys created yet
   const shouldDisableUI = !hasApiKeys
 
   return {
     hasApiKeys,
-    isLoading,
+    isLoading: isLoadingPermissions || (canReadAPIKeys && isLoadingApiKeys),
     canReadAPIKeys,
     canInitApiKeys,
     shouldDisableUI,
