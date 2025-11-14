@@ -8653,3 +8653,570 @@ functions:
           ```ts
           functions.setAuth(session.access_token)
           ```
+
+  - id: storage-js-storageclient-constructor
+    title: new StorageClient()
+    $ref: '@supabase/storage-js.StorageClient.constructor'
+    description: Creates a client for Storage buckets, files, analytics, and vectors.
+    examples:
+      - id: storage-js-storageclient-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import { StorageClient } from '@supabase/storage-js'
+
+          const storage = new StorageClient('https://xyzcompany.supabase.co/storage/v1', {
+            apikey: 'public-anon-key',
+          })
+          const avatars = storage.from('avatars')
+          ```
+  - id: storage-js-storageclient-from
+    title: StorageClient.from()
+    $ref: '@supabase/storage-js.StorageClient.from'
+    description: Perform file operation in a bucket.
+  - id: storage-js-storagevectorsclient-constructor
+    title: new StorageVectorsClient()
+    $ref: '@supabase/storage-js.StorageVectorsClient.constructor'
+    description: 'TODO: Add description for constructor'
+  - id: storage-js-storagevectorsclient-from
+    title: StorageVectorsClient.from()
+    $ref: '@supabase/storage-js.StorageVectorsClient.from'
+    description: |-
+      Access operations for a specific vector bucket
+      Returns a scoped client for index and vector operations within the bucket
+    examples:
+      - id: storage-js-storagevectorsclient-from-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const bucket = client.bucket('embeddings-prod')
+
+          // Create an index in this bucket
+          await bucket.createIndex({
+            indexName: 'documents-openai',
+            dataType: 'float32',
+            dimension: 1536,
+            distanceMetric: 'cosine'
+          })
+
+          // List indexes in this bucket
+          const { data } = await bucket.listIndexes()
+          ```
+  - id: storage-js-vectorbucketapi-constructor
+    title: new VectorBucketApi()
+    $ref: '@supabase/storage-js.VectorBucketApi.constructor'
+    description: Creates a new VectorBucketApi instance
+  - id: storage-js-vectorbucketapi-createbucket
+    title: VectorBucketApi.createBucket()
+    $ref: '@supabase/storage-js.VectorBucketApi.createBucket'
+    description: |-
+      Creates a new vector bucket
+      Vector buckets are containers for vector indexes and their data
+    examples:
+      - id: storage-js-vectorbucketapi-createbucket-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const { data, error } = await client.createBucket('embeddings-prod')
+          if (error) {
+            console.error('Failed to create bucket:', error.message)
+          }
+          ```
+  - id: storage-js-vectorbucketapi-deletebucket
+    title: VectorBucketApi.deleteBucket()
+    $ref: '@supabase/storage-js.VectorBucketApi.deleteBucket'
+    description: |-
+      Deletes a vector bucket
+      Bucket must be empty before deletion (all indexes must be removed first)
+    examples:
+      - id: storage-js-vectorbucketapi-deletebucket-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          // Delete all indexes first, then delete bucket
+          const { error } = await client.deleteBucket('old-bucket')
+          if (error?.statusCode === 'S3VectorBucketNotEmpty') {
+            console.error('Must delete all indexes first')
+          }
+          ```
+  - id: storage-js-vectorbucketapi-getbucket
+    title: VectorBucketApi.getBucket()
+    $ref: '@supabase/storage-js.VectorBucketApi.getBucket'
+    description: |-
+      Retrieves metadata for a specific vector bucket
+      Returns bucket configuration including encryption settings and creation time
+    examples:
+      - id: storage-js-vectorbucketapi-getbucket-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const { data, error } = await client.getBucket('embeddings-prod')
+          if (data) {
+            console.log('Bucket created at:', new Date(data.vectorBucket.creationTime! * 1000))
+          }
+          ```
+  - id: storage-js-vectorbucketapi-listbuckets
+    title: VectorBucketApi.listBuckets()
+    $ref: '@supabase/storage-js.VectorBucketApi.listBuckets'
+    description: |-
+      Lists vector buckets with optional filtering and pagination
+      Supports prefix-based filtering and paginated results
+    examples:
+      - id: storage-js-vectorbucketapi-listbuckets-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          // List all buckets with prefix 'prod-'
+          const { data, error } = await client.listBuckets({ prefix: 'prod-' })
+          if (data) {
+            console.log('Found buckets:', data.buckets.length)
+            // Fetch next page if available
+            if (data.nextToken) {
+              const next = await client.listBuckets({ nextToken: data.nextToken })
+            }
+          }
+          ```
+  - id: storage-js-vectorbucketapi-throwonerror
+    title: VectorBucketApi.throwOnError()
+    $ref: '@supabase/storage-js.VectorBucketApi.throwOnError'
+    description: |-
+      Enable throwing errors instead of returning them in the response
+      When enabled, failed operations will throw instead of returning { data: null, error }
+    examples:
+      - id: storage-js-vectorbucketapi-throwonerror-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const client = new VectorBucketApi(url, headers)
+          client.throwOnError()
+          const { data } = await client.createBucket('my-bucket') // throws on error
+          ```
+  - id: storage-js-vectorbucketscope-constructor
+    title: new VectorBucketScope()
+    $ref: '@supabase/storage-js.VectorBucketScope.constructor'
+    description: 'TODO: Add description for constructor'
+  - id: storage-js-vectorbucketscope-createindex
+    title: VectorBucketScope.createIndex()
+    $ref: '@supabase/storage-js.VectorBucketScope.createIndex'
+    description: |-
+      Creates a new vector index in this bucket
+      Convenience method that automatically includes the bucket name
+    examples:
+      - id: storage-js-vectorbucketscope-createindex-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const bucket = client.bucket('embeddings-prod')
+          await bucket.createIndex({
+            indexName: 'documents-openai',
+            dataType: 'float32',
+            dimension: 1536,
+            distanceMetric: 'cosine',
+            metadataConfiguration: {
+              nonFilterableMetadataKeys: ['raw_text']
+            }
+          })
+          ```
+  - id: storage-js-vectorbucketscope-deleteindex
+    title: VectorBucketScope.deleteIndex()
+    $ref: '@supabase/storage-js.VectorBucketScope.deleteIndex'
+    description: |-
+      Deletes an index from this bucket
+      Convenience method that automatically includes the bucket name
+    examples:
+      - id: storage-js-vectorbucketscope-deleteindex-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const bucket = client.bucket('embeddings-prod')
+          await bucket.deleteIndex('old-index')
+          ```
+  - id: storage-js-vectorbucketscope-getindex
+    title: VectorBucketScope.getIndex()
+    $ref: '@supabase/storage-js.VectorBucketScope.getIndex'
+    description: |-
+      Retrieves metadata for a specific index in this bucket
+      Convenience method that automatically includes the bucket name
+    examples:
+      - id: storage-js-vectorbucketscope-getindex-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const bucket = client.bucket('embeddings-prod')
+          const { data } = await bucket.getIndex('documents-openai')
+          console.log('Dimension:', data?.index.dimension)
+          ```
+  - id: storage-js-vectorbucketscope-listindexes
+    title: VectorBucketScope.listIndexes()
+    $ref: '@supabase/storage-js.VectorBucketScope.listIndexes'
+    description: |-
+      Lists indexes in this bucket
+      Convenience method that automatically includes the bucket name
+    examples:
+      - id: storage-js-vectorbucketscope-listindexes-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const bucket = client.bucket('embeddings-prod')
+          const { data } = await bucket.listIndexes({ prefix: 'documents-' })
+          ```
+  - id: storage-js-vectordataapi-constructor
+    title: new VectorDataApi()
+    $ref: '@supabase/storage-js.VectorDataApi.constructor'
+    description: 'TODO: Add description for constructor'
+  - id: storage-js-vectordataapi-deletevectors
+    title: VectorDataApi.deleteVectors()
+    $ref: '@supabase/storage-js.VectorDataApi.deleteVectors'
+    description: |-
+      Deletes vectors by their keys in batch
+      Accepts 1-500 keys per request
+    examples:
+      - id: storage-js-vectordataapi-deletevectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const { error } = await client.deleteVectors({
+            vectorBucketName: 'embeddings-prod',
+            indexName: 'documents-openai-small',
+            keys: ['doc-1', 'doc-2', 'doc-3']
+          })
+          if (!error) {
+            console.log('Vectors deleted successfully')
+          }
+          ```
+  - id: storage-js-vectordataapi-getvectors
+    title: VectorDataApi.getVectors()
+    $ref: '@supabase/storage-js.VectorDataApi.getVectors'
+    description: |-
+      Retrieves vectors by their keys in batch
+      Optionally includes vector data and/or metadata in response
+      Additional permissions required when returning data or metadata
+    examples:
+      - id: storage-js-vectordataapi-getvectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const { data, error } = await client.getVectors({
+            vectorBucketName: 'embeddings-prod',
+            indexName: 'documents-openai-small',
+            keys: ['doc-1', 'doc-2', 'doc-3'],
+            returnData: false,     // Don't return embeddings
+            returnMetadata: true   // Return metadata only
+          })
+          if (data) {
+            data.vectors.forEach(v => console.log(v.key, v.metadata))
+          }
+          ```
+  - id: storage-js-vectordataapi-listvectors
+    title: VectorDataApi.listVectors()
+    $ref: '@supabase/storage-js.VectorDataApi.listVectors'
+    description: |-
+      Lists/scans vectors in an index with pagination
+      Supports parallel scanning via segment configuration for high-throughput scenarios
+      Additional permissions required when returning data or metadata
+    examples:
+      - id: storage-js-vectordataapi-listvectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          // Simple pagination
+          let nextToken: string | undefined
+          do {
+            const { data, error } = await client.listVectors({
+              vectorBucketName: 'embeddings-prod',
+              indexName: 'documents-openai-small',
+              maxResults: 500,
+              nextToken,
+              returnMetadata: true
+            })
+            if (error) break
+            console.log('Batch:', data.vectors.length)
+            nextToken = data.nextToken
+          } while (nextToken)
+
+          // Parallel scanning (4 concurrent workers)
+          const workers = [0, 1, 2, 3].map(async (segmentIndex) => {
+            const { data } = await client.listVectors({
+              vectorBucketName: 'embeddings-prod',
+              indexName: 'documents-openai-small',
+              segmentCount: 4,
+              segmentIndex,
+              returnMetadata: true
+            })
+            return data?.vectors || []
+          })
+          const results = await Promise.all(workers)
+          ```
+  - id: storage-js-vectordataapi-putvectors
+    title: VectorDataApi.putVectors()
+    $ref: '@supabase/storage-js.VectorDataApi.putVectors'
+    description: |-
+      Inserts or updates vectors in batch (upsert operation)
+      Accepts 1-500 vectors per request. Larger batches should be split
+    examples:
+      - id: storage-js-vectordataapi-putvectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const { data, error } = await client.putVectors({
+            vectorBucketName: 'embeddings-prod',
+            indexName: 'documents-openai-small',
+            vectors: [
+              {
+                key: 'doc-1',
+                data: { float32: [0.1, 0.2, 0.3, ...] }, // 1536 dimensions
+                metadata: { title: 'Introduction', page: 1 }
+              },
+              {
+                key: 'doc-2',
+                data: { float32: [0.4, 0.5, 0.6, ...] },
+                metadata: { title: 'Conclusion', page: 42 }
+              }
+            ]
+          })
+          ```
+  - id: storage-js-vectordataapi-queryvectors
+    title: VectorDataApi.queryVectors()
+    $ref: '@supabase/storage-js.VectorDataApi.queryVectors'
+    description: |-
+      Queries for similar vectors using approximate nearest neighbor (ANN) search
+      Returns top-K most similar vectors based on the configured distance metric
+      Supports optional metadata filtering (requires GetVectors permission)
+    examples:
+      - id: storage-js-vectordataapi-queryvectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          // Semantic search with filtering
+          const { data, error } = await client.queryVectors({
+            vectorBucketName: 'embeddings-prod',
+            indexName: 'documents-openai-small',
+            queryVector: { float32: [0.1, 0.2, 0.3, ...] }, // 1536 dimensions
+            topK: 5,
+            filter: {
+              category: 'technical',
+              published: true
+            },
+            returnDistance: true,
+            returnMetadata: true
+          })
+          if (data) {
+            data.matches.forEach(match => {
+              console.log(`${match.key}: distance=${match.distance}`)
+              console.log('Metadata:', match.metadata)
+            })
+          }
+          ```
+  - id: storage-js-vectordataapi-throwonerror
+    title: VectorDataApi.throwOnError()
+    $ref: '@supabase/storage-js.VectorDataApi.throwOnError'
+    description: |-
+      Enable throwing errors instead of returning them in the response
+      When enabled, failed operations will throw instead of returning { data: null, error }
+    examples:
+      - id: storage-js-vectordataapi-throwonerror-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const client = new VectorDataApi(url, headers)
+          client.throwOnError()
+          const { data } = await client.putVectors(options) // throws on error
+          ```
+  - id: storage-js-vectorindexapi-constructor
+    title: new VectorIndexApi()
+    $ref: '@supabase/storage-js.VectorIndexApi.constructor'
+    description: 'TODO: Add description for constructor'
+  - id: storage-js-vectorindexapi-createindex
+    title: VectorIndexApi.createIndex()
+    $ref: '@supabase/storage-js.VectorIndexApi.createIndex'
+    description: |-
+      Creates a new vector index within a bucket
+      Defines the schema for vectors including dimensionality, distance metric, and metadata config
+    examples:
+      - id: storage-js-vectorindexapi-createindex-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const { data, error } = await client.createIndex({
+            vectorBucketName: 'embeddings-prod',
+            indexName: 'documents-openai-small',
+            dataType: 'float32',
+            dimension: 1536,
+            distanceMetric: 'cosine',
+            metadataConfiguration: {
+              nonFilterableMetadataKeys: ['raw_text', 'internal_id']
+            }
+          })
+          ```
+  - id: storage-js-vectorindexapi-deleteindex
+    title: VectorIndexApi.deleteIndex()
+    $ref: '@supabase/storage-js.VectorIndexApi.deleteIndex'
+    description: |-
+      Deletes a vector index and all its data
+      This operation removes the index schema and all vectors stored in the index
+    examples:
+      - id: storage-js-vectorindexapi-deleteindex-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          // Delete an index and all its vectors
+          const { error } = await client.deleteIndex('embeddings-prod', 'old-index')
+          if (!error) {
+            console.log('Index deleted successfully')
+          }
+          ```
+  - id: storage-js-vectorindexapi-getindex
+    title: VectorIndexApi.getIndex()
+    $ref: '@supabase/storage-js.VectorIndexApi.getIndex'
+    description: |-
+      Retrieves metadata for a specific vector index
+      Returns index configuration including dimension, distance metric, and metadata settings
+    examples:
+      - id: storage-js-vectorindexapi-getindex-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const { data, error } = await client.getIndex('embeddings-prod', 'documents-openai-small')
+          if (data) {
+            console.log('Index dimension:', data.index.dimension)
+            console.log('Distance metric:', data.index.distanceMetric)
+          }
+          ```
+  - id: storage-js-vectorindexapi-listindexes
+    title: VectorIndexApi.listIndexes()
+    $ref: '@supabase/storage-js.VectorIndexApi.listIndexes'
+    description: |-
+      Lists vector indexes within a bucket with optional filtering and pagination
+      Supports prefix-based filtering and paginated results
+    examples:
+      - id: storage-js-vectorindexapi-listindexes-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          // List all indexes in a bucket
+          const { data, error } = await client.listIndexes({
+            vectorBucketName: 'embeddings-prod',
+            prefix: 'documents-'
+          })
+          if (data) {
+            console.log('Found indexes:', data.indexes.map(i => i.indexName))
+            // Fetch next page if available
+            if (data.nextToken) {
+              const next = await client.listIndexes({
+                vectorBucketName: 'embeddings-prod',
+                nextToken: data.nextToken
+              })
+            }
+          }
+          ```
+  - id: storage-js-vectorindexapi-throwonerror
+    title: VectorIndexApi.throwOnError()
+    $ref: '@supabase/storage-js.VectorIndexApi.throwOnError'
+    description: |-
+      Enable throwing errors instead of returning them in the response
+      When enabled, failed operations will throw instead of returning { data: null, error }
+    examples:
+      - id: storage-js-vectorindexapi-throwonerror-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const client = new VectorIndexApi(url, headers)
+          client.throwOnError()
+          const { data } = await client.createIndex(options) // throws on error
+          ```
+  - id: storage-js-vectorindexscope-constructor
+    title: new VectorIndexScope()
+    $ref: '@supabase/storage-js.VectorIndexScope.constructor'
+    description: 'TODO: Add description for constructor'
+  - id: storage-js-vectorindexscope-deletevectors
+    title: VectorIndexScope.deleteVectors()
+    $ref: '@supabase/storage-js.VectorIndexScope.deleteVectors'
+    description: |-
+      Deletes vectors by keys from this index
+      Convenience method that automatically includes bucket and index names
+    examples:
+      - id: storage-js-vectorindexscope-deletevectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const index = client.bucket('embeddings-prod').index('documents-openai')
+          await index.deleteVectors({
+            keys: ['doc-1', 'doc-2', 'doc-3']
+          })
+          ```
+  - id: storage-js-vectorindexscope-getvectors
+    title: VectorIndexScope.getVectors()
+    $ref: '@supabase/storage-js.VectorIndexScope.getVectors'
+    description: |-
+      Retrieves vectors by keys from this index
+      Convenience method that automatically includes bucket and index names
+    examples:
+      - id: storage-js-vectorindexscope-getvectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const index = client.bucket('embeddings-prod').index('documents-openai')
+          const { data } = await index.getVectors({
+            keys: ['doc-1', 'doc-2'],
+            returnMetadata: true
+          })
+          ```
+  - id: storage-js-vectorindexscope-listvectors
+    title: VectorIndexScope.listVectors()
+    $ref: '@supabase/storage-js.VectorIndexScope.listVectors'
+    description: |-
+      Lists vectors in this index with pagination
+      Convenience method that automatically includes bucket and index names
+    examples:
+      - id: storage-js-vectorindexscope-listvectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const index = client.bucket('embeddings-prod').index('documents-openai')
+          const { data } = await index.listVectors({
+            maxResults: 500,
+            returnMetadata: true
+          })
+          ```
+  - id: storage-js-vectorindexscope-putvectors
+    title: VectorIndexScope.putVectors()
+    $ref: '@supabase/storage-js.VectorIndexScope.putVectors'
+    description: |-
+      Inserts or updates vectors in this index
+      Convenience method that automatically includes bucket and index names
+    examples:
+      - id: storage-js-vectorindexscope-putvectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const index = client.bucket('embeddings-prod').index('documents-openai')
+          await index.putVectors({
+            vectors: [
+              {
+                key: 'doc-1',
+                data: { float32: [0.1, 0.2, ...] },
+                metadata: { title: 'Introduction', page: 1 }
+              }
+            ]
+          })
+          ```
+  - id: storage-js-vectorindexscope-queryvectors
+    title: VectorIndexScope.queryVectors()
+    $ref: '@supabase/storage-js.VectorIndexScope.queryVectors'
+    description: |-
+      Queries for similar vectors in this index
+      Convenience method that automatically includes bucket and index names
+    examples:
+      - id: storage-js-vectorindexscope-queryvectors-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const index = client.bucket('embeddings-prod').index('documents-openai')
+          const { data } = await index.queryVectors({
+            queryVector: { float32: [0.1, 0.2, ...] },
+            topK: 5,
+            filter: { category: 'technical' },
+            returnDistance: true,
+            returnMetadata: true
+          })
+          ```
