@@ -601,6 +601,10 @@
     "./types/assets.d": {
       "import": "./src/types/assets.d.ts",
       "types": "./src/types/assets.d.ts"
+    },
+    "./MetricCard": {
+      "import": "./src/MetricCard/index.tsx",
+      "types": "./src/MetricCard/index.tsx"
     }
   },
   "dependencies": {
