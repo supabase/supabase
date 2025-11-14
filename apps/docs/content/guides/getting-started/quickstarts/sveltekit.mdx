@@ -167,15 +167,15 @@ hideToc: true
 
 
       ```svelte name=src/routes/+page.svelte
-        <script>
-          let { data } = $props();
-        </script>
+      <script>
+        let { data } = $props();
+      </script>
 
-        <ul>
-          {#each data.instruments as instrument}
-            <li>{instrument.name}</li>
-          {/each}
-        </ul>
+      <ul>
+        {#each data.instruments as instrument}
+          <li>{instrument.name}</li>
+        {/each}
+      </ul>
       ```
 
     </StepHikeCompact.Code>
