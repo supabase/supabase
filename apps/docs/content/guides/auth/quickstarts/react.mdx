@@ -21,7 +21,6 @@ hideToc: true
      ```sql name=SQL_EDITOR
       select * from auth.users;
       ````
-
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
@@ -38,14 +37,11 @@ hideToc: true
     ```bash name=Terminal
     npm create vite@latest my-app -- --template react
     ```
-
   </StepHikeCompact.Code>
 </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Install the Supabase client library">
-
-    The fastest way to get started is to use Supabase's `auth-ui-react` library which provides a convenient interface for working with Supabase Auth from a React app.
 
     Navigate to the React app and install the Supabase libraries.
 
@@ -54,9 +50,8 @@ hideToc: true
     <StepHikeCompact.Code>
 
       ```bash name=Terminal
-      cd my-app && npm install @supabase/supabase-js @supabase/auth-ui-react @supabase/auth-ui-shared
+      cd my-app && npm install @supabase/supabase-js @supabase/auth-ui-react-router
       ```
-
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
@@ -68,8 +63,6 @@ hideToc: true
 
     <$Partial path="api_settings_steps.mdx" />
 
-    You can configure the Auth component to display whenever there is no session inside `supabase.auth.getSession()`
-
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
 
@@ -77,8 +70,7 @@ hideToc: true
         import './index.css'
         import { useState, useEffect } from 'react'
         import { createClient } from '@supabase/supabase-js'
-        import { Auth } from '@supabase/auth-ui-react'
-        import { ThemeSupa } from '@supabase/auth-ui-shared'
+        import { PasswordAuth } from '@supabase/auth-ui-react-router'
 
         const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_... or anon key>')
 
@@ -100,14 +92,13 @@ hideToc: true
           }, [])
 
           if (!session) {
-            return (<Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />)
+            return (<PasswordAuth supabaseClient={supabase} />)
           }
           else {
             return (<div>Logged in!</div>)
           }
         }
       ```
-
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
@@ -124,7 +115,6 @@ hideToc: true
       ```bash name=Terminal
       npm run dev
       ```
-
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
