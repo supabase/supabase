@@ -4,10 +4,7 @@ import { useParams } from 'common'
 import { useAnalyticsBucketDeleteMutation } from 'data/storage/analytics-bucket-delete-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
-import {
-  useAnalyticsBucketAssociatedEntities,
-  useAnalyticsBucketDeleteCleanUp,
-} from './AnalyticsBucketDetails/useAnalyticsBucketAssociatedEntities'
+import { useAnalyticsBucketDeleteCleanUp } from './AnalyticsBucketDetails/useAnalyticsBucketAssociatedEntities'
 
 export interface DeleteAnalyticsBucketModalProps {
   visible: boolean
@@ -25,26 +22,13 @@ export const DeleteAnalyticsBucketModal = ({
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { icebergWrapper, icebergWrapperMeta, s3AccessKey, publication } =
-    useAnalyticsBucketAssociatedEntities({ projectRef, bucketId: bucketId })
-
   const { mutateAsync: deleteAnalyticsBucketCleanUp, isLoading: isCleaningUpAnalyticsBucket } =
-    useAnalyticsBucketDeleteCleanUp()
+    useAnalyticsBucketDeleteCleanUp({ projectRef, bucketId })
 
   const { mutate: deleteAnalyticsBucket, isLoading: isDeletingAnalyticsBucket } =
     useAnalyticsBucketDeleteMutation({
       onSuccess: async () => {
-        if (project?.connectionString) {
-          await deleteAnalyticsBucketCleanUp({
-            projectRef,
-            connectionString: project.connectionString,
-            bucketId: bucketId,
-            icebergWrapper,
-            icebergWrapperMeta,
-            s3AccessKey,
-            publication,
-          })
-        }
+        if (project?.connectionString) await deleteAnalyticsBucketCleanUp()
         toast.success(`Successfully deleted analytics bucket ${bucketId}`)
         onClose()
         onSuccess?.()

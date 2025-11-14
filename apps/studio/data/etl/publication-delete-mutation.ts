@@ -6,7 +6,7 @@ import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { replicationKeys } from './keys'
 
 export type DeletePublicationParams = {
-  projectRef: string
+  projectRef?: string
   sourceId: number
   publicationName: string
 }
