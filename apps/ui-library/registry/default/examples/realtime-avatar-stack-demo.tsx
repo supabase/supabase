@@ -1,9 +1,8 @@
 'use client'
 
-import { AvatarStack } from '@/registry/default/blocks/realtime-avatar-stack/components/avatar-stack'
-import { RealtimeUser } from '@/registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room'
-import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
-import { REALTIME_SUBSCRIBE_STATES } from '@supabase/supabase-js'
+import { AvatarStack } from '../blocks/realtime-avatar-stack/components/avatar-stack'
+import { RealtimeUser } from '../blocks/realtime-avatar-stack/hooks/use-realtime-presence-room'
+import { createClient } from '../clients/nextjs/lib/supabase/client'
 import { useUser } from 'common'
 import { useEffect, useMemo, useState } from 'react'
 import { Label_Shadcn_, Switch } from 'ui'

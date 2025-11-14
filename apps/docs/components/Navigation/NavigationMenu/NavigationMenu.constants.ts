@@ -268,7 +268,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
           {
             label: 'UI Library',
             icon: 'ui',
-            href: 'https://supabase.com/ui' as `/${string}`,
+            href: '/guides/ui' as `/${string}`,
             level: 'ui',
           },
         ],
@@ -3209,6 +3209,45 @@ export const references = [
     ],
   },
 ]
+
+export const ui: NavMenuConstant = {
+  icon: 'ui',
+  title: 'UI Library',
+  url: '/guides/ui',
+  items: [
+    { name: 'Overview', url: '/guides/ui' },
+    {
+      name: 'Getting Started',
+      url: undefined,
+      items: [
+        { name: 'Quickstart', url: '/guides/ui/quickstart' },
+        { name: 'FAQ', url: '/guides/ui/faq' },
+      ],
+    },
+    {
+      name: 'Blocks',
+      url: undefined,
+      items: [
+        { name: 'Client', url: '/guides/ui/blocks/client' },
+        { name: 'Password-based Authentication', url: '/guides/ui/blocks/password-based-auth' },
+        { name: 'Social Auth', url: '/guides/ui/blocks/social-auth' },
+        { name: 'Dropzone', url: '/guides/ui/blocks/dropzone' },
+        { name: 'Realtime Cursor', url: '/guides/ui/blocks/realtime-cursor' },
+        { name: 'Current User Avatar', url: '/guides/ui/blocks/current-user-avatar' },
+        { name: 'Realtime Avatar Stack', url: '/guides/ui/blocks/realtime-avatar-stack' },
+        { name: 'Realtime Chat', url: '/guides/ui/blocks/realtime-chat' },
+        { name: 'Infinite Query Hook', url: '/guides/ui/blocks/infinite-query-hook' },
+      ]
+    },
+    {
+      name: 'Platform',
+      url: undefined,
+      items: [
+        { name: 'Platform Kit', url: '/guides/ui/platform-kit' }
+      ]
+    }
+  ],
+}
 
 export const navDataForMdx = {
   migrationPages: MIGRATION_PAGES,

@@ -1,4 +1,4 @@
-import { Style } from '@/registry/styles'
+import { Style } from '../registry/styles' // '@/registry/styles'
 // import { Theme } from '@/registry/themes'
 import { useAtom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
