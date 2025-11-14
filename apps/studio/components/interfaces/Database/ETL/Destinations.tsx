@@ -12,8 +12,9 @@ import { fetchReplicationPipelineVersion } from 'data/etl/pipeline-version-query
 import { useReplicationPipelinesQuery } from 'data/etl/pipelines-query'
 import { useReplicationSourcesQuery } from 'data/etl/sources-query'
 import { DOCS_URL } from 'lib/constants'
-import { Button, cn, Input_Shadcn_ } from 'ui'
+import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationRow } from './DestinationRow'
 import { EnableReplicationModal } from './EnableReplicationModal'
@@ -95,19 +96,16 @@ export const Destinations = () => {
       <div className="mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <div className="relative">
-              <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
-                size={14}
-              />
-              <Input_Shadcn_
-                className="pl-9 h-7"
-                placeholder={'Filter destinations'}
-                value={filterString}
-                onChange={(e) => setFilterString(e.target.value)}
-              />
-            </div>
+            <Input
+              size="tiny"
+              icon={<Search size={12} />}
+              className="w-48 pl-8"
+              placeholder="Search for a destination"
+              value={filterString}
+              onChange={(e) => setFilterString(e.target.value)}
+            />
           </div>
+
           {!!sourceId && (
             <Button type="default" icon={<Plus />} onClick={() => setShowNewDestinationPanel(true)}>
               Add destination
