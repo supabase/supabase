@@ -27,9 +27,9 @@ import { getGeneralPolicyTemplates } from './PolicyEditorModal.constants'
 import PolicyEditorModalTitle from './PolicyEditorModalTitle'
 
 interface PolicyEditorModalProps {
-  visible: boolean
-  schema: string
-  table: string
+  visible?: boolean
+  schema?: string
+  table?: string
   selectedPolicyToEdit: any
   showAssistantPreview?: boolean
   onSelectCancel: () => void

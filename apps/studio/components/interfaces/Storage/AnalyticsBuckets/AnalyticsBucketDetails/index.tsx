@@ -11,7 +11,6 @@ import {
   convertKVStringArrayToJson,
   formatWrapperTables,
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer/useSelectedBucket'
 import {
   ScaffoldContainer,
   ScaffoldSection,
@@ -25,7 +24,6 @@ import {
 } from 'data/database-extensions/database-extensions-query'
 import { useReplicationPipelineStatusQuery } from 'data/etl/pipeline-status-query'
 import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
-import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -34,6 +32,7 @@ import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
+import { useSelectedAnalyticsBucket } from '../useSelectedAnalyticsBucket'
 import { BucketHeader } from './BucketHeader'
 import { ConnectTablesDialog } from './ConnectTablesDialog'
 import { NamespaceWithTables } from './NamespaceWithTables'
@@ -48,12 +47,11 @@ export const AnalyticBucketDetails = () => {
   const { data: project } = useSelectedProjectQuery()
   const { state: extensionState } = useIcebergWrapperExtension()
   const {
-    bucket: _bucket,
+    data: bucket,
     error: bucketError,
     isSuccess: isSuccessBucket,
     isError: isErrorBucket,
-  } = useSelectedBucket()
-  const bucket = _bucket as undefined | AnalyticsBucket
+  } = useSelectedAnalyticsBucket()
 
   const [modal, setModal] = useState<'delete' | null>(null)
   // [Joshen] Namespaces are now created asynchronously when the pipeline is started, so long poll after
@@ -332,7 +330,7 @@ export const AnalyticBucketDetails = () => {
                 </div>
                 <Button
                   type="danger"
-                  disabled={!isSuccessBucket}
+                  disabled={!bucket?.id || !isSuccessBucket}
                   onClick={() => setModal('delete')}
                 >
                   Delete bucket
