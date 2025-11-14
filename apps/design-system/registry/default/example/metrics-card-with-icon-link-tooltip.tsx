@@ -38,7 +38,7 @@ export default function MetricsCardDemo() {
           <MetricsCardIcon>
             <User2 size={14} strokeWidth={1.5} />
           </MetricsCardIcon>
-          <MetricsCardLabel tooltip="The number of Active Users over the last 24 hours">
+          <MetricsCardLabel tooltip="The number of active users over the last 24 hours">
             Active Users
           </MetricsCardLabel>
         </MetricsCardHeader>
