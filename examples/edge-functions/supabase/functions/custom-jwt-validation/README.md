@@ -7,7 +7,7 @@ Since Supabase legacy JWT Secret will be deprecated, users that would like to ve
 > see [Upcoming changes to Supabase API Keys #29260](https://github.com/orgs/supabase/discussions/29260)
 
 To simplify this task, Supabase provides a collection of JWT validation examples
-that can be found at [`_shared/jwt/`](https://github.com/supabase/supabase/blob/main/examples/edge-functions/supabase/functions/_shared/jwt) folder.
+that can be found at [`_shared/jwt/`](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/_shared/jwt) folder.
 
 ## Setup
 
