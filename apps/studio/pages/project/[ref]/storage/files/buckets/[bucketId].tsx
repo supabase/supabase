@@ -101,7 +101,7 @@ const BucketPage: NextPageWithLayout = () => {
               }
             >
               <Link
-                href={`/project/${ref}/storage/files/policies?search=${encodeURIComponent(bucket.name)}`}
+                href={`/project/${ref}/storage/files/policies?search=${encodeURIComponent(bucket?.name ?? '')}`}
               >
                 Policies
               </Link>
