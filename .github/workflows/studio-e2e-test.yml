@@ -62,6 +62,15 @@ jobs:
             e2e/studio/test-results/
           retention-days: 7
 
+      - name: Publish test results
+        uses: dorny/test-reporter@31a54ee7ebcacc03a09ea97a7e5465a47b84aea5 # v1.9.1
+        if: always()
+        with:
+          name: Playwright Tests
+          path: e2e/studio/test-results/junit.xml
+          reporter: java-junit
+          fail-on-error: false
+
       - name: Fail job if tests failed
         if: steps.playwright.outcome != 'success' || steps.summarize.outputs.flaky_count > 0
         run: |
