@@ -178,7 +178,7 @@ For API logs, logs can originate from the API Load Balancer as well. The upstrea
 
 ### Metrics
 
-Observability and metrics for Read Replicas are available on the Supabase Dashboard. Resource utilization for a specific Read Replica can be viewed on the [Database Reports page](/dashboard/project/_/reports/database) by toggling for `Source`. Likewise, metrics on API requests going through either a Read Replica or Load Balancer API endpoint are also available on the dashboard through the [API Reports page](/dashboard/project/_/reports/api-overview)
+Observability and metrics for Read Replicas are available on the Supabase Dashboard. Resource utilization for a specific Read Replica can be viewed on the [Database Reports page](/dashboard/project/_/observability/database) by toggling for `Source`. Likewise, metrics on API requests going through either a Read Replica or Load Balancer API endpoint are also available on the dashboard through the [API Reports page](/dashboard/project/_/observability/api-overview)
 
 We recommend ingesting your [project's metrics](/docs/guides/platform/metrics#accessing-the-metrics-endpoint) into your own environment. If you have an existing ingestion pipeline set up for your project, you can [update it](https://github.com/supabase/supabase-grafana?tab=readme-ov-file#read-replica-support) to additionally ingest metrics from your Read Replicas.
 
@@ -229,7 +229,7 @@ We combine it with streaming replication to reduce replication lag. Once WAL-G f
 
 ### Monitoring replication lag
 
-Replication lag for a specific Read Replica can be monitored through the dashboard. On the [Database Reports page](/dashboard/project/_/reports/database) Read Replicas will have an additional chart under `Replica Information` displaying historical replication lag in seconds. Realtime replication lag in seconds can be observed on the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure). This is the value on top of the Read Replica. Do note that there is no single threshold to indicate when replication lag should be addressed. It would be fully dependent on the requirements of your project.
+Replication lag for a specific Read Replica can be monitored through the dashboard. On the [Database Reports page](/dashboard/project/_/observability/database) Read Replicas will have an additional chart under `Replica Information` displaying historical replication lag in seconds. Realtime replication lag in seconds can be observed on the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure). This is the value on top of the Read Replica. Do note that there is no single threshold to indicate when replication lag should be addressed. It would be fully dependent on the requirements of your project.
 
 If you are already ingesting your [project's metrics](/docs/guides/platform/metrics#accessing-the-metrics-endpoint) into your own environment, you can also keep track of replication lag and set alarms accordingly with the metric: `physical_replication_lag_physical_replica_lag_seconds`.
 
