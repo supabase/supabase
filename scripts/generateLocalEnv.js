@@ -43,7 +43,7 @@ fs.writeFileSync(
 
 const STUDIO_URL = environment.NEXT_PUBLIC_SITE_URL
 const WEB_SERVER_PORT = new URL(STUDIO_URL).port ?? undefined
-const API_URL = environment.SUPABASE_URL
+const API_URL = environment.API_URL
 
 const e2eTestEnv = {
   STUDIO_URL,
