@@ -63,7 +63,7 @@ jobs:
           retention-days: 7
 
       - name: Comment Playwright test results on PR
-        uses: daun/playwright-report-comment@7ea4d0c3cc7248897a727fd7eb0fb2460f56b3b9 # v3.4.3
+        uses: daun/playwright-report-comment@5b72497e81ed11f0d0d7f1d375ef0a0c76d5e6fb # v3.10.0
         if: always() && github.event_name == 'pull_request'
         with:
           report-path: e2e/studio/playwright-report
