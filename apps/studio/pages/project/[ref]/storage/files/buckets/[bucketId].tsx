@@ -98,7 +98,11 @@ const BucketPage: NextPageWithLayout = () => {
                 ) : undefined
               }
             >
-              <Link href={`/project/${ref}/storage/files/policies`}>Policies</Link>
+              <Link
+                href={`/project/${ref}/storage/files/policies?search=${encodeURIComponent(bucket.name)}`}
+              >
+                Policies
+              </Link>
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
