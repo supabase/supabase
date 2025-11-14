@@ -83,7 +83,10 @@ export const UnshareSnippetModal = ({
         description: 'Only you will have access to this query',
       }}
     >
-      <ul className="text-sm text-foreground-light space-y-5">
+      <ul
+        data-testid="confirm-unshare-snippet-modal"
+        className="text-sm text-foreground-light space-y-5"
+      >
         <li className="flex gap-3">
           <EyeOffIcon />
           <span>Project members will no longer be able to view this query.</span>

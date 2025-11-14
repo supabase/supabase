@@ -157,6 +157,7 @@ const RowEditor = ({
 
   return (
     <SidePanel
+      data-testid="side-panel-row-editor"
       hideFooter
       size="large"
       key="RowEditor"
