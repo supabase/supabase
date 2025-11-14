@@ -204,7 +204,9 @@ const SparklineTooltip = ({ active, payload, label }: RechartsTooltipProps<any, 
   return (
     <div className="bg-black/90 text-white p-2 rounded text-xs">
       {label && (
-        <div className="text-foreground-light">{formatTimestamp(payload[0].payload.timestamp)}</div>
+        <div className="dark:text-foreground-light text-white/60">
+          {formatTimestamp(payload[0].payload.timestamp)}
+        </div>
       )}
       <div>{payload[0].value.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
     </div>
