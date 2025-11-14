@@ -36,7 +36,7 @@ export default function MetricsCardDemo() {
       <MetricsCard isLoading={!data.length}>
         <MetricsCardHeader href="https://www.supabase.io">
           <MetricsCardIcon>
-            <User2 size={16} strokeWidth={1.5} />
+            <User2 size={14} strokeWidth={1.5} />
           </MetricsCardIcon>
           <MetricsCardLabel tooltip="The number of Active Users over the last 24 hours">
             Active Users
