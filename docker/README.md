@@ -37,13 +37,34 @@ This Docker Compose configuration includes the following services:
 - **[CHANGELOG.md](./CHANGELOG.md)** - Track recent updates and changes to services
 - **[versions.md](./versions.md)** - Complete history of Docker image versions for rollback reference
 
+## Updates
+
+To update your self-hosted Supabase instance:
+
+1. Review [CHANGELOG.md](./CHANGELOG.md) for breaking changes
+2. Check [versions.md](./versions.md) for new image versions
+3. Update `docker-compose.yml` if there are configuration changes
+4. Pull the latest images: `docker compose pull`
+5. Stop services: `docker compose down`
+6. Start services with new configuration: `docker compose up -d`
+
+**Note:** Consider to always backup your database before updating.
+
 ## Community & Support
+
+For troubleshooting common issues, see:
+- [GitHub Discussions](https://github.com/orgs/supabase/discussions?discussions_q=is%3Aopen+label%3Aself-hosted) - Questions, feature requests, and workarounds
+- [GitHub Issues](https://github.com/supabase/supabase/issues?q=is%3Aissue%20state%3Aopen%20label%3Aself-hosted) - Known issues
+- [Documentation](https://supabase.com/docs/guides/self-hosting) - Setup and configuration guides
 
 Self-hosted Supabase is community-supported. Get help and connect with other users:
 
 - **[Discord](https://discord.supabase.com)** - Real-time chat and community support
 - **[Reddit](https://www.reddit.com/r/Supabase/)** - Community forum
-- **[GitHub Discussions](https://github.com/orgs/supabase/discussions/39820)** - Self-hosted community discussion
+
+Share your self-hosting experience and read what's working for other users:
+
+- **[GitHub Discussions](https://github.com/orgs/supabase/discussions/39820)** - Self-hosting: What's working (and what's not)?)
 
 ## Important Notes
 
@@ -60,26 +81,6 @@ Before deploying to production, you must:
 - Set up proper backup procedures
 
 See the [security section](https://supabase.com/docs/guides/self-hosting/docker#securing-your-services) in the documentation.
-
-### Updates
-
-To update your self-hosted Supabase instance:
-
-1. Review [CHANGELOG.md](./CHANGELOG.md) for breaking changes
-2. Check [versions.md](./versions.md) for new image versions
-3. Update `docker-compose.yml` if there are configuration changes
-4. Pull the latest images: `docker compose pull`
-5. Stop services: `docker compose down`
-6. Start services with new configuration: `docker compose up -d`
-
-**Note:** Consider to always backup your database before updating.
-
-### Common Issues
-
-For troubleshooting common issues, see:
-- [GitHub Discussions](https://github.com/orgs/supabase/discussions?discussions_q=is%3Aopen+label%3Aself-hosted) - Questions, feature requests, and workarounds
-- [GitHub Issues](https://github.com/supabase/supabase/issues?q=is%3Aissue%20state%3Aopen%20label%3Aself-hosted) - Known issues
-- [Documentation](https://supabase.com/docs/guides/self-hosting) - Setup and configuration guides
 
 ## License
 
