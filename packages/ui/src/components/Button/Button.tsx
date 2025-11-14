@@ -239,12 +239,18 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const Comp = asChild ? Slot : 'button'
-    const { className } = props
+    const { className, tabIndex } = props
     const showIcon = loading || icon
     // decrecating 'showIcon' for rightIcon
     const _iconLeft: React.ReactNode = icon ?? iconLeft
     // if loading, button is disabled
     const disabled = loading === true || props.disabled
+
+    // Set default tabIndex for proper Safari focus handling
+    // - Explicit tabIndex prop takes precedence
+    // - If disabled, default to -1 (unless explicitly set)
+    // - Otherwise, default to 0 for keyboard accessibility
+    const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
 
     return (
       <Comp
@@ -253,6 +259,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         type={htmlType}
         {...props}
         disabled={disabled}
+        tabIndex={computedTabIndex}
         className={cn(buttonVariants({ type, size, disabled, block, rounded }), className)}
         onClick={(e) => {
           // [Joshen] Prevents redirecting if Button is used with a link-based child element
