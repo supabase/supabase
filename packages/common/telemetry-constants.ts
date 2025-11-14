@@ -423,6 +423,58 @@ export interface RealtimeToggleTableClickedEvent {
 }
 
 /**
+ * Realtime was enabled on a table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface TableRealtimeEnabledEvent {
+  action: 'table_realtime_enabled'
+  properties: {
+    /**
+     * The method used to enable realtime
+     */
+    method: 'ui' | 'sql_editor' | 'api'
+    /**
+     * Schema name
+     */
+    schema_name: string
+    /**
+     * Table name
+     */
+    table_name: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Realtime was disabled on a table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface TableRealtimeDisabledEvent {
+  action: 'table_realtime_disabled'
+  properties: {
+    /**
+     * The method used to disable realtime
+     */
+    method: 'ui' | 'sql_editor' | 'api'
+    /**
+     * Schema name
+     */
+    schema_name: string
+    /**
+     * Table name
+     */
+    table_name: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the quickstart card in the SQL editor.
  *
  * @group Events
@@ -1547,6 +1599,32 @@ export interface HomeAdvisorAskAssistantClickedEvent {
 }
 
 /**
+ * User was exposed to the realtime experiment (shown or not shown the Enable Realtime button).
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface RealtimeExperimentExposedEvent {
+  action: 'realtime_experiment_exposed'
+  properties: {
+    /**
+     * The experiment variant shown to the user
+     */
+    variant: 'control' | 'hide-button' | 'triggers'
+    /**
+     * Whether the table already has realtime enabled
+     */
+    table_has_realtime_enabled: boolean
+    /**
+     * Days since project creation (to segment by new user cohorts)
+     */
+    days_since_project_creation: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked on an issue card in the Advisor section of HomeV2.
  *
  * @group Events
@@ -2266,6 +2344,8 @@ export type TelemetryEvent =
   | RealtimeInspectorFiltersAppliedEvent
   | RealtimeInspectorDatabaseRoleUpdatedEvent
   | RealtimeToggleTableClickedEvent
+  | TableRealtimeEnabledEvent
+  | TableRealtimeDisabledEvent
   | SqlEditorQuickstartClickedEvent
   | SqlEditorTemplateClickedEvent
   | SqlEditorResultDownloadCsvClickedEvent
@@ -2337,6 +2417,7 @@ export type TelemetryEvent =
   | HomeAdvisorAskAssistantClickedEvent
   | HomeAdvisorIssueCardClickedEvent
   | HomeAdvisorFixIssueClickedEvent
+  | RealtimeExperimentExposedEvent
   | HomeProjectUsageServiceClickedEvent
   | HomeProjectUsageChartClickedEvent
   | HomeCustomReportBlockAddedEvent

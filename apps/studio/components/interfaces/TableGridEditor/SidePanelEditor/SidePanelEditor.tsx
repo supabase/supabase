@@ -25,6 +25,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { useUrlState } from 'hooks/ui/useUrlState'
+import { useTrack } from 'lib/telemetry/track'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
@@ -132,6 +133,7 @@ export const SidePanelEditor = ({
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
 
@@ -397,6 +399,12 @@ export const SidePanelEditor = ({
           publish_delete: true,
           tables: realtimeTables,
         })
+
+        track(enabled ? 'table_realtime_enabled' : 'table_realtime_disabled', {
+          method: 'ui',
+          schema_name: table.schema,
+          table_name: table.name,
+        })
         return
       }
       if (realtimePublication.tables === null) {
@@ -425,6 +433,12 @@ export const SidePanelEditor = ({
           connectionString: project.connectionString,
           tables: realtimeTables,
         })
+
+        track(enabled ? 'table_realtime_enabled' : 'table_realtime_disabled', {
+          method: 'ui',
+          schema_name: table.schema,
+          table_name: table.name,
+        })
         return
       }
       const isAlreadyEnabled = realtimePublication.tables.some((x) => x.id == table.id)
@@ -446,6 +460,12 @@ export const SidePanelEditor = ({
         projectRef: project.ref,
         connectionString: project.connectionString,
         tables: realtimeTables,
+      })
+
+      track(enabled ? 'table_realtime_enabled' : 'table_realtime_disabled', {
+        method: 'ui',
+        schema_name: table.schema,
+        table_name: table.name,
       })
     } catch (error: any) {
       toast.error(`Failed to update realtime for ${table.name}: ${error.message}`)
