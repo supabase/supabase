@@ -601,6 +601,10 @@
     "./types/assets.d": {
       "import": "./src/types/assets.d.ts",
       "types": "./src/types/assets.d.ts"
+    },
+    "./MetricCard": {
+      "import": "./src/MetricCard/index.tsx",
+      "types": "./src/MetricCard/index.tsx"
     }
   },
   "dependencies": {
@@ -635,7 +639,7 @@
     "react-syntax-highlighter": "^15.6.6",
     "react-tooltip": "*",
     "react-use": "^17.5.0",
-    "recharts": "^2.8.0",
+    "recharts": "catalog:",
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.0",
     "scroll-into-view-if-needed": "^3.1.0",

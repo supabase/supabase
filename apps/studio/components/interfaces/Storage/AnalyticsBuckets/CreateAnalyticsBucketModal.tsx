@@ -105,7 +105,7 @@ export const CreateAnalyticsBucketModal = ({
 
   const [visible, setVisible] = useState(false)
 
-  const { data: buckets = [] } = useAnalyticsBucketsQuery({ projectRef: ref })
+  const { data: buckets = [], isLoading } = useAnalyticsBucketsQuery({ projectRef: ref })
   const icebergCatalogEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
   const wrappersExtenstionNeedsUpgrading = wrappersExtensionState === 'needs-upgrade'
 
@@ -125,6 +125,8 @@ export const CreateAnalyticsBucketModal = ({
 
   const config = BUCKET_TYPES['analytics']
   const isCreating = isEnablingExtension || isCreatingIcebergWrapper || isCreatingAnalyticsBucket
+  const isDisabled =
+    !canCreateBuckets || !icebergCatalogEnabled || isLoading || buckets.length >= 2 || disabled
 
   const form = useForm<CreateAnalyticsBucketForm>({
     resolver: zodResolver(FormSchema),
@@ -192,7 +194,8 @@ export const CreateAnalyticsBucketModal = ({
           type={buttonType}
           className={buttonClassName}
           icon={<Plus size={14} />}
-          disabled={!canCreateBuckets || !icebergCatalogEnabled || disabled}
+          disabled={isDisabled}
+          tabIndex={isDisabled ? -1 : 0}
           style={{ justifyContent: 'start' }}
           onClick={() => setVisible(true)}
           tooltip={{
@@ -203,7 +206,9 @@ export const CreateAnalyticsBucketModal = ({
                 ? 'Analytics buckets are not enabled for your project. Please contact support to enable it.'
                 : !canCreateBuckets
                   ? 'You need additional permissions to create buckets'
-                  : tooltip?.content?.text,
+                  : buckets.length >= 2
+                    ? 'Bucket limit reached'
+                    : tooltip?.content?.text,
             },
           }}
         >
