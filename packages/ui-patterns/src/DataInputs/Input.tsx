@@ -15,9 +15,11 @@ export const HIDDEN_PLACEHOLDER = '**** **** **** ****'
 export interface Props extends Omit<ComponentProps<typeof Input_Shadcn_>, 'size' | 'onCopy'> {
   copy?: boolean
   showCopyOnHover?: boolean
-  onCopy?: () => void
+  onCopy?: (() => void) | (() => string) | (() => Promise<string>)
   icon?: any
   reveal?: boolean
+  onReveal?: () => void
+  hiddenPlaceholder?: string
   actions?: React.ReactNode
   iconContainerClassName?: string
   containerClassName?: string
@@ -33,6 +35,8 @@ const Input = forwardRef<
       showCopyOnHover = false,
       icon,
       reveal = false,
+      onReveal,
+      hiddenPlaceholder = HIDDEN_PLACEHOLDER,
       actions,
       onCopy,
       iconContainerClassName,
@@ -46,18 +50,37 @@ const Input = forwardRef<
 
     const __styles = styleHandler('input')
 
-    function _onCopy(value: any) {
-      copyToClipboard(value, () => {
-        /* clipboard successfully set */
-        setCopyLabel('Copied')
-        setTimeout(function () {
-          setCopyLabel('Copy')
-        }, 3000)
-        onCopy?.()
-      })
+    async function _onCopy(value: any) {
+      if (onCopy) {
+        try {
+          const result = await onCopy()
+          if (typeof result === 'string') {
+            copyToClipboard(result, () => {
+              setCopyLabel('Copied')
+              setTimeout(() => setCopyLabel('Copy'), 3000)
+            })
+          } else {
+            // onCopy returned void, just show copied state
+            setCopyLabel('Copied')
+            setTimeout(() => setCopyLabel('Copy'), 3000)
+          }
+        } catch (error) {
+          console.error('Failed to copy:', error)
+          setCopyLabel('Failed to copy')
+          setTimeout(() => setCopyLabel('Copy'), 3000)
+        }
+      } else {
+        copyToClipboard(value, () => {
+          setCopyLabel('Copied')
+          setTimeout(() => setCopyLabel('Copy'), 3000)
+        })
+      }
     }
 
-    function onReveal() {
+    function handleReveal() {
+      if (onReveal) {
+        onReveal()
+      }
       setHidden(false)
     }
 
@@ -70,7 +93,7 @@ const Input = forwardRef<
           ref={ref}
           {...props}
           onCopy={onCopy}
-          value={reveal && hidden ? HIDDEN_PLACEHOLDER : props.value}
+          value={reveal && hidden ? hiddenPlaceholder : props.value}
           disabled={reveal && hidden ? true : props.disabled}
           className={cn(...inputClasses, props.className)}
         />
@@ -89,7 +112,7 @@ const Input = forwardRef<
               </Button>
             ) : null}
             {reveal && hidden ? (
-              <Button size="tiny" type="default" onClick={onReveal}>
+              <Button size="tiny" type="default" onClick={handleReveal}>
                 Reveal
               </Button>
             ) : null}

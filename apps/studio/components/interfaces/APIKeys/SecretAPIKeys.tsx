@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { useMemo, useRef } from 'react'
 
 import { useParams } from 'common'
+import { ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { APIKeysData, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
@@ -75,8 +76,25 @@ export const SecretAPIKeys = () => {
 
   const empty = secretApiKeys?.length === 0 && !isLoadingApiKeys && !isLoadingPermissions
 
-  return (
-    <div className="pb-30">
+  const RowLoading = () => (
+    <TableRow>
+      <TableCell>
+        <Skeleton className="max-w-12 h-4 rounded-full" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="max-w-60 h-4 rounded-full" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="max-w-60 h-4 rounded-full" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="w-2 h-4 rounded-full" />
+      </TableCell>
+    </TableRow>
+  )
+
+  const TableContainer = ({ children, className }: { children: ReactNode; className?: string }) => (
+    <ScaffoldSection isFullWidth>
       <FormHeader
         title="Secret keys"
         description="These API keys allow privileged access to your project's APIs. Use in servers, functions, workers or other backend components of your application."
@@ -126,8 +144,8 @@ export const SecretAPIKeys = () => {
               ))}
             </TableBody>
           </Table>
-        </Card>
-      )}
-    </div>
+        </CardContent>
+      </Card>
+    </ScaffoldSection>
   )
 }
