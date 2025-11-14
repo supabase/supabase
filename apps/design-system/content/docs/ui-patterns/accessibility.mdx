@@ -21,18 +21,29 @@ About to push some code? At a minimum, check your work against this list:
 
 ## Focus management
 
-All interactive page elements should be reachable by keyboard. They should also provide visual feedback upon selection via a `focus-visible` state. We use consistent focus styles such as `inset-focus` so users recognize this state instantly.
+All interactive page elements should be reachable by keyboard. Browsers such as Safari require the `tabIndex` to be explicitly set for elements to be recognised.
 
-```jsx
-<TableCell>
-  <p>{name}</p>
-  <button
-    className={cn('absolute inset-0', 'inset-focus')}
-    onClick={(event) => handleBucketNavigation(name, event)}
-  >
-    <span className="sr-only">Go to bucket details</span>
-  </button>
-</TableCell>
+Interactive page elements should also provide visual feedback upon selection via a `focus-visible` state. We use consistent focus styles such as `inset-focus` so users recognize this state instantly.
+
+[Button](../components/button) has all of the above built-in. Any bespoke interactive elements, such as the below button-like [TableRow](../components/table) require these props to be manually added:
+
+```tsx showLineNumbers {3, 5-11}
+<TableRow
+  key={id}
+  className="relative cursor-pointer h-16 inset-focus"
+  onClick={(event) => handleBucketNavigation(name, event)}
+  onKeyDown={(event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleBucketNavigation(name, event)
+    }
+  }}
+  tabIndex={0}
+>
+  <TableCell>
+    <p>{name}</p>
+  </TableCell>
+</TableRow>
 ```
 
 Consider also affordances like `ctrl` and `meta` key support for opening in a new tab. Anything that you can do with a mouse input should be replicable by keyboard.
