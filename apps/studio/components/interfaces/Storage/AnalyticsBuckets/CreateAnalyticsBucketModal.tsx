@@ -199,6 +199,15 @@ export const CreateAnalyticsBucketModal = ({
             buckets.length >= 2 ||
             disabled
           }
+          tabIndex={
+            !canCreateBuckets ||
+            !icebergCatalogEnabled ||
+            isLoading ||
+            buckets.length >= 2 ||
+            disabled
+              ? -1
+              : 0
+          }
           style={{ justifyContent: 'start' }}
           onClick={() => setVisible(true)}
           tooltip={{
