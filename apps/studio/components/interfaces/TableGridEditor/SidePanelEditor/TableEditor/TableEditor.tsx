@@ -10,6 +10,7 @@ import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constra
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useChanged } from 'hooks/misc/useChanged'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -258,8 +259,9 @@ export const TableEditor = ({
     }
   }
 
+  const visibleChanged = useChanged(visible)
   useEffect(() => {
-    if (visible) {
+    if (visibleChanged && visible) {
       setErrors({})
       setImportContent(undefined)
       setIsDuplicateRows(false)
@@ -281,7 +283,28 @@ export const TableEditor = ({
         setTableFields(tableFields)
       }
     }
-  }, [visible, templateData])
+  }, [
+    visible,
+    templateData,
+    foreignKeyMeta,
+    isRealtimeEnabled,
+    isNewRecord,
+    isDuplicating,
+    table,
+    visibleChanged,
+  ])
+
+  useEffect(() => {
+    if (!isNewRecord) {
+      const tableFields = generateTableFieldFromPostgresTable(
+        table,
+        foreignKeyMeta ?? [],
+        isDuplicating,
+        isRealtimeEnabled
+      )
+      setTableFields(tableFields)
+    }
+  }, [isNewRecord, table, foreignKeyMeta, isDuplicating, isRealtimeEnabled])
 
   useEffect(() => {
     if (isSuccessForeignKeyMeta) setFkRelations(formatForeignKeys(foreignKeys))
