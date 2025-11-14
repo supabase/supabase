@@ -103,14 +103,7 @@ export const BucketTableRow = ({
     <BucketTableRow
       key={bucket.id}
       className={cn('relative cursor-pointer h-16 group', 'inset-focus')}
-      onClick={(event) => {
-        // Don't navigate if clicking on interactive elements
-        const target = event.target as HTMLElement
-        if (target.closest('button, a, [role="button"]')) {
-          return
-        }
-        handleBucketNavigation(bucket.id, event)
-      }}
+      onClick={(event) => handleBucketNavigation(bucket.id, event)}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault()
