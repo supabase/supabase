@@ -12,6 +12,7 @@ import {
   ScaffoldSectionDescription,
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
@@ -262,6 +263,13 @@ export const StoragePolicies = () => {
                   }
                 />
               </div>
+            )}
+
+            {searchString.length > 0 && filteredBucketsWithPolicies.length === 0 && (
+              <NoSearchResults
+                searchString={searchString}
+                onResetFilter={() => setSearchString('')}
+              />
             )}
 
             {/* Sections for policies grouped by buckets */}
