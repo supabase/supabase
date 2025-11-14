@@ -116,6 +116,7 @@ export function parseSupaTable(table: Entity): SupaTable {
     name: table.name,
     comment: table.comment,
     schema: table.schema,
+    type: table.entity_type,
     columns: supaColumns,
     estimateRowCount: isTableLike(table) ? table.live_rows_estimate : 0,
     primaryKey: primaryKeys?.length > 0 ? primaryKeys.map((col) => col.name) : undefined,

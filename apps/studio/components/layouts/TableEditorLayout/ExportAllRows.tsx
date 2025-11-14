@@ -1,6 +1,6 @@
 import saveAs from 'file-saver'
 import Papa from 'papaparse'
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useRef, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 
 import { useQueryClient, type QueryClient } from '@tanstack/react-query'
@@ -10,7 +10,7 @@ import {
   MAX_EXPORT_ROW_COUNT_MESSAGE,
 } from 'components/grid/components/header/Header'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
-import type { SupaTable } from 'components/grid/types'
+import type { Filter, Sort, SupaTable } from 'components/grid/types'
 import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import type { Entity } from 'data/entity-types/entity-types-infinite-query'
@@ -18,8 +18,10 @@ import { tableEditorKeys } from 'data/table-editor/keys'
 import { getTableEditor, type TableEditorData } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
-import useLatest from 'hooks/misc/useLatest'
+import { useStaticEffectEvent } from 'hooks/useStaticEffectEvent'
+import type { RoleImpersonationState } from 'lib/role-impersonation'
 import { AlertTriangle } from 'lucide-react'
+import { SonnerProgress } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const toLoggableError = (error: unknown): { message: string; stack: string } => {
@@ -39,21 +41,29 @@ type FetchFormattedRowsParams = {
   queryClient: QueryClient
   projectRef: string
   connectionString: string | null
-  entity: Entity
+  entity: Pick<Entity, 'id' | 'name' | 'type'>
   bypassConfirmation: boolean
+  filters?: Filter[]
+  sorts?: Sort[]
+  roleImpersonationState?: RoleImpersonationState
+  progressCallback?: (progress: number) => void
 }
 
 type FetchFormattedRowsReturn =
   | { status: 'require_confirmation'; reason: string }
   | { status: 'error'; customMessage: ReactNode | null }
-  | { status: 'success'; table: SupaTable; formattedRows: Record<string, unknown>[] }
+  | { status: 'success'; table: SupaTable; rows: Record<string, unknown>[] }
 
-const fetchFormattedRows = async ({
+const fetchAllRows = async ({
   queryClient,
   projectRef,
   connectionString,
   entity,
   bypassConfirmation,
+  filters,
+  sorts,
+  roleImpersonationState,
+  progressCallback,
 }: FetchFormattedRowsParams): Promise<FetchFormattedRowsReturn> => {
   if (IS_PLATFORM && !connectionString) {
     console.error('Export All Rows > Connection string is required')
@@ -124,6 +134,10 @@ const fetchFormattedRows = async ({
       projectRef,
       connectionString,
       table: supaTable,
+      filters,
+      sorts,
+      roleImpersonationState,
+      progressCallback,
     })
   } catch (error: unknown) {
     const loggableError = toLoggableError(error)
@@ -135,7 +149,16 @@ const fetchFormattedRows = async ({
     )
     return { status: 'error', customMessage: null }
   }
-  const formattedRows = rows.map((row) => {
+
+  return {
+    status: 'success',
+    table: supaTable,
+    rows,
+  }
+}
+
+const formatRowsForExport = (rows: Record<string, unknown>[]) => {
+  return rows.map((row) => {
     const formattedRow = row
     Object.keys(row).map((column) => {
       if (typeof row[column] === 'object' && row[column] !== null)
@@ -143,18 +166,277 @@ const fetchFormattedRows = async ({
     })
     return formattedRow
   })
+}
+
+const useProgressToasts = () => {
+  const toastIdsRef = useRef(new Map<number, string | number>())
+
+  const startProgressTracker = useCallback(
+    ({
+      id,
+      name,
+      trackPercentage = false,
+    }: {
+      id: number
+      name: string
+      trackPercentage?: boolean
+    }) => {
+      if (toastIdsRef.current.has(id)) return
+
+      if (trackPercentage) {
+        toastIdsRef.current.set(
+          id,
+          toast(<SonnerProgress progress={0} message={`Exporting ${name}...`} />, {
+            closeButton: false,
+            duration: Infinity,
+          })
+        )
+      } else {
+        toastIdsRef.current.set(id, toast.loading(`Exporting ${name}...`))
+      }
+    },
+    []
+  )
+
+  const trackPercentageProgress = useCallback(
+    ({
+      id,
+      name,
+      value,
+      totalRows,
+    }: {
+      id: number
+      name: string
+      value: number
+      totalRows: number
+    }) => {
+      const savedToastId = toastIdsRef.current.get(id)
+
+      const progress = Math.min((value / totalRows) * 100, 100)
+      const newToastId = toast(
+        <SonnerProgress progress={progress} message={`Exporting ${name}...`} />,
+        {
+          id: savedToastId,
+          closeButton: false,
+          duration: Infinity,
+        }
+      )
+
+      if (!savedToastId) toastIdsRef.current.set(id, newToastId)
+    },
+    []
+  )
+
+  const stopTrackerWithError = useCallback(
+    (id: number, name: string, customMessage?: ReactNode) => {
+      const savedToastId = toastIdsRef.current.get(id)
+      if (savedToastId) {
+        toast.dismiss(savedToastId)
+        toastIdsRef.current.delete(id)
+      }
+
+      toast.error(customMessage ?? `There was an error exporting ${name}`)
+    },
+    []
+  )
+
+  const dismissTrackerSilently = useCallback((id: number) => {
+    const savedToastId = toastIdsRef.current.get(id)
+    if (savedToastId) {
+      toast.dismiss(savedToastId)
+      toastIdsRef.current.delete(id)
+    }
+  }, [])
+
+  const markTrackerComplete = useCallback((id: number, name: string, totalRows: number) => {
+    const savedToastId = toastIdsRef.current.get(id)
+    const deleteSavedToastId = () => toastIdsRef.current.delete(id)
+
+    toast.success(`Successfully exported ${totalRows} rows`, {
+      id: savedToastId,
+      onAutoClose: deleteSavedToastId,
+      onDismiss: deleteSavedToastId,
+    })
+  }, [])
 
   return {
-    status: 'success',
-    table: supaTable,
-    formattedRows,
+    startProgressTracker,
+    trackPercentageProgress,
+    stopTrackerWithError,
+    dismissTrackerSilently,
+    markTrackerComplete,
   }
 }
 
-type UseExportAllRowsAsCsvParams = {
-  projectRef: string
-  connectionString: string | null
-  entity: Entity
+type UseExportAllRowsParams =
+  | { enabled: false }
+  | ({
+      enabled: true
+      projectRef: string
+      connectionString: string | null
+      entity: Pick<Entity, 'id' | 'name' | 'type'>
+      totalRows?: number
+    } & (
+      | {
+          type: 'fetch_all'
+          filters?: Filter[]
+          sorts?: Sort[]
+          roleImpersonationState?: RoleImpersonationState
+        }
+      | {
+          type: 'provided_rows'
+          table: SupaTable
+          rows: Record<string, unknown>[]
+        }
+    ))
+
+type GenericProviders = {
+  convertToOutputFormat: (formattedRows: Record<string, unknown>[], table: SupaTable) => string
+  convertToBlob: (str: string) => Blob
+  save: (blob: Blob, table: SupaTable) => void
+}
+
+type UseExportAllRowsReturn = {
+  exportInDesiredFormat: () => Promise<void>
+  confirmationModal: ReactNode | null
+}
+
+export const useExportAllRowsGeneric = (
+  params: UseExportAllRowsParams & GenericProviders
+): UseExportAllRowsReturn => {
+  const queryClient = useQueryClient()
+  const {
+    startProgressTracker,
+    trackPercentageProgress,
+    stopTrackerWithError,
+    dismissTrackerSilently,
+    markTrackerComplete,
+  } = useProgressToasts()
+
+  const { convertToOutputFormat, convertToBlob, save } = params
+
+  const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null)
+
+  const exportInternal = useStaticEffectEvent(
+    async ({ bypassConfirmation }: { bypassConfirmation: boolean }): Promise<void> => {
+      if (!params.enabled) return
+
+      const { projectRef, connectionString, entity, totalRows } = params
+
+      startProgressTracker({
+        id: entity.id,
+        name: entity.name,
+        trackPercentage: totalRows !== undefined,
+      })
+
+      const rowsResult =
+        params.type === 'provided_rows'
+          ? ({
+              status: 'success',
+              table: params.table,
+              rows: params.rows,
+            } as const)
+          : await fetchAllRows({
+              queryClient,
+              projectRef: projectRef,
+              connectionString: connectionString,
+              entity: entity,
+              bypassConfirmation,
+              filters: params.filters,
+              sorts: params.sorts,
+              roleImpersonationState: params.roleImpersonationState,
+              progressCallback: totalRows
+                ? (value: number) =>
+                    trackPercentageProgress({
+                      id: entity.id,
+                      name: entity.name,
+                      totalRows: totalRows,
+                      value,
+                    })
+                : undefined,
+            })
+
+      if (rowsResult.status === 'error') {
+        return stopTrackerWithError(entity.id, entity.name)
+      }
+
+      if (rowsResult.status === 'require_confirmation') {
+        return setConfirmationMessage(rowsResult.reason)
+      }
+
+      const { table, rows } = rowsResult
+      if (rows.length === 0) {
+        return stopTrackerWithError(
+          entity.id,
+          entity.name,
+          `No rows found in ${entity.name} to export`
+        )
+      }
+      const formattedRows = formatRowsForExport(rows)
+
+      let output: string
+      try {
+        output = convertToOutputFormat(formattedRows, table)
+      } catch (error: unknown) {
+        const loggableError = toLoggableError(error)
+        console.error(
+          `Export All Rows > Error converting table rows to CSV: %s\n%s`,
+          loggableError.message,
+          loggableError.stack
+        )
+        return stopTrackerWithError(entity.id, entity.name)
+      }
+      const data = convertToBlob(output)
+      try {
+        save(data, table)
+      } catch (error: unknown) {
+        const loggableError = toLoggableError(error)
+        console.error(
+          `Export All Rows > Error saving CSV file: %s\n%s`,
+          loggableError.message,
+          loggableError.stack
+        )
+        stopTrackerWithError(entity.id, entity.name)
+      }
+
+      markTrackerComplete(entity.id, entity.name, formattedRows.length)
+    }
+  )
+
+  const exportInDesiredFormat = useCallback(
+    () => exportInternal({ bypassConfirmation: false }),
+    [exportInternal]
+  )
+
+  const onConfirmExport = () => {
+    exportInternal({
+      bypassConfirmation: true,
+    })
+    setConfirmationMessage(null)
+  }
+  const onCancelExport = () => {
+    if (!params.enabled) return
+
+    dismissTrackerSilently(params.entity.id)
+    setConfirmationMessage(null)
+  }
+
+  return {
+    exportInDesiredFormat,
+    confirmationModal: confirmationMessage ? (
+      <ConfirmationModal
+        title="Confirm export"
+        visible={true}
+        onCancel={onCancelExport}
+        onConfirm={onConfirmExport}
+      >
+        <div className="flex items-center gap-4">
+          <AlertTriangle aria-label="warning" className="shrink-0 text-foreground-lighter" />
+          <p className="text-sm text-foreground-lighter">{confirmationMessage}</p>
+        </div>
+      </ConfirmationModal>
+    ) : null,
+  }
 }
 
 type UseExportAllRowsAsCsvReturn = {
@@ -162,134 +444,23 @@ type UseExportAllRowsAsCsvReturn = {
   confirmationModal: ReactNode | null
 }
 
-export const useExportAllRowsAsCsv = ({
-  projectRef,
-  connectionString,
-  entity,
-}: UseExportAllRowsAsCsvParams): UseExportAllRowsAsCsvReturn => {
-  const queryClient = useQueryClient()
-
-  const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null)
-  const toastIdRef = useRef<string | number>()
-  const timeoutHandle = useRef<NodeJS.Timeout>()
-  useEffect(() => () => clearTimeout(timeoutHandle.current), [])
-
-  const projectRefRef = useLatest(projectRef)
-  const connectionStringRef = useLatest(connectionString)
-  const entityRef = useLatest(entity)
-  const exportCsvInternal = useCallback(
-    async ({ bypassConfirmation }: { bypassConfirmation: boolean }): Promise<void> => {
-      if (!toastIdRef.current) {
-        toastIdRef.current = toast.loading(`Exporting ${entityRef.current.name} as CSV...`)
-      }
-
-      const result = await fetchFormattedRows({
-        queryClient,
-        projectRef: projectRefRef.current,
-        connectionString: connectionStringRef.current,
-        entity: entityRef.current,
-        bypassConfirmation,
-      })
-
-      if (result.status === 'error') {
-        toast.dismiss(toastIdRef.current)
-        toastIdRef.current = undefined
-        return void toast.error(
-          result.customMessage ?? `There was an error exporting ${entityRef.current.name}`
-        )
-      }
-
-      if (result.status === 'require_confirmation') {
-        return setConfirmationMessage(result.reason)
-      }
-
-      const { table, formattedRows } = result
-      if (formattedRows.length === 0) {
-        toast.dismiss(toastIdRef.current)
-        toastIdRef.current = undefined
-        return void toast.info(`No rows found in ${entityRef.current.name} to export`)
-      }
-
-      let csv: string
-      try {
-        csv = Papa.unparse(formattedRows, {
-          columns: table.columns.map((col) => col.name),
-        })
-      } catch (error: unknown) {
-        toast.dismiss(toastIdRef.current)
-        toastIdRef.current = undefined
-
-        const loggableError = toLoggableError(error)
-        console.error(
-          `Export All Rows > Error converting table rows to CSV: %s\n%s`,
-          loggableError.message,
-          loggableError.stack
-        )
-        return void toast.error(`There was an error exporting ${entityRef.current.name}`)
-      }
-      const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-      try {
-        saveAs(csvData, `${entityRef.current.name}_rows.csv`)
-      } catch (error: unknown) {
-        toast.dismiss(toastIdRef.current)
-        toastIdRef.current = undefined
-
-        const loggableError = toLoggableError(error)
-        console.error(
-          `Export All Rows > Error saving CSV file: %s\n%s`,
-          loggableError.message,
-          loggableError.stack
-        )
-        return void toast.error(`There was an error exporting ${entityRef.current.name}`)
-      }
-
-      toast.success(`Successfully exported ${entityRef.current.name} as CSV`, {
-        id: toastIdRef.current,
-      })
-      timeoutHandle.current = setTimeout(() => {
-        toastIdRef.current = undefined
-      })
-    },
-    [queryClient, setConfirmationMessage, entityRef, projectRefRef, connectionStringRef]
-  )
-
-  const exportCsv = useCallback(
-    () => exportCsvInternal({ bypassConfirmation: false }),
-    [exportCsvInternal]
-  )
-
-  const onConfirmExport = () => {
-    exportCsvInternal({ bypassConfirmation: true })
-    setConfirmationMessage(null)
-  }
-  const onCancelExport = () => {
-    setConfirmationMessage(null)
-    toast.dismiss(toastIdRef.current)
-    toastIdRef.current = undefined
-  }
+export const useExportAllRowsAsCsv = (
+  params: UseExportAllRowsParams
+): UseExportAllRowsAsCsvReturn => {
+  const { exportInDesiredFormat: exportCsv, confirmationModal } = useExportAllRowsGeneric({
+    ...params,
+    convertToOutputFormat: (formattedRows, table) =>
+      Papa.unparse(formattedRows, {
+        columns: table.columns.map((col) => col.name),
+      }),
+    convertToBlob: (csv) => new Blob([csv], { type: 'text/csv;charset=utf-8;' }),
+    save: (csvData, table) => saveAs(csvData, `${table.name}_rows.csv`),
+  })
 
   return {
     exportCsv,
-    confirmationModal: confirmationMessage ? (
-      <ConfirmationModal
-        title="Confirm export"
-        visible={true}
-        onCancel={onCancelExport}
-        onConfirm={onConfirmExport}
-      >
-        <div className="flex items-center gap-4">
-          <AlertTriangle aria-label="warning" className="shrink-0 text-foreground-lighter" />
-          <p className="text-sm text-foreground-lighter">{confirmationMessage}</p>
-        </div>
-      </ConfirmationModal>
-    ) : null,
+    confirmationModal,
   }
-}
-
-type UseExportAllRowsAsSqlParams = {
-  projectRef: string
-  connectionString: string | null
-  entity: Entity
 }
 
 type UseExportAllRowsAsSqlReturn = {
@@ -297,124 +468,40 @@ type UseExportAllRowsAsSqlReturn = {
   confirmationModal: ReactNode | null
 }
 
-export const useExportAllRowsAsSql = ({
-  projectRef,
-  connectionString,
-  entity,
-}: UseExportAllRowsAsSqlParams): UseExportAllRowsAsSqlReturn => {
-  const queryClient = useQueryClient()
-
-  const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null)
-  const toastIdRef = useRef<string | number>()
-  const timeoutHandle = useRef<NodeJS.Timeout>()
-  useEffect(() => () => clearTimeout(timeoutHandle.current), [])
-
-  const projectRefRef = useLatest(projectRef)
-  const connectionStringRef = useLatest(connectionString)
-  const entityRef = useLatest(entity)
-  const exportSqlInternal = useCallback(
-    async ({ bypassConfirmation }: { bypassConfirmation: boolean }): Promise<void> => {
-      if (!toastIdRef.current) {
-        toastIdRef.current = toast.loading(`Exporting ${entityRef.current.name} as CSV...`)
-      }
-
-      const result = await fetchFormattedRows({
-        queryClient,
-        projectRef: projectRefRef.current,
-        connectionString: connectionStringRef.current ?? null,
-        entity: entityRef.current,
-        bypassConfirmation,
-      })
-
-      if (result.status === 'error') {
-        toast.dismiss(toastIdRef.current)
-        toastIdRef.current = undefined
-        return void toast.error(
-          result.customMessage ?? `There was an error exporting ${entityRef.current.name}`
-        )
-      }
-
-      if (result.status === 'require_confirmation') {
-        return setConfirmationMessage(result.reason)
-      }
-
-      const { table, formattedRows } = result
-      if (formattedRows.length === 0) {
-        toast.dismiss(toastIdRef.current)
-        toastIdRef.current = undefined
-        return void toast.info(`No rows found in ${entityRef.current.name} to export`)
-      }
-
-      let sqlStatements: string
-      try {
-        sqlStatements = formatTableRowsToSQL(table, formattedRows)
-      } catch (error: unknown) {
-        toast.dismiss(toastIdRef.current)
-        toastIdRef.current = undefined
-
-        const loggableError = toLoggableError(error)
-        console.error(
-          `Export All Rows > Error converting table rows to CSV: %s\n%s`,
-          loggableError.message,
-          loggableError.stack
-        )
-        return void toast.error(`There was an error exporting ${entityRef.current.name}`)
-      }
-      const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })
-      try {
-        saveAs(sqlData, `${entityRef.current.name}_rows.sql`)
-      } catch (error: unknown) {
-        toast.dismiss(toastIdRef.current)
-        toastIdRef.current = undefined
-
-        const loggableError = toLoggableError(error)
-        console.error(
-          `Export All Rows > Error saving CSV file: %s\n%s`,
-          loggableError.message,
-          loggableError.stack
-        )
-        return void toast.error(`There was an error exporting ${entityRef.current.name}`)
-      }
-
-      toast.success(`Successfully exported ${entityRef.current.name} as CSV`, {
-        id: toastIdRef.current,
-      })
-      timeoutHandle.current = setTimeout(() => {
-        toastIdRef.current = undefined
-      })
-    },
-    [queryClient, setConfirmationMessage, entityRef, projectRefRef, connectionStringRef]
-  )
-
-  const exportSql = useCallback(
-    () => exportSqlInternal({ bypassConfirmation: false }),
-    [exportSqlInternal]
-  )
-
-  const onConfirmExport = () => {
-    exportSqlInternal({ bypassConfirmation: true })
-    setConfirmationMessage(null)
-  }
-  const onCancelExport = () => {
-    setConfirmationMessage(null)
-    toast.dismiss(toastIdRef.current)
-    toastIdRef.current = undefined
-  }
+export const useExportAllRowsAsSql = (
+  params: UseExportAllRowsParams
+): UseExportAllRowsAsSqlReturn => {
+  const { exportInDesiredFormat: exportSql, confirmationModal } = useExportAllRowsGeneric({
+    ...params,
+    convertToOutputFormat: (formattedRows, table) => formatTableRowsToSQL(table, formattedRows),
+    convertToBlob: (sqlStatements) =>
+      new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' }),
+    save: (sqlData, table) => saveAs(sqlData, `${table.name}_rows.sql`),
+  })
 
   return {
     exportSql,
-    confirmationModal: confirmationMessage ? (
-      <ConfirmationModal
-        title="Confirm export"
-        visible={true}
-        onCancel={onCancelExport}
-        onConfirm={onConfirmExport}
-      >
-        <div className="flex items-center gap-4">
-          <AlertTriangle aria-label="warning" className="shrink-0 text-foreground-lighter" />
-          <p className="text-sm text-foreground-lighter">{confirmationMessage}</p>
-        </div>
-      </ConfirmationModal>
-    ) : null,
+    confirmationModal,
+  }
+}
+
+type UseExportAllRowsAsJsonReturn = {
+  exportJson: () => Promise<void>
+  confirmationModal: ReactNode | null
+}
+
+export const useExportAllRowsAsJson = (
+  params: UseExportAllRowsParams
+): UseExportAllRowsAsJsonReturn => {
+  const { exportInDesiredFormat: exportJson, confirmationModal } = useExportAllRowsGeneric({
+    ...params,
+    convertToOutputFormat: (formattedRows) => JSON.stringify(formattedRows),
+    convertToBlob: (jsonStr) => new Blob([jsonStr], { type: 'text/sql;charset=utf-8;' }),
+    save: (jsonData, table) => saveAs(jsonData, `${table.name}_rows.json`),
+  })
+
+  return {
+    exportJson,
+    confirmationModal,
   }
 }
