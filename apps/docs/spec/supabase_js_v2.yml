@@ -8187,13 +8187,13 @@ functions:
     $ref: '@supabase/auth-js.GoTrueClient.isThrowOnErrorEnabled'
   - id: auth-js-authoauthserverapi-approveauthorization
     title: AuthOAuthServerApi.approveAuthorization()
-    $ref: '@supabase/auth-js.AuthOAuthServerApi.approveAuthorization'
+    $ref: '@supabase/auth-js.GoTrueClient.oauth.approveAuthorization'
   - id: auth-js-authoauthserverapi-denyauthorization
     title: AuthOAuthServerApi.denyAuthorization()
-    $ref: '@supabase/auth-js.AuthOAuthServerApi.denyAuthorization'
+    $ref: '@supabase/auth-js.GoTrueClient.oauth.denyAuthorization'
   - id: auth-js-authoauthserverapi-getauthorizationdetails
     title: AuthOAuthServerApi.getAuthorizationDetails()
-    $ref: '@supabase/auth-js.AuthOAuthServerApi.getAuthorizationDetails'
+    $ref: '@supabase/auth-js.GoTrueClient.oauth.getAuthorizationDetails'
   - id: auth-js-gotrueadminoauthapi-createclient
     title: GoTrueAdminOAuthApi.createClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.createClient'
