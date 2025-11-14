@@ -3,9 +3,17 @@ import { env, STORAGE_STATE_PATH } from './env.config'
 import dotenv from 'dotenv'
 import path from 'path'
 
-dotenv.config({ path: path.resolve(__dirname, '.env.local') })
+dotenv.config({
+  path: path.resolve(__dirname, '.env.local'),
+})
 
 const IS_CI = !!process.env.CI
+
+const webServerConfig = {
+  command: 'pnpm -w run e2e:setup',
+  port: 8082,
+  timeout: 10 * 60 * 1000,
+}
 
 export default defineConfig({
   timeout: 90 * 1000,
@@ -51,4 +59,5 @@ export default defineConfig({
     ['html', { open: 'never' }],
     ['json', { outputFile: 'test-results/test-results.json' }],
   ],
+  webServer: webServerConfig,
 })
