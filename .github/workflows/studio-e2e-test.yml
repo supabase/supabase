@@ -62,14 +62,12 @@ jobs:
             e2e/studio/test-results/
           retention-days: 7
 
-      - name: Publish test results
-        uses: dorny/test-reporter@31a54ee7ebcacc03a09ea97a7e5465a47b84aea5 # v1.9.1
-        if: always()
+      - name: Comment Playwright test results on PR
+        uses: daun/playwright-report-comment@7ea4d0c3cc7248897a727fd7eb0fb2460f56b3b9 # v3.4.3
+        if: always() && github.event_name == 'pull_request'
         with:
-          name: Playwright Tests
-          path: e2e/studio/test-results/junit.xml
-          reporter: java-junit
-          fail-on-error: false
+          report-path: e2e/studio/playwright-report
+          comment-title: '🎭 Playwright Test Results'
 
       - name: Fail job if tests failed
         if: steps.playwright.outcome != 'success' || steps.summarize.outputs.flaky_count > 0

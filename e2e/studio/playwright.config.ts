@@ -55,7 +55,6 @@ export default defineConfig({
     ['list'],
     ['html', { open: 'never' }],
     ['json', { outputFile: 'test-results/test-results.json' }],
-    ['junit', { outputFile: 'test-results/junit.xml' }],
   ],
   webServer: {
     command: 'pnpm -w run e2e:setup',
