@@ -1,4 +1,9 @@
 #!/usr/bin/env tsx
+/**
+ * Validates that apps/docs/spec/supabase_js_v2.yml stays in sync with the latest
+ * TypeDoc output (apps/docs/spec/enrichments/tsdoc_v2/combined.json). Run via
+ * `pnpm --filter docs validate:refs` whenever tsdoc data or the YAML spec changes.
+ */
 
 import { readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
