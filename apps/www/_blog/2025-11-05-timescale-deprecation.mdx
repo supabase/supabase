@@ -12,7 +12,7 @@ toc_depth: 2
 
 As you might have seen, Supabase is deprecating support for the [TimescaleDB community extension](https://github.com/orgs/supabase/discussions/35851). This change affects users who have been using hypertables in their Supabase projects. In this post, we'll explain what this means for you and how to migrate your data and queries to standard PostgreSQL tables.
 
-For Postgres versions 17 and later, `TimescaleDB` is no longer available and support for [pg_partman](https://github.com/pgpartman/pg_partman) has been added. 
+For Postgres versions 17 and later, `TimescaleDB` is no longer available and support for [pg_partman](https://github.com/pgpartman/pg_partman) has been added.
 
 ### Why no TimescaleDB?
 
@@ -23,7 +23,6 @@ On the other end of the use case spectrum, some customers have a need for the ad
 This is why we are adding support for `pg_partman`, which provides automatic partition management for standard Postgres tables.
 
 We hope that this change reduces confusion for users and unlocks more options to scale your data efficiently.
-
 
 ### How to migrate?
 
@@ -66,7 +65,7 @@ CREATE TABLE messages (LIKE ht_messages) PARTITION BY RANGE(sent_at);
 2. Copy the data from your hypertable
 
 ```sql
-INSERT INTO messages SELECT * FROM ht_messages;
+insert into messages select * from ht_messages;
 ```
 
 3. Drop the hypertable
@@ -93,10 +92,3 @@ SELECT partman.create_parent(
 ```
 
 Done! We are safe to upgrade to Postgres 17 now and use `pg_partman` to manage our partitions going forward.
-
-
-
-
-
-
-
