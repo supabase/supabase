@@ -823,7 +823,7 @@ export const updateTable = async ({
       })
       if (!!error) hasError = true
     } else {
-      const originalColumn = find(originalColumns, { id: column.id })
+      const originalColumn = find(table.columns, { id: column.id })
       if (originalColumn) {
         const columnPayload = generateUpdateColumnPayload(originalColumn, updatedTable, column)
         if (!isEmpty(columnPayload)) {
