@@ -41,6 +41,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { urlRegex } from '../Auth/Auth.constants'
 import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
+import { useDisabledDrains } from './LogDrains.utils'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -98,6 +99,11 @@ const formUnion = z.discriminatedUnion('type', [
       .string()
       .min(1, { message: 'Sentry DSN is required' })
       .refine((dsn) => dsn.startsWith('https://'), 'Sentry DSN must start with https://'),
+  }),
+  z.object({
+    type: z.literal('axiom'),
+    api_token: z.string().min(1, { message: 'API token is required' }),
+    dataset_name: z.string().min(1, { message: 'Dataset name is required' }),
   }),
 ])
 
@@ -174,7 +180,7 @@ export function LogDrainDestinationSheetForm({
   }
   const DEFAULT_HEADERS = mode === 'create' ? CREATE_DEFAULT_HEADERS : defaultConfig?.headers || {}
 
-  const sentryEnabled = useFlag('SentryLogDrain')
+  const disabledDrains = useDisabledDrains()
 
   const { ref } = useParams()
   const { data: logDrains } = useLogDrainsQuery({
@@ -200,6 +206,8 @@ export function LogDrainDestinationSheetForm({
       username: defaultConfig?.username || '',
       password: defaultConfig?.password || '',
       dsn: defaultConfig?.dsn || '',
+      dataset_name: defaultConfig?.dataset_name || '',
+      api_token: defaultConfig?.api_token || '',
     },
   })
 
@@ -322,18 +330,16 @@ export function LogDrainDestinationSheetForm({
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
                       </SelectTrigger_Shadcn_>
                       <SelectContent_Shadcn_>
-                        {LOG_DRAIN_TYPES.filter((t) => t.value !== 'sentry' || sentryEnabled).map(
-                          (type) => (
-                            <SelectItem_Shadcn_
-                              value={type.value}
-                              key={type.value}
-                              id={type.value}
-                              className="text-left"
-                            >
-                              {type.name}
-                            </SelectItem_Shadcn_>
-                          )
-                        )}
+                        {LOG_DRAIN_TYPES.filter((t) => !disabledDrains.has(t.value)).map((type) => (
+                          <SelectItem_Shadcn_
+                            value={type.value}
+                            key={type.value}
+                            id={type.value}
+                            className="text-left"
+                          >
+                            {type.name}
+                          </SelectItem_Shadcn_>
+                        ))}
                       </SelectContent_Shadcn_>
                     </Select_Shadcn_>
                   </FormItemLayout>
@@ -509,6 +515,26 @@ export function LogDrainDestinationSheetForm({
                           .
                         </>
                       }
+                    />
+                  </div>
+                )}
+                {type === 'axiom' && (
+                  <div className="grid gap-4 px-content">
+                    <LogDrainFormItem
+                      type="text"
+                      value="dataset_name"
+                      label="Dataset name"
+                      placeholder="dataset"
+                      formControl={form.control}
+                      description="Name of the dataset in Axiom where the logs will be sent."
+                    />
+                    <LogDrainFormItem
+                      type="text"
+                      value="api_token"
+                      label="API Token"
+                      placeholder="xaat-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                      formControl={form.control}
+                      description="Token allowing ingest access to the specified dataset"
                     />
                   </div>
                 )}

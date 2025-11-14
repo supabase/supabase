@@ -1,5 +1,5 @@
 import { components } from 'api-types'
-import { Datadog, Grafana, Sentry } from 'icons'
+import { Axiom, Datadog, Grafana, Sentry } from 'icons'
 import { BracesIcon } from 'lucide-react'
 
 const iconProps = {
@@ -36,6 +36,13 @@ export const LOG_DRAIN_TYPES = [
     description:
       'Sentry is an application monitoring service that helps developers identify and debug performance issues and errors',
     icon: <Sentry {...iconProps} fill="currentColor" strokeWidth={0} />,
+  },
+  {
+    value: 'axiom',
+    name: 'Axiom',
+    description:
+      'Axiom is a data platform designed to efficiently collect, store, and analyze event and telemetry data at massive scale.',
+    icon: <Axiom {...iconProps} fill="currentColor" strokeWidth={0} />,
   },
 ] as const
 
