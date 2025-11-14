@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Alert_Shadcn_,
@@ -46,8 +46,11 @@ const SCHEMA = z.object({
 })
 
 const CreateSecretAPIKeyDialog = () => {
-  const [visible, setVisible] = useState(false)
   const { ref: projectRef } = useParams()
+  const [visible, setVisible] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const onClose = (value: boolean) => {
     setVisible(value)
