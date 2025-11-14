@@ -65,7 +65,7 @@ export const EnableReplicationModal = () => {
           </Admonition>
         </DialogSection>
         <DialogFooter>
-          <Button type="default" disabled={creatingTenantSource}>
+          <Button type="default" disabled={creatingTenantSource} onClick={() => setOpen(false)}>
             Cancel
           </Button>
           <Button type="primary" loading={creatingTenantSource} onClick={onEnableReplication}>
