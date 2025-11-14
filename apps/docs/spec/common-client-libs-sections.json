@@ -61,338 +61,450 @@
     "items": [
       {
         "id": "select",
-        "title": "Fetch data",
+        "title": "Fetch data: select()",
         "slug": "select",
-        "product": "database",
-        "type": "function"
+        "type": "function",
+        "product": "database"
       },
       {
         "id": "insert",
-        "title": "Insert data",
+        "title": "Create data: insert()",
         "slug": "insert",
-        "product": "database",
-        "type": "function"
+        "type": "function",
+        "product": "database"
       },
       {
         "id": "update",
-        "title": "Update data",
+        "title": "Modify data: update()",
         "slug": "update",
-        "product": "database",
-        "type": "function"
+        "type": "function",
+        "product": "database"
       },
       {
         "id": "upsert",
-        "title": "Upsert data",
+        "title": "Upsert data: upsert()",
         "slug": "upsert",
-        "product": "database",
-        "type": "function"
+        "type": "function",
+        "product": "database"
       },
       {
         "id": "delete",
-        "title": "Delete data",
+        "title": "Delete data: delete()",
         "slug": "delete",
-        "product": "database",
-        "type": "function"
+        "type": "function",
+        "product": "database"
       },
       {
         "id": "rpc",
-        "title": "Call a Postgres function",
+        "title": "Postgres functions: rpc()",
         "slug": "rpc",
-        "product": "database",
-        "type": "function"
+        "type": "function",
+        "product": "database"
       },
       {
         "id": "using-filters",
-        "isFunc": false,
-        "title": "Using filters",
+        "title": "Using Filters",
         "slug": "using-filters",
-        "product": "database",
         "type": "function",
+        "product": "database",
+        "isFunc": false,
         "items": [
           {
             "id": "eq",
-            "title": "Column is equal to a value",
+            "title": "eq()",
             "slug": "eq",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "neq",
-            "title": "Column is not equal to a value",
+            "title": "neq()",
             "slug": "neq",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "gt",
-            "title": "Column is greater than a value",
+            "title": "gt()",
             "slug": "gt",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "gte",
-            "title": "Column is greater than or equal to a value",
+            "title": "gte()",
             "slug": "gte",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "lt",
-            "title": "Column is less than a value",
+            "title": "lt()",
             "slug": "lt",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "lte",
-            "title": "Column is less than or equal to a value",
+            "title": "lte()",
             "slug": "lte",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "like",
-            "title": "Column matches a pattern",
+            "title": "like()",
             "slug": "like",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "ilike",
-            "title": "Column matches a case-insensitive pattern",
+            "title": "ilike()",
             "slug": "ilike",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "is",
-            "title": "Column is a value",
+            "title": "is()",
             "slug": "is",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "in",
-            "title": "Column is in an array",
+            "title": "in()",
             "slug": "in",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "contains",
-            "title": "Column contains every element in a value",
+            "title": "contains()",
             "slug": "contains",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "contained-by",
-            "title": "Contained by value",
-            "slug": "containedby",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "title": "containedBy()",
+            "slug": "contained-by",
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "range-gt",
-            "title": "Greater than a range",
-            "slug": "rangegt",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "title": "rangeGt()",
+            "slug": "range-gt",
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "range-gte",
-            "title": "Greater than or equal to a range",
-            "slug": "rangegte",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "title": "rangeGte()",
+            "slug": "range-gte",
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "range-lt",
-            "title": "Less than a range",
-            "slug": "rangelt",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "title": "rangeLt()",
+            "slug": "range-lt",
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "range-lte",
-            "title": "Less than or equal to a range",
-            "slug": "rangelte",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "title": "rangeLte()",
+            "slug": "range-lte",
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "range-adjacent",
-            "title": "Mutually exclusive to a range",
-            "slug": "rangeadjacent",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "title": "rangeAdjacent()",
+            "slug": "range-adjacent",
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "overlaps",
-            "title": "With a common element",
+            "title": "overlaps()",
             "slug": "overlaps",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "text-search",
-            "title": "Match a string",
-            "slug": "textsearch",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "title": "textSearch()",
+            "slug": "text-search",
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "match",
-            "title": "Match an associated value",
+            "title": "match()",
             "slug": "match",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "not",
-            "title": "Don't match the filter",
+            "title": "not()",
             "slug": "not",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "or",
-            "title": "Match at least one filter",
+            "title": "or()",
             "slug": "or",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "filter",
-            "title": "Match the filter",
+            "title": "filter()",
             "slug": "filter",
-            "product": "database",
-            "parent": "filters",
-            "type": "function"
+            "type": "function",
+            "product": "database"
+          },
+          {
+            "id": "postgrest-js-postgrestfilterbuilder-constructor",
+            "title": "new PostgrestFilterBuilder()",
+            "slug": "postgrest-js-postgrestfilterbuilder-constructor",
+            "type": "function",
+            "product": "database"
+          },
+          {
+            "id": "postgrest-js-postgrestfilterbuilder-ilikeallof",
+            "title": "PostgrestFilterBuilder.ilikeAllOf()",
+            "slug": "postgrest-js-postgrestfilterbuilder-ilikeallof",
+            "type": "function",
+            "product": "database"
+          },
+          {
+            "id": "postgrest-js-postgrestfilterbuilder-ilikeanyof",
+            "title": "PostgrestFilterBuilder.ilikeAnyOf()",
+            "slug": "postgrest-js-postgrestfilterbuilder-ilikeanyof",
+            "type": "function",
+            "product": "database"
+          },
+          {
+            "id": "postgrest-js-postgrestfilterbuilder-likeallof",
+            "title": "PostgrestFilterBuilder.likeAllOf()",
+            "slug": "postgrest-js-postgrestfilterbuilder-likeallof",
+            "type": "function",
+            "product": "database"
+          },
+          {
+            "id": "postgrest-js-postgrestfilterbuilder-likeanyof",
+            "title": "PostgrestFilterBuilder.likeAnyOf()",
+            "slug": "postgrest-js-postgrestfilterbuilder-likeanyof",
+            "type": "function",
+            "product": "database"
           }
         ]
       },
       {
         "id": "using-modifiers",
-        "isFunc": false,
-        "title": "Using modifiers",
+        "title": "Using Modifiers",
         "slug": "using-modifiers",
-        "product": "database",
-        "parent": "modifiers",
         "type": "function",
+        "product": "database",
+        "isFunc": false,
         "items": [
           {
             "id": "db-modifiers-select",
-            "title": "Return data after inserting",
+            "title": "select()",
             "slug": "db-modifiers-select",
-            "product": "database",
-            "parent": "modifiers",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "order",
-            "title": "Order the results",
+            "title": "order()",
             "slug": "order",
-            "product": "database",
-            "parent": "modifiers",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "limit",
-            "title": "Limit the number of rows returned",
+            "title": "limit()",
             "slug": "limit",
-            "product": "database",
-            "parent": "modifiers",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "range",
-            "title": "Limit the query to a range",
+            "title": "range()",
             "slug": "range",
-            "product": "database",
-            "parent": "modifiers",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "abort-signal",
-            "title": "Set an abort signal",
-            "slug": "db-abortsignal",
-            "product": "database",
-            "parent": "modifiers",
-            "type": "function"
+            "title": "abortSignal()",
+            "slug": "abort-signal",
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "single",
-            "title": "Retrieve one row of data",
+            "title": "single()",
             "slug": "single",
-            "product": "database",
-            "parent": "modifiers",
-            "type": "function"
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "maybe-single",
-            "title": "Retrieve zero or one row of data",
-            "slug": "maybesingle",
-            "product": "database",
-            "parent": "modifiers",
-            "type": "function"
+            "title": "maybeSingle()",
+            "slug": "maybe-single",
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "csv",
-            "title": "Retrieve as a CSV",
-            "slug": "db-csv",
-            "product": "database",
-            "parent": "modifiers",
-            "type": "function"
+            "title": "csv()",
+            "slug": "csv",
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "returns",
-            "title": "Override type of successful response",
-            "slug": "db-returns",
-            "product": "database",
-            "parent": "modifiers",
-            "type": "function"
-          },
-          {
-            "id": "overrideTypes",
-            "title": "Partially override or replace type of successful response",
-            "slug": "db-overrideTypes",
-            "product": "database",
-            "parent": "modifiers",
-            "type": "function"
+            "title": "returns()",
+            "slug": "returns",
+            "type": "function",
+            "product": "database"
           },
           {
             "id": "explain",
-            "title": "Using explain",
+            "title": "Using Explain",
             "slug": "explain",
-            "product": "database",
-            "parent": "modifiers",
-            "type": "function"
+            "type": "function",
+            "product": "database"
+          },
+          {
+            "id": "postgrest-js-postgresttransformbuilder-constructor",
+            "title": "new PostgrestTransformBuilder()",
+            "slug": "postgrest-js-postgresttransformbuilder-constructor",
+            "type": "function",
+            "product": "database"
+          },
+          {
+            "id": "postgrest-js-postgresttransformbuilder-geojson",
+            "title": "PostgrestTransformBuilder.geojson()",
+            "slug": "postgrest-js-postgresttransformbuilder-geojson",
+            "type": "function",
+            "product": "database"
+          },
+          {
+            "id": "postgrest-js-postgresttransformbuilder-maxaffected",
+            "title": "PostgrestTransformBuilder.maxAffected()",
+            "slug": "postgrest-js-postgresttransformbuilder-maxaffected",
+            "type": "function",
+            "product": "database"
+          },
+          {
+            "id": "postgrest-js-postgresttransformbuilder-rollback",
+            "title": "PostgrestTransformBuilder.rollback()",
+            "slug": "postgrest-js-postgresttransformbuilder-rollback",
+            "type": "function",
+            "product": "database"
           }
         ]
+      },
+      {
+        "id": "overrideTypes",
+        "title": "overrideTypes()",
+        "slug": "overrideTypes",
+        "type": "function",
+        "product": "database"
+      },
+      {
+        "id": "supabase-js-supabaseclient-from",
+        "title": "SupabaseClient.from()",
+        "slug": "supabase-js-supabaseclient-from",
+        "type": "function",
+        "product": "database"
+      },
+      {
+        "id": "supabase-js-supabaseclient-rpc",
+        "title": "SupabaseClient.rpc()",
+        "slug": "supabase-js-supabaseclient-rpc",
+        "type": "function",
+        "product": "database"
+      },
+      {
+        "id": "supabase-js-supabaseclient-schema",
+        "title": "SupabaseClient.schema()",
+        "slug": "supabase-js-supabaseclient-schema",
+        "type": "function",
+        "product": "database"
+      },
+      {
+        "id": "postgrest-js-postgrestbuilder-constructor",
+        "title": "new PostgrestBuilder()",
+        "slug": "postgrest-js-postgrestbuilder-constructor",
+        "type": "function",
+        "product": "database"
+      },
+      {
+        "id": "postgrest-js-postgrestbuilder-returns",
+        "title": "PostgrestBuilder.returns()",
+        "slug": "postgrest-js-postgrestbuilder-returns",
+        "type": "function",
+        "product": "database"
+      },
+      {
+        "id": "postgrest-js-postgrestbuilder-setheader",
+        "title": "PostgrestBuilder.setHeader()",
+        "slug": "postgrest-js-postgrestbuilder-setheader",
+        "type": "function",
+        "product": "database"
+      },
+      {
+        "id": "postgrest-js-postgrestbuilder-then",
+        "title": "PostgrestBuilder.then()",
+        "slug": "postgrest-js-postgrestbuilder-then",
+        "type": "function",
+        "product": "database"
+      },
+      {
+        "id": "postgrest-js-postgrestbuilder-throwonerror",
+        "title": "PostgrestBuilder.throwOnError()",
+        "slug": "postgrest-js-postgrestbuilder-throwonerror",
+        "type": "function",
+        "product": "database"
+      },
+      {
+        "id": "postgrest-js-postgrestclient-constructor",
+        "title": "new PostgrestClient()",
+        "slug": "postgrest-js-postgrestclient-constructor",
+        "type": "function",
+        "product": "database"
+      },
+      {
+        "id": "postgrest-js-postgrestclient-from",
+        "title": "PostgrestClient.from()",
+        "slug": "postgrest-js-postgrestclient-from",
+        "type": "function",
+        "product": "database"
+      },
+      {
+        "id": "postgrest-js-postgrestclient-schema",
+        "title": "PostgrestClient.schema()",
+        "slug": "postgrest-js-postgrestclient-schema",
+        "type": "function",
+        "product": "database"
+      },
+      {
+        "id": "postgrest-js-postgrestquerybuilder-constructor",
+        "title": "new PostgrestQueryBuilder()",
+        "slug": "postgrest-js-postgrestquerybuilder-constructor",
+        "type": "function",
+        "product": "database"
       }
     ]
   },
@@ -404,387 +516,420 @@
         "id": "auth-api",
         "title": "Overview",
         "slug": "auth-api",
-        "type": "function"
+        "type": "function",
+        "product": "auth"
       },
       {
         "id": "sign-up",
-        "title": "Create a new user",
-        "slug": "auth-signup",
-        "product": "auth",
-        "type": "function"
+        "title": "signUp()",
+        "slug": "sign-up",
+        "type": "function",
+        "product": "auth"
       },
       {
         "id": "on-auth-state-change",
-        "title": "Listen to auth events",
-        "slug": "auth-onauthstatechange",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "sign-in",
-        "title": "Sign in a user",
-        "slug": "auth-signin",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "sign-in-with-provider",
-        "title": "Sign in a user through OAuth",
-        "slug": "auth-signinwithprovider",
-        "product": "auth",
-        "type": "function"
+        "title": "onAuthStateChange()",
+        "slug": "on-auth-state-change",
+        "type": "function",
+        "product": "auth"
       },
       {
         "id": "sign-in-anonymously",
-        "title": "Create an anonymous user",
-        "slug": "auth-signinanonymously",
-        "product": "auth",
-        "type": "function"
+        "title": "signInAnonymously()",
+        "slug": "sign-in-anonymously",
+        "type": "function",
+        "product": "auth"
       },
       {
         "id": "sign-in-with-password",
-        "title": "Sign in a user",
-        "slug": "auth-signinwithpassword",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "sign-in-with-id-token",
-        "title": "Sign in with ID token (native sign-in)",
-        "slug": "auth-signinwithidtoken",
-        "product": "auth",
-        "type": "function"
+        "title": "signInWithPassword()",
+        "slug": "sign-in-with-password",
+        "type": "function",
+        "product": "auth"
       },
       {
         "id": "sign-in-with-otp",
-        "title": "Sign in a user through OTP",
-        "slug": "auth-signinwithotp",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "sign-in-with-whatsapp-otp",
-        "title": "Sign in a user through WhatsApp",
-        "slug": "auth-signinwithwhatsappotp",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "sign-in-with-apple",
-        "title": "Sign in with Apple",
-        "slug": "sign-in-with-apple",
-        "product": "auth",
-        "type": "function"
+        "title": "signInWithOtp()",
+        "slug": "sign-in-with-otp",
+        "type": "function",
+        "product": "auth"
       },
       {
         "id": "sign-in-with-oauth",
-        "title": "Sign in a user through OAuth",
-        "slug": "auth-signinwithoauth",
-        "product": "auth",
-        "type": "function"
+        "title": "signInWithOAuth()",
+        "slug": "sign-in-with-oauth",
+        "type": "function",
+        "product": "auth"
+      },
+      {
+        "id": "sign-in-with-id-token",
+        "title": "signInWithIdToken",
+        "slug": "sign-in-with-id-token",
+        "type": "function",
+        "product": "auth"
       },
       {
         "id": "sign-in-with-sso",
-        "title": "Sign in a user through SSO",
-        "slug": "auth-signinwithsso",
-        "product": "auth",
-        "type": "function"
+        "title": "signInWithSSO()",
+        "slug": "sign-in-with-sso",
+        "type": "function",
+        "product": "auth"
       },
       {
         "id": "sign-in-with-web3",
-        "title": "Sign in a user through Web3 (Solana, Ethereum)",
-        "slug": "auth-signinwithweb3",
-        "product": "auth",
-        "type": "function"
+        "title": "signInWithWeb3()",
+        "slug": "sign-in-with-web3",
+        "type": "function",
+        "product": "auth"
       },
       {
         "id": "get-claims",
-        "title": "Get user claims from verified JWT",
-        "slug": "auth-getclaims",
-        "product": "auth",
-        "type": "function"
+        "title": "getClaims()",
+        "slug": "get-claims",
+        "type": "function",
+        "product": "auth"
       },
       {
         "id": "sign-out",
-        "title": "Sign out a user",
-        "slug": "auth-signout",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "reset-password-for-email",
-        "title": "Send a password reset request",
-        "slug": "auth-resetpasswordforemail",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "auth-update",
-        "title": "Update a user",
-        "slug": "auth-update",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "set-auth",
-        "title": "Update the access token",
-        "slug": "auth-setauth",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "user",
-        "title": "Retrieve a user",
-        "slug": "auth-user",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "session",
-        "title": "Retrieve a session",
-        "slug": "auth-session",
-        "product": "auth",
-        "type": "function"
+        "title": "signOut()",
+        "slug": "sign-out",
+        "type": "function",
+        "product": "auth"
       },
       {
         "id": "verify-otp",
-        "title": "Verify and log in through OTP",
-        "slug": "auth-verifyotp",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "current-session",
-        "title": "Retrieve a session",
-        "slug": "auth-currentsession",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "current-user",
-        "title": "Retrieve a user",
-        "slug": "auth-currentuser",
-        "product": "auth",
-        "type": "function"
+        "title": "verifyOtp()",
+        "slug": "verify-otp",
+        "type": "function",
+        "product": "auth"
       },
       {
         "id": "get-session",
-        "title": "Retrieve a session",
-        "slug": "auth-getsession",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "refresh-session",
-        "title": "Retrieve a new session",
-        "slug": "auth-refreshsession",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "get-user",
-        "title": "Retrieve a user",
-        "slug": "auth-getuser",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "update-user",
-        "title": "Update a user",
-        "slug": "auth-updateuser",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "get-user-identities",
-        "title": "Retrieve identities linked to a user",
-        "slug": "auth-getuseridentities",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "link-identity",
-        "title": "Link an identity to a user",
-        "slug": "auth-linkidentity",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "unlink-identity",
-        "title": "Unlink an identity from a user",
-        "slug": "auth-unlinkidentity",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "send-password-reauthentication",
-        "title": "Send a password reauthentication nonce",
-        "slug": "auth-reauthentication",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "resend-email-or-phone-otps",
-        "title": "Resend an OTP",
-        "slug": "auth-resend",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "set-session",
-        "title": "Set the session data",
-        "slug": "auth-setsession",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "exchange-code-for-session",
-        "title": "Exchange an auth code for a session",
-        "slug": "auth-exchangecodeforsession",
-        "product": "auth",
-        "type": "function"
+        "title": "getSession()",
+        "slug": "get-session",
+        "type": "function",
+        "product": "auth"
       },
       {
         "id": "start-auto-refresh",
-        "title": "Start auto-refresh session (non-browser)",
-        "slug": "auth-startautorefresh",
-        "product": "auth",
-        "type": "function"
+        "title": "startAutoRefresh()",
+        "slug": "start-auto-refresh",
+        "type": "function",
+        "product": "auth"
       },
       {
         "id": "stop-auto-refresh",
-        "title": "Stop auto-refresh session (non-browser)",
-        "slug": "auth-stopautorefresh",
-        "product": "auth",
-        "type": "function"
+        "title": "stopAutoRefresh()",
+        "slug": "stop-auto-refresh",
+        "type": "function",
+        "product": "auth"
+      },
+      {
+        "id": "get-user",
+        "title": "getUser()",
+        "slug": "get-user",
+        "type": "function",
+        "product": "auth"
+      },
+      {
+        "id": "update-user",
+        "title": "updateUser()",
+        "slug": "update-user",
+        "type": "function",
+        "product": "auth"
+      },
+      {
+        "id": "get-user-identities",
+        "title": "getUserIdentities()",
+        "slug": "get-user-identities",
+        "type": "function",
+        "product": "auth"
+      },
+      {
+        "id": "link-identity",
+        "title": "linkIdentity()",
+        "slug": "link-identity",
+        "type": "function",
+        "product": "auth"
+      },
+      {
+        "id": "unlink-identity",
+        "title": "unlinkIdentity()",
+        "slug": "unlink-identity",
+        "type": "function",
+        "product": "auth"
+      },
+      {
+        "id": "send-password-reauthentication",
+        "title": "reauthenticate()",
+        "slug": "send-password-reauthentication",
+        "type": "function",
+        "product": "auth"
+      },
+      {
+        "id": "resend-email-or-phone-otps",
+        "title": "resend()",
+        "slug": "resend-email-or-phone-otps",
+        "type": "function",
+        "product": "auth"
+      },
+      {
+        "id": "set-session",
+        "title": "setSession()",
+        "slug": "set-session",
+        "type": "function",
+        "product": "auth"
+      },
+      {
+        "id": "refresh-session",
+        "title": "refreshSession()",
+        "slug": "refresh-session",
+        "type": "function",
+        "product": "auth"
+      },
+      {
+        "id": "exchange-code-for-session",
+        "title": "exchangeCodeForSession()",
+        "slug": "exchange-code-for-session",
+        "type": "function",
+        "product": "auth"
       },
       {
         "id": "auth-mfa-api",
-        "title": "Auth MFA",
+        "title": "Overview",
         "slug": "auth-mfa-api",
         "type": "function",
+        "product": "auth",
+        "isFunc": false,
         "items": [
           {
             "id": "mfa-enroll",
-            "title": "Enroll a factor",
-            "slug": "auth-mfa-enroll",
-            "product": "auth",
-            "type": "function"
+            "title": "mfa.enroll()",
+            "slug": "mfa-enroll",
+            "type": "function",
+            "product": "auth"
           },
           {
             "id": "mfa-challenge",
-            "title": "Create a challenge",
-            "slug": "auth-mfa-challenge",
-            "product": "auth",
-            "type": "function"
+            "title": "mfa.challenge()",
+            "slug": "mfa-challenge",
+            "type": "function",
+            "product": "auth"
           },
           {
             "id": "mfa-verify",
-            "title": "Verify a challenge",
-            "slug": "auth-mfa-verify",
-            "product": "auth",
-            "type": "function"
+            "title": "mfa.verify()",
+            "slug": "mfa-verify",
+            "type": "function",
+            "product": "auth"
           },
           {
             "id": "mfa-challenge-and-verify",
-            "title": "Create and verify a challenge",
-            "slug": "auth-mfa-challengeandverify",
-            "product": "auth",
-            "type": "function"
+            "title": "mfa.challengeAndVerify()",
+            "slug": "mfa-challenge-and-verify",
+            "type": "function",
+            "product": "auth"
           },
           {
             "id": "mfa-unenroll",
-            "title": "Unenroll a factor",
-            "slug": "auth-mfa-unenroll",
-            "product": "auth",
-            "type": "function"
+            "title": "mfa.unenroll()",
+            "slug": "mfa-unenroll",
+            "type": "function",
+            "product": "auth"
           },
           {
             "id": "mfa-get-authenticator-assurance-level",
-            "title": "Get Authenticator Assurance Level",
-            "slug": "auth-mfa-getauthenticatorassurancelevel",
-            "product": "auth",
-            "type": "function"
+            "title": "mfa.getAuthenticatorAssuranceLevel()",
+            "slug": "mfa-get-authenticator-assurance-level",
+            "type": "function",
+            "product": "auth"
+          },
+          {
+            "id": "auth-js-gotruemfaapi-listfactors",
+            "title": "GoTrueMFAApi.listFactors()",
+            "slug": "auth-js-gotruemfaapi-listfactors",
+            "type": "function",
+            "product": "auth"
           }
         ]
       },
       {
         "id": "admin-api",
-        "title": "Auth Admin",
+        "title": "Overview",
         "slug": "admin-api",
         "type": "function",
+        "product": "auth-admin",
+        "isFunc": false,
         "items": [
           {
             "id": "get-user-by-id",
-            "title": "Retrieve a user",
-            "slug": "auth-admin-getuserbyid",
-            "product": "auth-admin",
-            "type": "function"
+            "title": "getUserById()",
+            "slug": "get-user-by-id",
+            "type": "function",
+            "product": "auth-admin"
           },
           {
             "id": "list-users",
-            "title": "List all users",
-            "slug": "auth-admin-listusers",
-            "product": "auth-admin",
-            "type": "function"
+            "title": "listUsers()",
+            "slug": "list-users",
+            "type": "function",
+            "product": "auth-admin"
           },
           {
             "id": "create-user",
-            "title": "Create a user",
-            "slug": "auth-admin-createuser",
-            "product": "auth-admin",
-            "type": "function"
+            "title": "createUser()",
+            "slug": "create-user",
+            "type": "function",
+            "product": "auth-admin"
           },
           {
             "id": "delete-user",
-            "title": "Delete a user",
-            "slug": "auth-admin-deleteuser",
-            "product": "auth-admin",
-            "type": "function"
+            "title": "deleteUser()",
+            "slug": "delete-user",
+            "type": "function",
+            "product": "auth-admin"
           },
           {
             "id": "invite-user-by-email",
-            "title": "Send an email invite link",
-            "slug": "auth-admin-inviteuserbyemail",
-            "product": "auth-admin",
-            "type": "function"
+            "title": "inviteUserByEmail()",
+            "slug": "invite-user-by-email",
+            "type": "function",
+            "product": "auth-admin"
           },
           {
             "id": "generate-link",
-            "title": "Generate an email link",
-            "slug": "auth-admin-generatelink",
-            "product": "auth-admin",
-            "type": "function"
-          },
-          {
-            "id": "send-mobile-otp",
-            "title": "Send a one-time passcode",
-            "slug": "auth-api-sendmobileotp",
-            "product": "auth-server",
-            "type": "function"
+            "title": "generateLink()",
+            "slug": "generate-link",
+            "type": "function",
+            "product": "auth-admin"
           },
           {
             "id": "update-user-by-id",
-            "title": "Update a user",
-            "slug": "auth-admin-updateuserbyid",
-            "product": "auth-admin",
-            "type": "function"
+            "title": "updateUserById()",
+            "slug": "update-user-by-id",
+            "type": "function",
+            "product": "auth-admin"
           },
           {
-            "id": "mfa-list-factors",
-            "title": "List all factors for a user",
-            "slug": "auth-admin-mfa-listfactors",
-            "product": "auth-admin",
-            "type": "function"
+            "id": "mfa-list-factors-admin",
+            "title": "mfa.listFactors()",
+            "slug": "mfa-list-factors-admin",
+            "type": "function",
+            "product": "auth-admin"
           },
           {
             "id": "mfa-delete-factor",
-            "title": "Delete a factor for a user",
-            "slug": "auth-admin-mfa-deletefactor",
-            "product": "auth-admin",
-            "type": "function"
+            "title": "mfa.deleteFactor()",
+            "slug": "mfa-delete-factor",
+            "type": "function",
+            "product": "auth-admin"
+          },
+          {
+            "id": "auth-js-gotrueadminapi-constructor",
+            "title": "new GoTrueAdminApi()",
+            "slug": "auth-js-gotrueadminapi-constructor",
+            "type": "function",
+            "product": "auth-admin"
+          },
+          {
+            "id": "auth-js-gotrueadminapi-signout",
+            "title": "GoTrueAdminApi.signOut()",
+            "slug": "auth-js-gotrueadminapi-signout",
+            "type": "function",
+            "product": "auth-admin"
+          },
+          {
+            "id": "auth-js-authoauthserverapi-approveauthorization",
+            "title": "AuthOAuthServerApi.approveAuthorization()",
+            "slug": "auth-js-authoauthserverapi-approveauthorization",
+            "type": "function",
+            "product": "auth-admin"
+          },
+          {
+            "id": "auth-js-authoauthserverapi-denyauthorization",
+            "title": "AuthOAuthServerApi.denyAuthorization()",
+            "slug": "auth-js-authoauthserverapi-denyauthorization",
+            "type": "function",
+            "product": "auth-admin"
+          },
+          {
+            "id": "auth-js-authoauthserverapi-getauthorizationdetails",
+            "title": "AuthOAuthServerApi.getAuthorizationDetails()",
+            "slug": "auth-js-authoauthserverapi-getauthorizationdetails",
+            "type": "function",
+            "product": "auth-admin"
+          },
+          {
+            "id": "auth-js-gotrueadminoauthapi-createclient",
+            "title": "GoTrueAdminOAuthApi.createClient()",
+            "slug": "auth-js-gotrueadminoauthapi-createclient",
+            "type": "function",
+            "product": "auth-admin"
+          },
+          {
+            "id": "auth-js-gotrueadminoauthapi-deleteclient",
+            "title": "GoTrueAdminOAuthApi.deleteClient()",
+            "slug": "auth-js-gotrueadminoauthapi-deleteclient",
+            "type": "function",
+            "product": "auth-admin"
+          },
+          {
+            "id": "auth-js-gotrueadminoauthapi-getclient",
+            "title": "GoTrueAdminOAuthApi.getClient()",
+            "slug": "auth-js-gotrueadminoauthapi-getclient",
+            "type": "function",
+            "product": "auth-admin"
+          },
+          {
+            "id": "auth-js-gotrueadminoauthapi-listclients",
+            "title": "GoTrueAdminOAuthApi.listClients()",
+            "slug": "auth-js-gotrueadminoauthapi-listclients",
+            "type": "function",
+            "product": "auth-admin"
+          },
+          {
+            "id": "auth-js-gotrueadminoauthapi-regenerateclientsecret",
+            "title": "GoTrueAdminOAuthApi.regenerateClientSecret()",
+            "slug": "auth-js-gotrueadminoauthapi-regenerateclientsecret",
+            "type": "function",
+            "product": "auth-admin"
+          },
+          {
+            "id": "auth-js-gotrueadminoauthapi-updateclient",
+            "title": "GoTrueAdminOAuthApi.updateClient()",
+            "slug": "auth-js-gotrueadminoauthapi-updateclient",
+            "type": "function",
+            "product": "auth-admin"
           }
         ]
+      },
+      {
+        "id": "reset-password-for-email",
+        "title": "resetPasswordForEmail()",
+        "slug": "reset-password-for-email",
+        "type": "function",
+        "product": "auth"
+      },
+      {
+        "id": "auth-js-gotrueclient-constructor",
+        "title": "new GoTrueClient()",
+        "slug": "auth-js-gotrueclient-constructor",
+        "type": "function",
+        "product": "auth"
+      },
+      {
+        "id": "auth-js-gotrueclient-initialize",
+        "title": "GoTrueClient.initialize()",
+        "slug": "auth-js-gotrueclient-initialize",
+        "type": "function",
+        "product": "auth"
+      },
+      {
+        "id": "auth-js-gotrueclient-isthrowonerrorenabled",
+        "title": "GoTrueClient.isThrowOnErrorEnabled()",
+        "slug": "auth-js-gotrueclient-isthrowonerrorenabled",
+        "type": "function",
+        "product": "auth"
       }
     ]
   },
@@ -794,10 +939,24 @@
     "items": [
       {
         "id": "invoke",
-        "title": "Invokes a Supabase Edge Function.",
-        "slug": "functions-invoke",
-        "product": "functions",
-        "type": "function"
+        "title": "invoke()",
+        "slug": "invoke",
+        "type": "function",
+        "product": "functions"
+      },
+      {
+        "id": "functions-js-functionsclient-constructor",
+        "title": "new FunctionsClient()",
+        "slug": "functions-js-functionsclient-constructor",
+        "type": "function",
+        "product": "functions"
+      },
+      {
+        "id": "functions-js-functionsclient-setauth",
+        "title": "FunctionsClient.setAuth()",
+        "slug": "functions-js-functionsclient-setauth",
+        "type": "function",
+        "product": "functions"
       }
     ]
   },
@@ -806,73 +965,305 @@
     "title": "Realtime",
     "items": [
       {
-        "id": "realtime-api",
-        "title": "Overview",
-        "slug": "realtime-api",
-        "type": "function"
-      },
-      {
-        "id": "stream",
-        "title": "Listen to database changes",
-        "slug": "stream",
-        "product": "realtime",
-        "type": "function"
-      },
-      {
         "id": "subscribe",
-        "title": "Subscribe to channel",
+        "title": "on().subscribe()",
         "slug": "subscribe",
-        "product": "realtime",
-        "type": "function"
-      },
-      {
-        "id": "remove-subscription",
-        "title": "Remove a subscription",
-        "slug": "removesubscription",
-        "product": "realtime",
-        "type": "function"
-      },
-      {
-        "id": "remove-all-subscriptions",
-        "title": "Remove all subscriptions",
-        "slug": "removeallsubscriptions",
-        "product": "realtime",
-        "type": "function"
-      },
-      {
-        "id": "get-subscriptions",
-        "title": "Retrieve subscriptions",
-        "slug": "getsubscriptions",
-        "product": "realtime",
-        "type": "function"
-      },
-      {
-        "id": "remove-channel",
-        "title": "Unsubscribe from a channel",
-        "slug": "removechannel",
-        "product": "realtime",
-        "type": "function"
-      },
-      {
-        "id": "remove-all-channels",
-        "title": "Unsubscribe from all channels",
-        "slug": "removeallchannels",
-        "product": "realtime",
-        "type": "function"
-      },
-      {
-        "id": "get-channels",
-        "title": "Retrieve all channels",
-        "slug": "getchannels",
-        "product": "realtime",
-        "type": "function"
+        "type": "function",
+        "product": "realtime"
       },
       {
         "id": "broadcast-message",
-        "title": "Broadcast a message",
-        "slug": "broadcastmessage",
-        "product": "realtime",
-        "type": "function"
+        "title": "broadcastMessage()",
+        "slug": "broadcast-message",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "get-channels",
+        "title": "getChannels()",
+        "slug": "get-channels",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "remove-channel",
+        "title": "removeChannel()",
+        "slug": "remove-channel",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "remove-all-channels",
+        "title": "removeAllChannels()",
+        "slug": "remove-all-channels",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "supabase-js-supabaseclient-channel",
+        "title": "SupabaseClient.channel()",
+        "slug": "supabase-js-supabaseclient-channel",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimechannel-constructor",
+        "title": "new RealtimeChannel()",
+        "slug": "realtime-js-realtimechannel-constructor",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimechannel-httpsend",
+        "title": "RealtimeChannel.httpSend()",
+        "slug": "realtime-js-realtimechannel-httpsend",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimechannel-presencestate",
+        "title": "RealtimeChannel.presenceState()",
+        "slug": "realtime-js-realtimechannel-presencestate",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimechannel-subscribe",
+        "title": "RealtimeChannel.subscribe()",
+        "slug": "realtime-js-realtimechannel-subscribe",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimechannel-teardown",
+        "title": "RealtimeChannel.teardown()",
+        "slug": "realtime-js-realtimechannel-teardown",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimechannel-track",
+        "title": "RealtimeChannel.track()",
+        "slug": "realtime-js-realtimechannel-track",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimechannel-unsubscribe",
+        "title": "RealtimeChannel.unsubscribe()",
+        "slug": "realtime-js-realtimechannel-unsubscribe",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimechannel-untrack",
+        "title": "RealtimeChannel.untrack()",
+        "slug": "realtime-js-realtimechannel-untrack",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimechannel-updatejoinpayload",
+        "title": "RealtimeChannel.updateJoinPayload()",
+        "slug": "realtime-js-realtimechannel-updatejoinpayload",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-constructor",
+        "title": "new RealtimeClient()",
+        "slug": "realtime-js-realtimeclient-constructor",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-channel",
+        "title": "RealtimeClient.channel()",
+        "slug": "realtime-js-realtimeclient-channel",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-connect",
+        "title": "RealtimeClient.connect()",
+        "slug": "realtime-js-realtimeclient-connect",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-connectionstate",
+        "title": "RealtimeClient.connectionState()",
+        "slug": "realtime-js-realtimeclient-connectionstate",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-disconnect",
+        "title": "RealtimeClient.disconnect()",
+        "slug": "realtime-js-realtimeclient-disconnect",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-endpointurl",
+        "title": "RealtimeClient.endpointURL()",
+        "slug": "realtime-js-realtimeclient-endpointurl",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-flushsendbuffer",
+        "title": "RealtimeClient.flushSendBuffer()",
+        "slug": "realtime-js-realtimeclient-flushsendbuffer",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-getchannels",
+        "title": "RealtimeClient.getChannels()",
+        "slug": "realtime-js-realtimeclient-getchannels",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-isconnected",
+        "title": "RealtimeClient.isConnected()",
+        "slug": "realtime-js-realtimeclient-isconnected",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-isconnecting",
+        "title": "RealtimeClient.isConnecting()",
+        "slug": "realtime-js-realtimeclient-isconnecting",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-isdisconnecting",
+        "title": "RealtimeClient.isDisconnecting()",
+        "slug": "realtime-js-realtimeclient-isdisconnecting",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-log",
+        "title": "RealtimeClient.log()",
+        "slug": "realtime-js-realtimeclient-log",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-onheartbeat",
+        "title": "RealtimeClient.onHeartbeat()",
+        "slug": "realtime-js-realtimeclient-onheartbeat",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-push",
+        "title": "RealtimeClient.push()",
+        "slug": "realtime-js-realtimeclient-push",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-removeallchannels",
+        "title": "RealtimeClient.removeAllChannels()",
+        "slug": "realtime-js-realtimeclient-removeallchannels",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-removechannel",
+        "title": "RealtimeClient.removeChannel()",
+        "slug": "realtime-js-realtimeclient-removechannel",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-sendheartbeat",
+        "title": "RealtimeClient.sendHeartbeat()",
+        "slug": "realtime-js-realtimeclient-sendheartbeat",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimeclient-setauth",
+        "title": "RealtimeClient.setAuth()",
+        "slug": "realtime-js-realtimeclient-setauth",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-realtimepresence-constructor",
+        "title": "new RealtimePresence()",
+        "slug": "realtime-js-realtimepresence-constructor",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-websocketfactory-constructor",
+        "title": "new WebSocketFactory()",
+        "slug": "realtime-js-websocketfactory-constructor",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-websocketfactory-createwebsocket",
+        "title": "WebSocketFactory.createWebSocket()",
+        "slug": "realtime-js-websocketfactory-createwebsocket",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-websocketfactory-getwebsocketconstructor",
+        "title": "WebSocketFactory.getWebSocketConstructor()",
+        "slug": "realtime-js-websocketfactory-getwebsocketconstructor",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-websocketfactory-iswebsocketsupported",
+        "title": "WebSocketFactory.isWebSocketSupported()",
+        "slug": "realtime-js-websocketfactory-iswebsocketsupported",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-websocketlike-addeventlistener",
+        "title": "WebSocketLike.addEventListener()",
+        "slug": "realtime-js-websocketlike-addeventlistener",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-websocketlike-close",
+        "title": "WebSocketLike.close()",
+        "slug": "realtime-js-websocketlike-close",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-websocketlike-removeeventlistener",
+        "title": "WebSocketLike.removeEventListener()",
+        "slug": "realtime-js-websocketlike-removeeventlistener",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-websocketlike-send",
+        "title": "WebSocketLike.send()",
+        "slug": "realtime-js-websocketlike-send",
+        "type": "function",
+        "product": "realtime"
+      },
+      {
+        "id": "realtime-js-websocketlikeconstructor-constructor",
+        "title": "new WebSocketLikeConstructor()",
+        "slug": "realtime-js-websocketlikeconstructor-constructor",
+        "type": "function",
+        "product": "realtime"
       }
     ]
   },
@@ -881,130 +1272,368 @@
     "title": "Storage",
     "items": [
       {
-        "id": "create-bucket",
-        "title": "Create a bucket",
-        "slug": "storage-createbucket",
-        "product": "storage",
-        "type": "function"
+        "id": "list-buckets",
+        "title": "listBuckets()",
+        "slug": "list-buckets",
+        "type": "function",
+        "product": "storage"
       },
       {
         "id": "get-bucket",
-        "title": "Retrieve a bucket",
-        "slug": "storage-getbucket",
-        "product": "storage",
-        "type": "function"
+        "title": "getBucket()",
+        "slug": "get-bucket",
+        "type": "function",
+        "product": "storage"
       },
       {
-        "id": "list-buckets",
-        "title": "List all buckets",
-        "slug": "storage-listbuckets",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "update-bucket",
-        "title": "Update a bucket",
-        "slug": "storage-updatebucket",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "delete-bucket",
-        "title": "Delete a bucket",
-        "slug": "storage-deletebucket",
-        "product": "storage",
-        "type": "function"
+        "id": "create-bucket",
+        "title": "createBucket()",
+        "slug": "create-bucket",
+        "type": "function",
+        "product": "storage"
       },
       {
         "id": "empty-bucket",
-        "title": "Empty a bucket",
-        "slug": "storage-emptybucket",
-        "product": "storage",
-        "type": "function"
+        "title": "emptyBucket()",
+        "slug": "empty-bucket",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "update-bucket",
+        "title": "updateBucket()",
+        "slug": "update-bucket",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "delete-bucket",
+        "title": "deleteBucket()",
+        "slug": "delete-bucket",
+        "type": "function",
+        "product": "storage"
       },
       {
         "id": "from-upload",
-        "title": "Upload a file",
-        "slug": "storage-from-upload",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "from-download",
-        "title": "Download a file",
-        "slug": "storage-from-download",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "from-list",
-        "title": "List all files in a bucket",
-        "slug": "storage-from-list",
-        "product": "storage",
-        "type": "function"
+        "title": "from.upload()",
+        "slug": "from-upload",
+        "type": "function",
+        "product": "storage"
       },
       {
         "id": "from-update",
-        "title": "Replace an existing file",
-        "slug": "storage-from-update",
-        "product": "storage",
-        "type": "function"
+        "title": "from.update()",
+        "slug": "from-update",
+        "type": "function",
+        "product": "storage"
       },
       {
         "id": "from-move",
-        "title": "Move an existing file",
-        "slug": "storage-from-move",
-        "product": "storage",
-        "type": "function"
+        "title": "from.move()",
+        "slug": "from-move",
+        "type": "function",
+        "product": "storage"
       },
       {
         "id": "from-copy",
-        "title": "Copy an existing file",
-        "slug": "storage-from-copy",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "from-remove",
-        "title": "Delete files in a bucket",
-        "slug": "storage-from-remove",
-        "product": "storage",
-        "type": "function"
+        "title": "from.copy()",
+        "slug": "from-copy",
+        "type": "function",
+        "product": "storage"
       },
       {
         "id": "from-create-signed-url",
-        "title": "Create a signed URL",
-        "slug": "storage-from-createsignedurl",
-        "product": "storage",
-        "type": "function"
+        "title": "from.createSignedUrl()",
+        "slug": "from-create-signed-url",
+        "type": "function",
+        "product": "storage"
       },
       {
         "id": "from-create-signed-urls",
-        "title": "Create signed URLs",
-        "slug": "storage-from-createsignedurls",
-        "product": "storage",
-        "type": "function"
+        "title": "from.createSignedUrls()",
+        "slug": "from-create-signed-urls",
+        "type": "function",
+        "product": "storage"
       },
       {
         "id": "from-create-signed-upload-url",
-        "title": "Create signed upload URL",
-        "slug": "storage-from-createsigneduploadurl",
-        "product": "storage",
-        "type": "function"
+        "title": "from.createSignedUploadUrl()",
+        "slug": "from-create-signed-upload-url",
+        "type": "function",
+        "product": "storage"
       },
       {
         "id": "from-upload-to-signed-url",
-        "title": "Upload to a signed URL",
-        "slug": "storage-from-uploadtosignedurl",
-        "product": "storage",
-        "type": "function"
+        "title": "from.uploadToSignedUrl()",
+        "slug": "from-upload-to-signed-url",
+        "type": "function",
+        "product": "storage"
       },
       {
         "id": "from-get-public-url",
-        "title": "Retrieve public URL",
-        "slug": "storage-from-getpublicurl",
-        "product": "storage",
-        "type": "function"
+        "title": "from.getPublicUrl()",
+        "slug": "from-get-public-url",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "from-download",
+        "title": "from.download()",
+        "slug": "from-download",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "from-remove",
+        "title": "from.remove()",
+        "slug": "from-remove",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "from-list",
+        "title": "from.list()",
+        "slug": "from-list",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-storageclient-constructor",
+        "title": "new StorageClient()",
+        "slug": "storage-js-storageclient-constructor",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-storageclient-from",
+        "title": "StorageClient.from()",
+        "slug": "storage-js-storageclient-from",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-storagevectorsclient-constructor",
+        "title": "new StorageVectorsClient()",
+        "slug": "storage-js-storagevectorsclient-constructor",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-storagevectorsclient-from",
+        "title": "StorageVectorsClient.from()",
+        "slug": "storage-js-storagevectorsclient-from",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorbucketapi-constructor",
+        "title": "new VectorBucketApi()",
+        "slug": "storage-js-vectorbucketapi-constructor",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorbucketapi-createbucket",
+        "title": "VectorBucketApi.createBucket()",
+        "slug": "storage-js-vectorbucketapi-createbucket",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorbucketapi-deletebucket",
+        "title": "VectorBucketApi.deleteBucket()",
+        "slug": "storage-js-vectorbucketapi-deletebucket",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorbucketapi-getbucket",
+        "title": "VectorBucketApi.getBucket()",
+        "slug": "storage-js-vectorbucketapi-getbucket",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorbucketapi-listbuckets",
+        "title": "VectorBucketApi.listBuckets()",
+        "slug": "storage-js-vectorbucketapi-listbuckets",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorbucketapi-throwonerror",
+        "title": "VectorBucketApi.throwOnError()",
+        "slug": "storage-js-vectorbucketapi-throwonerror",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorbucketscope-constructor",
+        "title": "new VectorBucketScope()",
+        "slug": "storage-js-vectorbucketscope-constructor",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorbucketscope-createindex",
+        "title": "VectorBucketScope.createIndex()",
+        "slug": "storage-js-vectorbucketscope-createindex",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorbucketscope-deleteindex",
+        "title": "VectorBucketScope.deleteIndex()",
+        "slug": "storage-js-vectorbucketscope-deleteindex",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorbucketscope-getindex",
+        "title": "VectorBucketScope.getIndex()",
+        "slug": "storage-js-vectorbucketscope-getindex",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorbucketscope-listindexes",
+        "title": "VectorBucketScope.listIndexes()",
+        "slug": "storage-js-vectorbucketscope-listindexes",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectordataapi-constructor",
+        "title": "new VectorDataApi()",
+        "slug": "storage-js-vectordataapi-constructor",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectordataapi-deletevectors",
+        "title": "VectorDataApi.deleteVectors()",
+        "slug": "storage-js-vectordataapi-deletevectors",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectordataapi-getvectors",
+        "title": "VectorDataApi.getVectors()",
+        "slug": "storage-js-vectordataapi-getvectors",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectordataapi-listvectors",
+        "title": "VectorDataApi.listVectors()",
+        "slug": "storage-js-vectordataapi-listvectors",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectordataapi-putvectors",
+        "title": "VectorDataApi.putVectors()",
+        "slug": "storage-js-vectordataapi-putvectors",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectordataapi-queryvectors",
+        "title": "VectorDataApi.queryVectors()",
+        "slug": "storage-js-vectordataapi-queryvectors",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectordataapi-throwonerror",
+        "title": "VectorDataApi.throwOnError()",
+        "slug": "storage-js-vectordataapi-throwonerror",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorindexapi-constructor",
+        "title": "new VectorIndexApi()",
+        "slug": "storage-js-vectorindexapi-constructor",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorindexapi-createindex",
+        "title": "VectorIndexApi.createIndex()",
+        "slug": "storage-js-vectorindexapi-createindex",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorindexapi-deleteindex",
+        "title": "VectorIndexApi.deleteIndex()",
+        "slug": "storage-js-vectorindexapi-deleteindex",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorindexapi-getindex",
+        "title": "VectorIndexApi.getIndex()",
+        "slug": "storage-js-vectorindexapi-getindex",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorindexapi-listindexes",
+        "title": "VectorIndexApi.listIndexes()",
+        "slug": "storage-js-vectorindexapi-listindexes",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorindexapi-throwonerror",
+        "title": "VectorIndexApi.throwOnError()",
+        "slug": "storage-js-vectorindexapi-throwonerror",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorindexscope-constructor",
+        "title": "new VectorIndexScope()",
+        "slug": "storage-js-vectorindexscope-constructor",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorindexscope-deletevectors",
+        "title": "VectorIndexScope.deleteVectors()",
+        "slug": "storage-js-vectorindexscope-deletevectors",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorindexscope-getvectors",
+        "title": "VectorIndexScope.getVectors()",
+        "slug": "storage-js-vectorindexscope-getvectors",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorindexscope-listvectors",
+        "title": "VectorIndexScope.listVectors()",
+        "slug": "storage-js-vectorindexscope-listvectors",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorindexscope-putvectors",
+        "title": "VectorIndexScope.putVectors()",
+        "slug": "storage-js-vectorindexscope-putvectors",
+        "type": "function",
+        "product": "storage"
+      },
+      {
+        "id": "storage-js-vectorindexscope-queryvectors",
+        "title": "VectorIndexScope.queryVectors()",
+        "slug": "storage-js-vectorindexscope-queryvectors",
+        "type": "function",
+        "product": "storage"
       }
     ]
   },
