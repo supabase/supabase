@@ -8503,6 +8503,13 @@ functions:
   - id: storage-js-vectorbucketapi-constructor
     title: new VectorBucketApi()
     $ref: '@supabase/storage-js.VectorBucketApi.constructor'
+    examples:
+      - id: storage-js-vectorbucketapi-constructor-example-1
+        name: Example 1
+        code: |-
+          ```typescript
+          const client = new VectorBucketApi(url, headers)
+          ```
   - id: storage-js-vectorbucketapi-createbucket
     title: VectorBucketApi.createBucket()
     $ref: '@supabase/storage-js.VectorBucketApi.createBucket'

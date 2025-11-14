@@ -80886,7 +80886,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Creates a StorageVectorsClient that can manage buckets, indexes, and vectors."
+          "shortText": "Creates a StorageVectorsClient that can manage buckets, indexes, and vectors.\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.StorageVectorsClient.createBucket": {
@@ -80968,7 +80968,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Creates a new vector bucket\\nVector buckets are containers for vector indexes and their data"
+          "shortText": "Creates a new vector bucket\\nVector buckets are containers for vector indexes and their data\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.StorageVectorsClient.deleteBucket": {
@@ -81050,7 +81050,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Deletes a vector bucket\\nBucket must be empty before deletion (all indexes must be removed first)"
+          "shortText": "Deletes a vector bucket\\nBucket must be empty before deletion (all indexes must be removed first)\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.StorageVectorsClient.from": {
@@ -81074,7 +81074,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Access operations for a specific vector bucket\\nReturns a scoped client for index and vector operations within the bucket"
+          "shortText": "Access operations for a specific vector bucket\\nReturns a scoped client for index and vector operations within the bucket\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.StorageVectorsClient.getBucket": {
@@ -81156,7 +81156,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Retrieves metadata for a specific vector bucket\\nReturns bucket configuration including encryption settings and creation time"
+          "shortText": "Retrieves metadata for a specific vector bucket\\nReturns bucket configuration including encryption settings and creation time\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.StorageVectorsClient.listBuckets": {
@@ -81273,7 +81273,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Lists vector buckets with optional filtering and pagination\\nSupports prefix-based filtering and paginated results"
+          "shortText": "Lists vector buckets with optional filtering and pagination\\nSupports prefix-based filtering and paginated results\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.StorageVectorsClient.throwOnError": {
@@ -81286,7 +81286,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }"
+          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.StorageVectorsError.constructor": {
@@ -81419,7 +81419,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Creates a new VectorBucketApi instance"
+          "shortText": "Creates a new VectorBucketApi instance\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorBucketApi.createBucket": {
@@ -81501,7 +81501,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Creates a new vector bucket\\nVector buckets are containers for vector indexes and their data"
+          "shortText": "Creates a new vector bucket\\nVector buckets are containers for vector indexes and their data\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorBucketApi.deleteBucket": {
@@ -81583,7 +81583,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Deletes a vector bucket\\nBucket must be empty before deletion (all indexes must be removed first)"
+          "shortText": "Deletes a vector bucket\\nBucket must be empty before deletion (all indexes must be removed first)\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorBucketApi.getBucket": {
@@ -81665,7 +81665,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Retrieves metadata for a specific vector bucket\\nReturns bucket configuration including encryption settings and creation time"
+          "shortText": "Retrieves metadata for a specific vector bucket\\nReturns bucket configuration including encryption settings and creation time\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorBucketApi.listBuckets": {
@@ -81782,7 +81782,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Lists vector buckets with optional filtering and pagination\\nSupports prefix-based filtering and paginated results"
+          "shortText": "Lists vector buckets with optional filtering and pagination\\nSupports prefix-based filtering and paginated results\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorBucketApi.throwOnError": {
@@ -81795,7 +81795,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }"
+          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorBucketScope.constructor": {
@@ -81883,7 +81883,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Creates a helper that automatically scopes all index operations to the provided bucket."
+          "shortText": "Creates a helper that automatically scopes all index operations to the provided bucket.\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorBucketScope.createIndex": {
@@ -81965,7 +81965,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Creates a new vector index in this bucket\\nConvenience method that automatically includes the bucket name"
+          "shortText": "Creates a new vector index in this bucket\\nConvenience method that automatically includes the bucket name\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorBucketScope.deleteIndex": {
@@ -82047,7 +82047,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Deletes an index from this bucket\\nConvenience method that automatically includes the bucket name"
+          "shortText": "Deletes an index from this bucket\\nConvenience method that automatically includes the bucket name\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorBucketScope.getIndex": {
@@ -82129,7 +82129,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Retrieves metadata for a specific index in this bucket\\nConvenience method that automatically includes the bucket name"
+          "shortText": "Retrieves metadata for a specific index in this bucket\\nConvenience method that automatically includes the bucket name\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorBucketScope": {
@@ -82153,7 +82153,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Access operations for a specific index within this bucket\\nReturns a scoped client for vector data operations"
+          "shortText": "Access operations for a specific index within this bucket\\nReturns a scoped client for vector data operations\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorBucketScope.listIndexes": {
@@ -82235,7 +82235,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Lists indexes in this bucket\\nConvenience method that automatically includes the bucket name"
+          "shortText": "Lists indexes in this bucket\\nConvenience method that automatically includes the bucket name\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorBucketScope.throwOnError": {
@@ -82248,7 +82248,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }"
+          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorDataApi.constructor": {
@@ -82338,7 +82338,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Creates a VectorDataApi bound to a Storage Vectors deployment."
+          "shortText": "Creates a VectorDataApi bound to a Storage Vectors deployment.\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorDataApi.deleteVectors": {
@@ -82455,7 +82455,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Deletes vectors by their keys in batch\\nAccepts 1-500 keys per request"
+          "shortText": "Deletes vectors by their keys in batch\\nAccepts 1-500 keys per request\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorDataApi.getVectors": {
@@ -82594,7 +82594,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Retrieves vectors by their keys in batch\\nOptionally includes vector data and/or metadata in response\\nAdditional permissions required when returning data or metadata"
+          "shortText": "Retrieves vectors by their keys in batch\\nOptionally includes vector data and/or metadata in response\\nAdditional permissions required when returning data or metadata\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorDataApi.listVectors": {
@@ -82764,7 +82764,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Lists/scans vectors in an index with pagination\\nSupports parallel scanning via segment configuration for high-throughput scenarios\\nAdditional permissions required when returning data or metadata"
+          "shortText": "Lists/scans vectors in an index with pagination\\nSupports parallel scanning via segment configuration for high-throughput scenarios\\nAdditional permissions required when returning data or metadata\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorDataApi.putVectors": {
@@ -82937,7 +82937,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Inserts or updates vectors in batch (upsert operation)\\nAccepts 1-500 vectors per request. Larger batches should be split"
+          "shortText": "Inserts or updates vectors in batch (upsert operation)\\nAccepts 1-500 vectors per request. Larger batches should be split\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorDataApi.queryVectors": {
@@ -83118,7 +83118,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Queries for similar vectors using approximate nearest neighbor (ANN) search\\nReturns top-K most similar vectors based on the configured distance metric\\nSupports optional metadata filtering (requires GetVectors permission)"
+          "shortText": "Queries for similar vectors using approximate nearest neighbor (ANN) search\\nReturns top-K most similar vectors based on the configured distance metric\\nSupports optional metadata filtering (requires GetVectors permission)\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorDataApi.throwOnError": {
@@ -83131,7 +83131,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }"
+          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorIndexApi.constructor": {
@@ -83221,7 +83221,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Creates an API client for managing vector indexes."
+          "shortText": "Creates an API client for managing vector indexes.\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorIndexApi.createIndex": {
@@ -83378,7 +83378,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Creates a new vector index within a bucket\\nDefines the schema for vectors including dimensionality, distance metric, and metadata config"
+          "shortText": "Creates a new vector index within a bucket\\nDefines the schema for vectors including dimensionality, distance metric, and metadata config\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorIndexApi.deleteIndex": {
@@ -83470,7 +83470,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Deletes a vector index and all its data\\nThis operation removes the index schema and all vectors stored in the index"
+          "shortText": "Deletes a vector index and all its data\\nThis operation removes the index schema and all vectors stored in the index\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorIndexApi.getIndex": {
@@ -83562,7 +83562,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Retrieves metadata for a specific vector index\\nReturns index configuration including dimension, distance metric, and metadata settings"
+          "shortText": "Retrieves metadata for a specific vector index\\nReturns index configuration including dimension, distance metric, and metadata settings\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorIndexApi.listIndexes": {
@@ -83689,7 +83689,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Lists vector indexes within a bucket with optional filtering and pagination\\nSupports prefix-based filtering and paginated results"
+          "shortText": "Lists vector indexes within a bucket with optional filtering and pagination\\nSupports prefix-based filtering and paginated results\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorIndexApi.throwOnError": {
@@ -83702,7 +83702,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }"
+          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorIndexScope.constructor": {
@@ -83797,7 +83797,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Creates a helper that automatically scopes all vector operations to the provided bucket/index names."
+          "shortText": "Creates a helper that automatically scopes all vector operations to the provided bucket/index names.\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorIndexScope.deleteVectors": {
@@ -83879,7 +83879,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Deletes vectors by keys from this index\\nConvenience method that automatically includes bucket and index names"
+          "shortText": "Deletes vectors by keys from this index\\nConvenience method that automatically includes bucket and index names\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorIndexScope.getVectors": {
@@ -83961,7 +83961,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Retrieves vectors by keys from this index\\nConvenience method that automatically includes bucket and index names"
+          "shortText": "Retrieves vectors by keys from this index\\nConvenience method that automatically includes bucket and index names\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorIndexScope.listVectors": {
@@ -84043,7 +84043,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Lists vectors in this index with pagination\\nConvenience method that automatically includes bucket and index names"
+          "shortText": "Lists vectors in this index with pagination\\nConvenience method that automatically includes bucket and index names\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorIndexScope.putVectors": {
@@ -84125,7 +84125,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Inserts or updates vectors in this index\\nConvenience method that automatically includes bucket and index names"
+          "shortText": "Inserts or updates vectors in this index\\nConvenience method that automatically includes bucket and index names\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorIndexScope.queryVectors": {
@@ -84207,7 +84207,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Queries for similar vectors in this index\\nConvenience method that automatically includes bucket and index names"
+          "shortText": "Queries for similar vectors in this index\\nConvenience method that automatically includes bucket and index names\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.VectorIndexScope.throwOnError": {
@@ -84220,7 +84220,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }"
+          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.packages/BlobDownloadBuilder.default.constructor": {
