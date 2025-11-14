@@ -2,14 +2,16 @@
 
 import { useEffect, useState } from 'react'
 import {
-  MetricsCard,
-  MetricsCardHeader,
-  MetricsCardLabel,
-  MetricsCardContent,
-  MetricsCardValue,
-  MetricsCardDifferential,
-  MetricsCardSparkline,
-} from 'ui-patterns/MetricsCard'
+  MetricCard,
+  MetricCardHeader,
+  MetricCardIcon,
+  MetricCardLabel,
+  MetricCardContent,
+  MetricCardValue,
+  MetricCardDifferential,
+  MetricCardSparkline,
+} from 'ui-patterns/MetricCard'
+import { User2 } from 'lucide-react'
 
 export default function MetricsCardDemo() {
   const [data, setData] = useState<Array<{ value: number; timestamp: string }>>([])
@@ -31,23 +33,26 @@ export default function MetricsCardDemo() {
 
   return (
     <div className="w-1/2">
-      <MetricsCard isLoading={!data.length}>
-        <MetricsCardHeader href="https://www.supabase.io">
-          <MetricsCardLabel tooltip="The number of active users over the last 24 hours">
+      <MetricCard isLoading={!data.length}>
+        <MetricCardHeader href="https://www.supabase.io">
+          <MetricCardIcon>
+            <User2 size={14} strokeWidth={1.5} />
+          </MetricCardIcon>
+          <MetricCardLabel tooltip="The number of active users over the last 24 hours">
             Active Users
-          </MetricsCardLabel>
-        </MetricsCardHeader>
-        <MetricsCardContent>
-          <MetricsCardValue>
+          </MetricCardLabel>
+        </MetricCardHeader>
+        <MetricCardContent>
+          <MetricCardValue>
             {averageValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-          </MetricsCardValue>
-          <MetricsCardDifferential variant={diffPercentage > 0 ? 'positive' : 'negative'}>
+          </MetricCardValue>
+          <MetricCardDifferential variant={diffPercentage > 0 ? 'positive' : 'negative'}>
             {diffPercentage > 0 ? '+' : '-'}
             {Math.abs(diffPercentage).toFixed(1)}%
-          </MetricsCardDifferential>
-        </MetricsCardContent>
-        <MetricsCardSparkline data={data} dataKey="value" />
-      </MetricsCard>
+          </MetricCardDifferential>
+        </MetricCardContent>
+        <MetricCardSparkline data={data} dataKey="value" />
+      </MetricCard>
     </div>
   )
 }

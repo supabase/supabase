@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import {
-  MetricsCard,
-  MetricsCardHeader,
-  MetricsCardLabel,
-  MetricsCardContent,
-  MetricsCardValue,
-  MetricsCardDifferential,
-} from 'ui-patterns/MetricsCard'
+  MetricCard,
+  MetricCardHeader,
+  MetricCardLabel,
+  MetricCardContent,
+  MetricCardValue,
+  MetricCardDifferential,
+} from 'ui-patterns/MetricCard'
 
 export default function MetricsCardDemo() {
   const [data, setData] = useState<Array<{ value: number; timestamp: string }>>([])
@@ -30,20 +30,20 @@ export default function MetricsCardDemo() {
 
   return (
     <div className="w-1/2">
-      <MetricsCard isLoading={!data.length}>
-        <MetricsCardHeader>
-          <MetricsCardLabel>Active Users</MetricsCardLabel>
-        </MetricsCardHeader>
-        <MetricsCardContent orientation="horizontal">
-          <MetricsCardValue>
+      <MetricCard isLoading={!data.length}>
+        <MetricCardHeader>
+          <MetricCardLabel>Active Users</MetricCardLabel>
+        </MetricCardHeader>
+        <MetricCardContent orientation="horizontal">
+          <MetricCardValue>
             {averageValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-          </MetricsCardValue>
-          <MetricsCardDifferential variant={diffPercentage > 0 ? 'positive' : 'negative'}>
+          </MetricCardValue>
+          <MetricCardDifferential variant={diffPercentage > 0 ? 'positive' : 'negative'}>
             {diffPercentage > 0 ? '+' : '-'}
             {Math.abs(diffPercentage).toFixed(1)}%
-          </MetricsCardDifferential>
-        </MetricsCardContent>
-      </MetricsCard>
+          </MetricCardDifferential>
+        </MetricCardContent>
+      </MetricCard>
     </div>
   )
 }

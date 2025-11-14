@@ -1334,23 +1334,23 @@ export const examples: Registry = [
     files: ['example/empty-state-zero-items-data-grid.tsx'],
   },
   {
-    name: 'metrics-card',
+    name: 'metric-card',
     type: 'components:example',
-    files: ['example/metrics-card.tsx'],
+    files: ['example/metric-card.tsx'],
   },
   {
-    name: 'metrics-card-minimal',
+    name: 'metric-card-minimal',
     type: 'components:example',
-    files: ['example/metrics-card-minimal.tsx'],
+    files: ['example/metric-card-minimal.tsx'],
   },
   {
-    name: 'metrics-card-minimal-horizontal',
+    name: 'metric-card-minimal-horizontal',
     type: 'components:example',
-    files: ['example/metrics-card-minimal-horizontal.tsx'],
+    files: ['example/metric-card-minimal-horizontal.tsx'],
   },
   {
-    name: 'metrics-card-with-icon-link-tooltip',
+    name: 'metric-card-with-icon-link-tooltip',
     type: 'components:example',
-    files: ['example/metrics-card-with-icon-link-tooltip.tsx'],
+    files: ['example/metric-card-with-icon-link-tooltip.tsx'],
   },
 ]

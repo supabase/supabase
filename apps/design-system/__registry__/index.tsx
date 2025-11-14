@@ -2480,46 +2480,46 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "metrics-card": {
-      name: "metrics-card",
+    "metric-card": {
+      name: "metric-card",
       type: "components:example",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/metrics-card")),
+      component: React.lazy(() => import("@/registry/default/example/metric-card")),
       source: "",
-      files: ["registry/default/example/metrics-card.tsx"],
+      files: ["registry/default/example/metric-card.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
     },
-    "metrics-card-minimal": {
-      name: "metrics-card-minimal",
+    "metric-card-minimal": {
+      name: "metric-card-minimal",
       type: "components:example",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/metrics-card-minimal")),
+      component: React.lazy(() => import("@/registry/default/example/metric-card-minimal")),
       source: "",
-      files: ["registry/default/example/metrics-card-minimal.tsx"],
+      files: ["registry/default/example/metric-card-minimal.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
     },
-    "metrics-card-minimal-horizontal": {
-      name: "metrics-card-minimal-horizontal",
+    "metric-card-minimal-horizontal": {
+      name: "metric-card-minimal-horizontal",
       type: "components:example",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/metrics-card-minimal-horizontal")),
+      component: React.lazy(() => import("@/registry/default/example/metric-card-minimal-horizontal")),
       source: "",
-      files: ["registry/default/example/metrics-card-minimal-horizontal.tsx"],
+      files: ["registry/default/example/metric-card-minimal-horizontal.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
     },
-    "metrics-card-with-icon-link-tooltip": {
-      name: "metrics-card-with-icon-link-tooltip",
+    "metric-card-with-icon-link-tooltip": {
+      name: "metric-card-with-icon-link-tooltip",
       type: "components:example",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/metrics-card-with-icon-link-tooltip")),
+      component: React.lazy(() => import("@/registry/default/example/metric-card-with-icon-link-tooltip")),
       source: "",
-      files: ["registry/default/example/metrics-card-with-icon-link-tooltip.tsx"],
+      files: ["registry/default/example/metric-card-with-icon-link-tooltip.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
