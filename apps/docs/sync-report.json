@@ -1,0 +1,10 @@
+{
+  "timestamp": "2025-11-14T15:39:13.927Z",
+  "summary": {
+    "total_issues": 0,
+    "broken_references": 0,
+    "missing_documentation": 0,
+    "private_apis_exposed": 0
+  },
+  "issues": []
+}

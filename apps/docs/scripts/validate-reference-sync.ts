@@ -2,12 +2,7 @@
 
 import { readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
-import {
-  Document,
-  parseDocument,
-  YAMLMap,
-  YAMLSeq,
-} from 'yaml'
+import { Document, parseDocument, YAMLMap, YAMLSeq } from 'yaml'
 
 // Types for TypeDoc JSON structure
 interface TypeDocNode {
@@ -481,7 +476,10 @@ function findDocumentableClasses(
     const normalizedPath = normalizeRefPath(currentPath)
 
     // Check if this is a class or interface with public methods
-    if ((node.kind === TypeDocKind.Class || node.kind === TypeDocKind.Interface) && isPublicApi(node)) {
+    if (
+      (node.kind === TypeDocKind.Class || node.kind === TypeDocKind.Interface) &&
+      isPublicApi(node)
+    ) {
       // Skip Error classes - we don't document them
       if (node.name.endsWith('Error')) {
         return
@@ -908,7 +906,9 @@ function mergeExamplesFromTypeDoc(
       .filter(Boolean)
   )
   const existingIds = new Set(
-    existingExamples.map((example) => example.id).filter((id): id is string => typeof id === 'string')
+    existingExamples
+      .map((example) => example.id)
+      .filter((id): id is string => typeof id === 'string')
   )
   const newExamples: YamlExample[] = []
   const startingIndex = existingExamples.length
@@ -944,7 +944,7 @@ function mergeExamplesFromTypeDoc(
   }
   fn.examples.push(...newExamples)
 
-  let examplesNode = fnNode.get('examples', true) as YAMLSeq<YAMLMap> | undefined
+  let examplesNode = fnNode.get('examples', true) as unknown as YAMLSeq<YAMLMap> | undefined
   if (!examplesNode) {
     examplesNode = yamlDoc.createNode([]) as YAMLSeq<YAMLMap>
     fnNode.set('examples', examplesNode)
@@ -965,7 +965,10 @@ function getDefaultProduct(category: CategoryKey): string {
 function getCategoryMeta(fn: YamlFunction): { category: CategoryKey; product: string } | null {
   const override = ID_CATEGORY_OVERRIDES[fn.id]
   if (override) {
-    return { category: override.category, product: override.product ?? getDefaultProduct(override.category) }
+    return {
+      category: override.category,
+      product: override.product ?? getDefaultProduct(override.category),
+    }
   }
 
   if (!fn.$ref) {
@@ -1054,7 +1057,10 @@ function buildCanonicalCategories(yamlSpec: YamlSpec): SectionCategory[] {
 
     const parentConfig = GROUP_PARENT_CONFIG[fn.id]
     if (parentConfig) {
-      const parentItem = createNavItem(fn, parentConfig.product ?? getDefaultProduct(parentConfig.category))
+      const parentItem = createNavItem(
+        fn,
+        parentConfig.product ?? getDefaultProduct(parentConfig.category)
+      )
       parentItem.isFunc = false
       parentItem.items = []
       groupParents.set(fn.id, parentItem)
@@ -1162,7 +1168,9 @@ function insertCategoriesIntoSections(
   categories: SectionCategory[]
 ): Array<SectionCategory | SectionItem> {
   if (categories.length === 0) {
-    return existingSections.filter((section) => !isCategoryEntry(section) || !isTargetCategory(section.title))
+    return existingSections.filter(
+      (section) => !isCategoryEntry(section) || !isTargetCategory(section.title)
+    )
   }
 
   const targetTitles = new Set(categories.map((category) => category.title))
@@ -1208,7 +1216,10 @@ async function validate(
   // Load YAML
   const yamlContent = await readFile(yamlPath, 'utf-8')
   const yamlDoc = parseDocument(yamlContent)
-  const yamlSpec: YamlSpec = (yamlDoc.toJSON() as YamlSpec) ?? { info: { definition: '' }, functions: [] }
+  const yamlSpec: YamlSpec = (yamlDoc.toJSON() as YamlSpec) ?? {
+    info: { definition: '' },
+    functions: [],
+  }
   const functionsSeq = getFunctionsSequence(yamlDoc)
   const functionNodeMap = buildFunctionNodeMap(functionsSeq)
   let yamlDocChanged = false

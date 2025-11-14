@@ -10,7 +10,11 @@
     "id": "installing",
     "slug": "installing",
     "type": "markdown",
-    "excludes": ["reference_javascript_v1", "reference_kotlin_v1", "reference_swift_v1"]
+    "excludes": [
+      "reference_javascript_v1",
+      "reference_kotlin_v1",
+      "reference_swift_v1"
+    ]
   },
   {
     "title": "Initializing",
