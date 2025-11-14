@@ -6,13 +6,7 @@ import * as React from 'react'
 import { DateRange } from 'react-day-picker'
 
 import { cn } from '@/lib/utils'
-import {
-  Button,
-  Calendar,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from 'ui'
+import { Button, Calendar, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
 export default function DatePickerWithRange({ className }: React.HTMLAttributes<HTMLDivElement>) {
   const [date, setDate] = React.useState<DateRange | undefined>({

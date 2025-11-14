@@ -323,12 +323,7 @@ const ProjectLinker = ({
                     {(selectedForeignProject && selectedForeignProject.name) ?? choosePrompt}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent
-                  className="p-0"
-                  side="bottom"
-                  align="center"
-                  sameWidthAsTrigger
-                >
+                <PopoverContent className="p-0" side="bottom" align="center" sameWidthAsTrigger>
                   <Command_Shadcn_>
                     <CommandInput_Shadcn_ placeholder="Search for a project" />
                     <CommandList_Shadcn_ className="!max-h-[170px]">

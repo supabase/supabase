@@ -4,13 +4,7 @@ import { KeyboardEvent, useCallback, useMemo, useState } from 'react'
 
 import type { Filter } from 'components/grid/types'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import {
-  Button,
-  PopoverContent,
-  PopoverSeparator,
-  PopoverTrigger,
-  Popover,
-} from 'ui'
+import { Button, PopoverContent, PopoverSeparator, PopoverTrigger, Popover } from 'ui'
 import FilterRow from './FilterRow'
 
 export interface FilterPopoverPrimitiveProps {

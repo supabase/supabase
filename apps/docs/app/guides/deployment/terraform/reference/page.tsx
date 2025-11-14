@@ -3,13 +3,7 @@ import { Check, PlusCircle } from 'lucide-react'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 
-import {
-  CodeBlock,
-  Heading,
-  PopoverContent,
-  PopoverTrigger,
-  Popover,
-} from 'ui'
+import { CodeBlock, Heading, PopoverContent, PopoverTrigger, Popover } from 'ui'
 
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
