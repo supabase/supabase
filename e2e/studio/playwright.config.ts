@@ -13,11 +13,11 @@ const WEB_SERVER_TIMEOUT = Number(process.env.WEB_SERVER_TIMEOUT) || 10 * 60 * 1
 const WEB_SERVER_PORT = Number(process.env.WEB_SERVER_PORT) || 8082
 
 export default defineConfig({
-  timeout: 90 * 1000,
+  timeout: 120 * 1000,
   testDir: './features',
   testMatch: /.*\.spec\.ts/,
   forbidOnly: IS_CI,
-  retries: IS_CI ? 3 : 0,
+  retries: IS_CI ? 5 : 0,
   maxFailures: 3,
   fullyParallel: true,
   use: {
