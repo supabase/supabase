@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { FilterProperty, FilterGroup as FilterGroupType } from './types'
 import { ActiveInput } from './hooks'
 import { FilterCondition } from './FilterCondition'
-import { Input_Shadcn_, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverAnchor_Shadcn_ } from 'ui'
+import { Input_Shadcn_, Popover, PopoverContent, PopoverAnchor } from 'ui'
 import { buildPropertyItems, MenuItem } from './menuItems'
 import { useDeferredBlur, useHighlightNavigation } from './hooks'
 import { DefaultCommandList } from './DefaultCommandList'
@@ -263,8 +263,8 @@ export function FilterGroup({
             </React.Fragment>
           )
         })}
-        <Popover_Shadcn_ open={isActive && !isLoading && items.length > 0}>
-          <PopoverAnchor_Shadcn_ asChild>
+        <Popover open={isActive && !isLoading && items.length > 0}>
+          <PopoverAnchor asChild>
             <Input_Shadcn_
               ref={freeformInputRef}
               type="text"
@@ -292,8 +292,8 @@ export function FilterGroup({
                     }
               }
             />
-          </PopoverAnchor_Shadcn_>
-          <PopoverContent_Shadcn_
+          </PopoverAnchor>
+          <PopoverContent
             className="min-w-[220px] p-0"
             align="start"
             side="bottom"
@@ -313,8 +313,8 @@ export function FilterGroup({
               onSelect={onSelectMenuItem}
               includeIcon
             />
-          </PopoverContent_Shadcn_>
-        </Popover_Shadcn_>
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   )

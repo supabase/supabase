@@ -5,10 +5,10 @@ import { isEqual } from 'lodash'
 import { DropdownControl } from 'components/grid/components/common/DropdownControl'
 import {
   Button,
-  PopoverContent_Shadcn_,
-  PopoverSeparator_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverSeparator,
+  PopoverTrigger,
+  Popover,
   Input,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
@@ -333,8 +333,8 @@ export const ReportFilterPopover = ({
   const hasChanges = !isEqual(localFilters, filters)
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverTrigger asChild>
         <Button
           type={filters.length > 0 ? 'link' : 'text'}
           icon={<FilterIcon />}
@@ -342,8 +342,8 @@ export const ReportFilterPopover = ({
         >
           {displayButtonText}
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-[500px]" side="bottom" align="start" portal={portal}>
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-[500px]" side="bottom" align="start" portal={portal}>
         <div className="space-y-2 py-2">
           <div>
             {localFilters.map((filter, index) => (
@@ -366,7 +366,7 @@ export const ReportFilterPopover = ({
               </div>
             )}
           </div>
-          <PopoverSeparator_Shadcn_ />
+          <PopoverSeparator />
           <div className="px-3 flex flex-row justify-between">
             <div className="flex gap-2">
               <Button icon={<Plus />} type="text" onClick={onAddFilter}>
@@ -383,7 +383,7 @@ export const ReportFilterPopover = ({
             </Button>
           </div>
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

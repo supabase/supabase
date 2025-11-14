@@ -8,17 +8,17 @@ import { cn } from '@/lib/utils'
 import {
   Button,
   Calendar,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 export default function DatePickerDemo() {
   const [date, setDate] = React.useState<Date>()
 
   return (
-    <Popover_Shadcn_>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover>
+      <PopoverTrigger asChild>
         <Button
           type={'outline'}
           className={cn(
@@ -29,10 +29,10 @@ export default function DatePickerDemo() {
         >
           {date ? format(date, 'PPP') : <span>Pick a date</span>}
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-auto p-0">
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0">
         <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

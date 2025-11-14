@@ -10,9 +10,9 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
   cn,
 } from 'ui'
 import type { McpClient } from '../types'
@@ -43,12 +43,12 @@ export const ClientSelectDropdown = ({
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
       <div className="flex">
         <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
           {label}
         </span>
-        <PopoverTrigger_Shadcn_ asChild>
+        <PopoverTrigger asChild>
           <Button
             size="small"
             type="default"
@@ -75,9 +75,9 @@ export const ClientSelectDropdown = ({
               {selectedClient?.label}
             </div>
           </Button>
-        </PopoverTrigger_Shadcn_>
+        </PopoverTrigger>
       </div>
-      <PopoverContent_Shadcn_ className="mt-0 p-0 max-w-48" side="bottom" align="start" portal>
+      <PopoverContent className="mt-0 p-0 max-w-48" side="bottom" align="start" portal>
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Search..." />
           <CommandList_Shadcn_>
@@ -118,7 +118,7 @@ export const ClientSelectDropdown = ({
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

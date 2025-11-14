@@ -9,9 +9,9 @@ import { cn } from '@/lib/utils'
 import {
   Button,
   Calendar,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 export default function DatePickerWithRange({ className }: React.HTMLAttributes<HTMLDivElement>) {
@@ -22,8 +22,8 @@ export default function DatePickerWithRange({ className }: React.HTMLAttributes<
 
   return (
     <div className={cn('grid gap-2', className)}>
-      <Popover_Shadcn_>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover>
+        <PopoverTrigger asChild>
           <Button
             id="date"
             type={'outline'}
@@ -45,8 +45,8 @@ export default function DatePickerWithRange({ className }: React.HTMLAttributes<
               <span>Pick a date</span>
             )}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             initialFocus
             mode="range"
@@ -55,8 +55,8 @@ export default function DatePickerWithRange({ className }: React.HTMLAttributes<
             onSelect={setDate}
             numberOfMonths={2}
           />
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }

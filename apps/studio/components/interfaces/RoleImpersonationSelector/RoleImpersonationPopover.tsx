@@ -1,5 +1,5 @@
 import { ReactNode, useState } from 'react'
-import { PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
+import { PopoverContent, PopoverTrigger, Popover, cn } from 'ui'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { User } from 'data/auth/users-infinite-query'
@@ -36,8 +36,8 @@ export const RoleImpersonationPopover = ({
   const currentRole = state.role?.role ?? serviceRoleLabel ?? 'service role'
 
   return (
-    <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
         <ButtonTooltip
           size="tiny"
           type="default"
@@ -70,8 +70,8 @@ export const RoleImpersonationPopover = ({
             <ChevronDown className="text-muted" strokeWidth={1} size={12} />
           </div>
         </ButtonTooltip>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent
         portal={portal}
         className="p-0 w-[592px] overflow-hidden"
         side="bottom"
@@ -81,8 +81,8 @@ export const RoleImpersonationPopover = ({
           serviceRoleLabel={serviceRoleLabel}
           disallowAuthenticatedOption={disallowAuthenticatedOption}
         />
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }
 

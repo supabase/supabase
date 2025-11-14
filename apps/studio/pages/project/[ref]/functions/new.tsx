@@ -38,9 +38,9 @@ import {
   FormItem_Shadcn_,
   Input_Shadcn_,
   Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -278,8 +278,8 @@ const NewFunctionPage = () => {
       ]}
       primaryActions={
         <>
-          <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-            <PopoverTrigger_Shadcn_ asChild>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
               <Button
                 size="tiny"
                 type="default"
@@ -289,8 +289,8 @@ const NewFunctionPage = () => {
               >
                 Templates
               </Button>
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ portal className="w-[300px] p-0" align="end">
+            </PopoverTrigger>
+            <PopoverContent portal className="w-[300px] p-0" align="end">
               <Command_Shadcn_>
                 <CommandInput_Shadcn_ placeholder="Search templates..." />
                 <CommandList_Shadcn_>
@@ -326,8 +326,8 @@ const NewFunctionPage = () => {
                   </CommandGroup_Shadcn_>
                 </CommandList_Shadcn_>
               </Command_Shadcn_>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+            </PopoverContent>
+          </Popover>
           <Button
             size="tiny"
             type="default"

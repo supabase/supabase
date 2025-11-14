@@ -18,9 +18,9 @@ import {
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 const FormSchema = z.object({
@@ -53,8 +53,8 @@ export default function CalendarForm() {
           render={({ field }) => (
             <FormItem_Shadcn_ className="flex flex-col">
               <FormLabel_Shadcn_>Date of birth</FormLabel_Shadcn_>
-              <Popover_Shadcn_>
-                <PopoverTrigger_Shadcn_ asChild>
+              <Popover>
+                <PopoverTrigger asChild>
                   <FormControl_Shadcn_>
                     <Button
                       type={'default'}
@@ -68,8 +68,8 @@ export default function CalendarForm() {
                       {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
                     </Button>
                   </FormControl_Shadcn_>
-                </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_ className="w-auto p-0" align="start" side="right">
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start" side="right">
                   <Calendar
                     mode="single"
                     selected={field.value}
@@ -77,8 +77,8 @@ export default function CalendarForm() {
                     disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
                     initialFocus
                   />
-                </PopoverContent_Shadcn_>
-              </Popover_Shadcn_>
+                </PopoverContent>
+              </Popover>
               <FormDescription_Shadcn_>
                 Your date of birth is used to calculate your age.
               </FormDescription_Shadcn_>

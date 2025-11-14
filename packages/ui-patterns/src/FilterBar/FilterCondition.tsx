@@ -4,9 +4,9 @@ import { X } from 'lucide-react'
 import {
   Button,
   Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverAnchor_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverAnchor,
 } from 'ui'
 import { buildOperatorItems, buildValueItems, MenuItem } from './menuItems'
 import { FilterGroup as FilterGroupType } from './types'
@@ -157,8 +157,8 @@ export function FilterCondition({
       >
         {property.label}
       </span>
-      <Popover_Shadcn_ open={isOperatorActive && !isLoading && operatorItems.length > 0}>
-        <PopoverAnchor_Shadcn_ asChild>
+      <Popover open={isOperatorActive && !isLoading && operatorItems.length > 0}>
+        <PopoverAnchor asChild>
           <Input_Shadcn_
             ref={operatorRef}
             type="text"
@@ -175,8 +175,8 @@ export function FilterCondition({
             disabled={isLoading}
             aria-label={`Operator for ${property.label}`}
           />
-        </PopoverAnchor_Shadcn_>
-        <PopoverContent_Shadcn_
+        </PopoverAnchor>
+        <PopoverContent
           className="min-w-[220px] p-0"
           align="start"
           side="bottom"
@@ -196,10 +196,10 @@ export function FilterCondition({
             onSelect={onSelectMenuItem}
             includeIcon={false}
           />
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
-      <Popover_Shadcn_ open={isActive && !isLoading && (showValueCustom || valueItems.length > 0)}>
-        <PopoverAnchor_Shadcn_ asChild>
+        </PopoverContent>
+      </Popover>
+      <Popover open={isActive && !isLoading && (showValueCustom || valueItems.length > 0)}>
+        <PopoverAnchor asChild>
           <Input_Shadcn_
             ref={valueRef}
             type="text"
@@ -216,8 +216,8 @@ export function FilterCondition({
             disabled={isLoading}
             aria-label={`Value for ${property.label}`}
           />
-        </PopoverAnchor_Shadcn_>
-        <PopoverContent_Shadcn_
+        </PopoverAnchor>
+        <PopoverContent
           className="min-w-[220px] w-fit p-0"
           align="start"
           onOpenAutoFocus={(e) => e.preventDefault()}
@@ -255,8 +255,8 @@ export function FilterCondition({
               includeIcon
             />
           )}
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
       <Button
         type="text"
         size="tiny"

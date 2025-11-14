@@ -13,9 +13,9 @@ import {
   Button,
   ButtonProps,
   Calendar,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
   cn,
   copyToClipboard,
 } from 'ui'
@@ -35,7 +35,7 @@ interface LogsDatePickerProps {
   helpers: DatetimeHelper[]
   onSubmit: (value: DatePickerValue) => void
   buttonTriggerProps?: ButtonProps
-  popoverContentProps?: typeof PopoverContent_Shadcn_
+  popoverContentProps?: typeof PopoverContent
   hideWarnings?: boolean
   align?: 'start' | 'end' | 'center'
 }
@@ -252,15 +252,15 @@ export const LogsDatePicker = ({
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <Button type="default" icon={<Clock size={12} />} {...buttonTriggerProps}>
           {value.isHelper
             ? value.text
             : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent
         className="flex w-full p-0"
         side="bottom"
         align={align}
@@ -391,7 +391,7 @@ export const LogsDatePicker = ({
             <Button onClick={handleApply}>Apply</Button>
           </div>
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

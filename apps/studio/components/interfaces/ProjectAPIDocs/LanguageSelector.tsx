@@ -8,9 +8,9 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
 } from 'ui'
 
 interface LanguageSelectorProps {
@@ -31,8 +31,8 @@ const LanguageSelector = ({ simplifiedVersion = false }: LanguageSelectorProps) 
 
   return (
     <div className="flex items-center gap-x-2">
-      <Popover_Shadcn_ modal={false} open={showLanguage} onOpenChange={setShowLanguage}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover modal={false} open={showLanguage} onOpenChange={setShowLanguage}>
+        <PopoverTrigger asChild>
           <Button
             type="default"
             className={simplifiedVersion ? 'px-1' : ''}
@@ -55,8 +55,8 @@ const LanguageSelector = ({ simplifiedVersion = false }: LanguageSelectorProps) 
               ? `Language: ${snap.docsLanguage === 'js' ? 'Javascript' : 'Bash'}`
               : undefined}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0 w-24" side="bottom" align="end">
+        </PopoverTrigger>
+        <PopoverContent className="p-0 w-24" side="bottom" align="end">
           <Command_Shadcn_>
             <CommandList_Shadcn_>
               <CommandGroup_Shadcn_>
@@ -77,8 +77,8 @@ const LanguageSelector = ({ simplifiedVersion = false }: LanguageSelectorProps) 
               </CommandGroup_Shadcn_>
             </CommandList_Shadcn_>
           </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }

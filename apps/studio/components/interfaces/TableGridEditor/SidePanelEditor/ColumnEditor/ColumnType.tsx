@@ -27,9 +27,9 @@ import {
   CriticalIcon,
   Input,
   Label_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
   ScrollArea,
   Tooltip,
   TooltipContent,
@@ -165,8 +165,8 @@ const ColumnType = ({
   return (
     <div className={cn('flex flex-col gap-y-2', className)}>
       {showLabel && <Label_Shadcn_ className="text-foreground-light">Type</Label_Shadcn_>}
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button
             type={error ? 'danger' : 'default'}
             role="combobox"
@@ -184,8 +184,8 @@ const ColumnType = ({
               'Choose a column type...'
             )}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="w-[460px] p-0" side="bottom" align="center">
+        </PopoverTrigger>
+        <PopoverContent className="w-[460px] p-0" side="bottom" align="center">
           <ScrollArea className="h-[335px]">
             <Command_Shadcn_>
               <CommandInput_Shadcn_
@@ -269,8 +269,8 @@ const ColumnType = ({
               </CommandList_Shadcn_>
             </Command_Shadcn_>
           </ScrollArea>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
 
       {showRecommendation && recommendation !== undefined && (
         <Alert_Shadcn_ variant="warning" className="mt-2">

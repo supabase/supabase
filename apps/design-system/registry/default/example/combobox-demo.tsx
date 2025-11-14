@@ -12,9 +12,9 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 const frameworks = [
@@ -45,8 +45,8 @@ export default function ComboboxDemo() {
   const [value, setValue] = React.useState('')
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <Button
           type="default"
           role="combobox"
@@ -59,8 +59,8 @@ export default function ComboboxDemo() {
             ? frameworks.find((framework) => framework.value === value)?.label
             : 'Select framework...'}
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-[200px] p-0">
+      </PopoverTrigger>
+      <PopoverContent className="w-[200px] p-0">
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Search framework..." />
           <CommandList_Shadcn_>
@@ -87,7 +87,7 @@ export default function ComboboxDemo() {
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }
