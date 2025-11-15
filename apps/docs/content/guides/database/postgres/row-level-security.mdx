@@ -36,7 +36,9 @@ You can just think of them as adding a `WHERE` clause to every query. For exampl
 
 ```sql
 create policy "Individuals can view their own todos."
-on todos for select
+on todos 
+for select
+to authenticated
 using ( (select auth.uid()) = user_id );
 ```
 
@@ -103,7 +105,8 @@ using ( true );
 -- OR
 
 create policy "Public profiles are viewable only by authenticated users"
-on profiles for select
+on profiles 
+for select
 to authenticated
 using ( true );
 ```
@@ -149,7 +152,9 @@ Alternatively, if you only wanted users to be able to see their own profiles:
 ```sql
 create policy "User can see their own profile only."
 on profiles
-for select using ( (select auth.uid()) = user_id );
+for select 
+to authenticated
+using ( (select auth.uid()) = user_id );
 ```
 
 ### INSERT policies
