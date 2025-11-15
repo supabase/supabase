@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
@@ -13,7 +13,7 @@ import {
 } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -33,7 +33,7 @@ const PostgRESTReport: NextPageWithLayout = () => {
 
 PostgRESTReport.getLayout = (page) => (
   <DefaultLayout>
-    <ReportsLayout title="PostgREST">{page}</ReportsLayout>
+    <ObservabilityLayout title="PostgREST">{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 
@@ -70,8 +70,11 @@ const PostgrestReport = () => {
 
   const state = useDatabaseSelectorStateSnapshot()
 
-  // [Joshen] Empty dependency array as we only want this running once
+  const hasStateSyncedFromUrlRef = useRef(false)
   useEffect(() => {
+    if (hasStateSyncedFromUrlRef.current) return
+    hasStateSyncedFromUrlRef.current = true
+
     if (db !== undefined) {
       setTimeout(() => {
         // [Joshen] Adding a timeout here to support navigation from settings to reports
@@ -86,7 +89,7 @@ const PostgrestReport = () => {
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }, 200)
     }
-  }, [])
+  }, [state, db, chart])
 
   const handleDatePickerChange = (values: DatePickerValue) => {
     handleDatePickerChangeFromHook(values)

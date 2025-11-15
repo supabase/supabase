@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -18,7 +18,7 @@ import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ChartHandler from 'components/ui/Charts/ChartHandler'
@@ -56,7 +56,7 @@ const DatabaseReport: NextPageWithLayout = () => {
 
 DatabaseReport.getLayout = (page) => (
   <DefaultLayout>
-    <ReportsLayout title="Database">{page}</ReportsLayout>
+    <ObservabilityLayout title="Database">{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 
@@ -173,8 +173,11 @@ const DatabaseUsage = () => {
     setTimeout(() => setIsRefreshing(false), 1000)
   }
 
-  // [Joshen] Empty dependency array as we only want this running once
+  const stateSyncedFromUrlRef = useRef(false)
   useEffect(() => {
+    if (stateSyncedFromUrlRef.current) return
+    stateSyncedFromUrlRef.current = true
+
     if (db !== undefined) {
       setTimeout(() => {
         // [Joshen] Adding a timeout here to support navigation from settings to reports

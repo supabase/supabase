@@ -1,7 +1,7 @@
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import Reports from 'components/interfaces/Reports/Reports'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => (
@@ -14,7 +14,7 @@ const PageLayout: NextPageWithLayout = () => (
 
 PageLayout.getLayout = (page) => (
   <DefaultLayout>
-    <ReportsLayout>{page}</ReportsLayout>
+    <ObservabilityLayout>{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 

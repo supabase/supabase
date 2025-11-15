@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useContentQuery } from 'data/content/content-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -30,8 +30,8 @@ export const UserReportPage: NextPageWithLayout = () => {
         const reports = data.content
           .filter((x) => x.type === 'report')
           .sort((a, b) => a.name.localeCompare(b.name))
-        if (reports.length >= 1) router.push(`/project/${ref}/reports/${reports[0].id}`)
-        if (reports.length === 0) router.push(`/project/${ref}/reports/api-overview`)
+        if (reports.length >= 1) router.push(`/project/${ref}/observability/${reports[0].id}`)
+        if (reports.length === 0) router.push(`/project/${ref}/observability/api-overview`)
       },
     }
   )
@@ -52,7 +52,7 @@ export const UserReportPage: NextPageWithLayout = () => {
       ) : (
         <>
           <ProductEmptyState
-            title="Reports"
+            title="Observability"
             ctaButtonLabel="New custom report"
             onClickCta={() => {
               setShowCreateReportModal(true)
@@ -81,7 +81,7 @@ export const UserReportPage: NextPageWithLayout = () => {
 
 UserReportPage.getLayout = (page) => (
   <DefaultLayout>
-    <ReportsLayout>{page}</ReportsLayout>
+    <ObservabilityLayout>{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 

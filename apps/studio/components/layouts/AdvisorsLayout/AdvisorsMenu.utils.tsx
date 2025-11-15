@@ -28,7 +28,7 @@ export const generateAdvisorsMenu = (
         {
           name: 'Query Performance',
           key: 'query-performance',
-          url: `/project/${ref}/reports/query-performance`,
+          url: `/project/${ref}/observability/query-performance`,
           items: [],
           rightIcon: <ArrowUpRight size={14} strokeWidth={1.5} className="h-4 w-4" />,
         },

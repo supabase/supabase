@@ -12,7 +12,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 import Link from 'next/link'
-import { ChevronRight, ExternalLink, HelpCircle } from 'lucide-react'
+import { ChevronRight, ExternalLink, HelpCircle, Telescope } from 'lucide-react'
 import { Reports } from 'icons'
 import {
   ScaffoldSection,
@@ -231,11 +231,11 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
         <div className="flex items-center justify-between mb-4">
           <ScaffoldSectionTitle>Usage</ScaffoldSectionTitle>
           <Link
-            href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}&isHelper=true&helperText=Last+24+hours`}
+            href={`/project/${ref}/observability/auth?its=${startDate}&ite=${endDate}&isHelper=true&helperText=Last+24+hours`}
             className="text-sm text-link inline-flex items-center gap-x-1.5"
           >
-            <Reports size={14} />
-            <span>View all reports</span>
+            <Telescope size={14} />
+            <span>Go to observability</span>
             <ChevronRight size={14} />
           </Link>
         </div>
