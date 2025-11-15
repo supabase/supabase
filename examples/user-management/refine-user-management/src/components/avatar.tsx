@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { supabaseClient } from "../utility/supabaseClient";
+
+import { supabaseClient } from "../providers/supabase-client";
 
 type TAvatarProps = {
   url?: string;
@@ -7,11 +8,7 @@ type TAvatarProps = {
   onUpload: (filePath: string) => void;
 };
 
-export default function Avatar({
-  url,
-  size,
-  onUpload,
-}: TAvatarProps) {
+export default function Avatar({ url, size, onUpload }: TAvatarProps) {
   const [avatarUrl, setAvatarUrl] = useState("");
   const [uploading, setUploading] = useState(false);
 
@@ -96,4 +93,4 @@ export default function Avatar({
       </div>
     </div>
   );
-};
+}

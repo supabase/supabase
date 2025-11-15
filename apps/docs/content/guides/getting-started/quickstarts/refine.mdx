@@ -1,6 +1,6 @@
 ---
-title: 'Use Supabase with refine'
-subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a refine app.'
+title: 'Use Supabase with Refine'
+subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Refine app.'
 breadcrumb: 'Framework Quickstarts'
 hideToc: true
 ---
@@ -15,11 +15,11 @@ hideToc: true
 
   <StepHikeCompact.Step step={2}>
 
-    <StepHikeCompact.Details title="Create a refine app">
+    <StepHikeCompact.Details title="Create a Refine app">
 
-    Create a [refine](https://github.com/refinedev/refine) app using the [create refine-app](https://refine.dev/docs/getting-started/quickstart/).
+    Create a [Refine](https://github.com/refinedev/refine) app using the [create refine-app](https://refine.dev/docs/getting-started/quickstart/).
 
-    The `refine-supabase` preset adds `@refinedev/supabase` supplementary package that supports Supabase in a refine app. `@refinedev/supabase` out-of-the-box includes the Supabase dependency: [supabase-js](https://github.com/supabase/supabase-js).
+    The `refine-supabase` preset adds `@refinedev/supabase` supplementary package that supports Supabase in a Refine app. `@refinedev/supabase` out-of-the-box includes the Supabase dependency: [supabase-js](https://github.com/supabase/supabase-js).
 
     </StepHikeCompact.Details>
 
@@ -34,9 +34,9 @@ hideToc: true
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Open your refine app in VS Code">
+    <StepHikeCompact.Details title="Open your Refine app in VS Code">
 
-    You will develop your app, connect to the Supabase backend and run the refine app in VS Code.
+    You will develop your app, connect to the Supabase backend and run the Refine app in VS Code.
 
     </StepHikeCompact.Details>
 
@@ -54,7 +54,7 @@ hideToc: true
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Start the app">
 
-    Start the app, go to http://localhost:5173 in a browser, and you should be greeted with the refine Welcome page.
+    Start the app, go to http://localhost:5173 in a browser, and you should be greeted with the Refine Welcome page.
 
     </StepHikeCompact.Details>
 
@@ -65,7 +65,7 @@ hideToc: true
       ```
 
 <StepHikeCompact.Code>
-  ![refine welcome page](/docs/img/refine-qs-welcome-page.png)
+  ![Refine welcome page](/docs/img/refine-qs-welcome-page.png)
 </StepHikeCompact.Code>
 
     </StepHikeCompact.Code>
@@ -75,7 +75,7 @@ hideToc: true
 <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Update `supabaseClient`">
 
-      You now have to update the `supabaseClient` with the `SUPABASE_URL` and `SUPABASE_KEY` of your Supabase API. The `supabaseClient` is used in auth provider and data provider methods that allow the refine app to connect to your Supabase backend.
+      You now have to update the `supabaseClient` with the `SUPABASE_URL` and `SUPABASE_KEY` of your Supabase API. The `supabaseClient` is used in auth provider and data provider methods that allow the Refine app to connect to your Supabase backend.
 
     <ProjectConfigVariables variable="url" />
     <ProjectConfigVariables variable="publishable" />
@@ -110,7 +110,7 @@ hideToc: true
 
       You have to then configure resources and define pages for `instruments` resource.
 
-      Use the following command to automatically add resources and generate code for pages for `instruments` using refine Inferencer.
+      Use the following command to automatically add resources and generate code for pages for `instruments` using Refine Inferencer.
 
       This defines pages for `list`, `create`, `show` and `edit` actions inside the `src/pages/instruments/` directory with `<HeadlessInferencer />` component.
 
@@ -118,7 +118,7 @@ hideToc: true
 
       <Admonition type="note">
 
-        The `<HeadlessInferencer />` is a refine Inferencer component that automatically generates necessary code for the `list`, `create`, `show` and `edit` pages.
+        The `<HeadlessInferencer />` is a Refine Inferencer component that automatically generates necessary code for the `list`, `create`, `show` and `edit` pages.
 
         More on [how the Inferencer works is available in the docs here](https://refine.dev/docs/packages/documentation/inferencer/).
 
@@ -151,13 +151,13 @@ hideToc: true
 
     <StepHikeCompact.Code>
       ```tsx name=src/App.tsx
-      import { Refine, WelcomePage } from "@refinedev/core";
+      import { Refine } from "@refinedev/core";
       import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
-      import routerBindings, {
+      import routerProvider, {
         DocumentTitleHandler,
         NavigateToResource,
         UnsavedChangesNotifier,
-      } from "@refinedev/react-router-v6";
+      } from "@refinedev/react-router";
       import { dataProvider, liveProvider } from "@refinedev/supabase";
       import { BrowserRouter, Route, Routes } from "react-router-dom";
 
@@ -174,7 +174,7 @@ hideToc: true
                 dataProvider={dataProvider(supabaseClient)}
                 liveProvider={liveProvider(supabaseClient)}
                 authProvider={authProvider}
-                routerProvider={routerBindings}
+                routerProvider={routerProvider}
                 options={{
                   syncWithLocation: true,
                   warnWhenUnsavedChanges: true,

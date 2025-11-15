@@ -1,15 +1,15 @@
-# Supabase refine User Management
+# Supabase Refine User Management
 
-This repo is a quick sample of how you can get started building apps using [refine](https://github.com/refinedev/refine) and Supabase: users can sign up with a magic link and then update their account with public profile information, including a profile image.
+This repo is a quick sample of how you can get started building apps using [Refine](https://github.com/refinedev/refine) and Supabase: users can sign up with a magic link and then update their account with public profile information, including a profile image.
 
-## About refine
+## About Refine
 
-[refine](https://github.com/refinedev/refine) is a React-based framework for building data-intensive applications in no time ✨
+[Refine](https://github.com/refinedev/refine) is a React-based framework for building data-intensive applications in no time ✨
 
-refine offers lots of out-of-the box functionality for rapid development, without compromising extreme customizability. Use-cases include, but are not limited to admin panels, B2B applications and dashboards.
+Refine offers lots of out-of-the box functionality for rapid development, without compromising extreme customizability. Use-cases include, but are not limited to admin panels, B2B applications and dashboards.
 
 - To learn more about **refine**, please check out the [Documentation](https://refine.dev/docs)
-- [Step up to refine tutorials.](https://refine.dev/docs/tutorial/introduction/index/)
+- [Step up to Refine tutorials.](https://refine.dev/docs/tutorial/introduction/index/)
 
 ## Available Scripts
 
