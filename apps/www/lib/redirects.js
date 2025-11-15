@@ -1846,7 +1846,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/with-expo-social-auth',
-    destination: '/docs/guides/getting-started/tutorials/with-expo-react-native-social-auth',
+    destination: '/docs/guides/auth/quickstarts/with-expo-react-native-social-auth',
   },
   {
     permanent: true,
@@ -1856,7 +1856,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/getting-started/tutorials/with-expo-social-auth',
-    destination: '/docs/guides/getting-started/tutorials/with-expo-react-native-social-auth',
+    destination: '/docs/guides/auth/quickstarts/with-expo-react-native-social-auth',
   },
   {
     permanent: true,
