@@ -11,7 +11,7 @@ import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from 'types'
-import { Button, Popover, cn } from 'ui'
+import { Button, Popover, PopoverContent, PopoverTrigger, cn } from 'ui'
 
 export const LogsTemplatesPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
@@ -75,27 +75,24 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
       description={template.description}
       footer={
         <div className="flex flex-row justify-end">
-          <Popover
-            onOpenChange={setShowPreview}
-            open={showPreview}
-            className="rounded-lg bg-alternative"
-            size="content"
-            overlay={
+          <Popover open={showPreview} onOpenChange={setShowPreview}>
+            <PopoverTrigger asChild>
+              <Button
+                type="default"
+                onClick={(e) => {
+                  e.preventDefault()
+                  setShowPreview(!showPreview)
+                }}
+              >
+                Preview
+              </Button>
+            </PopoverTrigger>
+
+            <PopoverContent align="start">
               <pre className="whitespace-pre-line break-words rounded-lg bg-alternative p-4 text-sm">
                 {template.searchString}
               </pre>
-            }
-          >
-            <Button
-              asChild
-              type="default"
-              onClick={(e) => {
-                e.preventDefault()
-                setShowPreview(!showPreview)
-              }}
-            >
-              <span>Preview</span>
-            </Button>
+            </PopoverContent>
           </Popover>
         </div>
       }
