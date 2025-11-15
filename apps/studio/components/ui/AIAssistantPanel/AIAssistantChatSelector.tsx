@@ -13,9 +13,9 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 
@@ -85,8 +85,8 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
   }
 
   return (
-    <Popover_Shadcn_ open={chatSelectorOpen} onOpenChange={setChatSelectorOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={chatSelectorOpen} onOpenChange={setChatSelectorOpen}>
+      <PopoverTrigger asChild>
         <Button
           type="text"
           size="tiny"
@@ -95,8 +95,8 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
         >
           {currentChat}
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-[250px] p-0" align="start">
+      </PopoverTrigger>
+      <PopoverContent className="w-[250px] p-0" align="start">
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Search chats..." />
           <CommandList_Shadcn_>
@@ -211,7 +211,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

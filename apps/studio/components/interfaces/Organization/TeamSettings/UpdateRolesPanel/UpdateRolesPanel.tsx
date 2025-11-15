@@ -23,9 +23,9 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
   ScrollArea,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -331,17 +331,17 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
               </div>
 
               {!isApplyingRoleToAllProjects && (
-                <Popover_Shadcn_
+                <Popover
                   open={showProjectDropdown}
                   onOpenChange={setShowProjectDropdown}
                   modal={false}
                 >
-                  <PopoverTrigger_Shadcn_ asChild>
+                  <PopoverTrigger asChild>
                     <Button type="default" className="w-min">
                       Add project
                     </Button>
-                  </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0" side="bottom" align="start">
                     <Command_Shadcn_>
                       <CommandInput_Shadcn_ placeholder="Find project..." />
                       <CommandList_Shadcn_>
@@ -371,8 +371,8 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                         </CommandGroup_Shadcn_>
                       </CommandList_Shadcn_>
                     </Command_Shadcn_>
-                  </PopoverContent_Shadcn_>
-                </Popover_Shadcn_>
+                  </PopoverContent>
+                </Popover>
               )}
             </SheetSection>
 

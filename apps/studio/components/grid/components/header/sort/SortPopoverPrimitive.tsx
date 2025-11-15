@@ -4,13 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import type { Sort } from 'components/grid/types'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import {
-  Button,
-  PopoverContent_Shadcn_,
-  PopoverSeparator_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-} from 'ui'
+import { Button, PopoverContent, PopoverSeparator, PopoverTrigger, Popover } from 'ui'
 import { DropdownControl } from '../../common/DropdownControl'
 import SortRow from './SortRow'
 
@@ -200,7 +194,7 @@ export const SortPopoverPrimitive = ({
         </div>
       )}
 
-      <PopoverSeparator_Shadcn_ />
+      <PopoverSeparator />
       <div className="px-3 flex flex-row justify-between">
         {dropdownOptions && dropdownOptions.length > 0 ? (
           <DropdownControl
@@ -232,15 +226,15 @@ export const SortPopoverPrimitive = ({
   )
 
   return (
-    <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover modal={false} open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <Button type={localSorts.length > 0 ? 'link' : 'text'} icon={<List />}>
           {displayButtonText}
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start" portal={portal}>
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-96" side="bottom" align="start" portal={portal}>
         {content}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

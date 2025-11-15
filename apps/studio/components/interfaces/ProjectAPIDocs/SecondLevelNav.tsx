@@ -17,9 +17,9 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
 } from 'ui'
 import { useIsAPIDocsSidePanelEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { navigateToSection } from './Content/Content.utils'
@@ -86,8 +86,8 @@ const SecondLevelNav = () => {
         <p className="text-sm text-foreground-light capitalize">{content[section].title}</p>
       </div>
 
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover open={open} onOpenChange={setOpen} modal={false}>
+        <PopoverTrigger asChild>
           <div className="px-4">
             <Button block type="default" size="small" className="[&>span]:w-full">
               <div>
@@ -100,8 +100,8 @@ const SecondLevelNav = () => {
               </div>
             </Button>
           </div>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0 w-60" side="bottom" align="center">
+        </PopoverTrigger>
+        <PopoverContent className="p-0 w-60" side="bottom" align="center">
           <Command_Shadcn_>
             <CommandList_Shadcn_>
               <CommandGroup_Shadcn_>
@@ -118,8 +118,8 @@ const SecondLevelNav = () => {
               </CommandGroup_Shadcn_>
             </CommandList_Shadcn_>
           </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
 
       <div className="px-2 py-4 space-y-2">
         {menuItems.map((item) => {

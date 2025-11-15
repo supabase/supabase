@@ -11,9 +11,9 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 
@@ -47,7 +47,7 @@ export const PublicationsComboBox = ({
   }, [field?.value])
 
   return (
-    <Popover_Shadcn_
+    <Popover
       modal={false}
       open={dropdownOpen}
       onOpenChange={(open) => {
@@ -57,7 +57,7 @@ export const PublicationsComboBox = ({
         }
       }}
     >
-      <PopoverTrigger_Shadcn_ asChild>
+      <PopoverTrigger asChild>
         <Button
           type="default"
           size="medium"
@@ -77,8 +77,8 @@ export const PublicationsComboBox = ({
         >
           {selectedPublication || 'Select publication'}
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0" sameWidthAsTrigger>
+      </PopoverTrigger>
+      <PopoverContent className="p-0" sameWidthAsTrigger>
         <Command_Shadcn_>
           <CommandInput_Shadcn_
             placeholder="Find publication..."
@@ -138,7 +138,7 @@ export const PublicationsComboBox = ({
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }
