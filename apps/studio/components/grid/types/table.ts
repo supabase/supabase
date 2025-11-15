@@ -28,6 +28,7 @@ export interface SupaTable {
   readonly comment?: string | null
   readonly estimateRowCount: number
   readonly primaryKey?: string[]
+  readonly uniqueIndexes?: string[][]
 }
 
 export interface SupaRow extends Dictionary<any> {

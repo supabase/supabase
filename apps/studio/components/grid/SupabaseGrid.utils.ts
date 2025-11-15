@@ -67,6 +67,7 @@ export function filtersToUrlParams(filters: Filter[]) {
 export function parseSupaTable(table: Entity): SupaTable {
   const columns = table.columns
   const primaryKeys = isTableLike(table) ? table.primary_keys : []
+  const uniqueIndexes = isTableLike(table) ? table.unique_indexes : []
   const relationships = isTableLike(table) ? table.relationships : []
 
   const supaColumns: SupaColumn[] = columns.map((column) => {
@@ -120,6 +121,10 @@ export function parseSupaTable(table: Entity): SupaTable {
     columns: supaColumns,
     estimateRowCount: isTableLike(table) ? table.live_rows_estimate : 0,
     primaryKey: primaryKeys?.length > 0 ? primaryKeys.map((col) => col.name) : undefined,
+    uniqueIndexes:
+      !!uniqueIndexes && uniqueIndexes.length > 0
+        ? uniqueIndexes.map(({ columns }) => columns)
+        : undefined,
   }
 }
 

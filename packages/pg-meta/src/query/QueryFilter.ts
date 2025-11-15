@@ -44,6 +44,13 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
     return this._getQueryModifier().range(from, to)
   }
 
+  clone(): QueryFilter {
+    const cloned = new QueryFilter(this.table, this.action, this.actionValue, this.actionOptions)
+    cloned.filters = this.filters.slice()
+    cloned.sorts = this.sorts.slice()
+    return cloned
+  }
+
   toSql(options?: { isCTE: boolean; isFinal: boolean }) {
     return this._getQueryModifier().toSql(options)
   }

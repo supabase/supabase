@@ -68,9 +68,9 @@ export const ExportDialog = ({
   const queryChains = !table ? undefined : getAllTableRowsSql({ table, sorts, filters })
   const query = !!queryChains
     ? ignoreRoleImpersonation
-      ? queryChains.toSql()
+      ? queryChains.sql.toSql()
       : wrapWithRoleImpersonation(
-          queryChains.toSql(),
+          queryChains.sql.toSql(),
           roleImpersonationState as RoleImpersonationState
         )
     : ''
