@@ -454,34 +454,37 @@ function App() {
   return (
     <BrowserRouter>
       <RefineKbarProvider>
-      <Refine
-        dataProvider={dataProvider(supabaseClient)}
-        liveProvider={liveProvider(supabaseClient)}
-        authProvider={authProvider}
-        routerProvider={routerProvider}
-        options={{
-          syncWithLocation: true,
-          warnWhenUnsavedChanges: true,
-        }}
-      >
-        <Routes>
-          <Route
-            element={
-                <Authenticated key="authenticated-routes" fallback={<CatchAllNavigate to="/login" />}>
-                <Outlet />
-              </Authenticated>
-            }
-          >
-            <Route index element={<Account />} />
-          </Route>
+        <Refine
+          dataProvider={dataProvider(supabaseClient)}
+          liveProvider={liveProvider(supabaseClient)}
+          authProvider={authProvider}
+          routerProvider={routerProvider}
+          options={{
+            syncWithLocation: true,
+            warnWhenUnsavedChanges: true,
+          }}
+        >
+          <Routes>
+            <Route
+              element={
+                <Authenticated
+                  key="authenticated-routes"
+                  fallback={<CatchAllNavigate to="/login" />}
+                >
+                  <Outlet />
+                </Authenticated>
+              }
+            >
+              <Route index element={<Account />} />
+            </Route>
             <Route element={<Authenticated key="auth-pages" fallback={<Outlet />} />}>
-            <Route path="/login" element={<Auth />} />
-          </Route>
-        </Routes>
-        <RefineKbar />
-        <UnsavedChangesNotifier />
-        <DocumentTitleHandler />
-      </Refine>
+              <Route path="/login" element={<Auth />} />
+            </Route>
+          </Routes>
+          <RefineKbar />
+          <UnsavedChangesNotifier />
+          <DocumentTitleHandler />
+        </Refine>
       </RefineKbarProvider>
     </BrowserRouter>
   )
@@ -622,36 +625,36 @@ import Avatar from './avatar'
 
 // ...
 
-  return (
+return (
   <div className="container" style={{ padding: '50px 0 100px 0' }}>
     <form onSubmit={handleSubmit} className="form-widget">
-        <Controller
-          control={control}
-          name="avatar_url"
-          render={({ field }) => {
-            return (
-              <Avatar
-                url={field.value}
-                size={150}
-                onUpload={(filePath) => {
-                  onFinish({
+      <Controller
+        control={control}
+        name="avatar_url"
+        render={({ field }) => {
+          return (
+            <Avatar
+              url={field.value}
+              size={150}
+              onUpload={(filePath) => {
+                onFinish({
                   ...query?.data?.data,
-                    avatar_url: filePath,
+                  avatar_url: filePath,
                   onMutationError: (data: { message: string }) => alert(data?.message),
                 })
-                  field.onChange({
-                    target: {
-                      value: filePath,
-                    },
+                field.onChange({
+                  target: {
+                    value: filePath,
+                  },
                 })
-                }}
-              />
+              }}
+            />
           )
-          }}
-        />
+        }}
+      />
       {/* ... */}
-      </form>
-    </div>
+    </form>
+  </div>
 )
 ```
 
