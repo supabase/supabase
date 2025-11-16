@@ -7,7 +7,6 @@
 
 import { Hono } from "hono";
 import { McpServer, StreamableHttpTransport } from "mcp-lite";
-import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 // We create two Hono instances:
@@ -21,199 +20,25 @@ const mcp = new McpServer({
   schemaAdapter: (schema: unknown) => z.toJSONSchema(schema as z.ZodType),
 });
 
-// Define the queryDatabase tool
+// Temporary placeholder tool while wiring up the rest of the MCP server.
 mcp.tool("queryDatabase", {
   description:
-    "Query a table in the Supabase database with Row Level Security (RLS) applied. Use this to fetch data from tables with optional filters and options.",
+    "Example placeholder tool that just echoes a string back to the caller.",
   inputSchema: z.object({
-    table: z
+    message: z
       .string()
-      .describe("The name of the table to query"),
-    columns: z
-      .string()
-      .optional()
-      .describe("Columns to select (comma-separated). Defaults to '*' for all columns."),
-    filters: z
-      .array(
-        z.object({
-          column: z.string().describe("The column to filter on"),
-          operator: z.enum(["eq", "neq", "gt", "gte", "lt", "lte", "like", "ilike", "in", "is"]).describe("The filter operator"),
-          value: z.any().describe("The value to filter by"),
-        })
-      )
-      .optional()
-      .describe("Array of filter conditions to apply"),
-    limit: z
-      .number()
-      .optional()
-      .describe("Maximum number of rows to return"),
-    orderBy: z
-      .object({
-        column: z.string().describe("Column to order by"),
-        ascending: z.boolean().optional().describe("Sort order (default: true)"),
-      })
-      .optional()
-      .describe("Ordering options"),
-    explanation: z
-      .string()
-      .optional()
-      .describe("Optional explanation of what the query does"),
+      .default("Hello from the Supabase MCP server!")
+      .describe("Optional message you would like the tool to return"),
   }),
-  handler: async (
-    args: {
-      table: string;
-      columns?: string;
-      filters?: Array<{ column: string; operator: string; value: any }>;
-      limit?: number;
-      orderBy?: { column: string; ascending?: boolean };
-      explanation?: string;
-    },
-    { req }: { req: Request }
-  ) => {
-    try {
-      // Create authenticated Supabase client with user context
-      const supabaseClient = createClient(
-        Deno.env.get("SUPABASE_URL") ?? "",
-        Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+  handler: async ({ message }: { message: string }) => {
+    return {
+      content: [
         {
-          global: {
-            headers: { Authorization: req.headers.get("Authorization")! },
-          },
-        }
-      );
-
-      // Verify user is authenticated
-      const authHeader = req.headers.get("Authorization");
-      if (!authHeader) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify({
-                error: "Unauthorized: Missing authentication token",
-              }),
-            },
-          ],
-        };
-      }
-
-      const token = authHeader.replace("Bearer ", "");
-      const { data: userData, error: authError } =
-        await supabaseClient.auth.getUser(token);
-
-      if (authError || !userData?.user) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify({
-                error: "Unauthorized: Invalid authentication token",
-              }),
-            },
-          ],
-        };
-      }
-
-      // Build the query using Supabase query builder
-      let query = supabaseClient.from(args.table).select(args.columns || "*");
-
-      // Apply filters if provided
-      if (args.filters && args.filters.length > 0) {
-        for (const filter of args.filters) {
-          switch (filter.operator) {
-            case "eq":
-              query = query.eq(filter.column, filter.value);
-              break;
-            case "neq":
-              query = query.neq(filter.column, filter.value);
-              break;
-            case "gt":
-              query = query.gt(filter.column, filter.value);
-              break;
-            case "gte":
-              query = query.gte(filter.column, filter.value);
-              break;
-            case "lt":
-              query = query.lt(filter.column, filter.value);
-              break;
-            case "lte":
-              query = query.lte(filter.column, filter.value);
-              break;
-            case "like":
-              query = query.like(filter.column, filter.value);
-              break;
-            case "ilike":
-              query = query.ilike(filter.column, filter.value);
-              break;
-            case "in":
-              query = query.in(filter.column, filter.value);
-              break;
-            case "is":
-              query = query.is(filter.column, filter.value);
-              break;
-          }
-        }
-      }
-
-      // Apply ordering if provided
-      if (args.orderBy) {
-        query = query.order(args.orderBy.column, {
-          ascending: args.orderBy.ascending ?? true,
-        });
-      }
-
-      // Apply limit if provided
-      if (args.limit) {
-        query = query.limit(args.limit);
-      }
-
-      // Execute the query
-      const { data, error } = await query;
-
-      if (error) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify({
-                error: `Query execution failed: ${error.message}`,
-                table: args.table,
-                explanation: args.explanation,
-              }),
-            },
-          ],
-        };
-      }
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify({
-              success: true,
-              table: args.table,
-              explanation: args.explanation,
-              results: data,
-              rowCount: Array.isArray(data) ? data.length : 0,
-              user: userData.user.email,
-            }),
-          },
-        ],
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify({
-              error: `Unexpected error: ${
-                error instanceof Error ? error.message : String(error)
-              }`,
-            }),
-          },
-        ],
-      };
-    }
+          type: "text",
+          text: `Example tool response: ${message}`,
+        },
+      ],
+    };
   },
 });
 

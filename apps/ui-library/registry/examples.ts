@@ -89,4 +89,15 @@ export const examples: RegistryItem[] = [
       },
     ],
   },
+  {
+    name: 'assistant-demo',
+    type: 'registry:example',
+    registryDependencies: [],
+    files: [
+      {
+        path: 'registry/default/examples/assistant-demo.tsx',
+        type: 'registry:example',
+      },
+    ],
+  },
 ]

@@ -5,6 +5,7 @@ import { registryItemAppend } from './utils'
 import currentUserAvatar from './default/blocks/current-user-avatar/registry-item.json' with { type: 'json' }
 import dropzone from './default/blocks/dropzone/registry-item.json' with { type: 'json' }
 import infiniteQueryHook from './default/blocks/infinite-query-hook/registry-item.json' with { type: 'json' }
+import assistant from './default/blocks/assistant/registry-item.json' with { type: 'json' }
 import realtimeAvatarStack from './default/blocks/realtime-avatar-stack/registry-item.json' with { type: 'json' }
 import realtimeChat from './default/blocks/realtime-chat/registry-item.json' with { type: 'json' }
 import realtimeCursor from './default/blocks/realtime-cursor/registry-item.json' with { type: 'json' }
@@ -54,4 +55,5 @@ export const blocks = [
   ...combine(realtimeChat as RegistryItem),
   // infinite query hook is intentionally not combined with the clients since it depends on clients having database types.
   infiniteQueryHook as RegistryItem,
+  assistant as RegistryItem,
 ] as RegistryItem[]

@@ -1,0 +1,111 @@
+---
+title: Assistant
+description: AI assistant widget that streams database-aware answers through Supabase Edge Functions and the Model Context Protocol (MCP).
+---
+
+<BlockPreview name="assistant-demo" wide />
+
+## Installation
+
+<BlockItem
+  name="assistant"
+  description="Installs the AI assistant widget, Supabase helpers, and the MCP-ready Edge Functions."
+/>
+
+## Folder structure
+
+<RegistryBlock itemName="assistant" />
+
+## Overview
+
+The Assistant block adds a bottom-right chat bubble that authenticates with Supabase, streams model responses from an Edge Function, and can safely execute SQL through an MCP server. It ships with the [AI SDK Elements](https://sdk.vercel.ai/docs/ai-elements) components for a polished chat experience plus Supabase utilities for both browser and server code paths.
+
+The bundle contains four key pieces:
+
+1. **`components/assistant-widget.tsx`** – client component that renders the widget, handles chat state, and sends authenticated requests to a Supabase Edge Function.
+2. **`supabase/functions/chat`** – Edge Function that receives browser requests, fans out to your MCP server, and streams completions back to the UI.
+3. **`supabase/functions/mcp-server`** – Hono-based MCP server exposing tools such as `queryDatabase` so the model can run RLS-aware SQL.
+4. **`lib/supabase/*`** – tiny helpers for browser/server Supabase clients and middleware.
+
+## Requirements
+
+- A Supabase project with authentication and Row Level Security enabled.
+- OpenAI (or MCP compatible) API key configured in the Edge Functions.
+- Supabase CLI ≥ `1.149.7` for running functions locally.
+- Deno 2.x for Supabase Edge Functions.
+
+## Environment variables
+
+| Key | Where it is used | Notes |
+| --- | ---------------- | ----- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Next.js client + Edge Functions | Base URL of your Supabase project. |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Next.js client | Anonymous key used by the browser client. |
+| `NEXT_PUBLIC_ASSISTANT_CHAT_URL` | Next.js client | Optional override for the chat Edge Function endpoint. Defaults to `${NEXT_PUBLIC_SUPABASE_URL}/functions/v1/chat`. |
+| `OPENAI_API_KEY` | `supabase/functions/chat` | Injected into the Edge Function to talk to your LLM provider. |
+| `MCP_SERVER_URL` | `supabase/functions/chat` and `supabase/functions/mcp-server` | Used by the chat handler to find the MCP server endpoint. |
+
+Store these values in `.env.local` for the app and in a `.env` file that you pass to `supabase functions serve`.
+
+## Running locally
+
+1. Start Supabase: `supabase start`
+2. Serve the MCP server: `supabase functions serve --no-verify-jwt --env-file .env.local mcp-server`
+3. Serve the chat bridge: `supabase functions serve --no-verify-jwt --env-file .env.local chat`
+4. Set `NEXT_PUBLIC_ASSISTANT_CHAT_URL=http://127.0.0.1:54321/functions/v1/chat` so the widget hits your local function.
+
+Both functions need to be running so that the Edge Function can call into the MCP server while streaming results back to the browser.
+
+## Adding the widget
+
+Place the widget close to your root layout so it is loaded once per page. The assistant automatically renders a floating toggle button and enforces Supabase authentication before sending requests.
+
+```tsx
+import { AssistantWidget } from '@/components/assistant-widget'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        <AssistantWidget />
+      </body>
+    </html>
+  )
+}
+```
+
+When a signed-in user submits a prompt, the widget:
+
+1. Pulls the current Supabase session via the browser client.
+2. Sends the prompt to `NEXT_PUBLIC_ASSISTANT_CHAT_URL` with the `Authorization` header set to the user's JWT.
+3. Streams assistant messages, reasoning traces, tool invocations, and sources into the AI SDK Elements UI.
+
+## Customizing MCP tools
+
+The generated `supabase/functions/mcp-server/index.ts` uses the `mcp-lite` transport with Zod-powered schemas. Edit the included `queryDatabase` tool (or add your own) to expose domain-specific capabilities. Every tool receives a fully-authenticated Supabase client so RLS is enforced automatically.
+
+```ts
+const mcp = new McpServer({
+  name: 'supabase-assistant-mcp-server',
+  version: '1.0.0',
+  schemaAdapter: (schema) => z.toJSONSchema(schema as z.ZodType),
+})
+
+mcp.tool('queryDatabase', {
+  input: z.object({ sql: z.string() }),
+  async execute({ sql }, { data }) {
+    const client = createClient()
+    const { data: rows, error } = await client.rpc('run_generated_sql', { sql })
+    if (error) throw error
+    return { content: rows }
+  },
+})
+```
+
+## Deploying
+
+1. Deploy the MCP server: `supabase functions deploy --no-verify-jwt mcp-server`
+2. Deploy the chat bridge: `supabase functions deploy --no-verify-jwt chat`
+3. Update the production values for `NEXT_PUBLIC_ASSISTANT_CHAT_URL` and `MCP_SERVER_URL`.
+
+Once deployed, the block can be installed into any shadcn/ui project via `npx shadcn@latest add https://ui.supabase.com/r/assistant`.

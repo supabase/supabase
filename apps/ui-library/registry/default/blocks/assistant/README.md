@@ -17,7 +17,7 @@ An AI-powered chatbot widget with database query capabilities using the Model Co
 The block consists of four main pieces that work together end to end:
 
 1. **Assistant Widget** (`components/assistant-widget.tsx`): React component providing the chat UI, built with AI SDK Elements
-2. **Chat API Route** (`app/api/chat/route.ts`): Next.js API route handling chat requests with MCP integration
+2. **Chat Edge Function** (`supabase/functions/chat/`): Supabase Edge Function that streams chat completions, bootstraps the MCP client, and is invoked directly from the browser
 3. **Hono MCP Server** (`supabase/functions/mcp-server/`): Supabase Edge Function exposing MCP tools (e.g. `queryDatabase`) via the `mcp-lite` transport
 4. **Supabase Client Utilities** (`lib/supabase/`): Server and browser helpers for authenticated Supabase access
 
@@ -67,8 +67,11 @@ OPENAI_API_KEY=your_openai_api_key
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-# MCP Server URL (update after deploying edge function)
-NEXT_PUBLIC_MCP_SERVER_URL=https://your-project.supabase.co/functions/v1/mcp-server/mcp
+# Chat Edge Function (used by the browser)
+NEXT_PUBLIC_ASSISTANT_CHAT_URL=https://your-project.supabase.co/functions/v1/chat
+
+# MCP Server URL (consumed by the edge functions)
+MCP_SERVER_URL=https://your-project.supabase.co/functions/v1/mcp-server
 ```
 
 ### 4. Build and Deploy the Hono MCP Server
@@ -145,7 +148,23 @@ Your MCP endpoint will be available at `http://localhost:54321/functions/v1/mcp-
 supabase functions deploy --no-verify-jwt mcp-server
 ```
 
-### 5. Add the Widget to Your App
+### 5. Build and Deploy the Chat Edge Function
+
+The chat edge function (located at `supabase/functions/chat/`) replaces the `/api/chat` Next.js route and is what the browser calls directly.
+
+1. Confirm the provided `deno.json` contains the AI + MCP dependencies required by the block.
+2. Run `supabase start` if you haven't already.
+3. Serve **both** edge functions in separate terminals so the MCP server and chat handler run side by side:
+
+```bash
+supabase functions serve --env-file .env.local --no-verify-jwt mcp-server
+supabase functions serve --env-file .env.local --no-verify-jwt chat
+```
+
+4. For local development, set `NEXT_PUBLIC_ASSISTANT_CHAT_URL=http://127.0.0.1:54321/functions/v1/chat`. In production, point it to `https://<project>.supabase.co/functions/v1/chat`.
+5. Ensure `MCP_SERVER_URL` is available to the chat function (either via the Supabase dashboard or an `.env` file passed to `supabase functions serve`) so it can reach the MCP server endpoint.
+
+### 6. Add the Widget to Your App
 
 ```tsx
 import { AssistantWidget } from "@/components/assistant-widget";
@@ -164,6 +183,7 @@ export default function Layout({ children }) {
 
 - Start Supabase locally: `supabase start`
 - Serve and iterate on the MCP function: `supabase functions serve --no-verify-jwt mcp-server`
+- Run the chat edge function alongside it: `supabase functions serve --no-verify-jwt chat`
 - Test with Claude Code: `claude mcp add my-mcp-server -t http http://localhost:54321/functions/v1/mcp-server/mcp`
 - Inspect traffic using the MCP inspector: `npx @modelcontextprotocol/inspector`
 - When everything looks good, deploy via `supabase functions deploy --no-verify-jwt mcp-server`
@@ -338,7 +358,7 @@ Inside your tools you can then rely on `ctx.state.user` (or whatever you set) ra
 
 ### Change the AI Model
 
-Edit `app/api/chat/route.ts`:
+Edit `supabase/functions/chat/index.ts`:
 
 ```ts
 const result = await streamText({
@@ -349,7 +369,7 @@ const result = await streamText({
 
 ### Customize the System Prompt
 
-Edit the `system` parameter in `app/api/chat/route.ts` to change the assistant's behavior.
+Edit the `system` parameter in `supabase/functions/chat/index.ts` to change the assistant's behavior.
 
 ### Style the Widget
 
@@ -406,6 +426,7 @@ mcp.tool("myCustomTool", {
 
 ### "Function not found" or 404
 
+- Verify the chat function is deployed at `/functions/v1/chat` and `NEXT_PUBLIC_ASSISTANT_CHAT_URL` points to it
 - Make sure the Hono app is mounted at `/mcp-server`
 - Confirm you are calling `/functions/v1/mcp-server/mcp`
 - Restart `supabase functions serve` after changing import maps

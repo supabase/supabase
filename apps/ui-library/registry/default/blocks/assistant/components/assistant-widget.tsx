@@ -1,20 +1,36 @@
-"use client";
+'use client'
 
-import { useEffect, useMemo, useState } from "react";
-import { useChat } from "@ai-sdk/react";
-import type { Message as ChatMessage } from "ai";
+import { cn } from '@/lib/utils'
+import { createClient } from '@/registry/default/blocks/assistant/lib/supabase/client'
 import {
   Conversation,
   ConversationContent,
   ConversationScrollButton,
-} from "@/components/ai-elements/conversation";
+} from '@/registry/default/components/ai-elements/conversation'
 import {
+  Message,
   MessageBranch,
   MessageBranchContent,
-  Message,
+  MessageBranchNext,
+  MessageBranchPage,
+  MessageBranchPrevious,
+  MessageBranchSelector,
   MessageContent,
   MessageResponse,
-} from "@/components/ai-elements/message";
+} from '@/registry/default/components/ai-elements/message'
+import {
+  ModelSelector,
+  ModelSelectorContent,
+  ModelSelectorEmpty,
+  ModelSelectorGroup,
+  ModelSelectorInput,
+  ModelSelectorItem,
+  ModelSelectorList,
+  ModelSelectorLogo,
+  ModelSelectorLogoGroup,
+  ModelSelectorName,
+  ModelSelectorTrigger,
+} from '@/registry/default/components/ai-elements/model-selector'
 import {
   PromptInput,
   PromptInputActionAddAttachments,
@@ -31,215 +47,250 @@ import {
   PromptInputSubmit,
   PromptInputTextarea,
   PromptInputTools,
-} from "@/components/ai-elements/prompt-input";
-import {
-  ModelSelector,
-  ModelSelectorContent,
-  ModelSelectorEmpty,
-  ModelSelectorGroup,
-  ModelSelectorInput,
-  ModelSelectorItem,
-  ModelSelectorList,
-  ModelSelectorLogo,
-  ModelSelectorLogoGroup,
-  ModelSelectorName,
-  ModelSelectorTrigger,
-} from "@/components/ai-elements/model-selector";
-import {
-  Sources,
-  SourcesContent,
-  SourcesTrigger,
-  Source,
-} from "@/components/ai-elements/sources";
+} from '@/registry/default/components/ai-elements/prompt-input'
 import {
   Reasoning,
   ReasoningContent,
   ReasoningTrigger,
-} from "@/components/ai-elements/reasoning";
-import { Suggestions, Suggestion } from "@/components/ai-elements/suggestion";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+} from '@/registry/default/components/ai-elements/reasoning'
 import {
-  CheckIcon,
-  GlobeIcon,
-  MessageSquare,
-  MicIcon,
-  Minimize2,
-  X,
-  Loader2,
-} from "lucide-react";
-import { toast } from "sonner";
+  Source,
+  Sources,
+  SourcesContent,
+  SourcesTrigger,
+} from '@/registry/default/components/ai-elements/sources'
+import { Suggestion, Suggestions } from '@/registry/default/components/ai-elements/suggestion'
+import { Button } from '@/registry/default/components/ui/button'
+import { useChat } from '@ai-sdk/react'
+import { DefaultChatTransport } from 'ai'
+import { GlobeIcon, MessageSquare, MicIcon, Minimize2, X } from 'lucide-react'
+import { useCallback, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
 const suggestions = [
-  "Show me my recent orders",
-  "How many active users do we have?",
-  "List all tasks due this week",
+  'Show me my recent orders',
+  'How many active users do we have?',
+  'List all tasks due this week',
   "Summarize today's signups",
-];
+]
 
 const models = [
   {
-    id: "gpt-4o",
-    name: "GPT-4o",
-    chef: "OpenAI",
-    chefSlug: "openai",
-    providers: ["openai", "azure"],
+    id: 'gpt-4o',
+    name: 'GPT-4o',
+    chef: 'OpenAI',
+    chefSlug: 'openai',
+    providers: ['openai', 'azure'],
   },
   {
-    id: "gpt-4o-mini",
-    name: "GPT-4o Mini",
-    chef: "OpenAI",
-    chefSlug: "openai",
-    providers: ["openai", "azure"],
+    id: 'gpt-4o-mini',
+    name: 'GPT-4o Mini',
+    chef: 'OpenAI',
+    chefSlug: 'openai',
+    providers: ['openai', 'azure'],
   },
   {
-    id: "claude-sonnet-4-20250514",
-    name: "Claude 4 Sonnet",
-    chef: "Anthropic",
-    chefSlug: "anthropic",
-    providers: ["anthropic", "azure", "google", "amazon-bedrock"],
+    id: 'claude-sonnet-4-20250514',
+    name: 'Claude 4 Sonnet',
+    chef: 'Anthropic',
+    chefSlug: 'anthropic',
+    providers: ['anthropic', 'azure', 'google', 'amazon-bedrock'],
   },
-];
+  {
+    id: 'gemini-2.0-flash-exp',
+    name: 'Gemini 2.0 Flash',
+    chef: 'Google',
+    chefSlug: 'google',
+    providers: ['google'],
+  },
+]
 
-type ComposerStatus = "ready" | "submitted" | "streaming" | "error";
+type TextPart = {
+  type: 'text'
+  text: string
+}
 
-type MessageMetadata = {
-  sources?: { href: string; title: string }[];
-  reasoning?: {
-    content: string;
-    duration: number;
-  };
-};
+type SourcePart = {
+  type: 'source-url'
+  url: string
+  title?: string
+}
 
-type ToolInvocationItem = NonNullable<ChatMessage["toolInvocations"]>[number];
+type ReasoningPart = {
+  type: 'reasoning'
+  text: string
+}
 
-const getMessageText = (content: ChatMessage["content"]) => {
-  if (typeof content === "string") {
-    return content;
-  }
+type FormattedMessage = {
+  key: string
+  from: 'user' | 'assistant'
+  sources?: { href: string; title: string }[]
+  versions: { id: string; content: string }[]
+  reasoning?: { content: string; duration?: number }
+}
 
-  return content
-    .map((part) => (part.type === "text" ? part.text : ""))
-    .join("")
-    .trim();
-};
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
+const DEFAULT_CHAT_API = SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/chat` : '/functions/v1/chat'
+const CHAT_API_URL = 'https://idglwaxxhycmeyjvbbbr.supabase.co/functions/v1/chat'
 
 export function AssistantWidget() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
-  const [text, setText] = useState("");
-  const [status, setStatus] = useState<ComposerStatus>("ready");
-  const [model, setModel] = useState(models[0].id);
-  const [modelSelectorOpen, setModelSelectorOpen] = useState(false);
-  const [useWebSearch, setUseWebSearch] = useState(false);
-  const [useMicrophone, setUseMicrophone] = useState(false);
+  const supabase = useMemo(() => createClient(), [])
+  const getAuthHeaders = useCallback(async () => {
+    let {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession()
 
-  const { messages, append, isLoading, error } = useChat({
-    api: "/api/chat",
+    if (sessionError) {
+      throw sessionError
+    }
+
+    if (!session) {
+      const { data, error } = await supabase.auth.signInAnonymously()
+
+      if (error || !data.session) {
+        throw error ?? new Error('Unable to authenticate anonymously.')
+      }
+
+      session = data.session
+    }
+
+    return {
+      Authorization: `Bearer ${session.access_token}`,
+    }
+  }, [supabase])
+
+  const [isOpen, setIsOpen] = useState(false)
+  const [isMinimized, setIsMinimized] = useState(false)
+  const [text, setText] = useState('')
+  const [model, setModel] = useState(models[0].id)
+  const [modelSelectorOpen, setModelSelectorOpen] = useState(false)
+  const [useWebSearch, setUseWebSearch] = useState(false)
+  const [useMicrophone, setUseMicrophone] = useState(false)
+
+  const { messages, sendMessage, status, error } = useChat({
+    transport: new DefaultChatTransport({
+      api: CHAT_API_URL,
+    }),
     onError: (chatError) => {
-      toast.error("Failed to send message", {
+      toast.error('Failed to send message', {
         description: chatError.message,
-      });
-      setStatus("error");
+      })
     },
-  });
+  })
 
-  useEffect(() => {
-    if (isLoading) {
-      setStatus("streaming");
-      return;
-    }
+  const selectedModelData = models.find((entry) => entry.id === model)
 
-    if (!isLoading && status === "streaming") {
-      setStatus("ready");
-    }
-  }, [isLoading, status]);
+  const formattedMessages = useMemo<FormattedMessage[]>(() => {
+    return messages.map((message) => {
+      const parts = message.parts ?? []
 
-  useEffect(() => {
-    if (!error && status === "error") {
-      setStatus("ready");
-    }
-  }, [error, status]);
+      const textParts =
+        parts.filter((part): part is TextPart => part?.type === 'text') ??
+        (Array.isArray(message.content)
+          ? message.content.filter(
+              (part): part is TextPart => typeof part === 'object' && part.type === 'text'
+            )
+          : [])
 
-  const selectedModel = useMemo(
-    () => models.find((entry) => entry.id === model),
-    [model]
-  );
+      const versions =
+        textParts.length > 0
+          ? textParts.map((part, index) => ({
+              id: `${message.id}-${index}`,
+              content: part.text,
+            }))
+          : [
+              {
+                id: `${message.id}-content`,
+                content:
+                  typeof message.content === 'string'
+                    ? message.content
+                    : message.content
+                        ?.map((part) =>
+                          typeof part === 'string' ? part : part.type === 'text' ? part.text : ''
+                        )
+                        .join('')
+                        .trim() ?? '',
+              },
+            ]
+
+      const sources = parts
+        .filter((part): part is SourcePart => part?.type === 'source-url')
+        .map((part) => ({
+          href: part.url,
+          title: part.title ?? part.url,
+        }))
+
+      const reasoningPart = parts.find((part): part is ReasoningPart => part?.type === 'reasoning')
+
+      return {
+        key: message.id,
+        from: message.role === 'assistant' ? 'assistant' : 'user',
+        sources,
+        versions,
+        reasoning: reasoningPart
+          ? {
+              content: reasoningPart.text,
+            }
+          : undefined,
+      }
+    })
+  }, [messages])
 
   const handleSubmit = async (message: PromptInputMessage) => {
-    const hasText = Boolean(message.text?.trim());
-    const hasAttachments = Boolean(message.files?.length);
+    const hasText = Boolean(message.text?.trim())
+    const hasAttachments = Boolean(message.files?.length)
 
-    if (!(hasText || hasAttachments) || isLoading) {
-      return;
+    if (!(hasText || hasAttachments) || status === 'streaming') {
+      return
     }
-
-    setStatus("submitted");
 
     if (message.files?.length) {
-      toast.success("Files attached", {
+      toast.success('Files attached', {
         description: `${message.files.length} file(s) attached to message`,
-      });
+      })
     }
 
     try {
-      await append({
-        role: "user",
-        content: message.text?.trim() ?? "Sent with attachments",
-        metadata: {
-          model,
-          useWebSearch,
-          useMicrophone,
+      const headers = await getAuthHeaders()
+      await sendMessage(
+        {
+          text: message.text?.trim() ?? 'Sent with attachments',
+          files: message.files,
         },
-      });
-    } catch (submissionError) {
-      console.error(submissionError);
-      setStatus("error");
-      return;
+        {
+          headers,
+          body: {
+            model,
+            webSearch: useWebSearch,
+          },
+        }
+      )
+      setText('')
+    } catch (sendError) {
+      toast.error('Failed to send message', {
+        description: sendError instanceof Error ? sendError.message : 'Unknown error occurred.',
+      })
     }
-
-    setText("");
-  };
+  }
 
   const handleSuggestionClick = async (suggestion: string) => {
-    if (isLoading) return;
-    setStatus("submitted");
+    if (status === 'streaming' || status === 'submitted') return
     try {
-      await append({ role: "user", content: suggestion });
-    } catch (suggestionError) {
-      console.error(suggestionError);
-      setStatus("error");
+      const headers = await getAuthHeaders()
+      await sendMessage(
+        { text: suggestion },
+        {
+          headers,
+          body: { model, webSearch: useWebSearch },
+        }
+      )
+    } catch (sendError) {
+      toast.error('Failed to send message', {
+        description: sendError instanceof Error ? sendError.message : 'Unknown error occurred.',
+      })
     }
-  };
-
-  const renderToolInvocation = (tool: ToolInvocationItem) => {
-    if (!tool) return null;
-
-    return (
-      <div
-        key={tool.toolCallId}
-        className="mt-3 rounded-md border bg-background/60 p-2 text-xs"
-      >
-        <div className="font-semibold">{tool.toolName}</div>
-        {tool.state === "call" && (
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Loader2 className="h-3 w-3 animate-spin" />
-            Running…
-          </div>
-        )}
-        {tool.state === "result" && (
-          <div className="text-muted-foreground">
-            {typeof tool.result === "string"
-              ? tool.result
-              : JSON.stringify(tool.result, null, 2)}
-          </div>
-        )}
-        {tool.state === "error" && (
-          <div className="text-destructive">{tool.error}</div>
-        )}
-      </div>
-    );
-  };
+  }
 
   if (!isOpen) {
     return (
@@ -250,14 +301,16 @@ export function AssistantWidget() {
       >
         <MessageSquare className="h-6 w-6" />
       </button>
-    );
+    )
   }
+
+  const submitDisabled = (!text.trim() && status !== 'streaming') || status === 'streaming'
 
   return (
     <div
       className={cn(
-        "fixed bottom-6 right-6 z-50 flex flex-col rounded-lg border bg-background shadow-2xl transition-all",
-        isMinimized ? "h-14 w-80" : "h-[640px] w-[420px]"
+        'fixed bottom-6 right-6 z-50 flex flex-col rounded-lg border bg-background shadow-2xl transition-all',
+        isMinimized ? 'h-14 w-80' : 'h-[640px] w-[420px]'
       )}
     >
       <div className="flex items-center justify-between border-b bg-muted/60 px-4 py-3">
@@ -277,94 +330,67 @@ export function AssistantWidget() {
           >
             <Minimize2 className="h-4 w-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => setIsOpen(false)}
-          >
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsOpen(false)}>
             <X className="h-4 w-4" />
           </Button>
         </div>
       </div>
 
       {!isMinimized && (
-        <>
+        <div className="flex h-full flex-col divide-y overflow-hidden">
           <div className="flex-1 overflow-hidden">
             <Conversation className="flex h-full flex-col">
               <ConversationContent>
-                {messages.length === 0 && (
-                  <div className="flex h-full flex-col items-center justify-center gap-2 text-center text-sm text-muted-foreground">
-                    <p>Hi! I'm your AI assistant.</p>
-                    <p>I can help you query your data using natural language.</p>
-                  </div>
-                )}
-                {messages.map((message) => {
-                  const content = getMessageText(message.content);
-                  const hasTools = Boolean(message.toolInvocations?.length);
-                  const metadata = message.metadata as MessageMetadata | undefined;
-
-                  return (
-                    <MessageBranch defaultBranch={0} key={message.id}>
-                      <MessageBranchContent>
-                        <Message from={message.role === "user" ? "user" : "assistant"}>
+                {formattedMessages.map(({ key, versions, sources, reasoning, from }) => (
+                  <MessageBranch defaultBranch={0} key={key}>
+                    <MessageBranchContent>
+                      {versions.map((version) => (
+                        <Message from={from} key={`${key}-${version.id}`}>
                           <div>
-                            {metadata?.sources?.length ? (
+                            {sources && sources.length > 0 && (
                               <Sources>
-                                <SourcesTrigger
-                                  count={metadata.sources.length}
-                                />
+                                <SourcesTrigger count={sources.length} />
                                 <SourcesContent>
-                                  {metadata.sources.map(
-                                    (source: { href: string; title: string }) => (
-                                      <Source
-                                        key={source.href}
-                                        href={source.href}
-                                        title={source.title}
-                                      />
-                                    )
-                                  )}
+                                  {sources.map((source) => (
+                                    <Source
+                                      key={source.href}
+                                      href={source.href}
+                                      title={source.title}
+                                    />
+                                  ))}
                                 </SourcesContent>
                               </Sources>
-                            ) : null}
+                            )}
 
-                            {metadata?.reasoning && (
-                              <Reasoning duration={metadata.reasoning.duration}>
+                            {reasoning && (
+                              <Reasoning>
                                 <ReasoningTrigger />
-                                <ReasoningContent>
-                                  {metadata.reasoning.content}
-                                </ReasoningContent>
+                                <ReasoningContent>{reasoning.content}</ReasoningContent>
                               </Reasoning>
                             )}
 
                             <MessageContent>
-                              <MessageResponse>{content}</MessageResponse>
+                              <MessageResponse>{version.content}</MessageResponse>
                             </MessageContent>
-
-                            {hasTools && (
-                              <div className="mt-2 space-y-2">
-                                {message.toolInvocations?.map((tool) =>
-                                  renderToolInvocation(tool)
-                                )}
-                              </div>
-                            )}
                           </div>
                         </Message>
-                      </MessageBranchContent>
-                    </MessageBranch>
-                  );
-                })}
-                {isLoading && (
-                  <div className="flex justify-start">
-                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                  </div>
-                )}
+                      ))}
+                    </MessageBranchContent>
+                    {versions.length > 1 && (
+                      <MessageBranchSelector from={from}>
+                        <MessageBranchPrevious />
+                        <MessageBranchPage />
+                        <MessageBranchNext />
+                      </MessageBranchSelector>
+                    )}
+                  </MessageBranch>
+                ))}
               </ConversationContent>
               <ConversationScrollButton />
             </Conversation>
           </div>
 
-          <div className="grid shrink-0 gap-3 border-t bg-background/95 pt-3">
+          <div className="grid shrink-0 gap-4 pt-4">
             <Suggestions className="px-4">
               {suggestions.map((suggestion) => (
                 <Suggestion
@@ -374,7 +400,7 @@ export function AssistantWidget() {
                 />
               ))}
             </Suggestions>
-            <div className="px-4 pb-4">
+            <div className="w-full px-4 pb-4">
               <PromptInput globalDrop multiple onSubmit={handleSubmit}>
                 <PromptInputHeader>
                   <PromptInputAttachments>
@@ -398,45 +424,36 @@ export function AssistantWidget() {
                     </PromptInputActionMenu>
                     <PromptInputButton
                       onClick={() => setUseMicrophone((prev) => !prev)}
-                      variant={useMicrophone ? "default" : "ghost"}
+                      variant={useMicrophone ? 'default' : 'ghost'}
                       type="button"
                     >
                       <MicIcon size={16} />
-                      <span className="sr-only">Toggle microphone</span>
+                      <span className="sr-only">Microphone</span>
                     </PromptInputButton>
                     <PromptInputButton
                       onClick={() => setUseWebSearch((prev) => !prev)}
-                      variant={useWebSearch ? "default" : "ghost"}
+                      variant={useWebSearch ? 'default' : 'ghost'}
                       type="button"
                     >
                       <GlobeIcon size={16} />
-                      <span className="sr-only">Toggle web search</span>
+                      <span>Search</span>
                     </PromptInputButton>
-                    <ModelSelector
-                      open={modelSelectorOpen}
-                      onOpenChange={setModelSelectorOpen}
-                    >
+                    <ModelSelector open={modelSelectorOpen} onOpenChange={setModelSelectorOpen}>
                       <ModelSelectorTrigger asChild>
                         <PromptInputButton type="button">
-                          {selectedModel?.chefSlug && (
-                            <ModelSelectorLogo
-                              provider={selectedModel.chefSlug}
-                            />
+                          {selectedModelData?.chefSlug && (
+                            <ModelSelectorLogo provider={selectedModelData.chefSlug} />
                           )}
-                          {selectedModel?.name && (
-                            <ModelSelectorName>
-                              {selectedModel.name}
-                            </ModelSelectorName>
+                          {selectedModelData?.name && (
+                            <ModelSelectorName>{selectedModelData.name}</ModelSelectorName>
                           )}
                         </PromptInputButton>
                       </ModelSelectorTrigger>
                       <ModelSelectorContent>
                         <ModelSelectorInput placeholder="Search models..." />
                         <ModelSelectorList>
-                          <ModelSelectorEmpty>
-                            No models found.
-                          </ModelSelectorEmpty>
-                          {["OpenAI", "Anthropic"].map((chef) => (
+                          <ModelSelectorEmpty>No models found.</ModelSelectorEmpty>
+                          {['OpenAI', 'Anthropic', 'Google'].map((chef) => (
                             <ModelSelectorGroup key={chef} heading={chef}>
                               {models
                                 .filter((entry) => entry.chef === chef)
@@ -445,26 +462,21 @@ export function AssistantWidget() {
                                     key={entry.id}
                                     value={entry.id}
                                     onSelect={() => {
-                                      setModel(entry.id);
-                                      setModelSelectorOpen(false);
+                                      setModel(entry.id)
+                                      setModelSelectorOpen(false)
                                     }}
                                   >
-                                    <ModelSelectorLogo
-                                      provider={entry.chefSlug}
-                                    />
-                                    <ModelSelectorName>
-                                      {entry.name}
-                                    </ModelSelectorName>
+                                    <ModelSelectorLogo provider={entry.chefSlug} />
+                                    <ModelSelectorName>{entry.name}</ModelSelectorName>
                                     <ModelSelectorLogoGroup>
                                       {entry.providers.map((provider) => (
-                                        <ModelSelectorLogo
-                                          key={provider}
-                                          provider={provider}
-                                        />
+                                        <ModelSelectorLogo key={provider} provider={provider} />
                                       ))}
                                     </ModelSelectorLogoGroup>
                                     {model === entry.id ? (
-                                      <CheckIcon className="ml-auto h-4 w-4" />
+                                      <span className="ml-auto text-xs text-foreground">
+                                        Selected
+                                      </span>
                                     ) : (
                                       <div className="ml-auto h-4 w-4" />
                                     )}
@@ -476,19 +488,14 @@ export function AssistantWidget() {
                       </ModelSelectorContent>
                     </ModelSelector>
                   </PromptInputTools>
-                  <PromptInputSubmit
-                    status={status}
-                    disabled={!text.trim() || isLoading}
-                  />
+                  <PromptInputSubmit status={status} disabled={submitDisabled} />
                 </PromptInputFooter>
               </PromptInput>
-              {error && (
-                <p className="mt-2 text-xs text-destructive">{error.message}</p>
-              )}
+              {error && <p className="mt-2 text-xs text-destructive">{error.message}</p>}
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
-  );
+  )
 }

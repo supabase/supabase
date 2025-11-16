@@ -33,11 +33,6 @@
       "type": "registry:component"
     },
     {
-      "path": "registry/default/blocks/assistant/app/api/chat/route.ts",
-      "type": "registry:page",
-      "target": "app/api/chat/route.ts"
-    },
-    {
       "path": "registry/default/blocks/assistant/lib/supabase/server.ts",
       "type": "registry:file",
       "target": "lib/supabase/server.ts"
@@ -61,6 +56,16 @@
       "path": "registry/default/blocks/assistant/supabase/functions/mcp-server/deno.json",
       "type": "registry:file",
       "target": "supabase/functions/mcp-server/deno.json"
+    },
+    {
+      "path": "registry/default/blocks/assistant/supabase/functions/chat/index.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/chat/index.ts"
+    },
+    {
+      "path": "registry/default/blocks/assistant/supabase/functions/chat/deno.json",
+      "type": "registry:file",
+      "target": "supabase/functions/chat/deno.json"
     },
     {
       "path": "registry/default/blocks/assistant/README.md",

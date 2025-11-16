@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "lib": ["deno.window", "deno.ns"],
+    "strict": true
+  },
+  "imports": {
+    "hono": "npm:hono@^4.6.14",
+    "zod": "npm:zod@^4.1.12",
+    "ai": "npm:ai@^5.0.90",
+    "@ai-sdk/openai": "npm:@ai-sdk/openai@^2.0.32",
+    "@ai-sdk/mcp": "npm:@ai-sdk/mcp@latest"
+  }
+}
