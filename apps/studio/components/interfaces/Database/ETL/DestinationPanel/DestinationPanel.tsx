@@ -44,6 +44,7 @@ import { AnalyticsBucketFields, BigQueryFields } from './DestinationPanelFields'
 import { DestinationTypeSelection } from './DestinationTypeSelection'
 import { NoDestinationsAvailable } from './NoDestinationsAvailable'
 import { PublicationSelection } from './PublicationSelection'
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 
 const formId = 'destination-editor'
 
@@ -126,7 +127,11 @@ export const DestinationPanel = ({
     pipelineId: existingDestination?.pipelineId,
   })
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef, reveal: true })
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: apiKeys } = useAPIKeysQuery(
+    { projectRef, reveal: true },
+    { enabled: canReadAPIKeys }
+  )
   const { serviceKey } = getKeys(apiKeys)
   const catalogToken = serviceKey?.api_key ?? ''
 

@@ -13,7 +13,6 @@ import {
   Badge,
   Button,
   Card,
-  cn,
   Table,
   TableBody,
   TableCell,
@@ -157,18 +156,23 @@ export const VectorsBuckets = () => {
                     const created = +bucket.creationTime * 1000
 
                     return (
-                      <TableRow key={id} className="relative cursor-pointer h-16">
+                      <TableRow
+                        key={id}
+                        className="relative cursor-pointer h-16 inset-focus"
+                        onClick={(event) => handleBucketNavigation(name, event)}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault()
+                            handleBucketNavigation(name, event)
+                          }
+                        }}
+                        tabIndex={0}
+                      >
                         <TableCell className="w-2 pr-1">
                           <BucketIcon size={16} className="text-foreground-muted" />
                         </TableCell>
                         <TableCell>
                           <p className="whitespace-nowrap max-w-[512px] truncate">{name}</p>
-                          <button
-                            className={cn('absolute inset-0', 'inset-focus')}
-                            onClick={(event) => handleBucketNavigation(name, event)}
-                          >
-                            <span className="sr-only">Go to bucket details</span>
-                          </button>
                         </TableCell>
                         <TableCell>
                           <p className="text-foreground-light">
