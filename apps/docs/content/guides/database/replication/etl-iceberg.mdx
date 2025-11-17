@@ -8,7 +8,11 @@ sidebar_label: 'Iceberg'
 
 Apache Iceberg is an open table format for analytic datasets. ETL Replication to Iceberg uses Supabase [Analytics Buckets](/docs/guides/storage/analytics) to store your replicated data.
 
-To set up ETL Replication, follow the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup).
+<Admonition type="tip">
+
+This page covers Iceberg-specific configuration. For complete setup instructions including publications, general settings, and pipeline management, see the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup).
+
+</Admonition>
 
 <Admonition type="caution" label="Current Limitation">
 
@@ -16,9 +20,13 @@ Iceberg replication is currently incomplete. It provides an append-only log list
 
 </Admonition>
 
-## Creating an Analytics Bucket
+## Setup
 
-Before configuring Iceberg as a destination, you need to create an Analytics Bucket:
+Setting up Iceberg replication requires two steps: creating an Analytics Bucket, then configuring it as an ETL destination.
+
+### Step 1: Create an Analytics Bucket
+
+First, create an Analytics Bucket to store your replicated data:
 
 1. Navigate to [Storage](/dashboard/project/_/storage/buckets) → **Analytics** in your Supabase Dashboard
 2. Click **New bucket**
@@ -29,7 +37,11 @@ Before configuring Iceberg as a destination, you need to create an Analytics Buc
      zoomable
    />
 
-3. Fill in the bucket details:
+### Step 2: Add Iceberg as an ETL destination
+
+After clicking **New bucket**, fill in the bucket details and copy the credentials:
+
+1. Fill in the bucket details:
 
    <Image
      alt="Analytics Bucket Details"
@@ -40,11 +52,18 @@ Before configuring Iceberg as a destination, you need to create an Analytics Buc
    - **Name**: A unique name for your bucket
    - **Region**: Select the region where your data will be stored
 
-4. Click **Create bucket**
-
-## Iceberg-specific settings
-
-When adding Iceberg (Analytics Bucket) as a destination in the ETL Replication setup, the configuration will automatically use your Analytics Bucket. No additional Iceberg-specific settings are required beyond selecting your bucket.
+2. Click **Create bucket**
+3. **Copy the credentials** displayed after bucket creation (Catalog Token, S3 Access Key ID, S3 Secret Access Key). You'll need these in the next steps.
+4. Navigate to [Database](/dashboard/project/_/database/etl) → **ETL Replication** in your Supabase Dashboard
+5. Click **Add destination**
+6. Configure the destination:
+   - **Destination type**: Select **Iceberg (Analytics Bucket)**
+   - **Bucket**: The name of your Analytics Bucket from Step 1
+   - **Namespace**: The schema name where your tables will be replicated (e.g., `public`)
+   - **Catalog Token**: Authentication token for accessing the Iceberg catalog (copied in Step 3)
+   - **S3 Access Key ID**: Access key for S3-compatible storage (copied in Step 3)
+   - **S3 Secret Access Key**: Secret key for S3-compatible storage (copied in Step 3)
+7. Complete the remaining configuration following the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup)
 
 For more information about Analytics Buckets, see the [Analytics Buckets documentation](/docs/guides/storage/analytics).
 

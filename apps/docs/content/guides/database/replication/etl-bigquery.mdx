@@ -8,42 +8,57 @@ sidebar_label: 'BigQuery'
 
 BigQuery is Google's fully managed data warehouse. ETL Replication allows you to automatically sync your Supabase database tables to BigQuery for analytics and reporting.
 
-To set up ETL Replication, follow the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup).
+<Admonition type="tip">
 
-## Prerequisites
+This page covers BigQuery-specific configuration. For complete setup instructions including publications, general settings, and pipeline management, see the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup).
 
-Before configuring BigQuery as a destination, you need:
+</Admonition>
 
-1. **Google Cloud Platform (GCP) account**: [Sign up for GCP](https://cloud.google.com/gcp)
-2. **BigQuery dataset**: A [BigQuery dataset](https://cloud.google.com/bigquery/docs/datasets-intro) in your GCP project
-3. **GCP service account key**: A [service account](https://cloud.google.com/iam/docs/keys-create-delete) in JSON format with the **BigQuery Data Editor** role
+## Setup
 
-## BigQuery-specific settings
+Setting up BigQuery replication requires preparing your GCP resources, then configuring BigQuery as an ETL destination.
 
-When adding BigQuery as a destination, you'll need to provide the following BigQuery-specific settings:
+### Step 1: Prepare GCP resources
 
-<Image
-  alt="BigQuery Configuration Settings"
-  src="/docs/img/database/replication/etl-bigquery-details.png"
-  zoomable
-/>
+Before configuring BigQuery as a destination, set up the following in Google Cloud Platform:
 
-- **Project ID**: Your BigQuery project identifier (found in the GCP Console)
-- **Dataset ID**: The name of your BigQuery dataset (without the project ID)
+1. **Google Cloud Platform (GCP) account**: [Sign up for GCP](https://cloud.google.com/gcp) if you don't have one
+2. **BigQuery dataset**: Create a [BigQuery dataset](https://cloud.google.com/bigquery/docs/datasets-intro) in your GCP project
+3. **GCP service account key**: Create a [service account](https://cloud.google.com/iam/docs/keys-create-delete) with the **BigQuery Data Editor** role and download the JSON key file
 
-  <Admonition type="note">
+### Step 2: Add BigQuery as an ETL destination
 
-  In the GCP Console, the dataset is shown as `project-id.dataset-id`. Enter only the part after the dot. For example, if you see `my-project.my_dataset`, enter `my_dataset`.
+After preparing your GCP resources, configure BigQuery as an ETL destination:
 
-  </Admonition>
+1. Navigate to [Database](/dashboard/project/_/database/etl) → **ETL Replication** in your Supabase Dashboard
+2. Click **Add destination**
+3. Configure the destination:
 
-- **Service Account Key**: Your GCP service account key in JSON format. The service account must have the following permissions:
-  - `bigquery.datasets.get`
-  - `bigquery.tables.create`
-  - `bigquery.tables.get`
-  - `bigquery.tables.getData`
-  - `bigquery.tables.update`
-  - `bigquery.tables.updateData`
+   <Image
+     alt="BigQuery Configuration Settings"
+     src="/docs/img/database/replication/etl-bigquery-details.png"
+     zoomable
+   />
+
+   - **Destination type**: Select **BigQuery**
+   - **Project ID**: Your BigQuery project identifier (found in the GCP Console)
+   - **Dataset ID**: The name of your BigQuery dataset (without the project ID)
+
+     <Admonition type="note">
+
+     In the GCP Console, the dataset is shown as `project-id.dataset-id`. Enter only the part after the dot. For example, if you see `my-project.my_dataset`, enter `my_dataset`.
+
+     </Admonition>
+
+   - **Service Account Key**: Your GCP service account key in JSON format. The service account must have the following permissions:
+     - `bigquery.datasets.get`
+     - `bigquery.tables.create`
+     - `bigquery.tables.get`
+     - `bigquery.tables.getData`
+     - `bigquery.tables.update`
+     - `bigquery.tables.updateData`
+
+4. Complete the remaining configuration following the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup)
 
 ## How it works
 
