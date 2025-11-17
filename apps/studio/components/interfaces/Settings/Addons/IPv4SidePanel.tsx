@@ -94,7 +94,7 @@ const IPv4SidePanel = () => {
       visible={visible}
       onCancel={closePanel}
       onConfirm={onConfirm}
-      loading={isLoading || isSubmitting || isLoadingEntitlement }
+      loading={isLoading || isSubmitting || isLoadingEntitlement}
       disabled={
         !hasAccessToIPv4 ||
         isLoadingEntitlement ||
