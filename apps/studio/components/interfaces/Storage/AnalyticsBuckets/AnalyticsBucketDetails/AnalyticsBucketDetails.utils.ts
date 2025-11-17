@@ -15,3 +15,10 @@ export const getAnalyticsBucketFDWName = (bucketId: string) => {
 export const getAnalyticsBucketFDWServerName = (bucketId: string) => {
   return `${snakeCase(bucketId)}_fdw_server`
 }
+
+export const getNamespaceTableNameFromPostgresTableName = (table: {
+  name: string
+  schema: string
+}) => {
+  return `${snakeCase(`${table.schema}.${table.name}`)}_changelog`
+}

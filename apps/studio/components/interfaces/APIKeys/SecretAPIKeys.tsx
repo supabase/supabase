@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { useMemo, useRef } from 'react'
 import { toast } from 'sonner'
@@ -23,6 +22,7 @@ import {
 } from 'ui/src/components/shadcn/ui/table'
 import { APIKeyRow } from './APIKeyRow'
 import CreateSecretAPIKeyDialog from './CreateSecretAPIKeyDialog'
+import { useApiKeysVisibility } from './hooks/useApiKeysVisibility'
 
 interface LastSeenData {
   [hash: string]: { timestamp: string }
@@ -55,17 +55,14 @@ function useLastSeen(projectRef: string): LastSeenData {
 
 export const SecretAPIKeys = () => {
   const { ref: projectRef } = useParams()
+
+  const { canReadAPIKeys, isLoading: isLoadingPermissions } = useApiKeysVisibility()
   const {
     data: apiKeysData,
     error,
     isLoading: isLoadingApiKeys,
     isError: isErrorApiKeys,
-  } = useAPIKeysQuery({ projectRef, reveal: false })
-
-  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    '*'
-  )
+  } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
 
   const lastSeen = useLastSeen(projectRef ?? '')
 
@@ -115,9 +112,7 @@ export const SecretAPIKeys = () => {
         actions={<CreateSecretAPIKeyDialog />}
       />
 
-      {isLoadingApiKeys || isLoadingPermissions ? (
-        <GenericSkeletonLoader />
-      ) : !canReadAPIKeys ? (
+      {!canReadAPIKeys && !isLoadingPermissions ? (
         <Card>
           <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
             <EyeOffIcon />
@@ -129,6 +124,8 @@ export const SecretAPIKeys = () => {
             </p>
           </div>
         </Card>
+      ) : isLoadingApiKeys || isLoadingPermissions ? (
+        <GenericSkeletonLoader />
       ) : isErrorApiKeys ? (
         <AlertError error={error} subject="Failed to load secret API keys" />
       ) : empty ? (

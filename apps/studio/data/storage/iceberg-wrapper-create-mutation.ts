@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { WRAPPERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import {
   getAnalyticsBucketFDWName,
@@ -19,7 +20,11 @@ import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
 export const useIcebergWrapperCreateMutation = () => {
   const { data: project } = useSelectedProjectQuery()
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref, reveal: true })
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: apiKeys } = useAPIKeysQuery(
+    { projectRef: project?.ref, reveal: true },
+    { enabled: canReadAPIKeys }
+  )
   const { secretKey, serviceKey } = getKeys(apiKeys)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })

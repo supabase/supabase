@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useFlag, useParams } from 'common'
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { convertKVStringArrayToJson } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
@@ -92,7 +93,7 @@ const PROGRESS_INDICATORS = {
 }
 
 interface ConnectTablesDialogProps {
-  onSuccessConnectTables: (tables: { schema: string; name: string }[]) => void
+  onSuccessConnectTables: () => void
 }
 
 export const ConnectTablesDialog = ({ onSuccessConnectTables }: ConnectTablesDialogProps) => {
@@ -156,7 +157,11 @@ export const ConnectTablesDialogContent = ({
   const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
 
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef, reveal: true })
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: apiKeys } = useAPIKeysQuery(
+    { projectRef, reveal: true },
+    { enabled: canReadAPIKeys }
+  )
   const { serviceKey } = getKeys(apiKeys)
 
   const { sourceId, pipeline, publication } = useAnalyticsBucketAssociatedEntities({
@@ -245,7 +250,7 @@ export const ConnectTablesDialogContent = ({
       setConnectingStep(PROGRESS_STAGE.START_PIPELINE)
       await startPipeline({ projectRef, pipelineId })
 
-      onSuccessConnectTables?.(publicationTables)
+      onSuccessConnectTables?.()
       toast.success(`Connected ${values.tables.length} tables to Analytics bucket!`)
       form.reset()
       onClose()
@@ -287,7 +292,7 @@ export const ConnectTablesDialogContent = ({
       setConnectingStep(PROGRESS_STAGE.START_PIPELINE)
       await startPipeline({ projectRef, pipelineId: pipeline.id })
 
-      onSuccessConnectTables?.(tablesToBeAdded)
+      onSuccessConnectTables?.()
       toast.success('Successfully updated connected tables! Pipeline is being restarted')
       onClose()
     } catch (error: any) {
