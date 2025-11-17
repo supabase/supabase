@@ -26,6 +26,12 @@ export const generateSettingsMenu = (
         title: 'Project Settings',
         items: [
           {
+            name: 'General',
+            key: 'general',
+            url: `/project/${ref}/settings/general`,
+            items: [],
+          },
+          {
             name: `Log Drains`,
             key: `log-drains`,
             url: `/project/${ref}/settings/log-drains`,
