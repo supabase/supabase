@@ -223,7 +223,7 @@ export const OAuthServerSettingsForm = () => {
                             Enable OAuth server functionality for your project to create and manage
                             OAuth applications.{' '}
                             <Link
-                              href="https://supabase.com/docs/guides/auth/oauth/oauth-apps"
+                              href="https://supabase.com/docs/guides/auth/oauth-server"
                               target="_blank"
                               rel="noreferrer"
                               className="text-foreground-light underline hover:text-foreground transition"
@@ -321,7 +321,7 @@ export const OAuthServerSettingsForm = () => {
                                 Enable dynamic OAuth app registration. Apps can be registered
                                 programmatically via APIs.{' '}
                                 <Link
-                                  href="https://supabase.com/docs/guides/auth/oauth/oauth-apps#dynamic-oauth-apps"
+                                  href="https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication#dynamic-client-registration"
                                   target="_blank"
                                   rel="noreferrer"
                                   className="text-foreground-light underline hover:text-foreground transition"
