@@ -45,10 +45,11 @@ export const LogDrainsEmpty = () => {
                 <div className="flex items-center gap-3 mb-2">
                   <span
                     className={cn(
-                      'text-xs shrink-0 font-mono text-foreground-light w-7 h-7 bg border flex items-center justify-center rounded-md'
+                      'text-xs shrink-0 font-mono text-foreground-light w-7 h-7 bg border flex items-center justify-center rounded-md',
+                      items.length === 1 ? 'hidden' : ''
                     )}
                   >
-                    {i + 1}
+                    {item.step}
                   </span>
                   <h3 className="heading-default">{item.title}</h3>
                 </div>
