@@ -97,6 +97,10 @@ const SchemaFlowDiagram = ({
   )
 
   const [lineStart, setLineStart] = useState<{ x: number; y: number } | null>(null)
+  const [verticalLinePosition, setVerticalLinePosition] = useState<{
+    x: number
+    y: number
+  } | null>(null)
 
   useEffect(() => {
     const updatePath = () => {
@@ -104,11 +108,17 @@ const SchemaFlowDiagram = ({
 
       const containerRect = containerRef.current.getBoundingClientRect()
       const sourceRect = sourceRef.current.getBoundingClientRect()
+      const targetRect = targetRef.current.getBoundingClientRect()
 
+      // Horizontal line position (desktop)
       const sourceX = sourceRect.right - containerRect.left
       const sourceY = sourceRect.top + sourceRect.height / 2 - containerRect.top
-
       setLineStart({ x: sourceX, y: sourceY })
+
+      // Vertical line position (mobile)
+      const sourceCenterX = sourceRect.left + sourceRect.width / 2 - containerRect.left
+      const sourceBottomY = sourceRect.bottom - containerRect.top
+      setVerticalLinePosition({ x: sourceCenterX, y: sourceBottomY })
     }
 
     // Small delay to ensure layout is ready
@@ -130,7 +140,7 @@ const SchemaFlowDiagram = ({
     // Outer container
     <div
       ref={containerRef}
-      className="relative flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-24 border-b px-8 py-8"
+      className="relative flex flex-col md:flex-row items-start md:items-center gap-8 md:gap-24 border-b px-8 py-8"
       role="img"
       aria-label={`Schema flow diagram showing ${sourceLabel} ${sourceType} schema connecting to ${targetLabel} Postgres schema`}
     >
@@ -165,7 +175,50 @@ const SchemaFlowDiagram = ({
         ariaLabel={`Source: ${sourceLabel} ${sourceType} schema`}
       />
 
-      {/* SVG Path for Straight Dashed Line */}
+      {/* SVG Path for Vertical Dashed Line (Mobile) */}
+      {verticalLinePosition && (
+        <svg
+          className="absolute md:hidden pointer-events-none"
+          style={{
+            left: `${verticalLinePosition.x - 0.5}px`,
+            top: `${verticalLinePosition.y}px`,
+            width: '1px',
+            height: '3rem', // Match gap on outer container, path d
+            overflow: 'visible',
+          }}
+          aria-hidden="true"
+        >
+          <defs>
+            <style>
+              {`
+                .animated-dash {
+                  stroke-dasharray: 5, 5;
+                  animation: dash 1.5s linear infinite;
+                }
+                @keyframes dash {
+                  to {
+                    stroke-dashoffset: -10;
+                  }
+                }
+              `}
+            </style>
+          </defs>
+          {/* Straight vertical line */}
+          <path
+            d="M 0 0 L 0 32"
+            fill="none"
+            stroke="hsl(var(--foreground-muted))"
+            strokeWidth="1.25"
+            className="animated-dash"
+          />
+          {/* Dot at start */}
+          <circle cx="0" cy="0" r="3" fill="hsl(var(--foreground-muted))" />
+          {/* Dot at end */}
+          <circle cx="0" cy="32" r="3" fill="hsl(var(--foreground-muted))" />
+        </svg>
+      )}
+
+      {/* SVG Path for Horizontal Dashed Line (Desktop) */}
       {lineStart && (
         <svg
           className="absolute hidden md:block pointer-events-none"
