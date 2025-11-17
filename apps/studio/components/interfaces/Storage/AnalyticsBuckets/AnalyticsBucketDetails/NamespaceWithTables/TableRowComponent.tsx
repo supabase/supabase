@@ -238,9 +238,12 @@ export const TableRowComponent = ({
   return (
     <>
       <TableRow>
-        <TableCell className="min-w-[120px]">{table.name}</TableCell>
+        <TableCell className="min-w-[120px] min-h-[60px] py-4">{table.name}</TableCell>
         {!!hasReplication && (
-          <TableCell colSpan={table.isConnected ? 1 : 2} className="min-w-[150px]">
+          <TableCell
+            colSpan={table.isConnected ? 1 : 2}
+            className="min-w-[150px] min-h-[60px] py-4"
+          >
             <div className="flex items-center">
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -272,8 +275,8 @@ export const TableRowComponent = ({
           </TableCell>
         )}
 
-        {table.isConnected && (
-          <TableCell className="text-right flex flex-row items-center gap-x-2 justify-end">
+        <TableCell className="text-right flex flex-row items-center gap-x-2 justify-end min-h-[60px] py-4">
+          {table.isConnected ? (
             <>
               <Button asChild type="default" size="tiny">
                 <Link href={`/project/${project?.ref}/editor/${table.id}?schema=${schema}`}>
@@ -336,22 +339,24 @@ export const TableRowComponent = ({
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
-          </TableCell>
-        )}
+          ) : (
+            <p className="text-sm text-foreground-muted">Waiting to connect</p>
+          )}
+        </TableCell>
       </TableRow>
       <ConfirmationModal
         size="medium"
         variant="warning"
         visible={showStopReplicationModal}
         loading={isUpdatingReplication}
-        title="Confirm to disable replication for table"
+        title="Disable replication on table"
         confirmLabel="Disable replication"
         onCancel={() => setShowStopReplicationModal(false)}
         onConfirm={() => onConfirmStopReplication()}
       >
         <p className="text-sm text-foreground-light">
-          Data within the "{table.name}" table will stop replicating. However do note that,
-          re-enabling replication on this table will clear and re-sync all data in it. Are you sure?
+          Data within the "{table.name}" table will stop replicating. Re-enabling replication on
+          this table will clear and re-sync all data in it. Are you sure?
         </p>
       </ConfirmationModal>
 

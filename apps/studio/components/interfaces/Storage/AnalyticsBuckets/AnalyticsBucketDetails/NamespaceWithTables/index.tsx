@@ -1,4 +1,4 @@
-import { Loader2, Plus, RefreshCw } from 'lucide-react'
+import { Loader2, RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
@@ -23,6 +23,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  cn,
 } from 'ui'
 import { getNamespaceTableNameFromPostgresTableName } from '../AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketAssociatedEntities } from '../useAnalyticsBucketAssociatedEntities'
@@ -178,7 +179,7 @@ export const NamespaceWithTables = ({
             </TableHead>
             {!!publication && (
               <TableHead className={allTables.length === 0 ? 'hidden' : undefined}>
-                Replication Status
+                Replication
               </TableHead>
             )}
             <TableHead />
@@ -187,7 +188,7 @@ export const NamespaceWithTables = ({
         <TableBody>
           {allTables.length === 0 ? (
             <TableRow className="[&>td]:hover:bg-inherit">
-              <TableCell colSpan={3}>
+              <TableCell colSpan={3} className="min-h-[60px] py-4">
                 <p className="text-sm text-foreground">No tables yet</p>
                 <p className="text-sm text-foreground-lighter">
                   {sourceType === 'direct'
@@ -218,38 +219,49 @@ export const NamespaceWithTables = ({
         onClose={() => setImportForeignSchemaShown(false)}
       />
       {(pollIntervalNamespaceTables > 0 || missingTables.length > 0) && (
-        <CardFooter className="border-t px-4 py-4 flex flex-row justify-end gap-x-4">
+        <CardFooter
+          className={cn(
+            'border-t px-4 py-4 flex flex-row justify-end gap-x-4 relative overflow-hidden',
+            missingTables.length > 0 &&
+              'before:absolute before:inset-0 before:pointer-events-none before:bg-gradient-to-l before:from-brand-300/20 before:to-transparent before:to-40% before:z-0'
+          )}
+        >
           {pollIntervalNamespaceTables > 0 && (
-            <Tooltip>
-              <TooltipTrigger>
-                <div className="flex items-center gap-x-2 text-foreground-lighter">
-                  <Loader2 size={14} className="animate-spin" />
-                  <p className="text-sm">
-                    Connecting {publicationTablesNotSyncedToNamespaceTables.length} table
-                    {publicationTablesNotSyncedToNamespaceTables.length > 1 ? 's' : ''}
-                  </p>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" align="end">
-                <p className="mb-1">Waiting for namespace table to be created for:</p>
-                <ul className="list-disc pl-6">
-                  {publicationTablesNotSyncedToNamespaceTables.map((x) => {
-                    const value = `${x.schema}.${x.name}`
-                    return <li key={value}>{value}</li>
-                  })}
-                </ul>
-              </TooltipContent>
-            </Tooltip>
+            <div className="relative z-10">
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="flex items-center gap-x-2 text-foreground-lighter">
+                    <Loader2 size={14} className="animate-spin" />
+                    <p className="text-sm">
+                      Connecting {publicationTablesNotSyncedToNamespaceTables.length} table
+                      {publicationTablesNotSyncedToNamespaceTables.length > 1 ? 's' : ''}
+                    </p>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" align="end">
+                  <p className="mb-1">Waiting for analytics table to be created for:</p>
+                  <ul className="list-disc pl-6">
+                    {publicationTablesNotSyncedToNamespaceTables.map((x) => {
+                      const value = `${x.schema}.${x.name}`
+                      return <li key={value}>{value}</li>
+                    })}
+                  </ul>
+                </TooltipContent>
+              </Tooltip>
+            </div>
           )}
           {missingTables.length > 0 && (
             <Button
-              type={schema ? 'default' : 'warning'}
+              type="default"
               size="tiny"
-              icon={schema ? <RefreshCw /> : <Plus size={14} />}
+              icon={schema ? <RefreshCw /> : undefined}
               onClick={() => (schema ? rescanNamespace() : setImportForeignSchemaShown(true))}
               loading={isImportingForeignSchema || isLoadingNamespaceTables}
+              className="relative z-10"
             >
-              {schema ? 'Sync tables' : `Connect to table${missingTables.length > 1 ? 's' : ''}`}
+              {schema
+                ? 'Sync tables'
+                : `Connect ${missingTables.length > 1 ? missingTables.length : ''} table${missingTables.length > 1 ? 's' : ''}`}
             </Button>
           )}
         </CardFooter>

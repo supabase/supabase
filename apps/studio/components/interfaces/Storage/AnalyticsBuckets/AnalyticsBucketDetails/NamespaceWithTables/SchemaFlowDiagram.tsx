@@ -1,3 +1,4 @@
+import { BASE_PATH } from 'lib/constants'
 import { Database, Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -50,7 +51,7 @@ const SchemaFlowNode = ({
               </p>
             </TooltipTrigger>
             <TooltipContent side="bottom" className="max-w-[36ch] text-center text-balance">
-              <p>This schema will be created when a table is published from your Iceberg client</p>
+              <p>This schema will be created once a table is published from your Iceberg client</p>
             </TooltipContent>
           </Tooltip>
         ) : (
@@ -156,7 +157,7 @@ export const SchemaFlowDiagram = ({
       ref={containerRef}
       className="relative flex flex-col lg:flex-row items-start lg:items-center gap-8 lg:gap-24 border-b px-8 py-8 space-y-0"
       role="img"
-      aria-label={`Schema flow diagram showing ${sourceLabel} ${sourceType} schema connecting to ${targetLabel} Postgres schema`}
+      aria-label={`Schema flow diagram showing ${sourceLabel} ${sourceType} schema connecting to ${targetLabel} analytics schema`}
     >
       {/* Shared styles for dashed lines */}
       <style>{dashedLineStyles}</style>
@@ -176,7 +177,11 @@ export const SchemaFlowDiagram = ({
         nodeRef={sourceRef}
         icon={
           sourceType === 'analytics' ? (
-            <img src="/img/icons/iceberg-icon.svg" alt="Iceberg" className="w-5 h-5" />
+            <img
+              src={`${BASE_PATH}/img/icons/iceberg-icon.svg`}
+              alt="Apache Iceberg icon"
+              className="w-5 h-5"
+            />
           ) : (
             <Database size={16} className="text-white" />
           )
@@ -272,4 +277,3 @@ export const SchemaFlowDiagram = ({
     </CardHeader>
   )
 }
-
