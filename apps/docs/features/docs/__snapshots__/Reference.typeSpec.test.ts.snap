@@ -680,6 +680,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "GoTrueAdminApi"
           }
+        },
+        "comment": {
+          "shortText": "Creates an admin API client that can be used to manage users and OAuth clients."
         }
       },
       "@supabase/supabase-js.GoTrueAdminApi.mfa.deleteFactor": {
@@ -35314,6 +35317,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "PostgrestError"
           }
+        },
+        "comment": {
+          "shortText": ""
         }
       },
       "@supabase/supabase-js.RealtimeChannel.constructor": {
@@ -35443,6 +35449,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "RealtimeChannel"
           }
+        },
+        "comment": {
+          "shortText": "Creates a channel that can broadcast messages, sync presence, and listen to Postgres changes.\\n\\nThe topic determines which realtime stream you are subscribing to. Config options let you\\nenable acknowledgement for broadcasts, presence tracking, or private channels."
         }
       },
       "@supabase/supabase-js.RealtimeChannel.httpSend": {
@@ -36744,6 +36753,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               }
             }
           }
+        },
+        "comment": {
+          "shortText": "Returns the current presence state for this channel.\\n\\nThe shape is a map keyed by presence key (for example a user id) where each entry contains the\\ntracked metadata for that user."
         }
       },
       "@supabase/supabase-js.RealtimeChannel.send": {
@@ -36972,6 +36984,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               ]
             }
           }
+        },
+        "comment": {
+          "shortText": "Sends the supplied payload to the presence tracker so other subscribers can see that this\\nclient is online. Use \`untrack\` to stop broadcasting presence for the same key."
         }
       },
       "@supabase/supabase-js.RealtimeChannel.unsubscribe": {
@@ -37055,6 +37070,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               ]
             }
           }
+        },
+        "comment": {
+          "shortText": "Removes the current presence state for this client."
         }
       },
       "@supabase/supabase-js.RealtimeChannel.updateJoinPayload": {
@@ -37080,6 +37098,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "intrinsic",
             "name": "void"
           }
+        },
+        "comment": {
+          "shortText": "Updates the payload that will be sent the next time the channel joins (reconnects).\\nUseful for rotating access tokens or updating config without re-creating the channel."
         }
       },
       "@supabase/supabase-js.RealtimeClient.constructor": {
@@ -37409,6 +37430,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "RealtimeChannel"
           }
+        },
+        "comment": {
+          "shortText": "Creates (or reuses) a RealtimeChannel for the provided topic.\\n\\nTopics are automatically prefixed with \`realtime:\` to match the Realtime service.\\nIf a channel with the same topic already exists it will be returned instead of creating\\na duplicate connection."
         }
       },
       "@supabase/supabase-js.RealtimeClient.connect": {
@@ -37620,6 +37644,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "intrinsic",
             "name": "void"
           }
+        },
+        "comment": {
+          "shortText": "Sets a callback that receives lifecycle events for internal heartbeat messages.\\nUseful for instrumenting connection health (e.g. sent/ok/timeout/disconnected)."
         }
       },
       "@supabase/supabase-js.RealtimeClient.push": {
@@ -37822,7 +37849,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               "name": "RealtimeChannel"
             },
             "comment": {
-              "shortText": "The RealtimeChannel"
+              "shortText": "The realtime channel to bind to."
             }
           },
           {
@@ -37833,7 +37860,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             },
             "isOptional": true,
             "comment": {
-              "shortText": "The options,\\n       for example \`{events: {state: 'state', diff: 'diff'}}\`"
+              "shortText": "Optional custom event names, e.g. \`{ events: { state: 'state', diff: 'diff' } }\`."
             }
           }
         ],
@@ -37844,7 +37871,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Initializes the Presence."
+          "shortText": "Creates a Presence helper that keeps the local presence state in sync with the server."
         }
       },
       "@supabase/supabase-js.SupabaseClient.constructor": {
@@ -38677,16 +38704,6 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           "shortText": "Select a schema to query or perform an function (rpc) call.\\n\\nThe schema needs to be on the list of exposed schemas inside Supabase."
         }
       },
-      "@supabase/supabase-js.WebSocketFactory.constructor": {
-        "name": "@supabase/supabase-js.WebSocketFactory.constructor",
-        "params": [],
-        "ret": {
-          "type": {
-            "type": "nameOnly",
-            "name": "WebSocketFactory"
-          }
-        }
-      },
       "@supabase/supabase-js.WebSocketFactory.createWebSocket": {
         "name": "@supabase/supabase-js.WebSocketFactory.createWebSocket",
         "params": [
@@ -38977,6 +38994,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               }
             ]
           }
+        },
+        "comment": {
+          "shortText": "Creates a WebSocket using the detected constructor."
         }
       },
       "@supabase/supabase-js.WebSocketFactory.getWebSocketConstructor": {
@@ -39030,6 +39050,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               }
             }
           }
+        },
+        "comment": {
+          "shortText": "Returns the best available WebSocket constructor for the current runtime."
         }
       },
       "@supabase/supabase-js.WebSocketFactory.isWebSocketSupported": {
@@ -39040,6 +39063,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "intrinsic",
             "name": "boolean"
           }
+        },
+        "comment": {
+          "shortText": "Detects whether the runtime can establish WebSocket connections."
         }
       }
     }
@@ -39632,6 +39658,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "GoTrueAdminApi"
           }
+        },
+        "comment": {
+          "shortText": "Creates an admin API client that can be used to manage users and OAuth clients."
         }
       },
       "@supabase/auth-js.GoTrueAdminApi.mfa.deleteFactor": {
@@ -71305,6 +71334,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "PostgrestBuilder"
           }
+        },
+        "comment": {
+          "shortText": "Creates a builder configured for a specific PostgREST request."
         }
       },
       "@supabase/postgrest-js.PostgrestBuilder.overrideTypes": {
@@ -71767,6 +71799,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "PostgrestError"
           }
+        },
+        "comment": {
+          "shortText": ""
         }
       },
       "@supabase/postgrest-js.PostgrestFilterBuilder.constructor": {
@@ -71914,6 +71949,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "PostgrestFilterBuilder"
           }
+        },
+        "comment": {
+          "shortText": "Creates a builder configured for a specific PostgREST request."
         }
       },
       "@supabase/postgrest-js.PostgrestFilterBuilder.abortSignal": {
@@ -74500,6 +74538,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "PostgrestQueryBuilder"
           }
+        },
+        "comment": {
+          "shortText": "Creates a query builder scoped to a Postgres table or view."
         }
       },
       "@supabase/postgrest-js.PostgrestQueryBuilder.delete": {
@@ -75075,6 +75116,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "PostgrestTransformBuilder"
           }
+        },
+        "comment": {
+          "shortText": "Creates a builder configured for a specific PostgREST request."
         }
       },
       "@supabase/postgrest-js.PostgrestTransformBuilder.abortSignal": {
@@ -76028,6 +76072,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "RealtimeChannel"
           }
+        },
+        "comment": {
+          "shortText": "Creates a channel that can broadcast messages, sync presence, and listen to Postgres changes.\\n\\nThe topic determines which realtime stream you are subscribing to. Config options let you\\nenable acknowledgement for broadcasts, presence tracking, or private channels."
         }
       },
       "@supabase/realtime-js.RealtimeChannel.httpSend": {
@@ -77328,6 +77375,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               }
             }
           }
+        },
+        "comment": {
+          "shortText": "Returns the current presence state for this channel.\\n\\nThe shape is a map keyed by presence key (for example a user id) where each entry contains the\\ntracked metadata for that user."
         }
       },
       "@supabase/realtime-js.RealtimeChannel.send": {
@@ -77553,6 +77603,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               ]
             }
           }
+        },
+        "comment": {
+          "shortText": "Sends the supplied payload to the presence tracker so other subscribers can see that this\\nclient is online. Use \`untrack\` to stop broadcasting presence for the same key."
         }
       },
       "@supabase/realtime-js.RealtimeChannel.unsubscribe": {
@@ -77634,6 +77687,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               ]
             }
           }
+        },
+        "comment": {
+          "shortText": "Removes the current presence state for this client."
         }
       },
       "@supabase/realtime-js.RealtimeChannel.updateJoinPayload": {
@@ -77659,6 +77715,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "intrinsic",
             "name": "void"
           }
+        },
+        "comment": {
+          "shortText": "Updates the payload that will be sent the next time the channel joins (reconnects).\\nUseful for rotating access tokens or updating config without re-creating the channel."
         }
       },
       "@supabase/realtime-js.RealtimeClient.constructor": {
@@ -77987,6 +78046,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "RealtimeChannel"
           }
+        },
+        "comment": {
+          "shortText": "Creates (or reuses) a RealtimeChannel for the provided topic.\\n\\nTopics are automatically prefixed with \`realtime:\` to match the Realtime service.\\nIf a channel with the same topic already exists it will be returned instead of creating\\na duplicate connection."
         }
       },
       "@supabase/realtime-js.RealtimeClient.connect": {
@@ -78198,6 +78260,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "intrinsic",
             "name": "void"
           }
+        },
+        "comment": {
+          "shortText": "Sets a callback that receives lifecycle events for internal heartbeat messages.\\nUseful for instrumenting connection health (e.g. sent/ok/timeout/disconnected)."
         }
       },
       "@supabase/realtime-js.RealtimeClient.push": {
@@ -78399,7 +78464,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               "name": "RealtimeChannel"
             },
             "comment": {
-              "shortText": "The RealtimeChannel"
+              "shortText": "The realtime channel to bind to."
             }
           },
           {
@@ -78410,7 +78475,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             },
             "isOptional": true,
             "comment": {
-              "shortText": "The options,\\n       for example \`{events: {state: 'state', diff: 'diff'}}\`"
+              "shortText": "Optional custom event names, e.g. \`{ events: { state: 'state', diff: 'diff' } }\`."
             }
           }
         ],
@@ -78421,17 +78486,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Initializes the Presence."
-        }
-      },
-      "@supabase/realtime-js.WebSocketFactory.constructor": {
-        "name": "@supabase/realtime-js.WebSocketFactory.constructor",
-        "params": [],
-        "ret": {
-          "type": {
-            "type": "nameOnly",
-            "name": "WebSocketFactory"
-          }
+          "shortText": "Creates a Presence helper that keeps the local presence state in sync with the server."
         }
       },
       "@supabase/realtime-js.WebSocketFactory.createWebSocket": {
@@ -78724,6 +78779,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               }
             ]
           }
+        },
+        "comment": {
+          "shortText": "Creates a WebSocket using the detected constructor."
         }
       },
       "@supabase/realtime-js.WebSocketFactory.getWebSocketConstructor": {
@@ -78777,6 +78835,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               }
             }
           }
+        },
+        "comment": {
+          "shortText": "Returns the best available WebSocket constructor for the current runtime."
         }
       },
       "@supabase/realtime-js.WebSocketFactory.isWebSocketSupported": {
@@ -78787,6 +78848,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "intrinsic",
             "name": "boolean"
           }
+        },
+        "comment": {
+          "shortText": "Detects whether the runtime can establish WebSocket connections."
         }
       }
     }
@@ -78959,6 +79023,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "StorageClient"
           }
+        },
+        "comment": {
+          "shortText": "Creates a client for Storage buckets, files, analytics, and vectors."
         }
       },
       "@supabase/storage-js.index.StorageClient.createBucket": {
@@ -79924,6 +79991,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": {
               "type": "intrinsic",
               "name": "string"
+            },
+            "comment": {
+              "shortText": "Base URL of the Storage Vectors REST API."
             }
           },
           {
@@ -80008,6 +80078,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "StorageVectorsClient"
           }
+        },
+        "comment": {
+          "shortText": "Creates a StorageVectorsClient that can manage buckets, indexes, and vectors.\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.StorageVectorsClient.createBucket": {
@@ -80089,7 +80162,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Creates a new vector bucket\\nVector buckets are containers for vector indexes and their data"
+          "shortText": "Creates a new vector bucket\\nVector buckets are containers for vector indexes and their data\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.StorageVectorsClient.deleteBucket": {
@@ -80171,7 +80244,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Deletes a vector bucket\\nBucket must be empty before deletion (all indexes must be removed first)"
+          "shortText": "Deletes a vector bucket\\nBucket must be empty before deletion (all indexes must be removed first)\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.StorageVectorsClient.from": {
@@ -80195,7 +80268,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Access operations for a specific vector bucket\\nReturns a scoped client for index and vector operations within the bucket"
+          "shortText": "Access operations for a specific vector bucket\\nReturns a scoped client for index and vector operations within the bucket\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.StorageVectorsClient.getBucket": {
@@ -80277,7 +80350,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Retrieves metadata for a specific vector bucket\\nReturns bucket configuration including encryption settings and creation time"
+          "shortText": "Retrieves metadata for a specific vector bucket\\nReturns bucket configuration including encryption settings and creation time\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.StorageVectorsClient.listBuckets": {
@@ -80394,7 +80467,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Lists vector buckets with optional filtering and pagination\\nSupports prefix-based filtering and paginated results"
+          "shortText": "Lists vector buckets with optional filtering and pagination\\nSupports prefix-based filtering and paginated results\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.StorageVectorsClient.throwOnError": {
@@ -80407,7 +80480,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }"
+          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.StorageVectorsError.constructor": {
@@ -80540,7 +80613,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Creates a new VectorBucketApi instance"
+          "shortText": "Creates a new VectorBucketApi instance\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorBucketApi.createBucket": {
@@ -80622,7 +80695,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Creates a new vector bucket\\nVector buckets are containers for vector indexes and their data"
+          "shortText": "Creates a new vector bucket\\nVector buckets are containers for vector indexes and their data\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorBucketApi.deleteBucket": {
@@ -80704,7 +80777,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Deletes a vector bucket\\nBucket must be empty before deletion (all indexes must be removed first)"
+          "shortText": "Deletes a vector bucket\\nBucket must be empty before deletion (all indexes must be removed first)\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorBucketApi.getBucket": {
@@ -80786,7 +80859,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Retrieves metadata for a specific vector bucket\\nReturns bucket configuration including encryption settings and creation time"
+          "shortText": "Retrieves metadata for a specific vector bucket\\nReturns bucket configuration including encryption settings and creation time\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorBucketApi.listBuckets": {
@@ -80903,7 +80976,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Lists vector buckets with optional filtering and pagination\\nSupports prefix-based filtering and paginated results"
+          "shortText": "Lists vector buckets with optional filtering and pagination\\nSupports prefix-based filtering and paginated results\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorBucketApi.throwOnError": {
@@ -80916,7 +80989,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }"
+          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorBucketScope.constructor": {
@@ -81002,6 +81075,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "VectorBucketScope"
           }
+        },
+        "comment": {
+          "shortText": "Creates a helper that automatically scopes all index operations to the provided bucket.\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorBucketScope.createIndex": {
@@ -81083,7 +81159,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Creates a new vector index in this bucket\\nConvenience method that automatically includes the bucket name"
+          "shortText": "Creates a new vector index in this bucket\\nConvenience method that automatically includes the bucket name\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorBucketScope.deleteIndex": {
@@ -81165,7 +81241,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Deletes an index from this bucket\\nConvenience method that automatically includes the bucket name"
+          "shortText": "Deletes an index from this bucket\\nConvenience method that automatically includes the bucket name\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorBucketScope.getIndex": {
@@ -81247,7 +81323,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Retrieves metadata for a specific index in this bucket\\nConvenience method that automatically includes the bucket name"
+          "shortText": "Retrieves metadata for a specific index in this bucket\\nConvenience method that automatically includes the bucket name\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorBucketScope.index": {
@@ -81271,7 +81347,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Access operations for a specific index within this bucket\\nReturns a scoped client for vector data operations"
+          "shortText": "Access operations for a specific index within this bucket\\nReturns a scoped client for vector data operations\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorBucketScope.listIndexes": {
@@ -81353,7 +81429,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Lists indexes in this bucket\\nConvenience method that automatically includes the bucket name"
+          "shortText": "Lists indexes in this bucket\\nConvenience method that automatically includes the bucket name\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorBucketScope.throwOnError": {
@@ -81366,7 +81442,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }"
+          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorDataApi.constructor": {
@@ -81377,6 +81453,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": {
               "type": "intrinsic",
               "name": "string"
+            },
+            "comment": {
+              "shortText": "Base URL for the Storage Vectors API."
             }
           },
           {
@@ -81391,6 +81470,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                 "type": "intrinsic",
                 "name": "string"
               }
+            },
+            "comment": {
+              "shortText": "Default headers (for example authentication tokens)."
             }
           },
           {
@@ -81437,7 +81519,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                 "shortText": "[MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/fetch)"
               }
             },
-            "isOptional": true
+            "isOptional": true,
+            "comment": {
+              "shortText": "Optional custom \`fetch\` implementation for non-browser runtimes."
+            }
           }
         ],
         "ret": {
@@ -81445,6 +81530,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "VectorDataApi"
           }
+        },
+        "comment": {
+          "shortText": "Creates a VectorDataApi bound to a Storage Vectors deployment.\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorDataApi.deleteVectors": {
@@ -81561,7 +81649,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Deletes vectors by their keys in batch\\nAccepts 1-500 keys per request"
+          "shortText": "Deletes vectors by their keys in batch\\nAccepts 1-500 keys per request\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorDataApi.getVectors": {
@@ -81700,7 +81788,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Retrieves vectors by their keys in batch\\nOptionally includes vector data and/or metadata in response\\nAdditional permissions required when returning data or metadata"
+          "shortText": "Retrieves vectors by their keys in batch\\nOptionally includes vector data and/or metadata in response\\nAdditional permissions required when returning data or metadata\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorDataApi.listVectors": {
@@ -81870,7 +81958,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Lists/scans vectors in an index with pagination\\nSupports parallel scanning via segment configuration for high-throughput scenarios\\nAdditional permissions required when returning data or metadata"
+          "shortText": "Lists/scans vectors in an index with pagination\\nSupports parallel scanning via segment configuration for high-throughput scenarios\\nAdditional permissions required when returning data or metadata\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorDataApi.putVectors": {
@@ -82043,7 +82131,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Inserts or updates vectors in batch (upsert operation)\\nAccepts 1-500 vectors per request. Larger batches should be split"
+          "shortText": "Inserts or updates vectors in batch (upsert operation)\\nAccepts 1-500 vectors per request. Larger batches should be split\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorDataApi.queryVectors": {
@@ -82224,7 +82312,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Queries for similar vectors using approximate nearest neighbor (ANN) search\\nReturns top-K most similar vectors based on the configured distance metric\\nSupports optional metadata filtering (requires GetVectors permission)"
+          "shortText": "Queries for similar vectors using approximate nearest neighbor (ANN) search\\nReturns top-K most similar vectors based on the configured distance metric\\nSupports optional metadata filtering (requires GetVectors permission)\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorDataApi.throwOnError": {
@@ -82237,7 +82325,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }"
+          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorIndexApi.constructor": {
@@ -82248,6 +82336,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": {
               "type": "intrinsic",
               "name": "string"
+            },
+            "comment": {
+              "shortText": "Base URL for the Storage Vectors API."
             }
           },
           {
@@ -82262,6 +82353,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                 "type": "intrinsic",
                 "name": "string"
               }
+            },
+            "comment": {
+              "shortText": "Default headers sent with each request."
             }
           },
           {
@@ -82308,7 +82402,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                 "shortText": "[MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/fetch)"
               }
             },
-            "isOptional": true
+            "isOptional": true,
+            "comment": {
+              "shortText": "Optional custom \`fetch\` implementation for non-browser runtimes."
+            }
           }
         ],
         "ret": {
@@ -82316,6 +82413,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "VectorIndexApi"
           }
+        },
+        "comment": {
+          "shortText": "Creates an API client for managing vector indexes.\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorIndexApi.createIndex": {
@@ -82472,7 +82572,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Creates a new vector index within a bucket\\nDefines the schema for vectors including dimensionality, distance metric, and metadata config"
+          "shortText": "Creates a new vector index within a bucket\\nDefines the schema for vectors including dimensionality, distance metric, and metadata config\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorIndexApi.deleteIndex": {
@@ -82564,7 +82664,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Deletes a vector index and all its data\\nThis operation removes the index schema and all vectors stored in the index"
+          "shortText": "Deletes a vector index and all its data\\nThis operation removes the index schema and all vectors stored in the index\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorIndexApi.getIndex": {
@@ -82656,7 +82756,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Retrieves metadata for a specific vector index\\nReturns index configuration including dimension, distance metric, and metadata settings"
+          "shortText": "Retrieves metadata for a specific vector index\\nReturns index configuration including dimension, distance metric, and metadata settings\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorIndexApi.listIndexes": {
@@ -82783,7 +82883,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Lists vector indexes within a bucket with optional filtering and pagination\\nSupports prefix-based filtering and paginated results"
+          "shortText": "Lists vector indexes within a bucket with optional filtering and pagination\\nSupports prefix-based filtering and paginated results\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorIndexApi.throwOnError": {
@@ -82796,7 +82896,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }"
+          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorIndexScope.constructor": {
@@ -82889,6 +82989,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "VectorIndexScope"
           }
+        },
+        "comment": {
+          "shortText": "Creates a helper that automatically scopes all vector operations to the provided bucket/index names.\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorIndexScope.deleteVectors": {
@@ -82970,7 +83073,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Deletes vectors by keys from this index\\nConvenience method that automatically includes bucket and index names"
+          "shortText": "Deletes vectors by keys from this index\\nConvenience method that automatically includes bucket and index names\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorIndexScope.getVectors": {
@@ -83052,7 +83155,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Retrieves vectors by keys from this index\\nConvenience method that automatically includes bucket and index names"
+          "shortText": "Retrieves vectors by keys from this index\\nConvenience method that automatically includes bucket and index names\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorIndexScope.listVectors": {
@@ -83134,7 +83237,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Lists vectors in this index with pagination\\nConvenience method that automatically includes bucket and index names"
+          "shortText": "Lists vectors in this index with pagination\\nConvenience method that automatically includes bucket and index names\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorIndexScope.putVectors": {
@@ -83216,7 +83319,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Inserts or updates vectors in this index\\nConvenience method that automatically includes bucket and index names"
+          "shortText": "Inserts or updates vectors in this index\\nConvenience method that automatically includes bucket and index names\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorIndexScope.queryVectors": {
@@ -83298,7 +83401,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Queries for similar vectors in this index\\nConvenience method that automatically includes bucket and index names"
+          "shortText": "Queries for similar vectors in this index\\nConvenience method that automatically includes bucket and index names\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.index.VectorIndexScope.throwOnError": {
@@ -83311,7 +83414,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }"
+          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }\\n\\n**Private alpha:** Vector storage APIs are currently in private alpha and may not be accessible."
         }
       },
       "@supabase/storage-js.packages/BlobDownloadBuilder.default.constructor": {
@@ -87961,6 +88064,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "nameOnly",
             "name": "FunctionsClient"
           }
+        },
+        "comment": {
+          "shortText": "Creates a new Functions client bound to an Edge Functions URL."
         }
       },
       "@supabase/functions-js.FunctionsClient.invoke": {
