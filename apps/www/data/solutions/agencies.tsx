@@ -107,7 +107,10 @@ const data: {
         authorTitle: 'COO, Imaginary Space',
         quote: (
           <>
-            <span className="text-foreground">Our clients want reliability and scale. Supabase gives us a backend we can trust for production work.</span>
+            <span className="text-foreground">
+              Our clients want reliability and scale. Supabase gives us a backend we can trust for
+              production work.
+            </span>
           </>
         ),
       },
@@ -118,7 +121,9 @@ const data: {
         authorTitle: 'CEO, SJ Innovation LLC',
         quote: (
           <>
-            <span className="text-foreground">Supabase lets us build stable, secure products extremely fast.</span>
+            <span className="text-foreground">
+              Supabase lets us build stable, secure products extremely fast.
+            </span>
           </>
         ),
       },
@@ -129,7 +134,10 @@ const data: {
         authorTitle: 'Founder, WeGetDesign',
         quote: (
           <>
-            <span className="text-foreground">Supabase brings structure and clarity to our backend work. Its interface and tooling make it easy to deploy, manage, and scale projects without friction.</span>
+            <span className="text-foreground">
+              Supabase brings structure and clarity to our backend work. Its interface and tooling
+              make it easy to deploy, manage, and scale projects without friction.
+            </span>
           </>
         ),
       },
@@ -140,7 +148,10 @@ const data: {
         authorTitle: 'Lead Product Manager, Brthrs',
         quote: (
           <>
-            <span className="text-foreground">Supabase is our go-to backend for client work because it&apos;s fast to build with and easy to maintain.</span>
+            <span className="text-foreground">
+              Supabase is our go-to backend for client work because it&apos;s fast to build with and
+              easy to maintain.
+            </span>
           </>
         ),
       },
@@ -365,8 +376,8 @@ const data: {
         icon: MainProducts[PRODUCT_SHORTNAMES.FUNCTIONS].icon,
         subheading: (
           <>
-            Serverless functions <span className="text-foreground">powered by Deno</span>,
-            deployed globally for low-latency execution.
+            Serverless functions <span className="text-foreground">powered by Deno</span>, deployed
+            globally for low-latency execution.
           </>
         ),
         className: '!border-l-0 sm:!border-l lg:!border-l-0',
@@ -873,4 +884,3 @@ The output should use the following instructions:
 }
 
 export default data
-
