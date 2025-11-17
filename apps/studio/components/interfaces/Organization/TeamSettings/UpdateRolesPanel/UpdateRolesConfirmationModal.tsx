@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -13,8 +13,7 @@ import {
 } from 'data/organization-members/organization-roles-query'
 import { organizationKeys as organizationKeysV1 } from 'data/organizations/keys'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
@@ -40,13 +39,12 @@ export const UpdateRolesConfirmationModal = ({
   const { slug } = useParams()
   const queryClient = useQueryClient()
   const { data: organization } = useSelectedOrganizationQuery()
-  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const { data: allRoles } = useOrganizationRolesV2Query({ slug: organization?.slug })
 
-  // [Joshen] We only need this data if the org has project scoped roles
-  const { data } = useProjectsQuery({ enabled: isOptedIntoProjectLevelPermissions && visible })
-  const projects = data?.projects ?? []
+  const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
+  const orgProjects =
+    useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 
   // [Joshen] Separate saving state instead of using RQ due to several successive steps
   const [saving, setSaving] = useState(false)
@@ -61,14 +59,9 @@ export const UpdateRolesConfirmationModal = ({
     org_scoped_roles: [],
     project_scoped_roles: [],
   }
-  const orgProjects = (projects ?? []).filter((p) => p.organization_id === organization?.id)
   const originalConfiguration =
     allRoles !== undefined ? formatMemberRoleToProjectRoleConfiguration(member, allRoles) : []
-  const changesToRoles = deriveChanges(
-    originalConfiguration,
-    projectsRoleConfiguration,
-    projects ?? []
-  )
+  const changesToRoles = deriveChanges(originalConfiguration, projectsRoleConfiguration)
 
   const onConfirmUpdateMemberRoles = async () => {
     if (slug === undefined) return console.error('Slug is required')
@@ -83,7 +76,8 @@ export const UpdateRolesConfirmationModal = ({
         // [Joshen] This is merely a patch to handle a issue on the BE whereby for a project-scoped member,
         // if one of the projects that the member is deleted, the roles isn't cleaned up on the BE
         // Hence adding an FE patch here for dashboard to self-remediate by omitting any project IDs from the role
-        // which no longer exists in the organization projects list
+        // which no longer exists in the organization projects list.
+        // Note that because orgProjects is paginated, this is not always guaranteed
         if ((x?.projects ?? []).length > 0) {
           return {
             ...x,
@@ -186,15 +180,12 @@ export const UpdateRolesConfirmationModal = ({
                   const role =
                     org_scoped_roles.find((y) => y.id === x.roleId) ??
                     project_scoped_roles.find((y) => y.id === x.roleId)
-                  const project = orgProjects.find((y) => y.ref === x.ref)
                   const roleName = (role?.name ?? 'Unknown').split('_')[0]
 
                   return (
                     <li key={`update-${i}`} className="text-sm text-foreground-light">
                       <span className="text-foreground">{roleName}</span> on{' '}
-                      <span className={project !== undefined ? 'text-foreground' : ''}>
-                        {project?.name ?? 'organization'}
-                      </span>
+                      <span className="text-foreground">{x?.name ?? 'organization'}</span>
                     </li>
                   )
                 })}
@@ -210,13 +201,10 @@ export const UpdateRolesConfirmationModal = ({
               <ul className="list-disc pl-6">
                 {changesToRoles.added.map((x, i) => {
                   const role = availableRoles.find((y) => y.id === x.roleId)
-                  const project = orgProjects.find((y) => y.ref === x.ref)
                   return (
                     <li key={`update-${i}`} className="text-sm text-foreground-light">
                       <span className="text-foreground">{role?.name}</span> on{' '}
-                      <span className={project !== undefined ? 'text-foreground' : ''}>
-                        {project?.name ?? 'organization'}
-                      </span>
+                      <span className="text-foreground">{x?.name ?? 'organization'}</span>
                     </li>
                   )
                 })}
@@ -235,16 +223,13 @@ export const UpdateRolesConfirmationModal = ({
                     org_scoped_roles.find((y) => y.id === x.originalRole) ??
                     project_scoped_roles.find((y) => y.id === x.originalRole)
                   const updatedRole = org_scoped_roles.find((y) => y.id === x.updatedRole)
-                  const project = orgProjects.find((y) => y.ref === x.ref)
                   const originalRoleName = (originalRole?.name ?? 'Unknown').split('_')[0]
 
                   return (
                     <li key={`update-${i}`} className="text-sm text-foreground-light">
                       From <span className="text-foreground">{originalRoleName}</span> to{' '}
                       <span className="text-foreground">{updatedRole?.name ?? 'Unknown'}</span> on{' '}
-                      <span className={project !== undefined ? 'text-foreground' : ''}>
-                        {project?.name ?? 'organization'}
-                      </span>
+                      <span className="text-foreground">{x?.name ?? 'organization'}</span>
                     </li>
                   )
                 })}

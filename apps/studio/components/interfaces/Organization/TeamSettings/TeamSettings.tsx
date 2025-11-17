@@ -13,7 +13,7 @@ import {
 } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
-import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { DOCS_URL } from 'lib/constants'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -27,10 +27,7 @@ export const TeamSettings = () => {
   const { data: roles } = useOrganizationRolesV2Query({ slug })
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
 
-  // [Joshen] Using the infinite query to get total count. We're using useProjectsInfiniteQuery
-  // here instead of useOrgProjectsInfiniteQuery because the UI here are using useProjectsQuery
-  // which returns all projects the user has access to (not scoped to org)
-  const { data } = useProjectsInfiniteQuery({})
+  const { data } = useOrgProjectsInfiniteQuery({ slug })
   const totalCount = data?.pages[0].pagination.count ?? 0
   const threshold = 1000
 

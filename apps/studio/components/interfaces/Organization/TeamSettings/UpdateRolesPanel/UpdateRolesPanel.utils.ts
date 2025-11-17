@@ -5,10 +5,10 @@ import {
   OrganizationRolesResponse,
 } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
-import { ProjectInfo } from 'data/projects/projects-query'
 
 export interface ProjectRoleConfiguration {
   ref?: string
+  name?: string
   roleId: number
   baseRoleId?: number
 }
@@ -28,9 +28,9 @@ export const formatMemberRoleToProjectRoleConfiguration = (
 
       const projectRole = project_scoped_roles.find((role) => role.id === id)
       if (projectRole !== undefined) {
-        const _projects = projectRole.projects.map((x) => x.ref)
-        return _projects.map((ref) => ({
-          ref: ref,
+        return projectRole.projects.map((x) => ({
+          ref: x.ref,
+          name: x.name,
           roleId: projectRole.id,
           baseRoleId: projectRole.base_role_id,
         }))
@@ -56,14 +56,13 @@ export const formatMemberRoleToProjectRoleConfiguration = (
 
 export const deriveChanges = (
   original: ProjectRoleConfiguration[] = [],
-  final: ProjectRoleConfiguration[] = [],
-  projects: ProjectInfo[]
+  final: ProjectRoleConfiguration[] = []
 ) => {
   const removed: ProjectRoleConfiguration[] = []
   const added: ProjectRoleConfiguration[] = []
   const updated: {
     ref?: string
-    projectId?: number
+    name?: string
     originalRole: number
     originalBaseRole?: number
     updatedRole: number
@@ -76,6 +75,7 @@ export const deriveChanges = (
     } else if (updatedRoleForProject.roleId !== x.roleId) {
       updated.push({
         ref: updatedRoleForProject.ref,
+        name: updatedRoleForProject.name,
         originalRole: x.roleId,
         originalBaseRole: x.baseRoleId,
         updatedRole: updatedRoleForProject.roleId,
@@ -90,11 +90,7 @@ export const deriveChanges = (
     }
   })
 
-  return {
-    removed: removed.map((r) => ({ ...r, projectId: projects.find((p) => p.ref === r.ref)?.id })),
-    added: added.map((r) => ({ ...r, projectId: projects.find((p) => p.ref === r.ref)?.id })),
-    updated: updated.map((r) => ({ ...r, projectId: projects.find((p) => p.ref === r.ref)?.id })),
-  }
+  return { removed, added, updated }
 }
 
 // [Joshen] Essentially spit out 3 arrays
@@ -107,7 +103,7 @@ export const deriveRoleChangeActions = (
     added: ProjectRoleConfiguration[]
     updated: {
       ref?: string
-      projectId?: number
+      name?: string
       originalRole: number
       originalBaseRole?: number
       updatedRole: number

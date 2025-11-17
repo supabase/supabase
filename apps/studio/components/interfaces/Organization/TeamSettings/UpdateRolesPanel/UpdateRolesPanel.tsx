@@ -1,14 +1,15 @@
 import { isEqual } from 'lodash'
 import { X } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
+import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
@@ -17,16 +18,6 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  ScrollArea,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
@@ -62,14 +53,12 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const { data: organization } = useSelectedOrganizationQuery()
   const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
+  const { data: permissions } = usePermissionsQuery()
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
 
-  // Only need to fetch projects for organizations with access to project scoped roles
-  // which will be Team or Enterprise (and when the panel is visible)
-  // We still need to use the old projects endpoint instead of org projects due to roles depending on project ID
-  const { data } = useProjectsQuery({ enabled: isOptedIntoProjectLevelPermissions && visible })
-  const projects = data?.projects ?? []
-  const { data: permissions } = usePermissionsQuery()
+  const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
+  const orgProjects =
+    useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 
   // [Joshen] We use the org scoped roles as the source for available roles
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
@@ -96,7 +85,6 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
       ? 'org-scope'
       : 'project-scope'
 
-  const orgProjects = (projects ?? []).filter((p) => p.organization_id === organization?.id)
   const isApplyingRoleToAllProjects =
     projectsRoleConfiguration.length === 1 && projectsRoleConfiguration[0]?.ref === undefined
   const canSaveRoles = projectsRoleConfiguration.length > 0
@@ -110,10 +98,11 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
   const hasNoChanges = isEqual(projectsRoleConfiguration, originalConfiguration)
 
-  const onSelectProject = (ref: string) => {
+  const onSelectProject = (project: OrgProject) => {
     setProjectsRoleConfiguration(
       projectsRoleConfiguration.concat({
-        ref,
+        ref: project.ref,
+        name: project.name,
         roleId: lowerPermissionsRole ?? orgScopedRoles[0].id,
       })
     )
@@ -130,7 +119,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
       setProjectsRoleConfiguration(
         projectsRoleConfiguration.map((p) => {
           if (p.ref === project.ref) {
-            return { ref: p.ref, roleId: Number(value) }
+            return { ref: p.ref, name: p.name, roleId: Number(value) }
           } else {
             return p
           }
@@ -148,7 +137,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
       if (originalConfigurationType === 'org-scope') {
         setProjectsRoleConfiguration(originalConfiguration)
       } else {
-        setProjectsRoleConfiguration([{ ref: undefined, roleId: roleIdToApply }])
+        setProjectsRoleConfiguration([{ ref: undefined, name: undefined, roleId: roleIdToApply }])
       }
     } else {
       if (originalConfigurationType === 'project-scope') {
@@ -156,7 +145,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
       } else {
         setProjectsRoleConfiguration(
           orgProjects.map((p) => {
-            return { ref: p.ref, projectId: p.id, roleId: roleIdToApply }
+            return { ref: p.ref, name: p.name, roleId: roleIdToApply }
           })
         )
       }
@@ -227,7 +216,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                       {noAccessProjects.length > 1 ? 's' : ''}:
                       <ul className="list-disc pl-6">
                         {noAccessProjects.map((project) => {
-                          return <li key={project.id}>{project.name}</li>
+                          return <li key={project.ref}>{project.name}</li>
                         })}
                       </ul>
                     </AlertDescription_Shadcn_>
@@ -236,10 +225,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
               <div className="flex flex-col gap-y-2">
                 {projectsRoleConfiguration.map((project) => {
-                  const name =
-                    project.ref === undefined
-                      ? 'All projects'
-                      : projects?.find((p) => p.ref === project.ref)?.name
+                  const name = project.ref === undefined ? 'All projects' : project.name
                   const role = orgScopedRoles.find((r) => {
                     if (project.baseRoleId !== undefined) return r.id === project.baseRoleId
                     else return r.id === project.roleId
@@ -323,48 +309,30 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
               </div>
 
               {!isApplyingRoleToAllProjects && (
-                <Popover_Shadcn_
+                <OrganizationProjectSelector
                   open={showProjectDropdown}
-                  onOpenChange={setShowProjectDropdown}
-                  modal={false}
-                >
-                  <PopoverTrigger_Shadcn_ asChild>
+                  setOpen={setShowProjectDropdown}
+                  onSelect={onSelectProject}
+                  renderTrigger={() => (
                     <Button type="default" className="w-min">
                       Add project
                     </Button>
-                  </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
-                    <Command_Shadcn_>
-                      <CommandInput_Shadcn_ placeholder="Find project..." />
-                      <CommandList_Shadcn_>
-                        <CommandEmpty_Shadcn_>No projects found</CommandEmpty_Shadcn_>
-                        <CommandGroup_Shadcn_>
-                          <ScrollArea className={(projects || []).length > 7 ? 'h-[210px]' : ''}>
-                            {orgProjects.map((project) => {
-                              const hasRoleAssigned = projectsRoleConfiguration.some(
-                                (p) => p.ref === project.ref
-                              )
-                              return (
-                                <CommandItem_Shadcn_
-                                  key={project.ref}
-                                  disabled={hasRoleAssigned}
-                                  className="cursor-pointer w-full justify-between"
-                                  onSelect={() => onSelectProject(project.ref)}
-                                  onClick={() => onSelectProject(project.ref)}
-                                >
-                                  <p className="truncate">{project.name}</p>
-                                  {hasRoleAssigned && (
-                                    <p className="w-[45%] text-right">Already assigned</p>
-                                  )}
-                                </CommandItem_Shadcn_>
-                              )
-                            })}
-                          </ScrollArea>
-                        </CommandGroup_Shadcn_>
-                      </CommandList_Shadcn_>
-                    </Command_Shadcn_>
-                  </PopoverContent_Shadcn_>
-                </Popover_Shadcn_>
+                  )}
+                  renderRow={(project) => {
+                    const hasRoleAssigned = projectsRoleConfiguration.some(
+                      (p) => p.ref === project.ref
+                    )
+                    return (
+                      <div className="w-full flex items-center justify-between">
+                        <span className="truncate">{project.name}</span>
+                        {hasRoleAssigned && <p className="w-[45%] text-right">Already assigned</p>}
+                      </div>
+                    )
+                  }}
+                  isOptionDisabled={(project) =>
+                    projectsRoleConfiguration.some((p) => p.ref === project.ref)
+                  }
+                />
               )}
             </SheetSection>
 
