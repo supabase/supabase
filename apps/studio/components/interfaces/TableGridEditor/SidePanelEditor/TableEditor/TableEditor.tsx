@@ -8,11 +8,11 @@ import { useDatabasePublicationsQuery } from 'data/database-publications/databas
 import { CONSTRAINT_TYPE, useTableConstraintsQuery } from 'data/database/constraints-query'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useTrack } from 'lib/telemetry/track'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useRealtimeExperiment, RealtimeButtonVariant } from 'hooks/misc/useRealtimeExperiment'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
@@ -72,14 +72,12 @@ export const TableEditor = ({
   const snap = useTableEditorStateSnapshot()
 
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
   const { selectedSchema } = useQuerySchemaState()
-
-  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
-  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
-  const { mutate: sendEvent } = useSendEventMutation()
-
   const isNewRecord = isUndefined(table)
+  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
+  const track = useTrack()
+
+  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
@@ -109,6 +107,12 @@ export const TableEditor = ({
   const isRealtimeEnabled = isNewRecord
     ? false
     : realtimeEnabledTables.some((t) => t.id === table?.id)
+
+  const { activeVariant: activeRealtimeVariant } = useRealtimeExperiment({
+    projectInsertedAt: project?.inserted_at,
+    isTable: !isNewRecord,
+    isRealtimeEnabled,
+  })
 
   const [errors, setErrors] = useState<PlainObject>({})
   const [tableFields, setTableFields] = useState<TableField>()
@@ -396,23 +400,16 @@ export const TableEditor = ({
           </Admonition>
         )}
 
-        {realtimeEnabled && (
+        {activeRealtimeVariant !== RealtimeButtonVariant.HIDE_BUTTON && realtimeEnabled && (
           <Checkbox
             id="enable-realtime"
             label="Enable Realtime"
             description="Broadcast changes on this table to authorized subscribers"
             checked={tableFields.isRealtimeEnabled}
             onChange={() => {
-              sendEvent({
-                action: 'realtime_toggle_table_clicked',
-                properties: {
-                  newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
-                  origin: 'tableSidePanel',
-                },
-                groups: {
-                  project: project?.ref ?? 'Unknown',
-                  organization: org?.slug ?? 'Unknown',
-                },
+              track('realtime_toggle_table_clicked', {
+                newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
+                origin: 'tableSidePanel',
               })
               onUpdateField({ isRealtimeEnabled: !tableFields.isRealtimeEnabled })
             }}
