@@ -1,7 +1,6 @@
 import { BASE_PATH } from 'lib/constants'
 import { Database, Info } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { CardHeader, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -98,16 +97,9 @@ export const SchemaFlowDiagram = ({
   targetLabel,
   isPending,
 }: SchemaFlowDiagramProps) => {
-  const { resolvedTheme } = useTheme()
   const containerRef = useRef<HTMLDivElement>(null)
   const sourceRef = useRef<HTMLDivElement>(null)
   const targetRef = useRef<HTMLDivElement>(null)
-
-  // Calculate dot color based on theme
-  const dotColor = useMemo(
-    () => (resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'),
-    [resolvedTheme]
-  )
 
   const [lineStart, setLineStart] = useState<{ x: number; y: number } | null>(null)
   const [verticalLinePosition, setVerticalLinePosition] = useState<{
@@ -147,10 +139,7 @@ export const SchemaFlowDiagram = ({
   }, [sourceLabel, targetLabel])
 
   // Create dotted background pattern
-  const dotPattern = useMemo(() => {
-    const radius = 1
-    return `radial-gradient(circle, ${dotColor} ${radius}px, transparent ${radius}px)`
-  }, [dotColor])
+  const dotPattern = `radial-gradient(circle, ${SVG_STROKE_COLOR} 1px, transparent 1px)`
 
   return (
     <CardHeader
