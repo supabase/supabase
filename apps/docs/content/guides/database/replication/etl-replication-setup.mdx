@@ -8,15 +8,21 @@ sidebar_label: 'Setting up'
 
 ETL Replication requires two main components: a **publication** (source) and a **destination**. Follow these steps to set up your replication pipeline.
 
+<Admonition type="tip">
+
+If you already have a publication set up, you can skip to [Step 2: Enable ETL Replication](#step-2-enable-etl-replication).
+
+</Admonition>
+
 ## Step 1: Create a publication
 
 A publication defines which tables and change types will be replicated. You need to create a publication before setting up a destination.
 
-### Example: Creating a publication
+### Basic publication examples
 
 The following examples assume you have `users` and `orders` tables in your database.
 
-To create a publication for both tables:
+#### Publication for specific tables
 
 ```sql
 -- Create publication for both tables
@@ -25,24 +31,6 @@ for table users, orders;
 ```
 
 This publication will track all changes (INSERT, UPDATE, DELETE) for both the `users` and `orders` tables.
-
-### Creating publications with different scopes
-
-You can create publications with different scopes depending on your needs:
-
-#### Publication for a single table
-
-```sql
--- Create a publication for a specific table
-create publication pub_users for table users;
-```
-
-#### Publication for multiple tables
-
-```sql
--- Create a publication for multiple specific tables
-create publication pub_users_orders for table users, orders;
-```
 
 #### Publication for all tables in a schema
 
@@ -62,36 +50,32 @@ create publication pub_all_tables for all tables;
 
 This will track changes for all tables in your database.
 
-### Customizing change types
+### Advanced publication options
 
-By default, publications track all operations (INSERT, UPDATE, DELETE). You can customize this:
+#### Selecting specific columns
+
+You can replicate only a subset of columns from a table:
 
 ```sql
--- Only track inserts and updates
-create publication pub_users_no_deletes for table users
-with (publish = 'insert,update');
-
--- Only track deletes
-create publication pub_users_deletes_only for table users
-with (publish = 'delete');
+-- Replicate only specific columns from the users table
+create publication pub_users_subset
+for table users (id, email, created_at);
 ```
 
-<Admonition type="note">
+This will only replicate the `id`, `email`, and `created_at` columns from the `users` table.
 
-ETL Replication requires all event types (INSERT, UPDATE, DELETE) to be enabled. If you create a publication with limited event types, replication may not work as expected.
+#### Filtering rows with a predicate
 
-</Admonition>
-
-### Adding tables to an existing publication
-
-You can add more tables to an existing publication:
+You can filter which rows to replicate using a WHERE clause:
 
 ```sql
--- Add a table to an existing publication
-alter publication pub_users_orders add table products;
+-- Only replicate active users
+create publication pub_active_users
+for table users where (status = 'active');
 
--- Add multiple tables
-alter publication pub_users_orders add table comments, likes;
+-- Only replicate recent orders
+create publication pub_recent_orders
+for table orders where (created_at > '2024-01-01');
 ```
 
 ### Viewing publications in the Dashboard
@@ -104,7 +88,7 @@ After creating a publication via SQL, you can view it in the Supabase Dashboard:
 
 You can also manage publications through the Dashboard by toggling **Source** for each table.
 
-## Step 2: Enable replication
+## Step 2: Enable ETL Replication
 
 Before adding destinations, you need to enable ETL replication for your project:
 
@@ -120,25 +104,24 @@ Before adding destinations, you need to enable ETL replication for your project:
 
 ## Step 3: Add a destination
 
-Once replication is enabled and you have a publication, you can add a destination. ETL Replication currently supports two destination types:
+Once replication is enabled and you have a publication, you can add a destination. The destination is where your replicated data will be stored, while the pipeline is the active process that continuously replicates changes from your database to that destination.
 
 ### Available destinations
 
-Choose a destination based on your needs:
+For a complete list of available destinations and how to choose the right one for your needs, see [ETL Destinations](/docs/guides/database/replication/etl-destinations).
 
-- **[BigQuery](/docs/guides/database/replication/etl-bigquery)**: Google's fully managed data warehouse for SQL analytics
-- **[Iceberg (Analytics Buckets)](/docs/guides/database/replication/etl-iceberg)**: Apache Iceberg tables in S3-compatible storage
-
-For detailed configuration instructions for each destination type, see the destination-specific guides linked above.
-
-### General configuration steps
+### Configuration
 
 1. In the ETL Replication tab, click **Add destination**
-2. Configure the destination settings in the form:
-   - **Name**: Enter a descriptive name for your destination
-   - **Publication**: Select the publication you created in Step 1
-   - **Type**: Choose your destination type (BigQuery or Analytics Bucket)
-   - Fill in destination-specific fields (see destination guides for details)
+2. Configure the destination settings:
+
+   **General Settings:**
+   - **Destination name**: A name to identify this destination (e.g., "Analytics Warehouse")
+   - **Publication**: The publication to replicate data from (created in Step 1)
+   - **Destination type**: Choose from available destination types
+
+   **Destination-specific settings:**
+   Each destination type requires different configuration. See the [ETL Destinations guide](/docs/guides/database/replication/etl-destinations) for configuration details specific to your chosen destination.
 
 <Image
   alt="Add ETL Destination"
@@ -146,23 +129,15 @@ For detailed configuration instructions for each destination type, see the desti
   zoomable
 />
 
-3. Review the **Advanced Settings** (optional):
-   - **Max fill milliseconds**: Number of milliseconds after which a batch should be sent, even if it hasn't reached its maximum size
-   - Additional settings vary by destination type
+3. Configure **Advanced Settings** (optional):
+
+   - **Batch wait time (milliseconds)**: How long to wait for more changes before sending a batch.
 
 4. Click **Create and start** to begin replication
 
-<Admonition type="tip">
-
-For detailed configuration instructions:
-- [BigQuery configuration →](/docs/guides/database/replication/etl-bigquery#configuration)
-- [Iceberg configuration →](/docs/guides/database/replication/etl-iceberg#configuration)
-
-</Admonition>
-
 ## Step 4: Monitor your pipeline
 
-After creating a destination, it will appear in the destinations list with its current status:
+After creating a destination, the pipeline will start and appear in the destinations list. You can monitor the pipeline's status and performance from the Dashboard.
 
 <Image
   alt="ETL Destinations List"
@@ -170,44 +145,60 @@ After creating a destination, it will appear in the destinations list with its c
   zoomable
 />
 
-### Pipeline statuses
+For comprehensive monitoring instructions including pipeline states, metrics, and logs, see the [ETL Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring).
 
-Your replication pipeline can be in one of the following states:
+## Adding or removing tables
 
-- **Stopped**: The pipeline is not currently running
-- **Starting**: The pipeline is initializing
-- **Running**: The pipeline is actively replicating data
-- **Stopping**: The pipeline is shutting down
-- **Failed**: An error occurred during replication
+If you need to modify which tables are replicated after your ETL pipeline is already running, follow these steps:
 
-### Viewing detailed status
+<Admonition type="note">
 
-To inspect the replication status of individual tables and check replication lag:
+If your publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, new tables in that scope are automatically included in the publication. However, you still **must restart the ETL pipeline** for the changes to take effect.
 
-1. Click the **View status** button on your destination
-2. This will show you:
-   - Replication status for each table
-   - Current replication lag
-   - Any errors or warnings
-   - Detailed logs (via the **View logs** button)
+</Admonition>
 
-<Image
-  alt="View ETL Status"
-  src="/docs/img/database/replication/etl-view-status.png"
-  zoomable
-/>
+### Adding tables to replication
 
-For more detailed monitoring instructions, see the [ETL Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring).
+1. Add the table to your publication using SQL:
+
+   ```sql
+   -- Add a single table to an existing publication
+   alter publication pub_users_orders add table products;
+
+   -- Or add multiple tables at once
+   alter publication pub_users_orders add table products, categories;
+   ```
+
+2. **Restart the ETL pipeline** from the destinations list by stopping and starting the destination for the changes to take effect.
+
+### Removing tables from replication
+
+1. Remove the table from your publication using SQL:
+
+   ```sql
+   -- Remove a single table from a publication
+   alter publication pub_users_orders drop table orders;
+
+   -- Or remove multiple tables at once
+   alter publication pub_users_orders drop table orders, products;
+   ```
+
+2. **Restart the ETL pipeline** from the destinations list by stopping and starting the destination for the changes to take effect.
 
 ## How it works
 
-Once configured, ETL Replication will:
+Once configured, ETL Replication:
 
-1. **Capture**: Monitor changes from your database using the publication
-2. **Transform**: Process the data as needed for your destination
-3. **Load**: Send the data to your destination in near real-time batches
+1. **Captures** changes from your database using the publication
+2. **Loads** the data to your destination in near real-time batches
 
 Changes are sent in batches to optimize performance and reduce costs. The batch size and timing can be adjusted using the advanced settings.
+
+<Admonition type="note">
+
+ETL Replication currently performs data extraction and loading only, without transformation. Your data is replicated as-is to the destination.
+
+</Admonition>
 
 ## Troubleshooting
 
@@ -223,5 +214,5 @@ For more troubleshooting help, see the [ETL Replication FAQ](/docs/guides/databa
 ## Next steps
 
 - [Monitor your replication](/docs/guides/database/replication/etl-replication-monitoring)
+- [Choose a destination](/docs/guides/database/replication/etl-destinations)
 - [View ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq)
-- [Learn about ETL destinations](/docs/guides/database/replication/etl-replication#destinations)
