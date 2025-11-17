@@ -63,9 +63,7 @@ export const UpdateRolesConfirmationModal = ({
   }
   const orgProjects = (projects ?? []).filter((p) => p.organization_id === organization?.id)
   const originalConfiguration =
-    allRoles !== undefined
-      ? formatMemberRoleToProjectRoleConfiguration(member, allRoles, projects ?? [])
-      : []
+    allRoles !== undefined ? formatMemberRoleToProjectRoleConfiguration(member, allRoles) : []
   const changesToRoles = deriveChanges(
     originalConfiguration,
     projectsRoleConfiguration,
@@ -86,10 +84,10 @@ export const UpdateRolesConfirmationModal = ({
         // if one of the projects that the member is deleted, the roles isn't cleaned up on the BE
         // Hence adding an FE patch here for dashboard to self-remediate by omitting any project IDs from the role
         // which no longer exists in the organization projects list
-        if (!!x?.project_ids) {
+        if ((x?.projects ?? []).length > 0) {
           return {
             ...x,
-            project_ids: x.project_ids.filter((id) => orgProjects.some((p) => id === p.id)),
+            projects: x?.projects.filter(({ ref }) => orgProjects.some((p) => p.ref === ref)) ?? [],
           }
         } else {
           return x
@@ -122,25 +120,25 @@ export const UpdateRolesConfirmationModal = ({
     const { toRemove, toAssign, toUpdate } = deriveRoleChangeActions(existingRoles, changesToRoles)
 
     try {
-      for (const { roleId, projectIds } of toAssign) {
+      for (const { roleId, refs } of toAssign) {
         await assignRole({
           slug,
           gotrueId,
           roleId,
-          projects: projectIds.map((id) => projects?.find((p) => p.id === id)?.ref) as string[],
+          projects: refs,
           skipInvalidation: true,
         })
       }
       for (const roleId of toRemove) {
         await removeRole({ slug, gotrueId, roleId, skipInvalidation: true })
       }
-      for (const { roleId, projectIds } of toUpdate) {
+      for (const { roleId, refs } of toUpdate) {
         await updateRole({
           slug,
           gotrueId,
           roleId,
           roleName: project_scoped_roles.find((r) => r.id === roleId)?.name as string,
-          projects: projectIds.map((id) => projects?.find((p) => p.id === id)?.ref) as string[],
+          projects: refs,
           skipInvalidation: true,
         })
       }

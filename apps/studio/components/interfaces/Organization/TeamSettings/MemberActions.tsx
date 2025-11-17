@@ -128,11 +128,11 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
       {
         onSuccess: () => {
           if (!member.primary_email) return toast.error('Email is required')
+
           const projectScopedRole = projectScopedRoles.find((role) => role.id === roleId)
+
           if (projectScopedRole !== undefined) {
-            const projects = (projectScopedRole?.project_ids ?? [])
-              .map((id) => allProjects?.find((p) => p.id === id)?.ref)
-              .filter(Boolean) as string[]
+            const projects = projectScopedRole.projects.map(({ ref }) => ref)
             inviteMember({
               slug,
               email: member.primary_email,

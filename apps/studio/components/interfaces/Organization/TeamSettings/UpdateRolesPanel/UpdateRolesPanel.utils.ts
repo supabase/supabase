@@ -9,15 +9,13 @@ import { ProjectInfo } from 'data/projects/projects-query'
 
 export interface ProjectRoleConfiguration {
   ref?: string
-  projectId?: number
   roleId: number
   baseRoleId?: number
 }
 
 export const formatMemberRoleToProjectRoleConfiguration = (
   member: OrganizationMember,
-  allRoles: OrganizationRolesResponse,
-  projects: ProjectInfo[]
+  allRoles: OrganizationRolesResponse
 ) => {
   const { org_scoped_roles, project_scoped_roles } = allRoles
 
@@ -27,18 +25,18 @@ export const formatMemberRoleToProjectRoleConfiguration = (
       if (orgRole !== undefined) {
         return { ref: undefined, roleId: orgRole.id }
       }
+
       const projectRole = project_scoped_roles.find((role) => role.id === id)
       if (projectRole !== undefined) {
-        const _projects = (projectRole?.project_ids ?? []).map((id) =>
-          projects.find((p) => p.id === id)
-        )
-        return _projects.map((p) => ({
-          ref: p?.ref,
-          projectId: p?.id,
+        const _projects = projectRole.projects.map((x) => x.ref)
+        return _projects.map((ref) => ({
+          ref: ref,
           roleId: projectRole.id,
           baseRoleId: projectRole.base_role_id,
         }))
       }
+
+      return undefined
     })
     .filter(Boolean)
     .flat()
@@ -118,26 +116,27 @@ export const deriveRoleChangeActions = (
 ) => {
   const { removed, added, updated } = changesToRoles
   const toRemove: number[] = []
-  const toAssign: { roleId: number; projectIds: number[] }[] = []
-  const toUpdate: { roleId: number; projectIds: number[] }[] = []
+  const toAssign: { roleId: number; refs: string[] }[] = []
+  const toUpdate: { roleId: number; refs: string[] }[] = []
 
   const groupByAddedRoles = groupBy(added, 'roleId')
   const groupByRemovedRoles = groupBy(removed, 'roleId')
   const groupByUpdatingFromRoles = groupBy(updated, 'originalRole')
   const groupByUpdatingToRoles = groupBy(updated, 'updatedRole')
   const existingProjectRolesByBaseIds = existingRoles
-    .filter((r) => (r?.project_ids ?? []).length > 0)
+    .filter((r) => (r?.projects ?? []).length > 0)
     .map((r) => r.base_role_id)
 
   existingRoles.forEach((role) => {
-    const projectIdsApplied = role.project_ids
-    if (projectIdsApplied === null) {
+    const projectRefsApplied = role.projects.map((x) => x.ref)
+    if (projectRefsApplied.length === 0) {
       // [Joshen] In this case we're removing an org scope role, skip all the chekcs
       return toRemove.push(role.id)
     }
-    const toRemoveRole = projectIdsApplied.every((id) => {
-      const isRemoved = removed.map((r) => r.projectId).some((x) => x === id)
-      const isUpdated = updated.map((r) => r.projectId).some((x) => x === id)
+
+    const toRemoveRole = projectRefsApplied.every((ref) => {
+      const isRemoved = removed.map((r) => r.ref).some((x) => x === ref)
+      const isUpdated = updated.map((r) => r.ref).some((x) => x === ref)
       return isRemoved || isUpdated
     })
     const isRoleGettingAdded = added.some((r) => r.roleId === role.base_role_id)
@@ -147,23 +146,22 @@ export const deriveRoleChangeActions = (
       return toRemove.push(role.id)
     }
 
-    const projectsToAddToRole = (groupByAddedRoles[role.base_role_id]?.map((r) => r.projectId) ??
-      []) as number[]
-    const projectsToRemoveFromRole = (groupByRemovedRoles[role.id]?.map((r) => r.projectId) ??
-      []) as number[]
-    const projectsUpdatingFromRole = (groupByUpdatingFromRoles[role.id]?.map((r) => r.projectId) ??
-      []) as number[]
-    const projectsUpdatingToRole = (groupByUpdatingToRoles[role.base_role_id]?.map(
-      (r) => r.projectId
-    ) ?? []) as number[]
-    const projectIdsAppliedUpdated = projectIdsApplied
+    const projectsToAddToRole = (groupByAddedRoles[role.base_role_id]?.map((r) => r.ref) ??
+      []) as string[]
+    const projectsToRemoveFromRole = (groupByRemovedRoles[role.id]?.map((r) => r.ref) ??
+      []) as string[]
+    const projectsUpdatingFromRole = (groupByUpdatingFromRoles[role.id]?.map((r) => r.ref) ??
+      []) as string[]
+    const projectsUpdatingToRole = (groupByUpdatingToRoles[role.base_role_id]?.map((r) => r.ref) ??
+      []) as string[]
+    const projectRefsAppliedUpdated = projectRefsApplied
       .filter((x) => !projectsToRemoveFromRole.includes(x))
       .filter((x) => !projectsUpdatingFromRole.includes(x))
       .concat(projectsToAddToRole)
       .concat(projectsUpdatingToRole)
 
-    if (!isEqual(projectIdsApplied, projectIdsAppliedUpdated)) {
-      toUpdate.push({ roleId: role.id, projectIds: projectIdsAppliedUpdated.sort((a, b) => a - b) })
+    if (!isEqual(projectRefsApplied, projectRefsAppliedUpdated)) {
+      toUpdate.push({ roleId: role.id, refs: projectRefsAppliedUpdated })
     }
   })
 
@@ -171,9 +169,7 @@ export const deriveRoleChangeActions = (
     if (!existingProjectRolesByBaseIds.includes(Number(roleId))) {
       toAssign.push({
         roleId: Number(roleId),
-        projectIds: (groupByAddedRoles[roleId].map((x) => x.projectId) as number[]).sort(
-          (a, b) => a - b
-        ),
+        refs: groupByAddedRoles[roleId].map((x) => x.ref).filter((x) => x !== undefined),
       })
     }
   })
@@ -182,13 +178,15 @@ export const deriveRoleChangeActions = (
     if (!existingProjectRolesByBaseIds.includes(Number(roleId))) {
       toAssign.push({
         roleId: Number(roleId),
-        projectIds: (groupByUpdatingToRoles[roleId].map((x) => x.projectId) as number[]).sort(
-          (a, b) => a - b
-        ),
+        refs: groupByUpdatingToRoles[roleId].map((x) => x.ref).filter((x) => x !== undefined),
       })
     }
   })
 
   // [Joshen] Am sorting the results just so its more deterministic when writing tests
-  return { toRemove: toRemove.sort((a, b) => a - b), toAssign, toUpdate }
+  return {
+    toRemove: toRemove.sort((a, b) => a - b),
+    toAssign: toAssign.map((x) => ({ ...x, refs: x.refs.sort((a, b) => a.localeCompare(b)) })),
+    toUpdate: toUpdate.map((x) => ({ ...x, refs: x.refs.sort((a, b) => a.localeCompare(b)) })),
+  }
 }

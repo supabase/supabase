@@ -63,13 +63,13 @@ export const MemberRow = ({ member }: MemberRowProps) => {
         ...(roles?.org_scoped_roles ?? []),
         ...(roles?.project_scoped_roles ?? []),
       ].find((role) => role.id === id)
-      const isOrgScope = role?.project_ids === null
+      if (!role) return false
+
+      const isOrgScope = role.projects.length === 0
       if (isOrgScope) return false
 
-      const appliedProjects = (role?.project_ids ?? [])
-        .map((id) => {
-          return projects?.find((p) => p.id === id)?.name ?? ''
-        })
+      const appliedProjects = role.projects
+        .map(({ ref }) => projects?.find((p) => p.ref === ref)?.name ?? '')
         .filter((x) => x.length > 0)
 
       return appliedProjects.length === 0
@@ -146,12 +146,10 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             const role = orgScopedRole || projectScopedRole
             const roleName = (role?.name ?? '').split('_')[0]
             const projectsApplied =
-              role?.project_ids === null
+              role?.projects.length === 0
                 ? orgProjects?.map((p) => p.name) ?? []
-                : (role?.project_ids ?? [])
-                    .map((id) => {
-                      return orgProjects?.find((p) => p.id === id)?.name ?? ''
-                    })
+                : (role?.projects ?? [])
+                    .map(({ ref }) => orgProjects?.find((p) => p.ref === ref)?.name ?? '')
                     .filter((x) => x.length > 0)
 
             return (
@@ -168,7 +166,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
                       <HoverCard_Shadcn_ openDelay={200}>
                         <HoverCardTrigger_Shadcn_ asChild>
                           <span className="text-foreground">
-                            {role?.project_ids === null
+                            {role?.projects.length === 0
                               ? 'Organization'
                               : `${projectsApplied.length} project${projectsApplied.length > 1 ? 's' : ''}`}
                           </span>
