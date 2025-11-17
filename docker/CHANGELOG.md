@@ -7,7 +7,7 @@ for complete image version history and rollback information.
 
 Check updates, changelogs, and release notes for each service to learn more.
 
-**Note:** Configuration updates marked with "requires [...] update" are already included in the latest version of the repository. Pull the latest changes or refer to the linked PR for manual updates.
+**Note:** Configuration updates marked with "requires [...] update" are already included in the latest version of the repository. Pull the latest changes or refer to the linked PR for manual updates. After updating `docker-compose.yml`, pull latest images and recreate containers - use `docker compose down && docker compose pull && docker compose up -d`.
 
 ## Unreleased
 
@@ -77,5 +77,69 @@ Check updates, changelogs, and release notes for each service to learn more.
 ### Studio
 - Added Kong configuration for MCP server routes (requires `volumes/api/kong.yml` update) - [PR #39849](https://github.com/supabase/supabase/pull/39849)
 - Added [documentation page](https://supabase.com/docs/guides/self-hosting/enable-mcp) for MCP server configuration - [PR #39952](https://github.com/supabase/supabase/pull/39952)
+
+---
+
+## [2025-10-21]
+
+### Studio
+- Updated to `2025.10.20-sha-5005fc6` - [Dashboard updates](https://github.com/orgs/supabase/discussions/40083)
+
+### Realtime
+- Updated to `v2.56.0` - [Release](https://github.com/supabase/realtime/releases/tag/v2.56.0)
+
+### Storage
+- Updated to `v1.28.1` - [Release](https://github.com/supabase/storage/releases/tag/v1.28.1)
+
+### Postgres Meta
+- Updated to `v0.93.0` - [Release](https://github.com/supabase/postgres-meta/releases/tag/v0.93.0)
+
+### Edge Runtime
+- Updated to `v1.69.14` - [Release](https://github.com/supabase/edge-runtime/releases/v1.69.14)
+
+### Supavisor
+- Updated to `2.7.3` - [Release](https://github.com/supabase/supavisor/releases/tag/v2.7.3)
+
+---
+
+## [2025-10-13]
+
+### Analytics (Logflare)
+- Updated to `1.22.6` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.22.6)
+- Fixed issues with Edge Functions and cron logs not being visible in Studio - [PR #39388](https://github.com/supabase/supabase/pull/39388), [PR #39704](https://github.com/supabase/supabase/pull/39704), [PR #39711](https://github.com/supabase/supabase/pull/39711)
+
+---
+
+## [2025-10-08]
+
+### Studio
+- Updated to `2025.10.01-sha-8460121` - [Dashboard updates](https://github.com/orgs/supabase/discussions/39709)
+- Added "local" remote MCP server - [PR #38797](https://github.com/supabase/supabase/pull/38797), [PR #39041](https://github.com/supabase/supabase/pull/39041)
+- ⚠️ Changed Studio connection method to `postgres-meta` - affects non-standard database port configurations, see fix in [2025-11-05]
+
+### Auth
+- Updated to `v2.180.0` - [Release](https://github.com/supabase/auth/releases/tag/v2.180.0)
+
+### PostgREST
+- Updated to `v13.0.7` - [Release](https://github.com/PostgREST/postgrest/releases/tag/v13.0.7) | [Changelog](https://github.com/PostgREST/postgrest/blob/main/CHANGELOG.md)
+
+### Realtime
+- Updated to `v2.51.11` - [Release](https://github.com/supabase/realtime/releases/tag/v2.51.11)
+
+### Storage
+- Updated to `v1.28.0` - [Release](https://github.com/supabase/storage/releases/tag/v1.28.0)
+
+### Postgres Meta
+- Updated to `v0.91.6` - [Release](https://github.com/supabase/postgres-meta/releases/tag/v0.91.6)
+- Performance: Fixed suboptimal tables query schema filter
+
+### Analytics (Logflare)
+- Updated to `1.22.4` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.22.4)
+
+### Postgres
+- Updated to `15.8.1.085` - [Release](https://github.com/supabase/postgres/releases/tag/15.8.1.085)
+
+### Supavisor
+- Updated to `2.7.0` - [Release](https://github.com/supabase/supavisor/releases/tag/v2.7.0)
 
 ---
