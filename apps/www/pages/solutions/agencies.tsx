@@ -9,7 +9,7 @@ import SolutionsStickyNav from 'components/SolutionsStickyNav'
 import content from 'data/solutions/agencies'
 import { Solutions } from 'data/Solutions'
 
-const SingleQuote = dynamic(() => import('components/Sections/SingleQuote'))
+const Quotes = dynamic(() => import('components/Solutions/Quotes'))
 const FeaturesSection = dynamic(() => import('components/Solutions/FeaturesSection'))
 const PlatformSection = dynamic(() => import('components/Solutions/PlatformSection'))
 const DXSection = dynamic(() => import('components/Solutions/DeveloperExperienceSection'))
@@ -37,20 +37,7 @@ const Agencies: NextPage = () => (
         className="[&_h1]:2xl:!text-5xl bg-default border-0 lg:pb-8 [&_.ph-footer]:mt-0 [&_.ph-footer]:lg:mt-16 [&_.ph-footer]:xl:mt-32"
         sectionContainerClassName="lg:gap-4"
       />
-      {content.quote && (
-        <SingleQuote
-          id={content.quote.id}
-          className={content.quote.className}
-          quote={{
-            text: content.quote.text,
-            author: content.quote.author,
-            role: content.quote.role,
-            logo: content.quote.logo,
-            avatar: content.quote.avatar,
-            link: content.quote.link,
-          }}
-        />
-      )}
+      <Quotes {...content.quotes} />
       <FeaturesSection {...content.why} />
       <PlatformSection {...content.platform} />
       <DXSection {...content.developerExperience} />

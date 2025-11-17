@@ -36,6 +36,7 @@ import {
   type FrameworkLinkProps,
   type HeroSection,
   type Metadata,
+  type Quotes,
   getEditors,
 } from './solutions.utils'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
@@ -47,21 +48,10 @@ const RealtimeVisual = dynamic(() => import('components/Products/RealtimeVisual'
 
 const editors = getEditors(false)
 
-type Quote = {
-  id: string
-  className?: string
-  text: string
-  author: string
-  role: string
-  logo?: JSX.Element | string
-  avatar?: JSX.Element | string
-  link?: string
-}
-
 const data: {
   metadata: Metadata
   heroSection: HeroSection
-  quote: Quote
+  quotes: Quotes
   why: FeaturesSection
   platform: PlatformSectionProps
   developerExperience: DXSectionProps
@@ -107,13 +97,54 @@ const data: {
       },
     ],
   },
-  quote: {
-    id: 'agency-quote',
-    className: '[&_q]:md:max-w-3xl',
-    text: `Supabase lets us build faster and deliver higher quality projects to our clients. We've cut our backend development time by 60%.`,
-    author: 'Jordan Patel',
-    role: 'Founder & CEO, Northwind Digital',
-    logo: <span className="text-lg font-semibold uppercase tracking-wide">Northwind Digital</span>,
+  quotes: {
+    id: 'quotes',
+    items: [
+      {
+        icon: '/images/logos/publicity/imaginary-space.svg',
+        avatar: '/images/avatars/thomas-olson.jpeg',
+        author: 'Thomas Olson',
+        authorTitle: 'COO, Imaginary Space',
+        quote: (
+          <>
+            <span className="text-foreground">Our clients want reliability and scale. Supabase gives us a backend we can trust for production work.</span>
+          </>
+        ),
+      },
+      {
+        icon: '/images/logos/publicity/sj-innovation.svg',
+        avatar: '/images/avatars/shahed-islam.jpeg',
+        author: 'Shahed Islam',
+        authorTitle: 'CEO, SJ Innovation LLC',
+        quote: (
+          <>
+            <span className="text-foreground">Supabase lets us build stable, secure products extremely fast.</span>
+          </>
+        ),
+      },
+      {
+        icon: '/images/logos/publicity/wegetdesign.svg',
+        avatar: '/images/avatars/omar-moulani.jpeg',
+        author: 'Omar Moulani',
+        authorTitle: 'Founder, WeGetDesign',
+        quote: (
+          <>
+            <span className="text-foreground">Supabase brings structure and clarity to our backend work. Its interface and tooling make it easy to deploy, manage, and scale projects without friction.</span>
+          </>
+        ),
+      },
+      {
+        icon: '/images/logos/publicity/brthrs.svg',
+        avatar: '/images/avatars/zimo-holdijk.jpeg',
+        author: 'Zimo Holdijk',
+        authorTitle: 'Lead Product Manager, Brthrs',
+        quote: (
+          <>
+            <span className="text-foreground">Supabase is our go-to backend for client work because it’s fast to build with and easy to maintain.</span>
+          </>
+        ),
+      },
+    ],
   },
   why: {
     id: 'why-agencies',
