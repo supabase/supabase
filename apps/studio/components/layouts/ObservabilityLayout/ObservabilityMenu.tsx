@@ -133,7 +133,7 @@ const ObservabilityMenu = () => {
           ? [
               {
                 name: 'Data API',
-                key: 'data-api',
+                key: 'postgrest',
                 url: `/project/${ref}/observability/postgrest${preservedQueryParams}`,
               },
             ]
