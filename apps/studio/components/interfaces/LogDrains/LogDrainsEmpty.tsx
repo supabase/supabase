@@ -48,7 +48,7 @@ export const LogDrainsEmpty = () => {
                       'text-xs shrink-0 font-mono text-foreground-light w-7 h-7 bg border flex items-center justify-center rounded-md'
                     )}
                   >
-                    {item.step}
+                    {i + 1}
                   </span>
                   <h3 className="heading-default">{item.title}</h3>
                 </div>
