@@ -1,44 +1,57 @@
 import type { OAuthClient } from '@supabase/supabase-js'
 import { useParams } from 'common'
-import type { OAuthServerAppDeleteVariables } from 'data/oauth-server-apps/oauth-server-app-delete-mutation'
+import { useOAuthServerAppDeleteMutation } from 'data/oauth-server-apps/oauth-server-app-delete-mutation'
 import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
+import { useState } from 'react'
+import { toast } from 'sonner'
 
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface DeleteOAuthAppModalProps {
   visible: boolean
   selectedApp?: OAuthClient
-  setVisible: (value: string | null) => void
-  onDelete: (params: OAuthServerAppDeleteVariables) => void
-  isLoading: boolean
+  onClose: () => void
 }
 
 export const DeleteOAuthAppModal = ({
   visible,
   selectedApp,
-  setVisible,
-  onDelete,
-  isLoading,
+  onClose,
 }: DeleteOAuthAppModalProps) => {
   const { ref: projectRef } = useParams()
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const { data: supabaseClientData } = useSupabaseClientQuery({ projectRef })
 
-  const onConfirmDeleteApp = () => {
-    if (!selectedApp) return
+  const { mutateAsync: deleteOAuthApp } = useOAuthServerAppDeleteMutation()
 
-    onDelete({
-      projectRef,
-      supabaseClient: supabaseClientData?.supabaseClient,
-      clientId: selectedApp.client_id,
-    })
+  const onConfirmDeleteApp = async () => {
+    if (!selectedApp) return console.error('No OAuth app selected')
+
+    setIsDeleting(true)
+
+    try {
+      await deleteOAuthApp({
+        projectRef,
+        supabaseClient: supabaseClientData?.supabaseClient,
+        clientId: selectedApp.client_id,
+      })
+
+      toast.success(`Successfully deleted OAuth app "${selectedApp.client_name}"`)
+      onClose()
+    } catch (error) {
+      toast.error('Failed to delete OAuth app')
+      console.error('Error deleting OAuth app:', error)
+    } finally {
+      setIsDeleting(false)
+    }
   }
 
   return (
     <ConfirmationModal
       variant={'destructive'}
       size="medium"
-      loading={isLoading}
+      loading={isDeleting}
       visible={visible}
       title={
         <>
@@ -47,7 +60,7 @@ export const DeleteOAuthAppModal = ({
       }
       confirmLabel="Confirm delete"
       confirmLabelLoading="Deleting..."
-      onCancel={() => setVisible(null)}
+      onCancel={onClose}
       onConfirm={() => onConfirmDeleteApp()}
       alert={{
         title: 'This action cannot be undone',

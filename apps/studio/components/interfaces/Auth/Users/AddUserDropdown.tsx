@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronDown, Mail, UserPlus } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useState } from 'react'
 
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -21,14 +21,8 @@ export const AddUserDropdown = () => {
     'create_user'
   )
 
-  const [inviteVisible, setInviteVisible] = useQueryState(
-    'invite',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
-  const [createVisible, setCreateVisible] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
+  const [inviteVisible, setInviteVisible] = useState(false)
+  const [createVisible, setCreateVisible] = useState(false)
 
   return (
     <>

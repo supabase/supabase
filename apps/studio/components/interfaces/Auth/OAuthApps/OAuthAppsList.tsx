@@ -1,9 +1,7 @@
 import type { OAuthClient } from '@supabase/supabase-js'
 import { MoreVertical, Plus, RotateCw, Search, Trash } from 'lucide-react'
 import Link from 'next/link'
-import { useRef, useState } from 'react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { toast } from 'sonner'
+import { useState } from 'react'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -11,11 +9,9 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useOAuthServerAppDeleteMutation } from 'data/oauth-server-apps/oauth-server-app-delete-mutation'
 import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
 import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
-import { useQueryStateWithSelect, handleErrorOnDelete } from 'hooks/misc/useQueryStateWithSelect'
 import {
   Badge,
   Button,
@@ -55,11 +51,14 @@ export const OAuthAppsList = () => {
   const { data: authConfig, isLoading: isAuthConfigLoading } = useAuthConfigQuery({ projectRef })
   const isOAuthServerEnabled = !!authConfig?.OAUTH_SERVER_ENABLED
   const [newOAuthApp, setNewOAuthApp] = useState<OAuthClient | undefined>(undefined)
+
+  // State for OAuth apps
+  const [showCreateSheet, setShowCreateSheet] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
   const [selectedApp, setSelectedApp] = useState<OAuthClient>()
   const [filteredAppTypes, setFilteredAppTypes] = useState<string[]>([])
   const [filteredAppScopes, setFilteredAppScopes] = useState<string[]>([])
-  const deletingOAuthAppIdRef = useRef<string | null>(null)
 
   const { data: supabaseClientData } = useSupabaseClientQuery({ projectRef })
 
@@ -82,32 +81,9 @@ export const OAuthAppsList = () => {
 
   const oAuthApps = data?.clients || []
 
-  const [showCreateSheet, setShowCreateSheet] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
-
-  const { setValue: setSelectedAppToDelete, value: appToDelete } = useQueryStateWithSelect({
-    urlKey: 'delete',
-    select: (client_id: string) =>
-      client_id ? oAuthApps?.find((app) => app.client_id === client_id) : undefined,
-    enabled: !!oAuthApps?.length,
-    onError: (_error, selectedId) =>
-      handleErrorOnDelete(deletingOAuthAppIdRef, selectedId, `OAuth App not found`),
-  })
-
-  const { mutate: deleteOAuthApp, isLoading: isDeletingApp } = useOAuthServerAppDeleteMutation({
-    onSuccess: () => {
-      toast.success(`Successfully deleted OAuth app`)
-      setSelectedAppToDelete(null)
-    },
-    onError: () => {
-      deletingOAuthAppIdRef.current = null
-    },
-  })
-
   const handleDeleteClick = (app: OAuthClient) => {
-    setSelectedAppToDelete(app.client_id)
+    setSelectedApp(app)
+    setShowDeleteModal(true)
   }
 
   const [filterString, setFilterString] = useState<string>('')
@@ -229,7 +205,7 @@ export const OAuthAppsList = () => {
                         {app.client_name}
                       </TableCell>
                       <TableCell className="max-w-40" title={app.client_id}>
-                        <Badge className="font-mono">{app.client_id}</Badge>
+                        <Badge>{app.client_id}</Badge>
                       </TableCell>
                       <TableCell className="max-w-40">
                         {app.client_type === 'public' ? 'Public' : 'Private'}
@@ -294,14 +270,9 @@ export const OAuthAppsList = () => {
       />
 
       <DeleteOAuthAppModal
-        visible={!!appToDelete}
-        selectedApp={appToDelete}
-        setVisible={setSelectedAppToDelete}
-        onDelete={(params: Parameters<typeof deleteOAuthApp>[0]) => {
-          deletingOAuthAppIdRef.current = params.clientId ?? null
-          deleteOAuthApp(params)
-        }}
-        isLoading={isDeletingApp}
+        visible={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        selectedApp={selectedApp}
       />
 
       <ConfirmationModal
@@ -312,13 +283,11 @@ export const OAuthAppsList = () => {
         confirmLabel="Confirm"
         onCancel={() => setShowRegenerateDialog(false)}
         onConfirm={() => {
-          if (selectedApp?.client_id) {
-            regenerateSecret({
-              projectRef,
-              supabaseClient: supabaseClientData?.supabaseClient,
-              clientId: selectedApp.client_id,
-            })
-          }
+          regenerateSecret({
+            projectRef,
+            supabaseClient: supabaseClientData?.supabaseClient,
+            clientId: selectedApp?.client_id!,
+          })
           setShowRegenerateDialog(false)
         }}
       >
