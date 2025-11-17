@@ -271,7 +271,7 @@ export const SchemaFlowDiagram = ({
         label={targetLabel}
         description={`Analytics schema`}
         ariaLabel={`Target: ${targetLabel} schema${isPending ? ' that will be created' : ''}`}
-        labelClassName={isPending ? 'text-foreground-muted' : 'text-foreground'}
+        labelClassName="text-foreground"
         isPending={isPending}
       />
     </CardHeader>
