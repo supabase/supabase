@@ -1,4 +1,4 @@
-import { ChevronRight, Database, FileText, Info, Loader2, Plus, RefreshCw } from 'lucide-react'
+import { ChevronRight, Database, Info, Loader2, Plus, RefreshCw } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
@@ -48,7 +48,6 @@ const SchemaFlowDiagram = ({
   const containerRef = useRef<HTMLDivElement>(null)
   const sourceRef = useRef<HTMLDivElement>(null)
   const targetRef = useRef<HTMLDivElement>(null)
-  const [pathData, setPathData] = useState<string>('')
 
   // Calculate dot color based on theme
   const dotColor = useMemo(
@@ -56,26 +55,19 @@ const SchemaFlowDiagram = ({
     [resolvedTheme]
   )
 
+  const [lineStart, setLineStart] = useState<{ x: number; y: number } | null>(null)
+
   useEffect(() => {
     const updatePath = () => {
       if (!containerRef.current || !sourceRef.current || !targetRef.current) return
 
       const containerRect = containerRef.current.getBoundingClientRect()
       const sourceRect = sourceRef.current.getBoundingClientRect()
-      const targetRect = targetRef.current.getBoundingClientRect()
 
       const sourceX = sourceRect.right - containerRect.left
       const sourceY = sourceRect.top + sourceRect.height / 2 - containerRect.top
-      const targetX = targetRect.left - containerRect.left
-      const targetY = targetRect.top + targetRect.height / 2 - containerRect.top
 
-      const midX = (sourceX + targetX) / 2
-      const controlY = Math.min(sourceY, targetY) - 20
-
-      // Create a smooth curved path with a quadratic bezier for a U-shape
-      const path = `M ${sourceX} ${sourceY} Q ${midX} ${controlY}, ${targetX} ${targetY}`
-
-      setPathData(path)
+      setLineStart({ x: sourceX, y: sourceY })
     }
 
     // Small delay to ensure layout is ready
@@ -94,9 +86,10 @@ const SchemaFlowDiagram = ({
   }, [dotColor])
 
   return (
+    // Outer container
     <div
       ref={containerRef}
-      className="relative flex items-center justify-between h-[80px] border-b px-8"
+      className="relative flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-24 border-b px-8 py-8"
       role="img"
       aria-label={`Schema flow diagram showing ${sourceLabel} ${sourceType} schema connecting to ${targetLabel} Postgres schema`}
     >
@@ -119,15 +112,20 @@ const SchemaFlowDiagram = ({
         aria-label={`Source: ${sourceLabel} ${sourceType} schema`}
       >
         <div
-          className={`w-8 h-8 border rounded-md flex items-center justify-center ${
+          className={`w-8 h-8 border rounded-md ${
             sourceType === 'analytics'
               ? 'bg-blue-600 border-blue-800'
-              : 'bg-brand-500 border-brand-600'
+              : 'bg-brand-500 border-brand-600 flex items-center justify-center'
           }`}
           aria-hidden="true"
         >
           {sourceType === 'analytics' ? (
-            <FileText size={16} className="text-white" />
+            // Iceberg
+            <img
+              src="/img/iceberg-square.png"
+              alt="Iceberg"
+              className="w-full h-full rounded-md object-cover"
+            />
           ) : (
             <Database size={16} className="text-white" />
           )}
@@ -135,16 +133,22 @@ const SchemaFlowDiagram = ({
         <div className="flex flex-col gap-y-0.5">
           <p className="text-sm text-foreground">{sourceLabel}</p>
           <p className="text-sm text-foreground-light">
-            {sourceType === 'analytics' ? 'Analytics' : 'Postgres'} schema
+            {sourceType === 'analytics' ? 'Iceberg namespace' : 'Database schema'}
           </p>
         </div>
       </div>
 
-      {/* SVG Path for Curved Dashed Line */}
-      {pathData && (
+      {/* SVG Path for Straight Dashed Line */}
+      {lineStart && (
         <svg
-          className="absolute inset-0 w-full h-full pointer-events-none"
-          style={{ overflow: 'visible' }}
+          className="absolute hidden md:block pointer-events-none"
+          style={{
+            left: `${lineStart.x}px`,
+            top: `${lineStart.y - 0.75}px`,
+            width: '6rem',
+            height: '1px',
+            overflow: 'visible',
+          }}
           aria-hidden="true"
         >
           <defs>
@@ -162,23 +166,29 @@ const SchemaFlowDiagram = ({
               `}
             </style>
           </defs>
+          {/* Straight horizontal line */}
           <path
-            d={pathData}
+            d="M 0 0 L 96 0"
             fill="none"
-            stroke="hsl(var(--border-stronger))"
-            strokeWidth="1.5"
+            stroke="hsl(var(--foreground-muted))"
+            strokeWidth="1.25"
             className="animated-dash"
           />
+          {/* Dot at start */}
+          <circle cx="0" cy="0" r="3" fill="hsl(var(--foreground-muted))" />
+          {/* Dot at end */}
+          <circle cx="96" cy="0" r="3" fill="hsl(var(--foreground-muted))" />
         </svg>
       )}
 
       {/* Target Node */}
       <div
         ref={targetRef}
-        className="flex items-center gap-x-3 rounded bg-surface-100 border border-default px-3 py-2 z-10 shrink-0"
+        className="flex items-center gap-x-3 rounded bg-surface-100 border border-default px-4 py-4 z-10 shrink-0"
         role="group"
-        aria-label={`Target: ${targetLabel} Postgres schema${isPending ? ' that will be created' : ''}`}
+        aria-label={`Target: ${targetLabel} schema${isPending ? ' that will be created' : ''}`}
       >
+        {/* Icon */}
         <div
           className={`w-8 h-8 border rounded-md flex items-center justify-center ${
             isPending ? 'bg-surface-100 border-foreground/20' : 'bg-brand-500 border-brand-600'
@@ -187,12 +197,15 @@ const SchemaFlowDiagram = ({
         >
           <Database size={16} className={isPending ? 'text-foreground-light' : 'text-white'} />
         </div>
-        <div className="flex flex-col gap-y-0.5">
-          <p className={`text-sm ${isPending ? 'text-foreground-muted' : 'text-foreground'}`}>
+        {/* Text */}
+        <div className="flex flex-col gap-y-1">
+          <p
+            className={`text-sm leading-none ${isPending ? 'text-foreground-muted' : 'text-foreground'}`}
+          >
             {targetLabel}
           </p>
-          <p className="text-xs text-foreground-light">
-            Postgres schema{isPending && ' that will be created'}
+          <p className="text-sm leading-none text-foreground-lighter">
+            Analytics schema{isPending && ' that will be created'}
           </p>
         </div>
       </div>
