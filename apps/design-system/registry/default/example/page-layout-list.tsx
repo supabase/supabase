@@ -54,7 +54,7 @@ export default function PageLayoutList(): React.JSX.Element {
   return (
     <div className="w-full">
       <PageHeader size="large">
-        <PageHeaderMeta size="large">
+        <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Database Functions</PageHeaderTitle>
             <PageHeaderDescription>Manage your database functions</PageHeaderDescription>
