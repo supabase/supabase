@@ -37,6 +37,39 @@ export function useApiKeysCommands() {
 
     return [
       project &&
+        publishableKey && {
+          id: 'publishable-key',
+          name: `Copy publishable key`,
+          action: () => {
+            copyToClipboard(publishableKey.api_key ?? '')
+            setIsOpen(false)
+          },
+          badge: () => (
+            <span className="flex items-center gap-x-1">
+              <Badge>Project: {project?.name}</Badge>
+              <Badge className="capitalize">{publishableKey.type}</Badge>
+            </span>
+          ),
+          icon: () => <Key />,
+        },
+      ...(project && allSecretKeys
+        ? allSecretKeys.map((key) => ({
+            id: key.id,
+            name: `Copy secret key (${key.name})`,
+            action: () => {
+              copyToClipboard(key.api_key ?? '')
+              setIsOpen(false)
+            },
+            badge: () => (
+              <span className="flex items-center gap-x-1">
+                <Badge>Project: {project?.name}</Badge>
+                <Badge className="capitalize">{key.type}</Badge>
+              </span>
+            ),
+            icon: () => <Key />,
+          }))
+        : []),
+      project &&
         anonKey && {
           id: 'anon-key',
           name: `Copy anonymous API key`,
@@ -70,39 +103,6 @@ export function useApiKeysCommands() {
           ),
           icon: () => <Key />,
         },
-      project &&
-        publishableKey && {
-          id: 'publishable-key',
-          name: `Copy publishable key`,
-          action: () => {
-            copyToClipboard(publishableKey.api_key ?? '')
-            setIsOpen(false)
-          },
-          badge: () => (
-            <span className="flex items-center gap-x-1">
-              <Badge>Project: {project?.name}</Badge>
-              <Badge className="capitalize">{publishableKey.type}</Badge>
-            </span>
-          ),
-          icon: () => <Key />,
-        },
-      ...(project && allSecretKeys
-        ? allSecretKeys.map((key) => ({
-            id: key.id,
-            name: `Copy secret key (${key.name})`,
-            action: () => {
-              copyToClipboard(key.api_key ?? '')
-              setIsOpen(false)
-            },
-            badge: () => (
-              <span className="flex items-center gap-x-1">
-                <Badge>Project: {project?.name}</Badge>
-                <Badge className="capitalize">{key.type}</Badge>
-              </span>
-            ),
-            icon: () => <Key />,
-          }))
-        : []),
       !(anonKey || serviceKey) && {
         id: 'api-keys-project-settings',
         name: 'See API keys in Project Settings',
