@@ -14,38 +14,14 @@ Some destinations may not be available for all users. Additional destinations ar
 
 </Admonition>
 
-## Available Destinations
+## Available destinations
 
-<div className="grid md:grid-cols-1 gap-4 not-prose">
-  <div className="border rounded-lg p-6">
-    <h3 className="text-xl font-medium mb-2">Google BigQuery</h3>
-    <p className="text-foreground-light mb-4">
-      Google's fully managed data warehouse for large-scale analytics.
-    </p>
-    <a href="/docs/guides/database/replication/etl-bigquery" className="text-brand">
-      Configure BigQuery destination →
-    </a>
-  </div>
-</div>
+| Destination | Description | Configuration |
+|-------------|-------------|---------------|
+| **BigQuery** | Google's fully managed data warehouse for large-scale analytics | [Configure BigQuery →](/docs/guides/database/replication/etl-bigquery) |
+| **Iceberg (Analytics Buckets)** | Apache Iceberg tables in S3-compatible storage | [Configure Iceberg →](/docs/guides/database/replication/etl-iceberg) |
 
-<div className="grid md:grid-cols-1 gap-4 not-prose">
-  <div className="border rounded-lg p-6">
-    <h3 className="text-xl font-medium mb-2">Apache Iceberg</h3>
-    <p className="text-foreground-light mb-4">
-      Apache Iceberg tables in S3-compatible storage.
-    </p>
-    <p className="text-foreground-light mb-4">
-      <strong>Note:</strong> Currently incomplete. Iceberg provides an append-only log listing all your data changes with an additional column explaining the type of operation (INSERT, UPDATE, DELETE).
-    </p>
-    <a href="/docs/guides/database/replication/etl-iceberg" className="text-brand">
-      Configure Iceberg destination →
-    </a>
-  </div>
-</div>
+## Next steps
 
-## Next Steps
-
-- [Configure BigQuery destination](/docs/guides/database/replication/etl-bigquery)
-- [Configure Iceberg destination](/docs/guides/database/replication/etl-iceberg)
 - [Set up ETL Replication](/docs/guides/database/replication/etl-replication-setup)
 - [Monitor ETL Replication](/docs/guides/database/replication/etl-replication-monitoring)
