@@ -63,7 +63,11 @@ export const useIsWithinETLAnalyticsBucketPrivateAlpha = ({
     typeof etlAnalyticsBucketPrivateAlpha === 'string'
       ? (etlAnalyticsBucketPrivateAlpha as string).split(',').map((x) => x.trim())
       : []
-  return privateAlphaProjectRefs.includes(projectRef ?? '')
+
+  const etlAnalyticsBucketShowAllProjects = useFlag('etlAnalyticsBucketOverride')
+  console.log({ etlAnalyticsBucketShowAllProjects })
+
+  return etlAnalyticsBucketShowAllProjects || privateAlphaProjectRefs.includes(projectRef ?? '')
 }
 
 export const useIsAnalyticsBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
