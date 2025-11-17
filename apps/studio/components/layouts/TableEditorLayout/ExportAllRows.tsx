@@ -1,7 +1,6 @@
 import saveAs from 'file-saver'
 import Papa from 'papaparse'
-import { useCallback, useRef, useState, type ReactNode } from 'react'
-import { toast } from 'sonner'
+import { useCallback, useState, type ReactNode } from 'react'
 
 import { useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
@@ -21,23 +20,28 @@ import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { useStaticEffectEvent } from 'hooks/useStaticEffectEvent'
 import type { RoleImpersonationState } from 'lib/role-impersonation'
 import { AlertTriangle } from 'lucide-react'
-import { SonnerProgress } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import {
+  BlobCreationError,
+  DownloadSaveError,
+  FetchRowsError,
+  NoConnectionStringError,
+  NoRowsToExportError,
+  NoTableError,
+  OutputConversionError,
+  TableDetailsFetchError,
+  TableTooLargeError,
+  type ExportAllRowsErrorFamily,
+} from './ExportAllRows.errors'
+import { useProgressToasts } from './ExportAllRows.progress'
 
-const toLoggableError = (error: unknown): { message: string; stack: string } => {
-  if (error instanceof Error) {
-    return { message: error.message, stack: error.stack || '' }
-  }
-  if (!!error && typeof error === 'object') {
-    return {
-      message: 'message' in error ? String(error.message) : JSON.stringify(error),
-      stack: '',
-    }
-  }
-  return { message: String(error), stack: '' }
+type OutputCallbacks = {
+  convertToOutputFormat: (formattedRows: Record<string, unknown>[], table: SupaTable) => string
+  convertToBlob: (str: string) => Blob
+  save: (blob: Blob, table: SupaTable) => void
 }
 
-type FetchFormattedRowsParams = {
+type FetchAllRowsParams = {
   queryClient: QueryClient
   projectRef: string
   connectionString: string | null
@@ -47,12 +51,12 @@ type FetchFormattedRowsParams = {
   sorts?: Sort[]
   roleImpersonationState?: RoleImpersonationState
   progressCallback?: (progress: number) => void
-}
+} & OutputCallbacks
 
-type FetchFormattedRowsReturn =
+type FetchAllRowsReturn =
   | { status: 'require_confirmation'; reason: string }
-  | { status: 'error'; customMessage: ReactNode | null }
-  | { status: 'success'; table: SupaTable; rows: Record<string, unknown>[] }
+  | { status: 'error'; error: ExportAllRowsErrorFamily }
+  | { status: 'success'; rowsExported: number }
 
 const fetchAllRows = async ({
   queryClient,
@@ -64,10 +68,12 @@ const fetchAllRows = async ({
   sorts,
   roleImpersonationState,
   progressCallback,
-}: FetchFormattedRowsParams): Promise<FetchFormattedRowsReturn> => {
+  convertToOutputFormat,
+  convertToBlob,
+  save,
+}: FetchAllRowsParams): Promise<FetchAllRowsReturn> => {
   if (IS_PLATFORM && !connectionString) {
-    console.error('Export All Rows > Connection string is required')
-    return { status: 'error', customMessage: null }
+    return { status: 'error', error: new NoConnectionStringError() }
   }
 
   let table: TableEditorData | undefined
@@ -80,19 +86,11 @@ const fetchAllRows = async ({
         getTableEditor({ projectRef, connectionString, id: entity.id }, signal),
     })
   } catch (error: unknown) {
-    const loggableError = toLoggableError(error)
-    console.error(
-      'Export All Rows > Error fetching table %s: %s\n%s',
-      entity.name,
-      loggableError.message,
-      loggableError.stack
-    )
-    return { status: 'error', customMessage: null }
+    return { status: 'error', error: new TableDetailsFetchError(entity.name, error) }
   }
 
   if (!table) {
-    console.error('Export All Rows > Table %s not found', entity.name)
-    return { status: 'error', customMessage: null }
+    return { status: 'error', error: new NoTableError(entity.name) }
   }
 
   const type = table.entity_type
@@ -114,7 +112,7 @@ const fetchAllRows = async ({
   if (isTableLike(table) && table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
     return {
       status: 'error',
-      customMessage: MAX_EXPORT_ROW_COUNT_MESSAGE,
+      error: new TableTooLargeError(table.name, table.live_rows_estimate, MAX_EXPORT_ROW_COUNT),
     }
   }
 
@@ -124,7 +122,7 @@ const fetchAllRows = async ({
   if (!primaryKey && !bypassConfirmation) {
     return {
       status: 'require_confirmation',
-      reason: `This table does not have a primary key defined, which may cause performance issues when exporting large tables.`,
+      reason: `This table does not have a primary key defined, which may cause performance issues when exporting very large tables.`,
     }
   }
 
@@ -140,27 +138,33 @@ const fetchAllRows = async ({
       progressCallback,
     })
   } catch (error: unknown) {
-    const loggableError = toLoggableError(error)
-    console.error(
-      'Export All Rows > Error fetching rows for table %s: %s\n%s',
-      entity.name,
-      loggableError.message,
-      loggableError.stack
-    )
-    return { status: 'error', customMessage: null }
+    return { status: 'error', error: new FetchRowsError(supaTable.name, error) }
   }
 
-  return {
-    status: 'success',
-    table: supaTable,
-    rows,
+  if (rows.length === 0) {
+    return { status: 'error', error: new NoRowsToExportError(entity.name) }
   }
+  const formattedRows = formatRowsForExport(rows, supaTable)
+
+  return convertAndDownload(formattedRows, supaTable, {
+    convertToOutputFormat,
+    convertToBlob,
+    save,
+  })
 }
 
-const formatRowsForExport = (rows: Record<string, unknown>[]) => {
+const formatRowsForExport = (rows: Record<string, unknown>[], table: SupaTable) => {
   return rows.map((row) => {
     const formattedRow = row
     Object.keys(row).map((column) => {
+      if (column === 'idx' && !table.columns.some((col) => col.name === 'idx')) {
+        // When we fetch this data from the database, we automatically add an
+        // 'idx' column if none exists. We shouldn't export this column since
+        // it's not actually part of the user's table.
+        delete formattedRow[column]
+        return
+      }
+
       if (typeof row[column] === 'object' && row[column] !== null)
         formattedRow[column] = JSON.stringify(formattedRow[column])
     })
@@ -168,103 +172,34 @@ const formatRowsForExport = (rows: Record<string, unknown>[]) => {
   })
 }
 
-const useProgressToasts = () => {
-  const toastIdsRef = useRef(new Map<number, string | number>())
-
-  const startProgressTracker = useCallback(
-    ({
-      id,
-      name,
-      trackPercentage = false,
-    }: {
-      id: number
-      name: string
-      trackPercentage?: boolean
-    }) => {
-      if (toastIdsRef.current.has(id)) return
-
-      if (trackPercentage) {
-        toastIdsRef.current.set(
-          id,
-          toast(<SonnerProgress progress={0} message={`Exporting ${name}...`} />, {
-            closeButton: false,
-            duration: Infinity,
-          })
-        )
-      } else {
-        toastIdsRef.current.set(id, toast.loading(`Exporting ${name}...`))
-      }
-    },
-    []
-  )
-
-  const trackPercentageProgress = useCallback(
-    ({
-      id,
-      name,
-      value,
-      totalRows,
-    }: {
-      id: number
-      name: string
-      value: number
-      totalRows: number
-    }) => {
-      const savedToastId = toastIdsRef.current.get(id)
-
-      const progress = Math.min((value / totalRows) * 100, 100)
-      const newToastId = toast(
-        <SonnerProgress progress={progress} message={`Exporting ${name}...`} />,
-        {
-          id: savedToastId,
-          closeButton: false,
-          duration: Infinity,
-        }
-      )
-
-      if (!savedToastId) toastIdsRef.current.set(id, newToastId)
-    },
-    []
-  )
-
-  const stopTrackerWithError = useCallback(
-    (id: number, name: string, customMessage?: ReactNode) => {
-      const savedToastId = toastIdsRef.current.get(id)
-      if (savedToastId) {
-        toast.dismiss(savedToastId)
-        toastIdsRef.current.delete(id)
-      }
-
-      toast.error(customMessage ?? `There was an error exporting ${name}`)
-    },
-    []
-  )
-
-  const dismissTrackerSilently = useCallback((id: number) => {
-    const savedToastId = toastIdsRef.current.get(id)
-    if (savedToastId) {
-      toast.dismiss(savedToastId)
-      toastIdsRef.current.delete(id)
-    }
-  }, [])
-
-  const markTrackerComplete = useCallback((id: number, name: string, totalRows: number) => {
-    const savedToastId = toastIdsRef.current.get(id)
-    const deleteSavedToastId = () => toastIdsRef.current.delete(id)
-
-    toast.success(`Successfully exported ${totalRows} rows`, {
-      id: savedToastId,
-      onAutoClose: deleteSavedToastId,
-      onDismiss: deleteSavedToastId,
-    })
-  }, [])
+const convertAndDownload = (
+  formattedRows: Record<string, unknown>[],
+  table: SupaTable,
+  callbacks: OutputCallbacks
+):
+  | { status: 'error'; error: ExportAllRowsErrorFamily }
+  | { status: 'success'; rowsExported: number } => {
+  let output: string
+  try {
+    output = callbacks.convertToOutputFormat(formattedRows, table)
+  } catch (error: unknown) {
+    return { status: 'error', error: new OutputConversionError(error) }
+  }
+  let data: Blob
+  try {
+    data = callbacks.convertToBlob(output)
+  } catch (error: unknown) {
+    return { status: 'error', error: new BlobCreationError(error) }
+  }
+  try {
+    callbacks.save(data, table)
+  } catch (error: unknown) {
+    return { status: 'error', error: new DownloadSaveError(error) }
+  }
 
   return {
-    startProgressTracker,
-    trackPercentageProgress,
-    stopTrackerWithError,
-    dismissTrackerSilently,
-    markTrackerComplete,
+    status: 'success',
+    rowsExported: formattedRows.length,
   }
 }
 
@@ -275,26 +210,30 @@ type UseExportAllRowsParams =
       projectRef: string
       connectionString: string | null
       entity: Pick<Entity, 'id' | 'name' | 'type'>
+      /**
+       * If known, the total number of rows that will be exported.
+       * This is used to show progress percentage during export.
+       */
       totalRows?: number
     } & (
       | {
+          /**
+           * Rows need to be fetched from the database.
+           */
           type: 'fetch_all'
           filters?: Filter[]
           sorts?: Sort[]
           roleImpersonationState?: RoleImpersonationState
         }
       | {
+          /**
+           * Rows are already available and provided directly.
+           */
           type: 'provided_rows'
           table: SupaTable
           rows: Record<string, unknown>[]
         }
     ))
-
-type GenericProviders = {
-  convertToOutputFormat: (formattedRows: Record<string, unknown>[], table: SupaTable) => string
-  convertToBlob: (str: string) => Blob
-  save: (blob: Blob, table: SupaTable) => void
-}
 
 type UseExportAllRowsReturn = {
   exportInDesiredFormat: () => Promise<void>
@@ -302,7 +241,7 @@ type UseExportAllRowsReturn = {
 }
 
 export const useExportAllRowsGeneric = (
-  params: UseExportAllRowsParams & GenericProviders
+  params: UseExportAllRowsParams & OutputCallbacks
 ): UseExportAllRowsReturn => {
   const queryClient = useQueryClient()
   const {
@@ -329,13 +268,13 @@ export const useExportAllRowsGeneric = (
         trackPercentage: totalRows !== undefined,
       })
 
-      const rowsResult =
+      const exportResult =
         params.type === 'provided_rows'
-          ? ({
-              status: 'success',
-              table: params.table,
-              rows: params.rows,
-            } as const)
+          ? convertAndDownload(formatRowsForExport(params.rows, params.table), params.table, {
+              convertToOutputFormat,
+              convertToBlob,
+              save,
+            })
           : await fetchAllRows({
               queryClient,
               projectRef: projectRef,
@@ -354,52 +293,37 @@ export const useExportAllRowsGeneric = (
                       value,
                     })
                 : undefined,
+              convertToOutputFormat,
+              convertToBlob,
+              save,
             })
 
-      if (rowsResult.status === 'error') {
+      if (exportResult.status === 'error') {
+        const error = exportResult.error
+        if (error instanceof NoRowsToExportError) {
+          return stopTrackerWithError(
+            entity.id,
+            entity.name,
+            `The table ${entity.name} has no rows to export.`
+          )
+        }
+        if (error instanceof TableTooLargeError) {
+          return stopTrackerWithError(entity.id, entity.name, MAX_EXPORT_ROW_COUNT_MESSAGE)
+        }
+        console.error(
+          `Export All Rows > Error: %s%s%s`,
+          error.message,
+          error.cause?.message ? `\n${error.cause.message}` : '',
+          error.cause?.stack ? `:\n${error.cause.stack}` : ''
+        )
         return stopTrackerWithError(entity.id, entity.name)
       }
 
-      if (rowsResult.status === 'require_confirmation') {
-        return setConfirmationMessage(rowsResult.reason)
+      if (exportResult.status === 'require_confirmation') {
+        return setConfirmationMessage(exportResult.reason)
       }
 
-      const { table, rows } = rowsResult
-      if (rows.length === 0) {
-        return stopTrackerWithError(
-          entity.id,
-          entity.name,
-          `No rows found in ${entity.name} to export`
-        )
-      }
-      const formattedRows = formatRowsForExport(rows)
-
-      let output: string
-      try {
-        output = convertToOutputFormat(formattedRows, table)
-      } catch (error: unknown) {
-        const loggableError = toLoggableError(error)
-        console.error(
-          `Export All Rows > Error converting table rows to CSV: %s\n%s`,
-          loggableError.message,
-          loggableError.stack
-        )
-        return stopTrackerWithError(entity.id, entity.name)
-      }
-      const data = convertToBlob(output)
-      try {
-        save(data, table)
-      } catch (error: unknown) {
-        const loggableError = toLoggableError(error)
-        console.error(
-          `Export All Rows > Error saving CSV file: %s\n%s`,
-          loggableError.message,
-          loggableError.stack
-        )
-        stopTrackerWithError(entity.id, entity.name)
-      }
-
-      markTrackerComplete(entity.id, entity.name, formattedRows.length)
+      markTrackerComplete(entity.id, exportResult.rowsExported)
     }
   )
 
@@ -496,7 +420,7 @@ export const useExportAllRowsAsJson = (
   const { exportInDesiredFormat: exportJson, confirmationModal } = useExportAllRowsGeneric({
     ...params,
     convertToOutputFormat: (formattedRows) => JSON.stringify(formattedRows),
-    convertToBlob: (jsonStr) => new Blob([jsonStr], { type: 'text/sql;charset=utf-8;' }),
+    convertToBlob: (jsonStr) => new Blob([jsonStr], { type: 'application/json;charset=utf-8;' }),
     save: (jsonData, table) => saveAs(jsonData, `${table.name}_rows.json`),
   })
 
