@@ -2290,7 +2290,7 @@ export interface LogDrainSaveButtonClickedEvent {
     /**
      * Type of the destination saved
      */
-    destination: 'webhook' | 'datadog' | 'loki' | 'sentry'
+    destination: 'webhook' | 'datadog' | 'loki' | 'sentry' | 'axiom'
   }
   groups: TelemetryGroups
 }
@@ -2308,7 +2308,7 @@ export interface LogDrainConfirmButtonSubmittedEvent {
     /**
      * Type of the destination confirmed
      */
-    destination: 'webhook' | 'datadog' | 'loki' | 'sentry'
+    destination: 'webhook' | 'datadog' | 'loki' | 'sentry' | 'axiom'
   }
   groups: TelemetryGroups
 }

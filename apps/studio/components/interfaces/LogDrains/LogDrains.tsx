@@ -27,6 +27,7 @@ import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { LogDrainsEmpty } from './LogDrainsEmpty'
 import { LogDrainsCard } from './LogDrainsCard'
 import { VoteLink } from './VoteLink'
+import { useDisabledDrains } from './LogDrains.utils'
 import { useTrack } from 'lib/telemetry/track'
 
 export function LogDrains({
@@ -54,7 +55,8 @@ export function LogDrains({
       enabled: logDrainsEnabled,
     }
   )
-  const sentryEnabled = useFlag('SentryLogDrain')
+
+  const disabledDrains = useDisabledDrains()
   const hasLogDrains = !!logDrains?.length
 
   const { mutate: deleteLogDrain } = useDeleteLogDrainMutation({
@@ -85,7 +87,7 @@ export function LogDrains({
     return (
       <>
         <div className="grid lg:grid-cols-2 gap-4">
-          {LOG_DRAIN_TYPES.filter((t) => t.value !== 'sentry' || sentryEnabled).map((src) => (
+          {LOG_DRAIN_TYPES.filter((t) => !disabledDrains.has(t.value)).map((src) => (
             <LogDrainsCard
               key={src.value}
               title={src.name}
