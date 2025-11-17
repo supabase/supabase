@@ -1,5 +1,6 @@
-import { ChevronRight, Info, Loader2, Plus, RefreshCw } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { ChevronRight, Database, FileText, Info, Loader2, Plus, RefreshCw } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useParams } from 'common'
 import type { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
@@ -28,6 +29,176 @@ import {
 import { getNamespaceTableNameFromPostgresTableName } from '../AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketAssociatedEntities } from '../useAnalyticsBucketAssociatedEntities'
 import { TableRowComponent } from './TableRowComponent'
+
+// Simple Schema Flow Diagram Component
+interface SchemaFlowDiagramProps {
+  sourceLabel: string
+  sourceType: 'analytics' | 'postgres'
+  targetLabel: string
+  isPending: boolean
+}
+
+const SchemaFlowDiagram = ({
+  sourceLabel,
+  sourceType,
+  targetLabel,
+  isPending,
+}: SchemaFlowDiagramProps) => {
+  const { resolvedTheme } = useTheme()
+  const containerRef = useRef<HTMLDivElement>(null)
+  const sourceRef = useRef<HTMLDivElement>(null)
+  const targetRef = useRef<HTMLDivElement>(null)
+  const [pathData, setPathData] = useState<string>('')
+
+  // Calculate dot color based on theme
+  const dotColor = useMemo(
+    () => (resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'),
+    [resolvedTheme]
+  )
+
+  useEffect(() => {
+    const updatePath = () => {
+      if (!containerRef.current || !sourceRef.current || !targetRef.current) return
+
+      const containerRect = containerRef.current.getBoundingClientRect()
+      const sourceRect = sourceRef.current.getBoundingClientRect()
+      const targetRect = targetRef.current.getBoundingClientRect()
+
+      const sourceX = sourceRect.right - containerRect.left
+      const sourceY = sourceRect.top + sourceRect.height / 2 - containerRect.top
+      const targetX = targetRect.left - containerRect.left
+      const targetY = targetRect.top + targetRect.height / 2 - containerRect.top
+
+      const midX = (sourceX + targetX) / 2
+      const controlY = Math.min(sourceY, targetY) - 20
+
+      // Create a smooth curved path with a quadratic bezier for a U-shape
+      const path = `M ${sourceX} ${sourceY} Q ${midX} ${controlY}, ${targetX} ${targetY}`
+
+      setPathData(path)
+    }
+
+    // Small delay to ensure layout is ready
+    const timeoutId = setTimeout(updatePath, 0)
+    window.addEventListener('resize', updatePath)
+    return () => {
+      clearTimeout(timeoutId)
+      window.removeEventListener('resize', updatePath)
+    }
+  }, [sourceLabel, targetLabel])
+
+  // Create dotted background pattern
+  const dotPattern = useMemo(() => {
+    const radius = 1
+    return `radial-gradient(circle, ${dotColor} ${radius}px, transparent ${radius}px)`
+  }, [dotColor])
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative flex items-center justify-between h-[80px] border-b px-8"
+      role="img"
+      aria-label={`Schema flow diagram showing ${sourceLabel} ${sourceType} schema connecting to ${targetLabel} Postgres schema`}
+    >
+      {/* Dotted Background Pattern */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: dotPattern,
+          backgroundSize: '16px 16px',
+          backgroundPosition: '0 0',
+          opacity: 0.2,
+        }}
+        aria-hidden="true"
+      />
+      {/* Source Node */}
+      <div
+        ref={sourceRef}
+        className="flex items-center gap-x-3 rounded bg-surface-100 border border-default px-3 py-2 z-10 shrink-0"
+        role="group"
+        aria-label={`Source: ${sourceLabel} ${sourceType} schema`}
+      >
+        <div
+          className={`w-8 h-8 border rounded-md flex items-center justify-center ${
+            sourceType === 'analytics'
+              ? 'bg-blue-600 border-blue-800'
+              : 'bg-brand-500 border-brand-600'
+          }`}
+          aria-hidden="true"
+        >
+          {sourceType === 'analytics' ? (
+            <FileText size={16} className="text-white" />
+          ) : (
+            <Database size={16} className="text-white" />
+          )}
+        </div>
+        <div className="flex flex-col gap-y-0.5">
+          <p className="text-sm text-foreground">{sourceLabel}</p>
+          <p className="text-sm text-foreground-light">
+            {sourceType === 'analytics' ? 'Analytics' : 'Postgres'} schema
+          </p>
+        </div>
+      </div>
+
+      {/* SVG Path for Curved Dashed Line */}
+      {pathData && (
+        <svg
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{ overflow: 'visible' }}
+          aria-hidden="true"
+        >
+          <defs>
+            <style>
+              {`
+                .animated-dash {
+                  stroke-dasharray: 5, 5;
+                  animation: dash 1.5s linear infinite;
+                }
+                @keyframes dash {
+                  to {
+                    stroke-dashoffset: -10;
+                  }
+                }
+              `}
+            </style>
+          </defs>
+          <path
+            d={pathData}
+            fill="none"
+            stroke="hsl(var(--border-stronger))"
+            strokeWidth="1.5"
+            className="animated-dash"
+          />
+        </svg>
+      )}
+
+      {/* Target Node */}
+      <div
+        ref={targetRef}
+        className="flex items-center gap-x-3 rounded bg-surface-100 border border-default px-3 py-2 z-10 shrink-0"
+        role="group"
+        aria-label={`Target: ${targetLabel} Postgres schema${isPending ? ' that will be created' : ''}`}
+      >
+        <div
+          className={`w-8 h-8 border rounded-md flex items-center justify-center ${
+            isPending ? 'bg-surface-100 border-foreground/20' : 'bg-brand-500 border-brand-600'
+          }`}
+          aria-hidden="true"
+        >
+          <Database size={16} className={isPending ? 'text-foreground-light' : 'text-white'} />
+        </div>
+        <div className="flex flex-col gap-y-0.5">
+          <p className={`text-sm ${isPending ? 'text-foreground-muted' : 'text-foreground'}`}>
+            {targetLabel}
+          </p>
+          <p className="text-xs text-foreground-light">
+            Postgres schema{isPending && ' that will be created'}
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 type NamespaceWithTablesProps = {
   bucketName?: string
@@ -159,6 +330,14 @@ export const NamespaceWithTables = ({
 
   return (
     <Card>
+      {validSchema && (
+        <SchemaFlowDiagram
+          sourceLabel={sourceType === 'direct' ? namespace : 'public'}
+          sourceType={sourceType === 'direct' ? 'analytics' : 'postgres'}
+          targetLabel={displaySchema}
+          isPending={tables.length === 0}
+        />
+      )}
       <CardHeader className="flex flex-row justify-between items-center px-4 py-5 space-y-0">
         <CardTitle className="text-sm font-normal font-sans normal-case leading-none flex flex-row items-center gap-x-1">
           <Tooltip>
