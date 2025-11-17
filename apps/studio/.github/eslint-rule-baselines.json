@@ -1,6 +1,6 @@
 {
   "rules": {
-    "react-hooks/exhaustive-deps": 237,
+    "react-hooks/exhaustive-deps": 236,
     "import/no-anonymous-default-export": 62,
     "@tanstack/query/exhaustive-deps": 19,
     "@tanstack/query/no-deprecated-options": 2
@@ -16,7 +16,7 @@
       "components/grid/hooks/useTableSort.ts": 1,
       "components/interfaces/Account/TOTPFactors/AddNewFactorModal.tsx": 1,
       "components/interfaces/Advisors/CreateRuleSheet.tsx": 1,
-      "components/interfaces/App/CommandMenu/ApiKeys.tsx": 1,
+      "components/interfaces/App/FeaturePreview/FeaturePreviewContext.tsx": 1,
       "components/interfaces/App/RouteValidationWrapper.tsx": 2,
       "components/interfaces/Auth/AdvancedAuthSettingsForm.tsx": 1,
       "components/interfaces/Auth/AuditLogsForm.tsx": 1,
@@ -171,7 +171,6 @@
       "pages/project/[ref]/integrations/[id]/[pageId]/index.tsx": 1,
       "pages/project/[ref]/logs/explorer/index.tsx": 1,
       "pages/project/[ref]/reports/postgrest.tsx": 1,
-      "pages/project/[ref]/reports/realtime.tsx": 1,
       "pages/project/[ref]/settings/jwt/index.tsx": 1,
       "pages/project/[ref]/sql/quickstarts.tsx": 1,
       "pages/project/[ref]/sql/templates.tsx": 1,
