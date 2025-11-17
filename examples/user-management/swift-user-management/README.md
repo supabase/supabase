@@ -1,6 +1,6 @@
 # Supabase Swift User Management
 
-This repo is a quick sample of how you can get started building apps using Swift and Supabase. You can find a step by step guide of how to build out this app in the [Quickstart: Swift guide](https://supabase.io/docs/guides/with-swift).
+This repo is a quick sample of how you can get started building apps using Swift and Supabase. You can find a step by step guide of how to build out this app in the [Quickstart: Swift guide](https://supabase.com/docs/guides/getting-started/quickstarts/ios-swiftui).
 
 This repo will demonstrate how to:
 
