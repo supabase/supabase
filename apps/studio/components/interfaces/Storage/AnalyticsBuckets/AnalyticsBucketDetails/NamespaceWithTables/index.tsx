@@ -95,6 +95,28 @@ interface SchemaFlowDiagramProps {
   isPending: boolean
 }
 
+// Shared constants for SVG styling
+const SVG_STROKE_COLOR = 'hsl(var(--foreground-muted))'
+const SVG_STROKE_WIDTH = '1.25'
+const SVG_CIRCLE_RADIUS = 3
+const SVG_DASH_ARRAY = '5, 5'
+
+// Shared CSS styles for animated/static dashed lines
+const dashedLineStyles = `
+  .schema-flow-animated-dash {
+    stroke-dasharray: ${SVG_DASH_ARRAY};
+    animation: schema-flow-dash 1s linear infinite;
+  }
+  .schema-flow-static-dash {
+    stroke-dasharray: ${SVG_DASH_ARRAY};
+  }
+  @keyframes schema-flow-dash {
+    to {
+      stroke-dashoffset: -10;
+    }
+  }
+`
+
 const SchemaFlowDiagram = ({
   sourceLabel,
   sourceType,
@@ -162,6 +184,8 @@ const SchemaFlowDiagram = ({
       role="img"
       aria-label={`Schema flow diagram showing ${sourceLabel} ${sourceType} schema connecting to ${targetLabel} Postgres schema`}
     >
+      {/* Shared styles for dashed lines */}
+      <style>{dashedLineStyles}</style>
       {/* Dotted Background Pattern */}
       <div
         className="absolute inset-0 pointer-events-none"
@@ -209,40 +233,22 @@ const SchemaFlowDiagram = ({
           preserveAspectRatio="none"
           aria-hidden="true"
         >
-          <defs>
-            <style>
-              {`
-                .animated-dash {
-                  stroke-dasharray: 5, 5;
-                  animation: dash 1.5s linear infinite;
-                }
-                .static-dash {
-                  stroke-dasharray: 5, 5;
-                }
-                @keyframes dash {
-                  to {
-                    stroke-dashoffset: -10;
-                  }
-                }
-              `}
-            </style>
-          </defs>
           {/* Straight vertical line - uses viewBox coordinates */}
           <path
             d={`M 0.5 0 L 0.5 ${verticalLinePosition.height}`}
             fill="none"
-            stroke="hsl(var(--foreground-muted))"
-            strokeWidth="1.25"
-            className={isPending ? 'static-dash' : 'animated-dash'}
+            stroke={SVG_STROKE_COLOR}
+            strokeWidth={SVG_STROKE_WIDTH}
+            className={isPending ? 'schema-flow-static-dash' : 'schema-flow-animated-dash'}
           />
           {/* Dot at start */}
-          <circle cx="0.5" cy="0" r="3" fill="hsl(var(--foreground-muted))" />
+          <circle cx="0.5" cy="0" r={SVG_CIRCLE_RADIUS} fill={SVG_STROKE_COLOR} />
           {/* Dot at end */}
           <circle
             cx="0.5"
             cy={verticalLinePosition.height}
-            r="3"
-            fill="hsl(var(--foreground-muted))"
+            r={SVG_CIRCLE_RADIUS}
+            fill={SVG_STROKE_COLOR}
           />
         </svg>
       )}
@@ -261,36 +267,18 @@ const SchemaFlowDiagram = ({
           }}
           aria-hidden="true"
         >
-          <defs>
-            <style>
-              {`
-                .animated-dash {
-                  stroke-dasharray: 5, 5;
-                  animation: dash 1.5s linear infinite;
-                }
-                .static-dash {
-                  stroke-dasharray: 5, 5;
-                }
-                @keyframes dash {
-                  to {
-                    stroke-dashoffset: -10;
-                  }
-                }
-              `}
-            </style>
-          </defs>
           {/* Straight horizontal line */}
           <path
             d="M 0 0 L 96 0"
             fill="none"
-            stroke="hsl(var(--foreground-muted))"
-            strokeWidth="1.25"
-            className={isPending ? 'static-dash' : 'animated-dash'}
+            stroke={SVG_STROKE_COLOR}
+            strokeWidth={SVG_STROKE_WIDTH}
+            className={isPending ? 'schema-flow-static-dash' : 'schema-flow-animated-dash'}
           />
           {/* Dot at start */}
-          <circle cx="0" cy="0" r="3" fill="hsl(var(--foreground-muted))" />
+          <circle cx="0" cy="0" r={SVG_CIRCLE_RADIUS} fill={SVG_STROKE_COLOR} />
           {/* Dot at end */}
-          <circle cx="96" cy="0" r="3" fill="hsl(var(--foreground-muted))" />
+          <circle cx="96" cy="0" r={SVG_CIRCLE_RADIUS} fill={SVG_STROKE_COLOR} />
         </svg>
       )}
 
@@ -499,45 +487,43 @@ export const NamespaceWithTables = ({
         visible={importForeignSchemaShown}
         onClose={() => setImportForeignSchemaShown(false)}
       />
-      {pollIntervalNamespaceTables > 0 ||
-        (missingTables.length > 0 && (
-          <CardFooter className="border-t px-4 py-4 flex flex-row justify-end gap-x-4">
-            <p className="text-sm text-foreground-lighter">Hello world</p>
-            {pollIntervalNamespaceTables > 0 && (
-              <Tooltip>
-                <TooltipTrigger>
-                  <div className="flex items-center gap-x-2 text-foreground-lighter">
-                    <Loader2 size={14} className="animate-spin" />
-                    <p className="text-sm">
-                      Connecting {publicationTablesNotSyncedToNamespaceTables.length} table
-                      {publicationTablesNotSyncedToNamespaceTables.length > 1 ? 's' : ''}
-                    </p>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" align="end">
-                  <p className="mb-1">Waiting for namespace table to be created for:</p>
-                  <ul className="list-disc pl-6">
-                    {publicationTablesNotSyncedToNamespaceTables.map((x) => {
-                      const value = `${x.schema}.${x.name}`
-                      return <li key={value}>{value}</li>
-                    })}
-                  </ul>
-                </TooltipContent>
-              </Tooltip>
-            )}
-            {missingTables.length > 0 && (
-              <Button
-                type={schema ? 'default' : 'warning'}
-                size="tiny"
-                icon={schema ? <RefreshCw /> : <Plus size={14} />}
-                onClick={() => (schema ? rescanNamespace() : setImportForeignSchemaShown(true))}
-                loading={isImportingForeignSchema || isLoadingNamespaceTables}
-              >
-                {schema ? 'Sync tables' : `Connect to table${missingTables.length > 1 ? 's' : ''}`}
-              </Button>
-            )}
-          </CardFooter>
-        ))}
+      {(pollIntervalNamespaceTables > 0 || missingTables.length > 0) && (
+        <CardFooter className="border-t px-4 py-4 flex flex-row justify-end gap-x-4">
+          {pollIntervalNamespaceTables > 0 && (
+            <Tooltip>
+              <TooltipTrigger>
+                <div className="flex items-center gap-x-2 text-foreground-lighter">
+                  <Loader2 size={14} className="animate-spin" />
+                  <p className="text-sm">
+                    Connecting {publicationTablesNotSyncedToNamespaceTables.length} table
+                    {publicationTablesNotSyncedToNamespaceTables.length > 1 ? 's' : ''}
+                  </p>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" align="end">
+                <p className="mb-1">Waiting for namespace table to be created for:</p>
+                <ul className="list-disc pl-6">
+                  {publicationTablesNotSyncedToNamespaceTables.map((x) => {
+                    const value = `${x.schema}.${x.name}`
+                    return <li key={value}>{value}</li>
+                  })}
+                </ul>
+              </TooltipContent>
+            </Tooltip>
+          )}
+          {missingTables.length > 0 && (
+            <Button
+              type={schema ? 'default' : 'warning'}
+              size="tiny"
+              icon={schema ? <RefreshCw /> : <Plus size={14} />}
+              onClick={() => (schema ? rescanNamespace() : setImportForeignSchemaShown(true))}
+              loading={isImportingForeignSchema || isLoadingNamespaceTables}
+            >
+              {schema ? 'Sync tables' : `Connect to table${missingTables.length > 1 ? 's' : ''}`}
+            </Button>
+          )}
+        </CardFooter>
+      )}
     </Card>
   )
 }
