@@ -17,19 +17,18 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
 import type { VaultSecret } from 'types'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import EditSecretModal from './EditSecretModal'
 import { SecretTableColumn } from './Secrets.types'
 
 interface SecretRowProps {
   row: VaultSecret
   col: SecretTableColumn
+  onSelectEdit: (secret: VaultSecret) => void
   onSelectRemove: (secret: VaultSecret) => void
 }
 
-const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
+const SecretRow = ({ row, col, onSelectEdit, onSelectRemove }: SecretRowProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const [modal, setModal] = useState<string | null>(null)
   const [revealSecret, setRevealSecret] = useState(false)
   const name = row?.name ?? 'No name provided'
 
@@ -49,8 +48,6 @@ const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
     }
   )
 
-  const onCloseModal = () => setModal(null)
-
   if (col.id === 'actions') {
     return (
       <div className="flex items-center justify-end w-full" onClick={(e) => e.stopPropagation()}>
@@ -62,7 +59,7 @@ const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
             <DropdownMenuItemTooltip
               className="gap-x-2"
               disabled={!canManageSecrets}
-              onClick={() => setModal(`edit`)}
+              onClick={() => onSelectEdit(row)}
               tooltip={{
                 content: { side: 'left', text: 'You need additional permissions to edit secrets' },
               }}
@@ -89,8 +86,6 @@ const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
             </DropdownMenuItemTooltip>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        <EditSecretModal visible={modal === `edit`} secret={row} onClose={onCloseModal} />
       </div>
     )
   }

@@ -14,8 +14,10 @@ export const SECRET_TABLE_COLUMNS: SecretTableColumn[] = [
 ]
 
 export const formatSecretColumns = ({
+  onSelectEdit,
   onSelectRemove,
 }: {
+  onSelectEdit: (secret: VaultSecret) => void
   onSelectRemove: (secret: VaultSecret) => void
 }): Column<VaultSecret>[] => {
   return SECRET_TABLE_COLUMNS.map((col) => {
@@ -41,7 +43,14 @@ export const formatSecretColumns = ({
           </div>
         )
       },
-      renderCell: ({ row }) => <SecretRow row={row} col={col} onSelectRemove={onSelectRemove} />,
+      renderCell: ({ row }) => (
+        <SecretRow
+          row={row}
+          col={col}
+          onSelectEdit={onSelectEdit}
+          onSelectRemove={onSelectRemove}
+        />
+      ),
     }
     return result
   })
