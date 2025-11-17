@@ -1,7 +1,7 @@
 import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
 import React, { useState } from 'react'
 import { toast } from 'sonner'
-import { useFlag, useParams } from 'common'
+import { useFlag, useParams, IS_PLATFORM } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
@@ -91,7 +91,7 @@ export function LogDrains({
               title={src.name}
               description={src.description}
               icon={src.icon}
-              rightLabel="Additional $60"
+              rightLabel={IS_PLATFORM ? 'Additional $60' : undefined}
               onClick={() => {
                 onNewDrainClick(src.value)
               }}
