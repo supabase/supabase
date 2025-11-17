@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { AnimatedLogos } from './AnimatedLogos'
 import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { VoteLink } from './VoteLink'
+import { IS_PLATFORM } from 'common'
 
 export const LogDrainsEmpty = () => {
   const items = [
@@ -22,7 +23,7 @@ export const LogDrainsEmpty = () => {
       label: 'Read our documentation',
       link: 'https://supabase.com/docs/guides/telemetry/log-drains',
     },
-  ]
+  ].filter((item) => IS_PLATFORM && item.title !== 'Pricing')
 
   return (
     <div className="flex grow h-full">
