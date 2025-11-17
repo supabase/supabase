@@ -92,7 +92,7 @@ You can also manage publications through the Dashboard by toggling **Source** fo
 
 Before adding destinations, you need to enable ETL replication for your project:
 
-1. Navigate to the [Database](/dashboard/project/_/database/replication) section in your Supabase Dashboard
+1. Navigate to the [Database](/dashboard/project/_/database/etl) section in your Supabase Dashboard
 2. Select the **ETL Replication** tab
 3. Click **Enable replication** to activate ETL replication for your project
 
@@ -147,6 +147,24 @@ After creating a destination, the pipeline will start and appear in the destinat
 
 For comprehensive monitoring instructions including pipeline states, metrics, and logs, see the [ETL Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring).
 
+## Managing your pipeline
+
+You can manage your pipeline from the destinations list using the actions menu.
+
+<Image
+  alt="Pipeline Actions"
+  src="/docs/img/database/replication/etl-pipeline-actions.png"
+  zoomable
+/>
+
+Available actions:
+
+- **Start**: Begin replication for a stopped pipeline
+- **Stop**: Pause replication (changes will queue up in the WAL)
+- **Restart**: Stop and start the pipeline (required after publication changes)
+- **Edit destination**: Modify destination settings like credentials or advanced options
+- **Delete**: Remove the destination and permanently stop replication
+
 ## Adding or removing tables
 
 If you need to modify which tables are replicated after your ETL pipeline is already running, follow these steps:
@@ -169,7 +187,7 @@ If your publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, new tables 
    alter publication pub_users_orders add table products, categories;
    ```
 
-2. **Restart the ETL pipeline** from the destinations list by stopping and starting the destination for the changes to take effect.
+2. **Restart the ETL pipeline** using the actions menu (see [Managing your pipeline](#managing-your-pipeline)) for the changes to take effect.
 
 ### Removing tables from replication
 
@@ -183,7 +201,7 @@ If your publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, new tables 
    alter publication pub_users_orders drop table orders, products;
    ```
 
-2. **Restart the ETL pipeline** from the destinations list by stopping and starting the destination for the changes to take effect.
+2. **Restart the ETL pipeline** using the actions menu (see [Managing your pipeline](#managing-your-pipeline)) for the changes to take effect.
 
 ## How it works
 

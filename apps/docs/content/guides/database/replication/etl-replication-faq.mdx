@@ -41,7 +41,7 @@ Table errors occur during the copy phase. To recover, click **View status**, fin
 
 # How do I know if replication is working?
 
-Check the [Database](/dashboard/project/_/database/replication) → **ETL Replication** page:
+Check the [Database](/dashboard/project/_/database/etl) → **ETL Replication** page:
 
 1. Verify your pipeline shows **Running** status
 2. Click **View status** to check table states
@@ -63,7 +63,7 @@ Destination-specific limitations may also apply. See the [BigQuery](/docs/guides
 
 # How do I stop or pause replication?
 
-You can stop or start your pipeline from the destinations list in the [ETL Replication dashboard](/dashboard/project/_/database/replication).
+You can manage your pipeline using the actions menu in the destinations list. See [Managing your pipeline](/docs/guides/database/replication/etl-replication-setup#managing-your-pipeline) for details on available actions.
 
 Note: Stopping replication will cause changes to queue up in the WAL.
 
