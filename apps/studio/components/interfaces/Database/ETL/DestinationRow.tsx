@@ -81,7 +81,7 @@ export const DestinationRow = ({
   const pipelineStatus = pipelineStatusData?.status
   const statusName = getStatusName(pipelineStatus)
 
-  // Fetch table-level streaming status to surface errors in list view
+  // Fetch table-level replication status to surface errors in list view
   const { data: replicationStatusData } = useReplicationPipelineReplicationStatusQuery(
     { projectRef, pipelineId: pipeline?.id },
     { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
@@ -185,7 +185,7 @@ export const DestinationRow = ({
                           <AlertCircle size={14} />
                         </TooltipTrigger>
                         <TooltipContent side="bottom">
-                          {errorCount} table{errorCount === 1 ? '' : 's'} encountered streaming errors
+                          {errorCount} table{errorCount === 1 ? '' : 's'} encountered replication errors
                         </TooltipContent>
                       </Tooltip>
                     )}

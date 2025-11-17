@@ -87,7 +87,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
                 <div>
                   <SheetTitle>New Publication</SheetTitle>
                   <SheetDescription>
-                    Create a new publication to stream table changes to destinations
+                    Create a new publication to replicate table changes to destinations
                   </SheetDescription>
                 </div>
                 <SheetClose
@@ -126,7 +126,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
                     render={({ field }) => (
                       <FormItemLayout
                         label="Tables"
-                        description="Which tables to stream to destinations"
+                        description="Which tables to replicate to destinations"
                       >
                         <FormControl_Shadcn_>
                           <MultiSelector

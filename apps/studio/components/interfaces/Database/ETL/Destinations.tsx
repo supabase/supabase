@@ -129,9 +129,9 @@ export const Destinations = () => {
         ) : replicationNotEnabled ? (
           <div className="border rounded-md p-4 md:p-12 flex flex-col gap-y-4">
             <div className="flex flex-col gap-y-1">
-              <h3>Stream data to external destinations in real-time</h3>
+              <h3>Replicate data to external destinations in real-time</h3>
               <p className="text-sm text-foreground-light">
-                Enable ETL replication to start streaming your database changes to data warehouses and
+                Enable ETL replication to start replicating your database changes to data warehouses and
                 analytics platforms
               </p>
             </div>
