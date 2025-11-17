@@ -4,8 +4,9 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationDeleteMutation } from 'data/organizations/organization-delete-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, Form, Input, Modal } from 'ui'
@@ -23,7 +24,11 @@ export const DeleteOrganizationButton = () => {
     ''
   )
 
-  const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const { can: canDeleteOrganization } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'organizations'
+  )
+
   const { mutate: deleteOrganization, isLoading: isDeleting } = useOrganizationDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted ${orgName}`)
@@ -55,9 +60,22 @@ export const DeleteOrganizationButton = () => {
   return (
     <>
       <div className="mt-2">
-        <Button loading={!orgSlug} onClick={() => setIsOpen(true)} type="danger">
+        <ButtonTooltip
+          type="danger"
+          disabled={!canDeleteOrganization}
+          loading={!orgSlug}
+          onClick={() => setIsOpen(true)}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !canDeleteOrganization
+                ? 'You need additional permissions to delete this organization'
+                : undefined,
+            },
+          }}
+        >
           Delete organization
-        </Button>
+        </ButtonTooltip>
       </div>
       <Modal
         hideFooter

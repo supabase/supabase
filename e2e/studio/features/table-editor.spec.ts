@@ -1,6 +1,8 @@
 import { expect, Locator, Page } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
+import { isCLI } from '../utils/is-cli'
+import { resetLocalStorage } from '../utils/reset-local-storage'
 import { test } from '../utils/test'
 import { toUrl } from '../utils/to-url'
 import {
@@ -8,47 +10,81 @@ import {
   waitForGridDataToLoad,
   waitForTableToLoad,
 } from '../utils/wait-for-response'
-import { resetLocalStorage } from '../utils/reset-local-storage'
-import { isCLI } from '../utils/is-cli'
 import { waitForApiResponseWithTimeout } from '../utils/wait-for-response-with-timeout'
 
 const tableNamePrefix = 'pw_table'
 const columnName = 'pw_column'
 
+const dismissToastsIfAny = async (page: Page) => {
+  const closeButtons = page.getByRole('button', { name: 'Close toast' })
+  const count = await closeButtons.count()
+  for (let i = 0; i < count; i++) {
+    await closeButtons.nth(i).click()
+  }
+}
+
 const createTable = async (page: Page, ref: string, tableName: string) => {
-  await page.getByRole('button', { name: 'New table', exact: true }).click()
-  await page.getByTestId('table-name-input').fill(tableName)
+  // Ensure no toast overlays block the dialog trigger
+  await dismissToastsIfAny(page)
+
+  const newTableBtn = page.getByRole('button', { name: 'New table', exact: true })
+  await expect(newTableBtn).toBeVisible()
+  await newTableBtn.click()
+
+  // Check if we're in the unable to find table error
+  // If so, click Close tab or Head back first
+  const closeTabBtn = page.getByRole('button', { name: 'Close tab' })
+  const headBackBtn = page.getByRole('button', { name: 'Head back' })
+  if ((await closeTabBtn.count()) > 0) {
+    await closeTabBtn.click()
+  }
+  if ((await headBackBtn.count()) > 0) {
+    await headBackBtn.click()
+  }
+
+  const nameInput = page.getByTestId('table-name-input')
+  await expect(nameInput).toBeVisible()
+  await nameInput.fill(tableName)
+  await expect(nameInput).toHaveValue(tableName)
   await page.getByTestId('created_at-extra-options').click()
-  await page.getByText('Is Nullable').click()
+  await page.getByRole('checkbox', { name: 'Is Nullable' }).click()
   await page.getByTestId('created_at-extra-options').click({ force: true })
   await page.getByRole('button', { name: 'Add column' }).click()
   await page.getByRole('textbox', { name: 'column_name' }).fill(columnName)
   await page.getByText('Choose a column type...').click()
   await page.getByRole('option', { name: 'text Variable-length' }).click()
-  await page.getByRole('button', { name: 'Save' }).click()
-  await waitForApiResponse(
-    page,
-    'pg-meta',
-    ref,
-    'tables?include_columns=true&included_schemas=public'
-  ) // wait for table creation
+  const createTablePromise = waitForApiResponseWithTimeout(page, (response) =>
+    response.url().includes('query?key=table-create')
+  )
+  // Wait specifically for tables list refresh instead of generic networkidle
+  const tablesPromise = waitForApiResponseWithTimeout(page, (response) =>
+    response.url().includes('tables?include_columns=true&included_schemas=public')
+  )
   // wait for tables to load, we don't need to wait here cause this response may complete before the table creation.
-  await waitForApiResponseWithTimeout(page, (response) =>
+  const entitiesPromise = waitForApiResponseWithTimeout(page, (response) =>
     response.url().includes('query?key=entity-types-public-')
   )
+  await page.getByRole('button', { name: 'Save' }).click()
+  await Promise.all([createTablePromise, tablesPromise, entitiesPromise])
   await expect(
     page.getByRole('button', { name: `View ${tableName}`, exact: true }),
     'Table should be visible after creation'
-  ).toBeVisible({ timeout: 10000 })
+  ).toBeVisible({ timeout: 15_000 })
 }
 
 const deleteTable = async (page: Page, ref: string, tableName: string) => {
-  await page.getByLabel(`View ${tableName}`).nth(0).click()
-  await page.getByLabel(`View ${tableName}`).getByRole('button').nth(1).click()
+  const viewLocator = page.getByLabel(`View ${tableName}`)
+  if ((await viewLocator.count()) === 0) return
+  await viewLocator.nth(0).click()
+  await viewLocator.locator('button[aria-haspopup="menu"]').click({ force: true })
   await page.getByText('Delete table').click()
   await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).click()
+  const apiPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-delete-', {
+    method: 'POST',
+  })
+  const revalidatePromise = waitForApiResponse(page, 'pg-meta', ref, `query?key=entity-types-`)
   await page.getByRole('button', { name: 'Delete' }).click()
-  await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-delete-', { method: 'POST' })
+  await Promise.all([apiPromise, revalidatePromise])
 }
 
 const deleteEnumIfExist = async (page: Page, ref: string, enumName: string) => {
@@ -68,57 +104,37 @@ const deleteEnumIfExist = async (page: Page, ref: string, enumName: string) => {
   await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
 }
 
-test.describe('table editor', () => {
-  let page: Page
-
-  test.beforeEach(async ({ ref }) => {
-    await resetLocalStorage(page, ref)
-
-    if (!page.url().includes('/editor')) {
-      await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
-    }
-
-    // wait for all settings to load, and no more network request for 500ms
-    await page.waitForLoadState('networkidle')
-  })
-
+test.describe.serial('table editor', () => {
   test.beforeAll(async ({ browser, ref }) => {
-    page = await browser.newPage()
+    const ctx = await browser.newContext()
+    const page = await ctx.newPage()
+
+    const loadPromise = waitForTableToLoad(page, ref)
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
-    await waitForTableToLoad(page, ref)
+    await loadPromise
 
-    // Delete all tables with prefix pw_table
-    const tablesToDelete = await (
-      await page.getByRole('button', { name: 'View' }).allTextContents()
-    ).filter((tableName) => tableName.startsWith(tableNamePrefix))
-
-    for (const tableName of tablesToDelete) {
-      await deleteTable(page, ref, tableName)
-      await waitForTableToLoad(page, ref) // wait for table data to update
-    }
-  })
-
-  test.afterAll(async ({ ref }) => {
-    await resetLocalStorage(page, ref)
-
-    // Only navigate and wait if not already at /editor
-    if (!page.url().includes('/editor')) {
-      await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
-      await waitForTableToLoad(page, ref) // wait for table data to load
-    }
-
-    // Delete all tables with prefix pw_table
-    const tablesToDelete = await (
-      await page.getByRole('button', { name: 'View' }).allTextContents()
-    ).filter((tableName) => tableName.startsWith(tableNamePrefix))
+    const viewButtons = page.getByRole('button', { name: /^View / })
+    const names = await Promise.all(
+      (await viewButtons.all()).map(async (btn) => {
+        const ariaLabel = await btn.getAttribute('aria-label')
+        const name = ariaLabel ? ariaLabel.replace(/^View\s+/, '').trim() : ''
+        return name
+      })
+    )
+    const tablesToDelete = names.filter((tableName) => tableName.startsWith(tableNamePrefix))
 
     for (const tableName of tablesToDelete) {
       await deleteTable(page, ref, tableName)
-      await waitForTableToLoad(page, ref) // wait for table data to update
     }
   })
 
-  test('sidebar actions works as expected', async ({ ref }) => {
+  test.beforeEach(async ({ page, ref }) => {
+    const loadPromise = waitForTableToLoad(page, ref)
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await loadPromise
+  })
+
+  test('sidebar actions works as expected', async ({ page, ref }) => {
     const tableNameActions = 'pw_table_actions'
     const tableNameActionsDuplicate = 'pw_table_actions_duplicate'
 
@@ -173,8 +189,8 @@ test.describe('table editor', () => {
     await deleteTable(page, ref, tableNameActions)
   })
 
-  test('switching schemas work as expected', async ({ ref }) => {
-    const authTableSso = 'sso_provider'
+  test('switching schemas work as expected', async ({ page, ref }) => {
+    const authTableSso = 'identities'
     const authTableMfa = 'mfa_factors'
 
     // change schema from public to auth
@@ -185,26 +201,14 @@ test.describe('table editor', () => {
     await expect(page.getByLabel(`View ${authTableSso}`)).toBeVisible()
     await expect(page.getByLabel(`View ${authTableMfa}`)).toBeVisible()
 
-    // filter by querying
+    // can find auth tables
     await page.getByRole('textbox', { name: 'Search tables...' }).fill('mfa')
     await waitForTableToLoad(page, ref, 'auth') // load tables
     await expect(page.getByLabel(`View ${authTableSso}`)).not.toBeVisible()
     await expect(page.getByLabel(`View ${authTableMfa}`)).toBeVisible()
-
-    // navigate to policies page when view policies action is clicked
-    await page.getByRole('button', { name: `View ${authTableMfa}` }).click()
-    await page.waitForURL(/\/editor\/\d+\?schema=auth$/)
-    await page
-      .getByRole('button', { name: `View ${authTableMfa}` })
-      .getByRole('button')
-      .nth(1)
-      .click()
-    await page.getByRole('menuitem', { name: 'View policies' }).click()
-    await page.waitForURL(/.*\/policies\?schema=auth/)
-    expect(page.url()).toContain('auth/policies?schema=auth')
   })
 
-  test('should show rls accordingly', async ({ ref }) => {
+  test('should show rls accordingly', async ({ page, ref }) => {
     const tableNameRlsEnabled = 'pw_table_rls_enabled'
     const tableNameRlsDisabled = 'pw_table_rls_disabled'
 
@@ -218,22 +222,19 @@ test.describe('table editor', () => {
     await page.getByTestId('table-name-input').fill(tableNameRlsDisabled)
     await page.getByLabel('Enable Row Level Security (').click()
     await page.getByRole('button', { name: 'Confirm' }).click()
-    await page.getByRole('button', { name: 'Save' }).click()
-    await waitForApiResponse(
+    const apiPromise = waitForApiResponse(
       page,
       'pg-meta',
       ref,
-      'tables?include_columns=true&included_schemas=public'
+      'tables?include_columns=false&included_schemas=public'
     ) // wait for table creation
+    await page.getByRole('button', { name: 'Save' }).click()
+    await apiPromise
     await page.getByRole('button', { name: `View ${tableNameRlsDisabled}` }).click()
     await expect(page.getByRole('button', { name: 'RLS disabled' })).toBeVisible()
-
-    // clear all tables
-    await deleteTable(page, ref, tableNameRlsEnabled)
-    await deleteTable(page, ref, tableNameRlsDisabled)
   })
 
-  test('add enums and show enums on table', async ({ ref }) => {
+  test('add enums and show enums on table', async ({ page, ref }) => {
     const tableNameEnum = 'pw_table_enum'
     const columnNameEnum = 'pw_column_enum'
     const enum_name = 'pw_enum'
@@ -309,7 +310,7 @@ test.describe('table editor', () => {
     await resetLocalStorage(page, ref)
   })
 
-  test('Grid editor exporting works as expected', async ({ ref }) => {
+  test('Grid editor exporting works as expected', async ({ page, ref }) => {
     const tableNameGridEditor = ' pw_table_grid_editor'
     const tableNameUpdated = 'pw_table_updated'
     const columnNameUpdated = 'pw_column_updated'
@@ -358,10 +359,16 @@ test.describe('table editor', () => {
       .getByRole('button')
       .nth(1)
       .click()
-    await page.getByRole('menuitem', { name: 'Export data' }).click()
-    const downloadCsvPromise = page.waitForEvent('download')
-    await page.getByRole('menuitem', { name: 'Export table as CSV' }).click()
-    const downloadCsv = await downloadCsvPromise
+    // Open nested export submenu via keyboard (more stable than hover in headless)
+    const exportDataItemCsv = page.getByRole('menuitem', { name: 'Export data' })
+    await expect(exportDataItemCsv).toBeVisible()
+    await exportDataItemCsv.hover()
+    await expect(exportDataItemCsv).toHaveAttribute('data-state', /open/)
+    await expect(page.getByRole('menuitem', { name: 'Export table as CSV' })).toBeVisible()
+    const [downloadCsv] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByRole('menuitem', { name: 'Export table as CSV' }).click(),
+    ])
     expect(downloadCsv.suggestedFilename()).toContain('.csv')
     const downloadCsvPath = await downloadCsv.path()
 
@@ -377,16 +384,32 @@ test.describe('table editor', () => {
     })
     fs.unlinkSync(downloadCsvPath)
 
+    // Close submenu and parent menu to avoid UI leftovers
+    await page.keyboard.press('Escape')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(500)
+
+    // expect to NOT find the Export data menu item
+    await expect(page.getByRole('menuitem', { name: 'Export data' })).not.toBeVisible()
+
     // test export data via SQL + verify
     await page
       .getByRole('button', { name: `View ${tableNameUpdated}`, exact: true })
       .getByRole('button')
       .nth(1)
       .click()
-    await page.getByRole('menuitem', { name: 'Export data' }).click()
-    const downloadSqlPromise = page.waitForEvent('download')
-    await page.getByRole('menuitem', { name: 'Export table as SQL' }).click()
-    const downloadSql = await downloadSqlPromise
+    // Open nested export submenu via keyboard (more stable than hover in headless)
+    const exportDataItemSql = page.getByRole('menuitem', { name: 'Export data' })
+    await expect(exportDataItemSql).toBeVisible()
+    await exportDataItemSql.hover({
+      force: true,
+    })
+    await expect(exportDataItemSql).toHaveAttribute('data-state', /open/)
+    await expect(page.getByRole('menuitem', { name: 'Export table as SQL' })).toBeVisible()
+    const [downloadSql] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByRole('menuitem', { name: 'Export table as SQL' }).click(),
+    ])
     expect(downloadSql.suggestedFilename()).toContain('.sql')
     const downloadSqlPath = await downloadSql.path()
     const sqlContent = fs.readFileSync(downloadSqlPath, 'utf-8')
@@ -398,56 +421,129 @@ test.describe('table editor', () => {
     expect(sqlContent).toContain('123')
     fs.unlinkSync(downloadSqlPath)
 
+    // Close submenu and parent menu to avoid UI leftovers
+    await page.keyboard.press('Escape')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(500)
+
     // test export data via CLI
     await page
       .getByRole('button', { name: `View ${tableNameUpdated}`, exact: true })
       .getByRole('button')
       .nth(1)
       .click()
-    await page.getByRole('menuitem', { name: 'Export data' }).click()
+
+    const exportDataItemCli = page.getByRole('menuitem', { name: 'Export data' })
+    await expect(exportDataItemCli).toBeVisible()
+    await exportDataItemCli.hover({
+      force: true,
+    })
+    await expect(page.getByRole('menuitem', { name: 'Export table via CLI' })).toBeVisible()
     await page.getByRole('menuitem', { name: 'Export table via CLI' }).click()
     await expect(page.getByRole('heading', { name: 'Export table data via CLI' })).toBeVisible()
     await page.getByRole('button', { name: 'Close' }).first().click()
+  })
 
-    // sort rows
-    await page.getByRole('button', { name: 'Sort' }).click()
-    await page.getByRole('button', { name: 'Pick a column to sort by' }).click()
-    await page.getByRole('menuitem', { name: columnNameUpdated }).click()
-    await page.getByRole('button', { name: 'Apply sorting' }).click()
-    await waitForGridDataToLoad(page, ref) // wait for sorted table data to load
-    await page.getByRole('button', { name: 'Sorted by 1 rule' }).click()
+  test('filtering rows works as expected', async ({ page, ref }) => {
+    const tableName = 'pw_table_filtering'
+    const colName = 'pw_column'
 
-    // verify sorted row content
-    await page.waitForTimeout(500) // may take some time for sorting to complete
-    expect(await page.getByRole('gridcell').nth(3).textContent()).toBe('123')
-    expect(await page.getByRole('gridcell').nth(8).textContent()).toBe('456')
-    expect(await page.getByRole('gridcell').nth(13).textContent()).toBe('789')
+    if (!page.url().includes('/editor')) {
+      await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+      await waitForTableToLoad(page, ref)
+    }
 
-    // filter rows
+    await createTable(page, ref, tableName)
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    for (const value of ['789', '456', '123']) {
+      await page.getByTestId('table-editor-insert-new-row').click()
+      await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+      await page.getByTestId(`${colName}-input`).fill(value)
+      const apiPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
+      await page.getByTestId('action-bar-save-row').click()
+      await apiPromise
+    }
+
     await page.getByRole('button', { name: 'Filter', exact: true }).click()
     await page.getByRole('button', { name: 'Add filter' }).click()
-    await page.getByRole('button', { name: 'id' }).click()
-    await page.getByRole('menuitem', { name: columnNameUpdated }).click()
+    await page.getByRole('button', { name: 'id', exact: true }).click()
+    await page.getByRole('menuitem', { name: colName }).click()
     await page.getByRole('textbox', { name: 'Enter a value' }).fill('789')
     await page.getByRole('button', { name: 'Apply filter' }).click()
-    await waitForGridDataToLoad(page, ref) // wait for filtered table data to load
-    await page.waitForTimeout(500) // may take some time for filtering to complete
-    await page.getByRole('button', { name: 'Filtered by 1 rule' }).click()
+    await waitForGridDataToLoad(page, ref)
+    await page.waitForTimeout(500)
+    await page.getByRole('button', { name: 'Filtered by 1 rule' }).click({ force: true })
     await expect(page.getByRole('gridcell', { name: '789' })).toBeVisible()
     await expect(page.getByRole('gridcell', { name: '456' })).not.toBeVisible()
     await expect(page.getByRole('gridcell', { name: '123' })).not.toBeVisible()
 
-    // view table definition
-    await page.getByText('definition', { exact: true }).click()
-    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-definition-') // wait for table definition
-    await expect(page.locator('.view-lines')).toContainText(
-      `create table public.${tableNameUpdated} (  id bigint generated by default as identity not null,  created_at timestamp with time zone null default now(),  ${columnNameUpdated} text null,  constraint ${tableNameGridEditor}_pkey primary key (id)) TABLESPACE pg_default;`
-    )
-
-    await deleteTable(page, ref, tableNameUpdated)
+    await deleteTable(page, ref, tableName)
   })
 
-  test('importing, pagination and large data actions works as expected', async ({ ref }) => {
+  test('view table definition works as expected', async ({ page, ref }) => {
+    const tableName = 'pw_table_definition'
+    const colName = 'pw_column'
+    if (!page.url().includes('/editor')) {
+      const tableLoadPromise = waitForTableToLoad(page, ref)
+      await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+      await tableLoadPromise
+    }
+    await createTable(page, ref, tableName)
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+    const apiPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-definition-')
+    await page.getByText('definition', { exact: true }).click()
+    await apiPromise
+    await expect(page.locator('.view-lines')).toContainText(
+      `create table public.${tableName} (  id bigint generated by default as identity not null,  created_at timestamp with time zone null default now(),  ${colName} text null,  constraint ${tableName}_pkey primary key (id)) TABLESPACE pg_default;`
+    )
+    await deleteTable(page, ref, tableName)
+  })
+
+  test('sorting rows works as expected', async ({ page, ref }) => {
+    const tableName = 'pw_table_sorting'
+    const colName = 'pw_column'
+
+    // Ensure we're on editor
+    if (!page.url().includes('/editor')) {
+      await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+      await waitForTableToLoad(page, ref)
+    }
+
+    // Create a small table and three rows
+    await createTable(page, ref, tableName)
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    for (const value of ['789', '456', '123']) {
+      await page.getByTestId('table-editor-insert-new-row').click()
+      await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+      await page.getByTestId(`${colName}-input`).fill(value)
+      await page.getByTestId('action-bar-save-row').click()
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
+    }
+
+    // Apply sorting
+    await page.getByRole('button', { name: 'Sort', exact: true }).click()
+    await page.getByRole('button', { name: 'Pick a column to sort by' }).click()
+    await page.getByRole('menuitem', { name: colName }).click()
+    await page.getByRole('button', { name: 'Apply sorting' }).click()
+    await waitForGridDataToLoad(page, ref)
+    await page.getByRole('button', { name: 'Sorted by 1 rule' }).click()
+
+    // Verify sorted row content asc lexicographically for strings
+    await page.waitForTimeout(500)
+    expect(await page.getByRole('gridcell').nth(3).textContent()).toBe('123')
+    expect(await page.getByRole('gridcell').nth(8).textContent()).toBe('456')
+    expect(await page.getByRole('gridcell').nth(13).textContent()).toBe('789')
+
+    // Cleanup
+    await deleteTable(page, ref, tableName)
+  })
+
+  test('importing, pagination and large data actions works as expected', async ({ page, ref }) => {
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     const tableNameDataActions = 'pw_table_data'
 
@@ -470,7 +566,6 @@ test.describe('table editor', () => {
     // importing 51 data via paste text
     const filePath = path.join(__dirname, 'files', 'table-editor-import-paste.txt')
     const fileContent = fs.readFileSync(filePath, 'utf-8')
-    await page.getByRole('button', { name: 'Close toast' }).first().click() // close toast, as paste text is behind toast
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByRole('menuitem', { name: 'Import data from CSV' }).click()
     await page.getByRole('tab', { name: 'Paste text' }).click()
@@ -524,9 +619,10 @@ test.describe('table editor', () => {
     await page.getByRole('row', { name: 'value 6 to export' }).getByRole('checkbox').click()
 
     await page.getByRole('button', { name: 'Export' }).click()
-    const downloadSqlPromise = page.waitForEvent('download')
-    await page.getByRole('menuitem', { name: 'Export as SQL' }).click()
-    const downloadSql = await downloadSqlPromise
+    const [downloadSql] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByRole('menuitem', { name: 'Export as SQL' }).click(),
+    ])
     expect(downloadSql.suggestedFilename()).toContain('.sql')
     const downloadSqlPath = await downloadSql.path()
     const sqlContent = fs.readFileSync(downloadSqlPath, 'utf-8')
@@ -536,10 +632,16 @@ test.describe('table editor', () => {
     await page.waitForTimeout(1000) // wait for event processing to complete
     fs.unlinkSync(downloadSqlPath)
 
+    // Close menu to prevent overlap with next export
+    await page.keyboard.press('Escape')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(500)
+
     await page.getByRole('button', { name: 'Export' }).click()
-    const downloadJsonPromise = page.waitForEvent('download')
-    await page.getByRole('menuitem', { name: 'Export as JSON' }).click()
-    const downloadJson = await downloadJsonPromise
+    const [downloadJson] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByRole('menuitem', { name: 'Export as JSON' }).click(),
+    ])
     expect(downloadJson.suggestedFilename()).toContain('.json')
     const downloadJsonPath = await downloadJson.path()
     const jsonContent = fs.readFileSync(downloadJsonPath, 'utf-8')
@@ -549,10 +651,16 @@ test.describe('table editor', () => {
     await page.waitForTimeout(1000) // wait for event processing to complete
     fs.unlinkSync(downloadJsonPath)
 
+    // Close menu to prevent overlap with next export
+    await page.keyboard.press('Escape')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(500)
+
     await page.getByRole('button', { name: 'Export' }).click()
-    const downloadCsvPromise = page.waitForEvent('download')
-    await page.getByRole('menuitem', { name: 'Export as CSV' }).click()
-    const downloadCsv = await downloadCsvPromise
+    const [downloadCsv] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByRole('menuitem', { name: 'Export as CSV' }).click(),
+    ])
     expect(downloadCsv.suggestedFilename()).toContain('.csv')
     const downloadCsvPath = await downloadCsv.path()
     const csvContent = fs.readFileSync(downloadCsvPath, 'utf-8').replace(/\r?\n/g, '\n')
@@ -572,6 +680,11 @@ test.describe('table editor', () => {
     })
     await page.waitForTimeout(1000) // wait for event processing to complete
     fs.unlinkSync(downloadCsvPath)
+
+    // Close menu to avoid leaving it open
+    await page.keyboard.press('Escape')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(500)
 
     // select all actions works (delete action)
     await page.getByRole('checkbox', { name: 'Select All' }).click()

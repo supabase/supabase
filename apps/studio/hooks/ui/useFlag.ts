@@ -1,15 +1,39 @@
 import * as Sentry from '@sentry/nextjs'
 
-import { useFeatureFlags, useFlag } from 'common'
+import { useFeatureFlags } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { trackFeatureFlag } from 'lib/posthog'
 
 const isObjectEmpty = (obj: Object) => {
   return Object.keys(obj).length === 0
 }
 
-// TODO(Alaister): move this to packages/common/feature-flags.tsx and rename to useFlag
+/**
+ * Hook to retrieve a PostHog feature flag value.
+ *
+ * @returns `undefined | false | T` where:
+ * - `undefined` = PostHog store is still loading OR flag doesn't exist (treat as "don't show")
+ * - `false` = Flag is explicitly set to false (typically means "disabled" or "control" for experiments)
+ * - `T` = The actual flag value (string, boolean, or custom type like variant names)
+ *
+ * @example Experiment usage convention:
+ * ```typescript
+ * const variant = usePHFlag<ExperimentVariant | false>('experimentName')
+ *
+ * // undefined = loading/doesn't exist, don't render anything yet
+ * if (variant === undefined) return null
+ *
+ * // false = explicitly disabled, show control
+ * if (variant === false) return <Control />
+ *
+ * // Otherwise, variant has a value, show experiment
+ * return <Experiment variant={variant} />
+ * ```
+ *
+ * @todo TODO(Alaister): move this to packages/common/feature-flags.tsx and rename to useFlag
+ * @todo TODO(sean): Refactor to have explicit loading/disabled/value states
+ *       See https://linear.app/supabase/issue/GROWTH-539
+ */
 export function usePHFlag<T = string | boolean>(name: string) {
   const flagStore = useFeatureFlags()
   // [Joshen] Prepend PH flags with "PH" in local storage for easier identification of PH flags
@@ -43,24 +67,4 @@ export function usePHFlag<T = string | boolean>(name: string) {
   }
 
   return flagValue as T
-}
-
-export const useIsRealtimeSettingsFFEnabled = () => {
-  const { data: project } = useSelectedProjectQuery()
-
-  // This flag is used to enable/disable the realtime settings for specific projects.
-  const approvedProjects = useFlag<string>('isRealtimeSettingsEnabledOnProjects')
-  // This flag is used to enable/disable the realtime settings for all projects.
-  // Will override isRealtimeSettingsEnabledOnProjects if enabled
-  const enableRealtimeSettingsFlag = useFlag('enableRealtimeSettings')
-
-  const isEnabledOnProject =
-    !!project?.ref &&
-    typeof approvedProjects === 'string' &&
-    (approvedProjects ?? '')
-      .split(',')
-      .map((it) => it.trim())
-      .includes(project?.ref)
-
-  return enableRealtimeSettingsFlag || isEnabledOnProject
 }

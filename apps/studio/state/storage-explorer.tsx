@@ -37,6 +37,11 @@ import {
 import { convertFromBytes } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
 import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
+import {
+  createTemporaryUploadKey,
+  isTemporaryUploadKeyValid,
+  type TemporaryUploadKey,
+} from 'data/api-keys/temp-api-keys-utils'
 import { configKeys } from 'data/config/keys'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
@@ -44,6 +49,7 @@ import { getQueryClient } from 'data/query-client'
 import { deleteBucketObject } from 'data/storage/bucket-object-delete-mutation'
 import { downloadBucketObject } from 'data/storage/bucket-object-download-mutation'
 import { listBucketObjects, StorageObject } from 'data/storage/bucket-objects-list-mutation'
+import { deleteBucketPrefix } from 'data/storage/bucket-prefix-delete-mutation'
 import { Bucket } from 'data/storage/buckets-query'
 import { moveStorageObject } from 'data/storage/object-move-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -79,10 +85,12 @@ if (typeof window !== 'undefined') {
 
 function createStorageExplorerState({
   projectRef,
+  connectionString,
   resumableUploadUrl,
   supabaseClient,
 }: {
   projectRef: string
+  connectionString: string
   resumableUploadUrl: string
   supabaseClient?: () => Promise<SupabaseClient<any, 'public', any>>
 }) {
@@ -93,9 +101,13 @@ function createStorageExplorerState({
 
   const state = proxy({
     projectRef,
+    connectionString,
     supabaseClient,
     resumableUploadUrl,
     uploadProgresses: [] as UploadProgress[],
+
+    // Temporary API key management for batch uploads
+    temporaryUploadKey: undefined as TemporaryUploadKey | undefined,
 
     // abortController,
     abortApiCalls: () => {
@@ -109,6 +121,29 @@ function createStorageExplorerState({
     abortUploads: (toastId: string | number) => {
       state.abortUploadCallbacks[toastId].forEach((callback) => callback())
       state.abortUploadCallbacks[toastId] = []
+    },
+
+    // Get or refresh the temporary upload key
+    getOrRefreshTemporaryUploadKey: async () => {
+      if (isTemporaryUploadKeyValid(state.temporaryUploadKey)) {
+        return state.temporaryUploadKey.apiKey
+      }
+
+      // Generate new key with 10 minutes expiry
+      const expiryInSeconds = 600
+      const data = await getTemporaryAPIKey({
+        projectRef: state.projectRef,
+        expiry: expiryInSeconds,
+      })
+
+      state.temporaryUploadKey = createTemporaryUploadKey(data.api_key, expiryInSeconds)
+
+      return data.api_key
+    },
+
+    // Clear the temporary upload key
+    clearTemporaryUploadKey: () => {
+      state.temporaryUploadKey = undefined
     },
 
     columns: [] as StorageColumn[],
@@ -591,7 +626,18 @@ function createStorageExplorerState({
       try {
         const isDeleteFolder = true
         const files = await state.getAllItemsAlongFolder(folder)
-        await state.deleteFiles({ files: files as any[], isDeleteFolder })
+
+        if (files.length === 0) {
+          // [Joshen] This is to self-remediate orphan prefixes
+          await deleteBucketPrefix({
+            projectRef: state.projectRef,
+            connectionString: state.connectionString,
+            bucketId: state.selectedBucket.id,
+            prefix: folder.path,
+          })
+        } else {
+          await state.deleteFiles({ files: files as any[], isDeleteFolder })
+        }
 
         state.popColumnAtIndex(folder.columnIndex)
         state.popOpenedFoldersAtIndex(folder.columnIndex - 1)
@@ -607,7 +653,6 @@ function createStorageExplorerState({
 
         await state.refetchAllOpenedFolders()
         state.setSelectedItemsToDelete([])
-
         toast.success(`Successfully deleted ${folder.name}`)
       } catch (error: any) {
         toast.error(`Failed to delete folder: ${error.message}`)
@@ -1009,13 +1054,12 @@ function createStorageExplorerState({
               Failed to upload {numberOfFilesRejected} file{numberOfFilesRejected > 1 ? 's' : ''} as{' '}
               {numberOfFilesRejected > 1 ? 'their' : 'its'} size
               {numberOfFilesRejected > 1 ? 's are' : ' is'} beyond the global upload limit of{' '}
-              {value}
-              {unit}.
+              {value} {unit}.
             </p>
             <p className="text-foreground-light">
               You can change the global file size upload limit in{' '}
               <InlineLink href={`/project/${state.projectRef}/storage/settings`}>
-                Storage settings
+                Storage Settings
               </InlineLink>
               .
             </p>
@@ -1084,6 +1128,15 @@ function createStorageExplorerState({
         .slice(0, derivedColumnIndex)
         .map((folder) => folder.name)
         .join('/')
+
+      // Generate temporary API key for the batch upload
+      try {
+        await state.getOrRefreshTemporaryUploadKey()
+      } catch (error) {
+        console.error('Failed to get temporary API key:', error)
+        toast.error('Failed to initialize upload session. Please try again.')
+        return
+      }
 
       const toastId = state.onUploadProgress()
 
@@ -1183,8 +1236,13 @@ function createStorageExplorerState({
               chunkSize,
               onBeforeRequest: async (req) => {
                 try {
-                  const data = await getTemporaryAPIKey({ projectRef: state.projectRef })
-                  req.setHeader('apikey', data.api_key)
+                  // Use the shared temporary key for batch uploads
+                  // This checks if the key is still valid and refreshes if needed
+                  const apiKey = await state.getOrRefreshTemporaryUploadKey()
+                  req.setHeader('apikey', apiKey)
+                  if (!IS_PLATFORM) {
+                    req.setHeader('Authorization', `Bearer ${apiKey}`)
+                  }
                 } catch (error) {
                   throw error
                 }
@@ -1216,7 +1274,7 @@ function createStorageExplorerState({
                     case 413:
                       // Payload too large
                       toast.error(
-                        `Failed to upload ${file.name}: File size exceeds the bucket upload limit.`
+                        `Failed to upload ${file.name}: File size exceeds the bucket file size limit.`
                       )
                       break
                     case 409:
@@ -1340,6 +1398,9 @@ function createStorageExplorerState({
           closeButton: true,
           duration: SONNER_DEFAULT_DURATION,
         })
+      } finally {
+        // Clear the temporary API key after batch upload completes
+        state.clearTemporaryUploadKey()
       }
 
       const t2 = new Date()
@@ -1412,7 +1473,6 @@ function createStorageExplorerState({
       isDeleteFolder?: boolean
     }) => {
       state.setSelectedFilePreview(undefined)
-      let progress = 0
 
       // If every file has the 'prefix' property, then just construct the prefix
       // directly (from delete folder). Otherwise go by the opened folders.
@@ -1430,37 +1490,13 @@ function createStorageExplorerState({
 
       state.clearSelectedItems()
 
-      const toastId = toast(
-        <SonnerProgress progress={0} message={`Deleting ${prefixes.length} file(s)...`} />,
-        { closeButton: false, position: 'top-right' }
-      )
+      const toastId = toast.loading(`Deleting ${prefixes.length} file(s)...`)
 
-      // batch BATCH_SIZE prefixes per request
-      const batches = chunk(prefixes, BATCH_SIZE).map((batch) => () => {
-        progress = progress + batch.length / prefixes.length
-        return deleteBucketObject({
-          projectRef: state.projectRef,
-          bucketId: state.selectedBucket.id,
-          paths: batch as string[],
-        })
+      await deleteBucketObject({
+        projectRef: state.projectRef,
+        bucketId: state.selectedBucket.id,
+        paths: prefixes,
       })
-
-      // make BATCH_SIZE requests at the same time
-      await chunk(batches, BATCH_SIZE).reduce(async (previousPromise, nextBatch) => {
-        await previousPromise
-        await Promise.all(nextBatch.map((batch) => batch()))
-        toast(
-          <SonnerProgress
-            progress={progress * 100}
-            message={`Deleting ${prefixes.length} file(s)...`}
-          />,
-          {
-            id: toastId,
-            closeButton: false,
-            position: 'top-right',
-          }
-        )
-      }, Promise.resolve())
 
       if (!isDeleteFolder) {
         // If parent folders are empty, reinstate .emptyFolderPlaceholder to persist them
@@ -1791,6 +1827,7 @@ type StorageExplorerState = ReturnType<typeof createStorageExplorerState>
 
 const DEFAULT_STATE_CONFIG = {
   projectRef: '',
+  connectionString: '',
   resumableUploadUrl: '',
   supabaseClient: undefined,
 }
@@ -1824,6 +1861,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
       setState(
         createStorageExplorerState({
           projectRef: project?.ref ?? '',
+          connectionString: project.connectionString ?? '',
           supabaseClient: async () => {
             try {
               const data = await getTemporaryAPIKey({ projectRef: project.ref })

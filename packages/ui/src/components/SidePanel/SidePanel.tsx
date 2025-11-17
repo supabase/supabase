@@ -72,7 +72,7 @@ const SidePanel = ({
           {cancelText}
         </Button>
       </div>
-      {onConfirm !== undefined && (
+      {!!onConfirm && (
         <Tooltip>
           <TooltipTrigger asChild>
             <span className="inline-block">
@@ -80,7 +80,7 @@ const SidePanel = ({
                 htmlType="submit"
                 disabled={disabled || loading}
                 loading={loading}
-                onClick={() => (onConfirm ? onConfirm() : null)}
+                onClick={onConfirm}
               >
                 {confirmText}
               </Button>
@@ -106,11 +106,7 @@ const SidePanel = ({
 
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange} defaultOpen={defaultOpen}>
-      {triggerElement && (
-        <Dialog.Trigger asChild className={__styles.trigger}>
-          {triggerElement}
-        </Dialog.Trigger>
-      )}
+      {triggerElement && <Dialog.Trigger asChild>{triggerElement}</Dialog.Trigger>}
 
       <Dialog.Portal>
         <Dialog.Overlay className={__styles.overlay} />

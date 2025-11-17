@@ -1,4 +1,5 @@
 import { PayloadRequest, CollectionSlug } from 'payload'
+import { WWW_SITE_ORIGIN } from './constants'
 
 const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {
   posts: '/blog',
@@ -12,9 +13,9 @@ type Props = {
 
 export const generatePreviewPath = ({ collection, slug }: Props) => {
   if (collection === 'posts') {
-    const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
+    const baseUrl = WWW_SITE_ORIGIN || 'http://localhost:3000'
     // Use our preview API route for post previews
-    return `${baseUrl}/api/preview?slug=${slug}`
+    return `${baseUrl}/api-v2/cms/preview?slug=${slug}`
   }
 
   const encodedParams = new URLSearchParams({

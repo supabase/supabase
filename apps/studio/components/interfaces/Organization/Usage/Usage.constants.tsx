@@ -2,6 +2,7 @@ import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/Billing/Billi
 import { EgressType, PricingMetric } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import type { OrgUsageResponse } from 'data/usage/org-usage-query'
+import { DOCS_URL } from 'lib/constants'
 import { Admonition } from 'ui-patterns'
 
 export const COLOR_MAP = {
@@ -79,7 +80,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       key: PricingMetric.EGRESS,
       attributes: [
         { key: EgressType.AUTH, name: 'Auth Egress', color: 'yellow' },
-        { key: EgressType.DATABASE, name: 'Database Egress', color: 'green' },
+        { key: EgressType.REST, name: 'PostgREST Egress', color: 'green' },
         { key: EgressType.STORAGE, name: 'Storage Egress', color: 'blue' },
         { key: EgressType.REALTIME, name: 'Realtime Egress', color: 'orange' },
         { key: EgressType.FUNCTIONS, name: 'Functions Egress', color: 'purple' },
@@ -89,22 +90,17 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       name: 'Egress',
       unit: 'bytes',
       description:
-        subscription?.cached_egress_enabled === true
-          ? 'Contains any outgoing traffic including Database, Storage, Realtime, Auth, API, Edge Functions, Pooler and Log Drains.\nBilling is based on the total sum of uncached egress in GB throughout your billing period.\nEgress via cache hits is billed separately.'
-          : 'Contains any outgoing traffic including Database, Storage, Realtime, Auth, API, Edge Functions, Pooler and Log Drains.\nBilling is based on the total sum of uncached egress in GB throughout your billing period.',
+        'Contains any outgoing traffic including Database, Storage, Realtime, Auth, API, Edge Functions, Pooler and Log Drains.\nBilling is based on the total sum of uncached egress in GB throughout your billing period.\nEgress via cache hits is billed separately.',
       chartDescription:
-        'The breakdown of different egress types is inclusive of cached egress, even though it is billed separately. The data refreshes every 24 hours.',
+        'The breakdown of different egress types is inclusive of cached egress, even though it is billed separately. The data refreshes every hour.',
       links: [
         {
           name: 'Documentation',
-          url: 'https://supabase.com/docs/guides/platform/manage-your-usage/egress',
+          url: `${DOCS_URL}/guides/platform/manage-your-usage/egress`,
         },
       ],
     },
-  ]
-
-  if (subscription?.cached_egress_enabled) {
-    egressAttributes.push({
+    {
       anchor: 'cachedEgress',
       key: PricingMetric.CACHED_EGRESS,
       attributes: [{ key: PricingMetric.CACHED_EGRESS.toLowerCase(), color: 'white' }],
@@ -112,15 +108,15 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       unit: 'bytes',
       description:
         'Contains any outgoing traffic that is served from a cache hit. Includes API, Storage and Edge Functions.\nBilling is based on the total sum of cached egress in GB throughout your billing period.',
-      chartDescription: 'The data refreshes every 24 hours.',
+      chartDescription: 'The data refreshes every hour.',
       links: [
         {
           name: 'Documentation',
-          url: 'https://supabase.com/docs/guides/platform/manage-your-usage/egress',
+          url: `${DOCS_URL}/guides/platform/manage-your-usage/egress`,
         },
       ],
-    })
-  }
+    },
+  ]
 
   return [
     {
@@ -147,10 +143,10 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
               links: [
                 {
                   name: 'Documentation',
-                  url: 'https://supabase.com/docs/guides/platform/database-size',
+                  url: `${DOCS_URL}/guides/platform/database-size`,
                 },
               ],
-              chartDescription: 'The data refreshes every 24 hours.',
+              chartDescription: 'The data refreshes every hour.',
               additionalInfo: (usage?: OrgUsageResponse) => {
                 const usageMeta = usage?.usages.find(
                   (x) => x.metric === PricingMetric.DATABASE_SIZE
@@ -205,11 +201,11 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
               links: [
                 {
                   name: 'Documentation',
-                  url: 'https://supabase.com/docs/guides/platform/manage-your-usage/disk-size',
+                  url: `${DOCS_URL}/guides/platform/manage-your-usage/disk-size`,
                 },
                 {
                   name: 'Disk Management',
-                  url: 'https://supabase.com/docs/guides/platform/database-size#disk-management',
+                  url: `${DOCS_URL}/guides/platform/database-size#disk-management`,
                 },
               ],
               chartDescription: '',
@@ -223,11 +219,11 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           unit: 'bytes',
           description:
             'Sum of all objects in your storage buckets.\nBilling is prorated down to the hour and will be displayed GB-Hrs.',
-          chartDescription: 'The data refreshes every 24 hours.',
+          chartDescription: 'The data refreshes every hour.',
           links: [
             {
               name: 'Storage',
-              url: 'https://supabase.com/docs/guides/storage',
+              url: `${DOCS_URL}/guides/storage`,
             },
           ],
         },
@@ -253,7 +249,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           links: [
             {
               name: 'Auth',
-              url: 'https://supabase.com/docs/guides/auth',
+              url: `${DOCS_URL}/guides/auth`,
             },
           ],
         },
@@ -274,7 +270,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           links: [
             {
               name: 'SSO with SAML 2.0',
-              url: 'https://supabase.com/docs/guides/auth/sso/auth-sso-saml',
+              url: `${DOCS_URL}/guides/auth/sso/auth-sso-saml`,
             },
           ],
         },
@@ -295,7 +291,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           links: [
             {
               name: 'Documentation',
-              url: 'https://supabase.com/docs/guides/storage/image-transformations',
+              url: `${DOCS_URL}/guides/storage/image-transformations`,
             },
           ],
         },
@@ -307,11 +303,11 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           unit: 'absolute',
           description:
             'Every serverless function invocation independent of response status is counted.\nBilling is based on the sum of all invocations throughout your billing period.',
-          chartDescription: 'The data refreshes every 24 hours.',
+          chartDescription: 'The data refreshes every hour.',
           links: [
             {
               name: 'Edge Functions',
-              url: 'https://supabase.com/docs/guides/functions',
+              url: `${DOCS_URL}/guides/functions`,
             },
           ],
         },
@@ -323,11 +319,11 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           unit: 'absolute',
           description:
             "Count of messages going through Realtime. Includes database changes, broadcast and presence. \nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
-          chartDescription: 'The data refreshes every 24 hours.',
+          chartDescription: 'The data refreshes every hour.',
           links: [
             {
               name: 'Realtime Quotas',
-              url: 'https://supabase.com/docs/guides/realtime/quotas',
+              url: `${DOCS_URL}/guides/realtime/quotas`,
             },
           ],
         },
@@ -342,11 +338,11 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           unit: 'absolute',
           description:
             'Total number of successful connections. Connections attempts are not counted towards usage.\nBilling is based on the maximum amount of concurrent peak connections throughout your billing period.',
-          chartDescription: 'The data refreshes every 24 hours.',
+          chartDescription: 'The data refreshes every hour.',
           links: [
             {
               name: 'Realtime Quotas',
-              url: 'https://supabase.com/docs/guides/realtime/quotas',
+              url: `${DOCS_URL}/guides/realtime/quotas`,
             },
           ],
         },

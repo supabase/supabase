@@ -16,7 +16,7 @@ import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutati
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { uuidv4 } from 'lib/helpers'
 import {
   AlertCircle,
@@ -52,6 +52,7 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { number, object } from 'yup'
+import { useApiKeysVisibility } from '../APIKeys/hooks/useApiKeysVisibility'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
@@ -73,15 +74,15 @@ const JWTSettings = () => {
   const [isCreatingKey, setIsCreatingKey] = useState<boolean>(false)
   const [isRegeneratingKey, setIsGeneratingKey] = useState<boolean>(false)
 
-  const { can: canReadJWTSecret } = useAsyncCheckProjectPermissions(
+  const { can: canReadJWTSecret } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'field.jwt_secret'
   )
-  const { can: canGenerateNewJWTSecret } = useAsyncCheckProjectPermissions(
+  const { can: canGenerateNewJWTSecret } = useAsyncCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.projects.update_jwt'
   )
-  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
@@ -91,17 +92,19 @@ const JWTSettings = () => {
   const { mutateAsync: updateJwt, isLoading: isSubmittingJwtSecretUpdateRequest } =
     useJwtSecretUpdateMutation()
 
-  const { data: legacyKey } = useLegacyJWTSigningKeyQuery({
-    projectRef,
-  })
-  const { data: legacyAPIKeysStatus } = useLegacyAPIKeysStatusQuery({ projectRef })
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: legacyKey } = useLegacyJWTSigningKeyQuery(
+    {
+      projectRef,
+    },
+    { enabled: canReadAPIKeys }
+  )
+  const { data: legacyAPIKeysStatus } = useLegacyAPIKeysStatusQuery(
+    { projectRef },
+    { enabled: canReadAPIKeys }
+  )
 
-  const {
-    data: authConfig,
-    error: authConfigError,
-    isLoading: isLoadingAuthConfig,
-    isSuccess: isSuccessAuthConfig,
-  } = useAuthConfigQuery({ projectRef })
+  const { data: authConfig, isLoading: isLoadingAuthConfig } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isLoading: isUpdatingAuthConfig } =
     useAuthConfigUpdateMutation()
 

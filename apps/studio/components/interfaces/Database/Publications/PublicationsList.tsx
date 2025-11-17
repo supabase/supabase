@@ -7,10 +7,10 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import InformationBox from 'components/ui/InformationBox'
-import NoSearchResults from 'components/ui/NoSearchResults'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
@@ -57,8 +57,10 @@ export const PublicationsList = () => {
     },
   })
 
-  const { can: canUpdatePublications, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckProjectPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'publications')
+  const { can: canUpdatePublications, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'publications'
+  )
 
   const publicationEvents: PublicationEvent[] = [
     { event: 'Insert', key: 'publish_insert' },
@@ -145,25 +147,27 @@ export const PublicationsList = () => {
               {isSuccess &&
                 publications.map((x) => (
                   <TableRow key={x.name}>
-                    <TableCell className="flex items-center gap-x-2 items-center">
-                      {x.name}
-                      {/* [Joshen] Making this tooltip very specific for these 2 publications */}
-                      {['supabase_realtime', 'supabase_realtime_messages_publication'].includes(
-                        x.name
-                      ) && (
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <Info size={14} className="text-foreground-light" />
-                          </TooltipTrigger>
-                          <TooltipContent side="bottom">
-                            {x.name === 'supabase_realtime'
-                              ? 'This publication is managed by Supabase and handles Postgres changes'
-                              : x.name === 'supabase_realtime_messages_publication'
-                                ? 'This publication is managed by Supabase and handles broadcasts from the database'
-                                : undefined}
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
+                    <TableCell>
+                      <div className="flex items-center gap-x-2">
+                        {x.name}
+                        {/* [Joshen] Making this tooltip very specific for these 2 publications */}
+                        {['supabase_realtime', 'supabase_realtime_messages_publication'].includes(
+                          x.name
+                        ) && (
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Info size={14} className="text-foreground-light" />
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              {x.name === 'supabase_realtime'
+                                ? 'Managed by Supabase and handles Postgres changes'
+                                : x.name === 'supabase_realtime_messages_publication'
+                                  ? 'Managed by Supabase and handles broadcasts from the database'
+                                  : undefined}
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>{x.id}</TableCell>
                     {publicationEvents.map((event) => (

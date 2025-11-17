@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-  '/v1/branches/{branch_id}': {
+  '/v1/branches/{branch_id_or_ref}': {
     parameters: {
       query?: never
       header?: never
@@ -32,7 +32,7 @@ export interface paths {
     patch: operations['v1-update-a-branch-config']
     trace?: never
   }
-  '/v1/branches/{branch_id}/push': {
+  '/v1/branches/{branch_id_or_ref}/push': {
     parameters: {
       query?: never
       header?: never
@@ -52,7 +52,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/branches/{branch_id}/merge': {
+  '/v1/branches/{branch_id_or_ref}/merge': {
     parameters: {
       query?: never
       header?: never
@@ -72,7 +72,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/branches/{branch_id}/reset': {
+  '/v1/branches/{branch_id_or_ref}/reset': {
     parameters: {
       query?: never
       header?: never
@@ -92,7 +92,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/branches/{branch_id}/diff': {
+  '/v1/branches/{branch_id_or_ref}/diff': {
     parameters: {
       query?: never
       header?: never

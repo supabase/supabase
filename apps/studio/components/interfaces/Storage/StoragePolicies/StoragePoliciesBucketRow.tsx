@@ -1,9 +1,10 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
-import { Archive } from 'lucide-react'
 
 import { PolicyRow } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
 import { Bucket } from 'data/storage/buckets-query'
+
+import { Bucket as BucketIcon } from 'icons'
 import {
   Badge,
   Button,
@@ -23,7 +24,7 @@ interface StoragePoliciesBucketRowProps {
   label: string
   bucket?: Bucket
   policies: PostgresPolicy[]
-  onSelectPolicyAdd: (bucketName: string, table: string) => void
+  onSelectPolicyAdd: (bucketName: string | undefined, table: string) => void
   onSelectPolicyEdit: (policy: PostgresPolicy, bucketName: string, table: string) => void
   onSelectPolicyDelete: (policy: PostgresPolicy) => void
 }
@@ -39,17 +40,17 @@ export const StoragePoliciesBucketRow = ({
 }: StoragePoliciesBucketRowProps) => {
   return (
     <Card>
-      <CardHeader className="flex flex-row w-full items-center justify-between gap-0 space-y-0">
-        <div className="flex items-center gap-3">
-          <Archive className="text-foreground-light" size={16} strokeWidth={1.5} />
-          <CardTitle>{label}</CardTitle>
-          {bucket?.public && <Badge variant="warning">Public</Badge>}
+      <CardHeader className="flex flex-row w-full items-center justify-between gap-2 space-y-0">
+        <div className="flex flex-1 min-w-0 items-center gap-3">
+          <BucketIcon className="text-foreground-muted" size={16} strokeWidth={1.5} />
+          <div className="flex flex-1 min-w-0 items-center gap-1.5">
+            <CardTitle className="truncate">{label}</CardTitle>
+            {bucket?.public && <Badge variant="warning">Public</Badge>}
+          </div>
         </div>
-        {!!bucket && (
-          <Button type="outline" onClick={() => onSelectPolicyAdd(bucket.name, table)}>
-            New policy
-          </Button>
-        )}
+        <Button type="outline" onClick={() => onSelectPolicyAdd(bucket?.name, table)}>
+          New policy
+        </Button>
       </CardHeader>
       {policies.length === 0 ? (
         <CardContent>

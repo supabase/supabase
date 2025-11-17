@@ -1,10 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 import pgMeta from '@supabase/pg-meta'
-import type { ResponseError } from 'types'
-import { databaseTriggerKeys } from './keys'
-import { executeSql } from 'data/sql/execute-sql-query'
 import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { toast } from 'sonner'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { databaseTriggerKeys } from './keys'
 
 export type DatabaseTriggerCreateVariables = {
   projectRef: string
@@ -36,27 +36,29 @@ export const useDatabaseTriggerCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseTriggerCreateData, ResponseError, DatabaseTriggerCreateVariables>,
+  UseCustomMutationOptions<
+    DatabaseTriggerCreateData,
+    ResponseError,
+    DatabaseTriggerCreateVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseTriggerCreateData, ResponseError, DatabaseTriggerCreateVariables>(
-    (vars) => createDatabaseTrigger(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseTriggerKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create database trigger: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseTriggerCreateData, ResponseError, DatabaseTriggerCreateVariables>({
+    mutationFn: (vars) => createDatabaseTrigger(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: databaseTriggerKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create database trigger: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

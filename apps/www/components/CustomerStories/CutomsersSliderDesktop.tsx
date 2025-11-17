@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import { range } from 'lib/helpers'
 import { cn } from 'ui'

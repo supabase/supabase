@@ -12,9 +12,10 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
   ref ||= '_'
 
-  const { databaseReplication, databaseRoles } = useIsFeatureEnabled([
+  const { databaseReplication, databaseRoles, integrationsWrappers } = useIsFeatureEnabled([
     'database:replication',
     'database:roles',
+    'integrations:wrappers',
   ])
 
   useRegisterCommands(
@@ -80,10 +81,10 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
       ...(databaseReplication
         ? [
             {
-              id: 'nav-database-replication',
-              name: 'Replication',
-              value: 'Database: Replication',
-              route: `/project/${ref}/database/replication`,
+              id: 'nav-database-etl',
+              name: 'ETL Replication',
+              value: 'Database: ETL Replication',
+              route: `/project/${ref}/database/etl`,
               defaultHidden: true,
             } as IRouteCommand,
           ]
@@ -92,7 +93,7 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         id: 'nav-database-hooks',
         name: 'Webhooks',
         value: 'Database: Webhooks',
-        route: `/project/${ref}/integrations/hooks`,
+        route: `/project/${ref}/integrations/webhooks`,
         defaultHidden: true,
       },
       {
@@ -102,13 +103,17 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/database/backups/scheduled`,
         defaultHidden: true,
       },
-      {
-        id: 'nav-database-wrappers',
-        name: 'Wrappers',
-        value: 'Database: Wrappers',
-        route: `/project/${ref}/integrations/wrappers`,
-        defaultHidden: true,
-      },
+      ...(integrationsWrappers
+        ? [
+            {
+              id: 'nav-database-wrappers',
+              name: 'Wrappers',
+              value: 'Database: Wrappers',
+              route: `/project/${ref}/integrations?category=wrappers`,
+              defaultHidden: true,
+            } as IRouteCommand,
+          ]
+        : []),
       {
         id: 'nav-database-migrations',
         name: 'Migrations',

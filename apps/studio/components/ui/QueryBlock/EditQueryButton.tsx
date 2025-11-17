@@ -1,15 +1,16 @@
 import { Edit } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { ComponentProps } from 'react'
 
 import { useParams } from 'common'
-import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import useNewQuery from 'components/interfaces/SQLEditor/hooks'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import Link from 'next/link'
-import { ComponentProps } from 'react'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   cn,
@@ -41,7 +42,7 @@ export const EditQueryButton = ({
   const { newQuery } = useNewQuery()
 
   const sqlEditorSnap = useSqlEditorV2StateSnapshot()
-  const snap = useAiAssistantStateSnapshot()
+  const { closeSidebar } = useSidebarManagerSnapshot()
 
   const isInSQLEditor = router.pathname.includes('/sql')
   const isInNewSnippet = router.pathname.endsWith('/sql')
@@ -79,7 +80,7 @@ export const EditQueryButton = ({
           // This component needs to be updated to work with local EditorPanel state
           // For now, fall back to creating a new query
           if (sql) newQuery(sql, title)
-          snap.closeAssistant()
+          closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
         } else {
           if (sql) newQuery(sql, title)
         }

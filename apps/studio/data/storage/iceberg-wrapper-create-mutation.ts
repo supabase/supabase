@@ -1,7 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { snakeCase } from 'lodash'
 
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { WRAPPERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
+import {
+  getAnalyticsBucketFDWName,
+  getAnalyticsBucketS3KeyName,
+} from 'components/interfaces/Storage/AnalyticsBuckets/AnalyticsBucketDetails/AnalyticsBucketDetails.utils'
 import {
   getCatalogURI,
   getConnectionURL,
@@ -9,14 +13,18 @@ import {
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { FDWCreateVariables, useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
 
 export const useIcebergWrapperCreateMutation = () => {
   const { data: project } = useSelectedProjectQuery()
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref, reveal: true })
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: apiKeys } = useAPIKeysQuery(
+    { projectRef: project?.ref, reveal: true },
+    { enabled: canReadAPIKeys }
+  )
   const { secretKey, serviceKey } = getKeys(apiKeys)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
@@ -27,7 +35,10 @@ export const useIcebergWrapperCreateMutation = () => {
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === 'iceberg_wrapper')
 
-  const canCreateCredentials = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const { can: canCreateCredentials } = useAsyncCheckPermissions(
+    PermissionAction.STORAGE_ADMIN_WRITE,
+    '*'
+  )
 
   const { mutateAsync: createS3AccessKey, isLoading: isCreatingS3AccessKey } =
     useS3AccessKeyCreateMutation()
@@ -37,10 +48,10 @@ export const useIcebergWrapperCreateMutation = () => {
   const mutateAsync = async ({ bucketName }: { bucketName: string }) => {
     const createS3KeyData = await createS3AccessKey({
       projectRef: project?.ref,
-      description: `${snakeCase(bucketName)}_keys`,
+      description: getAnalyticsBucketS3KeyName(bucketName),
     })
 
-    const wrapperName = `${snakeCase(bucketName)}_fdw`
+    const wrapperName = getAnalyticsBucketFDWName(bucketName)
 
     const params: FDWCreateVariables = {
       projectRef: project?.ref,

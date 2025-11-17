@@ -1,5 +1,5 @@
 import pgMeta from '@supabase/pg-meta'
-import { ModelMessage, stepCountIs, generateText, Output } from 'ai'
+import { generateText, ModelMessage, stepCountIs } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -16,9 +16,9 @@ import {
 } from 'lib/ai/prompts'
 import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
-import { queryPgMetaSelfHosted } from 'lib/self-hosted'
+import { executeQuery } from 'lib/api/self-hosted/query'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod/v4'
+import z from 'zod'
 
 export const maxDuration = 60
 
@@ -47,7 +47,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const accessToken = authorization?.replace('Bearer ', '')
 
     let aiOptInLevel: AiOptInLevel = 'disabled'
-    let isLimited = false
 
     if (!IS_PLATFORM) {
       aiOptInLevel = 'schema'
@@ -55,17 +54,24 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     if (IS_PLATFORM && orgSlug && authorization && projectRef) {
       // Get organizations and compute opt in level server-side
-      const { aiOptInLevel: orgAIOptInLevel, isLimited: orgAILimited } = await getOrgAIDetails({
+      const { aiOptInLevel: orgAIOptInLevel } = await getOrgAIDetails({
         orgSlug,
         authorization,
         projectRef,
       })
 
       aiOptInLevel = orgAIOptInLevel
-      isLimited = orgAILimited
     }
 
-    const { model, error: modelError, supportsCachePoint } = await getModel(projectRef, isLimited)
+    // For code completion, we always use the limited model
+    const {
+      model,
+      error: modelError,
+      promptProviderOptions,
+    } = await getModel({
+      provider: 'openai',
+      routingKey: projectRef,
+    })
 
     if (modelError) {
       return res.status(500).json({ error: modelError.message })
@@ -73,10 +79,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // Get a list of all schemas to add to context
     const pgMetaSchemasList = pgMeta.schemas.list()
+    type Schemas = z.infer<(typeof pgMetaSchemasList)['zod']>
 
     const { result: schemas } =
       aiOptInLevel !== 'disabled'
-        ? await executeSql(
+        ? await executeSql<Schemas>(
             {
               projectRef,
               connectionString,
@@ -87,7 +94,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
               'Content-Type': 'application/json',
               ...(authorization && { Authorization: authorization }),
             },
-            IS_PLATFORM ? undefined : queryPgMetaSelfHosted
+            IS_PLATFORM ? undefined : executeQuery
           )
         : { result: [] }
 
@@ -111,14 +118,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       {
         role: 'system',
         content: system,
-        ...(supportsCachePoint && {
-          providerOptions: {
-            bedrock: {
-              // Always cache the system prompt (must not contain dynamic content)
-              cachePoint: { type: 'default' },
-            },
-          },
-        }),
+        ...(promptProviderOptions && { providerOptions: promptProviderOptions }),
       },
       {
         role: 'assistant',

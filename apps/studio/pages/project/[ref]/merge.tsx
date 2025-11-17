@@ -13,7 +13,7 @@ import { ReviewWithAI } from 'components/interfaces/BranchManagement/ReviewWithA
 import WorkflowLogsCard from 'components/interfaces/BranchManagement/WorkflowLogsCard'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
+import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -22,11 +22,12 @@ import { useBranchMergeMutation } from 'data/branches/branch-merge-mutation'
 import { useBranchPushMutation } from 'data/branches/branch-push-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useBranchMergeDiff } from 'hooks/branches/useBranchMergeDiff'
 import { useWorkflowManagement } from 'hooks/branches/useWorkflowManagement'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useProjectByRefQuery, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
@@ -54,7 +55,7 @@ const MergePage: NextPageWithLayout = () => {
   const isBranch = project?.parent_project_ref !== undefined
   const parentProjectRef = project?.parent_project_ref
 
-  const { data: parentProject } = useProjectByRefQuery(parentProjectRef)
+  const { data: parentProject } = useProjectDetailQuery({ ref: parentProjectRef })
 
   const { data: branches } = useBranchesQuery(
     { projectRef: parentProjectRef },
@@ -86,7 +87,6 @@ const MergePage: NextPageWithLayout = () => {
     isLoading: isCombinedDiffLoading,
     hasChanges: combinedHasChanges,
   } = useBranchMergeDiff({
-    branchId: currentBranch?.id,
     currentBranchRef: ref,
     parentProjectRef,
     currentBranchConnectionString: project?.connectionString || undefined,
@@ -118,10 +118,10 @@ const MergePage: NextPageWithLayout = () => {
       setWorkflowFinalStatus(status)
       refetchDiff()
       clearDiffsOptimistically()
-      if (parentProjectRef && currentBranch?.id && currentBranch.review_requested_at) {
+      if (ref && parentProjectRef && currentBranch?.review_requested_at) {
         updateBranch(
           {
-            id: currentBranch.id,
+            branchRef: ref,
             projectRef: parentProjectRef,
             requestReview: false,
           },
@@ -135,7 +135,7 @@ const MergePage: NextPageWithLayout = () => {
       refetchDiff,
       clearDiffsOptimistically,
       parentProjectRef,
-      currentBranch?.id,
+      ref,
       updateBranch,
       currentBranch?.review_requested_at,
     ]
@@ -278,23 +278,23 @@ const MergePage: NextPageWithLayout = () => {
   })
 
   const handlePush = () => {
-    if (!currentBranch?.id || !parentProjectRef) return
+    if (!ref || !parentProjectRef) return
     pushBranch({
-      id: currentBranch.id,
+      branchRef: ref,
       projectRef: parentProjectRef,
     })
   }
 
   const handleCloseBranch = () => {
-    if (!currentBranch?.id || !parentProjectRef) return
+    if (!ref || !parentProjectRef) return
     deleteBranch({
-      id: currentBranch.id,
+      branchRef: ref,
       projectRef: parentProjectRef,
     })
   }
 
   const handleMerge = () => {
-    if (!currentBranch?.id || !parentProjectRef || !ref) return
+    if (!ref || !parentProjectRef) return
     setIsSubmitting(true)
 
     // Track merge attempt
@@ -307,25 +307,10 @@ const MergePage: NextPageWithLayout = () => {
     })
 
     mergeBranch({
-      id: currentBranch.id,
       branchProjectRef: ref,
       baseProjectRef: parentProjectRef,
       migration_version: undefined,
     })
-  }
-
-  const handleReadyForReview = () => {
-    if (!currentBranch?.id || !parentProjectRef) return
-    updateBranch(
-      {
-        id: currentBranch.id,
-        projectRef: parentProjectRef,
-        requestReview: true,
-      },
-      {
-        onSuccess: () => toast.success('Successfully marked as ready for review'),
-      }
-    )
   }
 
   const breadcrumbs = useMemo(
@@ -335,7 +320,7 @@ const MergePage: NextPageWithLayout = () => {
         href: `/project/${project?.ref}/branches/merge-requests`,
       },
     ],
-    [parentProjectRef]
+    [project?.ref]
   )
 
   const currentTab = (router.query.tab as string) || 'database'
@@ -433,10 +418,10 @@ const MergePage: NextPageWithLayout = () => {
           <DropdownMenuItem
             className="gap-x-2"
             onClick={() => {
-              if (!currentBranch?.id || !parentProjectRef) return
+              if (!ref || !parentProjectRef) return
               updateBranch(
                 {
-                  id: currentBranch.id,
+                  branchRef: ref,
                   projectRef: parentProjectRef,
                   requestReview: false,
                 },

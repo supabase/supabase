@@ -1299,6 +1299,18 @@ module.exports = [
     destination: '/docs/guides/auth/auth-helpers/auth-ui',
   },
   {
+    permanent: false,
+    source: '/docs/guides/auth/server-side/nextjs',
+    destination:
+      '/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=nextjs',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/auth/server-side/sveltekit',
+    destination:
+      '/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=sveltekit',
+  },
+  {
     permanent: true,
     source: '/docs/guides/client-libraries',
     destination: '/docs#reference-documentation',
@@ -1833,8 +1845,18 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/with-expo-social-auth',
+    destination: '/docs/guides/getting-started/tutorials/with-expo-react-native-social-auth',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/getting-started/tutorials/with-expo',
     destination: '/docs/guides/getting-started/tutorials/with-expo-react-native',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/tutorials/with-expo-social-auth',
+    destination: '/docs/guides/getting-started/tutorials/with-expo-react-native-social-auth',
   },
   {
     permanent: true,
@@ -2127,6 +2149,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/customers/mendableai',
+    destination: '/customers/firecrawl',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/auth-helpers/nextjs-server-components',
     destination: '/docs/guides/auth/auth-helpers/nextjs',
   },
@@ -2153,12 +2180,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/realtime/channels',
-    destination: '/docs/guides/realtime/concepts#channels',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/realtime/extensions',
-    destination: '/docs/guides/realtime/concepts',
+    destination: '/docs/guides/realtime/protocol#channels',
   },
   {
     permanent: true,

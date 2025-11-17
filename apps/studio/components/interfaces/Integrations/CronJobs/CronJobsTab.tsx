@@ -5,7 +5,7 @@ import { UIEvent, useMemo, useRef, useState } from 'react'
 import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
-import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet'
+import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet/CreateCronJobSheet'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCronJobsCountQuery } from 'data/database-cron-jobs/database-cron-jobs-count-query'
@@ -17,10 +17,12 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { BASE_PATH } from 'lib/constants'
-import { isAtBottom } from 'lib/helpers'
+import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import { Button, cn, LoadingLine, Sheet, SheetContent } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { formatCronJobColumns } from './CronJobs.utils'
 import { DeleteCronJob } from './DeleteCronJob'
 
@@ -42,8 +44,6 @@ export const CronjobsTab = () => {
     parseAsBoolean.withDefault(false).withOptions({ clearOnDefault: true })
   )
 
-  // used for confirmation prompt in the Create Cron Job Sheet
-  const [isClosingCreateCronJobSheet, setIsClosingCreateCronJobSheet] = useState(false)
   const [cronJobForEditing, setCronJobForEditing] = useState<
     Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'> | undefined
   >()
@@ -131,6 +131,20 @@ export const CronjobsTab = () => {
     setCreateCronJobSheetShown(true)
   }
 
+  const [isDirty, setIsDirty] = useState(false)
+  const onClose = () => {
+    setCronJobForEditing(undefined)
+    setCreateCronJobSheetShown(false)
+    cleanPointerEventsNoneOnBody(500)
+  }
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+    checkIsDirty: () => isDirty,
+    onClose: () => {
+      setIsDirty(false)
+      onClose()
+    },
+  })
+
   return (
     <>
       <div className="h-full w-full space-y-4">
@@ -144,7 +158,7 @@ export const CronjobsTab = () => {
               value={search ?? ''}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
-                if (e.code === 'Enter') setSearchQuery(search.trim())
+                if (e.code === 'Enter' || e.code === 'NumpadEnter') setSearchQuery(search.trim())
               }}
               actions={[
                 search && (
@@ -267,24 +281,33 @@ export const CronjobsTab = () => {
         cronJob={cronJobForDeletion!}
       />
 
-      <Sheet
-        open={!!createCronJobSheetShown}
-        onOpenChange={() => setIsClosingCreateCronJobSheet(true)}
-      >
+      <Sheet open={!!createCronJobSheetShown} onOpenChange={confirmOnClose}>
         <SheetContent size="default" tabIndex={undefined}>
           <CreateCronJobSheet
             selectedCronJob={cronJobForEditing ?? EMPTY_CRON_JOB}
             supportsSeconds={supportsSeconds}
-            onClose={() => {
-              setIsClosingCreateCronJobSheet(false)
-              setCronJobForEditing(undefined)
-              setCreateCronJobSheetShown(false)
-            }}
-            isClosing={isClosingCreateCronJobSheet}
-            setIsClosing={setIsClosingCreateCronJobSheet}
+            onDirty={setIsDirty}
+            onClose={onClose}
+            onCloseWithConfirmation={confirmOnClose}
           />
         </SheetContent>
       </Sheet>
+      <CloseConfirmationModal {...closeConfirmationModalProps} />
     </>
   )
 }
+
+const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
+  <ConfirmationModal
+    visible={visible}
+    title="Discard changes"
+    confirmLabel="Discard"
+    onCancel={onCancel}
+    onConfirm={onClose}
+  >
+    <p className="text-sm text-foreground-light">
+      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
+      lost.
+    </p>
+  </ConfirmationModal>
+)

@@ -33,7 +33,7 @@ export const MergeRequestButton = () => {
   if (!projectRef || !selectedBranch || selectedBranch.is_default || selectedBranch.git_branch)
     return null
 
-  const hasReviewRequested = !!selectedBranch?.review_requested_at
+  const hasReviewRequested = !!selectedBranch.review_requested_at
   const buttonLabel = hasReviewRequested ? 'Review merge request' : 'Open merge request'
 
   const handleClick = () => {
@@ -42,7 +42,7 @@ export const MergeRequestButton = () => {
     } else {
       updateBranch(
         {
-          id: selectedBranch.id,
+          branchRef: selectedBranch.project_ref,
           projectRef,
           requestReview: true,
         },

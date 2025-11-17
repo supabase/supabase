@@ -1,5 +1,24 @@
 export const analyticsKeys = {
   // logs/reports endpoints
+  functionsCombinedStats: (
+    projectRef: string | undefined,
+    {
+      interval,
+      functionId,
+    }: {
+      functionId: string | undefined
+      interval: string | undefined
+    }
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'functions-combined-stats',
+      {
+        interval,
+        functionId,
+      },
+    ] as const,
   functionsInvStats: (
     projectRef: string | undefined,
     {
@@ -58,42 +77,15 @@ export const analyticsKeys = {
       },
     ] as const,
 
-  orgDailyComputeStats: (
-    orgSlug: string | undefined,
-    {
-      startDate,
-      endDate,
-      projectRef,
-    }: {
-      startDate?: string
-      endDate?: string
-      projectRef?: string
-    }
-  ) =>
-    [
-      'organizations',
-      orgSlug,
-      'daily-stats-compute',
-      {
-        startDate: isoDateStringToDate(startDate),
-        endDate: isoDateStringToDate(endDate),
-        projectRef,
-      },
-    ] as const,
-
   orgDailyStats: (
     orgSlug: string | undefined,
     {
-      metric,
       startDate,
       endDate,
-      interval,
       projectRef,
     }: {
-      metric?: string
       startDate?: string
       endDate?: string
-      interval?: string
       projectRef?: string
     }
   ) =>
@@ -102,10 +94,8 @@ export const analyticsKeys = {
       orgSlug,
       'daily-stats',
       {
-        metric,
         startDate: isoDateStringToDate(startDate),
         endDate: isoDateStringToDate(endDate),
-        interval,
         projectRef,
       },
     ] as const,
@@ -131,6 +121,8 @@ export const analyticsKeys = {
       'infra-monitoring',
       { attribute, startDate, endDate, interval, databaseIdentifier },
     ] as const,
+  projectMetrics: (projectRef: string | undefined, { interval }: { interval?: string }) =>
+    ['projects', projectRef, 'project.metrics', { interval }] as const,
   usageApiCounts: (projectRef: string | undefined, interval: string | undefined) =>
     ['projects', projectRef, 'usage.api-counts', interval] as const,
 

@@ -19,9 +19,10 @@ import {
   QUEUES_SCHEMA,
   useDatabaseQueueToggleExposeMutation,
 } from 'data/database-queues/database-queues-toggle-postgrest-mutation'
+import { useDatabaseQueuesVersionQuery } from 'data/database-queues/database-queues-version-query'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
@@ -30,16 +31,18 @@ import {
   FormField_Shadcn_,
   FormItem_Shadcn_,
   Switch,
+  TextLink,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { IS_PLATFORM } from 'lib/constants'
 
 // [Joshen] Not convinced with the UI and layout but getting the functionality out first
 
 export const QueuesSettings = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { can: canUpdatePostgrestConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdatePostgrestConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_postgrest'
   )
@@ -78,20 +81,27 @@ export const QueuesSettings = () => {
   })
   const schemas = config?.db_schema.replace(/ /g, '').split(',') ?? []
 
+  const { data: pgmqVersion } = useDatabaseQueuesVersionQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
   const { mutateAsync: updateTable } = useTableUpdateMutation()
 
+  const onPostgrestConfigUpdateSuccess = () => {
+    if (enable) {
+      toast.success('Queues can now be managed through client libraries or PostgREST endpoints!')
+    } else {
+      toast.success(
+        'Queues can no longer be managed through client libraries or PostgREST endpoints'
+      )
+    }
+    setIsToggling(false)
+    form.reset({ enable })
+  }
+
   const { mutate: updatePostgrestConfig } = useProjectPostgrestConfigUpdateMutation({
-    onSuccess: () => {
-      if (enable) {
-        toast.success('Queues can now be managed through client libraries or PostgREST endpoints!')
-      } else {
-        toast.success(
-          'Queues can no longer be managed through client libraries or PostgREST endpoints'
-        )
-      }
-      setIsToggling(false)
-      form.reset({ enable })
-    },
+    onSuccess: onPostgrestConfigUpdateSuccess,
     onError: (error) => {
       setIsToggling(false)
       toast.error(`Failed to toggle queue exposure via PostgREST: ${error.message}`)
@@ -100,6 +110,7 @@ export const QueuesSettings = () => {
 
   const { mutate: toggleExposeQueuePostgrest } = useDatabaseQueueToggleExposeMutation({
     onSuccess: (_, values) => {
+      if (!IS_PLATFORM) return onPostgrestConfigUpdateSuccess()
       if (project && config) {
         if (values.enable) {
           const updatedSchemas = schemas.concat([QUEUES_SCHEMA])
@@ -161,12 +172,16 @@ export const QueuesSettings = () => {
         `Failed to toggle queue exposure via PostgREST: Unable to retrieve PostgREST configuration (${configError.message})`
       )
     }
+    if (!pgmqVersion) {
+      return toast.error('Unable to retrieve PGMQ version. Please try again later.')
+    }
 
     setIsToggling(true)
     toggleExposeQueuePostgrest({
       projectRef: project.ref,
       connectionString: project.connectionString,
       enable: values.enable,
+      pgmqVersion,
     })
   }
 
@@ -210,6 +225,20 @@ export const QueuesSettings = () => {
                               <code className="text-xs">archive</code>, and{' '}
                               <code className="text-xs">delete</code>
                             </p>
+                            {!IS_PLATFORM ? (
+                              <div className="mt-6 max-w-2xl">
+                                When running Supabase locally with the CLI or self-hosting using
+                                Docker Compose, you also need to update your configuration to expose
+                                the <code className="text-xs">{QUEUES_SCHEMA}</code> schema.
+                                <br />
+                                <TextLink
+                                  target="_blank"
+                                  className="mt-0 inline-block"
+                                  label="Learn more"
+                                  url="https://supabase.com/docs/guides/queues/expose-self-hosted-queues"
+                                />
+                              </div>
+                            ) : null}
                           </>
                         }
                       >

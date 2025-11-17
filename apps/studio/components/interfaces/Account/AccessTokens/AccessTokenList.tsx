@@ -110,7 +110,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
     return (
       <TableContainer>
         <TableRow>
-          <TableCell colSpan={4} className="p-0">
+          <TableCell colSpan={5} className="p-0">
             <AlertError
               error={error}
               subject="Failed to retrieve access tokens"
@@ -135,7 +135,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
     return (
       <TableContainer>
         <TableRow>
-          <TableCell colSpan={4} className="py-12">
+          <TableCell colSpan={5} className="py-12">
             <p className="text-sm text-center text-foreground">No access tokens found</p>
             <p className="text-sm text-center text-foreground-light">
               You do not have any tokens created yet

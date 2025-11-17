@@ -24,7 +24,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
-import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
+import { InstanceConfiguration } from './InfrastructureConfiguration/InstanceConfiguration'
 import {
   ObjectsToBeDroppedWarning,
   ReadReplicasWarning,
@@ -36,7 +36,8 @@ const InfrastructureInfo = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const authEnabled = useIsFeatureEnabled('project_auth:all')
+  const { projectAuthAll: authEnabled, projectSettingsDatabaseUpgrades: showDatabaseUpgrades } =
+    useIsFeatureEnabled(['project_auth:all', 'project_settings:database_upgrades'])
 
   const {
     data,
@@ -92,9 +93,9 @@ const InfrastructureInfo = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <ScaffoldSectionDetail>
-            <p>Service Versions</p>
-            <p className="text-foreground-light text-sm">
-              Information on your provisioned instance
+            <h4 className="text-base capitalize m-0">Service Versions</h4>
+            <p className="text-foreground-light text-sm pr-8 mt-1">
+              Service versions and upgrade eligibility for your provisioned instance.
             </p>
           </ScaffoldSectionDetail>
           <ScaffoldSectionContent>
@@ -109,6 +110,7 @@ const InfrastructureInfo = () => {
               </Alert_Shadcn_>
             ) : (
               <>
+                {/* [Joshen] Double check why we need this waterfall loading behaviour here */}
                 {isLoadingUpgradeEligibility && <GenericSkeletonLoader />}
                 {isErrorUpgradeEligibility && (
                   <AlertError error={error} subject="Failed to retrieve Postgres version" />
@@ -187,7 +189,7 @@ const InfrastructureInfo = () => {
                       </>
                     )}
 
-                    {data.eligible ? (
+                    {showDatabaseUpgrades && data.eligible ? (
                       hasReadReplicas ? (
                         <ReadReplicasWarning latestPgVersion={latestPgVersion} />
                       ) : (
@@ -195,7 +197,7 @@ const InfrastructureInfo = () => {
                       )
                     ) : null}
 
-                    {!data.eligible ? (
+                    {showDatabaseUpgrades && !data.eligible ? (
                       hasObjectsToBeDropped ? (
                         <ObjectsToBeDroppedWarning
                           objectsToBeDropped={data.objects_to_be_dropped}

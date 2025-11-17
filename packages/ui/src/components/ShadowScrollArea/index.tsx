@@ -1,9 +1,11 @@
+'use client'
 import * as React from 'react'
 import { cn } from '../../lib/utils/cn'
 import { useHorizontalScroll } from '../hooks/use-horizontal-scroll'
 
 interface ShadowScrollAreaProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
+  containerClassName?: string
   stickyLastColumn?: boolean
 }
 
@@ -14,7 +16,7 @@ interface ShadowScrollAreaProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 
 const ShadowScrollArea = React.forwardRef<HTMLDivElement, ShadowScrollAreaProps>(
-  ({ className, children, stickyLastColumn, ...props }, ref) => {
+  ({ className, containerClassName, children, stickyLastColumn, ...props }, ref) => {
     const containerRef = React.useRef<HTMLDivElement>(null)
     const { hasHorizontalScroll, canScrollLeft, canScrollRight } = useHorizontalScroll(containerRef)
 
@@ -32,7 +34,7 @@ const ShadowScrollArea = React.forwardRef<HTMLDivElement, ShadowScrollAreaProps>
     )
 
     return (
-      <div className="relative">
+      <div className={cn(containerClassName, 'relative')}>
         <div
           className={cn(
             'absolute inset-0 pointer-events-none z-50',

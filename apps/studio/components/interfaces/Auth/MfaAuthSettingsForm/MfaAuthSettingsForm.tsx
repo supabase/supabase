@@ -3,19 +3,19 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { number, object, string, boolean } from 'yup'
+import { boolean, number, object, string } from 'yup'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import {
-  AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
@@ -35,8 +35,9 @@ import {
   Switch,
   WarningIcon,
 } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 function determineMFAStatus(verifyEnabled: boolean, enrollEnabled: boolean) {
   return verifyEnabled ? (enrollEnabled ? 'Enabled' : 'Verify Enabled') : 'Disabled'
@@ -84,9 +85,14 @@ const securitySchema = object({
   MFA_ALLOW_LOW_AAL: boolean().required(),
 })
 
-const MfaAuthSettingsForm = () => {
+export const MfaAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
-  const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
+  const {
+    data: authConfig,
+    error: authConfigError,
+    isError,
+    isLoading,
+  } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
   // Separate loading states for each form
@@ -96,11 +102,11 @@ const MfaAuthSettingsForm = () => {
 
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false)
 
-  const { can: canReadConfig } = useAsyncCheckProjectPermissions(
+  const { can: canReadConfig } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'custom_config_gotrue'
   )
-  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
@@ -253,16 +259,26 @@ const MfaAuthSettingsForm = () => {
 
   if (isError) {
     return (
-      <Alert_Shadcn_ variant="destructive">
-        <WarningIcon />
-        <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+      <ScaffoldSection isFullWidth>
+        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+      </ScaffoldSection>
     )
   }
 
   if (!canReadConfig) {
-    return <NoPermission resourceText="view auth configuration settings" />
+    return (
+      <ScaffoldSection isFullWidth>
+        <NoPermission resourceText="view auth configuration settings" />
+      </ScaffoldSection>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <ScaffoldSection isFullWidth>
+        <GenericSkeletonLoader />
+      </ScaffoldSection>
+    )
   }
 
   const phoneMFAIsEnabled =
@@ -572,5 +588,3 @@ const MfaAuthSettingsForm = () => {
     </>
   )
 }
-
-export default MfaAuthSettingsForm

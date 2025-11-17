@@ -11,6 +11,7 @@ export const generateSettingsMenu = (
   organization?: Organization,
   features?: {
     auth?: boolean
+    authProviders?: boolean
     edgeFunctions?: boolean
     storage?: boolean
     invoices?: boolean
@@ -19,14 +20,29 @@ export const generateSettingsMenu = (
     billing?: boolean
   }
 ): ProductMenuGroup[] => {
+  if (!IS_PLATFORM) {
+    return [
+      {
+        title: 'Project Settings',
+        items: [
+          {
+            name: `Log Drains`,
+            key: `log-drains`,
+            url: `/project/${ref}/settings/log-drains`,
+            items: [],
+          },
+        ],
+      },
+    ]
+  }
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
 
   const authEnabled = features?.auth ?? true
+  const authProvidersEnabled = features?.authProviders ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
   const legacyJwtKeysEnabled = features?.legacyJwtKeys ?? true
-  const logDrainsEnabled = features?.logDrains ?? true
   const billingEnabled = features?.billing ?? true
 
   return [
@@ -39,64 +55,53 @@ export const generateSettingsMenu = (
           url: `/project/${ref}/settings/general`,
           items: [],
         },
-        ...(IS_PLATFORM
-          ? [
-              {
-                name: 'Compute and Disk',
-                key: 'compute-and-disk',
-                url: `/project/${ref}/settings/compute-and-disk`,
-                items: [],
-              },
-            ]
-          : []),
+        {
+          name: 'Compute and Disk',
+          key: 'compute-and-disk',
+          url: `/project/${ref}/settings/compute-and-disk`,
+          items: [],
+        },
         {
           name: 'Infrastructure',
           key: 'infrastructure',
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/infrastructure`,
           items: [],
         },
-        ...(IS_PLATFORM
-          ? [
-              {
-                name: 'Integrations',
-                key: 'integrations',
-                url: `/project/${ref}/settings/integrations`,
-                items: [],
-              },
-              ...(logDrainsEnabled
-                ? [
-                    {
-                      name: `Log Drains`,
-                      key: `log-drains`,
-                      url: `/project/${ref}/settings/log-drains`,
-                      items: [],
-                    },
-                  ]
-                : []),
-              {
-                name: 'Data API',
-                key: 'api',
-                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
-                items: [],
-              },
-              {
-                name: 'API Keys',
-                key: 'api-keys',
-                url: `/project/${ref}/settings/api-keys`,
-                items: [],
-                label: 'NEW',
-              },
-              {
-                name: 'JWT Keys',
-                key: 'jwt',
-                url: legacyJwtKeysEnabled
-                  ? `/project/${ref}/settings/jwt`
-                  : `/project/${ref}/settings/jwt/signing-keys`,
-                items: [],
-                label: 'NEW',
-              },
-            ]
-          : []),
+
+        {
+          name: 'Integrations',
+          key: 'integrations',
+          url: `/project/${ref}/settings/integrations`,
+          items: [],
+        },
+
+        {
+          name: 'Data API',
+          key: 'api',
+          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
+          items: [],
+        },
+        {
+          name: 'API Keys',
+          key: 'api-keys',
+          url: `/project/${ref}/settings/api-keys`,
+          items: [],
+        },
+        {
+          name: 'JWT Keys',
+          key: 'jwt',
+          url: legacyJwtKeysEnabled
+            ? `/project/${ref}/settings/jwt`
+            : `/project/${ref}/settings/jwt/signing-keys`,
+          items: [],
+        },
+
+        {
+          name: `Log Drains`,
+          key: `log-drains`,
+          url: `/project/${ref}/settings/log-drains`,
+          items: [],
+        },
         {
           name: 'Add Ons',
           key: 'addons',
@@ -109,7 +114,7 @@ export const generateSettingsMenu = (
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/vault/overview`,
           items: [],
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-          label: 'Alpha',
+          label: 'BETA',
         },
       ],
     },
@@ -123,18 +128,20 @@ export const generateSettingsMenu = (
           items: [],
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
         },
-        ...(IS_PLATFORM && authEnabled
+        ...(authEnabled
           ? [
               {
                 name: 'Authentication',
                 key: 'auth',
-                url: `/project/${ref}/auth/providers`,
+                url: authProvidersEnabled
+                  ? `/project/${ref}/auth/providers`
+                  : `/project/${ref}/auth/policies`,
                 items: [],
                 rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
               },
             ]
           : []),
-        ...(IS_PLATFORM && storageEnabled
+        ...(storageEnabled
           ? [
               {
                 name: 'Storage',
@@ -145,7 +152,7 @@ export const generateSettingsMenu = (
               },
             ]
           : []),
-        ...(IS_PLATFORM && edgeFunctionsEnabled
+        ...(edgeFunctionsEnabled
           ? [
               {
                 name: 'Edge Functions',

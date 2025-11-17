@@ -1,14 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
-import { useState } from 'react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useRef, useState } from 'react'
 
+import type { PostgresRole } from '@supabase/postgres-meta'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import NoSearchResults from 'components/ui/NoSearchResults'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import SparkBar from 'components/ui/SparkBar'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { CreateRolePanel } from './CreateRolePanel'
@@ -19,15 +22,14 @@ import { SUPABASE_ROLES } from './Roles.constants'
 
 type SUPABASE_ROLE = (typeof SUPABASE_ROLES)[number]
 
-const RolesList = () => {
+export const RolesList = () => {
   const { data: project } = useSelectedProjectQuery()
 
   const [filterString, setFilterString] = useState('')
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')
-  const [isCreatingRole, setIsCreatingRole] = useState(false)
-  const [selectedRoleToDelete, setSelectedRoleToDelete] = useState<any>()
+  const deletingRoleIdRef = useRef<string | null>(null)
 
-  const { can: canUpdateRoles } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateRoles } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'roles'
   )
@@ -42,6 +44,20 @@ const RolesList = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const [isCreatingRole, setIsCreatingRole] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const { setValue: setSelectedRoleIdToDelete, value: roleToDelete } = useQueryStateWithSelect({
+    urlKey: 'delete',
+    select: (id: string) => (id ? data?.find((role) => role.id.toString() === id) : undefined),
+    enabled: !!data,
+    onError: (_error, selectedId) =>
+      handleErrorOnDelete(deletingRoleIdRef, selectedId, `Database Role not found`),
+  })
+
   const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())
 
   const filteredRoles = (
@@ -182,7 +198,7 @@ const RolesList = () => {
                   disabled
                   key={role.id}
                   role={role}
-                  onSelectDelete={setSelectedRoleToDelete}
+                  onSelectDelete={setSelectedRoleIdToDelete}
                 />
               ))}
         </div>
@@ -199,7 +215,7 @@ const RolesList = () => {
                   key={role.id}
                   disabled={!canUpdateRoles}
                   role={role}
-                  onSelectDelete={setSelectedRoleToDelete}
+                  onSelectDelete={setSelectedRoleIdToDelete}
                 />
               ))}
         </div>
@@ -212,12 +228,15 @@ const RolesList = () => {
       <CreateRolePanel visible={isCreatingRole} onClose={() => setIsCreatingRole(false)} />
 
       <DeleteRoleModal
-        role={selectedRoleToDelete}
-        visible={selectedRoleToDelete !== undefined}
-        onClose={() => setSelectedRoleToDelete(undefined)}
+        role={roleToDelete as unknown as PostgresRole}
+        visible={!!roleToDelete}
+        onClose={() => setSelectedRoleIdToDelete(null)}
+        onDelete={() => {
+          if (roleToDelete) {
+            deletingRoleIdRef.current = roleToDelete.id.toString()
+          }
+        }}
       />
     </>
   )
 }
-
-export default RolesList

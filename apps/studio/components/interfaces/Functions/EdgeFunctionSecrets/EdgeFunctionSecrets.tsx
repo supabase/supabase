@@ -9,26 +9,29 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSecretsDeleteMutation } from 'data/secrets/secrets-delete-mutation'
 import { ProjectSecret, useSecretsQuery } from 'data/secrets/secrets-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Badge, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import AddNewSecretForm from './AddNewSecretForm'
 import EdgeFunctionSecret from './EdgeFunctionSecret'
+import { EditSecretSheet } from './EditSecretSheet'
+
+type SelectedProjectSecret = {
+  secret: ProjectSecret
+  op: 'delete' | 'edit'
+}
 
 const EdgeFunctionSecrets = () => {
   const { ref: projectRef } = useParams()
   const [searchString, setSearchString] = useState('')
-  const [selectedSecret, setSelectedSecret] = useState<ProjectSecret>()
+  const [selectedSecret, setSelectedSecret] = useState<SelectedProjectSecret>()
 
-  const { can: canReadSecrets, isLoading: isLoadingPermissions } = useAsyncCheckProjectPermissions(
+  const { can: canReadSecrets, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.SECRETS_READ,
     '*'
   )
-  const { can: canUpdateSecrets } = useAsyncCheckProjectPermissions(
-    PermissionAction.SECRETS_WRITE,
-    '*'
-  )
+  const { can: canUpdateSecrets } = useAsyncCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
 
   const { data, error, isLoading, isSuccess, isError } = useSecretsQuery({
     projectRef: projectRef,
@@ -36,7 +39,7 @@ const EdgeFunctionSecrets = () => {
 
   const { mutate: deleteSecret, isLoading: isDeleting } = useSecretsDeleteMutation({
     onSuccess: () => {
-      toast.success(`Successfully deleted ${selectedSecret?.name}`)
+      toast.success(`Successfully deleted ${selectedSecret?.secret.name}`)
       setSelectedSecret(undefined)
     },
   })
@@ -102,7 +105,8 @@ const EdgeFunctionSecrets = () => {
                             <EdgeFunctionSecret
                               key={secret.name}
                               secret={secret}
-                              onSelectDelete={() => setSelectedSecret(secret)}
+                              onSelectEdit={() => setSelectedSecret({ secret, op: 'edit' })}
+                              onSelectDelete={() => setSelectedSecret({ secret, op: 'delete' })}
                             />
                           ))
                         ) : secrets.length === 0 && searchString.length > 0 ? (
@@ -134,17 +138,23 @@ const EdgeFunctionSecrets = () => {
         </>
       )}
 
+      <EditSecretSheet
+        secret={selectedSecret?.secret}
+        visible={selectedSecret?.op === 'edit'}
+        onClose={() => setSelectedSecret(undefined)}
+      />
+
       <ConfirmationModal
         variant="destructive"
         loading={isDeleting}
-        visible={selectedSecret !== undefined}
+        visible={selectedSecret?.op === 'delete'}
         confirmLabel="Delete secret"
         confirmLabelLoading="Deleting secret"
-        title={`Confirm to delete secret "${selectedSecret?.name}"`}
+        title={`Confirm to delete secret "${selectedSecret?.secret.name}"`}
         onCancel={() => setSelectedSecret(undefined)}
         onConfirm={() => {
           if (selectedSecret !== undefined) {
-            deleteSecret({ projectRef, secrets: [selectedSecret.name] })
+            deleteSecret({ projectRef, secrets: [selectedSecret.secret.name] })
           }
         }}
       >

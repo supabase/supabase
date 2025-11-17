@@ -5,8 +5,9 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -17,7 +18,9 @@ import {
   SheetContent,
   WarningIcon,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
+import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
 import { WRAPPERS } from './Wrappers.constants'
 import { WrapperTable } from './WrapperTable'
@@ -26,9 +29,8 @@ export const WrapperOverviewTab = () => {
   const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [createWrapperShown, setCreateWrapperShown] = useState(false)
-  const [isClosingCreateWrapper, setisClosingCreateWrapper] = useState(false)
 
-  const { can: canCreateWrapper } = useAsyncCheckProjectPermissions(
+  const { can: canCreateWrapper } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'wrappers'
   )
@@ -36,6 +38,15 @@ export const WrapperOverviewTab = () => {
   const { data } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+  })
+
+  const [isDirty, setIsDirty] = useState(false)
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+    checkIsDirty: () => isDirty,
+    onClose: () => {
+      setCreateWrapperShown(false)
+      setIsDirty(false)
+    },
   })
 
   const wrapperMeta = WRAPPERS.find((w) => w.name === id)
@@ -53,7 +64,13 @@ export const WrapperOverviewTab = () => {
   const databaseNeedsUpgrading =
     wrappersExtension?.installed_version === wrappersExtension?.default_version
 
-  const CreateWrapperSheetComponent = wrapperMeta.createComponent || CreateWrapperSheet
+  // [Joshen] Opting to declare custom wrapper sheets here instead of within Wrappers.constants.ts
+  // as we'll easily run into circular dependencies doing so unfortunately
+  const CreateWrapperSheetComponent = wrapperMeta.customComponent
+    ? wrapperMeta.name === 'iceberg_wrapper'
+      ? CreateIcebergWrapperSheet
+      : ({}) => null
+    : CreateWrapperSheet
 
   return (
     <IntegrationOverviewTab
@@ -120,19 +137,34 @@ export const WrapperOverviewTab = () => {
       </div>
       <Separator />
 
-      <Sheet open={!!createWrapperShown} onOpenChange={() => setisClosingCreateWrapper(true)}>
+      <Sheet open={!!createWrapperShown} onOpenChange={confirmOnClose}>
         <SheetContent size="lg" tabIndex={undefined}>
           <CreateWrapperSheetComponent
             wrapperMeta={wrapperMeta}
+            onDirty={(dirty) => setIsDirty(dirty)}
             onClose={() => {
               setCreateWrapperShown(false)
-              setisClosingCreateWrapper(false)
             }}
-            isClosing={isClosingCreateWrapper}
-            setIsClosing={setisClosingCreateWrapper}
+            onCloseWithConfirmation={confirmOnClose}
           />
         </SheetContent>
       </Sheet>
+      <CloseConfirmationModal {...closeConfirmationModalProps} />
     </IntegrationOverviewTab>
   )
 }
+
+const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
+  <ConfirmationModal
+    visible={visible}
+    title="Discard changes"
+    confirmLabel="Discard"
+    onCancel={onCancel}
+    onConfirm={onClose}
+  >
+    <p className="text-sm text-foreground-light">
+      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
+      lost.
+    </p>
+  </ConfirmationModal>
+)

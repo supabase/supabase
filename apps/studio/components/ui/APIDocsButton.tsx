@@ -1,27 +1,48 @@
-import { Code } from 'lucide-react'
+import { BookOpenText } from 'lucide-react'
+import { useParams } from 'common'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useAppStateSnapshot } from 'state/app-state'
-import { Button } from 'ui'
+import { ButtonTooltip } from './ButtonTooltip'
 
 interface APIDocsButtonProps {
   section?: string[]
+  source: string
 }
 
-const APIDocsButton = ({ section }: APIDocsButtonProps) => {
+export const APIDocsButton = ({ section, source }: APIDocsButtonProps) => {
   const snap = useAppStateSnapshot()
+  const { ref } = useParams()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   return (
-    <Button
+    <ButtonTooltip
       size="tiny"
       type="default"
       onClick={() => {
         if (section) snap.setActiveDocsSection(section)
         snap.setShowProjectApiDocs(true)
+
+        sendEvent({
+          action: 'api_docs_opened',
+          properties: {
+            source,
+          },
+          groups: {
+            project: ref ?? 'Unknown',
+            organization: org?.slug ?? 'Unknown',
+          },
+        })
       }}
-      icon={<Code strokeWidth={1.5} className="text-foreground-muted" />}
-    >
-      API Docs
-    </Button>
+      icon={<BookOpenText />}
+      className="h-7 w-7"
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text: 'API Docs',
+        },
+      }}
+    />
   )
 }
-
-export default APIDocsButton

@@ -1,10 +1,12 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
-import { PropsWithChildren, createContext, useContext, useRef } from 'react'
+import { PropsWithChildren, createContext, useContext } from 'react'
 import { proxy, useSnapshot } from 'valtio'
 
+import { useConstant } from 'common'
 import type { SupaRow } from 'components/grid/types'
 import { ForeignKey } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
 import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
+import type { TableField } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
 import type { Dictionary } from 'types'
 
 export const TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE = 100
@@ -19,7 +21,7 @@ export type SidePanel =
   | { type: 'cell'; value?: { column: string; row: Dictionary<any> } }
   | { type: 'row'; row?: Dictionary<any> }
   | { type: 'column'; column?: PostgresColumn }
-  | { type: 'table'; mode: 'new' | 'edit' | 'duplicate' }
+  | { type: 'table'; mode: 'new' | 'edit' | 'duplicate'; templateData?: Partial<TableField> }
   | { type: 'schema'; mode: 'new' | 'edit' }
   | { type: 'json'; jsonValue: EditValue }
   | {
@@ -89,10 +91,10 @@ export const createTableEditorState = () => {
     },
 
     /* Tables */
-    onAddTable: () => {
+    onAddTable: (templateData?: Partial<TableField>) => {
       state.ui = {
         open: 'side-panel',
-        sidePanel: { type: 'table', mode: 'new' },
+        sidePanel: { type: 'table', mode: 'new', templateData },
       }
     },
     onEditTable: () => {
@@ -209,7 +211,7 @@ export type TableEditorState = ReturnType<typeof createTableEditorState>
 export const TableEditorStateContext = createContext<TableEditorState>(createTableEditorState())
 
 export const TableEditorStateContextProvider = ({ children }: PropsWithChildren<{}>) => {
-  const state = useRef(createTableEditorState()).current
+  const state = useConstant(createTableEditorState)
 
   return (
     <TableEditorStateContext.Provider value={state}>{children}</TableEditorStateContext.Provider>

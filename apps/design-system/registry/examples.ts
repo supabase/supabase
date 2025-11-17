@@ -385,12 +385,30 @@ export const examples: Registry = [
     registryDependencies: ['context-menu'],
     files: ['example/context-menu-demo.tsx'],
   },
-  // {
-  //   name: 'data-table-demo',
-  //   type: 'components:example',
-  //   registryDependencies: ['data-table'],
-  //   files: ['example/data-table-demo.tsx'],
-  // },
+  {
+    name: 'data-input-demo',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-demo.tsx'],
+  },
+  {
+    name: 'data-input-with-copy',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-with-copy.tsx'],
+  },
+  {
+    name: 'data-input-with-copy-secret',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-with-copy-secret.tsx'],
+  },
+  {
+    name: 'data-input-with-reveal-copy',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-with-reveal-copy.tsx'],
+  },
   {
     name: 'date-picker-demo',
     type: 'components:example',
@@ -574,6 +592,24 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['navigation-menu'],
     files: ['example/navigation-menu-responsive.tsx'],
+  },
+  {
+    name: 'nav-menu-demo',
+    type: 'components:example',
+    registryDependencies: ['nav-menu'],
+    files: ['example/nav-menu-demo.tsx'],
+  },
+  {
+    name: 'nav-menu-badges',
+    type: 'components:example',
+    registryDependencies: ['nav-menu'],
+    files: ['example/nav-menu-badges.tsx'],
+  },
+  {
+    name: 'nav-menu-icons',
+    type: 'components:example',
+    registryDependencies: ['nav-menu'],
+    files: ['example/nav-menu-icons.tsx'],
   },
   // {
   //   name: 'pagination-demo',
@@ -1043,6 +1079,51 @@ export const examples: Registry = [
     files: ['example/info-tooltip-demo.tsx'],
   },
   {
+    name: 'page-container-demo',
+    type: 'components:example',
+    files: ['example/page-container-demo.tsx'],
+  },
+  {
+    name: 'page-layout-detail',
+    type: 'components:example',
+    files: ['example/page-layout-detail.tsx'],
+  },
+  {
+    name: 'page-layout-list',
+    type: 'components:example',
+    files: ['example/page-layout-list.tsx'],
+  },
+  {
+    name: 'page-layout-list-simple',
+    type: 'components:example',
+    files: ['example/page-layout-list-simple.tsx'],
+  },
+  {
+    name: 'page-layout-settings',
+    type: 'components:example',
+    files: ['example/page-layout-settings.tsx'],
+  },
+  {
+    name: 'page-header-demo',
+    type: 'components:example',
+    files: ['example/page-header-demo.tsx'],
+  },
+  {
+    name: 'page-section-demo',
+    type: 'components:example',
+    files: ['example/page-section-demo.tsx'],
+  },
+  {
+    name: 'page-section-horizontal',
+    type: 'components:example',
+    files: ['example/page-section-horizontal.tsx'],
+  },
+  {
+    name: 'page-section-with-aside',
+    type: 'components:example',
+    files: ['example/page-section-with-aside.tsx'],
+  },
+  {
     name: 'inner-side-menu-demo',
     type: 'components:example',
     files: ['example/inner-side-menu-demo.tsx'],
@@ -1226,5 +1307,50 @@ export const examples: Registry = [
     name: 'logs-bar-chart',
     type: 'components:example',
     files: ['example/logs-bar-chart.tsx'],
+  },
+  {
+    name: 'empty-state-missing-route',
+    type: 'components:example',
+    files: ['example/empty-state-missing-route.tsx'],
+  },
+  {
+    name: 'empty-state-zero-items-table',
+    type: 'components:example',
+    files: ['example/empty-state-zero-items-table.tsx'],
+  },
+  {
+    name: 'empty-state-initial-state-presentational',
+    type: 'components:example',
+    files: ['example/empty-state-initial-state-presentational.tsx'],
+  },
+  {
+    name: 'empty-state-initial-state-informational',
+    type: 'components:example',
+    files: ['example/empty-state-initial-state-informational.tsx'],
+  },
+  {
+    name: 'empty-state-zero-items-data-grid',
+    type: 'components:example',
+    files: ['example/empty-state-zero-items-data-grid.tsx'],
+  },
+  {
+    name: 'metric-card',
+    type: 'components:example',
+    files: ['example/metric-card.tsx'],
+  },
+  {
+    name: 'metric-card-minimal',
+    type: 'components:example',
+    files: ['example/metric-card-minimal.tsx'],
+  },
+  {
+    name: 'metric-card-minimal-horizontal',
+    type: 'components:example',
+    files: ['example/metric-card-minimal-horizontal.tsx'],
+  },
+  {
+    name: 'metric-card-with-icon-link-tooltip',
+    type: 'components:example',
+    files: ['example/metric-card-with-icon-link-tooltip.tsx'],
   },
 ]

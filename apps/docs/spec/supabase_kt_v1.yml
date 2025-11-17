@@ -2904,7 +2904,7 @@ functions:
     title: 'generateLink()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
     notes: |
-      Generates email links and OTPs to be sent via a custom email provider.
+      Generates email links and OTPs. This will not send links or OTPs to the end user. This function is for custom admin functionality.
     examples:
       - id: generate-a-signup-link
         name: Generate a signup link

@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import { quoteLiteral } from 'lib/pg-format'
-import type { ResponseError, VaultSecret } from 'types'
+import type { ResponseError, UseCustomMutationOptions, VaultSecret } from 'types'
 import { vaultSecretsKeys } from './keys'
 
 export type VaultSecretUpdateVariables = {
@@ -39,30 +39,28 @@ export const useVaultSecretUpdateMutation = ({
   onSuccess,
   ...options
 }: Omit<
-  UseMutationOptions<VaultSecretUpdateData, ResponseError, VaultSecretUpdateVariables>,
+  UseCustomMutationOptions<VaultSecretUpdateData, ResponseError, VaultSecretUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<VaultSecretUpdateData, ResponseError, VaultSecretUpdateVariables>(
-    (vars) => updateVaultSecret(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { id, projectRef } = variables
-        await Promise.all([
-          queryClient.removeQueries(vaultSecretsKeys.getDecryptedValue(projectRef, id)),
-          queryClient.invalidateQueries(vaultSecretsKeys.list(projectRef)),
-        ])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update key: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<VaultSecretUpdateData, ResponseError, VaultSecretUpdateVariables>({
+    mutationFn: (vars) => updateVaultSecret(vars),
+    async onSuccess(data, variables, context) {
+      const { id, projectRef } = variables
+      await Promise.all([
+        queryClient.removeQueries({ queryKey: vaultSecretsKeys.getDecryptedValue(projectRef, id) }),
+        queryClient.invalidateQueries({ queryKey: vaultSecretsKeys.list(projectRef) }),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update key: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

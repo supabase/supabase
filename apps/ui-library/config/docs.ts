@@ -54,14 +54,14 @@ export const componentPages: SidebarNavGroup = {
   items: [
     {
       title: 'Client',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/client',
       items: [],
       commandItemLabel: 'Supabase Client',
     },
     {
       title: 'Password-Based Auth',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/password-based-auth',
       items: [],
       commandItemLabel: 'Password-Based Auth',
@@ -141,4 +141,6 @@ export const frameworkTitles: Record<string, string> = {
   'react-router': 'React Router',
   tanstack: 'TanStack Start',
   react: 'React SPA',
+  vue: 'Vue',
+  nuxtjs: 'Nuxt.js',
 }

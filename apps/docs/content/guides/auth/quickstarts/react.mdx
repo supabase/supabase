@@ -10,9 +10,9 @@ hideToc: true
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Create a new Supabase project">
 
-    [Launch a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
+    [Launch a new project](/dashboard) in the Supabase Dashboard.
 
-    Your new database has a table for storing your users. You can see that this table is currently empty by running some SQL in the [SQL Editor](https://supabase.com/dashboard/project/_/sql).
+    Your new database has a table for storing your users. You can see that this table is currently empty by running some SQL in the [SQL Editor](/dashboard/project/_/sql).
 
     </StepHikeCompact.Details>
 
@@ -29,17 +29,10 @@ hideToc: true
   <StepHikeCompact.Step step={2}>
   <StepHikeCompact.Details title="Create a React app">
 
-    Create a React app using [Vite](https://vitejs.dev/).
+    Select React from the [list of UI Library quickstarts](/ui/docs/getting-started/quickstart) and follow the instructions to create a new project.
 
   </StepHikeCompact.Details>
 
-  <StepHikeCompact.Code>
-
-    ```bash name=Terminal
-    npm create vite@latest my-app -- --template react
-    ```
-
-  </StepHikeCompact.Code>
 </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={3}>
@@ -64,7 +57,11 @@ hideToc: true
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Set up your login component">
 
-    In `App.jsx`, create a Supabase client using your [Project URL and public API (anon) key](https://supabase.com/dashboard/project/_/settings/api).
+    <$Partial path="uiLibCta.mdx" />
+
+    In `App.jsx`, create a Supabase client using your Project URL and key.
+
+    <$Partial path="api_settings_steps.mdx" />
 
     You can configure the Auth component to display whenever there is no session inside `supabase.auth.getSession()`
 

@@ -3,23 +3,39 @@ import { env, STORAGE_STATE_PATH } from './env.config'
 import dotenv from 'dotenv'
 import path from 'path'
 
-dotenv.config({ path: path.resolve(__dirname, '.env.local') })
+dotenv.config({
+  path: path.resolve(__dirname, '.env.local'),
+})
 
 const IS_CI = !!process.env.CI
 
+const webServerConfig = IS_CI
+  ? undefined
+  : {
+      command: 'pnpm -w run e2e:setup',
+      port: 8082,
+      timeout: 5 * 60 * 1000,
+    }
+
 export default defineConfig({
-  timeout: 60 * 1000,
+  timeout: 90 * 1000,
   testDir: './features',
   testMatch: /.*\.spec\.ts/,
   forbidOnly: IS_CI,
   retries: IS_CI ? 3 : 0,
+  maxFailures: 3,
+  fullyParallel: true,
   use: {
     baseURL: env.STUDIO_URL,
     screenshot: 'off',
     video: 'retain-on-failure',
-    headless: IS_CI,
+    headless: true || IS_CI,
     trace: 'retain-on-failure',
     permissions: ['clipboard-read', 'clipboard-write'],
+    extraHTTPHeaders: {
+      'x-vercel-protection-bypass': process.env.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO,
+      'x-vercel-set-bypass-cookie': 'true',
+    },
   },
   projects: [
     {
@@ -34,7 +50,9 @@ export default defineConfig({
       use: {
         browserName: 'chromium',
         screenshot: 'off',
-        storageState: STORAGE_STATE_PATH,
+        // Only use storage state if authentication is enabled. When AUTHENTICATION=false
+        // we should not require a pre-generated storage state file.
+        storageState: env.AUTHENTICATION ? STORAGE_STATE_PATH : undefined,
       },
     },
   ],
@@ -43,4 +61,5 @@ export default defineConfig({
     ['html', { open: 'never' }],
     ['json', { outputFile: 'test-results/test-results.json' }],
   ],
+  webServer: webServerConfig,
 })

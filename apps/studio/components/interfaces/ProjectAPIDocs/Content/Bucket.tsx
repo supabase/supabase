@@ -8,7 +8,7 @@ import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import type { ContentProps } from './Content.types'
 
-const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
+export const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
   const { data } = useBucketsQuery({ projectRef: ref })
@@ -106,5 +106,3 @@ const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
     </div>
   )
 }
-
-export default Bucket

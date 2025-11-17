@@ -1,8 +1,8 @@
 import 'react-data-grid/lib/styles.css'
 import 'styles/code.scss'
 import 'styles/contextMenu.scss'
-import 'styles/date-picker.scss'
 import 'styles/editor.scss'
+import 'styles/focus.scss'
 import 'styles/graphiql-base.scss'
 import 'styles/grid.scss'
 import 'styles/main.scss'
@@ -41,22 +41,24 @@ import {
   useThemeSandbox,
 } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
-import { RouteValidationWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
+import { StudioCommandProvider as CommandProvider } from 'components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
-import { GlobalErrorBoundaryState } from 'components/ui/GlobalErrorBoundaryState'
+import { RouteValidationWrapper } from 'components/interfaces/App/RouteValidationWrapper'
+import { GlobalErrorBoundaryState } from 'components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { useRootQueryClient } from 'data/query-client'
 import { customFont, sourceCodePro } from 'fonts'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { LegacyInlineEditorHotkeyMigration } from 'hooks/misc/useLegacyInlineEditorHotkeyMigration'
 import { AuthProvider } from 'lib/auth'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
 import { Telemetry } from 'lib/telemetry'
-import { AppPropsWithLayout } from 'types'
+import type { AppPropsWithLayout } from 'types'
 import { SonnerToaster, TooltipProvider } from 'ui'
-import { CommandProvider } from 'ui-patterns/CommandMenu'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -84,13 +86,18 @@ loader.config({
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const queryClient = useRootQueryClient()
+  const { appTitle } = useCustomContent(['app:title'])
 
   const getLayout = Component.getLayout ?? ((page) => page)
 
   const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
     Sentry.withScope(function (scope) {
       scope.setTag('globalErrorBoundary', true)
-      Sentry.captureException(error)
+      const eventId = Sentry.captureException(error)
+      // Attach the Sentry event ID to the error object so it can be accessed by the error boundary
+      if (eventId && error && typeof error === 'object') {
+        ;(error as any).sentryId = eventId
+      }
     })
 
     console.error(error.stack)
@@ -101,10 +108,10 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
   const cloudProvider = useDefaultProvider()
+
   const getConfigCatFlags = useCallback(
     (userEmail?: string) => {
       const customAttributes = cloudProvider ? { cloud_provider: cloudProvider } : undefined
-
       return getFlags(userEmail, customAttributes)
     },
     [cloudProvider]
@@ -123,9 +130,10 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
               >
                 <ProfileProvider>
                   <Head>
-                    <title>Supabase</title>
+                    <title>{appTitle ?? 'Supabase'}</title>
                     <meta name="viewport" content="initial-scale=1.0, width=device-width" />
                     <meta property="og:image" content={`${BASE_PATH}/img/supabase-logo.png`} />
+                    <meta name="googlebot" content="notranslate" />
                     {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
                     <style
                       dangerouslySetInnerHTML={{
@@ -133,7 +141,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       }}
                     />
                   </Head>
-                  <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
+                  <MetaFaviconsPagesRouter applicationName="Supabase Studio" includeManifest />
                   <TooltipProvider delayDuration={0}>
                     <RouteValidationWrapper>
                       <ThemeProvider
@@ -156,6 +164,8 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       </ThemeProvider>
                     </RouteValidationWrapper>
                   </TooltipProvider>
+                  {/* Temporary migration, to be removed by 2025-11-28 */}
+                  <LegacyInlineEditorHotkeyMigration />
                   <Telemetry />
                   {!isTestEnv && (
                     <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />

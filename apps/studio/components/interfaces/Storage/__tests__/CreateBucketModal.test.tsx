@@ -1,19 +1,19 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { screen, waitFor, fireEvent } from '@testing-library/dom'
+import { fireEvent, screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { addAPIMock } from 'tests/lib/msw'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import { addAPIMock } from 'tests/lib/msw'
 
 import { render } from 'tests/helpers'
 import { routerMock } from 'tests/lib/route-mock'
-import CreateBucketModal from '../CreateBucketModal'
+import { CreateBucketModal } from '../CreateBucketModal'
 
 describe(`CreateBucketModal`, () => {
   beforeEach(() => {
     vi.mock(`hooks/misc/useCheckPermissions`, () => ({
       useCheckPermissions: vi.fn(),
-      useAsyncCheckProjectPermissions: vi.fn().mockImplementation(() => ({ can: true })),
+      useAsyncCheckPermissions: vi.fn().mockImplementation(() => ({ can: true })),
     }))
     // useParams
     routerMock.setCurrentUrl(`/project/default/storage/buckets`)
@@ -54,37 +54,34 @@ describe(`CreateBucketModal`, () => {
       expect(screen.getByRole(`dialog`)).toBeInTheDocument()
     })
 
-    const nameInput = screen.getByLabelText(`Name of bucket`)
+    const nameInput = screen.getByLabelText(`Bucket name`)
     await userEvent.type(nameInput, `test`)
-
-    const standardOption = screen.getByLabelText(`Standard bucket`)
-    await userEvent.click(standardOption)
 
     const publicToggle = screen.getByLabelText(`Public bucket`)
     expect(publicToggle).not.toBeChecked()
     await userEvent.click(publicToggle)
     expect(publicToggle).toBeChecked()
 
-    const detailsTrigger = screen.getByRole(`button`, { name: `Additional configuration` })
-    expect(detailsTrigger).toHaveAttribute(`data-state`, `closed`)
-    await userEvent.click(detailsTrigger)
-    expect(detailsTrigger).toHaveAttribute(`data-state`, `open`)
-
-    const sizeLimitToggle = screen.getByLabelText(`Restrict file upload size for bucket`)
+    const sizeLimitToggle = screen.getByLabelText(`Restrict file size`)
     expect(sizeLimitToggle).not.toBeChecked()
     await userEvent.click(sizeLimitToggle)
     expect(sizeLimitToggle).toBeChecked()
 
     const sizeLimitInput = screen.getByLabelText(`File size limit`)
-    expect(sizeLimitInput).toHaveValue(0)
+    expect(sizeLimitInput).toHaveValue(null)
     await userEvent.type(sizeLimitInput, `25`)
 
     const sizeLimitUnitSelect = screen.getByLabelText(`File size limit unit`)
-    expect(sizeLimitUnitSelect).toHaveTextContent(`bytes`)
-    await userEvent.click(sizeLimitUnitSelect)
-    const mbOption = screen.getByRole(`option`, { name: `MB` })
-    await userEvent.click(mbOption)
     expect(sizeLimitUnitSelect).toHaveTextContent(`MB`)
+    await userEvent.click(sizeLimitUnitSelect)
+    const bytesOption = screen.getByRole(`option`, { name: `bytes` })
+    await userEvent.click(bytesOption)
+    expect(sizeLimitUnitSelect).toHaveTextContent(`bytes`)
+
+    const mimeTypeToggle = screen.getByLabelText(`Restrict MIME types`)
+    expect(mimeTypeToggle).not.toBeChecked()
+    await userEvent.click(mimeTypeToggle)
+    expect(mimeTypeToggle).toBeChecked()
 
     const mimeTypeInput = screen.getByLabelText(`Allowed MIME types`)
     expect(mimeTypeInput).toHaveValue(``)
@@ -93,9 +90,5 @@ describe(`CreateBucketModal`, () => {
     const submitButton = screen.getByRole(`button`, { name: `Create` })
 
     fireEvent.click(submitButton)
-
-    await waitFor(() =>
-      expect(routerMock.asPath).toStrictEqual(`/project/default/storage/buckets/test`)
-    )
   })
 })

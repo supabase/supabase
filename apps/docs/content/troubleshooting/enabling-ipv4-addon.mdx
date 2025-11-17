@@ -1,0 +1,30 @@
+---
+title = "Enabling the IPv4 add-on FAQ"
+topics = [ "database", "platform", "supavisor" ]
+---
+
+Enabling the IPv4 add-on will attach an IPv4 address to your project's compute instance, while preserving the existing IPv6 address. Both DNS records `ref.supabase.co` and `db.ref.supabase.co` will be updated to point to the IPv4 address.
+
+## How much downtime can be expected when enabling the IPv4 add-on?
+
+Enabling the IPv4 add-on will not cause any downtime since existing connections will not be dropped. New inbound connections (both direct connections on ports 5432 and 6543, as well as PostgREST requests) will use the newly allocated IPv4 address.
+
+## Will the project instance will be restarted?
+
+No, the IPv4 add-on will not require a restart of the instance.
+
+## Will IPv6 address change?
+
+The IPv6 address will be preserved. New inbound connections (both direct connections on ports 5432 and 6543, as well as PostgREST requests) will use the newly allocated IPv4 address.
+
+## Will existing connections be dropped?
+
+DNS changes do not affect already-established connections, and only new connections will resolve the updated record. For `db.ref.supabase.co` (i.e database connections through ports 5432 and 6543), the existing AAAA record will be updated to an A record pointing to the IPv4 address. This is essentially an in-place update for `db.ref.supabase.co`'s value and record type which would externally translate to an AAAA removal and an A record creation, which mitigates against split moments in time where no record would be available.
+
+## Is it the case that the new IPv4 address cannot be connected until DNS is updated?
+
+Clients will use the new IPv4 address only after DNS propagation; until then, IPv6 continues to resolve and work for connectivity.
+
+## Removing the IPv4 add-on
+
+Removing the IPv4 add-on does tend to result in 'downtime' at a sub-minute time interval for database connections, given clients would've resolved the A record which now points to an unassigned IP address, and would need to wait for DNS propagation to go through in order for the AAAA record to be available

@@ -11,7 +11,6 @@ import {
 } from 'react'
 
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS, useFlag } from 'common'
-import { useIsRealtimeSettingsFFEnabled } from 'hooks/ui/useFlag'
 import { EMPTY_OBJ } from 'lib/void'
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
 
@@ -29,10 +28,13 @@ export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 
 export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
   const { hasLoaded } = useContext(FeatureFlagContext)
+  const securityNotificationsFlag = useFlag('securityNotifications')
 
   // [Joshen] Similar logic to feature flagging previews, we can use flags to default opt in previews
   const isDefaultOptIn = (feature: (typeof FEATURE_PREVIEWS)[number]) => {
     switch (feature.key) {
+      case LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS:
+        return securityNotificationsFlag
       default:
         return false
     }
@@ -85,11 +87,6 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
 }
 
-export const useIsInlineEditorEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]
-}
-
 export const useUnifiedLogsPreview = () => {
   const { flags, onUpdateFlag } = useFeaturePreviewContext()
 
@@ -99,11 +96,6 @@ export const useUnifiedLogsPreview = () => {
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
 
   return { isEnabled, enable, disable }
-}
-
-export const useIsRealtimeSettingsEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_REALTIME_SETTINGS]
 }
 
 export const useIsBranching2Enabled = () => {
@@ -116,10 +108,14 @@ export const useIsAdvisorRulesEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
 }
 
+export const useIsSecurityNotificationsEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS]
+}
+
 export const useFeaturePreviewModal = () => {
   const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')
 
-  const isRealtimeSettingsEnabled = useIsRealtimeSettingsFFEnabled()
   const gitlessBranchingEnabled = useFlag('gitlessBranching')
   const advisorRulesEnabled = useFlag('advisorRules')
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
@@ -131,8 +127,6 @@ export const useFeaturePreviewModal = () => {
   const isFeaturePreviewReleasedToPublic = useCallback(
     (feature: (typeof FEATURE_PREVIEWS)[number]) => {
       switch (feature.key) {
-        case 'supabase-ui-realtime-settings':
-          return isRealtimeSettingsEnabled
         case 'supabase-ui-branching-2-0':
           return gitlessBranchingEnabled
         case 'supabase-ui-advisor-rules':
@@ -143,12 +137,7 @@ export const useFeaturePreviewModal = () => {
           return true
       }
     },
-    [
-      isRealtimeSettingsEnabled,
-      gitlessBranchingEnabled,
-      advisorRulesEnabled,
-      isUnifiedLogsPreviewAvailable,
-    ]
+    [gitlessBranchingEnabled, advisorRulesEnabled, isUnifiedLogsPreviewAvailable]
   )
 
   const selectedFeatureKey = (

@@ -2,6 +2,7 @@ import { ChevronDown, Plus, Trash } from 'lucide-react'
 import { useFieldArray } from 'react-hook-form'
 
 import { useParams } from 'common'
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import {
   Button,
@@ -19,7 +20,7 @@ import {
   Input_Shadcn_,
   SheetSection,
 } from 'ui'
-import { CreateCronJobForm } from './CreateCronJobSheet'
+import { CreateCronJobForm } from './CreateCronJobSheet/CreateCronJobSheet.constants'
 
 interface HTTPHeaderFieldsSectionProps {
   variant: 'edge_function' | 'http_request'
@@ -32,7 +33,11 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
   })
 
   const { ref } = useParams()
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref, reveal: true })
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: apiKeys } = useAPIKeysQuery(
+    { projectRef: ref, reveal: true },
+    { enabled: canReadAPIKeys }
+  )
 
   const { serviceKey, secretKey } = getKeys(apiKeys)
   const apiKey = secretKey?.api_key ?? serviceKey?.api_key ?? '[YOUR API KEY]'

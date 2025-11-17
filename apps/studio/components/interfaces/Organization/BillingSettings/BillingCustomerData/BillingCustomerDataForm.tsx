@@ -16,7 +16,6 @@ import {
   FormField_Shadcn_ as FormField,
   FormMessage_Shadcn_ as FormMessage,
   Input_Shadcn_ as Input,
-  Input_Shadcn_,
   Popover_Shadcn_ as Popover,
   PopoverContent_Shadcn_ as PopoverContent,
   PopoverTrigger_Shadcn_ as PopoverTrigger,
@@ -32,39 +31,18 @@ interface BillingCustomerDataFormProps {
 }
 
 // Define the expected form values structure and validation schema
-export const BillingCustomerDataSchema = z
-  .object({
-    billing_name: z.string().min(3, 'Name must be at least 3 letters long'),
-    line1: z.string().optional(),
-    line2: z.string().optional(),
-    city: z.string().optional(),
-    state: z.string().optional(),
-    postal_code: z.string().optional(),
-    country: z.string().optional(),
-    tax_id_type: z.string(),
-    tax_id_value: z.string(),
-    tax_id_name: z.string(),
-  })
-  .refine(
-    (data) => {
-      // its fine to just set the name, but once any other field is set, requires full address
-      const hasAnyField = data.line1 || data.line2 || data.city || data.state || data.postal_code
-      // If any field has value, country and line1 must have values.
-      return !hasAnyField || (!!data.country && !!data.line1)
-    },
-    {
-      message: 'Country and Address line 1 are required if any other field is provided.',
-      path: ['line1'],
-    }
-  )
-  .refine((data) => !(!!data.line1 && !data.country), {
-    message: 'Please select a country',
-    path: ['country'],
-  })
-  .refine((data) => !(!!data.country && !data.line1), {
-    message: 'Please provide an address line 1',
-    path: ['line1'],
-  })
+export const BillingCustomerDataSchema = z.object({
+  billing_name: z.string().min(3, 'Name must be at least 3 letters long'),
+  line1: z.string().trim().min(3, 'Address line 1 is required'),
+  line2: z.string().optional(),
+  city: z.string().trim().min(2, 'City is required'),
+  state: z.string().trim(),
+  postal_code: z.string().trim().min(1, 'Postal code is required'),
+  country: z.string().trim().min(1, 'Country is required'),
+  tax_id_type: z.string(),
+  tax_id_value: z.string(),
+  tax_id_name: z.string(),
+})
 
 export type BillingCustomerDataFormValues = z.infer<typeof BillingCustomerDataSchema>
 
@@ -104,7 +82,7 @@ export const BillingCustomerDataForm = ({
       <FormField
         control={form.control}
         name="billing_name"
-        render={({ field }: { field: any }) => (
+        render={({ field }) => (
           <FormItemLayout hideMessage label="Name">
             <FormControl>
               <Input {...field} disabled={disabled} />
@@ -117,7 +95,7 @@ export const BillingCustomerDataForm = ({
       <FormField
         control={form.control}
         name="line1"
-        render={({ field }: { field: any }) => (
+        render={({ field }) => (
           <FormItemLayout hideMessage label="Address line 1">
             <FormControl>
               <Input {...field} placeholder="123 Main Street" disabled={disabled} />
@@ -130,7 +108,7 @@ export const BillingCustomerDataForm = ({
       <FormField
         control={form.control}
         name="line2"
-        render={({ field }: { field: any }) => (
+        render={({ field }) => (
           <FormItemLayout hideMessage label="Address line 2 (optional)">
             <FormControl>
               <Input
@@ -148,7 +126,7 @@ export const BillingCustomerDataForm = ({
         <FormField
           control={form.control}
           name="country"
-          render={({ field }: { field: any }) => (
+          render={({ field }) => (
             <FormItemLayout hideMessage label="Country">
               <Popover open={showCountriesPopover} onOpenChange={setShowCountriesPopover}>
                 <PopoverTrigger asChild>
@@ -176,7 +154,7 @@ export const BillingCustomerDataForm = ({
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent sameWidthAsTrigger className="p-0" align="start">
+                <PopoverContent portal sameWidthAsTrigger className="p-0" align="start">
                   <Command>
                     <CommandInput placeholder="Search country..." />
                     <CommandList>
@@ -216,7 +194,7 @@ export const BillingCustomerDataForm = ({
         <FormField
           control={form.control}
           name="postal_code"
-          render={({ field }: { field: any }) => (
+          render={({ field }) => (
             <FormItemLayout hideMessage label="Postal code">
               <FormControl>
                 <Input {...field} placeholder="12345" disabled={disabled} />
@@ -231,7 +209,7 @@ export const BillingCustomerDataForm = ({
         <FormField
           control={form.control}
           name="city"
-          render={({ field }: { field: any }) => (
+          render={({ field }) => (
             <FormItemLayout hideMessage label="City">
               <FormControl>
                 <Input {...field} disabled={disabled} />
@@ -243,7 +221,7 @@ export const BillingCustomerDataForm = ({
         <FormField
           control={form.control}
           name="state"
-          render={({ field }: { field: any }) => (
+          render={({ field }) => (
             <FormItemLayout hideMessage label="State / Province">
               <FormControl>
                 <Input {...field} disabled={disabled} />
@@ -258,7 +236,7 @@ export const BillingCustomerDataForm = ({
         <FormField
           name="tax_id_name"
           control={form.control}
-          render={({ field }) => (
+          render={() => (
             <FormItemLayout hideMessage layout="vertical" label="Tax ID">
               <Popover open={showTaxIDsPopover} onOpenChange={setShowTaxIDsPopover}>
                 <PopoverTrigger asChild>
@@ -269,14 +247,11 @@ export const BillingCustomerDataForm = ({
                       size="medium"
                       disabled={disabled}
                       className={cn(
-                        'w-full justify-between h-[34px]',
+                        'w-full justify-between h-[34px] pr-2',
                         !selectedTaxId && 'text-muted'
                       )}
                       iconRight={
-                        <ChevronsUpDown
-                          className="ml-2 h-4 w-4 shrink-0 opacity-50"
-                          strokeWidth={1.5}
-                        />
+                        <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" strokeWidth={1.5} />
                       }
                     >
                       {selectedTaxId
@@ -285,7 +260,7 @@ export const BillingCustomerDataForm = ({
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent sameWidthAsTrigger className="p-0" align="start">
+                <PopoverContent portal sameWidthAsTrigger className="p-0" align="start">
                   <Command>
                     <CommandInput placeholder="Search tax ID..." />
                     <CommandList>
@@ -320,17 +295,17 @@ export const BillingCustomerDataForm = ({
         />
 
         {selectedTaxId && (
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 [&>div]:w-full">
             <FormField
               name="tax_id_value"
               control={form.control}
               render={({ field }) => (
-                <FormItemLayout hideMessage className="w-full">
+                <FormItemLayout hideMessage>
                   <FormControl>
-                    <Input_Shadcn_
+                    <Input
                       {...field}
-                      placeholder={selectedTaxId?.placeholder}
                       disabled={disabled}
+                      placeholder={selectedTaxId?.placeholder}
                     />
                   </FormControl>
                 </FormItemLayout>
