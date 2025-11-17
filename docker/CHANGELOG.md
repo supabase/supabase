@@ -84,6 +84,7 @@ Check updates, changelogs, and release notes for each service to learn more.
 
 ### Studio
 - Updated to `2025.10.20-sha-5005fc6` - [Dashboard updates](https://github.com/orgs/supabase/discussions/40083)
+- Fixed issues with Edge Functions and cron logs not being visible in Studio - [PR #39388](https://github.com/supabase/supabase/pull/39388), [PR #39704](https://github.com/supabase/supabase/pull/39704), [PR #39711](https://github.com/supabase/supabase/pull/39711)
 
 ### Realtime
 - Updated to `v2.56.0` - [Release](https://github.com/supabase/realtime/releases/tag/v2.56.0)
@@ -106,7 +107,6 @@ Check updates, changelogs, and release notes for each service to learn more.
 
 ### Analytics (Logflare)
 - Updated to `1.22.6` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.22.6)
-- Fixed issues with Edge Functions and cron logs not being visible in Studio - [PR #39388](https://github.com/supabase/supabase/pull/39388), [PR #39704](https://github.com/supabase/supabase/pull/39704), [PR #39711](https://github.com/supabase/supabase/pull/39711)
 
 ---
 
