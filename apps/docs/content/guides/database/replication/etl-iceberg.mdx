@@ -12,17 +12,17 @@ ETL Replication is currently in private alpha. Access is limited and features ma
 
 </Admonition>
 
+<Admonition type="caution" label="Current Limitation">
+
+Iceberg replication is currently incomplete. It provides an append-only log listing all your data changes with an additional column explaining the type of operation (INSERT, UPDATE, DELETE).
+
+</Admonition>
+
 Apache Iceberg is an open table format for analytic datasets. ETL Replication to Iceberg uses Supabase [Analytics Buckets](/docs/guides/storage/analytics) to store your replicated data.
 
 <Admonition type="tip">
 
 This page covers Iceberg-specific configuration. For complete setup instructions including publications, general settings, and pipeline management, see the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup).
-
-</Admonition>
-
-<Admonition type="caution" label="Current Limitation">
-
-Iceberg replication is currently incomplete. It provides an append-only log listing all your data changes with an additional column explaining the type of operation (INSERT, UPDATE, DELETE).
 
 </Admonition>
 
