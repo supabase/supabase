@@ -112,27 +112,23 @@ const SchemaFlowDiagram = ({
         aria-label={`Source: ${sourceLabel} ${sourceType} schema`}
       >
         <div
-          className={`w-8 h-8 border rounded-md ${
+          className={`w-8 h-8 border rounded-md flex items-center justify-center ${
             sourceType === 'analytics'
-              ? 'bg-blue-600 border-blue-800'
-              : 'bg-brand-500 border-brand-600 flex items-center justify-center'
+              ? 'bg-blue-300 border-blue-600'
+              : 'bg-brand-500 border-brand-600'
           }`}
           aria-hidden="true"
         >
           {sourceType === 'analytics' ? (
             // Iceberg
-            <img
-              src="/img/iceberg-square.png"
-              alt="Iceberg"
-              className="w-full h-full rounded-md object-cover"
-            />
+            <img src="/img/icons/iceberg-icon.svg" alt="Iceberg" className="w-5 h-5" />
           ) : (
             <Database size={16} className="text-white" />
           )}
         </div>
         <div className="flex flex-col gap-y-0.5">
           <p className="text-sm text-foreground">{sourceLabel}</p>
-          <p className="text-sm text-foreground-light">
+          <p className="text-sm text-foreground-lighter">
             {sourceType === 'analytics' ? 'Iceberg namespace' : 'Database schema'}
           </p>
         </div>
