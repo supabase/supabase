@@ -39,7 +39,9 @@ export const LogDrainsEmpty = () => {
               Upgrade plan
             </UpgradePlanButton>
           </div>
-          <Card className={cn("grid grid-cols-1 bg divide-x mb-8", IS_PLATFORM && '@xl:grid-cols-2'}>
+          <Card
+            className={cn('grid grid-cols-1 bg divide-x mb-8', IS_PLATFORM && '@xl:grid-cols-2')}
+          >
             {items.map((item, i) => (
               <div className="flex flex-col h-full p-6" key={i}>
                 <div className="flex items-center gap-3 mb-2">
