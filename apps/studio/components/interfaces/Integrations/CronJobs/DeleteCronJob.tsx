@@ -14,9 +14,10 @@ interface DeleteCronJobProps {
   cronJob: CronJob
   visible: boolean
   onClose: () => void
+  onDeleteStart?: (jobId: string) => void
 }
 
-export const DeleteCronJob = ({ cronJob, visible, onClose }: DeleteCronJobProps) => {
+export const DeleteCronJob = ({ cronJob, visible, onClose, onDeleteStart }: DeleteCronJobProps) => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const [searchQuery] = useQueryState('search', parseAsString.withDefault(''))
@@ -36,6 +37,7 @@ export const DeleteCronJob = ({ cronJob, visible, onClose }: DeleteCronJobProps)
   async function handleDelete() {
     if (!project) return console.error('Project is required')
 
+    onDeleteStart?.(cronJob.jobid.toString())
     deleteDatabaseCronJob({
       jobId: cronJob.jobid,
       projectRef: project.ref,
