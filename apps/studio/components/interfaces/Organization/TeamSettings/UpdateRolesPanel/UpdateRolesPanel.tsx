@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash'
-import { X } from 'lucide-react'
+import { ChevronDown, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
@@ -18,6 +18,9 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
@@ -95,7 +98,6 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   })
   const numberOfProjectsWithAccess = orgProjects.length - noAccessProjects.length
   const numberOfAccessHasChanges = originalConfiguration.length !== noAccessProjects.length
-
   const hasNoChanges = isEqual(projectsRoleConfiguration, originalConfiguration)
 
   const onSelectProject = (project: OrgProject) => {
@@ -155,8 +157,10 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   useEffect(() => {
     if (visible && isSuccessRoles) {
       const roleConfiguration = formatMemberRoleToProjectRoleConfiguration(member, allRoles)
+      console.log(roleConfiguration)
       setProjectsRoleConfiguration(roleConfiguration)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, isSuccessRoles])
 
   return (
@@ -204,23 +208,31 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
               {!isApplyingRoleToAllProjects &&
                 projectsRoleConfiguration.length > 0 &&
                 projectsRoleConfiguration.length !== orgProjects.length && (
-                  <Alert_Shadcn_>
-                    <AlertTitle_Shadcn_>
-                      {numberOfAccessHasChanges
-                        ? `This member will only have access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`
-                        : `This member only has access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`}
-                    </AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      {member.username} {numberOfAccessHasChanges ? 'will' : 'does'} not have access
-                      to the following {noAccessProjects.length} project
-                      {noAccessProjects.length > 1 ? 's' : ''}:
+                  <Collapsible_Shadcn_ className="bg-alternative border rounded-lg py-4 group">
+                    <CollapsibleTrigger_Shadcn_ className="w-full text-left px-4 flex items-center justify-between">
+                      <span className="text-sm">
+                        {hasNoChanges
+                          ? `This member only has access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`
+                          : `This member will only have access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`}
+                      </span>
+                      <ChevronDown
+                        size={14}
+                        className="transition group-data-[state=open]:-rotate-180"
+                      />
+                    </CollapsibleTrigger_Shadcn_>
+                    <CollapsibleContent_Shadcn_ className="text-foreground-light text-sm px-4">
+                      <p>
+                        {member.username} {hasNoChanges ? 'does' : 'will'} not have access to the
+                        following {noAccessProjects.length} project
+                        {noAccessProjects.length > 1 ? 's' : ''}:
+                      </p>
                       <ul className="list-disc pl-6">
                         {noAccessProjects.map((project) => {
                           return <li key={project.ref}>{project.name}</li>
                         })}
                       </ul>
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
+                    </CollapsibleContent_Shadcn_>
+                  </Collapsible_Shadcn_>
                 )}
 
               <div className="flex flex-col gap-y-2">

@@ -23,7 +23,7 @@ export const formatMemberRoleToProjectRoleConfiguration = (
     .map((id) => {
       const orgRole = org_scoped_roles.find((role) => role.id === id)
       if (orgRole !== undefined) {
-        return { ref: undefined, roleId: orgRole.id }
+        return { ref: undefined, name: undefined, roleId: orgRole.id }
       }
 
       const projectRole = project_scoped_roles.find((role) => role.id === id)
@@ -49,7 +49,8 @@ export const formatMemberRoleToProjectRoleConfiguration = (
       } else {
         return p
       }
-    }) as ProjectRoleConfiguration[]
+    })
+    .sort((a, b) => (a?.name ?? '').localeCompare(b?.name ?? '')) as ProjectRoleConfiguration[]
 
   return roleConfiguration
 }
