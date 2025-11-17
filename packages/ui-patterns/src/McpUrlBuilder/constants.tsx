@@ -1,11 +1,14 @@
 import { CodeBlock } from 'ui/src/components/CodeBlock'
 import type {
   ClaudeCodeMcpConfig,
+  FactoryMcpConfig,
+  GooseMcpConfig,
   McpClient,
   McpFeatureGroup,
   VSCodeMcpConfig,
   WindsurfMcpConfig,
 } from './types'
+import { getMcpUrl } from './types'
 
 export const FEATURE_GROUPS_PLATFORM: McpFeatureGroup[] = [
   {
@@ -63,9 +66,11 @@ export const MCP_CLIENTS: McpClient[] = [
     externalDocsUrl: 'https://docs.cursor.com/context/mcp',
     generateDeepLink: (config) => {
       const name = 'supabase'
-      const base64Config = Buffer.from(JSON.stringify(config.mcpServers.supabase)).toString(
-        'base64'
-      )
+      const mcpUrl = getMcpUrl(config)
+      const serverConfig = {
+        url: mcpUrl,
+      }
+      const base64Config = Buffer.from(JSON.stringify(serverConfig)).toString('base64')
       return `cursor://anysphere.cursor-deeplink/mcp/install?name=${name}&config=${encodeURIComponent(base64Config)}`
     },
   },
@@ -77,7 +82,7 @@ export const MCP_CLIENTS: McpClient[] = [
     externalDocsUrl: 'https://code.visualstudio.com/docs/copilot/chat/mcp-servers',
     transformConfig: (config): VSCodeMcpConfig => {
       return {
-        mcpServers: {
+        servers: {
           supabase: {
             type: 'http',
             url: config.mcpServers.supabase.url,
@@ -87,7 +92,7 @@ export const MCP_CLIENTS: McpClient[] = [
     },
     generateDeepLink: (_config) => {
       const config = _config as VSCodeMcpConfig
-      const mcpConfig = { name: 'supabase', ...config.mcpServers.supabase }
+      const mcpConfig = { name: 'supabase', ...config.servers.supabase }
 
       return `vscode:mcp/install?${encodeURIComponent(JSON.stringify(mcpConfig))}`
     },
@@ -120,7 +125,7 @@ export const MCP_CLIENTS: McpClient[] = [
     label: 'Claude Code',
     icon: 'claude',
     configFile: '.mcp.json',
-    externalDocsUrl: 'https://docs.anthropic.com/en/docs/claude-code/mcp',
+    externalDocsUrl: 'https://code.claude.com/docs/en/mcp',
     transformConfig: (config): ClaudeCodeMcpConfig => {
       return {
         mcpServers: {
@@ -166,6 +171,101 @@ export const MCP_CLIENTS: McpClient[] = [
         />
         <p className="text-xs text-foreground-light">
           Select the "supabase" server, then "Authenticate" to begin the authentication flow.
+        </p>
+      </div>
+    ),
+  },
+  {
+    key: 'goose',
+    label: 'Goose',
+    icon: 'goose',
+    configFile: '~/.config/goose/config.yaml',
+    externalDocsUrl: 'https://block.github.io/goose/docs/category/getting-started',
+    transformConfig: (config): GooseMcpConfig => {
+      return {
+        extensions: {
+          supabase: {
+            available_tools: [],
+            bundled: null,
+            description:
+              'Connect your Supabase projects to AI assistants. Manage tables, query data, deploy Edge Functions, and interact with your Supabase backend directly from your MCP client.',
+            enabled: true,
+            env_keys: [],
+            envs: {},
+            headers: {},
+            name: 'Supabase',
+            timeout: 300,
+            type: 'streamable_http',
+            uri: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+    generateDeepLink: (config) => {
+      const name = 'supabase'
+      const mcpUrl = getMcpUrl(config)
+      return `goose://extension?type=streamable_http&url=${encodeURIComponent(mcpUrl)}&id=supabase&name=${name}&description=${encodeURIComponent('Connect your Supabase projects to AI assistants. Manage tables, query data, deploy Edge Functions, and interact with your Supabase backend directly from your MCP client.')}`
+    },
+    primaryInstructions: (config) => {
+      const mcpUrl = getMcpUrl(config)
+      const command = `goose session --with-streamable-http-extension "${mcpUrl}"`
+      return (
+        <div className="space-y-2">
+          <p className="text-xs text-foreground-light">
+            Start a Goose session with the Supabase extension:
+          </p>
+          <CodeBlock value={command} language="bash" focusable={false} className="block" />
+        </div>
+      )
+    },
+    alternateInstructions: () => (
+      <div className="space-y-2">
+        <p className="text-xs text-foreground-light">
+          For more details, see{' '}
+          <a
+            href="https://block.github.io/goose/docs/getting-started/using-extensions"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand underline"
+          >
+            Using Extensions
+          </a>{' '}
+          in Goose.
+        </p>
+      </div>
+    ),
+  },
+  {
+    key: 'factory',
+    label: 'Factory',
+    icon: 'factory',
+    configFile: '~/.factory/mcp.json',
+    externalDocsUrl: 'https://docs.factory.ai/cli/configuration/mcp.md',
+    transformConfig: (config): FactoryMcpConfig => {
+      return {
+        mcpServers: {
+          supabase: {
+            type: 'http',
+            url: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+    primaryInstructions: (config) => {
+      const mcpUrl = getMcpUrl(config)
+      const command = `droid mcp add supabase ${mcpUrl} --type http`
+      return (
+        <div className="space-y-2">
+          <p className="text-xs text-foreground-light">Add the Supabase MCP server to Factory:</p>
+          <CodeBlock value={command} language="bash" focusable={false} className="block" />
+        </div>
+      )
+    },
+    alternateInstructions: () => (
+      <div className="space-y-2">
+        <p className="text-xs text-foreground-light">
+          Restart Factory or type <code>/mcp</code> within droid to complete the OAuth
+          authentication flow.
         </p>
       </div>
     ),
