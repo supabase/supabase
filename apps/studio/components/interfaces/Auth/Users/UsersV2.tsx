@@ -207,7 +207,7 @@ export const UsersV2 = () => {
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
 
   const { setValue: setSelectedUser, value: selectedUser } = useQueryStateWithSelect({
-    urlKey: 'uid',
+    urlKey: 'show',
     select: (id: string) => (id ? users?.find((u) => u.id === id)?.id : undefined),
     enabled: !!users && !isLoading,
     onError: () => toast.error(`User not found`),
