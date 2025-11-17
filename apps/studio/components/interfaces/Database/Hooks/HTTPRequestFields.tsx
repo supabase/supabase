@@ -2,6 +2,7 @@ import { ChevronDown, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
@@ -51,7 +52,11 @@ const HTTPRequestFields = ({
   const { data: selectedProject } = useSelectedProjectQuery()
 
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref, reveal: true })
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: apiKeys } = useAPIKeysQuery(
+    { projectRef: ref, reveal: true },
+    { enabled: canReadAPIKeys }
+  )
 
   const edgeFunctions = functions ?? []
   const { serviceKey, secretKey } = getKeys(apiKeys)
