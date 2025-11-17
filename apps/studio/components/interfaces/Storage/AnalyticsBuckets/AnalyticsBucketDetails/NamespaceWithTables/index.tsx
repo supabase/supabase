@@ -30,6 +30,47 @@ import { getNamespaceTableNameFromPostgresTableName } from '../AnalyticsBucketDe
 import { useAnalyticsBucketAssociatedEntities } from '../useAnalyticsBucketAssociatedEntities'
 import { TableRowComponent } from './TableRowComponent'
 
+// Schema Flow Node Component
+interface SchemaFlowNodeProps {
+  nodeRef: React.RefObject<HTMLDivElement>
+  icon: React.ReactNode
+  iconContainerClassName?: string
+  label: string
+  description: string
+  ariaLabel: string
+  labelClassName?: string
+}
+
+const SchemaFlowNode = ({
+  nodeRef,
+  icon,
+  iconContainerClassName = '',
+  label,
+  description,
+  ariaLabel,
+  labelClassName = 'text-foreground',
+}: SchemaFlowNodeProps) => {
+  return (
+    <div
+      ref={nodeRef}
+      className="flex items-center gap-x-3 rounded bg-surface-100 border border-default px-4 py-4 z-10 shrink-0"
+      role="group"
+      aria-label={ariaLabel}
+    >
+      <div
+        className={`w-8 h-8 border rounded-md flex items-center justify-center ${iconContainerClassName}`}
+        aria-hidden="true"
+      >
+        {icon}
+      </div>
+      <div className="flex flex-col gap-y-1">
+        <p className={`text-sm leading-none ${labelClassName}`}>{label}</p>
+        <p className="text-sm leading-none text-foreground-lighter">{description}</p>
+      </div>
+    </div>
+  )
+}
+
 // Simple Schema Flow Diagram Component
 interface SchemaFlowDiagramProps {
   sourceLabel: string
@@ -105,34 +146,24 @@ const SchemaFlowDiagram = ({
         aria-hidden="true"
       />
       {/* Source Node */}
-      <div
-        ref={sourceRef}
-        className="flex items-center gap-x-3 rounded bg-surface-100 border border-default px-3 py-2 z-10 shrink-0"
-        role="group"
-        aria-label={`Source: ${sourceLabel} ${sourceType} schema`}
-      >
-        <div
-          className={`w-8 h-8 border rounded-md flex items-center justify-center ${
-            sourceType === 'analytics'
-              ? 'bg-blue-300 border-blue-600'
-              : 'bg-brand-500 border-brand-600'
-          }`}
-          aria-hidden="true"
-        >
-          {sourceType === 'analytics' ? (
-            // Iceberg
+      <SchemaFlowNode
+        nodeRef={sourceRef}
+        icon={
+          sourceType === 'analytics' ? (
             <img src="/img/icons/iceberg-icon.svg" alt="Iceberg" className="w-5 h-5" />
           ) : (
             <Database size={16} className="text-white" />
-          )}
-        </div>
-        <div className="flex flex-col gap-y-0.5">
-          <p className="text-sm text-foreground">{sourceLabel}</p>
-          <p className="text-sm text-foreground-lighter">
-            {sourceType === 'analytics' ? 'Iceberg namespace' : 'Database schema'}
-          </p>
-        </div>
-      </div>
+          )
+        }
+        iconContainerClassName={
+          sourceType === 'analytics'
+            ? 'bg-blue-300 border-blue-600'
+            : 'bg-brand-500 border-brand-600'
+        }
+        label={sourceLabel}
+        description={sourceType === 'analytics' ? 'Iceberg namespace' : 'Database schema'}
+        ariaLabel={`Source: ${sourceLabel} ${sourceType} schema`}
+      />
 
       {/* SVG Path for Straight Dashed Line */}
       {lineStart && (
@@ -178,33 +209,17 @@ const SchemaFlowDiagram = ({
       )}
 
       {/* Target Node */}
-      <div
-        ref={targetRef}
-        className="flex items-center gap-x-3 rounded bg-surface-100 border border-default px-4 py-4 z-10 shrink-0"
-        role="group"
-        aria-label={`Target: ${targetLabel} schema${isPending ? ' that will be created' : ''}`}
-      >
-        {/* Icon */}
-        <div
-          className={`w-8 h-8 border rounded-md flex items-center justify-center ${
-            isPending ? 'bg-surface-100 border-foreground/20' : 'bg-brand-500 border-brand-600'
-          }`}
-          aria-hidden="true"
-        >
-          <Database size={16} className={isPending ? 'text-foreground-light' : 'text-white'} />
-        </div>
-        {/* Text */}
-        <div className="flex flex-col gap-y-1">
-          <p
-            className={`text-sm leading-none ${isPending ? 'text-foreground-muted' : 'text-foreground'}`}
-          >
-            {targetLabel}
-          </p>
-          <p className="text-sm leading-none text-foreground-lighter">
-            Analytics schema{isPending && ' that will be created'}
-          </p>
-        </div>
-      </div>
+      <SchemaFlowNode
+        nodeRef={targetRef}
+        icon={<Database size={16} className={isPending ? 'text-foreground-light' : 'text-white'} />}
+        iconContainerClassName={
+          isPending ? 'bg-surface-100 border-foreground/20' : 'bg-brand-500 border-brand-600'
+        }
+        label={targetLabel}
+        description={`Analytics schema${isPending ? ' that will be created' : ''}`}
+        ariaLabel={`Target: ${targetLabel} schema${isPending ? ' that will be created' : ''}`}
+        labelClassName={isPending ? 'text-foreground-muted' : 'text-foreground'}
+      />
     </div>
   )
 }
