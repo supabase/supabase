@@ -1,9 +1,3 @@
-import { uniq } from 'lodash'
-import { Loader2, MoreVertical, Pause, Play, Trash } from 'lucide-react'
-import Link from 'next/link'
-import { useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import {
   convertKVStringArrayToJson,
@@ -20,8 +14,15 @@ import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { useIcebergNamespaceTableDeleteMutation } from 'data/storage/iceberg-namespace-table-delete-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { SqlEditor } from 'icons'
+import { uniq } from 'lodash'
+import { Loader2, MoreVertical, Pause, Play, Trash } from 'lucide-react'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import {
+  Badge,
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -275,7 +276,12 @@ export const TableRowComponent = ({
           </TableCell>
         )}
 
-        <TableCell className="text-right flex flex-row items-center gap-x-2 justify-end min-h-[60px] py-4">
+        <TableCell
+          className={cn(
+            'text-right flex flex-row items-center gap-x-2 justify-end min-h-[60px] py-4',
+            !table.isConnected && 'bg-gradient-to-l from-brand-300/10 to-transparent to-80% '
+          )}
+        >
           {table.isConnected ? (
             <>
               <Button asChild type="default" size="tiny">
@@ -340,7 +346,11 @@ export const TableRowComponent = ({
               </DropdownMenu>
             </>
           ) : (
-            <p className="text-sm text-foreground-muted">Waiting to connect</p>
+            <>
+              <Badge variant="success" className="uppercase">
+                New
+              </Badge>
+            </>
           )}
         </TableCell>
       </TableRow>

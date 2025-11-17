@@ -1,4 +1,4 @@
-import { Loader2, RefreshCw } from 'lucide-react'
+import { Loader2, Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
@@ -23,7 +23,6 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
 import { getNamespaceTableNameFromPostgresTableName } from '../AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketAssociatedEntities } from '../useAnalyticsBucketAssociatedEntities'
@@ -219,13 +218,7 @@ export const NamespaceWithTables = ({
         onClose={() => setImportForeignSchemaShown(false)}
       />
       {(pollIntervalNamespaceTables > 0 || missingTables.length > 0) && (
-        <CardFooter
-          className={cn(
-            'border-t px-4 py-4 flex flex-row justify-end gap-x-4 relative overflow-hidden',
-            missingTables.length > 0 &&
-              'before:absolute before:inset-0 before:pointer-events-none before:bg-gradient-to-l before:from-brand-300/20 before:to-transparent before:to-40% before:z-0'
-          )}
-        >
+        <CardFooter className="border-t px-4 py-4 flex flex-row justify-end gap-x-4 relative overflow-hidden">
           {pollIntervalNamespaceTables > 0 && (
             <div className="relative z-10">
               <Tooltip>
@@ -251,18 +244,23 @@ export const NamespaceWithTables = ({
             </div>
           )}
           {missingTables.length > 0 && (
-            <Button
-              type="default"
-              size="tiny"
-              icon={schema ? <RefreshCw /> : undefined}
-              onClick={() => (schema ? rescanNamespace() : setImportForeignSchemaShown(true))}
-              loading={isImportingForeignSchema || isLoadingNamespaceTables}
-              className="relative z-10"
-            >
-              {schema
-                ? 'Sync tables'
-                : `Connect ${missingTables.length > 1 ? missingTables.length : ''} table${missingTables.length > 1 ? 's' : ''}`}
-            </Button>
+            <div className="flex items-center gap-x-2 items-between justify-between flex-1">
+              <p className="text-sm text-foreground-muted">
+                {missingTables.length} new table
+                {missingTables.length > 1 ? 's' : ''} waiting to connect
+              </p>
+              <Button
+                type="default"
+                size="tiny"
+                icon={schema ? <Plus /> : undefined}
+                onClick={() => (schema ? rescanNamespace() : setImportForeignSchemaShown(true))}
+                loading={isImportingForeignSchema || isLoadingNamespaceTables}
+                className="relative z-10"
+              >
+                Connect {missingTables.length > 1 ? missingTables.length : ''} table
+                {missingTables.length > 1 ? 's' : ''}
+              </Button>
+            </div>
           )}
         </CardFooter>
       )}
