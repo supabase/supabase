@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AnimatePresence, motion } from 'framer-motion'
-import { snakeCase } from 'lodash'
 import { Loader2, Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -41,7 +40,10 @@ import {
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
-import { getAnalyticsBucketPublicationName } from './AnalyticsBucketDetails.utils'
+import {
+  getAnalyticsBucketPublicationName,
+  getAnalyticsBucketsDestinationName,
+} from './AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketAssociatedEntities } from './useAnalyticsBucketAssociatedEntities'
 import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperInstance'
 
@@ -237,7 +239,7 @@ export const ConnectTablesDialogContent = ({
         s3SecretAccessKey,
         s3Region,
       }
-      const destinationName = `${snakeCase(bucketId)}_destination`
+      const destinationName = getAnalyticsBucketsDestinationName(bucketId)
       const { pipeline_id: pipelineId } = await createDestinationPipeline({
         projectRef,
         destinationName,
