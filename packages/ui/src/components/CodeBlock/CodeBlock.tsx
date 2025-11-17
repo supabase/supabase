@@ -29,6 +29,10 @@ import {
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
 import yaml from 'react-syntax-highlighter/dist/cjs/languages/hljs/yaml'
+<<<<<<< HEAD
+=======
+import txt from 'react-syntax-highlighter/dist/cjs/languages/hljs/plaintext'
+>>>>>>> 55d88c1661 (update configs for different clients)
 
 export type CodeBlockLang =
   | 'js'
@@ -48,6 +52,10 @@ export type CodeBlockLang =
   | 'go'
   | 'pgsql'
   | 'yaml'
+<<<<<<< HEAD
+=======
+  | 'txt'
+>>>>>>> 55d88c1661 (update configs for different clients)
 
 export interface CodeBlockProps {
   title?: ReactNode
@@ -161,6 +169,10 @@ export const CodeBlock = ({
   SyntaxHighlighter.registerLanguage('go', go)
   SyntaxHighlighter.registerLanguage('pgsql', pgsql)
   SyntaxHighlighter.registerLanguage('yaml', yaml)
+<<<<<<< HEAD
+=======
+  SyntaxHighlighter.registerLanguage('txt', txt)
+>>>>>>> 55d88c1661 (update configs for different clients)
 
   const large = false
   // don't show line numbers if bash == lang
