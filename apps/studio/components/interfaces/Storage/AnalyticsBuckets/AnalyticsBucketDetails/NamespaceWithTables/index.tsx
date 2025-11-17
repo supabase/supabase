@@ -100,6 +100,7 @@ const SchemaFlowDiagram = ({
   const [verticalLinePosition, setVerticalLinePosition] = useState<{
     x: number
     y: number
+    height: number
   } | null>(null)
 
   useEffect(() => {
@@ -115,10 +116,12 @@ const SchemaFlowDiagram = ({
       const sourceY = sourceRect.top + sourceRect.height / 2 - containerRect.top
       setLineStart({ x: sourceX, y: sourceY })
 
-      // Vertical line position (mobile)
-      const sourceCenterX = sourceRect.left + sourceRect.width / 2 - containerRect.left
+      // Vertical line position (mobile) - calculate actual gap between nodes
+      const lineX = 64 // ~3rem from left (48px = 3rem), relative to container
       const sourceBottomY = sourceRect.bottom - containerRect.top
-      setVerticalLinePosition({ x: sourceCenterX, y: sourceBottomY })
+      const targetTopY = targetRect.top - containerRect.top
+      const gapHeight = targetTopY - sourceBottomY
+      setVerticalLinePosition({ x: lineX, y: sourceBottomY, height: gapHeight })
     }
 
     // Small delay to ensure layout is ready
@@ -140,7 +143,7 @@ const SchemaFlowDiagram = ({
     // Outer container
     <div
       ref={containerRef}
-      className="relative flex flex-col md:flex-row items-start md:items-center gap-8 md:gap-24 border-b px-8 py-8"
+      className="relative flex flex-col lg:flex-row items-start lg:items-center gap-8 lg:gap-24 border-b px-8 py-8"
       role="img"
       aria-label={`Schema flow diagram showing ${sourceLabel} ${sourceType} schema connecting to ${targetLabel} Postgres schema`}
     >
@@ -178,14 +181,16 @@ const SchemaFlowDiagram = ({
       {/* SVG Path for Vertical Dashed Line (Mobile) */}
       {verticalLinePosition && (
         <svg
-          className="absolute md:hidden pointer-events-none"
+          className="absolute lg:hidden pointer-events-none"
           style={{
             left: `${verticalLinePosition.x - 0.5}px`,
             top: `${verticalLinePosition.y}px`,
             width: '1px',
-            height: '3rem', // Match gap on outer container, path d
+            height: `${verticalLinePosition.height}px`,
             overflow: 'visible',
           }}
+          viewBox={`0 0 1 ${verticalLinePosition.height}`}
+          preserveAspectRatio="none"
           aria-hidden="true"
         >
           <defs>
@@ -203,25 +208,30 @@ const SchemaFlowDiagram = ({
               `}
             </style>
           </defs>
-          {/* Straight vertical line */}
+          {/* Straight vertical line - uses viewBox coordinates */}
           <path
-            d="M 0 0 L 0 32"
+            d={`M 0.5 0 L 0.5 ${verticalLinePosition.height}`}
             fill="none"
             stroke="hsl(var(--foreground-muted))"
             strokeWidth="1.25"
             className="animated-dash"
           />
           {/* Dot at start */}
-          <circle cx="0" cy="0" r="3" fill="hsl(var(--foreground-muted))" />
+          <circle cx="0.5" cy="0" r="3" fill="hsl(var(--foreground-muted))" />
           {/* Dot at end */}
-          <circle cx="0" cy="32" r="3" fill="hsl(var(--foreground-muted))" />
+          <circle
+            cx="0.5"
+            cy={verticalLinePosition.height}
+            r="3"
+            fill="hsl(var(--foreground-muted))"
+          />
         </svg>
       )}
 
       {/* SVG Path for Horizontal Dashed Line (Desktop) */}
       {lineStart && (
         <svg
-          className="absolute hidden md:block pointer-events-none"
+          className="absolute hidden lg:block pointer-events-none"
           style={{
             left: `${lineStart.x}px`,
             top: `${lineStart.y - 0.75}px`,
@@ -255,9 +265,9 @@ const SchemaFlowDiagram = ({
             className="animated-dash"
           />
           {/* Dot at start */}
-          <circle cx="0" cy="0" r="3" fill="hsl(var(--foreground-muted))" />
+          <circle cx="0" cy="0" r="2" fill="hsl(var(--foreground-muted))" />
           {/* Dot at end */}
-          <circle cx="96" cy="0" r="3" fill="hsl(var(--foreground-muted))" />
+          <circle cx="96" cy="0" r="2" fill="hsl(var(--foreground-muted))" />
         </svg>
       )}
 
