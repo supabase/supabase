@@ -31,10 +31,12 @@ import {
   FormField_Shadcn_,
   FormItem_Shadcn_,
   Switch,
+  TextLink,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { IS_PLATFORM } from 'lib/constants'
 
 // [Joshen] Not convinced with the UI and layout but getting the functionality out first
 
@@ -86,18 +88,20 @@ export const QueuesSettings = () => {
 
   const { mutateAsync: updateTable } = useTableUpdateMutation()
 
+  const onPostgrestConfigUpdateSuccess = () => {
+    if (enable) {
+      toast.success('Queues can now be managed through client libraries or PostgREST endpoints!')
+    } else {
+      toast.success(
+        'Queues can no longer be managed through client libraries or PostgREST endpoints'
+      )
+    }
+    setIsToggling(false)
+    form.reset({ enable })
+  }
+
   const { mutate: updatePostgrestConfig } = useProjectPostgrestConfigUpdateMutation({
-    onSuccess: () => {
-      if (enable) {
-        toast.success('Queues can now be managed through client libraries or PostgREST endpoints!')
-      } else {
-        toast.success(
-          'Queues can no longer be managed through client libraries or PostgREST endpoints'
-        )
-      }
-      setIsToggling(false)
-      form.reset({ enable })
-    },
+    onSuccess: onPostgrestConfigUpdateSuccess,
     onError: (error) => {
       setIsToggling(false)
       toast.error(`Failed to toggle queue exposure via PostgREST: ${error.message}`)
@@ -106,6 +110,7 @@ export const QueuesSettings = () => {
 
   const { mutate: toggleExposeQueuePostgrest } = useDatabaseQueueToggleExposeMutation({
     onSuccess: (_, values) => {
+      if (!IS_PLATFORM) return onPostgrestConfigUpdateSuccess()
       if (project && config) {
         if (values.enable) {
           const updatedSchemas = schemas.concat([QUEUES_SCHEMA])
@@ -220,6 +225,20 @@ export const QueuesSettings = () => {
                               <code className="text-xs">archive</code>, and{' '}
                               <code className="text-xs">delete</code>
                             </p>
+                            {!IS_PLATFORM ? (
+                              <div className="mt-6 max-w-2xl">
+                                When running Supabase locally with the CLI or self-hosting using
+                                Docker Compose, you also need to update your configuration to expose
+                                the <code className="text-xs">{QUEUES_SCHEMA}</code> schema.
+                                <br />
+                                <TextLink
+                                  target="_blank"
+                                  className="mt-0 inline-block"
+                                  label="Learn more"
+                                  url="https://supabase.com/docs/guides/queues/expose-self-hosted-queues"
+                                />
+                              </div>
+                            ) : null}
                           </>
                         }
                       >

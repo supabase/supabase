@@ -38,6 +38,7 @@ export const OrganizationInvite = () => {
 
   const organizationName = isSuccessInvitation ? data?.organization_name : 'An organization'
   const loginRedirectLink = `/sign-in?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
+  const signupRedirectLink = `/sign-up?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
 
   const { mutate: joinOrganization, isLoading: isJoining } =
     useOrganizationAcceptInvitationMutation({
@@ -76,7 +77,7 @@ export const OrganizationInvite = () => {
               <Link href={loginRedirectLink}>Sign in</Link>
             </Button>
             <Button asChild type="default">
-              <Link href={loginRedirectLink}>Create an account</Link>
+              <Link href={signupRedirectLink}>Create an account</Link>
             </Button>
           </div>
         </>

@@ -37,6 +37,11 @@ import {
 import { convertFromBytes } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
 import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
+import {
+  createTemporaryUploadKey,
+  isTemporaryUploadKeyValid,
+  type TemporaryUploadKey,
+} from 'data/api-keys/temp-api-keys-utils'
 import { configKeys } from 'data/config/keys'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
@@ -101,6 +106,9 @@ function createStorageExplorerState({
     resumableUploadUrl,
     uploadProgresses: [] as UploadProgress[],
 
+    // Temporary API key management for batch uploads
+    temporaryUploadKey: undefined as TemporaryUploadKey | undefined,
+
     // abortController,
     abortApiCalls: () => {
       if (abortController) {
@@ -113,6 +121,29 @@ function createStorageExplorerState({
     abortUploads: (toastId: string | number) => {
       state.abortUploadCallbacks[toastId].forEach((callback) => callback())
       state.abortUploadCallbacks[toastId] = []
+    },
+
+    // Get or refresh the temporary upload key
+    getOrRefreshTemporaryUploadKey: async () => {
+      if (isTemporaryUploadKeyValid(state.temporaryUploadKey)) {
+        return state.temporaryUploadKey.apiKey
+      }
+
+      // Generate new key with 10 minutes expiry
+      const expiryInSeconds = 600
+      const data = await getTemporaryAPIKey({
+        projectRef: state.projectRef,
+        expiry: expiryInSeconds,
+      })
+
+      state.temporaryUploadKey = createTemporaryUploadKey(data.api_key, expiryInSeconds)
+
+      return data.api_key
+    },
+
+    // Clear the temporary upload key
+    clearTemporaryUploadKey: () => {
+      state.temporaryUploadKey = undefined
     },
 
     columns: [] as StorageColumn[],
@@ -1098,6 +1129,15 @@ function createStorageExplorerState({
         .map((folder) => folder.name)
         .join('/')
 
+      // Generate temporary API key for the batch upload
+      try {
+        await state.getOrRefreshTemporaryUploadKey()
+      } catch (error) {
+        console.error('Failed to get temporary API key:', error)
+        toast.error('Failed to initialize upload session. Please try again.')
+        return
+      }
+
       const toastId = state.onUploadProgress()
 
       // Upload files in batches
@@ -1196,10 +1236,12 @@ function createStorageExplorerState({
               chunkSize,
               onBeforeRequest: async (req) => {
                 try {
-                  const data = await getTemporaryAPIKey({ projectRef: state.projectRef })
-                  req.setHeader('apikey', data.api_key)
+                  // Use the shared temporary key for batch uploads
+                  // This checks if the key is still valid and refreshes if needed
+                  const apiKey = await state.getOrRefreshTemporaryUploadKey()
+                  req.setHeader('apikey', apiKey)
                   if (!IS_PLATFORM) {
-                    req.setHeader('Authorization', `Bearer ${data.api_key}`)
+                    req.setHeader('Authorization', `Bearer ${apiKey}`)
                   }
                 } catch (error) {
                   throw error
@@ -1356,6 +1398,9 @@ function createStorageExplorerState({
           closeButton: true,
           duration: SONNER_DEFAULT_DURATION,
         })
+      } finally {
+        // Clear the temporary API key after batch upload completes
+        state.clearTemporaryUploadKey()
       }
 
       const t2 = new Date()

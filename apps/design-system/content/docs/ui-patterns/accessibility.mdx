@@ -1,0 +1,50 @@
+---
+title: Accessibility
+description: Make Supabase work for everyone.
+---
+
+Accessibility is about making an interface work for as many people as possible across as many circumstances as possible. All of us lean on affordances that accessible experiences provide:
+
+- Keyboard navigation
+- Legible and resizable elements
+- Large tap targets
+- Clear and simple language
+
+## Checklist
+
+About to push some code? At a minimum, check your work against this list:
+
+- Are interactive page elements [keyboard-focusable](#focus-management)?
+- Are all elements announcable by a [screen reader](#screen-reader-support)?
+- Are textual elements legible and scalable?
+- Can I use this on a smaller and/or older device?
+
+## Focus management
+
+All interactive page elements should be reachable by keyboard. They should also provide visual feedback upon selection via a `focus-visible` state. We use consistent focus styles such as `inset-focus` so users recognize this state instantly.
+
+```jsx
+<TableCell>
+  <p>{name}</p>
+  <button
+    className={cn('absolute inset-0', 'inset-focus')}
+    onClick={(event) => handleBucketNavigation(name, event)}
+  >
+    <span className="sr-only">Go to bucket details</span>
+  </button>
+</TableCell>
+```
+
+Consider also affordances like `ctrl` and `meta` key support for opening in a new tab. Anything that you can do with a mouse input should be replicable by keyboard.
+
+## Screen reader support
+
+Textual elements are supported out-of-the-box by screen readers. Imagery of course should be described by `alt` tags.
+
+Less obvious however are scaffolding elements that only makes sense visually, when paired with other content. For example: a table column for actions may not have a visual _Actions_ label because its purpose is obvious to a sighted person. For everyone else’s sake, this column should be titled with `sr-only` text:
+
+```jsx
+<TableHead>
+  <span className="sr-only">Actions</span>
+</TableHead>
+```
