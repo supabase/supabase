@@ -215,12 +215,21 @@ const SparklineTooltip = ({ active, payload, label }: RechartsTooltipProps<any, 
 interface MetricCardSparklineProps extends React.HTMLAttributes<HTMLDivElement> {
   data?: Array<{ value: number; [key: string]: any }>
   dataKey?: string
+  hasTimestamp?: boolean
   className?: string
 }
 
 const MetricCardSparkline = React.forwardRef<HTMLDivElement, MetricCardSparklineProps>(
-  ({ className, data, dataKey, ...props }, ref) => {
+  ({ className, data, dataKey, hasTimestamp = false, ...props }, ref) => {
     const { isLoading } = useMetricCard()
+    const DateTimeFormat = 'MMM D, YYYY'
+    const startDate =
+      data && data.length > 0 ? dayjs(data[0]['timestamp']).format(DateTimeFormat) : ''
+    const endDate =
+      data && data.length > 0
+        ? dayjs(data[data.length - 1]?.['timestamp']).format(DateTimeFormat)
+        : ''
+
     if (isLoading) {
       return <Skeleton className="w-full h-[56px] rounded-none" />
     }
@@ -230,7 +239,7 @@ const MetricCardSparkline = React.forwardRef<HTMLDivElement, MetricCardSparkline
     }
 
     return (
-      <div ref={ref} className={cn('w-full h-16 relative', className)} {...props}>
+      <div ref={ref} className={cn('w-full h-16 relative box-border', className)} {...props}>
         <ResponsiveContainer width="100%" height="100%" className="relative">
           <AreaChart data={data} margin={{ top: 5, left: 0, right: 0, bottom: 0 }}>
             <defs>
@@ -250,6 +259,12 @@ const MetricCardSparkline = React.forwardRef<HTMLDivElement, MetricCardSparkline
             />
           </AreaChart>
         </ResponsiveContainer>
+        {hasTimestamp && (
+          <div className="text-brand bottom-1 left-3 right-3 absolute flex items-center justify-between text-[10px] font-mono">
+            <span>{startDate}</span>
+            <span>{endDate}</span>
+          </div>
+        )}
       </div>
     )
   }
