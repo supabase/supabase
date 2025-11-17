@@ -140,7 +140,7 @@ const data: {
         authorTitle: 'Lead Product Manager, Brthrs',
         quote: (
           <>
-            <span className="text-foreground">Supabase is our go-to backend for client work because it’s fast to build with and easy to maintain.</span>
+            <span className="text-foreground">Supabase is our go-to backend for client work because it&apos;s fast to build with and easy to maintain.</span>
           </>
         ),
       },
