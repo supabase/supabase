@@ -10,14 +10,20 @@ import { TriggersList } from 'components/interfaces/Database/Triggers/TriggersLi
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { DOCS_URL } from 'lib/constants'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const TriggersPage: NextPageWithLayout = () => {
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
@@ -99,23 +105,28 @@ execute function function_name();`)
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldSection>
-          <div className="col-span-12">
-            <FormHeader
-              title="Database Triggers"
-              description="Execute a set of actions automatically on specified table events"
-              docsUrl={`${DOCS_URL}/guides/database/postgres/triggers`}
-            />
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Database Triggers</PageHeaderTitle>
+            <PageHeaderDescription>
+              Execute a set of actions automatically on specified table events
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="large">
+        <PageSection>
+          <PageSectionContent>
             <TriggersList
               createTrigger={createTrigger}
               editTrigger={editTrigger}
               duplicateTrigger={duplicateTrigger}
               deleteTrigger={deleteTrigger}
             />
-          </div>
-        </ScaffoldSection>
-      </ScaffoldContainer>
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
       <TriggerSheet
         selectedTrigger={selectedTrigger}
         open={showCreateTriggerForm}

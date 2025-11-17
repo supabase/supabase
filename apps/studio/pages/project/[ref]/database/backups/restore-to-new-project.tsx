@@ -3,11 +3,18 @@ import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseB
 import { RestoreToNewProject } from 'components/interfaces/Database/RestoreToNewProject/RestoreToNewProject'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderFooter,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -18,19 +25,27 @@ const RestoreToNewProjectPage: NextPageWithLayout = () => {
   }
 
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection>
-        <div className="col-span-12">
-          <div className="space-y-6">
-            <FormHeader className="!mb-0" title="Database Backups" />
-            <DatabaseBackupsNav active="rtnp" />
+    <>
+      <PageHeader>
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Database Backups</PageHeaderTitle>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+        <PageHeaderFooter>
+          <DatabaseBackupsNav active="rtnp" />
+        </PageHeaderFooter>
+      </PageHeader>
+      <PageContainer>
+        <PageSection>
+          <PageSectionContent>
             <div className="space-y-8">
               <RestoreToNewProject />
             </div>
-          </div>
-        </div>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    </>
   )
 }
 

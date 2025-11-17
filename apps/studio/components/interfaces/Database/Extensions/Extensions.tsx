@@ -4,7 +4,6 @@ import { AlertCircle, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
 import InformationBox from 'components/ui/InformationBox'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -64,17 +63,14 @@ export const Extensions = () => {
   return (
     <>
       <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <Input
-            size="tiny"
-            placeholder="Search for an extension"
-            value={filterString}
-            onChange={(e) => setFilterString(e.target.value)}
-            className="w-52"
-            icon={<Search size={14} />}
-          />
-          <DocsButton href={`${DOCS_URL}/guides/database/extensions`} />
-        </div>
+        <Input
+          size="tiny"
+          placeholder="Search for an extension"
+          value={filterString}
+          onChange={(e) => setFilterString(e.target.value)}
+          className="w-52"
+          icon={<Search size={14} />}
+        />
       </div>
 
       {isPermissionsLoaded && !canUpdateExtensions && (

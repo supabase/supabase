@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import React from 'react'
+import React, { createContext, useContext } from 'react'
 
 import { cn } from 'ui'
 import { Breadcrumb } from 'ui/src/components/shadcn/ui/breadcrumb'
@@ -24,6 +24,20 @@ const pageHeaderVariants = cva(['flex flex-col gap-4 w-full'], {
 })
 
 // ============================================================================
+// Context
+// ============================================================================
+
+type PageHeaderContextValue = {
+  size: 'default' | 'small' | 'large' | 'full'
+}
+
+const PageHeaderContext = createContext<PageHeaderContextValue>({
+  size: 'default',
+})
+
+const usePageHeaderContext = () => useContext(PageHeaderContext)
+
+// ============================================================================
 // Root
 // ============================================================================
 
@@ -34,21 +48,19 @@ export type PageHeaderRootProps = React.ComponentProps<'div'> &
  * Root component for page header.
  * Renders children in order without searching for specific components.
  */
-const PageHeaderRoot = ({
-  className,
-  size = 'default',
-  children,
-  ...props
-}: PageHeaderRootProps) => {
+const PageHeaderRoot = ({ className, size, children, ...props }: PageHeaderRootProps) => {
+  const contextSize: 'default' | 'small' | 'large' | 'full' = size ?? 'default'
   return (
-    <div
-      data-slot="page-header"
-      data-size={size}
-      className={cn(pageHeaderVariants({ size }), className)}
-      {...props}
-    >
-      {children}
-    </div>
+    <PageHeaderContext.Provider value={{ size: contextSize }}>
+      <div
+        data-slot="page-header"
+        data-size={contextSize}
+        className={cn(pageHeaderVariants({ size: contextSize }), className)}
+        {...props}
+      >
+        {children}
+      </div>
+    </PageHeaderContext.Provider>
   )
 }
 
@@ -56,21 +68,15 @@ const PageHeaderRoot = ({
 // Breadcrumb
 // ============================================================================
 
-export type PageHeaderBreadcrumbProps = React.ComponentProps<typeof Breadcrumb> & {
-  size?: 'default' | 'small' | 'large' | 'full'
-}
+export type PageHeaderBreadcrumbProps = React.ComponentProps<typeof Breadcrumb>
 
 /**
  * Breadcrumb component for page header.
  * A wrapper around Breadcrumb with page header styling.
  * Should be placed as the first child of PageHeader.
  */
-const PageHeaderBreadcrumb = ({
-  className,
-  size = 'default',
-  children,
-  ...props
-}: PageHeaderBreadcrumbProps) => {
+const PageHeaderBreadcrumb = ({ className, children, ...props }: PageHeaderBreadcrumbProps) => {
+  const { size } = usePageHeaderContext()
   return (
     <PageContainer size={size}>
       <Breadcrumb
@@ -174,9 +180,7 @@ const PageHeaderDescription = ({ className, children, ...props }: PageHeaderDesc
 // Meta
 // ============================================================================
 
-export type PageHeaderMetaProps = React.ComponentProps<'div'> & {
-  size?: 'default' | 'small' | 'large' | 'full'
-}
+export type PageHeaderMetaProps = React.ComponentProps<'div'>
 
 /**
  * Meta wrapper for page header.
@@ -184,12 +188,8 @@ export type PageHeaderMetaProps = React.ComponentProps<'div'> & {
  * Should be placed after PageHeaderBreadcrumb (if present) and before PageHeaderFooter.
  * Uses CSS to style children based on their data-slot attributes.
  */
-const PageHeaderMeta = ({
-  className,
-  size = 'default',
-  children,
-  ...props
-}: PageHeaderMetaProps) => {
+const PageHeaderMeta = ({ className, children, ...props }: PageHeaderMetaProps) => {
+  const { size } = usePageHeaderContext()
   return (
     <PageContainer size={size}>
       <div
@@ -242,11 +242,8 @@ export type PageHeaderFooterProps = React.ComponentProps<'div'>
  * Container for tab navigation (NavMenu).
  * Should be placed as the last child of PageHeader.
  */
-const PageHeaderFooter = ({
-  className,
-  size = 'default',
-  ...props
-}: PageHeaderFooterProps & { size?: 'default' | 'small' | 'large' | 'full' }) => {
+const PageHeaderFooter = ({ className, ...props }: PageHeaderFooterProps) => {
+  const { size } = usePageHeaderContext()
   return (
     <PageContainer size={size} className={cn(size === 'full' && 'border-b')}>
       <div
