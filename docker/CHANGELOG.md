@@ -7,6 +7,8 @@ for complete image version history and rollback information.
 
 Check updates, changelogs, and release notes for each service to learn more.
 
+**Note:** Configuration updates marked with "requires [...] update" are already included in the latest version of the repository. Pull the latest changes or refer to the linked PR for manual updates.
+
 ## Unreleased
 
 ### Studio
