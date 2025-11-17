@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
-import { useParams } from 'common'
 import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
@@ -17,7 +16,6 @@ export interface DatabaseLayoutProps {
 }
 
 const DatabaseProductMenu = () => {
-  const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
   const router = useRouter()
