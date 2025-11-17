@@ -23,7 +23,7 @@ export const LogDrainsEmpty = () => {
       label: 'Read our documentation',
       link: 'https://supabase.com/docs/guides/telemetry/log-drains',
     },
-  ].filter((item) => IS_PLATFORM && item.title !== 'Pricing')
+  ].filter((item) => IS_PLATFORM || item.title !== 'Pricing')
 
   return (
     <div className="flex grow h-full">
