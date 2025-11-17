@@ -18,6 +18,7 @@ import { useProfile } from 'lib/profile'
 import { Menu, cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ObservabilityMenuItem } from './ObservabilityMenuItem'
+import { InnerSideBarEmptyPanel } from 'ui-patterns'
 
 const ObservabilityMenu = () => {
   const router = useRouter()
@@ -103,7 +104,7 @@ const ObservabilityMenu = () => {
       name: r.name,
       description: r.description || '',
       key: r.id || idx + '-report',
-      url: `/project/${ref}/observability/${r.id}${preservedQueryParams}`,
+      url: `/project/${ref}/reports/${r.id}${preservedQueryParams}`,
       hasDropdownActions: true,
       report: r,
     }))
@@ -115,14 +116,34 @@ const ObservabilityMenu = () => {
 
   const menuItems = [
     {
-      title: 'Built-in reports',
-      key: 'builtin-reports',
+      title: 'Performance Reports',
+      key: 'performance-reports',
       items: [
         {
           name: 'API Gateway',
           key: 'api-overview',
           url: `/project/${ref}/observability/api-overview${preservedQueryParams}`,
         },
+        {
+          name: 'Query Performance',
+          key: 'query-performance',
+          url: `/project/${ref}/observability/query-performance${preservedQueryParams}`,
+        },
+        ...(postgrestReportEnabled
+          ? [
+              {
+                name: 'Data API',
+                key: 'data-api',
+                url: `/project/${ref}/observability/postgrest${preservedQueryParams}`,
+              },
+            ]
+          : []),
+      ],
+    },
+    {
+      title: 'Product Reports',
+      key: 'product-reports',
+      items: [
         ...(authEnabled
           ? [
               {
@@ -146,20 +167,6 @@ const ObservabilityMenu = () => {
               },
             ]
           : []),
-        {
-          name: 'Query Performance',
-          key: 'query-performance',
-          url: `/project/${ref}/observability/query-performance${preservedQueryParams}`,
-        },
-        ...(postgrestReportEnabled
-          ? [
-              {
-                name: 'PostgREST',
-                key: 'postgrest',
-                url: `/project/${ref}/observability/postgrest${preservedQueryParams}`,
-              },
-            ]
-          : []),
         ...(realtimeEnabled
           ? [
               {
@@ -169,7 +176,6 @@ const ObservabilityMenu = () => {
               },
             ]
           : []),
-
         ...(storageEnabled
           ? [
               {
@@ -192,82 +198,119 @@ const ObservabilityMenu = () => {
           <ShimmeringLoader className="w-1/2" />
         </div>
       ) : (
-        <div className="flex flex-col px-2 gap-y-6">
-          <div className="px-2">
-            <ButtonTooltip
-              block
-              type="default"
-              icon={<Plus />}
-              disabled={!canCreateCustomReport}
-              className="justify-start flex-grow"
-              onClick={() => {
-                setShowNewReportModal(true)
-              }}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: !canCreateCustomReport
-                    ? 'You need additional permissions to create custom reports'
-                    : undefined,
-                },
-              }}
-            >
-              New custom report
-            </ButtonTooltip>
-          </div>
-
-          {reportMenuItems.length > 0 ? (
-            <div>
-              <Menu.Group
-                title={<span className="uppercase font-mono">Your custom reports</span>}
-              />
-              {reportMenuItems.map((item) => (
-                <ObservabilityMenuItem
-                  key={item.id}
-                  item={item as any}
-                  pageKey={pageKey}
-                  onSelectEdit={() => {
-                    setSelectedReportToUpdate(item.report)
-                  }}
-                  onSelectDelete={() => {
-                    setSelectedReportToDelete(item.report)
-                    setDeleteModalOpen(true)
-                  }}
+        <div className="flex flex-col gap-y-6">
+          <>
+            {menuItems.map((item, idx) => (
+              <>
+                <div className="h-px w-full bg-border-overlay first:hidden" />
+                <div key={item.key + '-menu-group'}>
+                  {item.items ? (
+                    <div className="px-2">
+                      <Menu.Group
+                        title={<span className="uppercase font-mono">{item.title}</span>}
+                      />
+                      <div key={item.key} className="flex flex-col">
+                        {item.items.map((subItem) => (
+                          <li
+                            key={subItem.key}
+                            className={cn(
+                              'pr-2 mt-1 text-foreground-light group-hover:text-foreground/80 text-sm',
+                              'flex items-center justify-between rounded-md group relative',
+                              subItem.key === pageKey
+                                ? 'bg-surface-300 text-foreground'
+                                : 'hover:text-foreground'
+                            )}
+                          >
+                            <Link
+                              href={subItem.url}
+                              className="flex-grow h-7 flex justify-between items-center pl-3"
+                            >
+                              <span>{subItem.name}</span>
+                            </Link>
+                          </li>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              </>
+            ))}
+          </>
+          <div className="h-px w-full bg-border-overlay first:hidden" />
+          <div className="mx-2">
+            <Menu.Group
+              title={
+                <span className="flex w-full items-center justify-between relative h-6">
+                  <span className="uppercase font-mono">Custom Reports</span>
+                  {reportMenuItems.length > 0 && (
+                    <ButtonTooltip
+                      type="default"
+                      size="tiny"
+                      icon={<Plus />}
+                      disabled={!canCreateCustomReport}
+                      className="flex items-center justify-center h-6 w-6 absolute top-0 -right-1"
+                      onClick={() => {
+                        setShowNewReportModal(true)
+                      }}
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: !canCreateCustomReport
+                            ? 'You need additional permissions to create custom reports'
+                            : undefined,
+                        },
+                      }}
+                    />
+                  )}
+                </span>
+              }
+            />
+            {reportMenuItems.length === 0 ? (
+              <div className="px-2">
+                <InnerSideBarEmptyPanel
+                  title="No custom reports yet"
+                  description="Create and save custom reports to track your project metrics"
+                  actions={
+                    <ButtonTooltip
+                      type="default"
+                      icon={<Plus />}
+                      disabled={!canCreateCustomReport}
+                      onClick={() => {
+                        setShowNewReportModal(true)
+                      }}
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: !canCreateCustomReport
+                            ? 'You need additional permissions to create custom reports'
+                            : undefined,
+                        },
+                      }}
+                    >
+                      New custom report
+                    </ButtonTooltip>
+                  }
                 />
-              ))}
-            </div>
-          ) : null}
-
-          {menuItems.map((item) => (
-            <div key={item.key + '-menu-group'}>
-              {item.items ? (
-                <>
-                  <Menu.Group title={<span className="uppercase font-mono">{item.title}</span>} />
-                  <div key={item.key} className="flex flex-col">
-                    {item.items.map((subItem) => (
-                      <li
-                        key={subItem.key}
-                        className={cn(
-                          'pr-2 mt-1 text-foreground-light group-hover:text-foreground/80 text-sm',
-                          'flex items-center justify-between rounded-md group relative',
-                          subItem.key === pageKey
-                            ? 'bg-surface-300 text-foreground'
-                            : 'hover:bg-surface-200'
-                        )}
-                      >
-                        <Link
-                          href={subItem.url}
-                          className="flex-grow h-7 flex justify-between items-center pl-3"
-                        >
-                          <span>{subItem.name}</span>
-                        </Link>
-                      </li>
-                    ))}
-                  </div>
-                </>
-              ) : null}
-            </div>
-          ))}
+              </div>
+            ) : (
+              <>
+                {reportMenuItems.map((item) => (
+                  <ObservabilityMenuItem
+                    key={item.id}
+                    item={item as any}
+                    pageKey={pageKey}
+                    onSelectEdit={() => {
+                      setSelectedReportToUpdate(item.report)
+                    }}
+                    onSelectDelete={() => {
+                      setSelectedReportToDelete(item.report)
+                      setDeleteModalOpen(true)
+                    }}
+                  />
+                ))}
+              </>
+            )}
+          </div>
 
           <UpdateCustomReportModal
             onCancel={() => setSelectedReportToUpdate(undefined)}

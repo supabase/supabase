@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronDown, Edit2, Trash } from 'lucide-react'
+import { Edit2, Trash, MoreVertical, MoreHorizontal } from 'lucide-react'
 import Link from 'next/link'
 
 import { ContentBase } from 'data/content/content-query'
@@ -59,7 +59,7 @@ export const ObservabilityMenuItem = ({
       className={cn(
         'pr-2 h-7 pl-3 mt-1 text-foreground-light group-hover:text-foreground/80 text-sm',
         'flex items-center justify-between rounded-md group relative',
-        item.key === pageKey ? 'bg-surface-300 text-foreground' : 'hover:bg-surface-200'
+        item.key === pageKey ? 'bg-surface-300 text-foreground' : 'hover:text-foreground'
       )}
       key={item.key + '-menukey'}
       href={item.url}
@@ -72,12 +72,18 @@ export const ObservabilityMenuItem = ({
             <Button
               type="text"
               className="px-1 opacity-50 hover:opacity-100"
-              icon={<ChevronDown size={12} strokeWidth={2} />}
+              icon={<MoreVertical size={12} strokeWidth={2} />}
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+              }}
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-32 *:gap-x-2">
             <DropdownMenuItem
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
                 if (!item.id) return
                 onSelectEdit()
               }}
@@ -87,7 +93,9 @@ export const ObservabilityMenuItem = ({
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
                 if (!item.id) return
                 onSelectDelete()
               }}
