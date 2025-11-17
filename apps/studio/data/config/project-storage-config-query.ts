@@ -65,7 +65,6 @@ export const useIsWithinETLAnalyticsBucketPrivateAlpha = ({
       : []
 
   const etlAnalyticsBucketShowAllProjects = useFlag('etlAnalyticsBucketOverride')
-  console.log({ etlAnalyticsBucketShowAllProjects })
 
   return etlAnalyticsBucketShowAllProjects || privateAlphaProjectRefs.includes(projectRef ?? '')
 }
