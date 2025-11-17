@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
 
 export type DiskAutoscaleCustomConfigVariables = {
@@ -33,10 +33,15 @@ export const useDiskAutoscaleCustomConfigQuery = <TData = DiskAutoscaleCustomCon
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<DiskAutoscaleCustomConfigData, DiskAutoscaleCustomConfigError, TData> = {}
+  }: UseCustomQueryOptions<
+    DiskAutoscaleCustomConfigData,
+    DiskAutoscaleCustomConfigError,
+    TData
+  > = {}
 ) =>
-  useQuery<DiskAutoscaleCustomConfigData, DiskAutoscaleCustomConfigError, TData>(
-    configKeys.diskAutoscaleConfig(projectRef),
-    ({ signal }) => getDiskAutoscaleCustomConfig({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<DiskAutoscaleCustomConfigData, DiskAutoscaleCustomConfigError, TData>({
+    queryKey: configKeys.diskAutoscaleConfig(projectRef),
+    queryFn: ({ signal }) => getDiskAutoscaleCustomConfig({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

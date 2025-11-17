@@ -7,6 +7,7 @@ import {
   ChartScatter,
   Clock,
   Cloud,
+  CloudCog,
   Database,
   DatabaseBackup,
   DatabaseZap,
@@ -329,7 +330,7 @@ By implementing Network Restrictions, you create a more secure environment for y
     docsUrl: 'https://supabase.com/docs/guides/platform/network-restrictions',
     slug: 'network-restrictions',
     status: {
-      stage: PRODUCT_STAGES.BETA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: false,
     },
   },
@@ -404,7 +405,7 @@ Supabase Branching allows you to create and test changes in separate, temporary 
     docsUrl: 'https://supabase.com/docs/guides/platform/branching',
     slug: 'branching',
     status: {
-      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      stage: PRODUCT_STAGES.BETA,
       availableOnSelfHosted: false,
     },
   },
@@ -483,7 +484,7 @@ By leveraging Read Replicas, you can achieve consistent low-latency performance 
     docsUrl: 'https://supabase.com/docs/guides/platform/read-replicas',
     slug: 'read-replicas',
     status: {
-      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: false,
     },
   },
@@ -577,7 +578,7 @@ This feature is particularly useful for teams looking to enhance their security 
     docsUrl: 'https://supabase.com/docs/guides/database/vault',
     slug: 'vault',
     status: {
-      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
       availableOnSelfHosted: true,
     },
   },
@@ -794,7 +795,7 @@ Supabase's Email Login feature enables secure email-based authentication for you
 - Secure authentication: Implement industry-standard security practices.
 - Customizable workflows: Tailor the signup and login processes to your needs.
 - Seamless integration: Works with Supabase's other auth providers and features.
-- Local development support: Test email flows using built-in tools like Inbucket.
+- Local development support: Test email flows using built-in tools like Mailpit.
 
 ## Email login is valuable for:
 - SaaS applications requiring user accounts
@@ -1188,7 +1189,7 @@ Supabase's Smart CDN automatically synchronizes asset metadata to the edge, ensu
 - Content freshness: Users always receive the most recent version of assets.
 - Reduced origin load: Minimize requests to the origin server by optimizing edge caching.
 - Improved user experience: Deliver fast-loading, up-to-date content globally.
-- Cost optimization: Reduce bandwidth costs by serving more content from the edge.
+- Cost optimization: Reduce egress costs by serving more content from the edge.
 
 ## The Smart CDN feature is valuable for:
 - Dynamic websites with frequently updated content
@@ -1223,14 +1224,14 @@ Supabase’s Image Transformations feature enables developers to dynamically man
 1. Dynamic resizing: Adjust image dimensions using width and height parameters to suit various display requirements.
 2. Quality control: Set image quality on a scale from 20 to 100 to balance visual fidelity and file size.
 3. Resize modes: Choose from ‘cover’, ‘contain’, or ‘fill’ to control how images fit within specified dimensions.
-4. Automatic format optimization: Automatically convert images to WebP format for supported browsers, enhancing load times and reducing bandwidth usage.
+4. Automatic format optimization: Automatically convert images to WebP format for supported browsers, enhancing load times and reducing egress usage.
 5. Flexible implementation: Utilize with public URLs, signed URLs, or direct downloads to fit various access control needs ([Server-side Auth](/features/server-side-auth)).
 6. [Next.js integration](/nextjs): Leverage a custom loader for optimized image handling in Next.js applications.
 7. Self-hosting option: Deploy your own image transformation service using Imgproxy for greater control and customization.
 
 
 ## Benefits:
-- Performance optimization: Reduce bandwidth usage and improve load times with optimized images.
+- Performance optimization: Reduce egress usage and improve load times with optimized images.
 - Storage efficiency: Store a single high-quality version and generate variants as needed.
 - Responsive design support: Serve appropriately sized images for different devices and layouts.
 - Simplified workflow: Automate image processing tasks, reducing the need for manual intervention and third-party tools.
@@ -1239,7 +1240,7 @@ Supabase’s Image Transformations feature enables developers to dynamically man
 - Responsive web applications: Deliver images optimized for various screen sizes and resolutions.
 - Ecommerce platforms: Showcase product images in multiple sizes without storing redundant files.
 - Content management systems (CMS): Adapt images for different layouts and templates dynamically.
-- Mobile applications: Optimize images for devices with varying bandwidth and display capabilities.
+- Mobile applications: Optimize images for devices with varying egress and display capabilities.
 - High-volume image handling: Efficiently manage and serve large quantities of images in diverse contexts with [resumable uploads](/features/resumable-uploads).
 
 Supabase's Image Transformations feature enables you to efficiently manage and serve optimized images, improving your application's performance and user experience while saving time and resources.
@@ -1273,11 +1274,11 @@ Supabase provides a custom loader for Next.js, allowing seamless integration of 
 
 ### Are there any limitations on image size or dimensions?
 
-While Supabase does not impose strict limits on image sizes, it’s recommended to optimize images for web use to ensure faster load times and better performance. Large images may consume more bandwidth and affect loading speeds.
+While Supabase does not impose strict limits on image sizes, it’s recommended to optimize images for web use to ensure faster load times and better performance. Large images may consume more egress and affect loading speeds.
 
 ### How does automatic format optimization work?
 
-Automatic format optimization detects the capabilities of the user’s browser and serves the most efficient image format supported, such as WebP. This enhances loading times and reduces bandwidth usage without compromising image quality.
+Automatic format optimization detects the capabilities of the user’s browser and serves the most efficient image format supported, such as WebP. This enhances loading times and reduces egress usage without compromising image quality.
 
 `,
     icon: Image,
@@ -1367,7 +1368,7 @@ Supabase's S3 compatibility allows seamless integration with existing workflows 
     docsUrl: 'https://supabase.com/docs/guides/storage/s3/compatibility',
     slug: 's3-compatibility',
     status: {
-      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
     },
   },
@@ -1410,7 +1411,7 @@ Supabase's Deno Edge Functions enable you to build responsive, globally distribu
     docsUrl: 'https://supabase.com/docs/guides/functions',
     slug: 'deno-edge-functions',
     status: {
-      stage: PRODUCT_STAGES.BETA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
     },
   },
@@ -1445,7 +1446,7 @@ By leveraging Supabase's Regional Invocations, you can significantly enhance the
     docsUrl: 'https://supabase.com/docs/guides/functions/regional-invocation',
     slug: 'regional-invocations',
     status: {
-      stage: PRODUCT_STAGES.BETA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
     },
   },
@@ -1480,7 +1481,7 @@ By leveraging NPM Compatibility in Supabase Edge Functions, you can take advanta
     docsUrl: 'https://supabase.com/blog/edge-functions-node-npm',
     slug: 'npm-compatibility',
     status: {
-      stage: PRODUCT_STAGES.BETA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
     },
   },
@@ -1735,7 +1736,7 @@ With Supabase AI Assistant, you gain a powerful ally in your development process
       availableOnSelfHosted: true,
       selfHostedTooling: {
         label: 'OpenAI API Key',
-        link: 'https://platform.openai.com/docs/quickstart#create-and-export-an-api-key://platform.openai.com/api-keys',
+        link: 'https://platform.openai.com/docs/libraries#create-and-export-an-api-key',
       },
     },
   },
@@ -1958,7 +1959,7 @@ This feature is essential for organizations aiming to maintain high security sta
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: '/images/features/security-and-performance-advisor.png',
     heroImageLight: '/images/features/security-and-performance-advisor-light.png',
-    docsUrl: 'https://supabase.com/blog/security-and-performance-advisor',
+    docsUrl: 'https://supabase.com/blog/security-performance-advisor',
     slug: 'security-and-performance-advisor',
     status: {
       stage: PRODUCT_STAGES.BETA,
@@ -2120,7 +2121,7 @@ This feature is particularly useful for Flutter developers aiming to create resp
     docsUrl: 'https://supabase.com/docs/reference/dart/start',
     slug: 'client-library-flutter',
     status: {
-      stage: PRODUCT_STAGES.BETA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
     },
   },
@@ -2145,7 +2146,7 @@ This feature is particularly valuable for iOS developers looking to leverage the
     docsUrl: 'https://supabase.com/docs/reference/swift/start',
     slug: 'client-library-swift',
     status: {
-      stage: PRODUCT_STAGES.BETA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
     },
   },
@@ -2252,6 +2253,161 @@ Supabase Queues provides the reliability of Postgres with the simplicity of Supa
     slug: 'queues',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'MCP Server',
+    subtitle:
+      'Connect your AI tools using the official Supabase Model Context Protocol (MCP) server.',
+    description: `
+The MCP Server bridges the gap between AI tools and your Supabase projects, enabling natural language commands and agent-like experiences for database management. It standardizes how Large Language Models (LLMs) communicate with platforms like Supabase, allowing AI tools such as Cursor, Claude, and Windsurf to spin up projects, design tables, query data, and manage configurations—all through a unified protocol.
+
+With the MCP Server, you can:
+
+- Create and manage Supabase projects directly from your AI tool.
+- Design tables, generate migrations, and manage schema.
+- Query data and run reports using SQL.
+- Manage branches, configurations, and TypeScript types.
+- Retrieve logs for debugging and troubleshooting.
+- Automate repetitive tasks and streamline AI-assisted development workflows.
+
+The MCP Server simplifies the integration of AI tools with Supabase, enabling a seamless development experience without the need for custom APIs or wrappers.
+
+## Key benefits
+1. AI-native development: Let AI tools like Cursor or Claude manage your Supabase projects with natural language commands.
+2. Standardized tool ecosystem: MCP standardizes how tools interact with Supabase, enabling a plug-and-play experience for AI-powered workflows.
+3. Streamlined workflows: Build faster by offloading repetitive tasks like schema design and configuration management to your AI assistant.
+4. Extensive toolset: Access over 20 tools for database design, data querying, and project management.
+5. Evolving capabilities: MCP continues to evolve, with upcoming support for native OAuth authentication, Edge Function deployment, and advanced schema discovery.
+
+The MCP Server empowers developers to build AI-native applications, accelerating productivity and reducing the complexity of working across multiple tools.
+
+## Use Cases for MCP Server
+
+The MCP Server unlocks new possibilities for AI-assisted development across various teams:
+
+- Frontend developers. Use tools like Cursor to scaffold Next.js apps backed by Supabase, configure environment files, and manage schema without leaving the IDE.
+- Backend engineers. Automate tasks like table creation, migrations, and TypeScript generation directly from AI tools.
+- AI engineers. Build custom AI agents that interact with Supabase databases, enabling dynamic and responsive AI-powered applications.
+- Educators & learners. Explore modern AI development practices by combining LLMs and databases in real-world projects.
+
+## Integration capabilities with Supabase MCP Server
+
+The MCP Server integrates seamlessly with popular AI tools and the broader Supabase ecosystem:
+
+- Cursor. Connect your IDE directly to Supabase for AI-driven development workflows.
+- Claude. Use Claude desktop and code tools to interact with Supabase resources and services.
+- Windsurf (Codium). Configure the MCP Server to manage Supabase projects directly within Codium's AI assistant.
+- Visual Studio Code (Copilot). Leverage AI capabilities to query data, generate types, and manage projects within VS Code.
+- Cline (VS Code extension). Connect Cline to Supabase through the MCP Server for AI-assisted database operations.
+
+These integrations empower developers to streamline workflows, reduce manual effort, and enhance productivity in AI-driven environments.
+
+## FAQs about the MCP Server
+
+Below are answers to common questions about the MCP Server, covering its functionality, compatibility, and setup requirements.
+
+### What is the Model Context Protocol (MCP)?
+
+MCP is a standard that defines how AI tools and platforms communicate. It enables AI tools to interact with Supabase by calling functions, retrieving data, and executing tasks through a common protocol.
+
+### Do I need a personal access token (PAT) to use the MCP Server?
+
+Yes, you'll need to create a PAT in your Supabase settings to authenticate the MCP Server. Future versions of MCP will support OAuth login flows for simpler authentication.
+
+### Can I use the MCP Server with self-hosted Supabase instances?
+
+No, the official Supabase MCP Server connects directly to Supabase Cloud. For local instances, you can use the Postgres MCP Server instead.
+
+### Which AI tools are compatible with the MCP Server?
+
+The MCP Server works with popular AI tools like Cursor, Claude, Windsurf, Visual Studio Code (CoPilot), and Cline. More tools will be supported as they adopt the MCP standard.
+
+### Can the MCP Server modify my database schema or data?
+
+Yes, the MCP Server can perform actions like creating tables, running queries, and managing branches. Use best practices like branching and access controls to protect production data.
+`,
+    icon: CloudCog,
+    products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: 'https://www.youtube-nocookie.com/embed/1SMldLoOhbg',
+    docsUrl: 'https://supabase.com/docs/guides/getting-started/mcp',
+    slug: 'mcp-server',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Declarative Schemas',
+    subtitle: 'Simplify database management with declarative schema files.',
+    description: `
+Declarative schemas help you manage complex Postgres databases more easily by defining your database structure in SQL files that represent the final, desired state. These schema files can be stored and versioned alongside your codebase, enabling better collaboration and simplified reviews.
+
+With declarative schemas, you can:
+
+- Maintain a single source of truth for your database schema, reducing duplication and errors.
+- Generate migration files automatically by diffing your declarative schema against the current database state.
+- Review changes easily through concise, readable diffs instead of long, complex migration scripts.
+
+## Key benefits
+1. Single source of truth: Define your entire database schema in a single, centralized location for better visibility and control.
+2. Version-controlled changes: Store your schema files alongside your application code, ensuring consistency across environments.
+3. Simplified code reviews: Schema changes become small, focused diffs that are easier to understand and validate.
+4. Reduce merge conflicts: Minimize the risk of conflicts when multiple developers work on the same schema.
+5. Support for advanced Postgres features: Manage tables, views, functions, triggers, policies, and more through declarative SQL files.
+
+Declarative schemas make it easier to manage growing database complexity, so your team can iterate faster without sacrificing stability or control.
+
+## Use Cases for Declarative Schemas
+
+Declarative schemas are valuable for a wide range of teams and scenarios:
+
+- Teams managing complex databases. Simplify schema management when working with multiple tables, views, policies, and functions.
+- Collaborative teams. Reduce merge conflicts and improve review processes when multiple developers are making schema changes.
+- CI/CD pipelines. Use declarative schemas to automate schema updates in your deployment workflows.
+- Teams adopting best practices. Adopt a more robust, maintainable approach to schema management with declarative patterns.
+
+## Integration capabilities with Supabase
+
+Declarative schemas integrate directly with the Supabase CLI, allowing you to:
+
+- Define your schema in SQL files within the \`supabase/schemas\` directory.
+- Use \`supabase db diff\` to generate migration files based on schema changes.
+- Apply and deploy migrations using the Supabase CLI, ensuring consistency across local and remote environments.
+- Combine with the Postgres Language Server for enhanced IDE support when working with declarative schemas.
+
+These tools help you maintain control over your database while moving faster and reducing the risk of errors.
+
+## FAQs about Declarative Schemas
+
+Below are answers to common questions about declarative schemas.
+
+### How do declarative schemas differ from migrations?
+
+Migrations are a record of incremental changes to your database schema. Declarative schemas define the final desired state of your schema, and the necessary migration files are generated by comparing the current database state with your schema files.
+
+### Do I need to write my own migration files?
+
+No. Supabase provides a schema diff tool (\`supabase db diff\`) that automatically generates migration files from your declarative schema files.
+
+### Can I use declarative schemas with my existing projects?
+
+Yes. You can pull your production schema into declarative files by running \`supabase db dump > supabase/schemas/prod.sql\`. From there, you can split the schema into smaller files and adopt a declarative workflow.
+
+### Are there any limitations to declarative schemas?
+
+The schema diff tool handles most Postgres objects, but some entities (like DML statements) are not captured and may still require manual migrations.
+
+For detailed instructions and best practices, see the [Declarative Schemas documentation](https://supabase.com/docs/guides/database/declarative-schemas).
+`,
+    icon: Database,
+    products: [PRODUCT_SHORTNAMES.DATABASE],
+    heroImage: 'https://www.youtube-nocookie.com/embed/EALkUlOKvAs',
+    docsUrl: 'https://supabase.com/docs/guides/local-development/declarative-database-schemas',
+    slug: 'declarative-schemas',
+    status: {
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
     },
   },

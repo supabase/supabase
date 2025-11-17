@@ -10,8 +10,9 @@ Claims returned must conform to our specification. Supabase Auth will check for 
 
 These are the fields currently available on an access token:
 
-Required Claims: `iss`, `aud`, `exp`, `iat`, `sub`, `role`, `aal`, `session_id`
-Optional Claims: `jti`, `nbf`, `app_metadata`, `user_metadata`, `amr`, `email`, `phone`
+Required Claims: `iss`, `aud`, `exp`, `iat`, `sub`, `role`, `aal`, `session_id`, `email`, `phone`, `is_anonymous`
+
+Optional Claims: `jti`, `nbf`, `app_metadata`, `user_metadata`, `amr`,
 
 **Inputs**
 
@@ -241,7 +242,10 @@ as $$
       'sub',
       'role',
       'aal',
-      'session_id'
+      'session_id',
+      'email',
+      'phone',
+      'is_anonymous'
    ] loop
       if original_claims ? claim then
         -- original_claims contains one of the listed claims, set it on new_claims

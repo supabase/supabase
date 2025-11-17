@@ -1,32 +1,58 @@
 ---
 id: 'function-ephemeral-storage'
-title: 'Ephemeral Storage'
-description: 'Read and write from temporary directory'
-subtitle: 'Read and write from temporary directory'
+title: 'File Storage'
+description: 'Use persistent and ephemeral file storage'
+subtitle: 'Use persistent and ephemeral file storage'
 ---
 
-Edge Functions provides ephemeral file storage. You can read and write files to the `/tmp` directory.
+Edge Functions provides two flavors of file storage:
+
+- Persistent - backed by S3 protocol, can read/write from any S3 compatible bucket, including Supabase Storage
+- Ephemeral - You can read and write files to the `/tmp` directory. Only suitable for temporary operations
+
+You can use file storage to:
+
+- Handle complex file transformations and workflows
+- Do data migrations between projects
+- Process user uploaded files and store them
+- Unzip archives and process contents before saving to database
+
+---
+
+## Persistent Storage
+
+The persistent storage option is built on top of the S3 protocol. It allows you to mount any S3-compatible bucket, including Supabase Storage Buckets, as a directory for your Edge Functions.
+You can perform operations such as reading and writing files to the mounted buckets as you would in a POSIX file system.
+
+To access an S3 bucket from Edge Functions, you must set the following for environment variables in Edge Function Secrets.
+
+- `S3FS_ENDPOINT_URL`
+- `S3FS_REGION`
+- `S3FS_ACCESS_KEY_ID`
+- `S3FS_SECRET_ACCESS_KEY`
+
+[Follow this guide](/docs/guides/storage/s3/authentication) to enable and create an access key for Supabase Storage S3.
+
+To access a file path in your mounted bucket from your Edge Function, use the prefix `/s3/YOUR-BUCKET-NAME`.
+
+```tsx
+// read from S3 bucket
+const data = await Deno.readFile('/s3/my-bucket/results.csv')
+
+// make a directory
+await Deno.mkdir('/s3/my-bucket/sub-dir')
+
+// write to S3 bucket
+await Deno.writeTextFile('/s3/my-bucket/demo.txt', 'hello world')
+```
+
+## Ephemeral storage
 
 Ephemeral storage will reset on each function invocation. This means the files you write during an invocation can only be read within the same invocation.
 
-### Use cases
+You can use [Deno File System APIs](https://docs.deno.com/api/deno/file-system) or the [`node:fs`](https://docs.deno.com/api/node/fs/) module to access the `/tmp` path.
 
-Here are some use cases where ephemeral storage can be useful:
-
-- Unzip an archive of CSVs and then add them as records to the DB
-- Custom image manipulation workflows (using [`magick-wasm`](https://supabase.com/docs/guides/functions/examples/image-manipulation))
-
-You can use [Background Tasks](https://supabase.com/docs/guides/functions/background-tasks) to handle slow file processing outside of a request.
-
-### How to use
-
-You can use [Deno File System APIs](https://docs.deno.com/api/deno/file-system) or the [`node:fs` module](https://docs.deno.com/api/node/fs/) to access the `/tmp` path.
-
-### Example
-
-Here is an example of how to write a user-uploaded zip file into temporary storage for further processing.
-
-```js
+```tsx
 Deno.serve(async (req) => {
   if (req.headers.get('content-type') !== 'application/zip') {
     return new Response('file must be a zip file', {
@@ -37,18 +63,137 @@ Deno.serve(async (req) => {
   const uploadId = crypto.randomUUID()
   await Deno.writeFile('/tmp/' + uploadId, req.body)
 
-  // do something with the written zip file
+  // E.g. extract and process the zip file
+  const zipFile = await Deno.readFile('/tmp/' + uploadId)
+  // You could use a zip library to extract contents
+  const extracted = await extractZip(zipFile)
 
-  return new Response('ok')
+  // Or process the file directly
+  console.log(`Processing zip file: ${uploadId}, size: ${zipFile.length} bytes`)
 })
 ```
 
-### Unavailable APIs
+---
 
-Currently, the synchronous APIs (e.g. `Deno.writeFileSync` or `Deno.mkdirSync`) for creating or writing files are not supported.
+## Common use cases
 
-You can use sync variations of read APIs (e.g. `Deno.readFileSync`).
+### Archive processing with background tasks
 
-### Limits
+You can use ephemeral storage with [Background Tasks](/docs/guides/functions/background-tasks) to handle large file processing operations that exceed memory limits.
 
-In the hosted platform, a free project can write up to 256MB of data to ephemeral storage. A paid project can write up to 512MB.
+Imagine you have a Photo Album application that accepts photo uploads as zip files. A streaming implementation will run into memory limit errors with zip files exceeding 100MB, as it retains all archive files in memory simultaneously.
+
+You can write the zip file to ephemeral storage first, then use a background task to extract and upload files to Supabase Storage. This way, you only read parts of the zip file to the memory.
+
+```tsx
+import { BlobWriter, ZipReader } from 'https://deno.land/x/zipjs/index.js'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
+
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL'),
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+)
+
+async function processZipFile(uploadId: string, filepath: string) {
+  const file = await Deno.open(filepath, { read: true })
+  const zipReader = new ZipReader(file.readable)
+  const entries = await zipReader.getEntries()
+
+  await supabase.storage.createBucket(uploadId, { public: false })
+
+  await Promise.all(
+    entries.map(async (entry) => {
+      if (entry.directory) return
+
+      // Read file entry from temp storage
+      const blobWriter = new BlobWriter()
+      const blob = await entry.getData(blobWriter)
+
+      // Upload to permanent storage
+      await supabase.storage.from(uploadId).upload(entry.filename, blob)
+
+      console.log('uploaded', entry.filename)
+    })
+  )
+
+  await zipReader.close()
+}
+
+Deno.serve(async (req) => {
+  const uploadId = crypto.randomUUID()
+  const filepath = `/tmp/${uploadId}.zip`
+
+  // Write zip to ephemeral storage
+  await Deno.writeFile(filepath, req.body)
+
+  // Process in background to avoid memory limits
+  EdgeRuntime.waitUntil(processZipFile(uploadId, filepath))
+
+  return new Response(JSON.stringify({ uploadId }), {
+    headers: { 'Content-Type': 'application/json' },
+  })
+})
+```
+
+### Image manipulation
+
+Custom image manipulation workflows using [`magick-wasm`](/docs/guides/functions/examples/image-manipulation).
+
+```tsx
+Deno.serve(async (req) => {
+  // Save uploaded image to temp storage
+  const imagePath = `/tmp/input-${crypto.randomUUID()}.jpg`
+  await Deno.writeFile(imagePath, req.body)
+
+  // Process image with magick-wasm
+  const processedPath = `/tmp/output-${crypto.randomUUID()}.jpg`
+  // ... image manipulation logic
+
+  // Read processed image and return
+  const processedImage = await Deno.readFile(processedPath)
+  return new Response(processedImage, {
+    headers: { 'Content-Type': 'image/jpeg' },
+  })
+})
+```
+
+---
+
+## Using synchronous file APIs
+
+You can safely use the following synchronous Deno APIs (and their Node counterparts) _during initial script evaluation_:
+
+- Deno.statSync
+- Deno.removeSync
+- Deno.writeFileSync
+- Deno.writeTextFileSync
+- Deno.readFileSync
+- Deno.readTextFileSync
+- Deno.mkdirSync
+- Deno.makeTempDirSync
+- Deno.readDirSync
+
+**Keep in mind** that the sync APIs are available only during initial script evaluation and aren’t supported in callbacks like HTTP handlers or `setTimeout`.
+
+```tsx
+Deno.statSync('...') // ✅
+
+setTimeout(() => {
+  Deno.statSync('...') // 💣 ERROR! Deno.statSync is blocklisted on the current context
+})
+
+Deno.serve(() => {
+  Deno.statSync('...') // 💣 ERROR! Deno.statSync is blocklisted on the current context
+})
+```
+
+---
+
+## Limits
+
+There are no limits on S3 buckets you mount for Persistent storage.
+
+Ephemeral Storage:
+
+- Free projects: Up to 256MB of ephemeral storage
+- Paid projects: Up to 512MB of ephemeral storage

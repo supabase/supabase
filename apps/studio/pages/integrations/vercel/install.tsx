@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { AlertTriangle, Info } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -15,7 +16,6 @@ import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-int
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 import type { NextPageWithLayout, Organization } from 'types'
-import { AlertTriangle, Info } from 'lucide-react'
 
 /**
  * Variations of the Vercel integration flow.
@@ -189,7 +189,7 @@ const VercelIntegration: NextPageWithLayout = () => {
     <>
       <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
         <ScaffoldColumn className="mx-auto w-full max-w-md">
-          <h1 className="text-xl text-foreground">Choose organization</h1>
+          <h2>Choose organization</h2>
           <>
             <Markdown content={`Choose the Supabase organization you wish to install in`} />
             <OrganizationPicker

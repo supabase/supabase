@@ -1,7 +1,7 @@
 import { fetchHandler } from 'data/fetchers'
 import type { Integration } from 'data/integrations/integrations.types'
 import { ResponseError, type SupaResponse } from 'types'
-import { isResponseOk } from './common/fetch'
+import { isResponseOk } from './api/apiWrapper'
 
 async function fetchGitHub<T = any>(url: string, responseJson = true): Promise<SupaResponse<T>> {
   const response = await fetchHandler(url)
@@ -83,24 +83,26 @@ export async function getInitialMigrationSQLFromGitHubRepo(
       statements text[],
       name text
     );
-    ${sortedFiles.map((file, i) => {
-      const migration = migrationFileResponses[i]
-      if (!isResponseOk(migration)) return ''
+    ${sortedFiles
+      .map((file, i) => {
+        const migration = migrationFileResponses[i]
+        if (!isResponseOk(migration)) return ''
 
-      const version = file.name.split('_')[0]
-      const statements = JSON.stringify(
-        migration
-          .split(';')
-          .map((statement) => statement.trim())
-          .filter(Boolean)
-      )
+        const version = file.name.split('_')[0]
+        const statements = JSON.stringify(
+          migration
+            .split(';')
+            .map((statement) => statement.trim())
+            .filter(Boolean)
+        )
 
-      return /* SQL */ `
+        return /* SQL */ `
         insert into supabase_migrations.schema_migrations (version, statements, name)
         select '${version}', array_agg(jsonb_statements)::text[], '${file.name}'
         from jsonb_array_elements_text($statements$${statements}$statements$::jsonb) as jsonb_statements;
       `
-    })}
+      })
+      .join('')}
   `
 
   return `${migrations};${migrationsTableSql};${seed}`

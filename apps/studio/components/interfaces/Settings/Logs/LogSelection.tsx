@@ -1,4 +1,4 @@
-import { Check, Clipboard, MousePointerClick, X } from 'lucide-react'
+import { Check, Copy, MousePointerClick, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -15,14 +15,13 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import type { LogData, QueryType } from './Logs.types'
-import { jwtAPIKey, apiKey, role as extractRole } from './Logs.utils'
+import { apiKey, role as extractRole, jwtAPIKey } from './Logs.utils'
 
 export interface LogSelectionProps {
   log?: LogData
   onClose: () => void
   queryType?: QueryType
   projectRef: string
-  collectionName?: string
   isLoading: boolean
   error?: string | object
 }
@@ -41,12 +40,11 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
     if (!log) return <LogDetailEmptyState />
 
     switch (queryType) {
-      // case 'warehouse':
-      //   return <WarehouseSelectionRenderer log={log} />
       case 'api':
         const status = log?.metadata?.[0]?.response?.[0]?.status_code
         const method = log?.metadata?.[0]?.request?.[0]?.method
         const path = log?.metadata?.[0]?.request?.[0]?.path
+        const search = log?.metadata?.[0]?.request?.[0]?.search
         const user_agent = log?.metadata?.[0]?.request?.[0]?.headers[0].user_agent
         const error_code = log?.metadata?.[0]?.response?.[0]?.headers?.[0]?.x_sb_error_code
         const apikey = jwtAPIKey(log?.metadata) ?? apiKey(log?.metadata)
@@ -59,6 +57,7 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
           status,
           method,
           path,
+          search,
           user_agent,
           timestamp,
           event_message,
@@ -98,26 +97,23 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
             <TabsTrigger_Shadcn_ disabled={!log} className="px-3" value="raw">
               Raw
             </TabsTrigger_Shadcn_>
+
             <div className="*:px-1.5 *:text-foreground-lighter ml-auto flex gap-1 absolute right-2 top-2">
               <ButtonTooltip
                 disabled={!log || isLoading}
                 type="text"
                 tooltip={{
                   content: {
+                    side: 'left',
                     text: isLoading ? 'Loading log...' : 'Copy as JSON',
                   },
                 }}
+                icon={showCopied ? <Check /> : <Copy />}
                 onClick={() => {
                   setShowCopied(true)
                   copyToClipboard(JSON.stringify(log, null, 2))
                 }}
-              >
-                {showCopied ? (
-                  <Check size={14} strokeWidth={2} />
-                ) : (
-                  <Clipboard size={14} strokeWidth={2} />
-                )}
-              </ButtonTooltip>
+              />
 
               <Button type="text" onClick={onClose}>
                 <X size={14} strokeWidth={2} />

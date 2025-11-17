@@ -1,13 +1,13 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type ValidateSpamVariables = {
   projectRef: string
-  template: components['schemas']['ValidateSpamBodyDto']
+  template: components['schemas']['ValidateSpamBody']
 }
 export type ValidateSpamResponse = components['schemas']['ValidateSpamResponse']
 
@@ -29,23 +29,21 @@ export const useValidateSpamMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ValidateSpamData, ResponseError, ValidateSpamVariables>,
+  UseCustomMutationOptions<ValidateSpamData, ResponseError, ValidateSpamVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ValidateSpamData, ResponseError, ValidateSpamVariables>(
-    (vars) => validateSpam(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to validate template: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ValidateSpamData, ResponseError, ValidateSpamVariables>({
+    mutationFn: (vars) => validateSpam(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to validate template: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

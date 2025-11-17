@@ -89,9 +89,20 @@ In this example we'll set up a database table, secure it with Row Level Security
 
     <StepHikeCompact.Details title="Enable Postgres replication">
 
-      Go to your project's [Publications settings](https://supabase.com/dashboard/project/_/database/publications), and under `supabase_realtime`, toggle on the tables you want to listen to.
+      Go to your project's [Publications settings](/dashboard/project/_/database/publications), and under `supabase_realtime`, toggle on the tables you want to listen to.
+
+      Alternatively, add tables to the `supabase_realtime` publication by running the given SQL:
 
     </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sql
+      alter publication supabase_realtime
+      add table your_table_name;
+      ```
+
+    </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 
@@ -128,7 +139,7 @@ In this example we'll set up a database table, secure it with Row Level Security
 
       const supabase = createClient(
         'https://<project>.supabase.co',
-        '<your-anon-key>'
+        '<sb_publishable_... or anon key>'
       )
       ```
 
@@ -227,6 +238,7 @@ const changes = supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -241,6 +253,8 @@ supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -261,6 +275,8 @@ for await change in changes {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -282,6 +298,8 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -294,6 +312,7 @@ changes = supabase.channel('schema-db-changes').on_postgres_changes(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 The channel name can be any string except 'realtime'.
@@ -326,6 +345,7 @@ const changes = supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -339,6 +359,8 @@ final changes = supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 Use `InsertAction.self` as type to listen only to database `INSERT`s:
@@ -356,6 +378,8 @@ for await change in changes {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 Use `PostgresAction.Insert` as type to listen only to database `INSERT`s:
@@ -375,6 +399,8 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -387,6 +413,7 @@ changes = supabase.channel('schema-db-changes').on_postgres_changes(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 The channel name can be any string except 'realtime'.
@@ -419,6 +446,7 @@ const changes = supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -432,6 +460,8 @@ supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 Use `UpdateAction.self` as type to listen only to database `UPDATE`s:
@@ -449,6 +479,8 @@ for await change in changes {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 Use `PostgresAction.Update` as type to listen only to database `UPDATE`s:
@@ -468,6 +500,8 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -480,6 +514,7 @@ changes = supabase.channel('schema-db-changes').on_postgres_changes(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 The channel name can be any string except 'realtime'.
@@ -512,6 +547,7 @@ const changes = supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -525,6 +561,8 @@ supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 Use `DeleteAction.self` as type to listen only to database `DELETE`s:
@@ -542,6 +580,8 @@ for await change in changes {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 Use `PostgresAction.Delete` as type to listen only to database `DELETE`s:
@@ -561,6 +601,8 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -573,6 +615,7 @@ changes = supabase.channel('schema-db-changes').on_postgres_changes(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 The channel name can be any string except 'realtime'.
@@ -606,6 +649,7 @@ const changes = supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -620,6 +664,8 @@ supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swfit">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -640,6 +686,8 @@ for await change in changes {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -659,6 +707,8 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -672,6 +722,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 The channel name can be any string except 'realtime'.
@@ -714,6 +765,7 @@ const channel = supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -733,6 +785,8 @@ supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -745,6 +799,8 @@ await myChannel.subscribe()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -759,6 +815,8 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -776,6 +834,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ### Filtering for specific changes
@@ -808,6 +867,7 @@ const changes = supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -827,6 +887,8 @@ const changes = supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -847,6 +909,8 @@ for await change in changes {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -867,6 +931,8 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -881,6 +947,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Available filters
@@ -917,6 +984,7 @@ const channel = supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -936,6 +1004,8 @@ supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -956,6 +1026,8 @@ for await change in changes {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -976,6 +1048,8 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -990,6 +1064,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 This filter uses Postgres's `=` filter.
@@ -1024,6 +1099,7 @@ const channel = supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -1043,6 +1119,8 @@ supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -1063,6 +1141,8 @@ for await change in changes {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -1084,6 +1164,8 @@ myChannel.join()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -1098,6 +1180,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 This filter uses Postgres's `!=` filter.
@@ -1132,6 +1215,7 @@ const channel = supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -1151,6 +1235,8 @@ supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -1171,6 +1257,8 @@ for await change in changes {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -1191,6 +1279,8 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -1205,6 +1295,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 This filter uses Postgres's `<` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
@@ -1239,6 +1330,7 @@ const channel = supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -1258,6 +1350,8 @@ supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -1278,6 +1372,8 @@ for await change in changes {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -1298,6 +1394,8 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -1312,6 +1410,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 This filter uses Postgres' `<=` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
@@ -1346,6 +1445,7 @@ const channel = supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -1365,6 +1465,8 @@ supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -1385,6 +1487,8 @@ for await change in changes {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -1405,6 +1509,8 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -1419,6 +1525,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 This filter uses Postgres's `>` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
@@ -1453,6 +1560,7 @@ const channel = supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -1472,6 +1580,8 @@ supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -1492,6 +1602,8 @@ for await change in changes {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -1512,6 +1624,8 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -1526,6 +1640,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 This filter uses Postgres's `>=` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
@@ -1560,6 +1675,7 @@ const channel = supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -1570,7 +1686,7 @@ supabase
         schema: 'public',
         table: 'colors',
         filter: PostgresChangeFilter(
-          type: PostgresChangeFilterType.lte,
+          type: PostgresChangeFilterType.inFilter,
           column: 'name',
           value: ['red', 'blue', 'yellow'],
         ),
@@ -1579,6 +1695,8 @@ supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -1599,6 +1717,8 @@ for await change in changes {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -1619,6 +1739,8 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -1633,6 +1755,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 This filter uses Postgres's `= ANY`. Realtime allows a maximum of 100 values for this filter.
@@ -1713,6 +1836,7 @@ const channel = supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -1735,6 +1859,8 @@ supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -1757,6 +1883,8 @@ for await change in changes {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -1782,6 +1910,8 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -1798,6 +1928,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ### Refreshed tokens
@@ -1822,6 +1953,7 @@ supabase.realtime.setAuth('fresh-token')
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -1829,6 +1961,8 @@ supabase.realtime.setAuth('fresh-token');
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -1836,6 +1970,8 @@ await supabase.realtime.setAuth("fresh-token")
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 In Kotlin, you have to update the token manually per channel:
@@ -1845,6 +1981,8 @@ myChannel.updateAuth("fresh-token")
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -1852,6 +1990,7 @@ supabase.realtime.set_auth('fresh-token')
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Limitations
@@ -1880,4 +2019,4 @@ Enter your database settings to estimate the maximum throughput for your instanc
 
 Don't forget to run your own benchmarks to make sure that the performance is acceptable for your use case.
 
-We are making many improvements to Realtime's Postgres Changes. If you are uncertain about the performance of your use case, reach out using [Support Form](https://supabase.com/dashboard/support/new) and we will be happy to help you. We have a team of engineers that can advise you on the best solution for your use-case.
+We are making many improvements to Realtime's Postgres Changes. If you are uncertain about the performance of your use case, reach out using [Support Form](/dashboard/support/new) and we will be happy to help you. We have a team of engineers that can advise you on the best solution for your use-case.

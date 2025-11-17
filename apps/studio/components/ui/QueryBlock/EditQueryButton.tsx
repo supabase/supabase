@@ -1,16 +1,16 @@
 import { Edit } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { ComponentProps } from 'react'
 
 import { useParams } from 'common'
-import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import useNewQuery from 'components/interfaces/SQLEditor/hooks'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import Link from 'next/link'
-import { ComponentProps } from 'react'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   cn,
@@ -42,8 +42,7 @@ export const EditQueryButton = ({
   const { newQuery } = useNewQuery()
 
   const sqlEditorSnap = useSqlEditorV2StateSnapshot()
-  const { setEditorPanel } = useAppStateSnapshot()
-  const snap = useAiAssistantStateSnapshot()
+  const { closeSidebar } = useSidebarManagerSnapshot()
 
   const isInSQLEditor = router.pathname.includes('/sql')
   const isInNewSnippet = router.pathname.endsWith('/sql')
@@ -52,7 +51,7 @@ export const EditQueryButton = ({
     content: { side: 'bottom', text: 'Edit in SQL Editor' },
   }
 
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
   if (id !== undefined) {
@@ -62,7 +61,7 @@ export const EditQueryButton = ({
         type={type}
         size="tiny"
         className={cn('w-7 h-7', className)}
-        icon={<Edit size={14} />}
+        icon={<Edit size={14} strokeWidth={1.5} />}
         tooltip={tooltip}
       >
         <Link href={`/project/${ref}/sql/${id}`} />
@@ -75,14 +74,13 @@ export const EditQueryButton = ({
       type={type}
       size="tiny"
       className={cn('w-7 h-7', className)}
-      icon={<Edit size={14} />}
+      icon={<Edit size={14} strokeWidth={1.5} />}
       onClick={() => {
         if (isInlineEditorEnabled) {
-          setEditorPanel({
-            open: true,
-            initialValue: sql,
-          })
-          snap.closeAssistant()
+          // This component needs to be updated to work with local EditorPanel state
+          // For now, fall back to creating a new query
+          if (sql) newQuery(sql, title)
+          closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
         } else {
           if (sql) newQuery(sql, title)
         }
@@ -105,7 +103,7 @@ export const EditQueryButton = ({
           size="tiny"
           disabled={!sql}
           className={cn('w-7 h-7', className)}
-          icon={<Edit size={14} />}
+          icon={<Edit size={14} strokeWidth={1.5} />}
           tooltip={!!sql ? tooltip : { content: { side: 'bottom', text: undefined } }}
         />
       </DropdownMenuTrigger>

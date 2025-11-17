@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { profileKeys } from './keys'
 import type { Profile } from './types'
 
@@ -30,14 +30,12 @@ export type ProfileError = ResponseError
 export const useProfileQuery = <TData = ProfileData>({
   enabled = true,
   ...options
-}: UseQueryOptions<ProfileData, ProfileError, TData> = {}) => {
-  return useQuery<ProfileData, ProfileError, TData>(
-    profileKeys.profile(),
-    ({ signal }) => getProfile(signal),
-    {
-      staleTime: 1000 * 60 * 30, // default good for 30 mins
-      ...options,
-      enabled,
-    }
-  )
+}: UseCustomQueryOptions<ProfileData, ProfileError, TData> = {}) => {
+  return useQuery<ProfileData, ProfileError, TData>({
+    queryKey: profileKeys.profile(),
+    queryFn: ({ signal }) => getProfile(signal),
+    staleTime: 1000 * 60 * 30,
+    ...options,
+    enabled,
+  })
 }

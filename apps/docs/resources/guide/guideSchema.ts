@@ -50,7 +50,8 @@ export const GraphQLObjectTypeGuide = new GraphQLObjectType({
       }),
       description:
         'The subsections of the document. If the document is returned from a search match, only matching content chunks are returned. For the full content of the original document, use the content field in the parent Guide.',
-      resolve: (node: GuideModel) => GraphQLCollectionBuilder.create({ items: node.subsections }),
+      resolve: async (node: GuideModel) =>
+        (await GraphQLCollectionBuilder.create({ items: node.subsections })).unwrap(),
     },
   },
 })

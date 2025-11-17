@@ -3,7 +3,7 @@ import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { NavMenu, NavMenuItem } from 'ui'
 import { ScaffoldContainerLegacy, ScaffoldTitle } from '../Scaffold'
 
@@ -13,44 +13,54 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   const fullCurrentPath = useCurrentPath()
   const [currentPath] = fullCurrentPath.split('#')
 
-  // [Joshen] RE Organization Settings - need to figure out how to enforce MFA across users before this goes live
-  const newSecurityPage = useFlag('showOrganizationSecuritySettings')
-
-  // Hide these settings in the new layout on the following paths
-  const isHidden = (path: string) => {
-    return (
-      path === `/org/${slug}/team` ||
-      path === `/org/${slug}/integrations` ||
-      path === `/org/${slug}/usage` ||
-      path === `/org/${slug}/billing`
-    )
-  }
-
-  if (isHidden(currentPath)) {
-    return children
-  }
+  const {
+    organizationShowSsoSettings: showSsoSettings,
+    organizationShowSecuritySettings: showSecuritySettings,
+    organizationShowLegalDocuments: showLegalDocuments,
+  } = useIsFeatureEnabled([
+    'organization:show_sso_settings',
+    'organization:show_security_settings',
+    'organization:show_legal_documents',
+  ])
 
   const navMenuItems = [
     {
       label: 'General',
       href: `/org/${slug}/general`,
     },
-    newSecurityPage && {
-      label: 'Security',
-      href: `/org/${slug}/security`,
-    },
+    ...(showSecuritySettings
+      ? [
+          {
+            label: 'Security',
+            href: `/org/${slug}/security`,
+          },
+        ]
+      : []),
     {
       label: 'OAuth Apps',
       href: `/org/${slug}/apps`,
     },
+    ...(showSsoSettings
+      ? [
+          {
+            label: 'SSO',
+            href: `/org/${slug}/sso`,
+          },
+        ]
+      : []),
+
     {
       label: 'Audit Logs',
       href: `/org/${slug}/audit`,
     },
-    {
-      label: 'Legal Documents',
-      href: `/org/${slug}/documents`,
-    },
+    ...(showLegalDocuments
+      ? [
+          {
+            label: 'Legal Documents',
+            href: `/org/${slug}/documents`,
+          },
+        ]
+      : []),
   ]
 
   return (
@@ -65,7 +75,7 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
           ))}
         </NavMenu>
       </ScaffoldContainerLegacy>
-      <main className="h-full w-full overflow-y-auto">{children}</main>
+      <div className="h-full w-full overflow-y-auto">{children}</div>
     </>
   )
 }

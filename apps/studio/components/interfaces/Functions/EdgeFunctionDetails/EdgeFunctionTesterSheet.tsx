@@ -5,17 +5,22 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import * as z from 'zod'
 
 import { useParams } from 'common'
-import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
+import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useEdgeFunctionTestMutation } from 'data/edge-functions/edge-function-test-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { prettifyJSON } from 'lib/helpers'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
-import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
+import {
+  RoleImpersonationStateContextProvider,
+  useGetImpersonatedRoleState,
+} from 'state/role-impersonation-state'
 import {
   Badge,
   Button,
@@ -76,17 +81,19 @@ const FormSchema = z.object({
 type FormValues = z.infer<typeof FormSchema>
 
 export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTesterSheetProps) => {
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const { ref: projectRef, functionSlug } = useParams()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const [response, setResponse] = useState<ResponseData | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
-  const { serviceKey } = getAPIKeys(settings)
+  const { serviceKey } = getKeys(apiKeys)
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: testEdgeFunction, isLoading } = useEdgeFunctionTestMutation({
@@ -159,7 +166,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
 
     // Validate that the body is valid JSON
     try {
-      JSON.parse(values.body)
+      JSON.parse(JSON.stringify(values.body))
     } catch (e) {
       form.setError('body', { message: 'Must be a valid JSON string' })
       return
@@ -187,14 +194,14 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
 
     // Construct custom headers
     const customHeaders: Record<string, string> = {}
-    headerFields.forEach(({ key, value }) => {
+    values.headers.forEach(({ key, value }) => {
       if (key && value) {
         customHeaders[key] = value
       }
     })
 
     // Construct query parameters
-    const queryString = queryParamFields
+    const queryString = values.queryParams
       .filter(({ key, value }) => key && value)
       .map(({ key, value }) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
       .join('&')
@@ -416,7 +423,12 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
 
             <SheetFooter className="px-5 py-3 border-t">
               <div className="flex items-center gap-2">
-                <RoleImpersonationPopover portal={false} />
+                {/* [Alaister]: We're using a fresh context here as edge functions don't allow impersonating users. */}
+                <RoleImpersonationStateContextProvider
+                  key={`role-impersonation-state-${projectRef}`}
+                >
+                  <RoleImpersonationPopover portal={false} disallowAuthenticatedOption={true} />
+                </RoleImpersonationStateContextProvider>
                 <Button
                   type="primary"
                   htmlType="submit"

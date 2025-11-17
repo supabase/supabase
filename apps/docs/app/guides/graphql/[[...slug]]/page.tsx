@@ -1,7 +1,7 @@
-import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { notFound } from 'next/navigation'
 import { isAbsolute, relative } from 'path'
 import rehypeSlug from 'rehype-slug'
+
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { REVALIDATION_TAGS } from '~/features/helpers.fetch'
@@ -9,8 +9,9 @@ import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLin
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
-
-export const dynamicParams = false
+import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
+import { IS_PROD } from 'common'
+import { getEmptyArray } from '~/features/helpers.fn'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -189,7 +190,9 @@ const urlTransform: UrlTransformFunction = (url) => {
   }
 }
 
-const generateStaticParams = async () => pageMap.map(({ slug }) => ({ slug: slug ? [slug] : [] }))
+const generateStaticParams = IS_PROD
+  ? async () => pageMap.map(({ slug }) => ({ slug: slug ? [slug] : [] }))
+  : getEmptyArray
 const generateMetadata = genGuideMeta(getContent)
 
 export default PGGraphQLDocs

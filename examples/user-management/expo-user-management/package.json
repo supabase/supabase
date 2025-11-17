@@ -7,13 +7,13 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "format": "prettier --write \"**/*.{js,json,md,ts,tsx,jsx,css}\""
+    "format": "prettier --cache --write \"**/*.{js,json,md,ts,tsx,jsx,css}\""
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.23.1",
     "@rneui/themed": "^4.0.0-rc.8",
     "@supabase/supabase-js": "^2.0.4",
-    "expo": "~51.0.8",
+    "expo": "~52.0.0",
     "expo-splash-screen": "~0.27.4",
     "expo-status-bar": "~1.12.1",
     "react": "18.2.0",

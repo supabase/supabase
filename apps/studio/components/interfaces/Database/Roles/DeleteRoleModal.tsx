@@ -1,18 +1,19 @@
 import type { PostgresRole } from '@supabase/postgres-meta'
 import { toast } from 'sonner'
-import { Modal } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseRoleDeleteMutation } from 'data/database-roles/database-role-delete-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Modal } from 'ui'
 
 interface DeleteRoleModalProps {
   role: PostgresRole
   visible: boolean
   onClose: () => void
+  onDelete?: () => void
 }
 
-const DeleteRoleModal = ({ role, visible, onClose }: DeleteRoleModalProps) => {
-  const { project } = useProjectContext()
+export const DeleteRoleModal = ({ role, visible, onClose, onDelete }: DeleteRoleModalProps) => {
+  const { data: project } = useSelectedProjectQuery()
 
   const { mutate: deleteDatabaseRole, isLoading: isDeleting } = useDatabaseRoleDeleteMutation({
     onSuccess: () => {
@@ -24,6 +25,7 @@ const DeleteRoleModal = ({ role, visible, onClose }: DeleteRoleModalProps) => {
   const deleteRole = async () => {
     if (!project) return console.error('Project is required')
     if (!role) return console.error('Failed to delete role: role is missing')
+    onDelete?.()
     deleteDatabaseRole({
       projectRef: project.ref,
       connectionString: project.connectionString,
@@ -50,5 +52,3 @@ const DeleteRoleModal = ({ role, visible, onClose }: DeleteRoleModalProps) => {
     </Modal>
   )
 }
-
-export default DeleteRoleModal

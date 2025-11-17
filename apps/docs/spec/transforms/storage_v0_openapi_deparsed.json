@@ -197,6 +197,10 @@
                     "type": "boolean",
                     "examples": [false]
                   },
+                  "type": {
+                    "type": "string",
+                    "enum": ["STANDARD", "ANALYTICS"]
+                  },
                   "file_size_limit": {
                     "anyOf": [
                       {
@@ -289,6 +293,53 @@
         "parameters": [
           {
             "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 10,
+            "in": "query",
+            "name": "limit",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "example": 0,
+            "in": "query",
+            "name": "offset",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["id", "name", "created_at", "updated_at"]
+            },
+            "in": "query",
+            "name": "sortColumn",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"]
+            },
+            "in": "query",
+            "name": "sortOrder",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-bucket",
+            "in": "query",
+            "name": "search",
+            "required": false
+          },
+          {
+            "schema": {
               "type": "string"
             },
             "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
@@ -317,8 +368,15 @@
                       "owner": {
                         "type": "string"
                       },
+                      "owner_id": {
+                        "type": "string"
+                      },
                       "public": {
                         "type": "boolean"
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": ["STANDARD", "ANALYTICS"]
                       },
                       "file_size_limit": {
                         "type": ["null", "integer"]
@@ -356,6 +414,7 @@
                 "example": [
                   {
                     "id": "avatars",
+                    "type": "STANDARD",
                     "name": "avatars",
                     "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
                     "public": false,
@@ -430,7 +489,9 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "examples": ["Successfully emptied"]
+                      "examples": [
+                        "Empty bucket has been queued. Completion may take up to an hour."
+                      ]
                     }
                   }
                 }
@@ -506,8 +567,15 @@
                     "owner": {
                       "type": "string"
                     },
+                    "owner_id": {
+                      "type": "string"
+                    },
                     "public": {
                       "type": "boolean"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["STANDARD", "ANALYTICS"]
                     },
                     "file_size_limit": {
                       "type": ["null", "integer"]
@@ -1165,8 +1233,15 @@
                           "owner": {
                             "type": "string"
                           },
+                          "owner_id": {
+                            "type": "string"
+                          },
                           "public": {
                             "type": "boolean"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["STANDARD", "ANALYTICS"]
                           },
                           "file_size_limit": {
                             "type": ["null", "integer"]
@@ -1898,6 +1973,20 @@
                   },
                   "with_delimiter": {
                     "type": "boolean"
+                  },
+                  "sortBy": {
+                    "type": "object",
+                    "properties": {
+                      "column": {
+                        "type": "string",
+                        "enum": ["name", "updated_at", "created_at"]
+                      },
+                      "order": {
+                        "type": "string",
+                        "enum": ["asc", "desc"]
+                      }
+                    },
+                    "required": ["column"]
                   }
                 }
               }
@@ -2088,8 +2177,15 @@
                           "owner": {
                             "type": "string"
                           },
+                          "owner_id": {
+                            "type": "string"
+                          },
                           "public": {
                             "type": "boolean"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["STANDARD", "ANALYTICS"]
                           },
                           "file_size_limit": {
                             "type": ["null", "integer"]
@@ -2448,8 +2544,15 @@
                         "owner": {
                           "type": "string"
                         },
+                        "owner_id": {
+                          "type": "string"
+                        },
                         "public": {
                           "type": "boolean"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": ["STANDARD", "ANALYTICS"]
                         },
                         "file_size_limit": {
                           "type": ["null", "integer"]
@@ -3015,6 +3118,84 @@
         "responses": {
           "200": {
             "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/cdn/{bucketName}/{wildcard}": {
+      "delete": {
+        "summary": "Purge cache for an object",
+        "tags": ["object"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "folder/cat.png",
+            "in": "path",
+            "name": "*",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
+            "in": "header",
+            "name": "authorization",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "examples": ["success"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["statusCode", "error", "message"],
+                  "title": "errorSchema"
+                }
+              }
+            }
           }
         }
       }

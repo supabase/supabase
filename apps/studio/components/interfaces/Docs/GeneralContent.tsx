@@ -2,7 +2,7 @@ import Authentication from 'components/interfaces/Docs/Authentication'
 import Introduction from 'components/interfaces/Docs/Introduction'
 import RpcIntroduction from 'components/interfaces/Docs/Pages/Rpc/Introduction'
 import TablesIntroduction from 'components/interfaces/Docs/Pages/Tables/Introduction'
-import UserManagement from 'components/interfaces/Docs/Pages/UserManagement'
+import { UserManagement } from 'components/interfaces/Docs/Pages/UserManagement'
 
 interface GeneralContentProps {
   page?: string
@@ -10,7 +10,7 @@ interface GeneralContentProps {
   showApiKey: string
 }
 
-const GeneralContent = ({ selectedLang, page, showApiKey }: GeneralContentProps) => {
+export const GeneralContent = ({ selectedLang, page, showApiKey }: GeneralContentProps) => {
   let selected = page?.toLowerCase()
   if (selected == 'intro' || selected == null) return <Introduction selectedLang={selectedLang} />
   if (selected == 'auth')
@@ -27,5 +27,3 @@ const GeneralContent = ({ selectedLang, page, showApiKey }: GeneralContentProps)
       </div>
     )
 }
-
-export default GeneralContent

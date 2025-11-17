@@ -1,22 +1,24 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty } from 'lodash'
 import { Edit, Trash } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { FDW } from 'data/fdw/fdws-query'
 import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { Button, Form, Input, SheetFooter, SheetHeader, SheetTitle } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import InputField from './InputField'
 import { WrapperMeta } from './Wrappers.types'
 import {
   convertKVStringArrayToJson,
+  FormattedWrapperTable,
   formatWrapperTables,
   makeValidateRequired,
 } from './Wrappers.utils'
@@ -40,7 +42,7 @@ export const EditWrapperSheet = ({
   onClose,
 }: EditWrapperSheetProps) => {
   const queryClient = useQueryClient()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: secrets, isLoading: isSecretsLoading } = useVaultSecretsQuery({
     projectRef: project?.ref,
@@ -57,12 +59,15 @@ export const EditWrapperSheet = ({
     },
   })
 
-  const [wrapperTables, setWrapperTables] = useState<any[]>(
+  const [wrapperTables, setWrapperTables] = useState(() =>
     formatWrapperTables(wrapper, wrapperMeta)
   )
   const [isEditingTable, setIsEditingTable] = useState(false)
-  const [selectedTableToEdit, setSelectedTableToEdit] = useState()
+  const [selectedTableToEdit, setSelectedTableToEdit] = useState<FormattedWrapperTable | undefined>(
+    undefined
+  )
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
+  const hasChangesRef = useRef(false)
 
   const initialValues = {
     wrapper_name: wrapper?.name,
@@ -92,7 +97,8 @@ export const EditWrapperSheet = ({
 
     const { wrapper_name } = values
     if (wrapper_name.length === 0) errors.name = 'Please provide a name for your wrapper'
-    if (wrapperTables.length === 0) errors.tables = 'Please add at least one table'
+    if (!wrapperMeta.canTargetSchema && wrapperTables.length === 0)
+      errors.tables = 'Please add at least one table'
     if (!isEmpty(errors)) return setFormErrors(errors)
 
     updateFDW({
@@ -104,6 +110,23 @@ export const EditWrapperSheet = ({
       tables: wrapperTables,
     })
   }
+
+  const checkIsDirty = useCallback(() => hasChangesRef.current, [])
+
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+    checkIsDirty,
+    onClose,
+  })
+
+  useEffect(() => {
+    if (!isClosing) return
+    if (checkIsDirty()) {
+      confirmOnClose()
+    } else {
+      onClose()
+    }
+    setIsClosing(false)
+  }, [checkIsDirty, confirmOnClose, isClosing, onClose, setIsClosing])
 
   return (
     <>
@@ -127,21 +150,9 @@ export const EditWrapperSheet = ({
             const hasFormChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
             const hasTableChanges = JSON.stringify(initialTables) !== JSON.stringify(wrapperTables)
             const hasChanges = hasFormChanges || hasTableChanges
+            hasChangesRef.current = hasChanges
 
             const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
-
-            const onClosePanel = () => {
-              if (hasChanges) {
-                setIsClosing(true)
-              } else {
-                onClose()
-              }
-            }
-
-            // if the form hasn't been touched and the user clicked esc or the backdrop, close the sheet
-            if (!hasChanges && isClosing) {
-              onClose()
-            }
 
             // [Alaister] although this "technically" is breaking the rules of React hooks
             // it won't error because the hooks are always rendered in the same order
@@ -273,15 +284,18 @@ export const EditWrapperSheet = ({
                                   </p>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                  <Button
-                                    type="default"
-                                    className="px-1"
-                                    icon={<Edit />}
-                                    onClick={() => {
-                                      setIsEditingTable(true)
-                                      setSelectedTableToEdit({ ...table, tableIndex: i })
-                                    }}
-                                  />
+                                  {/* Wrappers which import foreign schema don't have tables and their tables can't be edited */}
+                                  {wrapperMeta.tables.length !== 0 && (
+                                    <Button
+                                      type="default"
+                                      className="px-1"
+                                      icon={<Edit />}
+                                      onClick={() => {
+                                        setIsEditingTable(true)
+                                        setSelectedTableToEdit({ ...table, tableIndex: i })
+                                      }}
+                                    />
+                                  )}
                                   <Button
                                     type="default"
                                     className="px-1"
@@ -314,7 +328,7 @@ export const EditWrapperSheet = ({
                     size="tiny"
                     type="default"
                     htmlType="button"
-                    onClick={onClosePanel}
+                    onClick={confirmOnClose}
                     disabled={isSaving}
                   >
                     Cancel
@@ -336,18 +350,7 @@ export const EditWrapperSheet = ({
         </Form>
       </div>
 
-      <ConfirmationModal
-        visible={isClosing}
-        title="Discard changes"
-        confirmLabel="Discard"
-        onCancel={() => setIsClosing(false)}
-        onConfirm={() => onClose()}
-      >
-        <p className="text-sm text-foreground-light">
-          There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-          lost.
-        </p>
-      </ConfirmationModal>
+      <CloseConfirmationModal {...closeConfirmationModalProps} />
 
       <WrapperTableEditor
         visible={isEditingTable}
@@ -362,3 +365,18 @@ export const EditWrapperSheet = ({
     </>
   )
 }
+
+const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
+  <ConfirmationModal
+    visible={visible}
+    title="Discard changes"
+    confirmLabel="Discard"
+    onCancel={onCancel}
+    onConfirm={onClose}
+  >
+    <p className="text-sm text-foreground-light">
+      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
+      lost.
+    </p>
+  </ConfirmationModal>
+)

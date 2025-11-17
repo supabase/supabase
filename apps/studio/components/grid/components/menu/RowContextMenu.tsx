@@ -1,18 +1,20 @@
-import { Clipboard, Edit, Trash } from 'lucide-react'
+import { Copy, Edit, Trash } from 'lucide-react'
 import { useCallback } from 'react'
 import { Item, ItemParams, Menu } from 'react-contexify'
+import { toast } from 'sonner'
 
+import { ROW_CONTEXT_MENU_ID } from 'components/grid/constants'
 import type { SupaRow } from 'components/grid/types'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { ROW_CONTEXT_MENU_ID } from '.'
-import { copyToClipboard, formatClipboardValue } from '../../utils/common'
+import { copyToClipboard, DialogSectionSeparator } from 'ui'
+import { formatClipboardValue } from '../../utils/common'
 
 export type RowContextMenuProps = {
   rows: SupaRow[]
 }
 
-const RowContextMenu = ({ rows }: RowContextMenuProps) => {
+export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
 
@@ -47,27 +49,49 @@ const RowContextMenu = ({ rows }: RowContextMenuProps) => {
       const text = formatClipboardValue(value)
 
       copyToClipboard(text)
+      toast.success('Copied cell value to clipboard')
     },
     [rows, snap.gridColumns, snap.selectedCellPosition]
   )
 
+  const onCopyRowContent = useCallback(
+    (p: ItemParams) => {
+      const { props } = p
+      const { rowIdx } = props
+      const row = rows[rowIdx]
+      copyToClipboard(JSON.stringify(row))
+      toast.success('Copied row to clipboard')
+    },
+    [rows]
+  )
+
   return (
-    <>
-      <Menu id={ROW_CONTEXT_MENU_ID} animation={false}>
-        <Item onClick={onCopyCellContent}>
-          <Clipboard size={14} />
-          <span className="ml-2 text-xs">Copy cell content</span>
-        </Item>
-        <Item onClick={onEditRowClick} hidden={!snap.editable} data="edit">
-          <Edit size={14} />
-          <span className="ml-2 text-xs">Edit row</span>
-        </Item>
-        <Item onClick={onDeleteRow} hidden={!snap.editable} data="delete">
-          <Trash size={14} stroke="red" />
-          <span className="ml-2 text-xs">Delete row</span>
-        </Item>
-      </Menu>
-    </>
+    <Menu id={ROW_CONTEXT_MENU_ID} animation={false} className="!min-w-36">
+      <Item onClick={onCopyCellContent}>
+        <Copy size={12} />
+        <span className="ml-2 text-xs">Copy cell</span>
+      </Item>
+      <Item onClick={onCopyRowContent}>
+        <Copy size={12} />
+        <span className="ml-2 text-xs">Copy row</span>
+      </Item>
+
+      {/* We can't just wrap this entire section in a fragment conditional
+		  on snap.editable because of a bug in react-contexify. Only the
+		  top-level children of Menu are cloned with the necessary bound props,
+		  so Items must be direct children of Menu:
+		  https://github.com/fkhadra/react-contexify/blob/8d9fc63ac13040d3250e8eefd593d50a3ebdd1e6/src/components/Menu.tsx#L295
+		*/}
+      {snap.editable && <DialogSectionSeparator className="my-1.5" />}
+      <Item onClick={onEditRowClick} hidden={!snap.editable} data="edit">
+        <Edit size={12} />
+        <span className="ml-2 text-xs">Edit row</span>
+      </Item>
+      {snap.editable && <DialogSectionSeparator className="my-1.5" />}
+      <Item onClick={onDeleteRow} hidden={!snap.editable} data="delete">
+        <Trash size={12} />
+        <span className="ml-2 text-xs">Delete row</span>
+      </Item>
+    </Menu>
   )
 }
-export default RowContextMenu

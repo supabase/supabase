@@ -6,28 +6,6 @@ interface DocsConfig {
 }
 
 export const docsConfig: DocsConfig = {
-  // mainNav: [
-  //   {
-  //     title: 'Documentation',
-  //     href: '/docs',
-  //   },
-  //   {
-  //     title: 'Components',
-  //     href: '/docs/components/accordion',
-  //   },
-  //   {
-  //     title: 'Themes',
-  //     href: '/themes',
-  //   },
-  //   {
-  //     title: 'Examples',
-  //     href: '/examples',
-  //   },
-  //   {
-  //     title: 'Blocks',
-  //     href: '/blocks',
-  //   },
-  // ],
   sidebarNav: [
     {
       title: 'Getting Started',
@@ -38,13 +16,13 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Color usage',
-          href: '/docs/color-usage',
+          title: 'Tailwind Classes',
+          href: '/docs/tailwind-classes',
           items: [],
         },
         {
-          title: 'Tailwind classes',
-          href: '/docs/tailwind-classes',
+          title: 'Color Usage',
+          href: '/docs/color-usage',
           items: [],
         },
         {
@@ -58,13 +36,28 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Figma',
-          href: '/docs/figma',
+          items: [],
+          href: '/docs/ui-patterns/accessibility',
+          title: 'Accessibility',
+        },
+      ],
+    },
+    {
+      title: 'UI Patterns',
+      items: [
+        {
+          title: 'Navigation',
+          href: '/docs/ui-patterns/navigation',
           items: [],
         },
         {
-          title: 'Changelog',
-          href: '/docs/changelog',
+          title: 'Layout',
+          href: '/docs/ui-patterns/layout',
+          items: [],
+        },
+        {
+          title: 'Empty States',
+          href: '/docs/ui-patterns/empty-states',
           items: [],
         },
       ],
@@ -93,6 +86,21 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Page Container',
+          href: '/docs/fragments/page-container',
+          items: [],
+        },
+        {
+          title: 'Page Header',
+          href: '/docs/fragments/page-header',
+          items: [],
+        },
+        {
+          title: 'Page Section',
+          href: '/docs/fragments/page-section',
+          items: [],
+        },
+        {
           title: 'Text Confirm Dialog',
           href: '/docs/fragments/text-confirm-dialog',
           items: [],
@@ -105,6 +113,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Inner Side Menu',
           href: '/docs/fragments/inner-side-menu',
+          items: [],
+        },
+        {
+          title: 'Data Input',
+          href: '/docs/fragments/data-input',
           items: [],
         },
         {
@@ -125,6 +138,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Logs Bar Chart',
           href: '/docs/fragments/logs-bar-chart',
+          items: [],
+        },
+        {
+          title: 'Metric Card',
+          href: '/docs/fragments/metric-card',
           items: [],
         },
         {
@@ -290,6 +308,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'NavMenu',
+          href: '/docs/components/nav-menu',
+          items: [],
+        },
+        {
           title: 'Navigation Menu',
           href: '/docs/components/navigation-menu',
           items: [],
@@ -387,11 +410,6 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Textarea',
           href: '/docs/components/textarea',
-          items: [],
-        },
-        {
-          title: 'Toast',
-          href: '/docs/components/toast',
           items: [],
         },
         {

@@ -107,6 +107,14 @@
     "author_image_url": "https://github.com/laurenceisla.png"
   },
   {
+    "author_id": "avallete",
+    "author": "Andrew Valleteau",
+    "username": "avallete",
+    "position": "Engineering",
+    "author_url": "https://github.com/avallete",
+    "author_image_url": "https://github.com/avallete.png"
+  },
+  {
     "author_id": "supabase",
     "author": "Supabase",
     "position": "",
@@ -291,7 +299,7 @@
   {
     "author_id": "fsansalvadore",
     "author": "Francesco Sansalvadore",
-    "position": "Engineering",
+    "position": "Product Design",
     "author_url": "https://github.com/fsansalvadore",
     "author_image_url": "https://github.com/fsansalvadore.png"
   },
@@ -478,6 +486,14 @@
     "author_image_url": "https://github.com/chrischandler.png"
   },
   {
+    "author_id": "chris_caruso",
+    "author": "Chris Caruso",
+    "position": "Senior Solutions Architect",
+    "company": "Supabase",
+    "author_url": "https://www.linkedin.com/in/carusochristian/",
+    "author_image_url": "https://github.com/carusocv.png"
+  },
+  {
     "author_id": "bdon",
     "author": "Brandon Liu",
     "username": "bdon",
@@ -653,5 +669,83 @@
     "position": "Solution Architect",
     "author_url": "https://github.com/encima",
     "author_image_url": "https://user.fm/files/v2-15a3d4d6b3e33f2662af907301e9a99c/me.jpg"
+  },
+  {
+    "author_id": "staaldraad",
+    "author": "Etienne Stalmans",
+    "username": "staaldraad",
+    "position": "Security Engineer",
+    "author_url": "https://github.com/staaldraad",
+    "author_image_url": "https://avatars.githubusercontent.com/u/4200832?v=4"
+  },
+  {
+    "author_id": "dventimi",
+    "author": "David Ventimiglia",
+    "username": "dventimi",
+    "position": "Engineering",
+    "author_url": "https://github.com/dventimi",
+    "author_image_url": "https://avatars.githubusercontent.com/u/97983663?v=4"
+  },
+  {
+    "author_id": "jian_jie",
+    "author": "Jian Jie Liau",
+    "username": "jianji",
+    "position": "CTO and Co-Founder Mobbin",
+    "author_url": "https://github.com/liaujianjie",
+    "author_image_url": "https://avatars.githubusercontent.com/u/3143132?v=4"
+  },
+  {
+    "author_id": "bilharmer",
+    "author": "Bil Harmer",
+    "position": "CSO",
+    "author_url": "#",
+    "author_image_url": "/images/blog/avatars/bilharmer.jpg"
+  },
+  {
+    "author_id": "gregorykress",
+    "author": "Greg Kress",
+    "position": "Founder Advocate",
+    "author_url": "https://www.linkedin.com/in/gregorykress",
+    "author_image_url": "/images/blog/avatars/gregorykress.jpg"
+  },
+  {
+    "author_id": "harry_roper",
+    "author": "Harry Roper",
+    "position": "Founder and CEO",
+    "company": "Imaginary Space",
+    "author_url": "https://www.linkedin.com/in/harry-roper",
+    "author_image_url": "/images/avatars/harry-roper.png"
+  },
+  {
+    "author_id": "shahed_islam",
+    "author": "Shahed Islam",
+    "position": "Co-Founder and CEO",
+    "company": "SJ Innovation LLC",
+    "author_url": "https://www.linkedin.com/in/shahed-islam",
+    "author_image_url": "/images/avatars/shahed-islam.jpeg"
+  },
+  {
+    "author_id": "omar_moulani",
+    "author": "Omar Moulani",
+    "position": "Founder and Managing Director",
+    "company": "WeGetDesign",
+    "author_url": "https://www.linkedin.com/in/omar-moulani",
+    "author_image_url": "/images/avatars/omar-moulani.jpeg"
+  },
+  {
+    "author_id": "dave_wilson",
+    "author": "Dave Wilson",
+    "position": "Partnerships",
+    "company": "Supabase",
+    "author_url": "https://www.linkedin.com/in/david-wilson-285564140",
+    "author_image_url": "/images/avatars/dave-wilson.jpg"
+  },
+  {
+    "author_id": "seth_kramer",
+    "author": "Seth Kramer",
+    "position": "Founder",
+    "company": "No Code MBA",
+    "author_url": "https://www.linkedin.com/in/seth-kramer-62806b63/",
+    "author_image_url": "/images/avatars/seth-kramer.jpeg"
   }
 ]

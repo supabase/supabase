@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { createClient } from '@supabase/supabase-js'
+import { NextRequest, NextResponse } from 'next/server'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_EMAIL_ABUSE_URL as string
 const supabaseServiceKey = process.env.EMAIL_ABUSE_SERVICE_KEY as string
@@ -27,9 +28,16 @@ async function verifyCaptcha(token: string): Promise<boolean> {
   }
 }
 
-export async function POST(req: NextRequest, { params }: { params: { ref: string } }) {
+export async function POST(req: NextRequest, props: { params: Promise<{ ref: string }> }) {
+  const params = await props.params
   const ref = params.ref
   const { reason, email, captchaToken } = await req.json()
+
+  // Validate reason
+  const allowedReasons = ['phishing', 'advertisement', 'malware', 'scam', 'other']
+  if (!allowedReasons.includes(reason)) {
+    return NextResponse.json({ error: 'Bad Request: Invalid reason provided.' }, { status: 400 })
+  }
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
@@ -71,17 +79,14 @@ export async function POST(req: NextRequest, { params }: { params: { ref: string
       .from('manual_reports')
       .insert([{ project_ref: ref, reason, email }])
 
-    if (supabaseError) throw new Error(`Supabase error: ${supabaseError.message}`)
+    if (supabaseError) {
+      throw new Error(`Supabase error: ${supabaseError.message}`)
+    }
 
     const response = await fetch(process.env.EMAIL_REPORT_SLACK_WEBHOOK as string, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        blocks: [
-          { type: 'section', text: { type: 'plain_text', text: `New report from: ${ref}` } },
-          { type: 'section', text: { type: 'plain_text', text: reason } },
-        ],
-      }),
+      body: JSON.stringify({ text: `New report from: ${ref} \n\n ${reason}` }),
     })
 
     if (!response.ok) throw new Error('Failed to send to Slack')
@@ -91,6 +96,7 @@ export async function POST(req: NextRequest, { params }: { params: { ref: string
       { status: 200 }
     )
   } catch (error) {
+    Sentry.captureException(error)
     const errorMessage = (error as Error).message
     return NextResponse.json(
       { error: `Failure: Could not send post to Slack. Error: ${errorMessage}` },
