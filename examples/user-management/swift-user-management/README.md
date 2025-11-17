@@ -4,7 +4,7 @@ This repo is a quick sample of how you can get started building apps using Swift
 
 This repo will demonstrate how to:
 
-- Sign users in with Supabase Auth using [magic link](https://supabase.io/docs/reference/dart/auth-signin#sign-in-with-magic-link)
+- Sign users in with Supabase Auth using [magic link](https://supabase.com/docs/reference/dart/auth-signinwithotp)
 - Store and retrieve data with [Supabase database](https://supabase.io/docs/guides/database)
 - Store image files in [Supabase storage](https://supabase.io/docs/guides/storage)
 
