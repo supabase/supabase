@@ -832,7 +832,12 @@ export const updateTable = async ({
           const res = await updateColumn({
             projectRef: projectRef,
             connectionString: connectionString,
-            originalColumn: originalColumn,
+            // Use the updated table name and schema since the table might have been renamed
+            originalColumn: {
+              ...originalColumn,
+              table: updatedTable.name,
+              schema: updatedTable.schema,
+            },
             payload: columnPayload,
             selectedTable: updatedTable,
             skipPKCreation: true,
