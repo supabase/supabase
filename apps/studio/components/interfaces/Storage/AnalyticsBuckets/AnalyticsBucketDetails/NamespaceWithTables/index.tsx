@@ -39,6 +39,7 @@ interface SchemaFlowNodeProps {
   description: string
   ariaLabel: string
   labelClassName?: string
+  isPending?: boolean
 }
 
 const SchemaFlowNode = ({
@@ -49,11 +50,12 @@ const SchemaFlowNode = ({
   description,
   ariaLabel,
   labelClassName = 'text-foreground',
+  isPending = false,
 }: SchemaFlowNodeProps) => {
   return (
     <div
       ref={nodeRef}
-      className="flex items-center gap-x-3 rounded bg-surface-100 border border-default px-4 py-4 z-10 shrink-0"
+      className="flex items-center gap-x-3 rounded bg-surface-75 border border-default px-4 py-4 z-10 shrink-0"
       role="group"
       aria-label={ariaLabel}
     >
@@ -63,9 +65,23 @@ const SchemaFlowNode = ({
       >
         {icon}
       </div>
-      <div className="flex flex-col gap-y-1">
+      <div className="flex flex-col gap-y-1.5">
         <p className={`text-sm leading-none ${labelClassName}`}>{label}</p>
-        <p className="text-sm leading-none text-foreground-lighter">{description}</p>
+        {isPending ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <p className="text-sm leading-none text-foreground-lighter flex items-center gap-x-1 cursor-help">
+                {description}
+                <Info size={14} className="text-foreground-lighter" />
+              </p>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="max-w-[36ch] text-center text-balance">
+              <p>This schema will be created when a table is published from your Iceberg client</p>
+            </TooltipContent>
+          </Tooltip>
+        ) : (
+          <p className="text-sm leading-none text-foreground-lighter">{description}</p>
+        )}
       </div>
     </div>
   )
@@ -188,6 +204,7 @@ const SchemaFlowDiagram = ({
             width: '1px',
             height: `${verticalLinePosition.height}px`,
             overflow: 'visible',
+            opacity: isPending ? 0.5 : 1,
           }}
           viewBox={`0 0 1 ${verticalLinePosition.height}`}
           preserveAspectRatio="none"
@@ -199,6 +216,9 @@ const SchemaFlowDiagram = ({
                 .animated-dash {
                   stroke-dasharray: 5, 5;
                   animation: dash 1.5s linear infinite;
+                }
+                .static-dash {
+                  stroke-dasharray: 5, 5;
                 }
                 @keyframes dash {
                   to {
@@ -214,7 +234,7 @@ const SchemaFlowDiagram = ({
             fill="none"
             stroke="hsl(var(--foreground-muted))"
             strokeWidth="1.25"
-            className="animated-dash"
+            className={isPending ? 'static-dash' : 'animated-dash'}
           />
           {/* Dot at start */}
           <circle cx="0.5" cy="0" r="3" fill="hsl(var(--foreground-muted))" />
@@ -238,6 +258,7 @@ const SchemaFlowDiagram = ({
             width: '6rem',
             height: '1px',
             overflow: 'visible',
+            opacity: isPending ? 0.35 : 1,
           }}
           aria-hidden="true"
         >
@@ -247,6 +268,9 @@ const SchemaFlowDiagram = ({
                 .animated-dash {
                   stroke-dasharray: 5, 5;
                   animation: dash 1.5s linear infinite;
+                }
+                .static-dash {
+                  stroke-dasharray: 5, 5;
                 }
                 @keyframes dash {
                   to {
@@ -262,26 +286,27 @@ const SchemaFlowDiagram = ({
             fill="none"
             stroke="hsl(var(--foreground-muted))"
             strokeWidth="1.25"
-            className="animated-dash"
+            className={isPending ? 'static-dash' : 'animated-dash'}
           />
           {/* Dot at start */}
-          <circle cx="0" cy="0" r="2" fill="hsl(var(--foreground-muted))" />
+          <circle cx="0" cy="0" r="3" fill="hsl(var(--foreground-muted))" />
           {/* Dot at end */}
-          <circle cx="96" cy="0" r="2" fill="hsl(var(--foreground-muted))" />
+          <circle cx="96" cy="0" r="3" fill="hsl(var(--foreground-muted))" />
         </svg>
       )}
 
       {/* Target Node */}
       <SchemaFlowNode
         nodeRef={targetRef}
-        icon={<Database size={16} className={isPending ? 'text-foreground-light' : 'text-white'} />}
+        icon={<Database size={16} className={isPending ? 'text-foreground-muted' : 'text-white'} />}
         iconContainerClassName={
-          isPending ? 'bg-surface-100 border-foreground/20' : 'bg-brand-500 border-brand-600'
+          isPending ? 'bg-surface-100 border-border' : 'bg-brand-500 border-brand-600'
         }
         label={targetLabel}
-        description={`Analytics schema${isPending ? ' that will be created' : ''}`}
+        description={`Analytics schema`}
         ariaLabel={`Target: ${targetLabel} schema${isPending ? ' that will be created' : ''}`}
         labelClassName={isPending ? 'text-foreground-muted' : 'text-foreground'}
+        isPending={isPending}
       />
     </div>
   )
