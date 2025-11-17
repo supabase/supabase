@@ -13,6 +13,7 @@ import { convertKVStringArrayToJson } from 'components/interfaces/Integrations/W
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useIsWithinETLAnalyticsBucketPrivateAlpha } from 'data/config/project-storage-config-query'
 import { useCreateDestinationPipelineMutation } from 'data/etl/create-destination-pipeline-mutation'
 import { useCreateTenantSourceMutation } from 'data/etl/create-tenant-source-mutation'
 import { useCreatePublicationMutation } from 'data/etl/publication-create-mutation'
@@ -420,7 +421,7 @@ export const ConnectTablesDialogContent = ({
 
 const EnableReplicationDialogContent = ({ onClose }: { onClose: () => void }) => {
   const { ref: projectRef } = useParams()
-  const enablePgReplicate = useFlag('enablePgReplicate')
+  const enablePgReplicate = useIsWithinETLAnalyticsBucketPrivateAlpha({ projectRef })
   const { error } = useReplicationSourcesQuery({ projectRef })
   const noAccessToReplication =
     !enablePgReplicate || error?.message.includes('feature flag is required')

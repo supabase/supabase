@@ -53,9 +53,24 @@ export const useProjectStorageConfigQuery = <TData = ProjectStorageConfigData>(
     ...options,
   })
 
+export const useIsWithinETLAnalyticsBucketPrivateAlpha = ({
+  projectRef,
+}: {
+  projectRef?: string
+}) => {
+  const etlAnalyticsBucketPrivateAlpha = useFlag('etlAnalyticsBucketPrivateAlpha')
+  const privateAlphaProjectRefs =
+    typeof etlAnalyticsBucketPrivateAlpha === 'string'
+      ? (etlAnalyticsBucketPrivateAlpha as string).split(',').map((x) => x.trim())
+      : []
+  return privateAlphaProjectRefs.includes(projectRef ?? '')
+}
+
 export const useIsAnalyticsBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
   const { data } = useProjectStorageConfigQuery({ projectRef })
-  return !!data?.features.icebergCatalog?.enabled
+  const isIcebergCatalogEnabled = !!data?.features.icebergCatalog?.enabled
+  const projectHasAccessToPrivateAlpha = useIsWithinETLAnalyticsBucketPrivateAlpha({ projectRef })
+  return isIcebergCatalogEnabled && projectHasAccessToPrivateAlpha
 }
 
 export const useIsVectorBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
