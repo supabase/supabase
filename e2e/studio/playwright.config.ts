@@ -57,7 +57,7 @@ export default defineConfig({
     ['json', { outputFile: 'test-results/test-results.json' }],
   ],
   webServer: {
-    command: 'pnpm -w run e2e:setup',
+    command: 'pnpm --workspace-root run e2e:setup',
     port: WEB_SERVER_PORT,
     timeout: WEB_SERVER_TIMEOUT,
   },
