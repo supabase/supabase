@@ -6,108 +6,67 @@ subtitle: 'Stream data changes to BigQuery in real-time.'
 sidebar_label: 'BigQuery'
 ---
 
-BigQuery is Google's fully managed, serverless data warehouse that enables scalable analysis over petabytes of data. ETL Replication allows you to automatically sync your Supabase database tables to BigQuery for analytics and reporting.
+BigQuery is Google's fully managed data warehouse. ETL Replication allows you to automatically sync your Supabase database tables to BigQuery for analytics and reporting.
 
-## Overview
-
-ETL Replication to BigQuery uses change data capture (CDC) to stream database changes in real-time. When you replicate to BigQuery:
-
-- **Tables are created automatically**: BigQuery tables are created to match your Postgres schema
-- **Changes sync continuously**: INSERT, UPDATE, and DELETE operations are captured and replicated
-- **Data is optimized for analytics**: BigQuery stores data in a columnar format optimized for analytical queries
-- **CDC tables are managed**: BigQuery CDC tables track all changes with timestamps
-
-<Admonition type="note">
-
-Due to ingestion latency in BigQuery, there may be a delay in the data flow. This is normal and expected for BigQuery's architecture.
-
-</Admonition>
+To set up ETL Replication, follow the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup).
 
 ## Prerequisites
 
-Before setting up replication to BigQuery, you need:
+Before configuring BigQuery as a destination, you need:
 
 1. **Google Cloud Platform (GCP) account**: [Sign up for GCP](https://cloud.google.com/gcp)
-2. **BigQuery dataset**: A [BigQuery dataset](https://cloud.google.com/bigquery/docs/datasets-intro) in your GCP project where tables will be created
-3. **GCP service account key**: A [service account with appropriate permissions](https://cloud.google.com/iam/docs/keys-create-delete) in JSON format
+2. **BigQuery dataset**: A [BigQuery dataset](https://cloud.google.com/bigquery/docs/datasets-intro) in your GCP project
+3. **GCP service account key**: A [service account](https://cloud.google.com/iam/docs/keys-create-delete) in JSON format with the **BigQuery Data Editor** role
 
-### Required BigQuery permissions
+## BigQuery-specific settings
 
-Your GCP service account needs the following permissions:
+When adding BigQuery as a destination, you'll need to provide the following BigQuery-specific settings:
 
-- `bigquery.datasets.get`
-- `bigquery.tables.create`
-- `bigquery.tables.get`
-- `bigquery.tables.getData`
-- `bigquery.tables.update`
-- `bigquery.tables.updateData`
+<Image
+  alt="BigQuery Configuration Settings"
+  src="/docs/img/database/replication/etl-bigquery-details.png"
+  zoomable
+/>
 
-These permissions are typically granted through the **BigQuery Data Editor** role.
+- **Project ID**: Your BigQuery project identifier (found in the GCP Console)
+- **Dataset ID**: The name of your BigQuery dataset (without the project ID)
 
-## Configuration
+  <Admonition type="note">
 
-### Step 1: Create a publication
+  In the GCP Console, the dataset is shown as `project-id.dataset-id`. Enter only the part after the dot. For example, if you see `my-project.my_dataset`, enter `my_dataset`.
 
-Before configuring BigQuery as a destination, create a publication in your Supabase database. See the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup) for detailed instructions.
+  </Admonition>
 
-### Step 2: Configure BigQuery destination
-
-1. Navigate to the [Database](/dashboard/project/_/database/tables) section in your Supabase Dashboard
-2. Select the **ETL Replication** tab
-3. Click **Add destination** to open the New Destination panel
-4. Configure the following settings:
-
-   - **Name**: Enter a descriptive name for your replication destination (e.g., "BigQuery Analytics")
-   - **Publication**: Select the publication you created in Step 1
-   - **Type**: Select **BigQuery** from the destination types
-   - **Project Id**: Enter your GCP project ID (found in the GCP Console)
-   - **Project's Dataset Id**: Enter the ID of your BigQuery dataset
-
-   <Admonition type="note">
-
-   The BigQuery dataset ID in the GCP Console shows the project ID and dataset ID as one string, separated by a ".". The dataset ID is the part after the ".". For example, if you see `my-project.my_dataset`, enter `my_dataset` as the dataset ID.
-
-   </Admonition>
-
-   - **Service Account Key**: Paste your GCP service account key in JSON format
-
-5. Review the **Advanced Settings** (optional):
-   - **Max fill milliseconds**: Number of milliseconds after which a batch should be sent, even if it hasn't reached its maximum size (default: 5000ms)
-   - **Max staleness minutes**: BigQuery's [`max_staleness`](https://cloud.google.com/bigquery/docs/change-data-capture#manage_table_staleness) option controls how fresh the data must be
-
-6. Click **Create and start** to begin replication
+- **Service Account Key**: Your GCP service account key in JSON format. The service account must have the following permissions:
+  - `bigquery.datasets.get`
+  - `bigquery.tables.create`
+  - `bigquery.tables.get`
+  - `bigquery.tables.getData`
+  - `bigquery.tables.update`
+  - `bigquery.tables.updateData`
 
 ## How it works
 
 Once configured, ETL Replication to BigQuery:
 
-1. **Captures changes**: Monitors your Postgres database for INSERT, UPDATE, and DELETE operations
-2. **Batches data**: Groups changes into batches based on the max fill milliseconds setting
-3. **Creates CDC tables**: BigQuery creates CDC tables that include change metadata (operation type, timestamp, etc.)
-4. **Streams to BigQuery**: Sends batches to BigQuery using the Streaming API
-5. **Updates tables**: BigQuery applies changes to maintain an up-to-date copy of your data
+1. Captures changes from your Postgres database (INSERT, UPDATE, DELETE operations)
+2. Batches changes for optimal performance
+3. Creates BigQuery tables automatically to match your Postgres schema
+4. Streams data to BigQuery with CDC metadata
+
+<Admonition type="note">
+
+Due to ingestion latency in BigQuery's streaming API, there may be a delay (typically seconds to minutes) in data appearing. This is normal and expected for BigQuery's architecture.
+
+</Admonition>
 
 ### BigQuery CDC format
 
-BigQuery CDC tables include these additional columns:
+BigQuery tables include additional columns for change tracking:
 
 - `_change_type`: The type of change (`INSERT`, `UPDATE`, `DELETE`)
 - `_commit_timestamp`: When the change was committed in Postgres
 - `_stream_id`: Internal identifier for the replication stream
-
-## Monitoring
-
-Monitor your BigQuery replication pipeline:
-
-1. Go to [Database](/dashboard/project/_/database/replication) → **ETL Replication**
-2. Find your BigQuery destination
-3. Click **View status** to see:
-   - Replication lag
-   - Number of changes processed
-   - Any errors or warnings
-4. Click **View logs** for detailed information
-
-For more monitoring details, see the [ETL Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring).
 
 ## Querying replicated data
 
@@ -132,52 +91,14 @@ LIMIT 100;
 
 ## Limitations
 
-When replicating to BigQuery:
+BigQuery-specific limitations:
 
-- **TOAST values**: Large values are limited to 10MB
-- **Custom data types**: Not supported
-- **Schema changes**: Schema alterations in Postgres require manual intervention
-- **Primary keys required**: Tables must have primary keys
 - **Ingestion latency**: BigQuery's streaming API has inherent latency (typically seconds to minutes)
-- **Costs**: BigQuery charges for streaming inserts and storage
 
-For a complete list of limitations, see the [ETL Replication limitations](/docs/guides/database/replication/etl-replication#limitations).
-
-## Best practices
-
-1. **Start small**: Test with a single table before replicating your entire database
-2. **Monitor costs**: Keep an eye on BigQuery streaming insert costs
-3. **Use partitioned tables**: Consider partitioning BigQuery tables by date for better performance
-4. **Set appropriate staleness**: Balance freshness requirements with performance
-5. **Archive old data**: Use BigQuery's table expiration to manage storage costs
-
-## Troubleshooting
-
-### Permission denied errors
-
-If you see permission errors:
-- Verify your service account has the required BigQuery permissions
-- Ensure the dataset exists in the specified project
-- Check that the service account key is valid and not expired
-
-### High replication lag
-
-If replication lag is high:
-- Check your max fill milliseconds setting
-- Verify BigQuery isn't throttling your requests
-- Review your database load and instance size
-
-### Tables not appearing in BigQuery
-
-If tables aren't created:
-- Confirm the publication includes the tables
-- Verify tables have primary keys
-- Check the replication logs for errors
-
-For more help, see the [ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq).
+For general ETL Replication limitations that apply to all destinations, see the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup#limitations).
 
 ## Next steps
 
 - [Set up ETL Replication](/docs/guides/database/replication/etl-replication-setup)
 - [Monitor your replication](/docs/guides/database/replication/etl-replication-monitoring)
-- [Learn about Iceberg destinations](/docs/guides/database/replication/etl-iceberg)
+- [View ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq)

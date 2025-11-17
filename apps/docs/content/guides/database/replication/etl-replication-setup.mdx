@@ -211,8 +211,19 @@ If you encounter issues during setup:
 
 For more troubleshooting help, see the [ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq).
 
+## Limitations
+
+ETL Replication has the following limitations that apply to all destinations:
+
+- **Primary keys required**: Tables must have primary keys
+- **TOAST values**: Large values are limited to 10MB
+- **Custom data types**: Not supported
+- **Schema changes**: Not automatically handled
+- **No data transformation**: Data is replicated as-is without transformation
+
+Destination-specific limitations may also apply. See the [BigQuery](/docs/guides/database/replication/etl-bigquery#limitations) or [Iceberg](/docs/guides/database/replication/etl-iceberg#limitations) destination pages for details.
+
 ## Next steps
 
 - [Monitor your replication](/docs/guides/database/replication/etl-replication-monitoring)
-- [Choose a destination](/docs/guides/database/replication/etl-destinations)
 - [View ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq)

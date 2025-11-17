@@ -6,125 +6,75 @@ subtitle: 'Common questions and answers about ETL replication.'
 sidebar_label: 'FAQ'
 ---
 
-# What is ETL Replication?
+# What destinations are supported?
 
-ETL (Extract, Transform, Load) Replication is Supabase's managed solution for automatically syncing your database to external destinations. Unlike manual replication where you configure third-party tools yourself, ETL Replication is fully managed by Supabase and configured through the Dashboard.
-
-# How does ETL Replication differ from manual replication?
-
-| Feature | ETL Replication | Manual Replication |
-|---------|----------------|-------------------|
-| **Setup** | Configured through Dashboard | Requires external tools and manual configuration |
-| **Management** | Fully managed by Supabase | You manage the replication tools |
-| **Destinations** | Specific supported destinations | Any destination that supports Postgres logical replication |
-| **Monitoring** | Built-in Dashboard monitoring | Depends on your chosen tool |
-| **Pricing** | Included with project | May incur costs from third-party tools |
-
-# What destinations are currently supported?
-
-ETL Replication currently supports:
-- **BigQuery**: Google's data warehouse
-- **Analytics Buckets**: Supabase Analytics storage
-
-More destinations will be added in the future. For other destinations, use [Manual Replication](/docs/guides/database/replication/manual-replication-setup).
-
-# Can I replicate specific tables or all tables?
-
-Yes, you control what data is replicated by creating a [publication](/docs/guides/database/replication/etl-replication-setup#step-1-create-a-publication). You can create publications for:
-- A single table
-- All tables in a schema
-- All tables in your database
-
-# Can I filter which operations are replicated?
-
-Yes, when creating a publication, you can specify which operations to replicate (INSERT, UPDATE, DELETE). By default, all operations are replicated.
-
-However, ETL Replication requires all event types to be enabled. You cannot filter specific operations for ETL destinations.
-
-# What are the current limitations?
-
-ETL Replication has several limitations:
-
-- **TOASTed values**: Limited to 10MB (tables with TOAST columns should have replica identity set to full)
-- **Custom data types**: Not supported
-- **Event filtering**: No support for picking specific event types (all INSERT, UPDATE, DELETE events are required)
-- **Column lists and row filters**: Not supported
-- **Partitioned tables**: Not supported
-- **Generated columns**: Not supported
-- **Schema changes**: No support for altering schemas in the source
-- **Primary keys**: Tables must have a primary key set
-
-For more details, see the [ETL Replication limitations](/docs/guides/database/replication/etl-replication#limitations).
-
-# How do I know if my replication is working?
-
-You can monitor your replication status by:
-1. Going to [Database](/dashboard/project/_/database/replication) → **ETL Replication**
-2. Checking the status indicator on your destination
-3. Clicking **View status** to see detailed information and logs
-
-See the [Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring) for more details.
+ETL Replication currently supports BigQuery and Iceberg (Analytics Buckets). See the [ETL Destinations guide](/docs/guides/database/replication/etl-destinations) for details on choosing between them.
 
 # Why is my table not being replicated?
 
-Common reasons include:
-- The table is not included in your publication
-- The table doesn't have a primary key
-- The table contains unsupported data types
-- The table is a partitioned table
+Common reasons:
+- **Missing primary key**: Tables must have a primary key to be replicated
+- **Not in publication**: Ensure the table is included in your publication
+- **Unsupported data types**: Tables with custom data types are not supported
+- **Partitioned tables**: Not currently supported
 
-Check your publication settings and the [limitations](#what-are-the-current-limitations) to ensure your table is supported.
+Check your publication settings and verify your table meets the requirements.
 
-# How long does it take for data to appear in the destination?
+# I added/removed tables from my publication. Why aren't changes reflected?
 
-Data appears in near real-time, typically within seconds to a few minutes. However:
-- Initial syncs for large tables may take longer
-- Some destinations (like BigQuery) have ingestion latency
-- Network conditions can affect replication speed
+After modifying your publication, you must restart the ETL pipeline for changes to take effect. See [Adding or removing tables](/docs/guides/database/replication/etl-replication-setup#adding-or-removing-tables) for instructions.
 
-Monitor the replication lag in the [status view](/docs/guides/database/replication/etl-replication-monitoring#viewing-detailed-status-and-logs) to see the current delay.
+# Why is my pipeline in Failed state?
 
-# Can I pause or stop replication?
+Pipeline failures occur during the streaming phase when an error happens while replicating live data. This prevents data loss. To recover:
 
-Yes, you can pause or delete a replication destination:
-- To pause: Use the pause button in the ETL Replication dashboard
-- To stop completely: Delete the destination from the dashboard
+1. Check the error message by hovering over the **Failed** status
+2. Click **View status** for detailed information
+3. Fix the underlying issue (e.g., schema mismatches, destination connectivity)
+4. Restart the pipeline
 
-Note that pausing replication will cause data to queue up, which may consume WAL space on your database.
+See [Handling errors](/docs/guides/database/replication/etl-replication-monitoring#handling-errors) for more details.
 
-# What happens if replication fails?
+# Why is my table in Error state?
 
-If replication fails:
-1. The status will change to **Error** in the dashboard
-2. You'll see error details in the status view
-3. Failed events will be retried automatically
-4. You can view detailed error logs by clicking **View logs**
+Table errors occur during the copy phase. To recover, click **View status**, find the affected table, and reset the table state. This will restart the table copy from the beginning.
 
-If errors persist, check the [troubleshooting guide](/docs/guides/database/replication/etl-replication-monitoring#troubleshooting).
+# How do I know if replication is working?
 
-# How do I change which tables are replicated?
+Check the [Database](/dashboard/project/_/database/replication) → **ETL Replication** page:
 
-To add or remove tables from replication:
-1. Modify your publication using SQL (see [setup guide](/docs/guides/database/replication/etl-replication-setup#adding-tables-to-an-existing-publication))
-2. Or create a new publication with the desired tables
-3. Update your destination to use the new publication
+1. Verify your pipeline shows **Running** status
+2. Click **View status** to check table states
+3. Ensure all tables show **Live** state (actively replicating)
+4. Monitor replication lag metrics
 
-# Can I use ETL Replication with Read Replicas?
+See the [Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring) for comprehensive monitoring instructions.
 
-ETL Replication and [Read Replicas](/docs/guides/platform/read-replicas) are different features:
-- **ETL Replication**: Syncs data to external destinations for analytics and integration
-- **Read Replicas**: Creates read-only Postgres databases in different regions for load balancing and latency reduction
+# What are the main limitations?
 
-You can use both features on the same project.
+Key limitations to be aware of:
 
-# Is ETL Replication available on all plans?
+- **Primary keys**: Required on all tables
+- **Custom data types**: Not supported
+- **Schema changes**: Not automatically handled
+- **TOAST values**: Limited to 10MB
 
-ETL Replication is currently in private alpha. To join the early access program, send an email to product-ops@supabase.io.
+Destination-specific limitations may also apply. See the [BigQuery](/docs/guides/database/replication/etl-bigquery#limitations) or [Iceberg](/docs/guides/database/replication/etl-iceberg#limitations) destination pages for details.
 
-# How do I get help with ETL Replication?
+# How do I stop or pause replication?
+
+You can stop or start your pipeline from the destinations list in the [ETL Replication dashboard](/dashboard/project/_/database/replication).
+
+Note: Stopping replication will cause changes to queue up in the WAL.
+
+# Where can I find replication logs?
+
+Navigate to [Logs](/dashboard/project/_/logs/explorer) → **ETL Replication** to see all pipeline logs. Logs contain diagnostic information. If you're experiencing issues, contact support with your error details.
+
+# How do I get help?
 
 If you need assistance:
-1. Check the [setup guide](/docs/guides/database/replication/etl-replication-setup)
-2. Review the [monitoring guide](/docs/guides/database/replication/etl-replication-monitoring)
-3. Check this FAQ for common issues
-4. Contact support through the [Dashboard](/dashboard/support/new)
+
+1. Check the [setup guide](/docs/guides/database/replication/etl-replication-setup) and [monitoring guide](/docs/guides/database/replication/etl-replication-monitoring)
+2. Review this FAQ for common issues
+3. Contact support with your error details and logs
