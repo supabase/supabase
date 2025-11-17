@@ -86,7 +86,7 @@ export const PipelineStatus = ({
         case PipelineStatusName.STARTED:
           return {
             label: 'Running',
-            dot: <div className="w-2 h-2 bg-brand-600 rounded-full" />,
+            dot: <div className="w-2 h-2 bg-brand-600 rounded-full animate-pulse" />,
             color: 'text-brand-600',
             tooltip: stateMessages.message,
           }

@@ -193,7 +193,7 @@ export const Destinations = () => {
               <h4>Create your first destination</h4>
               <p className="prose text-sm text-center mt-1 max-w-full">
                 Destinations are external platforms where your database changes are automatically
-                sent. Connect to data warehouses like BigQuery or analytics buckets to enable
+                sent. Connect to various data warehouses and analytics platforms to enable
                 real-time data pipelines.
               </p>
               <Button
