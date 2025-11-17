@@ -1,5 +1,6 @@
 export const HOOKS_DEFINITIONS = [
   {
+    id: 'send-sms',
     title: 'Send SMS hook',
     subtitle: 'Will be called by Supabase Auth each time an SMS message needs to be sent.',
     enabledKey: 'HOOK_SEND_SMS_ENABLED',
@@ -9,6 +10,7 @@ export const HOOKS_DEFINITIONS = [
     docSlug: 'send-sms-hook',
   },
   {
+    id: 'send-email',
     title: 'Send Email hook',
     subtitle: 'Will be called by Supabase Auth each time an email message needs to be sent.',
     enabledKey: 'HOOK_SEND_EMAIL_ENABLED',
@@ -18,6 +20,7 @@ export const HOOKS_DEFINITIONS = [
     docSlug: 'send-email-hook',
   },
   {
+    id: 'custom-access-token-claims',
     title: 'Customize Access Token (JWT) Claims hook',
     subtitle:
       'Will be called by Supabase Auth each time a new JWT is created. It should return the claims you wish to be present in the JWT.',
@@ -28,6 +31,7 @@ export const HOOKS_DEFINITIONS = [
     docSlug: 'custom-access-token-hook',
   },
   {
+    id: 'mfa-verification-attempt',
     title: 'MFA Verification Attempt hook',
     subtitle:
       'Will be called by Supabase Auth each time a user tries to verify an MFA factor. Return a decision on whether to reject the attempt and future ones, or to allow the user to keep trying.',
@@ -38,6 +42,7 @@ export const HOOKS_DEFINITIONS = [
     docSlug: 'mfa-verification-hook',
   },
   {
+    id: 'password-verification-attempt',
     title: 'Password Verification Attempt hook',
     subtitle:
       'Will be called by Supabase Auth each time a user tries to sign in with a password. Return a decision whether to allow the user to reject the attempt, or to allow the user to keep trying.',
@@ -48,6 +53,7 @@ export const HOOKS_DEFINITIONS = [
     docSlug: 'password-verification-hook',
   },
   {
+    id: 'before-user-created',
     title: 'Before User Created hook',
     subtitle:
       'Will be called by Supabase Auth before creating a new user. Returning an error will prevent the user from being created.',
@@ -62,6 +68,7 @@ export const HOOKS_DEFINITIONS = [
 export type HOOK_DEFINITION_TITLE = (typeof HOOKS_DEFINITIONS)[number]['title']
 
 export interface Hook {
+  id: string
   title: HOOK_DEFINITION_TITLE
   subtitle: string
   enabled: boolean
