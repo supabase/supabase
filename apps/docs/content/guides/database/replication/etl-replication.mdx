@@ -16,143 +16,82 @@ ETL Replication is currently in private alpha. Features and functionality may ch
 
 <Admonition type="note">
 
-This guide covers **ETL Replication**, Supabase's automated replication product. For manual replication using external tools, see [Manual Replication](/docs/guides/database/replication/manual-replication-setup). For deploying read-only databases across multiple regions, see [Read Replicas](/docs/guides/platform/read-replicas) instead.
+This guide covers **ETL Replication**, Supabase's automated replication product. For manual replication using external tools, see [Manual Replication Setup](/docs/guides/database/replication/manual-replication-setup). For deploying read-only databases across multiple regions, see [Read Replicas](/docs/guides/platform/read-replicas) instead.
 
 </Admonition>
-
-ETL Replication automatically syncs your data by configuring a source and a destination. The source is your Supabase database, defined in the [**Publications**](/dashboard/project/_/database/publications) section of the dashboard.
-
-The destination is an external location, defined in the [**Replication**](/dashboard/project/_/database/replication) section of the dashboard. See the [supported destinations](#destinations).
 
 ## Getting started
 
 To set up ETL Replication:
 
-1. **[Create a publication](/docs/guides/database/replication/etl-replication-setup)** - Define which tables and changes to replicate
-2. **[Add a destination](#destinations)** - Configure where your data should be synced
-3. **[Monitor replication](/docs/guides/database/replication/etl-replication-monitoring)** - Track status and troubleshoot issues
+1. **[Create a publication](/docs/guides/database/replication/etl-replication-setup#step-1-create-a-publication)** - Define which tables and changes to replicate
+2. **[Choose a destination](#destinations)** - Select BigQuery or Iceberg based on your needs
+3. **[Configure replication](/docs/guides/database/replication/etl-replication-setup)** - Set up your destination in the Dashboard
+4. **[Monitor replication](/docs/guides/database/replication/etl-replication-monitoring)** - Track status and troubleshoot issues
 
 For common questions, see the [ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq).
 
-## Sources
-
-Choose what data to sync by creating a publication in your database. A publication is a set of changes, filtered by table and change type.
-
-For detailed instructions on creating publications with SQL, see the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup).
-
-### Managing publications in the Dashboard
-
-1. Go to the [Database](/dashboard/project/_/database/tables) page in the Dashboard.
-2. Click on **Publications** in the sidebar.
-3. To work with ETL, toggle **all** database events.
-4. Control which tables broadcast changes by selecting **Source** and toggling each table.
-
-<video width="99%" muted playsInline controls={true}>
-  <source
-    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-realtime.mp4"
-    type="video/mp4"
-  />
-</video>
-
 ## Destinations
 
-Currently available destinations:
-
-- [BigQuery](#bigquery)
-- [Analytics Buckets](#analytics-buckets)
+Choose a destination based on your analytics and integration needs:
 
 ### BigQuery
 
-#### Prerequisites
+Google's fully managed data warehouse for large-scale analytics.
 
-Before setting up replication to BigQuery, you need:
+- **Best for**: Google Cloud users, SQL analytics, business intelligence
+- **Format**: Managed BigQuery tables with CDC metadata
+- **Features**: Streaming inserts, automatic table creation, CDC history
 
-1. A [Google Cloud Platform (GCP)](https://cloud.google.com/gcp) account
-2. A [BigQuery dataset](https://cloud.google.com/bigquery/docs/datasets-intro) in your GCP project
-3. A [GCP service account key](https://cloud.google.com/iam/docs/keys-create-delete) in JSON format
+[Learn more about BigQuery replication →](/docs/guides/database/replication/etl-bigquery)
 
-#### Configuring BigQuery replication
+### Iceberg (Analytics Buckets)
 
-1. Navigate to the [Database](/dashboard/project/_/database/tables) section in your Supabase Dashboard and select the **Replication** tab.
-2. Click **Add destination** to open the New Destination panel.
-3. Configure the replication settings:
+Apache Iceberg tables in S3-compatible storage for flexible analytics.
 
-   - **Name**: Enter a descriptive name for your replication destination
-   - **Publication**: Select an existing publication or create a new one
-   - **Type**: Select "BigQuery" from the destination types
-   - **Project Id**: Enter the GCP project ID
-   - **Project's Dataset Id**: Enter the ID of the BigQuery Data set
+- **Best for**: Open-format data lakes, multi-tool analytics, data science
+- **Format**: Iceberg tables with Parquet files
+- **Features**: Time travel, schema evolution, S3 API access
 
-    <Admonition type="note">
-
-   The BigQuery Data set ID shows the project ID and Data set ID as one string, separated by a ".". The Data set ID is the part after the ".".
-
-    </Admonition>
-
-   - **Service Account Key**: Enter your GCP service account key
-
-4. Review the [Advanced Settings](#advanced-settings) to change the limits for the replication.
-
-   - **Max fill milliseconds**: Change are sent in batches. Max fill milliseconds are number of milliseconds after which a batch should be sent, even if it hasn't reached its maximum size.
-   - **Max staleness minutes**: See BigQuery's [`max_staleness`](https://cloud.google.com/bigquery/docs/change-data-capture#manage_table_staleness) option
-
-5. Click **Create and start** to start the replication process.
+[Learn more about Iceberg replication →](/docs/guides/database/replication/etl-iceberg)
 
 <Admonition type="note">
 
-Due to ingestion latency in BigQuery, there may be a delay in the data flow.
+More destinations will be added in the future. If you need to replicate to other destinations, consider using [Manual Replication](/docs/guides/database/replication/manual-replication-setup).
 
 </Admonition>
 
-### Analytics buckets
+## Advanced Settings
 
-#### Configuring analytics buckets replication
+When configuring a destination, you can adjust these advanced settings:
 
-1. Navigate to the [Database](/dashboard/project/_/database/tables) section in your Supabase Dashboard and select the **Replication** tab.
-2. Click **Add destination** to open the New Destination panel.
-3. Configure the replication settings:
-   - **Name**: Enter a descriptive name for your replication destination
-   - **Publication**: Select an existing publication or create a new one
-   - **Type**: Select "Analytics Bucket" from the destination types
-   - **Bucket**: Select an analytics bucket
-   - **Namespace**: Select a namespace in the analytics bucket
-   - **Catalog Token**: Will be automatically retrieved from your project's [API Secret key](/dashboard/project/_/settings/api-keys/new)
-   - **S3 Access Key ID**: Select an existing key id if you have its secret access key, or create a new one by selecting "Create a new key".
-   - **S3 Secret Access Key**: If you selected an existing key id in **S3 Access Key ID**, enter the corresponding S3 secret access key.
-4. Review the [Advanced Settings](#advanced-settings) to change the limits for the replication.
-
-   - **Max fill milliseconds**: Change are sent in batches. Max fill milliseconds are number of milliseconds after which a batch should be sent, even if it hasn't reached its maximum size.
-
-5. Click **Create and start** to start the replication process.
-
-## Monitoring replication
-
-After setting up replication, data begins flowing within a few minutes. You can monitor the replication status and review any errors directly from the [Supabase Dashboard](/dashboard/project/_/database/replication) by clicking the **View status** button for a replication. In the status view for the replication pipeline, you can also view logs by clicking the **View logs** button.
-
-For detailed monitoring instructions, see the [ETL Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring).
+- **Max fill milliseconds**: Number of milliseconds after which a batch should be sent, even if it hasn't reached its maximum size (default: 5000ms)
+- **Max staleness minutes** (BigQuery only): BigQuery's [`max_staleness`](https://cloud.google.com/bigquery/docs/change-data-capture#manage_table_staleness) option controls how fresh the data must be
 
 ## Limitations
 
-- Large values stored as [TOASTed values](https://www.postgresql.org/docs/current/storage-toast.html) are replicated, but limited to 10MB.
+ETL Replication has several limitations to be aware of:
 
-  <Admonition type="note" label="Set replica identity to full for tables with TOAST columns">
+- **TOAST values**: Large values stored as [TOASTed values](https://www.postgresql.org/docs/current/storage-toast.html) are limited to 10MB
 
-  This limitation is due to the underlying [replica identity](https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-REPLICA-IDENTITY). In most cases the default replica identity works, but Postgres doesn't send TOAST column values if they haven't changed. This makes it hard for downstream systems to apply the update.
+  <Admonition type="note" label="Workaround for TOAST columns">
 
-  To workaround this limitation, we set the table's replica identity to full (all columns), forcing Postgres to send the TOAST columns in the CDC stream and helping downstream systems apply the update event.
+  This limitation is due to the underlying [replica identity](https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-REPLICA-IDENTITY). To work around this, set the table's replica identity to full (all columns), which forces Postgres to send TOAST columns in the CDC stream.
 
   </Admonition>
 
-- Custom data types are not supported.
-- No support for picking event types to replicate. ETL needs all insert, update and delete events.
-- No column lists and row filter conditions support.
-- No partitioned tables support.
-- No generated columns support.
-- No support for changing schema in the source.
-- Tables should have a primary key set. Tables without a primary key will not be replicated. You can see in the sources list which tables don't have a primary key.
+- **Custom data types**: Not supported
+- **Event filtering**: All event types (INSERT, UPDATE, DELETE) are required
+- **Column lists and row filters**: Not supported
+- **Partitioned tables**: Not supported
+- **Generated columns**: Not supported
+- **Schema changes**: No automatic support for schema alterations
+- **Primary keys**: Tables must have primary keys
 
 ## Next steps
 
 - [Set up ETL Replication](/docs/guides/database/replication/etl-replication-setup)
+- [Configure BigQuery destination](/docs/guides/database/replication/etl-bigquery)
+- [Configure Iceberg destination](/docs/guides/database/replication/etl-iceberg)
 - [Monitor ETL Replication](/docs/guides/database/replication/etl-replication-monitoring)
 - [Review ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq)

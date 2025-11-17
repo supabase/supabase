@@ -1099,52 +1099,6 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/configuration' as `/${string}`,
         },
         {
-          name: 'Database replication',
-          url: '/guides/database/replication',
-          items: [
-            {
-              name: 'ETL Replication',
-              url: '/guides/database/replication/etl-replication',
-              items: [
-                {
-                  name: 'Setting up',
-                  url: '/guides/database/replication/etl-replication-setup',
-                },
-                {
-                  name: 'Monitoring',
-                  url: '/guides/database/replication/etl-replication-monitoring',
-                },
-                {
-                  name: 'FAQ',
-                  url: '/guides/database/replication/etl-replication-faq',
-                },
-              ],
-            },
-            {
-              name: 'Manual Replication',
-              url: '/guides/database/replication/manual-replication',
-              items: [
-                {
-                  name: 'Overview',
-                  url: '/guides/database/replication/manual-replication',
-                },
-                {
-                  name: 'Setting up',
-                  url: '/guides/database/replication/manual-replication-setup',
-                },
-                {
-                  name: 'Monitoring',
-                  url: '/guides/database/replication/manual-replication-monitoring',
-                },
-                {
-                  name: 'FAQ',
-                  url: '/guides/database/replication/manual-replication-faq',
-                },
-              ],
-            },
-          ],
-        },
-        {
           name: 'Query optimization',
           url: '/guides/database/query-optimization' as `/${string}`,
         },
@@ -1194,15 +1148,15 @@ export const database: NavMenuConstant = {
         { name: 'Overview', url: '/guides/database/replication' },
         {
           name: 'ETL Replication',
-          url: '/guides/database/replication/etl-replication' as `/${string}`,
+          url: '/guides/database/replication/etl-replication-setup' as `/${string}`,
           items: [
-            {
-              name: 'Overview',
-              url: '/guides/database/replication/etl-replication' as `/${string}`,
-            },
             {
               name: 'Setting up',
               url: '/guides/database/replication/etl-replication-setup' as `/${string}`,
+            },
+            {
+              name: 'Destinations',
+              url: '/guides/database/replication/etl-destinations' as `/${string}`,
             },
             {
               name: 'Monitoring',
@@ -1213,12 +1167,8 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'Manual Replication',
-          url: '/guides/database/replication/manual-replication' as `/${string}`,
+          url: '/guides/database/replication/manual-replication-setup' as `/${string}`,
           items: [
-            {
-              name: 'Overview',
-              url: '/guides/database/replication/manual-replication' as `/${string}`,
-            },
             {
               name: 'Setting up',
               url: '/guides/database/replication/manual-replication-setup' as `/${string}`,

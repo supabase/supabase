@@ -1,0 +1,228 @@
+---
+id: 'etl-iceberg'
+title: 'ETL to Iceberg (Analytics Buckets)'
+description: 'Replicate your Supabase database to Iceberg format using Analytics Buckets.'
+subtitle: 'Stream data to Analytics Buckets for flexible analytics.'
+sidebar_label: 'Iceberg'
+---
+
+Apache Iceberg is an open table format for huge analytic datasets. Supabase Analytics Buckets use Iceberg to store your replicated data in S3-compatible storage, providing a flexible foundation for analytics with various query engines.
+
+## Overview
+
+ETL Replication to Iceberg (via Analytics Buckets) provides:
+
+- **Open format**: Data stored in Apache Iceberg format, queryable by multiple engines (Spark, Trino, Presto, etc.)
+- **S3-compatible storage**: Data stored in Supabase's S3-compatible storage
+- **Schema evolution**: Iceberg supports schema changes without rewriting data
+- **Time travel**: Query historical versions of your data
+- **Partitioning**: Efficient data organization for query performance
+
+### What are Analytics Buckets?
+
+Analytics Buckets are Supabase's managed storage solution that uses the Apache Iceberg table format. They provide:
+
+- Organized storage with namespaces and tables
+- Automatic schema management
+- Integration with ETL Replication
+- S3 API compatibility for programmatic access
+
+<Admonition type="note">
+
+Analytics Buckets are optimized for analytical workloads and should not be confused with Supabase Storage buckets, which are designed for file storage.
+
+</Admonition>
+
+## Prerequisites
+
+Before setting up replication to Analytics Buckets, you need:
+
+1. **Supabase project**: On a plan that supports Analytics Buckets
+2. **Analytics Bucket**: Created in your project
+3. **Namespace**: A namespace within your Analytics Bucket
+4. **S3 Access Keys**: Generated for your project (created automatically or manually)
+
+### Creating an Analytics Bucket
+
+1. Navigate to your Supabase Dashboard
+2. Go to the Storage or Analytics section
+3. Create a new Analytics Bucket
+4. Define a namespace for organizing your tables
+
+## Configuration
+
+### Step 1: Create a publication
+
+Before configuring Analytics Buckets as a destination, create a publication in your Supabase database. See the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup) for detailed instructions.
+
+### Step 2: Configure Analytics Bucket destination
+
+1. Navigate to the [Database](/dashboard/project/_/database/tables) section in your Supabase Dashboard
+2. Select the **ETL Replication** tab
+3. Click **Add destination** to open the New Destination panel
+4. Configure the following settings:
+
+   - **Name**: Enter a descriptive name for your replication destination (e.g., "Iceberg Analytics")
+   - **Publication**: Select the publication you created in Step 1
+   - **Type**: Select **Analytics Bucket** from the destination types
+   - **Bucket**: Select your Analytics Bucket from the dropdown
+   - **Namespace**: Select or create a namespace in the Analytics Bucket
+   - **Catalog Token**: Automatically retrieved from your project's [API Secret key](/dashboard/project/_/settings/api-keys/new)
+   - **S3 Access Key ID**: Select an existing key or choose "Create a new key"
+   - **S3 Secret Access Key**: Enter the corresponding secret access key (if using an existing key)
+
+5. Review the **Advanced Settings** (optional):
+   - **Max fill milliseconds**: Number of milliseconds after which a batch should be sent, even if it hasn't reached its maximum size (default: 5000ms)
+
+6. Click **Create and start** to begin replication
+
+## How it works
+
+Once configured, ETL Replication to Iceberg:
+
+1. **Captures changes**: Monitors your Postgres database for INSERT, UPDATE, and DELETE operations
+2. **Batches data**: Groups changes into batches based on the max fill milliseconds setting
+3. **Creates Iceberg tables**: Tables are created in your Analytics Bucket namespace using Iceberg format
+4. **Writes to S3**: Data is written to S3-compatible storage in Parquet format
+5. **Updates metadata**: Iceberg metadata is updated to reflect the latest data
+
+### Iceberg table structure
+
+Your replicated data is organized as:
+
+```
+analytics-bucket/
+  └── namespace/
+      └── table_name/
+          ├── data/           # Parquet files with your data
+          └── metadata/       # Iceberg metadata (schema, snapshots, etc.)
+```
+
+## Querying replicated data
+
+You can query your Iceberg tables using various methods:
+
+### Using Supabase Dashboard
+
+Query your Analytics Bucket tables directly from the Supabase Dashboard using SQL.
+
+### Using Python with PyIceberg
+
+```python
+from pyiceberg.catalog import load_catalog
+
+# Load the Iceberg catalog
+catalog = load_catalog('supabase', **{
+    'uri': 'https://your-project.supabase.co/analytics',
+    's3.endpoint': 'https://your-project.supabase.co',
+    's3.access-key-id': 'your-access-key',
+    's3.secret-access-key': 'your-secret-key'
+})
+
+# Query a table
+table = catalog.load_table('namespace.table_name')
+df = table.scan().to_pandas()
+print(df.head())
+```
+
+### Using Spark
+
+```scala
+val df = spark.read
+  .format("iceberg")
+  .load("supabase.namespace.table_name")
+
+df.show()
+```
+
+### Time travel queries
+
+Iceberg supports querying historical data:
+
+```python
+# Query data as of a specific timestamp
+df = table.scan(
+    as_of_timestamp=datetime(2024, 1, 1)
+).to_pandas()
+
+# Query data from a specific snapshot
+df = table.scan(
+    snapshot_id=123456
+).to_pandas()
+```
+
+## Monitoring
+
+Monitor your Analytics Bucket replication pipeline:
+
+1. Go to [Database](/dashboard/project/_/database/replication) → **ETL Replication**
+2. Find your Analytics Bucket destination
+3. Click **View status** to see:
+   - Replication lag
+   - Number of changes processed
+   - Any errors or warnings
+4. Click **View logs** for detailed information
+
+For more monitoring details, see the [ETL Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring).
+
+## Limitations
+
+When replicating to Analytics Buckets:
+
+- **TOAST values**: Large values are limited to 10MB
+- **Custom data types**: Not supported
+- **Schema changes**: Limited support; major schema changes may require recreation
+- **Primary keys required**: Tables must have primary keys
+- **Partitioning**: Custom partitioning is not yet supported
+
+For a complete list of limitations, see the [ETL Replication limitations](/docs/guides/database/replication/etl-replication#limitations).
+
+## Best practices
+
+1. **Organize with namespaces**: Use namespaces to logically group related tables
+2. **Monitor storage**: Keep an eye on S3 storage usage and costs
+3. **Use appropriate batch sizes**: Balance latency with efficiency
+4. **Clean up old snapshots**: Regularly expire old Iceberg snapshots to manage storage
+5. **Test queries**: Verify your analytics queries work with the Iceberg format
+
+## Use cases
+
+Analytics Buckets with Iceberg format are ideal for:
+
+- **Data lake architectures**: Building a lakehouse with open formats
+- **Multi-tool analytics**: Using different query engines (Spark, Trino, etc.) on the same data
+- **Historical analysis**: Leveraging time travel for point-in-time queries
+- **Data science**: Integrating with Python data science tools
+- **ETL pipelines**: As a source for downstream data processing
+
+## Troubleshooting
+
+### Connection errors
+
+If you can't connect to your Analytics Bucket:
+- Verify your S3 access keys are correct
+- Ensure the Analytics Bucket exists
+- Check that the namespace is properly configured
+
+### Tables not appearing
+
+If tables aren't created:
+- Confirm the publication includes the tables
+- Verify tables have primary keys
+- Check the replication logs for errors
+
+### Slow queries
+
+If queries are slow:
+- Review your data volume and query patterns
+- Consider the query engine's capabilities
+- Check if you're using appropriate filters
+
+For more help, see the [ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq).
+
+## Next steps
+
+- [Set up ETL Replication](/docs/guides/database/replication/etl-replication-setup)
+- [Monitor your replication](/docs/guides/database/replication/etl-replication-monitoring)
+- [Learn about BigQuery destinations](/docs/guides/database/replication/etl-bigquery)
+- [Explore Analytics Buckets features](/docs/guides/storage/analytics)

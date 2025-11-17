@@ -1,0 +1,116 @@
+---
+id: 'etl-destinations'
+title: 'ETL Destinations'
+description: 'Choose where to replicate your database with ETL Replication.'
+subtitle: 'Available destinations for ETL Replication.'
+sidebar_label: 'Destinations'
+---
+
+ETL Replication supports multiple destination types for syncing your database. Choose the destination that best fits your analytics and integration needs.
+
+## Available Destinations
+
+### BigQuery
+
+<div className="grid md:grid-cols-1 gap-4 not-prose">
+  <div className="border rounded-lg p-6">
+    <h3 className="text-xl font-medium mb-2">Google BigQuery</h3>
+    <p className="text-foreground-light mb-4">
+      Google's fully managed data warehouse for large-scale analytics and business intelligence.
+    </p>
+    <ul className="space-y-2 mb-4">
+      <li><strong>Best for:</strong> Google Cloud users, SQL analytics, business intelligence</li>
+      <li><strong>Format:</strong> Managed BigQuery tables with CDC metadata</li>
+      <li><strong>Features:</strong> Streaming inserts, automatic table creation, CDC history tracking</li>
+    </ul>
+    <a href="/docs/guides/database/replication/etl-bigquery" className="text-brand">
+      Configure BigQuery destination →
+    </a>
+  </div>
+</div>
+
+### Iceberg (Analytics Buckets)
+
+<div className="grid md:grid-cols-1 gap-4 not-prose">
+  <div className="border rounded-lg p-6">
+    <h3 className="text-xl font-medium mb-2">Apache Iceberg</h3>
+    <p className="text-foreground-light mb-4">
+      Apache Iceberg tables in S3-compatible storage for flexible, open-format analytics.
+    </p>
+    <ul className="space-y-2 mb-4">
+      <li><strong>Best for:</strong> Open-format data lakes, multi-tool analytics, data science workflows</li>
+      <li><strong>Format:</strong> Iceberg tables with Parquet files</li>
+      <li><strong>Features:</strong> Time travel queries, schema evolution, S3 API access</li>
+    </ul>
+    <a href="/docs/guides/database/replication/etl-iceberg" className="text-brand">
+      Configure Iceberg destination →
+    </a>
+  </div>
+</div>
+
+## Choosing a Destination
+
+### BigQuery vs Iceberg
+
+| Feature | BigQuery | Iceberg (Analytics Buckets) |
+|---------|----------|----------------------------|
+| **Setup complexity** | Simple (GCP service account) | Simple (S3 credentials) |
+| **Query engines** | BigQuery SQL | Spark, Trino, Presto, DuckDB, etc. |
+| **Storage** | Google Cloud Storage (managed) | S3-compatible (managed by Supabase) |
+| **Cost model** | Pay per query + storage | Storage-based |
+| **Time travel** | Limited retention | Full Iceberg support |
+| **Best for** | Google Cloud ecosystem | Open-source data lakes |
+| **CDC metadata** | Included in tables | Available in Iceberg format |
+
+### Use Case Recommendations
+
+**Choose BigQuery if you:**
+- Are already using Google Cloud Platform
+- Need built-in business intelligence tools
+- Want a fully managed query experience
+- Require tight integration with Google services
+
+**Choose Iceberg if you:**
+- Want an open table format
+- Need to query data with multiple tools (Spark, Trino, etc.)
+- Are building a data lakehouse architecture
+- Want full control over query engines
+- Need advanced time travel capabilities
+
+## Getting Started
+
+To set up a destination:
+
+1. **[Create a publication](/docs/guides/database/replication/etl-replication-setup#step-1-create-a-publication)** - Define which tables to replicate
+2. **Choose your destination** - Select BigQuery or Iceberg based on your needs
+3. **Configure the destination** - Follow the destination-specific setup guide
+4. **Monitor replication** - Track status and performance
+
+## Common Features
+
+All ETL destinations provide:
+
+- **Automatic schema creation**: Tables are created automatically to match your Postgres schema
+- **Change data capture**: INSERT, UPDATE, and DELETE operations are tracked
+- **Batched delivery**: Changes are sent in optimized batches for performance
+- **Error handling**: Failed changes are automatically retried
+- **Built-in monitoring**: Track lag, throughput, and errors in the Dashboard
+
+## Limitations
+
+Some limitations apply to all destinations:
+
+- **Primary keys required**: Tables must have primary keys
+- **TOAST values**: Large values limited to 10MB
+- **Custom data types**: Not supported
+- **Event filtering**: All event types (INSERT, UPDATE, DELETE) are required
+- **Schema changes**: No automatic support for schema alterations
+
+For destination-specific limitations, see the individual destination pages.
+
+## Next Steps
+
+- [Configure BigQuery destination](/docs/guides/database/replication/etl-bigquery)
+- [Configure Iceberg destination](/docs/guides/database/replication/etl-iceberg)
+- [Set up ETL Replication](/docs/guides/database/replication/etl-replication-setup)
+- [Monitor ETL Replication](/docs/guides/database/replication/etl-replication-monitoring)
