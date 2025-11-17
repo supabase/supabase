@@ -247,7 +247,7 @@ export const AnalyticBucketDetails = () => {
                       <Admonition
                         type="note"
                         layout="horizontal"
-                        className="[&>div]:pl-[2.5rem] [&>div]:-translate-y-[3px]"
+                        className="[&>div]:pl-[2.5rem] [&>div]:-translate-y-[3px] mb-10"
                         childProps={{ title: { className: 'block capitalize-sentence' } }}
                         showIcon={isPipelineStopped}
                         title={
