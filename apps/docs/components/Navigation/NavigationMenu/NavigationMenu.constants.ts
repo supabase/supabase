@@ -1103,8 +1103,40 @@ export const database: NavMenuConstant = {
           url: '/guides/database/replication',
           items: [
             {
-              name: 'ETL',
-              url: '/guides/database/replication/etl',
+              name: 'ETL Replication',
+              url: '/guides/database/replication/etl-replication',
+              items: [
+                {
+                  name: 'Setting up',
+                  url: '/guides/database/replication/etl-replication-setup',
+                },
+                {
+                  name: 'Monitoring',
+                  url: '/guides/database/replication/etl-replication-monitoring',
+                },
+                {
+                  name: 'FAQ',
+                  url: '/guides/database/replication/etl-replication-faq',
+                },
+              ],
+            },
+            {
+              name: 'Manual Replication',
+              url: '/guides/database/replication/manual-replication-setup',
+              items: [
+                {
+                  name: 'Setting up',
+                  url: '/guides/database/replication/manual-replication-setup',
+                },
+                {
+                  name: 'Monitoring',
+                  url: '/guides/database/replication/manual-replication-monitoring',
+                },
+                {
+                  name: 'FAQ',
+                  url: '/guides/database/replication/manual-replication-faq',
+                },
+              ],
             },
           ],
         },
@@ -1157,14 +1189,39 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/database/replication' },
         {
-          name: 'Setting up replication',
-          url: '/guides/database/replication/setting-up-replication' as `/${string}`,
+          name: 'ETL Replication',
+          url: '/guides/database/replication/etl-replication' as `/${string}`,
+          items: [
+            {
+              name: 'Overview',
+              url: '/guides/database/replication/etl-replication' as `/${string}`,
+            },
+            {
+              name: 'Setting up',
+              url: '/guides/database/replication/etl-replication-setup' as `/${string}`,
+            },
+            {
+              name: 'Monitoring',
+              url: '/guides/database/replication/etl-replication-monitoring' as `/${string}`,
+            },
+            { name: 'FAQ', url: '/guides/database/replication/etl-replication-faq' },
+          ],
         },
         {
-          name: 'Monitoring replication',
-          url: '/guides/database/replication/monitoring-replication' as `/${string}`,
+          name: 'Manual Replication',
+          url: '/guides/database/replication/manual-replication-setup' as `/${string}`,
+          items: [
+            {
+              name: 'Setting up',
+              url: '/guides/database/replication/manual-replication-setup' as `/${string}`,
+            },
+            {
+              name: 'Monitoring',
+              url: '/guides/database/replication/manual-replication-monitoring' as `/${string}`,
+            },
+            { name: 'FAQ', url: '/guides/database/replication/manual-replication-faq' },
+          ],
         },
-        { name: 'FAQ', url: '/guides/database/replication/faq' },
       ],
     },
     {

@@ -1,0 +1,125 @@
+---
+id: 'etl-replication-setup'
+title: 'ETL Replication Setup'
+description: 'Set up ETL replication to automatically sync your database to external destinations.'
+subtitle: 'Configure publications and destinations for ETL replication.'
+sidebar_label: 'Setting up'
+---
+
+ETL Replication requires two main components: a **publication** (source) and a **destination**.
+
+## Step 1: Create a publication
+
+A publication defines which tables and change types will be replicated. You need to create a publication before setting up a destination.
+
+### Creating publications with SQL
+
+You can create publications using SQL with different scopes:
+
+#### Publication for a single table
+
+To replicate changes from a single table:
+
+```sql
+-- Create a publication for a specific table
+CREATE PUBLICATION my_publication FOR TABLE users;
+```
+
+This will track all changes (INSERT, UPDATE, DELETE) for the `users` table.
+
+#### Publication for all tables in a schema
+
+To replicate all tables in a specific schema:
+
+```sql
+-- Create a publication for all tables in the public schema
+CREATE PUBLICATION my_publication FOR TABLES IN SCHEMA public;
+```
+
+This will track changes for all existing and future tables in the `public` schema.
+
+#### Publication for all tables
+
+To replicate all tables in your database:
+
+```sql
+-- Create a publication for all tables
+CREATE PUBLICATION my_publication FOR ALL TABLES;
+```
+
+This will track changes for all tables in your database.
+
+### Customizing change types
+
+By default, publications track all operations (INSERT, UPDATE, DELETE). You can customize this:
+
+```sql
+-- Only track inserts and updates
+CREATE PUBLICATION my_publication FOR TABLE users
+WITH (publish = 'insert,update');
+
+-- Only track deletes
+CREATE PUBLICATION my_publication FOR TABLE users
+WITH (publish = 'delete');
+```
+
+### Adding tables to an existing publication
+
+You can add more tables to an existing publication:
+
+```sql
+-- Add a table to an existing publication
+ALTER PUBLICATION my_publication ADD TABLE posts;
+
+-- Add multiple tables
+ALTER PUBLICATION my_publication ADD TABLE comments, likes;
+```
+
+### Viewing publications in the Dashboard
+
+After creating a publication via SQL, you can view it in the Supabase Dashboard:
+
+1. Go to the [Database](/dashboard/project/_/database/tables) page in the Dashboard
+2. Click on **Publications** in the sidebar
+3. You'll see all your publications listed with their tables
+
+You can also manage publications through the Dashboard by toggling **Source** for each table.
+
+## Step 2: Add a destination
+
+Once you have a publication, you can add a destination to start replicating data:
+
+1. Navigate to the [Database](/dashboard/project/_/database/replication) section in your Supabase Dashboard
+2. Select the **ETL Replication** tab
+3. Click **Add destination** to open the New Destination panel
+4. Configure the destination settings:
+   - **Name**: Enter a descriptive name for your destination
+   - **Publication**: Select the publication you created in Step 1
+   - **Type**: Choose your destination type (BigQuery, Analytics Bucket, etc.)
+   - Fill in the destination-specific configuration
+
+5. Review the [Advanced Settings](#advanced-settings) if needed
+6. Click **Create and start** to begin replication
+
+<Admonition type="note">
+
+For detailed configuration instructions for each destination type, see the [ETL Replication](/docs/guides/database/replication/etl-replication#destinations) guide.
+
+</Admonition>
+
+## How it works
+
+{/* Image placeholder - will be added by the user */}
+
+Once configured, ETL Replication will:
+
+1. Capture changes from your database using the publication
+2. Transform the data as needed
+3. Load the data to your destination in near real-time
+
+Changes are sent in batches to optimize performance and reduce costs.
+
+## Next steps
+
+- [Monitor your replication](/docs/guides/database/replication/etl-replication-monitoring)
+- [View ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq)

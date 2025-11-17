@@ -1,0 +1,107 @@
+---
+id: 'etl-replication-monitoring'
+title: 'ETL Replication Monitoring'
+description: 'Monitor the status and health of your ETL replication pipelines.'
+subtitle: 'Track replication status, view logs, and troubleshoot issues.'
+sidebar_label: 'Monitoring'
+---
+
+After setting up ETL replication, you can monitor the status and health of your replication pipelines directly from the Supabase Dashboard.
+
+## Viewing replication status
+
+To monitor your ETL replication:
+
+1. Navigate to the [Database](/dashboard/project/_/database/replication) section in your Supabase Dashboard
+2. Select the **ETL Replication** tab
+3. You'll see a list of all your active destinations with their current status
+
+Each destination shows:
+- **Name**: The name you gave to the destination
+- **Type**: The destination type (BigQuery, Analytics Bucket, etc.)
+- **Status**: Current replication state (Active, Error, Paused, etc.)
+- **Publication**: The source publication being replicated
+
+## Viewing detailed status and logs
+
+For more detailed information about a specific replication pipeline:
+
+1. Navigate to [Database](/dashboard/project/_/database/replication) → **ETL Replication**
+2. Find the destination you want to monitor
+3. Click the **View status** button for that destination
+
+In the status view, you can:
+
+- **View real-time status**: See the current state of your replication pipeline
+- **Check replication lag**: Monitor how up-to-date your destination is
+- **View error details**: See any errors that occurred during replication
+- **Access logs**: Click the **View logs** button to see detailed replication logs
+
+## Understanding replication states
+
+Your ETL replication destination can be in one of several states:
+
+| State | Description |
+|-------|-------------|
+| **Active** | Replication is running normally |
+| **Initializing** | Initial setup is in progress |
+| **Syncing** | Performing initial data sync |
+| **Error** | An error occurred during replication |
+| **Paused** | Replication has been manually paused |
+
+## Monitoring replication lag
+
+Replication lag indicates how far behind the destination is from the source database. In the status view, you can see:
+
+- **Last sync time**: When the destination last received changes
+- **Records pending**: Number of changes waiting to be replicated
+- **Lag time**: Time delay between source and destination
+
+<Admonition type="note">
+
+Due to ingestion latency in some destinations (like BigQuery), there may be a natural delay in the data flow. This is normal and expected.
+
+</Admonition>
+
+## Common monitoring scenarios
+
+### Checking if replication is healthy
+
+1. Navigate to [Database](/dashboard/project/_/database/replication) → **ETL Replication**
+2. Check that your destination shows **Active** status
+3. Click **View status** to verify data is flowing
+
+### Investigating errors
+
+If you see an **Error** status:
+
+1. Click **View status** on the affected destination
+2. Review the error message displayed
+3. Click **View logs** to see detailed error information
+4. Check the [FAQ](/docs/guides/database/replication/etl-replication-faq) for common issues
+
+### Monitoring performance
+
+To ensure optimal performance:
+
+1. Check replication lag regularly
+2. Monitor the number of pending records
+3. Review logs for any warnings or performance issues
+4. Adjust [Advanced Settings](/docs/guides/database/replication/etl-replication#advanced-settings) if needed
+
+## Troubleshooting
+
+If you notice issues with your ETL replication:
+
+1. **Check the publication**: Ensure your publication is properly configured and includes the tables you want to replicate
+2. **Verify credentials**: Confirm that destination credentials are still valid
+3. **Review error logs**: Use the **View logs** button to identify specific errors
+4. **Check destination capacity**: Ensure your destination can handle the data volume
+5. **Monitor database load**: High load on the source database can affect replication
+
+For more troubleshooting tips, see the [ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq).
+
+## Next steps
+
+- [Review ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq)
+- [Configure ETL Replication](/docs/guides/database/replication/etl-replication-setup)

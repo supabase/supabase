@@ -1,25 +1,46 @@
 ---
-title: ETL
-description: Replicate your Supabase database to external destinations
+id: 'etl-replication'
+title: 'ETL Replication'
+description: 'Automatically replicate your database to external destinations like BigQuery and Analytics Buckets.'
+subtitle: 'Supabase managed replication to external destinations.'
+sidebar_label: 'ETL Replication'
 ---
 
-ETL simplifies the process of syncing your data to an external destination. This could be another database, a data warehouse, or a specialized service such as customer management or business analytics software.
+ETL Replication is Supabase's managed solution for automatically syncing your data to external destinations. This could be a data warehouse, or a specialized service such as customer management or business analytics software.
 
-<Admonition type="caution">
+<Admonition type="note" label="Private Alpha">
 
-`ETL` is currently in private alpha.
+ETL Replication is currently in private alpha. Features and functionality may change. To join our early access program, send an email to product-ops@supabase.io.
 
 </Admonition>
 
-Syncing requires a source and a destination. The source is your Supabase database, defined in the [**Publications**](/dashboard/project/_/database/publications) section of the dashboard.
+<Admonition type="note">
 
-The destination is a third party location, defined in the [**Replication**](/dashboard/project/_/database/replication) section of the dashboard. See the [supported destinations](#destinations).
+This guide covers **ETL Replication**, Supabase's automated replication product. For manual replication using external tools, see [Manual Replication](/docs/guides/database/replication/manual-replication-setup). For deploying read-only databases across multiple regions, see [Read Replicas](/docs/guides/platform/read-replicas) instead.
+
+</Admonition>
+
+ETL Replication automatically syncs your data by configuring a source and a destination. The source is your Supabase database, defined in the [**Publications**](/dashboard/project/_/database/publications) section of the dashboard.
+
+The destination is an external location, defined in the [**Replication**](/dashboard/project/_/database/replication) section of the dashboard. See the [supported destinations](#destinations).
+
+## Getting started
+
+To set up ETL Replication:
+
+1. **[Create a publication](/docs/guides/database/replication/etl-replication-setup)** - Define which tables and changes to replicate
+2. **[Add a destination](#destinations)** - Configure where your data should be synced
+3. **[Monitor replication](/docs/guides/database/replication/etl-replication-monitoring)** - Track status and troubleshoot issues
+
+For common questions, see the [ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq).
 
 ## Sources
 
 Choose what data to sync by creating a publication in your database. A publication is a set of changes, filtered by table and change type.
 
-### Managing publications
+For detailed instructions on creating publications with SQL, see the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup).
+
+### Managing publications in the Dashboard
 
 1. Go to the [Database](/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Publications** in the sidebar.
@@ -106,7 +127,9 @@ Due to ingestion latency in BigQuery, there may be a delay in the data flow.
 
 ## Monitoring replication
 
-After setting up replication, data begins flowing within a few minutes. You can monitor the replication status and review any errors directly from the [Supabase Dashboard](/dashboard/project/_/database/replication) and clicking the **View status** button for a replication. In status view for the replication pipeline, you can also view logs by clicking the **View logs** button.
+After setting up replication, data begins flowing within a few minutes. You can monitor the replication status and review any errors directly from the [Supabase Dashboard](/dashboard/project/_/database/replication) by clicking the **View status** button for a replication. In the status view for the replication pipeline, you can also view logs by clicking the **View logs** button.
+
+For detailed monitoring instructions, see the [ETL Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring).
 
 ## Limitations
 
@@ -127,3 +150,9 @@ After setting up replication, data begins flowing within a few minutes. You can 
 - No generated columns support.
 - No support for changing schema in the source.
 - Tables should have a primary key set. Tables without a primary key will not be replicated. You can see in the sources list which tables don't have a primary key.
+
+## Next steps
+
+- [Set up ETL Replication](/docs/guides/database/replication/etl-replication-setup)
+- [Monitor ETL Replication](/docs/guides/database/replication/etl-replication-monitoring)
+- [Review ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq)

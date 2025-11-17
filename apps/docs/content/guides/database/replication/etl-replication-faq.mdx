@@ -1,0 +1,130 @@
+---
+id: 'etl-replication-faq'
+title: 'ETL Replication FAQ'
+description: 'Frequently asked questions about ETL replication.'
+subtitle: 'Common questions and answers about ETL replication.'
+sidebar_label: 'FAQ'
+---
+
+# What is ETL Replication?
+
+ETL (Extract, Transform, Load) Replication is Supabase's managed solution for automatically syncing your database to external destinations. Unlike manual replication where you configure third-party tools yourself, ETL Replication is fully managed by Supabase and configured through the Dashboard.
+
+# How does ETL Replication differ from manual replication?
+
+| Feature | ETL Replication | Manual Replication |
+|---------|----------------|-------------------|
+| **Setup** | Configured through Dashboard | Requires external tools and manual configuration |
+| **Management** | Fully managed by Supabase | You manage the replication tools |
+| **Destinations** | Specific supported destinations | Any destination that supports Postgres logical replication |
+| **Monitoring** | Built-in Dashboard monitoring | Depends on your chosen tool |
+| **Pricing** | Included with project | May incur costs from third-party tools |
+
+# What destinations are currently supported?
+
+ETL Replication currently supports:
+- **BigQuery**: Google's data warehouse
+- **Analytics Buckets**: Supabase Analytics storage
+
+More destinations will be added in the future. For other destinations, use [Manual Replication](/docs/guides/database/replication/manual-replication-setup).
+
+# Can I replicate specific tables or all tables?
+
+Yes, you control what data is replicated by creating a [publication](/docs/guides/database/replication/etl-replication-setup#step-1-create-a-publication). You can create publications for:
+- A single table
+- All tables in a schema
+- All tables in your database
+
+# Can I filter which operations are replicated?
+
+Yes, when creating a publication, you can specify which operations to replicate (INSERT, UPDATE, DELETE). By default, all operations are replicated.
+
+However, ETL Replication requires all event types to be enabled. You cannot filter specific operations for ETL destinations.
+
+# What are the current limitations?
+
+ETL Replication has several limitations:
+
+- **TOASTed values**: Limited to 10MB (tables with TOAST columns should have replica identity set to full)
+- **Custom data types**: Not supported
+- **Event filtering**: No support for picking specific event types (all INSERT, UPDATE, DELETE events are required)
+- **Column lists and row filters**: Not supported
+- **Partitioned tables**: Not supported
+- **Generated columns**: Not supported
+- **Schema changes**: No support for altering schemas in the source
+- **Primary keys**: Tables must have a primary key set
+
+For more details, see the [ETL Replication limitations](/docs/guides/database/replication/etl-replication#limitations).
+
+# How do I know if my replication is working?
+
+You can monitor your replication status by:
+1. Going to [Database](/dashboard/project/_/database/replication) → **ETL Replication**
+2. Checking the status indicator on your destination
+3. Clicking **View status** to see detailed information and logs
+
+See the [Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring) for more details.
+
+# Why is my table not being replicated?
+
+Common reasons include:
+- The table is not included in your publication
+- The table doesn't have a primary key
+- The table contains unsupported data types
+- The table is a partitioned table
+
+Check your publication settings and the [limitations](#what-are-the-current-limitations) to ensure your table is supported.
+
+# How long does it take for data to appear in the destination?
+
+Data appears in near real-time, typically within seconds to a few minutes. However:
+- Initial syncs for large tables may take longer
+- Some destinations (like BigQuery) have ingestion latency
+- Network conditions can affect replication speed
+
+Monitor the replication lag in the [status view](/docs/guides/database/replication/etl-replication-monitoring#viewing-detailed-status-and-logs) to see the current delay.
+
+# Can I pause or stop replication?
+
+Yes, you can pause or delete a replication destination:
+- To pause: Use the pause button in the ETL Replication dashboard
+- To stop completely: Delete the destination from the dashboard
+
+Note that pausing replication will cause data to queue up, which may consume WAL space on your database.
+
+# What happens if replication fails?
+
+If replication fails:
+1. The status will change to **Error** in the dashboard
+2. You'll see error details in the status view
+3. Failed events will be retried automatically
+4. You can view detailed error logs by clicking **View logs**
+
+If errors persist, check the [troubleshooting guide](/docs/guides/database/replication/etl-replication-monitoring#troubleshooting).
+
+# How do I change which tables are replicated?
+
+To add or remove tables from replication:
+1. Modify your publication using SQL (see [setup guide](/docs/guides/database/replication/etl-replication-setup#adding-tables-to-an-existing-publication))
+2. Or create a new publication with the desired tables
+3. Update your destination to use the new publication
+
+# Can I use ETL Replication with Read Replicas?
+
+ETL Replication and [Read Replicas](/docs/guides/platform/read-replicas) are different features:
+- **ETL Replication**: Syncs data to external destinations for analytics and integration
+- **Read Replicas**: Creates read-only Postgres databases in different regions for load balancing and latency reduction
+
+You can use both features on the same project.
+
+# Is ETL Replication available on all plans?
+
+ETL Replication is currently in private alpha. To join the early access program, send an email to product-ops@supabase.io.
+
+# How do I get help with ETL Replication?
+
+If you need assistance:
+1. Check the [setup guide](/docs/guides/database/replication/etl-replication-setup)
+2. Review the [monitoring guide](/docs/guides/database/replication/etl-replication-monitoring)
+3. Check this FAQ for common issues
+4. Contact support through the [Dashboard](/dashboard/support/new)
