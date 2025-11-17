@@ -155,7 +155,7 @@ const fetchAllRows = async ({
 
 const formatRowsForExport = (rows: Record<string, unknown>[], table: SupaTable) => {
   return rows.map((row) => {
-    const formattedRow = row
+    const formattedRow = { ...row }
     Object.keys(row).map((column) => {
       if (column === 'idx' && !table.columns.some((col) => col.name === 'idx')) {
         // When we fetch this data from the database, we automatically add an
