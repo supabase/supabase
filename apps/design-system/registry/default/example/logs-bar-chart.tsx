@@ -1,3 +1,5 @@
+'use client'
+
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 export default function LogsBarChartDemo() {

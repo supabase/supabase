@@ -672,19 +672,6 @@ export const SubscriptionPlanUpdateDialog = ({
                         </div>
                       ))}
                     </div>
-
-                    {currentPlanMeta.id === 'free' && selectedTier !== 'tier_free' && (
-                      <div className="mb-4">
-                        <Admonition type="note">
-                          <p>
-                            Please note: Existing support cases will remain in the Free support
-                            queue after your subscription is upgraded. For faster assistance under
-                            your new plan, please open a new support case once the upgrade is
-                            complete.
-                          </p>
-                        </Admonition>
-                      </div>
-                    )}
                   </div>
                 )}
           </div>

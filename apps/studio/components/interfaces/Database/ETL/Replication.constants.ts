@@ -5,5 +5,6 @@ export enum PipelineStatusName {
   STARTING = 'starting',
   STARTED = 'started',
   STOPPED = 'stopped',
+  STOPPING = 'stopping',
   UNKNOWN = 'unknown',
 }

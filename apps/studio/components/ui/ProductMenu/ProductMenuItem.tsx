@@ -38,7 +38,7 @@ const ProductMenuItem = ({
         >
           <span className="truncate flex-1">{name}</span>
           {label !== undefined && (
-            <Badge variant="warning" className="py-0 px-1.5 uppercase">
+            <Badge variant="warning" size="tiny">
               {label}
             </Badge>
           )}

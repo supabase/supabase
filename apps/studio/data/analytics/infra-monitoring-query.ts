@@ -14,6 +14,15 @@ export type InfraMonitoringAttribute =
   | 'disk_io_consumption'
   | 'pg_stat_database_num_backends'
   | 'supavisor_connections_active'
+  | 'realtime_connections_connected'
+  | 'realtime_channel_events'
+  | 'realtime_channel_db_events'
+  | 'realtime_channel_presence_events'
+  | 'realtime_channel_joins'
+  | 'realtime_authorization_rls_execution_time'
+  | 'realtime_payload_size'
+  | 'realtime_sum_connections_connected'
+  | 'realtime_replication_connection_lag'
 
 export type InfraMonitoringVariables = {
   projectRef?: string

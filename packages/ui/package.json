@@ -73,7 +73,7 @@
     "react-medium-image-zoom": "^5.2.4",
     "react-resizable-panels": "^2.1.4",
     "react-syntax-highlighter": "^15.6.6",
-    "recharts": "^2.12.7",
+    "recharts": "catalog:",
     "sonner": "^1.5.0",
     "tailwind-merge": "^1.13.2",
     "tailwindcss": "catalog:",

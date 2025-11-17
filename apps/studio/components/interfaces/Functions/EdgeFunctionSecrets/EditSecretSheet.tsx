@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { SubmitHandler, useForm, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
@@ -7,6 +7,7 @@ import z from 'zod'
 import { useParams } from 'common'
 import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
 import { ProjectSecret } from 'data/secrets/secrets-query'
+import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { Eye, EyeOff, X } from 'lucide-react'
 import { useLatest } from 'react-use'
 import {
@@ -73,7 +74,7 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
     })
   }
 
-  const { confirmOnClose, modal: closeConfirmationModal } = useConfirmOnClose({
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
     onClose,
   })
@@ -97,7 +98,7 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
           </Button>
         </SheetFooter>
       </SheetContent>
-      {closeConfirmationModal}
+      <CloseConfirmationModal {...closeConfirmationModalProps} />
     </Sheet>
   )
 }
@@ -211,58 +212,11 @@ const SecretField = ({ form }: SecretFieldProps): ReactNode => {
   )
 }
 
-type UseConfirmOnCloseParams = {
-  checkIsDirty: () => boolean
-  onClose: () => void
-}
-
-type ConfirmOnCloseReturn = {
-  confirmOnClose: () => void
-  modal: ReactNode
-}
-
-const useConfirmOnClose = ({
-  checkIsDirty,
-  onClose,
-}: UseConfirmOnCloseParams): ConfirmOnCloseReturn => {
-  const [visible, setVisible] = useState(false)
-
-  const confirmOnClose = useCallback(() => {
-    if (checkIsDirty()) {
-      setVisible(true)
-    } else {
-      onClose()
-    }
-  }, [checkIsDirty, onClose])
-
-  const onConfirm = () => {
-    setVisible(false)
-    onClose()
-  }
-
-  return {
-    confirmOnClose,
-    modal: (
-      <CloseConfirmationModal
-        visible={visible}
-        onClose={onConfirm}
-        onCancel={() => setVisible(false)}
-      />
-    ),
-  }
-}
-
-type CloseConfirmationModalProps = {
-  visible: boolean
-  onClose: () => void
-  onCancel: () => void
-}
-
 const CloseConfirmationModal = ({
   visible,
   onClose,
   onCancel,
-}: CloseConfirmationModalProps): ReactNode => {
+}: ConfirmOnCloseModalProps): ReactNode => {
   return (
     <ConfirmationModal
       visible={visible}
