@@ -1122,8 +1122,12 @@ export const database: NavMenuConstant = {
             },
             {
               name: 'Manual Replication',
-              url: '/guides/database/replication/manual-replication-setup',
+              url: '/guides/database/replication/manual-replication',
               items: [
+                {
+                  name: 'Overview',
+                  url: '/guides/database/replication/manual-replication',
+                },
                 {
                   name: 'Setting up',
                   url: '/guides/database/replication/manual-replication-setup',
@@ -1209,8 +1213,12 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'Manual Replication',
-          url: '/guides/database/replication/manual-replication-setup' as `/${string}`,
+          url: '/guides/database/replication/manual-replication' as `/${string}`,
           items: [
+            {
+              name: 'Overview',
+              url: '/guides/database/replication/manual-replication' as `/${string}`,
+            },
             {
               name: 'Setting up',
               url: '/guides/database/replication/manual-replication-setup' as `/${string}`,
