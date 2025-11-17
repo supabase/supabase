@@ -1,4 +1,4 @@
-import { ChevronRight, Database, Info, Loader2, Plus, RefreshCw } from 'lucide-react'
+import { Database, Info, Loader2, Plus, RefreshCw } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
@@ -13,8 +13,8 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Card,
+  CardFooter,
   CardHeader,
-  CardTitle,
   LoadingLine,
   Table,
   TableBody,
@@ -156,10 +156,9 @@ const SchemaFlowDiagram = ({
   }, [dotColor])
 
   return (
-    // Outer container
-    <div
+    <CardHeader
       ref={containerRef}
-      className="relative flex flex-col lg:flex-row items-start lg:items-center gap-8 lg:gap-24 border-b px-8 py-8"
+      className="relative flex flex-col lg:flex-row items-start lg:items-center gap-8 lg:gap-24 border-b px-8 py-8 space-y-0"
       role="img"
       aria-label={`Schema flow diagram showing ${sourceLabel} ${sourceType} schema connecting to ${targetLabel} Postgres schema`}
     >
@@ -308,7 +307,7 @@ const SchemaFlowDiagram = ({
         labelClassName={isPending ? 'text-foreground-muted' : 'text-foreground'}
         isPending={isPending}
       />
-    </div>
+    </CardHeader>
   )
 }
 
@@ -450,79 +449,6 @@ export const NamespaceWithTables = ({
           isPending={tables.length === 0}
         />
       )}
-      <CardHeader className="flex flex-row justify-between items-center px-4 py-5 space-y-0">
-        <CardTitle className="text-sm font-normal font-sans normal-case leading-none flex flex-row items-center gap-x-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="flex flex-row items-center gap-x-1 text-foreground-lighter">
-                {sourceType === 'direct' ? namespace : 'public'}
-                <ChevronRight size={12} className="text-foreground-muted" />
-              </span>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">
-              <p>{sourceType === 'direct' ? 'Analytics' : 'Postgres'} schema</p>
-            </TooltipContent>
-          </Tooltip>
-          {validSchema && (
-            <Tooltip>
-              <TooltipTrigger
-                asChild
-                className={tables.length === 0 ? `flex flex-row items-center gap-x-1` : undefined}
-              >
-                <span
-                  className={
-                    tables.length > 0
-                      ? `text-foreground`
-                      : `text-foreground-muted flex flex-row items-center gap-x-1`
-                  }
-                >
-                  {displaySchema}
-                  {tables.length === 0 && <Info size={12} />}
-                </span>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p>Postgres schema{tables.length === 0 && ' that will be created'}</p>
-              </TooltipContent>
-            </Tooltip>
-          )}
-        </CardTitle>
-
-        <div className="flex flex-row gap-x-6">
-          {pollIntervalNamespaceTables > 0 && (
-            <Tooltip>
-              <TooltipTrigger>
-                <div className="flex items-center gap-x-2 text-foreground-lighter">
-                  <Loader2 size={14} className="animate-spin" />
-                  <p className="text-sm">
-                    Connecting {publicationTablesNotSyncedToNamespaceTables.length} table
-                    {publicationTablesNotSyncedToNamespaceTables.length > 1 ? 's' : ''}
-                  </p>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" align="end">
-                <p className="mb-1">Waiting for namespace table to be created for:</p>
-                <ul className="list-disc pl-6">
-                  {publicationTablesNotSyncedToNamespaceTables.map((x) => {
-                    const value = `${x.schema}.${x.name}`
-                    return <li key={value}>{value}</li>
-                  })}
-                </ul>
-              </TooltipContent>
-            </Tooltip>
-          )}
-          {missingTables.length > 0 && (
-            <Button
-              type={schema ? 'default' : 'warning'}
-              size="tiny"
-              icon={schema ? <RefreshCw /> : <Plus size={14} />}
-              onClick={() => (schema ? rescanNamespace() : setImportForeignSchemaShown(true))}
-              loading={isImportingForeignSchema || isLoadingNamespaceTables}
-            >
-              {schema ? 'Sync tables' : `Connect to table${missingTables.length > 1 ? 's' : ''}`}
-            </Button>
-          )}
-        </div>
-      </CardHeader>
 
       {pollIntervalNamespaceTables > 0 && <LoadingLine loading />}
 
@@ -573,6 +499,45 @@ export const NamespaceWithTables = ({
         visible={importForeignSchemaShown}
         onClose={() => setImportForeignSchemaShown(false)}
       />
+      {pollIntervalNamespaceTables > 0 ||
+        (missingTables.length > 0 && (
+          <CardFooter className="border-t px-4 py-4 flex flex-row justify-end gap-x-4">
+            <p className="text-sm text-foreground-lighter">Hello world</p>
+            {pollIntervalNamespaceTables > 0 && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="flex items-center gap-x-2 text-foreground-lighter">
+                    <Loader2 size={14} className="animate-spin" />
+                    <p className="text-sm">
+                      Connecting {publicationTablesNotSyncedToNamespaceTables.length} table
+                      {publicationTablesNotSyncedToNamespaceTables.length > 1 ? 's' : ''}
+                    </p>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" align="end">
+                  <p className="mb-1">Waiting for namespace table to be created for:</p>
+                  <ul className="list-disc pl-6">
+                    {publicationTablesNotSyncedToNamespaceTables.map((x) => {
+                      const value = `${x.schema}.${x.name}`
+                      return <li key={value}>{value}</li>
+                    })}
+                  </ul>
+                </TooltipContent>
+              </Tooltip>
+            )}
+            {missingTables.length > 0 && (
+              <Button
+                type={schema ? 'default' : 'warning'}
+                size="tiny"
+                icon={schema ? <RefreshCw /> : <Plus size={14} />}
+                onClick={() => (schema ? rescanNamespace() : setImportForeignSchemaShown(true))}
+                loading={isImportingForeignSchema || isLoadingNamespaceTables}
+              >
+                {schema ? 'Sync tables' : `Connect to table${missingTables.length > 1 ? 's' : ''}`}
+              </Button>
+            )}
+          </CardFooter>
+        ))}
     </Card>
   )
 }
