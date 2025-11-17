@@ -131,7 +131,6 @@ Check updates, changelogs, and release notes for each service to learn more.
 
 ### Postgres Meta
 - Updated to `v0.91.6` - [Release](https://github.com/supabase/postgres-meta/releases/tag/v0.91.6)
-- Performance: Fixed suboptimal tables query schema filter
 
 ### Analytics (Logflare)
 - Updated to `1.22.4` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.22.4)
