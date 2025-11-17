@@ -15,6 +15,8 @@ Check updates, changelogs, and release notes for each service to learn more.
 - Fixed PostgREST configuration UI and added [documentation for exposed queue schema](https://supabase.com/docs/guides/queues/expose-self-hosted-queues) - [PR #40078](https://github.com/supabase/supabase/pull/40078)
 - Fixed Studio showing paid options for log drains - [PR #40510](https://github.com/supabase/supabase/pull/40510)
 
+## [2025-11-17]
+
 ### Storage
 - Fixed resumable uploads for files larger than 6MB (requires `docker-compose.yml` update) - [PR #40500](https://github.com/supabase/supabase/pull/40500)
 
