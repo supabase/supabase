@@ -8,7 +8,7 @@ import { PipelineStatusName } from './Replication.constants'
 export const PIPELINE_ERROR_MESSAGES = {
   RETRIEVE_PIPELINE: 'Failed to retrieve pipeline information',
   RETRIEVE_PIPELINE_STATUS: 'Failed to retrieve pipeline status',
-  RETRIEVE_REPLICATION_STATUS: 'Failed to retrieve table replication status',
+  RETRIEVE_REPLICATION_STATUS: 'Failed to retrieve table streaming status',
   RETRIEVE_DESTINATIONS: 'Failed to retrieve destinations',
   ENABLE_DESTINATION: 'Failed to enable destination',
   DISABLE_DESTINATION: 'Failed to disable destination',
@@ -33,12 +33,12 @@ export const PIPELINE_ACTIONABLE_STATES = ['failed', 'started', 'stopped'] as Pi
 const PIPELINE_STATE_MESSAGES = {
   enabling: {
     title: 'Starting pipeline',
-    message: 'Starting the pipeline. Table replication will resume once running.',
+    message: 'Starting the pipeline. Data streaming will resume once running.',
     badge: 'Starting',
   },
   disabling: {
     title: 'Stopping pipeline',
-    message: 'Stopping the pipeline. Table replication will be paused once stopped.',
+    message: 'Stopping the pipeline. Data streaming will be paused once stopped.',
     badge: 'Stopping',
   },
   restarting: {
@@ -48,37 +48,37 @@ const PIPELINE_STATE_MESSAGES = {
   },
   failed: {
     title: 'Pipeline failed',
-    message: 'Replication has encountered an error.',
+    message: 'Data streaming has encountered an error.',
     badge: 'Failed',
   },
   stopped: {
     title: 'Pipeline stopped',
-    message: 'Replication is paused. Start the pipeline to resume data synchronization.',
+    message: 'Data streaming is paused. Start the pipeline to resume data synchronization.',
     badge: 'Stopped',
   },
   starting: {
     title: 'Pipeline starting',
-    message: 'Initializing replication. Table status will be available once running.',
+    message: 'Initializing data streaming. Table status will be available once running.',
     badge: 'Starting',
   },
   stopping: {
     title: 'Pipeline stopping',
-    message: 'Stopping replication. Table replication will be paused once stopped',
+    message: 'Stopping data streaming. Data transfer will be paused once stopped',
     badge: 'Stopping',
   },
   running: {
     title: 'Pipeline running',
-    message: 'Replication is active and processing data',
+    message: 'Data streaming is active and processing changes',
     badge: 'Running',
   },
   unknown: {
     title: 'Pipeline status unknown',
-    message: 'Unable to determine replication status.',
+    message: 'Unable to determine pipeline status.',
     badge: 'Unknown',
   },
   notRunning: {
     title: 'Pipeline not running',
-    message: 'Replication is not active. Start the pipeline to begin data synchronization.',
+    message: 'Data streaming is not active. Start the pipeline to begin data synchronization.',
     badge: 'Stopped',
   },
 } as const

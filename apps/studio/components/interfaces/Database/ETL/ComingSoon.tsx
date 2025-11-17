@@ -199,11 +199,11 @@ const CTANode = ({ projectRef }: { projectRef: string }) => {
     <Card className="w-[500px] p-6">
       <CardContent>
         <div className="flex items-center gap-x-2 justify-between mb-2">
-          <h2 className="text-lg">Replicate your data in real time</h2>
+          <h2 className="text-lg">Stream data to destinations in real-time</h2>
           <Badge variant="warning">Early Access</Badge>
         </div>
         <p className="text-foreground-light">
-          Stream database changes to multiple destinations - no manual exports, no lag. Limited
+          Stream database changes to multiple destinations with ETL replication - no manual exports, no lag. Limited
           rollout for external destinations has begun, read replicas available now.
         </p>
         <div className="flex items-center gap-x-2 mt-6">

@@ -131,7 +131,7 @@ export const Destinations = () => {
             <div className="flex flex-col gap-y-1">
               <h3>Stream data to external destinations in real-time</h3>
               <p className="text-sm text-foreground-light">
-                Enable replication to start sending your database changes to data warehouses and
+                Enable ETL replication to start streaming your database changes to data warehouses and
                 analytics platforms
               </p>
             </div>
