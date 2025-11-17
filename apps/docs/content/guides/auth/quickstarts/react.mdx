@@ -60,8 +60,26 @@ hideToc: true
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
-
   <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Declare Supabase Environment Variables">
+
+    Create `.env.local` and populate with your project's URL and Key.
+
+    <$Partial path="api_settings_steps.mdx" />
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```text name=.env.local
+      VITE_SUPABASE_URL=your-project-url
+      VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY=sb_publishable_... or anon key
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+  <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Set up your login component">
 
     <$Partial path="uiLibCta.mdx" />
@@ -235,7 +253,7 @@ hideToc: true
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={5}>
+  <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Customize email template">
 
     Before proceeding, change the email template to support support a server-side authentication flow that sends a token hash:
@@ -248,7 +266,7 @@ hideToc: true
 
     </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={6}>
+  <StepHikeCompact.Step step={7}>
     <StepHikeCompact.Details title="Start the app">
 
       Start the app, go to http://localhost:5173 in a browser, and open the browser console and you should be able to log in.
