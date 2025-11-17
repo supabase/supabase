@@ -7,7 +7,8 @@ import { useParams } from 'common/hooks'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
-import { copyToClipboard, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { copyToClipboard, TableCell, TableRow } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
 
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
@@ -77,16 +78,11 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
         </p>
       </TableCell>
       <TableCell className="lg:table-cell">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex items-center space-x-2">
-              <p className="text-sm text-foreground-light">{dayjs(item.updated_at).fromNow()}</p>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            Last updated on {dayjs(item.updated_at).format('DD MMM, YYYY HH:mm')}
-          </TooltipContent>
-        </Tooltip>
+        <TimestampInfo
+          className="text-sm text-foreground-light"
+          utcTimestamp={item.updated_at}
+          label={dayjs(item.updated_at).fromNow()}
+        />
       </TableCell>
       <TableCell className="lg:table-cell">
         <p className="text-foreground-light">{item.version}</p>

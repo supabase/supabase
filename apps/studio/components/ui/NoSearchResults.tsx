@@ -32,5 +32,3 @@ export const NoSearchResults = ({
     </div>
   )
 }
-
-export default NoSearchResults

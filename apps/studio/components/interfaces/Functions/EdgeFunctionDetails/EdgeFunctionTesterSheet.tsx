@@ -5,6 +5,7 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
@@ -87,7 +88,8 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
   const [response, setResponse] = useState<ResponseData | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef })
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })

@@ -1,0 +1,31 @@
+---
+title: Page Container
+description: A container component that provides consistent max-width and padding based on size variants.
+fragment: true
+---
+
+<ComponentPreview
+  name="page-container-demo"
+  description="Container with default size (1200px max-width)"
+  peekCode
+  wide
+/>
+
+## Usage
+
+```tsx
+import { PageContainer } from 'ui-patterns/PageContainer'
+```
+
+```tsx
+<PageContainer size="default">{/* Page content */}</PageContainer>
+```
+
+## Size Variants
+
+The `PageContainer` supports four size variants:
+
+- `small` - max-width: 768px
+- `default` - max-width: 1200px
+- `large` - max-width: 1600px
+- `full` - no max-width constraint

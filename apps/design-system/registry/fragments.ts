@@ -19,4 +19,22 @@ export const fragments: Registry = [
     files: ['/Dialogs/ConfirmDialog.tsx'],
     optionalPath: '/Dialogs',
   },
+  {
+    name: 'PageContainer',
+    type: 'components:fragment',
+    files: ['/PageContainer/index.tsx'],
+    optionalPath: '/PageContainer',
+  },
+  {
+    name: 'PageHeader',
+    type: 'components:fragment',
+    files: ['/PageHeader/index.tsx'],
+    optionalPath: '/PageHeader',
+  },
+  {
+    name: 'PageSection',
+    type: 'components:fragment',
+    files: ['/PageSection/index.tsx'],
+    optionalPath: '/PageSection',
+  },
 ]

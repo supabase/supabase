@@ -591,7 +591,7 @@ export function LogDrainDestinationSheetForm({
         <div className="mt-auto">
           <SheetSection
             className={cn(
-              `border-t bg-background-alternative-200 mt-auto py-1.5 ${!IS_PLATFORM ? 'hidden' : ''}`
+              `border-t bg-background-alternative-200 mt-auto py-1.5 ${!IS_PLATFORM && 'hidden'}`
             )}
           >
             <ul className="text-right text-foreground-light divide-y divide-dashed text-sm">

@@ -42,6 +42,7 @@ We use Tailwind for styling.
     - 'text-warning' for calling out information that needs action
     - 'text-destructive' for calling out when something went wrong
 - When needing to apply typography styles, read @apps/studio/styles/typography.scss and use one of the available classes instead of hard coding classes e.g. use "heading-default" instead of "text-sm font-medium"
+- When applying focus styles for keyboard navigation, read @apps/studio/styles/focus.scss for any appropriate classes for consistency with other focus styles
 
 ## Page structure
 
