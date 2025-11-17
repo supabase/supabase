@@ -2,6 +2,7 @@ import { Lock, Paintbrush, PlusCircle, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { DeleteQueue } from 'components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
@@ -37,7 +38,10 @@ export const QueueTab = () => {
 
   const [openRlsPopover, setOpenRlsPopover] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
-  const [sendMessageModalShown, setSendMessageModalShown] = useState(false)
+  const [sendMessageModalShown, setSendMessageModalShown] = useQueryState(
+    'new-message',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   const [purgeQueueModalShown, setPurgeQueueModalShown] = useState(false)
   const [deleteQueueModalShown, setDeleteQueueModalShown] = useState(false)
   const [selectedTypes, setSelectedTypes] = useState<QUEUE_MESSAGE_TYPE[]>([])
