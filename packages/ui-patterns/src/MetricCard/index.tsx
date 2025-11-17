@@ -240,7 +240,7 @@ const MetricCardSparkline = React.forwardRef<HTMLDivElement, MetricCardSparkline
 
     return (
       <div ref={ref} className={cn('w-full h-16 relative box-border', className)} {...props}>
-        <ResponsiveContainer width="100%" height="100%" className="relative">
+        <ResponsiveContainer width="100%" height="100%" className="relative z-10">
           <AreaChart data={data} margin={{ top: 5, left: 0, right: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="sparklineGradient" x1="0" y1="0" x2="0" y2="1">
@@ -260,7 +260,7 @@ const MetricCardSparkline = React.forwardRef<HTMLDivElement, MetricCardSparkline
           </AreaChart>
         </ResponsiveContainer>
         {hasTimestamp && (
-          <div className="text-brand bottom-1 left-3 right-3 absolute flex items-center justify-between text-[10px] font-mono">
+          <div className="text-brand bottom-1 left-3 right-3 absolute z-0 flex items-center justify-between text-[10px] font-mono">
             <span>{startDate}</span>
             <span>{endDate}</span>
           </div>
