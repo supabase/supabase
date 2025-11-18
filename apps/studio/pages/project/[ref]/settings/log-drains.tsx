@@ -52,7 +52,10 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   const { hasAccess: hasAccessToLogDrains, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('log_drains')
 
-  const { data: logDrains } = useLogDrainsQuery({ ref }, { enabled: !isLoadingEntitlement && hasAccessToLogDrains })
+  const { data: logDrains } = useLogDrainsQuery(
+    { ref },
+    { enabled: !isLoadingEntitlement && hasAccessToLogDrains }
+  )
 
   const { mutate: createLogDrain, isLoading: createLoading } = useCreateLogDrainMutation({
     onSuccess: () => {

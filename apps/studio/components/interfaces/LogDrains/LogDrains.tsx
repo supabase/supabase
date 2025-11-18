@@ -83,7 +83,6 @@ export function LogDrains({
     return <LogDrainsEmpty />
   }
 
-
   if (!isLoading && !hasLogDrains) {
     return (
       <>
