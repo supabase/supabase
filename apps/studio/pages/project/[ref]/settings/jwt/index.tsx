@@ -1,4 +1,5 @@
 import JWTSettings from 'components/interfaces/JwtSecrets/jwt-settings'
+import JWTSettingsLocalState from 'components/interfaces/JwtSecrets/jwt-settings-local-state'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import JWTKeysLayout from 'components/layouts/JWTKeys/JWTKeysLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
@@ -6,7 +7,7 @@ import type { NextPageWithLayout } from 'types'
 
 import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from 'components/interfaces/JwtSecrets/jwt.constants'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
@@ -54,11 +55,7 @@ const JWTKeysLegacyPage: NextPageWithLayout = () => {
     return <UnknownInterface urlBack={`/project/${projectRef}/settings/jwt/signing-keys`} />
   }
 
-  return (
-    <JWTKeysLayout>
-      <JWTSettings />
-    </JWTKeysLayout>
-  )
+  return <JWTKeysLayout>{IS_PLATFORM ? <JWTSettings /> : <JWTSettingsLocalState />}</JWTKeysLayout>
 }
 
 JWTKeysLegacyPage.getLayout = (page) => (
