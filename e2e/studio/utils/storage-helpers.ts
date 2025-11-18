@@ -2,11 +2,6 @@ import { expect, Page } from '@playwright/test'
 import { waitForApiResponse } from './wait-for-response'
 import { toUrl } from './to-url'
 
-export const navigateToStorageFiles = async (page: Page, ref: string) => {
-  await page.goto(toUrl(`/project/${ref}/storage/files`))
-  await page.waitForLoadState('networkidle')
-}
-
 /**
  * Dismisses any visible toast notifications
  */
@@ -16,6 +11,17 @@ export const dismissToastsIfAny = async (page: Page) => {
   for (let i = 0; i < count; i++) {
     await closeButtons.nth(i).click()
   }
+}
+
+/**
+ * Navigates to a specific bucket
+ * @param page - Playwright page instance
+ * @param ref - Project reference
+ * @param bucketName - Name of the bucket to navigate to
+ */
+export const navigateToStorageFiles = async (page: Page, ref: string) => {
+  await page.goto(toUrl(`/project/${ref}/storage/files`))
+  await page.waitForLoadState('networkidle')
 }
 
 /**
@@ -74,8 +80,6 @@ export const createBucket = async (
  * @param bucketName - Name of the bucket to delete
  */
 export const deleteBucket = async (page: Page, ref: string, bucketName: string) => {
-  await navigateToStorageFiles(page, ref)
-
   // Check if bucket exists
   const bucketRow = page.getByRole('row').filter({ hasText: bucketName })
   if ((await bucketRow.count()) === 0) return
@@ -240,34 +244,6 @@ export const renameItem = async (page: Page, oldName: string, newName: string) =
 }
 
 /**
- * Moves a file or folder to a different location
- * Note: Move functionality may vary - test this function carefully
- * @param page - Playwright page instance
- * @param itemName - Name of the item to move
- * @param targetFolder - Name of the target folder
- */
-export const moveItem = async (page: Page, itemName: string, targetFolder: string) => {
-  // Note: Move operations weren't fully tested in the exploration
-  // This is a placeholder that may need adjustment
-  throw new Error('moveItem function needs to be tested and updated')
-}
-
-/**
- * Navigates into a folder
- * @param page - Playwright page instance
- * @param folderName - Name of the folder to navigate into
- */
-export const navigateToFolder = async (page: Page, folderName: string) => {
-  // Click on the folder in the breadcrumb navigation or double-click
-  const folder = page.getByTitle(folderName)
-  await expect(folder, `Folder ${folderName} should be visible`).toBeVisible()
-  await folder.dblclick()
-
-  // Wait for navigation to complete
-  await page.waitForTimeout(1500)
-}
-
-/**
  * Downloads a file and returns the download object
  * @param page - Playwright page instance
  * @param fileName - Name of the file to download
@@ -287,4 +263,25 @@ export const downloadFile = async (page: Page, fileName: string) => {
   expect(download.suggestedFilename()).toContain(fileName)
 
   return download
+}
+
+export const deleteAllBuckets = async (page: Page, ref: string) => {
+  await navigateToStorageFiles(page, ref)
+
+  // Keep deleting until no more buckets exist
+  while (true) {
+    const tableRows = await page.getByRole('row').all()
+    // First row is header, so if only 1 row exists, no buckets remain
+    if (tableRows.length <= 1) break
+
+    // Get the first bucket row (skip header at index 0)
+    const firstBucketRow = tableRows[1]
+    // Get the first cell which should contain the bucket name
+    const firstCell = firstBucketRow.locator('td').first()
+    const bucketName = await firstCell.textContent()
+
+    if (!bucketName || bucketName.trim() === '') break
+
+    await deleteBucket(page, ref, bucketName.trim())
+  }
 }

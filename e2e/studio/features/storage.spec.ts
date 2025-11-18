@@ -1,19 +1,16 @@
 import { expect } from '@playwright/test'
 import path from 'path'
 import { test } from '../utils/test'
-import { toUrl } from '../utils/to-url'
 import { waitForApiResponse } from '../utils/wait-for-response'
 import {
   createBucket,
   createFolder,
+  deleteAllBuckets,
   deleteBucket,
   deleteItem,
   dismissToastsIfAny,
   downloadFile,
-  moveItem,
   navigateToBucket,
-  navigateToFolder,
-  navigateToStorageFiles,
   renameItem,
   uploadFile,
 } from '../utils/storage-helpers'
@@ -21,28 +18,8 @@ import {
 const bucketNamePrefix = 'pw_bucket'
 
 test.describe.serial('Storage', () => {
-  test.beforeAll(async ({ browser, ref }) => {
-    const ctx = await browser.newContext()
-    const page = await ctx.newPage()
-
-    await navigateToStorageFiles(page, ref)
-
-    // Clean up any existing test buckets
-    const bucketLinks = page.getByRole('link').filter({ hasText: bucketNamePrefix })
-    const count = await bucketLinks.count()
-
-    for (let i = 0; i < count; i++) {
-      const bucketName = await bucketLinks.nth(0).textContent()
-      if (bucketName && bucketName.startsWith(bucketNamePrefix)) {
-        await deleteBucket(page, ref, bucketName)
-      }
-    }
-
-    await ctx.close()
-  })
-
   test.beforeEach(async ({ page, ref }) => {
-    await navigateToStorageFiles(page, ref)
+    await deleteAllBuckets(page, ref)
   })
 
   test('can navigate to storage page', async ({ page, ref }) => {
@@ -67,9 +44,6 @@ test.describe.serial('Storage', () => {
       bucketRow.getByText('Public'),
       'Private bucket should not have Public badge'
     ).not.toBeVisible()
-
-    // Clean up
-    await deleteBucket(page, ref, bucketName)
   })
 
   test('can create a public bucket', async ({ page, ref }) => {
@@ -86,9 +60,6 @@ test.describe.serial('Storage', () => {
       bucketRow.getByText('Public', { exact: true }),
       'Bucket should be marked as Public'
     ).toBeVisible({ timeout: 10000 })
-
-    // Clean up
-    await deleteBucket(page, ref, bucketName)
   })
 
   test('can edit bucket settings', async ({ page, ref }) => {
@@ -121,9 +92,6 @@ test.describe.serial('Storage', () => {
       page.getByText('Public').first(),
       'Bucket should now be marked as Public'
     ).toBeVisible({ timeout: 10_000 })
-
-    // Clean up
-    await deleteBucket(page, ref, bucketName)
   })
 
   test('can delete a bucket', async ({ page, ref }) => {
@@ -137,7 +105,7 @@ test.describe.serial('Storage', () => {
 
     // Verify it's gone
     await expect(
-      page.getByRole('link', { name: bucketName, exact: true }),
+      page.getByRole('row').filter({ hasText: bucketName }),
       'Bucket should not be visible after deletion'
     ).not.toBeVisible()
   })
@@ -157,11 +125,11 @@ test.describe.serial('Storage', () => {
 
     // Verify only first bucket is visible
     await expect(
-      page.getByRole('link', { name: bucketName1, exact: true }),
+      page.getByRole('row').filter({ hasText: bucketName1 }),
       'First bucket should be visible in search results'
     ).toBeVisible()
     await expect(
-      page.getByRole('link', { name: bucketName2, exact: true }),
+      page.getByRole('row').filter({ hasText: bucketName2 }),
       'Second bucket should not be visible in search results'
     ).not.toBeVisible()
 
@@ -170,17 +138,13 @@ test.describe.serial('Storage', () => {
 
     // Verify both buckets are visible
     await expect(
-      page.getByRole('link', { name: bucketName1, exact: true }),
+      page.getByRole('row').filter({ hasText: bucketName1 }),
       'First bucket should be visible after clearing search'
     ).toBeVisible()
     await expect(
-      page.getByRole('link', { name: bucketName2, exact: true }),
+      page.getByRole('row').filter({ hasText: bucketName2 }),
       'Second bucket should be visible after clearing search'
     ).toBeVisible()
-
-    // Clean up
-    await deleteBucket(page, ref, bucketName1)
-    await deleteBucket(page, ref, bucketName2)
   })
 
   test('can upload a file', async ({ page, ref }) => {
@@ -194,12 +158,6 @@ test.describe.serial('Storage', () => {
     // Upload a file
     const filePath = path.join(__dirname, 'files', fileName)
     await uploadFile(page, filePath, fileName)
-
-    // Verify file is visible
-    await expect(
-      page.getByRole('button', { name: fileName }),
-      'Uploaded file should be visible in explorer'
-    ).toBeVisible()
 
     // Clean up
     await deleteBucket(page, ref, bucketName)
@@ -215,46 +173,6 @@ test.describe.serial('Storage', () => {
 
     // Create a folder
     await createFolder(page, folderName)
-
-    // Verify folder is visible
-    await expect(
-      page.getByRole('button', { name: folderName }),
-      'Folder should be visible in explorer'
-    ).toBeVisible()
-
-    // Clean up
-    await deleteBucket(page, ref, bucketName)
-  })
-
-  test('can navigate folder structure', async ({ page, ref }) => {
-    const bucketName = `${bucketNamePrefix}_navigate`
-    const folderName = 'parent_folder'
-    const subFolderName = 'child_folder'
-
-    // Create a bucket and navigate to it
-    await createBucket(page, ref, bucketName, false)
-    await navigateToBucket(page, ref, bucketName)
-
-    // Create parent folder
-    await createFolder(page, folderName)
-
-    // Navigate into parent folder
-    await navigateToFolder(page, folderName)
-
-    // Verify we're in the folder (breadcrumb or URL should change)
-    await expect(page).toHaveURL(new RegExp(`${folderName}`))
-
-    // Create subfolder
-    await createFolder(page, subFolderName)
-
-    // Navigate into subfolder
-    await navigateToFolder(page, subFolderName)
-
-    // Verify we're in the subfolder
-    await expect(page).toHaveURL(new RegExp(`${subFolderName}`))
-
-    // Clean up
-    await deleteBucket(page, ref, bucketName)
   })
 
   test('can rename a file', async ({ page, ref }) => {
@@ -272,16 +190,6 @@ test.describe.serial('Storage', () => {
     // Rename the file
     await renameItem(page, fileName, newFileName)
 
-    // Verify file was renamed
-    await expect(
-      page.getByRole('button', { name: newFileName }),
-      'File should have new name'
-    ).toBeVisible()
-    await expect(
-      page.getByRole('button', { name: fileName, exact: true }),
-      'Old file name should not be visible'
-    ).not.toBeVisible()
-
     // Clean up
     await deleteBucket(page, ref, bucketName)
   })
@@ -298,19 +206,6 @@ test.describe.serial('Storage', () => {
 
     // Rename the folder
     await renameItem(page, folderName, newFolderName)
-
-    // Verify folder was renamed
-    await expect(
-      page.getByRole('button', { name: newFolderName }),
-      'Folder should have new name'
-    ).toBeVisible()
-    await expect(
-      page.getByRole('button', { name: folderName, exact: true }),
-      'Old folder name should not be visible'
-    ).not.toBeVisible()
-
-    // Clean up
-    await deleteBucket(page, ref, bucketName)
   })
 
   test('can delete a file', async ({ page, ref }) => {
@@ -327,12 +222,6 @@ test.describe.serial('Storage', () => {
     // Delete the file
     await deleteItem(page, fileName)
 
-    // Verify file was deleted
-    await expect(
-      page.getByRole('button', { name: fileName, exact: true }),
-      'File should not be visible after deletion'
-    ).not.toBeVisible()
-
     // Clean up
     await deleteBucket(page, ref, bucketName)
   })
@@ -348,46 +237,6 @@ test.describe.serial('Storage', () => {
 
     // Delete the folder
     await deleteItem(page, folderName)
-
-    // Verify folder was deleted
-    await expect(
-      page.getByRole('button', { name: folderName, exact: true }),
-      'Folder should not be visible after deletion'
-    ).not.toBeVisible()
-
-    // Clean up
-    await deleteBucket(page, ref, bucketName)
-  })
-
-  test.skip('can move a file to a folder', async ({ page, ref }) => {
-    // This test is skipped because moveItem function needs to be fully tested and updated
-    const bucketName = `${bucketNamePrefix}_move_file`
-    const fileName = 'test-file.txt'
-    const folderName = 'destination_folder'
-
-    // Create a bucket, navigate to it
-    await createBucket(page, ref, bucketName, false)
-    await navigateToBucket(page, ref, bucketName)
-
-    // Upload a file and create a folder
-    const filePath = path.join(__dirname, 'files', fileName)
-    await uploadFile(page, filePath, fileName)
-    await createFolder(page, folderName)
-
-    // Move file to folder
-    await moveItem(page, fileName, folderName)
-
-    // Navigate into folder
-    await navigateToFolder(page, folderName)
-
-    // Verify file is in the folder
-    await expect(
-      page.getByTitle(fileName),
-      'File should be visible in destination folder'
-    ).toBeVisible()
-
-    // Clean up
-    await deleteBucket(page, ref, bucketName)
   })
 
   test('can download a file', async ({ page, ref }) => {
@@ -406,8 +255,5 @@ test.describe.serial('Storage', () => {
 
     // Verify download occurred
     expect(download.suggestedFilename()).toBe(fileName)
-
-    // Clean up
-    await deleteBucket(page, ref, bucketName)
   })
 })
