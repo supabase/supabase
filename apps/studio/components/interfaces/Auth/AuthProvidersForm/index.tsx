@@ -2,11 +2,6 @@ import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
-import {
-  ScaffoldSection,
-  ScaffoldSectionDescription,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { ResourceList } from 'components/ui/Resource/ResourceList'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
@@ -18,6 +13,14 @@ import {
   Button,
   WarningIcon,
 } from 'ui'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { getPhoneProviderValidationSchema, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import type { Provider } from './AuthProvidersForm.types'
 import { ProviderForm } from './ProviderForm'
@@ -33,11 +36,16 @@ export const AuthProvidersForm = () => {
   } = useAuthConfigQuery({ projectRef })
 
   return (
-    <ScaffoldSection isFullWidth>
-      <ScaffoldSectionTitle>Auth Providers</ScaffoldSectionTitle>
-      <ScaffoldSectionDescription className="mb-4">
-        Authenticate your users through a suite of providers and login methods
-      </ScaffoldSectionDescription>
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Auth Providers</PageSectionTitle>
+          <PageSectionDescription>
+            Authenticate your users through a suite of providers and login methods
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
 
       {isError ? (
         <AlertError
@@ -115,6 +123,7 @@ export const AuthProvidersForm = () => {
           </ResourceList>
         </div>
       )}
-    </ScaffoldSection>
+    </PageSectionContent>
+  </PageSection>
   )
 }

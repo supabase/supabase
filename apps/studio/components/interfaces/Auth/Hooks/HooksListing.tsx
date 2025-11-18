@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
@@ -12,6 +11,14 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import {
+  PageSection,
+  PageSectionAside,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { AddHookDropdown } from './AddHookDropdown'
 import { CreateHookSheet } from './CreateHookSheet'
 import { HookCard } from './HookCard'
@@ -66,29 +73,38 @@ export const HooksListing = () => {
 
   if (isError) {
     return (
-      <ScaffoldSection isFullWidth>
-        <AlertError
-          error={authConfigError}
-          subject="Failed to retrieve auth configuration for hooks"
-        />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <AlertError
+            error={authConfigError}
+            subject="Failed to retrieve auth configuration for hooks"
+          />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   if (isLoading) {
     return (
-      <ScaffoldSection isFullWidth>
-        <GenericSkeletonLoader />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <GenericSkeletonLoader />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   return (
-    <ScaffoldSection isFullWidth>
-      <div className="flex justify-between items-center mb-4">
-        <ScaffoldSectionTitle>All hooks</ScaffoldSectionTitle>
-        <AddHookDropdown onSelectHook={setSelectedHook} />
-      </div>
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>All hooks</PageSectionTitle>
+        </PageSectionSummary>
+        <PageSectionAside>
+          <AddHookDropdown onSelectHook={setSelectedHook} />
+        </PageSectionAside>
+      </PageSectionMeta>
+      <PageSectionContent>
 
       {hooks.filter((h) => isValidHook(h)).length === 0 && (
         <div
@@ -178,6 +194,7 @@ export const HooksListing = () => {
           )}
         </div>
       </ConfirmationModal>
-    </ScaffoldSection>
+    </PageSectionContent>
+  </PageSection>
   )
 }

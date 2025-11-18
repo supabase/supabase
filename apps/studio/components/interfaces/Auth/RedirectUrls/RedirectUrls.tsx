@@ -11,11 +11,12 @@ import { DOCS_URL } from 'lib/constants'
 import { Button, Modal, ScrollArea, cn } from 'ui'
 import {
   PageSection,
+  PageSectionAside,
   PageSectionContent,
+  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-  PageSectionDescription,
 } from 'ui-patterns/PageSection'
 import { AddNewURLModal } from './AddNewURLModal'
 import { RedirectUrlList } from './RedirectUrlList'
@@ -72,17 +73,15 @@ export const RedirectUrls = () => {
     <PageSection>
       <PageSectionMeta>
         <PageSectionSummary>
-          <div className="flex items-center justify-between">
-            <div>
-              <PageSectionTitle>Redirect URLs</PageSectionTitle>
-              <PageSectionDescription>
-                URLs that auth providers are permitted to redirect to post authentication. Wildcards are
-                allowed, for example, https://*.domain.com
-              </PageSectionDescription>
-            </div>
-            <DocsButton href={`${DOCS_URL}/guides/auth/concepts/redirect-urls`} />
-          </div>
+          <PageSectionTitle>Redirect URLs</PageSectionTitle>
+          <PageSectionDescription>
+            URLs that auth providers are permitted to redirect to post authentication. Wildcards are
+            allowed, for example, https://*.domain.com
+          </PageSectionDescription>
         </PageSectionSummary>
+        <PageSectionAside>
+          <DocsButton href={`${DOCS_URL}/guides/auth/concepts/redirect-urls`} />
+        </PageSectionAside>
       </PageSectionMeta>
       <PageSectionContent>
 
