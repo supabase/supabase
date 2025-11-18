@@ -47,7 +47,7 @@ export const getUnifiedLogsISOStartEnd = (
 }
 
 export async function getUnifiedLogs(
-  { projectRef, search, pageParam }: UnifiedLogsVariables & { pageParam?: PageParam },
+  { projectRef, search, pageParam }: UnifiedLogsVariables & { pageParam: PageParam | null },
   signal?: AbortSignal,
   headersInit?: HeadersInit
 ) {
@@ -170,12 +170,11 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
     keepPreviousData: true,
     getPreviousPageParam: (firstPage) => {
       if (!firstPage.prevCursor) return null
-      const result = { cursor: firstPage.prevCursor, direction: 'prev' }
-      return result
+      return { cursor: firstPage.prevCursor, direction: 'prev' } as const
     },
     getNextPageParam(lastPage) {
       if (!lastPage.nextCursor || lastPage.data.length === 0) return null
-      return { cursor: lastPage.nextCursor, direction: 'next' }
+      return { cursor: lastPage.nextCursor, direction: 'next' } as const
     },
     ...UNIFIED_LOGS_QUERY_OPTIONS,
     ...options,
