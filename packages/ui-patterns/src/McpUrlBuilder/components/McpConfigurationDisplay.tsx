@@ -3,10 +3,7 @@
 import { ExternalLink } from 'lucide-react'
 import Image from 'next/image'
 import yaml from 'js-yaml'
-<<<<<<< HEAD
 import { stringify as stringifyToml } from '@std/toml/stringify'
-=======
->>>>>>> 55d88c1661 (update configs for different clients)
 import { Button, cn } from 'ui'
 import { CodeBlock, type CodeBlockLang } from 'ui/src/components/CodeBlock'
 import type { McpClient, McpClientConfig, McpOnCopyCallback } from '../types'
@@ -42,7 +39,6 @@ export function McpConfigurationDisplay({
 
   // Extract file extension and determine format
   const fileExtension = selectedClient.configFile?.split('.').pop()?.toLowerCase()
-<<<<<<< HEAD
   // If the file extension is not 'json', 'yaml', or 'toml', default to 'txt'
   let configFormat: ConfigFormat | undefined
   if (['json', 'yaml', 'toml'].includes(fileExtension ?? '')) {
@@ -68,23 +64,6 @@ export function McpConfigurationDisplay({
   // Toml will default to undefined display language
   const displayLanguage: CodeBlockLang | undefined =
     configFormat === 'toml' ? undefined : configFormat
-=======
-  // If the file extension is not 'json' or 'yaml', default to 'txt'
-  let configFormat: CodeBlockLang
-  if (['json', 'yaml'].includes(fileExtension ?? '')) {
-    configFormat = fileExtension as CodeBlockLang
-  } else {
-    configFormat = 'txt'
-  }
-
-  // Serialize config based on format
-  const configValue =
-    configFormat === 'yaml'
-      ? yaml.dump(clientConfig, { indent: 2, lineWidth: -1 })
-      : configFormat === 'json'
-        ? JSON.stringify(clientConfig, null, 2)
-        : String(clientConfig)
->>>>>>> 55d88c1661 (update configs for different clients)
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -129,11 +108,7 @@ export function McpConfigurationDisplay({
 
       <CodeBlock
         value={configValue}
-<<<<<<< HEAD
         language={displayLanguage}
-=======
-        language={configFormat}
->>>>>>> 55d88c1661 (update configs for different clients)
         className="max-h-64 overflow-y-auto"
         focusable={false}
         onCopyCallback={() => onCopyCallback?.('config')}
