@@ -1,11 +1,16 @@
 import dayjs from 'dayjs'
 import { useMemo, useRef } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { APIKeysData, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
+import type { APIKeysData } from 'data/api-keys/api-keys-query'
+import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { Card, EyeOffIcon } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import {
@@ -59,7 +64,7 @@ export const SecretAPIKeys = () => {
     isError: isErrorApiKeys,
   } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
 
-  const lastSeen = useLastSeen(projectRef!)
+  const lastSeen = useLastSeen(projectRef ?? '')
 
   const secretApiKeys = useMemo(
     () =>
@@ -70,6 +75,34 @@ export const SecretAPIKeys = () => {
   )
 
   const empty = secretApiKeys?.length === 0 && !isLoadingApiKeys && !isLoadingPermissions
+
+  // Track the ID being deleted to exclude it from error checking
+  const deletingAPIKeyIdRef = useRef<string | null>(null)
+
+  const { setValue: setAPIKeyToDelete, value: apiKeyToDelete } = useQueryStateWithSelect({
+    urlKey: 'delete',
+    select: (id: string) => (id ? secretApiKeys?.find((key) => key.id === id) : undefined),
+    enabled: !!secretApiKeys?.length,
+    onError: (_error, selectedId) =>
+      handleErrorOnDelete(deletingAPIKeyIdRef, selectedId, `API Key not found`),
+  })
+
+  const { mutate: deleteAPIKey, isLoading: isDeletingAPIKey } = useAPIKeyDeleteMutation({
+    onSuccess: () => {
+      toast.success(`Successfully deleted API key`)
+      setAPIKeyToDelete(null)
+    },
+    onError: () => {
+      deletingAPIKeyIdRef.current = null
+    },
+  })
+
+  const onDeleteAPIKey = (apiKey: Extract<APIKeysData[number], { type: 'secret' }>) => {
+    if (!projectRef) return console.error('Project ref is required')
+    if (!apiKey.id) return console.error('API key ID is required')
+    deletingAPIKeyIdRef.current = apiKey.id
+    deleteAPIKey({ projectRef, id: apiKey.id })
+  }
 
   return (
     <div className="pb-30">
@@ -118,7 +151,15 @@ export const SecretAPIKeys = () => {
             </TableHeader>
             <TableBody>
               {secretApiKeys.map((apiKey) => (
-                <APIKeyRow key={apiKey.id} apiKey={apiKey} lastSeen={lastSeen[apiKey.hash]} />
+                <APIKeyRow
+                  key={apiKey.id}
+                  apiKey={apiKey}
+                  lastSeen={lastSeen[apiKey.hash]}
+                  isDeleting={apiKeyToDelete?.id === apiKey.id && isDeletingAPIKey}
+                  onDelete={() => onDeleteAPIKey(apiKey)}
+                  setKeyToDelete={setAPIKeyToDelete}
+                  isDeleteModalOpen={apiKeyToDelete?.id === apiKey.id}
+                />
               ))}
             </TableBody>
           </Table>
