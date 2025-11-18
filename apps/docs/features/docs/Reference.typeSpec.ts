@@ -47,6 +47,7 @@ interface Comment {
   shortText?: string
   text?: string
   tags?: Array<{ tag: string; text: string }>
+  examples?: Array<{ id: string; name: string; code: string; response?: string }>
 }
 
 export interface FunctionParameterType {
@@ -204,6 +205,10 @@ interface CommentBlockTag {
    * An @ string, e.g., `@returns`
    */
   tag: string
+  /**
+   * Optional name for the tag, e.g., "Empty bucket" for @example tags
+   */
+  name?: string
   content: CommentKind[]
 }
 
@@ -225,12 +230,51 @@ function normalizeComment(original: TypedocComment | Comment | undefined): Comme
     comment.tags = original.modifierTags.map((tag) => ({ tag: tag.replace(/^@/, ''), text: '' }))
   }
 
+  // Extract @example tags from blockTags
+  if ('blockTags' in original && Array.isArray(original.blockTags)) {
+    const exampleTags = original.blockTags.filter((tag) => tag.tag === '@example')
+    if (exampleTags.length > 0) {
+      comment.examples = exampleTags.map((tag, index) => {
+        // Use the name if provided, otherwise generate a default name
+        const name = tag.name || `Example ${index + 1}`
+        // Convert name to kebab-case for id
+        const id = name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '')
+        // Join content to get the full text
+        const fullText = tag.content.map((part) => part.text).join('')
+
+        // Check if there's a "Response:" section and split it
+        const responseMatch = fullText.match(/\n\s*Response:\s*\n/i)
+        let code = fullText
+        let response: string | undefined = undefined
+
+        if (responseMatch) {
+          const splitIndex = responseMatch.index! + responseMatch[0].length
+          code = fullText.substring(0, responseMatch.index!).trim()
+          response = fullText.substring(splitIndex).trim()
+        }
+
+        return { id, name, code, response }
+      })
+    }
+  }
+
   return comment
 }
 
 export function parseTypeSpec() {
   const modules = (typeSpec.children ?? []).map(parseMod)
   return modules as Array<ModuleTypes>
+}
+
+function normalizeRefPath(path: string) {
+  return path.replace(/\.index(?=\.|$)/g, '').replace(/\.+/g, '.')
+}
+
+function buildRefPath(segments: Array<string>) {
+  return normalizeRefPath(segments.filter(Boolean).join('.'))
 }
 
 // Reading the type spec happens in several layers. The first layer is the
@@ -246,8 +290,9 @@ function parseMod(mod: (typeof typeSpec)['children'][number]) {
   // Build a map of nodes by their IDs for easy cross-referencing.
   const targetMap = new Map<number, any>()
   buildMap(mod, targetMap)
+  const processingRefs = new Set<number>()
 
-  parseModInternal(mod, targetMap, [], res)
+  parseModInternal(mod, targetMap, [], res, processingRefs)
 
   return res
 }
@@ -269,24 +314,31 @@ function parseModInternal(
   node: any,
   map: Map<number, any>,
   currentPath: Array<string>,
-  res: ModuleTypes
+  res: ModuleTypes,
+  processingRefs: Set<number>
 ) {
   let updatedPath: Array<string>
 
   switch ((node.kindString ?? node.variant)?.toLowerCase()) {
     case 'module':
       updatedPath = [...currentPath, node.name]
-      node.children?.forEach((child: any) => parseModInternal(child, map, updatedPath, res))
+      node.children?.forEach((child: any) =>
+        parseModInternal(child, map, updatedPath, res, processingRefs)
+      )
       return
     // Some libraries have undefined where others have Project or declaration // for the same type of top-level node.
     case 'project':
     case undefined:
       updatedPath = [...currentPath, node.name]
-      node.children?.forEach((child: any) => parseModInternal(child, map, updatedPath, res))
+      node.children?.forEach((child: any) =>
+        parseModInternal(child, map, updatedPath, res, processingRefs)
+      )
       return
     case 'class':
       updatedPath = [...currentPath, node.name]
-      node.children?.forEach((child: any) => parseModInternal(child, map, updatedPath, res))
+      node.children?.forEach((child: any) =>
+        parseModInternal(child, map, updatedPath, res, processingRefs)
+      )
       return
     case 'constructor':
       return parseConstructor(node, map, currentPath, res)
@@ -294,32 +346,77 @@ function parseModInternal(
       return parseMethod(node, map, currentPath, res)
     case 'interface':
       updatedPath = [...currentPath, node.name]
-      node.children?.forEach((child: any) => parseModInternal(child, map, updatedPath, res))
+      node.children?.forEach((child: any) =>
+        parseModInternal(child, map, updatedPath, res, processingRefs)
+      )
       return
     case 'declaration':
       if (node.kind === KIND_CLASS || node.kind === KIND_MODULE) {
         updatedPath = [...currentPath, node.name]
-        node.children?.forEach((child: any) => parseModInternal(child, map, updatedPath, res))
+        node.children?.forEach((child: any) =>
+          parseModInternal(child, map, updatedPath, res, processingRefs)
+        )
+      } else if (node.kind === KIND_INTERFACE) {
+        updatedPath = [...currentPath, node.name]
+        node.children?.forEach((child: any) =>
+          parseModInternal(child, map, updatedPath, res, processingRefs)
+        )
       } else if (node.kind === KIND_CONSTRUCTOR) {
         parseConstructor(node, map, currentPath, res)
       } else if (node.kind === KIND_METHOD) {
         return parseMethod(node, map, currentPath, res)
       } else if (node.kind === KIND_PROPERTY) {
-        if (node.type?.type === 'reference') {
-          const referent = map.get(node.type.target)
-          if (referent?.variant === 'declaration' && referent?.kind === KIND_INTERFACE) {
-            const children = referent?.children ?? []
-            updatedPath = [...currentPath, node.name]
-            children.forEach((child: any) => parseModInternal(child, map, updatedPath, res))
-          }
-        }
+        parsePropertyReference(node, map, currentPath, res, processingRefs)
       }
       return
     case 'property':
+      parsePropertyReference(node, map, currentPath, res, processingRefs)
+      return
     case 'reference':
     default:
       return
   }
+}
+
+function parsePropertyReference(
+  node: any,
+  map: Map<number, any>,
+  currentPath: Array<string>,
+  res: ModuleTypes,
+  processingRefs: Set<number>
+) {
+  const refType = node.type
+  if (refType?.type !== 'reference') {
+    return
+  }
+
+  const referent = map.get(refType.target ?? refType.id)
+  if (!referent) {
+    return
+  }
+
+  if (processingRefs.has(referent.id)) {
+    return
+  }
+
+  const isForwardedNamespace =
+    referent?.variant === 'declaration' &&
+    (referent.kind === KIND_INTERFACE ||
+      referent.kind === KIND_CLASS ||
+      referent.kind === KIND_MODULE)
+
+  if (!isForwardedNamespace) {
+    return
+  }
+
+  const parentPath =
+    currentPath.length > 0 && currentPath[currentPath.length - 1]?.startsWith('@supabase/')
+      ? currentPath
+      : currentPath.slice(0, -1)
+
+  processingRefs.add(referent.id)
+  parseModInternal(referent, map, parentPath, res, processingRefs)
+  processingRefs.delete(referent.id)
 }
 
 /**
@@ -347,7 +444,7 @@ function parseConstructor(
   currentPath: Array<string>,
   res: ModuleTypes
 ) {
-  const $ref = `${currentPath.join('.')}.constructor`
+  const $ref = buildRefPath([...currentPath, 'constructor'])
 
   const signature = node.signatures[0]
   if (!signature) return
@@ -370,7 +467,7 @@ function parseMethod(
   currentPath: Array<string>,
   res: ModuleTypes
 ) {
-  const $ref = `${currentPath.join('.')}.${node.name}`
+  const $ref = buildRefPath([...currentPath, node.name])
 
   const signature = node.signatures[0]
   if (!signature) return
@@ -886,4 +983,73 @@ function parseInternalProperty(elem: any, map: Map<number, any>, typeArguments?:
   }
 
   return res
+}
+
+/**
+ * Formats a type for display in method signatures
+ */
+function formatTypeForSignature(type: TypeDetails | undefined): string {
+  if (!type) return 'any'
+
+  switch (type.type) {
+    case 'intrinsic':
+      return type.name !== TYPESPEC_NODE_ANONYMOUS ? (type.name as string) : 'any'
+    case 'literal':
+      if ('value' in type) {
+        return type.value === null ? 'null' : `"${type.value}"`
+      }
+      return type.name !== TYPESPEC_NODE_ANONYMOUS ? (type.name as string) : 'any'
+    case 'nameOnly':
+      return type.name !== TYPESPEC_NODE_ANONYMOUS ? (type.name as string) : 'any'
+    case 'promise':
+      return `Promise<${formatTypeForSignature(type.awaited)}>`
+    case 'array':
+      return `${formatTypeForSignature(type.elemType)}[]`
+    case 'object':
+      return type.name !== TYPESPEC_NODE_ANONYMOUS ? (type.name as string) : 'object'
+    case 'function':
+      return 'Function'
+    case 'union':
+      if (type.subTypes && type.subTypes.length > 0) {
+        return type.subTypes.map((st) => formatTypeForSignature(st)).join(' | ')
+      }
+      return 'any'
+    case 'record':
+      return `Record<${formatTypeForSignature(type.keyType)}, ${formatTypeForSignature(type.valueType)}>`
+    case 'index signature':
+      return `{ [key: ${formatTypeForSignature(type.keyType)}]: ${formatTypeForSignature(type.valueType)} }`
+    default:
+      return 'any'
+  }
+}
+
+/**
+ * Formats a method signature for display (minimal version)
+ * Example: "signUp(credentials, password)" - shows only method name and param names
+ * Returns empty string for constructors (they're shown in the title already)
+ */
+export function formatMethodSignature(method: MethodTypes): string {
+  let methodName = method.name !== TYPESPEC_NODE_ANONYMOUS ? method.name : 'anonymous'
+
+  // Strip package/class prefix - keep only the method name after the last dot
+  const lastDotIndex = methodName.lastIndexOf('.')
+  if (lastDotIndex !== -1) {
+    methodName = methodName.substring(lastDotIndex + 1)
+  }
+
+  // Hide constructors - they're already shown in the title
+  if (methodName.toLowerCase() === 'constructor') {
+    return ''
+  }
+
+  // Format parameters - only names, no types
+  const params = method.params
+    .map((param) => {
+      const paramName = param.name !== TYPESPEC_NODE_ANONYMOUS ? param.name : 'arg'
+      const optional = param.isOptional ? '?' : ''
+      return `${paramName}${optional}`
+    })
+    .join(', ')
+
+  return `${methodName}(${params})`
 }
