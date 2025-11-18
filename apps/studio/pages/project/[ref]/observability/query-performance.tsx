@@ -14,7 +14,7 @@ import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
@@ -102,7 +102,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
 
 QueryPerformanceReport.getLayout = (page) => (
   <DefaultLayout>
-    <ReportsLayout title="Query performance">{page}</ReportsLayout>
+    <ObservabilityLayout title="Query performance">{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 

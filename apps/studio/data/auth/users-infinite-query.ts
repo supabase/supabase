@@ -53,7 +53,7 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
           projectRef,
           connectionString,
           sql: getPaginatedUsersSQL({
-            page: column ? undefined : pageParam,
+            page: column ? undefined : (pageParam as number),
             verified: filter,
             keywords,
             providers,
@@ -61,7 +61,7 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
             order: order ?? 'asc',
             limit: USERS_PAGE_LIMIT,
             column,
-            startAt: column ? pageParam : undefined,
+            startAt: column ? (pageParam as string) : undefined,
           }),
           queryKey: authKeys.usersInfinite(projectRef),
         },
