@@ -3,6 +3,7 @@ import { openai } from '@ai-sdk/openai'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 import { convertToModelMessages, stepCountIs, streamText } from 'ai'
 import { corsHeaders } from '../_shared/cors.ts'
+import { systemPrompt } from './prompt.ts'
 
 type ChatRequestBody = {
   messages?: unknown[]
@@ -85,7 +86,7 @@ Deno.serve(async (req) => {
       model: openai(modelId),
       messages: normalizedMessages,
       stopWhen: stepCountIs(5),
-      system: 'You are a helpful AI assistant.',
+      system: systemPrompt,
       tools,
       onFinish: async () => {
         // Close the MCP client when the stream is complete
