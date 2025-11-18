@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import { boolean, number, object, string } from 'yup'
 
 import { useParams } from 'common'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
@@ -38,6 +37,13 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 function determineMFAStatus(verifyEnabled: boolean, enrollEnabled: boolean) {
   return verifyEnabled ? (enrollEnabled ? 'Enabled' : 'Verify Enabled') : 'Disabled'
@@ -259,25 +265,31 @@ export const MfaAuthSettingsForm = () => {
 
   if (isError) {
     return (
-      <ScaffoldSection isFullWidth>
-        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   if (!canReadConfig) {
     return (
-      <ScaffoldSection isFullWidth>
-        <NoPermission resourceText="view auth configuration settings" />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <NoPermission resourceText="view auth configuration settings" />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   if (isLoading) {
     return (
-      <ScaffoldSection isFullWidth>
-        <GenericSkeletonLoader />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <GenericSkeletonLoader />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
@@ -296,12 +308,14 @@ export const MfaAuthSettingsForm = () => {
 
   return (
     <>
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">
-          Multi-Factor Authentication (MFA)
-        </ScaffoldSectionTitle>
-
-        <Form_Shadcn_ {...totpForm}>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Multi-Factor Authentication (MFA)</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Form_Shadcn_ {...totpForm}>
           <form onSubmit={totpForm.handleSubmit(onSubmitTotpForm)} className="space-y-4">
             <Card>
               <CardContent className="pt-6">
@@ -381,10 +395,16 @@ export const MfaAuthSettingsForm = () => {
             </Card>
           </form>
         </Form_Shadcn_>
-      </ScaffoldSection>
+      </PageSectionContent>
+    </PageSection>
 
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">SMS MFA</ScaffoldSectionTitle>
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>SMS MFA</PageSectionTitle>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
 
         <Form_Shadcn_ {...phoneForm}>
           <form
@@ -515,7 +535,8 @@ export const MfaAuthSettingsForm = () => {
             </Card>
           </form>
         </Form_Shadcn_>
-      </ScaffoldSection>
+      </PageSectionContent>
+    </PageSection>
 
       <ConfirmationModal
         visible={isConfirmationModalVisible}
@@ -584,7 +605,8 @@ export const MfaAuthSettingsForm = () => {
             </Card>
           </form>
         </Form_Shadcn_>
-      </ScaffoldSection>
+      </PageSectionContent>
+    </PageSection>
     </>
   )
 }

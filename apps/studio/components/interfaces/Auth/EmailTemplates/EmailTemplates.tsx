@@ -10,7 +10,6 @@ import { z } from 'zod'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { FEATURE_PREVIEWS } from 'components/interfaces/App/FeaturePreview/FeaturePreview.constants'
 import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -38,6 +37,13 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
 import { EmailRateLimitsAlert } from '../EmailRateLimitsAlert'
 import { slugifyTitle } from './EmailTemplates.utils'
@@ -124,30 +130,35 @@ export const EmailTemplates = () => {
   }, [authConfig])
 
   return (
-    <ScaffoldSection isFullWidth className="!pt-0">
-      {isError && (
-        <AlertError
-          className="mt-12"
-          error={authConfigError}
-          subject="Failed to retrieve auth configuration"
-        />
-      )}
-      {isLoading && (
-        <div className="w-[854px] mt-12">
-          <GenericSkeletonLoader />
-        </div>
-      )}
-      {isSuccess && (
-        <>
-          {builtInSMTP ? (
-            <div className="mt-12">
-              <EmailRateLimitsAlert />
-            </div>
-          ) : null}
-          {isSecurityNotificationsEnabled ? (
-            <div className="mt-12 space-y-12">
-              <div>
-                <ScaffoldSectionTitle className="mb-4">Authentication</ScaffoldSectionTitle>
+    <PageSection className="!pt-0">
+      <PageSectionContent>
+        {isError && (
+          <AlertError
+            className="mt-12"
+            error={authConfigError}
+            subject="Failed to retrieve auth configuration"
+          />
+        )}
+        {isLoading && (
+          <div className="w-[854px] mt-12">
+            <GenericSkeletonLoader />
+          </div>
+        )}
+        {isSuccess && (
+          <>
+            {builtInSMTP ? (
+              <div className="mt-12">
+                <EmailRateLimitsAlert />
+              </div>
+            ) : null}
+            {isSecurityNotificationsEnabled ? (
+              <div className="mt-12 space-y-12">
+                <div>
+                  <PageSectionMeta>
+                    <PageSectionSummary>
+                      <PageSectionTitle>Authentication</PageSectionTitle>
+                    </PageSectionSummary>
+                  </PageSectionMeta>
                 <Card>
                   {TEMPLATES_SCHEMAS.filter(
                     (t) => t.misc?.emailTemplateType === 'authentication'
@@ -178,7 +189,11 @@ export const EmailTemplates = () => {
               </div>
 
               <div>
-                <ScaffoldSectionTitle className="mb-4">Security</ScaffoldSectionTitle>
+                <PageSectionMeta>
+                  <PageSectionSummary>
+                    <PageSectionTitle>Security</PageSectionTitle>
+                  </PageSectionSummary>
+                </PageSectionMeta>
                 {!acknowledged && (
                   <Admonition showIcon={false} type="tip" className="relative mb-6">
                     <Tooltip>
@@ -339,6 +354,7 @@ export const EmailTemplates = () => {
           )}
         </>
       )}
-    </ScaffoldSection>
+    </PageSectionContent>
+  </PageSection>
   )
 }
