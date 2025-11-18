@@ -558,10 +558,14 @@ export const MfaAuthSettingsForm = () => {
         </p>
       </ConfirmationModal>
 
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">Enhanced MFA Security</ScaffoldSectionTitle>
-
-        <Form_Shadcn_ {...securityForm}>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Enhanced MFA Security</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Form_Shadcn_ {...securityForm}>
           <form onSubmit={securityForm.handleSubmit(onSubmitSecurityForm)} className="space-y-4">
             <Card>
               <CardContent className="pt-6">
