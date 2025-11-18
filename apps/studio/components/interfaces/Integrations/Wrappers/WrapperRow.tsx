@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { ChevronRight, Edit, ExternalLink, Table2, Trash } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { MutableRefObject, useState } from 'react'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -25,18 +25,31 @@ import { formatWrapperTables } from './Wrappers.utils'
 
 interface WrapperRowProps {
   wrapper: FDW
+  wrappers: FDW[]
+  selectedWrapperToEdit?: FDW
+  selectedWrapperToDelete?: FDW
+  setSelectedWrapperToEdit: (value: string | null) => void
+  setSelectedWrapperToDelete: (value: string | null) => void
+  deletingWrapperIdRef: MutableRefObject<string | null>
 }
 
-const WrapperRow = ({ wrapper }: WrapperRowProps) => {
+const WrapperRow = ({
+  wrapper,
+  wrappers,
+  selectedWrapperToEdit,
+  selectedWrapperToDelete,
+  setSelectedWrapperToEdit,
+  setSelectedWrapperToDelete,
+  deletingWrapperIdRef,
+}: WrapperRowProps) => {
   const { ref, id } = useParams()
   const { can: canManageWrappers } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'wrappers'
   )
 
-  const [editWrapperShown, setEditWrapperShown] = useState(false)
+  const editWrapperShown = selectedWrapperToEdit?.id === wrapper.id
   const [isClosingEditWrapper, setIsClosingEditWrapper] = useState(false)
-  const [deleteWrapperShown, setDeleteWrapperShown] = useState(false)
 
   const integration = INTEGRATIONS.find((i) => i.id === id)
 
@@ -138,7 +151,7 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
               type="default"
               icon={<Edit strokeWidth={1.5} />}
               className="px-1.5"
-              onClick={() => setEditWrapperShown(true)}
+              onClick={() => setSelectedWrapperToEdit(wrapper.id.toString())}
               tooltip={{
                 content: {
                   side: 'bottom',
@@ -153,7 +166,7 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
               disabled={!canManageWrappers}
               icon={<Trash strokeWidth={1.5} />}
               className="px-1.5"
-              onClick={() => setDeleteWrapperShown(true)}
+              onClick={() => setSelectedWrapperToDelete(wrapper.id.toString())}
               tooltip={{
                 content: {
                   side: 'bottom',
@@ -166,24 +179,34 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
           </div>
         </TableCell>
       </TableRow>
-      <Sheet open={editWrapperShown} onOpenChange={() => setIsClosingEditWrapper(true)}>
+      <Sheet
+        open={editWrapperShown}
+        onOpenChange={(open) => {
+          if (!open) {
+            setIsClosingEditWrapper(true)
+          }
+        }}
+      >
         <SheetContent size="lg" tabIndex={undefined}>
-          <EditWrapperSheet
-            wrapper={wrapper}
-            wrapperMeta={integration.meta}
-            onClose={() => {
-              setEditWrapperShown(false)
-              setIsClosingEditWrapper(false)
-            }}
-            isClosing={isClosingEditWrapper}
-            setIsClosing={setIsClosingEditWrapper}
-          />
+          {selectedWrapperToEdit && (
+            <EditWrapperSheet
+              wrapper={selectedWrapperToEdit}
+              wrapperMeta={integration.meta}
+              onClose={() => {
+                setSelectedWrapperToEdit(null)
+                setIsClosingEditWrapper(false)
+              }}
+              isClosing={isClosingEditWrapper}
+              setIsClosing={setIsClosingEditWrapper}
+            />
+          )}
         </SheetContent>
       </Sheet>
-      {deleteWrapperShown && (
+      {selectedWrapperToDelete && (
         <DeleteWrapperModal
-          selectedWrapper={wrapper}
-          onClose={() => setDeleteWrapperShown(false)}
+          selectedWrapper={selectedWrapperToDelete}
+          onClose={() => setSelectedWrapperToDelete(null)}
+          deletingWrapperIdRef={deletingWrapperIdRef}
         />
       )}
     </>
