@@ -875,8 +875,7 @@ function createStorageExplorerState({
           }
         })
 
-        // Increase batch size to 50 since Storage API doesn't throttle like Management API
-        const batchedPromises = chunk(promises, 50)
+        const batchedPromises = chunk(promises, 10)
         const downloadedFiles = await batchedPromises.reduce(
           async (previousPromise, nextBatch) => {
             const previousResults = await previousPromise
