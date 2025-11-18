@@ -10,7 +10,6 @@ export const generateDatabaseMenu = (
     pgNetExtensionExists: boolean
     pitrEnabled: boolean
     columnLevelPrivileges: boolean
-    enablePgReplicate: boolean
     showPgReplicate: boolean
     showRoles: boolean
     showWrappers: boolean
@@ -21,7 +20,6 @@ export const generateDatabaseMenu = (
     pgNetExtensionExists,
     pitrEnabled,
     columnLevelPrivileges,
-    enablePgReplicate,
     showPgReplicate,
     showRoles,
     showWrappers,

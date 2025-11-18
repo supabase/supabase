@@ -1,17 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTrack } from 'lib/telemetry/track'
 import { TrashIcon } from 'lucide-react'
+import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import { useTrack } from 'lib/telemetry/track'
 
 import { IS_PLATFORM, useFlag, useParams } from 'common'
-import Link from 'next/link'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { DOCS_URL } from 'lib/constants'
 import {
   Button,
+  cn,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -35,7 +36,6 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
-  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -91,6 +91,9 @@ const formUnion = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal('s3'),
+  }),
+  z.object({
+    type: z.literal('axiom'),
   }),
   z.object({
     type: z.literal('sentry'),
@@ -289,7 +292,7 @@ export function LogDrainDestinationSheetForm({
                 track('log_drain_save_button_clicked', {
                   destination: form.getValues('type') as Exclude<
                     LogDrainType,
-                    'elastic' | 'postgres' | 'bigquery' | 'clickhouse' | 's3'
+                    'elastic' | 'postgres' | 'bigquery' | 'clickhouse' | 's3' | 'axiom'
                   >,
                 })
               }}
@@ -316,7 +319,9 @@ export function LogDrainDestinationSheetForm({
                     <Select_Shadcn_
                       defaultValue={defaultType}
                       value={form.getValues('type')}
-                      onValueChange={(v: LogDrainType) => form.setValue('type', v)}
+                      onValueChange={(v: Exclude<LogDrainType, 'axiom'>) =>
+                        form.setValue('type', v)
+                      }
                     >
                       <SelectTrigger_Shadcn_>
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
