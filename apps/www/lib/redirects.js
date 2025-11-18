@@ -55,6 +55,11 @@ module.exports = [
     destination: '/storage',
   },
   {
+    permanent: true,
+    source: '/docs/guides/reports/:match*',
+    destination: '/docs/guides/observability/:match*',
+  },
+  {
     permanent: false,
     source: '/blog/2021/03/08/toad-a-link-shorterner-with-simple-apis-for-low-coders',
     destination: '/blog/2021/03/08/toad-a-link-shortener-with-simple-apis-for-low-coders',
