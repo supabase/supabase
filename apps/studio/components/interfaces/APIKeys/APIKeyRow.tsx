@@ -1,4 +1,4 @@
-import { APIKeysData } from 'data/api-keys/api-keys-query'
+import type { APIKeysData } from 'data/api-keys/api-keys-query'
 import { motion } from 'framer-motion'
 import { MoreVertical } from 'lucide-react'
 import {
@@ -9,69 +9,100 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { APIKeyDeleteDialog } from './APIKeyDeleteDialog'
 import { ApiKeyPill } from './ApiKeyPill'
 
 export const APIKeyRow = ({
   apiKey,
   lastSeen,
+  isDeleting,
+  onDelete,
+  setKeyToDelete,
+  isDeleteModalOpen,
 }: {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
   lastSeen?: { timestamp: string }
+  isDeleting: boolean
+  onDelete: () => void
+  setKeyToDelete: (id: string | null) => void
+  isDeleteModalOpen: boolean
 }) => {
   const MotionTableRow = motion.create(TableRow)
 
   return (
-    <MotionTableRow
-      layout
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: 'auto' }}
-      exit={{ opacity: 0, height: 0 }}
-      transition={{
-        type: 'spring',
-        stiffness: 500,
-        damping: 50,
-        mass: 1,
-      }}
-    >
-      <TableCell className="py-2">
-        <div className="flex flex-col">
-          <span className="font-medium">{apiKey.name}</span>
-          <div className="text-sm text-foreground-lighter">
-            {apiKey.description || <span className="text-foreground-muted">No description</span>}
+    <>
+      <MotionTableRow
+        layout
+        initial={{ opacity: 0, height: 0 }}
+        animate={{ opacity: 1, height: 'auto' }}
+        exit={{ opacity: 0, height: 0 }}
+        transition={{
+          type: 'spring',
+          stiffness: 500,
+          damping: 50,
+          mass: 1,
+        }}
+      >
+        <TableCell className="py-2">
+          <div className="flex flex-col">
+            <span className="font-medium">{apiKey.name}</span>
+            <div className="text-sm text-foreground-lighter">
+              {apiKey.description || <span className="text-foreground-muted">No description</span>}
+            </div>
           </div>
-        </div>
-      </TableCell>
-      <TableCell className="py-2">
-        <div className="flex flex-row gap-2">
-          <ApiKeyPill apiKey={apiKey} />
-        </div>
-      </TableCell>
+        </TableCell>
+        <TableCell className="py-2">
+          <div className="flex flex-row gap-2">
+            <ApiKeyPill apiKey={apiKey} />
+          </div>
+        </TableCell>
 
-      <TableCell className="py-2 min-w-0 whitespace-nowrap hidden lg:table-cell">
-        <div className="truncate" title={lastSeen?.timestamp || 'Never used'}>
-          {lastSeen?.timestamp ?? <span className="text-foreground-lighter">Never used</span>}
-        </div>
-      </TableCell>
+        <TableCell className="py-2 min-w-0 whitespace-nowrap hidden lg:table-cell">
+          <div className="truncate" title={lastSeen?.timestamp || 'Never used'}>
+            {lastSeen?.timestamp ?? <span className="text-foreground-lighter">Never used</span>}
+          </div>
+        </TableCell>
 
-      <TableCell className="py-2">
-        <div className="flex justify-end">
-          <DropdownMenu>
-            <DropdownMenuTrigger className="px-1 focus-visible:outline-none" asChild>
-              <Button
-                type="text"
-                size="tiny"
-                icon={
-                  <MoreVertical size="14" className="text-foreground-light hover:text-foreground" />
-                }
-              />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="max-w-40" align="end">
-              <APIKeyDeleteDialog apiKey={apiKey} lastSeen={lastSeen} />
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </TableCell>
-    </MotionTableRow>
+        <TableCell className="py-2">
+          <div className="flex justify-end">
+            <DropdownMenu>
+              <DropdownMenuTrigger className="px-1 focus-visible:outline-none" asChild>
+                <Button
+                  type="text"
+                  size="tiny"
+                  icon={
+                    <MoreVertical
+                      size="14"
+                      className="text-foreground-light hover:text-foreground"
+                    />
+                  }
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="max-w-40" align="end">
+                <APIKeyDeleteDialog apiKey={apiKey} setKeyToDelete={setKeyToDelete} />
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </TableCell>
+      </MotionTableRow>
+      <TextConfirmModal
+        visible={isDeleteModalOpen}
+        onCancel={() => setKeyToDelete(null)}
+        onConfirm={onDelete}
+        title={`Delete ${apiKey.type} API key: ${apiKey.name}`}
+        confirmString={apiKey.name}
+        confirmLabel="Yes, irreversibly delete this API key"
+        confirmPlaceholder="Type the name of the API key to confirm"
+        loading={isDeleting}
+        variant="destructive"
+        alert={{
+          title: 'This cannot be undone',
+          description: lastSeen
+            ? `This API key was used ${lastSeen.timestamp}. Make sure all backend components using it have been updated. Deletion will cause them to receive HTTP 401 Unauthorized status codes on all Supabase APIs.`
+            : `This API key has not been used in the past 24 hours. Make sure you've updated all backend components using it before deletion.`,
+        }}
+      />
+    </>
   )
 }
