@@ -113,10 +113,19 @@ export interface FactoryMcpConfig extends McpClientBaseConfig {
   }
 }
 
+export interface CodexMcpConfig {
+  mcp_servers: {
+    supabase: {
+      url: string
+    }
+  }
+}
+
 // Union of all possible config types
 export type McpClientConfig =
   | ClaudeCodeMcpConfig
   | ClaudeDesktopMcpConfig
+  | CodexMcpConfig
   | CursorMcpConfig
   | FactoryMcpConfig
   | GooseMcpConfig
@@ -134,6 +143,10 @@ export function isGooseMcpConfig(config: McpClientConfig): config is GooseMcpCon
   return 'extensions' in config && 'supabase' in config.extensions
 }
 
+export function isCodexMcpConfig(config: McpClientConfig): config is CodexMcpConfig {
+  return 'mcp_servers' in config && 'supabase' in config.mcp_servers
+}
+
 export function isMcpServersConfig(
   config: McpClientConfig
 ): config is McpClientBaseConfig | ClaudeCodeMcpConfig | FactoryMcpConfig {
@@ -147,6 +160,9 @@ export function getMcpUrl(config: McpClientConfig): string {
   }
   if (isGooseMcpConfig(config)) {
     return config.extensions.supabase.uri
+  }
+  if (isCodexMcpConfig(config)) {
+    return config.mcp_servers.supabase.url
   }
   if (isMcpServersConfig(config)) {
     return config.mcpServers.supabase.url
