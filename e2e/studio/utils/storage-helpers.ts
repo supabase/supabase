@@ -261,25 +261,19 @@ export const downloadFile = async (page: Page, fileName: string) => {
   // Wait for and return the download
   const download = await downloadPromise
   expect(download.suggestedFilename()).toContain(fileName)
-
-  return download
 }
 
 export const deleteAllBuckets = async (page: Page, ref: string) => {
   await navigateToStorageFiles(page, ref)
 
-  // Keep deleting until no more buckets exist
-  while (true) {
-    // Find all bucket rows by data-bucket-id attribute
-    const bucketRows = await page.locator('[data-bucket-id]').all()
+  // Find all bucket rows and collect their IDs
+  const bucketRows = await page.locator('[data-bucket-id]').all()
+  const bucketIds = await Promise.all(bucketRows.map((row) => row.getAttribute('data-bucket-id')))
 
-    if (bucketRows.length === 0) break
-
-    // Get the bucket ID from the first bucket row
-    const bucketId = await bucketRows[0].getAttribute('data-bucket-id')
-
-    if (!bucketId) break
-
-    await deleteBucket(page, ref, bucketId)
+  // Delete each bucket
+  for (const bucketId of bucketIds) {
+    if (bucketId) {
+      await deleteBucket(page, ref, bucketId)
+    }
   }
 }
