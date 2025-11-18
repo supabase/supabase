@@ -16,16 +16,6 @@ cd e2e/studio
 pnpm exec playwright install
 ```
 
-### Run a local Supabase instance
-
-Make sure you have Supabase CLI installed
-
-```bash
-cd e2e/studio
-
-supabase start
-```
-
 ---
 
 ## Running the tests

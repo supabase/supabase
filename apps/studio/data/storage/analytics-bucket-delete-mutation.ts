@@ -42,7 +42,7 @@ export const useAnalyticsBucketDeleteMutation = ({
     mutationFn: (vars) => deleteAnalyticsBucket(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(storageKeys.analyticsBuckets(projectRef))
+      await queryClient.invalidateQueries({ queryKey: storageKeys.analyticsBuckets(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

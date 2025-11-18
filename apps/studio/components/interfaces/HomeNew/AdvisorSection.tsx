@@ -30,7 +30,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
   const { mutate: sendEvent } = useSendEventMutation()
   const { data: organization } = useSelectedOrganizationQuery()
   const { openSidebar } = useSidebarManagerSnapshot()
-  const { setSelectedItemId } = useAdvisorStateSnapshot()
+  const { setSelectedItem } = useAdvisorStateSnapshot()
 
   const errorLints: Lint[] = useMemo(() => {
     return lints?.filter((lint) => lint.level === LINTER_LEVELS.ERROR) ?? []
@@ -67,7 +67,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
 
   const handleCardClick = useCallback(
     (lint: Lint) => {
-      setSelectedItemId(lint.cache_key)
+      setSelectedItem(lint.cache_key, 'lint')
       openSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
       if (projectRef && organization?.slug) {
         sendEvent({
@@ -84,7 +84,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
         })
       }
     },
-    [sendEvent, setSelectedItemId, openSidebar, projectRef, organization, totalErrors]
+    [sendEvent, setSelectedItem, openSidebar, projectRef, organization, totalErrors]
   )
 
   if (showEmptyState) {

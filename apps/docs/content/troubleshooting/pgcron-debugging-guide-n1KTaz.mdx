@@ -106,7 +106,7 @@ SELECT
 FROM pg_stat_activity where application_name ilike 'pg_cron';
 ```
 
-You can view your concurrent peak connection usage throughout the day at the bottom of the [Reports Dashboard](/dashboard/project/_/reports/database)
+You can view your concurrent peak connection usage throughout the day at the bottom of the [Observability Dashboard](/dashboard/project/_/observability/database)
 
 <br />
 
@@ -114,7 +114,7 @@ You can view your concurrent peak connection usage throughout the day at the bot
 
 Unfortunately, excessive resource strain can slow down or disrupt jobs.
 
-Go to the [reports page](/dashboard/project/_/reports/database) (or [Supabase Grafana](/docs/guides/monitoring-troubleshooting/metrics#deploying-supabase-grafana) if you have it setup), and check for signs of resource exhaustion. If it's clear your database is under pressure, consider upgrading your compute add-on or following the advice from one of the optimization guides:
+Go to the [reports page](/dashboard/project/_/observability/database) (or [Supabase Grafana](/docs/guides/monitoring-troubleshooting/metrics#deploying-supabase-grafana) if you have it setup), and check for signs of resource exhaustion. If it's clear your database is under pressure, consider upgrading your compute add-on or following the advice from one of the optimization guides:
 
 - [Connections](https://github.com/orgs/supabase/discussions/27141)
 - [Disk/IO](https://github.com/orgs/supabase/discussions/27003)

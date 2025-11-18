@@ -197,7 +197,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{`Edit bucket "${bucket?.name}"`}</DialogTitle>
+          <DialogTitle>{`Edit bucket “${bucket?.name}”`}</DialogTitle>
         </DialogHeader>
 
         <DialogSectionSeparator />

@@ -1,173 +1,183 @@
-import { ExternalLink, MoreVertical, Search, Trash2 } from 'lucide-react'
-import Link from 'next/link'
+import { ChevronRight, Search } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { useParams } from 'common'
 import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { AnalyticsBucket, useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
+import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
+import { Bucket as BucketIcon } from 'icons'
+import { BASE_PATH } from 'lib/constants'
 import {
-  Button,
   Card,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
-import { Admonition, TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { AlphaNotice } from '../AlphaNotice'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateAnalyticsBucketModal } from './CreateAnalyticsBucketModal'
-import { DeleteAnalyticsBucketModal } from './DeleteAnalyticsBucketModal'
 
 export const AnalyticsBuckets = () => {
   const { ref } = useParams()
+  const router = useRouter()
 
   const [filterString, setFilterString] = useState('')
-  const [selectedBucket, setSelectedBucket] = useState<AnalyticsBucket>()
-  const [modal, setModal] = useState<'edit' | 'empty' | 'delete' | null>(null)
 
-  const { data: buckets = [], isLoading: isLoadingBuckets } = useAnalyticsBucketsQuery({
+  const {
+    data: buckets = [],
+    error: bucketsError,
+    isError: isErrorBuckets,
+    isLoading: isLoadingBuckets,
+    isSuccess: isSuccessBuckets,
+  } = useAnalyticsBucketsQuery({
     projectRef: ref,
   })
 
   const analyticsBuckets = buckets.filter((bucket) =>
     filterString.length === 0 ? true : bucket.id.toLowerCase().includes(filterString.toLowerCase())
   )
+  const hasNoBuckets = buckets.length === 0
+
+  const handleBucketNavigation = (
+    bucketId: string,
+    event: React.MouseEvent | React.KeyboardEvent
+  ) => {
+    const url = `/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucketId)}`
+    if (event.metaKey || event.ctrlKey) {
+      window.open(`${BASE_PATH}${url}`, '_blank')
+    } else {
+      router.push(url)
+    }
+  }
 
   return (
     <ScaffoldSection isFullWidth>
-      <Admonition
-        type="warning"
-        layout="horizontal"
-        className="mb-12 [&>div]:!translate-y-0 [&>svg]:!translate-y-1"
-        title="Analytics buckets are in alpha"
-        actions={
-          <Button asChild type="default" icon={<ExternalLink />}>
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://github.com/orgs/supabase/discussions/40116"
-            >
-              Leave feedback
-            </a>
-          </Button>
-        }
-      >
-        <p className="!leading-normal !mb-0">
-          Expect rapid changes, limited features, and possible breaking updates as we expand access.
-        </p>
-        <p className="!leading-normal !mb-0">Please share feedback as we refine the experience!</p>
-      </Admonition>
+      <AlphaNotice type="analytics" />
 
-      {!isLoadingBuckets &&
-      buckets.filter((bucket) => !('type' in bucket) || bucket.type === 'ANALYTICS').length ===
-        0 ? (
-        <EmptyBucketState bucketType="analytics" />
-      ) : (
-        <div className="flex flex-col gap-y-4">
-          <ScaffoldHeader className="py-0">
-            <ScaffoldSectionTitle>Buckets</ScaffoldSectionTitle>
-          </ScaffoldHeader>
-          <div className="flex flex-grow justify-between gap-x-2 items-center">
-            <Input
-              size="tiny"
-              className="flex-grow lg:flex-grow-0 w-52"
-              placeholder="Search for a bucket"
-              value={filterString}
-              onChange={(e) => setFilterString(e.target.value)}
-              icon={<Search size={12} />}
-            />
-            <CreateAnalyticsBucketModal buttonType="primary" buttonClassName="w-fit" />
-          </div>
+      {isLoadingBuckets && <GenericSkeletonLoader />}
 
-          {isLoadingBuckets ? (
-            <GenericSkeletonLoader />
-          ) : (
-            <Card>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Created at</TableHead>
-                    <TableHead />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {analyticsBuckets.length === 0 && filterString.length > 0 && (
-                    <TableRow className="[&>td]:hover:bg-inherit">
-                      <TableCell colSpan={3}>
-                        <p className="text-sm text-foreground">No results found</p>
-                        <p className="text-sm text-foreground-light">
-                          Your search for "{filterString}" did not return any results
-                        </p>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                  {analyticsBuckets.map((bucket) => (
-                    <TableRow key={bucket.id}>
-                      <TableCell>
-                        <p className="text-foreground">{bucket.id}</p>
-                      </TableCell>
-
-                      <TableCell>
-                        <p className="text-foreground-light">
-                          <TimestampInfo
-                            utcTimestamp={bucket.created_at}
-                            className="text-sm text-foreground-light"
-                          />
-                        </p>
-                      </TableCell>
-
-                      <TableCell>
-                        <div className="flex justify-end gap-2">
-                          <Button asChild type="default">
-                            <Link
-                              href={`/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucket.id)}`}
-                            >
-                              View contents
-                            </Link>
-                          </Button>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button type="default" className="px-1" icon={<MoreVertical />} />
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent side="bottom" align="end" className="w-40">
-                              <DropdownMenuItem
-                                className="flex items-center space-x-2"
-                                onClick={(e) => {
-                                  setModal('delete')
-                                  setSelectedBucket(bucket)
-                                }}
-                              >
-                                <Trash2 size={12} />
-                                <p>Delete bucket</p>
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Card>
-          )}
-        </div>
+      {isErrorBuckets && (
+        <AlertError error={bucketsError} subject="Failed to retrieve analytics buckets" />
       )}
 
-      {selectedBucket && (
-        <DeleteAnalyticsBucketModal
-          visible={modal === 'delete'}
-          bucketId={selectedBucket.id}
-          onClose={() => setModal(null)}
-        />
+      {isSuccessBuckets && (
+        <>
+          {hasNoBuckets ? (
+            <EmptyBucketState bucketType="analytics" />
+          ) : (
+            <div className="flex flex-col gap-y-4">
+              <ScaffoldHeader className="py-0 flex flex-row items-center gap-x-2">
+                <ScaffoldSectionTitle>Buckets</ScaffoldSectionTitle>
+                {analyticsBuckets.length > 0 && (
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <span className="bg-surface-200 rounded-full px-2 py-1 leading-none text-xs text-foreground-lighter tracking-widest">
+                        {analyticsBuckets.length}
+                        /2
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="w-64 text-center">
+                      Each project can only have up to 2 buckets while analytics buckets are in
+                      alpha{' '}
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+              </ScaffoldHeader>
+              <div className="flex flex-grow justify-between gap-x-2 items-center">
+                <Input
+                  size="tiny"
+                  className="flex-grow lg:flex-grow-0 w-52"
+                  placeholder="Search for a bucket"
+                  value={filterString}
+                  onChange={(e) => setFilterString(e.target.value)}
+                  icon={<Search size={12} />}
+                />
+                <CreateAnalyticsBucketModal buttonType="primary" buttonClassName="w-fit" />
+              </div>
+
+              {isLoadingBuckets ? (
+                <GenericSkeletonLoader />
+              ) : (
+                <Card>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        {analyticsBuckets.length > 0 && (
+                          <TableHead className="w-2 pr-1">
+                            <span className="sr-only">Icon</span>
+                          </TableHead>
+                        )}
+                        <TableHead>Name</TableHead>
+                        <TableHead>Created at</TableHead>
+                        <TableHead>
+                          <span className="sr-only">Actions</span>
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {analyticsBuckets.length === 0 && filterString.length > 0 && (
+                        <TableRow className="[&>td]:hover:bg-inherit">
+                          <TableCell colSpan={3}>
+                            <p className="text-sm text-foreground">No results found</p>
+                            <p className="text-sm text-foreground-light">
+                              Your search for "{filterString}" did not return any results
+                            </p>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                      {analyticsBuckets.map((bucket) => (
+                        <TableRow
+                          key={bucket.id}
+                          className="relative cursor-pointer h-16 inset-focus"
+                          onClick={(event) => handleBucketNavigation(bucket.id, event)}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault()
+                              handleBucketNavigation(bucket.id, event)
+                            }
+                          }}
+                          tabIndex={0}
+                        >
+                          <TableCell className="w-2 pr-1">
+                            <BucketIcon size={16} className="text-foreground-muted" />
+                          </TableCell>
+                          <TableCell>
+                            <p className="whitespace-nowrap max-w-[512px] truncate">{bucket.id}</p>
+                          </TableCell>
+
+                          <TableCell>
+                            <p className="text-foreground-light">
+                              <TimestampInfo
+                                utcTimestamp={bucket.created_at}
+                                className="text-sm text-foreground-light"
+                              />
+                            </p>
+                          </TableCell>
+
+                          <TableCell>
+                            <div className="flex justify-end items-center h-full">
+                              <ChevronRight size={14} className="text-foreground-muted/60" />
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Card>
+              )}
+            </div>
+          )}
+        </>
       )}
     </ScaffoldSection>
   )

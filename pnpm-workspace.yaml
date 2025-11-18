@@ -15,6 +15,7 @@ catalog:
   next: ^15.5.2
   react: ^18.3.0
   react-dom: ^18.3.0
+  recharts: ^2.15.4
   tailwindcss: 3.4.1
   tsx: 4.20.3
   typescript: ~5.9.0
@@ -54,6 +55,6 @@ overrides:
   '@tanstack/directive-functions-plugin>vite': 'catalog:'
   '@tanstack/react-start-plugin>vite': 'catalog:'
   'vinxi>vite': 'catalog:'
-  'refractor>prismjs': ^1.30.0 
+  'refractor>prismjs': ^1.30.0
   esbuild: ^0.25.2
   tmp: ^0.2.4

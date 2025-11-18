@@ -44,3 +44,9 @@ export function getCatalogURI(projectRef: string, protocol: string, endpoint?: s
   url.pathname = '/storage/v1/iceberg'
   return url.toString()
 }
+
+export function getVectorURI(projectRef: string, protocol: string, endpoint?: string) {
+  const url = getStorageURL(projectRef, protocol, endpoint)
+  url.pathname = '/storage/v1/vector'
+  return url.toString()
+}

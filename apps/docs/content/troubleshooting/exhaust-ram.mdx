@@ -19,7 +19,7 @@ You may observe elevated memory usage even when your database has little to no l
 
 Every Supabase project runs in its own dedicated virtual machine. Your instance will have a different set of hardware provisioned depending on your [compute add-on](/docs/guides/platform/compute-add-ons). Depending on your workload, your compute hardware may not be suitable and can result in high RAM usage.
 
-A good proxy for unhealthy memory usage is swap usage. If you run out of RAM, your system will offload memory to your disk's much slower swap partition. If your swap is above 70%, chances are high that your compute hardware is not suitable for your workload. Head over to your project's [Database Health](/dashboard/project/_/reports/database) to see your swap usage.
+A good proxy for unhealthy memory usage is swap usage. If you run out of RAM, your system will offload memory to your disk's much slower swap partition. If your swap is above 70%, chances are high that your compute hardware is not suitable for your workload. Head over to your project's [Database Health](/dashboard/project/_/observability/database) to see your swap usage.
 
 High RAM usage could come with a range of issues:
 
@@ -29,7 +29,7 @@ High RAM usage could come with a range of issues:
 
 ## Monitor your RAM
 
-To check your RAM usage on the Supabase Platform, head over to [Database Health in the Reports section](/dashboard/project/_/reports/database).
+To check your RAM usage on the Supabase Platform, head over to [Database Health in the Observability section](/dashboard/project/_/observability/database).
 
 It is also possible to monitor your resources and set up alerts using Prometheus/Grafana. With Grafana you will be able to see how much of your RAM is used for caching and you can track other metrics such as your Swap usage. Read the [Metrics Guide](/docs/guides/platform/metrics) to learn more.
 
