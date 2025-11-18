@@ -116,6 +116,13 @@ export function useAuthGotoCommands(options?: CommandOptions) {
               route: `/project/${ref}/auth/templates`,
               defaultHidden: true,
             } as IRouteCommand,
+            {
+              id: 'nav-auth-smtp',
+              name: 'SMTP Settings',
+              value: 'Auth: SMTP Settings (Email Configuration)',
+              route: `/project/${ref}/auth/smtp`,
+              defaultHidden: true,
+            } as IRouteCommand,
           ]
         : []),
       ...(authenticationMultiFactor

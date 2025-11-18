@@ -25,6 +25,7 @@ export type FDWCreateVariables = {
   tables: any[]
   sourceSchema: string
   targetSchema: string
+  schemaOptions?: string[]
 }
 
 export function getCreateFDWSql({
@@ -34,10 +35,8 @@ export function getCreateFDWSql({
   tables,
   sourceSchema,
   targetSchema,
-}: Pick<
-  FDWCreateVariables,
-  'wrapperMeta' | 'formState' | 'tables' | 'mode' | 'sourceSchema' | 'targetSchema'
->) {
+  schemaOptions = [],
+}: Omit<FDWCreateVariables, 'projectRef' | 'connectionString'>) {
   const newSchemasSql = tables
     .filter((table) => table.is_new_schema)
     .map((table) => /* SQL */ `create schema if not exists ${table.schema_name};`)
@@ -208,8 +207,10 @@ export function getCreateFDWSql({
     })
     .join('\n\n')
 
+  const options = [...schemaOptions, "strict 'true'"].join(', ')
+
   const importForeignSchemaSql = /* SQL */ `
-  import foreign schema "${sourceSchema}" from server ${formState.server_name} into ${targetSchema} options (strict 'true');
+  import foreign schema "${sourceSchema}" from server ${formState.server_name} into ${targetSchema} options (${options});
 `
 
   const sql = /* SQL */ `

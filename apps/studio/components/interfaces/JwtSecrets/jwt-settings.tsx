@@ -52,6 +52,7 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { number, object } from 'yup'
+import { useApiKeysVisibility } from '../APIKeys/hooks/useApiKeysVisibility'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
@@ -91,17 +92,19 @@ const JWTSettings = () => {
   const { mutateAsync: updateJwt, isLoading: isSubmittingJwtSecretUpdateRequest } =
     useJwtSecretUpdateMutation()
 
-  const { data: legacyKey } = useLegacyJWTSigningKeyQuery({
-    projectRef,
-  })
-  const { data: legacyAPIKeysStatus } = useLegacyAPIKeysStatusQuery({ projectRef })
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: legacyKey } = useLegacyJWTSigningKeyQuery(
+    {
+      projectRef,
+    },
+    { enabled: canReadAPIKeys }
+  )
+  const { data: legacyAPIKeysStatus } = useLegacyAPIKeysStatusQuery(
+    { projectRef },
+    { enabled: canReadAPIKeys }
+  )
 
-  const {
-    data: authConfig,
-    error: authConfigError,
-    isLoading: isLoadingAuthConfig,
-    isSuccess: isSuccessAuthConfig,
-  } = useAuthConfigQuery({ projectRef })
+  const { data: authConfig, isLoading: isLoadingAuthConfig } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isLoading: isUpdatingAuthConfig } =
     useAuthConfigUpdateMutation()
 

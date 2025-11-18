@@ -214,6 +214,7 @@ export const CreateBucketModal = ({
           disabled={!canCreateBuckets}
           style={{ justifyContent: 'start' }}
           onClick={() => setVisible(true)}
+          tabIndex={!canCreateBuckets ? -1 : 0}
           tooltip={{
             content: {
               side: 'bottom',
@@ -229,7 +230,7 @@ export const CreateBucketModal = ({
 
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>
-          <DialogTitle>Create a storage bucket</DialogTitle>
+          <DialogTitle>Create file bucket</DialogTitle>
         </DialogHeader>
 
         <DialogSectionSeparator />

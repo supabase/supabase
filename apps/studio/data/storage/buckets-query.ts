@@ -2,9 +2,10 @@ import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
+import { MAX_RETRY_FAILURE_COUNT } from 'data/query-client'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+import { ResponseError, type UseCustomQueryOptions } from 'types'
 import { storageKeys } from './keys'
 
 export type BucketsVariables = { projectRef?: string }
@@ -41,15 +42,16 @@ export const useBucketsQuery = <TData = BucketsData>(
     enabled: enabled && typeof projectRef !== 'undefined' && isActive,
     ...options,
     retry: (failureCount, error) => {
-      if (
-        typeof error === 'object' &&
-        error !== null &&
-        error.message.includes('Missing tenant config')
-      ) {
-        return false
+      if (error instanceof ResponseError) {
+        if (
+          error.message.includes('Missing tenant config') ||
+          error.message.includes('Project has no active API keys')
+        ) {
+          return false
+        }
       }
 
-      if (failureCount < 3) {
+      if (failureCount < MAX_RETRY_FAILURE_COUNT) {
         return true
       }
 

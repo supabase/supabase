@@ -1,31 +1,53 @@
-import { Edit, Shield } from 'lucide-react'
+import { ChevronDown, FolderOpen, Settings, Shield, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { DeleteBucketModal } from 'components/interfaces/Storage/DeleteBucketModal'
 import { EditBucketModal } from 'components/interfaces/Storage/EditBucketModal'
+import { EmptyBucketModal } from 'components/interfaces/Storage/EmptyBucketModal'
+import { useSelectedBucket } from 'components/interfaces/Storage/FilesBuckets/useSelectedBucket'
 import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
 import { StorageExplorer } from 'components/interfaces/Storage/StorageExplorer/StorageExplorer'
-import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer/useSelectedBucket'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { Bucket } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useStoragePolicyCounts } from 'hooks/storage/useStoragePolicyCounts'
+import { Bucket as BucketIcon } from 'icons'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import type { NextPageWithLayout } from 'types'
-import { Badge, Button } from 'ui'
+import {
+  Badge,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from 'ui'
 
 const BucketPage: NextPageWithLayout = () => {
+  const router = useRouter()
   const { bucketId, ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { projectRef } = useStorageExplorerStateSnapshot()
-  const { bucket, error, isSuccess, isError } = useSelectedBucket()
-  const [showEditModal, setShowEditModal] = useState(false)
+  const { data: bucket, error, isSuccess, isError } = useSelectedBucket()
+  const [modal, setModal] = useState<'edit' | 'empty' | 'delete' | null>(null)
 
   const { getPolicyCount } = useStoragePolicyCounts(bucket ? [bucket as Bucket] : [])
   const policyCount = bucket ? getPolicyCount(bucket.id) : 0
+
+  useEffect(() => {
+    if (isSuccess && !bucket) {
+      toast.info(`Bucket "${bucketId}" does not exist in your project`)
+      router.push(`/project/${ref}/storage/files`)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess])
 
   // [Joshen] Checking against projectRef from storage explorer to check if the store has initialized
   if (!project || !projectRef || !isSuccess) return null
@@ -34,31 +56,34 @@ const BucketPage: NextPageWithLayout = () => {
     return <StorageBucketsError error={error as any} />
   }
 
-  // If the bucket is not found or the bucket type is ANALYTICS or VECTOR, show an error message
-  if (!bucket || ('type' in bucket && bucket.type !== 'STANDARD')) {
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        <p className="text-sm text-foreground-light">Bucket "{bucketId}" cannot be found</p>
-      </div>
-    )
-  }
-
   return (
     <>
       <PageLayout
         size="full"
         isCompact
+        icon={
+          <div className="shrink-0 w-10 h-10 relative bg-surface-100 border rounded-md flex items-center justify-center">
+            <BucketIcon size={20} className="text-foreground-light" />
+          </div>
+        }
         className="[&>div:first-child]:!border-b-0" // Override the border-b from ScaffoldContainer
         title={
-          <div className="flex items-center gap-2">
-            <span>{bucket.name}</span>
-            {bucket.public && <Badge variant="warning">Public</Badge>}
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <span className="truncate">{bucketId}</span>
+            {bucket?.public && (
+              <Badge variant="warning" size="small" className="flex-shrink-0">
+                Public
+              </Badge>
+            )}
           </div>
         }
         breadcrumbs={[
           {
             label: 'Files',
             href: `/project/${ref}/storage/files`,
+          },
+          {
+            label: 'Buckets',
           },
         ]}
         primaryActions={
@@ -75,24 +100,72 @@ const BucketPage: NextPageWithLayout = () => {
                 ) : undefined
               }
             >
-              <Link href={`/project/${ref}/storage/files/policies`}>Policies</Link>
+              <Link
+                href={`/project/${ref}/storage/files/policies?search=${encodeURIComponent(bucket?.name ?? '')}`}
+              >
+                Policies
+              </Link>
             </Button>
-            <Button type="default" icon={<Edit size={14} />} onClick={() => setShowEditModal(true)}>
-              Edit bucket
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button type="default" iconRight={<ChevronDown size={14} />}>
+                  Edit bucket
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuItem
+                  className="flex items-center space-x-2"
+                  onClick={() => setModal('edit')}
+                >
+                  <Settings size={12} />
+                  <p>Bucket settings</p>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="flex items-center space-x-2"
+                  onClick={() => setModal('empty')}
+                >
+                  <FolderOpen size={12} />
+                  <p>Empty bucket</p>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="flex items-center space-x-2"
+                  onClick={() => setModal('delete')}
+                >
+                  <Trash2 size={12} />
+                  <p>Delete bucket</p>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </>
         }
       >
-        <div className="flex-1 min-h-0 px-6 pb-6">
-          <StorageExplorer bucket={bucket} />
-        </div>
+        {!!bucket && (
+          <div className="flex-1 min-h-0 px-6 pb-6">
+            <StorageExplorer bucket={bucket} />
+          </div>
+        )}
       </PageLayout>
 
-      <EditBucketModal
-        visible={showEditModal}
-        bucket={bucket}
-        onClose={() => setShowEditModal(false)}
-      />
+      {bucket && (
+        <>
+          <EditBucketModal
+            visible={modal === 'edit'}
+            bucket={bucket}
+            onClose={() => setModal(null)}
+          />
+          <EmptyBucketModal
+            visible={modal === 'empty'}
+            bucket={bucket}
+            onClose={() => setModal(null)}
+          />
+          <DeleteBucketModal
+            visible={modal === 'delete'}
+            bucket={bucket}
+            onClose={() => setModal(null)}
+          />
+        </>
+      )}
     </>
   )
 }
