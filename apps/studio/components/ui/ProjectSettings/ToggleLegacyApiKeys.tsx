@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useToggleLegacyAPIKeysMutation } from 'data/api-keys/legacy-api-key-toggle-mutation'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
@@ -30,14 +31,18 @@ export const ToggleLegacyApiKeysPanel = () => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const [isAppsWarningOpen, setIsAppsWarningOpen] = useState(false)
 
-  const { data: legacyAPIKeysStatusData, isSuccess: isLegacyAPIKeysStatusSuccess } =
-    useLegacyAPIKeysStatusQuery({ projectRef })
-
-  const { data: legacyJWTSecret } = useLegacyJWTSigningKeyQuery({ projectRef })
-
+  const { canReadAPIKeys } = useApiKeysVisibility()
   const { can: canUpdateAPIKeys, isSuccess: isPermissionsSuccess } = useAsyncCheckPermissions(
     PermissionAction.SECRETS_WRITE,
     '*'
+  )
+
+  const { data: legacyAPIKeysStatusData, isSuccess: isLegacyAPIKeysStatusSuccess } =
+    useLegacyAPIKeysStatusQuery({ projectRef }, { enabled: canReadAPIKeys })
+
+  const { data: legacyJWTSecret } = useLegacyJWTSigningKeyQuery(
+    { projectRef },
+    { enabled: canReadAPIKeys }
   )
 
   const { data: authorizedApps = [], isSuccess: isAuthorizedAppsSuccess } = useAuthorizedAppsQuery({

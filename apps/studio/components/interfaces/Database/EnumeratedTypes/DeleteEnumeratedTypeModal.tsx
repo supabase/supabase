@@ -8,12 +8,14 @@ interface DeleteEnumeratedTypeModalProps {
   visible: boolean
   selectedEnumeratedType?: any
   onClose: () => void
+  onDelete?: () => void
 }
 
 const DeleteEnumeratedTypeModal = ({
   visible,
   selectedEnumeratedType,
   onClose,
+  onDelete,
 }: DeleteEnumeratedTypeModalProps) => {
   const { data: project } = useSelectedProjectQuery()
   const { mutate: deleteEnumeratedType, isLoading: isDeleting } = useEnumeratedTypeDeleteMutation({
@@ -29,6 +31,7 @@ const DeleteEnumeratedTypeModal = ({
     if (project?.connectionString === undefined)
       return console.error('Project connectionString required')
 
+    onDelete?.()
     deleteEnumeratedType({
       projectRef: project?.ref,
       connectionString: project?.connectionString,

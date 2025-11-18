@@ -11,6 +11,7 @@ import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/databas
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import {
   Button,
@@ -32,6 +33,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import ChooseFunctionForm from './ChooseFunctionForm'
 import {
@@ -40,7 +42,6 @@ import {
   TRIGGER_ORIENTATIONS,
   TRIGGER_TYPES,
 } from './Triggers.constants'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const formId = 'create-trigger'
 
@@ -89,7 +90,6 @@ export const TriggerSheet = ({
 }: TriggerSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
 
-  const [isClosingPanel, setIsClosingPanel] = useState(false)
   const [showFunctionSelector, setShowFunctionSelector] = useState(false)
 
   const { mutate: createDatabaseTrigger, isLoading: isCreating } = useDatabaseTriggerCreateMutation(
@@ -135,9 +135,10 @@ export const TriggerSheet = ({
   })
   const { function_name, function_schema } = form.watch()
 
-  function isClosingSidePanel() {
-    form.formState.isDirty ? setIsClosingPanel(true) : onClose()
-  }
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+    checkIsDirty: () => form.formState.isDirty,
+    onClose,
+  })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!project) return console.error('Project is required')
@@ -188,7 +189,7 @@ export const TriggerSheet = ({
 
   return (
     <>
-      <Sheet open={open} onOpenChange={isClosingSidePanel}>
+      <Sheet open={open} onOpenChange={confirmOnClose}>
         <SheetContent size="lg" className="flex flex-col gap-0">
           <SheetHeader>
             <SheetTitle>
@@ -471,7 +472,7 @@ export const TriggerSheet = ({
               type="default"
               htmlType="reset"
               disabled={isCreating || isUpdating}
-              onClick={onClose}
+              onClick={confirmOnClose}
             >
               Cancel
             </Button>
@@ -480,21 +481,7 @@ export const TriggerSheet = ({
             </Button>
           </SheetFooter>
 
-          <ConfirmationModal
-            visible={isClosingPanel}
-            title="Discard changes"
-            confirmLabel="Discard"
-            onCancel={() => setIsClosingPanel(false)}
-            onConfirm={() => {
-              setIsClosingPanel(false)
-              onClose()
-            }}
-          >
-            <p className="text-sm text-foreground-light">
-              There are unsaved changes. Are you sure you want to close the panel? Your changes will
-              be lost.
-            </p>
-          </ConfirmationModal>
+          <CloseConfirmationModal {...closeConfirmationModalProps} />
         </SheetContent>
       </Sheet>
 
@@ -509,3 +496,18 @@ export const TriggerSheet = ({
     </>
   )
 }
+
+const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
+  <ConfirmationModal
+    visible={visible}
+    title="Discard changes"
+    confirmLabel="Discard"
+    onCancel={onCancel}
+    onConfirm={onClose}
+  >
+    <p className="text-sm text-foreground-light">
+      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
+      lost.
+    </p>
+  </ConfirmationModal>
+)

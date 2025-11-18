@@ -72,7 +72,7 @@ const SidePanel = ({
           {cancelText}
         </Button>
       </div>
-      {onConfirm !== undefined && (
+      {!!onConfirm && (
         <Tooltip>
           <TooltipTrigger asChild>
             <span className="inline-block">
@@ -80,7 +80,7 @@ const SidePanel = ({
                 htmlType="submit"
                 disabled={disabled || loading}
                 loading={loading}
-                onClick={() => (onConfirm ? onConfirm() : null)}
+                onClick={onConfirm}
               >
                 {confirmText}
               </Button>
