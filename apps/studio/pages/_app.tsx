@@ -20,7 +20,7 @@ import 'ui/build/css/themes/light.css'
 
 import { loader } from '@monaco-editor/react'
 import * as Sentry from '@sentry/nextjs'
-import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
+import { HydrationBoundary, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
@@ -120,7 +120,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
       <QueryClientProvider client={queryClient}>
         <NuqsAdapter>
-          <Hydrate state={pageProps.dehydratedState}>
+          <HydrationBoundary state={pageProps.dehydratedState}>
             <AuthProvider>
               <FeatureFlagProvider
                 API_URL={API_URL}
@@ -164,13 +164,11 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                     </RouteValidationWrapper>
                   </TooltipProvider>
                   <Telemetry />
-                  {!isTestEnv && (
-                    <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
-                  )}
+                  {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom" />}
                 </ProfileProvider>
               </FeatureFlagProvider>
             </AuthProvider>
-          </Hydrate>
+          </HydrationBoundary>
         </NuqsAdapter>
       </QueryClientProvider>
       <TelemetryTagManager />
