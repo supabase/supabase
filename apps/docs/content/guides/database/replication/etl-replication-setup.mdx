@@ -22,11 +22,11 @@ If you already have a publication set up, you can skip to [Step 2: Enable ETL Re
 
 ## Step 1: Create a publication
 
-A publication defines which tables and change types will be replicated. You need to create a publication before setting up a destination.
+A publication defines which tables and change types will be replicated. You need to create a publication using SQL.
 
-### Basic publication examples
+### Creating a publication
 
-The following examples assume you have `users` and `orders` tables in your database.
+The following SQL examples assume you have `users` and `orders` tables in your database.
 
 #### Publication for specific tables
 
@@ -88,11 +88,8 @@ for table orders where (created_at > '2024-01-01');
 
 After creating a publication via SQL, you can view it in the Supabase Dashboard:
 
-1. Go to the [Database](/dashboard/project/_/database/tables) page in the Dashboard
-2. Click on **Publications** in the sidebar
-3. You'll see all your publications listed with their tables
-
-You can also manage publications through the Dashboard by toggling **Source** for each table.
+1. Navigate to **Database** → [Publications](/dashboard/project/_/database/publications) in your Supabase Dashboard
+2. You'll see all your publications listed with their tables
 
 ## Step 2: Enable ETL Replication
 
@@ -137,7 +134,7 @@ For a complete list of available destinations and how to choose the right one fo
 
 3. Configure **Advanced Settings** (optional):
 
-   - **Batch wait time (milliseconds)**: How long to wait for more changes before sending a batch.
+   - **Batch wait time (milliseconds)**: How long to wait for more changes before sending a batch. We recommend leaving this at the default value for optimal performance. Setting this too low can result in too much traffic and less efficient batching.
 
 4. Click **Create and start** to begin replication
 
@@ -240,12 +237,20 @@ For more troubleshooting help, see the [ETL Replication FAQ](/docs/guides/databa
 ETL Replication has the following limitations that apply to all destinations:
 
 - **Primary keys required**: Tables must have primary keys
-- **TOAST values**: Large values are limited to 10MB
 - **Custom data types**: Not supported
 - **Schema changes**: Not automatically handled
 - **No data transformation**: Data is replicated as-is without transformation
 
-Destination-specific limitations may also apply. See the [BigQuery](/docs/guides/database/replication/etl-bigquery#limitations) or [Iceberg](/docs/guides/database/replication/etl-iceberg#limitations) destination pages for details.
+Destination-specific limitations may also apply. See the [Iceberg](/docs/guides/database/replication/etl-iceberg#limitations) destination page for details.
+
+## Future work
+
+ETL Replication is actively being developed. Planned improvements include:
+
+- **DDL support**: Automatic handling of schema changes (ALTER TABLE, ADD COLUMN, etc.)
+- **Additional destinations**: Support for more data warehouses and analytics platforms
+
+We don't have public timelines for these features, but they represent our roadmap for making ETL Replication more robust and flexible.
 
 ## Next steps
 

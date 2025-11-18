@@ -28,7 +28,7 @@ ETL Replication is currently in private alpha. Access is limited and features ma
 
 </Admonition>
 
-Use Supabase's built-in ETL product to automatically replicate data to supported systems. This is the easiest way to sync your data to external destinations like BigQuery and Analytics Buckets (Iceberg).
+Use Supabase ETL to automatically replicate data to supported systems.
 
 - [Set up ETL Replication](/docs/guides/database/replication/etl-replication-setup)
 
@@ -49,7 +49,7 @@ Choose the data syncing method based on your use case:
 
 ### Write-Ahead Log (WAL)
 
-Postgres uses a system called the Write-Ahead Log (WAL) to manage changes to the database. As you make changes, they are appended to the WAL (which is a series of files (also called "segments"), where the file size can be specified). Once one segment is full, Postgres will start appending to a new segment. After a period of time, a checkpoint occurs and Postgres synchronizes the WAL with your database. Once the checkpoint is complete, then the WAL files can be removed from disk and free up space.
+Postgres uses a system called the Write-Ahead Log (WAL) to manage changes to the database. As you make changes, they are appended to the WAL, which is a series of files (also called "segments") where the file size can be specified. Once one segment is full, Postgres will start appending to a new segment. After a period of time, a checkpoint occurs and Postgres synchronizes the WAL with your database. Once the checkpoint is complete, then the WAL files can be removed from disk and free up space.
 
 ### Logical replication and WAL
 

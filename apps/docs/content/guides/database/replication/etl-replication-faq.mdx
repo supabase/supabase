@@ -14,7 +14,7 @@ ETL Replication is currently in private alpha. Access is limited and features ma
 
 # What destinations are supported?
 
-ETL Replication currently supports BigQuery and Iceberg (Analytics Buckets). See the [ETL Destinations guide](/docs/guides/database/replication/etl-destinations) for details on choosing between them.
+ETL Replication currently supports Iceberg (Analytics Buckets). See the [ETL Destinations guide](/docs/guides/database/replication/etl-destinations) for details.
 
 # Why is my table not being replicated?
 
@@ -63,9 +63,8 @@ Key limitations to be aware of:
 - **Primary keys**: Required on all tables
 - **Custom data types**: Not supported
 - **Schema changes**: Not automatically handled
-- **TOAST values**: Limited to 10MB
 
-Destination-specific limitations may also apply. See the [BigQuery](/docs/guides/database/replication/etl-bigquery#limitations) or [Iceberg](/docs/guides/database/replication/etl-iceberg#limitations) destination pages for details.
+Destination-specific limitations may also apply. See the [Iceberg](/docs/guides/database/replication/etl-iceberg#limitations) destination page for details.
 
 # How do I stop or pause replication?
 

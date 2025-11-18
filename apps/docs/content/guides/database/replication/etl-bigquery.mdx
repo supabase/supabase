@@ -115,6 +115,7 @@ LIMIT 100;
 BigQuery-specific limitations:
 
 - **Ingestion latency**: BigQuery's streaming API has inherent latency (typically seconds to minutes)
+- **Row size**: Limited to 10 MB per row due to BigQuery Storage Write API constraints
 
 For general ETL Replication limitations that apply to all destinations, see the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup#limitations).
 
