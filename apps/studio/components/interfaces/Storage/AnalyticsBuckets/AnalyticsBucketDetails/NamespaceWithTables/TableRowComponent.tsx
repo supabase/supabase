@@ -1,5 +1,5 @@
 import { uniq } from 'lodash'
-import { Loader2, MoreVertical, Pause, Play, Trash } from 'lucide-react'
+import { Eye, Loader2, MoreVertical, Pause, Play, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -288,7 +288,7 @@ export const TableRowComponent = ({
                 <DropdownMenuContent side="bottom" align="end" className="w-fit min-w-[180px]">
                   <DropdownMenuItem asChild className="flex items-center gap-x-2">
                     <Link
-                      href={`/project/${project?.ref}/sql/new?content=${encodeURIComponent(`select * from ${schema}.${table.name};`)}`}
+                      href={`/project/${projectRef}/sql/new?content=${encodeURIComponent(`select * from ${schema}.${table.name};`)}`}
                     >
                       <SqlEditor size={12} className="text-foreground-lighter" />
                       <p>Query in SQL Editor</p>
@@ -297,6 +297,16 @@ export const TableRowComponent = ({
 
                   {!!publication && (
                     <>
+                      {!!inferredPostgresTable && (
+                        <DropdownMenuItem asChild className="flex items-center gap-x-2">
+                          <Link
+                            href={`/project/${projectRef}/database/etl/${pipeline?.id}?search=${inferredPostgresTable.schema}.${inferredPostgresTable.name}`}
+                          >
+                            <Eye size={12} className="text-foreground-lighter" />
+                            <p>View replication</p>
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
                       {isTableUnderReplicationPublication ? (
                         <DropdownMenuItem
                           className="flex items-center gap-x-2"
