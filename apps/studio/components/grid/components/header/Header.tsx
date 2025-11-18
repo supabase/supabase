@@ -47,7 +47,8 @@ export const MAX_EXPORT_ROW_COUNT = 500000
 export const MAX_EXPORT_ROW_COUNT_MESSAGE = (
   <>
     Sorry! We're unable to support exporting row counts larger than{' '}
-    {MAX_EXPORT_ROW_COUNT.toLocaleString()} at the moment. Alternatively, you may consider using
+    {MAX_EXPORT_ROW_COUNT.toLocaleString('en-US')} at the moment. Alternatively, you may consider
+    using{' '}
     <Link href={`${DOCS_URL}/reference/cli/supabase-db-dump`} target="_blank">
       pg_dump
     </Link>{' '}
