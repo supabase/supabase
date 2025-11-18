@@ -4,11 +4,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import {
-  ScaffoldSection,
-  ScaffoldSectionDescription,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -21,6 +16,15 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
 import { cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import {
+  PageSection,
+  PageSectionAside,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { AddIntegrationDropdown } from './AddIntegrationDropdown'
 import { CreateAuth0IntegrationDialog } from './CreateAuth0Dialog'
 import { CreateAwsCognitoAuthIntegrationDialog } from './CreateAwsCognitoAuthDialog'
@@ -65,11 +69,11 @@ export const ThirdPartyAuthForm = () => {
   }
 
   return (
-    <ScaffoldSection isFullWidth>
-      <div className="flex justify-between gap-4">
-        <div>
-          <ScaffoldSectionTitle>Third Party Auth</ScaffoldSectionTitle>
-          <ScaffoldSectionDescription className="mb-6">
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Third Party Auth</PageSectionTitle>
+          <PageSectionDescription>
             Use third-party authentication (TPA) systems based on JWTs to access your project.
             <br />
             Billing is based on the number of monthly active users (MAUs) requesting your API
@@ -80,15 +84,18 @@ export const ThirdPartyAuthForm = () => {
               billing docs
             </InlineLink>{' '}
             for more information.
-          </ScaffoldSectionDescription>
-        </div>
-        <div className="flex items-center gap-2 ">
-          <DocsButton href={`${DOCS_URL}/guides/auth/third-party/overview`} />
-          {integrations.length !== 0 && (
-            <AddIntegrationDropdown onSelectIntegrationType={setSelectedIntegration} />
-          )}
-        </div>
-      </div>
+          </PageSectionDescription>
+        </PageSectionSummary>
+        <PageSectionAside>
+          <div className="flex items-center gap-2">
+            <DocsButton href={`${DOCS_URL}/guides/auth/third-party/overview`} />
+            {integrations.length !== 0 && (
+              <AddIntegrationDropdown onSelectIntegrationType={setSelectedIntegration} />
+            )}
+          </div>
+        </PageSectionAside>
+      </PageSectionMeta>
+      <PageSectionContent>
 
       {isLoading && (
         <div
@@ -194,6 +201,7 @@ export const ThirdPartyAuthForm = () => {
           {getIntegrationTypeLabel(getIntegrationType(selectedIntegrationForDeletion))} integration?
         </p>
       </ConfirmationModal>
-    </ScaffoldSection>
+    </PageSectionContent>
+  </PageSection>
   )
 }

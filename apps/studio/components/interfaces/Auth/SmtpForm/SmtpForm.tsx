@@ -7,7 +7,6 @@ import { toast } from 'sonner'
 import * as yup from 'yup'
 
 import { useParams } from 'common'
-import { ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
@@ -28,6 +27,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { urlRegex } from '../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
@@ -178,23 +178,28 @@ export const SmtpForm = () => {
 
   if (isError) {
     return (
-      <ScaffoldSection isFullWidth>
-        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   if (!canReadConfig) {
     return (
-      <ScaffoldSection isFullWidth>
-        <NoPermission resourceText="view SMTP settings" />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <NoPermission resourceText="view SMTP settings" />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   return (
-    <ScaffoldSection isFullWidth>
-      <Form_Shadcn_ {...form}>
+    <PageSection>
+      <PageSectionContent>
+        <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
             <CardContent>
@@ -454,6 +459,7 @@ export const SmtpForm = () => {
           </Card>
         </form>
       </Form_Shadcn_>
-    </ScaffoldSection>
+    </PageSectionContent>
+  </PageSection>
   )
 }
