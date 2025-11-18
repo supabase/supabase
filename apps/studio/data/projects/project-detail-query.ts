@@ -163,26 +163,6 @@ export const useSetProjectStatus = () => {
       },
       { updatedAt: Date.now() }
     )
-
-    // [Joshen] Temporarily for completeness while we still have UIs depending on the old endpoint (Org teams)
-    // Can be removed once we completely deprecate projects-query (Old unpaginated endpoint)
-    queryClient.setQueriesData<PaginatedProjectsResponse | undefined>(
-      { queryKey: projectKeys.list() },
-      (old) => {
-        if (!old) return old
-
-        return {
-          ...old,
-          projects: old.projects.map((project) => {
-            if (project.ref === ref) {
-              return { ...project, status }
-            }
-            return project
-          }),
-        }
-      },
-      { updatedAt: Date.now() }
-    )
   }
 
   return { setProjectStatus }

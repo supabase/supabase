@@ -2149,6 +2149,23 @@ export interface paths {
     patch: operations['ProjectsRefController_updateProject']
     trace?: never
   }
+  '/platform/projects/{ref}/analytics/endpoints/auth.metrics': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets a project's auth metrics */
+    get: operations['AuthMetricsController_getAuthMetrics']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/projects/{ref}/analytics/endpoints/functions.combined-stats': {
     parameters: {
       query?: never
@@ -2212,6 +2229,23 @@ export interface paths {
     put?: never
     /** Gets project's logs */
     post: operations['LogsController_getProjectLogsViaPost']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/projects/{ref}/analytics/endpoints/project.metrics': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets a project's metrics */
+    get: operations['ProjectMetricsController_getProjectMetrics']
+    put?: never
+    post?: never
     delete?: never
     options?: never
     head?: never
@@ -4782,6 +4816,11 @@ export interface components {
         | {
             dsn: string
           }
+        | {
+            api_token: string
+            dataset_name: string
+            domain?: string
+          }
       description?: string
       name: string
       /** @enum {string} */
@@ -4795,6 +4834,7 @@ export interface components {
         | 'loki'
         | 'sentry'
         | 's3'
+        | 'axiom'
     }
     CreateBucketIndexBody: {
       /** @enum {string} */
@@ -6881,6 +6921,11 @@ export interface components {
         | {
             dsn: string
           }
+        | {
+            api_token: string
+            dataset_name: string
+            domain?: string
+          }
       description?: string
       id: number
       metadata: {
@@ -6901,6 +6946,7 @@ export interface components {
         | 'loki'
         | 'sentry'
         | 's3'
+        | 'axiom'
       user_id: number
     }
     LFEndpoint: {
@@ -7298,7 +7344,7 @@ export interface components {
       subscription_id: string | null
       usage_billing_enabled: boolean
     }
-    OrganizationRoleResponse: {
+    OrganizationRoleLegacyResponse: {
       org_scoped_roles: {
         base_role_id: number
         description: string | null
@@ -7312,6 +7358,30 @@ export interface components {
         id: number
         name: string
         project_ids: number[] | null
+      }[]
+    }
+    OrganizationRoleResponse: {
+      org_scoped_roles: {
+        base_role_id: number
+        description: string | null
+        id: number
+        name: string
+        projects: {
+          name: string
+          /** @description Project ref */
+          ref: string
+        }[]
+      }[]
+      project_scoped_roles: {
+        base_role_id: number
+        description: string | null
+        id: number
+        name: string
+        projects: {
+          name: string
+          /** @description Project ref */
+          ref: string
+        }[]
       }[]
     }
     OrganizationSlugAvailableVersionsBody: {
@@ -9528,6 +9598,11 @@ export interface components {
         | {
             dsn: string
           }
+        | {
+            api_token: string
+            dataset_name: string
+            domain?: string
+          }
       description?: string
       name?: string
       /** @enum {string} */
@@ -9541,6 +9616,7 @@ export interface components {
         | 'loki'
         | 'sentry'
         | 's3'
+        | 'axiom'
     }
     UpdateCollectionBody: {
       name: string
@@ -15554,7 +15630,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['OrganizationRoleResponse']
+          'application/json': components['schemas']['OrganizationRoleLegacyResponse']
         }
       }
       /** @description Unauthorized */
@@ -17364,6 +17440,58 @@ export interface operations {
       }
     }
   }
+  AuthMetricsController_getAuthMetrics: {
+    parameters: {
+      query: {
+        interval: '15min' | '1hr' | '3hr' | '1day' | '3day' | '7day'
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get project's auth metrics */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   FunctionsLogsController_getCombinedStats: {
     parameters: {
       query: {
@@ -17624,6 +17752,58 @@ export interface operations {
         content?: never
       }
       /** @description Failed to get project's logs */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ProjectMetricsController_getProjectMetrics: {
+    parameters: {
+      query: {
+        interval: '15min' | '1hr' | '3hr' | '1day' | '3day' | '7day'
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get project's metrics */
       500: {
         headers: {
           [name: string]: unknown
@@ -24304,7 +24484,13 @@ export interface operations {
   }
   StorageBucketsController_getBuckets: {
     parameters: {
-      query?: never
+      query?: {
+        limit?: number
+        offset?: number
+        search?: string
+        sortColumn?: 'id' | 'name' | 'updated_at' | 'created_at'
+        sortOrder?: 'asc' | 'desc'
+      }
       header?: never
       path: {
         /** @description Project ref */

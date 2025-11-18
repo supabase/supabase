@@ -185,7 +185,11 @@ test.describe.serial('Database', () => {
 
       // drop database tables if exists
       if ((await page.getByText(databaseTableNameNew, { exact: true }).count()) > 0) {
-        await page.getByRole('row', { name: databaseTableNameNew }).getByRole('button').click()
+        await page
+          .getByRole('row', { name: databaseTableNameNew })
+          .getByRole('button')
+          .last()
+          .click()
         await page.getByRole('menuitem', { name: 'Delete table' }).click()
         await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).check()
         await page.getByRole('button', { name: 'Delete' }).click()
@@ -193,7 +197,11 @@ test.describe.serial('Database', () => {
       }
 
       if ((await page.getByText(databaseTableNameUpdated, { exact: true }).count()) > 0) {
-        await page.getByRole('row', { name: databaseTableNameUpdated }).getByRole('button').click()
+        await page
+          .getByRole('row', { name: databaseTableNameUpdated })
+          .getByRole('button')
+          .last()
+          .click()
         await page.getByRole('menuitem', { name: 'Delete table' }).click()
         await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).check()
         await page.getByRole('button', { name: 'Delete' }).click()
@@ -204,6 +212,7 @@ test.describe.serial('Database', () => {
         await page
           .getByRole('row', { name: databaseTableNameDuplicate })
           .getByRole('button')
+          .last()
           .click()
         await page.getByRole('menuitem', { name: 'Delete table' }).click()
         await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).check()
@@ -222,7 +231,7 @@ test.describe.serial('Database', () => {
       await expect(page.getByText(databaseTableNameNew, { exact: true })).toBeVisible()
 
       // edit a new table
-      await page.getByRole('row', { name: databaseTableNameNew }).getByRole('button').click()
+      await page.getByRole('row', { name: databaseTableNameNew }).getByRole('button').last().click()
       await page.getByRole('menuitem', { name: 'Edit table' }).click()
       await page.getByTestId('table-name-input').fill(databaseTableNameUpdated)
       await page.getByRole('button', { name: 'Save' }).click()
@@ -233,7 +242,11 @@ test.describe.serial('Database', () => {
       await expect(page.getByText(databaseTableNameUpdated, { exact: true })).toBeVisible()
 
       // duplicate table
-      await page.getByRole('row', { name: databaseTableNameUpdated }).getByRole('button').click()
+      await page
+        .getByRole('row', { name: databaseTableNameUpdated })
+        .getByRole('button')
+        .last()
+        .click()
       await page.getByRole('menuitem', { name: 'Duplicate Table' }).click()
       await page.getByTestId('table-name-input').fill(databaseTableNameDuplicate)
       await page.getByRole('textbox', { name: 'Optional' }).fill('')
@@ -248,6 +261,7 @@ test.describe.serial('Database', () => {
       await page
         .getByRole('row', { name: `${databaseTableNameDuplicate}` })
         .getByRole('button')
+        .last()
         .click()
       await page.getByRole('menuitem', { name: 'Delete table' }).click()
       await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).check()
@@ -257,6 +271,7 @@ test.describe.serial('Database', () => {
       await page
         .getByRole('row', { name: `${databaseTableNameUpdated}` })
         .getByRole('button')
+        .last()
         .click()
       await page.getByRole('menuitem', { name: 'Delete table' }).click()
       await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).check()
@@ -264,7 +279,7 @@ test.describe.serial('Database', () => {
       await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-delete')
 
       // validate navigating to table editor from database table page
-      await page.getByRole('row', { name: databaseTableName }).getByRole('button').click()
+      await page.getByRole('row', { name: databaseTableName }).getByRole('button').last().click()
       await page.getByRole('menuitem', { name: 'View in Table Editor' }).click()
       await page.waitForTimeout(1000) // wait for the table editor to be loaded
       expect(page.url().includes('editor')).toBe(true)
@@ -468,7 +483,11 @@ test.describe.serial('Database', () => {
       expect(page.getByText('confirmation_token_idx')).toBeVisible()
 
       // check index definition
-      await page.getByRole('row', { name: 'confirmation_token_idx' }).getByRole('button').click()
+      await page
+        .getByRole('row', { name: 'confirmation_token_idx' })
+        .getByRole('button')
+        .last()
+        .click()
       await page.getByText('Index:confirmation_token_idx')
       await page.waitForTimeout(500) // wait for text content to be visible
       expect(await page.getByRole('presentation').textContent()).toBe(

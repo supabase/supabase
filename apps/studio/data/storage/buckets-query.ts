@@ -42,8 +42,13 @@ export const useBucketsQuery = <TData = BucketsData>(
     enabled: enabled && typeof projectRef !== 'undefined' && isActive,
     ...options,
     retry: (failureCount, error) => {
-      if (error instanceof ResponseError && error.message.includes('Missing tenant config')) {
-        return false
+      if (error instanceof ResponseError) {
+        if (
+          error.message.includes('Missing tenant config') ||
+          error.message.includes('Project has no active API keys')
+        ) {
+          return false
+        }
       }
 
       if (failureCount < MAX_RETRY_FAILURE_COUNT) {
