@@ -66,7 +66,7 @@ const ObservabilityMenu = () => {
     onSuccess: () => {
       setDeleteModalOpen(false)
       toast.success('Successfully deleted report')
-      router.push(`/project/${ref}/reports`)
+      router.push(`/project/${ref}/observability`)
     },
     onError: (error) => {
       toast.error(`Failed to delete report: ${error.message}`)
@@ -104,7 +104,7 @@ const ObservabilityMenu = () => {
       name: r.name,
       description: r.description || '',
       key: r.id || idx + '-report',
-      url: `/project/${ref}/reports/${r.id}${preservedQueryParams}`,
+      url: `/project/${ref}/observability/${r.id}${preservedQueryParams}`,
       hasDropdownActions: true,
       report: r,
     }))
