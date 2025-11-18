@@ -20,7 +20,7 @@ export function EventBanner() {
     <section className={cn('grid md:grid-cols-[minmax(320px,35%),1fr] gap-12')}>
       <CoverImage url={featuredEvent.cover_url} />
 
-      <article className="flex flex-col gap-6 py-2">
+      <article className="flex flex-col gap-6 lg:py-2">
         <div className="flex justify-between items-start">
           <div className="flex flex-col gap-1.5">
             <h2 className="text-2xl font-medium">{featuredEvent.title}</h2>
@@ -50,9 +50,15 @@ export function EventBanner() {
           <LocationWidget location={featuredEvent.location} />
         </div>
 
-        <p className="whitespace-pre-line text-foreground-light mt-4">
-          {featuredEvent.description}
-        </p>
+        <div className="h-80 relative flex">
+          <span className="absolute top-0 inset-x-0 h-8 bg-gradient-to-b from-background to-transparent" />
+
+          <p className="whitespace-pre-line py-4 text-foreground-light h-full overflow-y-auto">
+            {featuredEvent.description}
+          </p>
+
+          <span className="absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-background to-transparent" />
+        </div>
 
         {featuredEvent.link && (
           <Button className="block md:hidden mt-1" size="medium" asChild>
