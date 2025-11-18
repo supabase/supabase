@@ -14,10 +14,9 @@ export const dismissToastsIfAny = async (page: Page) => {
 }
 
 /**
- * Navigates to a specific bucket
+ * Navigates to a the storage home view
  * @param page - Playwright page instance
  * @param ref - Project reference
- * @param bucketName - Name of the bucket to navigate to
  */
 export const navigateToStorageFiles = async (page: Page, ref: string) => {
   await page.goto(toUrl(`/project/${ref}/storage/files`))
