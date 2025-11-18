@@ -10,9 +10,10 @@ import { IconPanel } from 'ui-patterns/IconPanel'
 import { getCustomContent } from '../lib/custom-content/getCustomContent'
 import DocsCoverLogo from './DocsCoverLogo'
 
-const { sdkDart: sdkDartEnabled, sdkKotlin: sdkKotlinEnabled } = isFeatureEnabled([
+const { sdkDart: sdkDartEnabled, sdkKotlin: sdkKotlinEnabled, sdkSwift: sdkSwiftEnabled } = isFeatureEnabled([
   'sdk:dart',
   'sdk:kotlin',
+  'sdk:swift',
 ])
 
 function AiPrompt({ className }: { className?: string }) {
@@ -51,31 +52,9 @@ const HomePageCover = (props) => {
       href: '/guides/getting-started/quickstarts/nextjs',
     },
     {
-      tooltip: 'RedwoodJS',
-      icon: '/docs/img/icons/redwoodjs-icon',
-      href: '/guides/getting-started/quickstarts/redwoodjs',
-    },
-    {
-      tooltip: 'Flutter',
-      icon: '/docs/img/icons/flutter-icon',
-      href: '/guides/getting-started/quickstarts/flutter',
-      enabled: sdkDartEnabled,
-    },
-    {
-      tooltip: 'Android Kotlin',
-      icon: '/docs/img/icons/kotlin-icon',
-      href: '/guides/getting-started/quickstarts/kotlin',
-      enabled: sdkKotlinEnabled,
-    },
-    {
       tooltip: 'SvelteKit',
       icon: '/docs/img/icons/svelte-icon',
       href: '/guides/getting-started/quickstarts/sveltekit',
-    },
-    {
-      tooltip: 'SolidJS',
-      icon: '/docs/img/icons/solidjs-icon',
-      href: '/guides/getting-started/quickstarts/solidjs',
     },
     {
       tooltip: 'Vue',
@@ -88,9 +67,32 @@ const HomePageCover = (props) => {
       href: '/guides/getting-started/quickstarts/nuxtjs',
     },
     {
-      tooltip: 'Refine',
-      icon: '/docs/img/icons/refine-icon',
-      href: '/guides/getting-started/quickstarts/refine',
+      tooltip: 'iOS Swift',
+      icon: '/docs/img/icons/swift-icon',
+      href: '/guides/getting-started/quickstarts/ios-swiftui',
+      enabled: sdkSwiftEnabled,
+    },
+    {
+      tooltip: 'Android Kotlin',
+      icon: '/docs/img/icons/kotlin-icon',
+      href: '/guides/getting-started/quickstarts/kotlin',
+      enabled: sdkKotlinEnabled,
+    },
+    {
+      tooltip: 'Expo React Native',
+      icon: '/docs/img/icons/expo-icon',
+      href: '/guides/getting-started/quickstarts/expo-react-native',
+    },
+    {
+      tooltip: 'Flutter',
+      icon: '/docs/img/icons/flutter-icon',
+      href: '/guides/getting-started/quickstarts/flutter',
+      enabled: sdkDartEnabled,
+    },
+    {
+      tooltip: 'SolidJS',
+      icon: '/docs/img/icons/solidjs-icon',
+      href: '/guides/getting-started/quickstarts/solidjs',
     },
   ]
 
