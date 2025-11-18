@@ -8,11 +8,11 @@ import {
   useFeaturePreviewModal,
   useUnifiedLogsPreview,
 } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsETLPrivateAlpha } from 'components/interfaces/Database/ETL/useIsETLPrivateAlpha'
 import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
 import SavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from 'components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useIsWithinETLAnalyticsBucketPrivateAlpha } from 'data/config/project-storage-config-query'
 import { useContentQuery } from 'data/content/content-query'
 import { useReplicationSourcesQuery } from 'data/etl/sources-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
@@ -100,7 +100,7 @@ export function LogsSidebarMenuV2() {
     'logs:collections',
   ])
 
-  const enablePgReplicate = useIsWithinETLAnalyticsBucketPrivateAlpha({ projectRef: ref })
+  const enablePgReplicate = useIsETLPrivateAlpha()
   const { data: etlData, isLoading: isETLLoading } = useReplicationSourcesQuery(
     {
       projectRef: ref,
