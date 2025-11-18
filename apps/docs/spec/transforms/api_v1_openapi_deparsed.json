@@ -62,7 +62,7 @@
     },
     {
       "name": "Storage",
-      "description": "Storage related endpoints"
+      "description": "Visit [https://supabase.github.io/storage/](https://supabase.github.io/storage/) for complete documentation."
     }
   ],
   "paths": {
@@ -8706,7 +8706,9 @@
                       "type": "string"
                     },
                     "statement_timeout": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Default unit: ms",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                     },
                     "track_commit_timestamp": {
                       "type": "boolean"
@@ -8715,15 +8717,17 @@
                       "type": "string"
                     },
                     "wal_sender_timeout": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Default unit: ms",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                     },
                     "work_mem": {
                       "type": "string"
                     },
                     "checkpoint_timeout": {
-                      "type": "integer",
-                      "minimum": 30,
-                      "maximum": 86400
+                      "type": "string",
+                      "description": "Default unit: s",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                     },
                     "hot_standby_feedback": {
                       "type": "boolean"
@@ -8852,7 +8856,9 @@
                     "type": "string"
                   },
                   "statement_timeout": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Default unit: ms",
+                    "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                   },
                   "track_commit_timestamp": {
                     "type": "boolean"
@@ -8861,15 +8867,17 @@
                     "type": "string"
                   },
                   "wal_sender_timeout": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Default unit: ms",
+                    "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                   },
                   "work_mem": {
                     "type": "string"
                   },
                   "checkpoint_timeout": {
-                    "type": "integer",
-                    "minimum": 30,
-                    "maximum": 86400
+                    "type": "string",
+                    "description": "Default unit: s",
+                    "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                   },
                   "hot_standby_feedback": {
                     "type": "boolean"
@@ -8959,7 +8967,9 @@
                       "type": "string"
                     },
                     "statement_timeout": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Default unit: ms",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                     },
                     "track_commit_timestamp": {
                       "type": "boolean"
@@ -8968,15 +8978,17 @@
                       "type": "string"
                     },
                     "wal_sender_timeout": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Default unit: ms",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                     },
                     "work_mem": {
                       "type": "string"
                     },
                     "checkpoint_timeout": {
-                      "type": "integer",
-                      "minimum": 30,
-                      "maximum": 86400
+                      "type": "string",
+                      "description": "Default unit: s",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                     },
                     "hot_standby_feedback": {
                       "type": "boolean"
@@ -22130,7 +22142,9 @@
             "type": "string"
           },
           "statement_timeout": {
-            "type": "string"
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
           },
           "track_commit_timestamp": {
             "type": "boolean"
@@ -22139,15 +22153,17 @@
             "type": "string"
           },
           "wal_sender_timeout": {
-            "type": "string"
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
           },
           "work_mem": {
             "type": "string"
           },
           "checkpoint_timeout": {
-            "type": "integer",
-            "minimum": 30,
-            "maximum": 86400
+            "type": "string",
+            "description": "Default unit: s",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
           },
           "hot_standby_feedback": {
             "type": "boolean"
@@ -22225,7 +22241,9 @@
             "type": "string"
           },
           "statement_timeout": {
-            "type": "string"
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
           },
           "track_commit_timestamp": {
             "type": "boolean"
@@ -22234,15 +22252,17 @@
             "type": "string"
           },
           "wal_sender_timeout": {
-            "type": "string"
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
           },
           "work_mem": {
             "type": "string"
           },
           "checkpoint_timeout": {
-            "type": "integer",
-            "minimum": 30,
-            "maximum": 86400
+            "type": "string",
+            "description": "Default unit: s",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
           },
           "hot_standby_feedback": {
             "type": "boolean"
