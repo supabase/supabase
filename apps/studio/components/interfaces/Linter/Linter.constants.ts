@@ -5,6 +5,12 @@ export enum LINTER_LEVELS {
   INFO = 'INFO',
 }
 
+export type LintActionArgs = {
+  projectRef: string
+  connectionString?: string | null
+  metadata: Lint['metadata']
+}
+
 export type LintInfo = {
   name: string
   title: string
@@ -13,6 +19,17 @@ export type LintInfo = {
   linkText: string
   docsLink: string
   category: 'security' | 'performance'
+  action?: {
+    label: string
+    getSql: (args: LintActionArgs) => string
+    confirm?: {
+      title: (args: LintActionArgs) => string
+      description?: (args: LintActionArgs) => string
+      confirmLabel?: string
+      cancelLabel?: string
+      variant?: 'default' | 'warning' | 'destructive'
+    }
+  }
 }
 
 export const LINT_TABS = [

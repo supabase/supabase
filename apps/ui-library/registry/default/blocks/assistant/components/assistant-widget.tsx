@@ -40,20 +40,21 @@ import { DefaultChatTransport } from 'ai'
 import { CheckIcon, MessageCircle } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
+import { Row, type RowItem } from './parts/row'
 
 const CHAT_API_URL = process.env.NEXT_PUBLIC_CHAT_API_URL
 
 const models = [
   {
-    id: 'gpt-4o',
-    name: 'GPT-4o',
+    id: 'gpt-5',
+    name: 'GPT-5',
     chef: 'OpenAI',
     chefSlug: 'openai',
     providers: ['openai', 'azure'],
   },
   {
-    id: 'gpt-4o-mini',
-    name: 'GPT-4o Mini',
+    id: 'gpt-5-mini',
+    name: 'GPT-5 Mini',
     chef: 'OpenAI',
     chefSlug: 'openai',
     providers: ['openai', 'azure'],
@@ -92,6 +93,10 @@ const suggestions = [
   'Explain cloud computing basics',
 ]
 
+type RenderRowToolInput = {
+  rows: RowItem[]
+}
+
 interface AssistantWidgetProps {
   /**
    * Override the trigger positioning if you need to embed the widget in a scoped container.
@@ -102,7 +107,7 @@ interface AssistantWidgetProps {
 export const AssistantWidget = ({
   triggerClassName = 'fixed bottom-6 right-6',
 }: AssistantWidgetProps = {}) => {
-  const [model, setModel] = useState<string>(models[0].id)
+  const [model, setModel] = useState<string>(models[1].id)
   const [modelSelectorOpen, setModelSelectorOpen] = useState(false)
   const [text, setText] = useState<string>('')
   const [useWebSearch, setUseWebSearch] = useState<boolean>(false)
@@ -213,6 +218,26 @@ export const AssistantWidget = ({
                     switch (part.type) {
                       case 'text':
                         return <MessageResponse key={`${role}-${i}`}>{part.text}</MessageResponse>
+                      case 'tool-renderRow': {
+                        const payload = (part.input ?? part.output) as
+                          | RenderRowToolInput
+                          | undefined
+                        if (!payload?.rows?.length) return null
+
+                        return (
+                          <Row
+                            key={`${role}-${i}`}
+                            onActionSelect={(prompt) => {
+                              if (prompt) {
+                                sendMessage({ text: prompt })
+                              }
+                            }}
+                            rows={payload.rows}
+                          />
+                        )
+                      }
+                      default:
+                        return null
                     }
                   })}
                 </MessageContent>

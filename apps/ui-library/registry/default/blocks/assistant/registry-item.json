@@ -34,6 +34,10 @@
       "type": "registry:component"
     },
     {
+      "path": "registry/default/blocks/assistant/components/parts/row.tsx",
+      "type": "registry:component"
+    },
+    {
       "path": "registry/default/blocks/assistant/lib/supabase/server.ts",
       "type": "registry:file",
       "target": "lib/supabase/server.ts"
@@ -62,6 +66,26 @@
       "path": "registry/default/blocks/assistant/supabase/functions/chat/index.ts",
       "type": "registry:file",
       "target": "supabase/functions/chat/index.ts"
+    },
+    {
+      "path": "registry/default/blocks/assistant/supabase/functions/chat/mcp-servers/types.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/chat/mcp-servers/types.ts"
+    },
+    {
+      "path": "registry/default/blocks/assistant/supabase/functions/chat/mcp-servers/supabase.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/chat/mcp-servers/supabase.ts"
+    },
+    {
+      "path": "registry/default/blocks/assistant/supabase/functions/chat/mcp-servers/registry.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/chat/mcp-servers/registry.ts"
+    },
+    {
+      "path": "registry/default/blocks/assistant/supabase/functions/chat/prompt.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/chat/prompt.ts"
     },
     {
       "path": "registry/default/blocks/assistant/supabase/functions/chat/deno.json",

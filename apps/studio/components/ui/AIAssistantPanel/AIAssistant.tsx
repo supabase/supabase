@@ -89,8 +89,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     !!selectedOrganization &&
     (aiOptInLevel === 'disabled' || aiOptInLevel === 'schema')
 
-  // Add a ref to store the last user message
+  // Add refs to store the last user message and track auto-submitted prompts
   const lastUserMessageRef = useRef<MessageType | null>(null)
+  const autoSubmittedInitialPromptChatsRef = useRef<Set<string>>(new Set())
 
   // Keep latest selected organization to avoid stale values in useChat transport
   const selectedOrganizationRef = useRef(selectedOrganization)
@@ -416,6 +417,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setMessages([])
     lastUserMessageRef.current = null
     setEditingMessageId(null)
+    autoSubmittedInitialPromptChatsRef.current.delete(snap.activeChatId ?? '')
   }
 
   useEffect(() => {
@@ -433,6 +435,22 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       inputRef.current.setSelectionRange(snap.initialInput.length, snap.initialInput.length)
     }
   }, [snap.initialInput])
+
+  useEffect(() => {
+    const initialInput = snap.initialInput?.trim()
+    if (
+      !initialInput ||
+      !snap.activeChatId ||
+      autoSubmittedInitialPromptChatsRef.current.has(snap.activeChatId) ||
+      chatMessages.length > 0 ||
+      isChatLoading
+    ) {
+      return
+    }
+
+    autoSubmittedInitialPromptChatsRef.current.add(snap.activeChatId)
+    sendMessageToAssistant(initialInput)
+  }, [snap.initialInput, snap.activeChatId, chatMessages.length, isChatLoading, sendMessageToAssistant])
 
   useEffect(() => {
     const isOpen = activeSidebar?.id === SIDEBAR_KEYS.AI_ASSISTANT

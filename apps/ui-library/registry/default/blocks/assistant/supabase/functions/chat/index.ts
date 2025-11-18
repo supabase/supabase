@@ -1,9 +1,47 @@
 import { experimental_createMCPClient as createMCPClient } from '@ai-sdk/mcp'
 import { openai } from '@ai-sdk/openai'
-import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
-import { convertToModelMessages, stepCountIs, streamText } from 'ai'
+import { convertToModelMessages, stepCountIs, streamText, tool } from 'ai'
+import { z } from 'zod'
 import { corsHeaders } from '../_shared/cors.ts'
+import { mcpServerRegistry } from './mcp-servers/registry.ts'
 import { systemPrompt } from './prompt.ts'
+
+const rowSchema = z.object({
+  primaryText: z.string().describe('Primary label for the row such as the task title.'),
+  secondaryText: z
+    .string()
+    .optional()
+    .describe('Secondary information such as due dates or task metadata.'),
+  actions: z
+    .array(
+      z.object({
+        label: z.string().describe('Text shown in the action menu, e.g., "Delete task".'),
+        prompt: z
+          .string()
+          .describe('Prompt to send back to the assistant when the action is selected.'),
+      })
+    )
+    .optional()
+    .describe('Optional list of quick actions the user can trigger for this row.'),
+})
+
+const renderRowTool = tool({
+  description:
+    'Render a task row to summarize Supabase records, including follow-up actions the user can take.',
+  inputSchema: z.object({
+    rows: z.array(rowSchema).min(1).describe('Rows to display to the user.'),
+  }),
+  execute: async ({ rows }) => {
+    return {
+      success: true,
+      message: 'Rows have been shown to the user',
+    }
+  },
+})
+
+const localTools = {
+  renderRow: renderRowTool,
+}
 
 type ChatRequestBody = {
   messages?: unknown[]
@@ -53,32 +91,39 @@ Deno.serve(async (req) => {
     })
   }
 
-  // Create MCP client to connect to our MCP server
-  let mcpClient
-  let tools = {}
+  // Create MCP clients from registry definitions
+  let tools = { ...localTools }
+  const mcpClients: Array<{ id: string; client: Awaited<ReturnType<typeof createMCPClient>> }> = []
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')
-    const mcpServerUrl = `${supabaseUrl}/functions/v1/mcp-server/mcp`
+    for (const server of mcpServerRegistry) {
+      try {
+        const transport = await server.createTransport({ authHeader })
+        if (!transport) continue
 
-    // Use StreamableHTTPClientTransport for compatibility with mcp-lite's StreamableHttpTransport
-    const transport = new StreamableHTTPClientTransport(new URL(mcpServerUrl), {
-      requestInit: {
-        headers: {
-          Authorization: authHeader,
-        },
-      },
-    })
+        const client = await createMCPClient({ transport })
+        mcpClients.push({ id: server.id, client })
 
-    mcpClient = await createMCPClient({
-      transport,
-    })
-
-    // Get available tools from the MCP server
-    tools = await mcpClient.tools()
+        const remoteTools = await client.tools()
+        tools = { ...tools, ...remoteTools }
+      } catch (serverError) {
+        console.error(`Failed to initialize MCP server "${server.id}":`, serverError)
+      }
+    }
   } catch (mcpError) {
-    console.error('MCP client initialization error:', mcpError)
-    // Continue without MCP tools if initialization fails
+    console.error('Unexpected MCP registry initialization error:', mcpError)
+  }
+
+  const closeMcpClients = async () => {
+    await Promise.all(
+      mcpClients.map(async ({ client }) => {
+        try {
+          await client.close()
+        } catch (closeError) {
+          console.error('Error closing MCP client:', closeError)
+        }
+      })
+    )
   }
 
   try {
@@ -89,10 +134,7 @@ Deno.serve(async (req) => {
       system: systemPrompt,
       tools,
       onFinish: async () => {
-        // Close the MCP client when the stream is complete
-        if (mcpClient) {
-          await mcpClient.close()
-        }
+        await closeMcpClients()
       },
     })
 
@@ -104,14 +146,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Assistant chat error:', error)
 
-    // Ensure MCP client is closed even on error
-    if (mcpClient) {
-      try {
-        await mcpClient.close()
-      } catch (closeError) {
-        console.error('Error closing MCP client:', closeError)
-      }
-    }
+    await closeMcpClients()
 
     return new Response(
       JSON.stringify({

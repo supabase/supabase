@@ -12,10 +12,20 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
+import { ident } from '@supabase/pg-meta/src/pg-format'
+
 import { LINTER_LEVELS, LintInfo } from 'components/interfaces/Linter/Linter.constants'
 import { LINT_TYPES, Lint } from 'data/lint/lint-query'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { DOCS_URL } from 'lib/constants'
 import { Badge, Button } from 'ui'
+
+const formatTableIdentifier = (metadata: { schema?: string; name?: string }) => {
+  if (!metadata.schema || !metadata.name) {
+    throw new Error('Table schema and name are required')
+  }
+  return `${ident(metadata.schema)}.${ident(metadata.name)}`
+}
 
 export const lintInfoMap: LintInfo[] = [
   {
@@ -134,6 +144,40 @@ export const lintInfoMap: LintInfo[] = [
     linkText: 'View policies',
     docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0013_rls_disabled_in_public`,
     category: 'security',
+    action: {
+      label: 'Enable RLS',
+      run: async ({ projectRef, connectionString, metadata }) => {
+        if (!projectRef) throw new Error('Project ref is required')
+
+        const tableSchema = (metadata as { schema?: string })?.schema
+        const tableName = (metadata as { name?: string })?.name
+
+        if (!tableSchema || !tableName) {
+          throw new Error('Table information is required to enable RLS')
+        }
+
+        const qualifiedIdentifier = `${ident(tableSchema)}.${ident(tableName)}`
+
+        await executeSql({
+          projectRef,
+          connectionString,
+          sql: `alter table ${qualifiedIdentifier} enable row level security;`,
+          contextualInvalidation: true,
+        })
+      },
+      confirm: {
+        title: ({ metadata }) => {
+          const tableName = (metadata as { name?: string })?.name ?? 'this table'
+          return `Enable Row Level Security for ${tableName}?`
+        },
+        description: ({ metadata }) => {
+          const tableSchema = (metadata as { schema?: string })?.schema ?? 'public'
+          const tableName = (metadata as { name?: string })?.name ?? 'this table'
+          return `Are you sure you want to enable Row Level Security for "${tableSchema}.${tableName}"?`
+        },
+        confirmLabel: 'Enable',
+      },
+    },
   },
   {
     name: 'extension_in_public',
@@ -376,7 +420,7 @@ export const createLintSummaryPrompt = (lint: Lint) => {
   const schema = lint.metadata?.schema ?? 'N/A'
   const issue = lint.detail ? lint.detail.replace(/\\`/g, '`') : 'N/A'
   const description = lint.description ? lint.description.replace(/\\`/g, '`') : 'N/A'
-  return `Summarize the issue and suggest fixes for the following lint item:
+  return `Execute the fix for the following issue with a brief one sentence explanation:
 Title: ${title}
 Entity: ${entity}
 Schema: ${schema}
