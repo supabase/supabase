@@ -17,6 +17,10 @@ services:
             - node_modules/
         - action: rebuild
           path: package.json
+    environment:
+      - EDGE_FUNCTIONS_MANAGEMENT_FOLDER=/app/edge-functions
+    volumes:
+      - ./volumes/functions:/app/edge-functions:Z
 
   mail:
     container_name: supabase-mail
