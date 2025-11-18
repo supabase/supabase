@@ -6,6 +6,7 @@
   "registryDependencies": [
     "button",
     "input",
+    "popover",
     "scroll-area",
     "@ai-elements/conversation",
     "@ai-elements/message",

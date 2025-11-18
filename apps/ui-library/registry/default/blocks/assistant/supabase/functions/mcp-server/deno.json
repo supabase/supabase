@@ -4,9 +4,10 @@
     "strict": true
   },
   "imports": {
-    "hono": "npm:hono@^4.6.14",
-    "mcp-lite": "npm:mcp-lite@0.8.2",
+    "hono": "npm:hono@4.10.6",
+    "mcp-lite": "npm:mcp-lite@0.10.0",
     "zod": "npm:zod@^4.1.12",
     "@supabase/supabase-js": "npm:@supabase/supabase-js@^2"
-  }
+  },
+  "verify_jwt": false
 }

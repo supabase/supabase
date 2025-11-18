@@ -1,6 +1,6 @@
 ---
 title: Assistant
-description: AI assistant widget that streams database-aware answers through Supabase Edge Functions and the Model Context Protocol (MCP).
+description: Add an AI Assistant to your product that can read and write to your database using user defined tools that respect your RLS policies.
 ---
 
 <BlockPreview name="assistant-demo" wide />
@@ -36,13 +36,13 @@ The bundle contains four key pieces:
 
 ## Environment variables
 
-| Key | Where it is used | Notes |
-| --- | ---------------- | ----- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Next.js client + Edge Functions | Base URL of your Supabase project. |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Next.js client | Anonymous key used by the browser client. |
-| `NEXT_PUBLIC_ASSISTANT_CHAT_URL` | Next.js client | Optional override for the chat Edge Function endpoint. Defaults to `${NEXT_PUBLIC_SUPABASE_URL}/functions/v1/chat`. |
-| `OPENAI_API_KEY` | `supabase/functions/chat` | Injected into the Edge Function to talk to your LLM provider. |
-| `MCP_SERVER_URL` | `supabase/functions/chat` and `supabase/functions/mcp-server` | Used by the chat handler to find the MCP server endpoint. |
+| Key                              | Where it is used                                              | Notes                                                                                                               |
+| -------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`       | Next.js client + Edge Functions                               | Base URL of your Supabase project.                                                                                  |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`  | Next.js client                                                | Anonymous key used by the browser client.                                                                           |
+| `NEXT_PUBLIC_ASSISTANT_CHAT_URL` | Next.js client                                                | Optional override for the chat Edge Function endpoint. Defaults to `${NEXT_PUBLIC_SUPABASE_URL}/functions/v1/chat`. |
+| `OPENAI_API_KEY`                 | `supabase/functions/chat`                                     | Injected into the Edge Function to talk to your LLM provider.                                                       |
+| `MCP_SERVER_URL`                 | `supabase/functions/chat` and `supabase/functions/mcp-server` | Used by the chat handler to find the MCP server endpoint.                                                           |
 
 Store these values in `.env.local` for the app and in a `.env` file that you pass to `supabase functions serve`.
 

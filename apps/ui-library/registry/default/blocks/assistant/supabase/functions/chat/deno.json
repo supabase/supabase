@@ -4,10 +4,11 @@
     "strict": true
   },
   "imports": {
-    "hono": "npm:hono@^4.6.14",
+    "hono": "npm:hono@4.10.6",
     "zod": "npm:zod@^4.1.12",
-    "ai": "npm:ai@^5.0.90",
-    "@ai-sdk/openai": "npm:@ai-sdk/openai@^2.0.32",
-    "@ai-sdk/mcp": "npm:@ai-sdk/mcp@latest"
+    "ai": "npm:ai@^5.0.93",
+    "@ai-sdk/openai": "npm:@ai-sdk/openai@^2.0.68",
+    "@ai-sdk/mcp": "npm:@ai-sdk/mcp@latest",
+    "@modelcontextprotocol/sdk/client/streamableHttp.js": "npm:@modelcontextprotocol/sdk@^1.22.0/client/streamableHttp.js"
   }
 }
