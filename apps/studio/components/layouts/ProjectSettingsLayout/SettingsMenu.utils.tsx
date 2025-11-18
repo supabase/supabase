@@ -44,6 +44,12 @@ export const generateSettingsMenu = (
             items: [],
           },
           {
+            name: 'JWT Keys',
+            key: 'jwt',
+            url: `/project/${ref}/settings/jwt`,
+            items: [],
+          },
+          {
             name: `Log Drains`,
             key: `log-drains`,
             url: `/project/${ref}/settings/log-drains`,
