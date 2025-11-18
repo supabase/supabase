@@ -2,11 +2,6 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import {
-  ScaffoldDescription,
-  ScaffoldSection,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
@@ -14,6 +9,14 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { DOCS_URL } from 'lib/constants'
 import { Button, Modal, ScrollArea, cn } from 'ui'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+  PageSectionDescription,
+} from 'ui-patterns/PageSection'
 import { AddNewURLModal } from './AddNewURLModal'
 import { RedirectUrlList } from './RedirectUrlList'
 import { ValueContainer } from './ValueContainer'
@@ -66,17 +69,22 @@ export const RedirectUrls = () => {
   }
 
   return (
-    <ScaffoldSection isFullWidth>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <ScaffoldSectionTitle>Redirect URLs</ScaffoldSectionTitle>
-          <ScaffoldDescription>
-            URLs that auth providers are permitted to redirect to post authentication. Wildcards are
-            allowed, for example, https://*.domain.com
-          </ScaffoldDescription>
-        </div>
-        <DocsButton href={`${DOCS_URL}/guides/auth/concepts/redirect-urls`} />
-      </div>
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <div className="flex items-center justify-between">
+            <div>
+              <PageSectionTitle>Redirect URLs</PageSectionTitle>
+              <PageSectionDescription>
+                URLs that auth providers are permitted to redirect to post authentication. Wildcards are
+                allowed, for example, https://*.domain.com
+              </PageSectionDescription>
+            </div>
+            <DocsButton href={`${DOCS_URL}/guides/auth/concepts/redirect-urls`} />
+          </div>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
 
       {isLoading && (
         <>
@@ -164,6 +172,7 @@ export const RedirectUrls = () => {
           </Button>
         </Modal.Content>
       </Modal>
-    </ScaffoldSection>
+    </PageSectionContent>
+  </PageSection>
   )
 }
