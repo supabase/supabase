@@ -8,7 +8,6 @@ import { toast } from 'sonner'
 import { boolean, object, string } from 'yup'
 
 import { useParams } from 'common'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
@@ -33,6 +32,13 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { NO_REQUIRED_CHARACTERS } from './Auth.constants'
 
 const schema = object({
@@ -114,39 +120,43 @@ export const BasicAuthSettingsForm = () => {
   }
 
   return (
-    <ScaffoldSection isFullWidth>
-      <ScaffoldSectionTitle className="mb-4">User Signups</ScaffoldSectionTitle>
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>User Signups</PageSectionTitle>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
+        {isError && (
+          <AlertError
+            error={authConfigError}
+            subject="Failed to retrieve auth configuration for hooks"
+          />
+        )}
 
-      {isError && (
-        <AlertError
-          error={authConfigError}
-          subject="Failed to retrieve auth configuration for hooks"
-        />
-      )}
+        {isPermissionsLoaded && !canReadConfig && (
+          <div className="mt-8">
+            <NoPermission resourceText="view auth configuration settings" />
+          </div>
+        )}
 
-      {isPermissionsLoaded && !canReadConfig && (
-        <div className="mt-8">
-          <NoPermission resourceText="view auth configuration settings" />
-        </div>
-      )}
-
-      {isLoading && (
-        <Card>
-          <CardContent className="py-6">
-            <ShimmeringLoader />
-          </CardContent>
-          <CardContent className="py-6">
-            <ShimmeringLoader />
-          </CardContent>
-          <CardContent className="py-6">
-            <ShimmeringLoader />
-          </CardContent>
-          <CardContent className="py-7">
-            <ShimmeringLoader />
-          </CardContent>
-          <CardContent className="py-7"></CardContent>
-        </Card>
-      )}
+        {isLoading && (
+          <Card>
+            <CardContent className="py-6">
+              <ShimmeringLoader />
+            </CardContent>
+            <CardContent className="py-6">
+              <ShimmeringLoader />
+            </CardContent>
+            <CardContent className="py-6">
+              <ShimmeringLoader />
+            </CardContent>
+            <CardContent className="py-7">
+              <ShimmeringLoader />
+            </CardContent>
+            <CardContent className="py-7"></CardContent>
+          </Card>
+        )}
 
       {isSuccess && (
         <Form_Shadcn_ {...form}>
@@ -331,6 +341,7 @@ export const BasicAuthSettingsForm = () => {
           </form>
         </Form_Shadcn_>
       )}
-    </ScaffoldSection>
+    </PageSectionContent>
+  </PageSection>
   )
 }
