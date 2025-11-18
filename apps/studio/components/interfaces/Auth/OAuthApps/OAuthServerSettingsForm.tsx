@@ -7,11 +7,6 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
@@ -33,6 +28,13 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 const configUrlSchema = z.object({
   id: z.string(),
@@ -186,12 +188,18 @@ export const OAuthServerSettingsForm = () => {
 
   if (isPermissionsLoaded && !canReadConfig) {
     return (
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">OAuth Server</ScaffoldSectionTitle>
-        <div className="mt-8">
-          <NoPermission resourceText="view OAuth server settings" />
-        </div>
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>OAuth Server</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <div className="mt-8">
+            <NoPermission resourceText="view OAuth server settings" />
+          </div>
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
@@ -205,8 +213,8 @@ export const OAuthServerSettingsForm = () => {
 
   return (
     <>
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionContent>
+      <PageSection>
+        <PageSectionContent>
           <Form_Shadcn_ {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="pb-10">
               <Card>
@@ -344,8 +352,8 @@ export const OAuthServerSettingsForm = () => {
               </Card>
             </form>
           </Form_Shadcn_>
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
+        </PageSectionContent>
+      </PageSection>
 
       {/* Dynamic Apps Confirmation Modal */}
       <ConfirmationModal
