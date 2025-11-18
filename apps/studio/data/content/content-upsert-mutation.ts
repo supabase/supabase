@@ -9,6 +9,7 @@ import { contentKeys } from './keys'
 
 export type UpsertContentPayload = Omit<components['schemas']['UpsertContentBody'], 'content'> & {
   content: Partial<Content['content']>
+  favorite?: boolean
 }
 
 export type UpsertContentVariables = {

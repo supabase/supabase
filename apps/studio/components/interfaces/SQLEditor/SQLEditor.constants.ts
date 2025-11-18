@@ -7,11 +7,11 @@ export const NEW_SQL_SNIPPET_SKELETON: UserContent<SqlSnippets.Content> = {
   description: '',
   type: 'sql',
   visibility: 'user', // default to user scope
+  favorite: false,
   content: {
     schema_version: SQL_SNIPPET_SCHEMA_VERSION,
     content_id: '',
     sql: 'this is a test',
-    favorite: false,
   },
 }
 

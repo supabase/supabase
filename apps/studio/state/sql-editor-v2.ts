@@ -395,10 +395,10 @@ if (typeof window !== 'undefined') {
               project_id: project_id ?? 0,
               owner_id: owner_id,
               folder_id: folder_id ?? undefined,
+              favorite: favorite ?? false,
               content: {
                 ...content!,
                 content_id: id,
-                favorite: favorite ?? false,
               },
             },
             shouldInvalidate

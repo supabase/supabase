@@ -9,6 +9,7 @@ import { contentKeys } from './keys'
 
 export type InsertContentPayload = Omit<components['schemas']['CreateContentBody'], 'content'> & {
   content: Content['content']
+  favorite?: boolean
 }
 
 export type InsertContentVariables = {
@@ -33,6 +34,7 @@ export async function insertContent(
       visibility: payload.visibility,
       content: payload.content as any,
       folder_id: payload.folder_id,
+      favorite: payload.favorite,
     },
     signal,
   })
