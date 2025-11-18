@@ -34,7 +34,10 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { CATEGORY_OPTIONS, type ExtendedSupportCategories } from './Support.constants'
-import { LinkSupportTicketFormSchema, type LinkSupportTicketFormValues } from './LinkSupportTicketForm.schema'
+import {
+  LinkSupportTicketFormSchema,
+  type LinkSupportTicketFormValues,
+} from './LinkSupportTicketForm.schema'
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
 
 interface LinkSupportTicketFormProps {
@@ -88,7 +91,10 @@ export function LinkSupportTicketForm({ conversationId }: LinkSupportTicketFormP
     linkSupportTicket({
       conversation_id: values.conversation_id,
       org_id: selectedOrg.id,
-      project_ref: values.projectRef && values.projectRef !== NO_PROJECT_MARKER ? values.projectRef : undefined,
+      project_ref:
+        values.projectRef && values.projectRef !== NO_PROJECT_MARKER
+          ? values.projectRef
+          : undefined,
       category: values.category,
       allow_support_access: values.allowSupportAccess,
     })
@@ -136,11 +142,9 @@ export function LinkSupportTicketForm({ conversationId }: LinkSupportTicketFormP
                     >
                       <SelectTrigger_Shadcn_ className="w-full" aria-label="Select an organization">
                         <SelectValue_Shadcn_ placeholder="Select an organization">
-                          {organizationSlug === NO_ORG_MARKER ? (
-                            'Select an organization'
-                          ) : (
-                            organizations?.find((o) => o.slug === field.value)?.name
-                          )}
+                          {organizationSlug === NO_ORG_MARKER
+                            ? 'Select an organization'
+                            : organizations?.find((o) => o.slug === field.value)?.name}
                         </SelectValue_Shadcn_>
                       </SelectTrigger_Shadcn_>
                       <SelectContent_Shadcn_>
@@ -170,7 +174,11 @@ export function LinkSupportTicketForm({ conversationId }: LinkSupportTicketFormP
                     sameWidthAsTrigger
                     fetchOnMount
                     checkPosition="left"
-                    slug={!selectedOrgSlug || selectedOrgSlug === NO_ORG_MARKER ? undefined : selectedOrgSlug}
+                    slug={
+                      !selectedOrgSlug || selectedOrgSlug === NO_ORG_MARKER
+                        ? undefined
+                        : selectedOrgSlug
+                    }
                     selectedRef={field.value}
                     onSelect={(project) => field.onChange(project.ref)}
                     renderTrigger={({ isLoading, project }) => {
@@ -182,7 +190,9 @@ export function LinkSupportTicketForm({ conversationId }: LinkSupportTicketFormP
                           aria-label="Select a project"
                           size="small"
                           className="justify-between"
-                          iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                          iconRight={
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          }
                           disabled={!selectedOrgSlug}
                         >
                           {!selectedOrgSlug ? (
@@ -225,7 +235,11 @@ export function LinkSupportTicketForm({ conversationId }: LinkSupportTicketFormP
             render={({ field }) => {
               const { ref: _ref, ...fieldWithoutRef } = field
               return (
-                <FormItemLayout hideMessage layout="vertical" label="What are you having issues with?">
+                <FormItemLayout
+                  hideMessage
+                  layout="vertical"
+                  label="What are you having issues with?"
+                >
                   <FormControl_Shadcn_>
                     <Select_Shadcn_
                       {...fieldWithoutRef}
@@ -298,13 +312,13 @@ export function LinkSupportTicketForm({ conversationId }: LinkSupportTicketFormP
                         <p>
                           By enabling this, you grant permission for our support team to access your
                           project temporarily and, if applicable, to use AI tools to assist in
-                          diagnosing and resolving issues. This access may involve analyzing database
-                          configurations, query performance, and other relevant data to expedite
-                          troubleshooting and enhance support accuracy.
+                          diagnosing and resolving issues. This access may involve analyzing
+                          database configurations, query performance, and other relevant data to
+                          expedite troubleshooting and enhance support accuracy.
                         </p>
                         <p>
-                          We are committed to maintaining strict data privacy and security standards in
-                          all support activities.{' '}
+                          We are committed to maintaining strict data privacy and security standards
+                          in all support activities.{' '}
                           <Link
                             href="https://supabase.com/privacy"
                             target="_blank"
@@ -346,4 +360,3 @@ export function LinkSupportTicketForm({ conversationId }: LinkSupportTicketFormP
     </Form_Shadcn_>
   )
 }
-

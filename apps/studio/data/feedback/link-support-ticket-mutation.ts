@@ -20,15 +20,18 @@ export async function linkSupportTicket({
   category,
   allow_support_access,
 }: LinkSupportTicketVariables) {
-  const { data, error } = await patch('/platform/feedback/conversations/{conversation_id}/custom-fields', {
-    params: { path: { conversation_id } },
-    body: {
-      org_id,
-      project_ref,
-      category,
-      allow_support_access,
-    },
-  })
+  const { data, error } = await patch(
+    '/platform/feedback/conversations/{conversation_id}/custom-fields',
+    {
+      params: { path: { conversation_id } },
+      body: {
+        org_id,
+        project_ref,
+        category,
+        allow_support_access,
+      },
+    }
+  )
 
   if (error) {
     handleError(error, {
@@ -68,4 +71,3 @@ export const useLinkSupportTicketMutation = ({
     ...options,
   })
 }
-

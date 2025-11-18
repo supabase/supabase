@@ -16,4 +16,3 @@ LinkSupportTicketPageRoute.getLayout = (page: ReactElement) => (
 )
 
 export default withAuth(LinkSupportTicketPageRoute, { useHighestAAL: false })
-

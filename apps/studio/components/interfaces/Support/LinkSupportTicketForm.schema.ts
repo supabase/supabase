@@ -25,4 +25,3 @@ export const LinkSupportTicketFormSchema = z.object({
 })
 
 export type LinkSupportTicketFormValues = z.infer<typeof LinkSupportTicketFormSchema>
-

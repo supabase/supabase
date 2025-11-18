@@ -42,4 +42,3 @@ function LinkSupportTicketPageWrapper({ children }: PropsWithChildren) {
     </div>
   )
 }
-
