@@ -14,6 +14,7 @@ Check updates, changelogs, and release notes for each service to learn more.
 ### Studio
 - Fixed PostgREST configuration UI and added [documentation for exposed queue schema](https://supabase.com/docs/guides/queues/expose-self-hosted-queues) - [PR #40078](https://github.com/supabase/supabase/pull/40078)
 - Fixed Studio showing paid options for log drains - [PR #40510](https://github.com/supabase/supabase/pull/40510)
+- Fixed MCP `list_tables` tool - [PR #40499](https://github.com/supabase/supabase/pull/40499)
 
 ## [2025-11-17]
 
