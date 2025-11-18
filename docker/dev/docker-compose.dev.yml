@@ -7,7 +7,7 @@ services:
       dockerfile: apps/studio/Dockerfile
       target: dev
     ports:
-      - 8082:8082
+      - 8082:3000
   mail:
     container_name: supabase-mail
     image: inbucket/inbucket:3.0.3
