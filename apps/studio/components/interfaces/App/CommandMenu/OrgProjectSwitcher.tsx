@@ -79,7 +79,10 @@ export function useConfigureOrganizationCommand() {
         },
       ],
     },
-    { deps: [organizations], enabled: !!organizations && organizations.length > 0 }
+    {
+      deps: [organizations],
+      enabled: IS_PLATFORM && !!organizations && organizations.length > 0,
+    }
   )
 
   useRegisterCommands(
@@ -93,6 +96,6 @@ export function useConfigureOrganizationCommand() {
         icon: () => <Building />,
       },
     ],
-    { enabled: !!organizations && organizations.length > 0 }
+    { enabled: IS_PLATFORM && !!organizations && organizations.length > 0 }
   )
 }

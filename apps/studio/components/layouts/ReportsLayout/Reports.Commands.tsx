@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 
 import { useParams } from 'common'
+import { IS_PLATFORM } from 'lib/constants'
 import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
@@ -67,6 +68,7 @@ export function useReportsGotoCommands(options?: CommandOptions) {
       ...options,
       orderSection: orderNavigateSection,
       deps: [ref, orderNavigateSection, ...(options?.deps ?? [])],
+      enabled: IS_PLATFORM,
     }
   )
 
@@ -87,6 +89,7 @@ export function useReportsGotoCommands(options?: CommandOptions) {
       orderCommands: orderQueryPerformanceCommand ?? options?.orderCommands,
       orderSection: orderNavigateSection,
       deps: [ref, orderQueryPerformanceCommand, orderNavigateSection, ...(options?.deps ?? [])],
+      enabled: IS_PLATFORM,
     }
   )
 }

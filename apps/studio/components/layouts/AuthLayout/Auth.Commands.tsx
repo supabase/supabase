@@ -1,6 +1,6 @@
 import { Lock } from 'lucide-react'
 
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
 import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -67,7 +67,32 @@ export function useAuthGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/auth/policies`,
         defaultHidden: true,
       },
-      ...(authenticationSignInProviders
+      ...(IS_PLATFORM
+        ? ([
+            {
+              id: 'nav-auth-sessions',
+              name: 'Sessions',
+              value: 'Auth: Sessions (User Sessions)',
+              route: `/project/${ref}/auth/sessions`,
+              defaultHidden: true,
+            },
+            {
+              id: 'nav-auth-url-configuration',
+              name: 'URL Configuration',
+              value: 'Auth: URL Configuration (Site URL, Redirect URLs)',
+              route: `/project/${ref}/auth/url-configuration`,
+              defaultHidden: true,
+            },
+            {
+              id: 'nav-auth-auth-hooks',
+              name: 'Auth Hooks',
+              value: 'Auth: Auth Hooks',
+              route: `/project/${ref}/auth/hooks`,
+              defaultHidden: true,
+            },
+          ] as IRouteCommand[])
+        : []),
+      ...(IS_PLATFORM && authenticationSignInProviders
         ? [
             {
               id: 'nav-auth-providers',
@@ -78,7 +103,7 @@ export function useAuthGotoCommands(options?: CommandOptions) {
             } as IRouteCommand,
           ]
         : []),
-      ...(authenticationThirdPartyAuth
+      ...(IS_PLATFORM && authenticationThirdPartyAuth
         ? [
             {
               id: 'nav-auth-providers',
@@ -89,14 +114,7 @@ export function useAuthGotoCommands(options?: CommandOptions) {
             } as IRouteCommand,
           ]
         : []),
-      {
-        id: 'nav-auth-sessions',
-        name: 'Sessions',
-        value: 'Auth: Sessions (User Sessions)',
-        route: `/project/${ref}/auth/sessions`,
-        defaultHidden: true,
-      },
-      ...(authenticationRateLimits
+      ...(IS_PLATFORM && authenticationRateLimits
         ? [
             {
               id: 'nav-auth-rate-limits',
@@ -107,7 +125,7 @@ export function useAuthGotoCommands(options?: CommandOptions) {
             } as IRouteCommand,
           ]
         : []),
-      ...(authenticationEmails
+      ...(IS_PLATFORM && authenticationEmails
         ? [
             {
               id: 'nav-auth-templates',
@@ -118,7 +136,7 @@ export function useAuthGotoCommands(options?: CommandOptions) {
             } as IRouteCommand,
           ]
         : []),
-      ...(authenticationMultiFactor
+      ...(IS_PLATFORM && authenticationMultiFactor
         ? [
             {
               id: 'nav-auth-mfa',
@@ -129,14 +147,7 @@ export function useAuthGotoCommands(options?: CommandOptions) {
             } as IRouteCommand,
           ]
         : []),
-      {
-        id: 'nav-auth-url-configuration',
-        name: 'URL Configuration',
-        value: 'Auth: URL Configuration (Site URL, Redirect URLs)',
-        route: `/project/${ref}/auth/url-configuration`,
-        defaultHidden: true,
-      },
-      ...(authenticationAttackProtection
+      ...(IS_PLATFORM && authenticationAttackProtection
         ? [
             {
               id: 'nav-auth-attack-protection',
@@ -147,14 +158,7 @@ export function useAuthGotoCommands(options?: CommandOptions) {
             } as IRouteCommand,
           ]
         : []),
-      {
-        id: 'nav-auth-auth-hooks',
-        name: 'Auth Hooks',
-        value: 'Auth: Auth Hooks',
-        route: `/project/${ref}/auth/hooks`,
-        defaultHidden: true,
-      },
-      ...(authenticationAdvanced
+      ...(IS_PLATFORM && authenticationAdvanced
         ? [
             {
               id: 'nav-auth-advanced-settings',
