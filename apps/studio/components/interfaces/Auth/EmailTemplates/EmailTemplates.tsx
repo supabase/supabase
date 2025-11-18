@@ -130,36 +130,44 @@ export const EmailTemplates = () => {
   }, [authConfig])
 
   return (
-    <PageSection className="!pt-0">
-      <PageSectionContent>
-        {isError && (
-          <AlertError
-            className="mt-12"
-            error={authConfigError}
-            subject="Failed to retrieve auth configuration"
-          />
-        )}
-        {isLoading && (
-          <div className="w-[854px] mt-12">
-            <GenericSkeletonLoader />
-          </div>
-        )}
-        {isSuccess && (
-          <>
-            {builtInSMTP ? (
-              <div className="mt-12">
-                <EmailRateLimitsAlert />
-              </div>
-            ) : null}
-            {isSecurityNotificationsEnabled ? (
-              <div className="mt-12 space-y-12">
-                <div>
-                  <PageSectionMeta>
-                    <PageSectionSummary>
-                      <PageSectionTitle>Authentication</PageSectionTitle>
-                    </PageSectionSummary>
-                  </PageSectionMeta>
-                <Card>
+    <>
+      {isError && (
+        <PageSection className="!pt-0">
+          <PageSectionContent>
+            <AlertError
+              className="mt-12"
+              error={authConfigError}
+              subject="Failed to retrieve auth configuration"
+            />
+          </PageSectionContent>
+        </PageSection>
+      )}
+      {isLoading && (
+        <PageSection className="!pt-0">
+          <PageSectionContent>
+            <div className="w-[854px] mt-12">
+              <GenericSkeletonLoader />
+            </div>
+          </PageSectionContent>
+        </PageSection>
+      )}
+      {isSuccess && (
+        <>
+          {builtInSMTP ? (
+            <div className="mt-12">
+              <EmailRateLimitsAlert />
+            </div>
+          ) : null}
+          {isSecurityNotificationsEnabled ? (
+            <>
+              <PageSection className="!pt-0">
+                <PageSectionMeta>
+                  <PageSectionSummary>
+                    <PageSectionTitle>Authentication</PageSectionTitle>
+                  </PageSectionSummary>
+                </PageSectionMeta>
+                <PageSectionContent>
+                  <Card>
                   {TEMPLATES_SCHEMAS.filter(
                     (t) => t.misc?.emailTemplateType === 'authentication'
                   ).map((template) => {
@@ -186,14 +194,16 @@ export const EmailTemplates = () => {
                     )
                   })}
                 </Card>
-              </div>
+                </PageSectionContent>
+              </PageSection>
 
-              <div>
+              <PageSection>
                 <PageSectionMeta>
                   <PageSectionSummary>
                     <PageSectionTitle>Security</PageSectionTitle>
                   </PageSectionSummary>
                 </PageSectionMeta>
+                <PageSectionContent>
                 {!acknowledged && (
                   <Admonition showIcon={false} type="tip" className="relative mb-6">
                     <Tooltip>
@@ -322,10 +332,13 @@ export const EmailTemplates = () => {
                     </Card>
                   </form>
                 </Form_Shadcn_>
-              </div>
-            </div>
+                </PageSectionContent>
+              </PageSection>
+            </>
           ) : (
-            <Card className="mt-12">
+            <PageSection className="!pt-0">
+              <PageSectionContent>
+                <Card className="mt-12">
               <Tabs_Shadcn_ defaultValue={slugifyTitle(TEMPLATES_SCHEMAS[0].title)}>
                 <TabsList_Shadcn_ className="pt-2 px-6 gap-5 mb-0 overflow-x-scroll no-scrollbar mb-4">
                   {TEMPLATES_SCHEMAS.filter(
@@ -351,10 +364,11 @@ export const EmailTemplates = () => {
                 })}
               </Tabs_Shadcn_>
             </Card>
+          </PageSectionContent>
+        </PageSection>
           )}
         </>
       )}
-    </PageSectionContent>
-  </PageSection>
+    </>
   )
 }
