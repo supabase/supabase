@@ -273,7 +273,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
             <StatCard
               title="Auth API Success Rate"
               current={apiSuccessRateCurrent}
