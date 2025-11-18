@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { AnimatedLogos } from './AnimatedLogos'
 import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { VoteLink } from './VoteLink'
+import { IS_PLATFORM } from 'common'
 
 export const LogDrainsEmpty = () => {
   const items = [
@@ -22,7 +23,7 @@ export const LogDrainsEmpty = () => {
       label: 'Read our documentation',
       link: 'https://supabase.com/docs/guides/telemetry/log-drains',
     },
-  ]
+  ].filter((item) => IS_PLATFORM || item.title !== 'Pricing')
 
   return (
     <div className="flex grow h-full">
@@ -38,13 +39,16 @@ export const LogDrainsEmpty = () => {
               Upgrade plan
             </UpgradePlanButton>
           </div>
-          <Card className="grid grid-cols-1 @xl:grid-cols-2 bg divide-x mb-8">
+          <Card
+            className={cn('grid grid-cols-1 bg divide-x mb-8', IS_PLATFORM && '@xl:grid-cols-2')}
+          >
             {items.map((item, i) => (
               <div className="flex flex-col h-full p-6" key={i}>
                 <div className="flex items-center gap-3 mb-2">
                   <span
                     className={cn(
-                      'text-xs shrink-0 font-mono text-foreground-light w-7 h-7 bg border flex items-center justify-center rounded-md'
+                      'text-xs shrink-0 font-mono text-foreground-light w-7 h-7 bg border flex items-center justify-center rounded-md',
+                      !IS_PLATFORM && 'hidden'
                     )}
                   >
                     {item.step}
