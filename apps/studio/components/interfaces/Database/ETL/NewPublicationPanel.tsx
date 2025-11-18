@@ -87,7 +87,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
                 <div>
                   <SheetTitle>New Publication</SheetTitle>
                   <SheetDescription>
-                    Create a new publication to share table changes for replication
+                    Create a new publication to replicate table changes to destinations
                   </SheetDescription>
                 </div>
                 <SheetClose
@@ -126,7 +126,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
                     render={({ field }) => (
                       <FormItemLayout
                         label="Tables"
-                        description="Which tables to make available for replication"
+                        description="Which tables to replicate to destinations"
                       >
                         <FormControl_Shadcn_>
                           <MultiSelector
