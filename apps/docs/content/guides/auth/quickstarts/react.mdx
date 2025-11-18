@@ -258,8 +258,8 @@ hideToc: true
 
     Before proceeding, change the email template to support support a server-side authentication flow that sends a token hash:
 
-    - Go to the Auth templates page in your dashboard.
-    - Select the Confirm signup template.
+    - Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard.
+    - Select the Confirm sign up template.
     - Change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}?token_hash={{ .TokenHash }}&type=email`.
     - Change your [Site URL](/dashboard/project/_/auth/url-configuration) to `https://localhost:5173`
 
