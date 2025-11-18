@@ -17,7 +17,6 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
-import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const AuthOverview: NextPageWithLayout = () => {
   const router = useRouter()
@@ -60,14 +59,8 @@ const AuthOverview: NextPageWithLayout = () => {
         </PageHeaderMeta>
       </PageHeader>
       <PageContainer size="large">
-        <PageSection>
-          <PageSectionContent>
-            <div className="mb-4 flex flex-col gap-2">
-              <OverviewMetrics metrics={metrics} isLoading={isLoading} error={error} />
-              <OverviewLearnMore />
-            </div>
-          </PageSectionContent>
-        </PageSection>
+        <OverviewMetrics metrics={metrics} isLoading={isLoading} error={error} />
+        <OverviewLearnMore />
       </PageContainer>
     </>
   )
