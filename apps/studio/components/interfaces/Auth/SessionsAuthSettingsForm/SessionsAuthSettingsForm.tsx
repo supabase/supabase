@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
@@ -29,6 +28,13 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 function HoursOrNeverText({ value }: { value: number }) {
   if (value === 0) {
@@ -158,34 +164,44 @@ export const SessionsAuthSettingsForm = () => {
 
   if (isError) {
     return (
-      <ScaffoldSection isFullWidth>
-        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   if (!canReadConfig) {
     return (
-      <ScaffoldSection isFullWidth>
-        <NoPermission resourceText="view auth configuration settings" />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <NoPermission resourceText="view auth configuration settings" />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   if (isLoading) {
     return (
-      <ScaffoldSection isFullWidth>
-        <GenericSkeletonLoader />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <GenericSkeletonLoader />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   return (
     <>
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">Refresh Tokens</ScaffoldSectionTitle>
-
-        <Form_Shadcn_ {...refreshTokenForm}>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Refresh Tokens</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Form_Shadcn_ {...refreshTokenForm}>
           <form
             onSubmit={refreshTokenForm.handleSubmit(onSubmitRefreshTokens)}
             className="space-y-4"
@@ -258,11 +274,16 @@ export const SessionsAuthSettingsForm = () => {
             </Card>
           </form>
         </Form_Shadcn_>
-      </ScaffoldSection>
+      </PageSectionContent>
+    </PageSection>
 
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">User Sessions</ScaffoldSectionTitle>
-
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>User Sessions</PageSectionTitle>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
         <Form_Shadcn_ {...userSessionsForm}>
           <form
             onSubmit={userSessionsForm.handleSubmit(onSubmitUserSessions)}
@@ -374,7 +395,8 @@ export const SessionsAuthSettingsForm = () => {
             </Card>
           </form>
         </Form_Shadcn_>
-      </ScaffoldSection>
+      </PageSectionContent>
+    </PageSection>
     </>
   )
 }
