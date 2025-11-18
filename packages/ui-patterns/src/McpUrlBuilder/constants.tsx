@@ -76,52 +76,6 @@ export const MCP_CLIENTS: McpClient[] = [
     },
   },
   {
-    key: 'vscode',
-    label: 'VS Code',
-    icon: 'vscode',
-    configFile: '.vscode/mcp.json',
-    externalDocsUrl: 'https://code.visualstudio.com/docs/copilot/chat/mcp-servers',
-    transformConfig: (config): VSCodeMcpConfig => {
-      return {
-        servers: {
-          supabase: {
-            type: 'http',
-            url: config.mcpServers.supabase.url,
-          },
-        },
-      }
-    },
-    generateDeepLink: (_config) => {
-      const config = _config as VSCodeMcpConfig
-      const mcpConfig = { name: 'supabase', ...config.servers.supabase }
-
-      return `vscode:mcp/install?${encodeURIComponent(JSON.stringify(mcpConfig))}`
-    },
-  },
-  {
-    key: 'windsurf',
-    label: 'Windsurf',
-    icon: 'windsurf',
-    configFile: '~/.codeium/windsurf/mcp_config.json',
-    externalDocsUrl: '',
-    transformConfig: (config): WindsurfMcpConfig => {
-      return {
-        mcpServers: {
-          supabase: {
-            command: 'npx',
-            args: ['-y', 'mcp-remote', config.mcpServers.supabase.url],
-          },
-        },
-      }
-    },
-    alternateInstructions: (_config, _onCopy) => (
-      <p className="text-xs text-foreground-light">
-        Windsurf does not currently support remote MCP servers over HTTP transport. You need to use
-        the mcp-remote package as a proxy.
-      </p>
-    ),
-  },
-  {
     key: 'claude-code',
     label: 'Claude Code',
     icon: 'claude',
@@ -174,6 +128,97 @@ export const MCP_CLIENTS: McpClient[] = [
           Select the "supabase" server, then "Authenticate" to begin the authentication flow.
         </p>
       </div>
+    ),
+  },
+  {
+    key: 'vscode',
+    label: 'VS Code',
+    icon: 'vscode',
+    configFile: '.vscode/mcp.json',
+    externalDocsUrl: 'https://code.visualstudio.com/docs/copilot/chat/mcp-servers',
+    transformConfig: (config): VSCodeMcpConfig => {
+      return {
+        servers: {
+          supabase: {
+            type: 'http',
+            url: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+    generateDeepLink: (_config) => {
+      const config = _config as VSCodeMcpConfig
+      const mcpConfig = { name: 'supabase', ...config.servers.supabase }
+
+      return `vscode:mcp/install?${encodeURIComponent(JSON.stringify(mcpConfig))}`
+    },
+  },
+  {
+    key: 'codex',
+    label: 'Codex',
+    icon: 'openai',
+    configFile: '~/.codex/config.toml',
+    externalDocsUrl: 'https://developers.openai.com/codex/mcp/',
+    transformConfig: (config): CodexMcpConfig => {
+      return {
+        mcp_servers: {
+          supabase: {
+            url: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+    primaryInstructions: (config) => {
+      const mcpUrl = getMcpUrl(config)
+      const command = `codex mcp add supabase --url ${mcpUrl}`
+      return (
+        <div className="space-y-2">
+          <p className="text-xs text-foreground-light">Add the Supabase MCP server to Codex:</p>
+          <CodeBlock value={command} language="bash" focusable={false} className="block" />
+        </div>
+      )
+    },
+    alternateInstructions: () => (
+      <div className="space-y-2">
+        <p className="text-xs text-foreground-light">
+          After adding the server, enable remote MCP client support by adding this to your{' '}
+          <code>~/.codex/config.toml</code>:
+        </p>
+        <CodeBlock value={`[features]\nrmcp_client = true`} focusable={false} className="block" />
+        <p className="text-xs text-foreground-light">Then authenticate:</p>
+        <CodeBlock
+          value="codex mcp login supabase"
+          language="bash"
+          focusable={false}
+          className="block"
+        />
+        <p className="text-xs text-foreground-light">
+          Finally, run <code>/mcp</code> inside Codex to verify authentication.
+        </p>
+      </div>
+    ),
+  },
+  {
+    key: 'windsurf',
+    label: 'Windsurf',
+    icon: 'windsurf',
+    configFile: '~/.codeium/windsurf/mcp_config.json',
+    externalDocsUrl: '',
+    transformConfig: (config): WindsurfMcpConfig => {
+      return {
+        mcpServers: {
+          supabase: {
+            command: 'npx',
+            args: ['-y', 'mcp-remote', config.mcpServers.supabase.url],
+          },
+        },
+      }
+    },
+    alternateInstructions: () => (
+      <p className="text-xs text-foreground-light">
+        Windsurf does not currently support remote MCP servers over HTTP transport. You need to use
+        the mcp-remote package as a proxy.
+      </p>
     ),
   },
   {
@@ -267,51 +312,6 @@ export const MCP_CLIENTS: McpClient[] = [
         <p className="text-xs text-foreground-light">
           Restart Factory or type <code>/mcp</code> within droid to complete the OAuth
           authentication flow.
-        </p>
-      </div>
-    ),
-  },
-  {
-    key: 'codex',
-    label: 'Codex',
-    icon: 'openai',
-    configFile: '~/.codex/config.toml',
-    externalDocsUrl: 'https://developers.openai.com/codex/mcp/',
-    transformConfig: (config): CodexMcpConfig => {
-      return {
-        mcp_servers: {
-          supabase: {
-            url: config.mcpServers.supabase.url,
-          },
-        },
-      }
-    },
-    primaryInstructions: (config) => {
-      const mcpUrl = getMcpUrl(config)
-      const command = `codex mcp add supabase --url ${mcpUrl}`
-      return (
-        <div className="space-y-2">
-          <p className="text-xs text-foreground-light">Add the Supabase MCP server to Codex:</p>
-          <CodeBlock value={command} language="bash" focusable={false} className="block" />
-        </div>
-      )
-    },
-    alternateInstructions: () => (
-      <div className="space-y-2">
-        <p className="text-xs text-foreground-light">
-          After adding the server, enable remote MCP client support by adding this to your{' '}
-          <code>~/.codex/config.toml</code>:
-        </p>
-        <CodeBlock value={`[features]\nrmcp_client = true`} focusable={false} className="block" />
-        <p className="text-xs text-foreground-light">Then authenticate:</p>
-        <CodeBlock
-          value="codex mcp login supabase"
-          language="bash"
-          focusable={false}
-          className="block"
-        />
-        <p className="text-xs text-foreground-light">
-          Finally, run <code>/mcp</code> inside Codex to verify authentication.
         </p>
       </div>
     ),
