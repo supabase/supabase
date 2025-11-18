@@ -4,8 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { addAPIMock } from 'tests/lib/msw'
-
-import { render } from 'tests/helpers'
+import { customRender } from 'tests/lib/custom-render'
 import { routerMock } from 'tests/lib/route-mock'
 import { CreateBucketModal } from '../CreateBucketModal'
 
@@ -41,7 +40,7 @@ describe(`CreateBucketModal`, () => {
   })
 
   it(`renders a dialog with a form`, async () => {
-    render(
+    customRender(
       <ProjectContextProvider projectRef="default">
         <CreateBucketModal />
       </ProjectContextProvider>
