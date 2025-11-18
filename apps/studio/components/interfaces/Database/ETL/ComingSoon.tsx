@@ -203,8 +203,9 @@ const CTANode = ({ projectRef }: { projectRef: string }) => {
           <Badge variant="warning">Early Access</Badge>
         </div>
         <p className="text-foreground-light">
-          Replicate database changes to multiple destinations with ETL replication - no manual exports, no lag. Limited
-          rollout for external destinations has begun, read replicas available now.
+          Replicate database changes to multiple destinations with ETL replication - no manual
+          exports, no lag. Limited rollout for external destinations has begun, read replicas
+          available now.
         </p>
         <div className="flex items-center gap-x-2 mt-6">
           <Button asChild type="secondary" iconRight={<ArrowUpRight size={16} strokeWidth={1.5} />}>

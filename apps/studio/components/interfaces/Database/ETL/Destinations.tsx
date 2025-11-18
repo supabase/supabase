@@ -200,7 +200,7 @@ export const Destinations = () => {
               )}
             >
               <h4>Create your first destination</h4>
-              <p className="prose text-sm text-center mt-1 max-w-full">
+              <p className="prose text-sm text-center mt-1 max-w-[70ch]">
                 Destinations are external platforms where your database changes are automatically
                 sent. Connect to various data warehouses and analytics platforms to enable real-time
                 data pipelines.
