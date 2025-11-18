@@ -5,6 +5,7 @@ import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import type { Bucket } from 'data/storage/buckets-query'
+import useLatest from 'hooks/misc/useLatest'
 import { IS_PLATFORM } from 'lib/constants'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
@@ -54,29 +55,37 @@ export const StorageExplorer = () => {
   const [itemSearchString, setItemSearchString] = useState('')
   const debouncedSearchString = useDebounce(itemSearchString, 500)
 
+  const fetchFoldersByPathRef = useLatest(fetchFoldersByPath)
+  const fetchFolderContentsRef = useLatest(fetchFolderContents)
+  const viewRef = useLatest(view)
+  const openedFoldersRef = useLatest(openedFolders)
   useEffect(() => {
     const fetchContents = async (bucket: Bucket) => {
-      if (view === STORAGE_VIEWS.LIST) {
-        const currentFolderIdx = openedFolders.length - 1
-        const currentFolder = openedFolders[currentFolderIdx]
+      if (viewRef.current === STORAGE_VIEWS.LIST) {
+        const currentFolderIdx = openedFoldersRef.current.length - 1
+        const currentFolder = openedFoldersRef.current[currentFolderIdx]
 
         const folderId = !currentFolder ? bucket.id : currentFolder.id
         const folderName = !currentFolder ? bucket.name : currentFolder.name
         const index = !currentFolder ? -1 : currentFolderIdx
 
-        await fetchFolderContents({
+        await fetchFolderContentsRef.current({
           bucketId: bucket.id,
           folderId,
           folderName,
           index,
           searchString: debouncedSearchString,
         })
-      } else if (view === STORAGE_VIEWS.COLUMNS) {
-        if (openedFolders.length > 0) {
-          const paths = openedFolders.map((folder) => folder.name)
-          fetchFoldersByPath({ paths, searchString: debouncedSearchString, showLoading: true })
+      } else if (viewRef.current === STORAGE_VIEWS.COLUMNS) {
+        if (openedFoldersRef.current.length > 0) {
+          const paths = openedFoldersRef.current.map((folder) => folder.name)
+          fetchFoldersByPathRef.current({
+            paths,
+            searchString: debouncedSearchString,
+            showLoading: true,
+          })
         } else {
-          await fetchFolderContents({
+          await fetchFolderContentsRef.current({
             bucketId: bucket.id,
             folderId: bucket.id,
             folderName: bucket.name,
@@ -88,13 +97,20 @@ export const StorageExplorer = () => {
     }
 
     if (bucket && !!projectRef) fetchContents(bucket)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bucket, projectRef, debouncedSearchString])
+  }, [
+    bucket,
+    projectRef,
+    debouncedSearchString,
+    viewRef,
+    openedFoldersRef,
+    fetchFolderContentsRef,
+    fetchFoldersByPathRef,
+  ])
 
+  const openBucketRef = useLatest(openBucket)
   useEffect(() => {
-    if (bucket && !!projectRef) openBucket(bucket)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bucket, projectRef])
+    if (bucket && !!projectRef) openBucketRef.current(bucket)
+  }, [bucket, projectRef, openBucketRef])
 
   /** Checkbox selection methods */
   /** [Joshen] We'll only support checkbox selection for files ONLY */

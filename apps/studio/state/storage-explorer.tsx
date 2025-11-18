@@ -1889,8 +1889,17 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
         })
       )
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [project?.ref, stateRef, isPaused, resumableUploadUrl, protocol, endpoint, isSuccessSettings])
+  }, [
+    state.projectRef,
+    project?.ref,
+    project?.connectionString,
+    stateRef,
+    isPaused,
+    resumableUploadUrl,
+    protocol,
+    endpoint,
+    isSuccessSettings,
+  ])
 
   return (
     <StorageExplorerStateContext.Provider value={state}>
