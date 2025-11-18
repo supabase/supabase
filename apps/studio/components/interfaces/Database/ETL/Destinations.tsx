@@ -134,11 +134,10 @@ export const Destinations = () => {
         ) : replicationNotEnabled ? (
           <div className="border rounded-md p-4 md:p-12 flex flex-col gap-y-4">
             <div className="flex flex-col gap-y-1">
-              <h3>Stream data to external destinations in real-time</h3>
+              <h3>Replicate data to external destinations in real-time</h3>
               <p className="text-sm text-foreground-light">
-                {isPaidPlan
-                  ? 'Enable replication to start sending your database changes to data warehouses and analytics platforms'
-                  : 'Upgrade to the Pro plan to send your database changes to data warehouses and analytics platforms via replication'}
+                {isPaidPlan ? 'Enable ETL replication' : 'Upgrade to the Pro plan'} to start
+                replicating your database changes to data warehouses and analytics platforms
               </p>
             </div>
             <div className="flex gap-x-2">
@@ -201,10 +200,10 @@ export const Destinations = () => {
               )}
             >
               <h4>Create your first destination</h4>
-              <p className="prose text-sm text-center mt-1 max-w-full">
+              <p className="prose text-sm text-center mt-1 max-w-[70ch]">
                 Destinations are external platforms where your database changes are automatically
-                sent. Connect to data warehouses like BigQuery or analytics buckets to enable
-                real-time data pipelines.
+                sent. Connect to various data warehouses and analytics platforms to enable real-time
+                data pipelines.
               </p>
               <Button
                 icon={<Plus />}

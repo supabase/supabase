@@ -1,6 +1,7 @@
 import { AlertTriangle, Loader2 } from 'lucide-react'
 
 import { useParams } from 'common'
+import { DotPing } from 'components/ui/DotPing'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ReplicationPipelineStatusData } from 'data/etl/pipeline-status-query'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
@@ -86,7 +87,7 @@ export const PipelineStatus = ({
         case PipelineStatusName.STARTED:
           return {
             label: 'Running',
-            dot: <div className="w-2 h-2 bg-brand-600 rounded-full" />,
+            dot: <DotPing animate={true} variant="primary" />,
             color: 'text-brand-600',
             tooltip: stateMessages.message,
           }
