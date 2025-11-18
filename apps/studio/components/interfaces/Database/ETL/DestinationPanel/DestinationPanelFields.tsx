@@ -8,7 +8,7 @@ import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/Sto
 import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useBucketsQuery } from 'data/storage/buckets-query'
+import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -149,11 +149,10 @@ export const AnalyticsBucketFields = ({
     !s3Keys.find((k) => k.access_key === s3AccessKeyId)
 
   const {
-    data: buckets = [],
+    data: analyticsBuckets = [],
     isLoading: isLoadingBuckets,
     isError: isErrorBuckets,
-  } = useBucketsQuery({ projectRef })
-  const analyticsBuckets = buckets.filter((bucket) => bucket.type === 'ANALYTICS')
+  } = useAnalyticsBucketsQuery({ projectRef })
 
   // Construct catalog URI for iceberg namespaces query
   const catalogUri = useMemo(() => {
@@ -243,8 +242,8 @@ export const AnalyticsBucketFields = ({
                           </SelectItem_Shadcn_>
                         ) : (
                           analyticsBuckets.map((bucket) => (
-                            <SelectItem_Shadcn_ key={bucket.id} value={bucket.name}>
-                              {bucket.name}
+                            <SelectItem_Shadcn_ key={bucket.id} value={bucket.id}>
+                              {bucket.id}
                             </SelectItem_Shadcn_>
                           ))
                         )}
