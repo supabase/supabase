@@ -1,13 +1,17 @@
 import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
 import React, { useState } from 'react'
 import { toast } from 'sonner'
-import { useFlag, useParams, IS_PLATFORM } from 'common'
+
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { useTrack } from 'lib/telemetry/track'
 import {
   Button,
+  Card,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -18,16 +22,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Card,
-  cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
-import { LogDrainsEmpty } from './LogDrainsEmpty'
 import { LogDrainsCard } from './LogDrainsCard'
+import { LogDrainsEmpty } from './LogDrainsEmpty'
 import { VoteLink } from './VoteLink'
-import { useTrack } from 'lib/telemetry/track'
 
 export function LogDrains({
   onNewDrainClick,
@@ -196,7 +197,7 @@ export function LogDrains({
                 track('log_drain_confirm_button_submitted', {
                   destination: selectedLogDrain.type as Exclude<
                     LogDrainType,
-                    'elastic' | 'postgres' | 'bigquery' | 'clickhouse' | 's3'
+                    'elastic' | 'postgres' | 'bigquery' | 'clickhouse' | 's3' | 'axiom'
                   >,
                 })
               }
