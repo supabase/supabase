@@ -8,13 +8,13 @@ const ApiKeysLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef } = useParams()
 
   const navigationItems = [
-    {
-      label: 'Legacy API Keys',
-      href: `/project/${projectRef}/settings/api-keys`,
-      id: 'legacy-keys',
-    },
     ...(IS_PLATFORM
       ? [
+          {
+            label: 'Legacy API Keys',
+            href: `/project/${projectRef}/settings/api-keys`,
+            id: 'legacy-keys',
+          },
           {
             label: 'API Keys',
             href: `/project/${projectRef}/settings/api-keys/new`,
