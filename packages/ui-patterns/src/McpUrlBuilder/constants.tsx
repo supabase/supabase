@@ -340,51 +340,6 @@ export const MCP_CLIENTS: McpClient[] = [
       </div>
     ),
   },
-  {
-    key: 'codex',
-    label: 'Codex',
-    icon: 'openai',
-    configFile: '~/.codex/config.toml',
-    externalDocsUrl: 'https://developers.openai.com/codex/mcp/',
-    transformConfig: (config): CodexMcpConfig => {
-      return {
-        mcp_servers: {
-          supabase: {
-            url: config.mcpServers.supabase.url,
-          },
-        },
-      }
-    },
-    primaryInstructions: (config) => {
-      const mcpUrl = getMcpUrl(config)
-      const command = `codex mcp add supabase --url ${mcpUrl}`
-      return (
-        <div className="space-y-2">
-          <p className="text-xs text-foreground-light">Add the Supabase MCP server to Codex:</p>
-          <CodeBlock value={command} language="bash" focusable={false} className="block" />
-        </div>
-      )
-    },
-    alternateInstructions: () => (
-      <div className="space-y-2">
-        <p className="text-xs text-foreground-light">
-          After adding the server, enable remote MCP client support by adding this to your{' '}
-          <code>~/.codex/config.toml</code>:
-        </p>
-        <CodeBlock value={`[features]\nrmcp_client = true`} focusable={false} className="block" />
-        <p className="text-xs text-foreground-light">Then authenticate:</p>
-        <CodeBlock
-          value="codex mcp login supabase"
-          language="bash"
-          focusable={false}
-          className="block"
-        />
-        <p className="text-xs text-foreground-light">
-          Finally, run <code>/mcp</code> inside Codex to verify authentication.
-        </p>
-      </div>
-    ),
-  },
 ]
 
 export const DEFAULT_MCP_URL_PLATFORM = 'http://localhost:8080/mcp'
