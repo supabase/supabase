@@ -32,7 +32,7 @@ export async function getDatabaseCronJobRuns({
   connectionString,
   jobId,
   afterTimestamp,
-}: DatabaseCronJobRunsVariables & { afterTimestamp: string }) {
+}: DatabaseCronJobRunsVariables & { afterTimestamp: string | undefined }) {
   if (!projectRef) throw new Error('Project ref is required')
 
   let query = `
