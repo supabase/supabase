@@ -1,8 +1,9 @@
 import { Eye, MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
@@ -24,6 +25,7 @@ import {
   VectorBucketIndex,
 } from 'data/storage/vector-buckets-indexes-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { DOCS_URL } from 'lib/constants'
 import {
   Button,
@@ -57,9 +59,14 @@ export const VectorBucketDetails = () => {
   // [Joshen] Use the list buckets to verify that the bucket exists first before fetching bucket details
   const { data: _bucket, isSuccess } = useSelectedVectorBucket()
 
+  // Track the ID being deleted to exclude it from error checking
+  const deletingTableIdRef = useRef<string | null>(null)
+
   const [filterString, setFilterString] = useState('')
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [selectedTableToDelete, setSelectedTableToDelete] = useState<VectorBucketIndex>()
+  const [showDeleteModal, setShowDeleteModal] = useQueryState(
+    'delete',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const {
     data: bucket,
@@ -76,6 +83,15 @@ export const VectorBucketDetails = () => {
     vectorBucketName: bucket?.vectorBucketName,
   })
   const allIndexes = data?.indexes ?? []
+
+  const { setValue: setSelectedTableToDelete, value: selectedTableToDelete } =
+    useQueryStateWithSelect({
+      urlKey: 'deleteTable',
+      select: (id: string) => (id ? allIndexes.find((index) => index.indexName === id) : undefined),
+      enabled: !!allIndexes.length,
+      onError: (_error, selectedId) =>
+        handleErrorOnDelete(deletingTableIdRef, selectedId, `Table not found`),
+    })
 
   const filteredList =
     filterString.length === 0
@@ -240,7 +256,7 @@ export const VectorBucketDetails = () => {
                                       className="flex items-center space-x-2"
                                       onClick={(e) => {
                                         e.stopPropagation()
-                                        setSelectedTableToDelete(index)
+                                        setSelectedTableToDelete(index.indexName)
                                       }}
                                     >
                                       <Trash2 size={12} />
@@ -289,7 +305,7 @@ export const VectorBucketDetails = () => {
       <DeleteVectorTableModal
         visible={!!selectedTableToDelete}
         table={selectedTableToDelete}
-        onClose={() => setSelectedTableToDelete(undefined)}
+        onClose={() => setSelectedTableToDelete(null)}
       />
 
       <DeleteVectorBucketModal
