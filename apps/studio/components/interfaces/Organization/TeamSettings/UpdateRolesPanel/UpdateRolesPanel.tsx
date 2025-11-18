@@ -157,7 +157,6 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   useEffect(() => {
     if (visible && isSuccessRoles) {
       const roleConfiguration = formatMemberRoleToProjectRoleConfiguration(member, allRoles)
-      console.log(roleConfiguration)
       setProjectsRoleConfiguration(roleConfiguration)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
