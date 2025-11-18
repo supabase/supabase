@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import AlertError from 'components/ui/AlertError'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -83,7 +84,13 @@ export const EdgeFunctionDetails = () => {
     '*'
   )
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef })
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: apiKeys } = useAPIKeysQuery(
+    {
+      projectRef,
+    },
+    { enabled: canReadAPIKeys }
+  )
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
   const {
@@ -360,7 +367,10 @@ export const EdgeFunctionDetails = () => {
                         <TabsContent key={tab.id} value={tab.id} className="mt-4 px-6">
                           <CodeBlock
                             value={code}
-                            className="p-0 text-xs !mt-0 border-none [&>code]:!whitespace-pre-wrap [&>code]:break-words"
+                            className={cn(
+                              'p-0 text-xs !mt-0 border-none [&>code]:!whitespace-pre-wrap',
+                              showKey ? '[&>code]:break-all' : '[&>code]:break-words'
+                            )}
                             language={tab.language}
                             wrapLines={true}
                             hideLineNumbers={tab.hideLineNumbers}

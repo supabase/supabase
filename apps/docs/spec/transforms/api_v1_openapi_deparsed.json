@@ -862,11 +862,25 @@
                     "properties": {
                       "id": {
                         "type": "string",
-                        "description": "Id of your project"
+                        "deprecated": true,
+                        "description": "Deprecated: Use `ref` instead."
+                      },
+                      "ref": {
+                        "type": "string",
+                        "minLength": 20,
+                        "maxLength": 20,
+                        "pattern": "^[a-z]+$",
+                        "description": "Project ref"
                       },
                       "organization_id": {
                         "type": "string",
-                        "description": "Slug of your organization"
+                        "description": "Deprecated: Use `organization_slug` instead.",
+                        "deprecated": true
+                      },
+                      "organization_slug": {
+                        "type": "string",
+                        "pattern": "^[\\w-]+$",
+                        "description": "Organization slug"
                       },
                       "name": {
                         "type": "string",
@@ -927,7 +941,9 @@
                     },
                     "required": [
                       "id",
+                      "ref",
                       "organization_id",
+                      "organization_slug",
                       "name",
                       "region",
                       "created_at",
@@ -976,7 +992,13 @@
                   },
                   "organization_id": {
                     "type": "string",
-                    "description": "Slug of your organization"
+                    "description": "Deprecated: Use `organization_slug` instead.",
+                    "deprecated": true
+                  },
+                  "organization_slug": {
+                    "type": "string",
+                    "pattern": "^[\\w-]+$",
+                    "description": "Organization slug"
                   },
                   "plan": {
                     "type": "string",
@@ -1118,7 +1140,7 @@
                     "deprecated": true
                   }
                 },
-                "required": ["db_pass", "name", "organization_id"],
+                "required": ["db_pass", "name", "organization_slug"],
                 "additionalProperties": false,
                 "hideDefinitions": ["release_channel", "postgres_engine"]
               }
@@ -1135,11 +1157,25 @@
                   "properties": {
                     "id": {
                       "type": "string",
-                      "description": "Id of your project"
+                      "deprecated": true,
+                      "description": "Deprecated: Use `ref` instead."
+                    },
+                    "ref": {
+                      "type": "string",
+                      "minLength": 20,
+                      "maxLength": 20,
+                      "pattern": "^[a-z]+$",
+                      "description": "Project ref"
                     },
                     "organization_id": {
                       "type": "string",
-                      "description": "Slug of your organization"
+                      "description": "Deprecated: Use `organization_slug` instead.",
+                      "deprecated": true
+                    },
+                    "organization_slug": {
+                      "type": "string",
+                      "pattern": "^[\\w-]+$",
+                      "description": "Organization slug"
                     },
                     "name": {
                       "type": "string",
@@ -1176,7 +1212,16 @@
                       ]
                     }
                   },
-                  "required": ["id", "organization_id", "name", "region", "created_at", "status"]
+                  "required": [
+                    "id",
+                    "ref",
+                    "organization_id",
+                    "organization_slug",
+                    "name",
+                    "region",
+                    "created_at",
+                    "status"
+                  ]
                 }
               }
             }
@@ -1398,13 +1443,20 @@
                     "type": "object",
                     "properties": {
                       "id": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "Deprecated: Use `slug` instead.",
+                        "deprecated": true
+                      },
+                      "slug": {
+                        "type": "string",
+                        "pattern": "^[\\w-]+$",
+                        "description": "Organization slug"
                       },
                       "name": {
                         "type": "string"
                       }
                     },
-                    "required": ["id", "name"]
+                    "required": ["id", "slug", "name"]
                   }
                 }
               }
@@ -1458,13 +1510,20 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Deprecated: Use `slug` instead.",
+                      "deprecated": true
+                    },
+                    "slug": {
+                      "type": "string",
+                      "pattern": "^[\\w-]+$",
+                      "description": "Organization slug"
                     },
                     "name": {
                       "type": "string"
                     }
                   },
-                  "required": ["id", "name"]
+                  "required": ["id", "slug", "name"]
                 }
               }
             }
@@ -5836,11 +5895,25 @@
                   "properties": {
                     "id": {
                       "type": "string",
-                      "description": "Id of your project"
+                      "deprecated": true,
+                      "description": "Deprecated: Use `ref` instead."
+                    },
+                    "ref": {
+                      "type": "string",
+                      "minLength": 20,
+                      "maxLength": 20,
+                      "pattern": "^[a-z]+$",
+                      "description": "Project ref"
                     },
                     "organization_id": {
                       "type": "string",
-                      "description": "Slug of your organization"
+                      "description": "Deprecated: Use `organization_slug` instead.",
+                      "deprecated": true
+                    },
+                    "organization_slug": {
+                      "type": "string",
+                      "pattern": "^[\\w-]+$",
+                      "description": "Organization slug"
                     },
                     "name": {
                       "type": "string",
@@ -5901,7 +5974,9 @@
                   },
                   "required": [
                     "id",
+                    "ref",
                     "organization_id",
+                    "organization_slug",
                     "name",
                     "region",
                     "created_at",
@@ -19594,11 +19669,25 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Id of your project"
+            "deprecated": true,
+            "description": "Deprecated: Use `ref` instead."
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 20,
+            "pattern": "^[a-z]+$",
+            "description": "Project ref"
           },
           "organization_id": {
             "type": "string",
-            "description": "Slug of your organization"
+            "description": "Deprecated: Use `organization_slug` instead.",
+            "deprecated": true
+          },
+          "organization_slug": {
+            "type": "string",
+            "pattern": "^[\\w-]+$",
+            "description": "Organization slug"
           },
           "name": {
             "type": "string",
@@ -19657,7 +19746,17 @@
             "required": ["host", "version", "postgres_engine", "release_channel"]
           }
         },
-        "required": ["id", "organization_id", "name", "region", "created_at", "status", "database"]
+        "required": [
+          "id",
+          "ref",
+          "organization_id",
+          "organization_slug",
+          "name",
+          "region",
+          "created_at",
+          "status",
+          "database"
+        ]
       },
       "V1CreateProjectBody": {
         "type": "object",
@@ -19673,7 +19772,13 @@
           },
           "organization_id": {
             "type": "string",
-            "description": "Slug of your organization"
+            "description": "Deprecated: Use `organization_slug` instead.",
+            "deprecated": true
+          },
+          "organization_slug": {
+            "type": "string",
+            "pattern": "^[\\w-]+$",
+            "description": "Organization slug"
           },
           "plan": {
             "type": "string",
@@ -19815,7 +19920,7 @@
             "deprecated": true
           }
         },
-        "required": ["db_pass", "name", "organization_id"],
+        "required": ["db_pass", "name", "organization_slug"],
         "additionalProperties": false,
         "hideDefinitions": ["release_channel", "postgres_engine"]
       },
@@ -19824,11 +19929,25 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Id of your project"
+            "deprecated": true,
+            "description": "Deprecated: Use `ref` instead."
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 20,
+            "pattern": "^[a-z]+$",
+            "description": "Project ref"
           },
           "organization_id": {
             "type": "string",
-            "description": "Slug of your organization"
+            "description": "Deprecated: Use `organization_slug` instead.",
+            "deprecated": true
+          },
+          "organization_slug": {
+            "type": "string",
+            "pattern": "^[\\w-]+$",
+            "description": "Organization slug"
           },
           "name": {
             "type": "string",
@@ -19865,7 +19984,16 @@
             ]
           }
         },
-        "required": ["id", "organization_id", "name", "region", "created_at", "status"]
+        "required": [
+          "id",
+          "ref",
+          "organization_id",
+          "organization_slug",
+          "name",
+          "region",
+          "created_at",
+          "status"
+        ]
       },
       "RegionsInfo": {
         "type": "object",
@@ -19980,13 +20108,20 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Deprecated: Use `slug` instead.",
+            "deprecated": true
+          },
+          "slug": {
+            "type": "string",
+            "pattern": "^[\\w-]+$",
+            "description": "Organization slug"
           },
           "name": {
             "type": "string"
           }
         },
-        "required": ["id", "name"]
+        "required": ["id", "slug", "name"]
       },
       "CreateOrganizationV1": {
         "type": "object",

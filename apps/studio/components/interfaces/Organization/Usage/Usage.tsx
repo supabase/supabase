@@ -21,6 +21,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { Check, ChevronDown } from 'lucide-react'
+import { useQueryState } from 'nuqs'
 import { Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Restriction } from '../BillingSettings/Restriction'
@@ -29,7 +30,6 @@ import Compute from './Compute'
 import Egress from './Egress'
 import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
-import { useQueryState } from 'nuqs'
 
 export const Usage = () => {
   const { slug, projectRef } = useParams()
@@ -114,7 +114,7 @@ export const Usage = () => {
   return (
     <>
       <ScaffoldContainer>
-        <ScaffoldHeader>
+        <ScaffoldHeader className="pt-8">
           <ScaffoldTitle>Usage</ScaffoldTitle>
         </ScaffoldHeader>
       </ScaffoldContainer>
