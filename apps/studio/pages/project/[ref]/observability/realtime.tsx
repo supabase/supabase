@@ -10,7 +10,7 @@ import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
@@ -34,7 +34,7 @@ const RealtimeReport: NextPageWithLayout = () => {
 
 RealtimeReport.getLayout = (page) => (
   <DefaultLayout>
-    <ReportsLayout title="Realtime">{page}</ReportsLayout>
+    <ObservabilityLayout title="Realtime">{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 
