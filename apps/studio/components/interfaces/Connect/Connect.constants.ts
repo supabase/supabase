@@ -227,7 +227,7 @@ export const FRAMEWORKS: ConnectionType[] = [
   },
   {
     key: 'refine',
-    label: 'refine',
+    label: 'Refine',
     icon: 'refine',
     guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/refine`,
     children: [
