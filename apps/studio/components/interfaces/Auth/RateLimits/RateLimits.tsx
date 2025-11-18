@@ -7,7 +7,6 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
-import { ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -28,6 +27,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
 
 export const RateLimits = () => {
@@ -143,31 +143,38 @@ export const RateLimits = () => {
 
   if (isError) {
     return (
-      <ScaffoldSection isFullWidth>
-        <AlertError error={error} subject="Failed to retrieve auth configuration" />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <AlertError error={error} subject="Failed to retrieve auth configuration" />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   if (!canReadConfig) {
     return (
-      <ScaffoldSection isFullWidth>
-        <NoPermission resourceText="view auth configuration settings" />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <NoPermission resourceText="view auth configuration settings" />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   if (isLoading) {
     return (
-      <ScaffoldSection isFullWidth>
-        <GenericSkeletonLoader />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <GenericSkeletonLoader />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   return (
-    <ScaffoldSection isFullWidth>
-      <Form_Shadcn_ {...form}>
+    <PageSection>
+      <PageSectionContent>
+        <Form_Shadcn_ {...form}>
         <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
             <CardContent className="pt-6">
@@ -514,6 +521,7 @@ export const RateLimits = () => {
           </Card>
         </form>
       </Form_Shadcn_>
-    </ScaffoldSection>
+    </PageSectionContent>
+  </PageSection>
   )
 }

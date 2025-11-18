@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import { object, string } from 'yup'
 
 import { useParams } from 'common'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
@@ -23,6 +22,13 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 const schema = object({
   SITE_URL: string().required('Must have a Site URL'),
@@ -79,25 +85,33 @@ const SiteUrl = () => {
 
   if (isError) {
     return (
-      <ScaffoldSection isFullWidth>
-        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   if (isLoading) {
     return (
-      <ScaffoldSection isFullWidth>
-        <GenericSkeletonLoader />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <GenericSkeletonLoader />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   return (
-    <ScaffoldSection isFullWidth>
-      <ScaffoldSectionTitle className="mb-4">Site URL</ScaffoldSectionTitle>
-
-      <Form_Shadcn_ {...siteUrlForm}>
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Site URL</PageSectionTitle>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
+        <Form_Shadcn_ {...siteUrlForm}>
         <form onSubmit={siteUrlForm.handleSubmit(onSubmitSiteUrl)} className="space-y-4">
           <Card>
             <CardContent className="pt-6">
@@ -136,7 +150,8 @@ const SiteUrl = () => {
           </Card>
         </form>
       </Form_Shadcn_>
-    </ScaffoldSection>
+    </PageSectionContent>
+  </PageSection>
   )
 }
 
