@@ -24,7 +24,7 @@ const RETRY_OPTIONS = [
     type: 'full' as RollbackType,
     icon: <RotateCcw className="w-3 h-3 mt-0.5" />,
     title: 'Reset from scratch',
-    description: 'Completely restart the table replication',
+    description: 'Completely restart replicating this table',
   },
 ] as const
 

@@ -1,5 +1,4 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import { CheckCircle2, ChevronRight, ChevronsLeftRight } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -10,7 +9,7 @@ import { useApiAuthorizationApproveMutation } from 'data/api-authorization/api-a
 import { ApiAuthorizationResponse } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationProjectClaimMutation } from 'data/organizations/organization-project-claim-mutation'
 import { OrganizationProjectClaimResponse } from 'data/organizations/organization-project-claim-query'
-import { projectKeys } from 'data/projects/keys'
+import { useInvalidateProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { BASE_PATH } from 'lib/constants'
 import type { Organization } from 'types'
 import {
@@ -38,7 +37,7 @@ export const ProjectClaimConfirm = ({
 }) => {
   const router = useRouter()
   const { auth_id, token: claimToken } = useParams()
-  const queryClient = useQueryClient()
+  const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
   const { mutateAsync: approveRequest, isLoading: isApproving } =
     useApiAuthorizationApproveMutation({ onError: () => {} })
@@ -61,7 +60,7 @@ export const ProjectClaimConfirm = ({
         window.location.href = url.toString()
       } catch {
         // invalidate the org projects to force them to be refetched
-        queryClient.invalidateQueries({ queryKey: projectKeys.list() })
+        await invalidateProjectsQuery()
         router.push(`/org/${selectedOrganization.slug}`)
       }
     } catch (error: any) {
