@@ -6,25 +6,6 @@ description: 'Integrate Supabase Auth with MCP servers to authenticate AI agents
 
 The Model Context Protocol (MCP) is an open standard for connecting AI agents and LLM tools to data sources and services. While Supabase doesn't provide MCP server functionality, you can build your own MCP servers that connect to your Supabase project and leverage Supabase Auth's OAuth 2.1 capabilities to authenticate AI agents using your existing user base.
 
-## What is Model Context Protocol?
-
-Model Context Protocol (MCP) provides a standardized way for AI applications to:
-
-- Access external data sources and APIs
-- Authenticate users securely via OAuth 2.1
-- Maintain user context across interactions
-- Execute actions on behalf of users with proper authorization
-
-Think of MCP as the standard that enables AI agents to interact with your application just like a third-party app would, but with the intelligence and capabilities of AI.
-
-### Common use cases
-
-- **AI assistants** that access user data from your platform
-- **LLM tools** that integrate with your application's APIs
-- **Chat bots** that perform actions on behalf of users
-- **Automated agents** that monitor and respond to events
-- **AI-powered workflows** that connect multiple services
-
 ## Why use Supabase Auth for MCP?
 
 When building MCP servers that connect to your Supabase project, you can leverage your existing Supabase Auth infrastructure to authenticate AI agents:
