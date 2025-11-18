@@ -53,7 +53,7 @@ hideToc: true
 
         ```text name=.env.local
         NEXT_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
-        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
         ```
 
       </$CodeTabs>
@@ -76,25 +76,23 @@ hideToc: true
     <$CodeTabs>
 
       ```ts name=utils/supabase/server.ts
-      import { createServerClient } from '@supabase/ssr'
-      import { cookies } from 'next/headers'
+      import { createServerClient } from "@supabase/ssr";
+      import { cookies } from "next/headers";
 
       export async function createClient() {
-        const cookieStore = await cookies()
+        const cookieStore = await cookies();
 
         return createServerClient(
           process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+          process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
           {
             cookies: {
               getAll() {
-                return cookieStore.getAll()
+                return cookieStore.getAll();
               },
               setAll(cookiesToSet) {
                 try {
-                  cookiesToSet.forEach(({ name, value, options }) =>
-                    cookieStore.set(name, value, options)
-                  )
+                  cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
                 } catch {
                   // The `setAll` method was called from a Server Component.
                   // This can be ignored if you have middleware refreshing
@@ -102,8 +100,8 @@ hideToc: true
                 }
               },
             },
-          }
-        )
+          },
+        );
       }
       ```
 
@@ -127,13 +125,22 @@ hideToc: true
     <$CodeTabs>
 
       ```ts name=app/instruments/page.tsx
-      import { createClient } from '@/utils/supabase/server';
+      import { createClient } from "@/utils/supabase/server";
+      import { Suspense } from "react";
 
-      export default async function Instruments() {
+      async function InstrumentsData() {
         const supabase = await createClient();
         const { data: instruments } = await supabase.from("instruments").select();
 
-        return <pre>{JSON.stringify(instruments, null, 2)}</pre>
+        return <pre>{JSON.stringify(instruments, null, 2)}</pre>;
+      }
+
+      export default function Instruments() {
+        return (
+          <Suspense fallback={<div>Loading instruments...</div>}>
+            <InstrumentsData />
+          </Suspense>
+        );
       }
       ```
 
