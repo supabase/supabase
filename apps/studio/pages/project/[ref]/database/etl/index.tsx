@@ -1,6 +1,7 @@
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { ReplicationComingSoon } from 'components/interfaces/Database/ETL/ComingSoon'
 import { Destinations } from 'components/interfaces/Database/ETL/Destinations'
+import { useIsETLPrivateAlpha } from 'components/interfaces/Database/ETL/useIsETLPrivateAlpha'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
@@ -12,7 +13,7 @@ import type { NextPageWithLayout } from 'types'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const enablePgReplicate = useFlag('enablePgReplicate')
+  const enablePgReplicate = useIsETLPrivateAlpha()
   const showPgReplicate = useIsFeatureEnabled('database:replication')
 
   if (!showPgReplicate) {
