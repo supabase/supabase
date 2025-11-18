@@ -28,7 +28,6 @@ import {
 } from 'components/interfaces/Storage/Storage.types'
 import {
   calculateTotalRemainingTime,
-  downloadFile,
   EMPTY_FOLDER_PLACEHOLDER_FILE_NAME,
   formatFolderItems,
   formatTime,
@@ -47,7 +46,6 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
 import { getQueryClient } from 'data/query-client'
 import { deleteBucketObject } from 'data/storage/bucket-object-delete-mutation'
-import { downloadBucketObject } from 'data/storage/bucket-object-download-mutation'
 import { listBucketObjects, StorageObject } from 'data/storage/bucket-objects-list-mutation'
 import { deleteBucketPrefix } from 'data/storage/bucket-prefix-delete-mutation'
 import { Bucket } from 'data/storage/buckets-query'
@@ -836,6 +834,9 @@ function createStorageExplorerState({
           { id: toastId, closeButton: false, position: 'top-right' }
         )
 
+        // Get authenticated Supabase client for Storage API access
+        const client = state.supabaseClient ? await state.supabaseClient() : undefined
+
         const promises = files.map((file) => {
           const fileMimeType = (file.metadata?.mimetype as string) ?? null
           return () => {
@@ -848,18 +849,23 @@ function createStorageExplorerState({
               | boolean
             >(async (resolve) => {
               try {
-                const data = await downloadBucketObject({
-                  projectRef: state.projectRef,
-                  bucketId: state.selectedBucket.id,
-                  path: `${file.prefix}/${file.name}`,
-                })
+                if (!client) {
+                  throw new Error('Supabase client not available')
+                }
+                // Use Storage API directly instead of Management API to avoid throttling
+                const { data, error } = await client.storage
+                  .from(state.selectedBucket.id)
+                  .download(`${file.prefix}/${file.name}`)
+
+                if (error) throw error
+                if (!data) throw new Error('No data returned from download')
+
                 progress = progress + 1 / files.length
 
-                const blob = await data.blob()
                 resolve({
                   name: file.name,
                   prefix: file.prefix,
-                  blob: new Blob([blob], { type: fileMimeType }),
+                  blob: new Blob([data], { type: fileMimeType }),
                 })
               } catch (error) {
                 console.error('Failed to download file', `${file.prefix}/${file.name}`)
@@ -869,7 +875,8 @@ function createStorageExplorerState({
           }
         })
 
-        const batchedPromises = chunk(promises, 10)
+        // Increase batch size to 50 since Storage API doesn't throttle like Management API
+        const batchedPromises = chunk(promises, 50)
         const downloadedFiles = await batchedPromises.reduce(
           async (previousPromise, nextBatch) => {
             const previousResults = await previousPromise
@@ -1523,6 +1530,85 @@ function createStorageExplorerState({
       }
     },
 
+    downloadFile: async (file: StorageItemWithColumn, showToast = true) => {
+      if (!file.path) {
+        toast.error('Failed to download: Unable to find path to file')
+        return false
+      }
+
+      const fileName: string = file.name
+      const fileMimeType = file?.metadata?.mimetype ?? undefined
+
+      const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
+
+      try {
+        const client = state.supabaseClient ? await state.supabaseClient() : undefined
+        if (!client) {
+          throw new Error('Supabase client not available')
+        }
+
+        // Use Storage API directly instead of Management API to avoid throttling
+        const { data, error } = await client.storage
+          .from(state.selectedBucket.id)
+          .download(file.path)
+
+        if (error) throw error
+        if (!data) throw new Error('No data returned from download')
+
+        const newBlob = new Blob([data], { type: fileMimeType })
+        const blobUrl = window.URL.createObjectURL(newBlob)
+        const link = document.createElement('a')
+        link.href = blobUrl
+        link.setAttribute('download', `${fileName}`)
+        document.body.appendChild(link)
+        link.click()
+        link.parentNode?.removeChild(link)
+        window.URL.revokeObjectURL(blobUrl)
+
+        if (toastId) {
+          toast.success(`Downloading ${fileName}`, {
+            id: toastId,
+            closeButton: true,
+            duration: SONNER_DEFAULT_DURATION,
+          })
+        }
+        return true
+      } catch (err) {
+        if (toastId) {
+          toast.error(`Failed to download ${fileName}`, {
+            id: toastId,
+            closeButton: true,
+            duration: SONNER_DEFAULT_DURATION,
+          })
+        }
+        return false
+      }
+    },
+
+    downloadFileAsBlob: async (file: StorageItemWithColumn) => {
+      if (!file.path) return false
+
+      try {
+        const client = state.supabaseClient ? await state.supabaseClient() : undefined
+        if (!client) {
+          throw new Error('Supabase client not available')
+        }
+
+        const { data, error } = await client.storage
+          .from(state.selectedBucket.id)
+          .download(file.path)
+
+        if (error) throw error
+        if (!data) throw new Error('No data returned from download')
+
+        const fileMimeType = file?.metadata?.mimetype ?? undefined
+        return { name: file.name, blob: new Blob([data], { type: fileMimeType }) }
+      } catch (err) {
+        console.error('Failed to download file', file.path)
+        return false
+      }
+    },
+
     downloadSelectedFiles: async (files: StorageItemWithColumn[]) => {
       const lowestColumnIndex = Math.min(...files.map((file) => file.columnIndex))
 
@@ -1537,7 +1623,6 @@ function createStorageExplorerState({
       })
 
       let progress = 0
-      const returnBlob = true
       const toastId = toast.loading(
         `Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`
       )
@@ -1545,12 +1630,7 @@ function createStorageExplorerState({
       const promises = formattedFilesWithPrefix.map((file) => {
         return () => {
           return new Promise<{ name: string; blob: Blob } | boolean>(async (resolve) => {
-            const data = await downloadFile({
-              projectRef: state.projectRef,
-              bucketId: state.selectedBucket.id,
-              file,
-              returnBlob,
-            })
+            const data = await state.downloadFileAsBlob(file)
             progress = progress + 1 / formattedFilesWithPrefix.length
             if (isObject(data)) {
               resolve({ ...data, name: file.formattedPathToFile })
@@ -1560,7 +1640,8 @@ function createStorageExplorerState({
         }
       })
 
-      const batchedPromises = chunk(promises, 10)
+      // Increase batch size to 50 since Storage API doesn't throttle like Management API
+      const batchedPromises = chunk(promises, 50)
       const downloadedFiles = await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         const previousResults = await previousPromise
         const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
