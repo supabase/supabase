@@ -22,3 +22,7 @@ export const getNamespaceTableNameFromPostgresTableName = (table: {
 }) => {
   return `${snakeCase(`${table.schema}.${table.name}`)}_changelog`
 }
+
+export const getAnalyticsBucketsDestinationName = (bucketId: string) => {
+  return `${snakeCase(bucketId)}_destination`
+}
