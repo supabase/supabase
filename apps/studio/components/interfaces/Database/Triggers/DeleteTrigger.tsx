@@ -1,46 +1,46 @@
-import { PostgresTrigger } from '@supabase/postgres-meta'
-import { toast } from 'sonner'
+import type { PostgresTrigger } from '@supabase/postgres-meta'
 
-import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface DeleteTriggerProps {
   trigger?: PostgresTrigger
   visible: boolean
-  setVisible: (value: boolean) => void
+  setVisible: (value: string | null) => void
+  onDelete: (params: {
+    projectRef: string
+    connectionString?: string | null
+    trigger: PostgresTrigger
+  }) => void
+  isLoading: boolean
 }
 
-export const DeleteTrigger = ({ trigger, visible, setVisible }: DeleteTriggerProps) => {
+export const DeleteTrigger = ({
+  trigger,
+  visible,
+  setVisible,
+  onDelete,
+  isLoading,
+}: DeleteTriggerProps) => {
   const { data: project } = useSelectedProjectQuery()
   const { name, schema } = trigger ?? {}
-
-  const { mutate: deleteDatabaseTrigger, isLoading } = useDatabaseTriggerDeleteMutation()
 
   async function handleDelete() {
     if (!project) return console.error('Project is required')
     if (!trigger) return console.error('Trigger ID is required')
 
-    deleteDatabaseTrigger(
-      {
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        trigger,
-      },
-      {
-        onSuccess: () => {
-          toast.success(`Successfully removed ${name}`)
-          setVisible(false)
-        },
-      }
-    )
+    onDelete({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      trigger,
+    })
   }
 
   return (
     <TextConfirmModal
       variant={'warning'}
       visible={visible}
-      onCancel={() => setVisible(!visible)}
+      onCancel={() => setVisible('')}
       onConfirm={handleDelete}
       title="Delete this trigger"
       loading={isLoading}
