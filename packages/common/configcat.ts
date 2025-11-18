@@ -34,29 +34,34 @@ async function getClient() {
     return undefined
   }
 
-  const response = await fetchHandler(process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL + endpoint)
-  const options = { pollIntervalSeconds: 7 * 60 } // 7 minutes
+  try {
+    const response = await fetchHandler(process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL + endpoint)
+    const options = { pollIntervalSeconds: 7 * 60 } // 7 minutes
 
-  if (response.status !== 200) {
-    if (!process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY) {
-      console.error('Failed to set up ConfigCat: SDK Key is missing')
-      return undefined
+    if (response.status !== 200) {
+      if (!process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY) {
+        console.error('Failed to set up ConfigCat: SDK Key is missing')
+        return undefined
+      }
+
+      // proxy is down, use default client
+      client = configcat.getClient(
+        process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY ?? '',
+        configcat.PollingMode.AutoPoll,
+        options
+      )
+    } else {
+      client = configcat.getClient('configcat-proxy/frontend-v2', configcat.PollingMode.AutoPoll, {
+        ...options,
+        baseUrl: process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL,
+      })
     }
 
-    // proxy is down, use default client
-    client = configcat.getClient(
-      process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY ?? '',
-      configcat.PollingMode.AutoPoll,
-      options
-    )
-  } else {
-    client = configcat.getClient('configcat-proxy/frontend-v2', configcat.PollingMode.AutoPoll, {
-      ...options,
-      baseUrl: process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL,
-    })
+    return client
+  } catch (error: any) {
+    console.error(`Failed to get ConfigCat client: ${error.message}`)
+    return undefined
   }
-
-  return client
 }
 
 export async function getFlags(userEmail: string = '', customAttributes?: Record<string, string>) {
