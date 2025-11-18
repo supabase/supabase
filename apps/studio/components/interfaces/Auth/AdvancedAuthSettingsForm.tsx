@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { StringNumberOrNull } from 'components/ui/Forms/Form.constants'
 import NoPermission from 'components/ui/NoPermission'
@@ -29,6 +28,13 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 const FormSchema = z.object({
   API_MAX_REQUEST_DURATION: z.coerce
@@ -151,25 +157,31 @@ export const AdvancedAuthSettingsForm = () => {
 
   if (isError) {
     return (
-      <ScaffoldSection isFullWidth>
-        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   if (!canReadConfig) {
     return (
-      <ScaffoldSection isFullWidth>
-        <NoPermission resourceText="view auth configuration settings" />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <NoPermission resourceText="view auth configuration settings" />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   if (isLoading) {
     return (
-      <ScaffoldSection isFullWidth>
-        <GenericSkeletonLoader />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <GenericSkeletonLoader />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
@@ -184,10 +196,14 @@ export const AdvancedAuthSettingsForm = () => {
           />
         </div>
       )}
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">Request Duration</ScaffoldSectionTitle>
-
-        <Form_Shadcn_ {...requestDurationForm}>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Request Duration</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Form_Shadcn_ {...requestDurationForm}>
           <form
             onSubmit={requestDurationForm.handleSubmit(onSubmitRequestDurationForm)}
             className="space-y-4"
@@ -244,11 +260,16 @@ export const AdvancedAuthSettingsForm = () => {
             </Card>
           </form>
         </Form_Shadcn_>
-      </ScaffoldSection>
+      </PageSectionContent>
+    </PageSection>
 
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">Auth Database Connections</ScaffoldSectionTitle>
-
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Auth Database Connections</PageSectionTitle>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
         <Form_Shadcn_ {...databaseForm}>
           <form onSubmit={databaseForm.handleSubmit(onSubmitDatabaseForm)} className="space-y-4">
             <Card>
@@ -295,7 +316,8 @@ export const AdvancedAuthSettingsForm = () => {
             </Card>
           </form>
         </Form_Shadcn_>
-      </ScaffoldSection>
+      </PageSectionContent>
+    </PageSection>
     </>
   )
 }
