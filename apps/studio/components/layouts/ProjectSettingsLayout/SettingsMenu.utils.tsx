@@ -38,6 +38,12 @@ export const generateSettingsMenu = (
             items: [],
           },
           {
+            name: 'API Keys',
+            key: 'api-keys',
+            url: `/project/${ref}/settings/api-keys`,
+            items: [],
+          },
+          {
             name: `Log Drains`,
             key: `log-drains`,
             url: `/project/${ref}/settings/log-drains`,
