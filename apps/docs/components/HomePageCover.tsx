@@ -88,7 +88,7 @@ const HomePageCover = (props) => {
       href: '/guides/getting-started/quickstarts/nuxtjs',
     },
     {
-      tooltip: 'refine',
+      tooltip: 'Refine',
       icon: '/docs/img/icons/refine-icon',
       href: '/guides/getting-started/quickstarts/refine',
     },

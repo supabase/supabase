@@ -8,6 +8,7 @@ import z from 'zod'
 
 import { useFlag, useParams } from 'common'
 import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
+import { useIsETLPrivateAlpha } from 'components/interfaces/Database/ETL/useIsETLPrivateAlpha'
 import { convertKVStringArrayToJson } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
@@ -422,7 +423,7 @@ export const ConnectTablesDialogContent = ({
 
 const EnableReplicationDialogContent = ({ onClose }: { onClose: () => void }) => {
   const { ref: projectRef } = useParams()
-  const enablePgReplicate = useFlag('enablePgReplicate')
+  const enablePgReplicate = useIsETLPrivateAlpha()
   const { error } = useReplicationSourcesQuery({ projectRef })
   const noAccessToReplication =
     !enablePgReplicate || error?.message.includes('feature flag is required')

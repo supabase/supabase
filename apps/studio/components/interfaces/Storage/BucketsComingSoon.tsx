@@ -1,7 +1,8 @@
-import { ScaffoldSection } from 'components/layouts/Scaffold'
-import { Bucket } from 'icons'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
+
+import { ScaffoldSection } from 'components/layouts/Scaffold'
+import { Bucket } from 'icons'
 import { Button } from 'ui'
 import { BUCKET_TYPES } from './Storage.constants'
 
