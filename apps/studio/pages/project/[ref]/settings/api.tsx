@@ -1,4 +1,6 @@
+import { IS_PLATFORM } from 'common'
 import { ServiceList } from 'components/interfaces/Settings/API/ServiceList'
+import { ServiceListLocalState } from 'components/interfaces/Settings/API/ServiceListLocalState'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
@@ -8,7 +10,7 @@ import type { NextPageWithLayout } from 'types'
 const ApiSettings: NextPageWithLayout = () => {
   return (
     <ScaffoldContainer bottomPadding>
-      <ServiceList />
+      {IS_PLATFORM ? <ServiceList /> : <ServiceListLocalState />}
     </ScaffoldContainer>
   )
 }

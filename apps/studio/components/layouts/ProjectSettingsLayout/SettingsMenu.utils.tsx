@@ -26,6 +26,30 @@ export const generateSettingsMenu = (
         title: 'Project Settings',
         items: [
           {
+            name: 'General',
+            key: 'general',
+            url: `/project/${ref}/settings/general`,
+            items: [],
+          },
+          {
+            name: 'Data API',
+            key: 'api',
+            url: `/project/${ref}/settings/api`,
+            items: [],
+          },
+          {
+            name: 'API Keys',
+            key: 'api-keys',
+            url: `/project/${ref}/settings/api-keys`,
+            items: [],
+          },
+          {
+            name: 'JWT Keys',
+            key: 'jwt',
+            url: `/project/${ref}/settings/jwt`,
+            items: [],
+          },
+          {
             name: `Log Drains`,
             key: `log-drains`,
             url: `/project/${ref}/settings/log-drains`,
@@ -67,14 +91,12 @@ export const generateSettingsMenu = (
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/infrastructure`,
           items: [],
         },
-
         {
           name: 'Integrations',
           key: 'integrations',
           url: `/project/${ref}/settings/integrations`,
           items: [],
         },
-
         {
           name: 'Data API',
           key: 'api',
