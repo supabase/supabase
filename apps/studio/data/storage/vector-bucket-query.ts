@@ -1,10 +1,10 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { storageKeys } from './keys'
 
 // [Joshen] JFYI typed incorrectly in API, to fix by adding creationTime to APi
@@ -35,7 +35,10 @@ export type VectorBucketError = ResponseError
 
 export const useVectorBucketQuery = <TData = VectorBucketData>(
   { projectRef, vectorBucketName }: VectorBucketVariables,
-  { enabled = true, ...options }: UseQueryOptions<VectorBucketData, VectorBucketError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<VectorBucketData, VectorBucketError, TData> = {}
 ) => {
   const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
