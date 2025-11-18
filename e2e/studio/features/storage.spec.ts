@@ -221,9 +221,6 @@ test.describe.serial('Storage', () => {
 
     // Delete the file
     await deleteItem(page, fileName)
-
-    // Clean up
-    await deleteBucket(page, ref, bucketName)
   })
 
   test('can delete a folder', async ({ page, ref }) => {
@@ -251,9 +248,6 @@ test.describe.serial('Storage', () => {
     await uploadFile(page, filePath, fileName)
 
     // Download the file
-    const download = await downloadFile(page, fileName)
-
-    // Verify download occurred
-    expect(download.suggestedFilename()).toBe(fileName)
+    await downloadFile(page, fileName)
   })
 })

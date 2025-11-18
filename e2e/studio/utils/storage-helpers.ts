@@ -200,7 +200,7 @@ export const deleteItem = async (page: Page, itemName: string) => {
   await page.getByRole('menuitem', { name: 'Delete' }).click()
 
   // Confirm deletion in the modal
-  await page.getByRole('button', { name: 'Delete' }).click()
+  await page.getByRole('button', { name: 'Submit' }).click()
 
   // Wait for deletion to complete
   await page.waitForTimeout(1000)
@@ -270,18 +270,16 @@ export const deleteAllBuckets = async (page: Page, ref: string) => {
 
   // Keep deleting until no more buckets exist
   while (true) {
-    const tableRows = await page.getByRole('row').all()
-    // First row is header, so if only 1 row exists, no buckets remain
-    if (tableRows.length <= 1) break
+    // Find all bucket rows by data-bucket-id attribute
+    const bucketRows = await page.locator('[data-bucket-id]').all()
 
-    // Get the first bucket row (skip header at index 0)
-    const firstBucketRow = tableRows[1]
-    // Get the first cell which should contain the bucket name
-    const firstCell = firstBucketRow.locator('td').first()
-    const bucketName = await firstCell.textContent()
+    if (bucketRows.length === 0) break
 
-    if (!bucketName || bucketName.trim() === '') break
+    // Get the bucket ID from the first bucket row
+    const bucketId = await bucketRows[0].getAttribute('data-bucket-id')
 
-    await deleteBucket(page, ref, bucketName.trim())
+    if (!bucketId) break
+
+    await deleteBucket(page, ref, bucketId)
   }
 }
