@@ -45,7 +45,16 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
   }
 
   clone(): QueryFilter {
-    const cloned = new QueryFilter(this.table, this.action, this.actionValue, this.actionOptions)
+    const cloned = new QueryFilter(
+      { ...this.table },
+      this.action,
+      Array.isArray(this.actionValue)
+        ? this.actionValue.map((val) => (typeof val === 'object' ? { ...val } : val))
+        : !!this.actionValue && typeof this.actionValue === 'object'
+          ? { ...this.actionValue }
+          : this.actionValue,
+      this.actionOptions ? { ...this.actionOptions } : undefined
+    )
     cloned.filters = this.filters.slice()
     cloned.sorts = this.sorts.slice()
     return cloned

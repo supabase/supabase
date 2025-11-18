@@ -46,7 +46,7 @@ const getPreferredOrderByColumns = (
 
   const uniqueIndexes = table.uniqueIndexes
   const cursorFriendlyUniqueIndexes = uniqueIndexes?.filter((index) => {
-    index.every((columnName) => {
+    return index.every((columnName) => {
       const column = table.columns.find((column) => column.name === columnName)
       return !!column && !column.isNullable
     })
