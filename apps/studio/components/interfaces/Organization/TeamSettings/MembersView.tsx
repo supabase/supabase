@@ -65,17 +65,23 @@ const MembersView = ({ searchString }: MembersViewProps) => {
         })
   }, [members, searchString])
 
-  const [[user], otherMembers] = partition(
+  const [[user], _otherMembers] = partition(
     filteredMembers,
     (m) => m.gotrue_id === profile?.gotrue_id
-  )
-  const sortedMembers = otherMembers.sort((a, b) =>
-    (a.primary_email ?? '').localeCompare(b.primary_email ?? '')
   )
 
   const userMember = members.find((m) => m.gotrue_id === profile?.gotrue_id)
   const orgScopedRoleIds = (roles?.org_scoped_roles ?? []).map((r) => r.id)
   const isOrgScopedRole = orgScopedRoleIds.includes(userMember?.role_ids?.[0] ?? -1)
+
+  // [Joshen] Temp wait on API level changes but I think it makes sense to hide invites for
+  // project scoped users since they can't see other members to begin with. Not a security issue nonetheless
+  const otherMembers = isOrgScopedRole
+    ? _otherMembers
+    : _otherMembers.filter((x) => !('invited_id' in x))
+  const sortedMembers = otherMembers.sort((a, b) =>
+    (a.primary_email ?? '').localeCompare(b.primary_email ?? '')
+  )
 
   return (
     <>
@@ -133,7 +139,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                               <Admonition
                                 type="note"
                                 title="You are currently assigned with project scoped roles in this organization"
-                                description="All the members within the organization will not be visible to you"
+                                description="All other members within the organization will not be visible to you"
                                 className="m-0 bg-alternative border-0 rounded-none"
                               />
                             </TableCell>
