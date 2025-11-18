@@ -324,18 +324,28 @@ const nextConfig = {
       },
       {
         permanent: true,
+        source: '/project/:ref/reports',
+        destination: '/project/:ref/observability',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/reports/:path*',
+        destination: '/project/:ref/observability/:path*',
+      },
+      {
+        permanent: true,
         source: '/project/:ref/query-performance',
-        destination: '/project/:ref/reports/query-performance',
+        destination: '/project/:ref/observability/query-performance',
       },
       {
         permanent: true,
         source: '/project/:ref/advisors/query-performance',
-        destination: '/project/:ref/reports/query-performance',
+        destination: '/project/:ref/observability/query-performance',
       },
       {
         permanent: true,
         source: '/project/:ref/database/query-performance',
-        destination: '/project/:ref/reports/query-performance',
+        destination: '/project/:ref/observability/query-performance',
       },
       {
         permanent: true,

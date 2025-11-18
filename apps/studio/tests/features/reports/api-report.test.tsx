@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { test } from 'vitest'
 
-import { ApiReport } from 'pages/project/[ref]/reports/api-overview'
+import { ApiReport } from 'pages/project/[ref]/observability/api-overview'
 import { customRender as render } from 'tests/lib/custom-render'
 
 test(`Render static elements`, async () => {
