@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Lock, Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -77,7 +77,6 @@ const FormSchema = z.object({
         })
       }
     }),
-  bucketName: z.string().default(''),
   dimension: z
     .number()
     .int('Dimension must be an integer')
@@ -116,7 +115,6 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
 
   const defaultValues = {
     name: '',
-    bucketName,
     dimension: undefined,
     distanceMetric: 'cosine' as 'cosine' | 'euclidean',
     metadataKeys: [],
@@ -143,11 +141,12 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
 
   const onSubmit: SubmitHandler<CreateVectorTableForm> = async (values) => {
     if (!project?.ref) return console.error('Project ref is required')
+    if (!bucketName) return
 
     try {
       await createVectorBucketTable({
         projectRef: project.ref,
-        bucketName: values.bucketName,
+        bucketName: bucketName,
         indexName: values.name,
         dataType: 'float32',
         dimension: values.dimension!,
@@ -165,9 +164,9 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
           projectRef: project.ref,
           connectionString: project?.connectionString,
           serverName: wrapperInstance.server_name,
-          sourceSchema: getVectorBucketFDWSchemaName(values.bucketName),
-          targetSchema: getVectorBucketFDWSchemaName(values.bucketName),
-          schemaOptions: [`bucket_name '${values.bucketName}'`],
+          sourceSchema: getVectorBucketFDWSchemaName(bucketName),
+          targetSchema: getVectorBucketFDWSchemaName(bucketName),
+          schemaOptions: [`bucket_name '${bucketName}'`],
         })
       }
     } catch (error: any) {
@@ -256,24 +255,6 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                   </FormItemLayout>
                 )}
               />
-
-              <FormField_Shadcn_
-                key="bucketName"
-                name="bucketName"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItemLayout name="bucketName" label="Bucket name" layout="horizontal">
-                    <FormControl_Shadcn_>
-                      <div className="relative">
-                        <Input_Shadcn_ {...field} value={field.value} disabled className="pr-10" />
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                          <Lock size={14} className="text-foreground-muted" />
-                        </div>
-                      </div>
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
             </SheetSection>
             <Separator />
             <SheetSection className="flex flex-col gap-y-4">
@@ -329,16 +310,10 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                             key={metric.value}
                             id={metric.value}
                             value={metric.value}
-                            label=""
-                            showIndicator={false}
-                          >
-                            <div className="flex flex-col gap-y-1">
-                              <p className="text-foreground text-left">{metric.label}</p>
-                              <p className="text-foreground-lighter text-left">
-                                {metric.description}
-                              </p>
-                            </div>
-                          </RadioGroupStackedItem>
+                            label={metric.label}
+                            description={metric.description}
+                            showIndicator={true}
+                          ></RadioGroupStackedItem>
                         ))}
                       </RadioGroupStacked>
                     </FormControl_Shadcn_>
@@ -401,7 +376,12 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
           <Button type="default" disabled={isCreating} onClick={() => setVisible(false)}>
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" loading={isCreating} disabled={isCreating}>
+          <Button
+            form={formId}
+            htmlType="submit"
+            loading={isCreating}
+            disabled={isCreating || !bucketName}
+          >
             Create
           </Button>
         </SheetFooter>
