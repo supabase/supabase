@@ -17,8 +17,6 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormMessage_Shadcn_,
   Input_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
@@ -173,7 +171,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
       toast.warning(`Failed to connect vector table to the database: ${error.message}`)
     }
 
-    toast.success(`Successfully created vector table ${values.name}`)
+    toast.success(`Successfully created vector table “${values.name}”`)
     form.reset()
 
     setVisible(false)
@@ -266,7 +264,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                   <FormItemLayout
                     name="dimension"
                     label="Dimension"
-                    description="Must be an integer between 1 and 4096."
+                    description="Must be an integer between 1–4096."
                     layout="horizontal"
                   >
                     <FormControl_Shadcn_>
@@ -331,33 +329,42 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
               <div className="space-y-2">
                 {fields.map((field, index) => (
                   <div key={field.id} className="flex items-start gap-2">
-                    <FormField_Shadcn_
-                      control={form.control}
-                      name={`metadataKeys.${index}.value`}
-                      render={({ field }) => (
-                        <FormItem_Shadcn_ className="flex-1">
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_
-                              {...field}
-                              value={field.value}
-                              size="small"
-                              className="w-full"
-                              placeholder="Header value"
-                              data-1p-ignore
-                              data-lpignore="true"
-                              data-form-type="other"
-                              data-bwignore
-                            />
-                          </FormControl_Shadcn_>
-                          <FormMessage_Shadcn_ />
-                        </FormItem_Shadcn_>
-                      )}
-                    />
+                    <div className="flex-1">
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name={`metadataKeys.${index}.value`}
+                        render={({ field }) => (
+                          <FormItemLayout
+                            name={`metadataKeys.${index}.value`}
+                            description={
+                              index === fields.length - 1
+                                ? 'Must be between 1–63 characters and unique within this table.'
+                                : undefined
+                            }
+                            layout="vertical"
+                          >
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_
+                                {...field}
+                                value={field.value}
+                                size="small"
+                                className="w-full"
+                                placeholder="Enter a metadata key name"
+                                data-1p-ignore
+                                data-lpignore="true"
+                                data-form-type="other"
+                                data-bwignore
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+                    </div>
                     <Button
-                      type="outline"
-                      className="px-2"
-                      size="small"
-                      icon={<Trash2 className="w-2 h-2" size={12} />}
+                      type="text"
+                      className="w-[34px] h-[34px]" // Match the height of the input
+                      size="tiny"
+                      icon={<Trash2 size={12} />}
                       onClick={() => remove(index)}
                     />
                   </div>
