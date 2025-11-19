@@ -68,7 +68,10 @@ export const TableRowComponent = ({
     projectRef,
     bucketId,
   })
-  const { data } = useReplicationPipelineStatusQuery({ projectRef, pipelineId: pipeline?.id })
+  const { data, isLoading: isLoadingPipelineStatus } = useReplicationPipelineStatusQuery({
+    projectRef,
+    pipelineId: pipeline?.id,
+  })
   const pipelineStatus = data?.status.name
 
   const { data: tables } = useReplicationTablesQuery({ projectRef, sourceId })
@@ -94,10 +97,10 @@ export const TableRowComponent = ({
 
   // [Joshen] Considers both the replication pipeline status + if the table is in the replication publication
   const replicationStatusLabel = useMemo(() => {
-    if (isLoading) return 'Checking'
-
     if (hasReplication) {
-      if (!isPipelineRunning) {
+      if (isLoadingPipelineStatus) {
+        return 'Checking'
+      } else if (!isPipelineRunning) {
         return '-'
       } else if (isTableUnderReplicationPublication) {
         return 'Running'
@@ -105,7 +108,12 @@ export const TableRowComponent = ({
         return 'Disabled'
       }
     }
-  }, [hasReplication, isLoading, isPipelineRunning, isTableUnderReplicationPublication])
+  }, [
+    hasReplication,
+    isLoadingPipelineStatus,
+    isPipelineRunning,
+    isTableUnderReplicationPublication,
+  ])
 
   const onConfirmStopReplication = async () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -245,7 +253,7 @@ export const TableRowComponent = ({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex items-center gap-x-2">
-                    {isLoading ? (
+                    {isLoadingPipelineStatus ? (
                       <Loader2 size={12} className="animate-spin text-foreground-lighter" />
                     ) : isPipelineRunning ? (
                       <DotPing
