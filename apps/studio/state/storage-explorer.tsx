@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import * as tus from 'tus-js-client'
 import { proxy, useSnapshot } from 'valtio'
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import {
@@ -28,7 +28,6 @@ import {
 } from 'components/interfaces/Storage/Storage.types'
 import {
   calculateTotalRemainingTime,
-  downloadFile,
   EMPTY_FOLDER_PLACEHOLDER_FILE_NAME,
   formatFolderItems,
   formatTime,
@@ -36,18 +35,12 @@ import {
 } from 'components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
 import { convertFromBytes } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
-import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
-import {
-  createTemporaryUploadKey,
-  isTemporaryUploadKeyValid,
-  type TemporaryUploadKey,
-} from 'data/api-keys/temp-api-keys-utils'
+import { getOrRefreshTemporaryApiKey } from 'data/api-keys/temp-api-keys-utils'
 import { configKeys } from 'data/config/keys'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
 import { getQueryClient } from 'data/query-client'
 import { deleteBucketObject } from 'data/storage/bucket-object-delete-mutation'
-import { downloadBucketObject } from 'data/storage/bucket-object-download-mutation'
 import { listBucketObjects, StorageObject } from 'data/storage/bucket-objects-list-mutation'
 import { deleteBucketPrefix } from 'data/storage/bucket-prefix-delete-mutation'
 import { Bucket } from 'data/storage/buckets-query'
@@ -87,12 +80,12 @@ function createStorageExplorerState({
   projectRef,
   connectionString,
   resumableUploadUrl,
-  supabaseClient,
+  clientEndpoint,
 }: {
   projectRef: string
   connectionString: string
   resumableUploadUrl: string
-  supabaseClient?: () => Promise<SupabaseClient<any, 'public', any>>
+  clientEndpoint: string
 }) {
   const localStorageKey = LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef)
   const { view, sortBy, sortByOrder, sortBucket } =
@@ -102,12 +95,31 @@ function createStorageExplorerState({
   const state = proxy({
     projectRef,
     connectionString,
-    supabaseClient,
     resumableUploadUrl,
     uploadProgresses: [] as UploadProgress[],
 
-    // Temporary API key management for batch uploads
-    temporaryUploadKey: undefined as TemporaryUploadKey | undefined,
+    supabaseClient: async () => {
+      try {
+        const { apiKey } = await getOrRefreshTemporaryApiKey(projectRef)
+
+        return createClient(clientEndpoint, apiKey, {
+          auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false,
+            storage: {
+              getItem: (key) => {
+                return null
+              },
+              setItem: (key, value) => {},
+              removeItem: (key) => {},
+            },
+          },
+        })
+      } catch (error) {
+        throw error
+      }
+    },
 
     // abortController,
     abortApiCalls: () => {
@@ -121,29 +133,6 @@ function createStorageExplorerState({
     abortUploads: (toastId: string | number) => {
       state.abortUploadCallbacks[toastId].forEach((callback) => callback())
       state.abortUploadCallbacks[toastId] = []
-    },
-
-    // Get or refresh the temporary upload key
-    getOrRefreshTemporaryUploadKey: async () => {
-      if (isTemporaryUploadKeyValid(state.temporaryUploadKey)) {
-        return state.temporaryUploadKey.apiKey
-      }
-
-      // Generate new key with 10 minutes expiry
-      const expiryInSeconds = 600
-      const data = await getTemporaryAPIKey({
-        projectRef: state.projectRef,
-        expiry: expiryInSeconds,
-      })
-
-      state.temporaryUploadKey = createTemporaryUploadKey(data.api_key, expiryInSeconds)
-
-      return data.api_key
-    },
-
-    // Clear the temporary upload key
-    clearTemporaryUploadKey: () => {
-      state.temporaryUploadKey = undefined
     },
 
     columns: [] as StorageColumn[],
@@ -829,6 +818,9 @@ function createStorageExplorerState({
           { id: toastId, closeButton: false, position: 'top-right' }
         )
 
+        // Get authenticated Supabase client for Storage API access
+        const client = state.supabaseClient ? await state.supabaseClient() : undefined
+
         const promises = files.map((file) => {
           const fileMimeType = (file.metadata?.mimetype as string) ?? null
           return () => {
@@ -841,18 +833,23 @@ function createStorageExplorerState({
               | boolean
             >(async (resolve) => {
               try {
-                const data = await downloadBucketObject({
-                  projectRef: state.projectRef,
-                  bucketId: state.selectedBucket.id,
-                  path: `${file.prefix}/${file.name}`,
-                })
+                if (!client) {
+                  throw new Error('Supabase client not available')
+                }
+                // Use Storage API directly instead of Management API to avoid throttling
+                const { data, error } = await client.storage
+                  .from(state.selectedBucket.id)
+                  .download(`${file.prefix}/${file.name}`)
+
+                if (error) throw error
+                if (!data) throw new Error('No data returned from download')
+
                 progress = progress + 1 / files.length
 
-                const blob = await data.blob()
                 resolve({
                   name: file.name,
                   prefix: file.prefix,
-                  blob: new Blob([blob], { type: fileMimeType }),
+                  blob: new Blob([data], { type: fileMimeType }),
                 })
               } catch (error) {
                 console.error('Failed to download file', `${file.prefix}/${file.name}`)
@@ -1122,15 +1119,6 @@ function createStorageExplorerState({
         .map((folder) => folder.name)
         .join('/')
 
-      // Generate temporary API key for the batch upload
-      try {
-        await state.getOrRefreshTemporaryUploadKey()
-      } catch (error) {
-        console.error('Failed to get temporary API key:', error)
-        toast.error('Failed to initialize upload session. Please try again.')
-        return
-      }
-
       const toastId = state.onUploadProgress()
 
       // Upload files in batches
@@ -1231,7 +1219,7 @@ function createStorageExplorerState({
                 try {
                   // Use the shared temporary key for batch uploads
                   // This checks if the key is still valid and refreshes if needed
-                  const apiKey = await state.getOrRefreshTemporaryUploadKey()
+                  const { apiKey } = await getOrRefreshTemporaryApiKey(state.projectRef)
                   req.setHeader('apikey', apiKey)
                   if (!IS_PLATFORM) {
                     req.setHeader('Authorization', `Bearer ${apiKey}`)
@@ -1395,9 +1383,6 @@ function createStorageExplorerState({
           closeButton: true,
           duration: SONNER_DEFAULT_DURATION,
         })
-      } finally {
-        // Clear the temporary API key after batch upload completes
-        state.clearTemporaryUploadKey()
       }
 
       const t2 = new Date()
@@ -1520,6 +1505,85 @@ function createStorageExplorerState({
       }
     },
 
+    downloadFile: async (file: StorageItemWithColumn, showToast = true) => {
+      if (!file.path) {
+        toast.error('Failed to download: Unable to find path to file')
+        return false
+      }
+
+      const fileName: string = file.name
+      const fileMimeType = file?.metadata?.mimetype ?? undefined
+
+      const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
+
+      try {
+        const client = state.supabaseClient ? await state.supabaseClient() : undefined
+        if (!client) {
+          throw new Error('Supabase client not available')
+        }
+
+        // Use Storage API directly instead of Management API to avoid throttling
+        const { data, error } = await client.storage
+          .from(state.selectedBucket.id)
+          .download(file.path)
+
+        if (error) throw error
+        if (!data) throw new Error('No data returned from download')
+
+        const newBlob = new Blob([data], { type: fileMimeType })
+        const blobUrl = window.URL.createObjectURL(newBlob)
+        const link = document.createElement('a')
+        link.href = blobUrl
+        link.setAttribute('download', `${fileName}`)
+        document.body.appendChild(link)
+        link.click()
+        link.parentNode?.removeChild(link)
+        window.URL.revokeObjectURL(blobUrl)
+
+        if (toastId) {
+          toast.success(`Downloading ${fileName}`, {
+            id: toastId,
+            closeButton: true,
+            duration: SONNER_DEFAULT_DURATION,
+          })
+        }
+        return true
+      } catch (err) {
+        if (toastId) {
+          toast.error(`Failed to download ${fileName}`, {
+            id: toastId,
+            closeButton: true,
+            duration: SONNER_DEFAULT_DURATION,
+          })
+        }
+        return false
+      }
+    },
+
+    downloadFileAsBlob: async (file: StorageItemWithColumn) => {
+      if (!file.path) return false
+
+      try {
+        const client = state.supabaseClient ? await state.supabaseClient() : undefined
+        if (!client) {
+          throw new Error('Supabase client not available')
+        }
+
+        const { data, error } = await client.storage
+          .from(state.selectedBucket.id)
+          .download(file.path)
+
+        if (error) throw error
+        if (!data) throw new Error('No data returned from download')
+
+        const fileMimeType = file?.metadata?.mimetype ?? undefined
+        return { name: file.name, blob: new Blob([data], { type: fileMimeType }) }
+      } catch (err) {
+        console.error('Failed to download file', file.path)
+        return false
+      }
+    },
+
     downloadSelectedFiles: async (files: StorageItemWithColumn[]) => {
       const lowestColumnIndex = Math.min(...files.map((file) => file.columnIndex))
 
@@ -1534,7 +1598,6 @@ function createStorageExplorerState({
       })
 
       let progress = 0
-      const returnBlob = true
       const toastId = toast.loading(
         `Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`
       )
@@ -1542,12 +1605,7 @@ function createStorageExplorerState({
       const promises = formattedFilesWithPrefix.map((file) => {
         return () => {
           return new Promise<{ name: string; blob: Blob } | boolean>(async (resolve) => {
-            const data = await downloadFile({
-              projectRef: state.projectRef,
-              bucketId: state.selectedBucket.id,
-              file,
-              returnBlob,
-            })
+            const data = await state.downloadFileAsBlob(file)
             progress = progress + 1 / formattedFilesWithPrefix.length
             if (isObject(data)) {
               resolve({ ...data, name: file.formattedPathToFile })
@@ -1557,7 +1615,8 @@ function createStorageExplorerState({
         }
       })
 
-      const batchedPromises = chunk(promises, 10)
+      // Increase batch size to 50 since Storage API doesn't throttle like Management API
+      const batchedPromises = chunk(promises, 50)
       const downloadedFiles = await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         const previousResults = await previousPromise
         const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
@@ -1826,7 +1885,7 @@ const DEFAULT_STATE_CONFIG = {
   projectRef: '',
   connectionString: '',
   resumableUploadUrl: '',
-  supabaseClient: undefined,
+  clientEndpoint: '',
 }
 
 const StorageExplorerStateContext = createContext<StorageExplorerState>(
@@ -1847,6 +1906,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
   const resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}/storage/v1/upload/resumable`
+  const clientEndpoint = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}`
 
   // [Joshen] JFYI opting with the useEffect here as the storage explorer state was being loaded
   // before the project details were ready, hence the store kept returning project ref as undefined
@@ -1862,30 +1922,8 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
         createStorageExplorerState({
           projectRef: project?.ref ?? '',
           connectionString: project.connectionString ?? '',
-          supabaseClient: async () => {
-            try {
-              const data = await getTemporaryAPIKey({ projectRef: project.ref })
-              const clientEndpoint = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}`
-
-              return createClient(clientEndpoint, data.api_key, {
-                auth: {
-                  persistSession: false,
-                  autoRefreshToken: false,
-                  detectSessionInUrl: false,
-                  storage: {
-                    getItem: (key) => {
-                      return null
-                    },
-                    setItem: (key, value) => {},
-                    removeItem: (key) => {},
-                  },
-                },
-              })
-            } catch (error) {
-              throw error
-            }
-          },
           resumableUploadUrl,
+          clientEndpoint,
         })
       )
     }
