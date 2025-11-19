@@ -1624,7 +1624,14 @@ describe('SupportFormPage', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/projects',
-      response: [],
+      response: {
+        pagination: {
+          count: 0,
+          offset: 0,
+          limit: 100,
+        },
+        projects: [],
+      },
     })
 
     addAPIMock({
