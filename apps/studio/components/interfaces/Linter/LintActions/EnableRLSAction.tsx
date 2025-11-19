@@ -14,7 +14,7 @@ const EnableRLSAction = ({ projectRef, connectionString, metadata }: LintActionA
   const tableName = (metadata as { name?: string })?.name
 
   // Query tables to find the table ID
-  const { data: table } = useTablesQuery(
+  const { data: table, isLoading } = useTablesQuery(
     {
       projectRef,
       connectionString,
@@ -80,7 +80,7 @@ const EnableRLSAction = ({ projectRef, connectionString, metadata }: LintActionA
 
   return (
     <div>
-      <Button type="primary" loading={isExecuting} onClick={() => setIsConfirmVisible(true)}>
+      <Button type="primary" loading={isExecuting} disabled={isLoading || isExecuting || !table?.id} onClick={() => setIsConfirmVisible(true)}>
         Enable RLS
       </Button>
       <ConfirmationModal
