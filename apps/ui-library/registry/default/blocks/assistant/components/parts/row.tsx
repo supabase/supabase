@@ -29,7 +29,7 @@ export function Row({ rows, onActionSelect }: RowProps) {
   if (!rows.length) return null
 
   return (
-    <div className="space-y-[1px] w-full mb-4">
+    <div className="space-y-[1px] w-full mb-4 shrink-0">
       {rows.map((row, index) => {
         const hasActions = Boolean(row.actions?.length)
 
