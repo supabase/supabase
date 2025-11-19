@@ -383,13 +383,13 @@ const index = client.storage.vectors.from(${bucketName}).index('${indexName}')
 const result = await index.putVectors({
   vectors: [
     {
-      key: 'product_001',
-      data: { float32: [${dimension === 1 ? '0.2' : `0.2, ...${dimension - 1} more floats`}] },
+      key: 'doc-1',
+      data: { float32: [${dimension === 1 ? '0.2' : `0.2, 0.3, ...`}] }, // ${dimension} dimension${dimension > 1 ? `s` : ''}
       metadata: { ${metadataKeys.map((key) => `${key}: "${key} value"`).join(', ')} },
     },
     {
-      key: 'product_002',
-      data: { float32: [${dimension === 1 ? '0.2' : `0.2, ...${dimension - 1} more floats`}] },
+      key: 'doc-2',
+      data: { float32: [${dimension === 1 ? '0.4' : `0.4, 0.5, ...`}] }, // ${dimension} dimension${dimension > 1 ? `s` : ''}
       metadata: { ${metadataKeys.map((key) => `${key}: "${key} value"`).join(', ')} },
     },
   ],
@@ -406,8 +406,8 @@ const result = await index.putVectors({
 -- Insert multiple vectors
 insert into ${bucketName}.${indexName} (key, data, metadata)
 values
-  ('product_001', '[${dimension === 1 ? '0.2' : `0.2, ...${dimension - 1} more floats`}]'::embd, '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb),
-  ('product_002', '[${dimension === 1 ? '0.2' : `0.2, ...${dimension - 1} more floats`}]'::embd, '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb);
+  ('doc-1', '[${dimension === 1 ? '0.2' : `0.2, 0.3, ...`}]'::embd, '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb),
+  ('doc-2', '[${dimension === 1 ? '0.4' : `0.4, 0.5, ...`}]'::embd, '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb);
 \`\`\``}
             </ReactMarkdown>
           </Card>
