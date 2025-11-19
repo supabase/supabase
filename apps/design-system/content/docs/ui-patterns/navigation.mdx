@@ -5,6 +5,55 @@ description: Navigation patterns help users understand where they are and where 
 
 Supabase has a necessarily complex navigation system to handle multiple products and levels of hierarchy. This page introduces those general patterns, best practices, and the components involved.
 
+## Row interaction
+
+Both [TableRow](../components/table-row) and [Card](../components/card) may be used to represent rows of data. Their individual interactivity depends on the context, such as:
+
+- Does the larger container represent mostly read-only content or is it an entry way into child routes?
+- Is there only one action on each row?
+- Does the row represent a single entity or a collection of entities?
+
+## Entirely clickable rows
+
+Where there is perhaps one primary action, and one or two overlapping (and therefore conflicting) secondary actions.
+
+_TODO: example like the Security email templates rows_
+
+These mostly only make sense for Card components, as their content tends to be more about navigation than representing data.
+
+`e.stopPropagation()` is used to prevent the click event from bubbling up to the parent row, which would cause the row to be clicked instead of the link.
+
+Be sure to add enough padding to each overriding interactive element to ensure the click target is large enough. Otherwise the click can feel hijacked if the user misclicks by even a few pixels.
+
+Prior art: Vercel deployments, Linear issues
+
+### Secondary actions
+
+Use the `.text-link-table-cell` class to style secondary actions.
+
+```tsx
+<TableCell>
+  <Link href="/bucket-name-here" className="text-link-table-cell">
+    Bucket name here
+  </Link>
+</TableCell>
+```
+
+Chain additional classes to the Link if there are multiple actions on the same row.
+
+```tsx
+<TableCell>
+  <Link href="/bucket-name-here" className="text-link-table-cell text-medium">
+    Bucket name here
+  </Link>
+</TableCell>
+<TableCell>
+  <Link href="/bucket-name-here/policies" className="text-link-table-cell text-foreground-lighter">
+    Policies
+  </Link>
+</TableCell>
+```
+
 ## Components
 
 ### NavMenu
