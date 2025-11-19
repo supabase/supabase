@@ -61,6 +61,7 @@ const McpTabContentInnerLoaded = ({
       connectionTab: 'MCP',
       selectedItem: selectedClient?.label,
       connectionType,
+      source: 'studio',
     })
   }
 
@@ -68,6 +69,7 @@ const McpTabContentInnerLoaded = ({
     if (selectedClient?.label) {
       track('mcp_install_button_clicked', {
         client: selectedClient.label,
+        source: 'studio',
       })
     }
   }

@@ -91,6 +91,10 @@ export interface ConnectionStringCopiedEvent {
      * Selected framework, tool, or client (e.g., 'Next.js', 'Prisma', 'Cursor')
      */
     selectedItem?: string
+    /**
+     * Source of the event, either 'studio' or 'docs'
+     */
+    source?: 'studio' | 'docs'
   }
   groups: TelemetryGroups
 }
@@ -99,7 +103,7 @@ export interface ConnectionStringCopiedEvent {
  * User clicked the MCP install button (one-click installation for Cursor or VS Code).
  *
  * @group Events
- * @source studio
+ * @source studio, docs
  */
 export interface McpInstallButtonClickedEvent {
   action: 'mcp_install_button_clicked'
@@ -108,6 +112,10 @@ export interface McpInstallButtonClickedEvent {
      * The MCP client that was selected (e.g., 'Cursor', 'VS Code')
      */
     client: string
+    /**
+     * Source of the event, either 'studio' or 'docs'
+     */
+    source?: 'studio' | 'docs'
   }
   groups: TelemetryGroups
 }
