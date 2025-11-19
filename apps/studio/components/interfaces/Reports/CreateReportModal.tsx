@@ -39,7 +39,7 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
     onSuccess: (_, vars) => {
       toast.success('Successfully created new report')
       const newReportId = vars.payload.id
-      router.push(`/project/${ref}/reports/${newReportId}${preservedQueryParams}`)
+      router.push(`/project/${ref}/observability/${newReportId}${preservedQueryParams}`)
       afterSubmit()
     },
     onError: (error) => {
