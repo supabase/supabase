@@ -11,7 +11,7 @@ export const LogDrainsEmpty = () => {
       step: 1,
       title: 'Pricing',
       description:
-        'Log Drains are available as a project Add-On for all Team and Enterprise users. Each Log Drain costs $60 per month.',
+        'Log Drains are available as a project Add-On for all paid users. Each Log Drain costs $60 per month.',
       label: 'See our pricing',
       link: 'https://supabase.com/docs/guides/platform/manage-your-usage/log-drains',
     },
