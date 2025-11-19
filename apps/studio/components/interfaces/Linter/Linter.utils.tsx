@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
+import EnableRLSAction from 'components/interfaces/Linter/LintActions/EnableRLSAction'
 import { LINTER_LEVELS, LintInfo } from 'components/interfaces/Linter/Linter.constants'
 import { LINT_TYPES, Lint } from 'data/lint/lint-query'
 import { DOCS_URL } from 'lib/constants'
@@ -134,6 +135,7 @@ export const lintInfoMap: LintInfo[] = [
     linkText: 'View policies',
     docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0013_rls_disabled_in_public`,
     category: 'security',
+    action: EnableRLSAction,
   },
   {
     name: 'extension_in_public',
@@ -319,6 +321,33 @@ export const LintCTA = ({
   )
 }
 
+export const LintAction = ({
+  title,
+  projectRef,
+  connectionString,
+  metadata,
+}: {
+  title: LINT_TYPES
+  projectRef: string
+  connectionString?: string | null
+  metadata: Lint['metadata']
+}) => {
+  const lintInfo = lintInfoMap.find((item) => item.name === title)
+  const ActionComponent = lintInfo?.action
+
+  if (!ActionComponent) {
+    return null
+  }
+
+  return (
+    <ActionComponent
+      projectRef={projectRef}
+      connectionString={connectionString}
+      metadata={metadata}
+    />
+  )
+}
+
 export const EntityTypeIcon = ({ type }: { type: string | undefined }) => {
   switch (type) {
     case 'table':
@@ -376,7 +405,7 @@ export const createLintSummaryPrompt = (lint: Lint) => {
   const schema = lint.metadata?.schema ?? 'N/A'
   const issue = lint.detail ? lint.detail.replace(/\\`/g, '`') : 'N/A'
   const description = lint.description ? lint.description.replace(/\\`/g, '`') : 'N/A'
-  return `Summarize the issue and suggest fixes for the following lint item:
+  return `Execute the fix for the following issue with a brief one sentence explanation:
 Title: ${title}
 Entity: ${entity}
 Schema: ${schema}
