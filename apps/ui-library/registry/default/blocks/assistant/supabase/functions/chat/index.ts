@@ -25,24 +25,32 @@ const rowSchema = z.object({
     .describe('Optional list of quick actions the user can trigger for this row.'),
 })
 
+const chartDataPointSchema = z
+  .object({})
+  .catchall(
+    z
+      .union([z.string(), z.number()])
+      .describe(
+        'Value for this property in the data point. Strings are typically labels, numbers are metrics.'
+      )
+  )
+  .describe('Data point object containing axis and value fields.')
+
 const chartSchema = z.object({
-  primaryText: z.string().describe('Primary title shown at the top of the chart card.'),
+  primaryText: z
+    .string()
+    .describe('Primary title shown at the top of the chart card. e.g. Tasks completed'),
   secondaryText: z
     .string()
     .optional()
-    .describe('Optional short description shown under the title.'),
+    .describe('Optional short description shown under the title. e.g. Last 7 days'),
   tertiaryText: z
     .string()
     .optional()
-    .describe('Optional supporting text shown beneath the chart.'),
-  data: z
-    .array(
-      z.record(z.union([z.string(), z.number()])).describe(
-        'Data point object containing axis and value fields.'
-      )
-    )
-    .min(1)
-    .describe('Data points to plot on the chart.'),
+    .describe(
+      'Optional supporting text shown beneath the chart. e.g. Increase of 12% week over week'
+    ),
+  data: z.array(chartDataPointSchema).min(1).describe('Data points to plot on the chart.'),
   xAxis: z
     .string()
     .describe('Key inside each data point to use for the X-axis labels (e.g., "month").'),

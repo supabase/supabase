@@ -84,14 +84,10 @@ const models = [
 ]
 
 const suggestions = [
-  'What are the latest trends in AI?',
-  'How does machine learning work?',
-  'Explain quantum computing',
-  'Best practices for React development',
-  'Tell me about TypeScript benefits',
-  'How to optimize database queries?',
-  'What is the difference between SQL and NoSQL?',
-  'Explain cloud computing basics',
+  'How many tasks have I completed this week',
+  'Show me active tasks',
+  'Mark all tasks as complete',
+  'Help me plan my day',
 ]
 
 type RenderRowToolInput = {
@@ -216,7 +212,7 @@ export const AssistantWidget = ({
           <ConversationContent>
             {messages.map(({ role, parts }, index) => (
               <Message from={role} key={index}>
-                <MessageContent>
+                <MessageContent className="space-y-4">
                   {parts.map((part, i) => {
                     switch (part.type) {
                       case 'text':
@@ -240,6 +236,7 @@ export const AssistantWidget = ({
                         )
                       }
                       case 'tool-renderChart': {
+                        console.log('part', part)
                         const payload = (part.input ?? part.output) as
                           | RenderChartToolInput
                           | undefined
