@@ -149,7 +149,15 @@ token_verifications = 30
 # secret = ""
 
 [auth.email]
-# Allow/disallow new user signups via email to your project.
+# Controls whether the email authentication provider is enabled (GOTRUE_EXTERNAL_EMAIL_ENABLED).
+# 
+# false = Email provider completely disabled (no login, invites, OTP, or signup)
+# true  = Email provider enabled (login, invites, OTP work; signup requires [auth].enable_signup=true)
+# 
+# Common configurations:
+#   Invite-only:    [auth].enable_signup=false, [auth.email].enable_signup=true
+#   Open signups:   [auth].enable_signup=true,  [auth.email].enable_signup=true
+#   No email auth:  [auth.email].enable_signup=false (regardless of [auth].enable_signup)
 enable_signup = true
 # If enabled, a user will be required to confirm any email change on both the old, and new email
 # addresses. If disabled, only the new email is required to confirm.
@@ -185,7 +193,15 @@ subject = "Reset your password"
 content_path = "./supabase/templates/recovery.html"
 
 [auth.sms]
-# Allow/disallow new user signups via SMS to your project.
+# Controls whether the phone authentication provider is enabled (GOTRUE_EXTERNAL_PHONE_ENABLED).
+# 
+# false = Phone provider completely disabled (no login, invites, OTP, or signup)
+# true  = Phone provider enabled (login, invites, OTP work; signup requires [auth].enable_signup=true)
+# 
+# Common configurations:
+#   Invite-only:    [auth].enable_signup=false, [auth.sms].enable_signup=true
+#   Open signups:   [auth].enable_signup=true,  [auth.sms].enable_signup=true
+#   No phone auth:  [auth.sms].enable_signup=false (regardless of [auth].enable_signup)
 enable_signup = false
 # If enabled, users need to confirm their phone number before signing in.
 enable_confirmations = false
