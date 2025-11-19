@@ -24,7 +24,7 @@ import {
 } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useStorageReport } from 'data/reports/storage-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
@@ -186,7 +186,7 @@ export const StorageReport: NextPageWithLayout = () => {
 
 StorageReport.getLayout = (page) => (
   <DefaultLayout>
-    <ReportsLayout>{page}</ReportsLayout>
+    <ObservabilityLayout>{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 

@@ -33,7 +33,7 @@ export async function getDatabaseQueue({
   queueName,
   afterTimestamp,
   status,
-}: DatabaseQueueVariables & { afterTimestamp: string }) {
+}: DatabaseQueueVariables & { afterTimestamp: string | undefined }) {
   if (!projectRef) throw new Error('Project ref is required')
   if (!isQueueNameValid(queueName)) {
     throw new Error(
