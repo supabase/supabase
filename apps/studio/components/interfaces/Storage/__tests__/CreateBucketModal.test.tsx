@@ -43,11 +43,15 @@ describe(`CreateBucketModal`, () => {
     customRender(
       <ProjectContextProvider projectRef="default">
         <CreateBucketModal />
-      </ProjectContextProvider>
+      </ProjectContextProvider>,
+      {
+        nuqs: {
+          searchParams: {
+            new: 'true',
+          },
+        },
+      }
     )
-
-    const dialogTrigger = screen.getByRole(`button`, { name: `New bucket` })
-    await userEvent.click(dialogTrigger)
 
     await waitFor(() => {
       expect(screen.getByRole(`dialog`)).toBeInTheDocument()
