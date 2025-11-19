@@ -20,7 +20,6 @@ export type UpdateTableBody = Partial<CreateTableBody> & {
 export type TableUpdateVariables = {
   projectRef: string
   connectionString?: string | null
-  id: number
   name: string
   schema: string
   payload: UpdateTableBody
@@ -29,18 +28,17 @@ export type TableUpdateVariables = {
 export async function updateTable({
   projectRef,
   connectionString,
-  id,
   name,
   schema,
   payload,
 }: TableUpdateVariables) {
-  const { sql } = pgMeta.tables.update({ id, name, schema }, payload)
+  const { sql } = pgMeta.tables.update({ name, schema }, payload)
 
-  const { result } = await executeSql<void>({
+  const { result } = await executeSql<{ table_id: number }[]>({
     projectRef,
     connectionString,
     sql,
-    queryKey: ['table', 'update', id],
+    queryKey: ['table', 'update', schema, name],
   })
 
   return result
@@ -61,9 +59,14 @@ export const useTableUpdateMutation = ({
   return useMutation<TableUpdateData, ResponseError, TableUpdateVariables>({
     mutationFn: (vars) => updateTable(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef, schema, id } = variables
+      const { projectRef, schema } = variables
+      const tableId = data[0]?.table_id
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: tableEditorKeys.tableEditor(projectRef, id) }),
+        tableId
+          ? queryClient.invalidateQueries({
+              queryKey: tableEditorKeys.tableEditor(projectRef, tableId),
+            })
+          : undefined,
         queryClient.invalidateQueries({ queryKey: tableKeys.list(projectRef, schema) }),
         queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
       ])

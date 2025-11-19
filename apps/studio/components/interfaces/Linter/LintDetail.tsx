@@ -46,7 +46,7 @@ const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
       <h3 className="text-sm mb-2">Resolve</h3>
       <div className="flex items-center gap-2">
         <LintAction
-          title={lint.name}
+          id={lint.name}
           projectRef={projectRef}
           connectionString={project?.connectionString}
           metadata={lint.metadata}

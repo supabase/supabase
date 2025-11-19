@@ -9,6 +9,7 @@ import { RefreshButton } from 'components/grid/components/header/RefreshButton'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { ToggleRlsButton } from 'components/ui/ToggleRlsButton'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
@@ -21,7 +22,6 @@ import {
   isMaterializedView as isTableLikeMaterializedView,
   isView as isTableLikeView,
 } from 'data/table-editor/table-editor-types'
-import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { RealtimeButtonVariant, useRealtimeExperiment } from 'hooks/misc/useRealtimeExperiment'
@@ -31,6 +31,7 @@ import { DOCS_URL } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import type { ResponseError } from 'types'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -41,7 +42,6 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector/RoleImpersonationPopover'
 import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
@@ -72,17 +72,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema })
 
-  const { mutate: updateTable } = useTableUpdateMutation({
-    onError: (error) => {
-      toast.error(`Failed to toggle RLS: ${error.message}`)
-    },
-    onSettled: () => {
-      closeConfirmModal()
-    },
-  })
-
   const [showEnableRealtime, setShowEnableRealtime] = useState(false)
-  const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
   const [isAutofixViewSecurityModalOpen, setIsAutofixViewSecurityModalOpen] = useState(false)
 
   const snap = useTableEditorTableStateSnapshot()
@@ -198,31 +188,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
     })
   }
 
-  const closeConfirmModal = () => {
-    setRlsConfirmModalOpen(false)
-  }
-  const onToggleRLS = async () => {
-    const payload = {
-      id: table.id,
-      rls_enabled: !(isTable && table.rls_enabled),
-    }
-
-    updateTable({
-      projectRef: project?.ref!,
-      connectionString: project?.connectionString,
-      id: table.id,
-      name: table.name,
-      schema: table.schema,
-      payload: payload,
-    })
-
-    track('table_rls_enabled', {
-      method: 'table_editor',
-      schema_name: table.schema,
-      table_name: table.name,
-    })
-  }
-
   return (
     <div className="sb-grid-header__inner">
       {showHeaderActions && (
@@ -321,14 +286,39 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                       With RLS enabled, anonymous users will not be able to read/write data in the
                       table.
                     </p>
-                    {!isSchemaLocked && (
-                      <Button
-                        type="default"
-                        className="mt-2 w-min"
-                        onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
+                    {!isSchemaLocked && !!project && (
+                      <ToggleRlsButton
+                        asChild
+                        schema={table.schema}
+                        tableName={table.name}
+                        isRlsEnabled={table.rls_enabled}
+                        projectRef={project.ref}
+                        connectionString={project.connectionString ?? null}
+                        onError={(error: ResponseError) =>
+                          toast.error(`Failed to toggle RLS: ${error.message}`)
+                        }
+                        onSuccess={(nextIsEnabled) => {
+                          if (nextIsEnabled) {
+                            track('table_rls_enabled', {
+                              method: 'table_editor',
+                              schema_name: table.schema,
+                              table_name: table.name,
+                            })
+                          }
+                        }}
                       >
-                        Enable RLS for this table
-                      </Button>
+                        {({ onClick, isLoading, disabled }) => (
+                          <Button
+                            type="default"
+                            className="mt-2 w-min"
+                            loading={isLoading}
+                            disabled={disabled}
+                            onClick={onClick}
+                          >
+                            Enable RLS for this table
+                          </Button>
+                        )}
+                      </ToggleRlsButton>
                     )}
                   </div>
                 </PopoverContent_Shadcn_>
@@ -558,19 +548,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
         isAutofixViewSecurityModalOpen={isAutofixViewSecurityModalOpen}
         setIsAutofixViewSecurityModalOpen={setIsAutofixViewSecurityModalOpen}
       />
-
-      {isTable && (
-        <ConfirmModal
-          danger={table.rls_enabled}
-          visible={rlsConfirmModalOpen}
-          title="Confirm to enable Row Level Security"
-          description="Are you sure you want to enable Row Level Security for this table?"
-          buttonLabel="Enable RLS"
-          buttonLoadingLabel="Updating"
-          onSelectCancel={closeConfirmModal}
-          onSelectConfirm={onToggleRLS}
-        />
-      )}
     </div>
   )
 }

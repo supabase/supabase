@@ -30,7 +30,6 @@ import { PolicyTableRowHeader } from './PolicyTableRowHeader'
 export interface PolicyTableRowProps {
   table: PolicyTable
   isLocked: boolean
-  onSelectToggleRLS: (table: PolicyTable) => void
   onSelectCreatePolicy: (table: PolicyTable) => void
   onSelectEditPolicy: (policy: PostgresPolicy) => void
   onSelectDeletePolicy: (policy: PostgresPolicy) => void
@@ -39,7 +38,6 @@ export interface PolicyTableRowProps {
 const PolicyTableRowComponent = ({
   table,
   isLocked,
-  onSelectToggleRLS = noop,
   onSelectCreatePolicy = noop,
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
@@ -96,7 +94,8 @@ const PolicyTableRowComponent = ({
         <PolicyTableRowHeader
           table={table}
           isLocked={isLocked}
-          onSelectToggleRLS={onSelectToggleRLS}
+          projectRef={project?.ref}
+          connectionString={project?.connectionString}
           onSelectCreatePolicy={onSelectCreatePolicy}
         />
       </CardHeader>

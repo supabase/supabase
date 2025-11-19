@@ -12,7 +12,6 @@ import {
 import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
-import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Card, CardContent } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
@@ -43,42 +42,20 @@ export const Policies = ({
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<{
-    id: number
-    schema: string
-    name: string
-    rls_enabled: boolean
-  }>()
   const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<any>({})
 
-  const { mutate: updateTable } = useTableUpdateMutation({
-    onError: (error) => {
-      toast.error(`Failed to toggle RLS: ${error.message}`)
-    },
-    onSettled: () => {
-      closeConfirmModal()
-    },
-  })
   const { mutate: deleteDatabasePolicy } = useDatabasePolicyDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted policy!')
     },
     onSettled: () => {
-      closeConfirmModal()
+      closeDeleteModal()
     },
   })
 
-  const closeConfirmModal = useCallback(() => {
+  const closeDeleteModal = useCallback(() => {
     setSelectedPolicyToDelete({})
-    setSelectedTableToToggleRLS(undefined)
   }, [])
-
-  const onSelectToggleRLS = useCallback(
-    (table: { id: number; schema: string; name: string; rls_enabled: boolean }) => {
-      setSelectedTableToToggleRLS(table)
-    },
-    []
-  )
 
   const onSelectEditPolicy = useCallback(
     (policy: PostgresPolicy) => {
@@ -90,25 +67,6 @@ export const Policies = ({
   const onSelectDeletePolicy = useCallback((policy: PostgresPolicy) => {
     setSelectedPolicyToDelete(policy)
   }, [])
-
-  // Methods that involve some API
-  const onToggleRLS = async () => {
-    if (!selectedTableToToggleRLS) return console.error('Table is required')
-
-    const payload = {
-      id: selectedTableToToggleRLS.id,
-      rls_enabled: !selectedTableToToggleRLS.rls_enabled,
-    }
-
-    updateTable({
-      projectRef: project?.ref!,
-      connectionString: project?.connectionString,
-      id: selectedTableToToggleRLS.id,
-      name: selectedTableToToggleRLS.name,
-      schema: selectedTableToToggleRLS.schema,
-      payload: payload,
-    })
-  }
 
   const onDeletePolicy = async () => {
     if (!project) return console.error('Project is required')
@@ -157,7 +115,6 @@ export const Policies = ({
                   <PolicyTableRow
                     table={table}
                     isLocked={schema === 'realtime' ? true : isLocked}
-                    onSelectToggleRLS={onSelectToggleRLS}
                     onSelectCreatePolicy={handleCreatePolicy}
                     onSelectEditPolicy={onSelectEditPolicy}
                     onSelectDeletePolicy={onSelectDeletePolicy}
@@ -181,23 +138,8 @@ export const Policies = ({
         description={`This is permanent! Are you sure you want to delete the policy "${selectedPolicyToDelete.name}"`}
         buttonLabel="Delete"
         buttonLoadingLabel="Deleting"
-        onSelectCancel={closeConfirmModal}
+        onSelectCancel={closeDeleteModal}
         onSelectConfirm={onDeletePolicy}
-      />
-
-      <ConfirmModal
-        danger={selectedTableToToggleRLS?.rls_enabled}
-        visible={selectedTableToToggleRLS !== undefined}
-        title={`Confirm to ${
-          selectedTableToToggleRLS?.rls_enabled ? 'disable' : 'enable'
-        } Row Level Security`}
-        description={`Are you sure you want to ${
-          selectedTableToToggleRLS?.rls_enabled ? 'disable' : 'enable'
-        } Row Level Security for the table "${selectedTableToToggleRLS?.name}"?`}
-        buttonLabel="Confirm"
-        buttonLoadingLabel="Saving"
-        onSelectCancel={closeConfirmModal}
-        onSelectConfirm={onToggleRLS}
       />
     </>
   )

@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
-import EnableRLSAction from 'components/interfaces/Linter/LintActions/EnableRLSAction'
+import { EnableRLSAction } from 'components/interfaces/Linter/LintActions/EnableRLSAction'
 import { LINTER_LEVELS, LintInfo } from 'components/interfaces/Linter/Linter.constants'
 import { LINT_TYPES, Lint } from 'data/lint/lint-query'
 import { DOCS_URL } from 'lib/constants'
@@ -322,17 +322,17 @@ export const LintCTA = ({
 }
 
 export const LintAction = ({
-  title,
+  id,
   projectRef,
   connectionString,
   metadata,
 }: {
-  title: LINT_TYPES
+  id: LINT_TYPES
   projectRef: string
   connectionString?: string | null
   metadata: Lint['metadata']
 }) => {
-  const lintInfo = lintInfoMap.find((item) => item.name === title)
+  const lintInfo = lintInfoMap.find((item) => item.name === id)
   const ActionComponent = lintInfo?.action
 
   if (!ActionComponent) {

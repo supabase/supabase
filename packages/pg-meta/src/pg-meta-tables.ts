@@ -164,7 +164,7 @@ type TableUpdateParams = {
 }
 
 function update(
-  old: Pick<PGTable, 'id' | 'name' | 'schema'>,
+  old: Pick<PGTable, 'name' | 'schema'>,
   {
     name,
     schema,
@@ -215,7 +215,11 @@ BEGIN
   SELECT conname
     INTO r
     FROM pg_constraint
-    WHERE contype = 'p' AND conrelid = ${literal(old.id)};
+	JOIN pg_class ON pg_constraint.conrelid = pg_class.oid
+    JOIN pg_namespace ON pg_class.relnamespace = pg_namespace.oid
+    WHERE contype = 'p'
+	  AND pg_namespace.nspname = ${literal(old.schema)}
+	  AND pg_class.relname = ${literal(old.name)};
   IF r IS NOT NULL THEN
     EXECUTE ${literal(`${alter} DROP CONSTRAINT `)} || quote_ident(r.conname);
   END IF;
@@ -236,7 +240,22 @@ $$;
       ? ''
       : `COMMENT ON TABLE ${ident(old.schema)}.${ident(old.name)} IS ${literal(comment)};`
 
-  // nameSql must be last, right below schemaSql
+  // Fetch table ID for downstream processing
+  const currentSchema = schema === undefined ? old.schema : schema
+  const currentName = name === undefined ? old.name : name
+  const tableIdSql = /** SQL */ `
+SELECT c.oid AS table_id
+FROM pg_class c
+JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE n.nspname = ${literal(currentSchema)}
+	AND c.relname = ${literal(currentName)};
+`.trim()
+
+  // The order is important for ensuring the right schema and table names are
+  // used in each step.
+  // All other alterations happen before `schemaSql` and `nameSql`, which must
+  // occur in that order.
+  // `tableIdSql` comes last.
   const sql = `
 BEGIN;
   ${enableRls}
@@ -246,6 +265,7 @@ BEGIN;
   ${commentSql}
   ${schemaSql}
   ${nameSql}
+  ${tableIdSql}
 COMMIT;`
 
   return { sql }
