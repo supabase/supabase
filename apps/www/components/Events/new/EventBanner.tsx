@@ -23,7 +23,7 @@ export function EventBanner() {
       <article className="flex flex-col gap-6 lg:py-2">
         <div className="flex justify-between items-start gap-4">
           <div className="flex flex-col gap-1.5">
-            <h2 className="text-2xl font-medium line-clamp-2">{featuredEvent.title}</h2>
+            <h2 className="text-2xl font-medium lg:line-clamp-2">{featuredEvent.title}</h2>
             <p
               className="text-lg font-medium text-foreground-light"
               title={`Hosted by ${formatHosts(featuredEvent.hosts).fullList}`}
