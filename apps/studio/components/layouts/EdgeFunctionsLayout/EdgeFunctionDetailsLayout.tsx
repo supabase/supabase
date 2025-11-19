@@ -5,7 +5,7 @@ import React, { useEffect, useState, type PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { EdgeFunctionTesterSheet } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
@@ -105,22 +105,26 @@ const EdgeFunctionDetailsLayout = ({
 
   const navigationItems = functionSlug
     ? [
-        {
-          label: 'Overview',
-          href: `/project/${ref}/functions/${functionSlug}`,
-        },
-        {
-          label: 'Invocations',
-          href: `/project/${ref}/functions/${functionSlug}/invocations`,
-        },
-        {
-          label: 'Logs',
-          href: `/project/${ref}/functions/${functionSlug}/logs`,
-        },
-        {
-          label: 'Code',
-          href: `/project/${ref}/functions/${functionSlug}/code`,
-        },
+        ...(IS_PLATFORM
+          ? [
+              {
+                label: 'Overview',
+                href: `/project/${ref}/functions/${functionSlug}`,
+              },
+              {
+                label: 'Invocations',
+                href: `/project/${ref}/functions/${functionSlug}/invocations`,
+              },
+              {
+                label: 'Logs',
+                href: `/project/${ref}/functions/${functionSlug}/logs`,
+              },
+              {
+                label: 'Code',
+                href: `/project/${ref}/functions/${functionSlug}/code`,
+              },
+            ]
+          : []),
         {
           label: 'Details',
           href: `/project/${ref}/functions/${functionSlug}/details`,

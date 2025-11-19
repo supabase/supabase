@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { useFlag } from 'common'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -65,6 +65,12 @@ const CHART_INTERVALS: ChartIntervals[] = [
 const PageLayout: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
+
+  if (!IS_PLATFORM) {
+    router.push(`/project/${projectRef}/functions/${functionSlug}/details`)
+    return <></>
+  }
+
   const newChartsEnabled = useFlag('newEdgeFunctionOverviewCharts')
   const [interval, setInterval] = useState<string>('15min')
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
