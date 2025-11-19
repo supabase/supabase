@@ -242,10 +242,17 @@ export const TableRowComponent = ({
           <Table2
             size={16}
             strokeWidth={1.5}
-            className={table.isConnected ? 'text-foreground-muted' : 'text-foreground-muted/40'}
+            className={table.isConnected ? 'text-foreground-muted' : 'text-foreground-muted/50'}
           />
         </TableCell>
-        <TableCell className="min-w-[120px] min-h-[60px] py-4">{table.name}</TableCell>
+        <TableCell className="min-w-[120px] min-h-[60px] py-4">
+          {table.name}
+          {!table.isConnected && (
+            <Badge variant="success" size="tiny" className="ml-2">
+              New
+            </Badge>
+          )}
+        </TableCell>
         {!!hasReplication && (
           <TableCell
             colSpan={table.isConnected ? 1 : 2}
