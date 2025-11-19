@@ -36,7 +36,7 @@ export const StorageMenuV2 = () => {
                     <div className="flex items-center justify-between">
                       <p className="truncate">{config.displayName}</p>
                       {isAlphaEnabled && (
-                        <Badge variant="default" size="small">
+                        <Badge variant="default" size="tiny">
                           New
                         </Badge>
                       )}
