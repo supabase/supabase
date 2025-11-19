@@ -16,10 +16,8 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { Bucket } from 'data/storage/buckets-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useStoragePolicyCounts } from 'hooks/storage/useStoragePolicyCounts'
 import { Bucket as BucketIcon } from 'icons'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
@@ -34,8 +32,6 @@ import {
 const BucketPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { bucketId, ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
-  const { projectRef } = useStorageExplorerStateSnapshot()
   const { data: bucket, error, isSuccess, isError } = useSelectedBucket()
 
   const [showEditModal, setShowEditModal] = useQueryState(
@@ -61,9 +57,6 @@ const BucketPage: NextPageWithLayout = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess])
-
-  // [Joshen] Checking against projectRef from storage explorer to check if the store has initialized
-  if (!project || !projectRef || !isSuccess) return null
 
   if (isError) {
     return <StorageBucketsError error={error as any} />
@@ -153,11 +146,9 @@ const BucketPage: NextPageWithLayout = () => {
           </>
         }
       >
-        {!!bucket && (
-          <div className="flex-1 min-h-0 px-6 pb-6">
-            <StorageExplorer bucket={bucket} />
-          </div>
-        )}
+        <div className="flex-1 min-h-0 px-6 pb-6">
+          <StorageExplorer />
+        </div>
       </PageLayout>
 
       {bucket && (

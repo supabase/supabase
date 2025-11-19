@@ -44,7 +44,9 @@ export const AnalyticsBuckets = () => {
   })
 
   const analyticsBuckets = buckets.filter((bucket) =>
-    filterString.length === 0 ? true : bucket.id.toLowerCase().includes(filterString.toLowerCase())
+    filterString.length === 0
+      ? true
+      : bucket.name.toLowerCase().includes(filterString.toLowerCase())
   )
   const hasNoBuckets = buckets.length === 0
 
@@ -137,13 +139,13 @@ export const AnalyticsBuckets = () => {
                       )}
                       {analyticsBuckets.map((bucket) => (
                         <TableRow
-                          key={bucket.id}
+                          key={bucket.name}
                           className="relative cursor-pointer h-16 inset-focus"
-                          onClick={(event) => handleBucketNavigation(bucket.id, event)}
+                          onClick={(event) => handleBucketNavigation(bucket.name, event)}
                           onKeyDown={(event) => {
                             if (event.key === 'Enter' || event.key === ' ') {
                               event.preventDefault()
-                              handleBucketNavigation(bucket.id, event)
+                              handleBucketNavigation(bucket.name, event)
                             }
                           }}
                           tabIndex={0}
@@ -152,7 +154,9 @@ export const AnalyticsBuckets = () => {
                             <BucketIcon size={16} className="text-foreground-muted" />
                           </TableCell>
                           <TableCell>
-                            <p className="whitespace-nowrap max-w-[512px] truncate">{bucket.id}</p>
+                            <p className="whitespace-nowrap max-w-[512px] truncate">
+                              {bucket.name}
+                            </p>
                           </TableCell>
 
                           <TableCell>
