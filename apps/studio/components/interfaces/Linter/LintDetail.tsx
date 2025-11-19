@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown'
 import { createLintSummaryPrompt, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import { Lint } from 'data/lint/lint-query'
 import { DOCS_URL } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
 import { ExternalLink } from 'lucide-react'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Button } from 'ui'
@@ -18,8 +19,30 @@ interface LintDetailProps {
 }
 
 const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
+  const track = useTrack()
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
+
+  const handleAskAssistant = () => {
+    // Track advisor_assistant_clicked event
+    const category = lint.categories.includes('SECURITY') 
+      ? 'SECURITY' 
+      : lint.categories.includes('PERFORMANCE')
+        ? 'PERFORMANCE'
+        : 'PERFORMANCE' // Default fallback
+    
+    track('advisor_assistant_clicked', {
+      advisor_category: category as 'SECURITY' | 'PERFORMANCE',
+      advisor_type: lint.name,
+    })
+
+    onAskAssistant?.()
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    snap.newChat({
+      name: 'Summarize lint',
+      initialInput: createLintSummaryPrompt(lint),
+    })
+  }
 
   return (
     <div>
@@ -42,14 +65,7 @@ const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
       <div className="flex items-center gap-2">
         <Button
           icon={<AiIconAnimation className="scale-75 w-3 h-3" />}
-          onClick={() => {
-            onAskAssistant?.()
-            openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-            snap.newChat({
-              name: 'Summarize lint',
-              initialInput: createLintSummaryPrompt(lint),
-            })
-          }}
+          onClick={handleAskAssistant}
         >
           Ask Assistant
         </Button>

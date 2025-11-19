@@ -2314,6 +2314,56 @@ export interface LogDrainConfirmButtonSubmittedEvent {
 }
 
 /**
+ * User opened an advisor detail page to view a specific advisor.
+ * This tracks when users engage with advisor recommendations.
+ *
+ * @group Events
+ * @source studio
+ * @page Advisor Panel
+ */
+export interface AdvisorViewedEvent {
+  action: 'advisor_viewed'
+  properties: {
+    /**
+     * Category of the advisor, e.g. performance, security
+     */
+    advisor_category: 'PERFORMANCE' | 'SECURITY'
+    /**
+     * Specific advisor type/name, e.g. missing_index, no_rls_policy
+     */
+    advisor_type: string
+    /**
+     * Source of the advisor
+     */
+    advisor_source: 'lint' | 'notification'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the assistant button from an advisor detail view.
+ * This tracks when users engage with AI assistance for resolving advisors.
+ *
+ * @group Events
+ * @source studio
+ * @page Advisor Panel
+ */
+export interface AdvisorAssistantClickedEvent {
+  action: 'advisor_assistant_clicked'
+  properties: {
+    /**
+     * Category of the advisor, e.g. performance, security
+     */
+    advisor_category: 'PERFORMANCE' | 'SECURITY'
+    /**
+     * Specific advisor type/name, e.g. missing_index, no_rls_policy
+     */
+    advisor_type: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2443,3 +2493,5 @@ export type TelemetryEvent =
   | SidebarOpenedEvent
   | LogDrainSaveButtonClickedEvent
   | LogDrainConfirmButtonSubmittedEvent
+  | AdvisorViewedEvent
+  | AdvisorAssistantClickedEvent

@@ -766,6 +766,22 @@ export const updateTable = async ({
           },
         },
       })
+
+      // Track advisor resolution - enabling RLS resolves the no_rls_policy advisor
+      await sendEvent({
+        event: {
+          action: 'advisor_resolved',
+          properties: {
+            advisor_type: 'no_rls_policy',
+            advisor_category: 'SECURITY',
+            resolution_method: 'ui_direct_action',
+          },
+          groups: {
+            project: projectRef,
+            ...(organizationSlug && { organization: organizationSlug }),
+          },
+        },
+      })
     } catch (error) {
       console.error('Failed to track RLS enablement event:', error)
     }

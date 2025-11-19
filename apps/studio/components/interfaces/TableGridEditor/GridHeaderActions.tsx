@@ -221,6 +221,13 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       schema_name: table.schema,
       table_name: table.name,
     })
+
+    // Track advisor resolution - enabling RLS resolves the no_rls_policy advisor
+    track('advisor_resolved', {
+      advisor_type: 'no_rls_policy',
+      advisor_category: 'SECURITY',
+      resolution_method: 'ui_direct_action',
+    })
   }
 
   return (
