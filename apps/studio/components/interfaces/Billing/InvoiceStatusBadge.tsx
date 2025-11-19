@@ -41,7 +41,6 @@ const InvoiceStatusBadge = ({
   status,
   paymentAttempted,
   paymentProcessing,
-  slug,
 }: InvoiceStatusBadgeProps) => {
   const statusMapping = paymentProcessing
     ? {

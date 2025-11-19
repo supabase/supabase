@@ -377,7 +377,14 @@ describe('SupportFormPage', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/projects',
-      response: mockProjects,
+      response: {
+        pagination: {
+          count: mockProjects.length,
+          limit: 100,
+          offset: 0,
+        },
+        projects: mockProjects,
+      },
     })
 
     addAPIMock({
