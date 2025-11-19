@@ -50,6 +50,7 @@
     "sass": "^1.72.0",
     "supabase": "^2.58.5",
     "supports-color": "^8.0.0",
+    "tailwindcss": "catalog:",
     "turbo": "2.3.3",
     "typescript": "catalog:"
   },
