@@ -84,84 +84,81 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     <PageContainer size="large">
       <PageSection>
         <PageSectionContent>
-          {IS_PLATFORM ? (
-            <>
-              {isLoading && <GenericSkeletonLoader />}
-              {isError && <AlertError error={error} subject="Failed to retrieve edge functions" />}
-              {isSuccess && (
-                <>
-                  {hasFunctions ? (
-                    <div className="space-y-4">
+          <div className="flex flex-col gap-6">
+            {isLoading && <GenericSkeletonLoader />}
+            {isError && <AlertError error={error} subject="Failed to retrieve edge functions" />}
+            {isSuccess && (
+              <>
+                {hasFunctions ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
                       <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-2">
-                          <div className="relative">
-                            <Input
-                              placeholder="Search function names"
-                              icon={<Search />}
-                              size="tiny"
-                              className="w-32 md:w-64"
-                              value={search}
-                              onChange={(event) => setSearch(event.target.value)}
-                              actions={[
-                                search && (
-                                  <Button
-                                    size="tiny"
-                                    type="text"
-                                    icon={<X />}
-                                    onClick={() => setSearch('')}
-                                    className="p-0 h-5 w-5"
-                                  />
-                                ),
-                              ]}
-                            />
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <EdgeFunctionsSortDropdown value={sort} onChange={setSortQueryParam} />
+                        <div className="relative">
+                          <Input
+                            placeholder="Search function names"
+                            icon={<Search />}
+                            size="tiny"
+                            className="w-32 md:w-64"
+                            value={search}
+                            onChange={(event) => setSearch(event.target.value)}
+                            actions={[
+                              search && (
+                                <Button
+                                  size="tiny"
+                                  type="text"
+                                  icon={<X />}
+                                  onClick={() => setSearch('')}
+                                  className="p-0 h-5 w-5"
+                                />
+                              ),
+                            ]}
+                          />
                         </div>
                       </div>
-                      <Card>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Name</TableHead>
-                              <TableHead>URL</TableHead>
-                              <TableHead className="hidden 2xl:table-cell">Created</TableHead>
-                              <TableHead className="lg:table-cell">Updated</TableHead>
-                              <TableHead className="lg:table-cell">Deployments</TableHead>
-                            </TableRow>
-                          </TableHeader>
-
-                          <TableBody>
-                            <>
-                              {filteredFunctions.length > 0 ? (
-                                filteredFunctions.map((item) => (
-                                  <EdgeFunctionsListItem key={item.id} function={item} />
-                                ))
-                              ) : (
-                                <TableRow>
-                                  <TableCell colSpan={5}>
-                                    <p className="text-sm text-foreground">No results found</p>
-                                    <p className="text-sm text-foreground-light">
-                                      Your search for "{search}" did not return any results
-                                    </p>
-                                  </TableCell>
-                                </TableRow>
-                              )}
-                            </>
-                          </TableBody>
-                        </Table>
-                      </Card>
+                      <div className="flex items-center gap-2">
+                        <EdgeFunctionsSortDropdown value={sort} onChange={setSortQueryParam} />
+                      </div>
                     </div>
-                  ) : (
-                    <FunctionsEmptyState />
-                  )}
-                </>
-              )}
-            </>
-          ) : (
-            <FunctionsEmptyStateLocal />
-          )}
+                    <Card>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Name</TableHead>
+                            <TableHead>URL</TableHead>
+                            <TableHead className="hidden 2xl:table-cell">Created</TableHead>
+                            <TableHead className="lg:table-cell">Updated</TableHead>
+                            <TableHead className="lg:table-cell">Deployments</TableHead>
+                          </TableRow>
+                        </TableHeader>
+
+                        <TableBody>
+                          <>
+                            {filteredFunctions.length > 0 ? (
+                              filteredFunctions.map((item) => (
+                                <EdgeFunctionsListItem key={item.id} function={item} />
+                              ))
+                            ) : (
+                              <TableRow>
+                                <TableCell colSpan={5}>
+                                  <p className="text-sm text-foreground">No results found</p>
+                                  <p className="text-sm text-foreground-light">
+                                    Your search for "{search}" did not return any results
+                                  </p>
+                                </TableCell>
+                              </TableRow>
+                            )}
+                          </>
+                        </TableBody>
+                      </Table>
+                    </Card>
+                  </div>
+                ) : (
+                  <FunctionsEmptyState />
+                )}
+              </>
+            )}
+            {!IS_PLATFORM && <FunctionsEmptyStateLocal />}
+          </div>
         </PageSectionContent>
       </PageSection>
     </PageContainer>

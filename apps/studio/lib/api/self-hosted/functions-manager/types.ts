@@ -8,13 +8,17 @@ export interface IFunctionsArtifactStore {
 
 export type FunctionArtifact = {
   slug: string
-  entrypoint_url: string
+  entrypoint_path: string
+  created_at: number
+  updated_at: number
 }
 
-export type NewFunctionArtifactStore = {
-  store: IFunctionsArtifactStore
-  error: undefined
-} | {
-  store: undefined
-  error: string
-}
+export type NewFunctionArtifactStore =
+  | {
+      store: IFunctionsArtifactStore
+      error: undefined
+    }
+  | {
+      store: undefined
+      error: string
+    }
