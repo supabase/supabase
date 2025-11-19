@@ -42,11 +42,34 @@ const McpTabContentInnerLoaded = ({
   const track = useTrack()
   const [selectedClient, setSelectedClient] = useState<McpClient | null>(null)
 
-  const handleCopy = () => {
+  const handleCopy = (type?: 'url' | 'json' | 'command') => {
+    let connectionType: string
+    switch (type) {
+      case 'command':
+        connectionType = 'Command Line'
+        break
+      case 'json':
+        connectionType = 'JSON'
+        break
+      case 'url':
+      default:
+        connectionType = 'MCP URL'
+        break
+    }
+
     track('connection_string_copied', {
       connectionTab: 'MCP',
       selectedItem: selectedClient?.label,
+      connectionType,
     })
+  }
+
+  const handleInstall = () => {
+    if (selectedClient?.label) {
+      track('mcp_install_button_clicked', {
+        client: selectedClient.label,
+      })
+    }
   }
 
   return (
@@ -57,6 +80,7 @@ const McpTabContentInnerLoaded = ({
       isPlatform={IS_PLATFORM}
       apiUrl={projectKeys.apiUrl ?? undefined}
       onCopyCallback={handleCopy}
+      onInstallCallback={handleInstall}
       onClientSelect={setSelectedClient}
     />
   )

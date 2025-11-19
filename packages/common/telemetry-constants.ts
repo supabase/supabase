@@ -69,7 +69,7 @@ export interface ConnectionStringCopiedEvent {
   action: 'connection_string_copied'
   properties: {
     /**
-     * Method selected by user, e.g. URI, PSQL, SQLAlchemy, MCP URL, Framework snippet, etc.
+     * Method selected by user, e.g. URI, PSQL, SQLAlchemy, MCP URL, Framework snippet, Command Line, JSON, etc.
      * Required for Connection String, App Frameworks, and Mobile Frameworks tabs
      */
     connectionType?: string
@@ -91,6 +91,23 @@ export interface ConnectionStringCopiedEvent {
      * Selected framework, tool, or client (e.g., 'Next.js', 'Prisma', 'Cursor')
      */
     selectedItem?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the MCP install button (one-click installation for Cursor or VS Code).
+ *
+ * @group Events
+ * @source studio
+ */
+export interface McpInstallButtonClickedEvent {
+  action: 'mcp_install_button_clicked'
+  properties: {
+    /**
+     * The MCP client that was selected (e.g., 'Cursor', 'VS Code')
+     */
+    client: string
   }
   groups: TelemetryGroups
 }
@@ -2331,6 +2348,7 @@ export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
   | ConnectionStringCopiedEvent
+  | McpInstallButtonClickedEvent
   | ApiDocsOpenedEvent
   | ApiDocsCodeCopyButtonClickedEvent
   | CronJobCreatedEvent

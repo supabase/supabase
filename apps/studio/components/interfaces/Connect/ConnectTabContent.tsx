@@ -10,7 +10,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { pluckObjectFields } from 'lib/helpers'
 import { useTrack } from 'lib/telemetry/track'
-import { cn } from 'ui'
+import { cn, CopyCallbackContext } from 'ui'
 import { getAddons } from '../Billing/Subscription/Subscription.utils'
 import type { projectKeys } from './Connect.types'
 import { getConnectionStrings } from './DatabaseSettings.utils'
@@ -108,21 +108,23 @@ export const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabPro
 
     return (
       <div ref={ref} {...props} className={cn('border rounded-lg', props.className)}>
-        <ContentFile
-          projectKeys={projectKeys}
-          filePath={filePath}
-          connectionTab={connectionTab}
-          selectedFrameworkOrTool={selectedFrameworkOrTool}
-          connectionStringPooler={{
-            transactionShared: connectionStringsShared.pooler.uri,
-            sessionShared: connectionStringsShared.pooler.uri.replace('6543', '5432'),
-            transactionDedicated: connectionStringsDedicated?.pooler.uri,
-            sessionDedicated: connectionStringsDedicated?.pooler.uri.replace('6543', '5432'),
-            ipv4SupportedForDedicatedPooler: !!ipv4Addon,
-            direct: connectionStringsShared.direct.uri,
-          }}
-          onCopy={handleCopy}
-        />
+        <CopyCallbackContext.Provider value={handleCopy}>
+          <ContentFile
+            projectKeys={projectKeys}
+            filePath={filePath}
+            connectionTab={connectionTab}
+            selectedFrameworkOrTool={selectedFrameworkOrTool}
+            connectionStringPooler={{
+              transactionShared: connectionStringsShared.pooler.uri,
+              sessionShared: connectionStringsShared.pooler.uri.replace('6543', '5432'),
+              transactionDedicated: connectionStringsDedicated?.pooler.uri,
+              sessionDedicated: connectionStringsDedicated?.pooler.uri.replace('6543', '5432'),
+              ipv4SupportedForDedicatedPooler: !!ipv4Addon,
+              direct: connectionStringsShared.direct.uri,
+            }}
+            onCopy={handleCopy}
+          />
+        </CopyCallbackContext.Provider>
       </div>
     )
   }
