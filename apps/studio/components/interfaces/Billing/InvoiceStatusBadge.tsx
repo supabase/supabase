@@ -1,6 +1,5 @@
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { InvoiceStatus } from './Invoices.types'
-import type { l } from 'node_modules/msw/lib/core/HttpResponse-B4YmE-GJ.mjs'
 import Link from 'next/link'
 
 interface InvoiceStatusBadgeProps {
@@ -36,19 +35,19 @@ const invoiceStatusMapping: Record<
     label: 'Outstanding',
     badgeVariant: 'destructive',
   },
-  [InvoiceStatus.PROCESSING]: {
-    label: 'Processing',
-    badgeVariant: 'warning',
-  },
 }
 
 const InvoiceStatusBadge = ({
   status,
   paymentAttempted,
   paymentProcessing,
+  slug,
 }: InvoiceStatusBadgeProps) => {
   const statusMapping = paymentProcessing
-    ? invoiceStatusMapping[InvoiceStatus.PROCESSING]
+    ? {
+        label: 'Processing',
+        badgeVariant: 'warning' as React.ComponentProps<typeof Badge>['variant'],
+      }
     : invoiceStatusMapping[status]
 
   return (
@@ -62,9 +61,28 @@ const InvoiceStatusBadge = ({
           {statusMapping?.label || status}
         </Badge>
       </TooltipTrigger>
-      <TooltipContent side="bottom">
+      <TooltipContent side="bottom" className="max-w-sm">
         {[InvoiceStatus.OPEN, InvoiceStatus.ISSUED, InvoiceStatus.UNCOLLECTIBLE].includes(status) &&
-          (paymentAttempted ? (
+          (paymentProcessing ? (
+            <div className="space-y-1">
+              <p className="text-xs text-foreground">
+                While most credit card payments get processed instantly, some Indian credit card
+                providers may take up to 72 hours. Your card issuer has neither confirmed nor denied
+                the payment and we have to wait until the card issuer processed the payment.
+              </p>
+
+              <p className="text-xs text-foreground">
+                If you run into this, we recommend{' '}
+                <Link
+                  href={'https://supabase.com/docs/guides/platform/credits#credit-top-ups'}
+                  className="text-foreground-light underline hover:text-foreground transition"
+                >
+                  topping up your credits
+                </Link>{' '}
+                in advance to avoid running into this in the future.
+              </p>
+            </div>
+          ) : paymentAttempted ? (
             <p className="text-xs text-foreground">
               We were not able to collect the payment. Make sure you have a valid payment method and
               enough funds. Outstanding invoices may cause restrictions. You can manually pay the
@@ -88,25 +106,6 @@ const InvoiceStatusBadge = ({
           <p className="text-xs text-foreground">
             This invoice has been forgiven. No action is required on your side.
           </p>
-        )}
-
-        {status === InvoiceStatus.PROCESSING && (
-          <div>
-            <p className="text-xs text-foreground">
-              While most credit card payments get processed instantly, some Indian credit card
-              providers may take up to 72 hours. Your card issuer has neither confirmed nor denied
-              the payment and we have to wait until the card issuer processed the payment.
-            </p>
-
-            <p className="text-xs text-foreground">
-              If you run into this, we recommend{' '}
-              <Link href={'https://supabase.com/docs/guides/platform/credits#credit-top-ups'}>
-                topping up your credits
-              </Link>{' '}
-              through your organization's billing page in advance to avoid running into this in the
-              future.
-            </p>
-          </div>
         )}
       </TooltipContent>
     </Tooltip>

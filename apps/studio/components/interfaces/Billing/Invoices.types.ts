@@ -4,7 +4,6 @@ export enum InvoiceStatus {
   UNCOLLECTIBLE = 'uncollectible',
   OPEN = 'open',
   ISSUED = 'issued',
-  PROCESSING = 'processing',
 }
 
 export type Invoice = {
