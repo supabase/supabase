@@ -15,14 +15,12 @@ import { useIcebergNamespaceTableDeleteMutation } from 'data/storage/iceberg-nam
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { SqlEditor } from 'icons'
 import { uniq } from 'lodash'
-import { Loader2, MoreVertical, Pause, Play, Trash } from 'lucide-react'
+import { Loader2, MoreVertical, Pause, Play, Table2, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  Badge,
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -239,6 +237,18 @@ export const TableRowComponent = ({
   return (
     <>
       <TableRow>
+        {/* Optical alignment with admonition iconography above it */}
+        <TableCell className="w-2 pl-5 pr-1">
+          <Table2
+            size={16}
+            strokeWidth={1.5}
+            className={
+              table.isConnected
+                ? 'text-foreground-muted'
+                : 'text-foreground-muted/60 [&_path]:stroke-dasharray-[4,2]'
+            }
+          />
+        </TableCell>
         <TableCell className="min-w-[120px] min-h-[60px] py-4">{table.name}</TableCell>
         {!!hasReplication && (
           <TableCell
@@ -276,12 +286,7 @@ export const TableRowComponent = ({
           </TableCell>
         )}
 
-        <TableCell
-          className={cn(
-            'text-right flex flex-row items-center gap-x-2 justify-end min-h-[60px] py-4',
-            !table.isConnected && 'bg-gradient-to-l from-brand-300/10 to-transparent to-80% '
-          )}
-        >
+        <TableCell className="text-right flex flex-row items-center gap-x-2 justify-end min-h-[60px] py-4">
           {table.isConnected ? (
             <>
               <Button asChild type="default" size="tiny">
@@ -347,9 +352,7 @@ export const TableRowComponent = ({
             </>
           ) : (
             <>
-              <Badge variant="success" className="uppercase">
-                New
-              </Badge>
+              <p className="text-sm text-foreground-muted">Waiting</p>
             </>
           )}
         </TableCell>

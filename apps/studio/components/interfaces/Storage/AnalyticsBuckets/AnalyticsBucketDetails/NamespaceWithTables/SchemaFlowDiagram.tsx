@@ -144,7 +144,7 @@ export const SchemaFlowDiagram = ({
   return (
     <CardHeader
       ref={containerRef}
-      className="relative flex flex-col lg:flex-row items-start lg:items-center gap-8 lg:gap-24 border-b px-8 py-8 space-y-0"
+      className="relative flex flex-col lg:flex-row items-start lg:items-center gap-8 lg:gap-24 border-b px-9 py-9 space-y-0"
       role="img"
       aria-label={`Schema flow diagram showing ${sourceLabel} ${sourceType} schema connecting to ${targetLabel} analytics schema`}
     >
