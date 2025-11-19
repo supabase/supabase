@@ -1,8 +1,7 @@
-import { components } from "api-types"
-import { getFunctionsArtifactStore } from "lib/api/self-hosted/functions-manager"
-import { uuidv4 } from "lib/helpers"
-import { NextApiRequest, NextApiResponse } from "next"
-
+import { components } from 'api-types'
+import { getFunctionsArtifactStore } from 'lib/api/self-hosted/functions-manager'
+import { uuidv4 } from 'lib/helpers'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -19,27 +18,30 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 type EdgeFunctionsResponse = components['schemas']['FunctionResponse']
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse) {
-  const { store, error } = getFunctionsArtifactStore();
+  const { store, error } = getFunctionsArtifactStore()
   if (!store || error) {
-    return res.status(404);
+    return res.status(404)
   }
 
-  const functionsArtifacts = await store.getFunctions();
-  if (!functionsArtifacts) return res.status(200).json([]);
+  const functionsArtifacts = await store.getFunctions()
+  if (!functionsArtifacts) return res.status(200).json([])
 
   // mix some mock data
-  const functions = functionsArtifacts.map(func => ({
-    id: uuidv4(),
-    slug: func.slug,
-    version: 1,
-    name: func.slug,
-    status: "ACTIVE",
-    entrypoint_path: func.entrypoint_url,
-    created_at: 0,
-    updated_at: 0,
-  }) satisfies EdgeFunctionsResponse);
+  const functions = functionsArtifacts.map(
+    (func) =>
+      ({
+        id: uuidv4(),
+        slug: func.slug,
+        version: 1,
+        name: func.slug,
+        status: 'ACTIVE',
+        entrypoint_path: func.entrypoint_path,
+        created_at: func.created_at,
+        updated_at: func.updated_at,
+      }) satisfies EdgeFunctionsResponse
+  )
 
-  return res.status(200).json(functions);
+  return res.status(200).json(functions)
 }
 
-export default handler;
+export default handler

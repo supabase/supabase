@@ -93,8 +93,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     <PageContainer size="large">
       <PageSection>
         <PageSectionContent>
-          {IS_PLATFORM ? (
-            <>
+          <div className="flex flex-col gap-6">
               {isLoading && <GenericSkeletonLoader />}
               {isError && <AlertError error={error} subject="Failed to retrieve edge functions" />}
               {isSuccess && (
@@ -163,14 +162,12 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                       </Card>
                     </div>
                   ) : (
-                    <FunctionsEmptyState />
-                  )}
-                </>
-              )}
-            </>
-          ) : (
-            <FunctionsEmptyStateLocal />
-          )}
+                  <FunctionsEmptyState />
+                )}
+              </>
+            )}
+            {!IS_PLATFORM && <FunctionsEmptyStateLocal />}
+          </div>
         </PageSectionContent>
       </PageSection>
     </PageContainer>

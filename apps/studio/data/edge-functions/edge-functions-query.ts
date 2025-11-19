@@ -37,6 +37,6 @@ export const useEdgeFunctionsQuery = <TData = EdgeFunctionsData>(
   useQuery<EdgeFunctionsData, EdgeFunctionsError, TData>({
     queryKey: edgeFunctionsKeys.list(projectRef),
     queryFn: ({ signal }) => getEdgeFunctions({ projectRef }, signal),
-    enabled: IS_PLATFORM && enabled && typeof projectRef !== 'undefined',
+    enabled: enabled && typeof projectRef !== 'undefined',
     ...options,
   })
