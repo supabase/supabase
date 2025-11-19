@@ -156,7 +156,7 @@ test.describe.serial('Storage', () => {
     await navigateToBucket(page, ref, bucketName)
 
     // Upload a file
-    const filePath = path.join(__dirname, 'files', fileName)
+    const filePath = path.join(import.meta.dirname, 'files', fileName)
     await uploadFile(page, filePath, fileName)
 
     // Clean up
@@ -184,7 +184,7 @@ test.describe.serial('Storage', () => {
     await createBucket(page, ref, bucketName, false)
     await navigateToBucket(page, ref, bucketName)
 
-    const filePath = path.join(__dirname, 'files', fileName)
+    const filePath = path.join(import.meta.dirname, 'files', fileName)
     await uploadFile(page, filePath, fileName)
 
     // Rename the file
@@ -216,7 +216,7 @@ test.describe.serial('Storage', () => {
     await createBucket(page, ref, bucketName, false)
     await navigateToBucket(page, ref, bucketName)
 
-    const filePath = path.join(__dirname, 'files', fileName)
+    const filePath = path.join(import.meta.dirname, 'files', fileName)
     await uploadFile(page, filePath, fileName)
 
     // Delete the file
@@ -244,7 +244,7 @@ test.describe.serial('Storage', () => {
     await createBucket(page, ref, bucketName, false)
     await navigateToBucket(page, ref, bucketName)
 
-    const filePath = path.join(__dirname, 'files', fileName)
+    const filePath = path.join(import.meta.dirname, 'files', fileName)
     await uploadFile(page, filePath, fileName)
 
     // Download the file
