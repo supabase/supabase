@@ -239,7 +239,7 @@ export const NamespaceWithTables = ({
         <TableHeader>
           <TableRow>
             <TableHead className={allTables.length === 0 ? 'text-foreground-muted' : undefined}>
-              Table name
+              Name
             </TableHead>
             {!!publication && (
               <TableHead className={allTables.length === 0 ? 'hidden' : undefined}>
