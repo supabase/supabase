@@ -8,6 +8,8 @@ import {
   useFeaturePreviewModal,
   useUnifiedLogsPreview,
 } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsETLPrivateAlpha } from 'components/interfaces/Database/ETL/useIsETLPrivateAlpha'
+import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
 import SavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from 'components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -32,7 +34,6 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
-import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
 
 const SupaIcon = ({ className }: { className?: string }) => {
   return (
@@ -99,7 +100,7 @@ export function LogsSidebarMenuV2() {
     'logs:collections',
   ])
 
-  const enablePgReplicate = useFlag('enablePgReplicate')
+  const enablePgReplicate = useIsETLPrivateAlpha()
   const { data: etlData, isLoading: isETLLoading } = useReplicationSourcesQuery(
     {
       projectRef: ref,

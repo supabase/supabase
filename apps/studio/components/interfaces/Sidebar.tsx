@@ -377,6 +377,8 @@ const OrganizationLinks = () => {
   const router = useRouter()
   const { slug } = useParams()
 
+  const organizationSlug: string = slug ?? (router.query.orgSlug as string) ?? ''
+
   const { data: org } = useSelectedOrganizationQuery()
   const isUserMFAEnabled = useIsMFAEnabled()
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
@@ -388,25 +390,25 @@ const OrganizationLinks = () => {
   const navMenuItems = [
     {
       label: 'Projects',
-      href: `/org/${slug}`,
+      href: `/org/${organizationSlug}`,
       key: 'projects',
       icon: <Boxes size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
       label: 'Team',
-      href: `/org/${slug}/team`,
+      href: `/org/${organizationSlug}/team`,
       key: 'team',
       icon: <Users size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
       label: 'Integrations',
-      href: `/org/${slug}/integrations`,
+      href: `/org/${organizationSlug}/integrations`,
       key: 'integrations',
       icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
       label: 'Usage',
-      href: `/org/${slug}/usage`,
+      href: `/org/${organizationSlug}/usage`,
       key: 'usage',
       icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
@@ -414,7 +416,7 @@ const OrganizationLinks = () => {
       ? [
           {
             label: 'Billing',
-            href: `/org/${slug}/billing`,
+            href: `/org/${organizationSlug}/billing`,
             key: 'billing',
             icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
           },
@@ -422,7 +424,7 @@ const OrganizationLinks = () => {
       : []),
     {
       label: 'Organization settings',
-      href: `/org/${slug}/general`,
+      href: `/org/${organizationSlug}/general`,
       key: 'settings',
       icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },

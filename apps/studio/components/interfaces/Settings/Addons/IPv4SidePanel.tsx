@@ -18,6 +18,7 @@ import { formatCurrency } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
 import { Button, Radio, SidePanel, cn } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 const IPv4SidePanel = () => {
   const isAws = useIsAwsCloudProvider()
@@ -62,6 +63,8 @@ const IPv4SidePanel = () => {
     (addons?.available_addons ?? []).find((addon) => addon.type === 'ipv4')?.variants ?? []
 
   const isFreePlan = organization?.plan?.id === 'free'
+  const { hasAccess: hasAccessToIPv4, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('ipv4')
   const hasChanges = selectedOption !== (subscriptionIpV4Option?.variant.identifier ?? 'ipv4_none')
   const selectedIPv4 = availableOptions.find((option) => option.identifier === selectedOption)
   const isPgBouncerEnabled = !isFreePlan
@@ -91,10 +94,18 @@ const IPv4SidePanel = () => {
       visible={visible}
       onCancel={closePanel}
       onConfirm={onConfirm}
-      loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateIPv4 || !isAws}
+      loading={isLoading || isSubmitting || isLoadingEntitlement}
+      disabled={
+        !hasAccessToIPv4 ||
+        isLoadingEntitlement ||
+        isLoading ||
+        !hasChanges ||
+        isSubmitting ||
+        !canUpdateIPv4 ||
+        !isAws
+      }
       tooltip={
-        isFreePlan
+        !hasAccessToIPv4
           ? 'Unable to enable IPv4 on a Free Plan'
           : !canUpdateIPv4
             ? 'You do not have permission to update IPv4'
@@ -147,7 +158,7 @@ const IPv4SidePanel = () => {
             </p>
           )}
 
-          <div className={cn('!mt-8 pb-4', isFreePlan && 'opacity-75')}>
+          <div className={cn('!mt-8 pb-4', !hasAccessToIPv4 && 'opacity-75')}>
             <Radio.Group
               type="large-cards"
               size="tiny"
@@ -181,7 +192,7 @@ const IPv4SidePanel = () => {
                   className="col-span-4 !p-0"
                   name="ipv4"
                   key={option.identifier}
-                  disabled={isFreePlan || !isAws}
+                  disabled={!hasAccessToIPv4 || !isAws}
                   checked={selectedOption === option.identifier}
                   label={option.name}
                   value={option.identifier}
@@ -239,7 +250,7 @@ const IPv4SidePanel = () => {
             </>
           )}
 
-          {isFreePlan && (
+          {!hasAccessToIPv4 && (
             <Admonition type="note" title="IPv4 add-on is unavailable on the Free Plan">
               <p>Upgrade your plan to enable a IPv4 address for your project</p>
               <Button asChild type="default">
