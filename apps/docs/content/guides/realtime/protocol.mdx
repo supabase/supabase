@@ -74,7 +74,7 @@ Version 2.0.0 uses text and binary WebSocket frames.
 
 ### Text frames
 
-Text frames are always JSON encoded but differently from version 1.0.0, a JSON array is used where the order is necessarily:
+Text frames are always JSON encoded, but unlike version 1.0.0, they use a JSON array where the element order must be exactly:
 
 - `join_ref`
 - `ref`
@@ -307,7 +307,7 @@ Example on protocol version `2.0.0`:
 
 #### access_token
 
-Used to setup a new token to be used by Realtime for authentication and to refresh the token to prevent the channel from closing.
+Used to setup a new token to be used by Realtime for authentication and to refresh the token to prevent a private channel from closing when the token expires.
 
 ```ts
 {
@@ -379,7 +379,7 @@ Example on protocol version `2.0.0`:
 See the [User Broadcast Push](#user-broadcast-push) section for the binary frame structure.
 
 This message is a streamlined version of the text frame broadcast event that also supports non-JSON payloads.
-See below the same example as the previous section using hexadecimal representation for the header and plain text for the rest with the following values:
+Below is the same example from the previous section, showing the binary frame structure with hexadecimal values for the header and plain text for the remaining fields:
 
 - Join Ref: `10`
 - Ref: `1`
@@ -482,7 +482,7 @@ This message is sent by the server when an unexpected error occurs in the channe
 
 #### phx_reply
 
-These messages are sent by the server on messages that expect a response. Their response can vary with the type of usage.
+The server sends these messages in response to client requests that require acknowledgment.
 
 ```ts
 {
@@ -545,7 +545,7 @@ Example on protocol version `2.0.0`:
 
 #### system
 
-System messages are sent by the server to inform the client about the status of Realtime channel subscriptions.
+The server sends system messages to inform clients about the status of their Realtime channel subscriptions.
 
 ```ts
 {
@@ -584,7 +584,7 @@ Example on protocol version `2.0.0`:
 
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 
-Structure of the broadcast event that is received by all clients in a channel. The `payload` field contains the event name and data that was broadcasted.
+This is the structure of broadcast events received by all clients subscribed to a channel. The `payload` field contains the event name and data that was broadcasted.
 
 ```ts
 {
@@ -636,7 +636,7 @@ Example on protocol version `2.0.0`:
 See the [User Broadcast](#user-broadcast) section for the binary frame structure.
 
 This message is a streamlined version of the text frame broadcast event that also supports non-JSON payloads.
-See below the same example as the previous section using hexadecimal representation for the header and plain text for the actual fields with the following values:
+Below is the same example from the previous section, showing the binary frame structure with hexadecimal values for the header and plain text for the remaining fields:
 
 - Topic: `realtime:chat-room`
 - Payload encoding being JSON
@@ -667,7 +667,7 @@ The metadata field is JSON encoded. The payload encoding is just a hint for the 
 
 #### postgres_changes
 
-Server sent message with a change from a schema and table. This message is sent when a change occurs in the database that the client is subscribed to. The payload contains the details of the change, including the schema, table, event type, and the new and old records.
+The server sends this message when a database change occurs in a subscribed schema and table. The payload contains the details of the change, including the schema, table, event type, and the new and old records.
 
 ```ts
 {
@@ -754,7 +754,7 @@ Server sent message with a change from a schema and table. This message is sent 
 
 #### presence_state
 
-After joining, the server sends a `presence_state` message to a client with presence information. The payload field contains keys, where each key represents a client and its value is a JSON object containing information about that client. The key was defined by the client when joining the channel, otherwise an UUID is automatically generated.
+After joining, the server sends a `presence_state` message to a client with presence information. The payload field contains keys, where each key represents a client and its value is a JSON object containing information about that client. The key is defined by the client when joining the channel. If not specified, a UUID is automatically generated.
 
 ```ts
 {
@@ -818,7 +818,7 @@ Example on protocol version `2.0.0`:
 
 #### presence_diff
 
-After a change to the presence state, such as a client joining or leaving, the server sends a presence_diff message to update the client's view of the presence state. The payload field contains two keys, `joins` and `leaves`, which represent clients that have joined and left, respectively. The key was defined by the client when joining the channel, otherwise an UUID is automatically generated.
+After a change to the presence state, such as a client joining or leaving, the server sends a presence_diff message to update the client's view of the presence state. The payload field contains two keys, `joins` and `leaves`, which represent clients that have joined and left, respectively. Each key is either specified by the client when joining the channel or automatically generated as a UUID.
 
 ```ts
 {
