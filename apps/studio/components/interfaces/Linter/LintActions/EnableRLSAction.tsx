@@ -80,7 +80,12 @@ const EnableRLSAction = ({ projectRef, connectionString, metadata }: LintActionA
 
   return (
     <div>
-      <Button type="primary" loading={isExecuting} disabled={isLoading || isExecuting || !table?.id} onClick={() => setIsConfirmVisible(true)}>
+      <Button
+        type="primary"
+        loading={isExecuting}
+        disabled={isLoading || isExecuting || !table?.id}
+        onClick={() => setIsConfirmVisible(true)}
+      >
         Enable RLS
       </Button>
       <ConfirmationModal
