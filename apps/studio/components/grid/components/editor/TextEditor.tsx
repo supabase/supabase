@@ -111,9 +111,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
 
   return (
     <>
-      <Popover
-        open={isPopoverOpen}
-      >
+      <Popover open={isPopoverOpen}>
         <PopoverTrigger asChild>
           <Button
             type="default"
@@ -138,7 +136,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
             <>
               <MonacoEditor
                 readOnly
-                onChange={() => { }}
+                onChange={() => {}}
                 width={`${column.width}px`}
                 value={value ?? ''}
                 language="markdown"

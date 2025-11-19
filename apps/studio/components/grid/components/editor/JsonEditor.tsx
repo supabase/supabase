@@ -10,7 +10,15 @@ import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
-import { Button, Popover, PopoverContent, PopoverTrigger, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Button,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { BlockKeys } from '../common/BlockKeys'
 import { MonacoEditor } from '../common/MonacoEditor'
 import { NullValue } from '../common/NullValue'
@@ -148,26 +156,29 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   }
 
   return (
-    <Popover
-      open={isPopoverOpen}
-    >
+    <Popover open={isPopoverOpen}>
       <PopoverTrigger asChild>
-        <Button className={`${!!value && jsonString.trim().length == 0 ? 'sb-grid-fill-container' : ''
-          } sb-grid-json-editor__trigger`} onClick={() => setIsPopoverOpen(!isPopoverOpen)}>
+        <Button
+          className={`${
+            !!value && jsonString.trim().length == 0 ? 'sb-grid-fill-container' : ''
+          } sb-grid-json-editor__trigger`}
+          onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+        >
           {value === null || value === '' ? <NullValue /> : jsonString}
-
         </Button>
       </PopoverTrigger>
-      <PopoverContent side="bottom"
+      <PopoverContent
+        side="bottom"
         align="start"
         sideOffset={-35}
         style={{ width: `${column.width}px` }}
-        className="flex items-center justify-center flex-col relative rounded-none pb-0">
+        className="flex items-center justify-center flex-col relative rounded-none pb-0"
+      >
         {isTruncated && !isSuccess ? (
           <>
             <MonacoEditor
               readOnly
-              onChange={() => { }}
+              onChange={() => {}}
               width={`${column.width}px`}
               value={value ?? ''}
               language="markdown"
