@@ -1,4 +1,3 @@
-import { ChevronRight, Info, Loader2, Plus, RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
@@ -12,8 +11,6 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Card,
-  CardHeader,
-  CardTitle,
   LoadingLine,
   Table,
   TableBody,
@@ -21,12 +18,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { getNamespaceTableNameFromPostgresTableName } from '../AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketAssociatedEntities } from '../useAnalyticsBucketAssociatedEntities'
+import { SchemaFlowDiagram } from './SchemaFlowDiagram'
 import { TableRowComponent } from './TableRowComponent'
 
 type NamespaceWithTablesProps = {
@@ -159,91 +155,47 @@ export const NamespaceWithTables = ({
 
   return (
     <Card>
-      <CardHeader className="flex flex-row justify-between items-center px-4 py-5 space-y-0">
-        <CardTitle className="text-sm font-normal font-sans normal-case leading-none flex flex-row items-center gap-x-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="flex flex-row items-center gap-x-1 text-foreground-lighter">
-                {sourceType === 'direct' ? namespace : 'public'}
-                <ChevronRight size={12} className="text-foreground-muted" />
-              </span>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">
-              <p>{sourceType === 'direct' ? 'Analytics' : 'Postgres'} schema</p>
-            </TooltipContent>
-          </Tooltip>
-          {validSchema && (
-            <Tooltip>
-              <TooltipTrigger
-                asChild
-                className={tables.length === 0 ? `flex flex-row items-center gap-x-1` : undefined}
-              >
-                <span
-                  className={
-                    tables.length > 0
-                      ? `text-foreground`
-                      : `text-foreground-muted flex flex-row items-center gap-x-1`
-                  }
-                >
-                  {displaySchema}
-                  {tables.length === 0 && <Info size={12} />}
-                </span>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p>Postgres schema{tables.length === 0 && ' that will be created'}</p>
-              </TooltipContent>
-            </Tooltip>
-          )}
-        </CardTitle>
+      {validSchema && (
+        <SchemaFlowDiagram
+          sourceLabel={sourceType === 'direct' ? namespace : 'public'}
+          sourceType={sourceType === 'direct' ? 'analytics' : 'postgres'}
+          targetLabel={displaySchema}
+          isPending={tables.length === 0}
+        />
+      )}
 
-        <div className="flex flex-row gap-x-6">
-          {pollIntervalNamespaceTables > 0 && (
-            <Tooltip>
-              <TooltipTrigger>
-                <div className="flex items-center gap-x-2 text-foreground-lighter">
-                  <Loader2 size={14} className="animate-spin" />
-                  <p className="text-sm">
-                    Connecting {publicationTablesNotSyncedToNamespaceTables.length} table
-                    {publicationTablesNotSyncedToNamespaceTables.length > 1 ? 's' : ''}
-                  </p>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" align="end">
-                <p className="mb-1">Waiting for namespace table to be created for:</p>
-                <ul className="list-disc pl-6">
-                  {publicationTablesNotSyncedToNamespaceTables.map((x) => {
-                    const value = `${x.schema}.${x.name}`
-                    return <li key={value}>{value}</li>
-                  })}
-                </ul>
-              </TooltipContent>
-            </Tooltip>
-          )}
-          {missingTables.length > 0 && (
+      {pollIntervalNamespaceTables > 0 && <LoadingLine loading />}
+
+      {missingTables.length > 0 && (
+        <Admonition
+          type="note"
+          layout="horizontal"
+          title={`${missingTables.length} new table${missingTables.length > 1 ? 's' : ''} detected`}
+          description={`${missingTables.length > 1 ? 'These must be accepted before they' : 'This table must be accepted before it'} can be saved to your bucket.`}
+          actions={
             <Button
-              type={schema ? 'default' : 'warning'}
+              type="default"
               size="tiny"
-              icon={schema ? <RefreshCw /> : <Plus size={14} />}
               onClick={() => (schema ? rescanNamespace() : setImportForeignSchemaShown(true))}
               loading={isImportingForeignSchema || isLoadingNamespaceTables}
             >
-              {schema ? 'Sync tables' : `Connect to table${missingTables.length > 1 ? 's' : ''}`}
+              Accept new table{missingTables.length > 1 ? 's' : ''}
             </Button>
-          )}
-        </div>
-      </CardHeader>
-
-      {pollIntervalNamespaceTables > 0 && <LoadingLine loading />}
+          }
+          className="mb-0 border-0 rounded-none border-b border-border"
+        />
+      )}
 
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead />
             <TableHead className={allTables.length === 0 ? 'text-foreground-muted' : undefined}>
-              Table name
+              Name
             </TableHead>
             {!!publication && (
               <TableHead className={allTables.length === 0 ? 'hidden' : undefined}>
-                Replication Status
+                Replication
               </TableHead>
             )}
             <TableHead />
@@ -252,7 +204,7 @@ export const NamespaceWithTables = ({
         <TableBody>
           {allTables.length === 0 ? (
             <TableRow className="[&>td]:hover:bg-inherit">
-              <TableCell colSpan={3}>
+              <TableCell colSpan={3} className="min-h-[60px] py-4">
                 <p className="text-sm text-foreground">No tables yet</p>
                 <p className="text-sm text-foreground-lighter">
                   {sourceType === 'direct'
@@ -269,11 +221,16 @@ export const NamespaceWithTables = ({
                 namespace={namespace}
                 schema={displaySchema}
                 isLoading={isImportingForeignSchema || isLoadingNamespaceTables}
+                pollIntervalNamespaceTables={pollIntervalNamespaceTables}
+                publicationTablesNotSyncedToNamespaceTables={
+                  publicationTablesNotSyncedToNamespaceTables
+                }
               />
             ))
           )}
         </TableBody>
       </Table>
+
       <ImportForeignSchemaDialog
         bucketName={bucketName ?? ''}
         namespace={namespace}

@@ -1,9 +1,3 @@
-import { uniq } from 'lodash'
-import { Loader2, MoreVertical, Pause, Play, Trash } from 'lucide-react'
-import Link from 'next/link'
-import { useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import {
   convertKVStringArrayToJson,
@@ -20,7 +14,13 @@ import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { useIcebergNamespaceTableDeleteMutation } from 'data/storage/iceberg-namespace-table-delete-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { SqlEditor } from 'icons'
+import { uniq } from 'lodash'
+import { Loader2, MoreVertical, Pause, Play, Table2, Trash } from 'lucide-react'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import {
+  Badge,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -47,6 +47,8 @@ interface TableRowComponentProps {
   schema: string
   namespace: string
   isLoading?: boolean
+  pollIntervalNamespaceTables?: number
+  publicationTablesNotSyncedToNamespaceTables?: Array<{ schema: string; name: string }>
 }
 
 export const TableRowComponent = ({
@@ -54,6 +56,8 @@ export const TableRowComponent = ({
   schema,
   namespace,
   isLoading,
+  pollIntervalNamespaceTables,
+  publicationTablesNotSyncedToNamespaceTables,
 }: TableRowComponentProps) => {
   const { ref: projectRef, bucketId } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -91,6 +95,24 @@ export const TableRowComponent = ({
   const hasReplication = !!pipeline && !!publication
   const isPipelineRunning = pipelineStatus === 'started'
   const isReplicating = isTableUnderReplicationPublication && isPipelineRunning
+
+  // Check if this specific table is being waited on during polling
+  const isTableBeingWaitedOn = useMemo(() => {
+    if (!pollIntervalNamespaceTables || pollIntervalNamespaceTables === 0) return false
+    if (!publicationTablesNotSyncedToNamespaceTables) return false
+
+    return publicationTablesNotSyncedToNamespaceTables.some(
+      (pubTable) => getNamespaceTableNameFromPostgresTableName(pubTable) === table.name
+    )
+  }, [pollIntervalNamespaceTables, publicationTablesNotSyncedToNamespaceTables, table.name])
+
+  // Get the Postgres table that this namespace table is waiting for
+  const waitingForPostgresTable = useMemo(() => {
+    if (!isTableBeingWaitedOn || !publicationTablesNotSyncedToNamespaceTables) return null
+    return publicationTablesNotSyncedToNamespaceTables.find(
+      (pubTable) => getNamespaceTableNameFromPostgresTableName(pubTable) === table.name
+    )
+  }, [isTableBeingWaitedOn, publicationTablesNotSyncedToNamespaceTables, table.name])
 
   // [Joshen] Considers both the replication pipeline status + if the table is in the replication publication
   const replicationStatusLabel = useMemo(() => {
@@ -238,9 +260,27 @@ export const TableRowComponent = ({
   return (
     <>
       <TableRow>
-        <TableCell className="min-w-[120px]">{table.name}</TableCell>
+        {/* Optical alignment with admonition iconography above it */}
+        <TableCell className="w-2 pl-5 pr-1">
+          <Table2
+            size={16}
+            strokeWidth={1.5}
+            className={table.isConnected ? 'text-foreground-muted' : 'text-foreground-muted/50'}
+          />
+        </TableCell>
+        <TableCell className="min-w-[120px] min-h-[60px] py-4">
+          {table.name}
+          {!table.isConnected && (
+            <Badge variant="success" size="tiny" className="ml-2">
+              New
+            </Badge>
+          )}
+        </TableCell>
         {!!hasReplication && (
-          <TableCell colSpan={table.isConnected ? 1 : 2} className="min-w-[150px]">
+          <TableCell
+            colSpan={table.isConnected ? 1 : 2}
+            className="min-w-[150px] min-h-[60px] py-4"
+          >
             <div className="flex items-center">
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -272,8 +312,8 @@ export const TableRowComponent = ({
           </TableCell>
         )}
 
-        {table.isConnected && (
-          <TableCell className="text-right flex flex-row items-center gap-x-2 justify-end">
+        <TableCell className="text-right flex flex-row items-center gap-x-2 justify-end min-h-[60px] py-4">
+          {table.isConnected ? (
             <>
               <Button asChild type="default" size="tiny">
                 <Link href={`/project/${project?.ref}/editor/${table.id}?schema=${schema}`}>
@@ -336,22 +376,45 @@ export const TableRowComponent = ({
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
-          </TableCell>
-        )}
+          ) : (
+            <div className="flex items-center gap-x-2">
+              {isTableBeingWaitedOn ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-x-2 text-foreground-lighter">
+                      <Loader2 size={14} className="animate-spin" />
+                      <p className="text-sm">Connecting</p>
+                    </div>
+                  </TooltipTrigger>
+                  {waitingForPostgresTable && (
+                    <TooltipContent side="left">
+                      <p>
+                        Waiting for analytics table to be created for:{' '}
+                        {waitingForPostgresTable.schema}.{waitingForPostgresTable.name}
+                      </p>
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              ) : (
+                <p className="text-sm text-foreground-muted">Waiting to be accepted</p>
+              )}
+            </div>
+          )}
+        </TableCell>
       </TableRow>
       <ConfirmationModal
         size="medium"
         variant="warning"
         visible={showStopReplicationModal}
         loading={isUpdatingReplication}
-        title="Confirm to disable replication for table"
+        title="Disable replication on table"
         confirmLabel="Disable replication"
         onCancel={() => setShowStopReplicationModal(false)}
         onConfirm={() => onConfirmStopReplication()}
       >
         <p className="text-sm text-foreground-light">
-          Data within the "{table.name}" table will stop replicating. However do note that,
-          re-enabling replication on this table will clear and re-sync all data in it. Are you sure?
+          Data within the "{table.name}" table will stop replicating. Re-enabling replication on
+          this table will clear and re-sync all data in it. Are you sure?
         </p>
       </ConfirmationModal>
 

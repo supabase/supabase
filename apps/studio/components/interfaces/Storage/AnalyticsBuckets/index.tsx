@@ -148,7 +148,7 @@ export const AnalyticsBuckets = () => {
                           }}
                           tabIndex={0}
                         >
-                          <TableCell className="w-2 pr-1">
+                          <TableCell>
                             <BucketIcon size={16} className="text-foreground-muted" />
                           </TableCell>
                           <TableCell>
