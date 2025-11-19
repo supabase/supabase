@@ -118,7 +118,7 @@ Check updates, changelogs, and release notes for each service to learn more.
 ### Studio
 - Updated to `2025.10.01-sha-8460121` - [Dashboard updates](https://github.com/orgs/supabase/discussions/39709)
 - Added "local" remote MCP server - [PR #38797](https://github.com/supabase/supabase/pull/38797), [PR #39041](https://github.com/supabase/supabase/pull/39041)
-- ⚠️ Changed Studio connection method to `postgres-meta` - affects non-standard database port configurations, see fix in [2025-11-05]
+- ⚠️ Changed Studio connection method to `postgres-meta` - affects non-standard database port configurations
 
 ### Auth
 - Updated to `v2.180.0` - [Release](https://github.com/supabase/auth/releases/tag/v2.180.0)
