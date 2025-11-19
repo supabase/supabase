@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test'
 import path from 'path'
-import { test } from '../utils/test'
-import { waitForApiResponse } from '../utils/wait-for-response'
+import { test } from '../utils/test.js'
+import { waitForApiResponse } from '../utils/wait-for-response.js'
 import {
   createBucket,
   createFolder,
@@ -13,7 +13,7 @@ import {
   navigateToBucket,
   renameItem,
   uploadFile,
-} from '../utils/storage-helpers'
+} from '../utils/storage-helpers.js'
 
 const bucketNamePrefix = 'pw_bucket'
 
