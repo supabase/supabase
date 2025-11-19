@@ -11,9 +11,9 @@ import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
+  PageHeaderAside,
   PageHeaderDescription,
   PageHeaderMeta,
-  PageHeaderMetaAside,
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
@@ -39,20 +39,15 @@ const TriggersPage: NextPageWithLayout = () => {
               Execute a set of actions automatically on specified table events
             </PageHeaderDescription>
           </PageHeaderSummary>
-          <PageHeaderMetaAside>
+          <PageHeaderAside>
             <DocsButton href={`${DOCS_URL}/guides/database/postgres/triggers`} />
-          </PageHeaderMetaAside>
+          </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
       <PageContainer size="large">
         <PageSection>
           <PageSectionContent>
-            <TriggersList
-              createTrigger={createTrigger}
-              editTrigger={editTrigger}
-              duplicateTrigger={duplicateTrigger}
-              deleteTrigger={deleteTrigger}
-            />
+            <TriggersList />
           </PageSectionContent>
         </PageSection>
       </PageContainer>
