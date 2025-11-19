@@ -53,10 +53,7 @@ import { SlotLagMetricsInline, SlotLagMetricsList } from './SlotLagMetrics'
  */
 export const ReplicationPipelineStatus = () => {
   const { ref: projectRef, pipelineId: _pipelineId } = useParams()
-  const [searchString, setSearchString] = useQueryState(
-    'search',
-    parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true })
-  )
+  const [searchString, setSearchString] = useQueryState('search', parseAsString.withDefault(''))
 
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
 
