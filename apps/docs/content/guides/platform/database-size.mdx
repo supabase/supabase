@@ -6,7 +6,7 @@ description: 'Understanding how database size applies to your subscription.'
 
 Disk metrics refer to the storage usage reported by Postgres. These metrics are updated daily. As you read through this document, we will refer to "database size" and "disk size":
 
-- _Database size_: Displays the actual size of the data within your Postgres database. This can be found on the [Database Reports page](/dashboard/project/_/reports/database).
+- _Database size_: Displays the actual size of the data within your Postgres database. This can be found on the [Database Reports page](/dashboard/project/_/observability/database).
 
 - _Disk size_: Shows the overall disk space usage, which includes both the database size and additional files required for Postgres to function like the Write Ahead Log (WAL) and other system log files. You can view this on the [Database Settings page](/dashboard/project/_/database/settings).
 
@@ -20,7 +20,7 @@ select
 from pg_database;
 ```
 
-This value is reported in the [database report page](/dashboard/project/_/reports/database).
+This value is reported in the [database report page](/dashboard/project/_/observability/database).
 
 Database size is consumed primarily by your data, indexes, and materialized views. You can reduce your database size by removing any of these and running a Vacuum operation.
 

@@ -1,5 +1,4 @@
 import { noop } from 'lodash'
-import Link from 'next/link'
 
 import { useParams } from 'common'
 import { FormattedWrapperTable } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
@@ -9,7 +8,6 @@ import {
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
 import { useReplicationPipelineStatusQuery } from 'data/etl/pipeline-status-query'
-import { Button } from 'ui'
 import { ConnectTablesDialog } from './ConnectTablesDialog'
 import { useAnalyticsBucketAssociatedEntities } from './useAnalyticsBucketAssociatedEntities'
 
@@ -45,13 +43,6 @@ export const BucketHeader = ({
       </div>
       {showActions && (
         <div className="flex items-center gap-x-2">
-          {!!pipeline && isPipelineRunning && (
-            <Button asChild type="default">
-              <Link href={`/project/${projectRef}/database/etl/${pipeline.replicator_id}`}>
-                View replication
-              </Link>
-            </Button>
-          )}
           {namespaces.length > 0 && (
             <ConnectTablesDialog onSuccessConnectTables={onSuccessConnectTables} />
           )}
