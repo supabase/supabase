@@ -3,6 +3,7 @@ import type {
   ClaudeCodeMcpConfig,
   CodexMcpConfig,
   FactoryMcpConfig,
+  GeminiMcpConfig,
   GooseMcpConfig,
   McpClient,
   McpFeatureGroup,
@@ -209,6 +210,59 @@ export const MCP_CLIENTS: McpClient[] = [
         </p>
       </div>
     ),
+  },
+  {
+    key: 'gemini-cli',
+    label: 'Gemini CLI',
+    icon: 'gemini-cli',
+    configFile: 'settings.json',
+    externalDocsUrl: 'https://geminicli.com/docs/tools/mcp-server/',
+    transformConfig: (config): GeminiMcpConfig => {
+      return {
+        mcpServers: {
+          supabase: {
+            url: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+    primaryInstructions: (config) => {
+      const mcpUrl = getMcpUrl(config)
+      const command = `gemini mcp add -t http supabase ${mcpUrl}`
+      return (
+        <div className="space-y-2">
+          <p className="text-xs text-foreground-light">
+            Add the Supabase MCP server to Gemini CLI:
+          </p>
+          <CodeBlock value={command} language="bash" focusable={false} className="block" />
+        </div>
+      )
+    },
+    alternateInstructions: (config) => {
+      const mcpUrl = getMcpUrl(config)
+      return (
+        <div className="space-y-2">
+          <p className="text-xs text-foreground-light">
+            You can install the Supabase MCP extension:
+          </p>
+          <CodeBlock
+            value="gemini extensions install https://github.com/supabase-community/supabase-mcp"
+            language="bash"
+            focusable={false}
+            className="block"
+          />
+          <p className="text-xs text-foreground-light">
+            After installation, authenticate the server:
+          </p>
+          <CodeBlock
+            value="/mcp auth supabase"
+            language="bash"
+            focusable={false}
+            className="block"
+          />
+        </div>
+      )
+    },
   },
   {
     key: 'windsurf',
