@@ -411,7 +411,10 @@ export const Connect = () => {
               )
             }
 
-            const connectionTabMap: Record<string, 'App Frameworks' | 'Mobile Frameworks' | 'ORMs'> = {
+            const connectionTabMap: Record<
+              string,
+              'App Frameworks' | 'Mobile Frameworks' | 'ORMs'
+            > = {
               frameworks: 'App Frameworks',
               mobiles: 'Mobile Frameworks',
               orms: 'ORMs',

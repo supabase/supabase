@@ -59,7 +59,8 @@ export function McpConfigurationDisplay({
         </>
       )}
 
-      {selectedClient.primaryInstructions && selectedClient.primaryInstructions(clientConfig, onCopyCallback)}
+      {selectedClient.primaryInstructions &&
+        selectedClient.primaryInstructions(clientConfig, onCopyCallback)}
 
       {selectedClient.configFile && (
         <div className="text-xs text-foreground-light">
@@ -81,7 +82,8 @@ export function McpConfigurationDisplay({
         onCopyCallback={() => onCopyCallback?.('json')}
       />
 
-      {selectedClient.alternateInstructions && selectedClient.alternateInstructions(clientConfig, onCopyCallback)}
+      {selectedClient.alternateInstructions &&
+        selectedClient.alternateInstructions(clientConfig, onCopyCallback)}
 
       {(selectedClient.docsUrl || selectedClient.externalDocsUrl) && (
         <div className="flex items-center gap-2 text-xs text-foreground-light">
