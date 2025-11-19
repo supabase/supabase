@@ -1,8 +1,16 @@
 import { Lint } from 'data/lint/lint-query'
+import { ComponentType } from 'react'
+
 export enum LINTER_LEVELS {
   ERROR = 'ERROR',
   WARN = 'WARN',
   INFO = 'INFO',
+}
+
+export type LintActionArgs = {
+  projectRef: string
+  connectionString?: string | null
+  metadata: Lint['metadata']
 }
 
 export type LintInfo = {
@@ -13,6 +21,7 @@ export type LintInfo = {
   linkText: string
   docsLink: string
   category: 'security' | 'performance'
+  action?: ComponentType<LintActionArgs>
 }
 
 export const LINT_TABS = [

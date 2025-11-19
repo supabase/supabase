@@ -1,5 +1,5 @@
 import { X } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import ReactMarkdown from 'react-markdown'
 
@@ -15,8 +15,8 @@ import { Lint } from 'data/lint/lint-query'
 import { useRouter } from 'next/router'
 import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { EntityTypeIcon } from './Linter.utils'
 import LintDetail from './LintDetail'
+import { EntityTypeIcon } from './Linter.utils'
 
 interface LinterDataGridProps {
   isLoading: boolean
