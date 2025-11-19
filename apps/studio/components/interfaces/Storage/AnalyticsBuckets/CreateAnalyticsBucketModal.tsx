@@ -138,7 +138,7 @@ export const CreateAnalyticsBucketModal = ({
     if (!project) return console.error('Project details is required')
     if (!wrappersExtension) return console.error('Unable to find wrappers extension')
 
-    const hasExistingBucket = buckets.some((x) => x.id === values.name)
+    const hasExistingBucket = buckets.some((x) => x.name === values.name)
     if (hasExistingBucket) return toast.error('Bucket name already exists')
 
     try {
