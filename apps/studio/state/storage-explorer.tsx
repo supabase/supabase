@@ -37,9 +37,10 @@ import { convertFromBytes } from 'components/interfaces/Storage/StorageSettings/
 import { InlineLink } from 'components/ui/InlineLink'
 import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
 import {
-  createTemporaryUploadKey,
-  isTemporaryUploadKeyValid,
-  type TemporaryUploadKey,
+  createTemporaryApiKey,
+  getOrRefreshTemporaryApiKey,
+  isTemporaryApiKeyValid,
+  type TemporaryApiKey,
 } from 'data/api-keys/temp-api-keys-utils'
 import { configKeys } from 'data/config/keys'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -85,12 +86,12 @@ function createStorageExplorerState({
   projectRef,
   connectionString,
   resumableUploadUrl,
-  supabaseClient,
+  clientEndpoint,
 }: {
   projectRef: string
   connectionString: string
   resumableUploadUrl: string
-  supabaseClient?: () => Promise<SupabaseClient<any, 'public', any>>
+  clientEndpoint: string
 }) {
   const localStorageKey = LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef)
   const { view, sortBy, sortByOrder, sortBucket } =
@@ -100,12 +101,31 @@ function createStorageExplorerState({
   const state = proxy({
     projectRef,
     connectionString,
-    supabaseClient,
     resumableUploadUrl,
     uploadProgresses: [] as UploadProgress[],
 
-    // Temporary API key management for batch uploads
-    temporaryUploadKey: undefined as TemporaryUploadKey | undefined,
+    supabaseClient: async () => {
+      try {
+        const { apiKey } = await getOrRefreshTemporaryApiKey(projectRef)
+
+        return createClient(clientEndpoint, apiKey, {
+          auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false,
+            storage: {
+              getItem: (key) => {
+                return null
+              },
+              setItem: (key, value) => {},
+              removeItem: (key) => {},
+            },
+          },
+        })
+      } catch (error) {
+        throw error
+      }
+    },
 
     // abortController,
     abortApiCalls: () => {
@@ -119,29 +139,6 @@ function createStorageExplorerState({
     abortUploads: (toastId: string | number) => {
       state.abortUploadCallbacks[toastId].forEach((callback) => callback())
       state.abortUploadCallbacks[toastId] = []
-    },
-
-    // Get or refresh the temporary upload key
-    getOrRefreshTemporaryUploadKey: async () => {
-      if (isTemporaryUploadKeyValid(state.temporaryUploadKey)) {
-        return state.temporaryUploadKey.apiKey
-      }
-
-      // Generate new key with 10 minutes expiry
-      const expiryInSeconds = 600
-      const data = await getTemporaryAPIKey({
-        projectRef: state.projectRef,
-        expiry: expiryInSeconds,
-      })
-
-      state.temporaryUploadKey = createTemporaryUploadKey(data.api_key, expiryInSeconds)
-
-      return data.api_key
-    },
-
-    // Clear the temporary upload key
-    clearTemporaryUploadKey: () => {
-      state.temporaryUploadKey = undefined
     },
 
     columns: [] as StorageColumn[],
@@ -1135,15 +1132,6 @@ function createStorageExplorerState({
         .map((folder) => folder.name)
         .join('/')
 
-      // Generate temporary API key for the batch upload
-      try {
-        await state.getOrRefreshTemporaryUploadKey()
-      } catch (error) {
-        console.error('Failed to get temporary API key:', error)
-        toast.error('Failed to initialize upload session. Please try again.')
-        return
-      }
-
       const toastId = state.onUploadProgress()
 
       // Upload files in batches
@@ -1244,7 +1232,7 @@ function createStorageExplorerState({
                 try {
                   // Use the shared temporary key for batch uploads
                   // This checks if the key is still valid and refreshes if needed
-                  const apiKey = await state.getOrRefreshTemporaryUploadKey()
+                  const { apiKey } = await getOrRefreshTemporaryApiKey(state.projectRef)
                   req.setHeader('apikey', apiKey)
                   if (!IS_PLATFORM) {
                     req.setHeader('Authorization', `Bearer ${apiKey}`)
@@ -1404,9 +1392,6 @@ function createStorageExplorerState({
           closeButton: true,
           duration: SONNER_DEFAULT_DURATION,
         })
-      } finally {
-        // Clear the temporary API key after batch upload completes
-        state.clearTemporaryUploadKey()
       }
 
       const t2 = new Date()
@@ -1909,7 +1894,7 @@ const DEFAULT_STATE_CONFIG = {
   projectRef: '',
   connectionString: '',
   resumableUploadUrl: '',
-  supabaseClient: undefined,
+  clientEndpoint: '',
 }
 
 const StorageExplorerStateContext = createContext<StorageExplorerState>(
@@ -1928,6 +1913,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
   const resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}/storage/v1/upload/resumable`
+  const clientEndpoint = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}`
 
   // [Joshen] JFYI opting with the useEffect here as the storage explorer state was being loaded
   // before the project details were ready, hence the store kept returning project ref as undefined
@@ -1942,30 +1928,8 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
         createStorageExplorerState({
           projectRef: project?.ref ?? '',
           connectionString: project.connectionString ?? '',
-          supabaseClient: async () => {
-            try {
-              const data = await getTemporaryAPIKey({ projectRef: project.ref })
-              const clientEndpoint = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}`
-
-              return createClient(clientEndpoint, data.api_key, {
-                auth: {
-                  persistSession: false,
-                  autoRefreshToken: false,
-                  detectSessionInUrl: false,
-                  storage: {
-                    getItem: (key) => {
-                      return null
-                    },
-                    setItem: (key, value) => {},
-                    removeItem: (key) => {},
-                  },
-                },
-              })
-            } catch (error) {
-              throw error
-            }
-          },
           resumableUploadUrl,
+          clientEndpoint,
         })
       )
     }
