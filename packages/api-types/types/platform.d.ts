@@ -9101,19 +9101,13 @@ export interface components {
     }
     StorageAnalyticsBucketResponse: {
       created_at: string
-      format: string
-      id: string
-      /** @enum {string} */
-      type: 'ANALYTICS'
+      name: string
       updated_at: string
     }
     StorageAnalyticsBucketsResponse: {
       data: {
         created_at: string
-        format: string
-        id: string
-        /** @enum {string} */
-        type: 'ANALYTICS'
+        name: string
         updated_at: string
       }[]
     }
@@ -24417,7 +24411,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
+        /** @description Analytics Bucket ID */
         id: string
         /** @description Project ref */
         ref: string
