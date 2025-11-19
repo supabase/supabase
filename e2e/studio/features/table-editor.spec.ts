@@ -1,16 +1,17 @@
 import { expect, Locator, Page } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
-import { isCLI } from '../utils/is-cli'
-import { resetLocalStorage } from '../utils/reset-local-storage'
-import { test } from '../utils/test'
-import { toUrl } from '../utils/to-url'
+import { isCLI } from '../utils/is-cli.js'
+import { releaseFileOnceCleanup, withFileOnceSetup } from '../utils/once-per-file.js'
+import { resetLocalStorage } from '../utils/reset-local-storage.js'
+import { test } from '../utils/test.js'
+import { toUrl } from '../utils/to-url.js'
+import { waitForApiResponseWithTimeout } from '../utils/wait-for-response-with-timeout.js'
 import {
   waitForApiResponse,
   waitForGridDataToLoad,
   waitForTableToLoad,
-} from '../utils/wait-for-response'
-import { waitForApiResponseWithTimeout } from '../utils/wait-for-response-with-timeout'
+} from '../utils/wait-for-response.js'
 
 const tableNamePrefix = 'pw_table'
 const columnName = 'pw_column'
@@ -66,6 +67,7 @@ const createTable = async (page: Page, ref: string, tableName: string) => {
   )
   await page.getByRole('button', { name: 'Save' }).click()
   await Promise.all([createTablePromise, tablesPromise, entitiesPromise])
+  await page.waitForSelector('[data-testid="table-editor-side-panel"]', { state: 'detached' })
   await expect(
     page.getByRole('button', { name: `View ${tableName}`, exact: true }),
     'Table should be visible after creation'
@@ -85,6 +87,7 @@ const deleteTable = async (page: Page, ref: string, tableName: string) => {
   const revalidatePromise = waitForApiResponse(page, 'pg-meta', ref, `query?key=entity-types-`)
   await page.getByRole('button', { name: 'Delete' }).click()
   await Promise.all([apiPromise, revalidatePromise])
+  await expect(page.getByTestId('confirm-delete-table-modal')).not.toBeVisible()
 }
 
 const deleteEnumIfExist = async (page: Page, ref: string, enumName: string) => {
@@ -104,34 +107,45 @@ const deleteEnumIfExist = async (page: Page, ref: string, enumName: string) => {
   await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
 }
 
-test.describe.serial('table editor', () => {
+test.describe('table editor', () => {
   test.beforeAll(async ({ browser, ref }) => {
-    const ctx = await browser.newContext()
-    const page = await ctx.newPage()
+    await withFileOnceSetup(import.meta.url, async () => {
+      const ctx = await browser.newContext()
+      const page = await ctx.newPage()
 
-    const loadPromise = waitForTableToLoad(page, ref)
-    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
-    await loadPromise
+      const loadPromise = waitForTableToLoad(page, ref)
+      await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+      await loadPromise
 
-    const viewButtons = page.getByRole('button', { name: /^View / })
-    const names = await Promise.all(
-      (await viewButtons.all()).map(async (btn) => {
-        const ariaLabel = await btn.getAttribute('aria-label')
-        const name = ariaLabel ? ariaLabel.replace(/^View\s+/, '').trim() : ''
-        return name
-      })
-    )
-    const tablesToDelete = names.filter((tableName) => tableName.startsWith(tableNamePrefix))
+      const viewButtons = page.getByRole('button', { name: /^View / })
+      const names = await Promise.all(
+        (await viewButtons.all()).map(async (btn) => {
+          const ariaLabel = await btn.getAttribute('aria-label')
+          const name = ariaLabel ? ariaLabel.replace(/^View\s+/, '').trim() : ''
+          return name
+        })
+      )
+      const tablesToDelete = names.filter((tableName) => tableName.startsWith(tableNamePrefix))
 
-    for (const tableName of tablesToDelete) {
-      await deleteTable(page, ref, tableName)
-    }
+      for (const tableName of tablesToDelete) {
+        await deleteTable(page, ref, tableName)
+        await expect
+          .poll(async () => {
+            return await page.getByLabel(`View ${tableName}`, { exact: true }).count()
+          })
+          .toBe(0)
+      }
+    })
   })
 
   test.beforeEach(async ({ page, ref }) => {
     const loadPromise = waitForTableToLoad(page, ref)
-    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await loadPromise
+  })
+
+  test.afterAll(async () => {
+    await releaseFileOnceCleanup(import.meta.url)
   })
 
   test('sidebar actions works as expected', async ({ page, ref }) => {
@@ -184,9 +198,6 @@ test.describe.serial('table editor', () => {
     await expect(
       page.getByLabel(`View ${tableNameActionsDuplicate}`, { exact: true })
     ).toBeVisible()
-
-    await deleteTable(page, ref, tableNameActionsDuplicate)
-    await deleteTable(page, ref, tableNameActions)
   })
 
   test('switching schemas work as expected', async ({ page, ref }) => {
@@ -286,12 +297,12 @@ test.describe.serial('table editor', () => {
     ).toBeVisible({
       timeout: 50000,
     })
+    await expect(page.getByTestId('table-editor-side-panel')).not.toBeVisible()
 
     // Wait for the grid to be visible and data to be loaded
-    await expect(
-      page.getByRole('grid'),
-      'Grid should be visible after inserting data'
-    ).toBeVisible()
+    await expect(page.getByRole('grid'), 'Grid should be visible after inserting data').toBeVisible(
+      { timeout: 10_000 }
+    )
     await expect(page.getByRole('columnheader', { name: enum_name })).toBeVisible()
 
     // insert row with enum value
@@ -299,6 +310,7 @@ test.describe.serial('table editor', () => {
     await page.getByText('Insert a new row into').click()
     await page.getByRole('combobox').selectOption('value1')
     await page.getByTestId('action-bar-save-row').click()
+    await expect(page.getByTestId('side-panel-row-editor')).not.toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'value1' })).toBeVisible()
 
     // insert row with another enum value
@@ -306,7 +318,7 @@ test.describe.serial('table editor', () => {
     await page.getByText('Insert a new row into').click()
     await page.getByRole('combobox').selectOption('value2')
     await page.getByTestId('action-bar-save-row').click()
-    await expect(page.getByRole('gridcell', { name: 'value2' })).toBeVisible()
+    await expect(page.getByRole('gridcell', { name: 'value2' })).toBeVisible({ timeout: 10_000 })
 
     // delete enum and enum table
     await deleteTable(page, ref, tableNameEnum)
@@ -560,7 +572,7 @@ test.describe.serial('table editor', () => {
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     // importing 50 data via csv file
-    const csvFilePath = path.join(__dirname, 'files', 'table-editor-import-file.csv')
+    const csvFilePath = path.join(import.meta.dirname, 'files', 'table-editor-import-file.csv')
     await page.getByRole('button', { name: 'Import data from CSV' }).click()
     await page.getByRole('tab', { name: 'Upload CSV' }).click()
     await page.setInputFiles('input[type="file"]', csvFilePath)
@@ -571,7 +583,7 @@ test.describe.serial('table editor', () => {
     await expect(page.getByText('50 records')).toBeVisible()
 
     // importing 51 data via paste text
-    const filePath = path.join(__dirname, 'files', 'table-editor-import-paste.txt')
+    const filePath = path.join(import.meta.dirname, 'files', 'table-editor-import-paste.txt')
     const fileContent = fs.readFileSync(filePath, 'utf-8')
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByRole('menuitem', { name: 'Import data from CSV' }).click()

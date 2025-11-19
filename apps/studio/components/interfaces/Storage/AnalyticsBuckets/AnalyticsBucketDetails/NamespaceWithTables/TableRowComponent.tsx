@@ -1,5 +1,5 @@
 import { uniq } from 'lodash'
-import { Loader2, MoreVertical, Pause, Play, Trash } from 'lucide-react'
+import { Eye, Loader2, MoreVertical, Pause, Play, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -68,7 +68,10 @@ export const TableRowComponent = ({
     projectRef,
     bucketId,
   })
-  const { data } = useReplicationPipelineStatusQuery({ projectRef, pipelineId: pipeline?.id })
+  const { data, isLoading: isLoadingPipelineStatus } = useReplicationPipelineStatusQuery({
+    projectRef,
+    pipelineId: pipeline?.id,
+  })
   const pipelineStatus = data?.status.name
 
   const { data: tables } = useReplicationTablesQuery({ projectRef, sourceId })
@@ -94,10 +97,10 @@ export const TableRowComponent = ({
 
   // [Joshen] Considers both the replication pipeline status + if the table is in the replication publication
   const replicationStatusLabel = useMemo(() => {
-    if (isLoading) return 'Checking'
-
     if (hasReplication) {
-      if (!isPipelineRunning) {
+      if (isLoadingPipelineStatus) {
+        return 'Checking'
+      } else if (!isPipelineRunning) {
         return '-'
       } else if (isTableUnderReplicationPublication) {
         return 'Running'
@@ -105,7 +108,12 @@ export const TableRowComponent = ({
         return 'Disabled'
       }
     }
-  }, [hasReplication, isLoading, isPipelineRunning, isTableUnderReplicationPublication])
+  }, [
+    hasReplication,
+    isLoadingPipelineStatus,
+    isPipelineRunning,
+    isTableUnderReplicationPublication,
+  ])
 
   const onConfirmStopReplication = async () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -245,7 +253,7 @@ export const TableRowComponent = ({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex items-center gap-x-2">
-                    {isLoading ? (
+                    {isLoadingPipelineStatus ? (
                       <Loader2 size={12} className="animate-spin text-foreground-lighter" />
                     ) : isPipelineRunning ? (
                       <DotPing
@@ -288,7 +296,7 @@ export const TableRowComponent = ({
                 <DropdownMenuContent side="bottom" align="end" className="w-fit min-w-[180px]">
                   <DropdownMenuItem asChild className="flex items-center gap-x-2">
                     <Link
-                      href={`/project/${project?.ref}/sql/new?content=${encodeURIComponent(`select * from ${schema}.${table.name};`)}`}
+                      href={`/project/${projectRef}/sql/new?content=${encodeURIComponent(`select * from ${schema}.${table.name};`)}`}
                     >
                       <SqlEditor size={12} className="text-foreground-lighter" />
                       <p>Query in SQL Editor</p>
@@ -297,6 +305,16 @@ export const TableRowComponent = ({
 
                   {!!publication && (
                     <>
+                      {!!inferredPostgresTable && (
+                        <DropdownMenuItem asChild className="flex items-center gap-x-2">
+                          <Link
+                            href={`/project/${projectRef}/database/etl/${pipeline?.id}?search=${inferredPostgresTable.schema}.${inferredPostgresTable.name}`}
+                          >
+                            <Eye size={12} className="text-foreground-lighter" />
+                            <p>View replication</p>
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
                       {isTableUnderReplicationPublication ? (
                         <DropdownMenuItem
                           className="flex items-center gap-x-2"

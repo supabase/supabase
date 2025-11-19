@@ -65,10 +65,10 @@ export const AnalyticBucketDetails = () => {
 
   /** The wrapper instance is the wrapper that is installed for this Analytics bucket. */
   const { data: wrapperInstance, isLoading: isLoadingWrapperInstance } =
-    useAnalyticsBucketWrapperInstance({ bucketId: bucket?.id })
+    useAnalyticsBucketWrapperInstance({ bucketId: bucket?.name })
   const { publication, pipeline } = useAnalyticsBucketAssociatedEntities({
     projectRef,
-    bucketId: bucket?.id,
+    bucketId: bucket?.name,
   })
   const { data, isSuccess: isSuccessPipelineStatus } = useReplicationPipelineStatusQuery(
     { projectRef, pipelineId: pipeline?.id },
@@ -178,20 +178,20 @@ export const AnalyticBucketDetails = () => {
             </ScaffoldSection>
           ) : state === 'not-installed' ? (
             <ExtensionNotInstalled
-              bucketName={bucket?.id}
+              bucketName={bucket?.name}
               projectRef={project?.ref!}
               wrapperMeta={wrapperMeta}
               wrappersExtension={wrappersExtension!}
             />
           ) : state === 'needs-upgrade' ? (
             <ExtensionNeedsUpgrade
-              bucketName={bucket?.id}
+              bucketName={bucket?.name}
               projectRef={project?.ref!}
               wrapperMeta={wrapperMeta}
               wrappersExtension={wrappersExtension!}
             />
           ) : state === 'missing' ? (
-            <WrapperMissing bucketName={bucket?.id} />
+            <WrapperMissing bucketName={bucket?.name} />
           ) : state === 'added' && wrapperInstance ? (
             <>
               <ScaffoldSection isFullWidth>
@@ -294,7 +294,7 @@ export const AnalyticBucketDetails = () => {
                       {namespaces.map(({ namespace, schema, tables }) => (
                         <NamespaceWithTables
                           key={namespace}
-                          bucketName={bucket?.id}
+                          bucketName={bucket?.name}
                           namespace={namespace}
                           sourceType="direct"
                           schema={schema}
@@ -311,7 +311,7 @@ export const AnalyticBucketDetails = () => {
                 )}
               </ScaffoldSection>
 
-              <SimpleConfigurationDetails bucketName={bucket?.id} />
+              <SimpleConfigurationDetails bucketName={bucket?.name} />
             </>
           ) : null}
 
@@ -330,7 +330,7 @@ export const AnalyticBucketDetails = () => {
                 </div>
                 <Button
                   type="danger"
-                  disabled={!bucket?.id || !isSuccessBucket}
+                  disabled={!bucket?.name || !isSuccessBucket}
                   onClick={() => setModal('delete')}
                 >
                   Delete bucket
@@ -343,7 +343,7 @@ export const AnalyticBucketDetails = () => {
 
       <DeleteAnalyticsBucketModal
         visible={modal === `delete`}
-        bucketId={bucket?.id}
+        bucketId={bucket?.name}
         onClose={() => setModal(null)}
         onSuccess={() => router.push(`/project/${projectRef}/storage/analytics`)}
       />

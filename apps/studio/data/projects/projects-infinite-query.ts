@@ -15,8 +15,8 @@ interface GetProjectsInfiniteVariables {
   page?: number
 }
 
-export type ProjectInfoInfinite =
-  components['schemas']['ListProjectsPaginatedResponse']['projects'][number]
+export type ProjectInfiniteResponse = components['schemas']['ListProjectsPaginatedResponse']
+export type ProjectInfoInfinite = ProjectInfiniteResponse['projects'][number]
 
 async function getProjects(
   {
