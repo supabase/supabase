@@ -72,7 +72,8 @@ export const NamespaceWithTables = ({
       projectRef,
     },
     {
-      refetchInterval: (data = []) => {
+      refetchInterval: (_data) => {
+        const data = _data ?? []
         if (pollIntervalNamespaceTables === 0) return false
 
         const publicationTables = publication?.tables ?? []
