@@ -94,9 +94,6 @@ export const getComputeSize = (project: OrgProject) => {
 export const useInvalidateProjectsInfiniteQuery = () => {
   const queryClient = useQueryClient()
   const invalidateProjectsQuery = () => {
-    // [Joshen] Temporarily for completeness while we still have UIs depending on the old endpoint (Org teams)
-    // Can be removed once we completely deprecate projects-query (Old unpaginated endpoint)
-    queryClient.invalidateQueries({ queryKey: projectKeys.list() })
     return queryClient.invalidateQueries({ queryKey: [INFINITE_PROJECTS_KEY_PREFIX] })
   }
   return { invalidateProjectsQuery }
