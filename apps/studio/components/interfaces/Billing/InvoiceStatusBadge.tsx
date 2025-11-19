@@ -1,6 +1,6 @@
+import { InlineLink } from 'components/ui/InlineLink'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { InvoiceStatus } from './Invoices.types'
-import Link from 'next/link'
 
 interface InvoiceStatusBadgeProps {
   status: InvoiceStatus
@@ -72,12 +72,9 @@ const InvoiceStatusBadge = ({
 
               <p className="text-xs text-foreground">
                 If you run into this, we recommend{' '}
-                <Link
-                  href={'https://supabase.com/docs/guides/platform/credits#credit-top-ups'}
-                  className="text-foreground-light underline hover:text-foreground transition"
-                >
+                <InlineLink href="https://supabase.com/docs/guides/platform/credits#credit-top-ups">
                   topping up your credits
-                </Link>{' '}
+                </InlineLink>{' '}
                 in advance to avoid running into this in the future.
               </p>
             </div>
