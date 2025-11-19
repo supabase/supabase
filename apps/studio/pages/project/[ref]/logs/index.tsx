@@ -6,7 +6,7 @@ import { useUnifiedLogsPreview } from 'components/interfaces/App/FeaturePreview/
 import { UnifiedLogs } from 'components/interfaces/UnifiedLogs/UnifiedLogs'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ProjectLayout } from 'components/layouts/ProjectLayout'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()

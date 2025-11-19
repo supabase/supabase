@@ -294,7 +294,7 @@ export function McpConfigPanel() {
         <Admonition type="note" title="Authentication" className="mt-3">
           <p>
             {
-              "Your MCP client will automatically prompt you to login to Supabase during setup. This will open a browser window where you can login to your Supabase account and grant access to the MCP client. Be sure to choose the organization that contains the project you wish to work with. In the future, we'll offer more fine grain control over these permissions."
+              "Some MCP clients will automatically prompt you to login during setup, while others may require manual authentication steps. Either authentication method will open a browser window where you can login to your Supabase account and grant organization access to the MCP client. In the future, we'll offer more fine grain control over these permissions."
             }
           </p>
           <p>

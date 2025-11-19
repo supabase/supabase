@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { configKeys } from './keys'
 
 export type ComplianceConfigUpdateVariables = {
@@ -32,7 +32,11 @@ export const useComplianceConfigUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ComplianceConfigUpdateData, ResponseError, ComplianceConfigUpdateVariables>,
+  UseCustomMutationOptions<
+    ComplianceConfigUpdateData,
+    ResponseError,
+    ComplianceConfigUpdateVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

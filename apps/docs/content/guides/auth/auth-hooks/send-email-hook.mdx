@@ -1,55 +1,17 @@
 ---
 id: 'send-email-hook'
 title: 'Send Email Hook'
-subtitle: 'Use a custom email provider to send authentication messages'
+subtitle: 'Use a custom email provider to send authentication messages.'
 ---
 
-The Send Email Hook runs before an email is sent and allows for flexibility around email sending. You can use this hook to configure a back-up email provider or add internationalization to your emails.
-
-## Email sending behavior
-
-Email sending depends on two settings: Email Provider and Auth Hook status.
-
-| Email Provider | Auth Hook | Result                                                               |
-| -------------- | --------- | -------------------------------------------------------------------- |
-| Enabled        | Enabled   | Auth Hook handles email sending (SMTP not used)                      |
-| Enabled        | Disabled  | SMTP handles email sending (custom if configured, default otherwise) |
-| Disabled       | Enabled   | Email Signups Disabled                                               |
-| Disabled       | Disabled  | Email Signups Disabled                                               |
-
-## Email change behavior and token hash mapping
-
-When `email_action_type` is `email_change`, the hook payload can include one or two OTPs and their hashes. This depends on your [Secure Email Change](/dashboard/project/_/auth/providers?provider=Email) setting.
-
-- Secure Email Change enabled: two OTPs are generated, one for the current email (`user.email`) and one for the new email (`user.email_new`). You must send two emails.
-- Secure Email Change disabled: only one OTP is generated for the new email. You send a single email.
-
-<Admonition type="note">
-
-Important quirk (backward compatibility):
-
-- `email_data.token_hash_new` = Hash(`user.email`, `email_data.token`)
-- `email_data.token_hash` = Hash(`user.email_new`, `email_data.token_new`)
-
-This naming is historical and kept for backward compatibility. Do not assume that the `_new` suffix refers to the new email.
-
-</Admonition>
-
-### What to send
-
-If both `token_hash` and `token_hash_new` are present, send two messages:
-
-- To the current email (`user.email`): use `token` with `token_hash_new`.
-- To the new email (`user.email_new`): use `token_new` with `token_hash`.
-
-If only one token/hash pair is present, send a single email. In non-secure mode, this is typically the new email OTP. Use `token` with `token_hash` or `token_new` with `token_hash`, depending on which fields are present in the payload.
+The Send Email Hook runs before an email is sent and allows for flexibility around email sending. You can use this hook to configure a backup email provider or to add internationalization to your emails.
 
 **Inputs**
 
-| Field   | Type                                              | Description                                                                        |
-| ------- | ------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `user`  | [`User`](/docs/guides/auth/users#the-user-object) | The user attempting to sign in.                                                    |
-| `email` | `object`                                          | Metadata specific to the email sending process. Includes the OTP and `token_hash`. |
+| Field   | Type                                              | Description                                    |
+| ------- | ------------------------------------------------- | ---------------------------------------------- |
+| `user`  | [`User`](/docs/guides/auth/users#the-user-object) | The user account taking the action             |
+| `email` | `object`                                          | Metadata specific to the email sending process |
 
 <Tabs
   scrollable
@@ -105,7 +67,11 @@ If only one token/hash pair is present, send a single email. In non-secure mode,
     "email_action_type": "signup",
     "site_url": "http://localhost:9999",
     "token_new": "",
-    "token_hash_new": ""
+    "token_hash_new": "",
+    "old_email": "",
+    "old_phone": "",
+    "provider": "",
+    "factor_type": ""
   }
 }
 ```
@@ -316,7 +282,14 @@ If only one token/hash pair is present, send a single email. In non-secure mode,
             "recovery",
             "email_change",
             "email",
-            "reauthentication"
+            "reauthentication",
+            "password_changed_notification",
+            "email_changed_notification",
+            "phone_changed_notification",
+            "identity_linked_notification",
+            "identity_unlinked_notification",
+            "mfa_factor_enrolled_notification",
+            "mfa_factor_unenrolled_notification"
           ]
         },
         "site_url": {
@@ -338,6 +311,24 @@ If only one token/hash pair is present, send a single email. In non-secure mode,
           "x-faker": {
             "fake": "{{random.alphaNumeric(30)}}"
           }
+        },
+        "old_email": {
+          "type": "string",
+          "x-faker": "internet.email"
+        },
+        "old_phone": {
+          "type": "string",
+          "x-faker": {
+            "fake": "{{phone.phoneNumber('+1##########')}}"
+          }
+        },
+        "provider": {
+          "type": "string",
+          "enum": ["email"]
+        },
+        "factor_type": {
+          "type": "string",
+          "enum": ["totp"]
         }
       },
       "required": [
@@ -361,6 +352,46 @@ If only one token/hash pair is present, send a single email. In non-secure mode,
 **Outputs**
 
 - No outputs are required. An empty response with a status code of 200 is taken as a successful response.
+
+## Email sending behavior
+
+Email sending depends on two settings: Email Provider and Auth Hook status.
+
+| Email Provider | Auth Hook | Result                                                               |
+| -------------- | --------- | -------------------------------------------------------------------- |
+| Enabled        | Enabled   | Auth Hook handles email sending (SMTP not used)                      |
+| Enabled        | Disabled  | SMTP handles email sending (custom if configured, default otherwise) |
+| Disabled       | Enabled   | Email signups disabled                                               |
+| Disabled       | Disabled  | Email signups disabled                                               |
+
+## Email change behavior and token hash mapping
+
+When `email_action_type` is `email_change`, the hook payload can include one or two OTPs and their hashes. This depends on your [Secure Email Change](/dashboard/project/_/auth/providers?provider=Email) setting.
+
+- Secure Email Change enabled: two OTPs are generated, one for the current email (`user.email`) and one for the new email (`user.email_new`). You must send two emails.
+- Secure Email Change disabled: only one OTP is generated for the new email. You send a single email.
+
+<Admonition type="caution" title="Counterintuitive field naming">
+
+The token hash field names are reversed due to backward compatibility. Pay careful attention to which token/hash pair goes with which email address:
+
+- `token_hash_new` → use with the **current** email address (`user.email`) and `token`
+- `token_hash` → use with the **new** email address (`user.email_new`) and `token_new`
+
+Do not assume the `_new` suffix refers to the new email address.
+
+</Admonition>
+
+### What to send
+
+When Secure Email Change is enabled (both token/hash pairs present):
+
+- Send to **current** email address (`user.email`): use `token` with `token_hash_new`
+- Send to **new** email address (`user.email_new`): use `token_new` with `token_hash`
+
+When Secure Email Change is **disabled** (only one token/hash pair present):
+
+- Send a single email to the **new** email address. Use `token` with `token_hash` or `token_new` with `token_hash`, depending on which fields are present in the payload.
 
 <Tabs
   scrollable

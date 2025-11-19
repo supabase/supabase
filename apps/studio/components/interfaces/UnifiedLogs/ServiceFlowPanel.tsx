@@ -2,7 +2,10 @@ import { useState } from 'react'
 
 import { useParams } from 'common'
 import { useDataTable } from 'components/ui/DataTable/providers/DataTableProvider'
-import { ServiceFlowType, useUnifiedLogInspectionQuery } from 'data/logs'
+import {
+  ServiceFlowType,
+  useUnifiedLogInspectionQuery,
+} from 'data/logs/unified-log-inspection-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
   CodeBlock,

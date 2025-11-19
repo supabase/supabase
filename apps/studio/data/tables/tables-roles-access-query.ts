@@ -1,8 +1,9 @@
 import { getTablesWithAnonAuthenticatedAccessSQL } from '@supabase/pg-meta/src/sql/studio/check-tables-anon-authenticated-access'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { tableKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 type TablesRolesAccessArgs = {
   schema: string
@@ -37,7 +38,7 @@ export const useTablesRolesAccessQuery = <TData = TablesRolesAccessData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<TablesRolesAccessData, TablesRolesAccessError, TData> = {}
+  }: UseCustomQueryOptions<TablesRolesAccessData, TablesRolesAccessError, TData> = {}
 ) =>
   useQuery<TablesRolesAccessData, TablesRolesAccessError, TData>({
     queryKey: tableKeys.rolesAccess(projectRef, schema),

@@ -23,7 +23,7 @@ export const FormHeader = ({
     >
       <div className="space-y-1">
         <h3 className="text-foreground text-xl prose">{title}</h3>
-        {description && <div className="prose text-sm max-w-2xl">{description}</div>}
+        {description && <p className="prose text-sm max-w-2xl">{description}</p>}
       </div>
       <div className="flex flex-col sm:flex-row md:items-center gap-x-2">
         {docsUrl !== undefined && <DocsButton href={docsUrl} />}

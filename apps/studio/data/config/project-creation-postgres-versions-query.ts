@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { handleError, post } from 'data/fetchers'
 import { CloudProvider } from 'shared-data'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
 
 export type ProjectCreationPostgresVersionsVariables = {
@@ -37,7 +37,7 @@ export const useProjectCreationPostgresVersionsQuery = <TData = ProjectCreationP
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<
+  }: UseCustomQueryOptions<
     ProjectCreationPostgresVersionData,
     ProjectCreationPostgresVersionError,
     TData

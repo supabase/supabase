@@ -1,9 +1,9 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions, useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { useProfile } from 'lib/profile'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { INFINITE_PROJECTS_KEY_PREFIX, projectKeys } from './keys'
 
 // [Joshen] Try to keep this value a multiple of 6 (common denominator of 2 and 3) to fit the cards view
@@ -65,7 +65,7 @@ export const useOrgProjectsInfiniteQuery = <TData = OrgProjectsInfiniteData>(
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<OrgProjectsInfiniteData, OrgProjectsInfiniteError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<OrgProjectsInfiniteData, OrgProjectsInfiniteError, TData> = {}
 ) => {
   const { profile } = useProfile()
   return useInfiniteQuery<OrgProjectsInfiniteData, OrgProjectsInfiniteError, TData>({
@@ -94,9 +94,6 @@ export const getComputeSize = (project: OrgProject) => {
 export const useInvalidateProjectsInfiniteQuery = () => {
   const queryClient = useQueryClient()
   const invalidateProjectsQuery = () => {
-    // [Joshen] Temporarily for completeness while we still have UIs depending on the old endpoint (Org teams)
-    // Can be removed once we completely deprecate projects-query (Old unpaginated endpoint)
-    queryClient.invalidateQueries({ queryKey: projectKeys.list() })
     return queryClient.invalidateQueries({ queryKey: [INFINITE_PROJECTS_KEY_PREFIX] })
   }
   return { invalidateProjectsQuery }

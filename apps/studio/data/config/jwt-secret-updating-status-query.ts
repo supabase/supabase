@@ -1,6 +1,7 @@
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
+import { UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
 
 export type JwtSecretUpdatingStatusVariables = {
@@ -49,7 +50,7 @@ export const useJwtSecretUpdatingStatusQuery = <TData = JwtSecretUpdatingStatusD
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<JwtSecretUpdatingStatusData, JwtSecretUpdatingStatusError, TData> = {}
+  }: UseCustomQueryOptions<JwtSecretUpdatingStatusData, JwtSecretUpdatingStatusError, TData> = {}
 ) => {
   const client = useQueryClient()
 

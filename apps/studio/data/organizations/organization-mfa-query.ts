@@ -1,6 +1,6 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationMfaVariables = {
@@ -29,7 +29,7 @@ export type OrganizationMfaError = ResponseError
 
 export const useOrganizationMfaQuery = <TData = boolean>(
   { slug }: OrganizationMfaVariables,
-  { enabled = true, ...options }: UseQueryOptions<boolean, OrganizationMfaError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<boolean, OrganizationMfaError, TData> = {}
 ) =>
   useQuery<boolean, OrganizationMfaError, TData>({
     queryKey: organizationKeys.mfa(slug),

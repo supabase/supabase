@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { resourceKeys } from './keys'
 
 export type ResourceUpdateVariables = {
@@ -29,7 +29,7 @@ export const useResourceUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ResourceUpdateData, ResponseError, ResourceUpdateVariables>,
+  UseCustomMutationOptions<ResourceUpdateData, ResponseError, ResourceUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

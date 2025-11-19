@@ -1,9 +1,10 @@
 import { AnimatePresence } from 'framer-motion'
-import { RotateCw, Timer } from 'lucide-react'
+import { AlertCircle, RotateCw, Timer } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useFlag, useParams } from 'common'
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
@@ -57,14 +58,21 @@ export const JWTSecretKeysTable = () => {
   const [selectedKeyToUpdate, setSelectedKeyToUpdate] = useState<string>()
   const [shownDialog, setShownDialog] = useState<DialogType>()
 
-  const { data: signingKeys, isLoading: isLoadingSigningKeys } = useJWTSigningKeysQuery({
-    projectRef,
-  })
-  const { data: legacyKey, isLoading: isLoadingLegacyKey } = useLegacyJWTSigningKeyQuery({
-    projectRef,
-  })
+  const { canReadAPIKeys, isLoading: isLoadingCanReadAPIKeys } = useApiKeysVisibility()
+  const { data: signingKeys, isLoading: isLoadingSigningKeys } = useJWTSigningKeysQuery(
+    {
+      projectRef,
+    },
+    { enabled: canReadAPIKeys }
+  )
+  const { data: legacyKey, isLoading: isLoadingLegacyKey } = useLegacyJWTSigningKeyQuery(
+    {
+      projectRef,
+    },
+    { enabled: canReadAPIKeys }
+  )
   const { data: legacyAPIKeysStatus, isLoading: isLoadingLegacyAPIKeysStatus } =
-    useLegacyAPIKeysStatusQuery({ projectRef })
+    useLegacyAPIKeysStatusQuery({ projectRef }, { enabled: canReadAPIKeys })
 
   const { mutate: migrateJWTSecret, isLoading: isMigrating } = useLegacyJWTSigningKeyCreateMutation(
     {
@@ -152,6 +160,20 @@ export const JWTSecretKeysTable = () => {
     )
   }
 
+  if (!canReadAPIKeys && !isLoadingCanReadAPIKeys) {
+    return (
+      <div className="bg-surface-100 rounded-md border shadow-sm">
+        <div className="flex items-center py-8 px-8 space-x-2">
+          <AlertCircle size={16} strokeWidth={1.5} />
+          <p className="text-sm text-foreground-light">
+            You don't have permission to view JWT signing keys. These keys are restricted to users
+            with higher access levels.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   if (isLoading) {
     return <GenericSkeletonLoader />
   }
@@ -163,7 +185,7 @@ export const JWTSecretKeysTable = () => {
   return (
     <>
       <div className="-space-y-px">
-        {legacyKey ? (
+        {!canReadAPIKeys ? null : legacyKey ? (
           <>
             {standbyKey && (
               <ActionPanel

@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageKeys } from './keys'
 
 type BucketCreateVariables = Omit<CreateStorageBucketBody, 'public'> & {
@@ -46,7 +46,7 @@ export const useBucketCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BucketCreateData, ResponseError, BucketCreateVariables>,
+  UseCustomMutationOptions<BucketCreateData, ResponseError, BucketCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

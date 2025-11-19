@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { accessTokenKeys } from './keys'
 
 export type AccessTokenDeleteVariables = {
@@ -25,7 +25,7 @@ export const useAccessTokenDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<AccessTokenDeleteData, ResponseError, AccessTokenDeleteVariables>,
+  UseCustomMutationOptions<AccessTokenDeleteData, ResponseError, AccessTokenDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

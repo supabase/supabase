@@ -49,7 +49,7 @@ export const AdvisorWidget = () => {
   )
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
-  const { setSelectedItemId } = useAdvisorStateSnapshot()
+  const { setSelectedItem } = useAdvisorStateSnapshot()
 
   const securityLints = useMemo(
     () => (lints ?? []).filter((lint: Lint) => lint.categories.includes('SECURITY')),
@@ -80,10 +80,10 @@ export const AdvisorWidget = () => {
 
   const handleLintClick = useCallback(
     (lint: Lint) => {
-      setSelectedItemId(lint.cache_key)
+      setSelectedItem(lint.cache_key, 'lint')
       openSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
     },
-    [setSelectedItemId, openSidebar]
+    [setSelectedItem, openSidebar]
   )
 
   const totalIssues =
@@ -187,13 +187,13 @@ export const AdvisorWidget = () => {
   }
 
   return (
-    <div>
+    <div className="@container">
       {isLoadingLints ? (
         <ShimmeringLoader className="w-96 mb-6" />
       ) : (
         <div className="flex justify-between items-center mb-6">{titleContent}</div>
       )}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 @xl:grid-cols-2 gap-4">
         <Card className="h-80">
           <Tabs value={selectedTab} className="h-full flex flex-col">
             <CardHeader className="h-10 py-0 pl-4 pr-2 flex flex-row items-center justify-between flex-0">

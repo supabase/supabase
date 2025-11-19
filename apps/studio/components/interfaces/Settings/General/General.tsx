@@ -140,7 +140,7 @@ export const General = () => {
           <div className="mt-6" id="restart-project">
             <FormPanel>
               <div className="flex flex-col px-8 py-4">
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4">
                   <div>
                     <p className="text-sm">
                       {projectSettingsRestartProject ? 'Restart project' : 'Restart database'}
@@ -155,7 +155,7 @@ export const General = () => {
                 </div>
               </div>
               <div
-                className="flex w-full items-center justify-between px-8 py-4"
+                className="flex w-full flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4 px-8 py-4"
                 id="pause-project"
               >
                 <div>
@@ -173,7 +173,7 @@ export const General = () => {
           <div className="mt-6">
             <Panel>
               <Panel.Content>
-                <div className="flex justify-between">
+                <div className="flex flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4">
                   <div className="flex space-x-4">
                     <BarChart2 strokeWidth={2} />
                     <div>

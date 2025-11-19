@@ -1,4 +1,4 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'api-types'
@@ -6,7 +6,7 @@ import { handleError, post } from 'data/fetchers'
 import { invoicesKeys } from 'data/invoices/keys'
 import { organizationKeys } from 'data/organizations/keys'
 import { usageKeys } from 'data/usage/keys'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { subscriptionKeys } from './keys'
 
 export type PendingSubscriptionChangeVariables = {
@@ -47,7 +47,7 @@ export const useConfirmPendingSubscriptionChangeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     PendingSubscriptionChangeData,
     ResponseError,
     PendingSubscriptionChangeVariables

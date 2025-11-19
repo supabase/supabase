@@ -1,8 +1,9 @@
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 import { PROJECT_STATUS } from 'lib/constants'
 import { configKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export type ProjectUpgradingStatusVariables = {
   projectRef?: string
@@ -38,7 +39,7 @@ export const useProjectUpgradingStatusQuery = <TData = ProjectUpgradingStatusDat
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectUpgradingStatusData, ProjectUpgradingStatusError, TData> = {}
+  }: UseCustomQueryOptions<ProjectUpgradingStatusData, ProjectUpgradingStatusError, TData> = {}
 ) => {
   const client = useQueryClient()
 

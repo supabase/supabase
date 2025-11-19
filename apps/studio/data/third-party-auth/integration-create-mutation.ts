@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { keys } from './keys'
 
 export type CreateThirdPartyAuthVariables = {
@@ -42,7 +42,11 @@ export const useCreateThirdPartyAuthIntegrationMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ThirdPartyIntegrationCreateData, ResponseError, CreateThirdPartyAuthVariables>,
+  UseCustomMutationOptions<
+    ThirdPartyIntegrationCreateData,
+    ResponseError,
+    CreateThirdPartyAuthVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

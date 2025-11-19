@@ -15,6 +15,7 @@ const AuthProductMenu = () => {
   const { ref: projectRef = 'default' } = useParams()
 
   const authenticationShowOverview = useFlag('authOverviewPage')
+  const authenticationOauth21 = useFlag('EnableOAuth21')
   const authenticationShowSecurityNotifications = useIsSecurityNotificationsEnabled()
 
   const {
@@ -48,6 +49,7 @@ const AuthProductMenu = () => {
         authenticationAdvanced,
         authenticationShowOverview,
         authenticationShowSecurityNotifications,
+        authenticationOauth21,
       })}
     />
   )

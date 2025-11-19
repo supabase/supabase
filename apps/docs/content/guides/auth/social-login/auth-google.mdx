@@ -39,12 +39,12 @@ It's strongly recommended you set up a custom domain and optionally verify your 
 
 </Admonition>
 
-Google's consent screen is shown to users when they sign in. Optionally configure the following to improve the appearance of the screen, increasing the perception of trust by your users:
+Google's consent screen is shown to users when they sign in. Optionally configure one of the following to improve the appearance of the screen, increasing the perception of trust by your users:
 
+1. Verify your application's brand (logo and name) by configuring it in the [Branding](https://console.cloud.google.com/auth/branding) section of the Google Auth Platform console. Brand verification is not automatic and may take a few business days.
 1. Set up a [custom domain for your project](/docs/guides/platform/custom-domains) to present the user with a clear relationship to the website they clicked Sign in with Google on.
    - A good approach is to use `auth.example.com` or `api.example.com`, if your application is hosted on `example.com`.
    - If you don't set this up, users will see `<project-id>.supabase.co` which does not inspire trust and can make your application more susceptible to successful phishing attempts.
-1. Verify your application's brand (logo and name) by configuring it in the [Branding](https://console.cloud.google.com/auth/branding) section of the Google Auth Platform console. Brand verification is not automatic and may take a few business days.
 
 ## Project setup
 
@@ -443,13 +443,13 @@ export default OneTapComponent
 
 <TabPanel id="react-native" label="Expo React Native">
 
-Unlike the OAuth flow which requires the use of a web browser, the native Sign in with Google flow on Android uses the [operating system's built-in functionalities](https://developers.google.com/android/reference/com/google/android/gms/auth/api/identity/package-summary) to prompt the user for consent. Note that native sign-in has been rebranded as _One Tap sign-in on Android_ by Google, which you should not confuse with _One Tap sign in for web_, as mentioned below.
+Unlike the OAuth flow which requires the use of a web browser, the native Sign in with Google flow on Android uses the [Credential Manager library](https://developer.android.com/identity/sign-in/credential-manager-siwg) to prompt the user for consent.
 
-When the user provides consent, Google issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
+When the user provides consent, Google issues an identity token (commonly abbreviated as ID token) that you then send to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
 
 By default, Supabase Auth implements nonce validation during the authentication flow. This can be disabled in production under `Authentication > Providers > Google > Skip Nonce Check` in the Dashboard, or when developing locally by setting `auth.external.<provider>.skip_nonce_check`. Only disable this if your client libraries cannot properly handle nonce verification.
 
-When working with Expo, you can use the [`react-native-google-signin/google-signin` library](https://github.com/react-native-google-signin/google-signin#expo-installation) library to obtain an ID token that you can pass to supabase-js [`signInWithIdToken` method](/docs/reference/javascript/auth-signinwithidtoken).
+When working with Expo, you can use the [`@react-native-google-signin/google-signin` library](https://github.com/react-native-google-signin/google-signin#expo-installation) to obtain an ID token that you can pass to supabase-js [`signInWithIdToken` method](/docs/reference/javascript/auth-signinwithidtoken).
 
 Follow the [Expo installation docs](https://react-native-google-signin.github.io/docs/setting-up/expo) for installation and configuration instructions. See the [supabase-js reference](/docs/reference/javascript/initializing?example=react-native-options-async-storage) for instructions on initializing the supabase-js client in React Native.
 
@@ -463,7 +463,6 @@ import { supabase } from '../utils/supabase'
 
 export default function () {
   GoogleSignin.configure({
-    scopes: ['https://www.googleapis.com/auth/drive.readonly'],
     webClientId: 'YOUR CLIENT ID FROM GOOGLE CONSOLE',
   })
 
@@ -474,20 +473,16 @@ export default function () {
       onPress={async () => {
         try {
           await GoogleSignin.hasPlayServices()
-          const userInfo = await GoogleSignin.signIn()
-          if (userInfo.data.idToken) {
+          const response = await GoogleSignin.signIn()
+          if (isSuccessResponse(response)) {
             const { data, error } = await supabase.auth.signInWithIdToken({
               provider: 'google',
-              token: userInfo.data.idToken,
+              token: response.data.idToken,
             })
             console.log(error, data)
-          } else {
-            throw new Error('no ID token present!')
           }
         } catch (error: any) {
-          if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-            // user cancelled the login flow
-          } else if (error.code === statusCodes.IN_PROGRESS) {
+          if (error.code === statusCodes.IN_PROGRESS) {
             // operation (e.g. sign in) is in progress already
           } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
             // play services not available or outdated

@@ -1,11 +1,11 @@
 import pgMeta from '@supabase/pg-meta'
 import { ident } from '@supabase/pg-meta/src/pg-format'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { configKeys } from 'data/config/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseExtensionsKeys } from './keys'
 
 export type DatabaseExtensionEnableVariables = {
@@ -48,7 +48,11 @@ export const useDatabaseExtensionEnableMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseExtensionEnableData, ResponseError, DatabaseExtensionEnableVariables>,
+  UseCustomMutationOptions<
+    DatabaseExtensionEnableData,
+    ResponseError,
+    DatabaseExtensionEnableVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

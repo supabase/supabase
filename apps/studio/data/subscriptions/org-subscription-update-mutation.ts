@@ -1,4 +1,4 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { handleError, put } from 'data/fetchers'
 import { invoicesKeys } from 'data/invoices/keys'
 import { organizationKeys } from 'data/organizations/keys'
@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import type { ResponseError } from 'types/base'
 import { subscriptionKeys } from './keys'
 import type { SubscriptionTier } from './types'
+import { UseCustomMutationOptions } from 'types'
 
 export type OrgSubscriptionUpdateVariables = {
   slug: string
@@ -54,7 +55,11 @@ export const useOrgSubscriptionUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<OrgSubscriptionUpdateData, ResponseError, OrgSubscriptionUpdateVariables>,
+  UseCustomMutationOptions<
+    OrgSubscriptionUpdateData,
+    ResponseError,
+    OrgSubscriptionUpdateVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

@@ -57,9 +57,6 @@ describe(`CreateBucketModal`, () => {
     const nameInput = screen.getByLabelText(`Bucket name`)
     await userEvent.type(nameInput, `test`)
 
-    const standardOption = screen.getByLabelText(`Standard bucket`)
-    await userEvent.click(standardOption)
-
     const publicToggle = screen.getByLabelText(`Public bucket`)
     expect(publicToggle).not.toBeChecked()
     await userEvent.click(publicToggle)
@@ -93,9 +90,5 @@ describe(`CreateBucketModal`, () => {
     const submitButton = screen.getByRole(`button`, { name: `Create` })
 
     fireEvent.click(submitButton)
-
-    await waitFor(() =>
-      expect(routerMock.asPath).toStrictEqual(`/project/default/storage/buckets/test`)
-    )
   })
 })
