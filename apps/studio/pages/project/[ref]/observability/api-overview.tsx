@@ -14,7 +14,7 @@ import {
 import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { useApiReport } from 'data/reports/api-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import type { NextPageWithLayout } from 'types'
@@ -134,7 +134,7 @@ export const ApiReport: NextPageWithLayout = () => {
 
 ApiReport.getLayout = (page) => (
   <DefaultLayout>
-    <ReportsLayout>{page}</ReportsLayout>
+    <ObservabilityLayout>{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 
