@@ -76,11 +76,11 @@ Version 2.0.0 uses text and binary WebSocket frames.
 
 Text frames are always JSON encoded but differently from version 1.0.0, a JSON array is used where the order is necessarily:
 
-* `join_ref`
-* `ref`
-* `topic`
-* `event`
-* `payload`
+- `join_ref`
+- `ref`
+- `topic`
+- `event`
+- `payload`
 
 Example:
 
@@ -109,10 +109,10 @@ Example:
 
 The two special message types have a well defined binary format where the first byte defines the type of message. Both are used to send and receive broadcast events. See the [client](#client-sent-events) and [server](#server-sent-events) sent events for more details.
 
-| Code | Type | Description |
-|------|------|-------------|
-| 3 | USER_BROADCAST_PUSH | User-initiated broadcast push |
-| 4 | USER_BROADCAST | User broadcast message |
+| Code | Type                | Description                   |
+| ---- | ------------------- | ----------------------------- |
+| 3    | USER_BROADCAST_PUSH | User-initiated broadcast push |
+| 4    | USER_BROADCAST      | User broadcast message        |
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -137,6 +137,7 @@ The two special message types have a well defined binary format where the first 
 ```
 
 **Field Descriptions:**
+
 - **Type**: 1 byte, value = 0x03
 - **Join Ref Size**: 1 byte, size of join reference string (max 255)
 - **Ref Size**: 1 byte, size of reference string (max 255)
@@ -168,6 +169,7 @@ The two special message types have a well defined binary format where the first 
 ```
 
 **Field Descriptions:**
+
 - **Type**: 1 byte, value = 0x04
 - **Topic Size**: 1 byte, size of topic string (max 255)
 - **User Event Size**: 1 byte, size of user event string (max 255)
@@ -185,13 +187,13 @@ Messages for all events are encoded as text frames using JSON except with the `b
 ### Client sent events
 
 | Event Type     | Description                                              | Requires Ref | Requires Join Ref |
-|----------------|----------------------------------------------------------|--------------|-------------------|
-| `phx_join`     | Initial message to join a channel and configure features | ✅            | ✅                |
-| `phx_leave`    | Message to leave a channel                               | ✅            | ✅                |
-| `heartbeat`    | Heartbeat message to keep the connection alive           | ✅            | ⛔                |
-| `access_token` | Message to update the access token                       | ✅            | ✅                |
-| `broadcast`    | Broadcast message sent to all clients in a channel       | ✅            | ✅                |
-| `presence`     | Presence state update sent after joining a channel       | ✅            | ✅                |
+| -------------- | -------------------------------------------------------- | ------------ | ----------------- |
+| `phx_join`     | Initial message to join a channel and configure features | ✅           | ✅                |
+| `phx_leave`    | Message to leave a channel                               | ✅           | ✅                |
+| `heartbeat`    | Heartbeat message to keep the connection alive           | ✅           | ⛔                |
+| `access_token` | Message to update the access token                       | ✅           | ✅                |
+| `broadcast`    | Broadcast message sent to all clients in a channel       | ✅           | ✅                |
+| `presence`     | Presence state update sent after joining a channel       | ✅           | ✅                |
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -324,7 +326,7 @@ Example on protocol version `2.0.0`:
   "realtime:chat-room",
   "access_token",
   {
-    "access_token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30"
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30"
   }
 ]
 ```
@@ -379,12 +381,12 @@ See the [User Broadcast Push](#user-broadcast-push) section for the binary frame
 This message is a streamlined version of the text frame broadcast event that also supports non-JSON payloads.
 See below the same example as the previous section using hexadecimal representation for the header and plain text for the rest with the following values:
 
-* Join Ref: `10`
-* Ref: `1`
-* Topic: `realtime:chat-room`
-* Payload encoding being JSON
-* User Event: `user-event`
-* User Payload
+- Join Ref: `10`
+- Ref: `1`
+- Topic: `realtime:chat-room`
+- Payload encoding being JSON
+- User Event: `user-event`
+- User Payload
 
 ```
 0x03                      // Type
@@ -444,15 +446,15 @@ Example on protocol version `2.0.0`:
 ### Server sent events
 
 | Event Type         | Description                                                             | Requires Ref | Requires Join Ref |
-|--------------------|-------------------------------------------------------------------------|--------------|-------------------|
-| `phx_close`        | Message from server to signal channel closed                            | ✅            | ✅                 |
-| `phx_error`        | Error message sent by the server when an error occurs                   | ✅            | ✅                 |
-| `phx_reply`        | Response to a `phx_join` or other requests                              | ✅            | ✅*                |
-| `system`           | System messages to inform about the status of the Postgres subscription | ⛔            | ⛔                 |
-| `broadcast`        | Broadcast message sent to all clients in a channel                      | ⛔            | ⛔                 |
-| `presence_state`   | Presence state sent by the server on join                               | ⛔            | ⛔                 |
-| `presence_diff`    | Presence state diff update sent after a change in presence state        | ⛔            | ⛔                 |
-| `postgres_changes` | Postgres CDC message containing changes to the database                 | ⛔            | ⛔                 |
+| ------------------ | ----------------------------------------------------------------------- | ------------ | ----------------- |
+| `phx_close`        | Message from server to signal channel closed                            | ✅           | ✅                |
+| `phx_error`        | Error message sent by the server when an error occurs                   | ✅           | ✅                |
+| `phx_reply`        | Response to a `phx_join` or other requests                              | ✅           | ✅\*              |
+| `system`           | System messages to inform about the status of the Postgres subscription | ⛔           | ⛔                |
+| `broadcast`        | Broadcast message sent to all clients in a channel                      | ⛔           | ⛔                |
+| `presence_state`   | Presence state sent by the server on join                               | ⛔           | ⛔                |
+| `presence_diff`    | Presence state diff update sent after a change in presence state        | ⛔           | ⛔                |
+| `postgres_changes` | Postgres CDC message containing changes to the database                 | ⛔           | ⛔                |
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -636,11 +638,11 @@ See the [User Broadcast](#user-broadcast) section for the binary frame structure
 This message is a streamlined version of the text frame broadcast event that also supports non-JSON payloads.
 See below the same example as the previous section using hexadecimal representation for the header and plain text for the actual fields with the following values:
 
-* Topic: `realtime:chat-room`
-* Payload encoding being JSON
-* Metadata: `{"id":"006554ce-d22d-469c-877a-88bef47214a3"}`
-* User Event: `message`
-* User Payload
+- Topic: `realtime:chat-room`
+- Payload encoding being JSON
+- Metadata: `{"id":"006554ce-d22d-469c-877a-88bef47214a3"}`
+- User Event: `message`
+- User Payload
 
 ```
 0x04                                          // Type
@@ -714,9 +716,7 @@ Server sent message with a change from a schema and table. This message is sent 
   "realtime:chat-room",
   "postgres_changes",
   {
-    "ids": [
-      104868189
-    ],
+    "ids": [104868189],
     "data": {
       "schema": "public",
       "table": "test",
