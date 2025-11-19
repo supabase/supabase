@@ -334,7 +334,7 @@ export const AnalyticBucketDetails = () => {
                 </div>
                 <Button
                   type="danger"
-                  disabled={!bucket?.id || !isSuccessBucket}
+                  disabled={!bucket?.name || !isSuccessBucket}
                   onClick={() => setShowDeleteModal(true)}
                 >
                   Delete bucket
@@ -347,7 +347,7 @@ export const AnalyticBucketDetails = () => {
 
       <DeleteAnalyticsBucketModal
         visible={showDeleteModal}
-        bucketId={bucket?.id}
+        bucketId={bucket?.name}
         onClose={() => setShowDeleteModal(false)}
         onSuccess={() => router.push(`/project/${projectRef}/storage/analytics`)}
       />
