@@ -147,6 +147,7 @@ export const InvoicesSettings = () => {
                       <InvoiceStatusBadge
                         status={x.status as InvoiceStatus}
                         paymentAttempted={x.payment_attempted}
+                        paymentProcessing={x.payment_is_processing}
                       />
                     </Table.td>
                     <Table.td className="align-right">

@@ -1,26 +1,25 @@
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { InvoiceStatus } from './Invoices.types'
+import type { l } from 'node_modules/msw/lib/core/HttpResponse-B4YmE-GJ.mjs'
+import Link from 'next/link'
 
 interface InvoiceStatusBadgeProps {
   status: InvoiceStatus
   paymentAttempted: boolean
+  paymentProcessing: boolean
 }
 
 const invoiceStatusMapping: Record<
   InvoiceStatus,
   { label: string; badgeVariant: React.ComponentProps<typeof Badge>['variant'] }
 > = {
-  [InvoiceStatus.DRAFT]: {
-    label: 'Upcoming',
-    badgeVariant: 'warning',
-  },
   [InvoiceStatus.PAID]: {
     label: 'Paid',
     badgeVariant: 'brand',
   },
   [InvoiceStatus.VOID]: {
     label: 'Forgiven',
-    badgeVariant: 'brand',
+    badgeVariant: 'warning',
   },
 
   // We do not want to overcomplicate it for the user, so we'll treat uncollectible/open/issued the same from a user perspective
@@ -37,10 +36,20 @@ const invoiceStatusMapping: Record<
     label: 'Outstanding',
     badgeVariant: 'destructive',
   },
+  [InvoiceStatus.PROCESSING]: {
+    label: 'Processing',
+    badgeVariant: 'warning',
+  },
 }
 
-const InvoiceStatusBadge = ({ status, paymentAttempted }: InvoiceStatusBadgeProps) => {
-  const statusMapping = invoiceStatusMapping[status]
+const InvoiceStatusBadge = ({
+  status,
+  paymentAttempted,
+  paymentProcessing,
+}: InvoiceStatusBadgeProps) => {
+  const statusMapping = paymentProcessing
+    ? invoiceStatusMapping[InvoiceStatus.PROCESSING]
+    : invoiceStatusMapping[status]
 
   return (
     <Tooltip>
@@ -69,12 +78,6 @@ const InvoiceStatusBadge = ({ status, paymentAttempted }: InvoiceStatusBadgeProp
             </p>
           ))}
 
-        {status === InvoiceStatus.DRAFT && (
-          <p className="text-xs text-foreground">
-            The invoice will soon be finalized and charged for.
-          </p>
-        )}
-
         {status === InvoiceStatus.PAID && (
           <p className="text-xs text-foreground">
             The invoice has been paid successfully. No action is required on your side.
@@ -85,6 +88,25 @@ const InvoiceStatusBadge = ({ status, paymentAttempted }: InvoiceStatusBadgeProp
           <p className="text-xs text-foreground">
             This invoice has been forgiven. No action is required on your side.
           </p>
+        )}
+
+        {status === InvoiceStatus.PROCESSING && (
+          <div>
+            <p className="text-xs text-foreground">
+              While most credit card payments get processed instantly, some Indian credit card
+              providers may take up to 72 hours. Your card issuer has neither confirmed nor denied
+              the payment and we have to wait until the card issuer processed the payment.
+            </p>
+
+            <p className="text-xs text-foreground">
+              If you run into this, we recommend{' '}
+              <Link href={'https://supabase.com/docs/guides/platform/credits#credit-top-ups'}>
+                topping up your credits
+              </Link>{' '}
+              through your organization's billing page in advance to avoid running into this in the
+              future.
+            </p>
+          </div>
         )}
       </TooltipContent>
     </Tooltip>
