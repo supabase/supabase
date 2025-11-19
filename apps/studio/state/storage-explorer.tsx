@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import * as tus from 'tus-js-client'
 import { proxy, useSnapshot } from 'valtio'
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import {
@@ -35,13 +35,7 @@ import {
 } from 'components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
 import { convertFromBytes } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
-import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
-import {
-  createTemporaryApiKey,
-  getOrRefreshTemporaryApiKey,
-  isTemporaryApiKeyValid,
-  type TemporaryApiKey,
-} from 'data/api-keys/temp-api-keys-utils'
+import { getOrRefreshTemporaryApiKey } from 'data/api-keys/temp-api-keys-utils'
 import { configKeys } from 'data/config/keys'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
