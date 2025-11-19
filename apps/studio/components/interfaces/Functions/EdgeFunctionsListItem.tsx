@@ -7,8 +7,9 @@ import { useParams } from 'common/hooks'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
-import { copyToClipboard, TableCell, TableRow } from 'ui'
+import { cn, copyToClipboard, TableCell, TableRow } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+import { IS_PLATFORM } from 'common'
 
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
@@ -33,9 +34,9 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
     <TableRow
       key={item.id}
       onClick={() => {
-        router.push(`/project/${ref}/functions/${item.slug}`)
+        IS_PLATFORM && router.push(`/project/${ref}/functions/${item.slug}`)
       }}
-      className="cursor-pointer"
+      className={cn(IS_PLATFORM && 'cursor-pointer')}
     >
       <TableCell>
         <p className="text-sm text-foreground whitespace-nowrap">{item.name}</p>

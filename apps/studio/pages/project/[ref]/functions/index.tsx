@@ -44,44 +44,41 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     <PageContainer size="large">
       <PageSection>
         <PageSectionContent>
-          {IS_PLATFORM ? (
-            <>
-              {isLoading && <GenericSkeletonLoader />}
-              {isError && <AlertError error={error} subject="Failed to retrieve edge functions" />}
-              {isSuccess && (
-                <>
-                  {hasFunctions ? (
-                    <Card>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>URL</TableHead>
-                            <TableHead className="hidden 2xl:table-cell">Created</TableHead>
-                            <TableHead className="lg:table-cell">Last updated</TableHead>
-                            <TableHead className="lg:table-cell">Deployments</TableHead>
-                          </TableRow>
-                        </TableHeader>
+          <div className="flex flex-col gap-6">
+            {isLoading && <GenericSkeletonLoader />}
+            {isError && <AlertError error={error} subject="Failed to retrieve edge functions" />}
+            {isSuccess && (
+              <>
+                {hasFunctions ? (
+                  <Card>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Name</TableHead>
+                          <TableHead>URL</TableHead>
+                          <TableHead className="hidden 2xl:table-cell">Created</TableHead>
+                          <TableHead className="lg:table-cell">Last updated</TableHead>
+                          <TableHead className="lg:table-cell">Deployments</TableHead>
+                        </TableRow>
+                      </TableHeader>
 
-                        <TableBody>
-                          <>
-                            {functions.length > 0 &&
-                              functions.map((item) => (
-                                <EdgeFunctionsListItem key={item.id} function={item} />
-                              ))}
-                          </>
-                        </TableBody>
-                      </Table>
-                    </Card>
-                  ) : (
-                    <FunctionsEmptyState />
-                  )}
-                </>
-              )}
-            </>
-          ) : (
-            <FunctionsEmptyStateLocal />
-          )}
+                      <TableBody>
+                        <>
+                          {functions.length > 0 &&
+                            functions.map((item) => (
+                              <EdgeFunctionsListItem key={item.id} function={item} />
+                            ))}
+                        </>
+                      </TableBody>
+                    </Table>
+                  </Card>
+                ) : (
+                  <FunctionsEmptyState />
+                )}
+              </>
+            )}
+            {!IS_PLATFORM && <FunctionsEmptyStateLocal />}
+          </div>
         </PageSectionContent>
       </PageSection>
     </PageContainer>
