@@ -17,7 +17,7 @@ export function EventBanner() {
   if (!featuredEvent) return null
 
   return (
-    <section className={cn('grid md:grid-cols-[minmax(320px,35%),1fr] gap-12')}>
+    <section className={cn('grid md:grid-cols-[minmax(320px,35%),1fr] gap-6 lg:gap-12')}>
       <CoverImage url={featuredEvent.cover_url} />
 
       <article className="flex flex-col gap-6 lg:py-2">
