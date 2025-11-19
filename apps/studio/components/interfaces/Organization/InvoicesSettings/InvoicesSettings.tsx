@@ -153,7 +153,7 @@ export const InvoicesSettings = () => {
                     <Table.td className="align-right">
                       <div className="flex items-center justify-end space-x-2">
                         {x.amount_due > 0 &&
-                          x.payment_is_processing === false &&
+                          !x.payment_is_processing &&
                           [
                             InvoiceStatus.UNCOLLECTIBLE,
                             InvoiceStatus.OPEN,
