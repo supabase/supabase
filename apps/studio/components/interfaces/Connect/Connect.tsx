@@ -411,6 +411,15 @@ export const Connect = () => {
               )
             }
 
+            const connectionTabMap: Record<string, 'App Frameworks' | 'Mobile Frameworks' | 'ORMs'> = {
+              frameworks: 'App Frameworks',
+              mobiles: 'Mobile Frameworks',
+              orms: 'ORMs',
+            }
+            const connectionTab = connectionTabMap[type.key] || 'App Frameworks'
+            const selectedFrameworkOrTool =
+              connectionObject.find((item) => item.key === selectedParent)?.label || ''
+
             return (
               <TabsContent_Shadcn_
                 key={`content-${type.key}`}
@@ -467,6 +476,8 @@ export const Connect = () => {
                 <ConnectTabContent
                   projectKeys={projectKeys}
                   filePath={filePath}
+                  connectionTab={connectionTab}
+                  selectedFrameworkOrTool={selectedFrameworkOrTool}
                   className="rounded-b-none"
                 />
                 <Panel.Notice

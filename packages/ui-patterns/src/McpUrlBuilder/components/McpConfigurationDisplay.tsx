@@ -13,6 +13,7 @@ interface McpConfigurationDisplayProps {
   className?: string
   theme?: 'light' | 'dark'
   basePath: string
+  onCopyCallback?: () => void
 }
 
 export function McpConfigurationDisplay({
@@ -21,6 +22,7 @@ export function McpConfigurationDisplay({
   className,
   theme = 'dark',
   basePath,
+  onCopyCallback,
 }: McpConfigurationDisplayProps) {
   const mcpButtonData = getMcpButtonData({
     basePath,
@@ -73,6 +75,7 @@ export function McpConfigurationDisplay({
         language="json"
         className="max-h-64 overflow-y-auto"
         focusable={false}
+        onCopyCallback={onCopyCallback}
       />
 
       {selectedClient.alternateInstructions && selectedClient.alternateInstructions(clientConfig)}

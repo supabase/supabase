@@ -69,17 +69,28 @@ export interface ConnectionStringCopiedEvent {
   action: 'connection_string_copied'
   properties: {
     /**
-     * Method selected by user, e.g. URI, PSQL, SQLAlchemy, etc.
+     * Method selected by user, e.g. URI, PSQL, SQLAlchemy, MCP URL, Framework snippet, etc.
+     * Required for Connection String, App Frameworks, and Mobile Frameworks tabs
      */
-    connectionType: string
+    connectionType?: string
     /**
-     * Language of the code block if selected, e.g. bash, go
+     * Language of the code block if selected, e.g. bash, go, http, typescript
+     * Required for Connection String, App Frameworks, and Mobile Frameworks tabs
      */
-    lang: string
+    lang?: string
     /**
      * Connection Method, e.g. direct, transaction_pooler, session_pooler
+     * Only used for Connection String tab
      */
-    connectionMethod: 'direct' | 'transaction_pooler' | 'session_pooler'
+    connectionMethod?: 'direct' | 'transaction_pooler' | 'session_pooler'
+    /**
+     * Tab from which the connection string was copied
+     */
+    connectionTab: 'Connection String' | 'App Frameworks' | 'Mobile Frameworks' | 'ORMs' | 'MCP'
+    /**
+     * Selected framework, tool, or client (e.g., 'Next.js', 'Prisma', 'Cursor')
+     */
+    selectedItem?: string
   }
   groups: TelemetryGroups
 }

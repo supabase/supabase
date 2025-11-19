@@ -2,8 +2,10 @@ import { IS_PLATFORM, useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { BASE_PATH } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
 import { useTheme } from 'next-themes'
-import { McpConfigPanel } from 'ui-patterns/McpUrlBuilder'
+import { useState } from 'react'
+import { McpConfigPanel, type McpClient } from 'ui-patterns/McpUrlBuilder'
 import type { projectKeys } from './Connect.types'
 
 export const McpTabContent = ({ projectKeys }: { projectKeys: projectKeys }) => {
@@ -37,6 +39,15 @@ const McpTabContentInnerLoaded = ({
   projectKeys: projectKeys
 }) => {
   const { resolvedTheme } = useTheme()
+  const track = useTrack()
+  const [selectedClient, setSelectedClient] = useState<McpClient | null>(null)
+
+  const handleCopy = () => {
+    track('connection_string_copied', {
+      connectionTab: 'MCP',
+      selectedItem: selectedClient?.label,
+    })
+  }
 
   return (
     <McpConfigPanel
@@ -45,6 +56,8 @@ const McpTabContentInnerLoaded = ({
       theme={resolvedTheme as 'light' | 'dark'}
       isPlatform={IS_PLATFORM}
       apiUrl={projectKeys.apiUrl ?? undefined}
+      onCopyCallback={handleCopy}
+      onClientSelect={setSelectedClient}
     />
   )
 }

@@ -8,7 +8,7 @@ import {
 } from 'components/interfaces/Connect/ConnectTabs'
 import { SimpleCodeBlock } from 'ui'
 
-const ContentFile = ({ projectKeys }: ContentFileProps) => {
+const ContentFile = ({ projectKeys, onCopy }: ContentFileProps) => {
   return (
     <ConnectTabs>
       <ConnectTabTriggers>
@@ -20,7 +20,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
       </ConnectTabTriggers>
 
       <ConnectTabContent value=".env.local">
-        <SimpleCodeBlock className="bash" parentClassName="min-h-72">
+        <SimpleCodeBlock className="bash" parentClassName="min-h-72" onCopy={onCopy}>
           {[
             '',
             `NEXT_PUBLIC_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
@@ -33,7 +33,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
       </ConnectTabContent>
 
       <ConnectTabContent value="page.tsx">
-        <SimpleCodeBlock className="tsx" parentClassName="min-h-72">
+        <SimpleCodeBlock className="tsx" parentClassName="min-h-72" onCopy={onCopy}>
           {`
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
@@ -57,7 +57,7 @@ export default async function Page() {
       </ConnectTabContent>
 
       <ConnectTabContent value="utils/supabase/server.ts">
-        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
+        <SimpleCodeBlock className="ts" parentClassName="min-h-72" onCopy={onCopy}>
           {`
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -91,7 +91,7 @@ export const createClient = (cookieStore: ReturnType<typeof cookies>) => {
         </SimpleCodeBlock>
       </ConnectTabContent>
       <ConnectTabContent value="utils/supabase/client.ts">
-        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
+        <SimpleCodeBlock className="ts" parentClassName="min-h-72" onCopy={onCopy}>
           {`
 import { createBrowserClient } from "@supabase/ssr";
 
@@ -108,7 +108,7 @@ export const createClient = () =>
       </ConnectTabContent>
 
       <ConnectTabContent value="utils/supabase/middleware.ts">
-        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
+        <SimpleCodeBlock className="ts" parentClassName="min-h-72" onCopy={onCopy}>
           {`
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
