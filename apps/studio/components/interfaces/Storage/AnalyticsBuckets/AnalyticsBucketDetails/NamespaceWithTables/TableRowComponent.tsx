@@ -242,11 +242,7 @@ export const TableRowComponent = ({
           <Table2
             size={16}
             strokeWidth={1.5}
-            className={
-              table.isConnected
-                ? 'text-foreground-muted'
-                : 'text-foreground-muted/60 [&_path]:stroke-dasharray-[4,2]'
-            }
+            className={table.isConnected ? 'text-foreground-muted' : 'text-foreground-muted/40'}
           />
         </TableCell>
         <TableCell className="min-w-[120px] min-h-[60px] py-4">{table.name}</TableCell>
@@ -351,9 +347,7 @@ export const TableRowComponent = ({
               </DropdownMenu>
             </>
           ) : (
-            <>
-              <p className="text-sm text-foreground-muted">Waiting</p>
-            </>
+            <p className="text-sm text-foreground-muted">Waiting</p>
           )}
         </TableCell>
       </TableRow>
