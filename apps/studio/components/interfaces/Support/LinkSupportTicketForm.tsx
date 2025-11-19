@@ -73,8 +73,6 @@ export function LinkSupportTicketForm({ conversationId }: LinkSupportTicketFormP
 
   const organizationSlug = form.watch('organizationSlug')
   const selectedOrgSlug = organizationSlug === NO_ORG_MARKER ? null : organizationSlug
-  const projectRef = form.watch('projectRef')
-  const selectedProjectRef = projectRef === NO_PROJECT_MARKER ? null : projectRef
 
   const onSubmit: SubmitHandler<LinkSupportTicketFormValues> = (values) => {
     if (!organizations) {

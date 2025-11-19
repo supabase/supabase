@@ -14,7 +14,7 @@ export function LinkSupportTicketPage() {
 
 function LinkSupportTicketPageContent() {
   const router = useRouter()
-  const { conversationId } = router.query
+  const conversationId = router.query.conversationId as string | undefined
 
   if (!conversationId) {
     return (
