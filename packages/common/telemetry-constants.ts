@@ -89,7 +89,7 @@ export interface ConnectionStringCopiedEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/integrations/cron/jobs?dialog-shown=true
+ * @page /dashboard/project/{ref}/integrations/cron/jobs?new=true
  */
 export interface CronJobCreatedEvent {
   action: 'cron_job_created'
@@ -111,7 +111,7 @@ export interface CronJobCreatedEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/integrations/cron/jobs?dialog-shown=true
+ * @page /dashboard/project/{ref}/integrations/cron/jobs?new=true
  */
 export interface CronJobUpdatedEvent {
   action: 'cron_job_updated'

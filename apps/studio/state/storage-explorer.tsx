@@ -257,14 +257,7 @@ function createStorageExplorerState({
     },
 
     openBucket: async (bucket: Bucket) => {
-      const { id, name } = bucket
       state.setSelectedBucket(bucket)
-      await state.fetchFolderContents({
-        bucketId: bucket.id,
-        folderId: id,
-        folderName: name,
-        index: -1,
-      })
     },
 
     // ======== Folders CRUD ========
@@ -1269,6 +1262,10 @@ function createStorageExplorerState({
                       // Resource already exists
                       toast.error(`Failed to upload ${file.name}: File name already exists.`)
                       break
+                    case 400:
+                      // Invalid key
+                      toast.error(`Failed to upload ${file.name}: File name is invalid`)
+                      break
                   }
                 } else {
                   toast.error(`Failed to upload ${file.name}: ${error.message}`)
@@ -1902,7 +1899,9 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))
   const stateRef = useLatest(state)
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
+  const { data: settings, isSuccess: isSuccessSettings } = useProjectSettingsV2Query({
+    projectRef: project?.ref,
+  })
 
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
@@ -1916,8 +1915,9 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   // Although I'd be keen to re-investigate this to see if we can remove this
   useEffect(() => {
     const hasDataReady = !!project?.ref
+    const storeAlreadyLoaded = state.projectRef === project?.ref
 
-    if (!isPaused && hasDataReady) {
+    if (!isPaused && hasDataReady && !storeAlreadyLoaded && isSuccessSettings) {
       setState(
         createStorageExplorerState({
           projectRef: project?.ref ?? '',
@@ -1927,7 +1927,17 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
         })
       )
     }
-  }, [project?.ref, stateRef, isPaused, resumableUploadUrl, protocol, endpoint])
+  }, [
+    state.projectRef,
+    project?.ref,
+    project?.connectionString,
+    stateRef,
+    isPaused,
+    resumableUploadUrl,
+    protocol,
+    endpoint,
+    isSuccessSettings,
+  ])
 
   return (
     <StorageExplorerStateContext.Provider value={state}>

@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { UIEvent, useMemo, useRef, useState } from 'react'
 import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet/CreateCronJobSheet'
@@ -15,6 +16,7 @@ import {
 } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
@@ -37,17 +39,15 @@ export const CronjobsTab = () => {
   const xScroll = useRef<number>(0)
   const gridRef = useRef<DataGridHandle>(null)
 
+  // Track the ID being deleted to exclude it from error checking
+  const deletingCronJobIdRef = useRef<string | null>(null)
+
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
   const [search, setSearch] = useState(searchQuery)
   const [createCronJobSheetShown, setCreateCronJobSheetShown] = useQueryState(
-    'dialog-shown',
+    'new',
     parseAsBoolean.withDefault(false).withOptions({ clearOnDefault: true })
   )
-
-  const [cronJobForEditing, setCronJobForEditing] = useState<
-    Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'> | undefined
-  >()
-  const [cronJobForDeletion, setCronJobForDeletion] = useState<CronJob | undefined>()
 
   const {
     data,
@@ -69,6 +69,28 @@ export const CronjobsTab = () => {
   )
   const cronJobs = useMemo(() => data?.pages.flatMap((p) => p) || [], [data?.pages])
 
+  const { setValue: setCronJobForEditing, value: cronJobForEditing } = useQueryStateWithSelect({
+    urlKey: 'edit',
+    select: (jobid: string) => {
+      if (!jobid) return undefined
+      const job = cronJobs?.find((j) => j.jobid.toString() === jobid)
+      return job
+        ? { jobname: job.jobname, schedule: job.schedule, active: job.active, command: job.command }
+        : undefined
+    },
+    enabled: !!cronJobs && cronJobs.length > 0 && !isLoading,
+    onError: () => toast.error(`Cron job not found`),
+  })
+
+  const { setValue: setCronJobForDeletion, value: cronJobForDeletion } = useQueryStateWithSelect({
+    urlKey: 'delete',
+    select: (jobid: string) =>
+      jobid ? cronJobs?.find((j) => j.jobid.toString() === jobid) : undefined,
+    enabled: !!cronJobs && cronJobs.length > 0 && !isLoading,
+    onError: (_error, selectedId) =>
+      handleErrorOnDelete(deletingCronJobIdRef, selectedId, `Cron job not found`),
+  })
+
   const { data: count, isLoading: isLoadingCount } = useCronJobsCountQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -88,18 +110,17 @@ export const CronjobsTab = () => {
           action: 'cron_job_update_clicked',
           groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
         })
-        setCreateCronJobSheetShown(true)
-        setCronJobForEditing(job)
+        setCronJobForEditing(job.jobid.toString())
       },
       onSelectDelete: (job: CronJob) => {
         sendEvent({
           action: 'cron_job_delete_clicked',
           groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
         })
-        setCronJobForDeletion(job)
+        setCronJobForDeletion(job.jobid.toString())
       },
     })
-  }, [org?.slug, ref, sendEvent, setCreateCronJobSheetShown])
+  }, [org?.slug, ref, sendEvent, setCronJobForEditing, setCronJobForDeletion])
 
   // check pg_cron version to see if it supports seconds
   const pgCronExtension = extensions.find((ext) => ext.name === 'pg_cron')
@@ -133,7 +154,7 @@ export const CronjobsTab = () => {
 
   const [isDirty, setIsDirty] = useState(false)
   const onClose = () => {
-    setCronJobForEditing(undefined)
+    setCronJobForEditing(null)
     setCreateCronJobSheetShown(false)
     cleanPointerEventsNoneOnBody(500)
   }
@@ -275,13 +296,21 @@ export const CronjobsTab = () => {
         </div>
       </div>
 
-      <DeleteCronJob
-        visible={!!cronJobForDeletion}
-        onClose={() => setCronJobForDeletion(undefined)}
-        cronJob={cronJobForDeletion!}
-      />
+      {cronJobForDeletion && (
+        <DeleteCronJob
+          visible={!!cronJobForDeletion}
+          onClose={() => {
+            deletingCronJobIdRef.current = null
+            setCronJobForDeletion(null)
+          }}
+          onDeleteStart={(jobId) => {
+            deletingCronJobIdRef.current = jobId
+          }}
+          cronJob={cronJobForDeletion}
+        />
+      )}
 
-      <Sheet open={!!createCronJobSheetShown} onOpenChange={confirmOnClose}>
+      <Sheet open={!!createCronJobSheetShown || !!cronJobForEditing} onOpenChange={confirmOnClose}>
         <SheetContent size="default" tabIndex={undefined}>
           <CreateCronJobSheet
             selectedCronJob={cronJobForEditing ?? EMPTY_CRON_JOB}

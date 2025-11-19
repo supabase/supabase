@@ -7,8 +7,6 @@ import { projectKeys } from './keys'
 import { OrgProjectsResponse } from './org-projects-infinite-query'
 
 type ProjectDetailVariables = { ref?: string }
-type PaginatedProjectsResponse = components['schemas']['ListProjectsPaginatedResponse']
-
 export type ProjectDetail = components['schemas']['ProjectDetailResponse']
 export interface Project extends Omit<ProjectDetail, 'status'> {
   /**
