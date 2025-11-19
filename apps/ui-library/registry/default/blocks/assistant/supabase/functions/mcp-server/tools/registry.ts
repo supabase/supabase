@@ -1,6 +1,7 @@
 import { createTaskTool } from './create-task.ts'
 import { deleteTaskTool } from './delete-task.ts'
 import { getUserTasksTool } from './get-user-tasks.ts'
+import { countTasksTool } from './count-tasks.ts'
 import { updateTaskTool } from './update-task.ts'
 import type { ToolDefinition } from './types.ts'
 
@@ -9,4 +10,5 @@ export const toolRegistry: ToolDefinition[] = [
   createTaskTool,
   updateTaskTool,
   deleteTaskTool,
+  countTasksTool,
 ]

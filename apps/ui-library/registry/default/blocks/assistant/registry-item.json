@@ -8,6 +8,7 @@
     "input",
     "popover",
     "scroll-area",
+    "chart",
     "@ai-elements/conversation",
     "@ai-elements/message",
     "@ai-elements/prompt-input",
@@ -26,7 +27,8 @@
     "zod@latest",
     "nanoid@latest",
     "sonner@latest",
-    "lucide-react@latest"
+    "lucide-react@latest",
+    "recharts@latest"
   ],
   "files": [
     {
@@ -35,6 +37,10 @@
     },
     {
       "path": "registry/default/blocks/assistant/components/parts/row.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/assistant/components/parts/chart.tsx",
       "type": "registry:component"
     },
     {

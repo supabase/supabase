@@ -25,6 +25,32 @@ const rowSchema = z.object({
     .describe('Optional list of quick actions the user can trigger for this row.'),
 })
 
+const chartSchema = z.object({
+  primaryText: z.string().describe('Primary title shown at the top of the chart card.'),
+  secondaryText: z
+    .string()
+    .optional()
+    .describe('Optional short description shown under the title.'),
+  tertiaryText: z
+    .string()
+    .optional()
+    .describe('Optional supporting text shown beneath the chart.'),
+  data: z
+    .array(
+      z.record(z.union([z.string(), z.number()])).describe(
+        'Data point object containing axis and value fields.'
+      )
+    )
+    .min(1)
+    .describe('Data points to plot on the chart.'),
+  xAxis: z
+    .string()
+    .describe('Key inside each data point to use for the X-axis labels (e.g., "month").'),
+  yAxis: z
+    .string()
+    .describe('Key inside each data point to use for the bar height values (e.g., "desktop").'),
+})
+
 const renderRowTool = tool({
   description:
     'Render a task row to summarize Supabase records, including follow-up actions the user can take.',
@@ -39,8 +65,20 @@ const renderRowTool = tool({
   },
 })
 
+const renderChartTool = tool({
+  description: 'Render a bar chart summarizing Supabase metrics for the user.',
+  inputSchema: chartSchema,
+  execute: async () => {
+    return {
+      success: true,
+      message: 'Chart has been shown to the user',
+    }
+  },
+})
+
 const localTools = {
   renderRow: renderRowTool,
+  renderChart: renderChartTool,
 }
 
 type ChatRequestBody = {

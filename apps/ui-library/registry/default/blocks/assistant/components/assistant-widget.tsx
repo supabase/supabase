@@ -40,6 +40,7 @@ import { DefaultChatTransport } from 'ai'
 import { CheckIcon, MessageCircle } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
+import { Chart, type ChartProps } from './parts/chart'
 import { Row, type RowItem } from './parts/row'
 
 const CHAT_API_URL = process.env.NEXT_PUBLIC_CHAT_API_URL
@@ -96,6 +97,8 @@ const suggestions = [
 type RenderRowToolInput = {
   rows: RowItem[]
 }
+
+type RenderChartToolInput = ChartProps
 
 interface AssistantWidgetProps {
   /**
@@ -235,6 +238,14 @@ export const AssistantWidget = ({
                             rows={payload.rows}
                           />
                         )
+                      }
+                      case 'tool-renderChart': {
+                        const payload = (part.input ?? part.output) as
+                          | RenderChartToolInput
+                          | undefined
+                        if (!payload) return null
+
+                        return <Chart key={`${role}-${i}`} {...payload} />
                       }
                       default:
                         return null
