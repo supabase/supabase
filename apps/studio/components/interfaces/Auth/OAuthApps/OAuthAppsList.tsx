@@ -293,7 +293,7 @@ export const OAuthAppsList = () => {
       >
         <p className="text-sm text-foreground-light">
           Are you sure you wish to regenerate the client secret for "{selectedApp?.client_name}"?
-          All existing sessions will be invalidated. This action cannot be undone.
+          You'll need to update it in all applications that use it. This action cannot be undone.
         </p>
       </ConfirmationModal>
     </>
