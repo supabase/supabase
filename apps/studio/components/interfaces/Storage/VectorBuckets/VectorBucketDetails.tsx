@@ -360,6 +360,19 @@ function VectorBucketIndexExamples({
   dimension,
   metadataKeys,
 }: VectorBucketIndexExamplesProps) {
+  const dimensionExample = (startValue: number) => {
+    if (dimension === 1) {
+      return `${startValue.toFixed(1)}`
+    } else if (dimension === 2) {
+      return `${startValue.toFixed(1)}, ${(startValue + 0.1).toFixed(1)}`
+    } else if (dimension === 3) {
+      return `${startValue.toFixed(1)}, ${(startValue + 0.1).toFixed(1)}, ${(startValue + 0.2).toFixed(1)}`
+    } else {
+      return `${startValue.toFixed(1)}, ${(startValue + 0.1).toFixed(1)}, ${(startValue + 0.2).toFixed(1)}, ...`
+    }
+  }
+  const dimensionLabel = `${dimension} dimension${dimension > 1 ? 's' : ''}`
+
   return (
     <div className="flex flex-col gap-1">
       <Tabs_Shadcn_ defaultValue="account" className="">
@@ -383,13 +396,13 @@ const index = client.storage.vectors.from(${bucketName}).index('${indexName}')
 const result = await index.putVectors({
   vectors: [
     {
-      key: 'product_001',
-      data: { float32: [${dimension === 1 ? '0.2' : `0.2, ...${dimension - 1} more floats`}] },
+      key: 'doc-1',
+      data: { float32: [${dimensionExample(0.2)}] }, // ${dimensionLabel}
       metadata: { ${metadataKeys.map((key) => `${key}: "${key} value"`).join(', ')} },
     },
     {
-      key: 'product_002',
-      data: { float32: [${dimension === 1 ? '0.2' : `0.2, ...${dimension - 1} more floats`}] },
+      key: 'doc-2',
+      data: { float32: [${dimensionExample(0.4)}] }, // ${dimensionLabel}
       metadata: { ${metadataKeys.map((key) => `${key}: "${key} value"`).join(', ')} },
     },
   ],
@@ -406,8 +419,8 @@ const result = await index.putVectors({
 -- Insert multiple vectors
 insert into ${bucketName}.${indexName} (key, data, metadata)
 values
-  ('product_001', '[${dimension === 1 ? '0.2' : `0.2, ...${dimension - 1} more floats`}]'::embd, '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb),
-  ('product_002', '[${dimension === 1 ? '0.2' : `0.2, ...${dimension - 1} more floats`}]'::embd, '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb);
+  ('doc-1', '[${dimensionExample(0.2)}]'::embd, '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb), -- ${dimensionLabel}
+  ('doc-2', '[${dimensionExample(0.4)}]'::embd, '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb); -- ${dimensionLabel}
 \`\`\``}
             </ReactMarkdown>
           </Card>
