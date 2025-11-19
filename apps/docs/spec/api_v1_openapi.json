@@ -5451,7 +5451,10 @@
     { "name": "Projects", "description": "Projects related endpoints" },
     { "name": "Rest", "description": "Rest related endpoints" },
     { "name": "Secrets", "description": "Secrets related endpoints" },
-    { "name": "Storage", "description": "Storage related endpoints" }
+    {
+      "name": "Storage",
+      "description": "Visit [https://supabase.github.io/storage/](https://supabase.github.io/storage/) for complete documentation."
+    }
   ],
   "servers": [],
   "components": {
@@ -7318,12 +7321,24 @@
           "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
           "session_replication_role": { "type": "string", "enum": ["origin", "replica", "local"] },
           "shared_buffers": { "type": "string" },
-          "statement_timeout": { "type": "string" },
+          "statement_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
           "track_commit_timestamp": { "type": "boolean" },
           "wal_keep_size": { "type": "string" },
-          "wal_sender_timeout": { "type": "string" },
+          "wal_sender_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
           "work_mem": { "type": "string" },
-          "checkpoint_timeout": { "type": "integer", "minimum": 30, "maximum": 86400 },
+          "checkpoint_timeout": {
+            "type": "string",
+            "description": "Default unit: s",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
           "hot_standby_feedback": { "type": "boolean" }
         }
       },
@@ -7348,12 +7363,24 @@
           "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
           "session_replication_role": { "type": "string", "enum": ["origin", "replica", "local"] },
           "shared_buffers": { "type": "string" },
-          "statement_timeout": { "type": "string" },
+          "statement_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
           "track_commit_timestamp": { "type": "boolean" },
           "wal_keep_size": { "type": "string" },
-          "wal_sender_timeout": { "type": "string" },
+          "wal_sender_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
           "work_mem": { "type": "string" },
-          "checkpoint_timeout": { "type": "integer", "minimum": 30, "maximum": 86400 },
+          "checkpoint_timeout": {
+            "type": "string",
+            "description": "Default unit: s",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
           "hot_standby_feedback": { "type": "boolean" },
           "restart_database": { "type": "boolean" }
         },
