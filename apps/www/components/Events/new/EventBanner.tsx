@@ -21,9 +21,9 @@ export function EventBanner() {
       <CoverImage url={featuredEvent.cover_url} />
 
       <article className="flex flex-col gap-6 lg:py-2">
-        <div className="flex justify-between items-start">
+        <div className="flex justify-between items-start gap-4">
           <div className="flex flex-col gap-1.5">
-            <h2 className="text-2xl font-medium">{featuredEvent.title}</h2>
+            <h2 className="text-2xl font-medium line-clamp-2">{featuredEvent.title}</h2>
             <p
               className="text-lg font-medium text-foreground-light"
               title={`Hosted by ${formatHosts(featuredEvent.hosts).fullList}`}
@@ -50,7 +50,7 @@ export function EventBanner() {
           <LocationWidget location={featuredEvent.location} />
         </div>
 
-        <div className="h-80 relative flex">
+        <div className="h-72 relative flex">
           <span className="absolute top-0 inset-x-0 h-8 bg-gradient-to-b from-background to-transparent" />
 
           <p className="whitespace-pre-line py-4 text-foreground-light h-full overflow-y-auto">
