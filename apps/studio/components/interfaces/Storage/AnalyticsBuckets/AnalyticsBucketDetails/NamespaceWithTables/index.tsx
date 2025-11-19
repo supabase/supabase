@@ -1,4 +1,3 @@
-import { Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
@@ -12,7 +11,6 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Card,
-  CardFooter,
   LoadingLine,
   Table,
   TableBody,
@@ -20,9 +18,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { getNamespaceTableNameFromPostgresTableName } from '../AnalyticsBucketDetails.utils'
@@ -226,38 +221,15 @@ export const NamespaceWithTables = ({
                 namespace={namespace}
                 schema={displaySchema}
                 isLoading={isImportingForeignSchema || isLoadingNamespaceTables}
+                pollIntervalNamespaceTables={pollIntervalNamespaceTables}
+                publicationTablesNotSyncedToNamespaceTables={
+                  publicationTablesNotSyncedToNamespaceTables
+                }
               />
             ))
           )}
         </TableBody>
       </Table>
-
-      {pollIntervalNamespaceTables > 0 && (
-        <CardFooter className="border-t px-4 py-4 flex flex-row justify-end gap-x-4 relative overflow-hidden">
-          <div className="relative z-10">
-            <Tooltip>
-              <TooltipTrigger>
-                <div className="flex items-center gap-x-2 text-foreground-lighter">
-                  <Loader2 size={14} className="animate-spin" />
-                  <p className="text-sm">
-                    Connecting {publicationTablesNotSyncedToNamespaceTables.length} table
-                    {publicationTablesNotSyncedToNamespaceTables.length > 1 ? 's' : ''}
-                  </p>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" align="end">
-                <p className="mb-1">Waiting for analytics table to be created for:</p>
-                <ul className="list-disc pl-6">
-                  {publicationTablesNotSyncedToNamespaceTables.map((x) => {
-                    const value = `${x.schema}.${x.name}`
-                    return <li key={value}>{value}</li>
-                  })}
-                </ul>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        </CardFooter>
-      )}
 
       <ImportForeignSchemaDialog
         bucketName={bucketName ?? ''}

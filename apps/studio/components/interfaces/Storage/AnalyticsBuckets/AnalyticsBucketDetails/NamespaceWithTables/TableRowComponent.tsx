@@ -20,6 +20,7 @@ import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
+  Badge,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -46,6 +47,8 @@ interface TableRowComponentProps {
   schema: string
   namespace: string
   isLoading?: boolean
+  pollIntervalNamespaceTables?: number
+  publicationTablesNotSyncedToNamespaceTables?: Array<{ schema: string; name: string }>
 }
 
 export const TableRowComponent = ({
@@ -53,6 +56,8 @@ export const TableRowComponent = ({
   schema,
   namespace,
   isLoading,
+  pollIntervalNamespaceTables,
+  publicationTablesNotSyncedToNamespaceTables,
 }: TableRowComponentProps) => {
   const { ref: projectRef, bucketId } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -90,6 +95,24 @@ export const TableRowComponent = ({
   const hasReplication = !!pipeline && !!publication
   const isPipelineRunning = pipelineStatus === 'started'
   const isReplicating = isTableUnderReplicationPublication && isPipelineRunning
+
+  // Check if this specific table is being waited on during polling
+  const isTableBeingWaitedOn = useMemo(() => {
+    if (!pollIntervalNamespaceTables || pollIntervalNamespaceTables === 0) return false
+    if (!publicationTablesNotSyncedToNamespaceTables) return false
+
+    return publicationTablesNotSyncedToNamespaceTables.some(
+      (pubTable) => getNamespaceTableNameFromPostgresTableName(pubTable) === table.name
+    )
+  }, [pollIntervalNamespaceTables, publicationTablesNotSyncedToNamespaceTables, table.name])
+
+  // Get the Postgres table that this namespace table is waiting for
+  const waitingForPostgresTable = useMemo(() => {
+    if (!isTableBeingWaitedOn || !publicationTablesNotSyncedToNamespaceTables) return null
+    return publicationTablesNotSyncedToNamespaceTables.find(
+      (pubTable) => getNamespaceTableNameFromPostgresTableName(pubTable) === table.name
+    )
+  }, [isTableBeingWaitedOn, publicationTablesNotSyncedToNamespaceTables, table.name])
 
   // [Joshen] Considers both the replication pipeline status + if the table is in the replication publication
   const replicationStatusLabel = useMemo(() => {
@@ -354,7 +377,28 @@ export const TableRowComponent = ({
               </DropdownMenu>
             </>
           ) : (
-            <p className="text-sm text-foreground-muted">Waiting</p>
+            <div className="flex items-center gap-x-2">
+              {isTableBeingWaitedOn ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-x-2 text-foreground-lighter">
+                      <Loader2 size={14} className="animate-spin" />
+                      <p className="text-sm">Connecting</p>
+                    </div>
+                  </TooltipTrigger>
+                  {waitingForPostgresTable && (
+                    <TooltipContent side="left">
+                      <p>
+                        Waiting for analytics table to be created for:{' '}
+                        {waitingForPostgresTable.schema}.{waitingForPostgresTable.name}
+                      </p>
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              ) : (
+                <p className="text-sm text-foreground-muted">Waiting to be accepted</p>
+              )}
+            </div>
           )}
         </TableCell>
       </TableRow>
