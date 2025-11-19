@@ -3166,7 +3166,8 @@ export interface components {
       root_key: string
     }
     PostgresConfigResponse: {
-      checkpoint_timeout?: number
+      /** @description Default unit: s */
+      checkpoint_timeout?: string
       effective_cache_size?: string
       hot_standby_feedback?: boolean
       logical_decoding_work_mem?: string
@@ -3186,10 +3187,12 @@ export interface components {
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
+      /** @description Default unit: ms */
       statement_timeout?: string
       track_activity_query_size?: string
       track_commit_timestamp?: boolean
       wal_keep_size?: string
+      /** @description Default unit: ms */
       wal_sender_timeout?: string
       work_mem?: string
     }
@@ -3808,7 +3811,8 @@ export interface components {
       root_key: string
     }
     UpdatePostgresConfigBody: {
-      checkpoint_timeout?: number
+      /** @description Default unit: s */
+      checkpoint_timeout?: string
       effective_cache_size?: string
       hot_standby_feedback?: boolean
       logical_decoding_work_mem?: string
@@ -3829,10 +3833,12 @@ export interface components {
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
+      /** @description Default unit: ms */
       statement_timeout?: string
       track_activity_query_size?: string
       track_commit_timestamp?: boolean
       wal_keep_size?: string
+      /** @description Default unit: ms */
       wal_sender_timeout?: string
       work_mem?: string
     }

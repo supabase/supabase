@@ -1,3 +1,4 @@
+import { MutableRefObject } from 'react'
 import { toast } from 'sonner'
 import { Modal } from 'ui'
 
@@ -9,14 +10,24 @@ import { getWrapperMetaForWrapper } from './Wrappers.utils'
 interface DeleteWrapperModalProps {
   selectedWrapper?: FDW
   onClose: () => void
+  deletingWrapperIdRef?: MutableRefObject<string | null>
 }
 
-const DeleteWrapperModal = ({ selectedWrapper, onClose }: DeleteWrapperModalProps) => {
+const DeleteWrapperModal = ({
+  selectedWrapper,
+  onClose,
+  deletingWrapperIdRef,
+}: DeleteWrapperModalProps) => {
   const { data: project } = useSelectedProjectQuery()
   const { mutate: deleteFDW, isLoading: isDeleting } = useFDWDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled ${selectedWrapper?.name} foreign data wrapper`)
       onClose()
+    },
+    onError: () => {
+      if (deletingWrapperIdRef) {
+        deletingWrapperIdRef.current = null
+      }
     },
   })
   const wrapperMeta = getWrapperMetaForWrapper(selectedWrapper)
@@ -25,6 +36,10 @@ const DeleteWrapperModal = ({ selectedWrapper, onClose }: DeleteWrapperModalProp
     if (!project?.ref) return console.error('Project ref is required')
     if (!selectedWrapper) return console.error('Wrapper is required')
     if (!wrapperMeta) return console.error('Wrapper meta is required')
+
+    if (deletingWrapperIdRef) {
+      deletingWrapperIdRef.current = selectedWrapper.id.toString()
+    }
 
     deleteFDW({
       projectRef: project?.ref,
