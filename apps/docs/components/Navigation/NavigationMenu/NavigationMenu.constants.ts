@@ -792,6 +792,7 @@ export const auth: NavMenuConstant = {
     {
       name: 'Debugging',
       items: [
+        { name: 'Reports', url: '/guides/auth/debugging/reports', enabled: billingEnabled },
         { name: 'Error Codes', url: '/guides/auth/debugging/error-codes' },
         {
           name: 'Troubleshooting',
@@ -1117,6 +1118,11 @@ export const database: NavMenuConstant = {
       name: 'Debugging',
       url: undefined,
       items: [
+        {
+          name: 'Reports',
+          url: '/guides/database/reports' as `/${string}`,
+          enabled: billingEnabled,
+        },
         {
           name: 'Timeouts',
           url: '/guides/database/postgres/timeouts' as `/${string}`,
@@ -1450,7 +1456,10 @@ export const api: NavMenuConstant = {
     {
       name: 'Tools',
       url: '/guides/api',
-      items: [{ name: 'SQL to REST API Translator', url: '/guides/api/sql-to-rest' }],
+      items: [
+        { name: 'Reports', url: '/guides/api/reports', enabled: billingEnabled },
+        { name: 'SQL to REST API Translator', url: '/guides/api/sql-to-rest' },
+      ],
     },
     {
       name: 'Guides',
@@ -1583,6 +1592,11 @@ export const functions: NavMenuConstant = {
       name: 'Debugging',
       url: undefined,
       items: [
+        {
+          name: 'Reports',
+          url: '/guides/functions/reports' as `/${string}`,
+          enabled: billingEnabled,
+        },
         {
           name: 'Local Debugging with DevTools',
           url: '/guides/functions/debugging-tools' as `/${string}`,
@@ -1840,6 +1854,8 @@ export const realtime: NavMenuConstant = {
       name: 'Debugging',
       url: undefined,
       items: [
+        { name: 'Reports', url: '/guides/realtime/reports', enabled: billingEnabled },
+
         { name: 'Operational Error Codes', url: '/guides/realtime/error_codes', items: [] },
         { name: 'Troubleshooting', url: '/guides/realtime/troubleshooting' },
       ],
@@ -1968,6 +1984,7 @@ export const storage: NavMenuConstant = {
       name: 'Debugging',
       url: undefined,
       items: [
+        { name: 'Reports', url: '/guides/storage/debugging/reports', enabled: billingEnabled },
         { name: 'Logs', url: '/guides/storage/debugging/logs' },
         { name: 'Error Codes', url: '/guides/storage/debugging/error-codes' },
         { name: 'Troubleshooting', url: '/guides/storage/troubleshooting' },
