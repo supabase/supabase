@@ -50,10 +50,8 @@ export const useAnalyticsBucketAssociatedEntities = (
   )
   const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
 
-  const { data: publications = [] } = useReplicationPublicationsQuery(
-    { projectRef, sourceId },
-    { enabled: options.enabled }
-  )
+  const { data: publications = [], isLoading: isLoadingPublications } =
+    useReplicationPublicationsQuery({ projectRef, sourceId }, { enabled: options.enabled })
   const publication = publications.find(
     (p) => p.name === getAnalyticsBucketPublicationName(bucketId ?? '')
   )

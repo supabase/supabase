@@ -19,11 +19,9 @@ You can create an Analytics Bucket using either the Supabase SDK or the Supabase
 ```ts
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://your-project.supabase.co', 'your-service-key')
+const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key')
 
-supabase.storage.createBucket('my-analytics-bucket', {
-  type: 'ANALYTICS',
-})
+const { data, error } = await supabase.storage.analytics.createBucket('analytics-data')
 ```
 
 ### Using the Supabase Dashboard

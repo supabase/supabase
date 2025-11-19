@@ -177,7 +177,7 @@ const EdgeFunctionDetailsLayout = ({
       <div className="w-full min-h-full flex flex-col items-stretch">
         <PageHeader size="full">
           {breadcrumbItems.length > 0 && (
-            <PageHeaderBreadcrumb size="full">
+            <PageHeaderBreadcrumb>
               <BreadcrumbList>
                 {breadcrumbItems.map((item, index) => (
                   <React.Fragment key={item.label || `breadcrumb-${index}`}>
@@ -197,7 +197,7 @@ const EdgeFunctionDetailsLayout = ({
             </PageHeaderBreadcrumb>
           )}
 
-          <PageHeaderMeta size="full">
+          <PageHeaderMeta>
             <PageHeaderSummary>
               <PageHeaderTitle>{functionSlug ? name : 'Edge Functions'}</PageHeaderTitle>
             </PageHeaderSummary>
@@ -269,7 +269,7 @@ const EdgeFunctionDetailsLayout = ({
           </PageHeaderMeta>
 
           {navigationItems.length > 0 && (
-            <PageHeaderFooter size="full">
+            <PageHeaderFooter>
               <NavMenu>
                 {navigationItems.map((item) => {
                   const isActive = router.asPath.split('?')[0] === item.href

@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useFlag, useParams } from 'common'
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -44,7 +45,6 @@ import { AnalyticsBucketFields, BigQueryFields } from './DestinationPanelFields'
 import { DestinationTypeSelection } from './DestinationTypeSelection'
 import { NoDestinationsAvailable } from './NoDestinationsAvailable'
 import { PublicationSelection } from './PublicationSelection'
-import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 
 const formId = 'destination-editor'
 
@@ -109,7 +109,7 @@ export const DestinationPanel = ({
     useS3AccessKeyCreateMutation()
 
   const { mutateAsync: createNamespace, isLoading: isCreatingNamespace } =
-    useIcebergNamespaceCreateMutation()
+    useIcebergNamespaceCreateMutation({ projectRef })
 
   const {
     data: publications = [],
