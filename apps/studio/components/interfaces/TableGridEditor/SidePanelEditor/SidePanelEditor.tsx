@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
+import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
@@ -155,6 +155,8 @@ export const SidePanelEditor = ({
   const editingColumnNameRef = useRef<string | null>(null)
   // Track if we've already handled URL params on mount to avoid clearing them
   const hasHandledInitialUrlParamsRef = useRef<boolean>(false)
+  // Track if we're currently saving/closing to prevent URL params from being re-set
+  const isSavingAndClosingRef = useRef<boolean>(false)
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
 
@@ -210,17 +212,10 @@ export const SidePanelEditor = ({
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const { setValue: setEditColumnParam, value: editColumnParam } = useQueryStateWithSelect({
-    urlKey: 'editColumn',
-    select: (columnName: string) => {
-      if (!columnName || !selectedTable) return undefined
-      const column = selectedTable.columns?.find((col) => col.name === columnName)
-      return column
-    },
-    enabled: !!selectedTable && !!selectedTable.columns,
-    onError: (_error, selectedColumnName) =>
-      handleErrorOnDelete(editingColumnNameRef, selectedColumnName, `Column not found`),
-  })
+  const [editColumnParam, setEditColumnParam] = useQueryState(
+    'editColumn',
+    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   // Sync URL params with global state
   useEffect(() => {
@@ -247,10 +242,13 @@ export const SidePanelEditor = ({
   useEffect(() => {
     if (newColumnParam && snap.sidePanel?.type !== 'column') {
       snap.onAddColumn()
-    } else if (editColumnParam && snap.sidePanel?.type !== 'column') {
-      snap.onEditColumn(editColumnParam)
+    } else if (editColumnParam && snap.sidePanel?.type !== 'column' && selectedTable) {
+      const column = selectedTable.columns?.find((col) => col.name === editColumnParam)
+      if (column) {
+        snap.onEditColumn(column)
+      }
     }
-  }, [newColumnParam, editColumnParam, snap])
+  }, [newColumnParam, editColumnParam, snap, selectedTable])
 
   // Sync global state changes with URL params
   useEffect(() => {
@@ -258,32 +256,41 @@ export const SidePanelEditor = ({
       // Mark that we've handled URL params once the panel is actually open
       hasHandledInitialUrlParamsRef.current = true
 
-      if (snap.sidePanel.mode === 'new' && !newTableParam) {
-        setNewTableParam(true)
-      } else if (snap.sidePanel.mode === 'edit' && !editTableParam && selectedTable) {
-        setEditTableParam(selectedTable.id.toString())
-      } else if (snap.sidePanel.mode === 'duplicate' && !duplicateTableParam && selectedTable) {
-        setDuplicateTableParam(selectedTable.id.toString())
+      // Don't set URL params if we're in the middle of saving and closing
+      if (!isSavingAndClosingRef.current) {
+        if (snap.sidePanel.mode === 'new' && !newTableParam) {
+          setNewTableParam(true)
+        } else if (snap.sidePanel.mode === 'edit' && !editTableParam && selectedTable) {
+          setEditTableParam(selectedTable.id.toString())
+        } else if (snap.sidePanel.mode === 'duplicate' && !duplicateTableParam && selectedTable) {
+          setDuplicateTableParam(selectedTable.id.toString())
+        }
       }
     } else if (snap.sidePanel?.type === 'row') {
       hasHandledInitialUrlParamsRef.current = true
 
-      const row = snap.sidePanel.row
-      if (!row && !newRowParam) {
-        setNewRowParam(true)
-      } else if (row && !editRowParam && selectedTable) {
-        // Generate a row identifier from primary keys
-        const rowId = generateRowIdentifier(row, selectedTable)
-        if (rowId) setEditRowParam(rowId)
+      // Don't set URL params if we're in the middle of saving and closing
+      if (!isSavingAndClosingRef.current) {
+        const row = snap.sidePanel.row
+        if (!row && !newRowParam) {
+          setNewRowParam(true)
+        } else if (row && !editRowParam && selectedTable) {
+          // Generate a row identifier from primary keys
+          const rowId = generateRowIdentifier(row, selectedTable)
+          if (rowId) setEditRowParam(rowId)
+        }
       }
     } else if (snap.sidePanel?.type === 'column') {
       hasHandledInitialUrlParamsRef.current = true
 
-      const column = snap.sidePanel.column
-      if (!column && !newColumnParam) {
-        setNewColumnParam(true)
-      } else if (column && !editColumnParam) {
-        setEditColumnParam(column.name)
+      // Don't set URL params if we're in the middle of saving and closing
+      if (!isSavingAndClosingRef.current) {
+        const column = snap.sidePanel.column
+        if (!column && !newColumnParam) {
+          setNewColumnParam(true)
+        } else if (column && !editColumnParam) {
+          setEditColumnParam(column.name)
+        }
       }
     } else if (snap.sidePanel === undefined && !hasHandledInitialUrlParamsRef.current) {
       // Panel was never opened and we haven't processed URL params yet
@@ -291,14 +298,18 @@ export const SidePanelEditor = ({
       // The first useEffect will handle opening the panel based on URL params
     } else {
       // Panel was open and is now closed, or we've already handled initial params
-      // Clear all URL params
+      // Clear all URL params EXCEPT editColumnParam if the ref is still set
+      // (indicating we just saved and need to keep the ref active for protection)
       if (newTableParam) setNewTableParam(false)
       if (editTableParam) setEditTableParam(null)
       if (duplicateTableParam) setDuplicateTableParam(null)
       if (newRowParam) setNewRowParam(false)
       if (editRowParam) setEditRowParam('')
       if (newColumnParam) setNewColumnParam(false)
-      if (editColumnParam) setEditColumnParam(null)
+      if (editColumnParam && !editingColumnNameRef.current) {
+        // Only clear if ref is not set (not protecting a recent save)
+        setEditColumnParam('')
+      }
     }
   }, [
     snap.sidePanel,
@@ -331,8 +342,9 @@ export const SidePanelEditor = ({
       setNewRowParam(false)
       setEditRowParam('')
       setNewColumnParam(false)
-      setEditColumnParam(null)
-      editingColumnNameRef.current = null
+      setEditColumnParam('')
+      // Don't clear editingColumnNameRef here - it's cleared via setTimeout in saveColumn
+      // to give time for all async operations to complete
       hasHandledInitialUrlParamsRef.current = false
     },
   })
@@ -419,11 +431,15 @@ export const SidePanelEditor = ({
     onComplete(saveRowError)
     if (!saveRowError) {
       setIsEdited(false)
+      isSavingAndClosingRef.current = true
       snap.closeSidePanel()
       // Clear URL params for row editor
       setNewRowParam(false)
       setEditRowParam('')
-      hasHandledInitialUrlParamsRef.current = false
+      setTimeout(() => {
+        hasHandledInitialUrlParamsRef.current = false
+        isSavingAndClosingRef.current = false
+      }, 100)
     }
   }
 
@@ -538,13 +554,6 @@ export const SidePanelEditor = ({
         reAddRenamedColumnSortAndFilter(selectedColumnToEdit.name, payload.name)
       }
 
-      // Clear URL params BEFORE invalidating queries to prevent "column not found" error
-      setNewTableParam(false)
-      setEditTableParam(null)
-      setDuplicateTableParam(null)
-      setNewColumnParam(false)
-      setEditColumnParam(null)
-
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: tableEditorKeys.tableEditor(project?.ref, selectedTable?.id),
@@ -565,10 +574,25 @@ export const SidePanelEditor = ({
       })
 
       setIsEdited(false)
+
+      // Set flag to prevent second useEffect from re-setting URL params during close
+      isSavingAndClosingRef.current = true
+
+      // Clear URL params BEFORE closing panel
+      setNewTableParam(false)
+      setEditTableParam(null)
+      setDuplicateTableParam(null)
+      setNewColumnParam(false)
+      setEditColumnParam('')
+
       snap.closeSidePanel()
-      // Clear the ref after all queries have been invalidated
-      editingColumnNameRef.current = null
-      hasHandledInitialUrlParamsRef.current = false
+
+      // Keep refs set for a bit longer, then clear everything
+      setTimeout(() => {
+        editingColumnNameRef.current = null
+        hasHandledInitialUrlParamsRef.current = false
+        isSavingAndClosingRef.current = false
+      }, 100)
     }
 
     resolve()
@@ -799,12 +823,16 @@ export const SidePanelEditor = ({
 
     if (!saveTableError) {
       setIsEdited(false)
+      isSavingAndClosingRef.current = true
       snap.closeSidePanel()
       // Clear URL params for table editor
       setNewTableParam(false)
       setEditTableParam(null)
       setDuplicateTableParam(null)
-      hasHandledInitialUrlParamsRef.current = false
+      setTimeout(() => {
+        hasHandledInitialUrlParamsRef.current = false
+        isSavingAndClosingRef.current = false
+      }, 100)
     }
 
     resolve()
@@ -875,12 +903,16 @@ export const SidePanelEditor = ({
       id: toastId,
     })
     resolve()
+    isSavingAndClosingRef.current = true
     snap.closeSidePanel()
     // Clear URL params for table editor
     setNewTableParam(false)
     setEditTableParam(null)
     setDuplicateTableParam(null)
-    hasHandledInitialUrlParamsRef.current = false
+    setTimeout(() => {
+      hasHandledInitialUrlParamsRef.current = false
+      isSavingAndClosingRef.current = false
+    }, 100)
   }
 
   const onClosePanel = confirmOnClose
