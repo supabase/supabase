@@ -72,6 +72,20 @@ You can manage your pipeline using the actions menu in the destinations list. Se
 
 Note: Stopping replication will cause changes to queue up in the WAL.
 
+# Can data duplicates occur during pipeline operations?
+
+Yes, data duplicates can occur in certain scenarios when stopping a pipeline.
+
+When you stop a pipeline (for restarts or updates), ETL Replication tries to finish processing any transactions that are currently being sent to your destination. It waits up to a few minutes to allow these in-progress transactions to complete cleanly before stopping.
+
+However, if a transaction in your database takes longer than this waiting period to complete, the pipeline will stop before that entire transaction has been fully processed. When the pipeline starts again, it must restart the incomplete transaction from the beginning to maintain transaction boundaries, which results in some data being sent twice to your destination.
+
+**Understanding transaction boundaries**: A transaction is a group of database changes that happen together (for example, all changes within a `BEGIN...COMMIT` block). ETL Replication must process entire transactions - it cannot process part of a transaction, stop, and then continue from the middle. This means if a transaction is interrupted, the whole transaction must be replayed when the pipeline resumes.
+
+**Example scenario**: Suppose you have a batch operation that updates 10,000 rows within a single transaction. If this operation takes 10 minutes to complete and you stop the pipeline after 5 minutes (when 5,000 rows have been processed), the pipeline cannot resume from row 5,001. Instead, when it restarts, it must reprocess all 10,000 rows from the beginning, resulting in the first 5,000 rows being sent to your destination twice.
+
+**Important**: We are not currently planning to implement automatic deduplication. If your use case requires guaranteed exactly-once delivery, you should implement deduplication logic in your downstream systems based on primary keys or other unique identifiers.
+
 # Where can I find replication logs?
 
 Navigate to [Logs](/dashboard/project/_/logs/explorer) → **ETL Replication** to see all pipeline logs. Logs contain diagnostic information. If you're experiencing issues, contact support with your error details.
