@@ -32,7 +32,7 @@ describe('createTemporaryUploadKey', () => {
 
     const result = createTemporaryApiKey(apiKey, expiryInSeconds)
 
-    expect(result.expiryTime).toBe(now + 3600 * 1000)
+    expect(result.expiryTimeMs).toBe(now + 3600 * 1000)
   })
 
   it('should handle short expiry durations', () => {
@@ -44,7 +44,7 @@ describe('createTemporaryUploadKey', () => {
 
     const result = createTemporaryApiKey(apiKey, expiryInSeconds)
 
-    expect(result.expiryTime).toBe(now + 60 * 1000)
+    expect(result.expiryTimeMs).toBe(now + 60 * 1000)
   })
 
   it('should create keys with different expiry times when called at different times', () => {
@@ -59,9 +59,9 @@ describe('createTemporaryUploadKey', () => {
     vi.setSystemTime(now2)
     const result2 = createTemporaryApiKey(apiKey, expiryInSeconds)
 
-    expect(result1.expiryTime).toBe(now1 + expiryInSeconds * 1000)
-    expect(result2.expiryTime).toBe(now2 + expiryInSeconds * 1000)
-    expect(result1.expiryTime).not.toBe(result2.expiryTime)
+    expect(result1.expiryTimeMs).toBe(now1 + expiryInSeconds * 1000)
+    expect(result2.expiryTimeMs).toBe(now2 + expiryInSeconds * 1000)
+    expect(result1.expiryTimeMs).not.toBe(result2.expiryTimeMs)
   })
 })
 
@@ -92,7 +92,7 @@ describe('isTemporaryUploadKeyValid', () => {
 
     const key: TemporaryApiKey = {
       apiKey: 'test-key',
-      expiryTime: now + 120000, // 2 minutes from now
+      expiryTimeMs: now + 120000, // 2 minutes from now
     }
 
     const result = isTemporaryApiKeyValid(key)
@@ -106,7 +106,7 @@ describe('isTemporaryUploadKeyValid', () => {
 
     const key: TemporaryApiKey = {
       apiKey: 'test-key',
-      expiryTime: now + 20000, // Exactly 20 seconds
+      expiryTimeMs: now + 20000, // Exactly 20 seconds
     }
 
     const result = isTemporaryApiKeyValid(key)
@@ -120,7 +120,7 @@ describe('isTemporaryUploadKeyValid', () => {
 
     const key: TemporaryApiKey = {
       apiKey: 'test-key',
-      expiryTime: now + 10000, // 10 seconds from now
+      expiryTimeMs: now + 10000, // 10 seconds from now
     }
 
     const result = isTemporaryApiKeyValid(key)
@@ -134,7 +134,7 @@ describe('isTemporaryUploadKeyValid', () => {
 
     const key: TemporaryApiKey = {
       apiKey: 'test-key',
-      expiryTime: now - 1000, // 1 second ago
+      expiryTimeMs: now - 1000, // 1 second ago
     }
 
     const result = isTemporaryApiKeyValid(key)
@@ -148,7 +148,7 @@ describe('isTemporaryUploadKeyValid', () => {
 
     const key: TemporaryApiKey = {
       apiKey: 'test-key',
-      expiryTime: now - 3600000, // 1 hour ago
+      expiryTimeMs: now - 3600000, // 1 hour ago
     }
 
     const result = isTemporaryApiKeyValid(key)
@@ -162,7 +162,7 @@ describe('isTemporaryUploadKeyValid', () => {
 
     const key: TemporaryApiKey = {
       apiKey: 'test-key',
-      expiryTime: now + 21000, // 21 seconds from now
+      expiryTimeMs: now + 21000, // 21 seconds from now
     }
 
     const result = isTemporaryApiKeyValid(key)
@@ -176,7 +176,7 @@ describe('isTemporaryUploadKeyValid', () => {
 
     const key: TemporaryApiKey = {
       apiKey: 'test-key',
-      expiryTime: now + 120000, // 2 minutes from now
+      expiryTimeMs: now + 120000, // 2 minutes from now
     }
 
     // Initially valid
@@ -196,7 +196,7 @@ describe('isTemporaryUploadKeyValid', () => {
     vi.setSystemTime(now)
 
     const key = {
-      expiryTime: now + 120000,
+      expiryTimeMs: now + 120000,
     } as TemporaryApiKey
 
     const result = isTemporaryApiKeyValid(key)
