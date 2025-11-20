@@ -41,8 +41,8 @@ export interface McpClientBaseConfig {
 
 export interface CursorMcpConfig extends McpClientBaseConfig {}
 
-export interface VSCodeMcpConfig extends McpClientBaseConfig {
-  mcpServers: {
+export interface VSCodeMcpConfig {
+  servers: {
     supabase: {
       type: 'http'
       url: string
@@ -86,12 +86,86 @@ export interface OtherMcpConfig extends McpClientBaseConfig {
   }
 }
 
+export interface GooseMcpConfig {
+  extensions: {
+    supabase: {
+      available_tools: string[]
+      bundled: null
+      description: string
+      enabled: boolean
+      env_keys: string[]
+      envs: Record<string, string>
+      headers: Record<string, string>
+      name: string
+      timeout: number
+      type: 'streamable_http'
+      uri: string
+    }
+  }
+}
+
+export interface FactoryMcpConfig extends McpClientBaseConfig {
+  mcpServers: {
+    supabase: {
+      type: 'http'
+      url: string
+    }
+  }
+}
+
+export interface CodexMcpConfig {
+  mcp_servers: {
+    supabase: {
+      url: string
+    }
+  }
+}
+
 // Union of all possible config types
 export type McpClientConfig =
   | ClaudeCodeMcpConfig
   | ClaudeDesktopMcpConfig
+  | CodexMcpConfig
   | CursorMcpConfig
+  | FactoryMcpConfig
+  | GooseMcpConfig
   | McpClientBaseConfig
   | OtherMcpConfig
   | VSCodeMcpConfig
   | WindsurfMcpConfig
+
+// Type guards
+export function isVSCodeMcpConfig(config: McpClientConfig): config is VSCodeMcpConfig {
+  return 'servers' in config && 'supabase' in config.servers
+}
+
+export function isGooseMcpConfig(config: McpClientConfig): config is GooseMcpConfig {
+  return 'extensions' in config && 'supabase' in config.extensions
+}
+
+export function isCodexMcpConfig(config: McpClientConfig): config is CodexMcpConfig {
+  return 'mcp_servers' in config && 'supabase' in config.mcp_servers
+}
+
+export function isMcpServersConfig(
+  config: McpClientConfig
+): config is McpClientBaseConfig | ClaudeCodeMcpConfig | FactoryMcpConfig {
+  return 'mcpServers' in config && 'supabase' in config.mcpServers
+}
+
+// Helper to extract MCP URL from any config type
+export function getMcpUrl(config: McpClientConfig): string {
+  if (isVSCodeMcpConfig(config)) {
+    return config.servers.supabase.url
+  }
+  if (isGooseMcpConfig(config)) {
+    return config.extensions.supabase.uri
+  }
+  if (isCodexMcpConfig(config)) {
+    return config.mcp_servers.supabase.url
+  }
+  if (isMcpServersConfig(config)) {
+    return config.mcpServers.supabase.url
+  }
+  throw new Error('Invalid MCP config type')
+}
