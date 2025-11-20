@@ -141,6 +141,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Metric Card',
+          href: '/docs/fragments/metric-card',
+          items: [],
+        },
+        {
           title: 'Table of Contents (TOC)',
           href: '/docs/fragments/toc',
           items: [],

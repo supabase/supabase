@@ -129,7 +129,7 @@ export const CreateWrapperSheet = ({
       }
     }
     if (selectedMode === 'schema') {
-      if (values.source_schema.length === 0) {
+      if (wrapperMeta.sourceSchemaOption && values.source_schema.length === 0) {
         errors.source_schema = 'Please provide a source schema'
       }
       if (values.target_schema.length === 0) {
@@ -162,7 +162,12 @@ export const CreateWrapperSheet = ({
           server_name: `${values.wrapper_name}_server`,
           supabase_target_schema: selectedMode === 'schema' ? values.target_schema : undefined,
         },
-        mode: selectedMode,
+        mode:
+          selectedMode === 'schema'
+            ? wrapperMeta.sourceSchemaOption
+              ? 'schema'
+              : 'skip'
+            : 'tables',
         tables: newTables,
         sourceSchema: values.source_schema,
         targetSchema: values.target_schema,

@@ -89,7 +89,9 @@ export function DiskManagementForm() {
       },
     })
 
-  const { hasAccess } = useCheckEntitlements('instances.compute_update')
+  const { hasAccess, isSuccess: isEntitlementsLoaded } = useCheckEntitlements(
+    'instances.compute_update_available_sizes'
+  )
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
@@ -318,7 +320,7 @@ export function DiskManagementForm() {
         <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
           <NoticeBar
             type="default"
-            visible={!hasAccess}
+            visible={isEntitlementsLoaded && !hasAccess}
             title="Compute and Disk configuration is not available on the Free Plan"
             actions={<UpgradePlanButton source="diskManagementConfigure" plan="Pro" />}
             description="You will need to upgrade to at least the Pro Plan to configure compute and disk"

@@ -9,9 +9,10 @@ interface DeleteRoleModalProps {
   role: PostgresRole
   visible: boolean
   onClose: () => void
+  onDelete?: () => void
 }
 
-export const DeleteRoleModal = ({ role, visible, onClose }: DeleteRoleModalProps) => {
+export const DeleteRoleModal = ({ role, visible, onClose, onDelete }: DeleteRoleModalProps) => {
   const { data: project } = useSelectedProjectQuery()
 
   const { mutate: deleteDatabaseRole, isLoading: isDeleting } = useDatabaseRoleDeleteMutation({
@@ -24,6 +25,7 @@ export const DeleteRoleModal = ({ role, visible, onClose }: DeleteRoleModalProps
   const deleteRole = async () => {
     if (!project) return console.error('Project is required')
     if (!role) return console.error('Failed to delete role: role is missing')
+    onDelete?.()
     deleteDatabaseRole({
       projectRef: project.ref,
       connectionString: project.connectionString,

@@ -17,6 +17,7 @@ const badgeVariants = cva('inline-flex items-center rounded-full font-normal whi
       outline: 'bg-transparent text border border-foreground-muted',
     },
     size: {
+      tiny: 'px-1.5 py-[3px] text-[10px] leading-none tracking-wide uppercase',
       small: 'px-2 py-0.5 text-xs',
       large: 'px-3 py-0.5 text-sm',
     },

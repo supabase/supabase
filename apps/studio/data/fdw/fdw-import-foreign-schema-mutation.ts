@@ -15,16 +15,21 @@ export type FDWImportForeignSchemaVariables = {
   serverName: string
   sourceSchema: string
   targetSchema: string
+  schemaOptions?: string[]
 }
 
 export function getImportForeignSchemaSql({
   serverName,
   sourceSchema,
   targetSchema,
-}: Pick<FDWImportForeignSchemaVariables, 'serverName' | 'sourceSchema' | 'targetSchema'>) {
+  schemaOptions = [],
+}: Omit<FDWImportForeignSchemaVariables, 'projectRef' | 'connectionString'>) {
+  const options = [...schemaOptions, "strict 'true'"].join(', ')
+
   const sql = /* SQL */ `
-  import foreign schema "${sourceSchema}" from server ${serverName} into ${targetSchema};
+  import foreign schema "${sourceSchema}" from server ${serverName} into ${targetSchema} options (${options});
 `
+
   return sql
 }
 

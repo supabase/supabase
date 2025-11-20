@@ -13,6 +13,7 @@ import {
   X,
 } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -52,7 +53,8 @@ import { SlotLagMetricsInline, SlotLagMetricsList } from './SlotLagMetrics'
  */
 export const ReplicationPipelineStatus = () => {
   const { ref: projectRef, pipelineId: _pipelineId } = useParams()
-  const [filterString, setFilterString] = useState<string>('')
+  const [searchString, setSearchString] = useQueryState('search', parseAsString.withDefault(''))
+
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
 
   const pipelineId = Number(_pipelineId)
@@ -111,10 +113,10 @@ export const ReplicationPipelineStatus = () => {
   const tableStatuses = replicationStatusData?.table_statuses || []
   const applyLagMetrics = replicationStatusData?.apply_lag
   const filteredTableStatuses =
-    filterString.length === 0
+    searchString.length === 0
       ? tableStatuses
       : tableStatuses.filter((table) =>
-          table.table_name.toLowerCase().includes(filterString.toLowerCase())
+          table.table_name.toLowerCase().includes(searchString.toLowerCase())
         )
   const tablesWithLag = tableStatuses.filter((table) => Boolean(table.table_sync_lag))
 
@@ -214,18 +216,18 @@ export const ReplicationPipelineStatus = () => {
               icon={<Search size={12} />}
               className="pl-7 h-[26px] text-xs"
               placeholder="Search for tables"
-              value={filterString}
+              value={searchString}
               disabled={isPipelineError}
-              onChange={(e) => setFilterString(e.target.value)}
+              onChange={(e) => setSearchString(e.target.value)}
               actions={
-                filterString.length > 0
+                searchString.length > 0
                   ? [
                       <X
                         key="close"
                         className="mx-2 cursor-pointer text-foreground"
                         size={14}
                         strokeWidth={2}
-                        onClick={() => setFilterString('')}
+                        onClick={() => setSearchString('')}
                       />,
                     ]
                   : undefined
@@ -365,7 +367,7 @@ export const ReplicationPipelineStatus = () => {
                           <div className="space-y-1">
                             <p className="text-sm text-foreground">No results found</p>
                             <p className="text-sm text-foreground-light">
-                              Your search for "{filterString}" did not return any results
+                              Your search for "{searchString}" did not return any results
                             </p>
                           </div>
                         </Table.td>

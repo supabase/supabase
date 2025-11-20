@@ -24,7 +24,7 @@ import { ROLE_PERMISSIONS } from './Roles.constants'
 interface RoleRowProps {
   role: PgRole
   disabled?: boolean
-  onSelectDelete: (role: PgRole) => void
+  onSelectDelete: (role: string) => void
 }
 
 export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
@@ -141,7 +141,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
                           className="space-x-2"
                           onClick={(event) => {
                             event.stopPropagation()
-                            onSelectDelete(role)
+                            onSelectDelete(role.id.toString())
                           }}
                         >
                           <Trash className="text-red-800" size="14" strokeWidth={2} />

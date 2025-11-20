@@ -214,6 +214,7 @@ export const CreateBucketModal = ({
           disabled={!canCreateBuckets}
           style={{ justifyContent: 'start' }}
           onClick={() => setVisible(true)}
+          tabIndex={!canCreateBuckets ? -1 : 0}
           tooltip={{
             content: {
               side: 'bottom',

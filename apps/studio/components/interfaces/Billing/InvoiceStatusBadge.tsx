@@ -1,26 +1,24 @@
+import { InlineLink } from 'components/ui/InlineLink'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { InvoiceStatus } from './Invoices.types'
 
 interface InvoiceStatusBadgeProps {
   status: InvoiceStatus
   paymentAttempted: boolean
+  paymentProcessing: boolean
 }
 
 const invoiceStatusMapping: Record<
   InvoiceStatus,
   { label: string; badgeVariant: React.ComponentProps<typeof Badge>['variant'] }
 > = {
-  [InvoiceStatus.DRAFT]: {
-    label: 'Upcoming',
-    badgeVariant: 'warning',
-  },
   [InvoiceStatus.PAID]: {
     label: 'Paid',
     badgeVariant: 'brand',
   },
   [InvoiceStatus.VOID]: {
     label: 'Forgiven',
-    badgeVariant: 'brand',
+    badgeVariant: 'warning',
   },
 
   // We do not want to overcomplicate it for the user, so we'll treat uncollectible/open/issued the same from a user perspective
@@ -39,8 +37,17 @@ const invoiceStatusMapping: Record<
   },
 }
 
-const InvoiceStatusBadge = ({ status, paymentAttempted }: InvoiceStatusBadgeProps) => {
-  const statusMapping = invoiceStatusMapping[status]
+const InvoiceStatusBadge = ({
+  status,
+  paymentAttempted,
+  paymentProcessing,
+}: InvoiceStatusBadgeProps) => {
+  const statusMapping = paymentProcessing
+    ? {
+        label: 'Processing',
+        badgeVariant: 'warning' as React.ComponentProps<typeof Badge>['variant'],
+      }
+    : invoiceStatusMapping[status]
 
   return (
     <Tooltip>
@@ -53,9 +60,25 @@ const InvoiceStatusBadge = ({ status, paymentAttempted }: InvoiceStatusBadgeProp
           {statusMapping?.label || status}
         </Badge>
       </TooltipTrigger>
-      <TooltipContent side="bottom">
+      <TooltipContent side="bottom" className="max-w-sm">
         {[InvoiceStatus.OPEN, InvoiceStatus.ISSUED, InvoiceStatus.UNCOLLECTIBLE].includes(status) &&
-          (paymentAttempted ? (
+          (paymentProcessing ? (
+            <div className="space-y-1">
+              <p className="text-xs text-foreground">
+                While most credit card payments get processed instantly, some Indian credit card
+                providers may take up to 72 hours. Your card issuer has neither confirmed nor denied
+                the payment and we have to wait until the card issuer processed the payment.
+              </p>
+
+              <p className="text-xs text-foreground">
+                If you run into this, we recommend{' '}
+                <InlineLink href="https://supabase.com/docs/guides/platform/credits#credit-top-ups">
+                  topping up your credits
+                </InlineLink>{' '}
+                in advance to avoid running into this in the future.
+              </p>
+            </div>
+          ) : paymentAttempted ? (
             <p className="text-xs text-foreground">
               We were not able to collect the payment. Make sure you have a valid payment method and
               enough funds. Outstanding invoices may cause restrictions. You can manually pay the
@@ -68,12 +91,6 @@ const InvoiceStatusBadge = ({ status, paymentAttempted }: InvoiceStatusBadgeProp
               using your card now using the "Pay Now" button.
             </p>
           ))}
-
-        {status === InvoiceStatus.DRAFT && (
-          <p className="text-xs text-foreground">
-            The invoice will soon be finalized and charged for.
-          </p>
-        )}
 
         {status === InvoiceStatus.PAID && (
           <p className="text-xs text-foreground">

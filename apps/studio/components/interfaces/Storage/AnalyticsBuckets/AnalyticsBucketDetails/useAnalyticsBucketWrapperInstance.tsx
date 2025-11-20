@@ -44,6 +44,6 @@ export const useAnalyticsBucketWrapperInstance = (
   return {
     data: icebergWrapper,
     meta: icebergWrapperMeta,
-    isLoading: isLoadingProject || isLoadingFDWs,
+    isLoading: isLoadingProject || isLoadingFDWs || !bucketId,
   }
 }

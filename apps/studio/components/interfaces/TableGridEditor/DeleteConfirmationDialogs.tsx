@@ -261,7 +261,7 @@ const DeleteConfirmationDialogs = ({
         }}
         onConfirm={onConfirmDeleteTable}
       >
-        <div className="space-y-4">
+        <div data-testid="confirm-delete-table-modal" className="space-y-4">
           <p className="text-sm text-foreground-light">
             Are you sure you want to delete the selected table? This action cannot be undone.
           </p>
