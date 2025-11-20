@@ -226,7 +226,7 @@ export const MCP_CLIENTS: McpClient[] = [
         },
       }
     },
-    primaryInstructions: (config) => {
+    primaryInstructions: (config, onCopy) => {
       const mcpUrl = getMcpUrl(config)
       const command = `gemini mcp add -t http supabase ${mcpUrl}`
       return (
@@ -234,11 +234,11 @@ export const MCP_CLIENTS: McpClient[] = [
           <p className="text-xs text-foreground-light">
             Add the Supabase MCP server to Gemini CLI:
           </p>
-          <CodeBlock value={command} language="bash" focusable={false} className="block" />
+          <CodeBlock value={command} language="bash" focusable={false} className="block" onCopyCallback={() => onCopy('command')} />
         </div>
       )
     },
-    alternateInstructions: (config) => {
+    alternateInstructions: (config, onCopy) => {
       const mcpUrl = getMcpUrl(config)
       return (
         <div className="space-y-2">
@@ -250,6 +250,7 @@ export const MCP_CLIENTS: McpClient[] = [
             language="bash"
             focusable={false}
             className="block"
+            onCopyCallback={() => onCopy('command')}
           />
           <p className="text-xs text-foreground-light">
             After installation, authenticate the server:
@@ -259,6 +260,7 @@ export const MCP_CLIENTS: McpClient[] = [
             language="bash"
             focusable={false}
             className="block"
+            onCopyCallback={() => onCopy('command')}
           />
         </div>
       )
