@@ -31,10 +31,11 @@ export const useAnalyticsBucketAssociatedEntities = (
     '*'
   )
 
-  const { data: icebergWrapper, meta: icebergWrapperMeta } = useAnalyticsBucketWrapperInstance(
-    { bucketId },
-    { enabled: options.enabled }
-  )
+  const {
+    data: icebergWrapper,
+    meta: icebergWrapperMeta,
+    isLoading: isLoadingWrapperInstance,
+  } = useAnalyticsBucketWrapperInstance({ bucketId }, { enabled: options.enabled })
 
   const { data: s3AccessKeys } = useStorageCredentialsQuery(
     { projectRef },
@@ -75,6 +76,7 @@ export const useAnalyticsBucketAssociatedEntities = (
     publication,
     pipeline,
     destination,
+    isLoadingWrapperInstance,
   }
 }
 

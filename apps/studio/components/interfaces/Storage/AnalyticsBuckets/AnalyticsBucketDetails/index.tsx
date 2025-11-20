@@ -40,7 +40,6 @@ import { CreateTableInstructions } from './CreateTableInstructions'
 import { NamespaceWithTables } from './NamespaceWithTables'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useAnalyticsBucketAssociatedEntities } from './useAnalyticsBucketAssociatedEntities'
-import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperInstance'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
 export const AnalyticBucketDetails = () => {
@@ -65,10 +64,12 @@ export const AnalyticBucketDetails = () => {
 
   const { mutateAsync: startPipeline, isLoading: isStartingPipeline } = useStartPipelineMutation()
 
-  /** The wrapper instance is the wrapper that is installed for this Analytics bucket. */
-  const { data: wrapperInstance, isLoading: isLoadingWrapperInstance } =
-    useAnalyticsBucketWrapperInstance({ bucketId: bucket?.name })
-  const { publication, pipeline } = useAnalyticsBucketAssociatedEntities({
+  const {
+    publication,
+    pipeline,
+    icebergWrapper: wrapperInstance,
+    isLoadingWrapperInstance,
+  } = useAnalyticsBucketAssociatedEntities({
     projectRef,
     bucketId: bucket?.name,
   })

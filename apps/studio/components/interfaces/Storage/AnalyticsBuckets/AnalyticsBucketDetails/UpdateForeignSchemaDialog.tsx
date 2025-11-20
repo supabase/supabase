@@ -47,7 +47,8 @@ export const UpdateForeignSchemaDialog = ({
 
   const { icebergWrapper } = useAnalyticsBucketAssociatedEntities({ bucketId })
   const connectedForeignTablesForNamespace =
-    icebergWrapper?.tables.filter((x) => x.options[0].startsWith(`table=${namespace}.`)) ?? []
+    (icebergWrapper?.tables ?? []).filter((x) => x.options[0].startsWith(`table=${namespace}.`)) ??
+    []
   const schemasAssociatedWithNamespace = [
     ...new Set(connectedForeignTablesForNamespace.map((x) => x.schema)),
   ]

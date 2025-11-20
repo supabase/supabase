@@ -103,7 +103,8 @@ export const NamespaceWithTables = ({
   )
 
   const connectedForeignTablesForNamespace =
-    icebergWrapper?.tables.filter((x) => x.options[0].startsWith(`table=${namespace}.`)) ?? []
+    (icebergWrapper?.tables ?? []).filter((x) => x.options[0].startsWith(`table=${namespace}.`)) ??
+    []
   const tablesWithConnectedForeignTables = connectedForeignTablesForNamespace.reduce((a, b) => {
     const table = b.options[0].split(`table=${namespace}.`)[1]
     if (!a.find((x) => x === table)) a.push(table)
