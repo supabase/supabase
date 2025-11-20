@@ -1,51 +1,55 @@
-import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { AnalyticBucketDetails } from 'components/interfaces/Storage/AnalyticsBucketDetails'
-import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
-import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer/useSelectedBucket'
+import { AnalyticBucketDetails } from 'components/interfaces/Storage/AnalyticsBuckets/AnalyticsBucketDetails'
+import { useSelectedAnalyticsBucket } from 'components/interfaces/Storage/AnalyticsBuckets/useSelectedAnalyticsBucket'
+import { BUCKET_TYPES } from 'components/interfaces/Storage/Storage.constants'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import { Bucket as BucketIcon } from 'icons'
 import type { NextPageWithLayout } from 'types'
-import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
 
 const AnalyticsBucketPage: NextPageWithLayout = () => {
-  const { bucketId } = useParams()
+  const config = BUCKET_TYPES.analytics
+  const router = useRouter()
+  const { ref, bucketId } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { projectRef } = useStorageExplorerStateSnapshot()
-  const { bucket, error, isSuccess, isError } = useSelectedBucket()
+  const { data: bucket, isSuccess } = useSelectedAnalyticsBucket()
 
-  // [Joshen] Checking against projectRef from storage explorer to check if the store has initialized
-  // We can probably replace this with a better skeleton loader that's more representative of the page layout
-  if (!project || !projectRef) return null
+  useEffect(() => {
+    if (isSuccess && !bucket) {
+      toast.info(`Bucket "${bucketId}" does not exist in your project`)
+      router.push(`/project/${ref}/storage/analytics`)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess])
 
   return (
-    <div className="storage-container flex flex-grow">
-      {isError && <StorageBucketsError error={error as any} />}
-
-      {isSuccess ? (
-        !bucket ? (
-          <div className="flex h-full w-full items-center justify-center">
-            <Admonition
-              className="max-w-md"
-              type="default"
-              title="Unable to find bucket"
-              description={`${bucketId ? `The template "${bucketId}"` : 'This template'} doesn’t seem to exist.`}
-            >
-              <Button asChild type="default" className="mt-2">
-                <Link href={`/project/${projectRef}/storage/analytics`}>Head back</Link>
-              </Button>
-            </Admonition>
-          </div>
-        ) : (
-          <AnalyticBucketDetails bucket={bucket as AnalyticsBucket} />
-        )
-      ) : null}
-    </div>
+    <PageLayout
+      title={bucketId}
+      icon={
+        <div className="shrink-0 w-10 h-10 relative bg-surface-100 border rounded-md flex items-center justify-center">
+          <BucketIcon size={20} className="text-foreground-light" />
+        </div>
+      }
+      breadcrumbs={[
+        {
+          label: 'Analytics',
+          href: `/project/${project?.ref}/storage/analytics`,
+        },
+        {
+          label: 'Buckets',
+        },
+      ]}
+      secondaryActions={config?.docsUrl ? [<DocsButton key="docs" href={config.docsUrl} />] : []}
+    >
+      <AnalyticBucketDetails />
+    </PageLayout>
   )
 }
 

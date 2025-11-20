@@ -47,7 +47,7 @@ export const useSchemasQuery = <TData = SchemasData>(
   })
 
 export function invalidateSchemasQuery(client: QueryClient, projectRef: string | undefined) {
-  return client.invalidateQueries(databaseKeys.schemas(projectRef))
+  return client.invalidateQueries({ queryKey: databaseKeys.schemas(projectRef) })
 }
 
 export function prefetchSchemas(

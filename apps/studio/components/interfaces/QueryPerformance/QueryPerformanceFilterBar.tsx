@@ -1,6 +1,6 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { Search, X } from 'lucide-react'
-import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
+import { parseAsArrayOf, parseAsString, useQueryStates, parseAsJson } from 'nuqs'
 import { ChangeEvent, ReactNode, useEffect, useState } from 'react'
 
 import { FilterPopover } from 'components/ui/FilterPopover'
@@ -9,6 +9,10 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
+import {
+  ReportsNumericFilter,
+  NumericFilter,
+} from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 
 export const QueryPerformanceFilterBar = ({
   actions,
@@ -20,10 +24,15 @@ export const QueryPerformanceFilterBar = ({
   const { data: project } = useSelectedProjectQuery()
   const { sort, clearSort } = useQueryPerformanceSort()
 
-  const [{ search: searchQuery, roles: defaultFilterRoles }, setSearchParams] = useQueryStates({
-    search: parseAsString.withDefault(''),
-    roles: parseAsArrayOf(parseAsString).withDefault([]),
-  })
+  const [{ search: searchQuery, roles: defaultFilterRoles, callsFilter }, setSearchParams] =
+    useQueryStates({
+      search: parseAsString.withDefault(''),
+      roles: parseAsArrayOf(parseAsString).withDefault([]),
+      callsFilter: parseAsJson((value) => value as NumericFilter | null).withDefault({
+        operator: '>=',
+        value: 0,
+      } as NumericFilter),
+    })
   const { data, isLoading: isLoadingRoles } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -35,6 +44,7 @@ export const QueryPerformanceFilterBar = ({
   })
   const [inputValue, setInputValue] = useState(searchQuery)
   const debouncedInputValue = useDebounce(inputValue, 500)
+  // const debouncedMinCalls = useDebounce(minCallsInput, 300)
   const searchValue = inputValue.length === 0 ? inputValue : debouncedInputValue
 
   const onSearchQueryChange = (value: string) => {
@@ -76,6 +86,17 @@ export const QueryPerformanceFilterBar = ({
                 />
               ),
             ]}
+          />
+
+          <ReportsNumericFilter
+            label="Calls"
+            value={callsFilter}
+            onChange={(value) => setSearchParams({ callsFilter: value })}
+            operators={['=', '>=', '<=', '>', '<', '!=']}
+            defaultOperator=">="
+            placeholder="e.g. 100"
+            min={0}
+            className="w-auto"
           />
 
           {showRolesFilter && (

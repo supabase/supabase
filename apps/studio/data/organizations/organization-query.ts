@@ -50,5 +50,5 @@ export const useOrganizationQuery = <TData = OrganizationsData>(
 }
 
 export function invalidateOrganizationsQuery(client: QueryClient) {
-  return client.invalidateQueries(organizationKeys.list())
+  return client.invalidateQueries({ queryKey: organizationKeys.list() })
 }

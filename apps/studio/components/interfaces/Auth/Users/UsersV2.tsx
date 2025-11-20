@@ -5,6 +5,7 @@ import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 
+import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AlertError from 'components/ui/AlertError'
@@ -21,6 +22,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import {
@@ -42,6 +44,7 @@ import { AddUserDropdown } from './AddUserDropdown'
 import { DeleteUserModal } from './DeleteUserModal'
 import { SortDropdown } from './SortDropdown'
 import { UserPanel } from './UserPanel'
+import type { SpecificFilterColumn } from './Users.constants'
 import {
   ColumnConfiguration,
   Filter,
@@ -91,9 +94,11 @@ export const UsersV2 = () => {
     }
   }, [showEmailPhoneColumns])
 
-  const [specificFilterColumn, setSpecificFilterColumn] = useQueryState(
+  const [specificFilterColumn, setSpecificFilterColumn] = useQueryState<SpecificFilterColumn>(
     'filter',
-    parseAsStringEnum(['id', 'email', 'phone', 'freeform']).withDefault('id')
+    parseAsStringEnum<SpecificFilterColumn>(['id', 'email', 'phone', 'freeform']).withDefault(
+      'email'
+    )
   )
   const [filterUserType, setFilterUserType] = useQueryState(
     'userType',
@@ -116,7 +121,7 @@ export const UsersV2 = () => {
   const [localStorageFilter, setLocalStorageFilter, { isSuccess: isLocalStorageFilterLoaded }] =
     useLocalStorageQuery<'id' | 'email' | 'phone' | 'freeform'>(
       LOCAL_STORAGE_KEYS.AUTH_USERS_FILTER(projectRef ?? ''),
-      'id'
+      'email'
     )
 
   const [
@@ -138,8 +143,7 @@ export const UsersV2 = () => {
   )
 
   const [columns, setColumns] = useState<Column<any>[]>([])
-  const [search, setSearch] = useState('')
-  const [selectedUser, setSelectedUser] = useState<string>()
+  const [search, setSearch] = useState(filterKeywords)
   const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<User>()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -187,7 +191,7 @@ export const UsersV2 = () => {
       sort: sortColumn as 'id' | 'created_at' | 'email' | 'phone',
       order: sortOrder as 'asc' | 'desc',
       ...(specificFilterColumn !== 'freeform'
-        ? { column: specificFilterColumn }
+        ? { column: specificFilterColumn as OptimizedSearchColumns }
         : { column: undefined }),
     },
     {
@@ -201,6 +205,14 @@ export const UsersV2 = () => {
   const { mutateAsync: deleteUser } = useUserDeleteMutation()
 
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
+
+  const { setValue: setSelectedUser, value: selectedUser } = useQueryStateWithSelect({
+    urlKey: 'show',
+    select: (id: string) => (id ? users?.find((u) => u.id === id)?.id : undefined),
+    enabled: !!users && !isLoading,
+    onError: () => toast.error(`User not found`),
+  })
+
   // [Joshen] Only relevant for when selecting one user only
   const selectedUserFromCheckbox = users.find((u) => u.id === [...selectedUsers][0])
 
@@ -305,7 +317,7 @@ export const UsersV2 = () => {
       setShowDeleteModal(false)
       setSelectedUsers(new Set([]))
 
-      if (userIds.includes(selectedUser)) setSelectedUser(undefined)
+      if (userIds.includes(selectedUser)) setSelectedUser(null)
     } catch (error: any) {
       toast.error(`Failed to delete selected users: ${error.message}`)
     } finally {
@@ -390,7 +402,7 @@ export const UsersV2 = () => {
                   setSearch={setSearch}
                   setFilterKeywords={(s) => {
                     setFilterKeywords(s)
-                    setSelectedUser(undefined)
+                    setSelectedUser(null)
                     sendEvent({
                       action: 'auth_users_search_submitted',
                       properties: {
@@ -676,7 +688,7 @@ export const UsersV2 = () => {
           {selectedUser !== undefined && (
             <UserPanel
               selectedUser={users.find((u) => u.id === selectedUser)}
-              onClose={() => setSelectedUser(undefined)}
+              onClose={() => setSelectedUser(null)}
             />
           )}
         </ResizablePanelGroup>
@@ -750,7 +762,7 @@ export const UsersV2 = () => {
           cleanPointerEventsNoneOnBody()
         }}
         onDeleteSuccess={() => {
-          if (selectedUserToDelete?.id === selectedUser) setSelectedUser(undefined)
+          if (selectedUserToDelete?.id === selectedUser) setSelectedUser(null)
           setSelectedUserToDelete(undefined)
           cleanPointerEventsNoneOnBody(500)
         }}

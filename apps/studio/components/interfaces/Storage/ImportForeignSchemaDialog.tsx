@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { snakeCase, uniq } from 'lodash'
+import { uniq } from 'lodash'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -17,6 +17,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import type { WrapperMeta } from '../Integrations/Wrappers/Wrappers.types'
 import { formatWrapperTables } from '../Integrations/Wrappers/Wrappers.utils'
 import SchemaEditor from '../TableGridEditor/SidePanelEditor/SchemaEditor'
+import { getAnalyticsBucketFDWServerName } from './AnalyticsBuckets/AnalyticsBucketDetails/AnalyticsBucketDetails.utils'
 import { getDecryptedParameters } from './ImportForeignSchemaDialog.utils'
 
 export interface ImportForeignSchemaDialogProps {
@@ -36,11 +37,14 @@ export const ImportForeignSchemaDialog = ({
   onClose,
   circumstance = 'fresh',
 }: ImportForeignSchemaDialogProps) => {
-  const { data: project } = useSelectedProjectQuery()
   const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
   const [loading, setLoading] = useState(false)
   const [createSchemaSheetOpen, setCreateSchemaSheetOpen] = useState(false)
 
+  const { data: schemas } = useSchemasQuery({ projectRef: project?.ref! })
+
+  const { mutateAsync: createSchema } = useSchemaCreateMutation()
   const { mutateAsync: importForeignSchema } = useFDWImportForeignSchemaMutation({})
   const { mutateAsync: updateFDW } = useFDWUpdateMutation({
     onSuccess: () => {
@@ -48,8 +52,6 @@ export const ImportForeignSchemaDialog = ({
       onClose()
     },
   })
-
-  const { data: schemas } = useSchemasQuery({ projectRef: project?.ref! })
 
   const FormSchema = z.object({
     bucketName: z.string().trim(),
@@ -73,14 +75,12 @@ export const ImportForeignSchemaDialog = ({
     defaultValues: {
       bucketName,
       sourceNamespace: namespace,
-      targetSchema: '',
+      targetSchema: `fdw_analytics_${namespace}`,
     },
   })
 
-  const { mutateAsync: createSchema } = useSchemaCreateMutation()
-
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
-    const serverName = `${snakeCase(values.bucketName)}_fdw_server`
+    const serverName = getAnalyticsBucketFDWServerName(values.bucketName)
 
     if (!ref) return console.error('Project ref is required')
     setLoading(true)
@@ -150,7 +150,7 @@ export const ImportForeignSchemaDialog = ({
       form.reset({
         bucketName,
         sourceNamespace: namespace,
-        targetSchema: '',
+        targetSchema: `fdw_analytics_${namespace}`,
       })
     }
   }, [visible, form, bucketName, namespace])

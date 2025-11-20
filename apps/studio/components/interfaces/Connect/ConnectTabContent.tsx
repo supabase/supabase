@@ -9,7 +9,8 @@ import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configur
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { pluckObjectFields } from 'lib/helpers'
-import { cn } from 'ui'
+import { useTrack } from 'lib/telemetry/track'
+import { cn, CopyCallbackContext } from 'ui'
 import { getAddons } from '../Billing/Subscription/Subscription.utils'
 import type { projectKeys } from './Connect.types'
 import { getConnectionStrings } from './DatabaseSettings.utils'
@@ -17,6 +18,8 @@ import { getConnectionStrings } from './DatabaseSettings.utils'
 interface ConnectContentTabProps extends HTMLAttributes<HTMLDivElement> {
   projectKeys: projectKeys
   filePath: string
+  connectionTab: 'App Frameworks' | 'Mobile Frameworks' | 'ORMs'
+  selectedFrameworkOrTool: string
   connectionStringPooler?: {
     transactionShared: string
     sessionShared: string
@@ -28,10 +31,31 @@ interface ConnectContentTabProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
-  ({ projectKeys, filePath, ...props }, ref) => {
+  ({ projectKeys, filePath, connectionTab, selectedFrameworkOrTool, ...props }, ref) => {
     const { ref: projectRef } = useParams()
+    const track = useTrack()
     const { data: selectedOrg } = useSelectedOrganizationQuery()
     const allowPgBouncerSelection = useMemo(() => selectedOrg?.plan.id !== 'free', [selectedOrg])
+
+    const handleCopy = () => {
+      const trackingProperties: {
+        connectionTab: 'App Frameworks' | 'Mobile Frameworks' | 'ORMs'
+        selectedItem: string
+        connectionType?: string
+        lang?: string
+      } = {
+        connectionTab,
+        selectedItem: selectedFrameworkOrTool,
+      }
+
+      // Only include connectionType and lang for App Frameworks and Mobile Frameworks
+      if (connectionTab !== 'ORMs') {
+        trackingProperties.connectionType = 'Framework snippet'
+        trackingProperties.lang = filePath.split('/').pop() ?? 'unknown'
+      }
+
+      track('connection_string_copied', trackingProperties)
+    }
 
     const { data: settings } = useProjectSettingsV2Query({ projectRef })
     const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
@@ -84,18 +108,23 @@ export const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabPro
 
     return (
       <div ref={ref} {...props} className={cn('border rounded-lg', props.className)}>
-        <ContentFile
-          projectKeys={projectKeys}
-          filePath={filePath}
-          connectionStringPooler={{
-            transactionShared: connectionStringsShared.pooler.uri,
-            sessionShared: connectionStringsShared.pooler.uri.replace('6543', '5432'),
-            transactionDedicated: connectionStringsDedicated?.pooler.uri,
-            sessionDedicated: connectionStringsDedicated?.pooler.uri.replace('6543', '5432'),
-            ipv4SupportedForDedicatedPooler: !!ipv4Addon,
-            direct: connectionStringsShared.direct.uri,
-          }}
-        />
+        <CopyCallbackContext.Provider value={handleCopy}>
+          <ContentFile
+            projectKeys={projectKeys}
+            filePath={filePath}
+            connectionTab={connectionTab}
+            selectedFrameworkOrTool={selectedFrameworkOrTool}
+            connectionStringPooler={{
+              transactionShared: connectionStringsShared.pooler.uri,
+              sessionShared: connectionStringsShared.pooler.uri.replace('6543', '5432'),
+              transactionDedicated: connectionStringsDedicated?.pooler.uri,
+              sessionDedicated: connectionStringsDedicated?.pooler.uri.replace('6543', '5432'),
+              ipv4SupportedForDedicatedPooler: !!ipv4Addon,
+              direct: connectionStringsShared.direct.uri,
+            }}
+            onCopy={handleCopy}
+          />
+        </CopyCallbackContext.Provider>
       </div>
     )
   }

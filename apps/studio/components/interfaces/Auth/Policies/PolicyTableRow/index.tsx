@@ -1,11 +1,14 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
-import { memo, useMemo } from 'react'
+import { memo, useCallback, useMemo, useRef } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useTablesRolesAccessQuery } from 'data/tables/tables-roles-access-query'
+import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
+import { useQueryStateWithSelect, handleErrorOnDelete } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Alert_Shadcn_,
@@ -21,6 +24,7 @@ import {
   TableRow,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { usePoliciesData } from '../PoliciesDataContext'
 import { PolicyRow } from './PolicyRow'
@@ -33,7 +37,6 @@ export interface PolicyTableRowProps {
   onSelectToggleRLS: (table: PolicyTable) => void
   onSelectCreatePolicy: (table: PolicyTable) => void
   onSelectEditPolicy: (policy: PostgresPolicy) => void
-  onSelectDeletePolicy: (policy: PostgresPolicy) => void
 }
 
 const PolicyTableRowComponent = ({
@@ -42,7 +45,6 @@ const PolicyTableRowComponent = ({
   onSelectToggleRLS = noop,
   onSelectCreatePolicy = noop,
   onSelectEditPolicy = noop,
-  onSelectDeletePolicy = noop,
 }: PolicyTableRowProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -53,6 +55,17 @@ const PolicyTableRowComponent = ({
     () => getPoliciesForTable(table.schema, table.name),
     [getPoliciesForTable, table.schema, table.name]
   )
+
+  const deletingPolicyIdRef = useRef<string | null>(null)
+
+  const { setValue: setPolicyToDelete, value: policyToDelete } = useQueryStateWithSelect({
+    urlKey: 'delete',
+    select: (id: string) =>
+      id ? policies?.find((policy) => policy.id.toString() === id) : undefined,
+    enabled: !!policies,
+    onError: (_error, selectedId) =>
+      handleErrorOnDelete(deletingPolicyIdRef, selectedId, `Policy not found`),
+  })
 
   // [Joshen] Changes here are so that warnings are more accurate and granular instead of purely relying if RLS is disabled or enabled
   // The following scenarios are technically okay if the table has RLS disabled, in which it won't be publicly readable / writable
@@ -84,96 +97,141 @@ const PolicyTableRowComponent = ({
 
   const showPolicies = !isPoliciesLoading && !isPoliciesError
 
+  const { mutate: deleteDatabasePolicy } = useDatabasePolicyDeleteMutation({
+    onSuccess: () => {
+      toast.success('Successfully deleted policy!')
+    },
+    onSettled: () => {
+      closeConfirmModal()
+    },
+    onError: () => {
+      deletingPolicyIdRef.current = null
+    },
+  })
+
+  const closeConfirmModal = useCallback(() => {
+    setPolicyToDelete(null)
+  }, [])
+
+  const onSelectDeletePolicy = useCallback((policy: PostgresPolicy) => {
+    setPolicyToDelete(policy.id.toString())
+  }, [])
+
+  const onDeletePolicy = async () => {
+    if (!project) return console.error('Project is required')
+    if (!policyToDelete) return console.error('Policy is required')
+
+    deletingPolicyIdRef.current = policyToDelete.id.toString()
+    deleteDatabasePolicy({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      originalPolicy: policyToDelete,
+    })
+  }
+
   return (
-    <Card className={cn(isPubliclyReadableWritable && 'border-warning-500')}>
-      <CardHeader
-        className={cn(
-          'py-3 px-4',
-          (isPubliclyReadableWritable || rlsEnabledNoPolicies || !isTableExposedThroughAPI) &&
-            'border-b-0'
-        )}
-      >
-        <PolicyTableRowHeader
-          table={table}
-          isLocked={isLocked}
-          onSelectToggleRLS={onSelectToggleRLS}
-          onSelectCreatePolicy={onSelectCreatePolicy}
-        />
-      </CardHeader>
-
-      {!isTableExposedThroughAPI && (
-        <Admonition
-          showIcon={false}
-          type="warning"
-          className="mb-0 border-0 border-y rounded-none [&>div]:text-foreground-light h-[50px] py-0 flex items-center"
-        >
-          No data will be selectable via Supabase APIs as this schema is not exposed. You may
-          configure this in your project's{' '}
-          <InlineLink href={`/project/${ref}/settings/api`}>API settings</InlineLink>.
-        </Admonition>
-      )}
-
-      {(isPubliclyReadableWritable || rlsEnabledNoPolicies) && isTableExposedThroughAPI && (
-        <Alert_Shadcn_
-          className="border-0 rounded-none mb-0 border-y h-[50px] py-0 flex items-center"
-          variant={isPubliclyReadableWritable ? 'warning' : 'default'}
-        >
-          <AlertDescription_Shadcn_>
-            {isPubliclyReadableWritable
-              ? "Anyone with your project's anonymous key can read, modify, or delete your data."
-              : 'No data will be selectable via Supabase APIs because RLS is enabled but no policies have been created yet.'}
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-      )}
-
-      {isPoliciesLoading && (
-        <CardContent>
-          <ShimmeringLoader />
-        </CardContent>
-      )}
-
-      {isPoliciesError && (
-        <CardContent>
-          <AlertError
-            className="border-0 rounded-none"
-            error={policiesError}
-            subject="Failed to retrieve policies"
-          />
-        </CardContent>
-      )}
-
-      {showPolicies && (
-        <CardContent className="p-0">
-          {policies.length === 0 ? (
-            <p className="text-foreground-lighter text-sm p-4">No policies created yet</p>
-          ) : (
-            <Table className="table-fixed">
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[40%]">Name</TableHead>
-                  <TableHead className="w-[20%]">Command</TableHead>
-                  <TableHead className="w-[30%]">Applied to</TableHead>
-                  <TableHead className="text-right">
-                    <span className="sr-only">Actions</span>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {policies.map((policy) => (
-                  <PolicyRow
-                    key={policy.id}
-                    policy={policy}
-                    isLocked={isTableLocked}
-                    onSelectEditPolicy={onSelectEditPolicy}
-                    onSelectDeletePolicy={onSelectDeletePolicy}
-                  />
-                ))}
-              </TableBody>
-            </Table>
+    <>
+      <Card className={cn(isPubliclyReadableWritable && 'border-warning-500')}>
+        <CardHeader
+          className={cn(
+            'py-3 px-4',
+            (isPubliclyReadableWritable || rlsEnabledNoPolicies || !isTableExposedThroughAPI) &&
+              'border-b-0'
           )}
-        </CardContent>
-      )}
-    </Card>
+        >
+          <PolicyTableRowHeader
+            table={table}
+            isLocked={isLocked}
+            onSelectToggleRLS={onSelectToggleRLS}
+            onSelectCreatePolicy={onSelectCreatePolicy}
+          />
+        </CardHeader>
+
+        {!isTableExposedThroughAPI && (
+          <Admonition
+            showIcon={false}
+            type="warning"
+            className="mb-0 border-0 border-y rounded-none [&>div]:text-foreground-light h-[50px] py-0 flex items-center"
+          >
+            No data will be selectable via Supabase APIs as this schema is not exposed. You may
+            configure this in your project's{' '}
+            <InlineLink href={`/project/${ref}/settings/api`}>API settings</InlineLink>.
+          </Admonition>
+        )}
+
+        {(isPubliclyReadableWritable || rlsEnabledNoPolicies) && isTableExposedThroughAPI && (
+          <Alert_Shadcn_
+            className="border-0 rounded-none mb-0 border-y h-[50px] py-0 flex items-center"
+            variant={isPubliclyReadableWritable ? 'warning' : 'default'}
+          >
+            <AlertDescription_Shadcn_>
+              {isPubliclyReadableWritable
+                ? "Anyone with your project's anonymous key can read, modify, or delete your data."
+                : 'No data will be selectable via Supabase APIs because RLS is enabled but no policies have been created yet.'}
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        )}
+
+        {isPoliciesLoading && (
+          <CardContent>
+            <ShimmeringLoader />
+          </CardContent>
+        )}
+
+        {isPoliciesError && (
+          <CardContent>
+            <AlertError
+              className="border-0 rounded-none"
+              error={policiesError}
+              subject="Failed to retrieve policies"
+            />
+          </CardContent>
+        )}
+
+        {showPolicies && (
+          <CardContent className="p-0">
+            {policies.length === 0 ? (
+              <p className="text-foreground-lighter text-sm p-4">No policies created yet</p>
+            ) : (
+              <Table className="table-fixed">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[40%]">Name</TableHead>
+                    <TableHead className="w-[20%]">Command</TableHead>
+                    <TableHead className="w-[30%]">Applied to</TableHead>
+                    <TableHead className="text-right">
+                      <span className="sr-only">Actions</span>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {policies.map((policy) => (
+                    <PolicyRow
+                      key={policy.id}
+                      policy={policy}
+                      isLocked={isTableLocked}
+                      onSelectEditPolicy={onSelectEditPolicy}
+                      onSelectDeletePolicy={onSelectDeletePolicy}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        )}
+      </Card>
+
+      <ConfirmModal
+        danger
+        visible={!!policyToDelete}
+        title="Confirm to delete policy"
+        description={`This is permanent! Are you sure you want to delete the policy "${policyToDelete?.name}"`}
+        buttonLabel="Delete"
+        buttonLoadingLabel="Deleting"
+        onSelectCancel={closeConfirmModal}
+        onSelectConfirm={onDeletePolicy}
+      />
+    </>
   )
 }
 

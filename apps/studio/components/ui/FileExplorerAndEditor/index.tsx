@@ -344,6 +344,7 @@ export const FileExplorerAndEditor = ({
               folding: false,
               padding: { top: 20, bottom: 20 },
               lineNumbersMinChars: 3,
+              fixedOverflowWidgets: true,
             }}
           />
         )}

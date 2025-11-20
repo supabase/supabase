@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import { ExternalLink } from 'lucide-react'
 import { useState } from 'react'
-import { type SubmitHandler, useForm } from 'react-hook-form'
+import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -214,16 +214,13 @@ export const NewAccessTokenDialog = ({
                           selectsRange={false}
                           triggerButtonSize="small"
                           contentSide="top"
+                          to={customExpiryDate?.date}
                           minDate={new Date()}
                           maxDate={dayjs().add(1, 'year').toDate()}
                           onChange={(date) => {
                             if (date.to) handleCustomDateChange({ date: date.to })
                           }}
-                        >
-                          {customExpiryDate
-                            ? `${dayjs(customExpiryDate.date).format('DD MMM, HH:mm')}`
-                            : 'Select date'}
-                        </DatePicker>
+                        />
                       )}
                     </div>
                     {field.value === NON_EXPIRING_TOKEN_VALUE && (

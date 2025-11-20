@@ -8,7 +8,7 @@ import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useAuthenticatorAssuranceLevelQuery } from 'data/profile/mfa-authenticator-assurance-level-query'
 import { useSignOut } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { type NextPageWithLayout, isNextPageWithLayout } from 'types'
+import { isNextPageWithLayout, type NextPageWithLayout } from 'types'
 
 const MAX_TIMEOUT = 10000 // 10 seconds
 

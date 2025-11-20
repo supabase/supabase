@@ -139,8 +139,9 @@ export const AuditLogsForm = () => {
                           <InlineLink
                             href={`/project/${projectRef}/logs/explorer?q=select%0A++cast(timestamp+as+datetime)+as+timestamp%2C%0A++event_message%2C+metadata+%0Afrom+auth_audit_logs+%0Alimit+10%0A`}
                           >
-                            Auth logs.
+                            Auth logs
                           </InlineLink>
+                          .
                         </p>
                       }
                     >

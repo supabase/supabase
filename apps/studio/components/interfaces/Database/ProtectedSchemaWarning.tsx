@@ -10,7 +10,6 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  cn,
 } from 'ui'
 
 import { INTERNAL_SCHEMAS, useIsProtectedSchema } from 'hooks/useProtectedSchemas'
@@ -65,32 +64,34 @@ export const ProtectedSchemaWarning = ({
   entity: string
 }) => {
   const [showModal, setShowModal] = useState(false)
-  const { isSchemaLocked, reason } = useIsProtectedSchema({ schema })
+  const { isSchemaLocked, reason, fdwType } = useIsProtectedSchema({ schema })
 
   if (!isSchemaLocked) return null
 
   return (
     <Admonition
-      showIcon={false}
+      showIcon={size === 'sm' ? false : true}
       type="note"
       title={
         size === 'sm' ? `Viewing protected schema` : `Viewing ${entity} from a protected schema`
       }
-      className={cn(
-        '[&>div>p]:prose [&>div>p]:max-w-full [&>div>p]:!leading-normal',
-        size === 'sm' ? '[&>div>p]:text-xs' : '[&>div>p]:text-sm'
-      )}
+      className="[&_p]:!m-0"
     >
-      {reason === 'fdw' ? (
+      {reason === 'fdw' && fdwType === 'iceberg' ? (
+        <p>
+          The <code className="text-code-inline">{schema}</code> schema is used by Supabase to
+          connect to analytics buckets and is read-only through the dashboard.
+        </p>
+      ) : reason === 'fdw' && fdwType === 's3_vectors' ? (
         <p>
           The <code className="text-xs">{schema}</code> schema is used by Supabase to connect to
-          analytics buckets and is read-only through the dashboard.
+          vector buckets and is read-only through the dashboard.
         </p>
       ) : (
         <>
           <p className="mb-2">
-            The <code className="text-xs">{schema}</code> schema is managed by Supabase and is
-            read-only through the dashboard.
+            The <code className="text-code-inline">{schema}</code> schema is managed by Supabase and
+            is read-only through the dashboard.
           </p>
           <Dialog open={showModal} onOpenChange={setShowModal}>
             <DialogTrigger asChild>

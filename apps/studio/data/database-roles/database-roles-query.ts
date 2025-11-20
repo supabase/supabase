@@ -45,5 +45,5 @@ export const useDatabaseRolesQuery = <TData = DatabaseRolesData>(
   })
 
 export function invalidateRolesQuery(client: QueryClient, projectRef: string | undefined) {
-  return client.invalidateQueries(databaseRoleKeys.databaseRoles(projectRef))
+  return client.invalidateQueries({ queryKey: databaseRoleKeys.databaseRoles(projectRef) })
 }
