@@ -168,29 +168,41 @@ export const MCP_CLIENTS: McpClient[] = [
         },
       }
     },
-    primaryInstructions: (config) => {
+    primaryInstructions: (config, onCopy) => {
       const mcpUrl = getMcpUrl(config)
       const command = `codex mcp add supabase --url ${mcpUrl}`
       return (
         <div className="space-y-2">
           <p className="text-xs text-foreground-light">Add the Supabase MCP server to Codex:</p>
-          <CodeBlock value={command} language="bash" focusable={false} className="block" />
+          <CodeBlock
+            value={command}
+            language="bash"
+            focusable={false}
+            className="block"
+            onCopyCallback={() => onCopy?.('command')}
+          />
         </div>
       )
     },
-    alternateInstructions: () => (
+    alternateInstructions: (config, onCopy) => (
       <div className="space-y-2">
         <p className="text-xs text-foreground-light">
           After adding the server, enable remote MCP client support by adding this to your{' '}
           <code>~/.codex/config.toml</code>:
         </p>
-        <CodeBlock value={`[features]\nrmcp_client = true`} focusable={false} className="block" />
+        <CodeBlock
+          value={`[features]\nrmcp_client = true`}
+          focusable={false}
+          className="block"
+          onCopyCallback={() => onCopy?.('config')}
+        />
         <p className="text-xs text-foreground-light">Then authenticate:</p>
         <CodeBlock
           value="codex mcp login supabase"
           language="bash"
           focusable={false}
           className="block"
+          onCopyCallback={() => onCopy?.('command')}
         />
         <p className="text-xs text-foreground-light">
           Finally, run <code>/mcp</code> inside Codex to verify authentication.
@@ -214,7 +226,7 @@ export const MCP_CLIENTS: McpClient[] = [
         },
       }
     },
-    alternateInstructions: () => (
+    alternateInstructions: (config, onCopy) => (
       <p className="text-xs text-foreground-light">
         Windsurf does not currently support remote MCP servers over HTTP transport. You need to use
         the mcp-remote package as a proxy.
@@ -252,7 +264,7 @@ export const MCP_CLIENTS: McpClient[] = [
       const mcpUrl = getMcpUrl(config)
       return `goose://extension?type=streamable_http&url=${encodeURIComponent(mcpUrl)}&id=supabase&name=${name}&description=${encodeURIComponent('Connect your Supabase projects to AI assistants. Manage tables, query data, deploy Edge Functions, and interact with your Supabase backend directly from your MCP client.')}`
     },
-    primaryInstructions: (config) => {
+    primaryInstructions: (config, onCopy) => {
       const mcpUrl = getMcpUrl(config)
       const command = `goose session --with-streamable-http-extension "${mcpUrl}"`
       return (
@@ -260,11 +272,17 @@ export const MCP_CLIENTS: McpClient[] = [
           <p className="text-xs text-foreground-light">
             Start a Goose session with the Supabase extension:
           </p>
-          <CodeBlock value={command} language="bash" focusable={false} className="block" />
+          <CodeBlock
+            value={command}
+            language="bash"
+            focusable={false}
+            className="block"
+            onCopyCallback={() => onCopy?.('command')}
+          />
         </div>
       )
     },
-    alternateInstructions: () => (
+    alternateInstructions: (config, onCopy) => (
       <div className="space-y-2">
         <p className="text-xs text-foreground-light">
           For more details, see{' '}
@@ -297,17 +315,23 @@ export const MCP_CLIENTS: McpClient[] = [
         },
       }
     },
-    primaryInstructions: (config) => {
+    primaryInstructions: (config, onCopy) => {
       const mcpUrl = getMcpUrl(config)
       const command = `droid mcp add supabase ${mcpUrl} --type http`
       return (
         <div className="space-y-2">
           <p className="text-xs text-foreground-light">Add the Supabase MCP server to Factory:</p>
-          <CodeBlock value={command} language="bash" focusable={false} className="block" />
+          <CodeBlock
+            value={command}
+            language="bash"
+            focusable={false}
+            className="block"
+            onCopyCallback={() => onCopy?.('command')}
+          />
         </div>
       )
     },
-    alternateInstructions: () => (
+    alternateInstructions: (config, onCopy) => (
       <div className="space-y-2">
         <p className="text-xs text-foreground-light">
           Restart Factory or type <code>/mcp</code> within droid to complete the OAuth
