@@ -1009,32 +1009,52 @@ functions:
             { id: 4, message: 'bar', username: 'supabot' }
             ])
           ```
-      - id: upserting-into-tables-with-constraints
-        name: Upserting into tables with constraints
-        description: |
-          Running the following will cause supabase to upsert data into the `users` table.
-          If the username 'supabot' already exists, the `onConflict` argument tells supabase to overwrite that row
-          based on the column passed into `onConflict`.
-        isSpotlight: true
-        code: |
-          ```js
-          const { data, error } = await supabase
-            .from('users')
-            .upsert({ username: 'supabot' }, { onConflict: 'username' })
-          ```
-      - name: Return the exact number of rows
-        isSpotlight: true
-        code: |
-          ```js
-          const { data, error, count } = await supabase
-            .from('users')
-            .upsert({
-                id: 3, message: 'foo',
-                username: 'supabot'
-            }, {
-              count: 'exact'
-            })
-          ```
+- id: upserting-into-tables-with-constraints
+  name: Upserting into tables with constraints
+  description: |
+    Running the following will cause supabase to upsert data into the `users` table.
+    If the username 'supabot' already exists, the `onConflict` argument tells supabase to overwrite that row
+    based on the column passed into `onConflict`.
+  isSpotlight: true
+  code: |
+    ```js
+    const { data, error } = await supabase
+      .from('users')
+      .upsert({ username: 'supabot' }, { onConflict: 'username' })
+    ```
+  response: |
+    ```json
+    {
+      "data": [
+        {
+          "id": 42,
+          "handle": "saoirse",
+          "display_name": "Saoirse"
+        }
+      ]
+    }
+    ```
+
+- id: return-exact-number-of-rows
+  name: Return the exact number of rows
+  isSpotlight: true
+  code: |
+    ```js
+    const { data, error, count } = await supabase
+      .from('users')
+      .upsert(
+        {
+          id: 3,
+          message: 'foo',
+          username: 'supabot'
+        },
+        {
+          onConflict: 'username',
+          count: 'exact'
+        }
+      )
+    ```
+
 
   - id: delete
     title: 'Delete data: delete()'
