@@ -77,7 +77,7 @@ export const MCP_CLIENTS: McpClient[] = [
     externalDocsUrl: 'https://code.visualstudio.com/docs/copilot/chat/mcp-servers',
     transformConfig: (config): VSCodeMcpConfig => {
       return {
-        mcpServers: {
+        servers: {
           supabase: {
             type: 'http',
             url: config.mcpServers.supabase.url,
