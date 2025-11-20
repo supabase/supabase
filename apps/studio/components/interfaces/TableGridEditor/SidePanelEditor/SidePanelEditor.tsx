@@ -1,11 +1,13 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty, isUndefined, noop } from 'lodash'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
@@ -120,6 +122,19 @@ export interface SidePanelEditorProps {
   onTableCreated?: (table: RetrieveTableResult) => void
 }
 
+// Helper function to generate a unique identifier for a row based on primary keys
+const generateRowIdentifier = (row: Dictionary<any>, table: PostgresTable): string | null => {
+  if (!table.primary_keys || table.primary_keys.length === 0) return null
+
+  const pkValues = table.primary_keys.map((pk) => {
+    const value = row[pk.name]
+    return value !== undefined && value !== null ? String(value) : null
+  })
+
+  if (pkValues.some((v) => v === null)) return null
+  return pkValues.join('__')
+}
+
 export const SidePanelEditor = ({
   editable = true,
   selectedTable,
@@ -136,23 +151,76 @@ export const SidePanelEditor = ({
   const { data: org } = useSelectedOrganizationQuery()
   const track = useTrack()
 
+  // Track the column name being edited to exclude it from error checking
+  const editingColumnNameRef = useRef<string | null>(null)
+  // Track if we've already handled URL params on mount to avoid clearing them
+  const hasHandledInitialUrlParamsRef = useRef<boolean>(false)
+
   const [isEdited, setIsEdited] = useState<boolean>(false)
+
+  // Fetch all tables for the table editor params
+  const { data: allTables, isLoading: isLoadingTables } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    includeColumns,
+  })
 
   // URL state management for table editor actions
   const [newTableParam, setNewTableParam] = useQueryState(
-    'new',
+    'newTable',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [editTableParam, setEditTableParam] = useQueryState(
-    'edit',
+  const { setValue: setEditTableParam, value: editTableParam } = useQueryStateWithSelect({
+    urlKey: 'editTable',
+    select: (id: string) => {
+      if (!id || !allTables) return undefined
+      const table = allTables.find((t) => t.id.toString() === id)
+      return table
+    },
+    enabled: !!allTables && !isLoadingTables,
+    onError: () => toast.error(`Table not found`),
+  })
+
+  const { setValue: setDuplicateTableParam, value: duplicateTableParam } = useQueryStateWithSelect({
+    urlKey: 'duplicateTable',
+    select: (id: string) => {
+      if (!id || !allTables) return undefined
+      const table = allTables.find((t) => t.id.toString() === id)
+      return table
+    },
+    enabled: !!allTables && !isLoadingTables,
+    onError: () => toast.error(`Table not found`),
+  })
+
+  // URL state management for row editor actions
+  const [newRowParam, setNewRowParam] = useQueryState(
+    'newRow',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [duplicateTableParam, setDuplicateTableParam] = useQueryState(
-    'duplicate',
+  const [editRowParam, setEditRowParam] = useQueryState(
+    'editRow',
+    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  // URL state management for column editor actions
+  const [newColumnParam, setNewColumnParam] = useQueryState(
+    'newColumn',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
+
+  const { setValue: setEditColumnParam, value: editColumnParam } = useQueryStateWithSelect({
+    urlKey: 'editColumn',
+    select: (columnName: string) => {
+      if (!columnName || !selectedTable) return undefined
+      const column = selectedTable.columns?.find((col) => col.name === columnName)
+      return column
+    },
+    enabled: !!selectedTable && !!selectedTable.columns,
+    onError: (_error, selectedColumnName) =>
+      handleErrorOnDelete(editingColumnNameRef, selectedColumnName, `Column not found`),
+  })
 
   // Sync URL params with global state
   useEffect(() => {
@@ -165,30 +233,90 @@ export const SidePanelEditor = ({
     }
   }, [newTableParam, editTableParam, duplicateTableParam, snap])
 
+  // Sync URL params with global state for rows
+  useEffect(() => {
+    if (newRowParam && snap.sidePanel?.type !== 'row') {
+      snap.onAddRow()
+    }
+    // Note: editRowParam requires fetching the specific row data by its primary key identifier
+    // This would need additional implementation to query the specific row from the table
+    // For now, row editing is primarily triggered from the grid where the row data is already available
+  }, [newRowParam, snap])
+
+  // Sync URL params with global state for columns
+  useEffect(() => {
+    if (newColumnParam && snap.sidePanel?.type !== 'column') {
+      snap.onAddColumn()
+    } else if (editColumnParam && snap.sidePanel?.type !== 'column') {
+      snap.onEditColumn(editColumnParam)
+    }
+  }, [newColumnParam, editColumnParam, snap])
+
   // Sync global state changes with URL params
   useEffect(() => {
     if (snap.sidePanel?.type === 'table') {
+      // Mark that we've handled URL params once the panel is actually open
+      hasHandledInitialUrlParamsRef.current = true
+
       if (snap.sidePanel.mode === 'new' && !newTableParam) {
         setNewTableParam(true)
-      } else if (snap.sidePanel.mode === 'edit' && !editTableParam) {
-        setEditTableParam(true)
-      } else if (snap.sidePanel.mode === 'duplicate' && !duplicateTableParam) {
-        setDuplicateTableParam(true)
+      } else if (snap.sidePanel.mode === 'edit' && !editTableParam && selectedTable) {
+        setEditTableParam(selectedTable.id.toString())
+      } else if (snap.sidePanel.mode === 'duplicate' && !duplicateTableParam && selectedTable) {
+        setDuplicateTableParam(selectedTable.id.toString())
       }
+    } else if (snap.sidePanel?.type === 'row') {
+      hasHandledInitialUrlParamsRef.current = true
+
+      const row = snap.sidePanel.row
+      if (!row && !newRowParam) {
+        setNewRowParam(true)
+      } else if (row && !editRowParam && selectedTable) {
+        // Generate a row identifier from primary keys
+        const rowId = generateRowIdentifier(row, selectedTable)
+        if (rowId) setEditRowParam(rowId)
+      }
+    } else if (snap.sidePanel?.type === 'column') {
+      hasHandledInitialUrlParamsRef.current = true
+
+      const column = snap.sidePanel.column
+      if (!column && !newColumnParam) {
+        setNewColumnParam(true)
+      } else if (column && !editColumnParam) {
+        setEditColumnParam(column.name)
+      }
+    } else if (snap.sidePanel === undefined && !hasHandledInitialUrlParamsRef.current) {
+      // Panel was never opened and we haven't processed URL params yet
+      // Don't clear URL params as they might be from initial page load
+      // The first useEffect will handle opening the panel based on URL params
     } else {
-      // Panel closed, clear all URL params
+      // Panel was open and is now closed, or we've already handled initial params
+      // Clear all URL params
       if (newTableParam) setNewTableParam(false)
-      if (editTableParam) setEditTableParam(false)
-      if (duplicateTableParam) setDuplicateTableParam(false)
+      if (editTableParam) setEditTableParam(null)
+      if (duplicateTableParam) setDuplicateTableParam(null)
+      if (newRowParam) setNewRowParam(false)
+      if (editRowParam) setEditRowParam('')
+      if (newColumnParam) setNewColumnParam(false)
+      if (editColumnParam) setEditColumnParam(null)
     }
   }, [
     snap.sidePanel,
     newTableParam,
     editTableParam,
     duplicateTableParam,
+    newRowParam,
+    editRowParam,
+    newColumnParam,
+    editColumnParam,
+    selectedTable,
     setNewTableParam,
     setEditTableParam,
     setDuplicateTableParam,
+    setNewRowParam,
+    setEditRowParam,
+    setNewColumnParam,
+    setEditColumnParam,
   ])
 
   const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
@@ -198,8 +326,14 @@ export const SidePanelEditor = ({
       snap.closeSidePanel()
       // Clear URL params when closing
       setNewTableParam(false)
-      setEditTableParam(false)
-      setDuplicateTableParam(false)
+      setEditTableParam(null)
+      setDuplicateTableParam(null)
+      setNewRowParam(false)
+      setEditRowParam('')
+      setNewColumnParam(false)
+      setEditColumnParam(null)
+      editingColumnNameRef.current = null
+      hasHandledInitialUrlParamsRef.current = false
     },
   })
 
@@ -286,6 +420,10 @@ export const SidePanelEditor = ({
     if (!saveRowError) {
       setIsEdited(false)
       snap.closeSidePanel()
+      // Clear URL params for row editor
+      setNewRowParam(false)
+      setEditRowParam('')
+      hasHandledInitialUrlParamsRef.current = false
     }
   }
 
@@ -357,7 +495,13 @@ export const SidePanelEditor = ({
     const selectedColumnToEdit = snap.sidePanel?.type === 'column' && snap.sidePanel.column
     const { primaryKey, foreignKeyRelations, existingForeignKeyRelations } = configuration
 
+    // Track the column being edited to prevent "column not found" error when renaming
+    if (!isNewRecord && selectedColumnToEdit) {
+      editingColumnNameRef.current = selectedColumnToEdit.name
+    }
+
     if (!project || selectedTable === undefined) {
+      editingColumnNameRef.current = null
       return console.error('no project or table selected')
     }
 
@@ -383,6 +527,7 @@ export const SidePanelEditor = ({
 
     if (response?.error) {
       toast.error(response.error.message)
+      editingColumnNameRef.current = null
     } else {
       if (
         !isNewRecord &&
@@ -392,6 +537,13 @@ export const SidePanelEditor = ({
       ) {
         reAddRenamedColumnSortAndFilter(selectedColumnToEdit.name, payload.name)
       }
+
+      // Clear URL params BEFORE invalidating queries to prevent "column not found" error
+      setNewTableParam(false)
+      setEditTableParam(null)
+      setDuplicateTableParam(null)
+      setNewColumnParam(false)
+      setEditColumnParam(null)
 
       await Promise.all([
         queryClient.invalidateQueries({
@@ -414,10 +566,9 @@ export const SidePanelEditor = ({
 
       setIsEdited(false)
       snap.closeSidePanel()
-      // Clear URL params for table editor
-      setNewTableParam(false)
-      setEditTableParam(false)
-      setDuplicateTableParam(false)
+      // Clear the ref after all queries have been invalidated
+      editingColumnNameRef.current = null
+      hasHandledInitialUrlParamsRef.current = false
     }
 
     resolve()
@@ -651,8 +802,9 @@ export const SidePanelEditor = ({
       snap.closeSidePanel()
       // Clear URL params for table editor
       setNewTableParam(false)
-      setEditTableParam(false)
-      setDuplicateTableParam(false)
+      setEditTableParam(null)
+      setDuplicateTableParam(null)
+      hasHandledInitialUrlParamsRef.current = false
     }
 
     resolve()
@@ -726,8 +878,9 @@ export const SidePanelEditor = ({
     snap.closeSidePanel()
     // Clear URL params for table editor
     setNewTableParam(false)
-    setEditTableParam(false)
-    setDuplicateTableParam(false)
+    setEditTableParam(null)
+    setDuplicateTableParam(null)
+    hasHandledInitialUrlParamsRef.current = false
   }
 
   const onClosePanel = confirmOnClose
@@ -763,7 +916,7 @@ export const SidePanelEditor = ({
         table={
           snap.sidePanel?.type === 'table' &&
           (snap.sidePanel.mode === 'edit' || snap.sidePanel.mode === 'duplicate')
-            ? selectedTable
+            ? selectedTable || editTableParam || duplicateTableParam
             : undefined
         }
         isDuplicating={isDuplicating}
