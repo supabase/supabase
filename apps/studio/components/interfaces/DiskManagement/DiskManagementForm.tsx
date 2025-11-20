@@ -24,6 +24,7 @@ import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AddonVariantId } from 'data/subscriptions/types'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
@@ -64,7 +65,6 @@ import {
 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 export function DiskManagementForm() {
   const { ref: projectRef } = useParams()
@@ -104,29 +104,10 @@ export function DiskManagementForm() {
     {
       refetchInterval,
       refetchOnWindowFocus: false,
-      onSuccess: (data) => {
-        // @ts-ignore
-        const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0 }
-        const formValues = {
-          storageType: type,
-          provisionedIOPS: iops,
-          throughput: throughput_mbps,
-          totalSize: size_gb,
-        }
-
-        if (!('requested_modification' in data)) {
-          if (refetchInterval !== false) {
-            form.reset(formValues)
-            setRefetchInterval(false)
-            toast.success('Disk configuration changes have been successfully applied!')
-          }
-        } else {
-          setRefetchInterval(2000)
-        }
-      },
       enabled: project != null && isAws,
     }
   )
+
   const { isSuccess: isAddonsSuccess } = useProjectAddonsQuery({ projectRef })
   const { isWithinCooldownWindow, isSuccess: isCooldownSuccess } =
     useRemainingDurationForDiskAttributeUpdate({
@@ -172,6 +153,28 @@ export function DiskManagementForm() {
     mode: 'onBlur',
     reValidateMode: 'onChange',
   })
+
+  useEffect(() => {
+    if (!isDiskAttributesSuccess) return
+    // @ts-ignore
+    const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0 }
+    const formValues = {
+      storageType: type,
+      provisionedIOPS: iops,
+      throughput: throughput_mbps,
+      totalSize: size_gb,
+    }
+
+    if (!('requested_modification' in data)) {
+      if (refetchInterval !== false) {
+        form.reset(formValues)
+        setRefetchInterval(false)
+        toast.success('Disk configuration changes have been successfully applied!')
+      }
+    } else {
+      setRefetchInterval(2000)
+    }
+  }, [data, isDiskAttributesSuccess, form, refetchInterval])
 
   const { computeSize: modifiedComputeSize } = form.watch()
 

@@ -122,7 +122,8 @@ export const AnalyticBucketDetails = () => {
       warehouse: wrapperValues.warehouse,
     },
     {
-      refetchInterval: (data = []) => {
+      refetchInterval: (_data) => {
+        const data = _data ?? []
         if (pollIntervalNamespaces === 0) return false
 
         const publicationTableSchemas = publication?.tables.map((x) => x.schema) ?? []
