@@ -65,8 +65,7 @@ export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) 
           <AlertDialogDescription className="flex flex-col gap-y-3">
             <p>
               This will reset and restart replication for this table only. The table will start
-              copying from scratch, and any existing data for this table downstream will be
-              deleted.
+              copying from scratch, and any existing data for this table downstream will be deleted.
             </p>
             <p className="text-foreground-light">
               Other tables in the pipeline will not be affected. Only this table will be restarted

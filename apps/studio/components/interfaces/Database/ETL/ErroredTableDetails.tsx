@@ -49,8 +49,8 @@ export const ErroredTableDetails = ({ state, tableName, tableId }: ErroredTableD
         <div className="flex flex-col gap-y-2 text-foreground-lighter">
           <p className="text-xs">
             {state.solution}
-            {state.solution && !/[.!?]$/.test(state.solution.trim()) && '.'} You can reset the
-            table to start replication from scratch.
+            {state.solution && !/[.!?]$/.test(state.solution.trim()) && '.'} You can reset the table
+            to start replication from scratch.
           </p>
           <div className="flex items-center gap-x-2">
             <ResetTableButton tableId={tableId} tableName={tableName} />

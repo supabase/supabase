@@ -20,7 +20,11 @@ export const ErrorDetailsButton = ({ reason, solution }: ErrorDetailsButtonProps
           Show Error
         </Button>
       </TooltipTrigger>
-      <TooltipContent side="bottom" align="start" className="w-[500px] max-w-[90vw] max-h-[400px] p-0 overflow-hidden">
+      <TooltipContent
+        side="bottom"
+        align="start"
+        className="w-[500px] max-w-[90vw] max-h-[400px] p-0 overflow-hidden"
+      >
         <div className="flex flex-col gap-y-3 p-4 max-h-[400px] overflow-y-auto">
           {/* Error message */}
           <div>
