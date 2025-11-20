@@ -128,15 +128,20 @@ export const UpdateVersionModal = ({
           <code className="text-xs">{newVersionName ?? 'Unknown'}</code>
         </div>
         {!isStopped ? (
-          <p className="text-sm text-foreground-light">
-            The pipeline will automatically restart to apply the update. Your replication will
-            continue without data loss.
-          </p>
+          <div className="flex flex-col gap-y-2">
+            <p className="text-sm text-foreground-light">
+              The pipeline will automatically restart to apply the update. Your replication will
+              continue without data loss.
+            </p>
+          </div>
         ) : (
-          <p className="text-sm text-foreground-light">
-            The pipeline is currently stopped. The update will be applied, and you can start the
-            pipeline when ready.
-          </p>
+          <div className="bg-surface-100 border border-border-stronger rounded-md p-3">
+            <p className="text-sm text-foreground-light">
+              <strong className="text-foreground">Pipeline is stopped:</strong> The image update
+              will be applied, but the pipeline will remain stopped. You'll need to manually start
+              the pipeline when you're ready to resume replication.
+            </p>
+          </div>
         )}
       </div>
     </ConfirmationModal>

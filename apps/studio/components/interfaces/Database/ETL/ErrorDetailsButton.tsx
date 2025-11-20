@@ -1,5 +1,5 @@
 import { AlertCircle } from 'lucide-react'
-import { Button, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface ErrorDetailsButtonProps {
   reason: string
@@ -8,43 +8,37 @@ interface ErrorDetailsButtonProps {
 
 export const ErrorDetailsButton = ({ reason, solution }: ErrorDetailsButtonProps) => {
   return (
-    <Popover_Shadcn_>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Tooltip delayDuration={0}>
+      <TooltipTrigger asChild>
         <Button
           size="tiny"
           type="default"
           className="w-min"
-          icon={<AlertCircle />}
+          icon={<AlertCircle size={14} />}
           aria-label="Show error details"
         >
           Show Error
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
-        className="w-[500px] max-w-[90vw]"
-        align="start"
-        side="bottom"
-      >
-        <div className="flex flex-col gap-y-4">
+      </TooltipTrigger>
+      <TooltipContent side="bottom" align="start" className="w-[500px] max-w-[90vw] max-h-[400px] p-0 overflow-hidden">
+        <div className="flex flex-col gap-y-3 p-4 max-h-[400px] overflow-y-auto">
           {/* Error message */}
           <div>
-            <h4 className="text-sm font-medium mb-2">Error</h4>
-            <div className="bg-surface-100 rounded-md p-3 overflow-x-auto">
-              <pre className="text-xs font-mono text-foreground-light whitespace-pre-wrap break-words">
-                {reason}
-              </pre>
+            <div className="text-xs font-medium mb-2">Error</div>
+            <div className="bg-surface-100 rounded p-2 max-h-[250px] overflow-y-auto">
+              <pre className="text-xs font-mono whitespace-pre-wrap break-words">{reason}</pre>
             </div>
           </div>
 
           {/* Solution if available */}
           {solution && (
             <div>
-              <h4 className="text-sm font-medium mb-2">Solution</h4>
-              <p className="text-xs text-foreground-light">{solution}</p>
+              <div className="text-xs font-medium mb-2">Solution</div>
+              <p className="text-xs">{solution}</p>
             </div>
           )}
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </TooltipContent>
+    </Tooltip>
   )
 }

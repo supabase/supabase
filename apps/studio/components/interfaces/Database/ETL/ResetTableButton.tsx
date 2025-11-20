@@ -3,8 +3,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { RollbackType, useRollbackTableMutation } from 'data/etl/rollback-table-mutation'
-import { useRestartPipelineHelper } from 'data/etl/restart-pipeline-helper'
+import { useTableReset } from 'data/etl/use-table-reset'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,33 +24,12 @@ interface ResetTableButtonProps {
 export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) => {
   const { ref: projectRef, pipelineId: _pipelineId } = useParams()
   const [isOpen, setIsOpen] = useState(false)
-  const [isRestartingPipeline, setIsRestartingPipeline] = useState(false)
 
-  const { restartPipeline } = useRestartPipelineHelper()
-
-  const { mutate: rollbackTable, isLoading: isRollingBack } = useRollbackTableMutation({
-    onSuccess: async (_, vars) => {
-      const { projectRef, pipelineId } = vars
-      toast.success(`Table "${tableName}" reset successfully and pipeline is being restarted`)
-
-      setIsRestartingPipeline(true)
-      try {
-        await restartPipeline({ projectRef, pipelineId })
-        toast.success('Pipeline restarted successfully')
-      } catch (error: any) {
-        toast.error(`Failed to restart pipeline: ${error.message}`)
-      } finally {
-        setIsRestartingPipeline(false)
-        setIsOpen(false)
-      }
-    },
-    onError: (error) => {
-      toast.error(`Failed to reset table: ${error.message}`)
-      setIsOpen(false)
-    },
+  const { resetTable, isRollingBack, isRestartingPipeline, isResetting } = useTableReset({
+    tableName,
+    onSuccess: () => setIsOpen(false),
+    onError: () => setIsOpen(false),
   })
-
-  const isLoading = isRollingBack || isRestartingPipeline
 
   const handleReset = () => {
     if (!projectRef) return toast.error('Project ref is required')
@@ -59,7 +37,7 @@ export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) 
 
     const pipelineId = Number(_pipelineId)
 
-    rollbackTable({
+    resetTable({
       projectRef,
       pipelineId,
       tableId,
@@ -72,8 +50,8 @@ export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) 
       <Button
         size="tiny"
         type="default"
-        loading={isLoading}
-        disabled={isLoading}
+        loading={isResetting}
+        disabled={isResetting}
         className="w-min"
         icon={<RotateCcw />}
         aria-label={`Reset and restart table ${tableName}`}
@@ -101,13 +79,17 @@ export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) 
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            disabled={isLoading}
+            disabled={isResetting}
             onClick={handleReset}
             className="bg-destructive hover:bg-destructive/90"
           >
-            {isLoading ? 'Resetting...' : 'Reset Table and Restart'}
+            {isRollingBack
+              ? 'Resetting table...'
+              : isRestartingPipeline
+                ? 'Restarting pipeline...'
+                : 'Reset Table and Restart'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

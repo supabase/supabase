@@ -22,10 +22,18 @@ export const useRestartPipelineHelper = () => {
 
   const restartPipeline = async ({ projectRef, pipelineId }: RestartPipelineParams) => {
     // Step 1: Stop the pipeline to ensure pods are fully terminated
-    await stopPipeline({ projectRef, pipelineId })
+    try {
+      await stopPipeline({ projectRef, pipelineId })
+    } catch (error: any) {
+      throw new Error(`Failed to stop pipeline: ${error.message}`)
+    }
 
     // Step 2: Start the pipeline to create fresh pods with clean state
-    await startPipeline({ projectRef, pipelineId })
+    try {
+      await startPipeline({ projectRef, pipelineId })
+    } catch (error: any) {
+      throw new Error(`Failed to start pipeline: ${error.message}`)
+    }
   }
 
   return { restartPipeline }
