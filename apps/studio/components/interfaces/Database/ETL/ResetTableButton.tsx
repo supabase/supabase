@@ -76,22 +76,27 @@ export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) 
         disabled={isLoading}
         className="w-min"
         icon={<RotateCcw />}
-        aria-label={`Reset table ${tableName}`}
+        aria-label={`Reset and restart table ${tableName}`}
         onClick={() => setIsOpen(true)}
       >
-        Reset Table
+        Reset Table and Restart
       </Button>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Reset table "{tableName}"?</AlertDialogTitle>
+          <AlertDialogTitle>Reset and restart table "{tableName}"?</AlertDialogTitle>
           <AlertDialogDescription className="flex flex-col gap-y-3">
             <p>
-              This will reset the table state and start copying the table from scratch. Any
-              existing data for this table downstream will be deleted.
+              This will reset and restart replication for this table only. The table will start
+              copying from scratch, and any existing data for this table downstream will be
+              deleted.
             </p>
             <p className="text-foreground-light">
-              The table will go through the full replication process again, starting with the
-              initial copy phase.
+              Other tables in the pipeline will not be affected. Only this table will be restarted
+              and go through the full replication process again, starting with the initial copy
+              phase.
+            </p>
+            <p className="text-foreground-light">
+              The pipeline will be restarted to apply the table reset.
             </p>
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -102,7 +107,7 @@ export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) 
             onClick={handleReset}
             className="bg-destructive hover:bg-destructive/90"
           >
-            {isLoading ? 'Resetting...' : 'Reset Table'}
+            {isLoading ? 'Resetting...' : 'Reset Table and Restart'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -48,7 +48,9 @@ export const ErroredTableDetails = ({ state, tableName, tableId }: ErroredTableD
       ) : retryPolicy === 'manual_retry' ? (
         <div className="flex flex-col gap-y-2 text-foreground-lighter">
           <p className="text-xs">
-            {state.solution}. You can reset the table to start replication from scratch.
+            {state.solution}
+            {state.solution && !state.solution.endsWith('.') && '.'} You can reset the table to
+            start replication from scratch.
           </p>
           <div className="flex items-center gap-x-2">
             <ResetTableButton tableId={tableId} tableName={tableName} />
