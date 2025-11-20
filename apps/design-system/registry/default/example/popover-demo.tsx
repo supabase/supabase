@@ -1,15 +1,15 @@
 import { Button } from 'ui'
 import { Input_Shadcn_ } from 'ui'
 import { Label_Shadcn_ } from 'ui'
-import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import { Popover, PopoverContent, PopoverTrigger } from 'ui'
 
 export default function PopoverDemo() {
   return (
-    <Popover_Shadcn_>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover>
+      <PopoverTrigger asChild>
         <Button type="outline">Open popover</Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-80">
+      </PopoverTrigger>
+      <PopoverContent className="w-80">
         <div className="grid gap-4">
           <div className="space-y-2">
             <h4 className="font-medium leading-none">Dimensions</h4>
@@ -34,7 +34,7 @@ export default function PopoverDemo() {
             </div>
           </div>
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

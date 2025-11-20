@@ -21,9 +21,9 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Input_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
   RadioGroupLargeItem_Shadcn_,
   RadioGroup_Shadcn_,
   ScrollArea,
@@ -141,8 +141,8 @@ export const PolicyDetailsV2 = ({
                 </FormLabel_Shadcn_>
                 {authContext === 'database' && (
                   <FormControl_Shadcn_>
-                    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-                      <PopoverTrigger_Shadcn_ asChild>
+                    <Popover open={open} onOpenChange={setOpen} modal={false}>
+                      <PopoverTrigger asChild>
                         <Button
                           type="default"
                           disabled={!canUpdatePolicies}
@@ -161,9 +161,9 @@ export const PolicyDetailsV2 = ({
                             </span>
                           </div>
                         </Button>
-                      </PopoverTrigger_Shadcn_>
+                      </PopoverTrigger>
 
-                      <PopoverContent_Shadcn_
+                      <PopoverContent
                         className="p-0"
                         side="bottom"
                         align="start"
@@ -198,8 +198,8 @@ export const PolicyDetailsV2 = ({
                             </CommandGroup_Shadcn_>
                           </CommandList_Shadcn_>
                         </Command_Shadcn_>
-                      </PopoverContent_Shadcn_>
-                    </Popover_Shadcn_>
+                      </PopoverContent>
+                    </Popover>
                   </FormControl_Shadcn_>
                 )}
                 {authContext === 'realtime' && (

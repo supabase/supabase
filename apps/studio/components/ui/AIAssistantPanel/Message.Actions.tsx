@@ -8,9 +8,9 @@ import { ButtonTooltip } from '../ButtonTooltip'
 import {
   cn,
   Button,
-  Popover_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  PopoverContent_Shadcn_,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
   Form_Shadcn_,
   FormField_Shadcn_,
   FormControl_Shadcn_,
@@ -148,8 +148,8 @@ function MessageActionsThumbsDown({
   }, [form.formState.isSubmitSuccessful])
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={handleOpenChange}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={handleOpenChange}>
+      <PopoverTrigger asChild>
         <Button
           type="text"
           disabled={disabled}
@@ -171,8 +171,8 @@ function MessageActionsThumbsDown({
             )}
           />
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ portal className="w-80" align="start">
+      </PopoverTrigger>
+      <PopoverContent portal className="w-80" align="start">
         {form.formState.isSubmitSuccessful ? (
           <p className="text-sm">We appreciate your feedback!</p>
         ) : (
@@ -203,8 +203,8 @@ function MessageActionsThumbsDown({
             </form>
           </Form_Shadcn_>
         )}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }
 MessageActions.ThumbsDown = MessageActionsThumbsDown

@@ -2,7 +2,7 @@ import { Lightbulb, TriangleAlert } from 'lucide-react'
 import { useState } from 'react'
 
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
+import { Button, PopoverContent, PopoverTrigger, Popover } from 'ui'
 import { FeedbackWidget } from './FeedbackWidget'
 
 export const FeedbackDropdown = ({ className }: { className?: string }) => {
@@ -10,7 +10,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
   const [stage, setStage] = useState<'select' | 'widget'>('select')
 
   return (
-    <Popover_Shadcn_
+    <Popover
       modal={false}
       open={isOpen}
       onOpenChange={(e) => {
@@ -18,7 +18,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
         if (!e) setStage('select')
       }}
     >
-      <PopoverTrigger_Shadcn_ asChild>
+      <PopoverTrigger asChild>
         <Button
           asChild
           onClick={() => {
@@ -30,8 +30,8 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
         >
           <span className={className}>Feedback</span>
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent
         side="bottom"
         align="end"
         className="px-0 flex flex-col pt-1 pb-3 w-96"
@@ -61,8 +61,8 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
           </div>
         )}
         {stage === 'widget' && <FeedbackWidget onClose={() => setIsOpen(false)} />}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }
 

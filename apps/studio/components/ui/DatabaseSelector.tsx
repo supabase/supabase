@@ -20,9 +20,9 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
   ScrollArea,
   Tooltip,
   TooltipContent,
@@ -79,8 +79,8 @@ const DatabaseSelector = ({
   }, [_selectedDatabaseId])
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverTrigger asChild>
         <div className={cn('flex cursor-pointer', className)}>
           <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
             Source
@@ -116,8 +116,8 @@ const DatabaseSelector = ({
             )}
           </Button>
         </div>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="end" portal={portal}>
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-64" side="bottom" align="end" portal={portal}>
         <Command_Shadcn_>
           <CommandList_Shadcn_>
             {additionalOptions.length > 0 && (
@@ -236,8 +236,8 @@ const DatabaseSelector = ({
             )}
           </CommandList_Shadcn_>
         </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }
 

@@ -8,9 +8,9 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  PopoverContent,
+  PopoverTrigger,
+  Popover,
   ScrollArea,
   cn,
 } from 'ui'
@@ -79,8 +79,8 @@ export const MultiSelectV2 = ({
 
   return (
     <div className={disabled ? 'pointer-events-none opacity-50' : ''}>
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover open={open} onOpenChange={setOpen} modal={false}>
+        <PopoverTrigger asChild>
           <div
             className={cn(
               'relative border border-strong bg-control rounded',
@@ -116,8 +116,8 @@ export const MultiSelectV2 = ({
               <ChevronDown size={16} strokeWidth={2} className="text-foreground-lighter" />
             </div>
           </div>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0 w-96 border-strong" side="bottom" align="start">
+        </PopoverTrigger>
+        <PopoverContent className="p-0 w-96 border-strong" side="bottom" align="start">
           <Command_Shadcn_>
             <CommandInput_Shadcn_ placeholder={searchPlaceholder} />
             <CommandList_Shadcn_>
@@ -151,8 +151,8 @@ export const MultiSelectV2 = ({
               </CommandGroup_Shadcn_>
             </CommandList_Shadcn_>
           </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }

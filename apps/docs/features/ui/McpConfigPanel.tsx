@@ -13,9 +13,9 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -86,7 +86,7 @@ function ProjectSelector({
   }, [isLoading, isFetching, isFetchingNextPage, hasNextPage, entry?.isIntersecting, fetchNextPage])
 
   return (
-    <Popover_Shadcn_
+    <Popover
       modal={false}
       open={open}
       onOpenChange={(open) => {
@@ -106,7 +106,7 @@ function ProjectSelector({
             </Link>
           </Button>
         ) : (
-          <PopoverTrigger_Shadcn_ asChild disabled={isUserLoading || isLoading || isError}>
+          <PopoverTrigger asChild disabled={isUserLoading || isLoading || isError}>
             <Button
               size="small"
               type="default"
@@ -127,10 +127,10 @@ function ProjectSelector({
                       : 'Select a project')}
               </div>
             </Button>
-          </PopoverTrigger_Shadcn_>
+          </PopoverTrigger>
         )}
       </div>
-      <PopoverContent_Shadcn_ className="mt-0 p-0 w-56" side="bottom" align="start">
+      <PopoverContent className="mt-0 p-0 w-56" side="bottom" align="start">
         <Command_Shadcn_ shouldFilter={false}>
           <CommandInput_Shadcn_
             placeholder="Search ..."
@@ -184,8 +184,8 @@ function ProjectSelector({
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }
 
@@ -201,13 +201,13 @@ function PlatformSelector({
   const [open, setOpen] = useState(false)
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
       <div className={cn('flex', className)}>
         <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
           Platform
         </span>
 
-        <PopoverTrigger_Shadcn_ asChild>
+        <PopoverTrigger asChild>
           <Button
             size="small"
             type="default"
@@ -223,9 +223,9 @@ function PlatformSelector({
               {PLATFORMS.find((p) => p.value === selectedPlatform)?.label}
             </div>
           </Button>
-        </PopoverTrigger_Shadcn_>
+        </PopoverTrigger>
       </div>
-      <PopoverContent_Shadcn_ className="mt-0 p-0 max-w-48" side="bottom" align="start">
+      <PopoverContent className="mt-0 p-0 max-w-48" side="bottom" align="start">
         <Command_Shadcn_>
           <CommandList_Shadcn_>
             <CommandGroup_Shadcn_>
@@ -253,8 +253,8 @@ function PlatformSelector({
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }
 
