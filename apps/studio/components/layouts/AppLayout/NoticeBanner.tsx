@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { useAppBannerContext } from 'components/interfaces/App/AppBannerWrapperContext'
@@ -50,15 +51,25 @@ export const NoticeBanner = () => {
             Up to 15 min downtime at ~13:00 UTC Nov 22. Your apps will continue to operate normally.
           </span>
         </div>
-        <Button
-          type="text"
-          className="opacity-75 z-[1] ml-auto"
-          onClick={() => {
-            onUpdateAcknowledged('maintenance-window-banner-2025-11-21')
-          }}
-        >
-          Dismiss
-        </Button>
+        <div className="flex items-center gap-2 ml-auto">
+          <Link
+            href="https://status.supabase.com/incidents/z0l2157y33xk"
+            target="_blank"
+            rel="noreferrer"
+            className="text-xs sm:text-sm z-[1] text-warning opacity-75 hover:opacity-100"
+          >
+            Learn more
+          </Link>
+          <Button
+            type="text"
+            className="opacity-75 z-[1]"
+            onClick={() => {
+              onUpdateAcknowledged('maintenance-window-banner-2025-11-21')
+            }}
+          >
+            Dismiss
+          </Button>
+        </div>
       </div>
     </div>
   )
