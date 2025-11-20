@@ -2250,8 +2250,10 @@ export interface LogDrainConfirmButtonSubmittedEvent {
   groups: TelemetryGroups
 }
 
+type AdvisorCategory = 'PERFORMANCE' | 'SECURITY'
+
 /**
- * User opened an advisor detail page to view a specific advisor.
+ * User opened an advisor detail page to view a specific advisor (lint or notification).
  * This tracks when users engage with advisor recommendations.
  *
  * @group Events
@@ -2272,7 +2274,7 @@ export interface AdvisorDetailOpenedEvent {
     /**
      * Category of the advisor
      */
-    advisorCategories?: ('PERFORMANCE' | 'SECURITY')[]
+    advisorCategories?: AdvisorCategory[]
     /**
      * Specific advisor type/name, e.g. missing_index, no_rls_policy
      */
@@ -2303,7 +2305,7 @@ export interface AdvisorClickedEvent {
     /**
      * Category of the advisor (SECURITY or PERFORMANCE)
      */
-    advisorCategories?: ('PERFORMANCE' | 'SECURITY')[]
+    advisorCategories?: AdvisorCategory[]
     /**
      * Specific advisor type/name
      */
