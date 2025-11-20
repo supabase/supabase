@@ -428,7 +428,7 @@ const EnableReplicationDialogContent = ({ onClose }: { onClose: () => void }) =>
   const noAccessToReplication =
     !enablePgReplicate || error?.message.includes('feature flag is required')
 
-  const { mutateAsync: createTenantSource, isLoading: creatingTenantSource } =
+  const { mutateAsync: createTenantSource, isPending: creatingTenantSource } =
     useCreateTenantSourceMutation()
 
   const onEnableReplication = async () => {

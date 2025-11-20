@@ -41,7 +41,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
     ? `${DOCS_URL}${extensionMeta?.link}`
     : extensionMeta?.link ?? undefined
 
-  const { mutate: disableExtension, isLoading: isDisabling } = useDatabaseExtensionDisableMutation({
+  const { mutate: disableExtension, isPending: isDisabling } = useDatabaseExtensionDisableMutation({
     onSuccess: () => {
       toast.success(`${extension.name} is off.`)
       setIsDisableModalOpen(false)

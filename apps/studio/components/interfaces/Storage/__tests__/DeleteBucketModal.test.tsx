@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from 'data/storage/buckets-query'
-import { render } from 'tests/helpers'
+import { customRender } from 'tests/lib/custom-render'
 import { addAPIMock } from 'tests/lib/msw'
 import { routerMock } from 'tests/lib/route-mock'
 import { DeleteBucketModal } from '../DeleteBucketModal'
@@ -104,13 +104,13 @@ describe(`DeleteBucketModal`, () => {
 
   it(`renders a confirmation dialog`, async () => {
     const onClose = vi.fn()
-    render(<Page onClose={onClose} />)
+    customRender(<Page onClose={onClose} />)
 
     const openButton = screen.getByRole(`button`, { name: `Open` })
     await userEvent.click(openButton)
     await screen.findByRole(`dialog`)
 
-    const input = screen.getByPlaceholderText(/Type/)
+    const input = screen.getByPlaceholderText(`Type bucket name`)
     await userEvent.type(input, `test`)
 
     const confirmButton = screen.getByRole(`button`, { name: `Delete bucket` })

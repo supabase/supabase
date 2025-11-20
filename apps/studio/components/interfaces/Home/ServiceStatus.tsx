@@ -123,7 +123,9 @@ export const ServiceStatus = () => {
       projectRef: ref,
     },
     {
-      refetchInterval: (data) => (data?.some((service) => !service.healthy) ? 5000 : false),
+      refetchInterval: (data) => {
+        return data?.some((service) => !service.healthy) ? 5000 : false
+      },
     }
   )
   const { data: edgeFunctionsStatus, refetch: refetchEdgeFunctionServiceStatus } =
@@ -132,7 +134,9 @@ export const ServiceStatus = () => {
         projectRef: ref,
       },
       {
-        refetchInterval: (data) => (!data?.healthy ? 5000 : false),
+        refetchInterval: (data) => {
+          return !data?.healthy ? 5000 : false
+        },
       }
     )
 

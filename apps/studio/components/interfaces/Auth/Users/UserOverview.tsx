@@ -99,7 +99,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const seconds = Math.floor(mailerOtpExpiry % 60)
   const formattedExpiry = `${mailerOtpExpiry > 60 ? `${minutes} minute${minutes > 1 ? 's' : ''} ${seconds > 0 ? 'and' : ''} ` : ''}${seconds > 0 ? `${seconds} second${seconds > 1 ? 's' : ''}` : ''}`
 
-  const { mutate: resetPassword, isLoading: isResettingPassword } = useUserResetPasswordMutation({
+  const { mutate: resetPassword, isPending: isResettingPassword } = useUserResetPasswordMutation({
     onSuccess: (_, vars) => {
       setSuccessAction('send_recovery')
       toast.success(`Sent password recovery to ${vars.user.email}`)
@@ -108,7 +108,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       toast.error(`Failed to send password recovery: ${err.message}`)
     },
   })
-  const { mutate: sendMagicLink, isLoading: isSendingMagicLink } = useUserSendMagicLinkMutation({
+  const { mutate: sendMagicLink, isPending: isSendingMagicLink } = useUserSendMagicLinkMutation({
     onSuccess: (_, vars) => {
       setSuccessAction('send_magic_link')
       toast.success(
@@ -125,7 +125,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       )
     },
   })
-  const { mutate: sendOTP, isLoading: isSendingOTP } = useUserSendOTPMutation({
+  const { mutate: sendOTP, isPending: isSendingOTP } = useUserSendOTPMutation({
     onSuccess: (_, vars) => {
       setSuccessAction('send_otp')
       toast.success(`Sent OTP to ${vars.user.phone}`)
@@ -140,7 +140,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       setIsDeleteFactorsModalOpen(false)
     },
   })
-  const { mutate: updateUser, isLoading: isUpdatingUser } = useUserUpdateMutation({
+  const { mutate: updateUser, isPending: isUpdatingUser } = useUserUpdateMutation({
     onSuccess: () => {
       toast.success('Successfully unbanned user')
       setIsUnbanModalOpen(false)

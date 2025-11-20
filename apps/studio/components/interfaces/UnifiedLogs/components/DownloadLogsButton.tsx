@@ -42,7 +42,7 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
   const [numHours, setNumHours] = useState(DEFAULT_NUM_ROWS)
   const [selectedFormat, setSelectedFormat] = useState<'csv' | 'json'>()
 
-  const { mutate: retrieveLogs, isLoading } = useGetUnifiedLogsMutation({
+  const { mutate: retrieveLogs, isPending } = useGetUnifiedLogsMutation({
     onSuccess: (res) => {
       if (selectedFormat === 'json') {
         const blob = new Blob([JSON.stringify(res, null, 2)], { type: 'text/json;charset=utf-8;' })
@@ -158,12 +158,12 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
           <DialogFooter>
             <Button
               type="default"
-              disabled={isLoading}
+              disabled={isPending}
               onClick={() => setSelectedFormat(undefined)}
             >
               Cancel
             </Button>
-            <Button type="primary" loading={isLoading} onClick={onExportData}>
+            <Button type="primary" loading={isPending} onClick={onExportData}>
               Export
             </Button>
           </DialogFooter>
