@@ -18,6 +18,7 @@ async function getNamespaces({
   warehouse,
   tempApiKey,
 }: GetNamespacesVariables & { tempApiKey?: string }) {
+  console.log('getNamespaces', { warehouse })
   try {
     if (!tempApiKey) throw new Error(`${errorPrefix}: API Key missing`)
 
@@ -71,7 +72,9 @@ export const useIcebergNamespacesQuery = <TData = IcebergNamespacesData>(
       typeof projectRef !== 'undefined' &&
       typeof tempApiKey !== 'undefined' &&
       typeof catalogUri !== 'undefined' &&
-      typeof warehouse !== 'undefined',
+      catalogUri.length > 0 &&
+      typeof warehouse !== 'undefined' &&
+      warehouse.length > 0,
     ...options,
   })
 }

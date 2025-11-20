@@ -13,8 +13,14 @@ export interface McpClient {
   configFile?: string
   generateDeepLink?: (config: McpClientConfig) => string | null
   transformConfig?: (config: McpClientBaseConfig) => McpClientConfig
-  primaryInstructions?: (config: McpClientConfig) => React.ReactNode
-  alternateInstructions?: (config: McpClientConfig) => React.ReactNode
+  primaryInstructions?: (
+    config: McpClientConfig,
+    onCopy?: (type?: 'url' | 'json' | 'command') => void
+  ) => React.ReactNode
+  alternateInstructions?: (
+    config: McpClientConfig,
+    onCopy?: (type?: 'url' | 'json' | 'command') => void
+  ) => React.ReactNode
 }
 
 export interface McpUrlBuilderConfig {

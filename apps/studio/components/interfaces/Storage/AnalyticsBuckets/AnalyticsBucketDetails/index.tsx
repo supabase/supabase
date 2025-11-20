@@ -3,6 +3,7 @@ import { Loader2, SquarePlus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
@@ -53,7 +54,10 @@ export const AnalyticBucketDetails = () => {
     isError: isErrorBucket,
   } = useSelectedAnalyticsBucket()
 
-  const [modal, setModal] = useState<'delete' | null>(null)
+  const [showDeleteModal, setShowDeleteModal] = useQueryState(
+    'delete',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   // [Joshen] Namespaces are now created asynchronously when the pipeline is started, so long poll after
   // updating connected tables until namespaces are updated
   // Namespace would just be the schema (Which is currently limited to public)
@@ -65,10 +69,10 @@ export const AnalyticBucketDetails = () => {
 
   /** The wrapper instance is the wrapper that is installed for this Analytics bucket. */
   const { data: wrapperInstance, isLoading: isLoadingWrapperInstance } =
-    useAnalyticsBucketWrapperInstance({ bucketId: bucket?.id })
+    useAnalyticsBucketWrapperInstance({ bucketId: bucket?.name })
   const { publication, pipeline } = useAnalyticsBucketAssociatedEntities({
     projectRef,
-    bucketId: bucket?.id,
+    bucketId: bucket?.name,
   })
   const { data, isSuccess: isSuccessPipelineStatus } = useReplicationPipelineStatusQuery(
     { projectRef, pipelineId: pipeline?.id },
@@ -178,20 +182,20 @@ export const AnalyticBucketDetails = () => {
             </ScaffoldSection>
           ) : state === 'not-installed' ? (
             <ExtensionNotInstalled
-              bucketName={bucket?.id}
+              bucketName={bucket?.name}
               projectRef={project?.ref!}
               wrapperMeta={wrapperMeta}
               wrappersExtension={wrappersExtension!}
             />
           ) : state === 'needs-upgrade' ? (
             <ExtensionNeedsUpgrade
-              bucketName={bucket?.id}
+              bucketName={bucket?.name}
               projectRef={project?.ref!}
               wrapperMeta={wrapperMeta}
               wrappersExtension={wrappersExtension!}
             />
           ) : state === 'missing' ? (
-            <WrapperMissing bucketName={bucket?.id} />
+            <WrapperMissing bucketName={bucket?.name} />
           ) : state === 'added' && wrapperInstance ? (
             <>
               <ScaffoldSection isFullWidth>
@@ -294,7 +298,7 @@ export const AnalyticBucketDetails = () => {
                       {namespaces.map(({ namespace, schema, tables }) => (
                         <NamespaceWithTables
                           key={namespace}
-                          bucketName={bucket?.id}
+                          bucketName={bucket?.name}
                           namespace={namespace}
                           sourceType="direct"
                           schema={schema}
@@ -311,7 +315,7 @@ export const AnalyticBucketDetails = () => {
                 )}
               </ScaffoldSection>
 
-              <SimpleConfigurationDetails bucketName={bucket?.id} />
+              <SimpleConfigurationDetails bucketName={bucket?.name} />
             </>
           ) : null}
 
@@ -330,8 +334,8 @@ export const AnalyticBucketDetails = () => {
                 </div>
                 <Button
                   type="danger"
-                  disabled={!bucket?.id || !isSuccessBucket}
-                  onClick={() => setModal('delete')}
+                  disabled={!bucket?.name || !isSuccessBucket}
+                  onClick={() => setShowDeleteModal(true)}
                 >
                   Delete bucket
                 </Button>
@@ -342,9 +346,9 @@ export const AnalyticBucketDetails = () => {
       )}
 
       <DeleteAnalyticsBucketModal
-        visible={modal === `delete`}
-        bucketId={bucket?.id}
-        onClose={() => setModal(null)}
+        visible={showDeleteModal}
+        bucketId={bucket?.name}
+        onClose={() => setShowDeleteModal(false)}
         onSuccess={() => router.push(`/project/${projectRef}/storage/analytics`)}
       />
     </>

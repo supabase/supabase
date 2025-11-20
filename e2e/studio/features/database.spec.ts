@@ -1,12 +1,12 @@
 import { expect, Page } from '@playwright/test'
-import { env } from '../env.config'
-import { test } from '../utils/test'
-import { toUrl } from '../utils/to-url'
+import { env } from '../env.config.js'
+import { test } from '../utils/test.js'
+import { toUrl } from '../utils/to-url.js'
 import {
+  createApiResponseWaiter,
   waitForApiResponse,
   waitForDatabaseToLoad,
-  createApiResponseWaiter,
-} from '../utils/wait-for-response'
+} from '../utils/wait-for-response.js'
 
 const databaseTableName = 'pw_database_table'
 const databaseTableNameNew = 'pw_database_table_new'
@@ -386,9 +386,7 @@ test.describe.serial('Database', () => {
         const triggerRow = await page.getByRole('row', { name: databaseTriggerName })
         await triggerRow.getByRole('button', { name: 'More options' }).click()
         await page.getByRole('menuitem', { name: 'Delete trigger' }).click()
-        await page
-          .getByRole('textbox', { name: `Type ${databaseTriggerName} to confirm.` })
-          .fill(databaseTriggerName)
+        await page.getByPlaceholder('Type in name of trigger').fill(databaseTriggerName)
         await page.getByRole('button', { name: `Delete trigger ${databaseTriggerName}` }).click()
         await expect(
           page.getByText(`Successfully removed ${databaseTriggerName}`),
@@ -441,9 +439,7 @@ test.describe.serial('Database', () => {
       // delete trigger
       await updatedTriggerRow.getByRole('button', { name: 'More options' }).click()
       await page.getByRole('menuitem', { name: 'Delete trigger' }).click()
-      await page
-        .getByRole('textbox', { name: `Type ${databaseTriggerNameUpdated} to confirm.` })
-        .fill(databaseTriggerNameUpdated)
+      await page.getByPlaceholder('Type in name of trigger').fill(databaseTriggerNameUpdated)
       await page
         .getByRole('button', { name: `Delete trigger ${databaseTriggerNameUpdated}` })
         .click()
@@ -791,9 +787,7 @@ END;`)
     // delete function
     await updatedFunctionRow.getByRole('button', { name: 'More options' }).click()
     await page.getByRole('menuitem', { name: 'Delete function' }).click()
-    await page
-      .getByRole('textbox', { name: `Type ${databaseFunctionNameUpdated} to confirm.` })
-      .fill(databaseFunctionNameUpdated)
+    await page.getByPlaceholder('Type in name of function').fill(databaseFunctionNameUpdated)
     await page
       .getByRole('button', { name: `Delete function ${databaseFunctionNameUpdated}` })
       .click()
