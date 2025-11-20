@@ -1581,24 +1581,6 @@ export interface HomeActivityStatClickedEvent {
 }
 
 /**
- * User clicked the main Ask Assistant button in the Advisor section of HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeAdvisorAskAssistantClickedEvent {
-  action: 'home_advisor_ask_assistant_clicked'
-  properties: {
-    /**
-     * Number of issues found by the advisor
-     */
-    issues_count: number
-  }
-  groups: TelemetryGroups
-}
-
-/**
  * User was exposed to the realtime experiment (shown or not shown the Enable Realtime button).
  *
  * @group Events
@@ -1620,51 +1602,6 @@ export interface RealtimeExperimentExposedEvent {
      * Days since project creation (to segment by new user cohorts)
      */
     days_since_project_creation: number
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked on an issue card in the Advisor section of HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeAdvisorIssueCardClickedEvent {
-  action: 'home_advisor_issue_card_clicked'
-  properties: {
-    /**
-     * Category of the issue (SECURITY or PERFORMANCE)
-     */
-    issue_category: string
-    /**
-     * Name/key of the lint issue
-     */
-    issue_name: string
-    issues_count: number
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked the Fix Issue button on an advisor card in HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeAdvisorFixIssueClickedEvent {
-  action: 'home_advisor_fix_issue_clicked'
-  properties: {
-    /**
-     * Category of the issue (SECURITY or PERFORMANCE)
-     */
-    issue_category: string
-    /**
-     * Name/key of the lint issue
-     */
-    issue_name: string
   }
   groups: TelemetryGroups
 }
@@ -2319,46 +2256,62 @@ export interface LogDrainConfirmButtonSubmittedEvent {
  *
  * @group Events
  * @source studio
- * @page Advisor Panel
+ * @page The advisor panel sidebar when opened
  */
-export interface AdvisorViewedEvent {
-  action: 'advisor_viewed'
+export interface AdvisorDetailOpenedEvent {
+  action: 'advisor_detail_opened'
   properties: {
     /**
-     * Category of the advisor, e.g. performance, security
+     * Where the advisor was viewed from
      */
-    advisor_category: 'PERFORMANCE' | 'SECURITY'
-    /**
-     * Specific advisor type/name, e.g. missing_index, no_rls_policy
-     */
-    advisor_type: string
+    origin: 'home' | 'advisor_panel'
     /**
      * Source of the advisor
      */
-    advisor_source: 'lint' | 'notification'
+    advisorSource: 'lint' | 'notification'
+    /**
+     * Category of the advisor
+     */
+    advisorCategories?: ('PERFORMANCE' | 'SECURITY')[]
+    /**
+     * Specific advisor type/name, e.g. missing_index, no_rls_policy
+     */
+    advisorType?: string
   }
   groups: TelemetryGroups
 }
 
 /**
- * User clicked the assistant button from an advisor detail view.
- * This tracks when users engage with AI assistance for resolving advisors.
+ * User clicked on an advisor-related element (card, button, etc.).
+ * This tracks various user interactions with advisor recommendations.
  *
  * @group Events
  * @source studio
- * @page Advisor Panel
+ * @page /project/{ref}, Advisor Panel
  */
-export interface AdvisorAssistantClickedEvent {
-  action: 'advisor_assistant_clicked'
+export interface AdvisorClickedEvent {
+  action: 'advisor_clicked'
   properties: {
     /**
-     * Category of the advisor, e.g. performance, security
+     * The type of click action performed
      */
-    advisor_category: 'PERFORMANCE' | 'SECURITY'
+    clickAction: 'ask_assistant' | 'issue_card' | 'fix_issue'
     /**
-     * Specific advisor type/name, e.g. missing_index, no_rls_policy
+     * Where the click occurred
      */
-    advisor_type: string
+    origin: 'home' | 'advisor_panel' | 'advisor_detail' | 'lint_detail'
+    /**
+     * Category of the advisor (SECURITY or PERFORMANCE)
+     */
+    advisorCategories?: ('PERFORMANCE' | 'SECURITY')[]
+    /**
+     * Specific advisor type/name
+     */
+    advisorType?: string
+    /**
+     * Number of issues found (only included when origin is 'home')
+     */
+    issuesCount?: number
   }
   groups: TelemetryGroups
 }
@@ -2464,9 +2417,6 @@ export type TelemetryEvent =
   | HomeGettingStartedClosedEvent
   | HomeSectionRowsMovedEvent
   | HomeActivityStatClickedEvent
-  | HomeAdvisorAskAssistantClickedEvent
-  | HomeAdvisorIssueCardClickedEvent
-  | HomeAdvisorFixIssueClickedEvent
   | RealtimeExperimentExposedEvent
   | HomeProjectUsageServiceClickedEvent
   | HomeProjectUsageChartClickedEvent
@@ -2493,5 +2443,5 @@ export type TelemetryEvent =
   | SidebarOpenedEvent
   | LogDrainSaveButtonClickedEvent
   | LogDrainConfirmButtonSubmittedEvent
-  | AdvisorViewedEvent
-  | AdvisorAssistantClickedEvent
+  | AdvisorDetailOpenedEvent
+  | AdvisorClickedEvent

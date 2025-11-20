@@ -24,16 +24,11 @@ const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
   const { openSidebar } = useSidebarManagerSnapshot()
 
   const handleAskAssistant = () => {
-    // Track advisor_assistant_clicked event
-    const category = lint.categories.includes('SECURITY')
-      ? 'SECURITY'
-      : lint.categories.includes('PERFORMANCE')
-        ? 'PERFORMANCE'
-        : 'PERFORMANCE' // Default fallback
-
-    track('advisor_assistant_clicked', {
-      advisor_category: category as 'SECURITY' | 'PERFORMANCE',
-      advisor_type: lint.name,
+    track('advisor_clicked', {
+      clickAction: 'ask_assistant',
+      origin: 'lint_detail',
+      advisorCategories: lint.categories,
+      advisorType: lint.name,
     })
 
     onAskAssistant?.()

@@ -53,9 +53,11 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     if (projectRef && organization?.slug) {
       sendEvent({
-        action: 'home_advisor_ask_assistant_clicked',
+        action: 'advisor_clicked',
         properties: {
-          issues_count: totalErrors,
+          clickAction: 'ask_assistant',
+          origin: 'home',
+          issuesCount: totalErrors,
         },
         groups: {
           project: projectRef,
@@ -71,11 +73,13 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
       openSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
       if (projectRef && organization?.slug) {
         sendEvent({
-          action: 'home_advisor_issue_card_clicked',
+          action: 'advisor_clicked',
           properties: {
-            issue_category: lint.categories[0] || 'UNKNOWN',
-            issue_name: lint.name,
-            issues_count: totalErrors,
+            clickAction: 'issue_card',
+            origin: 'home',
+            advisorCategories: lint.categories,
+            advisorType: lint.name,
+            issuesCount: totalErrors,
           },
           groups: {
             project: projectRef,
@@ -144,10 +148,12 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
                         })
                         if (projectRef && organization?.slug) {
                           sendEvent({
-                            action: 'home_advisor_fix_issue_clicked',
+                            action: 'advisor_clicked',
                             properties: {
-                              issue_category: lint.categories[0] || 'UNKNOWN',
-                              issue_name: lint.name,
+                              clickAction: 'fix_issue',
+                              origin: 'home',
+                              advisorCategories: lint.categories,
+                              advisorType: lint.name,
                             },
                             groups: {
                               project: projectRef,

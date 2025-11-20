@@ -253,34 +253,22 @@ export const AdvisorPanel = () => {
   const handleItemClick = (item: AdvisorItem) => {
     setSelectedItem(item.id, item.source)
 
-    // Track advisor_viewed event
-    if (item.source === 'lint') {
-      const lint = item.original as Lint
-      const category = lint.categories.includes('SECURITY')
-        ? 'SECURITY'
-        : lint.categories.includes('PERFORMANCE')
-          ? 'PERFORMANCE'
-          : 'PERFORMANCE' // Default fallback
-
-      track('advisor_viewed', {
-        advisor_category: category as 'SECURITY' | 'PERFORMANCE',
-        advisor_type: lint.name,
-        advisor_source: 'lint',
-      })
-    } else if (item.source === 'notification') {
+    if (item.source === 'notification') {
       const notification = item.original as Notification
       if (notification.status === 'new' && !markedRead.current.includes(notification.id)) {
         markedRead.current.push(notification.id)
       }
-
-      // Track advisor_viewed for notifications
-      // Note: Notifications don't have a specific type, so we use the title
-      track('advisor_viewed', {
-        advisor_category: 'SECURITY', // Notifications are typically security-related
-        advisor_type: notification.name || 'notification',
-        advisor_source: 'notification',
-      })
     }
+
+    const advisorCategories =
+      item.source === 'lint' && 'categories' in item.original ? item.original.categories : undefined
+
+    track('advisor_detail_opened', {
+      origin: 'advisor_panel',
+      advisorCategories,
+      advisorSource: item.source,
+      advisorType: item.original.name,
+    })
   }
 
   const handleUpdateNotificationStatus = (id: string, status: 'archived' | 'seen') => {
