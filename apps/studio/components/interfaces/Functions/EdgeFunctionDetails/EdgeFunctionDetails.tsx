@@ -104,8 +104,8 @@ export const EdgeFunctionDetails = () => {
     slug: functionSlug,
   })
 
-  const { mutate: updateEdgeFunction, isLoading: isUpdating } = useEdgeFunctionUpdateMutation()
-  const { mutate: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation({
+  const { mutate: updateEdgeFunction, isPending: isUpdating } = useEdgeFunctionUpdateMutation()
+  const { mutate: deleteEdgeFunction, isPending: isDeleting } = useEdgeFunctionDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted "${selectedFunction?.name}"`)
       router.push(`/project/${projectRef}/functions`)
@@ -367,7 +367,10 @@ export const EdgeFunctionDetails = () => {
                         <TabsContent key={tab.id} value={tab.id} className="mt-4 px-6">
                           <CodeBlock
                             value={code}
-                            className="p-0 text-xs !mt-0 border-none [&>code]:!whitespace-pre-wrap [&>code]:break-words"
+                            className={cn(
+                              'p-0 text-xs !mt-0 border-none [&>code]:!whitespace-pre-wrap',
+                              showKey ? '[&>code]:break-all' : '[&>code]:break-words'
+                            )}
                             language={tab.language}
                             wrapLines={true}
                             hideLineNumbers={tab.hideLineNumbers}

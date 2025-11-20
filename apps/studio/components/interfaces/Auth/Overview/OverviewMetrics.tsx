@@ -1,5 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
+import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import dayjs from 'dayjs'
+import { ChevronRight, ExternalLink, HelpCircle, Telescope } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import {
   Card,
   CardContent,
@@ -11,30 +19,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import Link from 'next/link'
-import { ChevronRight, ExternalLink, HelpCircle } from 'lucide-react'
-import { Reports } from 'icons'
-import {
-  calculatePercentageChange,
-  getChangeColor,
-  getMetricValues,
-  AuthMetricsResponse,
-  getApiSuccessRates,
-  getAuthSuccessRates,
-} from './OverviewUsage.constants'
-import {
-  fetchTopAuthErrorCodes,
-  fetchTopResponseErrors,
-  AuthErrorCodeRow,
-  ResponseErrorRow,
-} from './OverviewErrors.constants'
-import { OverviewTable } from './OverviewTable'
-import dayjs from 'dayjs'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useRouter } from 'next/router'
-import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
-import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import {
   PageSection,
   PageSectionContent,
@@ -42,6 +26,21 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import {
+  AuthErrorCodeRow,
+  fetchTopAuthErrorCodes,
+  fetchTopResponseErrors,
+  ResponseErrorRow,
+} from './OverviewErrors.constants'
+import { OverviewTable } from './OverviewTable'
+import {
+  AuthMetricsResponse,
+  calculatePercentageChange,
+  getApiSuccessRates,
+  getAuthSuccessRates,
+  getChangeColor,
+  getMetricValues,
+} from './OverviewUsage.constants'
 
 const StatCard = ({
   title,
@@ -238,8 +237,8 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                 href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}&isHelper=true&helperText=Last+24+hours`}
                 className="text-sm text-link inline-flex items-center gap-x-1.5"
               >
-                <Reports size={14} />
-                <span>View all reports</span>
+                <Telescope size={14} />
+                <span>Go to observability</span>
                 <ChevronRight size={14} />
               </Link>
             </div>

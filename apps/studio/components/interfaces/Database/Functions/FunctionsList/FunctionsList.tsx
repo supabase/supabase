@@ -6,19 +6,24 @@ import { useRef } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import {
+  ReportsSelectFilter,
+  selectFilterSchema,
+} from 'components/interfaces/Reports/v2/ReportsSelectFilter'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useDatabaseFunctionDeleteMutation } from 'data/database-functions/database-functions-delete-mutation'
+import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
+import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
@@ -32,13 +37,8 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import {
-  ReportsSelectFilter,
-  selectFilterSchema,
-} from 'components/interfaces/Reports/v2/ReportsSelectFilter'
 import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
-import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
 
 import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
 import { CreateFunction } from 'components/interfaces/Database/Functions/CreateFunction'
@@ -203,7 +203,7 @@ const FunctionsList = () => {
         handleErrorOnDelete(deletingFunctionIdRef, selectedId, `Function not found`),
     })
 
-  const { mutate: deleteDatabaseFunction, isLoading: isDeletingFunction } =
+  const { mutate: deleteDatabaseFunction, isPending: isDeletingFunction } =
     useDatabaseFunctionDeleteMutation({
       onSuccess: (_, variables) => {
         toast.success(`Successfully removed function ${variables.func.name}`)

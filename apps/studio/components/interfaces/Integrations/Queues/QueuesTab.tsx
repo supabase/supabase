@@ -1,6 +1,6 @@
 import { RefreshCw, Search, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
 
@@ -22,7 +22,10 @@ export const QueuesTab = () => {
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
   const [search, setSearch] = useState(searchQuery)
 
-  const [createQueueSheetShown, setCreateQueueSheetShown] = useState(false)
+  const [createQueueSheetShown, setCreateQueueSheetShown] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const {
     data: queues,

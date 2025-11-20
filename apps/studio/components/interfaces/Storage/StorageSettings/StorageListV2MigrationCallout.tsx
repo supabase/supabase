@@ -77,7 +77,7 @@ const StorageListV2MigrationDialog = () => {
 
   const [open, setOpen] = useState(false)
 
-  const { mutate: updateStorageConfig, isLoading: isUpdating } =
+  const { mutate: updateStorageConfig, isPending: isUpdating } =
     useProjectStorageConfigUpdateUpdateMutation({
       onSuccess: () => {
         toast.success(`Project's storage will be upgraded shortly!`)

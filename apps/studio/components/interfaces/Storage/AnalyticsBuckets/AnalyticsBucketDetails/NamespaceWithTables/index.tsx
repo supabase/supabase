@@ -72,7 +72,8 @@ export const NamespaceWithTables = ({
       projectRef,
     },
     {
-      refetchInterval: (data = []) => {
+      refetchInterval: (_data) => {
+        const data = _data ?? []
         if (pollIntervalNamespaceTables === 0) return false
 
         const publicationTables = publication?.tables ?? []
@@ -96,7 +97,7 @@ export const NamespaceWithTables = ({
   const isSyncedPublicationTablesAndNamespaceTables =
     publicationTablesNotSyncedToNamespaceTables.length === 0
 
-  const { mutateAsync: importForeignSchema, isLoading: isImportingForeignSchema } =
+  const { mutateAsync: importForeignSchema, isPending: isImportingForeignSchema } =
     useFDWImportForeignSchemaMutation()
 
   const rescanNamespace = async () => {
@@ -239,7 +240,7 @@ export const NamespaceWithTables = ({
         <TableHeader>
           <TableRow>
             <TableHead className={allTables.length === 0 ? 'text-foreground-muted' : undefined}>
-              Table name
+              Name
             </TableHead>
             {!!publication && (
               <TableHead className={allTables.length === 0 ? 'hidden' : undefined}>

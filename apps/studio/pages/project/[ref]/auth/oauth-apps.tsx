@@ -12,7 +12,7 @@ const OAuthApps: NextPageWithLayout = () => (
       <PageSectionContent>
         <FormHeader
           title="OAuth Apps"
-          docsUrl="https://supabase.com/docs/guides/auth/oauth/oauth-apps"
+          docsUrl="https://supabase.com/docs/guides/auth/oauth-server"
         />
         <OAuthAppsList />
       </PageSectionContent>

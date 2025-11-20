@@ -185,7 +185,8 @@ export const DestinationRow = ({
                           <AlertCircle size={14} />
                         </TooltipTrigger>
                         <TooltipContent side="bottom">
-                          {errorCount} table{errorCount === 1 ? '' : 's'} have replication errors
+                          {errorCount} table{errorCount === 1 ? '' : 's'} encountered replication
+                          errors
                         </TooltipContent>
                       </Tooltip>
                     )}

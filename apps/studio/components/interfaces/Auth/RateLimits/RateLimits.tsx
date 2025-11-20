@@ -48,7 +48,7 @@ export const RateLimits = () => {
     isError,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation({
+  const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
     onSuccess: () => {
       toast.success('Rate limits successfully updated')
     },

@@ -7,6 +7,7 @@ import ApiSchema from '~/components/ApiSchema'
 import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
 import { MDXRemoteRefs, getRefMarkdown } from '~/features/docs/Reference.mdx'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
+import { formatMethodSignature } from '~/features/docs/Reference.typeSpec'
 import {
   getApiEndpointById,
   getCliSpec,
@@ -447,6 +448,16 @@ async function FunctionSection({
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
       <StickyHeader {...section} className="col-[1_/_-1]" />
+
+      {/* Display method signature below title */}
+      {types && formatMethodSignature(types) && (
+        <div className="col-[1_/_-1] -mt-2 mb-4">
+          <code className="text-sm text-foreground-muted font-mono">
+            {formatMethodSignature(types)}
+          </code>
+        </div>
+      )}
+
       <div className="overflow-hidden flex flex-col gap-8">
         <div className="prose break-words text-sm">
           <MDXRemoteRefs source={fullDescription} />
@@ -468,48 +479,60 @@ async function FunctionSection({
         {!!types?.ret && <ReturnTypeDetails returnType={types.ret} />}
       </div>
       <div className="overflow-auto">
-        {'examples' in fn && Array.isArray(fn.examples) && fn.examples.length > 0 && (
-          <Tabs_Shadcn_ defaultValue={fn.examples[0].id}>
-            <TabsList_Shadcn_ className="flex-wrap gap-2 border-0">
-              {fn.examples.map((example) => (
-                <TabsTrigger_Shadcn_
-                  key={example.id}
-                  value={example.id}
-                  className={cn(
-                    'px-2.5 py-1 rounded-full',
-                    'border-0 bg-surface-200 hover:bg-surface-300',
-                    'text-xs text-foreground-lighter',
-                    // Undoing styles from primitive component
-                    'data-[state=active]:border-0 data-[state=active]:shadow-0',
-                    'data-[state=active]:bg-foreground data-[state=active]:text-background',
-                    'transition'
-                  )}
-                >
-                  {example.name}
-                </TabsTrigger_Shadcn_>
+        {(() => {
+          // Prefer YAML examples, fallback to TypeDoc examples
+          const yamlExamples =
+            'examples' in fn && Array.isArray(fn.examples) && fn.examples.length > 0
+              ? fn.examples
+              : []
+          const examples = yamlExamples.length > 0 ? yamlExamples : types?.comment?.examples || []
+
+          if (examples.length === 0) return null
+
+          return (
+            <Tabs_Shadcn_ defaultValue={examples[0].id}>
+              <TabsList_Shadcn_ className="flex-wrap gap-2 border-0">
+                {examples.map((example) => (
+                  <TabsTrigger_Shadcn_
+                    key={example.id}
+                    value={example.id}
+                    className={cn(
+                      'px-2.5 py-1 rounded-full',
+                      'border-0 bg-surface-200 hover:bg-surface-300',
+                      'text-xs text-foreground-lighter',
+                      // Undoing styles from primitive component
+                      'data-[state=active]:border-0 data-[state=active]:shadow-0',
+                      'data-[state=active]:bg-foreground data-[state=active]:text-background',
+                      'transition'
+                    )}
+                  >
+                    {example.name}
+                  </TabsTrigger_Shadcn_>
+                ))}
+              </TabsList_Shadcn_>
+              {examples.map((example) => (
+                <TabsContent_Shadcn_ key={example.id} value={example.id}>
+                  <MDXRemoteRefs source={example.code} />
+                  <div className="flex flex-col gap-2 mt-2">
+                    {/* Only YAML examples have data/response/description fields */}
+                    {'data' in example && !!example.data?.sql && (
+                      <CollapsibleDetails title="Data source" content={example.data.sql} />
+                    )}
+                    {'response' in example && !!example.response && (
+                      <CollapsibleDetails title="Response" content={example.response} />
+                    )}
+                    {'description' in example && !!example.description && (
+                      <CollapsibleDetails
+                        title="Notes"
+                        content={normalizeMarkdown(example.description)}
+                      />
+                    )}
+                  </div>
+                </TabsContent_Shadcn_>
               ))}
-            </TabsList_Shadcn_>
-            {fn.examples.map((example) => (
-              <TabsContent_Shadcn_ key={example.id} value={example.id}>
-                <MDXRemoteRefs source={example.code} />
-                <div className="flex flex-col gap-2 mt-2">
-                  {!!example.data?.sql && (
-                    <CollapsibleDetails title="Data source" content={example.data.sql} />
-                  )}
-                  {!!example.response && (
-                    <CollapsibleDetails title="Response" content={example.response} />
-                  )}
-                  {!!example.description && (
-                    <CollapsibleDetails
-                      title="Notes"
-                      content={normalizeMarkdown(example.description)}
-                    />
-                  )}
-                </div>
-              </TabsContent_Shadcn_>
-            ))}
-          </Tabs_Shadcn_>
-        )}
+            </Tabs_Shadcn_>
+          )
+        })()}
       </div>
     </RefSubLayout.Section>
   )
