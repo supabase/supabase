@@ -221,7 +221,7 @@ export const MCP_CLIENTS: McpClient[] = [
       return {
         mcpServers: {
           supabase: {
-            url: config.mcpServers.supabase.url,
+            httpUrl: config.mcpServers.supabase.url,
           },
         },
       }
@@ -239,19 +239,8 @@ export const MCP_CLIENTS: McpClient[] = [
       )
     },
     alternateInstructions: (config, onCopy) => {
-      const mcpUrl = getMcpUrl(config)
       return (
         <div className="space-y-2">
-          <p className="text-xs text-foreground-light">
-            You can install the Supabase MCP extension:
-          </p>
-          <CodeBlock
-            value="gemini extensions install https://github.com/supabase-community/supabase-mcp"
-            language="bash"
-            focusable={false}
-            className="block"
-            onCopyCallback={() => onCopy('command')}
-          />
           <p className="text-xs text-foreground-light">
             After installation, authenticate the server:
           </p>

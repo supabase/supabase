@@ -121,7 +121,13 @@ export interface CodexMcpConfig {
   }
 }
 
-export interface GeminiMcpConfig extends McpClientBaseConfig {}
+export interface GeminiMcpConfig {
+  mcpServers: {
+    supabase: {
+      httpUrl: string
+    }
+  }
+}
 
 // Union of all possible config types
 export type McpClientConfig =
