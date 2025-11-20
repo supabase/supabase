@@ -242,8 +242,8 @@ export const AnalyticsBucketFields = ({
                           </SelectItem_Shadcn_>
                         ) : (
                           analyticsBuckets.map((bucket) => (
-                            <SelectItem_Shadcn_ key={bucket.id} value={bucket.id}>
-                              {bucket.id}
+                            <SelectItem_Shadcn_ key={bucket.name} value={bucket.name}>
+                              {bucket.name}
                             </SelectItem_Shadcn_>
                           ))
                         )}

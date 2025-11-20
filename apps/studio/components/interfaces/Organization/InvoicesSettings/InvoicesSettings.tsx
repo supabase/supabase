@@ -147,11 +147,13 @@ export const InvoicesSettings = () => {
                       <InvoiceStatusBadge
                         status={x.status as InvoiceStatus}
                         paymentAttempted={x.payment_attempted}
+                        paymentProcessing={x.payment_is_processing}
                       />
                     </Table.td>
                     <Table.td className="align-right">
                       <div className="flex items-center justify-end space-x-2">
                         {x.amount_due > 0 &&
+                          !x.payment_is_processing &&
                           [
                             InvoiceStatus.UNCOLLECTIBLE,
                             InvoiceStatus.OPEN,

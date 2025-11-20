@@ -1,14 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { sortBy } from 'lodash'
 import { RefreshCw, Search, X } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import type { VaultSecret } from 'types'
@@ -25,15 +28,21 @@ import {
 } from 'ui'
 import AddNewSecretModal from './AddNewSecretModal'
 import DeleteSecretModal from './DeleteSecretModal'
+import EditSecretModal from './EditSecretModal'
 import { formatSecretColumns } from './Secrets.utils'
 
 export const SecretsManagement = () => {
   const { search } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
+  // Track the ID being deleted to exclude it from error checking
+  const deletingSecretIdRef = useRef<string | null>(null)
+
   const [searchValue, setSearchValue] = useState<string>('')
-  const [showAddSecretModal, setShowAddSecretModal] = useState(false)
-  const [selectedSecretToRemove, setSelectedSecretToRemove] = useState<VaultSecret>()
+  const [showAddSecretModal, setShowAddSecretModal] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   const [selectedSort, setSelectedSort] = useState<'updated_at' | 'name'>('updated_at')
 
   const { can: canManageSecrets } = useAsyncCheckPermissions(
@@ -46,6 +55,22 @@ export const SecretsManagement = () => {
     connectionString: project?.connectionString,
   })
   const allSecrets = useMemo(() => data || [], [data])
+
+  const { setValue: setSelectedSecretToEdit, value: secretToEdit } = useQueryStateWithSelect({
+    urlKey: 'edit',
+    select: (id: string) => (id ? allSecrets?.find((secret) => secret.id === id) : undefined),
+    enabled: !!allSecrets && !isLoading,
+    onError: () => toast.error(`Secret not found`),
+  })
+
+  const { setValue: setSelectedSecretToRemove, value: secretToDelete } = useQueryStateWithSelect({
+    urlKey: 'delete',
+    select: (id: string) => (id ? allSecrets?.find((secret) => secret.id === id) : undefined),
+    enabled: !!allSecrets && !isLoading,
+    onError: (_error, selectedId) =>
+      handleErrorOnDelete(deletingSecretIdRef, selectedId, `Secret not found`),
+  })
+
   const secrets = useMemo(() => {
     const filtered =
       searchValue.length > 0
@@ -69,9 +94,10 @@ export const SecretsManagement = () => {
   const columns = useMemo(
     () =>
       formatSecretColumns({
-        onSelectRemove: (secret) => setSelectedSecretToRemove(secret),
+        onSelectEdit: (secret) => setSelectedSecretToEdit(secret.id),
+        onSelectRemove: (secret) => setSelectedSecretToRemove(secret.id),
       }),
-    []
+    [setSelectedSecretToEdit, setSelectedSecretToRemove]
   )
 
   return (
@@ -193,13 +219,26 @@ export const SecretsManagement = () => {
         </div>
       </div>
 
-      <DeleteSecretModal
-        selectedSecret={selectedSecretToRemove}
-        onClose={() => setSelectedSecretToRemove(undefined)}
-      />
       <AddNewSecretModal
         visible={showAddSecretModal}
         onClose={() => setShowAddSecretModal(false)}
+      />
+      {secretToEdit && (
+        <EditSecretModal
+          visible={!!secretToEdit}
+          secret={secretToEdit}
+          onClose={() => setSelectedSecretToEdit(null)}
+        />
+      )}
+      <DeleteSecretModal
+        selectedSecret={secretToDelete}
+        onDeleteStart={(secretId) => {
+          deletingSecretIdRef.current = secretId
+        }}
+        onClose={() => {
+          deletingSecretIdRef.current = null
+          setSelectedSecretToRemove(null)
+        }}
       />
     </>
   )
