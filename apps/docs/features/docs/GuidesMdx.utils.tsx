@@ -41,6 +41,7 @@ const PUBLISHED_SECTIONS = [
   'self-hosting',
   'storage',
   'telemetry',
+  'ui',
 ] as const
 
 const getGuidesMarkdownInternal = async (slug: string[]) => {

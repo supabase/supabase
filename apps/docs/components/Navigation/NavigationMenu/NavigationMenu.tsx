@@ -26,6 +26,7 @@ enum MenuId {
   Integrations = 'integrations',
   LocalDevelopment = 'local_development',
   Contributing = 'contributing',
+  Ui = 'ui',
   RefJavaScriptV1 = 'reference_javascript_v1',
   RefJavaScriptV2 = 'reference_javascript_v2',
   RefDartV1 = 'reference_dart_v1',
@@ -140,6 +141,10 @@ const menus: Menu[] = [
   },
   {
     id: MenuId.Deployment,
+    type: 'guide',
+  },
+  {
+    id: MenuId.Ui,
     type: 'guide',
   },
   {
