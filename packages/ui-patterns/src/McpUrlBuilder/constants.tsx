@@ -106,7 +106,7 @@ export const MCP_CLIENTS: McpClient[] = [
             // This is a no-op but the CodeBlock component is designed to output
             // inline code if no className is given
             className="block"
-            onCopyCallback={() => onCopy?.('command')}
+            onCopyCallback={() => onCopy('command')}
           />
         </div>
       )
@@ -122,7 +122,7 @@ export const MCP_CLIENTS: McpClient[] = [
           language="bash"
           focusable={false}
           className="block"
-          onCopyCallback={() => onCopy?.('command')}
+          onCopyCallback={() => onCopy('command')}
         />
         <p className="text-xs text-foreground-light">
           Select the "supabase" server, then "Authenticate" to begin the authentication flow.
@@ -179,7 +179,7 @@ export const MCP_CLIENTS: McpClient[] = [
             language="bash"
             focusable={false}
             className="block"
-            onCopyCallback={() => onCopy?.('command')}
+            onCopyCallback={() => onCopy('command')}
           />
         </div>
       )
@@ -194,7 +194,7 @@ export const MCP_CLIENTS: McpClient[] = [
           value={`[features]\nrmcp_client = true`}
           focusable={false}
           className="block"
-          onCopyCallback={() => onCopy?.('config')}
+          onCopyCallback={() => onCopy('config')}
         />
         <p className="text-xs text-foreground-light">Then authenticate:</p>
         <CodeBlock
@@ -202,7 +202,7 @@ export const MCP_CLIENTS: McpClient[] = [
           language="bash"
           focusable={false}
           className="block"
-          onCopyCallback={() => onCopy?.('command')}
+          onCopyCallback={() => onCopy('command')}
         />
         <p className="text-xs text-foreground-light">
           Finally, run <code>/mcp</code> inside Codex to verify authentication.
@@ -277,7 +277,7 @@ export const MCP_CLIENTS: McpClient[] = [
             language="bash"
             focusable={false}
             className="block"
-            onCopyCallback={() => onCopy?.('command')}
+            onCopyCallback={() => onCopy('command')}
           />
         </div>
       )
@@ -326,7 +326,7 @@ export const MCP_CLIENTS: McpClient[] = [
             language="bash"
             focusable={false}
             className="block"
-            onCopyCallback={() => onCopy?.('command')}
+            onCopyCallback={() => onCopy('command')}
           />
         </div>
       )
