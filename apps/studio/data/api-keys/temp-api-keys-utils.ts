@@ -23,7 +23,7 @@ export function isTemporaryApiKeyValid(
 
   const now = Date.now()
   const timeRemaining = key.expiryTime - now
-  return timeRemaining > 60000 // More than 60 seconds remaining
+  return timeRemaining > 20_000 // More than 20 seconds remaining
 }
 
 const checkOrRefreshTemporaryApiKey = async (
@@ -35,7 +35,7 @@ const checkOrRefreshTemporaryApiKey = async (
     return resolvedKey
   }
 
-  const expiryInSeconds = 600
+  const expiryInSeconds = 60
   const fetchedKey = getTemporaryAPIKey({
     projectRef,
     expiry: expiryInSeconds,
