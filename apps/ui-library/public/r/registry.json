@@ -1853,19 +1853,43 @@
       "files": [
         {
           "path": "registry/default/password-based-auth/vue/components/login-form.vue",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/login-form.vue"
         },
         {
           "path": "registry/default/password-based-auth/vue/components/sign-up-form.vue",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/sign-up-form.vue"
         },
         {
           "path": "registry/default/password-based-auth/vue/components/forgot-password-form.vue",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/forgot-password-form.vue"
         },
         {
           "path": "registry/default/password-based-auth/vue/components/update-password-form.vue",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "components/update-password-form.vue"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ]
+    },
+    {
+      "name": "social-auth-vue",
+      "type": "registry:block",
+      "title": "Social Auth flow for Vue and Supabase",
+      "description": "Social Auth flow for Vue and Supabase",
+      "registryDependencies": [
+        "button",
+        "card"
+      ],
+      "files": [
+        {
+          "path": "registry/default/social-auth/vue/components/login-form.vue",
+          "type": "registry:component",
+          "target": "components/login-form.vue"
         }
       ],
       "dependencies": [
