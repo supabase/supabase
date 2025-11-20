@@ -5,6 +5,7 @@ import CommandRender from 'components/interfaces/Functions/CommandRender'
 import { convertKVStringArrayToJson } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import CopyButton from 'components/ui/CopyButton'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import {
   getDecryptedValues,
@@ -18,6 +19,7 @@ import {
   AccordionItem_Shadcn_,
   AccordionTrigger_Shadcn_,
   Card,
+  CardFooter,
   CardHeader,
   CardTitle,
   CodeBlock,
@@ -226,7 +228,7 @@ export const CreateTableInstructions = ({
           </AccordionContent_Shadcn_>
         </AccordionItem_Shadcn_>
 
-        <AccordionItem_Shadcn_ value="step-3" className="border-0">
+        <AccordionItem_Shadcn_ value="step-3">
           <AccordionTrigger_Shadcn_ className="px-6 py-3 text-sm">
             <div className="flex items-center gap-x-4">
               <div className="w-6 h-6 rounded-full border flex items-center justify-center text-xs font-mono">
@@ -248,6 +250,16 @@ export const CreateTableInstructions = ({
           </AccordionContent_Shadcn_>
         </AccordionItem_Shadcn_>
       </Accordion_Shadcn_>
+
+      <CardFooter className="bg">
+        <p className="text-xs text-foreground-light">
+          Connecting to bucket with other Iceberg clients? Read more in our{' '}
+          <InlineLink href="https://supabase.com/docs/guides/storage/analytics/connecting-to-analytics-bucket">
+            documentation
+          </InlineLink>
+          .
+        </p>
+      </CardFooter>
     </Card>
   )
 }
