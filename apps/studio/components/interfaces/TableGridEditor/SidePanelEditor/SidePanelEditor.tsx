@@ -1,7 +1,8 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty, isUndefined, noop } from 'lodash'
-import { useState } from 'react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -137,11 +138,68 @@ export const SidePanelEditor = ({
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
 
+  // URL state management for table editor actions
+  const [newTableParam, setNewTableParam] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const [editTableParam, setEditTableParam] = useQueryState(
+    'edit',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const [duplicateTableParam, setDuplicateTableParam] = useQueryState(
+    'duplicate',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  // Sync URL params with global state
+  useEffect(() => {
+    if (newTableParam && snap.sidePanel?.type !== 'table') {
+      snap.onAddTable()
+    } else if (editTableParam && snap.sidePanel?.type !== 'table') {
+      snap.onEditTable()
+    } else if (duplicateTableParam && snap.sidePanel?.type !== 'table') {
+      snap.onDuplicateTable()
+    }
+  }, [newTableParam, editTableParam, duplicateTableParam, snap])
+
+  // Sync global state changes with URL params
+  useEffect(() => {
+    if (snap.sidePanel?.type === 'table') {
+      if (snap.sidePanel.mode === 'new' && !newTableParam) {
+        setNewTableParam(true)
+      } else if (snap.sidePanel.mode === 'edit' && !editTableParam) {
+        setEditTableParam(true)
+      } else if (snap.sidePanel.mode === 'duplicate' && !duplicateTableParam) {
+        setDuplicateTableParam(true)
+      }
+    } else {
+      // Panel closed, clear all URL params
+      if (newTableParam) setNewTableParam(false)
+      if (editTableParam) setEditTableParam(false)
+      if (duplicateTableParam) setDuplicateTableParam(false)
+    }
+  }, [
+    snap.sidePanel,
+    newTableParam,
+    editTableParam,
+    duplicateTableParam,
+    setNewTableParam,
+    setEditTableParam,
+    setDuplicateTableParam,
+  ])
+
   const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
     checkIsDirty: () => isEdited,
     onClose: () => {
       setIsEdited(false)
       snap.closeSidePanel()
+      // Clear URL params when closing
+      setNewTableParam(false)
+      setEditTableParam(false)
+      setDuplicateTableParam(false)
     },
   })
 
@@ -356,6 +414,10 @@ export const SidePanelEditor = ({
 
       setIsEdited(false)
       snap.closeSidePanel()
+      // Clear URL params for table editor
+      setNewTableParam(false)
+      setEditTableParam(false)
+      setDuplicateTableParam(false)
     }
 
     resolve()
@@ -587,6 +649,10 @@ export const SidePanelEditor = ({
     if (!saveTableError) {
       setIsEdited(false)
       snap.closeSidePanel()
+      // Clear URL params for table editor
+      setNewTableParam(false)
+      setEditTableParam(false)
+      setDuplicateTableParam(false)
     }
 
     resolve()
@@ -658,6 +724,10 @@ export const SidePanelEditor = ({
     })
     resolve()
     snap.closeSidePanel()
+    // Clear URL params for table editor
+    setNewTableParam(false)
+    setEditTableParam(false)
+    setDuplicateTableParam(false)
   }
 
   const onClosePanel = confirmOnClose
