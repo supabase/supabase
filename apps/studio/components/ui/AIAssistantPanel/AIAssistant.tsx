@@ -220,7 +220,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             orgSlug: selectedOrganizationRef.current?.slug,
             model: selectedModel,
           },
-          headers: { Authorization: authorizationHeader ?? '' },
+          headers: IS_PLATFORM ? { Authorization: authorizationHeader ?? '' } : {},
         }
       },
     }),
