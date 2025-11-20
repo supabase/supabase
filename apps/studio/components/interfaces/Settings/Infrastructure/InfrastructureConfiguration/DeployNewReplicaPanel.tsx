@@ -125,7 +125,7 @@ const DeployNewReplicaPanel = ({
   const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion)
   const [selectedCompute, setSelectedCompute] = useState(defaultCompute)
 
-  useProjectDetailQuery(
+  const { data: projectDetail, isSuccess: isProjectDetailSuccess } = useProjectDetailQuery(
     { ref: projectRef },
     {
       refetchInterval,
@@ -135,6 +135,13 @@ const DeployNewReplicaPanel = ({
       },
     }
   )
+
+  useEffect(() => {
+    if (!isProjectDetailSuccess) return
+    if (projectDetail.is_physical_backups_enabled) {
+      setRefetchInterval(false)
+    }
+  }, [projectDetail?.is_physical_backups_enabled, isProjectDetailSuccess])
 
   const { mutate: enablePhysicalBackups, isLoading: isEnabling } = useEnablePhysicalBackupsMutation(
     {

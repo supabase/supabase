@@ -54,7 +54,7 @@ export const useProjectSettingsV2Query = <TData = ProjectSettingsData>(
     queryFn: ({ signal }) => getProjectSettings({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     refetchInterval(_data) {
-      const data = _data as ProjectSettings | undefined
+      const data = _data as ProjectSettingsData | undefined
       const apiKeys = data?.service_api_keys ?? []
       const interval =
         canReadAPIKeys && data?.status !== 'INACTIVE' && apiKeys.length === 0 ? 2000 : 0

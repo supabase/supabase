@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -106,7 +107,10 @@ interface CreateVectorTableSheetProps {
 export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
 
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useQueryState(
+    'newTable',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const { data: wrapperInstance } = useS3VectorsWrapperInstance({ bucketId: bucketName })

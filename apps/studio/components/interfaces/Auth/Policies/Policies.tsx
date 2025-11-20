@@ -1,4 +1,5 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
+import { isEmpty } from 'lodash'
 import Link from 'next/link'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
@@ -10,6 +11,7 @@ import {
 } from 'components/interfaces/Auth/Policies/PolicyTableRow'
 import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
+import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Card, CardContent } from 'ui'
@@ -47,6 +49,8 @@ export const Policies = ({
     name: string
     rls_enabled: boolean
   }>()
+  const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<any>({})
+
   const { mutate: updateTable } = useTableUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to toggle RLS: ${error.message}`)
@@ -56,7 +60,17 @@ export const Policies = ({
     },
   })
 
+  const { mutate: deleteDatabasePolicy } = useDatabasePolicyDeleteMutation({
+    onSuccess: () => {
+      toast.success('Successfully deleted policy!')
+    },
+    onSettled: () => {
+      closeConfirmModal()
+    },
+  })
+
   const closeConfirmModal = useCallback(() => {
+    setSelectedPolicyToDelete({})
     setSelectedTableToToggleRLS(undefined)
   }, [])
 
@@ -74,6 +88,10 @@ export const Policies = ({
     [onSelectEditPolicyAI]
   )
 
+  const onSelectDeletePolicy = useCallback((policy: PostgresPolicy) => {
+    setSelectedPolicyToDelete(policy)
+  }, [])
+
   // Methods that involve some API
   const onToggleRLS = async () => {
     if (!selectedTableToToggleRLS) return console.error('Table is required')
@@ -90,6 +108,15 @@ export const Policies = ({
       name: selectedTableToToggleRLS.name,
       schema: selectedTableToToggleRLS.schema,
       payload: payload,
+    })
+  }
+
+  const onDeletePolicy = async () => {
+    if (!project) return console.error('Project is required')
+    deleteDatabasePolicy({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      originalPolicy: selectedPolicyToDelete,
     })
   }
 
@@ -134,6 +161,7 @@ export const Policies = ({
                     onSelectToggleRLS={onSelectToggleRLS}
                     onSelectCreatePolicy={handleCreatePolicy}
                     onSelectEditPolicy={onSelectEditPolicy}
+                    onSelectDeletePolicy={onSelectDeletePolicy}
                   />
                 </section>
               )
@@ -146,6 +174,17 @@ export const Policies = ({
           <NoSearchResults searchString={search ?? ''} onResetFilter={onResetSearch} />
         ) : null}
       </div>
+
+      <ConfirmModal
+        danger
+        visible={!isEmpty(selectedPolicyToDelete)}
+        title="Confirm to delete policy"
+        description={`This is permanent! Are you sure you want to delete the policy "${selectedPolicyToDelete.name}"`}
+        buttonLabel="Delete"
+        buttonLoadingLabel="Deleting"
+        onSelectCancel={closeConfirmModal}
+        onSelectConfirm={onDeletePolicy}
+      />
 
       <ConfirmModal
         danger={selectedTableToToggleRLS?.rls_enabled}
