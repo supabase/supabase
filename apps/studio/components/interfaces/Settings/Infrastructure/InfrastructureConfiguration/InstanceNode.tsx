@@ -374,7 +374,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               className="gap-x-2"
               disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
             >
-              <Link href={`/project/${ref}/reports/database?db=${id}&chart=replication-lag`}>
+              <Link href={`/project/${ref}/observability/database?db=${id}&chart=replication-lag`}>
                 View replication lag
               </Link>
             </DropdownMenuItem>

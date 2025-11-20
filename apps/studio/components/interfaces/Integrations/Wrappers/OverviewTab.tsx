@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { useState } from 'react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -28,7 +29,10 @@ import { WrapperTable } from './WrapperTable'
 export const WrapperOverviewTab = () => {
   const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const [createWrapperShown, setCreateWrapperShown] = useState(false)
+  const [createWrapperShown, setCreateWrapperShown] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const { can: canCreateWrapper } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,

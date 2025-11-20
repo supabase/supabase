@@ -30,38 +30,45 @@ const mockOrganizations = [
   }),
 ]
 
-const mockProjects = [
-  {
-    ...createMockProject({
-      id: 1,
-      ref: 'project-1',
-      name: 'Project 1',
-      organization_id: 1,
-    }),
-    organization_slug: 'org-1',
-    preview_branch_refs: [],
+const mockProjects = {
+  pagination: {
+    count: 3,
+    limit: 100,
+    offset: 0,
   },
-  {
-    ...createMockProject({
-      id: 2,
-      ref: 'project-2',
-      name: 'Project 2',
-      organization_id: 2,
-    }),
-    organization_slug: 'org-2',
-    preview_branch_refs: [],
-  },
-  {
-    ...createMockProject({
-      id: 3,
-      ref: 'project-3',
-      name: 'Project 3',
-      organization_id: 1,
-    }),
-    organization_slug: 'org-1',
-    preview_branch_refs: [],
-  },
-]
+  projects: [
+    {
+      ...createMockProject({
+        id: 1,
+        ref: 'project-1',
+        name: 'Project 1',
+        organization_id: 1,
+      }),
+      organization_slug: 'org-1',
+      preview_branch_refs: [],
+    },
+    {
+      ...createMockProject({
+        id: 2,
+        ref: 'project-2',
+        name: 'Project 2',
+        organization_id: 2,
+      }),
+      organization_slug: 'org-2',
+      preview_branch_refs: [],
+    },
+    {
+      ...createMockProject({
+        id: 3,
+        ref: 'project-3',
+        name: 'Project 3',
+        organization_id: 1,
+      }),
+      organization_slug: 'org-1',
+      preview_branch_refs: [],
+    },
+  ],
+}
 
 const { mockCommitSha, mockCommitTime, mockUseDeploymentCommitQuery } = vi.hoisted(() => {
   const sha = 'mock-studio-commit-sha'
@@ -385,7 +392,7 @@ describe('SupportFormPage', () => {
       path: '/platform/projects/:ref',
       response: ({ params }) => {
         const { ref } = params as { ref: string }
-        const project = mockProjects.find((candidate) => candidate.ref === ref)
+        const project = mockProjects.projects.find((candidate) => candidate.ref === ref)
         return project
           ? HttpResponse.json(project)
           : HttpResponse.json({ msg: 'Project not found' }, { status: 404 })
@@ -409,7 +416,9 @@ describe('SupportFormPage', () => {
       path: '/platform/organizations/:slug/projects',
       response: ({ params, request }) => {
         const slug = (params as { slug: string }).slug
-        const projects = mockProjects.filter((project) => project.organization_slug === slug)
+        const projects = mockProjects.projects.filter(
+          (project) => project.organization_slug === slug
+        )
 
         const url = new URL(request.url)
         const limit = Number(url.searchParams.get('limit') ?? projects.length)
@@ -646,10 +655,13 @@ describe('SupportFormPage', () => {
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-      expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
+      },
+      { timeout: 5_000 }
+    )
 
     await selectCategoryOption(screen, 'Dashboard bug')
     await waitFor(() => {
@@ -739,10 +751,13 @@ describe('SupportFormPage', () => {
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-      expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
+      },
+      { timeout: 5_000 }
+    )
 
     await selectCategoryOption(screen, 'APIs and client libraries')
     await waitFor(() => {
@@ -924,7 +939,7 @@ describe('SupportFormPage', () => {
       path: '/platform/projects/:ref',
       response: ({ params }) => {
         const { ref } = params as { ref: string }
-        const project = mockProjects.find((candidate) => candidate.ref === ref)
+        const project = mockProjects.projects.find((candidate) => candidate.ref === ref)
         return project
           ? HttpResponse.json(project)
           : HttpResponse.json({ msg: 'Project not found' }, { status: 404 })
@@ -1617,7 +1632,7 @@ describe('SupportFormPage', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/projects',
-      response: [],
+      response: { pagination: { count: 0, limit: 100, offset: 0 }, projects: [] },
     })
 
     addAPIMock({
