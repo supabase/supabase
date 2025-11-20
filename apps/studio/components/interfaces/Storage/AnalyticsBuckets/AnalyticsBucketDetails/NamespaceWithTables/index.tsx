@@ -97,7 +97,7 @@ export const NamespaceWithTables = ({
   const isSyncedPublicationTablesAndNamespaceTables =
     publicationTablesNotSyncedToNamespaceTables.length === 0
 
-  const { mutateAsync: importForeignSchema, isLoading: isImportingForeignSchema } =
+  const { mutateAsync: importForeignSchema, isPending: isImportingForeignSchema } =
     useFDWImportForeignSchemaMutation()
 
   const rescanNamespace = async () => {

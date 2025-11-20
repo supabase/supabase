@@ -138,7 +138,7 @@ export const CustomDomainConfig = () => {
 }
 
 interface CustomDomainConfigFallthroughProps {
-  fetchStatus: 'error' | 'success' | 'loading'
+  fetchStatus: 'error' | 'success' | 'pending'
   data: CustomDomainsData | undefined
 }
 

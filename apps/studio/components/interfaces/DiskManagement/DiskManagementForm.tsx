@@ -225,13 +225,13 @@ export function DiskManagementForm() {
   const isProjectRequestingDiskChanges = isRequestingChanges && !isProjectResizing
   const noPermissions = isPermissionsLoaded && !canUpdateDiskConfiguration
 
-  const { mutateAsync: updateDiskConfiguration, isLoading: isUpdatingDisk } =
+  const { mutateAsync: updateDiskConfiguration, isPending: isUpdatingDisk } =
     useUpdateDiskAttributesMutation({
       // this is to suppress to toast message
       onError: () => {},
       onSuccess: () => setRefetchInterval(2000),
     })
-  const { mutateAsync: updateSubscriptionAddon, isLoading: isUpdatingCompute } =
+  const { mutateAsync: updateSubscriptionAddon, isPending: isUpdatingCompute } =
     useProjectAddonUpdateMutation({
       // this is to suppress to toast message
       onError: () => {},
@@ -240,7 +240,7 @@ export function DiskManagementForm() {
         if (projectRef) setProjectStatus({ ref: projectRef, status: PROJECT_STATUS.RESIZING })
       },
     })
-  const { mutateAsync: updateDiskAutoscaleConfig, isLoading: isUpdatingDiskAutoscaleConfig } =
+  const { mutateAsync: updateDiskAutoscaleConfig, isPending: isUpdatingDiskAutoscaleConfig } =
     useUpdateDiskAutoscaleConfigMutation({
       // this is to suppress to toast message
       onError: () => {},

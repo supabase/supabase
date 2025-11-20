@@ -1,28 +1,29 @@
 import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { DatabaseZap, FunctionSquare, Plus, Search, Shield } from 'lucide-react'
-import { useRef, useState } from 'react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
+import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
+import { DeleteTrigger } from 'components/interfaces/Database/Triggers/DeleteTrigger'
+import { TriggerSheet } from 'components/interfaces/Database/Triggers/TriggerSheet'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
-import { DeleteTrigger } from 'components/interfaces/Database/Triggers/DeleteTrigger'
-import { TriggerSheet } from 'components/interfaces/Database/Triggers/TriggerSheet'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
+import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useIsProtectedSchema, useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
@@ -35,7 +36,6 @@ import {
   TableRow,
 } from 'ui'
 import { TriggerList } from './TriggerList'
-import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
 
 export const TriggersList = () => {
@@ -114,7 +114,7 @@ export const TriggersList = () => {
       handleErrorOnDelete(deletingTriggerIdRef, selectedId, `Database Trigger not found`),
   })
 
-  const { mutate: deleteDatabaseTrigger, isLoading: isDeletingTrigger } =
+  const { mutate: deleteDatabaseTrigger, isPending: isDeletingTrigger } =
     useDatabaseTriggerDeleteMutation({
       onSuccess: (_, variables) => {
         toast.success(`Successfully removed ${variables.trigger.name}`)
