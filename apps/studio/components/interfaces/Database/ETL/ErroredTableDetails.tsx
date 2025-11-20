@@ -3,7 +3,8 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { TableState } from './ReplicationPipelineStatus/ReplicationPipelineStatus.types'
 import { isValidRetryPolicy } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
 import { RetryCountdown } from './RetryCountdown'
-import { RetryOptionsDropdown } from './RetryOptionsDropdown'
+import { ResetTableButton } from './ResetTableButton'
+import { ErrorDetailsButton } from './ErrorDetailsButton'
 
 interface ErroredTableDetailsProps {
   state: Extract<TableState['state'], { name: 'error' }>
@@ -31,27 +32,36 @@ export const ErroredTableDetails = ({ state, tableName, tableId }: ErroredTableD
   return (
     <div role="region" aria-label={`Error details for table ${tableName}`}>
       {retryPolicy === 'no_retry' ? (
-        <p className="text-xs text-foreground-lighter">
-          This error requires manual intervention from our{' '}
-          <InlineLink
-            className="text-foreground-lighter hover:text-foreground"
-            href={`/support?projectRef=${projectRef}&category=dashboard_bug&subject=Database%20replication%20error&error=${state.reason}`}
-          >
-            support
-          </InlineLink>
-          . Alternatively, you may also recreate the pipeline.
-        </p>
+        <div className="flex flex-col gap-y-2">
+          <p className="text-xs text-foreground-lighter">
+            This error requires manual intervention from our{' '}
+            <InlineLink
+              className="text-foreground-lighter hover:text-foreground"
+              href={`/support?projectRef=${projectRef}&category=dashboard_bug&subject=Database%20replication%20error&error=${state.reason}`}
+            >
+              support
+            </InlineLink>
+            . Alternatively, you may also recreate the pipeline.
+          </p>
+          <ErrorDetailsButton reason={state.reason} solution={state.solution} />
+        </div>
       ) : retryPolicy === 'manual_retry' ? (
         <div className="flex flex-col gap-y-2 text-foreground-lighter">
-          <p className="text-xs">{state.solution}. You may thereafter rollback the pipeline.</p>
-          <RetryOptionsDropdown tableId={tableId} tableName={tableName} />
+          <p className="text-xs">
+            {state.solution}. You can reset the table to start replication from scratch.
+          </p>
+          <div className="flex items-center gap-x-2">
+            <ResetTableButton tableId={tableId} tableName={tableName} />
+            <ErrorDetailsButton reason={state.reason} solution={state.solution} />
+          </div>
         </div>
       ) : retryPolicy === 'timed_retry' ? (
-        <div className="flex flex-col text-foreground-lighter">
+        <div className="flex flex-col text-foreground-lighter gap-y-2">
           <p className="text-xs">
             A retry will be triggered automatically by restarting the pipeline on this table.
           </p>
           <RetryCountdown nextRetryTime={state.retry_policy.next_retry} />
+          <ErrorDetailsButton reason={state.reason} solution={state.solution} />
         </div>
       ) : null}
     </div>

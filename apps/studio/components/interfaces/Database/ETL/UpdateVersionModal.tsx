@@ -4,7 +4,7 @@ import { useParams } from 'common'
 import { useReplicationPipelineStatusQuery } from 'data/etl/pipeline-status-query'
 import { useReplicationPipelineVersionQuery } from 'data/etl/pipeline-version-query'
 import { Pipeline } from 'data/etl/pipelines-query'
-import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
+import { useRestartPipelineHelper } from 'data/etl/restart-pipeline-helper'
 import { useUpdatePipelineVersionMutation } from 'data/etl/update-pipeline-version-mutation'
 import {
   PipelineStatusRequestStatus,
@@ -25,7 +25,7 @@ interface UpdateVersionModalProps {
 export const UpdateVersionModal = ({
   visible,
   pipeline,
-  confirmLabel = 'Update and restart',
+  confirmLabel,
   confirmLabelLoading = 'Updating',
   onClose,
 }: UpdateVersionModalProps) => {
@@ -38,6 +38,7 @@ export const UpdateVersionModal = ({
   )
   const pipelineStatus = pipelineStatusData?.status
   const statusName = getStatusName(pipelineStatus)
+  const isStopped = statusName === PipelineStatusName.STOPPED
 
   const { data: versionData } = useReplicationPipelineVersionQuery({
     projectRef,
@@ -47,7 +48,7 @@ export const UpdateVersionModal = ({
   const newVersionName = versionData?.new_version?.name
 
   const { mutateAsync: updatePipelineVersion } = useUpdatePipelineVersionMutation()
-  const { mutateAsync: startPipeline } = useStartPipelineMutation()
+  const { restartPipeline } = useRestartPipelineHelper()
 
   const onConfirmUpdate = async () => {
     if (!projectRef || !pipeline?.id) return
@@ -64,16 +65,13 @@ export const UpdateVersionModal = ({
       return
     }
 
-    // Step 2: Reflect optimistic restart (only if currently active) and close any panels
-    const isActive =
-      statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
-
-    if (isActive) {
+    // Step 2: Reflect optimistic restart (only if not stopped) and close any panels
+    if (!isStopped) {
       setRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
 
-      // Step 3: Restart the pipeline
+      // Step 3: Restart the pipeline (stop + start)
       try {
-        await startPipeline({ projectRef, pipelineId: pipeline.id })
+        await restartPipeline({ projectRef, pipelineId: pipeline.id })
         toast.success('Pipeline successfully updated and is currently restarting')
       } catch (e: any) {
         // Clear optimistic state and surface a single concise error
@@ -91,32 +89,56 @@ export const UpdateVersionModal = ({
     <ConfirmationModal
       size="medium"
       visible={visible}
-      title="Update pipeline version"
-      confirmLabel={confirmLabel}
+      title="Update pipeline image"
+      confirmLabel={confirmLabel ?? (isStopped ? 'Update image' : 'Update and restart')}
       confirmLabelLoading={confirmLabelLoading}
       onCancel={onClose}
       onConfirm={onConfirmUpdate}
-      alert={{
-        base: { variant: 'warning' },
-        title: 'Pipeline will be restarted briefly to complete the change',
-        description: (
-          <div className="flex flex-col gap-y-1">
-            <p className="!leading-normal">
-              During the update process, the replication pauses and resumes.
-            </p>
-            <p className="!leading-normal">
-              If a long‑running transaction is in progress, some records may be reprocessed due to
-              PostgreSQL logical replication limitations.
-            </p>
-          </div>
-        ),
-      }}
+      alert={
+        !isStopped
+          ? {
+              base: { variant: 'warning' },
+              title: 'Pipeline will restart to apply the new image',
+              description: (
+                <div className="flex flex-col gap-y-1">
+                  <p className="!leading-normal">
+                    The pipeline will briefly pause and resume with the new image version.
+                    Replication will continue from where it left off.
+                  </p>
+                  <p className="!leading-normal">
+                    If a long-running transaction is in progress, some records may be reprocessed
+                    due to PostgreSQL logical replication behavior.
+                  </p>
+                </div>
+              ),
+            }
+          : undefined
+      }
     >
-      <p className="text-sm text-foreground prose max-w-full mb-1">
-        Pipeline will be updated from <code>{currentVersionName ?? 'Current version'}</code> to{' '}
-        <code>{newVersionName ?? 'New version'}</code>.
-      </p>
-      <p className="text-sm">Confirm to update pipeline? This action cannot be undone.</p>
+      <div className="flex flex-col gap-y-3">
+        <p className="text-sm text-foreground">
+          A new pipeline image is available with improvements and bug fixes.
+        </p>
+        <div className="text-sm text-foreground">
+          <span className="text-foreground-light">Current version:</span>{' '}
+          <code className="text-xs">{currentVersionName ?? 'Unknown'}</code>
+        </div>
+        <div className="text-sm text-foreground">
+          <span className="text-foreground-light">New version:</span>{' '}
+          <code className="text-xs">{newVersionName ?? 'Unknown'}</code>
+        </div>
+        {!isStopped ? (
+          <p className="text-sm text-foreground-light">
+            The pipeline will automatically restart to apply the update. Your replication will
+            continue without data loss.
+          </p>
+        ) : (
+          <p className="text-sm text-foreground-light">
+            The pipeline is currently stopped. The update will be applied, and you can start the
+            pipeline when ready.
+          </p>
+        )}
+      </div>
     </ConfirmationModal>
   )
 }

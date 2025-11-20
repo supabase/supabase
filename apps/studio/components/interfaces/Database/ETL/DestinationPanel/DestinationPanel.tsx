@@ -15,6 +15,7 @@ import { useCreateDestinationPipelineMutation } from 'data/etl/create-destinatio
 import { useReplicationDestinationByIdQuery } from 'data/etl/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from 'data/etl/pipeline-by-id-query'
 import { useReplicationPublicationsQuery } from 'data/etl/publications-query'
+import { useRestartPipelineHelper } from 'data/etl/restart-pipeline-helper'
 import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
 import { useUpdateDestinationPipelineMutation } from 'data/etl/update-destination-pipeline-mutation'
 import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
@@ -104,6 +105,7 @@ export const DestinationPanel = ({
     })
 
   const { mutateAsync: startPipeline, isLoading: startingPipeline } = useStartPipelineMutation()
+  const { restartPipeline } = useRestartPipelineHelper()
 
   const { mutateAsync: createS3AccessKey, isLoading: isCreatingS3AccessKey } =
     useS3AccessKeyCreateMutation()
@@ -317,6 +319,7 @@ export const DestinationPanel = ({
             snapshot
           )
           toast.success('Settings applied. Restarting the pipeline...')
+          restartPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         } else {
           setRequestStatus(
             existingDestination.pipelineId,
@@ -324,8 +327,8 @@ export const DestinationPanel = ({
             snapshot
           )
           toast.success('Settings applied. Starting the pipeline...')
+          startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         }
-        startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         onClose()
       } else {
         let destinationConfig: any = {}
