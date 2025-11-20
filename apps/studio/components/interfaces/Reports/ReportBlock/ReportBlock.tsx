@@ -1,7 +1,7 @@
-import { X } from 'lucide-react'
-import { toast } from 'sonner'
 import { useQuery } from '@tanstack/react-query'
+import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'

@@ -112,7 +112,7 @@ export const OAuthAppsList = () => {
       handleErrorOnDelete(deletingOAuthAppIdRef, selectedId, `OAuth App not found`),
   })
 
-  const { mutate: deleteOAuthApp, isLoading: isDeletingApp } = useOAuthServerAppDeleteMutation({
+  const { mutate: deleteOAuthApp, isPending: isDeletingApp } = useOAuthServerAppDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted OAuth app`)
       setSelectedAppToDelete(null)
