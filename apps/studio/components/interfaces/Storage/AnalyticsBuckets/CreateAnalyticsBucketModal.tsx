@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -103,7 +104,10 @@ export const CreateAnalyticsBucketModal = ({
   const { extension: wrappersExtension, state: wrappersExtensionState } =
     useIcebergWrapperExtension()
 
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const { data: buckets = [], isLoading } = useAnalyticsBucketsQuery({ projectRef: ref })
   const icebergCatalogEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
