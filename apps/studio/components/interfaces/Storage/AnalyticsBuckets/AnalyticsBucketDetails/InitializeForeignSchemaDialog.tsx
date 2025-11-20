@@ -107,11 +107,7 @@ export const InitializeForeignSchemaDialog = ({ namespace }: { namespace: string
                 control={form.control}
                 name="schema"
                 render={({ field }) => (
-                  <FormItemLayout
-                    layout="vertical"
-                    label="Schema name"
-                    description="You can then query data by selecting from ..."
-                  >
+                  <FormItemLayout layout="vertical" label="Schema name">
                     <Input_Shadcn_ {...field} placeholder="Provide a name for your schema" />
                   </FormItemLayout>
                 )}
