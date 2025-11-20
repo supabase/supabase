@@ -33,8 +33,10 @@ import { Admonition } from 'ui-patterns/admonition'
 import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
 import { useSelectedAnalyticsBucket } from '../useSelectedAnalyticsBucket'
+import { HIDE_REPLICATION_USER_FLOW } from './AnalyticsBucketDetails.constants'
 import { BucketHeader } from './BucketHeader'
 import { ConnectTablesDialog } from './ConnectTablesDialog'
+import { CreateTableInstructions } from './CreateTableInstructions'
 import { NamespaceWithTables } from './NamespaceWithTables'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useAnalyticsBucketAssociatedEntities } from './useAnalyticsBucketAssociatedEntities'
@@ -107,10 +109,8 @@ export const AnalyticBucketDetails = () => {
 
   const {
     data: namespacesData = [],
-    error: namespacesError,
     isLoading: isLoadingNamespaces,
     isSuccess: isSuccessNamespaces,
-    isError: isErrorNamespaces,
   } = useIcebergNamespacesQuery(
     {
       projectRef,
@@ -174,7 +174,7 @@ export const AnalyticBucketDetails = () => {
           {state === 'loading' ? (
             <ScaffoldSection isFullWidth>
               <BucketHeader showActions={false} />
-              <GenericTableLoader headers={['Name']} />
+              <GenericTableLoader />
             </ScaffoldSection>
           ) : state === 'not-installed' ? (
             <ExtensionNotInstalled
@@ -205,11 +205,11 @@ export const AnalyticBucketDetails = () => {
 
                 {isLoadingNamespaces || isLoadingWrapperInstance ? (
                   <GenericTableLoader headers={['Name']} />
-                ) : isErrorNamespaces ? (
-                  <AlertError subject="Failed to retrieve namespaces" error={namespacesError} />
                 ) : namespaces.length === 0 ? (
                   <>
-                    {isPollingForData ? (
+                    {HIDE_REPLICATION_USER_FLOW ? (
+                      <CreateTableInstructions />
+                    ) : isPollingForData ? (
                       <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-3 items-center text-center gap-1 text-balance">
                         <Loader2
                           size={24}
@@ -294,14 +294,11 @@ export const AnalyticBucketDetails = () => {
                       {namespaces.map(({ namespace, schema, tables }) => (
                         <NamespaceWithTables
                           key={namespace}
-                          bucketName={bucket?.name}
                           namespace={namespace}
                           sourceType="direct"
                           schema={schema}
                           tables={tables as any}
-                          wrapperInstance={wrapperInstance}
                           wrapperValues={wrapperValues}
-                          wrapperMeta={wrapperMeta}
                           pollIntervalNamespaceTables={pollIntervalNamespaceTables}
                           setPollIntervalNamespaceTables={setPollIntervalNamespaceTables}
                         />
