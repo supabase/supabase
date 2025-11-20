@@ -25,7 +25,8 @@ export async function getProjectServiceStatus(
   })
 
   if (error) handleError(error)
-  return data
+  // Omit the 'healthy' field as it's equivalent to status = 'ACTIVE_HEALTHY'
+  return data as Omit<ServiceHealthResponse, 'healthy'>[]
 }
 
 export type ProjectServiceStatusData = Awaited<ReturnType<typeof getProjectServiceStatus>>
