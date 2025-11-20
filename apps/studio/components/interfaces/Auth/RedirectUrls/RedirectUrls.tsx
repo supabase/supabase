@@ -84,94 +84,93 @@ export const RedirectUrls = () => {
         </PageSectionAside>
       </PageSectionMeta>
       <PageSectionContent>
+        {isLoading && (
+          <>
+            <ValueContainer>
+              <HorizontalShimmerWithIcon />
+            </ValueContainer>
+            <ValueContainer>
+              <HorizontalShimmerWithIcon />
+            </ValueContainer>
+          </>
+        )}
 
-      {isLoading && (
-        <>
-          <ValueContainer>
-            <HorizontalShimmerWithIcon />
-          </ValueContainer>
-          <ValueContainer>
-            <HorizontalShimmerWithIcon />
-          </ValueContainer>
-        </>
-      )}
+        {isError && (
+          <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+        )}
 
-      {isError && (
-        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
-      )}
+        {isSuccess && (
+          <RedirectUrlList
+            allowList={URI_ALLOW_LIST_ARRAY}
+            selectedUrls={selectedUrls}
+            onSelectUrl={setSelectedUrls}
+            onSelectAddURL={() => setOpen(true)}
+            onSelectClearSelection={() => setSelectedUrls([])}
+            onSelectRemoveURLs={() => setOpenRemoveSelected(true)}
+          />
+        )}
 
-      {isSuccess && (
-        <RedirectUrlList
+        <AddNewURLModal
+          visible={open}
           allowList={URI_ALLOW_LIST_ARRAY}
-          selectedUrls={selectedUrls}
-          onSelectUrl={setSelectedUrls}
-          onSelectAddURL={() => setOpen(true)}
-          onSelectClearSelection={() => setSelectedUrls([])}
-          onSelectRemoveURLs={() => setOpenRemoveSelected(true)}
+          onClose={() => setOpen(false)}
         />
-      )}
 
-      <AddNewURLModal
-        visible={open}
-        allowList={URI_ALLOW_LIST_ARRAY}
-        onClose={() => setOpen(false)}
-      />
-
-      <Modal
-        hideFooter
-        size="large"
-        visible={openRemoveSelected}
-        header="Remove URLs"
-        onCancel={() => {
-          setSelectedUrls([])
-          setOpenRemoveSelected(false)
-        }}
-      >
-        <Modal.Content className="flex flex-col gap-y-2">
-          <p className="mb-2 text-sm text-foreground-light">
-            Are you sure you want to remove the following {selectedUrls.length} URL
-            {selectedUrls.length > 1 ? 's' : ''}?
-          </p>
-          <ScrollArea className={cn(selectedUrls.length > 4 ? 'h-[250px]' : '')}>
-            <div className="flex flex-col -space-y-1">
-              {selectedUrls.map((url) => {
-                return (
-                  <ValueContainer key={url} className="px-4 py-3 hover:bg-surface-100">
-                    {url}
-                  </ValueContainer>
-                )
-              })}
-            </div>
-          </ScrollArea>
-          <p className="text-foreground-light text-sm">
-            These URLs will no longer work with your authentication configuration.
-          </p>
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content className="flex items-center gap-x-2">
-          <Button
-            block
-            type="default"
-            size="medium"
-            onClick={() => {
-              setSelectedUrls([])
-              setOpenRemoveSelected(false)
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            block
-            size="medium"
-            type="warning"
-            loading={isUpdatingConfig}
-            onClick={() => onConfirmDeleteUrl(selectedUrls)}
-          >
-            {isUpdatingConfig ? 'Removing...' : 'Remove URL'}
-          </Button>
-        </Modal.Content>
-      </Modal>
-    </PageSectionContent>
-  </PageSection>
+        <Modal
+          hideFooter
+          size="large"
+          visible={openRemoveSelected}
+          header="Remove URLs"
+          onCancel={() => {
+            setSelectedUrls([])
+            setOpenRemoveSelected(false)
+          }}
+        >
+          <Modal.Content className="flex flex-col gap-y-2">
+            <p className="mb-2 text-sm text-foreground-light">
+              Are you sure you want to remove the following {selectedUrls.length} URL
+              {selectedUrls.length > 1 ? 's' : ''}?
+            </p>
+            <ScrollArea className={cn(selectedUrls.length > 4 ? 'h-[250px]' : '')}>
+              <div className="flex flex-col -space-y-1">
+                {selectedUrls.map((url) => {
+                  return (
+                    <ValueContainer key={url} className="px-4 py-3 hover:bg-surface-100">
+                      {url}
+                    </ValueContainer>
+                  )
+                })}
+              </div>
+            </ScrollArea>
+            <p className="text-foreground-light text-sm">
+              These URLs will no longer work with your authentication configuration.
+            </p>
+          </Modal.Content>
+          <Modal.Separator />
+          <Modal.Content className="flex items-center gap-x-2">
+            <Button
+              block
+              type="default"
+              size="medium"
+              onClick={() => {
+                setSelectedUrls([])
+                setOpenRemoveSelected(false)
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              block
+              size="medium"
+              type="warning"
+              loading={isUpdatingConfig}
+              onClick={() => onConfirmDeleteUrl(selectedUrls)}
+            >
+              {isUpdatingConfig ? 'Removing...' : 'Remove URL'}
+            </Button>
+          </Modal.Content>
+        </Modal>
+      </PageSectionContent>
+    </PageSection>
   )
 }

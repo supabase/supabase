@@ -31,13 +31,6 @@ import {
   FormField_Shadcn_,
   Switch,
 } from 'ui'
-import {
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from 'ui/src/components/shadcn/ui/breadcrumb'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -57,6 +50,13 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import {
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from 'ui/src/components/shadcn/ui/breadcrumb'
 
 const TemplatePage: NextPageWithLayout = () => {
   return <RedirectToTemplates />
@@ -254,7 +254,9 @@ const RedirectToTemplates = () => {
                             type="primary"
                             htmlType="submit"
                             disabled={
-                              !canUpdateConfig || isUpdatingConfig || !templateForm.formState.isDirty
+                              !canUpdateConfig ||
+                              isUpdatingConfig ||
+                              !templateForm.formState.isDirty
                             }
                             loading={isUpdatingConfig}
                           >

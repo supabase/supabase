@@ -204,120 +204,120 @@ export const AdvancedAuthSettingsForm = () => {
         </PageSectionMeta>
         <PageSectionContent>
           <Form_Shadcn_ {...requestDurationForm}>
-          <form
-            onSubmit={requestDurationForm.handleSubmit(onSubmitRequestDurationForm)}
-            className="space-y-4"
-          >
-            <Card>
-              <CardContent className="pt-6">
-                <FormField_Shadcn_
-                  control={requestDurationForm.control}
-                  name="API_MAX_REQUEST_DURATION"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Maximum time allowed for an Auth request to last"
-                      description="Number of seconds to wait for an Auth request to complete before canceling it. In certain high-load situations setting a larger or smaller value can be used to control load-shedding. Recommended: 10 seconds."
-                    >
-                      <FormControl_Shadcn_>
-                        <div className="relative">
-                          <PrePostTab postTab="seconds">
-                            <Input_Shadcn_
-                              type="number"
-                              min={5}
-                              max={30}
-                              {...field}
-                              disabled={!canUpdateConfig || promptTeamsEnterpriseUpgrade}
-                            />
-                          </PrePostTab>
-                        </div>
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
+            <form
+              onSubmit={requestDurationForm.handleSubmit(onSubmitRequestDurationForm)}
+              className="space-y-4"
+            >
+              <Card>
+                <CardContent className="pt-6">
+                  <FormField_Shadcn_
+                    control={requestDurationForm.control}
+                    name="API_MAX_REQUEST_DURATION"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Maximum time allowed for an Auth request to last"
+                        description="Number of seconds to wait for an Auth request to complete before canceling it. In certain high-load situations setting a larger or smaller value can be used to control load-shedding. Recommended: 10 seconds."
+                      >
+                        <FormControl_Shadcn_>
+                          <div className="relative">
+                            <PrePostTab postTab="seconds">
+                              <Input_Shadcn_
+                                type="number"
+                                min={5}
+                                max={30}
+                                {...field}
+                                disabled={!canUpdateConfig || promptTeamsEnterpriseUpgrade}
+                              />
+                            </PrePostTab>
+                          </div>
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+
+                <CardFooter className="justify-end space-x-2">
+                  {requestDurationForm.formState.isDirty && (
+                    <Button type="default" onClick={() => requestDurationForm.reset()}>
+                      Cancel
+                    </Button>
                   )}
-                />
-              </CardContent>
-
-              <CardFooter className="justify-end space-x-2">
-                {requestDurationForm.formState.isDirty && (
-                  <Button type="default" onClick={() => requestDurationForm.reset()}>
-                    Cancel
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={
+                      !canUpdateConfig ||
+                      isUpdatingRequestDurationForm ||
+                      !requestDurationForm.formState.isDirty ||
+                      promptTeamsEnterpriseUpgrade
+                    }
+                    loading={isUpdatingRequestDurationForm}
+                  >
+                    Save changes
                   </Button>
-                )}
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  disabled={
-                    !canUpdateConfig ||
-                    isUpdatingRequestDurationForm ||
-                    !requestDurationForm.formState.isDirty ||
-                    promptTeamsEnterpriseUpgrade
-                  }
-                  loading={isUpdatingRequestDurationForm}
-                >
-                  Save changes
-                </Button>
-              </CardFooter>
-            </Card>
-          </form>
-        </Form_Shadcn_>
-      </PageSectionContent>
-    </PageSection>
+                </CardFooter>
+              </Card>
+            </form>
+          </Form_Shadcn_>
+        </PageSectionContent>
+      </PageSection>
 
-    <PageSection>
-      <PageSectionMeta>
-        <PageSectionSummary>
-          <PageSectionTitle>Auth Database Connections</PageSectionTitle>
-        </PageSectionSummary>
-      </PageSectionMeta>
-      <PageSectionContent>
-        <Form_Shadcn_ {...databaseForm}>
-          <form onSubmit={databaseForm.handleSubmit(onSubmitDatabaseForm)} className="space-y-4">
-            <Card>
-              <CardContent className="pt-6">
-                <FormField_Shadcn_
-                  control={databaseForm.control}
-                  name="DB_MAX_POOL_SIZE"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Max Direct Auth Connections"
-                      description="Auth will take up no more than this number of connections from the total number of available connections to serve requests. These connections are not reserved, so when unused they are released. Defaults to 10 connections."
-                    >
-                      <FormControl_Shadcn_>
-                        <Input_Shadcn_
-                          type="number"
-                          placeholder="10"
-                          {...field}
-                          disabled={!canUpdateConfig || promptTeamsEnterpriseUpgrade}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Auth Database Connections</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Form_Shadcn_ {...databaseForm}>
+            <form onSubmit={databaseForm.handleSubmit(onSubmitDatabaseForm)} className="space-y-4">
+              <Card>
+                <CardContent className="pt-6">
+                  <FormField_Shadcn_
+                    control={databaseForm.control}
+                    name="DB_MAX_POOL_SIZE"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Max Direct Auth Connections"
+                        description="Auth will take up no more than this number of connections from the total number of available connections to serve requests. These connections are not reserved, so when unused they are released. Defaults to 10 connections."
+                      >
+                        <FormControl_Shadcn_>
+                          <Input_Shadcn_
+                            type="number"
+                            placeholder="10"
+                            {...field}
+                            disabled={!canUpdateConfig || promptTeamsEnterpriseUpgrade}
+                          />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+
+                <CardFooter className="justify-end space-x-2">
+                  {databaseForm.formState.isDirty && (
+                    <Button type="default" onClick={() => databaseForm.reset()}>
+                      Cancel
+                    </Button>
                   )}
-                />
-              </CardContent>
-
-              <CardFooter className="justify-end space-x-2">
-                {databaseForm.formState.isDirty && (
-                  <Button type="default" onClick={() => databaseForm.reset()}>
-                    Cancel
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={
+                      !canUpdateConfig || isUpdatingDatabaseForm || !databaseForm.formState.isDirty
+                    }
+                    loading={isUpdatingDatabaseForm}
+                  >
+                    Save changes
                   </Button>
-                )}
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  disabled={
-                    !canUpdateConfig || isUpdatingDatabaseForm || !databaseForm.formState.isDirty
-                  }
-                  loading={isUpdatingDatabaseForm}
-                >
-                  Save changes
-                </Button>
-              </CardFooter>
-            </Card>
-          </form>
-        </Form_Shadcn_>
-      </PageSectionContent>
-    </PageSection>
+                </CardFooter>
+              </Card>
+            </form>
+          </Form_Shadcn_>
+        </PageSectionContent>
+      </PageSection>
     </>
   )
 }

@@ -112,46 +112,46 @@ const SiteUrl = () => {
       </PageSectionMeta>
       <PageSectionContent>
         <Form_Shadcn_ {...siteUrlForm}>
-        <form onSubmit={siteUrlForm.handleSubmit(onSubmitSiteUrl)} className="space-y-4">
-          <Card>
-            <CardContent className="pt-6">
-              <FormField_Shadcn_
-                control={siteUrlForm.control}
-                name="SITE_URL"
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="flex-row-reverse"
-                    label="Site URL"
-                    description="Configure the default redirect URL used when a redirect URL is not specified or doesn't match one from the allow list. This value is also exposed as a template variable in the email templates section. Wildcards cannot be used here."
-                  >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} disabled={!canUpdateConfig} />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-            </CardContent>
+          <form onSubmit={siteUrlForm.handleSubmit(onSubmitSiteUrl)} className="space-y-4">
+            <Card>
+              <CardContent className="pt-6">
+                <FormField_Shadcn_
+                  control={siteUrlForm.control}
+                  name="SITE_URL"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Site URL"
+                      description="Configure the default redirect URL used when a redirect URL is not specified or doesn't match one from the allow list. This value is also exposed as a template variable in the email templates section. Wildcards cannot be used here."
+                    >
+                      <FormControl_Shadcn_>
+                        <Input_Shadcn_ {...field} disabled={!canUpdateConfig} />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </CardContent>
 
-            <CardFooter className="justify-end space-x-2">
-              {siteUrlForm.formState.isDirty && (
-                <Button type="default" onClick={() => siteUrlForm.reset()}>
-                  Cancel
+              <CardFooter className="justify-end space-x-2">
+                {siteUrlForm.formState.isDirty && (
+                  <Button type="default" onClick={() => siteUrlForm.reset()}>
+                    Cancel
+                  </Button>
+                )}
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  disabled={!canUpdateConfig || isUpdatingSiteUrl || !siteUrlForm.formState.isDirty}
+                  loading={isUpdatingSiteUrl}
+                >
+                  Save changes
                 </Button>
-              )}
-              <Button
-                type="primary"
-                htmlType="submit"
-                disabled={!canUpdateConfig || isUpdatingSiteUrl || !siteUrlForm.formState.isDirty}
-                loading={isUpdatingSiteUrl}
-              >
-                Save changes
-              </Button>
-            </CardFooter>
-          </Card>
-        </form>
-      </Form_Shadcn_>
-    </PageSectionContent>
-  </PageSection>
+              </CardFooter>
+            </Card>
+          </form>
+        </Form_Shadcn_>
+      </PageSectionContent>
+    </PageSection>
   )
 }
 
