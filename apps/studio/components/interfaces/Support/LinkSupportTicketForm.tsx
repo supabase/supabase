@@ -98,11 +98,9 @@ export function LinkSupportTicketForm({ conversationId }: LinkSupportTicketFormP
     })
   }
 
-  const formId = 'link-support-ticket-form'
-
   return (
     <Form_Shadcn_ {...form}>
-      <form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-6">
+      <form id="link-support-ticket-form" onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-6">
         <h3 className="px-6 text-xl">Link support ticket to account</h3>
 
         <div className="px-6 flex flex-col gap-y-8">

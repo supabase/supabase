@@ -21,7 +21,7 @@ function LinkSupportTicketPageContent() {
       <Admonition
         type="warning"
         title="Missing conversation ID"
-        description="Please provide a conversation_id in the URL to link your support ticket."
+        description="Please provide a conversationId in the URL to link your support ticket."
       />
     )
   }
