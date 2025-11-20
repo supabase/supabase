@@ -77,7 +77,7 @@ const DateWidget = ({ date, endDate }: { date: string; endDate?: string }) => {
 
   const formattedDate = eventDate.toLocaleDateString('en-US', {
     weekday: 'long',
-    month: 'long',
+    month: 'short',
     day: 'numeric',
   })
 
