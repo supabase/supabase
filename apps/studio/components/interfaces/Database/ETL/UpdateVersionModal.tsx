@@ -94,26 +94,6 @@ export const UpdateVersionModal = ({
       confirmLabelLoading={confirmLabelLoading}
       onCancel={onClose}
       onConfirm={onConfirmUpdate}
-      alert={
-        !isStopped
-          ? {
-              base: { variant: 'warning' },
-              title: 'Pipeline will restart to apply the new image',
-              description: (
-                <div className="flex flex-col gap-y-1">
-                  <p className="!leading-normal">
-                    The pipeline will briefly pause and resume with the new image version.
-                    Replication will continue from where it left off.
-                  </p>
-                  <p className="!leading-normal">
-                    If a long-running transaction is in progress, some records may be reprocessed
-                    due to PostgreSQL logical replication behavior.
-                  </p>
-                </div>
-              ),
-            }
-          : undefined
-      }
     >
       <div className="flex flex-col gap-y-3">
         <p className="text-sm text-foreground">
@@ -127,21 +107,11 @@ export const UpdateVersionModal = ({
           <span className="text-foreground-light">New version:</span>{' '}
           <code className="text-xs">{newVersionName ?? 'Unknown'}</code>
         </div>
-        {!isStopped ? (
-          <div className="flex flex-col gap-y-2">
-            <p className="text-sm text-foreground-light">
-              The pipeline will automatically restart to apply the update. Your replication will
-              continue without data loss.
-            </p>
-          </div>
-        ) : (
-          <div className="bg-surface-100 border border-border-stronger rounded-md p-3">
-            <p className="text-sm text-foreground-light">
-              <strong className="text-foreground">Pipeline is stopped:</strong> The image update
-              will be applied, but the pipeline will remain stopped. You'll need to manually start
-              the pipeline when you're ready to resume replication.
-            </p>
-          </div>
+        {!isStopped && (
+          <p className="text-sm text-foreground-light">
+            The pipeline will automatically restart to apply the update. Replication will continue
+            from where it left off.
+          </p>
         )}
       </div>
     </ConfirmationModal>
