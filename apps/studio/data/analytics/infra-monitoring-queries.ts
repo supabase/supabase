@@ -82,7 +82,7 @@ export function useInfraMonitoringQueries(
   }))
 }
 
-function mapMultiResponseToAnalyticsData(
+export function mapMultiResponseToAnalyticsData(
   response: InfraMonitoringMultiData,
   attributes: InfraMonitoringAttribute[],
   dateFormat: string = DEFAULT_DATE_FORMAT
