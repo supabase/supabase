@@ -43,33 +43,28 @@ export const NoticeBanner = () => {
       </div>
       <div className="items-center flex flex-row gap-3 z-[1]">
         <WarningIcon className="z-[1] flex-shrink-0" />
-        <div className="flex flex-col md:flex-row gap-0 md:gap-1">
-          <span className="text-xs sm:text-sm z-[1] text-warning">
-            Maintenance Nov 21-23: Dashboard may be affected.
-          </span>
-          <span className="text-xs sm:text-sm z-[1] opacity-75 text-warning">
-            Up to 15 min downtime at ~13:00 UTC Nov 22. Your apps will continue to operate normally.
-          </span>
-        </div>
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="flex-1 text-xs sm:text-sm z-[1] text-warning">
+          Maintenance Nov 21-23: Some dashboard operations may take longer than usual or be
+          momentarily inaccessible. Your projects will continue to operate normally.{' '}
           <Link
             href="https://status.supabase.com/incidents/z0l2157y33xk"
             target="_blank"
             rel="noreferrer"
-            className="text-xs sm:text-sm z-[1] text-warning opacity-75 hover:opacity-100"
+            className="opacity-75 hover:opacity-100 underline"
           >
             Learn more
           </Link>
-          <Button
-            type="text"
-            className="opacity-75 z-[1]"
-            onClick={() => {
-              onUpdateAcknowledged('maintenance-window-banner-2025-11-21')
-            }}
-          >
-            Dismiss
-          </Button>
+          .
         </div>
+        <Button
+          type="text"
+          className="opacity-75 z-[1] flex-shrink-0"
+          onClick={() => {
+            onUpdateAcknowledged('maintenance-window-banner-2025-11-21')
+          }}
+        >
+          Dismiss
+        </Button>
       </div>
     </div>
   )
