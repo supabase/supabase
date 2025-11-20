@@ -104,7 +104,7 @@ export const PostgrestConfig = () => {
 
   const isLoading = isLoadingConfig || isLoadingSchemas
 
-  const { mutate: updatePostgrestConfig, isLoading: isUpdating } =
+  const { mutate: updatePostgrestConfig, isPending: isUpdating } =
     useProjectPostgrestConfigUpdateMutation({
       onSuccess: () => {
         toast.success('Successfully saved settings')

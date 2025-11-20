@@ -5451,7 +5451,10 @@
     { "name": "Projects", "description": "Projects related endpoints" },
     { "name": "Rest", "description": "Rest related endpoints" },
     { "name": "Secrets", "description": "Secrets related endpoints" },
-    { "name": "Storage", "description": "Storage related endpoints" }
+    {
+      "name": "Storage",
+      "description": "Visit [https://supabase.github.io/storage/](https://supabase.github.io/storage/) for complete documentation."
+    }
   ],
   "servers": [],
   "components": {
@@ -5708,8 +5711,28 @@
       "V1ProjectWithDatabaseResponse": {
         "type": "object",
         "properties": {
-          "id": { "type": "string", "description": "Id of your project" },
-          "organization_id": { "type": "string", "description": "Slug of your organization" },
+          "id": {
+            "type": "string",
+            "deprecated": true,
+            "description": "Deprecated: Use `ref` instead."
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 20,
+            "pattern": "^[a-z]+$",
+            "description": "Project ref"
+          },
+          "organization_id": {
+            "type": "string",
+            "description": "Deprecated: Use `organization_slug` instead.",
+            "deprecated": true
+          },
+          "organization_slug": {
+            "type": "string",
+            "pattern": "^[\\w-]+$",
+            "description": "Organization slug"
+          },
           "name": { "type": "string", "description": "Name of your project" },
           "region": {
             "type": "string",
@@ -5752,14 +5775,33 @@
             "required": ["host", "version", "postgres_engine", "release_channel"]
           }
         },
-        "required": ["id", "organization_id", "name", "region", "created_at", "status", "database"]
+        "required": [
+          "id",
+          "ref",
+          "organization_id",
+          "organization_slug",
+          "name",
+          "region",
+          "created_at",
+          "status",
+          "database"
+        ]
       },
       "V1CreateProjectBody": {
         "type": "object",
         "properties": {
           "db_pass": { "type": "string", "description": "Database password" },
           "name": { "type": "string", "maxLength": 256, "description": "Name of your project" },
-          "organization_id": { "type": "string", "description": "Slug of your organization" },
+          "organization_id": {
+            "type": "string",
+            "description": "Deprecated: Use `organization_slug` instead.",
+            "deprecated": true
+          },
+          "organization_slug": {
+            "type": "string",
+            "pattern": "^[\\w-]+$",
+            "description": "Organization slug"
+          },
           "plan": {
             "type": "string",
             "enum": ["free", "pro"],
@@ -5892,15 +5934,35 @@
             "deprecated": true
           }
         },
-        "required": ["db_pass", "name", "organization_id"],
+        "required": ["db_pass", "name", "organization_slug"],
         "additionalProperties": false,
         "hideDefinitions": ["release_channel", "postgres_engine"]
       },
       "V1ProjectResponse": {
         "type": "object",
         "properties": {
-          "id": { "type": "string", "description": "Id of your project" },
-          "organization_id": { "type": "string", "description": "Slug of your organization" },
+          "id": {
+            "type": "string",
+            "deprecated": true,
+            "description": "Deprecated: Use `ref` instead."
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 20,
+            "pattern": "^[a-z]+$",
+            "description": "Project ref"
+          },
+          "organization_id": {
+            "type": "string",
+            "description": "Deprecated: Use `organization_slug` instead.",
+            "deprecated": true
+          },
+          "organization_slug": {
+            "type": "string",
+            "pattern": "^[\\w-]+$",
+            "description": "Organization slug"
+          },
           "name": { "type": "string", "description": "Name of your project" },
           "region": {
             "type": "string",
@@ -5933,7 +5995,16 @@
             ]
           }
         },
-        "required": ["id", "organization_id", "name", "region", "created_at", "status"]
+        "required": [
+          "id",
+          "ref",
+          "organization_id",
+          "organization_slug",
+          "name",
+          "region",
+          "created_at",
+          "status"
+        ]
       },
       "RegionsInfo": {
         "type": "object",
@@ -6010,8 +6081,16 @@
       },
       "OrganizationResponseV1": {
         "type": "object",
-        "properties": { "id": { "type": "string" }, "name": { "type": "string" } },
-        "required": ["id", "name"]
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Deprecated: Use `slug` instead.",
+            "deprecated": true
+          },
+          "slug": { "type": "string", "pattern": "^[\\w-]+$", "description": "Organization slug" },
+          "name": { "type": "string" }
+        },
+        "required": ["id", "slug", "name"]
       },
       "CreateOrganizationV1": {
         "type": "object",
@@ -7242,12 +7321,24 @@
           "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
           "session_replication_role": { "type": "string", "enum": ["origin", "replica", "local"] },
           "shared_buffers": { "type": "string" },
-          "statement_timeout": { "type": "string" },
+          "statement_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
           "track_commit_timestamp": { "type": "boolean" },
           "wal_keep_size": { "type": "string" },
-          "wal_sender_timeout": { "type": "string" },
+          "wal_sender_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
           "work_mem": { "type": "string" },
-          "checkpoint_timeout": { "type": "integer", "minimum": 30, "maximum": 86400 },
+          "checkpoint_timeout": {
+            "type": "string",
+            "description": "Default unit: s",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
           "hot_standby_feedback": { "type": "boolean" }
         }
       },
@@ -7272,12 +7363,24 @@
           "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
           "session_replication_role": { "type": "string", "enum": ["origin", "replica", "local"] },
           "shared_buffers": { "type": "string" },
-          "statement_timeout": { "type": "string" },
+          "statement_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
           "track_commit_timestamp": { "type": "boolean" },
           "wal_keep_size": { "type": "string" },
-          "wal_sender_timeout": { "type": "string" },
+          "wal_sender_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
           "work_mem": { "type": "string" },
-          "checkpoint_timeout": { "type": "integer", "minimum": 30, "maximum": 86400 },
+          "checkpoint_timeout": {
+            "type": "string",
+            "description": "Default unit: s",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
           "hot_standby_feedback": { "type": "boolean" },
           "restart_database": { "type": "boolean" }
         },

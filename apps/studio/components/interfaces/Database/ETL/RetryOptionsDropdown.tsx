@@ -24,7 +24,7 @@ const RETRY_OPTIONS = [
     type: 'full' as RollbackType,
     icon: <RotateCcw className="w-3 h-3 mt-0.5" />,
     title: 'Reset from scratch',
-    description: 'Completely restart the table replication',
+    description: 'Completely restart replicating this table',
   },
 ] as const
 
@@ -37,7 +37,7 @@ export const RetryOptionsDropdown = ({ tableId, tableName }: RetryOptionsDropdow
   const { ref: projectRef, pipelineId: _pipelineId } = useParams()
   const [isOpen, setIsOpen] = useState(false)
 
-  const { mutate: rollbackTable, isLoading: isRollingBack } = useRollbackTableMutation({
+  const { mutate: rollbackTable, isPending: isRollingBack } = useRollbackTableMutation({
     onSuccess: (_, vars) => {
       const { projectRef, pipelineId } = vars
       toast.success(`Table "${tableName}" rolled back successfully and pipeline is being restarted`)
@@ -50,7 +50,7 @@ export const RetryOptionsDropdown = ({ tableId, tableName }: RetryOptionsDropdow
       )
     },
   })
-  const { mutate: startPipeline, isLoading: isRestartingPipeline } = useStartPipelineMutation({
+  const { mutate: startPipeline, isPending: isRestartingPipeline } = useStartPipelineMutation({
     onSuccess: () => {
       toast.success('Pipeline restarted successfully')
       setIsOpen(false)

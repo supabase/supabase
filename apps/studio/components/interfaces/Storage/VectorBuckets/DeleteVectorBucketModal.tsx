@@ -32,7 +32,7 @@ export const DeleteVectorBucketModal = ({
 
   const { mutate: deleteFDW } = useFDWDeleteMutation()
 
-  const { mutateAsync: deleteBucket, isLoading: isDeletingBucket } = useVectorBucketDeleteMutation({
+  const { mutateAsync: deleteBucket, isPending: isDeletingBucket } = useVectorBucketDeleteMutation({
     onSuccess: async () => {
       toast.success(`Bucket "${bucketName}" deleted successfully`)
       if (vectorBucketWrapper) {

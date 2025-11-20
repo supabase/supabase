@@ -102,6 +102,7 @@ export const BucketTableRow = ({
   return (
     <BucketTableRow
       key={bucket.id}
+      data-bucket-id={bucket.id}
       className="relative cursor-pointer h-16 group inset-focus"
       onClick={(event) => handleBucketNavigation(bucket.id, event)}
       onKeyDown={(event) => {
@@ -113,7 +114,7 @@ export const BucketTableRow = ({
       tabIndex={0}
     >
       <BucketTableCell className="w-2 pr-1">
-        <BucketIcon size={16} className="text-foreground-muted" />
+        <BucketIcon aria-label="bucket icon" size={16} className="text-foreground-muted" />
       </BucketTableCell>
       <BucketTableCell className="flex-1">
         <div className="flex items-center gap-2.5">
@@ -146,8 +147,11 @@ export const BucketTableRow = ({
 
       <BucketTableCell>
         <div className="flex justify-end items-center h-full">
-          <ChevronRight size={14} className="text-foreground-muted/60" />
+          <ChevronRight aria-hidden={true} size={14} className="text-foreground-muted/60" />
         </div>
+        <button tabIndex={-1} className="sr-only">
+          Go to bucket details
+        </button>
       </BucketTableCell>
     </BucketTableRow>
   )

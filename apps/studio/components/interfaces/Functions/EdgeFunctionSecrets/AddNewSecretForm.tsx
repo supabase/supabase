@@ -5,11 +5,9 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
-import Panel from 'components/ui/Panel'
 import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
 import { useSecretsQuery } from 'data/secrets/secrets-query'
 import { Eye, EyeOff, MinusCircle } from 'lucide-react'
-import { DuplicateSecretWarningModal } from './DuplicateSecretWarningModal'
 import {
   Button,
   Card,
@@ -25,6 +23,7 @@ import {
   FormMessage_Shadcn_,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { DuplicateSecretWarningModal } from './DuplicateSecretWarningModal'
 
 type SecretPair = {
   name: string
@@ -127,7 +126,7 @@ const AddNewSecretForm = () => {
     }
   }
 
-  const { mutate: createSecret, isLoading: isCreating } = useSecretsCreateMutation({
+  const { mutate: createSecret, isPending: isCreating } = useSecretsCreateMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully created new secret "${variables.secrets[0].name}"`)
       // RHF recommends using setTimeout/useEffect to reset the form

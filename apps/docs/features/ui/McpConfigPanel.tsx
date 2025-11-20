@@ -19,11 +19,12 @@ import {
   ScrollArea,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { McpConfigPanel as McpConfigPanelBase } from 'ui-patterns/McpUrlBuilder'
+import { McpConfigPanel as McpConfigPanelBase, type McpClient } from 'ui-patterns/McpUrlBuilder'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { useDebounce } from '~/hooks/useDebounce'
 import { useIntersectionObserver } from '~/hooks/useIntersectionObserver'
 import { useProjectsInfiniteQuery } from '~/lib/fetch/projects-infinite'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 type PlatformType = (typeof PLATFORMS)[number]['value']
 
@@ -260,10 +261,56 @@ function PlatformSelector({
 export function McpConfigPanel() {
   const [selectedProject, setSelectedProject] = useState<{ ref: string; name: string } | null>(null)
   const [selectedPlatform, setSelectedPlatform] = useState<'hosted' | 'local'>('hosted')
+  const [selectedClient, setSelectedClient] = useState<McpClient | null>(null)
   const { theme } = useTheme()
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   const isPlatform = selectedPlatform === 'hosted'
   const project = isPlatform ? selectedProject : null
+
+  const handleCopy = (type?: 'url' | 'json' | 'command') => {
+    let connectionType: string
+    switch (type) {
+      case 'command':
+        connectionType = 'Command Line'
+        break
+      case 'json':
+        connectionType = 'JSON'
+        break
+      case 'url':
+      default:
+        connectionType = 'MCP URL'
+        break
+    }
+
+    sendTelemetryEvent({
+      action: 'connection_string_copied',
+      properties: {
+        connectionTab: 'MCP',
+        selectedItem: selectedClient?.label,
+        connectionType,
+        source: 'docs',
+      },
+      groups: {
+        ...(project?.ref && { project: project.ref }),
+      } as any,
+    })
+  }
+
+  const handleInstall = () => {
+    if (selectedClient?.label) {
+      sendTelemetryEvent({
+        action: 'mcp_install_button_clicked',
+        properties: {
+          client: selectedClient.label,
+          source: 'docs',
+        },
+        groups: {
+          ...(project?.ref && { project: project.ref }),
+        } as any,
+      })
+    }
+  }
 
   return (
     <>
@@ -288,6 +335,9 @@ export function McpConfigPanel() {
           projectRef={project?.ref}
           theme={theme as 'light' | 'dark'}
           isPlatform={isPlatform}
+          onCopyCallback={handleCopy}
+          onInstallCallback={handleInstall}
+          onClientSelect={setSelectedClient}
         />
       </div>
       {isPlatform && (

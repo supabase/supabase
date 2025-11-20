@@ -3,10 +3,12 @@ import { Loader, Shield, Users, Wrench } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { useFlag } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { projectKeys } from 'data/projects/keys'
 import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -31,7 +33,7 @@ export const TransferProjectButton = () => {
   const {
     mutate: transferProject,
     error: transferError,
-    isLoading: isTransferring,
+    isPending: isTransferring,
   } = useProjectTransferMutation({
     onSuccess: () => {
       toast.success(`Successfully transferred project ${project?.name}.`)
@@ -43,11 +45,11 @@ export const TransferProjectButton = () => {
     data: transferPreviewData,
     error: transferPreviewError,
     isLoading: transferPreviewIsLoading,
-    remove,
   } = useProjectTransferPreviewQuery(
     { projectRef, targetOrganizationSlug: selectedOrg },
     { enabled: !isTransferring && isOpen }
   )
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     if (isOpen) {
@@ -55,9 +57,11 @@ export const TransferProjectButton = () => {
       setSelectedOrg(undefined)
     } else {
       // Invalidate cache
-      remove()
+      queryClient.removeQueries({
+        queryKey: projectKeys.projectTransferPreview(projectRef, selectedOrg),
+      })
     }
-  }, [isOpen])
+  }, [isOpen, projectRef, selectedOrg, queryClient])
 
   const { can: canTransferProject } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
