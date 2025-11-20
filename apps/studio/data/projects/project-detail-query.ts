@@ -1,4 +1,5 @@
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback } from 'react'
 
 import type { components } from 'data/api'
 import { get, handleError, isValidConnString } from 'data/fetchers'
@@ -74,9 +75,12 @@ export function prefetchProjectDetail(client: QueryClient, { ref }: ProjectDetai
 export const useInvalidateProjectDetailsQuery = () => {
   const queryClient = useQueryClient()
 
-  const invalidateProjectDetailsQuery = (ref: string) => {
-    return queryClient.invalidateQueries({ queryKey: projectKeys.detail(ref) })
-  }
+  const invalidateProjectDetailsQuery = useCallback(
+    (ref: string) => {
+      return queryClient.invalidateQueries({ queryKey: projectKeys.detail(ref) })
+    },
+    [queryClient]
+  )
 
   return { invalidateProjectDetailsQuery }
 }
