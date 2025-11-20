@@ -100,7 +100,7 @@ export const DisplayBlockRenderer = ({
   const {
     mutate: executeSql,
     error: executeSqlError,
-    isLoading: executeSqlLoading,
+    isPending: executeSqlLoading,
   } = useExecuteSqlMutation({
     onError: () => {
       // Suppress toast because error message is displayed inline

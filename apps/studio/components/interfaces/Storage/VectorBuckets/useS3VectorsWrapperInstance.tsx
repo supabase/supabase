@@ -5,26 +5,20 @@ import {
   WRAPPERS,
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import { wrapperMetaComparator } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { type FDW, useFDWsQuery } from 'data/fdw/fdws-query'
+import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { getVectorBucketFDWName } from './VectorBuckets.utils'
 
-export const useS3VectorsWrapperInstance = (
-  { bucketId }: { bucketId?: string },
-  options?: { enabled?: boolean; refetchInterval?: (data: FDW[] | undefined) => number | false }
-) => {
+export const useS3VectorsWrapperInstance = ({ bucketId }: { bucketId?: string }) => {
   const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
 
-  const defaultEnabled = options?.enabled ?? true
   const { data, isLoading: isLoadingFDWs } = useFDWsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
     {
-      enabled: defaultEnabled && !!bucketId,
-      refetchInterval: (data) =>
-        !!options?.refetchInterval ? options.refetchInterval(data) : false,
+      enabled: !!bucketId,
     }
   )
 

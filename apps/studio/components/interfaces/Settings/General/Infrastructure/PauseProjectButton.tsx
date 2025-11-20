@@ -34,7 +34,7 @@ const PauseProjectButton = () => {
   const isFreePlan = organization?.plan.id === 'free'
   const isPaidAndNotAwsK8s = !isFreePlan && !isAwsK8s
 
-  const { mutate: pauseProject, isLoading: isPausing } = useProjectPauseMutation({
+  const { mutate: pauseProject, isPending: isPausing } = useProjectPauseMutation({
     onSuccess: (_, variables) => {
       setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.PAUSING })
       toast.success('Pausing project...')

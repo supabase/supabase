@@ -31,10 +31,10 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     schema: 'storage',
   })
 
-  const { mutateAsync: deletePolicy, isLoading: isDeletingPolicies } =
+  const { mutateAsync: deletePolicy, isPending: isDeletingPolicies } =
     useDatabasePolicyDeleteMutation()
 
-  const { mutate: deleteBucket, isLoading: isDeletingBucket } = useBucketDeleteMutation({
+  const { mutate: deleteBucket, isPending: isDeletingBucket } = useBucketDeleteMutation({
     onSuccess: async () => {
       if (!project) return console.error('Project is required')
 

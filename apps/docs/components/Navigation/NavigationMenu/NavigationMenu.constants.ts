@@ -392,7 +392,7 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/redwoodjs' as `/${string}`,
         },
         {
-          name: 'refine',
+          name: 'Refine',
           url: '/guides/getting-started/quickstarts/refine',
         },
       ],
@@ -438,7 +438,7 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/tutorials/with-sveltekit' as `/${string}`,
         },
         {
-          name: 'refine',
+          name: 'Refine',
           url: '/guides/getting-started/tutorials/with-refine' as `/${string}`,
         },
       ],

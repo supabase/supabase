@@ -113,7 +113,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
     isRealtimeEnabled,
   })
 
-  const { mutate: updatePublications, isLoading: isTogglingRealtime } =
+  const { mutate: updatePublications, isPending: isTogglingRealtime } =
     useDatabasePublicationUpdateMutation({
       onSuccess: () => {
         setShowEnableRealtime(false)

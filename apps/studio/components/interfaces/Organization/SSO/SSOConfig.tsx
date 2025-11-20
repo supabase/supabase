@@ -99,11 +99,11 @@ export const SSOConfig = () => {
 
   const isSSOEnabled = form.watch('enabled')
 
-  const { mutate: createSSOConfig, isLoading: isCreating } = useSSOConfigCreateMutation({
+  const { mutate: createSSOConfig, isPending: isCreating } = useSSOConfigCreateMutation({
     onSuccess: () => form.reset(),
   })
 
-  const { mutate: updateSSOConfig, isLoading: isUpdating } = useSSOConfigUpdateMutation({
+  const { mutate: updateSSOConfig, isPending: isUpdating } = useSSOConfigUpdateMutation({
     onSuccess: () => form.reset(),
   })
 
