@@ -1,11 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useContentQuery } from 'data/content/content-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -20,21 +20,20 @@ export const UserReportPage: NextPageWithLayout = () => {
   const { profile } = useProfile()
   const [showCreateReportModal, setShowCreateReportModal] = useState(false)
 
-  const { isLoading } = useContentQuery(
-    {
-      projectRef: ref,
-      type: 'report',
-    },
-    {
-      onSuccess: (data) => {
-        const reports = data.content
-          .filter((x) => x.type === 'report')
-          .sort((a, b) => a.name.localeCompare(b.name))
-        if (reports.length >= 1) router.push(`/project/${ref}/reports/${reports[0].id}`)
-        if (reports.length === 0) router.push(`/project/${ref}/reports/api-overview`)
-      },
-    }
-  )
+  const { isLoading, isSuccess, data } = useContentQuery({
+    projectRef: ref,
+    type: 'report',
+  })
+
+  useEffect(() => {
+    if (!isSuccess) return
+
+    const reports = data.content
+      .filter((x) => x.type === 'report')
+      .sort((a, b) => a.name.localeCompare(b.name))
+    if (reports.length >= 1) router.push(`/project/${ref}/observability/${reports[0].id}`)
+    if (reports.length === 0) router.push(`/project/${ref}/observability/api-overview`)
+  }, [isSuccess, data, router, ref])
 
   const { can: canCreateReport } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
@@ -52,7 +51,7 @@ export const UserReportPage: NextPageWithLayout = () => {
       ) : (
         <>
           <ProductEmptyState
-            title="Reports"
+            title="Observability"
             ctaButtonLabel="New custom report"
             onClickCta={() => {
               setShowCreateReportModal(true)
@@ -81,7 +80,7 @@ export const UserReportPage: NextPageWithLayout = () => {
 
 UserReportPage.getLayout = (page) => (
   <DefaultLayout>
-    <ReportsLayout>{page}</ReportsLayout>
+    <ObservabilityLayout>{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 
