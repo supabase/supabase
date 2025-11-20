@@ -45,7 +45,7 @@ export const useProjectUpgradingStatusQuery = <TData = ProjectUpgradingStatusDat
 ) => {
   const client = useQueryClient()
 
-  const query = useQuery({
+  const query = useQuery<ProjectUpgradingStatusData, ProjectUpgradingStatusError, TData>({
     queryKey: configKeys.upgradeStatus(projectRef),
     queryFn: ({ signal }) => getProjectUpgradingStatus({ projectRef, trackingId }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
