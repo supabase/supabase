@@ -23,7 +23,7 @@ The Assistant block adds a bottom-right chat bubble that authenticates with Supa
 The bundle contains four key pieces:
 
 1. **`components/assistant-widget.tsx`** – client component that renders the widget, handles chat state, and sends authenticated requests to a Supabase Edge Function.
-2. **`supabase/functions/chat`** – Edge Function that receives browser requests, fans out to your MCP server, and streams completions back to the UI.
+2. **`supabase/functions/chat`** – Edge Function that receives browser requests, fans out to your MCP server, and streams completions back to the UI. It also registers UI-specific tools like `renderChart` and `renderRow`.
 3. **`supabase/functions/mcp-server`** – Hono-based MCP server exposing tools such as `queryDatabase` so the model can run RLS-aware SQL.
 4. **`lib/supabase/*`** – tiny helpers for browser/server Supabase clients and middleware.
 
@@ -82,24 +82,43 @@ When a signed-in user submits a prompt, the widget:
 
 ## Customizing MCP tools
 
-The generated `supabase/functions/mcp-server/index.ts` uses the `mcp-lite` transport with Zod-powered schemas. Edit the included `queryDatabase` tool (or add your own) to expose domain-specific capabilities. Every tool receives a fully-authenticated Supabase client so RLS is enforced automatically.
+The generated `supabase/functions/mcp-server` directory contains a `tools` folder where you can define your own MCP tools.
+
+1. Create a new tool file in `supabase/functions/mcp-server/tools/`, for example `my-tool.ts`.
+2. Define your tool using the `ToolDefinition` interface.
+3. Register it in `supabase/functions/mcp-server/tools/registry.ts`.
 
 ```ts
-const mcp = new McpServer({
-  name: 'supabase-assistant-mcp-server',
-  version: '1.0.0',
-  schemaAdapter: (schema) => z.toJSONSchema(schema as z.ZodType),
-})
+// supabase/functions/mcp-server/tools/my-tool.ts
+import { z } from 'zod'
+import { ToolDefinition } from './types.ts'
 
-mcp.tool('queryDatabase', {
-  input: z.object({ sql: z.string() }),
-  async execute({ sql }, { data }) {
-    const client = createClient()
-    const { data: rows, error } = await client.rpc('run_generated_sql', { sql })
-    if (error) throw error
-    return { content: rows }
+export const myTool: ToolDefinition = {
+  name: 'myTool',
+  description: 'A description of what this tool does',
+  inputSchema: z.object({
+    param: z.string(),
+  }),
+  authErrorMessage: 'User must be authenticated to use this tool',
+  run: async (supabase, { param }) => {
+    // Your tool logic here
+    return {
+      content: [{ type: 'text', text: `Processed ${param}` }],
+    }
   },
-})
+}
+```
+
+Then add it to the registry:
+
+```ts
+// supabase/functions/mcp-server/tools/registry.ts
+import { myTool } from './my-tool.ts'
+
+export const toolRegistry = [
+  // ... existing tools
+  myTool,
+]
 ```
 
 ## Deploying

@@ -102,6 +102,51 @@
       "path": "registry/default/blocks/assistant/README.md",
       "type": "registry:file",
       "target": "README.assistant.md"
+    },
+    {
+      "path": "registry/default/blocks/assistant/supabase/functions/_shared/cors.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/_shared/cors.ts"
+    },
+    {
+      "path": "registry/default/blocks/assistant/supabase/functions/chat/render-tools.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/chat/render-tools.ts"
+    },
+    {
+      "path": "registry/default/blocks/assistant/supabase/functions/mcp-server/tools/count-tasks.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/tools/count-tasks.ts"
+    },
+    {
+      "path": "registry/default/blocks/assistant/supabase/functions/mcp-server/tools/create-task.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/tools/create-task.ts"
+    },
+    {
+      "path": "registry/default/blocks/assistant/supabase/functions/mcp-server/tools/delete-task.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/tools/delete-task.ts"
+    },
+    {
+      "path": "registry/default/blocks/assistant/supabase/functions/mcp-server/tools/get-user-tasks.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/tools/get-user-tasks.ts"
+    },
+    {
+      "path": "registry/default/blocks/assistant/supabase/functions/mcp-server/tools/registry.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/tools/registry.ts"
+    },
+    {
+      "path": "registry/default/blocks/assistant/supabase/functions/mcp-server/tools/types.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/tools/types.ts"
+    },
+    {
+      "path": "registry/default/blocks/assistant/supabase/functions/mcp-server/tools/update-task.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/tools/update-task.ts"
     }
   ]
 }
