@@ -1157,12 +1157,10 @@ export const database: NavMenuConstant = {
             {
               name: 'Destinations',
               url: '/guides/database/replication/etl-destinations' as `/${string}`,
-              items: [
-                {
-                  name: 'Iceberg',
-                  url: '/guides/database/replication/etl-iceberg' as `/${string}`,
-                },
-              ],
+            },
+            {
+              name: 'Iceberg',
+              url: '/guides/database/replication/etl-iceberg' as `/${string}`,
             },
             {
               name: 'Monitoring',
