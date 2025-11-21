@@ -34,9 +34,11 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
     <TableRow
       key={item.id}
       onClick={() => {
-        IS_PLATFORM && router.push(`/project/${ref}/functions/${item.slug}`)
+        if (!IS_PLATFORM) return
+
+        router.push(`/project/${ref}/functions/${item.slug}`)
       }}
-      className={cn(IS_PLATFORM && 'cursor-pointer')}
+      className={cn({ 'cursor-pointer': IS_PLATFORM })}
     >
       <TableCell>
         <p className="text-sm text-foreground whitespace-nowrap">{item.name}</p>
