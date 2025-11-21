@@ -1,12 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { useTemporaryAPIKeyQuery } from 'data/api-keys/temp-api-keys-query'
+import { getOrRefreshTemporaryApiKey } from 'data/api-keys/temp-api-keys-utils'
 import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageKeys } from './keys'
 
 type CreateIcebergNamespaceVariables = {
+  projectRef?: string
   catalogUri: string
   warehouse: string
   namespace: string
@@ -15,13 +16,16 @@ type CreateIcebergNamespaceVariables = {
 const errorPrefix = 'Failed to create Iceberg namespace'
 
 async function createIcebergNamespace({
+  projectRef,
   catalogUri,
   warehouse,
   namespace,
-  tempApiKey,
-}: CreateIcebergNamespaceVariables & { tempApiKey?: string }) {
+}: CreateIcebergNamespaceVariables) {
   try {
-    if (!tempApiKey) throw new Error(`${errorPrefix}: API Key missing`)
+    if (!projectRef) throw new Error(`${errorPrefix}: projectRef is required`)
+
+    const tempApiKeyObj = await getOrRefreshTemporaryApiKey(projectRef)
+    const tempApiKey = tempApiKeyObj.apiKey
 
     let headers = new Headers()
     headers = await constructHeaders({
@@ -52,11 +56,10 @@ async function createIcebergNamespace({
 type IcebergNamespaceCreateData = Awaited<ReturnType<typeof createIcebergNamespace>>
 
 export const useIcebergNamespaceCreateMutation = ({
-  projectRef,
   onSuccess,
   onError,
   ...options
-}: { projectRef?: string } & Omit<
+}: Omit<
   UseCustomMutationOptions<
     IcebergNamespaceCreateData,
     ResponseError,
@@ -65,15 +68,13 @@ export const useIcebergNamespaceCreateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  const { data } = useTemporaryAPIKeyQuery({ projectRef })
-  const tempApiKey = data?.api_key
 
   return useMutation<IcebergNamespaceCreateData, ResponseError, CreateIcebergNamespaceVariables>({
-    mutationFn: (vars) => createIcebergNamespace({ ...vars, tempApiKey }),
+    mutationFn: (vars) => createIcebergNamespace({ ...vars }),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({
         queryKey: storageKeys.icebergNamespace({
-          projectRef,
+          projectRef: variables.projectRef,
           catalog: variables.catalogUri,
           warehouse: variables.warehouse,
           namespace: variables.namespace,
@@ -81,7 +82,7 @@ export const useIcebergNamespaceCreateMutation = ({
       })
       await queryClient.invalidateQueries({
         queryKey: storageKeys.icebergNamespaces({
-          projectRef,
+          projectRef: variables.projectRef,
           catalog: variables.catalogUri,
           warehouse: variables.warehouse,
         }),
