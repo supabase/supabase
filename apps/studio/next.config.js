@@ -150,13 +150,23 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/project/:ref/storage/policies',
+        destination: '/project/:ref/storage/files/policies',
+        permanent: true,
+      },
+      {
         source: '/project/:ref/storage/buckets/:bucketId',
         destination: '/project/:ref/storage/files/buckets/:bucketId',
         permanent: true,
       },
       {
         source: '/project/:ref/settings/storage',
-        destination: '/project/:ref/storage/settings',
+        destination: '/project/:ref/storage/files/settings',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage/settings',
+        destination: '/project/:ref/storage/files/settings',
         permanent: true,
       },
       {
@@ -314,18 +324,28 @@ const nextConfig = {
       },
       {
         permanent: true,
+        source: '/project/:ref/reports',
+        destination: '/project/:ref/observability',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/reports/:path*',
+        destination: '/project/:ref/observability/:path*',
+      },
+      {
+        permanent: true,
         source: '/project/:ref/query-performance',
-        destination: '/project/:ref/reports/query-performance',
+        destination: '/project/:ref/observability/query-performance',
       },
       {
         permanent: true,
         source: '/project/:ref/advisors/query-performance',
-        destination: '/project/:ref/reports/query-performance',
+        destination: '/project/:ref/observability/query-performance',
       },
       {
         permanent: true,
         source: '/project/:ref/database/query-performance',
-        destination: '/project/:ref/reports/query-performance',
+        destination: '/project/:ref/observability/query-performance',
       },
       {
         permanent: true,
@@ -418,6 +438,22 @@ const nextConfig = {
             },
           ]
         : []),
+
+      ...(process.env.MAINTENANCE_MODE === 'true'
+        ? [
+            {
+              source: '/((?!maintenance).*)', // Redirect all paths except /maintenance
+              destination: '/maintenance',
+              permanent: false,
+            },
+          ]
+        : [
+            {
+              source: '/maintenance',
+              destination: '/',
+              permanent: false,
+            },
+          ]),
     ]
   },
   async headers() {

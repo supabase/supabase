@@ -1,7 +1,6 @@
 import { FeatureFlagContext, useFlag, useParams } from 'common'
 import { OverviewLearnMore } from 'components/interfaces/Auth/Overview/OverviewLearnMore'
-import { OverviewMonitoring } from 'components/interfaces/Auth/Overview/OverviewMonitoring'
-import { OverviewUsage } from 'components/interfaces/Auth/Overview/OverviewUsage'
+import { OverviewMetrics } from 'components/interfaces/Auth/Overview/OverviewMetrics'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
@@ -11,12 +10,19 @@ import { DOCS_URL } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
+import { useAuthOverviewQuery } from 'data/auth/auth-overview-query'
 
 const AuthOverview: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { hasLoaded } = useContext(FeatureFlagContext)
   const authOverviewPageEnabled = useFlag('authOverviewPage')
+
+  const {
+    data: metrics,
+    isLoading,
+    error,
+  } = useAuthOverviewQuery({ projectRef: ref }, { enabled: !!ref })
 
   useEffect(() => {
     if (hasLoaded && !authOverviewPageEnabled) {
@@ -32,8 +38,7 @@ const AuthOverview: NextPageWithLayout = () => {
   return (
     <ScaffoldContainer size="large">
       <div className="mb-4 flex flex-col gap-2">
-        <OverviewUsage />
-        <OverviewMonitoring />
+        <OverviewMetrics metrics={metrics} isLoading={isLoading} error={error} />
         <OverviewLearnMore />
       </div>
     </ScaffoldContainer>

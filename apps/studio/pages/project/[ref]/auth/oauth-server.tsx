@@ -18,7 +18,7 @@ ProvidersPage.getLayout = (page) => (
     <AuthLayout>
       <PageLayout
         title="OAuth Server"
-        subtitle="Configure your project to act as an identity provider for third-party applications."
+        subtitle="Configure your project to act as an identity provider for third-party applications"
       >
         {page}
       </PageLayout>

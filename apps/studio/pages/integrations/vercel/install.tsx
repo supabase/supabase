@@ -111,7 +111,7 @@ const VercelIntegration: NextPageWithLayout = () => {
     }
   }
 
-  const { mutate, isLoading: isLoadingVercelIntegrationCreateMutation } =
+  const { mutate, isPending: isLoadingVercelIntegrationCreateMutation } =
     useVercelIntegrationCreateMutation({
       onMutate() {
         snapshot.setLoading(true)

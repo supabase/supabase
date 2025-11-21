@@ -183,6 +183,11 @@ export const PlanUpdateSidePanel = () => {
               const features = plan.features
               const footer = plan.footer
 
+              const source = Array.isArray(router.query.source)
+                ? router.query.source[0]
+                : router.query.source
+              const shouldHighlight = source === 'log-drains-empty-state' && plan.id === 'tier_team'
+
               if (plan.id === 'tier_enterprise') {
                 return <EnterpriseCard key={plan.id} plan={plan} isCurrentPlan={isCurrentPlan} />
               }
@@ -192,7 +197,9 @@ export const PlanUpdateSidePanel = () => {
                   key={plan.id}
                   className={cn(
                     'px-4 py-4 flex flex-col items-start justify-between',
-                    'border rounded-md col-span-12 md:col-span-4 bg-surface-200'
+                    'border rounded-md col-span-12 md:col-span-4 bg-surface-200',
+                    shouldHighlight &&
+                      'ring-4 ring-brand animate-[pulse_1.5s_ease-in-out_1] shadow-md shadow-brand/40'
                   )}
                 >
                   <div className="w-full">

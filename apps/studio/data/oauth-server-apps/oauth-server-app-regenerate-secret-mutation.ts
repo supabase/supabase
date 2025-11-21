@@ -58,7 +58,7 @@ export const useOAuthServerAppRegenerateSecretMutation = ({
     },
     onError: async (data, variables, context) => {
       if (onError === undefined) {
-        toast.error(`Failed to regenerate OAuth Server application secret: ${data.message}`)
+        toast.error(`Failed to regenerate OAuth application secret: ${data.message}`)
       } else {
         onError(data, variables, context)
       }

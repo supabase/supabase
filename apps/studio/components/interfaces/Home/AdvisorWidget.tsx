@@ -49,7 +49,7 @@ export const AdvisorWidget = () => {
   )
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
-  const { setSelectedItemId } = useAdvisorStateSnapshot()
+  const { setSelectedItem } = useAdvisorStateSnapshot()
 
   const securityLints = useMemo(
     () => (lints ?? []).filter((lint: Lint) => lint.categories.includes('SECURITY')),
@@ -80,10 +80,10 @@ export const AdvisorWidget = () => {
 
   const handleLintClick = useCallback(
     (lint: Lint) => {
-      setSelectedItemId(lint.cache_key)
+      setSelectedItem(lint.cache_key, 'lint')
       openSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
     },
-    [setSelectedItemId, openSidebar]
+    [setSelectedItem, openSidebar]
   )
 
   const totalIssues =

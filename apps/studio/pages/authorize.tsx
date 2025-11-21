@@ -285,7 +285,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
                     label="Organization to grant API access to"
                     description={
                       organization_slug
-                        ? `'This organization has been pre-selected by ${requester?.name}.`
+                        ? `This organization has been pre-selected by ${requester?.name}.`
                         : undefined
                     }
                     isReactForm

@@ -9,7 +9,7 @@ import { tableKeys } from './keys'
 export type CreateTableBody = {
   name: string
   schema?: string
-  comment?: string
+  comment?: string | null
 }
 
 export type TableCreateVariables = {

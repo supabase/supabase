@@ -8,10 +8,11 @@ import { Sidebar } from 'components/interfaces/Sidebar'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useCheckLatestDeploy } from 'hooks/use-check-latest-deploy'
 import { useAppStateSnapshot } from 'state/app-state'
-import { SidebarProvider } from 'ui'
+import { ResizablePanel, ResizablePanelGroup, SidebarProvider } from 'ui'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader/LayoutHeader'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
+import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
 import { LayoutSidebarProvider } from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 
 export interface DefaultLayoutProps {
@@ -55,8 +56,8 @@ const DefaultLayout = ({
 
   return (
     <SidebarProvider defaultOpen={false}>
-      <ProjectContextProvider projectRef={ref}>
-        <LayoutSidebarProvider>
+      <LayoutSidebarProvider>
+        <ProjectContextProvider projectRef={ref}>
           <AppBannerContextProvider>
             <div className="flex flex-col h-screen w-screen">
               {/* Top Banner */}
@@ -75,13 +76,22 @@ const DefaultLayout = ({
               <div className="flex flex-1 w-full overflow-y-hidden">
                 {/* Sidebar - Only show for project pages, not account pages */}
                 {!router.pathname.startsWith('/account') && <Sidebar />}
-                {/* Main Content */}
-                <div className="flex-grow h-full overflow-y-auto">{children}</div>
+                {/* Main Content with Layout Sidebar */}
+                <ResizablePanelGroup
+                  direction="horizontal"
+                  className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
+                  autoSaveId="default-layout-content"
+                >
+                  <ResizablePanel id="panel-content" defaultSize={1} className="w-full">
+                    <div className="h-full overflow-y-auto">{children}</div>
+                  </ResizablePanel>
+                  <LayoutSidebar />
+                </ResizablePanelGroup>
               </div>
             </div>
           </AppBannerContextProvider>
-        </LayoutSidebarProvider>
-      </ProjectContextProvider>
+        </ProjectContextProvider>
+      </LayoutSidebarProvider>
     </SidebarProvider>
   )
 }

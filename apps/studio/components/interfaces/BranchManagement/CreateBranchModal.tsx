@@ -177,12 +177,12 @@ export const CreateBranchModal = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { mutateAsync: checkGithubBranchValidity, isLoading: isCheckingGHBranchValidity } =
+  const { mutateAsync: checkGithubBranchValidity, isPending: isCheckingGHBranchValidity } =
     useCheckGithubBranchValidity({
       onError: () => {},
     })
 
-  const { mutate: createBranch, isLoading: isCreatingBranch } = useBranchCreateMutation({
+  const { mutate: createBranch, isPending: isCreatingBranch } = useBranchCreateMutation({
     onSuccess: async (data) => {
       toast.success(`Successfully created preview branch "${data.name}"`)
       if (projectRef) {
@@ -398,9 +398,11 @@ export const CreateBranchModal = () => {
                       description="Clone production data into this branch"
                     >
                       <FormControl_Shadcn_>
-                        {hasPitrEnabled && (
-                          <Switch checked={field.value} onCheckedChange={field.onChange} />
-                        )}
+                        <Switch
+                          disabled={!hasPitrEnabled}
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}

@@ -1,6 +1,6 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { sortBy } from 'lodash'
-import { ArrowRight, Database, HelpCircle, Table, X } from 'lucide-react'
+import { ArrowRight, Database, HelpCircle, Loader2, Table, X } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
 import {
   AlertDescription_Shadcn_,
@@ -16,6 +16,7 @@ import InformationBox from 'components/ui/InformationBox'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useTablesQuery as useTableRetrieveQuery } from 'data/tables/table-retrieve-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
@@ -69,16 +70,27 @@ export const ForeignKeySelector = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data: tables } = useTablesQuery<PostgresTable[] | undefined>({
+  const { data: tables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: fk.schema,
-    includeColumns: true,
+    includeColumns: false,
   })
 
-  const selectedTable = (tables ?? []).find((x) => x.name === fk.table && x.schema === fk.schema)
+  const { data: selectedTable, isLoading: isLoadingSelectedTable } =
+    useTableRetrieveQuery<PostgresTable>(
+      {
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        schema: fk.schema,
+        name: fk.table,
+      },
+      {
+        enabled: !!project?.ref && !!fk.schema && !!fk.table,
+      }
+    )
 
-  const disableApply = selectedTable === undefined || hasTypeErrors
+  const disableApply = isLoadingSelectedTable || selectedTable === undefined || hasTypeErrors
 
   const updateSelectedSchema = (schema: string) => {
     const updatedFk = { ...EMPTY_STATE, id: fk.id, schema }
@@ -258,6 +270,7 @@ export const ForeignKeySelector = ({
             label="Select a table to reference to"
             value={selectedTable?.id ?? 1}
             onChange={(value: string) => updateSelectedTable(Number(value))}
+            disabled={isLoadingSelectedTable}
           >
             <Listbox.Option key="empty" className="min-w-96" value={1} label="---">
               ---
@@ -284,42 +297,87 @@ export const ForeignKeySelector = ({
 
           {fk.schema && fk.table && (
             <>
-              <div className="flex flex-col gap-y-3">
-                <label className="text-foreground-light text-sm">
-                  Select columns from{' '}
-                  <code className="text-xs">
-                    {fk.schema}.{fk.table}
-                  </code>{' '}
-                  to reference to
-                </label>
-                <div className="grid grid-cols-10 gap-y-2">
-                  <div className="col-span-5 text-xs text-foreground-lighter">
-                    {selectedSchema}.{table.name.length > 0 ? table.name : '[unnamed table]'}
-                  </div>
-                  <div className="col-span-4 text-xs text-foreground-lighter text-right">
-                    {fk.schema}.{fk.table}
-                  </div>
-                  {fk.columns.length === 0 && (
-                    <Alert_Shadcn_ className="col-span-10 py-2 px-3">
-                      <AlertDescription_Shadcn_>
-                        There are no foreign key relations between the tables
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  )}
-                  {fk.columns.map((_, idx) => (
-                    <Fragment key={`${uuidv4()}`}>
-                      <div className="col-span-4">
-                        <Listbox
-                          id="column"
-                          value={fk.columns[idx].source}
-                          onChange={(value: string) => updateSelectedColumn(idx, 'source', value)}
-                        >
-                          <Listbox.Option key="empty" value={''} label="---" className="!w-[170px]">
-                            ---
-                          </Listbox.Option>
-                          {(table?.columns ?? [])
-                            .filter((x) => x.name.length !== 0)
-                            .map((column) => (
+              {isLoadingSelectedTable ? (
+                <div className="flex py-6 flex-col items-center justify-center space-y-2">
+                  <Loader2 size={14} className="animate-spin" />
+                  <p className="text-sm text-foreground-light">Loading table columns</p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-y-3">
+                  <label className="text-foreground-light text-sm">
+                    Select columns from{' '}
+                    <code className="text-xs">
+                      {fk.schema}.{fk.table}
+                    </code>{' '}
+                    to reference to
+                  </label>
+                  <div className="grid grid-cols-10 gap-y-2">
+                    <div className="col-span-5 text-xs text-foreground-lighter">
+                      {selectedSchema}.{table.name.length > 0 ? table.name : '[unnamed table]'}
+                    </div>
+                    <div className="col-span-4 text-xs text-foreground-lighter text-right">
+                      {fk.schema}.{fk.table}
+                    </div>
+                    {fk.columns.length === 0 && (
+                      <Alert_Shadcn_ className="col-span-10 py-2 px-3">
+                        <AlertDescription_Shadcn_>
+                          There are no foreign key relations between the tables
+                        </AlertDescription_Shadcn_>
+                      </Alert_Shadcn_>
+                    )}
+                    {fk.columns.map((_, idx) => (
+                      <Fragment key={`${fk.schema}-${fk.table}-${idx}`}>
+                        <div className="col-span-4">
+                          <Listbox
+                            id="column"
+                            value={fk.columns[idx].source}
+                            onChange={(value: string) => updateSelectedColumn(idx, 'source', value)}
+                          >
+                            <Listbox.Option
+                              key="empty"
+                              value={''}
+                              label="---"
+                              className="!w-[170px]"
+                            >
+                              ---
+                            </Listbox.Option>
+                            {(table?.columns ?? [])
+                              .filter((x) => x.name.length !== 0)
+                              .map((column) => (
+                                <Listbox.Option
+                                  key={column.id}
+                                  value={column.name}
+                                  label={column.name}
+                                  className="!w-[170px]"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-foreground">{column.name}</span>
+                                    <span className="text-foreground-lighter">
+                                      {column.format === '' ? '-' : column.format}
+                                    </span>
+                                  </div>
+                                </Listbox.Option>
+                              ))}
+                          </Listbox>
+                        </div>
+                        <div className="col-span-1 flex justify-center items-center">
+                          <ArrowRight />
+                        </div>
+                        <div className="col-span-4">
+                          <Listbox
+                            id="column"
+                            value={fk.columns[idx].target}
+                            onChange={(value: string) => updateSelectedColumn(idx, 'target', value)}
+                          >
+                            <Listbox.Option
+                              key="empty"
+                              value={''}
+                              label="---"
+                              className="!w-[170px]"
+                            >
+                              ---
+                            </Listbox.Option>
+                            {(selectedTable?.columns ?? []).map((column) => (
                               <Listbox.Option
                                 key={column.id}
                                 value={column.name}
@@ -328,194 +386,171 @@ export const ForeignKeySelector = ({
                               >
                                 <div className="flex items-center gap-2">
                                   <span className="text-foreground">{column.name}</span>
-                                  <span className="text-foreground-lighter">
-                                    {column.format === '' ? '-' : column.format}
-                                  </span>
+                                  <span className="text-foreground-lighter">{column.format}</span>
                                 </div>
                               </Listbox.Option>
                             ))}
-                        </Listbox>
-                      </div>
-                      <div className="col-span-1 flex justify-center items-center">
-                        <ArrowRight />
-                      </div>
-                      <div className="col-span-4">
-                        <Listbox
-                          id="column"
-                          value={fk.columns[idx].target}
-                          onChange={(value: string) => updateSelectedColumn(idx, 'target', value)}
-                        >
-                          <Listbox.Option key="empty" value={''} label="---" className="!w-[170px]">
-                            ---
-                          </Listbox.Option>
-                          {(selectedTable?.columns ?? []).map((column) => (
-                            <Listbox.Option
-                              key={column.id}
-                              value={column.name}
-                              label={column.name}
-                              className="!w-[170px]"
-                            >
-                              <div className="flex items-center gap-2">
-                                <span className="text-foreground">{column.name}</span>
-                                <span className="text-foreground-lighter">{column.format}</span>
-                              </div>
-                            </Listbox.Option>
-                          ))}
-                        </Listbox>
-                      </div>
-                      <div className="col-span-1 flex justify-end items-center">
-                        <Button
-                          type="default"
-                          className="px-1"
-                          icon={<X />}
-                          disabled={fk.columns.length === 1}
-                          onClick={() => onRemoveColumn(idx)}
-                        />
-                      </div>
-                    </Fragment>
-                  ))}
-                </div>
-                <div className="space-y-2">
-                  <Button type="default" onClick={addColumn}>
-                    Add another column
-                  </Button>
-                  {errors.columns && <p className="text-red-900 text-sm">{errors.columns}</p>}
-                  {hasTypeErrors && (
-                    <Alert_Shadcn_ variant="warning">
-                      <AlertTitle_Shadcn_>Column types do not match</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        The following columns cannot be referenced as they are not of the same type:
-                      </AlertDescription_Shadcn_>
-                      <ul className="list-disc pl-5 mt-2 text-foreground-light">
-                        {(errors?.types ?? []).map((x, idx: number) => {
-                          if (x === undefined) return null
-                          return (
-                            <li key={`type-error-${idx}`}>
-                              <code className="text-xs">{fk.columns[idx]?.source}</code> (
-                              {x.sourceType}) and{' '}
-                              <code className="text-xs">{fk.columns[idx]?.target}</code>(
-                              {x.targetType})
-                            </li>
-                          )
-                        })}
-                      </ul>
-                    </Alert_Shadcn_>
-                  )}
-                  {hasTypeNotices && (
-                    <Alert_Shadcn_>
-                      <AlertTitle_Shadcn_>Column types will be updated</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        The following columns will have their types updated to match their
-                        referenced column
-                      </AlertDescription_Shadcn_>
-                      <ul className="list-disc pl-5 mt-2 text-foreground-light">
-                        {(errors?.typeNotice ?? []).map((x, idx: number) => {
-                          if (x === undefined) return null
-                          return (
-                            <li key={`type-error-${idx}`}>
-                              <div className="flex items-center gap-x-1">
-                                <code className="text-xs">{fk.columns[idx]?.source}</code>{' '}
-                                <ArrowRight size={14} /> {x.targetType}
-                              </div>
-                            </li>
-                          )
-                        })}
-                      </ul>
-                    </Alert_Shadcn_>
-                  )}
-                </div>
-              </div>
-
-              <SidePanel.Separator />
-
-              <InformationBox
-                icon={<HelpCircle size="20" strokeWidth={1.5} />}
-                title="Which action is most appropriate?"
-                description={
-                  <>
-                    <p>
-                      The choice of the action depends on what kinds of objects the related tables
-                      represent:
-                    </p>
-                    <ul className="mt-2 list-disc pl-4 space-y-1">
-                      <li>
-                        <code className="text-xs">Cascade</code>: if the referencing table
-                        represents something that is a component of what is represented by the
-                        referenced table and cannot exist independently
-                      </li>
-                      <li>
-                        <code className="text-xs">Restrict</code> or{' '}
-                        <code className="text-xs">No action</code>: if the two tables represent
-                        independent objects
-                      </li>
-                      <li>
-                        <code className="text-xs">Set NULL</code> or{' '}
-                        <code className="text-xs">Set default</code>: if a foreign-key relationship
-                        represents optional information
-                      </li>
-                    </ul>
-                    <p className="mt-2">
-                      Typically, restricting and cascading deletes are the most common options, but
-                      the default behavior is no action
-                    </p>
-                  </>
-                }
-                url="https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-FK"
-                urlLabel="More information"
-              />
-
-              <Listbox
-                id="updateAction"
-                value={fk.updateAction}
-                label="Action if referenced row is updated"
-                descriptionText={
-                  <p>
-                    {generateCascadeActionDescription(
-                      'update',
-                      fk.updateAction,
-                      `${fk.schema}.${fk.table}`
+                          </Listbox>
+                        </div>
+                        <div className="col-span-1 flex justify-end items-center">
+                          <Button
+                            type="default"
+                            className="px-1"
+                            icon={<X />}
+                            disabled={fk.columns.length === 1}
+                            onClick={() => onRemoveColumn(idx)}
+                          />
+                        </div>
+                      </Fragment>
+                    ))}
+                  </div>
+                  <div className="space-y-2">
+                    <Button type="default" onClick={addColumn}>
+                      Add another column
+                    </Button>
+                    {errors.columns && <p className="text-red-900 text-sm">{errors.columns}</p>}
+                    {hasTypeErrors && (
+                      <Alert_Shadcn_ variant="warning">
+                        <AlertTitle_Shadcn_>Column types do not match</AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_>
+                          The following columns cannot be referenced as they are not of the same
+                          type:
+                        </AlertDescription_Shadcn_>
+                        <ul className="list-disc pl-5 mt-2 text-foreground-light">
+                          {(errors?.types ?? []).map((x, idx: number) => {
+                            if (x === undefined) return null
+                            return (
+                              <li key={`type-error-${idx}`}>
+                                <code className="text-xs">{fk.columns[idx]?.source}</code> (
+                                {x.sourceType}) and{' '}
+                                <code className="text-xs">{fk.columns[idx]?.target}</code>(
+                                {x.targetType})
+                              </li>
+                            )
+                          })}
+                        </ul>
+                      </Alert_Shadcn_>
                     )}
-                  </p>
-                }
-                onChange={(value: string) => updateCascadeAction('updateAction', value)}
-              >
-                {FOREIGN_KEY_CASCADE_OPTIONS.filter((option) =>
-                  ['no-action', 'cascade', 'restrict'].includes(option.key)
-                ).map((option) => (
-                  <Listbox.Option key={option.key} value={option.value} label={option.label}>
-                    <p className="text-foreground">{option.label}</p>
-                  </Listbox.Option>
-                ))}
-              </Listbox>
+                    {hasTypeNotices && (
+                      <Alert_Shadcn_>
+                        <AlertTitle_Shadcn_>Column types will be updated</AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_>
+                          The following columns will have their types updated to match their
+                          referenced column
+                        </AlertDescription_Shadcn_>
+                        <ul className="list-disc pl-5 mt-2 text-foreground-light">
+                          {(errors?.typeNotice ?? []).map((x, idx: number) => {
+                            if (x === undefined) return null
+                            return (
+                              <li key={`type-error-${idx}`}>
+                                <div className="flex items-center gap-x-1">
+                                  <code className="text-xs">{fk.columns[idx]?.source}</code>{' '}
+                                  <ArrowRight size={14} /> {x.targetType}
+                                </div>
+                              </li>
+                            )
+                          })}
+                        </ul>
+                      </Alert_Shadcn_>
+                    )}
+                  </div>
+                </div>
+              )}
 
-              <Listbox
-                id="deletionAction"
-                value={fk.deletionAction}
-                className="[&>div>label]:flex [&>div>label]:items-center"
-                label="Action if referenced row is removed"
-                // @ts-ignore
-                labelOptional={
-                  <DocsButton href={`${DOCS_URL}/guides/database/postgres/cascade-deletes`} />
-                }
-                descriptionText={
-                  <>
-                    <p>
-                      {generateCascadeActionDescription(
-                        'delete',
-                        fk.deletionAction,
-                        `${fk.schema}.${fk.table}`
-                      )}
-                    </p>
-                  </>
-                }
-                onChange={(value: string) => updateCascadeAction('deletionAction', value)}
-              >
-                {FOREIGN_KEY_CASCADE_OPTIONS.map((option) => (
-                  <Listbox.Option key={option.key} value={option.value} label={option.label}>
-                    <p className="text-foreground">{option.label}</p>
-                  </Listbox.Option>
-                ))}
-              </Listbox>
+              {!isLoadingSelectedTable && (
+                <>
+                  <SidePanel.Separator />
+
+                  <InformationBox
+                    icon={<HelpCircle size="20" strokeWidth={1.5} />}
+                    title="Which action is most appropriate?"
+                    description={
+                      <>
+                        <p>
+                          The choice of the action depends on what kinds of objects the related
+                          tables represent:
+                        </p>
+                        <ul className="mt-2 list-disc pl-4 space-y-1">
+                          <li>
+                            <code className="text-xs">Cascade</code>: if the referencing table
+                            represents something that is a component of what is represented by the
+                            referenced table and cannot exist independently
+                          </li>
+                          <li>
+                            <code className="text-xs">Restrict</code> or{' '}
+                            <code className="text-xs">No action</code>: if the two tables represent
+                            independent objects
+                          </li>
+                          <li>
+                            <code className="text-xs">Set NULL</code> or{' '}
+                            <code className="text-xs">Set default</code>: if a foreign-key
+                            relationship represents optional information
+                          </li>
+                        </ul>
+                        <p className="mt-2">
+                          Typically, restricting and cascading deletes are the most common options,
+                          but the default behavior is no action
+                        </p>
+                      </>
+                    }
+                    url="https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-FK"
+                    urlLabel="More information"
+                  />
+
+                  <Listbox
+                    id="updateAction"
+                    value={fk.updateAction}
+                    label="Action if referenced row is updated"
+                    descriptionText={
+                      <p>
+                        {generateCascadeActionDescription(
+                          'update',
+                          fk.updateAction,
+                          `${fk.schema}.${fk.table}`
+                        )}
+                      </p>
+                    }
+                    onChange={(value: string) => updateCascadeAction('updateAction', value)}
+                  >
+                    {FOREIGN_KEY_CASCADE_OPTIONS.filter((option) =>
+                      ['no-action', 'cascade', 'restrict'].includes(option.key)
+                    ).map((option) => (
+                      <Listbox.Option key={option.key} value={option.value} label={option.label}>
+                        <p className="text-foreground">{option.label}</p>
+                      </Listbox.Option>
+                    ))}
+                  </Listbox>
+
+                  <Listbox
+                    id="deletionAction"
+                    value={fk.deletionAction}
+                    className="[&>div>label]:flex [&>div>label]:items-center"
+                    label="Action if referenced row is removed"
+                    // @ts-ignore
+                    labelOptional={
+                      <DocsButton href={`${DOCS_URL}/guides/database/postgres/cascade-deletes`} />
+                    }
+                    descriptionText={
+                      <>
+                        <p>
+                          {generateCascadeActionDescription(
+                            'delete',
+                            fk.deletionAction,
+                            `${fk.schema}.${fk.table}`
+                          )}
+                        </p>
+                      </>
+                    }
+                    onChange={(value: string) => updateCascadeAction('deletionAction', value)}
+                  >
+                    {FOREIGN_KEY_CASCADE_OPTIONS.map((option) => (
+                      <Listbox.Option key={option.key} value={option.value} label={option.label}>
+                        <p className="text-foreground">{option.label}</p>
+                      </Listbox.Option>
+                    ))}
+                  </Listbox>
+                </>
+              )}
             </>
           )}
         </div>

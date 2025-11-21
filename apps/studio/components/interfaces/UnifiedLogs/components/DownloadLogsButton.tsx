@@ -1,5 +1,6 @@
 import saveAs from 'file-saver'
 import { Download } from 'lucide-react'
+import Link from 'next/link'
 import Papa from 'papaparse'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -41,7 +42,7 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
   const [numHours, setNumHours] = useState(DEFAULT_NUM_ROWS)
   const [selectedFormat, setSelectedFormat] = useState<'csv' | 'json'>()
 
-  const { mutate: retrieveLogs, isLoading } = useGetUnifiedLogsMutation({
+  const { mutate: retrieveLogs, isPending } = useGetUnifiedLogsMutation({
     onSuccess: (res) => {
       if (selectedFormat === 'json') {
         const blob = new Blob([JSON.stringify(res, null, 2)], { type: 'text/json;charset=utf-8;' })
@@ -91,13 +92,18 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
       <DropdownMenu>
         <DropdownMenuTrigger>
           <ButtonTooltip
-            type="outline"
+            type="default"
             className="w-[26px]"
             icon={<Download className="text-foreground" />}
             tooltip={{ content: { side: 'bottom', text: 'Download logs' } }}
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-36">
+          <DropdownMenuItem asChild className="gap-x-2">
+            <Link href={`/project/${ref}/settings/log-drains`}>
+              <p>Add a Log Drain</p>
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setSelectedFormat('csv')}>
             <p>Download as CSV</p>
           </DropdownMenuItem>
@@ -152,12 +158,12 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
           <DialogFooter>
             <Button
               type="default"
-              disabled={isLoading}
+              disabled={isPending}
               onClick={() => setSelectedFormat(undefined)}
             >
               Cancel
             </Button>
-            <Button type="primary" loading={isLoading} onClick={onExportData}>
+            <Button type="primary" loading={isPending} onClick={onExportData}>
               Export
             </Button>
           </DialogFooter>
