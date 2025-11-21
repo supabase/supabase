@@ -113,35 +113,195 @@ Before adding destinations, you need to enable replication to managed destinatio
 
 Once replication is enabled and you have a Postgres publication, you can add a destination. The destination is where your replicated data will be stored, while the pipeline is the active Postgres replication process that continuously streams changes from your database to that destination.
 
-#### Available managed destinations
+#### Choose and configure your destination
 
-For a complete list of available managed destinations and how to choose the right one for your needs, see [Managed Destinations](/docs/guides/database/replication/etl-destinations).
+Follow these steps to configure your destination. The specific configuration depends on which destination type you choose.
 
-#### Configuration
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="iceberg"
+  queryGroup="destination"
+>
+<TabPanel id="iceberg" label="Iceberg">
 
-1. In the ETL Replication tab, click **Add destination**
-2. Configure the destination settings:
+Apache Iceberg is an open table format for analytic datasets. Replication to Iceberg uses Supabase [Analytics Buckets](/docs/guides/storage/analytics) to store your replicated data in S3-compatible storage.
 
-   **General Settings:**
+##### Step 1: Create an Analytics Bucket
 
+First, create an Analytics Bucket to store your replicated data:
+
+1. Navigate to [Storage](/dashboard/project/_/storage/buckets) → **Analytics** in your Supabase Dashboard
+2. Click **New bucket**
+
+   <Image
+     alt="Create New Analytics Bucket"
+     src="/docs/img/database/replication/etl-iceberg-new-bucket.png"
+     zoomable
+   />
+
+3. Fill in the bucket details:
+
+   <Image
+     alt="Analytics Bucket Details"
+     src="/docs/img/database/replication/etl-iceberg-details.png"
+     zoomable
+   />
+
+   - **Name**: A unique name for your bucket (e.g., `analytics_warehouse`)
+   - **Region**: Select the region where your data will be stored
+
+4. Click **Create bucket**
+
+5. **Copy the credentials** displayed after bucket creation. You'll need these in the next steps:
+   - **Catalog Token**: Authentication token for accessing the Iceberg catalog
+   - **S3 Access Key ID**: Access key for S3-compatible storage
+   - **S3 Secret Access Key**: Secret key for S3-compatible storage
+
+##### Step 2: Configure Iceberg as a destination
+
+1. Navigate to [Database](/dashboard/project/_/database/etl) → **ETL Replication** in your Supabase Dashboard
+2. Click **Add destination**
+
+   <Image
+     alt="Add Destination"
+     src="/docs/img/database/replication/etl-add-destination.png"
+     zoomable
+   />
+
+3. Configure the general settings:
    - **Destination name**: A name to identify this destination (e.g., "Analytics Warehouse")
-   - **Publication**: The publication to replicate data from (created in Step 1)
-   - **Destination type**: Choose from available destination types
+   - **Publication**: The publication to replicate data from (created in [Step 1](#step-1-create-a-postgres-publication))
+   - **Destination type**: Select **Iceberg (Analytics Bucket)**
 
-   **Destination-specific settings:**
-   Each destination type requires different configuration. See the [Managed Destinations guide](/docs/guides/database/replication/etl-destinations) for configuration details specific to your chosen destination.
+4. Configure Iceberg-specific settings:
+   - **Bucket**: The name of your Analytics Bucket from Step 1
+   - **Namespace**: The schema name where your tables will be replicated (e.g., `public`)
+   - **Catalog Token**: Authentication token from Step 1
+   - **S3 Access Key ID**: Access key from Step 1
+   - **S3 Secret Access Key**: Secret key from Step 1
 
-<Image
-  alt="Add Destination"
-  src="/docs/img/database/replication/etl-add-destination.png"
-  zoomable
-/>
+5. Configure **Advanced Settings** (optional):
+   - **Batch wait time (milliseconds)**: How long to wait for more changes before sending a batch. Default is recommended for optimal performance.
 
-3. Configure **Advanced Settings** (optional):
+6. Click **Create and start** to begin replication
 
-   - **Batch wait time (milliseconds)**: How long to wait for more changes before sending a batch. We recommend leaving this at the default value for optimal performance. Setting this too low can result in too much traffic and less efficient batching.
+Your replication pipeline will now start copying data from your database to the Analytics Bucket in Iceberg format.
 
-4. Click **Create and start** to begin replication
+##### How it works
+
+Once configured, replication to Iceberg:
+
+1. Captures changes from your Postgres database (INSERT, UPDATE, DELETE operations)
+2. Batches changes for optimal performance
+3. Writes data to Analytics Buckets in Iceberg format
+4. Creates an append-only log with CDC metadata
+
+##### Limitations
+
+- **Append-only log**: Currently provides an append-only log format rather than a full table representation
+
+##### Additional resources
+
+- [Analytics Buckets documentation](/docs/guides/storage/analytics) - Learn more about Analytics Buckets and S3-compatible storage
+- [Apache Iceberg](https://iceberg.apache.org/) - Official Iceberg documentation
+
+</TabPanel>
+<TabPanel id="bigquery" label="BigQuery">
+
+BigQuery is Google's fully managed data warehouse. Replication to BigQuery allows you to sync your database tables for analytics and reporting.
+
+##### Step 1: Prepare GCP resources
+
+Before configuring BigQuery as a destination, set up the following in Google Cloud Platform:
+
+1. **Google Cloud Platform (GCP) account**: [Sign up for GCP](https://cloud.google.com/gcp) if you don't have one
+
+2. **BigQuery dataset**: Create a [BigQuery dataset](https://cloud.google.com/bigquery/docs/datasets-intro) in your GCP project
+   - Open the BigQuery console in GCP
+   - Select your project
+   - Click "Create Dataset"
+   - Provide a dataset ID (e.g., `supabase_replication`)
+
+3. **GCP service account key**: Create a [service account](https://cloud.google.com/iam/docs/keys-create-delete) with appropriate permissions:
+   - Go to IAM & Admin → Service Accounts
+   - Click "Create Service Account"
+   - Grant the **BigQuery Data Editor** role
+   - Create and download the JSON key file
+
+   Required permissions:
+   - `bigquery.datasets.get`
+   - `bigquery.tables.create`
+   - `bigquery.tables.get`
+   - `bigquery.tables.getData`
+   - `bigquery.tables.update`
+   - `bigquery.tables.updateData`
+
+##### Step 2: Configure BigQuery as a destination
+
+1. Navigate to [Database](/dashboard/project/_/database/etl) → **ETL Replication** in your Supabase Dashboard
+2. Click **Add destination**
+
+   <Image
+     alt="BigQuery Configuration Settings"
+     src="/docs/img/database/replication/etl-bigquery-details.png"
+     zoomable
+   />
+
+3. Configure the general settings:
+   - **Destination name**: A name to identify this destination (e.g., "BigQuery Warehouse")
+   - **Publication**: The publication to replicate data from (created in [Step 1](#step-1-create-a-postgres-publication))
+   - **Destination type**: Select **BigQuery**
+
+4. Configure BigQuery-specific settings:
+   - **Project ID**: Your BigQuery project identifier (found in the GCP Console)
+   - **Dataset ID**: The name of your BigQuery dataset (without the project ID)
+
+     <Admonition type="note">
+
+     In the GCP Console, the dataset is shown as `project-id.dataset-id`. Enter only the part after the dot. For example, if you see `my-project.my_dataset`, enter `my_dataset`.
+
+     </Admonition>
+
+   - **Service Account Key**: Your GCP service account key in JSON format (from Step 1)
+
+5. Configure **Advanced Settings** (optional):
+   - **Batch wait time (milliseconds)**: How long to wait for more changes before sending a batch. Default is recommended for optimal performance.
+
+6. Click **Create and start** to begin replication
+
+Your replication pipeline will now start copying data from your database to BigQuery.
+
+##### How it works
+
+Once configured, replication to BigQuery:
+
+1. Captures changes from your Postgres database (INSERT, UPDATE, DELETE operations)
+2. Batches changes for optimal performance
+3. Creates BigQuery tables automatically to match your Postgres schema
+4. Streams data to BigQuery with CDC metadata
+
+##### How tables are structured
+
+Due to BigQuery limitations, replicated tables use a versioned structure:
+
+- The table you query is a **view** (e.g., `users`)
+- The actual data is stored in versioned tables with a `_version` suffix (e.g., `users_version`)
+- When a table is truncated in your database, a new version is created and the view automatically points to the latest version
+
+This structure handles table truncations seamlessly while maintaining query compatibility.
+
+##### Limitations
+
+- **Row size**: Limited to 10 MB per row due to BigQuery Storage Write API constraints
+
+##### Additional resources
+
+- [BigQuery documentation](https://cloud.google.com/bigquery/docs) - Official Google BigQuery documentation
+
+</TabPanel>
+</Tabs>
 
 ### Step 4: Monitor your pipeline
 
@@ -248,7 +408,7 @@ Replication to managed destinations has the following limitations:
 - **No data transformation**: Data is replicated as-is without transformation
 - **Data duplicates**: Duplicates can occur when stopping a pipeline if your database has transactions that take longer than a few minutes to complete. See [Can data duplicates occur?](/docs/guides/database/replication/etl-replication-faq#can-data-duplicates-occur-during-pipeline-operations) for details
 
-Destination-specific limitations may also apply. See the [Iceberg](/docs/guides/database/replication/etl-iceberg#limitations) destination page for details.
+Destination-specific limitations (such as Iceberg's append-only log format or BigQuery's ingestion latency) are detailed in each destination tab in [Step 3](#step-3-add-a-destination) above.
 
 ### Future work
 

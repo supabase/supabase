@@ -14,7 +14,11 @@ Managed destinations are currently in private alpha. Access is limited and featu
 
 ## What managed destinations are supported?
 
-Supabase currently provides managed replication to Iceberg (Analytics Buckets) with BigQuery coming soon. See the [Managed Destinations guide](/docs/guides/database/replication/etl-destinations) for details.
+Supabase currently provides managed replication to:
+- **Iceberg (Analytics Buckets)**: Apache Iceberg tables in S3-compatible storage
+- **BigQuery**: Google's fully managed data warehouse (coming soon)
+
+For detailed setup instructions, see the [Managed Destinations Setup guide](/docs/guides/database/replication/etl-replication-setup).
 
 ## Why is a table not being replicated?
 
@@ -65,7 +69,7 @@ Key limitations to be aware of:
 - **Custom data types**: Not supported
 - **Schema changes**: Not automatically handled
 
-Destination-specific limitations may also apply. See the [Iceberg](/docs/guides/database/replication/etl-iceberg#limitations) destination page for details.
+Destination-specific limitations (such as Iceberg's append-only log format or BigQuery's ingestion latency) are detailed in the [Managed Destinations Setup guide](/docs/guides/database/replication/etl-replication-setup#step-3-add-a-destination).
 
 ## How to stop or pause replication
 
