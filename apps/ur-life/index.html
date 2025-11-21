@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UR Life - Sign In</title>
+    <link rel="stylesheet" href="/src/styles/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <img src="/src/assets/symbol_only.svg" alt="UR Logo" class="ur-logo">
+            </div>
+            <h1 class="university-name">UNIVERSITY <span class="of">of</span> ROCHESTER</h1>
+        </div>
+
+        <!-- Login Card -->
+        <div class="login-card">
+            <h2 class="login-title">UR Life</h2>
+            <p class="login-subtitle">Sign in to access your dashboard</p>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="netId">Net ID</label>
+                    <input
+                        type="text"
+                        id="netId"
+                        name="netId"
+                        placeholder="Enter your Net ID"
+                        autocomplete="username"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <div id="errorMessage" class="error-message"></div>
+
+                <button type="submit" class="btn-login">Sign In</button>
+            </form>
+
+            <!-- Demo Accounts -->
+            <div class="demo-accounts">
+                <p class="demo-title">Try Demo Accounts</p>
+                <div class="demo-cards">
+                    <div class="demo-card" data-netid="fox123" data-password="rochester2025">
+                        <div class="demo-emoji">🦊</div>
+                        <div class="demo-info">
+                            <div class="demo-name">Fox</div>
+                            <div class="demo-details">Computer Science Junior</div>
+                        </div>
+                    </div>
+
+                    <div class="demo-card" data-netid="bear456" data-password="yellowjacket">
+                        <div class="demo-emoji">🐻</div>
+                        <div class="demo-info">
+                            <div class="demo-name">Bear</div>
+                            <div class="demo-details">Mathematics Senior</div>
+                        </div>
+                    </div>
+
+                    <div class="demo-card" data-netid="cat789" data-password="meowmeow123">
+                        <div class="demo-emoji">🐱</div>
+                        <div class="demo-info">
+                            <div class="demo-name">Cat</div>
+                            <div class="demo-details">Biology Sophomore</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sign Up Link -->
+            <div class="signup-link">
+                <p>Don't have an account? <a href="#" id="signupLink">Create one</a></p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2025 University of Rochester · Meliora - Ever Better</p>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p>Signing in...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="/src/js/login.js"></script>
+</body>
+</html>
