@@ -5,7 +5,7 @@ import {
   Check,
   CheckCircle,
   Circle,
-  Loader,
+  Loader2,
   Maximize2,
   Minimize2,
   Settings,
@@ -80,7 +80,7 @@ export const UpgradingState = () => {
             {isCompleted ? (
               <div className="grid gap-4">
                 <div className="relative mx-auto max-w-[300px]">
-                  <CheckCircle className="text-brand" size={40} strokeWidth={1.5} />
+                  <CheckCircle className="text-brand-link" size={40} strokeWidth={1.5} />
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">Upgrade completed!</p>
@@ -129,9 +129,13 @@ export const UpgradingState = () => {
               <div className="grid w-[480px] gap-4">
                 <div className="relative mx-auto max-w-[300px]">
                   <div className="absolute flex items-center justify-center w-full h-full">
-                    <Settings className="animate-spin" size={20} strokeWidth={2} />
+                    <Settings
+                      className="animate-[spin_4s_linear_infinite]"
+                      size={20}
+                      strokeWidth={2}
+                    />
                   </div>
-                  <Circle className="text-foreground-lighter" size={50} strokeWidth={1.5} />
+                  <Circle className="text-foreground-lighter" size={50} strokeWidth={1} />
                 </div>
                 <div className="space-y-2">
                   {isPerformingFullPhysicalBackup ? (
@@ -195,15 +199,15 @@ export const UpgradingState = () => {
                           <div key={message.key} className="flex items-center space-x-4">
                             {isCurrent ? (
                               <div className="flex items-center justify-center w-5 h-5 rounded-full">
-                                <Loader
+                                <Loader2
                                   size={20}
                                   className="animate-spin text-foreground-light"
                                   strokeWidth={2}
                                 />
                               </div>
                             ) : isCompleted ? (
-                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand border-brand">
-                                <Check size={12} className="text-white" strokeWidth={3} />
+                              <div className="flex items-center justify-center w-5 h-5 rounded-full bg-brand-500 dark:bg-brand">
+                                <Check size={12} className="text-contrast" strokeWidth={3} />
                               </div>
                             ) : (
                               <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-overlay-hover" />
@@ -231,12 +235,16 @@ export const UpgradingState = () => {
 
                   {initiated_at !== undefined && (
                     <Tooltip>
-                      <TooltipTrigger>
-                        <p className="text-sm text-center text-foreground-light">
-                          Started on: {initiatedAtUTC} (UTC)
-                        </p>
+                      <TooltipTrigger asChild>
+                        <div className="block w-full text-center">
+                          <p className="text-sm text-center text-foreground-light">
+                            Started on: {initiatedAtUTC} (UTC)
+                          </p>
+                        </div>
                       </TooltipTrigger>
-                      <TooltipContent side="bottom">{initiatedAt}</TooltipContent>
+                      <TooltipContent side="bottom" className="text-center">
+                        {initiatedAt}
+                      </TooltipContent>
                     </Tooltip>
                   )}
                 </div>
