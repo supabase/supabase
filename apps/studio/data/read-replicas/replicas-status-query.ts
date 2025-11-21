@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { replicaKeys } from './keys'
 
 // [Joshen] Is it possible to import this from the code gen?
@@ -46,7 +46,7 @@ export const useReadReplicasStatusesQuery = <TData = ReadReplicasStatusesData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ReadReplicasStatusesData, ReadReplicasStatusesError, TData> = {}
+  }: UseCustomQueryOptions<ReadReplicasStatusesData, ReadReplicasStatusesError, TData> = {}
 ) => {
   return useQuery<ReadReplicasStatusesData, ReadReplicasStatusesError, TData>({
     queryKey: replicaKeys.statuses(projectRef),

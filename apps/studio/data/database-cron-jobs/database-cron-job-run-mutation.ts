@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseCronJobsKeys } from './keys'
 
 export type DatabaseCronJobRunVariables = {
@@ -44,7 +44,7 @@ export const useDatabaseCronJobRunCommandMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseCronJobRunData, ResponseError, DatabaseCronJobRunVariables>,
+  UseCustomMutationOptions<DatabaseCronJobRunData, ResponseError, DatabaseCronJobRunVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<DatabaseCronJobRunData, ResponseError, DatabaseCronJobRunVariables>({

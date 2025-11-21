@@ -115,6 +115,9 @@ const logIndexedDB = (message: string, ...args: any[]) => {
   })()
 }
 
+/**
+ * Reference to a function that captures exceptions for debugging purposes to be sent to Sentry.
+ */
 let captureException: ((e: any) => any) | null = null
 
 export function setCaptureException(fn: typeof captureException) {

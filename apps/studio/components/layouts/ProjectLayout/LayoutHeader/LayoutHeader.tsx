@@ -8,6 +8,7 @@ import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview
 import { Connect } from 'components/interfaces/Connect/Connect'
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
+import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
 import { AssistantButton } from 'components/layouts/AppLayout/AssistantButton'
 import { BranchDropdown } from 'components/layouts/AppLayout/BranchDropdown'
 import { InlineEditorButton } from 'components/layouts/AppLayout/InlineEditorButton'
@@ -21,16 +22,14 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Badge, cn } from 'ui'
-import { SIDEBAR_KEYS } from '../LayoutSidebar/LayoutSidebarProvider'
+import { CommandMenuTriggerInput } from 'ui-patterns'
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
 import { HelpPopover } from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import MergeRequestButton from './MergeRequestButton'
-import { NotificationsPopoverV2 } from './NotificationsPopoverV2/NotificationsPopover'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -58,7 +57,7 @@ interface LayoutHeaderProps {
   backToDashboardURL?: string
 }
 
-const LayoutHeader = ({
+export const LayoutHeader = ({
   customHeaderComponents,
   breadcrumbs = [],
   headerTitle,
@@ -71,13 +70,10 @@ const LayoutHeader = ({
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { setMobileMenuOpen } = useAppStateSnapshot()
   const gitlessBranching = useIsBranching2Enabled()
-  const { toggleSidebar } = useSidebarManagerSnapshot()
+
+  const [commandMenuEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU, true)
 
   const isAccountPage = router.pathname.startsWith('/account')
-  const [inlineEditorHotkeyEnabled] = useLocalStorageQuery<boolean>(
-    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.EDITOR_PANEL),
-    true
-  )
 
   // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
   const { data: orgUsage } = useOrgUsageQuery(
@@ -216,16 +212,24 @@ const LayoutHeader = ({
               <>
                 <FeedbackDropdown />
 
-                <div className="overflow-hidden flex items-center rounded-full border">
+                <div className="flex items-center gap-2">
+                  <CommandMenuTriggerInput
+                    showShortcut={commandMenuEnabled}
+                    placeholder="Search..."
+                    className={cn(
+                      'hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent',
+                      '[&_.command-shortcut>div]:border-none',
+                      '[&_.command-shortcut>div]:pr-2',
+                      '[&_.command-shortcut>div]:bg-transparent',
+                      '[&_.command-shortcut>div]:text-foreground-lighter'
+                    )}
+                  />
                   <HelpPopover />
-                  <NotificationsPopoverV2 />
+                  <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton
-                          onClick={() => toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)}
-                          showShortcut={inlineEditorHotkeyEnabled}
-                        />
+                        <InlineEditorButton />
                         <AssistantButton />
                       </>
                     )}
@@ -236,14 +240,21 @@ const LayoutHeader = ({
             ) : (
               <>
                 <LocalVersionPopover />
-                <div className="overflow-hidden flex items-center rounded-full border">
+                <div className="flex items-center gap-2">
+                  <CommandMenuTriggerInput
+                    placeholder="Search..."
+                    className="hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent
+                        [&_.command-shortcut>div]:border-none
+                        [&_.command-shortcut>div]:pr-2
+                        [&_.command-shortcut>div]:bg-transparent
+                        [&_.command-shortcut>div]:text-foreground-lighter
+                      "
+                  />
+                  <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton
-                          onClick={() => toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)}
-                          showShortcut={inlineEditorHotkeyEnabled}
-                        />
+                        <InlineEditorButton />
                         <AssistantButton />
                       </>
                     )}
@@ -258,5 +269,3 @@ const LayoutHeader = ({
     </>
   )
 }
-
-export default LayoutHeader

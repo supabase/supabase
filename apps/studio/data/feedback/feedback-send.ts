@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type SendFeedbackVariables = {
   message: string
@@ -37,7 +37,7 @@ export const useSendFeedbackMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<SendFeedbackData, ResponseError, SendFeedbackVariables>,
+  UseCustomMutationOptions<SendFeedbackData, ResponseError, SendFeedbackVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<SendFeedbackData, ResponseError, SendFeedbackVariables>({

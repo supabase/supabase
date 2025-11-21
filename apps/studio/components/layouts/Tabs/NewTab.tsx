@@ -40,6 +40,8 @@ import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { ActionCard } from './ActionCard'
 import { RecentItems } from './RecentItems'
 import { SIDEBAR_KEYS } from '../ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 
 const NEW_PROJECT_THRESHOLD_DAYS = 7
 const TABLE_QUICKSTART_FLAG = 'tableQuickstart'
@@ -57,6 +59,8 @@ export function NewTab() {
   const { profile } = useProfile()
   const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
+  const { selectedSchema } = useQuerySchemaState()
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   const snap = useTableEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
@@ -81,7 +85,7 @@ export function NewTab() {
 
   /**
    * Returns:
-   * - `QuickstartVariant`: user variation (`ai`, `templates`, `assistant`)
+   * - `QuickstartVariant`: user variation (`control`, `ai`, `templates`, `assistant`)
    * - `false`: user not yet bucketed or not targeted for experiment
    * - `undefined`: PostHog still loading
    */
@@ -102,14 +106,20 @@ export function NewTab() {
       ? tableQuickstartVariant
       : null
 
+  const shouldTrackExposure =
+    editor !== 'sql' &&
+    isNewProject &&
+    tableQuickstartVariant !== false &&
+    tableQuickstartVariant !== undefined
+
   useEffect(() => {
-    if (activeQuickstartVariant && !hasTrackedExposure.current) {
+    if (shouldTrackExposure && !hasTrackedExposure.current) {
       hasTrackedExposure.current = true
       track('table_quickstart_opened', {
-        variant: activeQuickstartVariant,
+        variant: tableQuickstartVariant,
       })
     }
-  }, [activeQuickstartVariant, track])
+  }, [shouldTrackExposure, tableQuickstartVariant, track])
 
   const handleOpenAssistant = () => {
     if (isCreatingChat) return
@@ -155,16 +165,18 @@ export function NewTab() {
     }
   }
 
-  const tableEditorActions = [
-    {
-      icon: <Table2 className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
-      title: 'Create a table',
-      description: 'Design and create a new database table',
-      bgColor: 'bg-blue-500',
-      isBeta: false,
-      onClick: () => snap.onAddTable(),
-    },
-  ]
+  const tableEditorActions = isSchemaLocked
+    ? []
+    : [
+        {
+          icon: <Table2 className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
+          title: 'Create a table',
+          description: 'Design and create a new database table',
+          bgColor: 'bg-blue-500',
+          isBeta: false,
+          onClick: () => snap.onAddTable(),
+        },
+      ]
 
   const sqlEditorActions = [
     {

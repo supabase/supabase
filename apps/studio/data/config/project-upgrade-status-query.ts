@@ -1,7 +1,10 @@
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
+
 import { get, handleError } from 'data/fetchers'
 import { PROJECT_STATUS } from 'lib/constants'
+import { UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
 
 export type ProjectUpgradingStatusVariables = {
@@ -38,11 +41,11 @@ export const useProjectUpgradingStatusQuery = <TData = ProjectUpgradingStatusDat
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectUpgradingStatusData, ProjectUpgradingStatusError, TData> = {}
+  }: UseCustomQueryOptions<ProjectUpgradingStatusData, ProjectUpgradingStatusError, TData> = {}
 ) => {
   const client = useQueryClient()
 
-  return useQuery<ProjectUpgradingStatusData, ProjectUpgradingStatusError, TData>({
+  const query = useQuery<ProjectUpgradingStatusData, ProjectUpgradingStatusError, TData>({
     queryKey: configKeys.upgradeStatus(projectRef),
     queryFn: ({ signal }) => getProjectUpgradingStatus({ projectRef, trackingId }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
@@ -61,12 +64,17 @@ export const useProjectUpgradingStatusQuery = <TData = ProjectUpgradingStatusDat
 
       return interval
     },
-    onSuccess(data) {
-      const response = data as unknown as ProjectUpgradingStatusData
-      if (response.databaseUpgradeStatus?.status === DatabaseUpgradeStatus.Upgraded) {
-        client.invalidateQueries(configKeys.upgradeEligibility(projectRef))
-      }
-    },
+
     ...options,
   })
+
+  useEffect(() => {
+    if (!query.isSuccess) return
+    const response = query.data as unknown as ProjectUpgradingStatusData
+    if (response.databaseUpgradeStatus?.status === DatabaseUpgradeStatus.Upgraded) {
+      client.invalidateQueries({ queryKey: configKeys.upgradeEligibility(projectRef) })
+    }
+  }, [query.isSuccess, query.data, projectRef, client])
+
+  return query
 }

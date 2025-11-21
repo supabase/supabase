@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { branchKeys } from './keys'
 
 export type BranchUpdateVariables = {
@@ -44,7 +44,7 @@ export const useBranchUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BranchUpdateData, ResponseError, BranchUpdateVariables>,
+  UseCustomMutationOptions<BranchUpdateData, ResponseError, BranchUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

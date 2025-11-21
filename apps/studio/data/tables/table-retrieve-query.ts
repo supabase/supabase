@@ -1,8 +1,8 @@
 import pgMeta from '@supabase/pg-meta'
-import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { tableKeys } from './keys'
 
 export type TablesVariables = {
@@ -39,7 +39,7 @@ export const useTablesQuery = <TData = RetrieveTableResult>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<RetrieveTableResult, RetrieveTableError, TData> = {}
+  }: UseCustomQueryOptions<RetrieveTableResult, RetrieveTableError, TData> = {}
 ) => {
   return useQuery<RetrieveTableResult, RetrieveTableError, TData>({
     queryKey: tableKeys.retrieve(projectRef, name, schema),

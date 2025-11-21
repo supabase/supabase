@@ -3,22 +3,23 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import {
   createSqlSnippetSkeletonV2,
   suffixWithLimit,
 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { SqlRunButton } from 'components/interfaces/SQLEditor/UtilityPanel/RunButton'
-import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
   cn,
@@ -43,7 +44,6 @@ import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/A
 import AIEditor from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 
 export const EditorPanel = () => {
   const {
@@ -67,6 +67,10 @@ export const EditorPanel = () => {
     LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.EDITOR_PANEL),
     true
   )
+  const [isAIAssistantHotkeyEnabled] = useLocalStorageQuery<boolean>(
+    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.AI_ASSISTANT),
+    true
+  )
 
   const currentValue = value || ''
 
@@ -88,7 +92,7 @@ export const EditorPanel = () => {
           ?.slice(1) ?? []
       : [error?.message ?? '']
 
-  const { mutate: executeSql, isLoading: isExecuting } = useExecuteSqlMutation({
+  const { mutate: executeSql, isPending: isExecuting } = useExecuteSqlMutation({
     onSuccess: async (res) => {
       setResults(res.result)
       setError(undefined)
@@ -147,7 +151,7 @@ export const EditorPanel = () => {
   return (
     <div className="flex h-full flex-col bg-background">
       <div className="border-b border-b-muted flex items-center justify-between gap-x-4 px-4 h-[46px]">
-        <div className="text-sm font-medium">{label}</div>
+        <div className="text-xs">{label}</div>
         <div className="flex items-center">
           {templates.length > 0 && (
             <Popover_Shadcn_ open={isTemplatesOpen} onOpenChange={setIsTemplatesOpen}>
@@ -294,6 +298,7 @@ export const EditorPanel = () => {
             executeQuery={onExecuteSql}
             onClose={handleClosePanel}
             closeShortcutEnabled={isInlineEditorHotkeyEnabled}
+            openAIAssistantShortcutEnabled={isAIAssistantHotkeyEnabled}
           />
         </div>
 

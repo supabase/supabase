@@ -73,7 +73,7 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
   const { data: organization } = useSelectedOrganizationQuery()
   const { data: members = [] } = useOrganizationMembersQuery({ slug: organization?.slug })
 
-  const { mutate: createRule, isLoading: isCreating } = useLintRuleCreateMutation({
+  const { mutate: createRule, isPending: isCreating } = useLintRuleCreateMutation({
     onSuccess: (_, vars) => {
       const ruleLint = vars.exception.lint_name
       const ruleLintMeta = lintInfoMap.find((x) => x.name === ruleLint)

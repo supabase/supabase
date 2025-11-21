@@ -1,28 +1,41 @@
+import { paths } from 'api-types'
 import { DOCS_URL } from 'lib/constants'
 import { executeQuery } from './query'
-import { paths } from 'api-types'
-import { WrappedResult } from 'lib/api/self-hosted/types'
 
 interface GetLintsOptions {
   headers?: HeadersInit
+  exposedSchemas?: string
 }
 
-export async function getLints({ headers }: GetLintsOptions) {
-  return await executeQuery<ResponseData[number]>({ query: enrichQuery(LINT_SQL), headers })
+export async function getLints({ headers, exposedSchemas }: GetLintsOptions) {
+  return await executeQuery<ResponseData[number]>({
+    query: enrichLintsQuery(LINT_SQL, exposedSchemas),
+    headers,
+  })
 }
 
 export type ResponseData =
   paths['/platform/projects/{ref}/run-lints']['get']['responses']['200']['content']['application/json']
 
-export const enrichQuery = (query: string) => `
+export const enrichLintsQuery = (query: string, exposedSchemas?: string) => {
+  const literalSchemas = exposedSchemas ? `'${exposedSchemas}'` : ''
+  return `
+set pg_stat_statements.track = none;
+set local pgrst.db_schemas = ${literalSchemas};
 -- source: dashboard
 -- user: ${'self host'}
 -- date: ${new Date().toISOString()}
 
 ${query}
 `
+}
 
-// Pulled from https://github.com/supabase/splinter/blob/main/splinter.sql
+/**
+ * Pulled from https://github.com/supabase/splinter/blob/main/splinter.sql
+ * Things to do after copy pasting from splinter.sql
+ * - Replace all "\`%s\`" with backquotes to escape the tick character ("\`%s\`")
+ * - Replace docs url with DOCS_URL (${DOCS_URL})
+ */
 const LINT_SQL = /* SQL */ `set local search_path = '';
 
 (
@@ -83,14 +96,14 @@ from
     foreign_keys fk
     left join index_ idx
         on fk.table_oid = idx.table_oid
-        and fk.col_attnums = idx.col_attnums
+        and fk.col_attnums = idx.col_attnums[1:array_length(fk.col_attnums, 1)]
     left join pg_catalog.pg_depend dep
         on idx.table_oid = dep.objid
         and dep.deptype = 'e'
 where
     idx.index_ is null
     and fk.schema_name not in (
-        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and dep.objid is null -- exclude tables owned by extensions
 order by
@@ -222,9 +235,9 @@ select
     'WARN' as level,
     'EXTERNAL' as facing,
     array['PERFORMANCE'] as categories,
-    'Detects if calls to \`auth.<function>()\` in RLS policies are being unnecessarily re-evaluated for each row' as description,
+    'Detects if calls to \`current_setting()\` and \`auth.<function>()\` in RLS policies are being unnecessarily re-evaluated for each row' as description,
     format(
-        'Table \`%s.%s\` has a row level security policy \`%s\` that re-evaluates an auth.<function>() for each row. This produces suboptimal query performance at scale. Resolve the issue by replacing \`auth.<function>()\` with \`(select auth.<function>())\`. See [docs](${DOCS_URL}/guides/database/postgres/row-level-security#call-functions-with-select) for more info.',
+        'Table \`%s.%s\` has a row level security policy \`%s\` that re-evaluates current_setting() or auth.<function>() for each row. This produces suboptimal query performance at scale. Resolve the issue by replacing \`auth.<function>()\` with \`(select auth.<function>())\`. See [docs](${DOCS_URL}/guides/database/postgres/row-level-security#call-functions-with-select) for more info.',
         schema_name,
         table_name,
         policy_name
@@ -242,7 +255,7 @@ where
     is_rls_active
     -- NOTE: does not include realtime in support of monitoring policies on realtime.messages
     and schema_name not in (
-        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and (
         -- Example: auth.uid()
@@ -263,6 +276,10 @@ where
             and lower(qual) not like '%select auth.email()%'
         )
         or (
+            qual like '%current\_setting(%)%'
+            and lower(qual) not like '%select current\_setting(%)%'
+        )
+        or (
             with_check like '%auth.uid()%'
             and lower(with_check) not like '%select auth.uid()%'
         )
@@ -277,6 +294,10 @@ where
         or (
             with_check like '%auth.email()%'
             and lower(with_check) not like '%select auth.email()%'
+        )
+        or (
+            with_check like '%current\_setting(%)%'
+            and lower(with_check) not like '%select current\_setting(%)%'
         )
     ))
 union all
@@ -316,7 +337,7 @@ from
 where
     pgc.relkind = 'r' -- regular tables
     and pgns.nspname not in (
-        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and dep.objid is null -- exclude tables owned by extensions
 group by
@@ -366,7 +387,7 @@ where
     and not pi.indisprimary
     and dep.objid is null -- exclude tables owned by extensions
     and psui.schemaname not in (
-        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     ))
 union all
 (
@@ -428,7 +449,7 @@ where
     c.relkind = 'r' -- regular tables
     and p.polpermissive -- policy is permissive
     and n.nspname not in (
-        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and r.rolname not like 'pg_%'
     and r.rolname not like 'supabase%admin'
@@ -479,7 +500,7 @@ from
 where
     c.relkind = 'r' -- regular tables
     and n.nspname not in (
-        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     -- RLS is disabled
     and not c.relrowsecurity
@@ -524,7 +545,7 @@ from
 where
     c.relkind = 'r' -- regular tables
     and n.nspname not in (
-        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     -- RLS is enabled
     and c.relrowsecurity
@@ -578,7 +599,7 @@ from
 where
     c.relkind in ('r', 'm') -- tables and materialized views
     and n.nspname not in (
-        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and dep.objid is null -- exclude tables owned by extensions
 group by
@@ -629,7 +650,7 @@ where
     and substring(pg_catalog.version() from 'PostgreSQL ([0-9]+)') >= '15' -- security invoker was added in pg15
     and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
     and n.nspname not in (
-        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and dep.objid is null -- exclude views owned by extensions
     and not (
@@ -649,7 +670,7 @@ select
     'WARN' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
-    'Detects functions where the search_path parameter is not set to an empty string.' as description,
+    'Detects functions where the search_path parameter is not set.' as description,
     format(
         'Function \`%s.%s\` has a role mutable search_path',
         n.nspname,
@@ -676,11 +697,15 @@ from
         and dep.deptype = 'e'
 where
     n.nspname not in (
-        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and dep.objid is null -- exclude functions owned by extensions
-    -- Search path not set to ''
-    and not coalesce(p.proconfig, '{}') && array['search_path=""'])
+    -- Search path not set
+    and not exists (
+        select 1
+        from unnest(coalesce(p.proconfig, '{}')) as config
+        where config like 'search_path=%'
+    ))
 union all
 (
 select
@@ -720,7 +745,7 @@ where
     )
     and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
     and n.nspname not in (
-        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     ))
 union all
 (
@@ -800,7 +825,7 @@ from
     policies
 where
     schema_name not in (
-        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and (
         -- Example: auth.jwt() -> 'user_metadata'
@@ -851,7 +876,7 @@ where
     )
     and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
     and n.nspname not in (
-        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and dep.objid is null)
 union all
@@ -894,7 +919,7 @@ where
     )
     and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
     and n.nspname not in (
-        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and dep.objid is null)
 union all
@@ -939,4 +964,225 @@ from
 where
     tn.nspname = 'pg_catalog'
     and t.typname in ('regcollation', 'regconfig', 'regdictionary', 'regnamespace', 'regoper', 'regoperator', 'regproc', 'regprocedure')
-    and n.nspname not in ('pg_catalog', 'information_schema', 'pgsodium'))`.trim()
+    and n.nspname not in ('pg_catalog', 'information_schema', 'pgsodium'))
+union all
+(
+select
+    'insecure_queue_exposed_in_api' as name,
+    'Insecure Queue Exposed in API' as title,
+    'ERROR' as level,
+    'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
+    'Detects cases where an insecure Queue is exposed over Data APIs' as description,
+    format(
+        'Table \`%s.%s\` is public, but RLS has not been enabled.',
+        n.nspname,
+        c.relname
+    ) as detail,
+    '${DOCS_URL}/guides/database/database-linter?lint=0019_insecure_queue_exposed_in_api' as remediation,
+    jsonb_build_object(
+        'schema', n.nspname,
+        'name', c.relname,
+        'type', 'table'
+    ) as metadata,
+    format(
+        'rls_disabled_in_public_%s_%s',
+        n.nspname,
+        c.relname
+    ) as cache_key
+from
+    pg_catalog.pg_class c
+    join pg_catalog.pg_namespace n
+        on c.relnamespace = n.oid
+where
+    c.relkind in ('r', 'I') -- regular or partitioned tables
+    and not c.relrowsecurity -- RLS is disabled
+    and (
+        pg_catalog.has_table_privilege('anon', c.oid, 'SELECT')
+        or pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT')
+    )
+    and n.nspname = 'pgmq' -- tables in the pgmq schema
+    and c.relname like 'q_%' -- only queue tables
+    -- Constant requirements
+    and 'pgmq_public' = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ','))))))
+union all
+(
+with constants as (
+    select current_setting('block_size')::numeric as bs, 23 as hdr, 4 as ma
+),
+
+bloat_info as (
+    select
+        ma,
+        bs,
+        schemaname,
+        tablename,
+        (datawidth + (hdr + ma - (case when hdr % ma = 0 then ma else hdr % ma end)))::numeric as datahdr,
+        (maxfracsum * (nullhdr + ma - (case when nullhdr % ma = 0 then ma else nullhdr % ma end))) as nullhdr2
+    from (
+        select
+            schemaname,
+            tablename,
+            hdr,
+            ma,
+            bs,
+            sum((1 - null_frac) * avg_width) as datawidth,
+            max(null_frac) as maxfracsum,
+            hdr + (
+                select 1 + count(*) / 8
+                from pg_stats s2
+                where
+                    null_frac <> 0
+                    and s2.schemaname = s.schemaname
+                    and s2.tablename = s.tablename
+            ) as nullhdr
+        from pg_stats s, constants
+        group by 1, 2, 3, 4, 5
+    ) as foo
+),
+
+table_bloat as (
+    select
+        schemaname,
+        tablename,
+        cc.relpages,
+        bs,
+        ceil((cc.reltuples * ((datahdr + ma -
+          (case when datahdr % ma = 0 then ma else datahdr % ma end)) + nullhdr2 + 4)) / (bs - 20::float)) as otta
+    from
+        bloat_info
+        join pg_class cc
+            on cc.relname = bloat_info.tablename
+        join pg_namespace nn
+            on cc.relnamespace = nn.oid
+            and nn.nspname = bloat_info.schemaname
+            and nn.nspname <> 'information_schema'
+        where
+            cc.relkind = 'r'
+            and cc.relam = (select oid from pg_am where amname = 'heap')
+),
+
+bloat_data as (
+    select
+        'table' as type,
+        schemaname,
+        tablename as object_name,
+        round(case when otta = 0 then 0.0 else table_bloat.relpages / otta::numeric end, 1) as bloat,
+        case when relpages < otta then 0 else (bs * (table_bloat.relpages - otta)::bigint)::bigint end as raw_waste
+    from
+        table_bloat
+)
+
+select
+    'table_bloat' as name,
+    'Table Bloat' as title,
+    'INFO' as level,
+    'EXTERNAL' as facing,
+    array['PERFORMANCE'] as categories,
+    'Detects if a table has excess bloat and may benefit from maintenance operations like vacuum full or cluster.' as description,
+    format(
+        'Table \`%s\`.\`%s\` has excessive bloat',
+        bloat_data.schemaname,
+        bloat_data.object_name
+    ) as detail,
+    'Consider running vacuum full (WARNING: incurs downtime) and tweaking autovacuum settings to reduce bloat.' as remediation,
+    jsonb_build_object(
+        'schema', bloat_data.schemaname,
+        'name', bloat_data.object_name,
+        'type', bloat_data.type
+    ) as metadata,
+    format(
+        'table_bloat_%s_%s',
+        bloat_data.schemaname,
+        bloat_data.object_name
+    ) as cache_key
+from
+    bloat_data
+where
+    bloat > 70.0
+    and raw_waste > (20 * 1024 * 1024) -- filter for waste > 200 MB
+order by
+    schemaname,
+    object_name)
+union all
+(
+select
+    'fkey_to_auth_unique' as name,
+    'Foreign Key to Auth Unique Constraint' as title,
+    'ERROR' as level,
+    'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
+    'Detects user defined foreign keys to unique constraints in the auth schema.' as description,
+    format(
+        'Table \`%s\`.\`%s\` has a foreign key \`%s\` referencing an auth unique constraint',
+        n.nspname, -- referencing schema
+        c_rel.relname, -- referencing table
+        c.conname -- fkey name
+    ) as detail,
+    'Drop the foreign key constraint that references the auth schema.' as remediation,
+    jsonb_build_object(
+        'schema', n.nspname,
+        'name', c_rel.relname,
+        'foreign_key', c.conname
+    ) as metadata,
+    format(
+        'fkey_to_auth_unique_%s_%s_%s',
+        n.nspname, -- referencing schema
+        c_rel.relname, -- referencing table
+        c.conname
+    ) as cache_key
+from
+    pg_catalog.pg_constraint c
+    join pg_catalog.pg_class c_rel
+        on c.conrelid = c_rel.oid
+    join pg_catalog.pg_namespace n
+        on c_rel.relnamespace = n.oid
+    join pg_catalog.pg_class ref_rel
+        on c.confrelid = ref_rel.oid
+    join pg_catalog.pg_namespace cn
+        on ref_rel.relnamespace = cn.oid
+    join pg_catalog.pg_index i
+        on c.conindid = i.indexrelid
+where c.contype = 'f'
+    and cn.nspname = 'auth'
+    and i.indisunique
+    and not i.indisprimary)
+union all
+(
+select
+    'extension_versions_outdated' as name,
+    'Extension Versions Outdated' as title,
+    'WARN' as level,
+    'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
+    'Detects extensions that are not using the default (recommended) version.' as description,
+    format(
+        'Extension \`%s\` is using version \`%s\` but version \`%s\` is available. Using outdated extension versions may expose the database to security vulnerabilities.',
+        ext.name,
+        ext.installed_version,
+        ext.default_version
+    ) as detail,
+    '${DOCS_URL}/guides/database/database-linter?lint=0022_extension_versions_outdated' as remediation,
+    jsonb_build_object(
+        'extension_name', ext.name,
+        'installed_version', ext.installed_version,
+        'default_version', ext.default_version
+    ) as metadata,
+    format(
+        'extension_versions_outdated_%s_%s',
+        ext.name,
+        ext.installed_version
+    ) as cache_key
+from
+    pg_catalog.pg_available_extensions ext
+join
+    -- ignore versions not in pg_available_extension_versions
+    -- e.g. residue of pg_upgrade
+    pg_catalog.pg_available_extension_versions extv
+    on extv.name = ext.name and extv.installed
+where
+    ext.installed_version is not null
+    and ext.default_version is not null
+    and ext.installed_version != ext.default_version
+order by
+    ext.name)`.trim()

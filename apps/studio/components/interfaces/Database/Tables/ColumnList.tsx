@@ -6,10 +6,10 @@ import { useState } from 'react'
 
 import { PostgresColumn } from '@supabase/postgres-meta'
 import { useParams } from 'common'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
@@ -120,7 +120,10 @@ export const ColumnList = ({
       {isSuccess && (
         <>
           {columns.length === 0 ? (
-            <NoSearchResults />
+            <NoSearchResults
+              searchString={filterString}
+              onResetFilter={() => setFilterString('')}
+            />
           ) : (
             <div>
               <Table

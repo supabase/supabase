@@ -1,10 +1,5 @@
-import * as Sentry from '@sentry/nextjs'
-import { gotrueClient, setCaptureException } from 'common'
+import { gotrueClient } from 'common'
 import { useEffect } from 'react'
-
-setCaptureException((e: any) => {
-  Sentry.captureException(e)
-})
 
 export const auth = gotrueClient
 

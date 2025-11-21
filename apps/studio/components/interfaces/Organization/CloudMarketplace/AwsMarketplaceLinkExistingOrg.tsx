@@ -17,7 +17,7 @@ import {
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationLinkAwsMarketplaceMutation } from 'data/organizations/organization-link-aws-marketplace-mutation'
 import { DOCS_URL } from 'lib/constants'
-import { Organization } from 'types'
+import type { Organization } from 'types'
 import {
   Button,
   Collapsible_Shadcn_,
@@ -98,7 +98,7 @@ export const AwsMarketplaceLinkExistingOrg = ({
   const [showOrgCreationDialog, setShowOrgCreationDialog] = useState(false)
   const [orgToRedirectTo, setOrgToRedirectTo] = useState('')
 
-  const { mutate: linkOrganization, isLoading: isLinkingOrganization } =
+  const { mutate: linkOrganization, isPending: isLinkingOrganization } =
     useOrganizationLinkAwsMarketplaceMutation({
       onSuccess: (_) => {
         //TODO(thomas): send tracking event?

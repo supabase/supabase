@@ -4,11 +4,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 
-import { useFlag } from 'common'
+import { getAccessToken, useFlag } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
+import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
 import { tweets } from 'shared-data'
 
 type SignInLayoutProps = {
@@ -86,9 +86,24 @@ const SignInLayout = ({
   } | null>(null)
 
   useEffect(() => {
-    const randomQuote = tweets[Math.floor(Math.random() * tweets.length)]
+    // Weighted random selection
+    // Calculate total weight (default weight is fallbackWeight for tweets without weight specified)
+    const fallbackWeight = 1
+    const totalWeight = tweets.reduce((sum, tweet) => sum + (tweet.weight ?? fallbackWeight), 0)
 
-    setQuote(randomQuote)
+    // Generate random number between 0 and totalWeight
+    const random = Math.random() * totalWeight
+
+    // Find the selected tweet based on cumulative weights
+    let accumulatedWeight = 0
+    for (const tweet of tweets) {
+      const weight = tweet.weight ?? fallbackWeight
+      accumulatedWeight += weight
+      if (random <= accumulatedWeight) {
+        setQuote(tweet)
+        break
+      }
+    }
   }, [])
 
   return (

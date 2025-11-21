@@ -1,44 +1,16 @@
 ---
 title: Table
-description: A responsive table component.
+description: A responsive table component for basic data.
 component: true
-source:
-  shadcn: true
 ---
+
+Table presents basic tabular data presentation within a [Card](/docs/components/card).
 
 <ComponentPreview name="table-demo" peekCode wide />
 
-## Installation
+Columns will naturally take the width of their content. Width specification is therefore not required unless you require columns to span a specific width. An example use-case may be when placing multiple Table instances on the one page, where columns on each table should optically align.
 
-<Tabs defaultValue="cli">
-
-<TabsList>
-  <TabsTrigger value="cli">CLI</TabsTrigger>
-  <TabsTrigger value="manual">Manual</TabsTrigger>
-</TabsList>
-<TabsContent value="cli">
-
-```bash
-npx shadcn-ui@latest add table
-```
-
-</TabsContent>
-
-<TabsContent value="manual">
-
-<Steps>
-
-<Step>Copy and paste the following code into your project.</Step>
-
-<ComponentSource name="table" />
-
-<Step>Update the import paths to match your project setup.</Step>
-
-</Steps>
-
-</TabsContent>
-
-</Tabs>
+`TableHead` includes a `whitespace-nowrap` utility class to prevent its text from wrapping. `TableCell` must have any custom width specified, as there are legitimate use cases for both wrapping (or truncated) text.
 
 ## Usage
 
@@ -59,7 +31,7 @@ import {
   <TableCaption>A list of your recent invoices.</TableCaption>
   <TableHeader>
     <TableRow>
-      <TableHead className="w-[100px]">Invoice</TableHead>
+      <TableHead>Invoice</TableHead>
       <TableHead>Status</TableHead>
       <TableHead>Method</TableHead>
       <TableHead className="text-right">Amount</TableHead>

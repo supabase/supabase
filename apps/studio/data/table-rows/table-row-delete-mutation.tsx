@@ -1,4 +1,4 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { Query } from '@supabase/pg-meta/src/query'
@@ -10,7 +10,7 @@ import { Entity } from 'data/table-editor/table-editor-types'
 import { DOCS_URL } from 'lib/constants'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { tableRowKeys } from './keys'
 import { getPrimaryKeys } from './utils'
 
@@ -67,7 +67,7 @@ export const useTableRowDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<TableRowDeleteData, ResponseError, TableRowDeleteVariables>,
+  UseCustomMutationOptions<TableRowDeleteData, ResponseError, TableRowDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
