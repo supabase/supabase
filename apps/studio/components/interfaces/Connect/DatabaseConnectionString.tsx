@@ -209,7 +209,12 @@ export const DatabaseConnectionString = () => {
     const lang = connectionInfo?.lang ?? 'Unknown'
     sendEvent({
       action: 'connection_string_copied',
-      properties: { connectionType, lang, connectionMethod: connectionStringMethod },
+      properties: {
+        connectionType,
+        lang,
+        connectionMethod: connectionStringMethod,
+        connectionTab: 'Connection String',
+      },
       groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
   }

@@ -37,7 +37,7 @@ const ResetDbPassword = ({ disabled = false }) => {
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState<string>('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState<number>(0)
 
-  const { mutate: resetDatabasePassword, isLoading: isUpdatingPassword } =
+  const { mutate: resetDatabasePassword, isPending: isUpdatingPassword } =
     useDatabasePasswordResetMutation({
       onSuccess: async () => {
         toast.success('Successfully updated database password')

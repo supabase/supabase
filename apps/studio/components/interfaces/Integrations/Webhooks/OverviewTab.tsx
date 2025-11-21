@@ -31,7 +31,7 @@ export const WebhooksOverviewTab = () => {
     'triggers'
   )
 
-  const { mutate: enableHooks, isLoading: isEnablingHooks } = useHooksEnableMutation({
+  const { mutate: enableHooks, isPending: isEnablingHooks } = useHooksEnableMutation({
     onSuccess: async () => {
       await refetch()
       toast.success('Successfully enabled webhooks')

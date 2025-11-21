@@ -8,8 +8,8 @@ export const NoDestinationsAvailable = () => {
       </div>
       <h3 className="text-lg font-medium text-foreground mb-2">No destinations available</h3>
       <p className="text-sm text-foreground-light max-w-lg">
-        Replication destinations are not currently enabled for this project. Contact support to
-        enable real-time data replication to external platforms.
+        ETL replication destinations are not currently enabled for this project. Contact support to
+        enable real-time replication to external platforms.
       </p>
     </div>
   )

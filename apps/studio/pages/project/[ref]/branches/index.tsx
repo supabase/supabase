@@ -77,7 +77,7 @@ const BranchesPage: NextPageWithLayout = () => {
   const isLoading = isLoadingConnections || isLoadingBranches
   const isSuccess = isSuccessConnections && isSuccessBranches
 
-  const { mutate: deleteBranch, isLoading: isDeleting } = useBranchDeleteMutation({
+  const { mutate: deleteBranch, isPending: isDeleting } = useBranchDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted branch')
       setSelectedBranchToDelete(undefined)

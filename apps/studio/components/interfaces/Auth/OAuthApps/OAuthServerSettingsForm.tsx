@@ -81,7 +81,7 @@ export const OAuthServerSettingsForm = () => {
     isLoading: isAuthConfigLoading,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig, isLoading } = useAuthConfigUpdateMutation({
+  const { mutate: updateAuthConfig, isPending } = useAuthConfigUpdateMutation({
     onSuccess: () => {
       toast.success('OAuth server settings updated successfully')
     },
@@ -223,7 +223,7 @@ export const OAuthServerSettingsForm = () => {
                             Enable OAuth server functionality for your project to create and manage
                             OAuth applications.{' '}
                             <Link
-                              href="https://supabase.com/docs/guides/auth/oauth/oauth-apps"
+                              href="https://supabase.com/docs/guides/auth/oauth-server"
                               target="_blank"
                               rel="noreferrer"
                               className="text-foreground-light underline hover:text-foreground transition"
@@ -285,11 +285,28 @@ export const OAuthServerSettingsForm = () => {
                           </FormItemLayout>
                         )}
                       />
-                      <Admonition
-                        type="tip"
-                        title="Make sure this path is implemented in your application."
-                        description={`Preview Authorization URL: ${authConfig?.SITE_URL}${form.watch('OAUTH_SERVER_AUTHORIZATION_PATH') || '/oauth/consent'}`}
-                      />
+                      {(() => {
+                        const authorizationUrl = `${authConfig?.SITE_URL}${form.watch('OAUTH_SERVER_AUTHORIZATION_PATH') || '/oauth/consent'}`
+                        return (
+                          <Admonition
+                            type="tip"
+                            title="Make sure this path is implemented in your application."
+                            description={
+                              <>
+                                Preview Authorization URL:{' '}
+                                <a
+                                  href={authorizationUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="text-foreground-light underline hover:text-foreground transition"
+                                >
+                                  {authorizationUrl}
+                                </a>
+                              </>
+                            }
+                          />
+                        )
+                      })()}
                     </CardContent>
                     <CardContent className="py-6">
                       <FormField_Shadcn_
@@ -302,9 +319,9 @@ export const OAuthServerSettingsForm = () => {
                             description={
                               <>
                                 Enable dynamic OAuth app registration. Apps can be registered
-                                programmatically via apis.{' '}
+                                programmatically via APIs.{' '}
                                 <Link
-                                  href="https://supabase.com/docs/guides/auth/oauth/oauth-apps#dynamic-oauth-apps"
+                                  href="https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication#dynamic-client-registration"
                                   target="_blank"
                                   rel="noreferrer"
                                   className="text-foreground-light underline hover:text-foreground transition"
@@ -329,14 +346,14 @@ export const OAuthServerSettingsForm = () => {
                 )}
 
                 <CardFooter className="justify-end space-x-2">
-                  <Button type="default" onClick={() => form.reset()} disabled={isLoading}>
+                  <Button type="default" onClick={() => form.reset()} disabled={isPending}>
                     Cancel
                   </Button>
                   <Button
                     type="primary"
                     htmlType="submit"
                     disabled={!canUpdateConfig || !form.formState.isDirty}
-                    loading={isLoading}
+                    loading={isPending}
                   >
                     Save changes
                   </Button>

@@ -116,7 +116,7 @@ export const SubscriptionPlanUpdateDialog = ({
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   }
 
-  const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
+  const { mutate: updateOrgSubscription, isPending: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
       onSuccess: (data) => {
         if (data.pending_payment_intent_secret) {
@@ -133,7 +133,7 @@ export const SubscriptionPlanUpdateDialog = ({
     }
   )
 
-  const { mutate: confirmPendingSubscriptionChange, isLoading: isConfirming } =
+  const { mutate: confirmPendingSubscriptionChange, isPending: isConfirming } =
     useConfirmPendingSubscriptionChangeMutation({
       onSuccess: () => {
         onSuccessfulPlanChange()
