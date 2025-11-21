@@ -1,28 +1,32 @@
 ---
 id: 'etl-replication-setup'
-title: 'ETL Replication Setup'
-description: 'Set up ETL replication to automatically sync your database to external destinations.'
-subtitle: 'Configure publications and destinations for ETL replication.'
-sidebar_label: 'Setting up'
+title: 'Automatic Destinations Setup'
+description: 'Set up replication to automatic destinations using Postgres logical replication.'
+subtitle: 'Configure publications and destinations for automatic replication.'
+sidebar_label: 'Automatic destinations'
 ---
 
 <Admonition type="caution" label="Private Alpha">
 
-ETL Replication is currently in private alpha. Access is limited and features may change.
+Automatic destinations are currently in private alpha. Access is limited and features may change.
 
 </Admonition>
 
-ETL Replication requires two main components: a **publication** (source) and a **destination**. Follow these steps to set up your replication pipeline.
+Automatic destinations use **Postgres logical replication** to stream changes from your database. Supabase ETL, an [open source tool](https://github.com/supabase/etl) built for Postgres logical replication, provides a managed interface through the Dashboard to configure and monitor these replication pipelines.
+
+## Setup overview
+
+Replication requires two main components: a **Postgres publication** (defines what to replicate) and a **destination** (where data is sent). Follow these steps to set up your replication pipeline.
 
 <Admonition type="tip">
 
-If you already have a publication set up, you can skip to [Step 2: Enable ETL Replication](#step-2-enable-etl-replication).
+If you already have a Postgres publication set up, you can skip to [Step 2: Enable replication](#step-2-enable-replication).
 
 </Admonition>
 
-### Step 1: Create a publication
+### Step 1: Create a Postgres publication
 
-A publication defines which tables and change types will be replicated. You need to create a publication using SQL.
+A Postgres publication defines which tables and change types will be replicated from your database. You create publications using SQL.
 
 #### Creating a publication
 
@@ -91,31 +95,31 @@ After creating a publication via SQL, you can view it in the Supabase Dashboard:
 1. Navigate to **Database** → [Publications](/dashboard/project/_/database/publications) in your Supabase Dashboard
 2. You'll see all your publications listed with their tables
 
-### Step 2: Enable ETL replication
+### Step 2: Enable replication
 
-Before adding destinations, you need to enable ETL replication for your project:
+Before adding destinations, you need to enable replication to built-in destinations for your project:
 
 1. Navigate to the [Database](/dashboard/project/_/database/etl) section in your Supabase Dashboard
-2. Select the **ETL Replication** tab
-3. Click **Enable replication** to activate ETL replication for your project
+2. Select the **Replication** tab
+3. Click **Enable replication** to activate replication for your project
 
 <Image
-  alt="Enable ETL Replication"
+  alt="Enable Replication"
   src="/docs/img/database/replication/etl-enable-replication.png"
   zoomable
 />
 
 ### Step 3: Add a destination
 
-Once replication is enabled and you have a publication, you can add a destination. The destination is where your replicated data will be stored, while the pipeline is the active process that continuously replicates changes from your database to that destination.
+Once replication is enabled and you have a Postgres publication, you can add a destination. The destination is where your replicated data will be stored, while the pipeline is the active Postgres replication process that continuously streams changes from your database to that destination.
 
-#### Available destinations
+#### Available automatic destinations
 
-For a complete list of available destinations and how to choose the right one for your needs, see [ETL Destinations](/docs/guides/database/replication/etl-destinations).
+For a complete list of available automatic destinations and how to choose the right one for your needs, see [Automatic Destinations](/docs/guides/database/replication/etl-destinations).
 
 #### Configuration
 
-1. In the ETL Replication tab, click **Add destination**
+1. In the Replication tab, click **Add destination**
 2. Configure the destination settings:
 
    **General Settings:**
@@ -125,10 +129,10 @@ For a complete list of available destinations and how to choose the right one fo
    - **Destination type**: Choose from available destination types
 
    **Destination-specific settings:**
-   Each destination type requires different configuration. See the [ETL Destinations guide](/docs/guides/database/replication/etl-destinations) for configuration details specific to your chosen destination.
+   Each destination type requires different configuration. See the [Automatic Destinations guide](/docs/guides/database/replication/etl-destinations) for configuration details specific to your chosen destination.
 
 <Image
-  alt="Add ETL Destination"
+  alt="Add Destination"
   src="/docs/img/database/replication/etl-add-destination.png"
   zoomable
 />
@@ -141,15 +145,15 @@ For a complete list of available destinations and how to choose the right one fo
 
 ### Step 4: Monitor your pipeline
 
-After creating a destination, the pipeline will start and appear in the destinations list. You can monitor the pipeline's status and performance from the Dashboard.
+After creating a destination, the replication pipeline will start and appear in the destinations list. You can monitor the pipeline's status and performance from the Dashboard.
 
 <Image
-  alt="ETL Destinations List"
+  alt="Replication Destinations List"
   src="/docs/img/database/replication/etl-destinations-list.png"
   zoomable
 />
 
-For comprehensive monitoring instructions including pipeline states, metrics, and logs, see the [ETL Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring).
+For comprehensive monitoring instructions including pipeline states, metrics, and logs, see the [Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring).
 
 ### Managing your pipeline
 
@@ -171,11 +175,11 @@ Available actions:
 
 ### Adding or removing tables
 
-If you need to modify which tables are replicated after your ETL pipeline is already running, follow these steps:
+If you need to modify which tables are replicated after your replication pipeline is already running, follow these steps:
 
 <Admonition type="note">
 
-If your publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, new tables in that scope are automatically included in the publication. However, you still **must restart the ETL pipeline** for the changes to take effect.
+If your Postgres publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, new tables in that scope are automatically included in the publication. However, you still **must restart the replication pipeline** for the changes to take effect.
 
 </Admonition>
 
@@ -191,11 +195,11 @@ If your publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, new tables 
    alter publication pub_users_orders add table products, categories;
    ```
 
-2. **Restart the ETL pipeline** using the actions menu (see [Managing your pipeline](#managing-your-pipeline)) for the changes to take effect.
+2. **Restart the replication pipeline** using the actions menu (see [Managing your pipeline](#managing-your-pipeline)) for the changes to take effect.
 
 #### Removing tables from replication
 
-1. Remove the table from your publication using SQL:
+1. Remove the table from your Postgres publication using SQL:
 
    ```sql
    -- Remove a single table from a publication
@@ -205,20 +209,21 @@ If your publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, new tables 
    alter publication pub_users_orders drop table orders, products;
    ```
 
-2. **Restart the ETL pipeline** using the actions menu (see [Managing your pipeline](#managing-your-pipeline)) for the changes to take effect.
+2. **Restart the replication pipeline** using the actions menu (see [Managing your pipeline](#managing-your-pipeline)) for the changes to take effect.
 
 ### How it works
 
-Once configured, ETL Replication:
+Once configured, replication to automatic destinations:
 
-1. **Captures** changes from your database using the publication
-2. **Loads** the data to your destination in near real-time batches
+1. **Captures** changes from your Postgres database using Postgres publications and logical replication
+2. **Streams** the changes through Supabase ETL's replication pipeline
+3. **Loads** the data to your destination in near real-time batches
 
 Changes are sent in batches to optimize performance and reduce costs. The batch size and timing can be adjusted using the advanced settings.
 
 <Admonition type="note">
 
-ETL Replication currently performs data extraction and loading only, without transformation. Your data is replicated as-is to the destination.
+Replication to automatic destinations currently performs data extraction and loading only, without transformation. Your data is replicated as-is to the destination.
 
 </Admonition>
 
@@ -226,20 +231,20 @@ ETL Replication currently performs data extraction and loading only, without tra
 
 If you encounter issues during setup:
 
-- **Publication not appearing**: Ensure you created the publication via SQL and refresh the dashboard
-- **Tables not showing in publication**: Verify your tables have primary keys (required for replication)
+- **Publication not appearing**: Ensure you created the Postgres publication via SQL and refresh the dashboard
+- **Tables not showing in publication**: Verify your tables have primary keys (required for Postgres logical replication)
 - **Pipeline failed to start**: Check the error message in the status view for specific details
-- **No data being replicated**: Verify your publication includes the correct tables and event types
+- **No data being replicated**: Verify your Postgres publication includes the correct tables and event types
 
-For more troubleshooting help, see the [ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq).
+For more troubleshooting help, see the [Replication FAQ](/docs/guides/database/replication/etl-replication-faq).
 
 ### Limitations
 
-ETL Replication has the following limitations that apply to all destinations:
+Replication to automatic destinations has the following limitations:
 
-- **Primary keys required**: Tables must have primary keys
+- **Primary keys required**: Tables must have primary keys (Postgres logical replication requirement)
 - **Custom data types**: Not supported
-- **Schema changes**: Not automatically handled
+- **Schema changes**: Not automatically handled (DDL changes require manual intervention)
 - **No data transformation**: Data is replicated as-is without transformation
 - **Data duplicates**: Duplicates can occur when stopping a pipeline if your database has transactions that take longer than a few minutes to complete. See [Can data duplicates occur?](/docs/guides/database/replication/etl-replication-faq#can-data-duplicates-occur-during-pipeline-operations) for details
 
@@ -247,14 +252,14 @@ Destination-specific limitations may also apply. See the [Iceberg](/docs/guides/
 
 ### Future work
 
-ETL Replication is actively being developed. Planned improvements include:
+Replication to automatic destinations is actively being developed. Planned improvements include:
 
-- **DDL support**: Automatic handling of schema changes (ALTER TABLE, ADD COLUMN, etc.)
+- **DDL support**: Automatic handling of Postgres schema changes (ALTER TABLE, ADD COLUMN, etc.)
 - **Additional destinations**: Support for more data warehouses and analytics platforms
 
-We don't have public timelines for these features, but they represent our roadmap for making ETL Replication more robust and flexible.
+We don't have public timelines for these features, but they represent our roadmap for making replication more robust and flexible.
 
 ### Next steps
 
-- [Monitor ETL Replication](/docs/guides/database/replication/etl-replication-monitoring)
-- [View ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq)
+- [Monitor Replication](/docs/guides/database/replication/etl-replication-monitoring)
+- [View Replication FAQ](/docs/guides/database/replication/etl-replication-faq)

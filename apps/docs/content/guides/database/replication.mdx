@@ -1,12 +1,14 @@
 ---
 id: 'replication'
 title: 'Database Replication'
-description: 'Replicate your database to external destinations using ETL or manual replication.'
-subtitle: 'An introduction to database replication and change data capture.'
+description: 'Replicate your Postgres database to external destinations using logical replication.'
+subtitle: 'An introduction to Postgres replication and change data capture.'
 sidebar_label: 'Overview'
 ---
 
-Replication is the process of copying changes from your database to another location. It's also referred to as change data capture (CDC): capturing all the changes that occur to your data.
+Database replication is the process of copying changes from your database to another location. It's also referred to as change data capture (CDC): capturing all the changes that occur to your data.
+
+Supabase uses **Postgres logical replication**, a native Postgres feature that streams changes from your database's Write-Ahead Log (WAL) to external destinations in near real-time.
 
 ## Use cases
 
@@ -16,27 +18,31 @@ You might use database replication for:
 - **Data Integration**: Keep your data synchronized across different systems and services in your tech stack.
 - **Backup and Disaster Recovery**: Maintain up-to-date copies of your data in different locations.
 
-## Replication methods
+## Destination types
 
-Supabase supports two methods for replicating your database to external destinations:
+Supabase supports replicating your database to two types of destinations:
 
-### ETL replication
+### Automatic destinations
 
 <Admonition type="caution" label="Private Alpha">
 
-ETL Replication is currently in private alpha. Access is limited and features may change.
+Automatic destinations are currently in private alpha. Access is limited and features may change.
 
 </Admonition>
 
-Use Supabase ETL to automatically replicate data to supported systems.
+Supabase provides managed replication to popular data platforms powered by [Supabase ETL](https://github.com/supabase/etl), an open source tool for Postgres logical replication. Configure your destination through the Dashboard, and Supabase ETL handles the replication pipeline automatically.
 
-- [Set up ETL Replication](/docs/guides/database/replication/etl-replication-setup)
+**Available automatic destinations:**
+- Analytics Buckets (Iceberg format)
+- BigQuery (coming soon)
 
-### Manual replication
+- [Set up automatic destinations](/docs/guides/database/replication/etl-replication-setup)
 
-Configure your own replication using external tools and Postgres's native logical replication. This gives you full control over the replication process and allows you to use any tool that supports Postgres logical replication.
+### Manual destinations
 
-- [Set up Manual Replication](/docs/guides/database/replication/manual-replication-setup)
+Configure your own replication destination using external tools and Postgres's native logical replication. This gives you full control over the replication process and allows you to replicate to any system that supports Postgres logical replication.
+
+- [Set up manual destinations](/docs/guides/database/replication/manual-replication-setup)
 
 ## Related features
 
