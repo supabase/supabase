@@ -16,7 +16,7 @@ ETL Replication is currently in private alpha. Access is limited and features ma
 
 ETL Replication currently supports Iceberg (Analytics Buckets). See the [ETL Destinations guide](/docs/guides/database/replication/etl-destinations) for details.
 
-# Why is my table not being replicated?
+# Why is a table not being replicated?
 
 Common reasons:
 - **Missing primary key**: Tables must have a primary key to be replicated
@@ -26,11 +26,11 @@ Common reasons:
 
 Check your publication settings and verify your table meets the requirements.
 
-# I added/removed tables from my publication. Why aren't changes reflected?
+# Why aren't publication changes reflected after adding or removing tables?
 
 After modifying your publication, you must restart the ETL pipeline for changes to take effect. See [Adding or removing tables](/docs/guides/database/replication/etl-replication-setup#adding-or-removing-tables) for instructions.
 
-# Why is my pipeline in Failed state?
+# Why is a pipeline in failed state?
 
 Pipeline failures occur during the streaming phase when an error happens while replicating live data. This prevents data loss. To recover:
 
@@ -41,11 +41,11 @@ Pipeline failures occur during the streaming phase when an error happens while r
 
 See [Handling errors](/docs/guides/database/replication/etl-replication-monitoring#handling-errors) for more details.
 
-# Why is my table in Error state?
+# Why is a table in error state?
 
 Table errors occur during the copy phase. To recover, click **View status**, find the affected table, and reset the table state. This will restart the table copy from the beginning.
 
-# How do I know if replication is working?
+# How to verify replication is working
 
 Check the [Database](/dashboard/project/_/database/etl) → **ETL Replication** page:
 
@@ -66,7 +66,7 @@ Key limitations to be aware of:
 
 Destination-specific limitations may also apply. See the [Iceberg](/docs/guides/database/replication/etl-iceberg#limitations) destination page for details.
 
-# How do I stop or pause replication?
+# How to stop or pause replication
 
 You can manage your pipeline using the actions menu in the destinations list. See [Managing your pipeline](/docs/guides/database/replication/etl-replication-setup#managing-your-pipeline) for details on available actions.
 
@@ -86,11 +86,11 @@ However, if a transaction in your database takes longer than this waiting period
 
 **Important**: We are not currently planning to implement automatic deduplication. If your use case requires guaranteed exactly-once delivery, you should implement deduplication logic in your downstream systems based on primary keys or other unique identifiers.
 
-# Where can I find replication logs?
+# Where to find replication logs
 
 Navigate to [Logs](/dashboard/project/_/logs/explorer) → **ETL Replication** to see all pipeline logs. Logs contain diagnostic information. If you're experiencing issues, contact support with your error details.
 
-# How do I get help?
+# How to get help
 
 If you need assistance:
 
