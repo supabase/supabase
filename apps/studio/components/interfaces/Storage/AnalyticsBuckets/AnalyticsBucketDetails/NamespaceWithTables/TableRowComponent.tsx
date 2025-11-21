@@ -242,12 +242,10 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
   }
 
   const connectedForeignTablesInNamespace =
-    (icebergWrapper?.tables ?? []).filter((x) => x.options[0].includes(`table=${namespace}.`)) ?? []
+    icebergWrapper?.tables.filter((x) => x.options[0].includes(`table=${namespace}.`)) ?? []
 
   const connectedForeignTables =
-    (icebergWrapper?.tables ?? []).filter(
-      (x) => x.options[0] === `table=${namespace}.${table.name}`
-    ) ?? []
+    icebergWrapper?.tables.filter((x) => x.options[0] === `table=${namespace}.${table.name}`) ?? []
 
   // [Joshen] For purely Analytics Bucket context
   const onConfirmRemoveNamespaceTable = async () => {
@@ -414,7 +412,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
 
       {/* [Joshen] Render each foreign table associated to the namespace table as its own row */}
       {connectedForeignTables?.map((x) => (
-        <TableRow>
+        <TableRow key={x.id}>
           <TableCell className="pl-6">
             <div className="flex items-center gap-x-2 rounded">
               <div className="w-4 h-4 rounded-bl-lg border-l-2 border-b-2 border-copntrol -translate-y-1.5" />
@@ -464,7 +462,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
             <Tooltip>
               <TooltipTrigger>
                 <div className="flex items-center gap-x-2 rounded">
-                  <div className="w-4 h-4 rounded-bl-lg border-l-2 border-b-2 border-copntrol -translate-y-1.5" />
+                  <div className="w-4 h-4 rounded-bl-lg border-l-2 border-b-2 border-control -translate-y-1.5" />
                   <div
                     className={cn(
                       'flex items-center justify-center text-xs h-4 w-4 rounded-[2px]',

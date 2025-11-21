@@ -12,6 +12,7 @@ import {
   useVaultSecretDecryptedValueQuery,
 } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { Eye, EyeOff } from 'lucide-react'
 import {
   Accordion_Shadcn_,
@@ -254,7 +255,7 @@ export const CreateTableInstructions = ({
       <CardFooter className="bg">
         <p className="text-xs text-foreground-light">
           Connecting to bucket with other Iceberg clients? Read more in our{' '}
-          <InlineLink href="https://supabase.com/docs/guides/storage/analytics/connecting-to-analytics-bucket">
+          <InlineLink href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}>
             documentation
           </InlineLink>
           .

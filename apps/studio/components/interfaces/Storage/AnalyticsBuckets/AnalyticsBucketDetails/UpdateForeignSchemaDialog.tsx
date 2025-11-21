@@ -47,8 +47,7 @@ export const UpdateForeignSchemaDialog = ({
 
   const { icebergWrapper } = useAnalyticsBucketAssociatedEntities({ bucketId })
   const connectedForeignTablesForNamespace =
-    (icebergWrapper?.tables ?? []).filter((x) => x.options[0].startsWith(`table=${namespace}.`)) ??
-    []
+    icebergWrapper?.tables.filter((x) => x.options[0].startsWith(`table=${namespace}.`)) ?? []
   const schemasAssociatedWithNamespace = [
     ...new Set(connectedForeignTablesForNamespace.map((x) => x.schema)),
   ]
@@ -111,9 +110,9 @@ export const UpdateForeignSchemaDialog = ({
                         {tables.join(', ')}
                       </TooltipContent>
                     </Tooltip>{' '}
-                    that have yet to be included in the Iceberg Foreign Data Wrapper. The wrapper
-                    can be updated to expose these tables as foreign tables where you then can query
-                    data from.
+                    that aren't included in the Iceberg Foreign Data Wrapper. Update the wrapper to
+                    create foreign tables for all unexposed tables. This will let you query the
+                    tables from Postgres.
                   </>
                 ) : (
                   `The table "${tables[0]}" in the "${namespace}" namespace is not yet included in the Iceberg Foreign Data Wrapper. The schema can be updated to expose this table as a foreign table.`

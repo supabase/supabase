@@ -103,14 +103,13 @@ export const NamespaceWithTables = ({
   )
 
   const connectedForeignTablesForNamespace =
-    (icebergWrapper?.tables ?? []).filter((x) => x.options[0].startsWith(`table=${namespace}.`)) ??
-    []
+    icebergWrapper?.tables.filter((x) => x.options[0].startsWith(`table=${namespace}.`)) ?? []
   const tablesWithConnectedForeignTables = connectedForeignTablesForNamespace.reduce((a, b) => {
     const table = b.options[0].split(`table=${namespace}.`)[1]
-    if (!a.find((x) => x === table)) a.push(table)
+    a.add(table)
     return a
-  }, [] as string[])
-  const unconnectedTables = tablesData.filter((x) => !tablesWithConnectedForeignTables.includes(x))
+  }, new Set<string>())
+  const unconnectedTables = tablesData.filter((x) => !tablesWithConnectedForeignTables.has(x))
   const hasUnconnectedForeignTablesForNamespace = unconnectedTables.length > 0
 
   const publicationTables = publication?.tables ?? []
@@ -120,7 +119,7 @@ export const NamespaceWithTables = ({
   const isSyncedPublicationTablesAndNamespaceTables =
     publicationTablesNotSyncedToNamespaceTables.length === 0
 
-  const { mutateAsync: importForeignSchema, isLoading: isImportingForeignSchema } =
+  const { mutateAsync: importForeignSchema, isPending: isImportingForeignSchema } =
     useFDWImportForeignSchemaMutation()
   const { mutateAsync: deleteNamespace } = useIcebergNamespaceDeleteMutation({ projectRef })
   const { mutateAsync: dropForeignTable } = useFDWDropForeignTableMutation()
