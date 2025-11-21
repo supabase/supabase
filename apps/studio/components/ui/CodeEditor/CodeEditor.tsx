@@ -4,11 +4,10 @@ import { editor } from 'monaco-editor'
 import { MutableRefObject, useEffect, useRef, useState } from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { formatSql } from 'lib/formatSql'
 import { timeout } from 'lib/helpers'
-import { cn } from 'ui'
-import { Loading } from '../Loading'
+import { cn, LogoLoader } from 'ui'
 import { alignEditor } from './CodeEditor.utils'
 
 type CodeEditorActions = { enabled: boolean; callback: (value: any) => void }
@@ -61,7 +60,7 @@ const CodeEditor = ({
   onInputChange = noop,
 }: CodeEditorProps) => {
   const monaco = useMonaco()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const hasValue = useRef<any>()
   const ref = useRef<editor.IStandaloneCodeEditor>()
@@ -238,7 +237,7 @@ const CodeEditor = ({
         value={value ?? undefined}
         language={language}
         defaultValue={defaultValue ?? undefined}
-        loading={loading || <Loading />}
+        loading={loading || <LogoLoader />}
         options={optionsMerged}
         onMount={onMount}
         onChange={onChangeContent}

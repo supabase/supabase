@@ -1,17 +1,18 @@
+import * as Sentry from '@sentry/nextjs'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
-import SignInMfaForm from 'components/interfaces/SignIn/SignInMfaForm'
+import { getAccessToken, useParams } from 'common'
+import { SignInMfaForm } from 'components/interfaces/SignIn/SignInMfaForm'
 import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
-import { Loading } from 'components/ui/Loading'
 import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import useLatest from 'hooks/misc/useLatest'
-import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
+import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
 import type { NextPageWithLayout } from 'types'
+import { LogoLoader } from 'ui'
 
 const SignInMfaPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -65,8 +66,8 @@ const SignInMfaPage: NextPageWithLayout = () => {
             await queryClient.resetQueries()
             router.push(getReturnToPath())
             return
-          }
-          if (data.currentLevel !== data.nextLevel) {
+          } else {
+            // Show the MFA form
             setLoading(false)
             return
           }
@@ -77,13 +78,19 @@ const SignInMfaPage: NextPageWithLayout = () => {
           return
         }
       })
-      .catch(() => {}) // catch all errors thrown by auth methods
+      .catch((error) => {
+        Sentry.captureException(error)
+        console.error('Auth initialization error:', error)
+        toast.error('Failed to initialize authentication. Please try again.')
+        setLoading(false)
+        router.push({ pathname: '/sign-in', query: router.query })
+      })
   }, [])
 
   if (loading) {
     return (
       <div className="flex flex-col flex-1 bg-alternative h-screen items-center justify-center">
-        <Loading />
+        <LogoLoader />
       </div>
     )
   }

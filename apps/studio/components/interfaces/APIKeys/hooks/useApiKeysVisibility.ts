@@ -1,13 +1,11 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useMemo } from 'react'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 
 interface ApiKeysVisibilityState {
-  isInRollout: boolean
   hasApiKeys: boolean
   isLoading: boolean
   canReadAPIKeys: boolean
@@ -21,13 +19,18 @@ interface ApiKeysVisibilityState {
  */
 export function useApiKeysVisibility(): ApiKeysVisibilityState {
   const { ref: projectRef } = useParams()
-  const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'api_keys')
-  const isInRollout = useFlag('basicApiKeys')
+  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.SECRETS_READ,
+    '*'
+  )
 
-  const { data: apiKeysData, isLoading } = useAPIKeysQuery({
-    projectRef,
-    reveal: false,
-  })
+  const { data: apiKeysData, isLoading: isLoadingApiKeys } = useAPIKeysQuery(
+    {
+      projectRef,
+      reveal: false,
+    },
+    { enabled: canReadAPIKeys }
+  )
 
   const publishableApiKeys = useMemo(
     () => apiKeysData?.filter(({ type }) => type === 'publishable') ?? [],
@@ -39,14 +42,14 @@ export function useApiKeysVisibility(): ApiKeysVisibilityState {
   const hasApiKeys = publishableApiKeys.length > 0
 
   // Can initialize API keys when in rollout, has permissions, not loading, and no API keys yet
-  const canInitApiKeys = hasApiKeys ? false : isInRollout && canReadAPIKeys && !isLoading
+  const canInitApiKeys = canReadAPIKeys && !isLoadingApiKeys && !hasApiKeys
 
-  const shouldDisableUI = hasApiKeys ? false : !isInRollout
+  // Disable UI for publishable keys and secrets keys if flag is not enabled OR no API keys created yet
+  const shouldDisableUI = !hasApiKeys
 
   return {
-    isInRollout,
     hasApiKeys,
-    isLoading,
+    isLoading: isLoadingPermissions || (canReadAPIKeys && isLoadingApiKeys),
     canReadAPIKeys,
     canInitApiKeys,
     shouldDisableUI,

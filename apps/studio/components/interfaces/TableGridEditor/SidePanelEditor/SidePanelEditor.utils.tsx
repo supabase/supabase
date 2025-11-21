@@ -13,25 +13,28 @@ import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constan
 import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { databaseKeys } from 'data/database/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
+import { lintKeys } from 'data/lint/keys'
 import { prefetchEditorTablePage } from 'data/prefetchers/project.$ref.editor.$id'
 import { getQueryClient } from 'data/query-client'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { tableRowKeys } from 'data/table-rows/keys'
+import { executeWithRetry } from 'data/table-rows/table-rows-query'
 import { tableKeys } from 'data/tables/keys'
 import { createTable as createTableMutation } from 'data/tables/table-create-mutation'
 import { deleteTable as deleteTableMutation } from 'data/tables/table-delete-mutation'
-import {
-  UpdateTableBody,
-  updateTable as updateTableMutation,
-} from 'data/tables/table-update-mutation'
-import { getTables } from 'data/tables/tables-query'
 import {
   getTable,
   RetrievedTableColumn,
   RetrieveTableResult,
 } from 'data/tables/table-retrieve-query'
+import {
+  UpdateTableBody,
+  updateTable as updateTableMutation,
+} from 'data/tables/table-update-mutation'
+import { getTables } from 'data/tables/tables-query'
+import { sendEvent } from 'data/telemetry/send-event-mutation'
 import { timeout, tryParseJson } from 'lib/helpers'
 import {
   generateCreateColumnPayload,
@@ -372,7 +375,7 @@ export const updateColumn = async ({
 export const duplicateTable = async (
   projectRef: string,
   connectionString: string | undefined | null,
-  payload: { name: string; comment?: string },
+  payload: { name: string; comment?: string | null },
   metadata: {
     duplicateTable: RetrieveTableResult
     isRLSEnabled: boolean
@@ -392,12 +395,12 @@ export const duplicateTable = async (
     connectionString,
     sql: [
       `CREATE TABLE "${sourceTableSchema}"."${duplicatedTableName}" (LIKE "${sourceTableSchema}"."${sourceTableName}" INCLUDING ALL);`,
-      payload.comment !== undefined
+      payload.comment != undefined
         ? `comment on table "${sourceTableSchema}"."${duplicatedTableName}" is '${payload.comment}';`
         : '',
     ].join('\n'),
   })
-  await queryClient.invalidateQueries(tableKeys.list(projectRef, sourceTableSchema))
+  await queryClient.invalidateQueries({ queryKey: tableKeys.list(projectRef, sourceTableSchema) })
 
   // Duplicate foreign key constraints over
   if (foreignKeyRelations.length > 0) {
@@ -460,6 +463,7 @@ export const createTable = async ({
   foreignKeyRelations,
   isRLSEnabled,
   importContent,
+  organizationSlug,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -467,12 +471,13 @@ export const createTable = async ({
   payload: {
     name: string
     schema: string
-    comment?: string | undefined
+    comment?: string | null
   }
   columns: ColumnField[]
   foreignKeyRelations: ForeignKey[]
   isRLSEnabled: boolean
   importContent?: ImportContent
+  organizationSlug?: string
 }) => {
   const queryClient = getQueryClient()
 
@@ -482,6 +487,26 @@ export const createTable = async ({
     connectionString: connectionString,
     payload: payload,
   })
+
+  // Track table creation event
+  try {
+    await sendEvent({
+      event: {
+        action: 'table_created',
+        properties: {
+          method: 'table_editor',
+          schema_name: payload.schema,
+          table_name: payload.name,
+        },
+        groups: {
+          project: projectRef,
+          ...(organizationSlug && { organization: organizationSlug }),
+        },
+      },
+    })
+  } catch (error) {
+    console.error('Failed to track table creation event:', error)
+  }
 
   const table = await queryClient.fetchQuery({
     queryKey: tableKeys.retrieve(projectRef, payload.name, payload.schema),
@@ -507,6 +532,26 @@ export const createTable = async ({
         schema: table.schema,
         payload: { rls_enabled: isRLSEnabled },
       })
+
+      // Track RLS enablement event
+      try {
+        await sendEvent({
+          event: {
+            action: 'table_rls_enabled',
+            properties: {
+              method: 'table_editor',
+              schema_name: table.schema,
+              table_name: table.name,
+            },
+            groups: {
+              project: projectRef,
+              ...(organizationSlug && { organization: organizationSlug }),
+            },
+          },
+        })
+      } catch (error) {
+        console.error('Failed to track RLS enablement event:', error)
+      }
     }
 
     // Then insert the columns - we don't do Promise.all as we want to keep the integrity
@@ -661,6 +706,7 @@ export const updateTable = async ({
   foreignKeyRelations,
   existingForeignKeyRelations,
   primaryKey,
+  organizationSlug,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -671,6 +717,7 @@ export const updateTable = async ({
   foreignKeyRelations: ForeignKey[]
   existingForeignKeyRelations: ForeignKeyConstraint[]
   primaryKey?: Constraint
+  organizationSlug?: string
 }) => {
   const queryClient = getQueryClient()
 
@@ -678,7 +725,6 @@ export const updateTable = async ({
   const primaryKeyColumns = columns
     .filter((column) => column.isPrimaryKey)
     .map((column) => column.name)
-
   const existingPrimaryKeyColumns = table.primary_keys.map((pk: PostgresPrimaryKey) => pk.name)
   const isPrimaryKeyUpdated = !isEqual(primaryKeyColumns, existingPrimaryKeyColumns)
 
@@ -692,15 +738,38 @@ export const updateTable = async ({
     }
   }
 
-  // Update the table
-  await updateTableMutation({
-    projectRef,
-    connectionString,
-    id: table.id,
-    name: table.name,
-    schema: table.schema,
-    payload,
-  })
+  if (Object.keys(payload).length > 0) {
+    await updateTableMutation({
+      projectRef,
+      connectionString,
+      id: table.id,
+      name: table.name,
+      schema: table.schema,
+      payload,
+    })
+  }
+
+  // Track RLS enablement if it's being turned on
+  if (payload.rls_enabled === true) {
+    try {
+      await sendEvent({
+        event: {
+          action: 'table_rls_enabled',
+          properties: {
+            method: 'table_editor',
+            schema_name: table.schema,
+            table_name: payload.name ?? table.name,
+          },
+          groups: {
+            project: projectRef,
+            ...(organizationSlug && { organization: organizationSlug }),
+          },
+        },
+      })
+    } catch (error) {
+      console.error('Failed to track RLS enablement event:', error)
+    }
+  }
 
   const updatedTable = await queryClient.fetchQuery({
     queryKey: tableKeys.retrieve(
@@ -755,7 +824,7 @@ export const updateTable = async ({
       })
       if (!!error) hasError = true
     } else {
-      const originalColumn = find(originalColumns, { id: column.id })
+      const originalColumn = find(table.columns, { id: column.id })
       if (originalColumn) {
         const columnPayload = generateUpdateColumnPayload(originalColumn, updatedTable, column)
         if (!isEmpty(columnPayload)) {
@@ -764,7 +833,12 @@ export const updateTable = async ({
           const res = await updateColumn({
             projectRef: projectRef,
             connectionString: connectionString,
-            originalColumn: originalColumn,
+            // Use the updated table name and schema since the table might have been renamed
+            originalColumn: {
+              ...originalColumn,
+              table: updatedTable.name,
+              schema: updatedTable.schema,
+            },
             payload: columnPayload,
             selectedTable: updatedTable,
             skipPKCreation: true,
@@ -800,16 +874,21 @@ export const updateTable = async ({
   })
 
   await Promise.all([
-    queryClient.invalidateQueries(tableEditorKeys.tableEditor(projectRef, table.id)),
-    queryClient.invalidateQueries(databaseKeys.foreignKeyConstraints(projectRef, table.schema)),
-    queryClient.invalidateQueries(databaseKeys.tableDefinition(projectRef, table.id)),
-    queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
-    queryClient.invalidateQueries(tableKeys.list(projectRef, table.schema, true)),
+    queryClient.invalidateQueries({ queryKey: tableEditorKeys.tableEditor(projectRef, table.id) }),
+    queryClient.invalidateQueries({
+      queryKey: databaseKeys.foreignKeyConstraints(projectRef, table.schema),
+    }),
+    queryClient.invalidateQueries({ queryKey: databaseKeys.tableDefinition(projectRef, table.id) }),
+    queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(projectRef) }),
+    queryClient.invalidateQueries({ queryKey: tableKeys.list(projectRef, table.schema, true) }),
+    queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
   ])
 
   // We need to invalidate tableRowsAndCount after tableEditor
   // to ensure the query sent is correct
-  await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
+  await queryClient.invalidateQueries({
+    queryKey: tableRowKeys.tableRowsAndCount(projectRef, table.id),
+  })
 
   return {
     table: await prefetchTableEditor(queryClient, {
@@ -819,6 +898,47 @@ export const updateTable = async ({
     }),
     hasError,
   }
+}
+
+/**
+ * Used in insertRowsViaSpreadsheet + insertTableRows
+ */
+export const formatRowsForInsert = ({
+  rows,
+  headers,
+  columns = [],
+}: {
+  rows: any[]
+  headers: string[]
+  columns?: RetrieveTableResult['columns']
+}) => {
+  return rows.map((row: any) => {
+    const formattedRow: any = {}
+    headers.forEach((header) => {
+      const column = columns?.find((c) => c.name === header)
+      const originalValue = row[header]
+
+      if ((column?.format ?? '').includes('json')) {
+        formattedRow[header] = tryParseJson(originalValue)
+      } else if ((column?.data_type ?? '') === 'ARRAY') {
+        if (
+          typeof originalValue === 'string' &&
+          originalValue.startsWith('{') &&
+          originalValue.endsWith('}')
+        ) {
+          const formattedPostgresArraytoJsonArray = `[${originalValue.slice(1, originalValue.length - 1)}]`
+          formattedRow[header] = tryParseJson(formattedPostgresArraytoJsonArray)
+        } else {
+          formattedRow[header] = tryParseJson(originalValue)
+        }
+      } else if (originalValue === '') {
+        formattedRow[header] = column?.is_nullable ? null : ''
+      } else {
+        formattedRow[header] = originalValue
+      }
+    })
+    return formattedRow
+  })
 }
 
 export const insertRowsViaSpreadsheet = async (
@@ -843,25 +963,17 @@ export const insertRowsViaSpreadsheet = async (
       chunk: async (results: any, parser: any) => {
         parser.pause()
 
-        const formattedData = results.data.map((row: any) => {
-          const formattedRow: any = {}
-          selectedHeaders.forEach((header) => {
-            const column = table.columns?.find((c) => c.name === header)
-            if ((column?.data_type ?? '') === 'ARRAY' || (column?.format ?? '').includes('json')) {
-              formattedRow[header] = tryParseJson(row[header])
-            } else if (row[header] === '') {
-              // if the cell is empty string, convert it to NULL
-              formattedRow[header] = column?.is_nullable ? null : ''
-            } else {
-              formattedRow[header] = row[header]
-            }
-          })
-          return formattedRow
+        const formattedData = formatRowsForInsert({
+          rows: results.data,
+          headers: selectedHeaders,
+          columns: table.columns,
         })
 
         const insertQuery = new Query().from(table.name, table.schema).insert(formattedData).toSql()
         try {
-          await executeSql({ projectRef, connectionString, sql: insertQuery })
+          await executeWithRetry(() =>
+            executeSql({ projectRef, connectionString, sql: insertQuery })
+          )
         } catch (error) {
           console.warn(error)
           insertError = error
@@ -894,19 +1006,10 @@ export const insertTableRows = async (
   let insertError = undefined
   let insertProgress = 0
 
-  const formattedRows = rows.map((row: any) => {
-    const formattedRow: any = {}
-    selectedHeaders.forEach((header) => {
-      const column = table.columns?.find((c) => c.name === header)
-      if ((column?.data_type ?? '') === 'ARRAY' || (column?.format ?? '').includes('json')) {
-        formattedRow[header] = tryParseJson(row[header])
-      } else if (row[header] === '') {
-        formattedRow[header] = column?.is_nullable ? null : ''
-      } else {
-        formattedRow[header] = row[header]
-      }
-    })
-    return formattedRow
+  const formattedRows = formatRowsForInsert({
+    rows,
+    headers: selectedHeaders,
+    columns: table.columns,
   })
 
   const batches = chunk(formattedRows, BATCH_SIZE)

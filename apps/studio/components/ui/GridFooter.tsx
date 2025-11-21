@@ -4,6 +4,7 @@ import { cn } from 'ui'
 export const GridFooter = ({ children, className }: PropsWithChildren<{ className?: string }>) => {
   return (
     <div
+      aria-label="Table grid footer"
       className={cn(
         'flex min-h-9 h-9 overflow-hidden overflow-x-auto items-center px-2 w-full border-t',
         className

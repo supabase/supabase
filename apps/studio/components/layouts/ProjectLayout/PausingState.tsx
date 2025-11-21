@@ -1,13 +1,12 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Badge } from 'ui'
 
-import { Project, invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
+import { useInvalidateProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
+import { Project, useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
-import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { PROJECT_STATUS } from 'lib/constants'
+import { Circle, Loader } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Loader, Circle } from 'lucide-react'
 
 export interface PausingStateProps {
   project: Project
@@ -15,24 +14,36 @@ export interface PausingStateProps {
 
 const PausingState = ({ project }: PausingStateProps) => {
   const { ref } = useParams()
-  const queryClient = useQueryClient()
   const [startPolling, setStartPolling] = useState(false)
 
-  useProjectStatusQuery(
+  const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
+  const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
+
+  const { data: projectStatusData, isSuccess: isProjectStatusSuccess } = useProjectStatusQuery(
     { projectRef: ref },
     {
       enabled: startPolling,
-      refetchInterval: (res) => {
-        return res?.status === PROJECT_STATUS.INACTIVE ? false : 2000
-      },
-      onSuccess: async (res) => {
-        if (res.status === PROJECT_STATUS.INACTIVE) {
-          if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
-          await invalidateProjectsQuery(queryClient)
-        }
+      refetchInterval: (data) => {
+        return data?.status === PROJECT_STATUS.INACTIVE ? false : 2000
       },
     }
   )
+
+  useEffect(() => {
+    if (!isProjectStatusSuccess) return
+    if (projectStatusData?.status === PROJECT_STATUS.INACTIVE) {
+      if (ref) {
+        invalidateProjectDetailsQuery(ref)
+      }
+      invalidateProjectsQuery()
+    }
+  }, [
+    isProjectStatusSuccess,
+    projectStatusData,
+    ref,
+    invalidateProjectDetailsQuery,
+    invalidateProjectsQuery,
+  ])
 
   useEffect(() => {
     setTimeout(() => setStartPolling(true), 4000)

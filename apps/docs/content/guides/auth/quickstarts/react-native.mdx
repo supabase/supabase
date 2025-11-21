@@ -10,9 +10,9 @@ hideToc: true
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Create a new Supabase project">
 
-    [Launch a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
+    [Launch a new project](/dashboard) in the Supabase Dashboard.
 
-    Your new database has a table for storing your users. You can see that this table is currently empty by running some SQL in the [SQL Editor](https://supabase.com/dashboard/project/_/sql).
+    Your new database has a table for storing your users. You can see that this table is currently empty by running some SQL in the [SQL Editor](/dashboard/project/_/sql).
 
     </StepHikeCompact.Details>
 
@@ -64,24 +64,26 @@ hideToc: true
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Set up your login component">
 
-    Create a helper file `lib/supabase.ts` that exports a Supabase client using your [Project URL and public API (anon) key](https://supabase.com/dashboard/project/_/settings/api).
+    Create a helper file `lib/supabase.ts` that exports a Supabase client using your Project URL and key.
+
+    <$Partial path="api_settings_steps.mdx" />
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
 
 
       ```ts name=lib/supabase.ts
-      import { AppState } from 'react-native'
+      import { AppState, Platform } from 'react-native'
       import 'react-native-url-polyfill/auto'
       import AsyncStorage from '@react-native-async-storage/async-storage'
       import { createClient, processLock } from '@supabase/supabase-js'
 
       const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
-      const supabaseAnonKey = YOUR_REACT_NATIVE_SUPABASE_ANON_KEY
+      const supabaseAnonKey = YOUR_REACT_NATIVE_SUPABASE_PUBLISHABLE_KEY
 
       export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
         auth: {
-          storage: AsyncStorage,
+          ...(Platform.OS !== "web" ? { storage: AsyncStorage } : {}),
           autoRefreshToken: true,
           persistSession: true,
           detectSessionInUrl: false,
@@ -94,13 +96,15 @@ hideToc: true
       // to receive `onAuthStateChange` events with the `TOKEN_REFRESHED` or
       // `SIGNED_OUT` event if the user's session is terminated. This should
       // only be registered once.
-      AppState.addEventListener('change', (state) => {
-        if (state === 'active') {
-          supabase.auth.startAutoRefresh()
-        } else {
-          supabase.auth.stopAutoRefresh()
-        }
-      })
+      if (Platform.OS !== "web") {
+        AppState.addEventListener('change', (state) => {
+          if (state === 'active') {
+            supabase.auth.startAutoRefresh()
+          } else {
+            supabase.auth.stopAutoRefresh()
+          }
+        })
+      }
       ```
 
     </StepHikeCompact.Code>

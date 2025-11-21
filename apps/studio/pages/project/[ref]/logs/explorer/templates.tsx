@@ -1,24 +1,37 @@
 import { useParams } from 'common'
 import { CodeIcon } from 'lucide-react'
 import { useState } from 'react'
-import { Button, Popover, cn } from 'ui'
 
 import { TEMPLATES } from 'components/interfaces/Settings/Logs/Logs.constants'
 import type { LogTemplate } from 'components/interfaces/Settings/Logs/Logs.types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import CardButton from 'components/ui/CardButton'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
+import { UnknownInterface } from 'components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from 'types'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { Button, Popover, cn } from 'ui'
 
 export const LogsTemplatesPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
+  const { logsTemplates: isTemplatesEnabled, logsShowMetadataIpTemplate: showMetadataIpTemplate } =
+    useIsFeatureEnabled(['logs:templates', 'logs:show_metadata_ip_template'])
+
+  if (!isTemplatesEnabled) {
+    return <UnknownInterface urlBack={`/project/${projectRef}/logs/explorer`} />
+  }
+
+  const allTemplates = showMetadataIpTemplate
+    ? TEMPLATES
+    : TEMPLATES.filter((template) => template.label !== 'Metadata IP')
 
   return (
     <div className="mx-auto h-full w-full px-5 py-6">
       <LogsExplorerHeader subtitle="Templates" />
       <div className="grid lg:grid-cols-3 gap-6 mt-4 pb-24">
-        {TEMPLATES.sort((a, b) => a.label!.localeCompare(b.label!))
+        {allTemplates
+          .sort((a, b) => a.label!.localeCompare(b.label!))
           .filter((template) => template.mode === 'custom')
           .map((template, i) => {
             return <Template key={i} projectRef={projectRef} template={template} />

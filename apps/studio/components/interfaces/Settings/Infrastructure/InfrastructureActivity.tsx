@@ -6,11 +6,9 @@ import { Fragment, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import {
-  CPUWarnings,
-  DiskIOBandwidthWarnings,
-  RAMWarnings,
-} from 'components/interfaces/Billing/Usage/UsageWarningAlerts'
+import { CPUWarnings } from 'components/interfaces/Billing/Usage/UsageWarningAlerts/CPUWarnings'
+import { DiskIOBandwidthWarnings } from 'components/interfaces/Billing/Usage/UsageWarningAlerts/DiskIOBandwidthWarnings'
+import { RAMWarnings } from 'components/interfaces/Billing/Usage/UsageWarningAlerts/RAMWarnings'
 import UsageBarChart from 'components/interfaces/Organization/Usage/UsageBarChart'
 import {
   ScaffoldContainer,
@@ -29,9 +27,9 @@ import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS, InstanceSpecs } from 'lib/constants'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS, InstanceSpecs } from 'lib/constants'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Admonition } from 'ui-patterns/admonition'
@@ -47,10 +45,10 @@ const NON_DEDICATED_IO_RESOURCES = [
   'ci_2xlarge',
 ]
 
-const InfrastructureActivity = () => {
+export const InfrastructureActivity = () => {
   const { ref: projectRef } = useParams()
-  const project = useSelectedProject()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
   const [dateRange, setDateRange] = useState<any>()
 
@@ -59,13 +57,14 @@ const InfrastructureActivity = () => {
   })
   const isFreePlan = organization?.plan?.id === 'free'
 
-  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery({ ref: projectRef })
+  // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
   const projectResourceWarnings = resourceWarnings?.find((x) => x.project === projectRef)
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const selectedAddons = addons?.selected_addons ?? []
 
-  const { showNewReplicaPanel, setShowNewReplicaPanel } = useShowNewReplicaPanel()
+  const { setShowNewReplicaPanel } = useShowNewReplicaPanel()
 
   const { computeInstance } = getAddons(selectedAddons)
   const hasDedicatedIOResources =
@@ -202,7 +201,7 @@ const InfrastructureActivity = () => {
 
   return (
     <>
-      <ScaffoldContainer>
+      <ScaffoldContainer id="infrastructure-activity">
         <div className="mx-auto flex flex-col gap-10 pt-6">
           <div>
             <p className="text-xl">Infrastructure Activity</p>
@@ -404,7 +403,7 @@ const InfrastructureActivity = () => {
                       >
                         <DocsButton
                           abbrev={false}
-                          href="https://supabase.com/docs/guides/platform/compute-add-ons#disk-throughput-and-iops"
+                          href={`${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput-and-iops`}
                         />
                       </Admonition>
                     </>
@@ -416,7 +415,7 @@ const InfrastructureActivity = () => {
                     </div>
                   ) : chartData.length ? (
                     <UsageBarChart
-                      name={`${attribute.chartPrefix || ''}${attribute.name}`}
+                      name={`${attribute.chartPrefix || ''} ${attribute.name}`}
                       unit={attribute.unit}
                       attributes={attribute.attributes}
                       data={chartData}
@@ -447,5 +446,3 @@ const InfrastructureActivity = () => {
     </>
   )
 }
-
-export default InfrastructureActivity

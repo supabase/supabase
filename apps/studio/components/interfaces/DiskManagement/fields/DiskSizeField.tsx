@@ -6,9 +6,9 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 import dayjs from 'dayjs'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { GB } from 'lib/constants'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL, GB } from 'lib/constants'
 import { Button, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Skeleton, cn } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
@@ -16,7 +16,7 @@ import { calculateDiskSizePrice } from '../DiskManagement.utils'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import { DiskType, PLAN_DETAILS } from '../ui/DiskManagement.constants'
 import { DiskManagementDiskSizeReadReplicas } from '../ui/DiskManagementReadReplicas'
-import DiskSpaceBar from '../ui/DiskSpaceBar'
+import { DiskSpaceBar } from '../ui/DiskSpaceBar'
 import { DiskTypeRecommendationSection } from '../ui/DiskTypeRecommendationSection'
 import FormMessage from '../ui/FormMessage'
 import { InputPostTab } from '../ui/InputPostTab'
@@ -35,8 +35,8 @@ export function DiskSizeField({
 }: DiskSizeFieldProps) {
   const { ref: projectRef } = useParams()
   const { control, formState, setValue, trigger, getValues, resetField, watch } = form
-  const org = useSelectedOrganization()
-  const project = useSelectedProject()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { data: project } = useSelectedProjectQuery()
 
   const {
     isLoading: isLoadingDiskAttributes,
@@ -88,7 +88,7 @@ export function DiskSizeField({
   const mainDiskUsed = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
 
   return (
-    <div className="grid @xl:grid-cols-12 gap-5">
+    <div id="disk-size" className="grid @xl:grid-cols-12 gap-5">
       <div className="col-span-4">
         <FormField_Shadcn_
           name="totalSize"
@@ -156,10 +156,7 @@ export function DiskSizeField({
               `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`}
 
             <div className="mt-3">
-              <DocsButton
-                abbrev={false}
-                href="https://supabase.com/docs/guides/platform/database-size"
-              />
+              <DocsButton abbrev={false} href={`${DOCS_URL}/guides/platform/database-size`} />
             </div>
           </span>
           <DiskTypeRecommendationSection

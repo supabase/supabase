@@ -1,12 +1,16 @@
 import { useRouter } from 'next/router'
-import { ComponentType, useEffect } from 'react'
+import { ComponentType, useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useAuth } from 'common'
+import { SessionTimeoutModal } from 'components/interfaces/SignIn/SessionTimeoutModal'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useAuthenticatorAssuranceLevelQuery } from 'data/profile/mfa-authenticator-assurance-level-query'
-import { useAuth } from 'lib/auth'
-import { IS_PLATFORM } from 'lib/constants'
-import { NextPageWithLayout, isNextPageWithLayout } from 'types'
+import { useSignOut } from 'lib/auth'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { isNextPageWithLayout, type NextPageWithLayout } from 'types'
+
+const MAX_TIMEOUT = 10000 // 10 seconds
 
 export function withAuth<T>(
   WrappedComponent: ComponentType<T> | NextPageWithLayout<T, T>,
@@ -29,47 +33,108 @@ export function withAuth<T>(
 
   const WithAuthHOC: ComponentType<T> = (props) => {
     const router = useRouter()
+    const signOut = useSignOut()
     const { isLoading, session } = useAuth()
-    const { isLoading: isAALLoading, data: aalData } = useAuthenticatorAssuranceLevelQuery({
-      onError(error) {
-        toast.error(
-          `Failed to fetch authenticator assurance level: ${error.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
-        )
-      },
-    })
 
-    usePermissionsQuery({
-      onError(error: any) {
+    const timeoutIdRef = useRef<NodeJS.Timeout | null>(null)
+    const [isSessionTimeoutModalOpen, setIsSessionTimeoutModalOpen] = useState(false)
+
+    const {
+      isLoading: isAALLoading,
+      data: aalData,
+      isError: isErrorAAL,
+      error: errorAAL,
+    } = useAuthenticatorAssuranceLevelQuery()
+
+    useEffect(() => {
+      if (isErrorAAL) {
         toast.error(
-          `Failed to fetch permissions: ${error.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
+          `Failed to fetch authenticator assurance level: ${errorAAL?.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
         )
-      },
-    })
+      }
+    }, [isErrorAAL, errorAAL])
+
+    const { isError: isErrorPermissions, error: errorPermissions } = usePermissionsQuery()
+
+    useEffect(() => {
+      if (isErrorPermissions) {
+        toast.error(
+          `Failed to fetch permissions: ${errorPermissions?.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
+        )
+      }
+    }, [isErrorPermissions, errorPermissions])
 
     const isLoggedIn = Boolean(session)
     const isFinishedLoading = !isLoading && !isAALLoading
 
-    useEffect(() => {
-      const isCorrectLevel = options.useHighestAAL
-        ? aalData?.currentLevel === aalData?.nextLevel
-        : true
-
-      if (isFinishedLoading && (!isLoggedIn || !isCorrectLevel)) {
-        const searchParams = new URLSearchParams(location.search)
-        let pathname = location.pathname
-        if (process.env.NEXT_PUBLIC_BASE_PATH) {
-          pathname = pathname.replace(process.env.NEXT_PUBLIC_BASE_PATH, '')
-        }
-
-        searchParams.set('returnTo', pathname)
-
-        router.push(`/sign-in?${searchParams.toString()}`)
+    const redirectToSignIn = useCallback(() => {
+      let pathname = location.pathname
+      if (BASE_PATH) {
+        pathname = pathname.replace(BASE_PATH, '')
       }
-    }, [session, isLoading, router, aalData, isFinishedLoading, isLoggedIn])
+
+      if (pathname === '/sign-in') {
+        // If the user is already on the sign in page, we don't need to redirect them
+        return
+      }
+
+      const searchParams = new URLSearchParams(location.search)
+      searchParams.set('returnTo', pathname)
+
+      // Sign out before redirecting to sign in page incase the user is stuck in a loading state
+      signOut().finally(() => {
+        router.push(`/sign-in?${searchParams.toString()}`)
+      })
+    }, [router, signOut])
+
+    useEffect(() => {
+      if (!isFinishedLoading) {
+        timeoutIdRef.current = setTimeout(() => {
+          setIsSessionTimeoutModalOpen(true)
+        }, MAX_TIMEOUT)
+      } else {
+        if (timeoutIdRef.current) {
+          clearTimeout(timeoutIdRef.current)
+          timeoutIdRef.current = null
+        }
+      }
+
+      return () => {
+        if (timeoutIdRef.current) {
+          clearTimeout(timeoutIdRef.current)
+        }
+      }
+    }, [isFinishedLoading, router, redirectToSignIn])
+
+    const isCorrectLevel = options.useHighestAAL
+      ? aalData?.currentLevel === aalData?.nextLevel
+      : true
+
+    const shouldRedirect = isFinishedLoading && (!isLoggedIn || !isCorrectLevel)
+
+    useEffect(() => {
+      if (shouldRedirect) {
+        // Clear the timeout if it's still active and we are redirecting
+        if (timeoutIdRef.current) {
+          clearTimeout(timeoutIdRef.current)
+          timeoutIdRef.current = null
+        }
+        redirectToSignIn()
+      }
+    }, [redirectToSignIn, shouldRedirect])
 
     const InnerComponent = WrappedComponent as any
 
-    return <InnerComponent {...props} />
+    return (
+      <>
+        <SessionTimeoutModal
+          visible={isSessionTimeoutModalOpen}
+          onClose={() => setIsSessionTimeoutModalOpen(false)}
+          redirectToSignIn={redirectToSignIn}
+        />
+        <InnerComponent {...props} />
+      </>
+    )
   }
 
   WithAuthHOC.displayName = `withAuth(${WrappedComponent.displayName})`

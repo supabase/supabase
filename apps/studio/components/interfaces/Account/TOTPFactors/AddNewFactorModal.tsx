@@ -18,10 +18,10 @@ interface AddNewFactorModalProps {
   onClose: () => void
 }
 
-const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) => {
+export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) => {
   // Generate a name with a number between 0 and 1000
   const [name, setName] = useState(`App ${Math.floor(Math.random() * 1000)}`)
-  const { data, mutate: enroll, isLoading: isEnrolling, reset } = useMfaEnrollMutation()
+  const { data, mutate: enroll, isPending: isEnrolling, reset } = useMfaEnrollMutation()
 
   useEffect(() => {
     // reset has to be called because the state is kept between if the process is canceled during
@@ -122,13 +122,15 @@ const SecondStep = ({
   )
 
   const { mutate: unenroll } = useMfaUnenrollMutation({ onSuccess: () => onClose() })
-  const { mutate: challengeAndVerify, isLoading: isVerifying } = useMfaChallengeAndVerifyMutation({
+  const { mutate: challengeAndVerify, isPending: isVerifying } = useMfaChallengeAndVerifyMutation({
     onError: (error) => {
       toast.error(`Failed to add a second factor authentication:  ${error?.message}`)
     },
     onSuccess: async () => {
       if (lastVisitedOrganization) {
-        await queryClient.invalidateQueries(organizationKeys.members(lastVisitedOrganization))
+        await queryClient.invalidateQueries({
+          queryKey: organizationKeys.members(lastVisitedOrganization),
+        })
       }
       toast.success(`Successfully added a second factor authentication`)
       onClose()
@@ -216,5 +218,3 @@ const SecondStep = ({
     </ConfirmationModal>
   )
 }
-
-export default AddNewFactorModal

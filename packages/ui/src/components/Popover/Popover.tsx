@@ -30,7 +30,7 @@ interface RootProps {
 }
 
 /**
- * @deprecated Use ./Popover_shadcn_ instead
+ * @deprecated Use `import { Popover_shadcn_ } from "ui"` instead
  */
 function Popover({
   align = 'center',

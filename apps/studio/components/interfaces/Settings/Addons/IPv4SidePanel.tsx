@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -9,27 +10,33 @@ import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useIsAwsCloudProvider } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
-import { ExternalLink } from 'lucide-react'
 import { useAddonsPagePanel } from 'state/addons-page'
 import { Button, Radio, SidePanel, cn } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 const IPv4SidePanel = () => {
+  const isAws = useIsAwsCloudProvider()
   const { ref: projectRef } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const [selectedOption, setSelectedOption] = useState<string>('ipv4_none')
 
-  const canUpdateIPv4 = useCheckPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
+  const { can: canUpdateIPv4 } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
   const { panel, closePanel } = useAddonsPagePanel()
   const visible = panel === 'ipv4'
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
-  const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
+  const { mutate: updateAddon, isPending: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully enabled IPv4`)
       closePanel()
@@ -38,7 +45,7 @@ const IPv4SidePanel = () => {
       toast.error(`Unable to enable IPv4: ${error.message}`)
     },
   })
-  const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
+  const { mutate: removeAddon, isPending: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled IPv4.`)
       closePanel()
@@ -56,6 +63,8 @@ const IPv4SidePanel = () => {
     (addons?.available_addons ?? []).find((addon) => addon.type === 'ipv4')?.variants ?? []
 
   const isFreePlan = organization?.plan?.id === 'free'
+  const { hasAccess: hasAccessToIPv4, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('ipv4')
   const hasChanges = selectedOption !== (subscriptionIpV4Option?.variant.identifier ?? 'ipv4_none')
   const selectedIPv4 = availableOptions.find((option) => option.identifier === selectedOption)
   const isPgBouncerEnabled = !isFreePlan
@@ -85,10 +94,18 @@ const IPv4SidePanel = () => {
       visible={visible}
       onCancel={closePanel}
       onConfirm={onConfirm}
-      loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateIPv4}
+      loading={isLoading || isSubmitting || isLoadingEntitlement}
+      disabled={
+        !hasAccessToIPv4 ||
+        isLoadingEntitlement ||
+        isLoading ||
+        !hasChanges ||
+        isSubmitting ||
+        !canUpdateIPv4 ||
+        !isAws
+      }
       tooltip={
-        isFreePlan
+        !hasAccessToIPv4
           ? 'Unable to enable IPv4 on a Free Plan'
           : !canUpdateIPv4
             ? 'You do not have permission to update IPv4'
@@ -99,7 +116,7 @@ const IPv4SidePanel = () => {
           <h4>Dedicated IPv4 address</h4>
           <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
-              href="https://supabase.com/docs/guides/platform/ipv4-address"
+              href={`${DOCS_URL}/guides/platform/ipv4-address`}
               target="_blank"
               rel="noreferrer"
             >
@@ -117,6 +134,13 @@ const IPv4SidePanel = () => {
             database via a IPv4 address.
           </p>
 
+          {!isAws && (
+            <Admonition
+              type="default"
+              title="Dedicated IPv4 address is only available for AWS projects"
+            />
+          )}
+
           {isPgBouncerEnabled ? (
             <Admonition
               type="default"
@@ -127,14 +151,14 @@ const IPv4SidePanel = () => {
             <p className="text-sm">
               If you are connecting via the Shared connection pooler, you do not need this add-on as
               our pooler resolves to IPv4 addresses. You can check your connection info in your{' '}
-              <InlineLink href={`/project/${projectRef}/settings/database#connection-pooler`}>
+              <InlineLink href={`/project/${projectRef}/database/settings#connection-pooler`}>
                 project database settings
               </InlineLink>
               .
             </p>
           )}
 
-          <div className={cn('!mt-8 pb-4', isFreePlan && 'opacity-75')}>
+          <div className={cn('!mt-8 pb-4', !hasAccessToIPv4 && 'opacity-75')}>
             <Radio.Group
               type="large-cards"
               size="tiny"
@@ -168,7 +192,7 @@ const IPv4SidePanel = () => {
                   className="col-span-4 !p-0"
                   name="ipv4"
                   key={option.identifier}
-                  disabled={isFreePlan}
+                  disabled={!hasAccessToIPv4 || !isAws}
                   checked={selectedOption === option.identifier}
                   label={option.name}
                   value={option.identifier}
@@ -226,7 +250,7 @@ const IPv4SidePanel = () => {
             </>
           )}
 
-          {isFreePlan && (
+          {!hasAccessToIPv4 && (
             <Admonition type="note" title="IPv4 add-on is unavailable on the Free Plan">
               <p>Upgrade your plan to enable a IPv4 address for your project</p>
               <Button asChild type="default">

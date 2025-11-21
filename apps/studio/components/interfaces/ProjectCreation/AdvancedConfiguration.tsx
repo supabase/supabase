@@ -1,8 +1,9 @@
 import { ChevronRight } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 
+import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
-import { CreateProjectForm } from 'pages/new/[slug]'
+import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   cn,
@@ -17,7 +18,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { DocsButton } from 'components/ui/DocsButton'
+import { CreateProjectForm } from './ProjectCreation.schema'
 
 interface AdvancedConfigurationProps {
   form: UseFormReturn<CreateProjectForm>
@@ -97,10 +98,7 @@ export const AdvancedConfiguration = ({
                   title="OrioleDB is not production ready"
                   description="Postgres with OrioleDB extension is currently in Public Alpha and not recommended for production usage yet."
                 >
-                  <DocsButton
-                    className="mt-2"
-                    href="https://supabase.com/docs/guides/database/orioledb"
-                  />
+                  <DocsButton className="mt-2" href={`${DOCS_URL}/guides/database/orioledb`} />
                 </Admonition>
               )}
             </FormItemLayout>

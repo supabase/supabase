@@ -1,13 +1,15 @@
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { ArrowRight } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
 import type { RenderCellProps } from 'react-data-grid'
 
 import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useTablesQuery } from 'data/tables/tables-query'
+import { useTablesQuery as useTableRetrieveQuery } from 'data/tables/table-retrieve-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
 import type { SupaRow } from '../../types'
 import { NullValue } from '../common/NullValue'
@@ -18,11 +20,10 @@ interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {
 }
 
 export const ForeignKeyFormatter = (props: Props) => {
-  const { project } = useProjectContext()
-
   const { tableId, row, column } = props
+  const { data: project } = useSelectedProjectQuery()
 
-  const { data } = useTableEditorQuery({
+  const { data, isLoading } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id: tableId,
@@ -36,17 +37,22 @@ export const ForeignKeyFormatter = (props: Props) => {
       r.source_table_name === selectedTable?.name &&
       r.source_column_name === column.name
   )
-  const { data: tables } = useTablesQuery({
-    projectRef: project?.ref,
-    includeColumns: true,
-    connectionString: project?.connectionString,
-    schema: relationship?.target_table_schema,
-  })
-  const targetTable = tables?.find(
-    (table) =>
-      table.schema === relationship?.target_table_schema &&
-      table.name === relationship.target_table_name
-  )
+
+  const { data: targetTable, isLoading: isLoadingTargetTable } =
+    useTableRetrieveQuery<PostgresTable>(
+      {
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        schema: relationship?.target_table_schema ?? '',
+        name: relationship?.target_table_name ?? '',
+      },
+      {
+        enabled:
+          !!project?.ref &&
+          !!relationship?.target_table_schema &&
+          !!relationship?.target_table_name,
+      }
+    )
 
   const value = row[column.key]
   const formattedValue =
@@ -57,25 +63,39 @@ export const ForeignKeyFormatter = (props: Props) => {
       <span className="sb-grid-foreign-key-formatter__text">
         {formattedValue === null ? <NullValue /> : formattedValue}
       </span>
-      {relationship !== undefined && targetTable !== undefined && formattedValue !== null && (
-        <Popover_Shadcn_>
-          <PopoverTrigger_Shadcn_ asChild>
-            <ButtonTooltip
-              type="default"
-              className="w-6 h-6"
-              icon={<ArrowRight />}
-              onClick={(e) => e.stopPropagation()}
-              tooltip={{ content: { side: 'bottom', text: 'View referencing record' } }}
-            />
-          </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ portal align="end" className="p-0 w-96">
-            <ReferenceRecordPeek
-              table={targetTable}
-              column={relationship.target_column_name}
-              value={formattedValue}
-            />
-          </PopoverContent_Shadcn_>
-        </Popover_Shadcn_>
+      {isLoading && formattedValue !== null && (
+        <div className="w-6 h-6 flex items-center justify-center">
+          <ShimmeringLoader className="w-4 h-4" />
+        </div>
+      )}
+      {!isLoading && relationship !== undefined && formattedValue !== null && (
+        <>
+          {isLoadingTargetTable && (
+            <div className="w-6 h-6 flex items-center justify-center">
+              <ShimmeringLoader className="w-4 h-4" />
+            </div>
+          )}
+          {!isLoadingTargetTable && targetTable !== undefined && (
+            <Popover_Shadcn_>
+              <PopoverTrigger_Shadcn_ asChild>
+                <ButtonTooltip
+                  type="default"
+                  className="w-6 h-6"
+                  icon={<ArrowRight />}
+                  onClick={(e) => e.stopPropagation()}
+                  tooltip={{ content: { side: 'bottom', text: 'View referencing record' } }}
+                />
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_ portal align="end" className="p-0 w-96">
+                <ReferenceRecordPeek
+                  table={targetTable}
+                  column={relationship.target_column_name}
+                  value={formattedValue}
+                />
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
+          )}
+        </>
       )}
     </div>
   )

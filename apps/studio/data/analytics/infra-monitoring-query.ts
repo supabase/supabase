@@ -1,9 +1,10 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 
 import { get, handleError } from 'data/fetchers'
 import type { AnalyticsData, AnalyticsInterval } from './constants'
 import { analyticsKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export type InfraMonitoringAttribute =
   | 'max_cpu_usage'
@@ -13,6 +14,15 @@ export type InfraMonitoringAttribute =
   | 'disk_io_consumption'
   | 'pg_stat_database_num_backends'
   | 'supavisor_connections_active'
+  | 'realtime_connections_connected'
+  | 'realtime_channel_events'
+  | 'realtime_channel_db_events'
+  | 'realtime_channel_presence_events'
+  | 'realtime_channel_joins'
+  | 'realtime_authorization_rls_execution_time'
+  | 'realtime_payload_size'
+  | 'realtime_sum_connections_connected'
+  | 'realtime_replication_connection_lag'
 
 export type InfraMonitoringVariables = {
   projectRef?: string
@@ -76,42 +86,40 @@ export const useInfraMonitoringQuery = <TData = InfraMonitoringData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<InfraMonitoringData, InfraMonitoringError, TData> = {}
+  }: UseCustomQueryOptions<InfraMonitoringData, InfraMonitoringError, TData> = {}
 ) =>
-  useQuery<InfraMonitoringData, InfraMonitoringError, TData>(
-    analyticsKeys.infraMonitoring(projectRef, {
+  useQuery<InfraMonitoringData, InfraMonitoringError, TData>({
+    queryKey: analyticsKeys.infraMonitoring(projectRef, {
       attribute,
       startDate,
       endDate,
       interval,
       databaseIdentifier,
     }),
-    ({ signal }) =>
+    queryFn: ({ signal }) =>
       getInfraMonitoring(
         { projectRef, attribute, startDate, endDate, interval, databaseIdentifier },
         signal
       ),
-    {
-      enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        typeof attribute !== 'undefined' &&
-        typeof startDate !== 'undefined' &&
-        typeof endDate !== 'undefined',
-      select(data) {
-        return {
-          ...data,
-          data: data.data.map((x) => {
-            return {
-              ...x,
-              [attribute]:
-                modifier !== undefined ? modifier(Number(x[attribute])) : Number(x[attribute]),
-              periodStartFormatted: dayjs(x.period_start).format(dateFormat),
-            }
-          }),
-        } as TData
-      },
-      staleTime: 1000 * 60, // default good for a minute
-      ...options,
-    }
-  )
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      typeof attribute !== 'undefined' &&
+      typeof startDate !== 'undefined' &&
+      typeof endDate !== 'undefined',
+    select(data) {
+      return {
+        ...data,
+        data: data.data.map((x) => {
+          return {
+            ...x,
+            [attribute]:
+              modifier !== undefined ? modifier(Number(x[attribute])) : Number(x[attribute]),
+            periodStartFormatted: dayjs(x.period_start).format(dateFormat),
+          }
+        }),
+      } as TData
+    },
+    staleTime: 1000 * 60,
+    ...options,
+  })

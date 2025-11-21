@@ -1,5 +1,5 @@
-import type { Filter, FilterOperator, QueryTable, Sort, Dictionary } from './types'
 import { IQueryModifier, QueryModifier } from './QueryModifier'
+import type { Dictionary, Filter, FilterOperator, QueryTable, Sort } from './types'
 
 export interface IQueryFilter {
   filter: (column: string, operator: FilterOperator, value: string) => IQueryFilter
@@ -18,7 +18,7 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
     protected actionOptions?: { returning: boolean; enumArrayColumns?: string[] }
   ) {}
 
-  filter(column: string, operator: FilterOperator, value: any) {
+  filter(column: string | string[], operator: FilterOperator, value: any) {
     this.filters.push({ column, operator, value })
     return this
   }

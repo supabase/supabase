@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import anime from 'animejs'
+import { createTimeline } from 'animejs'
 import { Check, Copy } from 'lucide-react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import Typed from 'typed.js'
@@ -127,7 +127,7 @@ const FunctionsHero = () => {
   }, [])
 
   const animate = () => {
-    const tl = anime.timeline({
+    const tl = createTimeline({
       loop: false,
       autoplay: true,
     })

@@ -122,7 +122,7 @@ Sign up at [Supabase Dashboard](https://supabase.com/dashboard) and create a new
 
 ```dotenv
 NEXT_PUBLIC_SUPABASE_URL=https://<your-project>.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-project-apikey>
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<your-project-apikey>
 ```
 
 2. **Configure Production Variables:**

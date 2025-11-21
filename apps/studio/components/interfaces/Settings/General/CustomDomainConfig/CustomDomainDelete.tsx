@@ -5,6 +5,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
+import { DOCS_URL } from 'lib/constants'
 import { Trash } from 'lucide-react'
 import { Button } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
@@ -18,7 +19,9 @@ const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProp
   const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false)
   const { mutate: deleteCustomDomain } = useCustomDomainDeleteMutation({
     onSuccess: () => {
-      toast.success(`Successfully deleted custom domain`)
+      toast.success(
+        `Successfully deleted custom domain. It may take a few seconds before your custom domain is fully removed, hence you may need to refresh your browser.`
+      )
       setIsDeleteConfirmModalVisible(false)
     },
   })
@@ -49,7 +52,7 @@ const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProp
 
       <Panel.Content className="w-full">
         <div className="flex items-center justify-between">
-          <DocsButton href="https://supabase.com/docs/guides/platform/custom-domains" />
+          <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
           <Button
             type="danger"
             icon={<Trash />}

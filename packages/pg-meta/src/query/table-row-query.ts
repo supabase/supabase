@@ -21,6 +21,10 @@ export interface BuildTableRowsQueryArgs {
   page?: number
   maxCharacters?: number
   maxArraySize?: number
+  /**
+   * Columns that should not be used for default sorting
+   */
+  sortExcludedColumns?: string[]
 }
 
 // Text and JSON types that should be truncated
@@ -71,19 +75,33 @@ const LARGE_COLUMNS_TYPES_SET = new Set(LARGE_COLUMNS_TYPES)
 export const THRESHOLD_COUNT = 100000
 
 // Return the primary key columns if exists, otherwise return the first column to use as a default sort
-export const getDefaultOrderByColumns = (table: Pick<PGTable, 'primary_keys' | 'columns'>) => {
+export const getDefaultOrderByColumns = (
+  table: Pick<PGTable, 'primary_keys' | 'columns'>,
+  { excludedColumns = [] }: { excludedColumns?: string[] } = {}
+) => {
   const primaryKeyColumns = table.primary_keys?.map((pk) => pk.name)
-  if (primaryKeyColumns && primaryKeyColumns.length > 0) {
+  if (
+    primaryKeyColumns &&
+    primaryKeyColumns.length > 0 &&
+    !primaryKeyColumns.every((col) => excludedColumns.includes(col))
+  ) {
     return primaryKeyColumns
   }
   if (table.columns && table.columns.length > 0) {
-    return [table.columns[0].name]
+    const eligibleColumnsForSorting = table.columns.filter(
+      (x) => !x.data_type.includes('json') && !excludedColumns.includes(x.name)
+    )
+    if (eligibleColumnsForSorting.length > 0) return [eligibleColumnsForSorting[0].name]
+    else return []
   }
   return []
 }
 
 /**
  * Determines if a column type should be truncated based on its format and dataType
+ * Be aware if the logic in RowEditor.utils.ts -> isValueTruncated needs to be revised
+ * if we're updating the truncation logic, as it'll affect whether the Table Editor displays
+ * the data as truncated or not
  */
 export const shouldTruncateColumn = (columnFormat: string): boolean =>
   LARGE_COLUMNS_TYPES_SET.has(columnFormat.toLowerCase())
@@ -106,6 +124,7 @@ export const getTableRowsSql = ({
   limit,
   maxCharacters = MAX_CHARACTERS,
   maxArraySize = MAX_ARRAY_SIZE,
+  sortExcludedColumns = [],
 }: BuildTableRowsQueryArgs) => {
   if (!table || !table.columns) return ``
 
@@ -124,11 +143,13 @@ export const getTableRowsSql = ({
     )
   })
 
-  // If sorts is empty and table row count is within threshold, use the primary key as the default sort
+  // If sorts is empty and table row count is within threshold, use the primary key as the default sort.
   // Only apply for selections over a Table, not View, MaterializedViews, ...
   const liveRowCount = (table as PGTable).live_rows_estimate || 0
   if (sorts.length === 0 && liveRowCount <= THRESHOLD_COUNT && table.columns.length > 0) {
-    const defaultOrderByColumns = getDefaultOrderByColumns(table as PGTable)
+    const defaultOrderByColumns = getDefaultOrderByColumns(table as PGTable, {
+      excludedColumns: sortExcludedColumns,
+    })
     if (defaultOrderByColumns.length > 0) {
       defaultOrderByColumns.forEach((col) => {
         queryChains = queryChains.order(table.name, col)
@@ -194,10 +215,20 @@ export const getTableRowsSql = ({
       // This returns the first MAX_ARRAY_SIZE elements of the array (adjustable) and adds '...' if truncated
       // NOTE: this is not optimal, as the first element in the array could still be very large (more than 10Kb) and in such case
       // the trimming might fail.
+      // Also handle multi-dimentionals array truncation, but won't happen the extra `...` element to it as we can't determine what's
+      // the right number of items to generate within the array. Studio side, we'll consider any multi-dimentional array as possibly
+      // truncated.
       selectExpressions[index] = `
         case 
           when octet_length(${ident(columnName)}::text) > ${maxCharacters} 
-          then (select array_cat(${ident(columnName)}[1:${maxArraySize}]::${typeCast}, ${lastElement}::${typeCast}))::${typeCast}
+          then
+            case
+              when array_ndims(${ident(columnName)}) = 1
+              then
+                (select array_cat(${ident(columnName)}[1:${maxArraySize}]::${typeCast}, ${lastElement}::${typeCast}))::${typeCast}
+              else
+                ${ident(columnName)}[1:${maxArraySize}]::${typeCast}
+            end
           else ${ident(columnName)}::${typeCast}
         end
       `

@@ -1,12 +1,14 @@
 import dayjs from 'dayjs'
 import sumBy from 'lodash/sumBy'
-import { Archive, ChevronDown, Database, Key, Zap } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
+import { Auth, Database, Realtime, Storage } from 'icons'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
 import BarChart from 'components/ui/Charts/BarChart'
+import { InlineLink } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
 import {
   ProjectLogStatsVariables,
@@ -16,6 +18,7 @@ import {
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import type { ChartIntervals } from 'types'
 import {
   Button,
@@ -25,9 +28,14 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
   Loading,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 type ChartIntervalKey = ProjectLogStatsVariables['interval']
+
+const LOG_RETENTION = { free: 1, pro: 7, team: 28, enterprise: 90 }
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -36,7 +44,7 @@ const CHART_INTERVALS: ChartIntervals[] = [
     startValue: 1,
     startUnit: 'hour',
     format: 'MMM D, h:mma',
-    availableIn: ['free', 'pro', 'enterprise', 'team'],
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
     key: '1day',
@@ -44,21 +52,22 @@ const CHART_INTERVALS: ChartIntervals[] = [
     startValue: 24,
     startUnit: 'hour',
     format: 'MMM D, ha',
-    availableIn: ['free', 'pro', 'enterprise', 'team'],
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
-  // {
-  //   key: '',
-  //   label: 'Last 7 days',
-  //   startValue: 7,
-  //   startUnit: 'day',
-  //   format: 'MMM D',
-  //   availableIn: ['pro', 'enterprise', 'team'],
-  // },
+  {
+    key: '7day',
+    label: 'Last 7 days',
+    startValue: 7,
+    startUnit: 'day',
+    format: 'MMM D',
+    availableIn: ['pro', 'team', 'enterprise'],
+  },
 ]
 
 const ProjectUsage = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
     'project_auth:all',
@@ -97,14 +106,27 @@ const ProjectUsage = () => {
 
   const handleBarClick = (
     value: UsageApiCounts,
-    // TODO (ziinc): link to edge logs with correct filter applied
     _type: 'rest' | 'realtime' | 'storage' | 'auth'
   ) => {
     const unit = selectedInterval.startUnit
     const selectedStart = dayjs(value?.timestamp)
     const selectedEnd = selectedStart.add(1, unit)
+
+    if (_type === 'rest') {
+      router.push(
+        `/project/${projectRef}/logs/edge-logs?its=${selectedStart.toISOString()}&ite=${selectedEnd.toISOString()}`
+      )
+      return
+    }
+
     router.push(
-      `/project/${projectRef}/logs/edge-logs?ite=${encodeURIComponent(selectedEnd.toISOString())}`
+      `/project/${projectRef}/logs/edge-logs?its=${selectedStart.toISOString()}&ite=${selectedEnd.toISOString()}&f=${JSON.stringify(
+        {
+          product: {
+            [_type]: true,
+          },
+        }
+      )}`
     )
   }
 
@@ -124,15 +146,48 @@ const ProjectUsage = () => {
                 setInterval(interval as ProjectLogStatsVariables['interval'])
               }
             >
-              {CHART_INTERVALS.map((i) => (
-                <DropdownMenuRadioItem
-                  key={i.key}
-                  value={i.key}
-                  disabled={!i.availableIn?.includes(plan?.id || 'free')}
-                >
-                  {i.label}
-                </DropdownMenuRadioItem>
-              ))}
+              {CHART_INTERVALS.map((i) => {
+                const disabled = !i.availableIn?.includes(plan?.id || 'free')
+
+                if (disabled) {
+                  const retentionDuration = LOG_RETENTION[plan?.id ?? 'free']
+                  return (
+                    <Tooltip key={i.key}>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuRadioItem
+                          disabled
+                          value={i.key}
+                          className="!pointer-events-auto"
+                        >
+                          {i.label}
+                        </DropdownMenuRadioItem>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">
+                        <p>
+                          {plan?.name} plan only includes up to {retentionDuration} day
+                          {retentionDuration > 1 ? 's' : ''} of log retention
+                        </p>
+                        <p className="text-foreground-light">
+                          <InlineLink
+                            className="text-foreground-light hover:text-foreground"
+                            href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}
+                          >
+                            Upgrade your plan
+                          </InlineLink>{' '}
+                          to increase log retention and view statistics for the{' '}
+                          {i.label.toLowerCase()}
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )
+                } else {
+                  return (
+                    <DropdownMenuRadioItem key={i.key} value={i.key}>
+                      {i.label}
+                    </DropdownMenuRadioItem>
+                  )
+                }
+              })}
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -140,13 +195,13 @@ const ProjectUsage = () => {
           Statistics for {selectedInterval.label.toLowerCase()}
         </span>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-4">
-        <Panel className="mb-0 md:mb-0">
+      <div className="grid grid-cols-1 @md:grid-cols-2 gap-4 @2xl:grid-cols-4">
+        <Panel className="mb-0">
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
                 <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                  <Database strokeWidth={2} size={16} />
+                  <Database strokeWidth={1.5} size={16} />
                 </div>
               }
               title="Database"
@@ -172,7 +227,7 @@ const ProjectUsage = () => {
               <PanelHeader
                 icon={
                   <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                    <Key strokeWidth={2} size={16} />
+                    <Auth strokeWidth={1.5} size={16} />
                   </div>
                 }
                 title="Auth"
@@ -198,7 +253,7 @@ const ProjectUsage = () => {
               <PanelHeader
                 icon={
                   <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                    <Archive strokeWidth={2} size={16} />
+                    <Storage strokeWidth={1.5} size={16} />
                   </div>
                 }
                 title="Storage"
@@ -224,7 +279,7 @@ const ProjectUsage = () => {
             <PanelHeader
               icon={
                 <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                  <Zap strokeWidth={2} size={16} />
+                  <Realtime strokeWidth={1.5} size={16} />
                 </div>
               }
               title="Realtime"

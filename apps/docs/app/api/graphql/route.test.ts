@@ -3,15 +3,11 @@ import { POST } from './route'
 
 describe('/api/graphql basic error statuses', () => {
   beforeAll(() => {
-    vi.mock('server-only', () => {
-      return {}
-    })
     vi.spyOn(console, 'error').mockImplementation(() => {})
   })
 
   afterAll(() => {
     vi.restoreAllMocks()
-    vi.doUnmock('server-only')
   })
 
   beforeEach(() => {

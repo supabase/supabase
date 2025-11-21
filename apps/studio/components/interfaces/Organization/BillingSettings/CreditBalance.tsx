@@ -11,14 +11,16 @@ import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection'
 import NoPermission from 'components/ui/NoPermission'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { CreditTopUp } from './CreditTopUp'
 
 const CreditBalance = () => {
   const { slug } = useParams()
 
-  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
-    useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.subscriptions')
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
 
   const {
     data: subscription,
@@ -53,7 +55,9 @@ const CreditBalance = () => {
         {isPermissionsLoaded && !canReadSubscriptions ? (
           <NoPermission resourceText="view this organization's credits" />
         ) : (
-          <FormPanel footer={<CreditTopUp slug={slug} />}>
+          <FormPanel
+            footer={subscription?.billing_via_partner ? undefined : <CreditTopUp slug={slug} />}
+          >
             <FormSection>
               <FormSectionContent fullWidth loading={isLoading}>
                 {isError && (
@@ -69,7 +73,7 @@ const CreditBalance = () => {
                     <div className="flex items-center space-x-1">
                       {isDebt && <h4 className="opacity-50">-</h4>}
                       <h4 className="opacity-50">$</h4>
-                      <h2 className="text-2xl relative">{balance}</h2>
+                      <h1 className="relative">{balance}</h1>
                       {isCredit && <h4 className="opacity-50">/credits</h4>}
                     </div>
                   </div>

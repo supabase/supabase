@@ -2,91 +2,95 @@
 id: 'auth'
 title: 'Integrating With Supabase Auth'
 description: 'Supabase Edge Functions and Auth.'
-subtitle: 'Supabase Edge Functions and Auth.'
+subtitle: 'Integrate Supabase Auth with Edge Functions'
 ---
 
 Edge Functions work seamlessly with [Supabase Auth](/docs/guides/auth).
 
-## Auth context
+This allows you to:
 
-When a user makes a request to an Edge Function, you can use the Authorization header to set the Auth context in the Supabase client:
+- Automatically identify users through JWT tokens
+- Enforce Row Level Security policies
+- Seamlessly integrate with your existing auth flow
+
+---
+
+## Setting up auth context
+
+When a user makes a request to an Edge Function, you can use the `Authorization` header to set the Auth context in the Supabase client and enforce Row Level Security policies.
 
 ```js
-import { createClient } from 'jsr:@supabase/supabase-js@2'
+import { createClient } from 'npm:@supabase/supabase-js@2'
 
 Deno.serve(async (req: Request) => {
-
   const supabaseClient = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
     Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+    // Create client with Auth context of the user that called the function.
+    // This way your row-level-security (RLS) policies are applied.
+    {
+      global: {
+        headers: { Authorization: req.headers.get('Authorization')! },
+      },
+    }
   );
 
-  // Get the session or user object
-  const authHeader = req.headers.get('Authorization')!;
-  const token = authHeader.replace('Bearer ', '');
-  const { data } = await supabaseClient.auth.getUser(token);
-
+  //...
 })
 ```
 
-Importantly, this is done _inside_ the `Deno.serve()` callback argument, so that the Authorization header is set for each request.
+<Admonition type="note">
+
+Importantly, this is done _inside_ the `Deno.serve()` callback argument, so that the `Authorization` header is set for each individual request!
+
+</Admonition>
+
+---
 
 ## Fetching the user
 
-After initializing a Supabase client with the Auth context, you can use `getUser()` to fetch the user object, and run queries in the context of the user with [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) policies enforced.
+By getting the JWT from the `Authorization` header, you can provide the token to `getUser()` to fetch the user object to obtain metadata for the logged in user.
 
 ```js
-import { createClient } from 'jsr:@supabase/supabase-js@2'
-
 Deno.serve(async (req: Request) => {
-
-  const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-  )
-
-  // Get the session or user object
+  // ...
   const authHeader = req.headers.get('Authorization')!
   const token = authHeader.replace('Bearer ', '')
   const { data } = await supabaseClient.auth.getUser(token)
-  const user = data.user
-
-  return new Response(JSON.stringify({ user }), {
-    headers: { 'Content-Type': 'application/json' },
-    status: 200,
-  })
-
+  // ...
 })
 ```
+
+---
 
 ## Row Level Security
 
 After initializing a Supabase client with the Auth context, all queries will be executed with the context of the user. For database queries, this means [Row Level Security](/docs/guides/database/postgres/row-level-security) will be enforced.
 
 ```js
-import { createClient } from 'jsr:@supabase/supabase-js@2'
+import { createClient } from 'npm:@supabase/supabase-js@2'
 
 Deno.serve(async (req: Request) => {
-
-  const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-  );
-
-  // Get the session or user object
-  const authHeader = req.headers.get('Authorization')!;
-  const token = authHeader.replace('Bearer ', '');
-  const { data: userData } = await supabaseClient.auth.getUser(token);
+  // ...
+  // This query respects RLS - users only see rows they have access to
   const { data, error } = await supabaseClient.from('profiles').select('*');
 
-  return new Response(JSON.stringify({ data }), {
-    headers: { 'Content-Type': 'application/json' },
-    status: 200,
-  })
+  if (error) {
+    return new Response('Database error', { status: 500 })
+  }
 
+  // ...
 })
 ```
 
-## Example code
+---
 
-See a full [example on GitHub](https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/select-from-table-with-auth-rls/index.ts).
+## Example
+
+See the full [example on GitHub](https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/select-from-table-with-auth-rls/index.ts).
+
+<$CodeSample
+path="/edge-functions/supabase/functions/select-from-table-with-auth-rls/index.ts"
+title="Select from table with auth RLS"
+language="typescript"
+/>

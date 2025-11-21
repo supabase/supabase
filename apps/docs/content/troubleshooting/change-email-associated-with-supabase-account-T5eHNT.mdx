@@ -7,12 +7,13 @@ keywords = [ "email", "account", "authentication" ]
 database_id = "6de3c3a9-8614-48d7-827e-cf41d6a1ce23"
 ---
 
-Currently, there isn't a direct way to change the email address of an existing Supabase account.
-
 If you are using Email Authentication to login into your Supabase account:
 
-- Invite a new email address to your Supabase Organization(s) as an Organization owner.
-- After signing up for a new account with your new email address and confirming you have access to the Organization(s) with your new account, you can leave the Organization(s) from your previous account.
+Go to [**Account Settings > Preferences**](/dashboard/account/me)
+
+- Find your email under **Account Identities** and click the edit icon
+- After saving the new address, an email is sent to _both the old and new email addresses_
+- Your account email is updated after clicking the link _in both emails_
 
 If you are using GitHub Authentication to login into your Supabase account:
 

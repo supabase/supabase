@@ -1,4 +1,4 @@
-import { pick } from 'lodash'
+import { pick } from 'lodash-es'
 
 /**
  * Gets the Notion team to send feedback to based on the pathname.

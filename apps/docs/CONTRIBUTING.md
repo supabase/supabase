@@ -147,7 +147,7 @@ If you're a library maintainer, follow these steps when updating function parame
 
 ## Content reuse
 
-If you copy the same content multiple times across different files, create a **partial** for content reuse instead. Partials are MDX files contained in [`apps/docs/components/MDX`](https://github.com/supabase/supabase/tree/master/apps/docs/components/MDX). They contain reusable snippets that can be inserted in multiple pages. For example, you can create a partial to define a common setup step for a group of tutorials.
+If you copy the same content multiple times across different files, create a **partial** for content reuse instead. Partials are MDX files contained in [`apps/docs/content/_partials`](https://github.com/supabase/supabase/tree/master/apps/docs/content/_partials). They contain reusable snippets that can be inserted in multiple pages. For example, you can create a partial to define a common setup step for a group of tutorials.
 
 To use a partial, import it into your MDX file. You can also set up a partial to automatically import by including it in the `components` within [`apps/docs/components/index.tsx`](https://github.com/supabase/supabase/blob/master/apps/docs/components/index.tsx).
 

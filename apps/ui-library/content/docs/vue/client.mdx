@@ -1,0 +1,59 @@
+---
+title: Supabase Client Libraries
+description: Supabase client for Vue Single Page Applications
+---
+
+## Installation
+
+<BlockItem name="supabase-client-vue" description="Supabase Client for Vue SPA" />
+
+## Folder structure
+
+<RegistryBlock itemName="supabase-client-vue" />
+
+## Usage
+
+This block installs a Supabase client for connecting your Vue project to Supabase. It's designed for use in client-side components.
+
+If you've already set up a Supabase client in your project, you can just continue using that existing setup.
+
+### Getting started
+
+After installing the block, you'll have the following environment variables in your `.env.local` file:
+
+```env
+VITE_SUPABASE_URL=
+VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY=
+```
+
+- If you're using supabase.com, you can find these values in the [Connect modal](https://supabase.com/dashboard/project/_?showConnect=true&tab=frameworks&framework=vuejs&using=supabasejs) under App Frameworks or in your project's [API keys](https://supabase.com/dashboard/project/_/settings/api-keys).
+
+- If you're using a local instance of Supabase, you can find these values by running `supabase start` or `supabase status` (if you already have it running).
+
+You can use the client in your Vue component like following:
+
+```vue
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { createClient } from './lib/supabase/client'
+
+const profile = ref(null)
+
+onMounted(async () => {
+  const { data, error } = await createClient.from('profiles').select('*').single()
+
+  if (!error) profile.value = data
+})
+</script>
+
+<template>
+  <div>
+    {{ profile }}
+  </div>
+</template>
+```
+
+## Further reading
+
+- [Generating TypeScript types for your client](https://supabase.com/docs/guides/api/rest/generating-types)
+- [Use Supabase with Vue](https://supabase.com/docs/guides/getting-started/quickstarts/vue)

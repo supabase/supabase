@@ -17,7 +17,9 @@ hideToc: true
 
     <StepHikeCompact.Details title="Create a Vue app">
 
-    Create a Vue app using the `npm init` command.
+    - Create a Vue app using the `npm init` command.
+
+    <$Partial path="uiLibCta.mdx" />
 
     </StepHikeCompact.Details>
 
@@ -56,7 +58,8 @@ hideToc: true
     Create a `.env.local` file and populate with your Supabase connection variables:
 
     <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="anonKey" />
+    <ProjectConfigVariables variable="publishable" />
+    <ProjectConfigVariables variable="anon" />
 
     </StepHikeCompact.Details>
 
@@ -66,7 +69,7 @@ hideToc: true
 
         ```text name=.env.local
         VITE_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
-        VITE_SUPABASE_ANON_KEY=<SUBSTITUTE_SUPABASE_ANON_KEY>
+        VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
         ```
 
       </$CodeTabs>
@@ -88,9 +91,9 @@ hideToc: true
       import { createClient } from '@supabase/supabase-js'
 
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+      const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
 
-      export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+      export const supabase = createClient(supabaseUrl, supabasePublishableKey)
       ```
 
     </StepHikeCompact.Code>

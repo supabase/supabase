@@ -6,68 +6,72 @@ import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
 
 export const LAYOUT_COLUMN_COUNT = 2
 
-interface ReportsDatetimeHelper extends DatetimeHelper {
+export interface ReportsDatetimeHelper extends DatetimeHelper {
   availableIn: PlanId[]
+}
+
+export enum REPORT_DATERANGE_HELPER_LABELS {
+  LAST_10_MINUTES = 'Last 10 minutes',
+  LAST_30_MINUTES = 'Last 30 minutes',
+  LAST_60_MINUTES = 'Last 60 minutes',
+  LAST_3_HOURS = 'Last 3 hours',
+  LAST_24_HOURS = 'Last 24 hours',
+  LAST_7_DAYS = 'Last 7 days',
+  LAST_14_DAYS = 'Last 14 days',
+  LAST_28_DAYS = 'Last 28 days',
 }
 
 export const REPORTS_DATEPICKER_HELPERS: ReportsDatetimeHelper[] = [
   {
-    text: 'Last 10 minutes',
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_10_MINUTES,
     calcFrom: () => dayjs().subtract(10, 'minute').toISOString(),
     calcTo: () => dayjs().toISOString(),
-    availableIn: ['team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
-    text: 'Last 30 minutes',
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_30_MINUTES,
     calcFrom: () => dayjs().subtract(30, 'minute').toISOString(),
     calcTo: () => dayjs().toISOString(),
-    availableIn: ['team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
-    text: 'Last 60 minutes',
-    calcFrom: () => dayjs().subtract(1, 'hour').startOf('day').toISOString(),
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES,
+    calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
     calcTo: () => dayjs().toISOString(),
     default: true,
     availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
-    text: 'Last 3 hours',
-    calcFrom: () => dayjs().subtract(3, 'hour').startOf('day').toISOString(),
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS,
+    calcFrom: () => dayjs().subtract(3, 'hour').toISOString(),
     calcTo: () => dayjs().toISOString(),
     availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
-    text: 'Last 24 hours',
-    calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS,
+    calcFrom: () => dayjs().subtract(1, 'day').toISOString(),
     calcTo: () => dayjs().toISOString(),
     availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
-    text: 'Last 7 days',
-    calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
-    calcTo: () => '',
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_7_DAYS,
+    calcFrom: () => dayjs().subtract(7, 'day').toISOString(),
+    calcTo: () => dayjs().toISOString(),
     availableIn: ['pro', 'team', 'enterprise'],
   },
   {
-    text: 'Last 14 days',
-    calcFrom: () => dayjs().subtract(14, 'day').startOf('day').toISOString(),
-    calcTo: () => '',
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_14_DAYS,
+    calcFrom: () => dayjs().subtract(14, 'day').toISOString(),
+    calcTo: () => dayjs().toISOString(),
     availableIn: ['team', 'enterprise'],
   },
   {
-    text: 'Last 28 days',
-    calcFrom: () => dayjs().subtract(28, 'day').startOf('day').toISOString(),
-    calcTo: () => '',
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_28_DAYS,
+    calcFrom: () => dayjs().subtract(28, 'day').toISOString(),
+    calcTo: () => dayjs().toISOString(),
     availableIn: ['team', 'enterprise'],
   },
 ]
-
-export const createFilteredDatePickerHelpers = (planId: PlanId) => {
-  return REPORTS_DATEPICKER_HELPERS.map((helper) => ({
-    ...helper,
-    disabled: !helper.availableIn?.includes(planId),
-  }))
-}
 
 export const DEFAULT_QUERY_PARAMS = {
   iso_timestamp_start: REPORTS_DATEPICKER_HELPERS[0].calcFrom(),
@@ -82,13 +86,41 @@ export const generateRegexpWhere = (filters: ReportFilterItem[], prepend = true)
       const normalizedKey = [splitKey[splitKey.length - 2], splitKey[splitKey.length - 1]].join('.')
       const filterKey = filter.key.includes('.') ? normalizedKey : filter.key
 
-      if (filter.compare === 'matches') {
-        return `REGEXP_CONTAINS(${filterKey}, '${filter.value}')`
-      } else if (filter.compare === 'is') {
-        return `${filterKey} = ${filter.value}`
+      const hasQuotes =
+        filter.value.toString().includes('"') || filter.value.toString().includes("'")
+
+      const valueIsNumber = !isNaN(Number(filter.value))
+      const valueWithQuotes = !valueIsNumber && hasQuotes ? filter.value : `'${filter.value}'`
+      const lowercaseValue = !valueIsNumber && String(valueWithQuotes).toLowerCase()
+
+      const finalValue = valueIsNumber ? filter.value : lowercaseValue
+
+      // Handle different comparison operators
+      switch (filter.compare) {
+        case 'matches':
+          return `REGEXP_CONTAINS(${filterKey}, ${finalValue})`
+        case 'is':
+          return `${filterKey} = ${finalValue}`
+        case '!=':
+          return `${filterKey} != ${finalValue}`
+        case '>=':
+          return `${filterKey} >= ${finalValue}`
+        case '<=':
+          return `${filterKey} <= ${finalValue}`
+        case '>':
+          return `${filterKey} > ${finalValue}`
+        case '<':
+          return `${filterKey} < ${finalValue}`
+        default:
+          // Fallback to exact match for unknown operators
+          return `${filterKey} = ${finalValue}`
       }
     })
+    .filter(Boolean) // Remove any null/undefined conditions
     .join(' AND ')
+
+  if (conditions === '') return ''
+
   if (prepend) {
     return 'WHERE ' + conditions
   } else {
@@ -281,7 +313,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       cacheHitRate: {
         queryType: 'logs',
         // storage report does not perform any filtering
-        sql: (_filters) => `
+        sql: (filters) => `
         -- reports-storage-cache-hit-rate
 SELECT
   timestamp_trunc(timestamp, hour) as timestamp,
@@ -293,6 +325,7 @@ from edge_logs f
   cross join unnest(m.response) as res
   cross join unnest(res.headers) as h
 where starts_with(r.path, '/storage/v1/object') and r.method = 'GET'
+  ${generateRegexpWhere(filters, false)}
 group by timestamp
 order by timestamp desc
 `,
@@ -300,7 +333,7 @@ order by timestamp desc
       topCacheMisses: {
         queryType: 'logs',
         // storage report does not perform any filtering
-        sql: (_filters) => `
+        sql: (filters) => `
         -- reports-storage-top-cache-misses
 SELECT
   r.path as path,
@@ -311,9 +344,10 @@ from edge_logs f
   cross join unnest(m.request) as r
   cross join unnest(m.response) as res
   cross join unnest(res.headers) as h
-where starts_with(r.path, '/storage/v1/object') 
+where starts_with(r.path, '/storage/v1/object')
   and r.method = 'GET'
   and h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')
+  ${generateRegexpWhere(filters, false)}
 group by path, search
 order by count desc
 limit 12
@@ -344,10 +378,20 @@ select
     -- min_time,
     -- max_time,
     -- mean_time,
-    statements.rows / statements.calls as avg_rows${
+    statements.rows / statements.calls as avg_rows,
+    statements.rows as rows_read,
+    case 
+      when (statements.shared_blks_hit + statements.shared_blks_read) > 0 
+      then round(
+        (statements.shared_blks_hit * 100.0) / 
+        (statements.shared_blks_hit + statements.shared_blks_read), 
+        2
+      )
+      else 0
+    end as cache_hit_rate${
       runIndexAdvisor
         ? `,
-    case 
+    case
       when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
       then (
         select json_build_object(
@@ -381,10 +425,11 @@ select
     statements.query,
     statements.calls,
     statements.total_exec_time + statements.total_plan_time as total_time,
-    to_char(((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) OVER()) * 100, 'FM90D0') || '%'  AS prop_total_time${
+    statements.mean_exec_time + statements.mean_plan_time as mean_time,
+    ((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) OVER()) * 100 as prop_total_time${
       runIndexAdvisor
         ? `,
-    case 
+    case
       when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
       then (
         select json_build_object(
@@ -430,7 +475,7 @@ select
     statements.rows / statements.calls as avg_rows${
       runIndexAdvisor
         ? `,
-    case 
+    case
       when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
       then (
         select json_build_object(
@@ -466,6 +511,94 @@ select
     sum(heap_blks_hit) / nullif(sum(heap_blks_hit) + sum(heap_blks_read),0) as ratio
   from pg_statio_user_tables;`,
       },
+      unified: {
+        queryType: 'db',
+        sql: (_params, where, orderBy, runIndexAdvisor = false) => `
+        -- reports-query-performance-unified
+        set search_path to public, extensions;
+
+        select
+            auth.rolname,
+            statements.query,
+            statements.calls,
+            -- -- Postgres 13, 14, 15
+            statements.total_exec_time + statements.total_plan_time as total_time,
+            statements.min_exec_time + statements.min_plan_time as min_time,
+            statements.max_exec_time + statements.max_plan_time as max_time,
+            statements.mean_exec_time + statements.mean_plan_time as mean_time,
+            -- -- Postgres <= 12
+            -- total_time,
+            -- min_time,
+            -- max_time,
+            -- mean_time,
+            statements.rows / statements.calls as avg_rows,
+            statements.rows as rows_read,
+            statements.shared_blks_hit as debug_hit,
+            statements.shared_blks_read as debug_read,
+            case 
+              when (statements.shared_blks_hit + statements.shared_blks_read) > 0 
+              then (statements.shared_blks_hit::numeric * 100.0) / 
+                   (statements.shared_blks_hit + statements.shared_blks_read)
+              else 0
+            end as cache_hit_rate,
+            ((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) OVER()) * 100 as prop_total_time${
+              runIndexAdvisor
+                ? `,
+            case
+              when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
+              then (
+                select json_build_object(
+                  'has_suggestion', array_length(index_statements, 1) > 0,
+                  'startup_cost_before', startup_cost_before,
+                  'startup_cost_after', startup_cost_after,
+                  'total_cost_before', total_cost_before,
+                  'total_cost_after', total_cost_after,
+                  'index_statements', index_statements
+                )
+                from index_advisor(statements.query)
+              )
+              else null
+            end as index_advisor_result`
+                : ''
+            }
+          from pg_stat_statements as statements
+            inner join pg_authid as auth on statements.userid = auth.oid
+          ${where || ''}
+          ${orderBy || 'order by statements.total_exec_time + statements.total_plan_time desc'}
+          limit 20`,
+      },
+      slowQueriesCount: {
+        queryType: 'db',
+        sql: () => `
+        -- reports-query-performance-slow-queries-count
+        set search_path to public, extensions;
+
+        -- Count of slow queries (> 1 second average)
+        SELECT count(*) as slow_queries_count
+        FROM pg_stat_statements 
+        WHERE statements.mean_exec_time > 1000;`,
+      },
+      queryMetrics: {
+        queryType: 'db',
+        sql: (_params, where, orderBy, runIndexAdvisor = false) => `
+        -- reports-query-performance-metrics
+        set search_path to public, extensions;
+      
+        SELECT 
+          COALESCE(ROUND(AVG(statements.rows::numeric / NULLIF(statements.calls, 0)), 1), 0) as avg_rows_per_call,
+          COUNT(*) FILTER (WHERE statements.total_exec_time + statements.total_plan_time > 1000) as slow_queries,
+          COALESCE(
+            ROUND(
+              SUM(statements.shared_blks_hit) * 100.0 / 
+              NULLIF(SUM(statements.shared_blks_hit + statements.shared_blks_read), 0), 
+              2
+            ), 0
+          ) || '%' as cache_hit_rate
+        FROM pg_stat_statements as statements
+        WHERE statements.calls > 0
+        ${where || ''}
+        ${orderBy || ''}`,
+      },
     },
   },
   [Presets.DATABASE]: {
@@ -474,12 +607,12 @@ select
       largeObjects: {
         queryType: 'db',
         sql: (_) => `-- reports-database-large-objects
-SELECT 
+SELECT
         SCHEMA_NAME,
         relname,
         table_size
       FROM
-        (SELECT 
+        (SELECT
           pg_catalog.pg_namespace.nspname AS SCHEMA_NAME,
           relname,
           pg_total_relation_size(pg_catalog.pg_class.oid) AS table_size
@@ -505,4 +638,77 @@ export const DEPRECATED_REPORTS = [
   'total_storage_options_requests',
   'total_storage_patch_requests',
   'total_options_requests',
+  'total_rest_ingress',
+  'total_rest_get_requests',
+  'total_rest_post_requests',
+  'total_rest_patch_requests',
+  'total_rest_delete_requests',
+  'total_storage_get_requests',
+  'total_storage_post_requests',
+  'total_storage_delete_requests',
+  'total_auth_delete_requests',
+  'total_get_requests',
+  'total_patch_requests',
+  'total_post_requests',
+  'total_ingress',
+  'total_delete_requests',
 ]
+
+export const EDGE_FUNCTION_REGIONS = [
+  {
+    key: 'ap-northeast-1',
+    label: 'Tokyo',
+  },
+  {
+    key: 'ap-northeast-2',
+    label: 'Seoul',
+  },
+  {
+    key: 'ap-south-1',
+    label: 'Mumbai',
+  },
+  {
+    key: 'ap-southeast-1',
+    label: 'Singapore',
+  },
+  {
+    key: 'ap-southeast-2',
+    label: 'Sydney',
+  },
+  {
+    key: 'ca-central-1',
+    label: 'Canada Central',
+  },
+  {
+    key: 'us-east-1',
+    label: 'N. Virginia',
+  },
+  {
+    key: 'us-west-1',
+    label: 'N. California',
+  },
+  {
+    key: 'us-west-2',
+    label: 'Oregon',
+  },
+  {
+    key: 'eu-central-1',
+    label: 'Frankfurt',
+  },
+  {
+    key: 'eu-west-1',
+    label: 'Ireland',
+  },
+  {
+    key: 'eu-west-2',
+    label: 'London',
+  },
+  {
+    key: 'eu-west-3',
+    label: 'Paris',
+  },
+  {
+    key: 'sa-east-1',
+    label: 'São Paulo',
+  },
+] as const

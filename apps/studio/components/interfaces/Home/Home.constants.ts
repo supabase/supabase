@@ -1,49 +1,3 @@
-export const CLIENT_LIBRARIES = [
-  {
-    language: 'JavaScript',
-    officialSupport: true,
-    releaseState: undefined,
-    docsUrl: 'https://supabase.com/docs/reference/javascript/installing',
-    gitUrl: 'https://github.com/supabase/supabase-js',
-  },
-  {
-    language: 'Flutter',
-    officialSupport: true,
-    releaseState: undefined,
-    docsUrl: 'https://supabase.com/docs/reference/dart/installing',
-    gitUrl: 'https://github.com/supabase/supabase-flutter',
-  },
-  {
-    language: 'Python',
-    officialSupport: true,
-    releaseState: 'Alpha',
-    docsUrl: 'https://supabase.com/docs/reference/python/initializing',
-    gitUrl: 'https://github.com/supabase/supabase-py',
-  },
-  {
-    language: 'C#',
-    officialSupport: false,
-    releaseState: undefined,
-    docsUrl: 'https://supabase.com/docs/reference/csharp/installing',
-    gitUrl: 'https://github.com/supabase-community/supabase-csharp',
-    altIconName: 'c-sharp',
-  },
-  {
-    language: 'Swift',
-    officialSupport: true,
-    releaseState: undefined,
-    docsUrl: 'https://supabase.com/docs/reference/swift/initializing',
-    gitUrl: 'https://github.com/supabase/supabase-swift',
-  },
-  {
-    language: 'Kotlin',
-    officialSupport: false,
-    releaseState: undefined,
-    docsUrl: 'https://supabase.com/docs/reference/kotlin/installing',
-    gitUrl: 'https://github.com/supabase-community/supabase-kt',
-  },
-]
-
 export const EXAMPLE_PROJECTS = [
   {
     framework: 'Svelte',
@@ -63,7 +17,7 @@ export const EXAMPLE_PROJECTS = [
     framework: 'nextjs',
     title: 'Next.js Subscription and Auth',
     description: 'The all-in-one starter kit for high-performance SaaS applications.',
-    url: 'https://github.com/vercel/nextjs-subscription-payments',
+    url: 'https://github.com/nextjs/saas-starter',
     type: 'app',
   },
   {

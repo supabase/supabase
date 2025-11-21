@@ -1,16 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
+import { LogsPreviewer } from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 
 const LogsPage: NextPageWithLayout = () => {
-  const { project } = useProjectContext()
-  const canReadAuthLogs = useCheckPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
+  const { data: project } = useSelectedProjectQuery()
+  const { can: canReadAuthLogs } = useAsyncCheckPermissions(
+    PermissionAction.ANALYTICS_READ,
+    'logflare'
+  )
 
   return !canReadAuthLogs ? (
     <NoPermission isFullPage resourceText="access your project's authentication logs" />

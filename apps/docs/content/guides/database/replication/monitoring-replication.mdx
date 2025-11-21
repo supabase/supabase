@@ -4,12 +4,12 @@ title: 'Monitoring replication'
 
 Monitoring replication lag is important and there are 3 ways to do this:
 
-1. Dashboard - Under the [Reports](/guides/platform/reports) of the dashboard, you can view the replication lag of your project
+1. Dashboard - Under the [Reports](/docs/guides/platform/reports) of the dashboard, you can view the replication lag of your project
 2. Database -
    - pg_stat_subscription (subscriber) - if PID is null, then the subscription is not active
    - pg_stat_subscription_stats - look here for error_count to see if there were issues applying or syncing (if yes, check the logs for why)
    - pg_replication_slots - use this to check if the slot is active and you can also calculate the lag from here
-3. [Metrics](/guides/telemetry/metrics) - Using the prometheus endpoint for your project
+3. [Metrics](/docs/guides/telemetry/metrics) - Using the prometheus endpoint for your project
    - replication_slots_max_lag_bytes - this is the more important one
    - pg_stat_replication_replay_lag - lag to replay WAL files from the source DB on the target DB (throttled by disk or high activity)
    - pg_stat_replication_send_lag - lag in sending WAL files from the source DB (a high lag means that the publisher is not being asked to send new WAL files OR a network issues)

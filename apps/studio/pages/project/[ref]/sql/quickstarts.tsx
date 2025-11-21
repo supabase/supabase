@@ -2,7 +2,6 @@ import { useParams } from 'next/navigation'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
-import { useIsSQLEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import SQLQuickstarts from 'components/interfaces/SQLEditor/SQLTemplates/SQLQuickstarts'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
@@ -16,25 +15,20 @@ const SqlQuickstarts: NextPageWithLayout = () => {
   const { ref } = useParams<{ ref: string }>()
   const tabs = useTabsStateSnapshot()
 
-  const isSqlEditorTabsEnabled = useIsSQLEditorTabsEnabled()
-
   useEffect(() => {
-    if (isSqlEditorTabsEnabled) {
-      if (!router.isReady) return
+    if (!router.isReady) return
 
-      const tabId = createTabId('sql', { id: 'quickstarts' })
-
-      tabs.addTab({
-        id: tabId,
-        type: 'sql',
-        label: 'Quickstarts',
-        metadata: {
-          sqlId: 'quickstarts',
-          name: 'quickstarts',
-        },
-      })
-    }
-  }, [router.isReady, isSqlEditorTabsEnabled, ref])
+    const tabId = createTabId('sql', { id: 'quickstarts' })
+    tabs.addTab({
+      id: tabId,
+      type: 'sql',
+      label: 'Quickstarts',
+      metadata: {
+        sqlId: 'quickstarts',
+        name: 'quickstarts',
+      },
+    })
+  }, [router.isReady, ref])
 
   return <SQLQuickstarts />
 }

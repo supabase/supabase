@@ -4,6 +4,7 @@
 #
 # [error_code]
 # description = "Error description."
+# resolution = "How to resolve this error."
 # [[error_code.references]]
 # href = "https://supabase.com/docs/some/relevant/guide"
 # description = "Guide for doing some relevant thing"

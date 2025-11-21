@@ -1,15 +1,17 @@
 import { useParams } from 'common'
 import { useState } from 'react'
 
-import { GeneralContent, ResourceContent, RpcContent } from 'components/interfaces/Docs'
-import LangSelector from 'components/interfaces/Docs/LangSelector'
+import { GeneralContent } from 'components/interfaces/Docs/GeneralContent'
+import { LangSelector } from 'components/interfaces/Docs/LangSelector'
+import { ResourceContent } from 'components/interfaces/Docs/ResourceContent'
+import { RpcContent } from 'components/interfaces/Docs/RpcContent'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import DocsLayout from 'components/layouts/DocsLayout/DocsLayout'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { snakeToCamel } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const PageConfig: NextPageWithLayout = () => {
   return <DocView />
@@ -29,7 +31,7 @@ const DocView = () => {
 
   const { ref: projectRef, page, resource, rpc } = useParams()
   const [selectedLang, setSelectedLang] = useState<any>('js')
-  const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
+  const [selectedApikey, setSelectedApiKey] = useState<any>(DEFAULT_KEY)
 
   const { data: settings, error: settingsError } = useProjectSettingsV2Query({ projectRef })
   const {
@@ -112,9 +114,9 @@ const DocView = () => {
         <div className="sticky top-0 z-40 flex flex-row-reverse w-full ">
           <LangSelector
             selectedLang={selectedLang}
-            showApiKey={showApiKey}
+            selectedApiKey={selectedApikey}
             setSelectedLang={setSelectedLang}
-            setShowApiKey={setShowApiKey}
+            setSelectedApiKey={setSelectedApiKey}
           />
         </div>
         <div>
@@ -124,7 +126,7 @@ const DocView = () => {
               selectedLang={selectedLang}
               resourceId={resource}
               resources={resources}
-              showApiKey={showApiKey.key}
+              showApiKey={selectedApikey.key}
               refreshDocs={refreshDocs}
             />
           ) : rpc ? (
@@ -133,11 +135,15 @@ const DocView = () => {
               rpcId={rpc}
               paths={paths}
               rpcs={rpcs}
-              showApiKey={showApiKey.key}
+              showApiKey={selectedApikey.key}
               refreshDocs={refreshDocs}
             />
           ) : (
-            <GeneralContent selectedLang={selectedLang} showApiKey={showApiKey.key} page={page} />
+            <GeneralContent
+              selectedLang={selectedLang}
+              showApiKey={selectedApikey.key}
+              page={page}
+            />
           )}
         </div>
       </div>

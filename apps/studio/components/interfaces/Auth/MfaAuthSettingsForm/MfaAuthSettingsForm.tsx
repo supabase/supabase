@@ -3,19 +3,19 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { number, object, string } from 'yup'
+import { boolean, number, object, string } from 'yup'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import {
-  AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
@@ -26,14 +26,17 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  Select_Shadcn_,
+  PrePostTab,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
+  Switch,
   WarningIcon,
-  PrePostTab,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 function determineMFAStatus(verifyEnabled: boolean, enrollEnabled: boolean) {
@@ -78,19 +81,37 @@ const phoneSchema = object({
   MFA_PHONE_TEMPLATE: string().required('SMS template is required.'),
 })
 
-const MfaAuthSettingsForm = () => {
+const securitySchema = object({
+  MFA_ALLOW_LOW_AAL: boolean().required(),
+})
+
+export const MfaAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
-  const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
+  const {
+    data: authConfig,
+    error: authConfigError,
+    isError,
+    isLoading,
+  } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
   // Separate loading states for each form
   const [isUpdatingTotpForm, setIsUpdatingTotpForm] = useState(false)
   const [isUpdatingPhoneForm, setIsUpdatingPhoneForm] = useState(false)
+  const [isUpdatingSecurityForm, setIsUpdatingSecurityForm] = useState(false)
 
-  const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false)
 
-  const organization = useSelectedOrganization()
+  const { can: canReadConfig } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'custom_config_gotrue'
+  )
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
+
+  const { data: organization } = useSelectedOrganizationQuery()
   const isProPlanAndUp = organization?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
 
@@ -114,6 +135,13 @@ const MfaAuthSettingsForm = () => {
       MFA_PHONE: 'Disabled',
       MFA_PHONE_OTP_LENGTH: 6,
       MFA_PHONE_TEMPLATE: 'Your code is {{ .Code }}',
+    },
+  })
+
+  const securityForm = useForm({
+    resolver: yupResolver(securitySchema),
+    defaultValues: {
+      MFA_ALLOW_LOW_AAL: false,
     },
   })
 
@@ -141,8 +169,14 @@ const MfaAuthSettingsForm = () => {
           MFA_PHONE_TEMPLATE: authConfig?.MFA_PHONE_TEMPLATE || 'Your code is {{ .Code }}',
         })
       }
+
+      if (!isUpdatingSecurityForm) {
+        securityForm.reset({
+          MFA_ALLOW_LOW_AAL: authConfig?.MFA_ALLOW_LOW_AAL ?? true,
+        })
+      }
     }
-  }, [authConfig, isUpdatingTotpForm, isUpdatingPhoneForm])
+  }, [authConfig, isUpdatingTotpForm, isUpdatingPhoneForm, isUpdatingSecurityForm])
 
   const onSubmitTotpForm = (values: any) => {
     const { verifyEnabled: MFA_TOTP_VERIFY_ENABLED, enrollEnabled: MFA_TOTP_ENROLL_ENABLED } =
@@ -167,6 +201,26 @@ const MfaAuthSettingsForm = () => {
         onSuccess: () => {
           toast.success('Successfully updated TOTP settings')
           setIsUpdatingTotpForm(false)
+        },
+      }
+    )
+  }
+
+  const onSubmitSecurityForm = (values: any) => {
+    const payload = { ...values }
+
+    setIsUpdatingSecurityForm(true)
+
+    updateAuthConfig(
+      { projectRef: projectRef!, config: payload },
+      {
+        onError: (error) => {
+          toast.error(`Failed to update phone MFA settings: ${error?.message}`)
+          setIsUpdatingSecurityForm(false)
+        },
+        onSuccess: () => {
+          toast.success('Successfully updated phone MFA settings')
+          setIsUpdatingSecurityForm(false)
         },
       }
     )
@@ -205,22 +259,40 @@ const MfaAuthSettingsForm = () => {
 
   if (isError) {
     return (
-      <Alert_Shadcn_ variant="destructive">
-        <WarningIcon />
-        <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+      <ScaffoldSection isFullWidth>
+        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+      </ScaffoldSection>
     )
   }
 
   if (!canReadConfig) {
-    return <NoPermission resourceText="view auth configuration settings" />
+    return (
+      <ScaffoldSection isFullWidth>
+        <NoPermission resourceText="view auth configuration settings" />
+      </ScaffoldSection>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <ScaffoldSection isFullWidth>
+        <GenericSkeletonLoader />
+      </ScaffoldSection>
+    )
   }
 
   const phoneMFAIsEnabled =
     phoneForm.watch('MFA_PHONE') === 'Enabled' || phoneForm.watch('MFA_PHONE') === 'Verify Enabled'
   const hasUpgradedPhoneMFA =
     authConfig && !authConfig.MFA_PHONE_VERIFY_ENABLED && phoneMFAIsEnabled
+
+  const maybeConfirmPhoneMFAOrSubmit = () => {
+    if (hasUpgradedPhoneMFA) {
+      setIsConfirmationModalVisible(true)
+    } else {
+      phoneForm.handleSubmit(onSubmitPhoneForm)()
+    }
+  }
 
   return (
     <>
@@ -315,7 +387,13 @@ const MfaAuthSettingsForm = () => {
         <ScaffoldSectionTitle className="mb-4">SMS MFA</ScaffoldSectionTitle>
 
         <Form_Shadcn_ {...phoneForm}>
-          <form onSubmit={phoneForm.handleSubmit(onSubmitPhoneForm)} className="space-y-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              maybeConfirmPhoneMFAOrSubmit()
+            }}
+            className="space-y-4"
+          >
             <Card>
               <CardContent className="pt-6">
                 {promptProPlanUpgrade && (
@@ -414,20 +492,6 @@ const MfaAuthSettingsForm = () => {
                 />
               </CardContent>
 
-              {hasUpgradedPhoneMFA && (
-                <CardContent>
-                  <Alert_Shadcn_ variant="warning">
-                    <WarningIcon />
-                    <AlertTitle_Shadcn_>
-                      Enabling advanced MFA with phone will result in an additional charge of{' '}
-                      <span translate="no">$75</span>
-                      per month for the first project in the organization and an additional{' '}
-                      <span translate="no">$10</span> per month for additional projects.
-                    </AlertTitle_Shadcn_>
-                  </Alert_Shadcn_>
-                </CardContent>
-              )}
-
               <CardFooter className="justify-end space-x-2">
                 {phoneForm.formState.isDirty && (
                   <Button type="default" onClick={() => phoneForm.reset()}>
@@ -452,8 +516,75 @@ const MfaAuthSettingsForm = () => {
           </form>
         </Form_Shadcn_>
       </ScaffoldSection>
+
+      <ConfirmationModal
+        visible={isConfirmationModalVisible}
+        title="Confirm SMS MFA"
+        confirmLabel="Confirm and save"
+        onCancel={() => setIsConfirmationModalVisible(false)}
+        onConfirm={() => {
+          setIsConfirmationModalVisible(false)
+          phoneForm.handleSubmit(onSubmitPhoneForm)()
+        }}
+        variant="warning"
+      >
+        Enabling SMS MFA will result in an additional charge of <span translate="no">$75</span> per
+        month for the first project in the organization and an additional{' '}
+        <span translate="no">$10</span> per month for additional projects.
+        <p className="mt-2">
+          Billing will start immediately upon enabling this add-on, regardless of whether your
+          customers are using SMS MFA.
+        </p>
+      </ConfirmationModal>
+
+      <ScaffoldSection isFullWidth>
+        <ScaffoldSectionTitle className="mb-4">Enhanced MFA Security</ScaffoldSectionTitle>
+
+        <Form_Shadcn_ {...securityForm}>
+          <form onSubmit={securityForm.handleSubmit(onSubmitSecurityForm)} className="space-y-4">
+            <Card>
+              <CardContent className="pt-6">
+                <FormField_Shadcn_
+                  control={securityForm.control}
+                  name="MFA_ALLOW_LOW_AAL"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Limit duration of AAL1 sessions"
+                      description="A user's session will be terminated unless they verify one of their factors within 15 minutes of initial sign in. Recommendation: ON"
+                    >
+                      <FormControl_Shadcn_>
+                        <Switch
+                          checked={!field.value}
+                          onCheckedChange={(value) => field.onChange(!value)}
+                          disabled={!canUpdateConfig}
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </CardContent>
+              <CardFooter className="justify-end space-x-2">
+                {securityForm.formState.isDirty && (
+                  <Button type="default" onClick={() => securityForm.reset()}>
+                    Cancel
+                  </Button>
+                )}
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  disabled={
+                    !canUpdateConfig || isUpdatingSecurityForm || !securityForm.formState.isDirty
+                  }
+                  loading={isUpdatingPhoneForm}
+                >
+                  Save changes
+                </Button>
+              </CardFooter>
+            </Card>
+          </form>
+        </Form_Shadcn_>
+      </ScaffoldSection>
     </>
   )
 }
-
-export default MfaAuthSettingsForm

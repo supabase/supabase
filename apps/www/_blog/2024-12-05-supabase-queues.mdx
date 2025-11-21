@@ -140,7 +140,7 @@ If you're [connecting](/docs/guides/database/connecting-to-postgres) to your Pos
 ```sql
 select * from pgmq.send(
   queue_name  => 'foo',
-  msg         => '{ "hello": "world" }',
+  msg         => '{ "hello": "world" }'
 );
 ```
 

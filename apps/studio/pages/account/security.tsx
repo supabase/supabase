@@ -1,12 +1,18 @@
 import { Smartphone } from 'lucide-react'
 
-import { TOTPFactors } from 'components/interfaces/Account'
+import { TOTPFactors } from 'components/interfaces/Account/TOTPFactors'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import { AccountSettingsLayout } from 'components/layouts/AccountLayout/AccountSettingsLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
+import {
+  ScaffoldContainer,
+  ScaffoldHeader,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
+import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
@@ -30,41 +36,54 @@ const collapsibleClasses = [
 ]
 
 const Security: NextPageWithLayout = () => {
-  const { data } = useMfaListFactorsQuery()
+  const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
+
+  const { data } = useMfaListFactorsQuery({ enabled: showSecuritySettings })
+
+  if (!showSecuritySettings) {
+    return <UnknownInterface urlBack={`/account/me`} />
+  }
 
   return (
-    <Collapsible_Shadcn_ className={cn(collapsibleClasses)}>
-      <CollapsibleTrigger_Shadcn_ asChild>
-        <button
-          type="button"
-          className="group flex w-full items-center justify-between rounded py-3 px-4 md:px-6 text-foreground"
-        >
-          <div className="flex flex-row gap-4 items-center py-1">
-            <Smartphone strokeWidth={1.5} />
-            <span className="text-sm">Authenticator app</span>
-          </div>
+    <>
+      <ScaffoldContainer>
+        <ScaffoldHeader className="pt-0">
+          <ScaffoldSectionTitle>Security</ScaffoldSectionTitle>
+        </ScaffoldHeader>
+      </ScaffoldContainer>
+      <ScaffoldContainer bottomPadding>
+        <Collapsible_Shadcn_ className={cn(collapsibleClasses)}>
+          <CollapsibleTrigger_Shadcn_ asChild>
+            <button
+              type="button"
+              className="group flex w-full items-center justify-between rounded py-3 px-4 md:px-6 text-foreground"
+            >
+              <div className="flex flex-row gap-4 items-center py-1">
+                <Smartphone strokeWidth={1.5} />
+                <span className="text-sm">Authenticator app</span>
+              </div>
 
-          {data ? (
-            <Badge variant={data.totp.length === 0 ? 'default' : 'brand'}>
-              {data.totp.length} app{data.totp.length === 1 ? '' : 's'} configured
-            </Badge>
-          ) : null}
-        </button>
-      </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_ className="group border-t border-default bg-surface-100 py-6 px-4 md:px-6 text-foreground">
-        <TOTPFactors />
-      </CollapsibleContent_Shadcn_>
-    </Collapsible_Shadcn_>
+              {data ? (
+                <Badge variant={data.totp.length === 0 ? 'default' : 'brand'}>
+                  {data.totp.length} app{data.totp.length === 1 ? '' : 's'} configured
+                </Badge>
+              ) : null}
+            </button>
+          </CollapsibleTrigger_Shadcn_>
+          <CollapsibleContent_Shadcn_ className="group border-t border-default bg-surface-100 py-6 px-4 md:px-6 text-foreground">
+            <TOTPFactors />
+          </CollapsibleContent_Shadcn_>
+        </Collapsible_Shadcn_>
+      </ScaffoldContainer>
+    </>
   )
 }
 
 Security.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout headerTitle="Account">
+    <DefaultLayout hideMobileMenu headerTitle="Account">
       <OrganizationLayout>
-        <AccountLayout title="Security">
-          <AccountSettingsLayout>{page}</AccountSettingsLayout>
-        </AccountLayout>
+        <AccountLayout title="Security">{page}</AccountLayout>
       </OrganizationLayout>
     </DefaultLayout>
   </AppLayout>
