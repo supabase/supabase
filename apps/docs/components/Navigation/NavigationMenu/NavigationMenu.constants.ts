@@ -801,6 +801,16 @@ export const auth: NavMenuConstant = {
       ],
     },
     {
+      name: 'OAuth 2.1 Server',
+      items: [
+        { name: 'Overview', url: '/guides/auth/oauth-server' },
+        { name: 'Getting Started', url: '/guides/auth/oauth-server/getting-started' },
+        { name: 'OAuth Flows', url: '/guides/auth/oauth-server/oauth-flows' },
+        { name: 'MCP Authentication', url: '/guides/auth/oauth-server/mcp-authentication' },
+        { name: 'Token Security & RLS', url: '/guides/auth/oauth-server/token-security' },
+      ],
+    },
+    {
       name: 'Third-party auth',
       enabled: allAuthProvidersEnabled,
       items: [
