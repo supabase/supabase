@@ -151,7 +151,7 @@ const data = {
         type: 'networking',
         cta: {
           label: 'Apply to attend',
-          href: 'https://forms.gle/supabase-felicis-reception',
+          href: 'https://gatsby.events/felicis/rsvp/register?e=aws-re-invent-reset-cocktails-and-conversation-with-supabase-tines-mother-duck-semgrep-felicis&ref=supabase',
         },
       },
       // December 3
@@ -173,7 +173,7 @@ const data = {
         type: 'networking',
         cta: {
           label: 'Apply to attend',
-          href: 'https://forms.gle/ai-after-dark',
+          href: 'https://luma.com/4nhjbjak?utm_source=supabase',
         },
       },
       // December 4
