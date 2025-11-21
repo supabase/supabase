@@ -6,6 +6,8 @@ subtitle: 'Set up replication with Airbyte, Estuary, Fivetran, and other tools.'
 sidebar_label: 'Manual Destinations'
 ---
 
+Manual destinations let you configure your own replication using external tools and **Postgres logical replication**. This gives you full control over the replication process and allows you to replicate to any system that supports Postgres logical replication.
+
 This guide covers setting up **manual destinations** using external tools. If you prefer a simpler, managed solution, see [Managed destinations](/docs/guides/database/replication/etl-replication-setup) instead.
 
 <Admonition type="note">
@@ -13,6 +15,17 @@ This guide covers setting up **manual destinations** using external tools. If yo
 This guide is for replicating data to external systems using your own tools. For deploying read-only databases across multiple regions, see [Read Replicas](/docs/guides/platform/read-replicas) instead.
 
 </Admonition>
+
+## Setup overview
+
+To set up replication to a manual destination, you'll need to:
+
+1. Configure a **Postgres publication** (defines what to replicate)
+2. Create a **replication slot** using the `postgres` user
+3. Configure your external tool to connect to your Supabase database
+4. Monitor replication lag and status
+
+The specific steps depend on which external tool you're using. Below are instructions for popular replication tools.
 
 ### Prerequisites
 
