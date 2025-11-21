@@ -1,6 +1,6 @@
 'use client'
 
-import { CalendarIcon, MapPinIcon, UsersIcon } from 'lucide-react'
+import { CalendarIcon, MapPinIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { cn, Button } from 'ui'
@@ -8,7 +8,7 @@ import { useEvents } from '~/app/events/context'
 import { formatHosts } from '~/lib/eventsUtils'
 
 export function EventBanner() {
-  const { isLoading, allEvents, featuredEvent } = useEvents()
+  const { isLoading, featuredEvent } = useEvents()
 
   if (isLoading) {
     return <EventBannerSkeleton />
@@ -20,7 +20,7 @@ export function EventBanner() {
     <section className={cn('grid md:grid-cols-[minmax(320px,35%),1fr] gap-6 lg:gap-12')}>
       <CoverImage url={featuredEvent.cover_url} />
 
-      <article className="flex flex-col gap-6 lg:py-2">
+      <article className="flex flex-col md:justify-center gap-6 lg:py-2">
         <div className="flex justify-between items-start gap-4">
           <div className="flex flex-col gap-1.5">
             <h2 className="text-2xl font-medium lg:line-clamp-2">{featuredEvent.title}</h2>
@@ -50,14 +50,10 @@ export function EventBanner() {
           <LocationWidget location={featuredEvent.location} />
         </div>
 
-        <div className="h-72 relative flex">
-          <span className="absolute top-0 inset-x-0 h-8 bg-gradient-to-b from-background to-transparent" />
-
-          <p className="whitespace-pre-line py-4 text-foreground-light h-full overflow-y-auto">
+        <div className="relative flex">
+          <p className="text-foreground-light line-clamp-3 lg:line-clamp-4">
             {featuredEvent.description}
           </p>
-
-          <span className="absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-background to-transparent" />
         </div>
 
         {featuredEvent.link && (
@@ -81,7 +77,7 @@ const DateWidget = ({ date, endDate }: { date: string; endDate?: string }) => {
 
   const formattedDate = eventDate.toLocaleDateString('en-US', {
     weekday: 'long',
-    month: 'long',
+    month: 'short',
     day: 'numeric',
   })
 
@@ -111,8 +107,8 @@ const DateWidget = ({ date, endDate }: { date: string; endDate?: string }) => {
 
   return (
     <div className="flex items-center gap-4">
-      <div className="bg-surface-100 p-1.5 border rounded-md">
-        <CalendarIcon className="size-7" />
+      <div className="bg-surface-100 w-10 h-10 flex items-center justify-center border rounded-md">
+        <CalendarIcon className="size-5" strokeWidth={1.5} />
       </div>
 
       <div className="flex flex-col gap-0">
@@ -129,8 +125,8 @@ const LocationWidget = ({ location }: { location?: string }) => {
 
   return (
     <div className="flex items-center gap-4">
-      <div className="bg-surface-100 p-1.5 border rounded-md">
-        <MapPinIcon className="size-7" />
+      <div className="bg-surface-100 w-10 h-10 flex items-center justify-center border rounded-md">
+        <MapPinIcon className="size-5" strokeWidth={1.5} />
       </div>
 
       <div className="flex flex-col gap-0">
@@ -144,14 +140,14 @@ const LocationWidget = ({ location }: { location?: string }) => {
 const CoverImage = ({ url }: { url?: string }) => {
   if (!url)
     return (
-      <div className="w-full bg-surface-100 aspect-square border rounded-lg grid place-items-center">
+      <div className="w-full bg-surface-100 aspect-square border rounded-lg hidden md:grid place-items-center">
         <Logo />
       </div>
     )
 
   return (
-    <div className="w-full bg-surface-100 aspect-square border rounded-lg overflow-hidden relative">
-      <img src={url} alt="Event Cover" className="object-cover w-full" />
+    <div className="w-full bg-surface-100 hidden md:block aspect-square border rounded-lg overflow-hidden relative">
+      <img src={url} alt="Event Cover" className="object-cover object-center w-full" />
     </div>
   )
 }
