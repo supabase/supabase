@@ -438,6 +438,22 @@ const nextConfig = {
             },
           ]
         : []),
+
+      ...(process.env.MAINTENANCE_MODE === 'true'
+        ? [
+            {
+              source: '/((?!maintenance).*)', // Redirect all paths except /maintenance
+              destination: '/maintenance',
+              permanent: false,
+            },
+          ]
+        : [
+            {
+              source: '/maintenance',
+              destination: '/',
+              permanent: false,
+            },
+          ]),
     ]
   },
   async headers() {
