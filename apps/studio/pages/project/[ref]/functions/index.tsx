@@ -47,12 +47,16 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
         <PageSectionContent>
           <div className="flex flex-col gap-6">
             {isLoading && <GenericSkeletonLoader />}
-            {isError && (IS_PLATFORM ?
-              <AlertError error={error} subject="Failed to retrieve edge functions" />
-              : (
-                <Admonition type='warning' title="Failed to retrieve edge functions">
-                  <p className='prose [&>code]:text-xs text-sm'>Local functions can be found at <code>supabase/functions</code> folder.</p>
-                </Admonition>))}
+            {isError &&
+              (IS_PLATFORM ? (
+                <AlertError error={error} subject="Failed to retrieve edge functions" />
+              ) : (
+                <Admonition type="warning" title="Failed to retrieve edge functions">
+                  <p className="prose [&>code]:text-xs text-sm">
+                    Local functions can be found at <code>supabase/functions</code> folder.
+                  </p>
+                </Admonition>
+              ))}
             {isSuccess && (
               <>
                 {hasFunctions ? (
