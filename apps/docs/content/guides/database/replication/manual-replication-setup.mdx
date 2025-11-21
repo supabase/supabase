@@ -16,25 +16,13 @@ This guide is for replicating data to external systems using your own tools. For
 
 </Admonition>
 
-## Setup overview
+## Prerequisites
 
-To set up replication to a manual destination, you'll need to:
+Before setting up manual replication, ensure you have:
 
-1. Configure a **Postgres publication** (defines what to replicate)
-2. Create a **replication slot** using the `postgres` user
-3. Configure your external tool to connect to your Supabase database
-4. Monitor replication lag and status
-
-The specific steps depend on which external tool you're using. Below are instructions for popular replication tools.
-
-### Prerequisites
-
-To set up replication, the following is recommended:
-
-- Instance size of XL or greater
-- [IPv4 add-on](/docs/guides/platform/ipv4-address) enabled
-
-To create a replication slot, you will need to use the `postgres` user and follow the instructions in our [guide](/docs/guides/database/postgres/setup-replication-external).
+- **Instance size**: XL or greater (recommended for replication workloads)
+- **IPv4 add-on**: [Enabled](/docs/guides/platform/ipv4-address) if your external tool doesn't support IPv6
+- **Database access**: You'll need the `postgres` user credentials
 
 <Admonition type="note">
 
@@ -42,7 +30,11 @@ If you are running Postgres 17 or higher, you can create a new user and grant th
 
 </Admonition>
 
-If you are replicating to an external system and using any of the tools below, check their documentation first and we have added additional information where the setup with Supabase can vary.
+## Configure your replication tool
+
+To create a replication slot, you will need to use the `postgres` user and follow the instructions in our [Setup Replication External guide](/docs/guides/database/postgres/setup-replication-external).
+
+If you are replicating to an external system and using any of the tools below, check their documentation first. We have added Supabase-specific information where the setup can vary.
 
 <Tabs
   scrollable
@@ -54,55 +46,65 @@ If you are replicating to an external system and using any of the tools below, c
 
 <TabPanel id="airbyte" label="Airbyte">
 
-Airbyte has the following [documentation](https://docs.airbyte.com/integrations/sources/postgres/) for setting up Postgres as a source, either in their cloud offering or by self-hosting.
+Airbyte provides [documentation](https://docs.airbyte.com/integrations/sources/postgres/) for setting up Postgres as a source, available in both cloud and self-hosted versions.
 
-You can follow those steps with the following modifications:
+**Supabase-specific modifications:**
 
-1. Use the `postgres` user
-2. Select `logical replication` as the replication method (`xmin` is possible, but not recommended)
+1. Use the `postgres` user for authentication
+2. Select **logical replication** as the replication method (not `xmin`)
 
-### Troubleshooting
+<Admonition type="caution">
 
-Airbyte has a known [issue](https://discuss.airbyte.io/t/postgres-source-replication-slot-safe-wal-size-only-reset-when-a-change-occurs/3263/7) where it does not clear WAL files on each successful sync. The recommended workaround is to have a `heartbeat` table that you write changes to once an hour.>
+Airbyte has a known [issue](https://discuss.airbyte.io/t/postgres-source-replication-slot-safe-wal-size-only-reset-when-a-change-occurs/3263/7) where it doesn't clear WAL files on each successful sync. The recommended workaround is to create a `heartbeat` table and write changes to it once an hour.
+
+</Admonition>
 
 </TabPanel>
 
 <TabPanel id="estuary" label="Estuary">
-Estuary has the following [documentation](https://docs.estuary.dev/reference/Connectors/capture-connectors/PostgreSQL/Supabase/) for setting up Postgres as a source.
+
+Estuary provides [Supabase-specific documentation](https://docs.estuary.dev/reference/Connectors/capture-connectors/PostgreSQL/Supabase/) for setting up Postgres replication.
+
+Follow their guide - it includes all the necessary Supabase configurations.
 
 </TabPanel>
 
 <TabPanel id="fivetran" label="Fivetran">
 
-Fivetran has the following [documentation](https://fivetran.com/docs/connectors/databases/postgresql/setup-guide) for setting up Postgres as a source.
+Fivetran provides [documentation](https://fivetran.com/docs/connectors/databases/postgresql/setup-guide) for setting up Postgres as a source.
 
-You can follow those steps with the following modifications:
+**Supabase-specific modifications:**
 
-1. In Step 2, choose `logical replication` as the sync mechanism
-2. In Step 3, do not create a user and use the existing `postgres` user for replication
-3. In Step 5, no need to modify any WAL settings as we have done that for you
+1. **Step 2**: Choose **logical replication** as the sync mechanism
+2. **Step 3**: Use the existing `postgres` user (don't create a new user)
+3. **Step 5**: Skip WAL settings modification (already configured for you)
 
 </TabPanel>
 
 <TabPanel id="materialize" label="Materialize">
 
-Materialize has the following [documentation](https://materialize.com/docs/sql/create-source/postgres/) on setting up Postgres as a source.
+Materialize provides [documentation](https://materialize.com/docs/sql/create-source/postgres/) for setting up Postgres as a source.
 
-You can follow those steps with the following modifications:
+**Supabase-specific modifications:**
 
-1. Follow the steps in our [guide](/docs/guides/database/postgres/setup-replication-external) to create a publication slot
+1. Follow our [Setup Replication External guide](/docs/guides/database/postgres/setup-replication-external) to create the publication and replication slot
 
 </TabPanel>
 
 <TabPanel id="stitch" label="Stitch">
 
-Stitch has the following [documentation](https://www.stitchdata.com/docs/integrations/databases/postgresql/v2#extract-data) on configuring Postgres as a source.
+Stitch provides [documentation](https://www.stitchdata.com/docs/integrations/databases/postgresql/v2#extract-data) for configuring Postgres as a source.
 
-You can follow those steps with the following modifications:
+**Supabase-specific modifications:**
 
-1. Use the `postgres` user for replication
-2. Skip step 3
+1. Use the `postgres` user for authentication
+2. **Step 3**: Skip this step (WAL settings already configured)
 
 </TabPanel>
 
 </Tabs>
+
+## Next steps
+
+- [Monitor Manual Destinations](/docs/guides/database/replication/manual-replication-monitoring) - Track replication lag and health
+- [Manual Destinations FAQ](/docs/guides/database/replication/manual-replication-faq) - Common questions and troubleshooting
