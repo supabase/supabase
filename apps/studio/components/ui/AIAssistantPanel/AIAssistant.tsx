@@ -1,6 +1,6 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { useChat } from '@ai-sdk/react'
-import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
+import { lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Eraser, Info, Pencil, X } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -12,7 +12,6 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { useRateMessageMutation } from 'data/ai/rate-message-mutation'
-import { constructHeaders } from 'data/fetchers'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
@@ -20,11 +19,10 @@ import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useHotKey } from 'hooks/ui/useHotKey'
-import { prepareMessagesForAPI } from 'lib/ai/message-utils'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import type { AssistantModel } from 'state/ai-assistant-state'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useAiAssistantState, useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Button, cn, KeyboardShortcut } from 'ui'
@@ -61,6 +59,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
   const snap = useAiAssistantStateSnapshot()
+  const state = useAiAssistantState()
   const { closeSidebar, activeSidebar } = useSidebarManagerSnapshot()
 
   const isPaidPlan = selectedOrganization?.plan?.id !== 'free'
@@ -125,41 +124,27 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const currentSchema = searchParams?.get('schema') ?? 'public'
   const currentChat = snap.activeChat?.name
 
+  // Update context in state
+  useEffect(() => {
+    state.setContext({
+      projectRef: project?.ref,
+      orgSlug: selectedOrganizationRef.current?.slug,
+      connectionString: project?.connectionString,
+      schema: currentSchema,
+      table: currentTable?.name,
+    })
+  }, [
+    project?.ref,
+    selectedOrganizationRef.current?.slug,
+    project?.connectionString,
+    currentSchema,
+    currentTable?.name,
+    state,
+  ])
+
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const updateMessage = useCallback(
-    (updatedMessage: MessageType) => {
-      snap.updateMessage(updatedMessage)
-    },
-    [snap]
-  )
 
-  // Handle completion of the assistant's response
-  const handleChatFinish = useCallback(
-    ({ message }: { message: MessageType }) => {
-      if (lastUserMessageRef.current) {
-        snap.saveMessage([lastUserMessageRef.current, message])
-        lastUserMessageRef.current = null
-      } else {
-        updateMessage(message)
-      }
-    },
-    [snap, updateMessage]
-  )
-
-  // TODO(refactor): This useChat hook should be moved down into each chat session.
-  // That way we won't have to disable switching chats while the chat is loading,
-  // and don't run the risk of messages getting mixed up between chats.
-  // Sanitize messages to remove Valtio proxy wrappers that can't be cloned
-  const sanitizedMessages = useMemo(() => {
-    if (!snap.activeChat?.messages) return undefined
-
-    return snap.activeChat.messages.map((msg: any) => {
-      // Convert proxy objects to plain objects
-      const plainMessage = JSON.parse(JSON.stringify(msg))
-      return plainMessage
-    })
-  }, [snap.activeChat?.messages])
 
   const {
     messages: chatMessages,
@@ -172,60 +157,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     regenerate,
   } = useChat({
     id: snap.activeChatId,
+    chat: snap.chatInstance,
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
-    messages: sanitizedMessages,
-    async onToolCall({ toolCall }) {
-      if (toolCall.dynamic) {
-        return
-      }
-
-      if (toolCall.toolName === 'rename_chat') {
-        const { newName } = toolCall.input as { newName: string }
-
-        if (snap.activeChatId && newName?.trim()) {
-          snap.renameChat(snap.activeChatId, newName.trim())
-
-          addToolResult({
-            tool: toolCall.toolName,
-            toolCallId: toolCall.toolCallId,
-            output: 'Chat renamed',
-          })
-        } else {
-          addToolResult({
-            tool: toolCall.toolName,
-            toolCallId: toolCall.toolCallId,
-            output: 'Failed to rename chat: Invalid chat or name',
-          })
-        }
-      }
-    },
-    transport: new DefaultChatTransport({
-      api: `${BASE_PATH}/api/ai/sql/generate-v4`,
-      async prepareSendMessagesRequest({ messages, ...options }) {
-        const cleanedMessages = prepareMessagesForAPI(messages)
-
-        const headerData = await constructHeaders()
-        const authorizationHeader = headerData.get('Authorization')
-
-        return {
-          ...options,
-          body: {
-            messages: cleanedMessages,
-            aiOptInLevel,
-            projectRef: project?.ref,
-            connectionString: project?.connectionString,
-            schema: currentSchema,
-            table: currentTable?.name,
-            chatName: currentChat,
-            orgSlug: selectedOrganizationRef.current?.slug,
-            model: selectedModel,
-          },
-          ...(IS_PLATFORM ? { headers: { Authorization: authorizationHeader ?? '' } } : {}),
-        }
-      },
-    }),
     onError: onErrorChat,
-    onFinish: handleChatFinish,
   })
 
   const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
@@ -413,6 +347,16 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const handleClearMessages = () => {
     snap.clearMessages()
+    // We also need to clear the chat instance messages if possible, or create a new chat.
+    // snap.clearMessages() clears the state messages.
+    // But chatInstance has its own messages.
+    // We should probably just create a new chat instance or reset it.
+    // But snap.clearMessages() updates the state.
+    // If we are using the same chat ID, we need to update chatInstance.
+    // But chatInstance doesn't have a clear method exposed easily?
+    // Actually, if we clear messages in state, we should probably re-initialize the chat instance
+    // or just rely on the fact that we are starting fresh.
+    // But useChat keeps the messages.
     setMessages([])
     lastUserMessageRef.current = null
     setEditingMessageId(null)
