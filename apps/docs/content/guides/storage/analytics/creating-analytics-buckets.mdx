@@ -21,9 +21,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://your-project.supabase.co', 'your-service-key')
 
-supabase.storage.createBucket('my-analytics-bucket', {
-  type: 'ANALYTICS',
-})
+supabase.storage.analytics.createBucket('my-analytics-bucket')
 ```
 
 {/* Changes */}
