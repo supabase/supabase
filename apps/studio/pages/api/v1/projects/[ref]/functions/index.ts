@@ -1,14 +1,19 @@
+import { NextApiRequest, NextApiResponse } from 'next'
+
+import { uuidv4 } from 'lib/helpers'
+import apiWrapper from 'lib/api/apiWrapper'
 import { components } from 'api-types'
 import { getFunctionsArtifactStore } from 'lib/api/self-hosted/functions'
-import { uuidv4 } from 'lib/helpers'
-import { NextApiRequest, NextApiResponse } from 'next'
+
+export default (req: NextApiRequest, res: NextApiResponse) =>
+  apiWrapper(req, res, handler, { withAuth: true })
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
 
   switch (method) {
     case 'GET':
-      return handleGet(req, res)
+      return handleGetAll(req, res)
     default:
       res.setHeader('Allow', ['GET'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
@@ -17,10 +22,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 type EdgeFunctionsResponse = components['schemas']['FunctionResponse']
 
-async function handleGet(req: NextApiRequest, res: NextApiResponse) {
+const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const { store, error } = getFunctionsArtifactStore()
   if (!store || error) {
-    return res.status(404)
+    return res.status(500).json({ error })
   }
 
   const functionsArtifacts = await store.getFunctions()
@@ -43,5 +48,3 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
 
   return res.status(200).json(functions)
 }
-
-export default handler
