@@ -1,9 +1,15 @@
 import { Loader2 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
 import { useParams } from 'common'
+import {
+  formatSortURLParams,
+  loadTableEditorStateFromLocalStorage,
+  saveTableEditorStateToLocalStorage,
+  sortsToUrlParams,
+} from 'components/grid/SupabaseGrid.utils'
 import { RefreshButton } from 'components/grid/components/header/RefreshButton'
 import { FilterPopoverPrimitive } from 'components/grid/components/header/filter/FilterPopoverPrimitive'
 import { SortPopoverPrimitive } from 'components/grid/components/header/sort/SortPopoverPrimitive'
@@ -17,17 +23,13 @@ import {
 } from 'state/role-impersonation-state'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { Button, SidePanel } from 'ui'
-import {
-  formatSortURLParams,
-  sortsToUrlParams,
-  loadTableEditorStateFromLocalStorage,
-  saveTableEditorStateToLocalStorage,
-} from 'components/grid/SupabaseGrid.utils'
 import ActionBar from '../../ActionBar'
 import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 import { convertByteaToHex } from '../RowEditor.utils'
 import Pagination from './Pagination'
 import SelectorGrid from './SelectorGrid'
+
+const FOREIGN_ROW_SELECTOR_TABLE_NAME_SUFFIX = '__frselector'
 
 export interface ForeignRowSelectorProps {
   visible: boolean
@@ -113,14 +115,15 @@ const ForeignRowSelector = ({
     }
   )
 
-  // Hydrate persisted sorts only once on mount to avoid re-applying after user clears
-  const hasHydratedPersistedSorts = useRef(false)
+  // Only start saving sorts after the previous sorts have been loaded
+  const [shouldSaveSorts, setShouldSaveSorts] = useState(false)
+
+  // Load sorts from local storage
   useEffect(() => {
-    if (!project?.ref || !table?.name) return
-    if (hasHydratedPersistedSorts.current) return
+    if (!project?.ref || !table?.name || !table?.schema) return
 
     try {
-      const persistenceTableName = `${table.name}__frselector`
+      const persistenceTableName = table.name + FOREIGN_ROW_SELECTOR_TABLE_NAME_SUFFIX
       const savedState = loadTableEditorStateFromLocalStorage(
         project.ref,
         persistenceTableName,
@@ -134,15 +137,16 @@ const ForeignRowSelector = ({
     } catch (e) {
       console.error(e)
     } finally {
-      hasHydratedPersistedSorts.current = true
+      setShouldSaveSorts(true)
     }
   }, [project?.ref, table?.schema, table?.name])
 
+  // Persist sorts to local storage
   useEffect(() => {
-    if (!project?.ref || !table?.name) return
+    if (!project?.ref || !table?.name || !table?.schema || !shouldSaveSorts) return
     try {
       const urlSorts = sortsToUrlParams(sorts)
-      const persistenceTableName = `${table.name}__frselector`
+      const persistenceTableName = table.name + FOREIGN_ROW_SELECTOR_TABLE_NAME_SUFFIX
       saveTableEditorStateToLocalStorage({
         projectRef: project.ref,
         tableName: persistenceTableName,
@@ -152,7 +156,7 @@ const ForeignRowSelector = ({
     } catch (e) {
       console.error(e)
     }
-  }, [sorts, project?.ref, table?.schema, table?.name])
+  }, [shouldSaveSorts, sorts, project?.ref, table?.schema, table?.name])
 
   return (
     <SidePanel
