@@ -71,7 +71,7 @@ export const OAuthAppsList = () => {
     { enabled: isOAuthServerEnabled }
   )
 
-  const { mutateAsync: regenerateSecret, isLoading: isRegenerating } =
+  const { mutateAsync: regenerateSecret, isPending: isRegenerating } =
     useOAuthServerAppRegenerateSecretMutation({
       onSuccess: (data) => {
         if (data) {

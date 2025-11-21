@@ -40,12 +40,6 @@ async function deleteIcebergNamespaceTable({
       )
 
     const response = await fetchHandler(url, { headers, method: 'DELETE' })
-    const result = await response.json()
-    if (result.error) {
-      if (result.error.message) throw new Error(`${errorPrefix}: ${result.error.message}`)
-      else throw new Error(errorPrefix)
-    }
-
     return response.status === 204
   } catch (error) {
     handleError(error)
@@ -79,11 +73,12 @@ export const useIcebergNamespaceTableDeleteMutation = ({
     mutationFn: (vars) => deleteIcebergNamespaceTable({ ...vars, tempApiKey }),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({
-        queryKey: storageKeys.icebergNamespace(
-          variables.catalogUri,
-          variables.warehouse,
-          variables.namespace
-        ),
+        queryKey: storageKeys.icebergNamespace({
+          projectRef,
+          catalog: variables.catalogUri,
+          warehouse: variables.warehouse,
+          namespace: variables.namespace,
+        }),
       })
       await onSuccess?.(data, variables, context)
     },

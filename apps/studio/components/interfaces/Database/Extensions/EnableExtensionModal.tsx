@@ -46,7 +46,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
     { enabled: visible }
   )
   const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
-  const { mutate: enableExtension, isLoading: isEnabling } = useDatabaseExtensionEnableMutation({
+  const { mutate: enableExtension, isPending: isEnabling } = useDatabaseExtensionEnableMutation({
     onSuccess: () => {
       toast.success(`Extension "${extension.name}" is now enabled`)
       onCancel()

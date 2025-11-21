@@ -413,9 +413,9 @@ const ExtensionNeedsUpgrade = ({
 
 const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
   const { data: project } = useSelectedProjectQuery()
-  const { mutateAsync: createS3VectorsWrapper, isLoading: isCreatingS3VectorsWrapper } =
+  const { mutateAsync: createS3VectorsWrapper, isPending: isCreatingS3VectorsWrapper } =
     useS3VectorsWrapperCreateMutation()
-  const { mutateAsync: createSchema, isLoading: isCreatingSchema } = useSchemaCreateMutation()
+  const { mutateAsync: createSchema, isPending: isCreatingSchema } = useSchemaCreateMutation()
 
   const onSetupWrapper = async () => {
     if (!bucketName) return console.error('Bucket name is required')

@@ -73,6 +73,7 @@
         "SUPABASE_URL",
         "VERCEL",
         "VERCEL_ENV",
+        "MAINTENANCE_MODE",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",

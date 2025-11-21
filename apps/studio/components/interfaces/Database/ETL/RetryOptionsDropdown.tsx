@@ -3,8 +3,8 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { RollbackType, useRollbackTableMutation } from 'data/etl/rollback-table-mutation'
 import { useRestartPipelineHelper } from 'data/etl/restart-pipeline-helper'
+import { RollbackType, useRollbackTableMutation } from 'data/etl/rollback-table-mutation'
 import {
   Button,
   DropdownMenu,
@@ -40,7 +40,7 @@ export const RetryOptionsDropdown = ({ tableId, tableName }: RetryOptionsDropdow
 
   const { restartPipeline } = useRestartPipelineHelper()
 
-  const { mutate: rollbackTable, isLoading: isRollingBack } = useRollbackTableMutation({
+  const { mutate: rollbackTable, isPending: isRollingBack } = useRollbackTableMutation({
     onSuccess: async (_, vars) => {
       const { projectRef, pipelineId, rollbackType } = vars
       toast.success(
