@@ -24,11 +24,11 @@ const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
   const { openSidebar } = useSidebarManagerSnapshot()
 
   const handleAskAssistant = () => {
-    track('advisor_clicked', {
-      clickAction: 'ask_assistant',
+    track('advisor_assistant_button_clicked', {
       origin: 'lint_detail',
-      advisorCategories: lint.categories,
+      advisorCategory: lint.categories[0],
       advisorType: lint.name,
+      advisorLevel: lint.level,
     })
 
     onAskAssistant?.()

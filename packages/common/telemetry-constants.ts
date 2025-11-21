@@ -2287,6 +2287,7 @@ export interface LogDrainConfirmButtonSubmittedEvent {
 }
 
 type AdvisorCategory = 'PERFORMANCE' | 'SECURITY'
+type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
 
 /**
  * User opened an advisor detail page to view a specific advisor (lint or notification).
@@ -2294,7 +2295,7 @@ type AdvisorCategory = 'PERFORMANCE' | 'SECURITY'
  *
  * @group Events
  * @source studio
- * @page The advisor panel sidebar when opened
+ * @page /dashboard/project/{ref}/advisors/security or home page or advisor panel sidebar
  */
 export interface AdvisorDetailOpenedEvent {
   action: 'advisor_detail_opened'
@@ -2302,52 +2303,56 @@ export interface AdvisorDetailOpenedEvent {
     /**
      * Where the advisor was viewed from
      */
-    origin: 'home' | 'advisor_panel'
+    origin: 'homepage' | 'advisor_panel' | 'advisors_page'
     /**
      * Source of the advisor
      */
     advisorSource: 'lint' | 'notification'
     /**
-     * Category of the advisor
+     * Category of the advisor (SECURITY or PERFORMANCE)
      */
-    advisorCategories?: AdvisorCategory[]
+    advisorCategory?: AdvisorCategory
     /**
      * Specific advisor type/name, e.g. missing_index, no_rls_policy
      */
     advisorType?: string
+    /**
+     * Severity level of the advisor (only for lints)
+     */
+    advisorLevel?: AdvisorLevel
   }
   groups: TelemetryGroups
 }
 
 /**
- * User clicked on an advisor-related element (card, button, etc.).
- * This tracks various user interactions with advisor recommendations.
+ * User clicked the Assistant button to get AI help with an advisor issue.
+ * This opens the AI Assistant sidebar with a pre-filled prompt about the issue.
  *
  * @group Events
  * @source studio
- * @page /project/{ref}, Advisor Panel
+ * @page /dashboard/project/{ref} (homepage), /dashboard/project/{ref}/advisors/security or /dashboard/project/{ref}/advisors/performance (lint detail panel)
  */
-export interface AdvisorClickedEvent {
-  action: 'advisor_clicked'
+export interface AdvisorAssistantButtonClickedEvent {
+  action: 'advisor_assistant_button_clicked'
   properties: {
     /**
-     * The type of click action performed
+     * Where the button was clicked
      */
-    clickAction: 'ask_assistant' | 'issue_card' | 'fix_issue'
-    /**
-     * Where the click occurred
-     */
-    origin: 'home' | 'advisor_panel' | 'advisor_detail' | 'lint_detail'
+    origin: 'homepage' | 'lint_detail'
     /**
      * Category of the advisor (SECURITY or PERFORMANCE)
      */
-    advisorCategories?: AdvisorCategory[]
+    advisorCategory?: AdvisorCategory
     /**
      * Specific advisor type/name
      */
     advisorType?: string
     /**
-     * Number of issues found (only included when origin is 'home')
+     * Severity level of the advisor (only for lints)
+     */
+    advisorLevel?: AdvisorLevel
+    /**
+     * Number of issues found (only included when origin is 'homepage')
      */
     issuesCount?: number
   }
@@ -2483,4 +2488,4 @@ export type TelemetryEvent =
   | LogDrainSaveButtonClickedEvent
   | LogDrainConfirmButtonSubmittedEvent
   | AdvisorDetailOpenedEvent
-  | AdvisorClickedEvent
+  | AdvisorAssistantButtonClickedEvent

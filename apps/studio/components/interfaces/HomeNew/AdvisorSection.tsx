@@ -7,8 +7,7 @@ import { createLintSummaryPrompt } from 'components/interfaces/Linter/Linter.uti
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useTrack } from 'lib/telemetry/track'
 import { useAdvisorStateSnapshot } from 'state/advisor-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
@@ -26,9 +25,8 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
       enabled: !showEmptyState,
     }
   )
+  const track = useTrack()
   const snap = useAiAssistantStateSnapshot()
-  const { mutate: sendEvent } = useSendEventMutation()
-  const { data: organization } = useSelectedOrganizationQuery()
   const { openSidebar } = useSidebarManagerSnapshot()
   const { setSelectedItem } = useAdvisorStateSnapshot()
 
@@ -51,44 +49,25 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
 
   const handleAskAssistant = useCallback(() => {
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-    if (projectRef && organization?.slug) {
-      sendEvent({
-        action: 'advisor_clicked',
-        properties: {
-          clickAction: 'ask_assistant',
-          origin: 'home',
-          issuesCount: totalErrors,
-        },
-        groups: {
-          project: projectRef,
-          organization: organization.slug,
-        },
-      })
-    }
-  }, [sendEvent, openSidebar, projectRef, organization, totalErrors])
+    track('advisor_assistant_button_clicked', {
+      origin: 'homepage',
+      issuesCount: totalErrors,
+    })
+  }, [track, openSidebar, totalErrors])
 
   const handleCardClick = useCallback(
     (lint: Lint) => {
       setSelectedItem(lint.cache_key, 'lint')
       openSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
-      if (projectRef && organization?.slug) {
-        sendEvent({
-          action: 'advisor_clicked',
-          properties: {
-            clickAction: 'issue_card',
-            origin: 'home',
-            advisorCategories: lint.categories,
-            advisorType: lint.name,
-            issuesCount: totalErrors,
-          },
-          groups: {
-            project: projectRef,
-            organization: organization.slug,
-          },
-        })
-      }
+      track('advisor_detail_opened', {
+        origin: 'homepage',
+        advisorSource: 'lint',
+        advisorCategory: lint.categories[0],
+        advisorType: lint.name,
+        advisorLevel: lint.level,
+      })
     },
-    [sendEvent, setSelectedItem, openSidebar, projectRef, organization, totalErrors]
+    [track, setSelectedItem, openSidebar]
   )
 
   if (showEmptyState) {
@@ -146,21 +125,12 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
                           name: 'Summarize lint',
                           initialInput: createLintSummaryPrompt(lint),
                         })
-                        if (projectRef && organization?.slug) {
-                          sendEvent({
-                            action: 'advisor_clicked',
-                            properties: {
-                              clickAction: 'fix_issue',
-                              origin: 'home',
-                              advisorCategories: lint.categories,
-                              advisorType: lint.name,
-                            },
-                            groups: {
-                              project: projectRef,
-                              organization: organization.slug,
-                            },
-                          })
-                        }
+                        track('advisor_assistant_button_clicked', {
+                          origin: 'homepage',
+                          advisorCategory: lint.categories[0],
+                          advisorType: lint.name,
+                          advisorLevel: lint.level,
+                        })
                       }}
                       tooltip={{
                         content: { side: 'bottom', text: 'Help me fix this issue' },

@@ -260,14 +260,19 @@ export const AdvisorPanel = () => {
       }
     }
 
-    const advisorCategories =
-      item.source === 'lint' && 'categories' in item.original ? item.original.categories : undefined
+    const advisorCategory =
+      item.source === 'lint' && 'categories' in item.original
+        ? item.original.categories[0]
+        : undefined
+    const advisorLevel =
+      item.source === 'lint' && 'level' in item.original ? item.original.level : undefined
 
     track('advisor_detail_opened', {
       origin: 'advisor_panel',
-      advisorCategories,
+      advisorCategory,
       advisorSource: item.source,
       advisorType: item.original.name,
+      advisorLevel,
     })
   }
 
