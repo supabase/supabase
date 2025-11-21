@@ -1,5 +1,5 @@
 import { X } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -74,11 +74,12 @@ export const ReportBlock = ({
 
   const [rows, setRows] = useState<any[] | undefined>(undefined)
   const [isWriteQuery, setIsWriteQuery] = useState(false)
+  const lastExecutedSqlRef = useRef<string | undefined>()
 
   const {
     mutate: executeSql,
     error: executeSqlError,
-    isLoading: executeSqlLoading,
+    isPending: executeSqlLoading,
   } = useExecuteSqlMutation({
     onError: () => {
       // Silence the error toast because the error will be displayed inline
@@ -88,6 +89,10 @@ export const ReportBlock = ({
   const runQuery = useCallback(
     (queryType: 'select' | 'mutation' = 'select', sqlToRun?: string) => {
       if (!projectRef || !sqlToRun) return false
+
+      if (lastExecutedSqlRef.current === sqlToRun && queryType === 'select') {
+        return false
+      }
 
       const connectionString =
         queryType === 'mutation'
@@ -102,6 +107,9 @@ export const ReportBlock = ({
       if (queryType === 'mutation') {
         setIsWriteQuery(true)
       }
+
+      lastExecutedSqlRef.current = sqlToRun
+
       executeSql(
         { projectRef, connectionString, sql: sqlToRun },
         {
@@ -127,20 +135,24 @@ export const ReportBlock = ({
     [projectRef, readOnlyConnectionString, postgresConnectionString, executeSql]
   )
 
-  useEffect(() => {
-    if (!isSuccess) return
-    if (!isSnippet) return
-    const fetchedSql = (data?.content as SqlSnippets.Content | undefined)?.sql
-    if (fetchedSql) {
-      runQuery('select', fetchedSql)
-    }
-  }, [data, isSuccess, runQuery, isSnippet])
-
   const sqlHasChanged = useChangedSync(sql)
   const isRefreshingChanged = useChangedSync(isRefreshing)
-  if (sqlHasChanged || (isRefreshingChanged && isRefreshing)) {
-    runQuery('select', sql)
-  }
+
+  useEffect(() => {
+    if (!isSnippet) return
+
+    if (isSuccess) {
+      const fetchedSql = (data?.content as SqlSnippets.Content | undefined)?.sql
+      if (fetchedSql) {
+        runQuery('select', fetchedSql)
+      }
+    }
+
+    const shouldRunQuery = sqlHasChanged || (isRefreshingChanged && isRefreshing)
+    if (sql && shouldRunQuery) {
+      runQuery('select', sql)
+    }
+  }, [data, isSuccess, isSnippet, sqlHasChanged, isRefreshingChanged, isRefreshing, sql, runQuery])
 
   return (
     <>
