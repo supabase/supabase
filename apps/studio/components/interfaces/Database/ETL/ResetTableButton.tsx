@@ -57,12 +57,12 @@ export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) 
         aria-label={`Reset and restart table ${tableName}`}
         onClick={() => setIsOpen(true)}
       >
-        Reset Table and Restart
+        Reset table and restart
       </Button>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Reset and restart table "{tableName}"?</AlertDialogTitle>
-          <AlertDialogDescription className="flex flex-col gap-y-3">
+          <AlertDialogDescription className="flex flex-col gap-y-3 py-4 !mt-0">
             <p>
               This will reset and restart replication for this table only. The table will start
               copying from scratch, and any existing data for this table downstream will be deleted.
@@ -88,7 +88,7 @@ export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) 
               ? 'Resetting table...'
               : isRestartingPipeline
                 ? 'Restarting pipeline...'
-                : 'Reset Table and Restart'}
+                : 'Confirm reset and restart'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

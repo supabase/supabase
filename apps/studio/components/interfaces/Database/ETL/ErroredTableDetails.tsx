@@ -1,10 +1,10 @@
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
+import { ErrorDetailsButton } from './ErrorDetailsButton'
 import { TableState } from './ReplicationPipelineStatus/ReplicationPipelineStatus.types'
 import { isValidRetryPolicy } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
-import { RetryCountdown } from './RetryCountdown'
 import { ResetTableButton } from './ResetTableButton'
-import { ErrorDetailsButton } from './ErrorDetailsButton'
+import { RetryCountdown } from './RetryCountdown'
 
 interface ErroredTableDetailsProps {
   state: Extract<TableState['state'], { name: 'error' }>
@@ -32,7 +32,7 @@ export const ErroredTableDetails = ({ state, tableName, tableId }: ErroredTableD
   return (
     <div role="region" aria-label={`Error details for table ${tableName}`}>
       {retryPolicy === 'no_retry' ? (
-        <div className="flex flex-col gap-y-2">
+        <div className="flex flex-col gap-y-3">
           <p className="text-xs text-foreground-lighter">
             This error requires manual intervention from our{' '}
             <InlineLink
@@ -43,27 +43,41 @@ export const ErroredTableDetails = ({ state, tableName, tableId }: ErroredTableD
             </InlineLink>
             . Alternatively, you may also recreate the pipeline.
           </p>
-          <ErrorDetailsButton reason={state.reason} solution={state.solution} />
+          <ErrorDetailsButton
+            tableName={tableName}
+            reason={state.reason}
+            solution={state.solution}
+          />
         </div>
       ) : retryPolicy === 'manual_retry' ? (
-        <div className="flex flex-col gap-y-2 text-foreground-lighter">
-          <p className="text-xs">
-            {state.solution}
-            {state.solution && !/[.!?]$/.test(state.solution.trim()) && '.'} You can reset the table
-            to start replication from scratch.
-          </p>
+        <div className="flex flex-col gap-y-3 text-foreground-lighter">
+          <div>
+            <p className="text-xs">
+              {state.solution}
+              {state.solution && !/[.!?]$/.test(state.solution.trim()) && '.'}
+            </p>
+            <p className="text-xs">You can reset the table to start replication from scratch.</p>
+          </div>
           <div className="flex items-center gap-x-2">
             <ResetTableButton tableId={tableId} tableName={tableName} />
-            <ErrorDetailsButton reason={state.reason} solution={state.solution} />
+            <ErrorDetailsButton
+              tableName={tableName}
+              reason={state.reason}
+              solution={state.solution}
+            />
           </div>
         </div>
       ) : retryPolicy === 'timed_retry' ? (
-        <div className="flex flex-col text-foreground-lighter gap-y-2">
+        <div className="flex flex-col text-foreground-lighter gap-y-3">
           <p className="text-xs">
             A retry will be triggered automatically by restarting the pipeline on this table.
           </p>
           <RetryCountdown nextRetryTime={state.retry_policy.next_retry} />
-          <ErrorDetailsButton reason={state.reason} solution={state.solution} />
+          <ErrorDetailsButton
+            tableName={tableName}
+            reason={state.reason}
+            solution={state.solution}
+          />
         </div>
       ) : null}
     </div>

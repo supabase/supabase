@@ -413,7 +413,7 @@ export const ReplicationPipelineStatus = () => {
                                 Status unavailable while pipeline is {config.badge.toLowerCase()}
                               </p>
                             ) : (
-                              <div className="space-y-3">
+                              <div className="flex flex-col gap-y-2">
                                 <div className="text-sm text-foreground">
                                   {statusConfig.description}
                                 </div>
@@ -461,6 +461,7 @@ export const ReplicationPipelineStatus = () => {
           </div>
         )}
       </div>
+
       <UpdateVersionModal
         visible={showUpdateVersionModal}
         pipeline={pipeline}
