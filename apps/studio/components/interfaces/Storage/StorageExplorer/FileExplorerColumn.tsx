@@ -57,15 +57,15 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) =>
 }
 
 export interface FileExplorerColumnProps {
-  index: number
+  index?: number
   column: StorageColumn
   fullWidth?: boolean
-  selectedItems: StorageItemWithColumn[]
-  itemSearchString: string
-  onFilesUpload: (event: any, index: number) => void
-  onSelectAllItemsInColumn: (index: number) => void
-  onSelectColumnEmptySpace: (index: number) => void
-  onColumnLoadMore: (index: number, column: StorageColumn) => void
+  selectedItems?: StorageItemWithColumn[]
+  itemSearchString?: string
+  onFilesUpload?: (event: any, index: number) => void
+  onSelectAllItemsInColumn?: (index: number) => void
+  onSelectColumnEmptySpace?: (index: number) => void
+  onColumnLoadMore?: (index: number, column: StorageColumn) => void
 }
 
 export const FileExplorerColumn = ({
@@ -73,7 +73,7 @@ export const FileExplorerColumn = ({
   column,
   fullWidth = false,
   selectedItems = [],
-  itemSearchString,
+  itemSearchString = '',
   onFilesUpload = noop,
   onSelectAllItemsInColumn = noop,
   onSelectColumnEmptySpace = noop,

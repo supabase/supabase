@@ -26,7 +26,7 @@ export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalP
   const { ref: projectRef } = useParams()
   const { fetchFolderContents } = useStorageExplorerStateSnapshot()
 
-  const { mutate: emptyBucket, isLoading } = useBucketEmptyMutation({
+  const { mutate: emptyBucket, isPending } = useBucketEmptyMutation({
     onSuccess: async () => {
       if (bucket === undefined) return
       await fetchFolderContents({
@@ -70,10 +70,10 @@ export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalP
           </p>
         </DialogSection>
         <DialogFooter>
-          <Button type="default" disabled={isLoading} onClick={onClose}>
+          <Button type="default" disabled={isPending} onClick={onClose}>
             Cancel
           </Button>
-          <Button type="danger" loading={isLoading} onClick={onEmptyBucket}>
+          <Button type="danger" loading={isPending} onClick={onEmptyBucket}>
             Empty bucket
           </Button>
         </DialogFooter>

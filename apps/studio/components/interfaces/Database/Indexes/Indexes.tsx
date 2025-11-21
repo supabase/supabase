@@ -18,15 +18,15 @@ import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQuer
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
+  Card,
   Input,
   SidePanel,
   Table,
   TableBody,
   TableCell,
   TableHead,
-  TableRow,
   TableHeader,
-  Card,
+  TableRow,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
@@ -83,7 +83,7 @@ const Indexes = () => {
     connectionString: project?.connectionString,
   })
 
-  const { mutate: deleteIndex, isLoading: isExecuting } = useDatabaseIndexDeleteMutation({
+  const { mutate: deleteIndex, isPending: isExecuting } = useDatabaseIndexDeleteMutation({
     onSuccess: async () => {
       setSelectedIndexNameToDelete(null)
       toast.success('Successfully deleted index')

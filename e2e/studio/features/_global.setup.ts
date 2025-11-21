@@ -1,7 +1,7 @@
 import { expect, test as setup } from '@playwright/test'
 import dotenv from 'dotenv'
 import path from 'path'
-import { env, STORAGE_STATE_PATH } from '../env.config'
+import { env, STORAGE_STATE_PATH } from '../env.config.js'
 
 /**
  * Run any setup tasks for the tests.
@@ -9,7 +9,7 @@ import { env, STORAGE_STATE_PATH } from '../env.config'
  */
 
 dotenv.config({
-  path: path.resolve(__dirname, '..', '.env.local'),
+  path: path.resolve(import.meta.dirname, '..', '.env.local'),
   override: true,
 })
 
@@ -24,18 +24,6 @@ setup('Global Setup', async ({ page }) => {
     - Auth: ${envHasAuth ? 'enabled' : 'disabled'}
     - Is Platform: ${IS_PLATFORM}
     `)
-
-  /*
-   * Check if we're in CI, if so, check VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO
-   * is set to true.
-   */
-  const VERCEL_BYPASS = process.env.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO
-
-  if (process.env.CI === 'true') {
-    if (!VERCEL_BYPASS || VERCEL_BYPASS.length === 0) {
-      throw new Error('VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO is not set')
-    }
-  }
 
   /**
    * Studio Check
