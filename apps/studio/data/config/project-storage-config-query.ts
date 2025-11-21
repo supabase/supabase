@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { useFlag } from 'common'
 import { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -62,8 +61,7 @@ export const useIsAnalyticsBucketsEnabled = ({ projectRef }: { projectRef?: stri
 }
 
 export const useIsVectorBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
-  const { storageVectors } = useIsFeatureEnabled(['storage:vectors'])
-  // [Joshen] Temp using feature flag - will need to shift to storage config like analytics bucket once ready
-  const isVectorBucketsEnabled = useFlag('storageAnalyticsVector')
-  return storageVectors && isVectorBucketsEnabled
+  const { data } = useProjectStorageConfigQuery({ projectRef })
+  const isVectorBucketsEnabled = !!data?.features.vectorBuckets?.enabled
+  return isVectorBucketsEnabled
 }
