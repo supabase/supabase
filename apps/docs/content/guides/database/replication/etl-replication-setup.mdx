@@ -138,13 +138,13 @@ When you replicate to Analytics Buckets, your database changes are automatically
 
 ##### Step 1: Create an analytics bucket
 
-First, create an Analytics Bucket to store your replicated data:
+First, create an analytics bucket to store your replicated data:
 
 1. Navigate to [Storage](/dashboard/project/_/storage/buckets) → **Analytics** in your Supabase Dashboard
 2. Click **New bucket**
 
    <Image
-     alt="Create New Analytics Bucket"
+     alt="Create new analytics bucket"
      src="/docs/img/database/replication/etl-iceberg-new-bucket.png"
      zoomable
    />
@@ -152,7 +152,7 @@ First, create an Analytics Bucket to store your replicated data:
 3. Fill in the bucket details:
 
    <Image
-     alt="Analytics Bucket Details"
+     alt="Analytics bucket details"
      src="/docs/img/database/replication/etl-iceberg-details.png"
      zoomable
    />
@@ -184,7 +184,7 @@ First, create an Analytics Bucket to store your replicated data:
    - **Destination type**: Select **Analytics Buckets**
 
 4. Configure Analytics Buckets settings:
-   - **Bucket**: The name of your Analytics Bucket from Step 1
+   - **Bucket**: The name of your analytics bucket from Step 1
    - **Namespace**: The schema name where your tables will be replicated (e.g., `public`)
    - **Catalog Token**: Authentication token from Step 1
    - **S3 Access Key ID**: Access key from Step 1
@@ -195,7 +195,7 @@ First, create an Analytics Bucket to store your replicated data:
 
 6. Click **Create and start** to begin replication
 
-Your replication pipeline will now start copying data from your database to the Analytics Bucket in Iceberg format.
+Your replication pipeline will now start copying data from your database to the analytics bucket in Iceberg format.
 
 ##### How it works
 
