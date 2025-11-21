@@ -47,7 +47,7 @@ export const AIAssistantHeader = ({
               <path d="M16 3.549L7.12 20.600" />
             </svg>
           </span>
-          <AIAssistantChatSelector disabled={isChatLoading} />
+          <AIAssistantChatSelector />
         </div>
         <div className="flex items-center gap-x-4">
           <div className="flex items-center">
@@ -57,7 +57,6 @@ export const AIAssistantHeader = ({
               icon={<Plus strokeWidth={1.5} />}
               onClick={onNewChat}
               className="h-7 w-7 p-0"
-              disabled={isChatLoading}
               tooltip={{ content: { side: 'bottom', text: 'New chat' } }}
             />
             <ButtonTooltip
