@@ -32,13 +32,13 @@ To monitor your ETL replication pipelines:
 
 Each destination shows its pipeline in one of these states:
 
-| State | Description |
-|-------|-------------|
-| **Stopped** | Pipeline is not running |
-| **Starting** | Pipeline is being started |
-| **Running** | Pipeline is actively replicating data |
-| **Stopping** | Pipeline is being stopped |
-| **Failed** | Pipeline has encountered an error (hover over the status to view error details) |
+| State        | Description                                                                     |
+| ------------ | ------------------------------------------------------------------------------- |
+| **Stopped**  | Pipeline is not running                                                         |
+| **Starting** | Pipeline is being started                                                       |
+| **Running**  | Pipeline is actively replicating data                                           |
+| **Stopping** | Pipeline is being stopped                                                       |
+| **Failed**   | Pipeline has encountered an error (hover over the status to view error details) |
 
 ## Viewing detailed pipeline metrics
 
@@ -58,13 +58,13 @@ The status page shows replication lag metrics that help you determine how fast y
 
 The pipeline status page also shows the state of individual tables being replicated. Each table can be in one of these states:
 
-| State | Description |
-|-------|-------------|
-| **Queue** | Table is getting ready to be copied |
-| **Copying** | Initial snapshot of the table is being copied |
-| **Copied** | Table snapshot is complete and getting ready for real-time replication |
-| **Live** | Table is now replicating data in near real-time |
-| **Error** | Table has experienced an error during replication |
+| State       | Description                                                            |
+| ----------- | ---------------------------------------------------------------------- |
+| **Queue**   | Table is getting ready to be copied                                    |
+| **Copying** | Initial snapshot of the table is being copied                          |
+| **Copied**  | Table snapshot is complete and getting ready for real-time replication |
+| **Live**    | Table is now replicating data in near real-time                        |
+| **Error**   | Table has experienced an error during replication                      |
 
 ## Handling errors
 
@@ -81,6 +81,7 @@ Table errors occur during the copy phase and affect individual tables. These err
 />
 
 **Viewing table error details:**
+
 1. Click **View status** on your destination
 2. Check the table states section to identify tables in **Error** state
 3. Review the error message for that specific table
@@ -100,6 +101,7 @@ Pipeline errors occur during the streaming phase (Live state) and affect the ent
 />
 
 **Viewing pipeline error details:**
+
 1. Hover over the **Failed** status in the destinations list to see a quick error summary
 2. Click **View status** for comprehensive error information
 3. Navigate to [Logs](/dashboard/project/_/logs/explorer) → **ETL Replication** for detailed error logs
@@ -107,6 +109,7 @@ Pipeline errors occur during the streaming phase (Live state) and affect the ent
 **Recovering from pipeline errors:**
 
 To recover from a pipeline error, you'll need to:
+
 1. Investigate the root cause using the error details and logs
 2. Fix the underlying issue (e.g., destination connectivity, schema compatibility)
 3. Restart the pipeline from the destinations list
