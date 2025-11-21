@@ -1,7 +1,7 @@
 import { expect, test as setup } from '@playwright/test'
 import dotenv from 'dotenv'
 import path from 'path'
-import { env, STORAGE_STATE_PATH } from '../env.config'
+import { env, STORAGE_STATE_PATH } from '../env.config.js'
 
 /**
  * Run any setup tasks for the tests.
@@ -9,7 +9,7 @@ import { env, STORAGE_STATE_PATH } from '../env.config'
  */
 
 dotenv.config({
-  path: path.resolve(__dirname, '..', '.env.local'),
+  path: path.resolve(import.meta.dirname, '..', '.env.local'),
   override: true,
 })
 

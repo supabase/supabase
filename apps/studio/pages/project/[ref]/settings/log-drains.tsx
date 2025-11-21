@@ -33,6 +33,7 @@ import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ChevronDown } from 'lucide-react'
 import { cloneElement } from 'react'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
   const { can: canManageLogDrains, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -48,13 +49,15 @@ const LogDrainsSettings: NextPageWithLayout = () => {
     useState<LogDrainCreateVariables | null>(null)
   const [mode, setMode] = useState<'create' | 'update'>('create')
 
-  const { plan, isLoading: planLoading } = useCurrentOrgPlan()
+  const { hasAccess: hasAccessToLogDrains, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('log_drains')
 
-  const logDrainsEnabled = !planLoading && (plan?.id === 'team' || plan?.id === 'enterprise')
+  const { data: logDrains } = useLogDrainsQuery(
+    { ref },
+    { enabled: !isLoadingEntitlement && hasAccessToLogDrains }
+  )
 
-  const { data: logDrains } = useLogDrainsQuery({ ref }, { enabled: logDrainsEnabled })
-
-  const { mutate: createLogDrain, isLoading: createLoading } = useCreateLogDrainMutation({
+  const { mutate: createLogDrain, isPending: createLoading } = useCreateLogDrainMutation({
     onSuccess: () => {
       toast.success('Log drain destination created')
       setOpen(false)
@@ -65,7 +68,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
     },
   })
 
-  const { mutate: updateLogDrain, isLoading: updateLoading } = useUpdateLogDrainMutation({
+  const { mutate: updateLogDrain, isPending: updateLoading } = useUpdateLogDrainMutation({
     onSuccess: () => {
       toast.success('Log drain updated')
       setOpen(false)
@@ -178,7 +181,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   )
 
   // [kemal]: Ordinarily <PageLayout /> would be bundled with the getLayout function below, however in this case we need access to some bits for the "Add destination" button to render as part of the in-built page header in <PageLayout />.
-  if (logDrainsEnabled && !planLoading) {
+  if (!isLoadingEntitlement && hasAccessToLogDrains) {
     return (
       <PageLayout
         title="Log Drains"
@@ -188,7 +191,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             {!(logDrains?.length === 0) && (
               <div className="flex items-center">
                 <Button
-                  disabled={!logDrainsEnabled || !canManageLogDrains}
+                  disabled={!hasAccessToLogDrains || !canManageLogDrains}
                   onClick={() => {
                     setSelectedLogDrain(null)
                     setMode('create')

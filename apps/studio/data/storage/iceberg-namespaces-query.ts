@@ -11,7 +11,7 @@ type GetNamespacesVariables = {
   projectRef?: string
 }
 
-const errorPrefix = 'Failed to delete Iceberg namespaces'
+const errorPrefix = 'Failed to retrieve Iceberg namespaces'
 
 async function getNamespaces({
   catalogUri,
@@ -71,7 +71,9 @@ export const useIcebergNamespacesQuery = <TData = IcebergNamespacesData>(
       typeof projectRef !== 'undefined' &&
       typeof tempApiKey !== 'undefined' &&
       typeof catalogUri !== 'undefined' &&
-      typeof warehouse !== 'undefined',
+      catalogUri.length > 0 &&
+      typeof warehouse !== 'undefined' &&
+      warehouse.length > 0,
     ...options,
   })
 }

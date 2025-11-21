@@ -72,14 +72,16 @@ export const useIcebergNamespaceCreateMutation = ({
     mutationFn: (vars) => createIcebergNamespace({ ...vars, tempApiKey }),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({
-        queryKey: storageKeys.icebergNamespace(
-          variables.catalogUri,
-          variables.warehouse,
-          variables.namespace
-        ),
+        queryKey: storageKeys.icebergNamespace({
+          projectRef,
+          catalog: variables.catalogUri,
+          warehouse: variables.warehouse,
+          namespace: variables.namespace,
+        }),
       })
       await queryClient.invalidateQueries({
         queryKey: storageKeys.icebergNamespaces({
+          projectRef,
           catalog: variables.catalogUri,
           warehouse: variables.warehouse,
         }),

@@ -23,14 +23,14 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
   const [selectedReason, setSelectedReason] = useState<string[]>([])
 
   const subscriptionUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
+  const { mutate: updateOrgSubscription, isPending: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
       onError: (error) => {
         toast.error(`Failed to downgrade project: ${error.message}`)
       },
     }
   )
-  const { mutateAsync: sendExitSurvey, isLoading: isSubmittingFeedback } =
+  const { mutateAsync: sendExitSurvey, isPending: isSubmittingFeedback } =
     useSendDowngradeFeedbackMutation()
   const isSubmitting = isUpdating || isSubmittingFeedback
 

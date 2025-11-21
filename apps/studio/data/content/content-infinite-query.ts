@@ -7,7 +7,7 @@ import { contentKeys } from './keys'
 
 interface GetContentVariables {
   projectRef?: string
-  cursor?: string
+  cursor?: string | undefined
   type: ContentType
   name?: string
   limit?: number

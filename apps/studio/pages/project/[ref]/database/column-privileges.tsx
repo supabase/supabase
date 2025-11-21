@@ -1,7 +1,7 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { AlertCircle, XIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import {
@@ -47,23 +47,24 @@ const PrivilegesPage: NextPageWithLayout = () => {
   const [selectedTable, setSelectedTable] = useState<string | undefined>(paramTable)
   const [selectedRole, setSelectedRole] = useState<string>('authenticated')
 
-  const { data: tableList, isLoading: isLoadingTables } = useTablesQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    {
-      onSuccess(data) {
-        const tables = data
-          .filter((table) => table.schema === selectedSchema)
-          .map((table) => table.name)
+  const {
+    data: tableList,
+    isLoading: isLoadingTables,
+    isSuccess: isSuccessTables,
+  } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
-        if (tables[0] && selectedTable === undefined) {
-          setSelectedTable(tables[0])
-        }
-      },
+  useEffect(() => {
+    if (!isSuccessTables) return
+    const tables = tableList
+      .filter((table) => table.schema === selectedSchema)
+      .map((table) => table.name)
+    if (tables[0] && selectedTable === undefined) {
+      setSelectedTable(tables[0])
     }
-  )
+  }, [isSuccessTables, tableList, selectedSchema, selectedTable])
 
   const { data: allRoles, isLoading: isLoadingRoles } = useDatabaseRolesQuery({
     projectRef: project?.ref,

@@ -18,11 +18,6 @@ functions:
   - id: initializing
     title: 'Initializing'
     $ref: '@supabase/supabase-js.SupabaseClient.constructor'
-    description: |
-      You can initialize a new Supabase client using the `createClient()` method.
-
-      The Supabase client is your entrypoint to the rest of the Supabase functionality
-      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
 
     examples:
       - id: create-client
@@ -186,6 +181,20 @@ functions:
           - You keep the `expo-secure-storage`, `aes-js` and `react-native-get-random-values` libraries up-to-date.
           - Choose the correct [`SecureStoreOptions`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestoreoptions) for your app's needs. E.g. [`SecureStore.WHEN_UNLOCKED`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestorewhen_unlocked) regulates when the data can be accessed.
           - Carefully consider optimizations or other modifications to the above example, as those can lead to introducing subtle security vulnerabilities.
+      - id: initializing-typedoc-example-1
+        name: Example 8
+        code: >-
+          ```ts
+
+          import { createClient } from '@supabase/supabase-js'
+
+
+          const supabase = createClient('https://xyzcompany.supabase.co',
+          'public-anon-key')
+
+          const { data } = await supabase.from('profiles').select('*')
+
+          ```
 
   - id: auth-api
     title: 'Overview'
@@ -798,7 +807,9 @@ functions:
       - id: sign-in-with-email
         name: Sign in with email
         isSpotlight: true
-        description: The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
+        description: The user will be sent an email which contains either a magiclink or
+          a OTP or both. By default, a given user can only request a OTP once
+          every 60 seconds.
         code: |
           ```js
           const { data, error } = await supabase.auth.signInWithOtp({
@@ -821,7 +832,8 @@ functions:
       - id: sign-in-with-sms-otp
         name: Sign in with SMS OTP
         isSpotlight: false
-        description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
+        description: The user will be sent a SMS which contains a OTP. By default, a
+          given user can only request a OTP once every 60 seconds.
         code: |
           ```js
           const { data, error } = await supabase.auth.signInWithOtp({
@@ -831,7 +843,10 @@ functions:
       - id: sign-in-with-whatsapp-otp
         name: Sign in with WhatsApp OTP
         isSpotlight: false
-        description: The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
+        description: The user will be sent a WhatsApp message which contains a OTP. By
+          default, a given user can only request a OTP once every 60 seconds.
+          Note that a user will need to have a valid WhatsApp account that is
+          linked to Twilio in order to use this feature.
         code: |
           ```js
           const { data, error } = await supabase.auth.signInWithOtp({
@@ -1835,7 +1850,8 @@ functions:
     examples:
       - id: set-the-session
         name: Set the session
-        description: Sets the session data from an access_token and refresh_token, then returns an auth response or error.
+        description: Sets the session data from an access_token and refresh_token, then
+          returns an auth response or error.
         isSpotlight: true
         code: |
           ```js
@@ -2250,7 +2266,7 @@ functions:
       Learn more about implementing MFA in your application [in the MFA guide](https://supabase.com/docs/guides/auth/auth-mfa#overview).
   - id: mfa-enroll
     title: 'mfa.enroll()'
-    $ref: '@supabase/auth-js.GoTrueClient.mfa.enroll'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.enroll'
     notes: |
       - Use `totp` or `phone` as the `factorType` and use the returned `id` to create a challenge.
       - To create a challenge, see [`mfa.challenge()`](/docs/reference/javascript/auth-mfa-challenge).
@@ -2324,7 +2340,7 @@ functions:
           ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
-    $ref: '@supabase/auth-js.GoTrueClient.mfa.challenge'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.challenge'
     notes: |
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before creating a challenge.
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify).
@@ -2392,7 +2408,7 @@ functions:
           ```
   - id: mfa-verify
     title: 'mfa.verify()'
-    $ref: '@supabase/auth-js.GoTrueClient.mfa.verify'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.verify'
     notes: |
       - To verify a challenge, please [create a challenge](/docs/reference/javascript/auth-mfa-challenge) first.
     examples:
@@ -2468,7 +2484,7 @@ functions:
           ```
   - id: mfa-challenge-and-verify
     title: 'mfa.challengeAndVerify()'
-    $ref: '@supabase/auth-js.GoTrueClient.mfa.challengeAndVerify'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.challengeAndVerify'
     notes: |
       - Intended for use with only TOTP factors.
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
@@ -2545,7 +2561,7 @@ functions:
           ```
   - id: mfa-unenroll
     title: 'mfa.unenroll()'
-    $ref: '@supabase/auth-js.GoTrueClient.mfa.unenroll'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.unenroll'
     examples:
       - id: unenroll-a-factor
         name: Unenroll a factor
@@ -2567,7 +2583,7 @@ functions:
           ```
   - id: mfa-get-authenticator-assurance-level
     title: 'mfa.getAuthenticatorAssuranceLevel()'
-    $ref: '@supabase/auth-js.GoTrueClient.mfa.getAuthenticatorAssuranceLevel'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel'
     notes: |
       - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
       - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP) or Phone factor.
@@ -2942,7 +2958,8 @@ functions:
         type: GenerateLinkParams
         subContent:
           - name: type
-            type: 'signup | invite | magiclink | recovery | email_change_current | email_change_new'
+            type: 'signup | invite | magiclink | recovery | email_change_current |
+              email_change_new'
           - name: email
             type: string
           - name: password
@@ -2952,7 +2969,8 @@ functions:
           - name: newEmail
             type: string
             isOptional: true
-            description: Only required if type is `email_change_current` or `email_change_new`.
+            description: Only required if type is `email_change_current` or
+              `email_change_new`.
           - name: options
             type: object
             isOptional: true
@@ -2960,12 +2978,14 @@ functions:
               - name: data
                 type: object
                 description: >
-                  Custom JSON object containing user metadata, to be stored in the `raw_user_meta_data` column.
-                  Only accepted if type is `signup`, `invite`, or `magiclink`.
+                  Custom JSON object containing user metadata, to be stored in
+                  the `raw_user_meta_data` column. Only accepted if type is
+                  `signup`, `invite`, or `magiclink`.
               - name: redirectTo
                 type: string
                 description: >
-                  A redirect URL which will be appended to the generated email link.
+                  A redirect URL which will be appended to the generated email
+                  link.
     examples:
       - id: generate-a-signup-link
         name: Generate a signup link
@@ -4458,17 +4478,6 @@ functions:
 
   - id: rpc
     title: 'Postgres functions: rpc()'
-    description: |
-      You can call Postgres functions as _Remote Procedure Calls_, logic in your database that you can execute from anywhere.
-      Functions are useful when the logic rarely changes—like for password resets and updates.
-
-      ```sql
-      create or replace function hello_world() returns text as $$
-        select 'Hello world';
-      $$ language sql;
-      ```
-
-      To call Postgres functions on [Read Replicas](/docs/guides/platform/read-replicas), use the `get: true` option.
     $ref: '@supabase/postgrest-js.PostgrestClient.rpc'
     examples:
       - id: call-a-postgres-function-without-arguments
@@ -5818,7 +5827,6 @@ functions:
           can filter on range columns using the string representation of range
           values.
         hideCodeBlock: true
-  # TODO: schema & result
   - id: text-search
     title: textSearch()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.textSearch'
@@ -6882,18 +6890,26 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+      - id: overrideTypes-typedoc-example-1
+        name: Example 5
+        code: |-
+          ```typescript
+          // Merge with existing types (default behavior)
+          const query = supabase
+            .from('users')
+            .select()
+            .overrideTypes<{ custom_field: string }>()
+
+          // Replace existing types completely
+          const replaceQuery = supabase
+            .from('users')
+            .select()
+            .overrideTypes<{ id: number; name: string }, { merge: false }>()
+          ```
 
   - id: explain
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.explain'
     title: Using Explain
-    description: |
-      For debugging slow queries, you can get the [Postgres `EXPLAIN` execution plan](https://www.postgresql.org/docs/current/sql-explain.html) of a query
-      using the `explain()` method. This works on any query, even for `rpc()` or writes.
-
-      Explain is not enabled by default as it can reveal sensitive information about your database.
-      It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
-
-      Follow the [Performance Debugging Guide](/docs/guides/database/debugging-performance) to enable the functionality on your project.
     examples:
       - id: get-execution-plan
         name: Get the execution plan
@@ -7051,8 +7067,6 @@ functions:
 
   - id: invoke
     title: invoke()
-    description: |
-      Invoke a Supabase Edge Function.
     $ref: '@supabase/functions-js.FunctionsClient.invoke'
     notes: |
       - Requires an Authorization header.
@@ -7165,6 +7179,14 @@ functions:
               "my-custom-header": 'my-custom-header-value'
             },
             method: 'GET'
+          })
+          ```
+      - id: invoke-typedoc-example-1
+        name: Example 7
+        code: |-
+          ```ts
+          const { data, error } = await functions.invoke('hello-world', {
+            body: { name: 'Ada' },
           })
           ```
 
@@ -7317,7 +7339,8 @@ functions:
           ```
       - id: listen-to-multiple-events
         name: Listen to multiple events
-        description: You can chain listeners if you want to listen to multiple events for each table.
+        description: You can chain listeners if you want to listen to multiple events
+          for each table.
         code: |
           ```js
           supabase
@@ -7328,7 +7351,9 @@ functions:
           ```
       - id: listening-to-row-level-changes
         name: Listen to row level changes
-        description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+        description: You can listen to individual rows using the format
+          `{table}:{col}=eq.{val}` - where `{col}` is the column name, and
+          `{val}` is the value which you want to match.
         notes: |
           - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
         code: |
@@ -7340,8 +7365,6 @@ functions:
           ```
   - id: broadcast-message
     title: broadcastMessage()
-    description: |
-      Broadcast a message to all connected clients to a channel.
     notes: |
       - When using REST you don't need to subscribe to the channel
       - REST calls are only available from 2.37.0 onwards
@@ -7417,6 +7440,10 @@ functions:
           supabase.removeAllChannels()
           ```
 
+  - id: file-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with File Buckets.
   - id: list-buckets
     title: listBuckets()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
@@ -7425,36 +7452,6 @@ functions:
         - `buckets` table permissions: `select`
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
-    examples:
-      - id: list-buckets
-        name: List buckets
-        isSpotlight: true
-        code: |
-          ```ts
-          const { data, error } = await supabase
-            .storage
-            .listBuckets()
-          ```
-        response: |
-          ```json
-          {
-            "data": [
-              {
-                "id": "avatars",
-                "name": "avatars",
-                "owner": "",
-                "public": false,
-                "file_size_limit": 1024,
-                "allowed_mime_types": [
-                  "image/png"
-                ],
-                "created_at": "2024-05-22T22:26:05.100Z",
-                "updated_at": "2024-05-22T22:26:05.100Z"
-              }
-            ],
-            "error": null
-          }
-          ```
 
   - id: get-bucket
     title: getBucket()
@@ -7464,34 +7461,6 @@ functions:
         - `buckets` table permissions: `select`
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
-    examples:
-      - id: get-bucket
-        name: Get bucket
-        isSpotlight: true
-        code: |
-          ```js
-          const { data, error } = await supabase
-            .storage
-            .getBucket('avatars')
-          ```
-        response: |
-          ```json
-          {
-            "data": {
-              "id": "avatars",
-              "name": "avatars",
-              "owner": "",
-              "public": false,
-              "file_size_limit": 1024,
-              "allowed_mime_types": [
-                "image/png"
-              ],
-              "created_at": "2024-05-22T22:26:05.100Z",
-              "updated_at": "2024-05-22T22:26:05.100Z"
-            },
-            "error": null
-          }
-          ```
 
   - id: create-bucket
     title: createBucket()
@@ -7501,29 +7470,6 @@ functions:
         - `buckets` table permissions: `insert`
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
-    examples:
-      - id: create-bucket
-        name: Create bucket
-        isSpotlight: true
-        code: |
-          ```js
-          const { data, error } = await supabase
-            .storage
-            .createBucket('avatars', {
-              public: false,
-              allowedMimeTypes: ['image/png'],
-              fileSizeLimit: 1024
-            })
-          ```
-        response: |
-          ```json
-          {
-            "data": {
-              "name": "avatars"
-            },
-            "error": null
-          }
-          ```
 
   - id: empty-bucket
     title: emptyBucket()
@@ -7533,25 +7479,7 @@ functions:
         - `buckets` table permissions: `select`
         - `objects` table permissions: `select` and `delete`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
-    examples:
-      - id: empty-bucket
-        name: Empty bucket
-        isSpotlight: true
-        code: |
-          ```js
-          const { data, error } = await supabase
-            .storage
-            .emptyBucket('avatars')
-          ```
-        response: |
-          ```json
-          {
-            "data": {
-              "message": "Successfully emptied"
-            },
-            "error": null
-          }
-          ```
+
   - id: update-bucket
     title: updateBucket()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.updateBucket'
@@ -7560,29 +7488,6 @@ functions:
         - `buckets` table permissions: `select` and `update`
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
-    examples:
-      - id: update-bucket
-        name: Update bucket
-        isSpotlight: true
-        code: |
-          ```js
-          const { data, error } = await supabase
-            .storage
-            .updateBucket('avatars', {
-              public: false,
-              allowedMimeTypes: ['image/png'],
-              fileSizeLimit: 1024
-            })
-          ```
-        response: |
-          ```json
-          {
-            "data": {
-              "message": "Successfully updated"
-            },
-            "error": null
-          }
-          ```
 
   - id: delete-bucket
     title: deleteBucket()
@@ -7592,25 +7497,30 @@ functions:
         - `buckets` table permissions: `select` and `delete`
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
-    examples:
-      - id: delete-bucket
-        name: Delete bucket
-        isSpotlight: true
-        code: |
-          ```js
-          const { data, error } = await supabase
-            .storage
-            .deleteBucket('avatars')
-          ```
-        response: |
-          ```json
-          {
-            "data": {
-              "message": "Successfully deleted"
-            },
-            "error": null
-          }
-          ```
+
+  - id: analytics-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with Analytics Buckets.
+  - id: storageanalyticsclient-createbucket
+    title: Create a new analytics bucket
+    $ref: '@supabase/storage-js.packages/StorageAnalyticsClient.default.createBucket'
+    notes: |
+      - Creates a new analytics bucket using Iceberg tables
+      - Analytics buckets are optimized for analytical queries and data processing
+
+  - id: storageanalyticsclient-listbuckets
+    title: List analytics buckets
+    $ref: '@supabase/storage-js.packages/StorageAnalyticsClient.default.listBuckets'
+    notes: |
+      - Retrieves the details of all Analytics Storage buckets within an existing project
+      - Only returns buckets of type 'ANALYTICS'
+
+  - id: storageanalyticsclient-deletebucket
+    title: Delete an analytics bucket
+    $ref: '@supabase/storage-js.packages/StorageAnalyticsClient.default.deleteBucket'
+    notes: |
+      - Deletes an analytics bucket
 
   - id: from-upload
     title: from.upload()
@@ -7621,43 +7531,6 @@ functions:
         - `objects` table permissions: only `insert` when you are uploading new files and `select`, `insert` and `update` when you are upserting files
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Upload file using `ArrayBuffer` from base64 file data instead, see example below.
-    examples:
-      - id: upload-file
-        name: Upload file
-        isSpotlight: true
-        code: |
-          ```js
-          const avatarFile = event.target.files[0]
-          const { data, error } = await supabase
-            .storage
-            .from('avatars')
-            .upload('public/avatar1.png', avatarFile, {
-              cacheControl: '3600',
-              upsert: false
-            })
-          ```
-        response: |
-          ```json
-          {
-            "data": {
-              "path": "public/avatar1.png",
-              "fullPath": "avatars/public/avatar1.png"
-            },
-            "error": null
-          }
-      - id: upload-file-using-arraybuffer-from-base64-file-data
-        name: Upload file using `ArrayBuffer` from base64 file data
-        code: |
-          ```js
-          import { decode } from 'base64-arraybuffer'
-
-          const { data, error } = await supabase
-            .storage
-            .from('avatars')
-            .upload('public/avatar1.png', decode('base64FileData'), {
-              contentType: 'image/png'
-            })
-          ```
 
   - id: from-update
     title: from.update()
@@ -7668,44 +7541,6 @@ functions:
         - `objects` table permissions: `update` and `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
-    examples:
-      - id: update-file
-        name: Update file
-        isSpotlight: true
-        code: |
-          ```js
-          const avatarFile = event.target.files[0]
-          const { data, error } = await supabase
-            .storage
-            .from('avatars')
-            .update('public/avatar1.png', avatarFile, {
-              cacheControl: '3600',
-              upsert: true
-            })
-          ```
-        response: |
-          ```json
-          {
-            "data": {
-              "path": "public/avatar1.png",
-              "fullPath": "avatars/public/avatar1.png"
-            },
-            "error": null
-          }
-          ```
-      - id: update-file-using-arraybuffer-from-base64-file-data
-        name: Update file using `ArrayBuffer` from base64 file data
-        code: |
-          ```js
-          import {decode} from 'base64-arraybuffer'
-
-          const { data, error } = await supabase
-            .storage
-            .from('avatars')
-            .update('public/avatar1.png', decode('base64FileData'), {
-              contentType: 'image/png'
-            })
-          ```
 
   - id: from-move
     title: from.move()
@@ -7715,26 +7550,6 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
-    examples:
-      - id: move-file
-        name: Move file
-        isSpotlight: true
-        code: |
-          ```js
-          const { data, error } = await supabase
-            .storage
-            .from('avatars')
-            .move('public/avatar1.png', 'private/avatar2.png')
-          ```
-        response: |
-          ```json
-          {
-            "data": {
-              "message": "Successfully moved"
-            },
-            "error": null
-          }
-          ```
 
   - id: from-copy
     title: from.copy()
@@ -7744,26 +7559,6 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert` and `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
-    examples:
-      - id: copy-file
-        name: Copy file
-        isSpotlight: true
-        code: |
-          ```js
-          const { data, error } = await supabase
-            .storage
-            .from('avatars')
-            .copy('public/avatar1.png', 'private/avatar2.png')
-          ```
-        response: |
-          ```json
-          {
-            "data": {
-              "path": "avatars/private/avatar2.png"
-            },
-            "error": null
-          }
-          ```
 
   - id: from-create-signed-url
     title: from.createSignedUrl()
@@ -7773,53 +7568,6 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
-    examples:
-      - id: create-signed-url
-        name: Create Signed URL
-        isSpotlight: true
-        code: |
-          ```js
-          const { data, error } = await supabase
-            .storage
-            .from('avatars')
-            .createSignedUrl('folder/avatar1.png', 60)
-          ```
-        response: |
-          ```json
-          {
-            "data": {
-              "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>"
-            },
-            "error": null
-          }
-          ```
-      - id: create-signed-url-with-transformations
-        name: Create a signed URL for an asset with transformations
-        isSpotlight: true
-        code: |
-          ```js
-          const { data } = await supabase
-            .storage
-            .from('avatars')
-            .createSignedUrl('folder/avatar1.png', 60, {
-              transform: {
-                width: 100,
-                height: 100,
-              }
-            })
-          ```
-      - id: create-signed-url-with-download
-        name: Create a signed URL which triggers the download of the asset
-        isSpotlight: true
-        code: |
-          ```js
-          const { data } = await supabase
-            .storage
-            .from('avatars')
-            .createSignedUrl('folder/avatar1.png', 60, {
-              download: true,
-            })
-          ```
 
   - id: from-create-signed-urls
     title: from.createSignedUrls()
@@ -7829,37 +7577,6 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
-    examples:
-      - id: create-signed-urls
-        name: Create Signed URLs
-        isSpotlight: true
-        code: |
-          ```js
-          const { data, error } = await supabase
-            .storage
-            .from('avatars')
-            .createSignedUrls(['folder/avatar1.png', 'folder/avatar2.png'], 60)
-          ```
-        response: |
-          ```json
-          {
-            "data": [
-              {
-                "error": null,
-                "path": "folder/avatar1.png",
-                "signedURL": "/object/sign/avatars/folder/avatar1.png?token=<TOKEN>",
-                "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>"
-              },
-              {
-                "error": null,
-                "path": "folder/avatar2.png",
-                "signedURL": "/object/sign/avatars/folder/avatar2.png?token=<TOKEN>",
-                "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar2.png?token=<TOKEN>"
-              }
-            ],
-            "error": null
-          }
-          ```
 
   - id: from-create-signed-upload-url
     title: from.createSignedUploadUrl()
@@ -7869,28 +7586,6 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
-    examples:
-      - id: create-signed-upload-url
-        name: Create Signed Upload URL
-        isSpotlight: true
-        code: |
-          ```js
-          const { data, error } = await supabase
-            .storage
-            .from('avatars')
-            .createSignedUploadUrl('folder/cat.jpg')
-          ```
-        response: |
-          ```json
-          {
-            "data": {
-              "signedUrl": "https://example.supabase.co/storage/v1/object/upload/sign/avatars/folder/cat.jpg?token=<TOKEN>",
-              "path": "folder/cat.jpg",
-              "token": "<TOKEN>"
-            },
-            "error": null
-          }
-          ```
 
   - id: from-upload-to-signed-url
     title: from.uploadToSignedUrl()
@@ -7900,27 +7595,6 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
-    examples:
-      - id: upload-to-signed-url
-        name: Upload to a signed URL
-        isSpotlight: true
-        code: |
-          ```js
-          const { data, error } = await supabase
-            .storage
-            .from('avatars')
-            .uploadToSignedUrl('folder/cat.jpg', 'token-from-createSignedUploadUrl', file)
-          ```
-        response: |
-          ```json
-          {
-            "data": {
-              "path": "folder/cat.jpg",
-              "fullPath": "avatars/folder/cat.jpg"
-            },
-            "error": null
-          }
-          ```
 
   - id: from-get-public-url
     title: from.getPublicUrl()
@@ -7931,52 +7605,6 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
-    examples:
-      - id: returns-the-url-for-an-asset-in-a-public-bucket
-        name: Returns the URL for an asset in a public bucket
-        isSpotlight: true
-        code: |
-          ```js
-          const { data } = supabase
-            .storage
-            .from('public-bucket')
-            .getPublicUrl('folder/avatar1.png')
-          ```
-        response: |
-          ```json
-          {
-            "data": {
-              "publicUrl": "https://example.supabase.co/storage/v1/object/public/public-bucket/folder/avatar1.png"
-            }
-          }
-          ```
-      - id: transform-asset-in-public-bucket
-        name: Returns the URL for an asset in a public bucket with transformations
-        isSpotlight: true
-        code: |
-          ```js
-          const { data } = supabase
-            .storage
-            .from('public-bucket')
-            .getPublicUrl('folder/avatar1.png', {
-              transform: {
-                width: 100,
-                height: 100,
-              }
-            })
-          ```
-      - id: download-asset-in-public-bucket
-        name: Returns the URL which triggers the download of an asset in a public bucket
-        isSpotlight: true
-        code: |
-          ```js
-          const { data } = supabase
-            .storage
-            .from('public-bucket')
-            .getPublicUrl('folder/avatar1.png', {
-              download: true,
-            })
-          ```
 
   - id: from-download
     title: from.download()
@@ -7986,40 +7614,6 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
-    examples:
-      - id: download-file
-        name: Download file
-        isSpotlight: true
-        code: |
-          ```js
-          const { data, error } = await supabase
-            .storage
-            .from('avatars')
-            .download('folder/avatar1.png')
-          ```
-        response: |
-          ```json
-          {
-            "data": <BLOB>,
-            "error": null
-          }
-          ```
-      - id: download-file-with-transformations
-        name: Download file with transformations
-        isSpotlight: true
-        code: |
-          ```js
-          const { data, error } = await supabase
-            .storage
-            .from('avatars')
-            .download('folder/avatar1.png', {
-              transform: {
-                width: 100,
-                height: 100,
-                quality: 80
-              }
-            })
-          ```
 
   - id: from-remove
     title: from.remove()
@@ -8029,24 +7623,6 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `delete` and `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
-    examples:
-      - id: delete-file
-        name: Delete file
-        isSpotlight: true
-        code: |
-          ```js
-          const { data, error } = await supabase
-            .storage
-            .from('avatars')
-            .remove(['folder/avatar1.png'])
-          ```
-        response: |
-          ```json
-          {
-            "data": [],
-            "error": null
-          }
-          ```
 
   - id: from-list
     title: from.list()
@@ -8056,56 +7632,541 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+
+  - id: supabase-js-supabaseclient-channel
+    title: SupabaseClient.channel()
+    $ref: '@supabase/supabase-js.SupabaseClient.channel'
+  - id: supabase-js-supabaseclient-from
+    title: SupabaseClient.from()
+    $ref: '@supabase/supabase-js.SupabaseClient.from'
+  - id: supabase-js-supabaseclient-rpc
+    title: SupabaseClient.rpc()
+    $ref: '@supabase/supabase-js.SupabaseClient.rpc'
+  - id: supabase-js-supabaseclient-schema
+    title: SupabaseClient.schema()
+    $ref: '@supabase/supabase-js.SupabaseClient.schema'
+  - id: auth-js-gotrueadminapi-constructor
+    title: new GoTrueAdminApi()
+    $ref: '@supabase/auth-js.GoTrueAdminApi.constructor'
     examples:
-      - id: list-files-in-a-bucket
-        name: List files in a bucket
-        isSpotlight: true
-        code: |
-          ```js
-          const { data, error } = await supabase
-            .storage
-            .from('avatars')
-            .list('folder', {
-              limit: 100,
-              offset: 0,
-              sortBy: { column: 'name', order: 'asc' },
-            })
+      - id: auth-js-gotrueadminapi-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import { GoTrueAdminApi } from '@supabase/auth-js'
+
+          const admin = new GoTrueAdminApi({
+            url: 'https://xyzcompany.supabase.co/auth/v1',
+            headers: { Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}` },
+          })
           ```
-        response: |
-          ```json
-          {
-            "data": [
-              {
-                "name": "avatar1.png",
-                "id": "e668cf7f-821b-4a2f-9dce-7dfa5dd1cfd2",
-                "updated_at": "2024-05-22T23:06:05.580Z",
-                "created_at": "2024-05-22T23:04:34.443Z",
-                "last_accessed_at": "2024-05-22T23:04:34.443Z",
-                "metadata": {
-                  "eTag": "\"c5e8c553235d9af30ef4f6e280790b92\"",
-                  "size": 32175,
-                  "mimetype": "image/png",
-                  "cacheControl": "max-age=3600",
-                  "lastModified": "2024-05-22T23:06:05.574Z",
-                  "contentLength": 32175,
-                  "httpStatusCode": 200
-                }
-              }
-            ],
-            "error": null
+  - id: auth-js-gotrueadminapi-signout
+    title: GoTrueAdminApi.signOut()
+    $ref: '@supabase/auth-js.GoTrueAdminApi.signOut'
+  - id: auth-js-gotrueclient-constructor
+    title: new GoTrueClient()
+    $ref: '@supabase/auth-js.GoTrueClient.constructor'
+    examples:
+      - id: auth-js-gotrueclient-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import { GoTrueClient } from '@supabase/auth-js'
+
+          const auth = new GoTrueClient({
+            url: 'https://xyzcompany.supabase.co/auth/v1',
+            headers: { apikey: 'public-anon-key' },
+            storageKey: 'supabase-auth',
+          })
+          ```
+  - id: auth-js-gotrueclient-initialize
+    title: GoTrueClient.initialize()
+    $ref: '@supabase/auth-js.GoTrueClient.initialize'
+  - id: auth-js-gotrueclient-isthrowonerrorenabled
+    title: GoTrueClient.isThrowOnErrorEnabled()
+    $ref: '@supabase/auth-js.GoTrueClient.isThrowOnErrorEnabled'
+  - id: auth-js-authoauthserverapi-approveauthorization
+    title: AuthOAuthServerApi.approveAuthorization()
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.approveAuthorization'
+  - id: auth-js-authoauthserverapi-denyauthorization
+    title: AuthOAuthServerApi.denyAuthorization()
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.denyAuthorization'
+  - id: auth-js-authoauthserverapi-getauthorizationdetails
+    title: AuthOAuthServerApi.getAuthorizationDetails()
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.getAuthorizationDetails'
+  - id: auth-js-gotrueadminoauthapi-createclient
+    title: GoTrueAdminOAuthApi.createClient()
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.createClient'
+  - id: auth-js-gotrueadminoauthapi-deleteclient
+    title: GoTrueAdminOAuthApi.deleteClient()
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.deleteClient'
+  - id: auth-js-gotrueadminoauthapi-getclient
+    title: GoTrueAdminOAuthApi.getClient()
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.getClient'
+  - id: auth-js-gotrueadminoauthapi-listclients
+    title: GoTrueAdminOAuthApi.listClients()
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.listClients'
+  - id: auth-js-gotrueadminoauthapi-regenerateclientsecret
+    title: GoTrueAdminOAuthApi.regenerateClientSecret()
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.regenerateClientSecret'
+  - id: auth-js-gotrueadminoauthapi-updateclient
+    title: GoTrueAdminOAuthApi.updateClient()
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.updateClient'
+  - id: auth-js-gotruemfaapi-listfactors
+    title: GoTrueMFAApi.listFactors()
+    $ref: '@supabase/auth-js.GoTrueMFAApi.listFactors'
+  - id: postgrest-js-postgrestbuilder-constructor
+    title: new PostgrestBuilder()
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.constructor'
+    examples:
+      - id: postgrest-js-postgrestbuilder-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import PostgrestQueryBuilder from '@supabase/postgrest-js'
+
+          const builder = new PostgrestQueryBuilder(
+            new URL('https://xyzcompany.supabase.co/rest/v1/users'),
+            { headers: new Headers({ apikey: 'public-anon-key' }) }
+          )
+          ```
+  - id: postgrest-js-postgrestbuilder-returns
+    title: PostgrestBuilder.returns()
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.returns'
+  - id: postgrest-js-postgrestbuilder-setheader
+    title: PostgrestBuilder.setHeader()
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.setHeader'
+  - id: postgrest-js-postgrestbuilder-then
+    title: PostgrestBuilder.then()
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.then'
+  - id: postgrest-js-postgrestbuilder-throwonerror
+    title: PostgrestBuilder.throwOnError()
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.throwOnError'
+  - id: postgrest-js-postgrestclient-constructor
+    title: new PostgrestClient()
+    $ref: '@supabase/postgrest-js.PostgrestClient.constructor'
+    examples:
+      - id: postgrest-js-postgrestclient-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import PostgrestClient from '@supabase/postgrest-js'
+
+          const postgrest = new PostgrestClient('https://xyzcompany.supabase.co/rest/v1', {
+            headers: { apikey: 'public-anon-key' },
+            schema: 'public',
+          })
+          ```
+  - id: postgrest-js-postgrestclient-from
+    title: PostgrestClient.from()
+    $ref: '@supabase/postgrest-js.PostgrestClient.from'
+  - id: postgrest-js-postgrestclient-schema
+    title: PostgrestClient.schema()
+    $ref: '@supabase/postgrest-js.PostgrestClient.schema'
+  - id: postgrest-js-postgrestfilterbuilder-constructor
+    title: new PostgrestFilterBuilder()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.constructor'
+    examples:
+      - id: postgrest-js-postgrestfilterbuilder-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import PostgrestQueryBuilder from '@supabase/postgrest-js'
+
+          const builder = new PostgrestQueryBuilder(
+            new URL('https://xyzcompany.supabase.co/rest/v1/users'),
+            { headers: new Headers({ apikey: 'public-anon-key' }) }
+          )
+          ```
+  - id: postgrest-js-postgrestfilterbuilder-ilikeallof
+    title: PostgrestFilterBuilder.ilikeAllOf()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilikeAllOf'
+  - id: postgrest-js-postgrestfilterbuilder-ilikeanyof
+    title: PostgrestFilterBuilder.ilikeAnyOf()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilikeAnyOf'
+  - id: postgrest-js-postgrestfilterbuilder-likeallof
+    title: PostgrestFilterBuilder.likeAllOf()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.likeAllOf'
+  - id: postgrest-js-postgrestfilterbuilder-likeanyof
+    title: PostgrestFilterBuilder.likeAnyOf()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.likeAnyOf'
+  - id: postgrest-js-postgrestquerybuilder-constructor
+    title: new PostgrestQueryBuilder()
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.constructor'
+    examples:
+      - id: postgrest-js-postgrestquerybuilder-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import PostgrestQueryBuilder from '@supabase/postgrest-js'
+
+          const query = new PostgrestQueryBuilder(
+            new URL('https://xyzcompany.supabase.co/rest/v1/users'),
+            { headers: { apikey: 'public-anon-key' } }
+          )
+          ```
+  - id: postgrest-js-postgresttransformbuilder-constructor
+    title: new PostgrestTransformBuilder()
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.constructor'
+    examples:
+      - id: postgrest-js-postgresttransformbuilder-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import PostgrestQueryBuilder from '@supabase/postgrest-js'
+
+          const builder = new PostgrestQueryBuilder(
+            new URL('https://xyzcompany.supabase.co/rest/v1/users'),
+            { headers: new Headers({ apikey: 'public-anon-key' }) }
+          )
+          ```
+  - id: postgrest-js-postgresttransformbuilder-geojson
+    title: PostgrestTransformBuilder.geojson()
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.geojson'
+  - id: postgrest-js-postgresttransformbuilder-maxaffected
+    title: PostgrestTransformBuilder.maxAffected()
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.maxAffected'
+  - id: postgrest-js-postgresttransformbuilder-rollback
+    title: PostgrestTransformBuilder.rollback()
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.rollback'
+  - id: realtime-js-realtimechannel-httpsend
+    title: RealtimeChannel.httpSend()
+    $ref: '@supabase/realtime-js.RealtimeChannel.httpSend'
+
+  - id: realtime-js-realtimechannel-subscribe
+    title: RealtimeChannel.subscribe()
+    $ref: '@supabase/realtime-js.RealtimeChannel.subscribe'
+  - id: realtime-js-realtimechannel-teardown
+    title: RealtimeChannel.teardown()
+    $ref: '@supabase/realtime-js.RealtimeChannel.teardown'
+  - id: realtime-js-realtimechannel-unsubscribe
+    title: RealtimeChannel.unsubscribe()
+    $ref: '@supabase/realtime-js.RealtimeChannel.unsubscribe'
+  - id: realtime-js-realtimeclient-constructor
+    title: new RealtimeClient()
+    $ref: '@supabase/realtime-js.RealtimeClient.constructor'
+    examples:
+      - id: realtime-js-realtimeclient-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import RealtimeClient from '@supabase/realtime-js'
+
+          const client = new RealtimeClient('https://xyzcompany.supabase.co/realtime/v1', {
+            params: { apikey: 'public-anon-key' },
+          })
+          client.connect()
+          ```
+  - id: realtime-js-realtimeclient-connect
+    title: RealtimeClient.connect()
+    $ref: '@supabase/realtime-js.RealtimeClient.connect'
+  - id: realtime-js-realtimeclient-connectionstate
+    title: RealtimeClient.connectionState()
+    $ref: '@supabase/realtime-js.RealtimeClient.connectionState'
+  - id: realtime-js-realtimeclient-disconnect
+    title: RealtimeClient.disconnect()
+    $ref: '@supabase/realtime-js.RealtimeClient.disconnect'
+  - id: realtime-js-realtimeclient-endpointurl
+    title: RealtimeClient.endpointURL()
+    $ref: '@supabase/realtime-js.RealtimeClient.endpointURL'
+  - id: realtime-js-realtimeclient-flushsendbuffer
+    title: RealtimeClient.flushSendBuffer()
+    $ref: '@supabase/realtime-js.RealtimeClient.flushSendBuffer'
+  - id: realtime-js-realtimeclient-getchannels
+    title: RealtimeClient.getChannels()
+    $ref: '@supabase/realtime-js.RealtimeClient.getChannels'
+  - id: realtime-js-realtimeclient-isconnected
+    title: RealtimeClient.isConnected()
+    $ref: '@supabase/realtime-js.RealtimeClient.isConnected'
+  - id: realtime-js-realtimeclient-isconnecting
+    title: RealtimeClient.isConnecting()
+    $ref: '@supabase/realtime-js.RealtimeClient.isConnecting'
+  - id: realtime-js-realtimeclient-isdisconnecting
+    title: RealtimeClient.isDisconnecting()
+    $ref: '@supabase/realtime-js.RealtimeClient.isDisconnecting'
+  - id: realtime-js-realtimeclient-log
+    title: RealtimeClient.log()
+    $ref: '@supabase/realtime-js.RealtimeClient.log'
+  - id: realtime-js-realtimeclient-push
+    title: RealtimeClient.push()
+    $ref: '@supabase/realtime-js.RealtimeClient.push'
+  - id: realtime-js-realtimeclient-removeallchannels
+    title: RealtimeClient.removeAllChannels()
+    $ref: '@supabase/realtime-js.RealtimeClient.removeAllChannels'
+  - id: realtime-js-realtimeclient-removechannel
+    title: RealtimeClient.removeChannel()
+    $ref: '@supabase/realtime-js.RealtimeClient.removeChannel'
+  - id: realtime-js-realtimeclient-sendheartbeat
+    title: RealtimeClient.sendHeartbeat()
+    $ref: '@supabase/realtime-js.RealtimeClient.sendHeartbeat'
+  - id: realtime-js-realtimeclient-setauth
+    title: RealtimeClient.setAuth()
+    $ref: '@supabase/realtime-js.RealtimeClient.setAuth'
+  - id: realtime-js-websocketfactory-createwebsocket
+    title: WebSocketFactory.createWebSocket()
+    $ref: '@supabase/realtime-js.WebSocketFactory.createWebSocket'
+    examples:
+      - id: realtime-js-websocketfactory-createwebsocket-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          const socket = WebSocketFactory.createWebSocket('wss://realtime.supabase.co/socket')
+          ```
+  - id: realtime-js-websocketfactory-getwebsocketconstructor
+    title: WebSocketFactory.getWebSocketConstructor()
+    $ref: '@supabase/realtime-js.WebSocketFactory.getWebSocketConstructor'
+    examples:
+      - id: realtime-js-websocketfactory-getwebsocketconstructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          const WS = WebSocketFactory.getWebSocketConstructor()
+          const socket = new WS('wss://realtime.supabase.co/socket')
+          ```
+  - id: realtime-js-websocketfactory-iswebsocketsupported
+    title: WebSocketFactory.isWebSocketSupported()
+    $ref: '@supabase/realtime-js.WebSocketFactory.isWebSocketSupported'
+    examples:
+      - id: realtime-js-websocketfactory-iswebsocketsupported-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          if (!WebSocketFactory.isWebSocketSupported()) {
+            console.warn('Falling back to long polling')
           }
           ```
-      - id: search-files-in-a-bucket
-        name: Search files in a bucket
-        code: |
-          ```js
-          const { data, error } = await supabase
-            .storage
-            .from('avatars')
-            .list('folder', {
-              limit: 100,
-              offset: 0,
-              sortBy: { column: 'name', order: 'asc' },
-              search: 'jon'
-            })
+  - id: functions-js-functionsclient-constructor
+    title: new FunctionsClient()
+    $ref: '@supabase/functions-js.FunctionsClient.constructor'
+    examples:
+      - id: functions-js-functionsclient-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import { FunctionsClient, FunctionRegion } from '@supabase/functions-js'
+
+          const functions = new FunctionsClient('https://xyzcompany.supabase.co/functions/v1', {
+            headers: { apikey: 'public-anon-key' },
+            region: FunctionRegion.UsEast1,
+          })
           ```
+  - id: functions-js-functionsclient-setauth
+    title: FunctionsClient.setAuth()
+    $ref: '@supabase/functions-js.FunctionsClient.setAuth'
+    examples:
+      - id: functions-js-functionsclient-setauth-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          functions.setAuth(session.access_token)
+          ```
+
+  - id: storageclient-constructor
+    title: new StorageClient()
+    $ref: '@supabase/storage-js.StorageClient.constructor'
+
+  - id: storageclient-from
+    title: StorageClient.from()
+    $ref: '@supabase/storage-js.StorageClient.from'
+  - id: storagevectorsclient-from
+    title: StorageVectorsClient.from()
+    $ref: '@supabase/storage-js.StorageVectorsClient.from'
+
+  - id: vector-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with Vector Buckets.
+  - id: vectorbucketapi-constructor
+    title: new VectorBucketApi()
+    $ref: '@supabase/storage-js.VectorBucketApi.constructor'
+
+  - id: vectorbucketapi-createbucket
+    title: VectorBucketApi.createBucket()
+    $ref: '@supabase/storage-js.VectorBucketApi.createBucket'
+
+  - id: vectorbucketapi-deletebucket
+    title: VectorBucketApi.deleteBucket()
+    $ref: '@supabase/storage-js.VectorBucketApi.deleteBucket'
+
+  - id: vectorbucketapi-getbucket
+    title: VectorBucketApi.getBucket()
+    $ref: '@supabase/storage-js.VectorBucketApi.getBucket'
+
+  - id: vectorbucketapi-listbuckets
+    title: VectorBucketApi.listBuckets()
+    $ref: '@supabase/storage-js.VectorBucketApi.listBuckets'
+
+  - id: vectorbucketapi-throwonerror
+    title: VectorBucketApi.throwOnError()
+    $ref: '@supabase/storage-js.VectorBucketApi.throwOnError'
+
+  - id: vectorbucketscope-createindex
+    title: VectorBucketScope.createIndex()
+    $ref: '@supabase/storage-js.VectorBucketScope.createIndex'
+
+  - id: vectorbucketscope-deleteindex
+    title: VectorBucketScope.deleteIndex()
+    $ref: '@supabase/storage-js.VectorBucketScope.deleteIndex'
+
+  - id: vectorbucketscope-getindex
+    title: VectorBucketScope.getIndex()
+    $ref: '@supabase/storage-js.VectorBucketScope.getIndex'
+
+  - id: vectorbucketscope-listindexes
+    title: VectorBucketScope.listIndexes()
+    $ref: '@supabase/storage-js.VectorBucketScope.listIndexes'
+
+  - id: vector-data
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with Vector Data.
+  - id: vectordataapi-deletevectors
+    title: VectorDataApi.deleteVectors()
+    $ref: '@supabase/storage-js.VectorDataApi.deleteVectors'
+
+  - id: vectordataapi-getvectors
+    title: VectorDataApi.getVectors()
+    $ref: '@supabase/storage-js.VectorDataApi.getVectors'
+
+  - id: vectordataapi-listvectors
+    title: VectorDataApi.listVectors()
+    $ref: '@supabase/storage-js.VectorDataApi.listVectors'
+
+  - id: vectordataapi-putvectors
+    title: VectorDataApi.putVectors()
+    $ref: '@supabase/storage-js.VectorDataApi.putVectors'
+
+  - id: vectordataapi-queryvectors
+    title: VectorDataApi.queryVectors()
+    $ref: '@supabase/storage-js.VectorDataApi.queryVectors'
+
+  - id: vectordataapi-throwonerror
+    title: VectorDataApi.throwOnError()
+    $ref: '@supabase/storage-js.VectorDataApi.throwOnError'
+
+  - id: vector-index
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with Vector Index.
+  - id: vectorindexapi-createindex
+    title: VectorIndexApi.createIndex()
+    $ref: '@supabase/storage-js.VectorIndexApi.createIndex'
+
+  - id: vectorindexapi-deleteindex
+    title: VectorIndexApi.deleteIndex()
+    $ref: '@supabase/storage-js.VectorIndexApi.deleteIndex'
+
+  - id: vectorindexapi-getindex
+    title: VectorIndexApi.getIndex()
+    $ref: '@supabase/storage-js.VectorIndexApi.getIndex'
+
+  - id: vectorindexapi-listindexes
+    title: VectorIndexApi.listIndexes()
+    $ref: '@supabase/storage-js.VectorIndexApi.listIndexes'
+
+  - id: vectorindexapi-throwonerror
+    title: VectorIndexApi.throwOnError()
+    $ref: '@supabase/storage-js.VectorIndexApi.throwOnError'
+
+  - id: vectorindexscope-deletevectors
+    title: VectorIndexScope.deleteVectors()
+    $ref: '@supabase/storage-js.VectorIndexScope.deleteVectors'
+
+  - id: vectorindexscope-getvectors
+    title: VectorIndexScope.getVectors()
+    $ref: '@supabase/storage-js.VectorIndexScope.getVectors'
+
+  - id: vectorindexscope-listvectors
+    title: VectorIndexScope.listVectors()
+    $ref: '@supabase/storage-js.VectorIndexScope.listVectors'
+
+  - id: vectorindexscope-putvectors
+    title: VectorIndexScope.putVectors()
+    $ref: '@supabase/storage-js.VectorIndexScope.putVectors'
+
+  - id: vectorindexscope-queryvectors
+    title: VectorIndexScope.queryVectors()
+    $ref: '@supabase/storage-js.VectorIndexScope.queryVectors'
+
+  - id: realtime-js-realtimechannel-constructor
+    title: new RealtimeChannel()
+    $ref: '@supabase/realtime-js.RealtimeChannel.constructor'
+    examples:
+      - id: realtime-js-realtimechannel-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          import RealtimeClient from '@supabase/realtime-js'
+
+          const client = new RealtimeClient('https://xyzcompany.supabase.co/realtime/v1', {
+            params: { apikey: 'public-anon-key' },
+          })
+          const channel = new RealtimeChannel('realtime:public:messages', { config: {} }, client)
+          ```
+  - id: realtime-js-realtimechannel-presencestate
+    title: RealtimeChannel.presenceState()
+    $ref: '@supabase/realtime-js.RealtimeChannel.presenceState'
+  - id: realtime-js-realtimechannel-track
+    title: RealtimeChannel.track()
+    $ref: '@supabase/realtime-js.RealtimeChannel.track'
+  - id: realtime-js-realtimechannel-untrack
+    title: RealtimeChannel.untrack()
+    $ref: '@supabase/realtime-js.RealtimeChannel.untrack'
+  - id: realtime-js-realtimechannel-updatejoinpayload
+    title: RealtimeChannel.updateJoinPayload()
+    $ref: '@supabase/realtime-js.RealtimeChannel.updateJoinPayload'
+  - id: realtime-js-realtimeclient-channel
+    title: RealtimeClient.channel()
+    $ref: '@supabase/realtime-js.RealtimeClient.channel'
+  - id: realtime-js-realtimeclient-onheartbeat
+    title: RealtimeClient.onHeartbeat()
+    $ref: '@supabase/realtime-js.RealtimeClient.onHeartbeat'
+  - id: realtime-js-realtimepresence-constructor
+    title: new RealtimePresence()
+    $ref: '@supabase/realtime-js.RealtimePresence.constructor'
+    examples:
+      - id: realtime-js-realtimepresence-constructor-example-1
+        name: Example 1
+        code: |-
+          ```ts
+          const presence = new RealtimePresence(channel)
+
+          channel.on('presence', ({ event, key }) => {
+            console.log(`Presence ${event} on ${key}`)
+          })
+          ```
+  - id: realtime-js-websocketlike-addeventlistener
+    title: WebSocketLike.addEventListener()
+    $ref: '@supabase/realtime-js.WebSocketLike.addEventListener'
+  - id: realtime-js-websocketlike-close
+    title: WebSocketLike.close()
+    $ref: '@supabase/realtime-js.WebSocketLike.close'
+  - id: realtime-js-websocketlike-removeeventlistener
+    title: WebSocketLike.removeEventListener()
+    $ref: '@supabase/realtime-js.WebSocketLike.removeEventListener'
+  - id: realtime-js-websocketlike-send
+    title: WebSocketLike.send()
+    $ref: '@supabase/realtime-js.WebSocketLike.send'
+  - id: storagevectorsclient-constructor
+    title: new StorageVectorsClient()
+    $ref: '@supabase/storage-js.StorageVectorsClient.constructor'
+
+  - id: vectorbucketscope-constructor
+    title: new VectorBucketScope()
+    $ref: '@supabase/storage-js.VectorBucketScope.constructor'
+
+  - id: vectordataapi-constructor
+    title: new VectorDataApi()
+    $ref: '@supabase/storage-js.VectorDataApi.constructor'
+
+  - id: vectorindexapi-constructor
+    title: new VectorIndexApi()
+    $ref: '@supabase/storage-js.VectorIndexApi.constructor'
+
+  - id: vectorindexscope-constructor
+    title: new VectorIndexScope()
+    $ref: '@supabase/storage-js.VectorIndexScope.constructor'
+
+  - id: realtime-js-websocketlikeconstructor-constructor
+    title: new WebSocketLikeConstructor()
+    $ref: '@supabase/realtime-js.WebSocketLikeConstructor.constructor'
