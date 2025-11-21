@@ -43,7 +43,7 @@ export const useOAuthServerAppsQuery = <TData = OAuthServerAppsData>(
     ...options
   }: UseCustomQueryOptions<OAuthServerAppsData, OAuthServerAppsError, TData> = {}
 ) => {
-  return useQuery({
+  return useQuery<OAuthServerAppsData, OAuthServerAppsError, TData>({
     queryKey: oauthServerAppKeys.list(projectRef),
     queryFn: () => getOAuthServerApps({ projectRef, supabaseClient }),
     enabled: enabled && typeof projectRef !== 'undefined' && !!supabaseClient,

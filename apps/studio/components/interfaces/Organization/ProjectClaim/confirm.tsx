@@ -39,10 +39,10 @@ export const ProjectClaimConfirm = ({
   const { auth_id, token: claimToken } = useParams()
   const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
-  const { mutateAsync: approveRequest, isLoading: isApproving } =
+  const { mutateAsync: approveRequest, isPending: isApproving } =
     useApiAuthorizationApproveMutation({ onError: () => {} })
 
-  const { mutateAsync: claimProject, isLoading: isClaiming } = useOrganizationProjectClaimMutation()
+  const { mutateAsync: claimProject, isPending: isClaiming } = useOrganizationProjectClaimMutation()
 
   const onClaimProject = async () => {
     try {

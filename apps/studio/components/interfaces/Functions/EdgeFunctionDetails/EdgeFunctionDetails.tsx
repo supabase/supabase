@@ -104,8 +104,8 @@ export const EdgeFunctionDetails = () => {
     slug: functionSlug,
   })
 
-  const { mutate: updateEdgeFunction, isLoading: isUpdating } = useEdgeFunctionUpdateMutation()
-  const { mutate: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation({
+  const { mutate: updateEdgeFunction, isPending: isUpdating } = useEdgeFunctionUpdateMutation()
+  const { mutate: deleteEdgeFunction, isPending: isDeleting } = useEdgeFunctionDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted "${selectedFunction?.name}"`)
       router.push(`/project/${projectRef}/functions`)

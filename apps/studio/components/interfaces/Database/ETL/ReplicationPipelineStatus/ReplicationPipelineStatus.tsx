@@ -103,8 +103,8 @@ export const ReplicationPipelineStatus = () => {
   })
   const hasUpdate = Boolean(versionData?.new_version)
 
-  const { mutateAsync: startPipeline, isLoading: isStartingPipeline } = useStartPipelineMutation()
-  const { mutateAsync: stopPipeline, isLoading: isStoppingPipeline } = useStopPipelineMutation()
+  const { mutateAsync: startPipeline, isPending: isStartingPipeline } = useStartPipelineMutation()
+  const { mutateAsync: stopPipeline, isPending: isStoppingPipeline } = useStopPipelineMutation()
 
   const destinationName = pipeline?.destination_name
   const statusName = getStatusName(pipelineStatusData?.status)

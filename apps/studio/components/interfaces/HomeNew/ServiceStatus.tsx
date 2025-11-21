@@ -109,7 +109,11 @@ export const ServiceStatus = () => {
   // [Joshen] Need pooler service check eventually
   const { data: status, isLoading } = useProjectServiceStatusQuery(
     { projectRef: ref },
-    { refetchInterval: (data) => (data?.some((service) => !service.healthy) ? 5000 : false) }
+    {
+      refetchInterval: (data) => {
+        return data?.some((service) => !service.healthy) ? 5000 : false
+      },
+    }
   )
   const { data: edgeFunctionsStatus } = useEdgeFunctionServiceStatusQuery(
     { projectRef: ref },

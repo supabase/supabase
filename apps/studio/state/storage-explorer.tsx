@@ -76,6 +76,29 @@ if (typeof window !== 'undefined') {
   abortController = new AbortController()
 }
 
+async function createSupabaseClient(projectRef: string, clientEndpoint: string) {
+  try {
+    const { apiKey } = await getOrRefreshTemporaryApiKey(projectRef)
+
+    return createClient(clientEndpoint, apiKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+        storage: {
+          getItem: (key) => {
+            return null
+          },
+          setItem: (key, value) => {},
+          removeItem: (key) => {},
+        },
+      },
+    })
+  } catch (error) {
+    throw error
+  }
+}
+
 function createStorageExplorerState({
   projectRef,
   connectionString,
@@ -97,29 +120,6 @@ function createStorageExplorerState({
     connectionString,
     resumableUploadUrl,
     uploadProgresses: [] as UploadProgress[],
-
-    supabaseClient: async () => {
-      try {
-        const { apiKey } = await getOrRefreshTemporaryApiKey(projectRef)
-
-        return createClient(clientEndpoint, apiKey, {
-          auth: {
-            persistSession: false,
-            autoRefreshToken: false,
-            detectSessionInUrl: false,
-            storage: {
-              getItem: (key) => {
-                return null
-              },
-              setItem: (key, value) => {},
-              removeItem: (key) => {},
-            },
-          },
-        })
-      } catch (error) {
-        throw error
-      }
-    },
 
     // abortController,
     abortApiCalls: () => {
@@ -313,7 +313,7 @@ function createStorageExplorerState({
       columnIndex: number
       onError?: () => void
     }) => {
-      if (!state.supabaseClient) return console.error('Supabase Client is missing')
+      const supabaseClient = await createSupabaseClient(state.projectRef, clientEndpoint)
 
       const autofix = false
       const formattedName = state.sanitizeNameForDuplicateInColumn({
@@ -347,7 +347,8 @@ function createStorageExplorerState({
       const formattedPathToEmptyPlaceholderFile =
         pathToFolder.length > 0 ? `${pathToFolder}/${emptyPlaceholderFile}` : emptyPlaceholderFile
 
-      await (await state.supabaseClient()).storage
+      const client = await createSupabaseClient(state.projectRef, clientEndpoint)
+      await client.storage
         .from(state.selectedBucket.name)
         .upload(
           formattedPathToEmptyPlaceholderFile,
@@ -597,7 +598,8 @@ function createStorageExplorerState({
 
         if (data.length === 0) {
           const prefixToPlaceholder = `${parentFolderPrefix}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`
-          await (await state.supabaseClient!())?.storage
+          const client = await createSupabaseClient(state.projectRef, clientEndpoint)
+          await client.storage
             .from(state.selectedBucket.name)
             .upload(prefixToPlaceholder, new File([], EMPTY_FOLDER_PLACEHOLDER_FILE_NAME))
         }
@@ -818,9 +820,6 @@ function createStorageExplorerState({
           { id: toastId, closeButton: false, position: 'top-right' }
         )
 
-        // Get authenticated Supabase client for Storage API access
-        const client = state.supabaseClient ? await state.supabaseClient() : undefined
-
         const promises = files.map((file) => {
           const fileMimeType = (file.metadata?.mimetype as string) ?? null
           return () => {
@@ -833,6 +832,9 @@ function createStorageExplorerState({
               | boolean
             >(async (resolve) => {
               try {
+                // Get authenticated Supabase client for Storage API access
+                const client = await createSupabaseClient(state.projectRef, clientEndpoint)
+
                 if (!client) {
                   throw new Error('Supabase client not available')
                 }
@@ -1517,7 +1519,7 @@ function createStorageExplorerState({
       const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
 
       try {
-        const client = state.supabaseClient ? await state.supabaseClient() : undefined
+        const client = await createSupabaseClient(state.projectRef, clientEndpoint)
         if (!client) {
           throw new Error('Supabase client not available')
         }
@@ -1564,7 +1566,7 @@ function createStorageExplorerState({
       if (!file.path) return false
 
       try {
-        const client = state.supabaseClient ? await state.supabaseClient() : undefined
+        const client = await createSupabaseClient(state.projectRef, clientEndpoint)
         if (!client) {
           throw new Error('Supabase client not available')
         }

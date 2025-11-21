@@ -93,23 +93,23 @@ export const DestinationPanel = ({
   )
   const [isFormInteracting, setIsFormInteracting] = useState(false)
 
-  const { mutateAsync: createDestinationPipeline, isLoading: creatingDestinationPipeline } =
+  const { mutateAsync: createDestinationPipeline, isPending: creatingDestinationPipeline } =
     useCreateDestinationPipelineMutation({
       onSuccess: () => form.reset(defaultValues),
     })
 
-  const { mutateAsync: updateDestinationPipeline, isLoading: updatingDestinationPipeline } =
+  const { mutateAsync: updateDestinationPipeline, isPending: updatingDestinationPipeline } =
     useUpdateDestinationPipelineMutation({
       onSuccess: () => form.reset(defaultValues),
     })
 
-  const { mutateAsync: startPipeline, isLoading: startingPipeline } = useStartPipelineMutation()
+  const { mutateAsync: startPipeline, isPending: startingPipeline } = useStartPipelineMutation()
 
-  const { mutateAsync: createS3AccessKey, isLoading: isCreatingS3AccessKey } =
+  const { mutateAsync: createS3AccessKey, isPending: isCreatingS3AccessKey } =
     useS3AccessKeyCreateMutation()
 
-  const { mutateAsync: createNamespace, isLoading: isCreatingNamespace } =
-    useIcebergNamespaceCreateMutation({ projectRef })
+  const { mutateAsync: createNamespace, isPending: isCreatingNamespace } =
+    useIcebergNamespaceCreateMutation()
 
   const {
     data: publications = [],

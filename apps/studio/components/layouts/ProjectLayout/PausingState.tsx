@@ -19,21 +19,31 @@ const PausingState = ({ project }: PausingStateProps) => {
   const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
   const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
-  useProjectStatusQuery(
+  const { data: projectStatusData, isSuccess: isProjectStatusSuccess } = useProjectStatusQuery(
     { projectRef: ref },
     {
       enabled: startPolling,
-      refetchInterval: (res) => {
-        return res?.status === PROJECT_STATUS.INACTIVE ? false : 2000
-      },
-      onSuccess: async (res) => {
-        if (res.status === PROJECT_STATUS.INACTIVE) {
-          if (ref) await invalidateProjectDetailsQuery(ref)
-          await invalidateProjectsQuery()
-        }
+      refetchInterval: (data) => {
+        return data?.status === PROJECT_STATUS.INACTIVE ? false : 2000
       },
     }
   )
+
+  useEffect(() => {
+    if (!isProjectStatusSuccess) return
+    if (projectStatusData?.status === PROJECT_STATUS.INACTIVE) {
+      if (ref) {
+        invalidateProjectDetailsQuery(ref)
+      }
+      invalidateProjectsQuery()
+    }
+  }, [
+    isProjectStatusSuccess,
+    projectStatusData,
+    ref,
+    invalidateProjectDetailsQuery,
+    invalidateProjectsQuery,
+  ])
 
   useEffect(() => {
     setTimeout(() => setStartPolling(true), 4000)
