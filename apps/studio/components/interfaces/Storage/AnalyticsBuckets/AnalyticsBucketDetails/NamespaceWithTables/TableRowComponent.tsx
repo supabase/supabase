@@ -417,7 +417,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
         <TableRow key={x.id}>
           <TableCell className="pl-6">
             <div className="flex items-center gap-x-2 rounded">
-              <div className="w-4 h-4 rounded-bl-lg border-l-2 border-b-2 border-copntrol -translate-y-1.5" />
+              <div className="w-4 h-4 rounded-bl-lg border-l-2 border-b-2 border-control -translate-y-1.5" />
               <div
                 className={cn(
                   'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
