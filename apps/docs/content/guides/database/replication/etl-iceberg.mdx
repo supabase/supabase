@@ -8,7 +8,7 @@ sidebar_label: 'Iceberg'
 
 <Admonition type="caution" label="Private Alpha">
 
-Automatic destinations are currently in private alpha. Access is limited and features may change.
+Managed destinations are currently in private alpha. Access is limited and features may change.
 
 </Admonition>
 
@@ -22,7 +22,7 @@ Apache Iceberg is an open table format for analytic datasets. Replication to Ice
 
 <Admonition type="tip">
 
-This page covers Iceberg-specific configuration. For complete setup instructions including publications, general settings, and pipeline management, see the [Automatic Destinations Setup guide](/docs/guides/database/replication/etl-replication-setup).
+This page covers Iceberg-specific configuration. For complete setup instructions including publications, general settings, and pipeline management, see the [Managed Destinations Setup guide](/docs/guides/database/replication/etl-replication-setup).
 
 </Admonition>
 
@@ -60,7 +60,7 @@ After clicking **New bucket**, fill in the bucket details and copy the credentia
 
 2. Click **Create bucket**
 3. **Copy the credentials** displayed after bucket creation (Catalog Token, S3 Access Key ID, S3 Secret Access Key). You'll need these in the next steps.
-4. Navigate to [Database](/dashboard/project/_/database/etl) → **Replication** in your Supabase Dashboard
+4. Navigate to [Database](/dashboard/project/_/database/etl) → **ETL Replication** in your Supabase Dashboard
 5. Click **Add destination**
 6. Configure the destination:
    - **Destination type**: Select **Iceberg (Analytics Bucket)**
@@ -69,7 +69,7 @@ After clicking **New bucket**, fill in the bucket details and copy the credentia
    - **Catalog Token**: Authentication token for accessing the Iceberg catalog (copied in Step 3)
    - **S3 Access Key ID**: Access key for S3-compatible storage (copied in Step 3)
    - **S3 Secret Access Key**: Secret key for S3-compatible storage (copied in Step 3)
-7. Complete the remaining configuration following the [Automatic Destinations Setup guide](/docs/guides/database/replication/etl-replication-setup)
+7. Complete the remaining configuration following the [Managed Destinations Setup guide](/docs/guides/database/replication/etl-replication-setup)
 
 For more information about Analytics Buckets, see the [Analytics Buckets documentation](/docs/guides/storage/analytics).
 
@@ -79,10 +79,10 @@ Iceberg-specific limitations:
 
 - **Append-only log**: Currently provides an append-only log format rather than a full table representation
 
-For general replication limitations that apply to all automatic destinations, see the [Automatic Destinations Setup guide](/docs/guides/database/replication/etl-replication-setup#limitations).
+For general replication limitations that apply to all managed destinations, see the [Managed Destinations Setup guide](/docs/guides/database/replication/etl-replication-setup#limitations).
 
 ### Next steps
 
-- [Set up automatic destinations](/docs/guides/database/replication/etl-replication-setup)
+- [Set up managed destinations](/docs/guides/database/replication/etl-replication-setup)
 - [Monitor replication](/docs/guides/database/replication/etl-replication-monitoring)
 - [View FAQ](/docs/guides/database/replication/etl-replication-faq)

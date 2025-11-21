@@ -8,15 +8,15 @@ sidebar_label: 'BigQuery'
 
 <Admonition type="caution" label="Private Alpha">
 
-Automatic destinations are currently in private alpha. Access is limited and features may change.
+Managed destinations are currently in private alpha. Access is limited and features may change.
 
 </Admonition>
 
-BigQuery is Google's fully managed data warehouse. Automatic destinations allow you to sync your database tables to BigQuery for analytics and reporting.
+BigQuery is Google's fully managed data warehouse. Managed destinations allow you to sync your database tables to BigQuery for analytics and reporting.
 
 <Admonition type="tip">
 
-This page covers BigQuery-specific configuration. For complete setup instructions including publications, general settings, and pipeline management, see the [Automatic Destinations Setup guide](/docs/guides/database/replication/etl-replication-setup).
+This page covers BigQuery-specific configuration. For complete setup instructions including publications, general settings, and pipeline management, see the [Managed Destinations Setup guide](/docs/guides/database/replication/etl-replication-setup).
 
 </Admonition>
 
@@ -36,7 +36,7 @@ Before configuring BigQuery as a destination, set up the following in Google Clo
 
 After preparing your GCP resources, configure BigQuery as a replication destination:
 
-1. Navigate to [Database](/dashboard/project/_/database/etl) → **Replication** in your Supabase Dashboard
+1. Navigate to [Database](/dashboard/project/_/database/etl) → **ETL Replication** in your Supabase Dashboard
 2. Click **Add destination**
 3. Configure the destination:
 
@@ -64,7 +64,7 @@ After preparing your GCP resources, configure BigQuery as a replication destinat
      - `bigquery.tables.update`
      - `bigquery.tables.updateData`
 
-4. Complete the remaining configuration following the [Automatic Destinations Setup guide](/docs/guides/database/replication/etl-replication-setup)
+4. Complete the remaining configuration following the [Managed Destinations Setup guide](/docs/guides/database/replication/etl-replication-setup)
 
 ### How it works
 
@@ -117,10 +117,10 @@ BigQuery-specific limitations:
 - **Ingestion latency**: BigQuery's streaming API has inherent latency (typically seconds to minutes)
 - **Row size**: Limited to 10 MB per row due to BigQuery Storage Write API constraints
 
-For general replication limitations that apply to all automatic destinations, see the [Automatic Destinations Setup guide](/docs/guides/database/replication/etl-replication-setup#limitations).
+For general replication limitations that apply to all managed destinations, see the [Managed Destinations Setup guide](/docs/guides/database/replication/etl-replication-setup#limitations).
 
 ### Next steps
 
-- [Set up automatic destinations](/docs/guides/database/replication/etl-replication-setup)
+- [Set up managed destinations](/docs/guides/database/replication/etl-replication-setup)
 - [Monitor replication](/docs/guides/database/replication/etl-replication-monitoring)
 - [View FAQ](/docs/guides/database/replication/etl-replication-faq)

@@ -1,18 +1,18 @@
 ---
 id: 'etl-replication-setup'
-title: 'Automatic Destinations Setup'
-description: 'Set up replication to automatic destinations using Postgres logical replication.'
-subtitle: 'Configure publications and destinations for automatic replication.'
-sidebar_label: 'Automatic destinations'
+title: 'Managed Destinations Setup'
+description: 'Set up replication to managed destinations using Postgres logical replication.'
+subtitle: 'Configure publications and destinations for managed replication.'
+sidebar_label: 'Managed destinations'
 ---
 
 <Admonition type="caution" label="Private Alpha">
 
-Automatic destinations are currently in private alpha. Access is limited and features may change.
+Managed destinations are currently in private alpha. Access is limited and features may change.
 
 </Admonition>
 
-Automatic destinations use **Postgres logical replication** to stream changes from your database. Supabase ETL, an [open source tool](https://github.com/supabase/etl) built for Postgres logical replication, provides a managed interface through the Dashboard to configure and monitor these replication pipelines.
+Managed destinations use **Postgres logical replication** to stream changes from your database. Supabase ETL, an [open source tool](https://github.com/supabase/etl) built for Postgres logical replication, provides a managed interface through the Dashboard to configure and monitor these replication pipelines.
 
 ## Setup overview
 
@@ -97,10 +97,10 @@ After creating a publication via SQL, you can view it in the Supabase Dashboard:
 
 ### Step 2: Enable replication
 
-Before adding destinations, you need to enable replication to built-in destinations for your project:
+Before adding destinations, you need to enable replication to managed destinations for your project:
 
 1. Navigate to the [Database](/dashboard/project/_/database/etl) section in your Supabase Dashboard
-2. Select the **Replication** tab
+2. Select the **ETL Replication** tab
 3. Click **Enable replication** to activate replication for your project
 
 <Image
@@ -113,13 +113,13 @@ Before adding destinations, you need to enable replication to built-in destinati
 
 Once replication is enabled and you have a Postgres publication, you can add a destination. The destination is where your replicated data will be stored, while the pipeline is the active Postgres replication process that continuously streams changes from your database to that destination.
 
-#### Available automatic destinations
+#### Available managed destinations
 
-For a complete list of available automatic destinations and how to choose the right one for your needs, see [Automatic Destinations](/docs/guides/database/replication/etl-destinations).
+For a complete list of available managed destinations and how to choose the right one for your needs, see [Managed Destinations](/docs/guides/database/replication/etl-destinations).
 
 #### Configuration
 
-1. In the Replication tab, click **Add destination**
+1. In the ETL Replication tab, click **Add destination**
 2. Configure the destination settings:
 
    **General Settings:**
@@ -129,7 +129,7 @@ For a complete list of available automatic destinations and how to choose the ri
    - **Destination type**: Choose from available destination types
 
    **Destination-specific settings:**
-   Each destination type requires different configuration. See the [Automatic Destinations guide](/docs/guides/database/replication/etl-destinations) for configuration details specific to your chosen destination.
+   Each destination type requires different configuration. See the [Managed Destinations guide](/docs/guides/database/replication/etl-destinations) for configuration details specific to your chosen destination.
 
 <Image
   alt="Add Destination"
@@ -213,7 +213,7 @@ If your Postgres publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, ne
 
 ### How it works
 
-Once configured, replication to automatic destinations:
+Once configured, replication to managed destinations:
 
 1. **Captures** changes from your Postgres database using Postgres publications and logical replication
 2. **Streams** the changes through Supabase ETL's replication pipeline
@@ -223,7 +223,7 @@ Changes are sent in batches to optimize performance and reduce costs. The batch 
 
 <Admonition type="note">
 
-Replication to automatic destinations currently performs data extraction and loading only, without transformation. Your data is replicated as-is to the destination.
+Replication to managed destinations currently performs data extraction and loading only, without transformation. Your data is replicated as-is to the destination.
 
 </Admonition>
 
@@ -240,7 +240,7 @@ For more troubleshooting help, see the [Replication FAQ](/docs/guides/database/r
 
 ### Limitations
 
-Replication to automatic destinations has the following limitations:
+Replication to managed destinations has the following limitations:
 
 - **Primary keys required**: Tables must have primary keys (Postgres logical replication requirement)
 - **Custom data types**: Not supported
@@ -252,7 +252,7 @@ Destination-specific limitations may also apply. See the [Iceberg](/docs/guides/
 
 ### Future work
 
-Replication to automatic destinations is actively being developed. Planned improvements include:
+Replication to managed destinations is actively being developed. Planned improvements include:
 
 - **DDL support**: Automatic handling of Postgres schema changes (ALTER TABLE, ADD COLUMN, etc.)
 - **Additional destinations**: Support for more data warehouses and analytics platforms

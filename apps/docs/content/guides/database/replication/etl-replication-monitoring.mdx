@@ -1,14 +1,14 @@
 ---
 id: 'etl-replication-monitoring'
-title: 'Monitoring Automatic Destinations'
-description: 'Monitor the status and health of your replication pipelines to automatic destinations.'
+title: 'Monitoring Managed Destinations'
+description: 'Monitor the status and health of your replication pipelines to managed destinations.'
 subtitle: 'Track replication status, view logs, and troubleshoot issues.'
 sidebar_label: 'Monitoring'
 ---
 
 <Admonition type="caution" label="Private Alpha">
 
-Automatic destinations are currently in private alpha. Access is limited and features may change.
+Managed destinations are currently in private alpha. Access is limited and features may change.
 
 </Admonition>
 
@@ -16,7 +16,7 @@ After setting up replication, you can monitor the status and health of your repl
 
 <Admonition type="note">
 
-Automatic destinations are powered by [Supabase ETL](https://github.com/supabase/etl), an open source tool built specifically for Postgres logical replication. The Dashboard provides a managed interface to configure and monitor your replication pipelines.
+Managed destinations are powered by [Supabase ETL](https://github.com/supabase/etl), an open source tool built specifically for Postgres logical replication. The Dashboard provides a managed interface to configure and monitor your replication pipelines.
 
 </Admonition>
 
@@ -25,7 +25,7 @@ Automatic destinations are powered by [Supabase ETL](https://github.com/supabase
 To monitor your replication pipelines:
 
 1. Navigate to the [Database](/dashboard/project/_/database/etl) section in your Supabase Dashboard
-2. Select the **Replication** tab
+2. Select the **ETL Replication** tab
 3. You'll see a list of all your destinations with their pipeline status
 
 <Image
@@ -125,7 +125,7 @@ To recover from a pipeline error, you'll need to:
 To see detailed logs for all your replication pipelines:
 
 1. Navigate to [Logs](/dashboard/project/_/logs/explorer) in your Supabase Dashboard
-2. Select **Replication** from the log source filter
+2. Select **ETL Replication** from the log source filter
 3. You'll see all logs from your replication pipelines
 
 <Image
@@ -144,7 +144,7 @@ Logs contain diagnostic information that may be too technical for most users. If
 
 #### Checking if replication is healthy
 
-1. Navigate to [Database](/dashboard/project/_/database/etl) → **Replication**
+1. Navigate to [Database](/dashboard/project/_/database/etl) → **ETL Replication**
 2. Verify your destination shows **Running** status
 3. Click **View status** to check replication lag and table states
 4. Ensure all tables show **Live** state
@@ -156,7 +156,7 @@ If you see a **Failed** status:
 1. Hover over the status to see a prompt directing you to view logs
 2. Click **View status** to see detailed error information
 3. Check table states to identify which tables are affected
-4. Navigate to [Logs](/dashboard/project/_/logs/explorer) → **Replication** for full error details
+4. Navigate to [Logs](/dashboard/project/_/logs/explorer) → **ETL Replication** for full error details
 5. For table errors, attempt to reset the affected tables
 
 #### Monitoring performance
@@ -174,7 +174,7 @@ If you notice issues with your replication:
 
 1. **Check pipeline state**: Ensure the pipeline is in **Running** state
 2. **Review table states**: Identify tables in **Error** state
-3. **Check logs**: Navigate to Logs → Replication for detailed error information
+3. **Check logs**: Navigate to Logs → ETL Replication for detailed error information
 4. **Verify publication**: Ensure your Postgres publication is properly configured
 5. **Monitor replication lag**: High lag may indicate performance issues
 
