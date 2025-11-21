@@ -157,7 +157,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     regenerate,
   } = useChat({
     id: snap.activeChatId,
-    chat: snap.activeChatId ? snap.chatInstances[snap.activeChatId] : undefined,
+    ...(snap.activeChatId && snap.chatInstances[snap.activeChatId]
+      ? { chat: snap.chatInstances[snap.activeChatId] }
+      : {}),
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
     onError: onErrorChat,
   })
