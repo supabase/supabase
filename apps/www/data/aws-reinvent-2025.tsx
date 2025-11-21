@@ -111,7 +111,7 @@ const data = {
       {
         date: 'December 01',
         time: '4:00 PM - 7:00 PM',
-        title: 'Registration & Networking',
+        title: 'Welcome to Day 1',
         description:
           'Meet us at Booth #1857. Watch a demo and collect your ticket for our Daily Giveaway.',
         location: 'Expo Hall - Booth #1857',
