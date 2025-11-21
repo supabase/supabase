@@ -44,7 +44,8 @@ export const NoticeBanner = () => {
       <div className="items-center flex flex-row gap-3 z-[1]">
         <WarningIcon className="z-[1] flex-shrink-0" />
         <div className="flex-1 text-xs sm:text-sm z-[1] text-warning">
-          Urgent Dashboard and Management API maintenance currently in progress. For full details,{' '}
+          Urgent Dashboard and Management API maintenance between 23:00 UTC on Nov 21, 2025 and
+          23:00 UTC on Nov 23, 2025. For full details,{' '}
           <Link
             href="https://status.supabase.com/incidents/z0l2157y33xk"
             target="_blank"
