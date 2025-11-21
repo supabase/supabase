@@ -81,18 +81,19 @@ const deletePolicyIfExists = async (page: Page, ref: string, policyNameToDelete:
 
   if (policyExists) {
     // Click the policy row actions button
-    await policyButton.locator('..').locator('..').getByRole('button').last().click()
+    await page.getByTestId(`policy-${policyNameToDelete}-actions-button`).click()
     await page.waitForTimeout(200)
 
     // Click delete
     await page.getByText('Delete', { exact: true }).click()
     await page.waitForTimeout(200)
 
+    const waitForDeletion = waitForApiResponse(page, 'pg-meta', ref, 'query?key=')
     // Confirm deletion
     await page.getByRole('button', { name: 'Delete' }).click()
 
     // Wait for deletion to complete
-    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=')
+    await waitForDeletion
 
     await expect(
       page.getByText('Successfully removed policy'),
