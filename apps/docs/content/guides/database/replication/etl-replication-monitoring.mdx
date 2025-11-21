@@ -14,7 +14,7 @@ ETL Replication is currently in private alpha. Access is limited and features ma
 
 After setting up ETL replication, you can monitor the status and health of your replication pipelines directly from the Supabase Dashboard. The pipeline is the active process that continuously replicates changes from your database to your destination.
 
-## Viewing pipeline status
+### Viewing pipeline status
 
 To monitor your ETL replication pipelines:
 
@@ -28,7 +28,7 @@ To monitor your ETL replication pipelines:
   zoomable
 />
 
-### Pipeline states
+#### Pipeline states
 
 Each destination shows its pipeline in one of these states:
 
@@ -40,7 +40,7 @@ Each destination shows its pipeline in one of these states:
 | **Stopping** | Pipeline is being stopped                                                       |
 | **Failed**   | Pipeline has encountered an error (hover over the status to view error details) |
 
-## Viewing detailed pipeline metrics
+### Viewing detailed pipeline metrics
 
 For detailed information about a specific pipeline, click **View status** on the destination. This opens the pipeline status page where you can monitor replication performance and table states.
 
@@ -50,11 +50,11 @@ For detailed information about a specific pipeline, click **View status** on the
   zoomable
 />
 
-### Replication lag metrics
+#### Replication lag metrics
 
 The status page shows replication lag metrics that help you determine how fast your pipeline is replicating data. These metrics are loaded directly from Postgres itself.
 
-### Table states
+#### Table states
 
 The pipeline status page also shows the state of individual tables being replicated. Each table can be in one of these states:
 
@@ -66,11 +66,11 @@ The pipeline status page also shows the state of individual tables being replica
 | **Live**    | Table is now replicating data in near real-time                        |
 | **Error**   | Table has experienced an error during replication                      |
 
-## Handling errors
+### Handling errors
 
 Errors can occur at two levels: per table or per pipeline.
 
-### Table errors
+#### Table errors
 
 Table errors occur during the copy phase and affect individual tables. These errors can be retried without stopping the entire pipeline.
 
@@ -90,7 +90,7 @@ Table errors occur during the copy phase and affect individual tables. These err
 
 When a table encounters an error during the copy phase, you can reset the table state (for some errors). This will restart the table copy from the beginning.
 
-### Pipeline errors
+#### Pipeline errors
 
 Pipeline errors occur during the streaming phase (Live state) and affect the entire pipeline. When streaming data, if an error occurs, the entire pipeline will stop and enter a **Failed** state. This prevents data loss by ensuring no changes are skipped.
 
@@ -114,7 +114,7 @@ To recover from a pipeline error, you'll need to:
 2. Fix the underlying issue (e.g., destination connectivity, schema compatibility)
 3. Restart the pipeline from the destinations list
 
-## Viewing logs
+### Viewing logs
 
 To see detailed logs for all your ETL replication pipelines:
 
@@ -134,16 +134,16 @@ Logs contain diagnostic information that may be too technical for most users. If
 
 </Admonition>
 
-## Common monitoring scenarios
+### Common monitoring scenarios
 
-### Checking if replication is healthy
+#### Checking if replication is healthy
 
 1. Navigate to [Database](/dashboard/project/_/database/etl) → **ETL Replication**
 2. Verify your destination shows **Running** status
 3. Click **View status** to check replication lag and table states
 4. Ensure all tables show **Live** state
 
-### Investigating errors
+#### Investigating errors
 
 If you see a **Failed** status:
 
@@ -153,7 +153,7 @@ If you see a **Failed** status:
 4. Navigate to [Logs](/dashboard/project/_/logs/explorer) → **ETL Replication** for full error details
 5. For table errors, attempt to reset the affected tables
 
-### Monitoring performance
+#### Monitoring performance
 
 To ensure optimal performance:
 
@@ -162,7 +162,7 @@ To ensure optimal performance:
 3. Review logs for warnings or performance issues
 4. If lag is consistently high, consider adjusting your publication or batch wait time settings
 
-## Troubleshooting
+### Troubleshooting
 
 If you notice issues with your ETL replication:
 
@@ -174,7 +174,7 @@ If you notice issues with your ETL replication:
 
 For more troubleshooting tips, see the [ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq).
 
-## Next steps
+### Next steps
 
 - [Set up ETL Replication](/docs/guides/database/replication/etl-replication-setup)
 - [View ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq)

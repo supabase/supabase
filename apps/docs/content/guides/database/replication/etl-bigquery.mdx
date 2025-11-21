@@ -20,11 +20,11 @@ This page covers BigQuery-specific configuration. For complete setup instruction
 
 </Admonition>
 
-## Setup
+### Setup
 
 Setting up BigQuery replication requires preparing your GCP resources, then configuring BigQuery as an ETL destination.
 
-### Step 1: Prepare GCP resources
+#### Step 1: Prepare GCP resources
 
 Before configuring BigQuery as a destination, set up the following in Google Cloud Platform:
 
@@ -32,7 +32,7 @@ Before configuring BigQuery as a destination, set up the following in Google Clo
 2. **BigQuery dataset**: Create a [BigQuery dataset](https://cloud.google.com/bigquery/docs/datasets-intro) in your GCP project
 3. **GCP service account key**: Create a [service account](https://cloud.google.com/iam/docs/keys-create-delete) with the **BigQuery Data Editor** role and download the JSON key file
 
-### Step 2: Add BigQuery as an ETL destination
+#### Step 2: Add BigQuery as an ETL destination
 
 After preparing your GCP resources, configure BigQuery as an ETL destination:
 
@@ -66,7 +66,7 @@ After preparing your GCP resources, configure BigQuery as an ETL destination:
 
 4. Complete the remaining configuration following the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup)
 
-## How it works
+### How it works
 
 Once configured, ETL Replication to BigQuery:
 
@@ -81,7 +81,7 @@ Due to ingestion latency in BigQuery's streaming API, there may be a delay (typi
 
 </Admonition>
 
-### BigQuery CDC format
+#### BigQuery CDC format
 
 BigQuery tables include additional columns for change tracking:
 
@@ -89,7 +89,7 @@ BigQuery tables include additional columns for change tracking:
 - `_commit_timestamp`: When the change was committed in Postgres
 - `_stream_id`: Internal identifier for the replication stream
 
-## Querying replicated data
+### Querying replicated data
 
 Once replication is running, you can query your data in BigQuery:
 
@@ -110,7 +110,7 @@ ORDER BY _commit_timestamp DESC
 LIMIT 100;
 ```
 
-## Limitations
+### Limitations
 
 BigQuery-specific limitations:
 
@@ -119,7 +119,7 @@ BigQuery-specific limitations:
 
 For general ETL Replication limitations that apply to all destinations, see the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup#limitations).
 
-## Next steps
+### Next steps
 
 - [Set up ETL Replication](/docs/guides/database/replication/etl-replication-setup)
 - [Monitor ETL Replication](/docs/guides/database/replication/etl-replication-monitoring)

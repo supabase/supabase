@@ -20,15 +20,15 @@ If you already have a publication set up, you can skip to [Step 2: Enable ETL Re
 
 </Admonition>
 
-## Step 1: Create a publication
+### Step 1: Create a publication
 
 A publication defines which tables and change types will be replicated. You need to create a publication using SQL.
 
-### Creating a publication
+#### Creating a publication
 
 The following SQL examples assume you have `users` and `orders` tables in your database.
 
-#### Publication for specific tables
+##### Publication for specific tables
 
 ```sql
 -- Create publication for both tables
@@ -38,7 +38,7 @@ for table users, orders;
 
 This publication will track all changes (INSERT, UPDATE, DELETE) for both the `users` and `orders` tables.
 
-#### Publication for all tables in a schema
+##### Publication for all tables in a schema
 
 ```sql
 -- Create a publication for all tables in the public schema
@@ -47,7 +47,7 @@ create publication pub_all_public for tables in schema public;
 
 This will track changes for all existing and future tables in the `public` schema.
 
-#### Publication for all tables
+##### Publication for all tables
 
 ```sql
 -- Create a publication for all tables
@@ -56,9 +56,9 @@ create publication pub_all_tables for all tables;
 
 This will track changes for all tables in your database.
 
-### Advanced publication options
+#### Advanced publication options
 
-#### Selecting specific columns
+##### Selecting specific columns
 
 You can replicate only a subset of columns from a table:
 
@@ -70,7 +70,7 @@ for table users (id, email, created_at);
 
 This will only replicate the `id`, `email`, and `created_at` columns from the `users` table.
 
-#### Filtering rows with a predicate
+##### Filtering rows with a predicate
 
 You can filter which rows to replicate using a WHERE clause:
 
@@ -84,14 +84,14 @@ create publication pub_recent_orders
 for table orders where (created_at > '2024-01-01');
 ```
 
-### Viewing publications in the Dashboard
+#### Viewing publications in the Dashboard
 
 After creating a publication via SQL, you can view it in the Supabase Dashboard:
 
 1. Navigate to **Database** → [Publications](/dashboard/project/_/database/publications) in your Supabase Dashboard
 2. You'll see all your publications listed with their tables
 
-## Step 2: Enable ETL replication
+### Step 2: Enable ETL replication
 
 Before adding destinations, you need to enable ETL replication for your project:
 
@@ -105,15 +105,15 @@ Before adding destinations, you need to enable ETL replication for your project:
   zoomable
 />
 
-## Step 3: Add a destination
+### Step 3: Add a destination
 
 Once replication is enabled and you have a publication, you can add a destination. The destination is where your replicated data will be stored, while the pipeline is the active process that continuously replicates changes from your database to that destination.
 
-### Available destinations
+#### Available destinations
 
 For a complete list of available destinations and how to choose the right one for your needs, see [ETL Destinations](/docs/guides/database/replication/etl-destinations).
 
-### Configuration
+#### Configuration
 
 1. In the ETL Replication tab, click **Add destination**
 2. Configure the destination settings:
@@ -139,7 +139,7 @@ For a complete list of available destinations and how to choose the right one fo
 
 4. Click **Create and start** to begin replication
 
-## Step 4: Monitor your pipeline
+### Step 4: Monitor your pipeline
 
 After creating a destination, the pipeline will start and appear in the destinations list. You can monitor the pipeline's status and performance from the Dashboard.
 
@@ -151,7 +151,7 @@ After creating a destination, the pipeline will start and appear in the destinat
 
 For comprehensive monitoring instructions including pipeline states, metrics, and logs, see the [ETL Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring).
 
-## Managing your pipeline
+### Managing your pipeline
 
 You can manage your pipeline from the destinations list using the actions menu.
 
@@ -169,7 +169,7 @@ Available actions:
 - **Edit destination**: Modify destination settings like credentials or advanced options
 - **Delete**: Remove the destination and permanently stop replication
 
-## Adding or removing tables
+### Adding or removing tables
 
 If you need to modify which tables are replicated after your ETL pipeline is already running, follow these steps:
 
@@ -179,7 +179,7 @@ If your publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, new tables 
 
 </Admonition>
 
-### Adding tables to replication
+#### Adding tables to replication
 
 1. Add the table to your publication using SQL:
 
@@ -193,7 +193,7 @@ If your publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, new tables 
 
 2. **Restart the ETL pipeline** using the actions menu (see [Managing your pipeline](#managing-your-pipeline)) for the changes to take effect.
 
-### Removing tables from replication
+#### Removing tables from replication
 
 1. Remove the table from your publication using SQL:
 
@@ -207,7 +207,7 @@ If your publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, new tables 
 
 2. **Restart the ETL pipeline** using the actions menu (see [Managing your pipeline](#managing-your-pipeline)) for the changes to take effect.
 
-## How it works
+### How it works
 
 Once configured, ETL Replication:
 
@@ -222,7 +222,7 @@ ETL Replication currently performs data extraction and loading only, without tra
 
 </Admonition>
 
-## Troubleshooting
+### Troubleshooting
 
 If you encounter issues during setup:
 
@@ -233,7 +233,7 @@ If you encounter issues during setup:
 
 For more troubleshooting help, see the [ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq).
 
-## Limitations
+### Limitations
 
 ETL Replication has the following limitations that apply to all destinations:
 
@@ -245,7 +245,7 @@ ETL Replication has the following limitations that apply to all destinations:
 
 Destination-specific limitations may also apply. See the [Iceberg](/docs/guides/database/replication/etl-iceberg#limitations) destination page for details.
 
-## Future work
+### Future work
 
 ETL Replication is actively being developed. Planned improvements include:
 
@@ -254,7 +254,7 @@ ETL Replication is actively being developed. Planned improvements include:
 
 We don't have public timelines for these features, but they represent our roadmap for making ETL Replication more robust and flexible.
 
-## Next steps
+### Next steps
 
 - [Monitor ETL Replication](/docs/guides/database/replication/etl-replication-monitoring)
 - [View ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq)
