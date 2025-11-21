@@ -10,7 +10,6 @@ import { AnalyticsInterval } from 'data/analytics/constants'
 import { useContentIdQuery } from 'data/content/content-id-query'
 import { usePrimaryDatabase } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useChangedSync } from 'hooks/misc/useChanged'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { Dashboards, SqlSnippets } from 'types'
 import { DEPRECATED_REPORTS } from '../Reports.constants'
@@ -135,24 +134,25 @@ export const ReportBlock = ({
     [projectRef, readOnlyConnectionString, postgresConnectionString, executeSql]
   )
 
-  const sqlHasChanged = useChangedSync(sql)
-  const isRefreshingChanged = useChangedSync(isRefreshing)
-
   useEffect(() => {
     if (!isSnippet) return
 
-    if (isSuccess) {
+    if (isRefreshing) {
+      lastExecutedSqlRef.current = undefined
+    }
+
+    const shouldRunQuery = sql || isRefreshing
+    if (!shouldRunQuery && isSuccess) {
       const fetchedSql = (data?.content as SqlSnippets.Content | undefined)?.sql
       if (fetchedSql) {
         runQuery('select', fetchedSql)
       }
     }
 
-    const shouldRunQuery = sqlHasChanged || (isRefreshingChanged && isRefreshing)
     if (sql && shouldRunQuery) {
       runQuery('select', sql)
     }
-  }, [data, isSuccess, isSnippet, sqlHasChanged, isRefreshingChanged, isRefreshing, sql, runQuery])
+  }, [data, isSuccess, isSnippet, isRefreshing, sql, runQuery])
 
   return (
     <>
