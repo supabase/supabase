@@ -231,7 +231,7 @@ function createChatInstance(
   state: AiAssistantState,
   options: { id: string; initialMessages: MessageType[] }
 ) {
-  return new Chat({
+  return new Chat<MessageType>({
     id: options.id,
     messages: options.initialMessages,
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
@@ -242,6 +242,9 @@ function createChatInstance(
         const headerData = await constructHeaders()
         const authorizationHeader = headerData.get('Authorization')
 
+        // Get the chat specific to this request to ensure we have the correct name
+        const chat = state.chats[options.id]
+
         return {
           ...opts,
           body: {
@@ -250,7 +253,7 @@ function createChatInstance(
             connectionString: state.context.connectionString,
             schema: state.context.schema,
             table: state.context.table,
-            chatName: state.activeChat?.name,
+            chatName: chat?.name,
             orgSlug: state.context.orgSlug,
             model: state.model,
           },
@@ -266,23 +269,21 @@ function createChatInstance(
       if (toolCall.toolName === 'rename_chat') {
         const { newName } = toolCall.input as { newName: string }
 
-        if (state.activeChatId && newName?.trim()) {
-          state.renameChat(state.activeChatId, newName.trim())
+        if (options.id && newName?.trim()) {
+          state.renameChat(options.id, newName.trim())
         }
       }
     },
     onFinish(result) {
       // Sync messages back to state
-      if (state.activeChatId) {
-         const chatInstance = state.chatInstance
-         if (chatInstance) {
-             const messages = chatInstance.messages
-             const chat = state.chats[state.activeChatId]
-             if (chat) {
-                 chat.messages = messages as AssistantMessageType[]
-                 chat.updatedAt = new Date()
-             }
-         }
+      const chatInstance = state.chatInstances[options.id]
+      if (chatInstance) {
+        const messages = chatInstance.messages
+        const chat = state.chats[options.id]
+        if (chat) {
+          chat.messages = messages as AssistantMessageType[]
+          chat.updatedAt = new Date()
+        }
       }
     },
   })
@@ -294,7 +295,7 @@ export const createAiAssistantState = (): AiAssistantState => {
 
   const state: AiAssistantState = proxy({
     ...initialState, // Spread initial values directly
-    chatInstance: undefined,
+    chatInstances: {},
 
     setContext: (context: Partial<AiAssistantContext>) => {
       state.context = { ...state.context, ...context }
@@ -334,7 +335,7 @@ export const createAiAssistantState = (): AiAssistantState => {
       state.activeChatId = chatId
       
       // Create new chat instance
-      state.chatInstance = ref(createChatInstance(state, { id: chatId, initialMessages: [] }))
+      state.chatInstances[chatId] = ref(createChatInstance(state, { id: chatId, initialMessages: [] }))
 
       // Update non-chat related state based on options, falling back to current state, then initial
       state.initialInput = options?.initialInput ?? INITIAL_AI_ASSISTANT.initialInput
@@ -350,7 +351,9 @@ export const createAiAssistantState = (): AiAssistantState => {
         state.activeChatId = id
         const chat = state.chats[id]
         if (chat) {
-           state.chatInstance = ref(createChatInstance(state, { id, initialMessages: chat.messages }))
+           if (!state.chatInstances[id]) {
+             state.chatInstances[id] = ref(createChatInstance(state, { id, initialMessages: chat.messages }))
+           }
         }
       }
     },
@@ -365,9 +368,9 @@ export const createAiAssistantState = (): AiAssistantState => {
         
         if (state.activeChatId) {
            const chat = state.chats[state.activeChatId]
-           state.chatInstance = ref(createChatInstance(state, { id: state.activeChatId, initialMessages: chat.messages }))
-        } else {
-           state.chatInstance = undefined
+           if (!state.chatInstances[state.activeChatId]) {
+             state.chatInstances[state.activeChatId] = ref(createChatInstance(state, { id: state.activeChatId, initialMessages: chat.messages }))
+           }
         }
       }
     },
@@ -481,10 +484,12 @@ export const createAiAssistantState = (): AiAssistantState => {
       
       // Initialize chat instance for the active chat
       if (state.activeChatId && state.chats[state.activeChatId]) {
-        state.chatInstance = ref(createChatInstance(state, { 
-            id: state.activeChatId, 
-            initialMessages: state.chats[state.activeChatId].messages 
-        }))
+        if (!state.chatInstances[state.activeChatId]) {
+          state.chatInstances[state.activeChatId] = ref(createChatInstance(state, { 
+              id: state.activeChatId, 
+              initialMessages: state.chats[state.activeChatId].messages 
+          }))
+        }
       }
     },
 
@@ -499,7 +504,7 @@ export const createAiAssistantState = (): AiAssistantState => {
 export type AiAssistantState = AiAssistantData & {
   resetAiAssistantPanel: () => void
   activeChat: ChatSession | undefined
-  chatInstance: Chat<MessageType> | undefined
+  chatInstances: Record<string, Chat<MessageType>>
   setContext: (context: Partial<AiAssistantContext>) => void
   setModel: (model: AssistantModel) => void
   newChat: (
