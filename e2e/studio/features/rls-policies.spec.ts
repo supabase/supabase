@@ -44,7 +44,12 @@ const deleteTestTable = async (page: Page, ref: string) => {
 
   if (tableExists) {
     await page.getByLabel(`View ${policyTableName}`).nth(0).click()
-    await page.getByLabel(`View ${policyTableName}`).getByRole('button').nth(1).click()
+    // Open the row actions menu (three dots) using the same selector pattern as table-editor.spec.ts.
+    // This avoids brittle index-based selection and ignores the Unrestricted badge button.
+    await page
+      .getByLabel(`View ${policyTableName}`)
+      .locator('button[aria-haspopup="menu"]')
+      .click({ force: true })
     await page.getByText('Delete table').click()
     await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).click()
     await page.getByRole('button', { name: 'Delete' }).click()
@@ -171,6 +176,66 @@ test.describe.serial('RLS Policies', () => {
       await page.getByRole('button', { name: 'schema auth' }).click()
       await page.getByRole('option', { name: 'public', exact: true }).click()
       await page.waitForTimeout(1000)
+    })
+  })
+
+  test.describe('Table editor RLS badge', () => {
+    test('shows Unrestricted badge when RLS is disabled for public table', async ({ ref }) => {
+      // First, ensure RLS is disabled for the test table via the Policies page
+      await navigateToPoliciesPage(page, ref)
+
+      // Wait for the test table row to appear in the policies list
+      await expect(
+        page.getByRole('heading', { name: policyTableName, exact: true }),
+        'Test table heading should be visible on policies page'
+      ).toBeVisible({ timeout: 50000 })
+
+      const toggleRlsButton = page.getByTestId(`${policyTableName}-toggle-rls`)
+
+      // If RLS is currently enabled, the toggle button label will be "Disable RLS"
+      const toggleLabel = (await toggleRlsButton.innerText()) ?? ''
+      if (toggleLabel.includes('Disable RLS')) {
+        await toggleRlsButton.click()
+
+        // A confirmation modal appears when toggling RLS from the policies page
+        await expect(
+          page.getByRole('heading', { name: 'Confirm to disable Row Level Security' }),
+          'RLS disable confirmation modal should appear'
+        ).toBeVisible({ timeout: 50000 })
+
+        // Confirm disabling RLS
+        await page.getByRole('button', { name: 'Confirm' }).click()
+
+        // After confirming, the toggle button text should change to "Enable RLS"
+        await expect(
+          toggleRlsButton,
+          'Toggle should switch to "Enable RLS" after disabling RLS'
+        ).toHaveText(/Enable RLS/, { timeout: 50000 })
+      }
+
+      // Navigate to the table editor for the public schema so we can see the sidebar badge
+      await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+      await page.waitForTimeout(1000)
+
+      // In the table sidebar, the test table should have an "Unrestricted" badge
+      const tableRow = page.getByRole('button', { name: `View ${policyTableName}` })
+      await expect(
+        tableRow,
+        'Test table should be visible in the table editor sidebar'
+      ).toBeVisible({ timeout: 50000 })
+
+      const unrestrictedBadge = tableRow.getByText('Unrestricted', { exact: true })
+      await expect(
+        unrestrictedBadge,
+        'Unrestricted badge should be visible for public tables with RLS disabled'
+      ).toBeVisible({ timeout: 50000 })
+
+      // Hover the badge to verify the tooltip explains the risk
+      await unrestrictedBadge.hover()
+      await expect(
+        page.getByText(/Data is publicly accessible via API/i),
+        'Tooltip should describe unrestricted public access when RLS is disabled'
+      ).toBeVisible({ timeout: 10000 })
     })
   })
 
