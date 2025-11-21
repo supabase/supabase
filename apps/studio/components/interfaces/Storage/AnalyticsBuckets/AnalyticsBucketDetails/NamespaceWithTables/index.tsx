@@ -123,11 +123,9 @@ export const NamespaceWithTables = ({
 
   const { mutateAsync: importForeignSchema, isPending: isImportingForeignSchema } =
     useFDWImportForeignSchemaMutation()
-  const { mutateAsync: deleteNamespace } = useIcebergNamespaceDeleteMutation({ projectRef })
+  const { mutateAsync: deleteNamespace } = useIcebergNamespaceDeleteMutation()
   const { mutateAsync: dropForeignTable } = useFDWDropForeignTableMutation()
-  const { mutateAsync: deleteNamespaceTable } = useIcebergNamespaceTableDeleteMutation({
-    projectRef,
-  })
+  const { mutateAsync: deleteNamespaceTable } = useIcebergNamespaceTableDeleteMutation()
 
   const rescanNamespace = async () => {
     if (!icebergWrapper) return console.error('Iceberg wrapper cannot be found')
@@ -194,6 +192,7 @@ export const NamespaceWithTables = ({
       await Promise.all(
         allTables.map((table) =>
           deleteNamespaceTable({
+            projectRef,
             catalogUri,
             warehouse: bucketId,
             namespace,
@@ -214,7 +213,7 @@ export const NamespaceWithTables = ({
         )
       )
 
-      await deleteNamespace({ catalogUri, warehouse: bucketId, namespace })
+      await deleteNamespace({ projectRef, catalogUri, warehouse: bucketId, namespace })
 
       toast.success(`Successfully deleted namespace "${namespace}"`)
       setShowConfirmDeleteNamespace(false)

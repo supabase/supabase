@@ -113,7 +113,7 @@ export const DestinationPanel = ({
     useS3AccessKeyCreateMutation()
 
   const { mutateAsync: createNamespace, isPending: isCreatingNamespace } =
-    useIcebergNamespaceCreateMutation({ projectRef })
+    useIcebergNamespaceCreateMutation()
 
   const {
     data: publications = [],
@@ -232,6 +232,7 @@ export const DestinationPanel = ({
       const catalogUri = getCatalogURI(project?.ref ?? '', protocol, endpoint)
 
       await createNamespace({
+        projectRef,
         catalogUri,
         warehouse: data.warehouseName!,
         namespace: data.newNamespaceName,
