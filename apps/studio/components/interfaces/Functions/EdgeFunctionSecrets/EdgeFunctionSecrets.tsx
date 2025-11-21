@@ -8,7 +8,7 @@ import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSecretsDeleteMutation } from 'data/secrets/secrets-delete-mutation'
-import { ProjectSecret, useSecretsQuery } from 'data/secrets/secrets-query'
+import { useSecretsQuery } from 'data/secrets/secrets-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { Badge, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
@@ -54,7 +54,7 @@ const EdgeFunctionSecrets = () => {
         handleErrorOnDelete(deletingSecretNameRef, selectedId, `Secret not found`),
     })
 
-  const { mutate: deleteSecret, isLoading: isDeleting } = useSecretsDeleteMutation({
+  const { mutate: deleteSecret, isPending: isDeleting } = useSecretsDeleteMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully deleted ${variables.secrets[0]}`)
       setSelectedSecretToDelete(null)

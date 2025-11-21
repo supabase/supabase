@@ -12,7 +12,6 @@ import { useProjectStatusQuery } from 'data/projects/project-status-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Button } from 'ui'
-import status from 'http-status'
 
 const RestoringState = () => {
   const { ref } = useParams()
@@ -48,7 +47,7 @@ const RestoringState = () => {
     }
   }, [isProjectStatusSuccess, projectStatusData, ref, invalidateProjectDetailsQuery])
 
-  const { mutate: downloadBackup, isLoading: isDownloading } = useBackupDownloadMutation({
+  const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
     onSuccess: (res) => {
       const { fileUrl } = res
 

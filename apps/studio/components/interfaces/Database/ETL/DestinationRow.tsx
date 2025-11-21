@@ -88,7 +88,10 @@ export const DestinationRow = ({
   )
   const tableStatuses = replicationStatusData?.table_statuses ?? []
   const errorCount = tableStatuses.filter((t) => t.state?.name === 'error').length
-  const hasTableErrors = errorCount > 0
+  // Only show errors when pipeline is running (not when stopped or restarting)
+  const isPipelineStopped = statusName === PipelineStatusName.STOPPED
+  const isRestarting = requestStatus === PipelineStatusRequestStatus.RestartRequested
+  const hasTableErrors = errorCount > 0 && !isPipelineStopped && !isRestarting
 
   // Check if a newer pipeline version is available (one-time check cached for session)
   const { data: versionData } = useReplicationPipelineVersionQuery({

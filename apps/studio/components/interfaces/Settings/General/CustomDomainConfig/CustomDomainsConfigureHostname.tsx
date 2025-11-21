@@ -22,8 +22,8 @@ const CustomDomainsConfigureHostname = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { mutate: checkCNAMERecord, isLoading: isCheckingRecord } = useCheckCNAMERecordMutation()
-  const { mutate: createCustomDomain, isLoading: isCreating } = useCustomDomainCreateMutation()
+  const { mutate: checkCNAMERecord, isPending: isCheckingRecord } = useCheckCNAMERecordMutation()
+  const { mutate: createCustomDomain, isPending: isCreating } = useCustomDomainCreateMutation()
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
 
   const FORM_ID = 'custom-domains-form'

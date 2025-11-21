@@ -4,6 +4,7 @@ Supabase is 100% remote.
 
 Aaron Byrne
 Adam Mokan
+Akash Manimaran
 Alaister Young
 Alan De Los Santos
 Aleksi Immonen
@@ -79,6 +80,7 @@ Jean-Paul Argudo
 Jeff Smick
 Jenny Kibiri
 Jess Shears
+Jim Brodeur
 Jim Chanco Jr
 Joakim Ahrlin
 John Pena
@@ -98,6 +100,7 @@ Katerina Skroumpelou
 Kemal Y
 Kevin Brolly
 Kevin Grüneberg
+Kostas Botsas
 Krishna Sai Vandavasi
 Lakshan Perera
 Laura C
@@ -110,10 +113,12 @@ Luca Forstner
 Manan Gupta
 Margarita Sandomirskaia
 Mark Burggraf
+Matthew Hambright
 Matt Johnston
 Matt Rossman
 Monica Khoury
 Mykhailo Mischa Lieibenson
+Nick B
 Nick Littman
 Nyannyacha
 Oli R

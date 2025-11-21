@@ -136,10 +136,10 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
     name: 'metadataKeys',
   })
 
-  const { mutateAsync: createVectorBucketTable, isLoading: isCreatingVectorBucketTable } =
+  const { mutateAsync: createVectorBucketTable, isPending: isCreatingVectorBucketTable } =
     useVectorBucketIndexCreateMutation()
 
-  const { mutateAsync: importForeignSchema, isLoading: isImportingForeignSchema } =
+  const { mutateAsync: importForeignSchema, isPending: isImportingForeignSchema } =
     useFDWImportForeignSchemaMutation({
       onError: () => {},
     })

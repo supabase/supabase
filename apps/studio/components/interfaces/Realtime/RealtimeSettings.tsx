@@ -76,7 +76,7 @@ export const RealtimeSettings = () => {
   const hasRealtimeMessagesPolicies =
     realtimeMessagesPolicies && realtimeMessagesPolicies.length > 0
 
-  const { mutate: updateRealtimeConfig, isLoading: isUpdatingConfig } =
+  const { mutate: updateRealtimeConfig, isPending: isUpdatingConfig } =
     useRealtimeConfigurationUpdateMutation({
       onSuccess: () => {
         form.reset(form.getValues())

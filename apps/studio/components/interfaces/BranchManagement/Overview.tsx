@@ -190,14 +190,14 @@ const PreviewBranchActions = ({
   ] = useState(false)
   const [showEditBranchModal, setShowEditBranchModal] = useState(false)
 
-  const { mutate: resetBranch, isLoading: isResetting } = useBranchResetMutation({
+  const { mutate: resetBranch, isPending: isResetting } = useBranchResetMutation({
     onSuccess() {
       toast.success('Success! Please allow a few seconds for the branch to reset.')
       setShowConfirmResetModal(false)
     },
   })
 
-  const { mutate: updateBranch, isLoading: isUpdatingBranch } = useBranchUpdateMutation({
+  const { mutate: updateBranch, isPending: isUpdatingBranch } = useBranchUpdateMutation({
     onSuccess() {
       toast.success('Successfully updated branch')
       setShowBranchModeSwitch(false)

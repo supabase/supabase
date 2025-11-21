@@ -121,6 +121,9 @@
   "sdk:python": true,
   "sdk:swift": true,
 
+  "storage:analytics": true,
+  "storage:vectors": false,
+
   "search:fullIndex": true,
 
   "support:show_client_libraries": true

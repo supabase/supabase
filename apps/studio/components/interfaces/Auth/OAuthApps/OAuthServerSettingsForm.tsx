@@ -81,7 +81,7 @@ export const OAuthServerSettingsForm = () => {
     isLoading: isAuthConfigLoading,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig, isLoading } = useAuthConfigUpdateMutation({
+  const { mutate: updateAuthConfig, isPending } = useAuthConfigUpdateMutation({
     onSuccess: () => {
       toast.success('OAuth server settings updated successfully')
     },
@@ -346,14 +346,14 @@ export const OAuthServerSettingsForm = () => {
                 )}
 
                 <CardFooter className="justify-end space-x-2">
-                  <Button type="default" onClick={() => form.reset()} disabled={isLoading}>
+                  <Button type="default" onClick={() => form.reset()} disabled={isPending}>
                     Cancel
                   </Button>
                   <Button
                     type="primary"
                     htmlType="submit"
                     disabled={!canUpdateConfig || !form.formState.isDirty}
-                    loading={isLoading}
+                    loading={isPending}
                   >
                     Save changes
                   </Button>
