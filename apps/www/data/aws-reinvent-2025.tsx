@@ -59,17 +59,23 @@ const data = {
     title: 'Supabase at AWS re:Invent 2025',
     h1: (
       <>
-        <span className="block text-foreground">Build in a weekend.</span>
-        <span className="block text-foreground">Scale to millions.</span>
+        <span className="block text-foreground lg:text-3xl lg:leading-[1.5]">
+          The complete Postgres platform.
+        </span>
+        <span className="block text-foreground lg:text-3xl lg:leading-[1.5]">On AWS.</span>
       </>
     ),
     subheader: [
-      <>December 1-4, 2025 — Las Vegas, NV — Booth #1857</>,
       <>
-        Supabase is an open-source Postgres-based backend platform, built on AWS. It gives you the
-        AI-native tools you need to prove and deliver your ideas while maintaining enterprise-grade
-        security and compliance. It powers the world's leading AI coding agents, including Lovable,
-        Bolt, Figma Make, and Vercel v0.
+        December 1-4, 2025 — Las Vegas, NV —{' '}
+        <span className="text-foreground font-medium">Booth #1857</span>
+      </>,
+      <>
+        Supabase is the open-source Postgres development platform built to run on AWS
+        infrastructure. Get a complete backend with Database, Auth, Storage, Edge Functions, and
+        Real-Time in minutes. Deploy globally across AWS regions with enterprise-grade security,
+        compliance, and the performance AWS customers expect. Use Foreign Data Wrappers to connect
+        to your existing AWS data stack.
       </>,
     ],
     ctas: [
