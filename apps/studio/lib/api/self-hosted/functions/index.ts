@@ -1,5 +1,5 @@
 import { IS_PLATFORM } from 'common'
-import { FileSystemFunctionsArtifactStore } from './fileSystemFunctionsArtifactStore'
+import { FileSystemFunctionsArtifactStore } from './fileSystemStore'
 import { NewFunctionArtifactStore } from './types'
 
 export function getFunctionsArtifactStore(): NewFunctionArtifactStore {

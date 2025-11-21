@@ -1,5 +1,5 @@
 import { components } from 'api-types'
-import { getFunctionsArtifactStore } from 'lib/api/self-hosted/functions-manager'
+import { getFunctionsArtifactStore } from 'lib/api/self-hosted/functions'
 import { uuidv4 } from 'lib/helpers'
 import { NextApiRequest, NextApiResponse } from 'next'
 
