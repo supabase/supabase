@@ -119,7 +119,7 @@ Follow these steps to configure your destination. The specific configuration dep
 
 <Admonition type="note">
 
-Both Analytics Buckets and BigQuery destinations are supported. However, availability varies based on our planned rollout strategy. The destinations you can access depend on your project and access level.
+Both Analytics Buckets and BigQuery destinations are supported. However, availability varies based on our planned roll-out strategy. The destinations you can access depend on your project and access level.
 
 </Admonition>
 
@@ -134,9 +134,9 @@ Both Analytics Buckets and BigQuery destinations are supported. However, availab
 
 [Analytics Buckets](/docs/guides/storage/analytics/introduction) are specialized storage buckets in Supabase Storage designed for analytical workloads. They provide S3-compatible storage and use the [Apache Iceberg](https://iceberg.apache.org/) open table format, making your data accessible via standard tools like DuckDB, Spark, and other analytics platforms.
 
-When you replicate to Analytics Buckets, your database changes are automatically written in Iceberg format, creating queryable tables in object storage optimized for analytics.
+When you replicate to Analytics Buckets, your database changes are automatically written in Iceberg format, creating tables in object storage that you can query for analytics.
 
-##### Step 1: Create an Analytics Bucket
+##### Step 1: Create an analytics bucket
 
 First, create an Analytics Bucket to store your replicated data:
 
@@ -167,7 +167,7 @@ First, create an Analytics Bucket to store your replicated data:
    - **S3 Access Key ID**: Access key for S3-compatible storage
    - **S3 Secret Access Key**: Secret key for S3-compatible storage
 
-##### Step 2: Configure Analytics Buckets as a destination
+##### Step 2: Configure analytics buckets as a destination
 
 1. Navigate to [Database](/dashboard/project/_/database/etl) → **ETL Replication** in your Supabase Dashboard
 2. Click **Add destination**
