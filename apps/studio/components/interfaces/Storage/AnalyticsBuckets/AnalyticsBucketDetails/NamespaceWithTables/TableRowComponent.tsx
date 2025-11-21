@@ -289,7 +289,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
             <p>{table.name}</p>
           </div>
         </TableCell>
-        {!!hasReplication && (
+        {!HIDE_REPLICATION_USER_FLOW && !!hasReplication && (
           <TableCell colSpan={table.isConnected ? 1 : 2} className="min-w-[150px]">
             <div className="flex items-center">
               <Tooltip>
@@ -322,7 +322,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
           </TableCell>
         )}
 
-        {table.isConnected ? (
+        {!HIDE_REPLICATION_USER_FLOW && table.isConnected ? (
           // [Joshen] These are if there's the context of replication which we're currently not doing
           // May need to clean up if we decided to move forward de-coupling replication and Analytics Buckets
           <TableCell className="text-right flex flex-row items-center gap-x-2 justify-end">
