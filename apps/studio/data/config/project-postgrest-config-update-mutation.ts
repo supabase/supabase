@@ -12,6 +12,7 @@ export type ProjectPostgrestConfigUpdateVariables = {
   maxRows: number
   dbExtraSearchPath: string
   dbPool: number | null
+  serverCorsAllowedOrigins: string
 }
 
 type UpdatePostgrestConfigResponse = components['schemas']['UpdatePostgrestConfigBody']
@@ -22,11 +23,13 @@ export async function updateProjectPostgrestConfig({
   maxRows,
   dbExtraSearchPath,
   dbPool,
+  serverCorsAllowedOrigins,
 }: ProjectPostgrestConfigUpdateVariables) {
   const payload: UpdatePostgrestConfigResponse = {
     db_schema: dbSchema,
     max_rows: maxRows,
     db_extra_search_path: dbExtraSearchPath,
+    server_cors_allowed_origins: serverCorsAllowedOrigins,
   }
   if (dbPool) payload.db_pool = dbPool
 

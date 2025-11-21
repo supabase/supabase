@@ -6160,6 +6160,7 @@ export interface components {
       jwt_secret: string
       max_rows: number
       role_claim_key: string
+      server_cors_allowed_origins: string
     }
     GetPrivateLinkResponse: {
       private_link_associations: {
@@ -10007,6 +10008,7 @@ export interface components {
       db_pool?: number
       db_schema?: string
       max_rows?: number
+      server_cors_allowed_origins?: string
     }
     UpdatePostgrestConfigResponse: {
       db_extra_search_path: string

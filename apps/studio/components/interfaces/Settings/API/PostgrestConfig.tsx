@@ -56,6 +56,7 @@ const formSchema = z
   .object({
     dbSchema: z.array(z.string()),
     dbExtraSearchPath: z.array(z.string()),
+    serverCorsAllowedOrigins: z.string(),
     maxRows: z.number().max(1000000, "Can't be more than 1,000,000"),
     dbPool: z
       .number()
@@ -128,6 +129,7 @@ export const PostgrestConfig = () => {
       .map((x) => x.trim())
       .filter((x) => x.length > 0 && allSchemas.find((y) => y.name === x)),
     dbPool: config?.db_pool,
+    serverCorsAllowedOrigins: config?.server_cors_allowed_origins,
   }
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -165,6 +167,7 @@ export const PostgrestConfig = () => {
       maxRows: values.maxRows,
       dbExtraSearchPath: values.dbExtraSearchPath.join(','),
       dbPool: values.dbPool ? values.dbPool : null,
+      serverCorsAllowedOrigins: values.serverCorsAllowedOrigins,
     })
   }
 
@@ -387,6 +390,29 @@ export const PostgrestConfig = () => {
                                 </MultiSelectorContent>
                               </MultiSelector>
                             )}
+                          </FormItemLayout>
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="serverCorsAllowedOrigins"
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="w-full">
+                          <FormItemLayout
+                            className="w-full px-8 py-8"
+                            layout="horizontal"
+                            label="Allowed CORS origins"
+                            description="List of CORS origin domains that will be able to call the Data API."
+                          >
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_
+                                size="small"
+                                disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
+                                {...field}
+                              />
+                            </FormControl_Shadcn_>
                           </FormItemLayout>
                         </FormItem_Shadcn_>
                       )}
