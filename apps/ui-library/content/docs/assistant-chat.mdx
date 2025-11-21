@@ -46,15 +46,6 @@ The bundle contains four key pieces:
 
 Store these values in `.env.local` for the app and in a `.env` file that you pass to `supabase functions serve`.
 
-## Running locally
-
-1. Start Supabase: `supabase start`
-2. Serve the MCP server: `supabase functions serve --no-verify-jwt --env-file .env.local mcp-server`
-3. Serve the chat bridge: `supabase functions serve --no-verify-jwt --env-file .env.local chat`
-4. Set `NEXT_PUBLIC_ASSISTANT_CHAT_URL=http://127.0.0.1:54321/functions/v1/chat` so the widget hits your local function.
-
-Both functions need to be running so that the Edge Function can call into the MCP server while streaming results back to the browser.
-
 ## Adding the widget
 
 Place the widget close to your root layout so it is loaded once per page. The assistant automatically renders a floating toggle button and enforces Supabase authentication before sending requests.

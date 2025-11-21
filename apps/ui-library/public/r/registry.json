@@ -1425,7 +1425,9 @@
       "registryDependencies": [
         "button",
         "input",
+        "popover",
         "scroll-area",
+        "chart",
         "@ai-elements/conversation",
         "@ai-elements/message",
         "@ai-elements/prompt-input",
@@ -1444,11 +1446,20 @@
         "zod@latest",
         "nanoid@latest",
         "sonner@latest",
-        "lucide-react@latest"
+        "lucide-react@latest",
+        "recharts@latest"
       ],
       "files": [
         {
           "path": "registry/default/blocks/assistant/components/assistant-widget.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/assistant/components/parts/row.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/assistant/components/parts/chart.tsx",
           "type": "registry:component"
         },
         {
@@ -1482,14 +1493,74 @@
           "target": "supabase/functions/chat/index.ts"
         },
         {
+          "path": "registry/default/blocks/assistant/supabase/functions/chat/mcp-servers/types.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/chat/mcp-servers/types.ts"
+        },
+        {
+          "path": "registry/default/blocks/assistant/supabase/functions/chat/mcp-servers/supabase.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/chat/mcp-servers/supabase.ts"
+        },
+        {
+          "path": "registry/default/blocks/assistant/supabase/functions/chat/mcp-servers/registry.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/chat/mcp-servers/registry.ts"
+        },
+        {
+          "path": "registry/default/blocks/assistant/supabase/functions/chat/prompt.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/chat/prompt.ts"
+        },
+        {
           "path": "registry/default/blocks/assistant/supabase/functions/chat/deno.json",
           "type": "registry:file",
           "target": "supabase/functions/chat/deno.json"
         },
         {
-          "path": "registry/default/blocks/assistant/README.md",
+          "path": "registry/default/blocks/assistant/supabase/functions/_shared/cors.ts",
           "type": "registry:file",
-          "target": "README.assistant.md"
+          "target": "supabase/functions/_shared/cors.ts"
+        },
+        {
+          "path": "registry/default/blocks/assistant/supabase/functions/chat/render-tools.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/chat/render-tools.ts"
+        },
+        {
+          "path": "registry/default/blocks/assistant/supabase/functions/mcp-server/tools/count-tasks.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/count-tasks.ts"
+        },
+        {
+          "path": "registry/default/blocks/assistant/supabase/functions/mcp-server/tools/create-task.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/create-task.ts"
+        },
+        {
+          "path": "registry/default/blocks/assistant/supabase/functions/mcp-server/tools/delete-task.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/delete-task.ts"
+        },
+        {
+          "path": "registry/default/blocks/assistant/supabase/functions/mcp-server/tools/get-user-tasks.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/get-user-tasks.ts"
+        },
+        {
+          "path": "registry/default/blocks/assistant/supabase/functions/mcp-server/tools/registry.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/registry.ts"
+        },
+        {
+          "path": "registry/default/blocks/assistant/supabase/functions/mcp-server/tools/types.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/types.ts"
+        },
+        {
+          "path": "registry/default/blocks/assistant/supabase/functions/mcp-server/tools/update-task.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/update-task.ts"
         }
       ]
     },

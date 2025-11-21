@@ -99,11 +99,6 @@
       "target": "supabase/functions/chat/deno.json"
     },
     {
-      "path": "registry/default/blocks/assistant/README.md",
-      "type": "registry:file",
-      "target": "README.assistant.md"
-    },
-    {
       "path": "registry/default/blocks/assistant/supabase/functions/_shared/cors.ts",
       "type": "registry:file",
       "target": "supabase/functions/_shared/cors.ts"
