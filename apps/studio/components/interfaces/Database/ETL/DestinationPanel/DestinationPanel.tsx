@@ -15,6 +15,7 @@ import { useCreateDestinationPipelineMutation } from 'data/etl/create-destinatio
 import { useReplicationDestinationByIdQuery } from 'data/etl/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from 'data/etl/pipeline-by-id-query'
 import { useReplicationPublicationsQuery } from 'data/etl/publications-query'
+import { useRestartPipelineHelper } from 'data/etl/restart-pipeline-helper'
 import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
 import { useUpdateDestinationPipelineMutation } from 'data/etl/update-destination-pipeline-mutation'
 import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
@@ -36,6 +37,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
+import { NewPublicationPanel } from '../NewPublicationPanel'
 import { ReplicationDisclaimerDialog } from '../ReplicationDisclaimerDialog'
 import { AdvancedSettings } from './AdvancedSettings'
 import { DestinationNameInput } from './DestinationNameInput'
@@ -88,6 +90,7 @@ export const DestinationPanel = ({
 
   const editMode = !!existingDestination
   const [showDisclaimerDialog, setShowDisclaimerDialog] = useState(false)
+  const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
   const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
     null
   )
@@ -104,12 +107,13 @@ export const DestinationPanel = ({
     })
 
   const { mutateAsync: startPipeline, isPending: startingPipeline } = useStartPipelineMutation()
+  const { restartPipeline } = useRestartPipelineHelper()
 
   const { mutateAsync: createS3AccessKey, isPending: isCreatingS3AccessKey } =
     useS3AccessKeyCreateMutation()
 
   const { mutateAsync: createNamespace, isPending: isCreatingNamespace } =
-    useIcebergNamespaceCreateMutation()
+    useIcebergNamespaceCreateMutation({ projectRef })
 
   const {
     data: publications = [],
@@ -317,6 +321,7 @@ export const DestinationPanel = ({
             snapshot
           )
           toast.success('Settings applied. Restarting the pipeline...')
+          restartPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         } else {
           setRequestStatus(
             existingDestination.pipelineId,
@@ -324,8 +329,8 @@ export const DestinationPanel = ({
             snapshot
           )
           toast.success('Settings applied. Starting the pipeline...')
+          startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         }
-        startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         onClose()
       } else {
         let destinationConfig: any = {}
@@ -440,7 +445,11 @@ export const DestinationPanel = ({
   return (
     <>
       <Sheet open={visible} onOpenChange={onClose}>
-        <SheetContent showClose={false} size="default">
+        <SheetContent
+          showClose={false}
+          size="default"
+          className={publicationPanelVisible ? 'right-32' : 'right-0'}
+        >
           <div className="flex flex-col h-full" tabIndex={-1}>
             <SheetHeader>
               <SheetTitle>{editMode ? 'Edit destination' : 'Create a new destination'}</SheetTitle>
@@ -467,7 +476,12 @@ export const DestinationPanel = ({
 
                       <div className="space-y-4">
                         <DestinationNameInput form={form} />
-                        <PublicationSelection form={form} sourceId={sourceId} visible={visible} />
+                        <PublicationSelection
+                          form={form}
+                          sourceId={sourceId}
+                          visible={visible}
+                          onSelectNewPublication={() => setPublicationPanelVisible(true)}
+                        />
                       </div>
                     </div>
                     <DialogSectionSeparator />
@@ -513,6 +527,12 @@ export const DestinationPanel = ({
           </div>
         </SheetContent>
       </Sheet>
+
+      <NewPublicationPanel
+        sourceId={sourceId}
+        visible={publicationPanelVisible}
+        onClose={() => setPublicationPanelVisible(false)}
+      />
 
       <ReplicationDisclaimerDialog
         open={showDisclaimerDialog}

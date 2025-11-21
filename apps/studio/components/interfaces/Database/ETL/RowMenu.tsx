@@ -5,6 +5,7 @@ import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ReplicationPipelineStatusData } from 'data/etl/pipeline-status-query'
 import { Pipeline } from 'data/etl/pipelines-query'
+import { useRestartPipelineHelper } from 'data/etl/restart-pipeline-helper'
 import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/etl/stop-pipeline-mutation'
 import {
@@ -58,6 +59,7 @@ export const RowMenu = ({
 
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
+  const { restartPipeline } = useRestartPipelineHelper()
   const { getRequestStatus, setRequestStatus: setGlobalRequestStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
     ? getRequestStatus(pipeline.id)
@@ -117,7 +119,7 @@ export const RowMenu = ({
 
     try {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
-      await startPipeline({ projectRef, pipelineId: pipeline.id })
+      await restartPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
       toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
