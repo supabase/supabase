@@ -43,6 +43,7 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - ai
+  - js-yaml
   - supabase
 
 onlyBuiltDependencies:
