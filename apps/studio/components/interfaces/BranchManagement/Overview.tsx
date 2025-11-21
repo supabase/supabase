@@ -394,7 +394,7 @@ const PreviewBranchActions = ({
           {branch.deletion_scheduled_at && (
             <DropdownMenuItemTooltip
               className="gap-x-2"
-              disabled={!canRestoreBranches || branch.preview_project_status === 'COMING_UP'}
+              disabled={!canRestoreBranches || branch.preview_project_status !== 'INACTIVE'}
               onSelect={(e) => {
                 e.stopPropagation()
                 onRestoreBranch()
@@ -408,8 +408,8 @@ const PreviewBranchActions = ({
                   side: 'left',
                   text: !canRestoreBranches
                     ? 'You need additional permissions to restore branches'
-                    : branch.preview_project_status === 'COMING_UP'
-                      ? 'Preview project is still coming up. Please wait for it to become healthy.'
+                    : branch.preview_project_status !== 'INACTIVE'
+                      ? 'Preview project is not fully paused or already coming up. Please wait for it to become fully paused before restoring.'
                       : undefined,
                 },
               }}
