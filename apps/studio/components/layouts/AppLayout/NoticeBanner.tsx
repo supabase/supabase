@@ -44,15 +44,14 @@ export const NoticeBanner = () => {
       <div className="items-center flex flex-row gap-3 z-[1]">
         <WarningIcon className="z-[1] flex-shrink-0" />
         <div className="flex-1 text-xs sm:text-sm z-[1] text-warning">
-          Maintenance Nov 21-23: Some dashboard operations may take longer than usual or be
-          momentarily inaccessible. Your projects will continue to operate normally.{' '}
+          Urgent Dashboard and Management API maintenance currently in progress. For full details,{' '}
           <Link
             href="https://status.supabase.com/incidents/z0l2157y33xk"
             target="_blank"
             rel="noreferrer"
             className="opacity-75 hover:opacity-100 underline"
           >
-            Learn more
+            check here
           </Link>
           .
         </div>
