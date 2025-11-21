@@ -76,7 +76,7 @@ export const ConnectionPooling = () => {
   })
   const { data: addons, isSuccess: isSuccessAddons } = useProjectAddonsQuery({ projectRef })
 
-  const { mutate: updatePoolerConfig, isLoading: isUpdatingPoolerConfig } =
+  const { mutate: updatePoolerConfig, isPending: isUpdatingPoolerConfig } =
     usePgbouncerConfigurationUpdateMutation()
 
   const hasIpv4Addon = !!addons?.selected_addons.find((addon) => addon.type === 'ipv4')

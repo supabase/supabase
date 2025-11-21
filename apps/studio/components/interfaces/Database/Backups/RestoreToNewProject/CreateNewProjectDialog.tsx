@@ -74,7 +74,7 @@ export const CreateNewProjectDialog = ({
   )
   const hasPITREnabled = cloneBackups?.pitr_enabled
 
-  const { mutate: triggerClone, isLoading: cloneMutationLoading } = useProjectCloneMutation({
+  const { mutate: triggerClone, isPending: cloneMutationLoading } = useProjectCloneMutation({
     onError: (error) => {
       toast.error(`Failed to restore to new project: ${error.message}`)
     },

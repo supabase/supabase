@@ -67,7 +67,7 @@ export const OngoingQueriesPanel = () => {
     }
   }, [viewOngoingQueries])
 
-  const { mutate: abortQuery, isLoading } = useQueryAbortMutation({
+  const { mutate: abortQuery, isPending } = useQueryAbortMutation({
     onSuccess: () => {
       toast.success(`Successfully aborted query (ID: ${selectedId})`)
       setSelectedId(undefined)
@@ -171,7 +171,7 @@ export const OngoingQueriesPanel = () => {
       </Sheet>
 
       <ConfirmationModal
-        loading={isLoading}
+        loading={isPending}
         variant="warning"
         title={`Confirm to abort this query? (ID: ${selectedId})`}
         visible={selectedId !== undefined}

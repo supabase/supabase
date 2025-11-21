@@ -39,21 +39,30 @@ export function withAuth<T>(
     const timeoutIdRef = useRef<NodeJS.Timeout | null>(null)
     const [isSessionTimeoutModalOpen, setIsSessionTimeoutModalOpen] = useState(false)
 
-    const { isLoading: isAALLoading, data: aalData } = useAuthenticatorAssuranceLevelQuery({
-      onError(error) {
-        toast.error(
-          `Failed to fetch authenticator assurance level: ${error.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
-        )
-      },
-    })
+    const {
+      isLoading: isAALLoading,
+      data: aalData,
+      isError: isErrorAAL,
+      error: errorAAL,
+    } = useAuthenticatorAssuranceLevelQuery()
 
-    usePermissionsQuery({
-      onError(error: any) {
+    useEffect(() => {
+      if (isErrorAAL) {
         toast.error(
-          `Failed to fetch permissions: ${error.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
+          `Failed to fetch authenticator assurance level: ${errorAAL?.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
         )
-      },
-    })
+      }
+    }, [isErrorAAL, errorAAL])
+
+    const { isError: isErrorPermissions, error: errorPermissions } = usePermissionsQuery()
+
+    useEffect(() => {
+      if (isErrorPermissions) {
+        toast.error(
+          `Failed to fetch permissions: ${errorPermissions?.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
+        )
+      }
+    }, [isErrorPermissions, errorPermissions])
 
     const isLoggedIn = Boolean(session)
     const isFinishedLoading = !isLoading && !isAALLoading
