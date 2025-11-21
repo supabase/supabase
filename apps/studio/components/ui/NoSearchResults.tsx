@@ -6,7 +6,11 @@ export interface NoSearchResultsProps {
   className?: string
 }
 
-const NoSearchResults = ({ searchString, onResetFilter, className }: NoSearchResultsProps) => {
+export const NoSearchResults = ({
+  searchString,
+  onResetFilter,
+  className,
+}: NoSearchResultsProps) => {
   return (
     <div
       className={cn(
@@ -28,5 +32,3 @@ const NoSearchResults = ({ searchString, onResetFilter, className }: NoSearchRes
     </div>
   )
 }
-
-export default NoSearchResults

@@ -1,4 +1,4 @@
-import { pick } from 'lodash'
+import { pick } from 'lodash-es'
 
 /**
  * Gets the Notion team to send feedback to based on the pathname.
@@ -30,6 +30,8 @@ const getLinearTeam = (pathname: string) => {
       return 'Dev Workflows'
     case 'integrations':
       return 'API'
+    case 'security':
+      return 'Security'
     case 'platform':
     case 'monitoring-troubleshooting':
       return 'Infra'

@@ -2,6 +2,7 @@ import Link from 'next/link'
 
 import { useParams } from 'common'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { DOCS_URL } from 'lib/constants'
 import { Button } from 'ui'
 import { NoticeBar } from './ui/NoticeBar'
 
@@ -13,7 +14,7 @@ export function DiskManagementPanelForm() {
     <div id="disk-management">
       <FormHeader
         title="Disk Management"
-        docsUrl="https://supabase.com/docs/guides/platform/database-size#disk-management"
+        docsUrl={`${DOCS_URL}/guides/platform/database-size#disk-management`}
       />
       <NoticeBar
         visible={true}

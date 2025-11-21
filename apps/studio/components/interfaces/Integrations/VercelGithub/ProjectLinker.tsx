@@ -1,18 +1,24 @@
-import { ChevronDown, PlusIcon } from 'lucide-react'
+import { Check, ChevronDown, Plus, PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { ReactNode, useEffect, useRef, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import {
   IntegrationConnectionsCreateVariables,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import { EMPTY_ARR } from 'lib/void'
+import Link from 'next/link'
 import {
+  Badge,
   Button,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
@@ -39,9 +45,9 @@ export interface ForeignProject {
 }
 
 export interface ProjectLinkerProps {
+  slug?: string
   organizationIntegrationId?: string
   foreignProjects: ForeignProject[]
-  supabaseProjects: Project[]
   onCreateConnections: (variables: IntegrationConnectionsCreateVariables) => void
   installedConnections?: IntegrationProjectConnection[]
   isLoading?: boolean
@@ -50,7 +56,6 @@ export interface ProjectLinkerProps {
   choosePrompt?: string
   onSkip?: () => void
   loadingForeignProjects?: boolean
-  loadingSupabaseProjects?: boolean
   showNoEntitiesState?: boolean
 
   defaultSupabaseProjectRef?: string
@@ -59,9 +64,9 @@ export interface ProjectLinkerProps {
 }
 
 const ProjectLinker = ({
+  slug,
   organizationIntegrationId,
   foreignProjects,
-  supabaseProjects,
   onCreateConnections: _onCreateConnections,
   installedConnections = EMPTY_ARR,
   isLoading,
@@ -70,7 +75,6 @@ const ProjectLinker = ({
   choosePrompt = 'Choose a project',
   onSkip,
   loadingForeignProjects,
-  loadingSupabaseProjects,
   showNoEntitiesState = true,
 
   defaultSupabaseProjectRef,
@@ -78,24 +82,28 @@ const ProjectLinker = ({
   mode,
 }: ProjectLinkerProps) => {
   const router = useRouter()
-  const [supabaseProjectsComboBoxOpen, setSupabaseProjectsComboboxOpen] = useState(false)
-  const [foreignProjectsComboBoxOpen, setForeignProjectsComboboxOpen] = useState(false)
-  const supabaseProjectsComboBoxRef = useRef<HTMLButtonElement>(null)
-  const foreignProjectsComboBoxRef = useRef<HTMLButtonElement>(null)
+  const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
-  const selectedOrganization = useSelectedOrganization()
-
+  const [openProjectsDropdown, setOpenProjectsDropdown] = useState(false)
+  const [openForeignProjectsComboBox, setOpenForeignProjectsComboBox] = useState(false)
+  const [foreignProjectId, setForeignProjectId] = useState<string | undefined>(
+    defaultForeignProjectId
+  )
   const [supabaseProjectRef, setSupabaseProjectRef] = useState<string | undefined>(
     defaultSupabaseProjectRef
   )
+
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { data: orgProjects, isLoading: loadingSupabaseProjects } = useOrgProjectsInfiniteQuery({
+    slug,
+  })
+  const numProjects = orgProjects?.pages[0].pagination.count ?? 0
+
   useEffect(() => {
     if (defaultSupabaseProjectRef !== undefined && supabaseProjectRef === undefined)
       setSupabaseProjectRef(defaultSupabaseProjectRef)
   }, [defaultSupabaseProjectRef, supabaseProjectRef])
 
-  const [foreignProjectId, setForeignProjectId] = useState<string | undefined>(
-    defaultForeignProjectId
-  )
   useEffect(() => {
     if (defaultForeignProjectId !== undefined && foreignProjectId === undefined)
       setForeignProjectId(defaultForeignProjectId)
@@ -104,9 +112,7 @@ const ProjectLinker = ({
   // create a flat array of foreign project ids. ie, ["prj_MlkO6AiLG5ofS9ojKrkS3PhhlY3f", ..]
   const flatInstalledConnectionsIds = new Set(installedConnections.map((x) => x.foreign_project_id))
 
-  const selectedSupabaseProject = supabaseProjectRef
-    ? supabaseProjects.find((x) => x.ref?.toLowerCase() === supabaseProjectRef?.toLowerCase())
-    : undefined
+  const { data: selectedSupabaseProject } = useProjectDetailQuery({ ref: supabaseProjectRef })
 
   const selectedForeignProject = foreignProjectId
     ? foreignProjects.find((x) => x.id?.toLowerCase() === foreignProjectId?.toLowerCase())
@@ -158,20 +164,20 @@ const ProjectLinker = ({
     )
   }
 
-  const noSupabaseProjects = supabaseProjects.length === 0
+  const noSupabaseProjects = numProjects === 0
   const noForeignProjects = foreignProjects.length === 0
   const missingEntity = noSupabaseProjects ? 'Supabase' : mode
   const oppositeMissingEntity = noSupabaseProjects ? mode : 'Supabase'
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="relative border rounded-lg p-12 bg shadow">
+    <div className="flex flex-col bg border shadow rounded-lg overflow-hidden">
+      <div className="relative p-12 border-b border-muted">
         <div
           className="absolute inset-0 bg-grid-black/5 [mask-image:linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-white/5 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
           style={{ backgroundPosition: '10px 10px' }}
         />
 
-        {loadingForeignProjects || loadingSupabaseProjects ? (
+        {loadingForeignProjects ? (
           <div className="w-1/2 mx-auto space-y-2 py-4">
             <p className="text-sm text-foreground text-center">Loading projects</p>
             <ShimmerLine active />
@@ -193,94 +199,94 @@ const ProjectLinker = ({
                 <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" className="w-6" />
               </div>
 
-              <Popover_Shadcn_
-                open={supabaseProjectsComboBoxOpen}
-                onOpenChange={setSupabaseProjectsComboboxOpen}
-              >
-                <PopoverTrigger_Shadcn_ asChild>
-                  <Button
-                    ref={supabaseProjectsComboBoxRef}
-                    type="default"
-                    block
-                    disabled={defaultSupabaseProjectRef !== undefined || loadingSupabaseProjects}
-                    loading={loadingSupabaseProjects}
-                    className="justify-start h-[34px]"
-                    icon={
-                      <div className="bg-white shadow border rounded p-1 w-6 h-6 flex justify-center items-center">
-                        <img
-                          src={`${BASE_PATH}/img/supabase-logo.svg`}
-                          alt="Supabase"
-                          className="w-4"
-                        />
+              <OrganizationProjectSelector
+                sameWidthAsTrigger
+                open={openProjectsDropdown}
+                setOpen={setOpenProjectsDropdown}
+                slug={slug}
+                selectedRef={supabaseProjectRef}
+                onSelect={(project) => {
+                  setSupabaseProjectRef(project.ref)
+                  setOpenProjectsDropdown(false)
+                }}
+                renderRow={(project) => {
+                  return (
+                    <div className={cn('w-full flex items-center justify-between')}>
+                      <div className="flex items-center gap-x-2">
+                        <div className="bg-white shadow border rounded p-1 w-6 h-6 flex justify-center items-center">
+                          <img
+                            src={`${BASE_PATH}/img/supabase-logo.svg`}
+                            alt="Supabase"
+                            className="w-4"
+                          />
+                        </div>
+                        <p>{project.name}</p>
+                        {project.status === 'INACTIVE' && <Badge>Paused</Badge>}
+                        {project.status === 'GOING_DOWN' && <Badge>Pausing</Badge>}
                       </div>
-                    }
-                    iconRight={
-                      defaultSupabaseProjectRef === undefined ? (
-                        <span className="grow flex justify-end">
-                          <ChevronDown />
-                        </span>
-                      ) : null
-                    }
-                  >
-                    {selectedSupabaseProject
-                      ? selectedSupabaseProject.name
-                      : 'Choose Supabase Project'}
-                  </Button>
-                </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_
-                  className="p-0 !w-72"
-                  side="bottom"
-                  align="center"
-                  style={{ width: supabaseProjectsComboBoxRef.current?.offsetWidth }}
-                >
-                  <Command_Shadcn_>
-                    <CommandInput_Shadcn_ placeholder="Search for a project" />
-                    <CommandList_Shadcn_ className="!max-h-[170px]">
-                      <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-                      <CommandGroup_Shadcn_>
-                        {supabaseProjects.map((project, i) => {
-                          return (
-                            <CommandItem_Shadcn_
-                              value={`${project.name.replaceAll('"', '')}-${i}`}
-                              key={project.ref}
-                              className="flex gap-2 items-center"
-                              onSelect={() => {
-                                if (project.ref) setSupabaseProjectRef(project.ref)
-                                setSupabaseProjectsComboboxOpen(false)
-                              }}
-                            >
-                              <div className="bg-white shadow border rounded p-1 w-6 h-6 flex justify-center items-center">
-                                <img
-                                  src={`${BASE_PATH}/img/supabase-logo.svg`}
-                                  alt="Supabase"
-                                  className="w-4"
-                                />
-                              </div>
-                              <span>{project.name}</span>
-                            </CommandItem_Shadcn_>
-                          )
-                        })}
-                        {supabaseProjects.length === 0 && (
-                          <p className="text-xs text-foreground-lighter px-2 py-2">
-                            No projects found in this organization
-                          </p>
-                        )}
-                      </CommandGroup_Shadcn_>
-                      <CommandSeparator_Shadcn_ />
+                      {project.ref === supabaseProjectRef && <Check size={16} />}
+                    </div>
+                  )
+                }}
+                renderTrigger={() => {
+                  return (
+                    <Button
+                      type="default"
+                      block
+                      disabled={defaultSupabaseProjectRef !== undefined || loadingSupabaseProjects}
+                      loading={loadingSupabaseProjects}
+                      className="justify-between h-[34px]"
+                      iconRight={
+                        defaultSupabaseProjectRef === undefined ? (
+                          <span className="grow flex justify-end">
+                            <ChevronDown />
+                          </span>
+                        ) : null
+                      }
+                    >
+                      <div className="flex items-center gap-x-2">
+                        <div className="bg-white shadow border rounded p-1 w-6 h-6 flex justify-center items-center">
+                          <img
+                            src={`${BASE_PATH}/img/supabase-logo.svg`}
+                            alt="Supabase"
+                            className="w-4"
+                          />
+                        </div>
+                        {selectedSupabaseProject
+                          ? selectedSupabaseProject.name
+                          : 'Choose Supabase Project'}
+                      </div>
+                    </Button>
+                  )
+                }}
+                renderActions={() => {
+                  return (
+                    projectCreationEnabled && (
                       <CommandGroup_Shadcn_>
                         <CommandItem_Shadcn_
-                          className="flex gap-2 items-center cursor-pointer"
-                          onClick={() => router.push(`/new/${selectedOrganization?.slug}`)}
-                          onSelect={() => router.push(`/new/${selectedOrganization?.slug}`)}
+                          className="cursor-pointer w-full"
+                          onSelect={() => {
+                            setOpenProjectsDropdown(false)
+                            router.push(`/new/${selectedOrganization?.slug}`)
+                          }}
+                          onClick={() => setOpenProjectsDropdown(false)}
                         >
-                          <PlusIcon size={16} />
-                          <span>Create a new project</span>
+                          <Link
+                            href={`/new/${selectedOrganization?.slug}`}
+                            onClick={() => {
+                              setOpenProjectsDropdown(false)
+                            }}
+                            className="w-full flex items-center gap-2"
+                          >
+                            <Plus size={14} strokeWidth={1.5} />
+                            <p>Create a new project</p>
+                          </Link>
                         </CommandItem_Shadcn_>
                       </CommandGroup_Shadcn_>
-                    </CommandList_Shadcn_>
-                  </Command_Shadcn_>
-                </PopoverContent_Shadcn_>
-              </Popover_Shadcn_>
+                    )
+                  )
+                }}
+              />
             </Panel>
 
             <div className="border border-foreground-lighter h-px w-8 border-dashed self-end mb-4" />
@@ -291,12 +297,11 @@ const ProjectLinker = ({
               </div>
 
               <Popover_Shadcn_
-                open={foreignProjectsComboBoxOpen}
-                onOpenChange={setForeignProjectsComboboxOpen}
+                open={openForeignProjectsComboBox}
+                onOpenChange={setOpenForeignProjectsComboBox}
               >
                 <PopoverTrigger_Shadcn_ asChild>
                   <Button
-                    ref={foreignProjectsComboBoxRef}
                     type="default"
                     block
                     disabled={loadingForeignProjects}
@@ -319,10 +324,10 @@ const ProjectLinker = ({
                   </Button>
                 </PopoverTrigger_Shadcn_>
                 <PopoverContent_Shadcn_
-                  className="p-0 !w-72"
+                  className="p-0"
                   side="bottom"
                   align="center"
-                  style={{ width: foreignProjectsComboBoxRef.current?.offsetWidth }}
+                  sameWidthAsTrigger
                 >
                   <Command_Shadcn_>
                     <CommandInput_Shadcn_ placeholder="Search for a project" />
@@ -337,7 +342,7 @@ const ProjectLinker = ({
                               className="flex gap-2 items-center"
                               onSelect={() => {
                                 if (project.id) setForeignProjectId(project.id)
-                                setForeignProjectsComboboxOpen(false)
+                                setOpenForeignProjectsComboBox(false)
                               }}
                             >
                               <div>{getForeignProjectIcon?.(project) ?? integrationIcon}</div>
@@ -374,7 +379,7 @@ const ProjectLinker = ({
         )}
       </div>
 
-      <div className="flex w-full justify-end gap-2">
+      <div className="flex w-full justify-end gap-2 p-4 bg-surface-75">
         {onSkip !== undefined && (
           <Button
             size="medium"

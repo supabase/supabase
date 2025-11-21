@@ -66,6 +66,7 @@ const MobileHeader = ({
             })
           }
           size="medium"
+          planId={selectedPlan.planId}
         />
       ) : (
         <Button asChild size="medium" type={plan === 'Enterprise' ? 'default' : 'primary'} block>
@@ -387,7 +388,10 @@ const PricingComparisonTable = ({
                             plan.name === 'Enterprise' && 'xl:opacity-0'
                           )}
                         >
-                          <span className="text-foreground-lighter font-mono text-xl mr-1 tracking-tighter">
+                          <span
+                            className="text-foreground-lighter font-mono text-xl mr-1 tracking-tighter"
+                            translate="no"
+                          >
                             {plan.name !== 'Enterprise' && '$'}
                             {plan.priceMonthly}
                           </span>
@@ -412,6 +416,7 @@ const PricingComparisonTable = ({
                               })
                             }
                             size="tiny"
+                            planId={plan.planId}
                           />
                         ) : (
                           <Button

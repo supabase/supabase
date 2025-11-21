@@ -4,7 +4,7 @@ interface BreadcrumbsViewProps {
   defaultValue: any
 }
 
-const BreadcrumbsView = ({ defaultValue: breadcrumbs }: BreadcrumbsViewProps) => {
+export const BreadcrumbsView = ({ defaultValue: breadcrumbs }: BreadcrumbsViewProps) => {
   return (
     <>
       {breadcrumbs?.length
@@ -42,5 +42,3 @@ const BreadcrumbsView = ({ defaultValue: breadcrumbs }: BreadcrumbsViewProps) =>
     </>
   )
 }
-
-export default BreadcrumbsView

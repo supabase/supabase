@@ -1,44 +1,42 @@
 import { common, dirname, relative } from '@std/path/posix'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { LogoLoader } from 'ui'
 import { useParams } from 'common'
 import { DeployEdgeFunctionWarningModal } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
+import { EdgeFunctionFile } from 'components/interfaces/EdgeFunctions/EdgeFunction.types'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
+import { FileExplorerAndEditor } from 'components/ui/FileExplorerAndEditor'
 import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH } from 'lib/constants'
+import { LogoLoader } from 'ui'
 
 const CodePage = () => {
-  const router = useRouter()
   const { ref, functionSlug } = useParams()
-  const project = useSelectedProject()
-  const isOptedInToAI = useOrgOptedIntoAi()
-  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
-  const edgeFunctionCreate = useFlag('edgeFunctionCreate')
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
+
   const { mutate: sendEvent } = useSendEventMutation()
-  const org = useSelectedOrganization()
   const [showDeployWarning, setShowDeployWarning] = useState(false)
 
-  const canDeployFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
+  const { can: canDeployFunction } = useAsyncCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
-  const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
+  const { data: selectedFunction } = useEdgeFunctionQuery({
+    projectRef: ref,
+    slug: functionSlug,
+  })
   const {
-    data: functionFiles,
+    data: functionBody,
     isLoading: isLoadingFiles,
     isError: isErrorLoadingFiles,
     isSuccess: isSuccessLoadingFiles,
@@ -49,16 +47,21 @@ const CodePage = () => {
       slug: functionSlug,
     },
     {
+      // [Alaister]: These parameters prevent the function files
+      // from being refetched when the user is editing the code
       retry: false,
-      refetchOnWindowFocus: false,
       retryOnMount: false,
+      refetchOnWindowFocus: false,
+      staleTime: Infinity,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchInterval: false,
+      refetchIntervalInBackground: false,
     }
   )
-  const [files, setFiles] = useState<
-    { id: number; name: string; content: string; selected?: boolean }[]
-  >([])
+  const [files, setFiles] = useState<EdgeFunctionFile[]>([])
 
-  const { mutate: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
+  const { mutate: deployFunction, isPending: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
       toast.success('Successfully updated edge function')
       setShowDeployWarning(false)
@@ -72,43 +75,14 @@ const CodePage = () => {
       const newEntrypointPath = selectedFunction.entrypoint_path?.split('/').pop()
       const newImportMapPath = selectedFunction.import_map_path?.split('/').pop()
 
-      const fallbackEntrypointPath = () => {
-        // when there's no matching entrypoint path is set,
-        // we use few heuristics to find an entrypoint file
-        // 1. If the function has only a single TS / JS file, if so set it as entrypoint
-        const jsFiles = files.filter(({ name }) => name.endsWith('.js') || name.endsWith('.ts'))
-        if (jsFiles.length === 1) {
-          return jsFiles[0].name
-        } else if (jsFiles.length) {
-          // 2. If function has a `index` or `main` file use it as the entrypoint
-          const regex = /^.*?(index|main).*$/i
-          const matchingFile = jsFiles.find(({ name }) => regex.test(name))
-          // 3. if no valid index / main file found, we set the entrypoint expliclty to first JS file
-          return matchingFile ? matchingFile.name : jsFiles[0].name
-        } else {
-          // no potential entrypoint files found, this will most likely result in an error on deploy
-          return 'index.ts'
-        }
-      }
-
-      const fallbackImportMapPath = () => {
-        // try to find a deno.json or import_map.json file
-        const regex = /^.*?(deno|import_map).json*$/i
-        return files.find(({ name }) => regex.test(name))?.name
-      }
-
       deployFunction({
         projectRef: ref,
         slug: selectedFunction.slug,
         metadata: {
           name: selectedFunction.name,
           verify_jwt: selectedFunction.verify_jwt,
-          entrypoint_path: files.some(({ name }) => name === newEntrypointPath)
-            ? (newEntrypointPath as string)
-            : fallbackEntrypointPath(),
-          import_map_path: files.some(({ name }) => name === newImportMapPath)
-            ? newImportMapPath
-            : fallbackImportMapPath(),
+          entrypoint_path: newEntrypointPath,
+          import_map_path: newImportMapPath,
         },
         files: files.map(({ name, content }) => ({ name, content })),
       })
@@ -119,16 +93,22 @@ const CodePage = () => {
     }
   }
 
-  function getBasePath(entrypoint: string | undefined): string {
+  function getBasePath(entrypoint: string | undefined, fileNames: string[]): string {
     if (!entrypoint) {
       return '/'
     }
 
-    try {
-      return dirname(new URL(entrypoint).pathname)
-    } catch (e) {
-      console.error('Failed to parse entrypoint', entrypoint)
-      return '/'
+    let candidate = fileNames.find((name) => entrypoint.endsWith(name))
+
+    if (candidate) {
+      return dirname(candidate)
+    } else {
+      try {
+        return dirname(new URL(entrypoint).pathname)
+      } catch (e) {
+        console.error('Failed to parse entrypoint', entrypoint)
+        return '/'
+      }
     }
   }
 
@@ -137,32 +117,32 @@ const CodePage = () => {
     setShowDeployWarning(true)
     sendEvent({
       action: 'edge_function_deploy_updates_button_clicked',
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      groups: {
+        project: ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
     })
   }
 
   const handleDeployConfirm = () => {
     sendEvent({
       action: 'edge_function_deploy_updates_confirm_clicked',
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      groups: {
+        project: ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
     })
     onUpdate()
   }
 
-  // TODO (Saxon): Remove this once the flag is fully launched
-  useEffect(() => {
-    if (edgeFunctionCreate !== undefined && !edgeFunctionCreate) {
-      router.push(`/project/${ref}/functions`)
-    }
-  }, [edgeFunctionCreate])
-
   useEffect(() => {
     // Set files from API response when available
-    if (selectedFunction?.entrypoint_path && functionFiles) {
-      const base_path = getBasePath(selectedFunction?.entrypoint_path)
-      const filesWithRelPath = functionFiles
-        // ignore empty files
-        .filter((file: { name: string; content: string }) => !!file.content.length)
+    if (selectedFunction?.entrypoint_path && functionBody) {
+      const base_path = getBasePath(
+        selectedFunction?.entrypoint_path,
+        functionBody.files.map((file) => file.name)
+      )
+      const filesWithRelPath = functionBody.files
         // set file paths relative to entrypoint
         .map((file: { name: string; content: string }) => {
           try {
@@ -173,7 +153,8 @@ const CodePage = () => {
               return file
             }
 
-            file.name = relative(base_path, file.name)
+            // prepend "/" to turn relative paths to absolute
+            file.name = relative('/' + base_path, '/' + file.name)
             return file
           } catch (e) {
             console.error(e)
@@ -195,7 +176,7 @@ const CodePage = () => {
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [functionFiles])
+  }, [functionBody])
 
   return (
     <div className="flex flex-col h-full">
@@ -223,11 +204,11 @@ const CodePage = () => {
           <FileExplorerAndEditor
             files={files}
             onFilesChange={setFiles}
-            aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete`}
+            aiEndpoint={`${BASE_PATH}/api/ai/code/complete`}
             aiMetadata={{
               projectRef: project?.ref,
               connectionString: project?.connectionString,
-              includeSchemaMetadata,
+              orgSlug: org?.slug,
             }}
           />
           <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 shrink-0">
@@ -264,6 +245,7 @@ const CodePage = () => {
         visible={showDeployWarning}
         onCancel={() => setShowDeployWarning(false)}
         onConfirm={handleDeployConfirm}
+        isDeploying={isDeploying}
       />
     </div>
   )

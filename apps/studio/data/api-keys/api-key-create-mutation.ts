@@ -1,13 +1,14 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { apiKeysKeys } from './keys'
 
 export type APIKeyCreateVariables = {
   projectRef?: string
-  description: string
+  name: string
+  description?: string
 } & (
   | {
       type: 'publishable'
@@ -30,20 +31,20 @@ export async function createAPIKey(payload: APIKeyCreateVariables) {
         reveal: false,
       },
     },
-    body:
-      payload.type === 'secret'
+    body: {
+      ...(payload.type === 'secret'
         ? {
-            type: payload.type,
-            description: payload.description || null,
             // secret_jwt_template: payload?.secret_jwt_template || null,
             secret_jwt_template: {
-              role: 'service_role', // @mildtomato (Jonny) this should be default in API for type secret
+              role: 'service_role',
             },
           }
-        : {
-            type: payload.type,
-            description: payload.description || null,
-          },
+        : name),
+
+      type: payload.type,
+      name: payload.name,
+      description: payload.description || null,
+    },
   })
 
   if (error) handleError(error)
@@ -57,29 +58,27 @@ export const useAPIKeyCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<APIKeyCreateData, ResponseError, APIKeyCreateVariables>,
+  UseCustomMutationOptions<APIKeyCreateData, ResponseError, APIKeyCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<APIKeyCreateData, ResponseError, APIKeyCreateVariables>(
-    (vars) => createAPIKey(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<APIKeyCreateData, ResponseError, APIKeyCreateVariables>({
+    mutationFn: (vars) => createAPIKey(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await queryClient.invalidateQueries(apiKeysKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: apiKeysKeys.list(projectRef) })
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to mutate: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create API key: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

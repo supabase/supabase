@@ -1,18 +1,24 @@
+import { PostgresTable } from '@supabase/postgres-meta'
 import { useState } from 'react'
 
-import { PostgresTable } from '@supabase/postgres-meta'
 import { useParams } from 'common'
-import { TableList } from 'components/interfaces/Database'
-import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
+import { TableList } from 'components/interfaces/Database/Tables/TableList'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
+import { SidePanelEditor } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { Entity, isTableLike, postgresTableToEntity } from 'data/table-editor/table-editor-types'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const DatabaseTables: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
@@ -21,10 +27,16 @@ const DatabaseTables: NextPageWithLayout = () => {
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldSection>
-          <div className="col-span-12">
-            <FormHeader title="Database Tables" />
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Database Tables</PageHeaderTitle>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="large">
+        <PageSection>
+          <PageSectionContent>
             <TableList
               onAddTable={snap.onAddTable}
               onEditTable={(table) => {
@@ -40,9 +52,9 @@ const DatabaseTables: NextPageWithLayout = () => {
                 snap.onDuplicateTable()
               }}
             />
-          </div>
-        </ScaffoldSection>
-      </ScaffoldContainer>
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
 
       {projectRef !== undefined &&
         selectedTableToEdit !== undefined &&

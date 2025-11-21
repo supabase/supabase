@@ -1,8 +1,10 @@
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import {
   Card,
   CardContent,
@@ -23,7 +25,7 @@ interface WrapperTableProps {
 
 export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
   const { id, ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const integration = INTEGRATIONS.find((i) => i.id === id)
 
   const { data } = useFDWsQuery({
@@ -38,6 +40,28 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
         : [],
     [data, integration]
   )
+
+  // Track the ID being deleted to exclude it from error checking
+  const deletingWrapperIdRef = useRef<string | null>(null)
+
+  const { setValue: setSelectedWrapperToEdit, value: selectedWrapperToEdit } =
+    useQueryStateWithSelect({
+      urlKey: 'edit',
+      select: (wrapperId: string) =>
+        wrapperId ? wrappers.find((w) => w.id.toString() === wrapperId) : undefined,
+      enabled: !!wrappers.length,
+      onError: () => toast.error(`Wrapper not found`),
+    })
+
+  const { setValue: setSelectedWrapperToDelete, value: selectedWrapperToDelete } =
+    useQueryStateWithSelect({
+      urlKey: 'delete',
+      select: (wrapperId: string) =>
+        wrapperId ? wrappers.find((w) => w.id.toString() === wrapperId) : undefined,
+      enabled: !!wrappers.length,
+      onError: (_error, selectedId) =>
+        handleErrorOnDelete(deletingWrapperIdRef, selectedId, `Wrapper not found`),
+    })
 
   if (!integration || integration.type !== 'wrapper') {
     return (
@@ -60,12 +84,23 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
               <TableHead className="w-[220px]">Name</TableHead>
               <TableHead>Tables</TableHead>
               <TableHead>Encrypted key</TableHead>
-              <TableHead className="text-right"></TableHead>
+              <TableHead className="text-right w-24"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className="[&_td]:py-0 [&_tr]:h-[50px] [&_tr]:border-dotted bg-surface-100">
             {(isLatest ? wrappers.slice(0, 3) : wrappers).map((x) => {
-              return <WrapperRow key={x.id} wrapper={x} />
+              return (
+                <WrapperRow
+                  key={x.id}
+                  wrapper={x}
+                  wrappers={wrappers}
+                  selectedWrapperToEdit={selectedWrapperToEdit}
+                  selectedWrapperToDelete={selectedWrapperToDelete}
+                  setSelectedWrapperToEdit={setSelectedWrapperToEdit}
+                  setSelectedWrapperToDelete={setSelectedWrapperToDelete}
+                  deletingWrapperIdRef={deletingWrapperIdRef}
+                />
+              )
             })}
           </TableBody>
         </Table>

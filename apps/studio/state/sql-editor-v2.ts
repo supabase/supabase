@@ -1,4 +1,5 @@
 import { debounce, memoize } from 'lodash'
+import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxyMap } from 'valtio/utils'
@@ -10,8 +11,7 @@ import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
 import { updateSQLSnippetFolder } from 'data/content/sql-folder-update-mutation'
 import { Snippet, SnippetFolder } from 'data/content/sql-folders-query'
 import { getQueryClient } from 'data/query-client'
-import { useMemo } from 'react'
-import { SqlSnippets } from 'types'
+import type { SqlSnippets } from 'types'
 
 export type StateSnippetFolder = {
   projectRef: string
@@ -22,6 +22,7 @@ export type StateSnippetFolder = {
 // [Joshen] API codegen is somehow missing the content property
 export interface SnippetWithContent extends Snippet {
   content?: SqlSnippets.Content
+  isNotSavedInDatabaseYet?: boolean
 }
 
 export type StateSnippet = {
@@ -298,12 +299,16 @@ async function upsertSnippet(
     if (shouldInvalidate) {
       const queryClient = getQueryClient()
       await Promise.all([
-        queryClient.invalidateQueries(contentKeys.count(projectRef, 'sql')),
-        queryClient.invalidateQueries(contentKeys.sqlSnippets(projectRef)),
-        queryClient.invalidateQueries(contentKeys.folders(projectRef)),
+        queryClient.invalidateQueries({ queryKey: contentKeys.count(projectRef, 'sql') }),
+        queryClient.invalidateQueries({ queryKey: contentKeys.sqlSnippets(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: contentKeys.folders(projectRef) }),
       ])
     }
 
+    let snippet = sqlEditorState.snippets[id]?.snippet
+    if (snippet?.content && 'isNotSavedInDatabaseYet' in snippet) {
+      snippet.isNotSavedInDatabaseYet = false
+    }
     sqlEditorState.savingStates[id] = 'IDLE'
   } catch (error) {
     sqlEditorState.savingStates[id] = 'UPDATING_FAILED'
@@ -390,10 +395,10 @@ if (typeof window !== 'undefined') {
               project_id: project_id ?? 0,
               owner_id: owner_id,
               folder_id: folder_id ?? undefined,
+              favorite: favorite ?? false,
               content: {
                 ...content!,
                 content_id: id,
-                favorite: favorite ?? false,
               },
             },
             shouldInvalidate

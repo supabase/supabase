@@ -1,17 +1,15 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import type { Content } from './content-query'
 import { contentKeys } from './keys'
 
-export type InsertContentPayload = Omit<
-  components['schemas']['CreateContentBodyDto'],
-  'content'
-> & {
+export type InsertContentPayload = Omit<components['schemas']['CreateContentBody'], 'content'> & {
   content: Content['content']
+  favorite?: boolean
 }
 
 export type InsertContentVariables = {
@@ -36,6 +34,7 @@ export async function insertContent(
       visibility: payload.visibility,
       content: payload.content as any,
       folder_id: payload.folder_id,
+      favorite: payload.favorite,
     },
     signal,
   })
@@ -50,27 +49,25 @@ export const useContentInsertMutation = ({
   onSuccess,
   ...options
 }: Omit<
-  UseMutationOptions<InsertContentData, ResponseError, InsertContentVariables>,
+  UseCustomMutationOptions<InsertContentData, ResponseError, InsertContentVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<InsertContentData, ResponseError, InsertContentVariables>(
-    (args) => insertContent(args),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(contentKeys.allContentLists(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to insert content: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<InsertContentData, ResponseError, InsertContentVariables>({
+    mutationFn: (args) => insertContent(args),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: contentKeys.allContentLists(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to insert content: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

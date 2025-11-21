@@ -13,7 +13,7 @@ export type OrgSubscription = components['schemas']['GetSubscriptionResponse']
 
 export type ProjectAddon = components['schemas']['GetSubscriptionResponse']['project_addons'][0]
 
-export type PlanId = components['schemas']['BillingPlanId']
+export type PlanId = components['schemas']['PlansResponse']['plans'][number]['id']
 
 export type OrgPlan = components['schemas']['PlansResponse']['plans'][0]
 

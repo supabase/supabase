@@ -22,7 +22,7 @@ function ClientLibHeader({ menuData, className }: ClientLibHeaderProps) {
     <div className={cn('flex items-start gap-6', className)}>
       {'icon' in menuData && (
         <MenuIconPicker
-          icon={menuData.icon}
+          icon={menuData.icon || ''}
           width={35}
           height={35}
           className="text-foreground-light"
@@ -40,7 +40,7 @@ function ClientLibHeader({ menuData, className }: ClientLibHeaderProps) {
             href={menuData.pkg.repo}
             target="_blank"
             rel="noreferrer noopener"
-            className="hover:text-brand focus-visible:text-brand transition-colors"
+            className="hover:text-brand-link focus-visible:text-brand-link transition-colors"
           >
             <span className="sr-only">View on GitHub</span>
             <Github size={18} />

@@ -1,20 +1,17 @@
+import { yupResolver } from '@hookform/resolvers/yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { object, string } from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Card,
   CardContent,
@@ -24,7 +21,8 @@ import {
   Form_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
-import { AlertCircle } from 'lucide-react'
+import { GenericSkeletonLoader } from 'ui-patterns'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const schema = object({
   SITE_URL: string().required('Must have a Site URL'),
@@ -32,11 +30,19 @@ const schema = object({
 
 const SiteUrl = () => {
   const { ref: projectRef } = useParams()
-  const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
+  const {
+    data: authConfig,
+    error: authConfigError,
+    isError,
+    isLoading,
+  } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
   const [isUpdatingSiteUrl, setIsUpdatingSiteUrl] = useState(false)
 
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
 
   const siteUrlForm = useForm({
     resolver: yupResolver(schema),
@@ -73,11 +79,17 @@ const SiteUrl = () => {
 
   if (isError) {
     return (
-      <Alert_Shadcn_ variant="destructive">
-        <AlertCircle strokeWidth={2} />
-        <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+      <ScaffoldSection isFullWidth>
+        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+      </ScaffoldSection>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <ScaffoldSection isFullWidth>
+        <GenericSkeletonLoader />
+      </ScaffoldSection>
     )
   }
 

@@ -9,7 +9,6 @@ import supabase from '~/lib/supabase'
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-// import { Meetup } from '~/components/LaunchWeek/12/LWMeetups'
 import LWStickyNav from '~/components/LaunchWeek/12/Releases/LWStickyNav'
 import LWHeader from '~/components/LaunchWeek/12/Releases/LWHeader'
 import MainStage from '~/components/LaunchWeek/12/Releases/MainStage'
@@ -74,7 +73,7 @@ export default function LaunchWeekIndex() {
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: LW_URL,
+          url: `${LW_URL}/12`,
           images: [
             {
               url: OG_IMAGE,

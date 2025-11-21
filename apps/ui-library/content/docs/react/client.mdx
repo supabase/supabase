@@ -19,14 +19,14 @@ If you've already set up a Supabase client in your project, you can just continu
 
 ### Getting started
 
-First, add a `.env` file to your project with the following environment variables:
+After installing the block, you'll have the following environment variables in your `.env.local` file:
 
 ```env
 VITE_SUPABASE_URL=
-VITE_SUPABASE_ANON_KEY=
+VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY=
 ```
 
-- If you're using supabase.com, you can find these values in the [Connect modal](https://supabase.com/dashboard/project/_?showConnect=true) under App Frameworks or in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api).
+- If you're using supabase.com, you can find these values in the [Connect modal](https://supabase.com/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=react&using=vite&with=supabasejs) under App Frameworks or in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api).
 
 - If you're using a local instance of Supabase, you can find these values by running `supabase start` or `supabase status` (if you already have it running).
 

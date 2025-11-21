@@ -9,7 +9,7 @@ Amazon Cognito User Pools (via AWS Amplify or on its own) can be used as a third
 ## Getting started
 
 1. First you need to add an integration to connect your Supabase project with your Amazon Cognito User Pool. You will need the pool's ID and region.
-2. Add a new Third-party Auth integration in your project's [Authentication settings](/dashboard/project/_/settings/auth) or configure it in the CLI.
+2. Add a new Third-party Auth integration in your project's [Authentication settings](/dashboard/project/_/auth/third-party) or configure it in the CLI.
 3. Assign the `role: 'authenticated'` custom claim to all JWTs by using a Pre-Token Generation Trigger.
 4. Finally setup the Supabase client in your application.
 
@@ -22,14 +22,18 @@ Amazon Cognito User Pools (via AWS Amplify or on its own) can be used as a third
 ```typescript
 import { fetchAuthSession, Hub } from 'aws-amplify/auth'
 
-const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABASE_ANON_KEY', {
-  accessToken: async () => {
-    const tokens = await fetchAuthSession()
+const supabase = createClient(
+  'https://<supabase-project>.supabase.co',
+  'SUPABASE_PUBLISHABLE_KEY',
+  {
+    accessToken: async () => {
+      const tokens = await fetchAuthSession()
 
-    // Alternatively you can use tokens?.idToken instead.
-    return tokens?.accessToken
-  },
-})
+      // Alternatively you can use tokens?.idToken instead.
+      return tokens?.accessToken
+    },
+  }
+)
 
 // if you're using Realtime you also need to set up a listener for Cognito auth changes
 Hub.listen('auth', () => {
@@ -38,6 +42,8 @@ Hub.listen('auth', () => {
 ```
 
 </TabPanel>
+
+<$Show if="sdk:swift">
 
 <TabPanel id="swift" label="Swift (iOS)">
 
@@ -49,7 +55,7 @@ struct UnexpectedAuthSessionError: Error {}
 
 let supabase = SupabaseClient(
   supabaseURL: URL(string: "https://<supabase-project>.supabase.co")!,
-  supabaseKey: "SUPABASE_ANON_KEY",
+  supabaseKey: "SUPABASE_PUBLISHABLE_KEY",
   options: SupabaseClientOptions(
     auth: SupabaseClientOptions.AuthOptions(
       accessToken: {
@@ -68,6 +74,9 @@ let supabase = SupabaseClient(
 ```
 
 </TabPanel>
+</$Show>
+
+<$Show if="sdk:dart">
 
 <TabPanel id="dart" label="Flutter">
 
@@ -80,7 +89,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<void> main() async {
   await Supabase.initialize(
     url: 'https://<supabase-project>.supabase.co',
-    anonKey: 'SUPABASE_ANON_KEY',
+    anonKey: 'SUPABASE_PUBLISHABLE_KEY',
     accessToken: () async {
       final session = await Amplify.Auth.fetchAuthSession();
       final cognitoSession = session as CognitoAuthSession;
@@ -92,6 +101,9 @@ Future<void> main() async {
 ```
 
 </TabPanel>
+</$Show>
+
+<$Show if="sdk:kotlin">
 
 <TabPanel id="kotlin" label="Kotlin">
 
@@ -102,7 +114,7 @@ import com.amplifyframework.core.Amplify
 
 val supabase = createSupabaseClient(
     "https://<supabase-project>.supabase.co",
-    "SUPABASE_ANON_KEY"
+    "SUPABASE_PUBLISHABLE_KEY"
 ) {
     accessToken = {
         getAccessToken()
@@ -124,12 +136,13 @@ suspend fun getAccessToken(): String? {
 ```
 
 </TabPanel>
+</$Show>
 
 </Tabs>
 
 ## Add a new Third-Party Auth integration to your project
 
-In the dashboard navigate to your project's [Authentication settings](/dashboard/project/_/settings/auth) and find the Third-Party Auth section to add a new integration.
+In the dashboard navigate to your project's [Authentication settings](/dashboard/project/_/auth/third-party) and find the Third-Party Auth section to add a new integration.
 
 In the CLI add the following config to your `supabase/config.toml` file:
 

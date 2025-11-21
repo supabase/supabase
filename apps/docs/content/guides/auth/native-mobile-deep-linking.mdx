@@ -31,7 +31,7 @@ With Deep Linking, you can configure this redirect to open a specific page. This
     }
     ```
 
-    In your project's [auth settings](https://supabase.com/dashboard/project/_/auth/url-configuration) add the redirect URL, e.g. `com.supabase://**`.
+    In your project's [auth settings](/dashboard/project/_/auth/url-configuration) add the redirect URL, e.g. `com.supabase://**`.
 
     Finally, implement the OAuth and linking handlers. See the [supabase-js reference](/docs/reference/javascript/initializing?example=react-native-options-async-storage) for instructions on initializing the supabase-js client in React Native.
 
@@ -102,7 +102,7 @@ With Deep Linking, you can configure this redirect to open a specific page. This
 
       return (
         <>
-          <Button onPress={performOAuth} title="Sign in with Github" />
+          <Button onPress={performOAuth} title="Sign in with GitHub" />
           <Button onPress={sendMagicLink} title="Send Magic Link" />
         </>
       );
@@ -117,7 +117,7 @@ With Deep Linking, you can configure this redirect to open a specific page. This
 
     ### Deep link config
 
-    - Go to your [auth settings](https://supabase.com/dashboard/project/_/auth/url-configuration) page.
+    - Go to your [auth settings](/dashboard/project/_/auth/url-configuration) page.
     - You need to enter your app redirect callback on `Additional Redirect URLs` field.
 
     The redirect callback URL should have this format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.flutterquickstart://login-callback` is just an example, you can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
@@ -304,10 +304,12 @@ With Deep Linking, you can configure this redirect to open a specific page. This
 
   </TabPanel>
 
+<$Show if="sdk:swift">
+
   <TabPanel id="swift" label="Swift">
   ### Deep link config
 
-    1. Go to your [auth settings](https://supabase.com/dashboard/project/_/auth/url-configuration) page.
+    1. Go to your [auth settings](/dashboard/project/_/auth/url-configuration) page.
     2. Enter your app redirect URL in the `Additional Redirect URLs` field. This is the URL that the user gets redirected to after clicking a magic link.
 
     The redirect callback URL should have the format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.user-management://login-callback` is just an example. You can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
@@ -342,10 +344,12 @@ With Deep Linking, you can configure this redirect to open a specific page. This
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:kotlin">
   <TabPanel id="kotlin" label="Android Kotlin">
   ### Deep link config
 
-    1. Go to your [auth settings](https://supabase.com/dashboard/project/_/auth/url-configuration) page.
+    1. Go to your [auth settings](/dashboard/project/_/auth/url-configuration) page.
     2. Enter your app redirect URL in the `Additional Redirect URLs` field. This is the URL that the user gets redirected to after clicking a magic link.
 
     The redirect callback URL should have the format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.user-management://login-callback` is just an example. You can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
@@ -396,4 +400,5 @@ With Deep Linking, you can configure this redirect to open a specific page. This
     The user will now be authenticated when your app receives a valid deep link!
 
   </TabPanel>
+  </$Show>
 </Tabs>

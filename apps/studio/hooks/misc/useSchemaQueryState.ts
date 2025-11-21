@@ -1,8 +1,7 @@
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo } from 'react'
 
-import { useParams } from 'common'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 
 /**
  * This hook wraps useQueryState because useQueryState imports app router for some reason which breaks the SSR in
@@ -13,7 +12,12 @@ const useIsomorphicUseQueryState = (defaultSchema: string) => {
     return [defaultSchema, () => {}] as const
   } else {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    return useQueryState('schema', parseAsString.withDefault(defaultSchema))
+    return useQueryState(
+      'schema',
+      parseAsString.withDefault(defaultSchema).withOptions({
+        clearOnDefault: false,
+      })
+    )
   }
 }
 

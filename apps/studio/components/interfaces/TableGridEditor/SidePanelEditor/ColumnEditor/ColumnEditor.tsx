@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import {
   CONSTRAINT_TYPE,
@@ -17,7 +16,9 @@ import {
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { PROTECTED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
 import type { Dictionary } from 'types'
 import { Button, Checkbox, Input, SidePanel, Toggle } from 'ui'
 import ActionBar from '../ActionBar'
@@ -70,7 +71,7 @@ const ColumnEditor = ({
   updateEditorDirty = noop,
 }: ColumnEditorProps) => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
@@ -83,8 +84,9 @@ const ColumnEditor = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
   const enumTypes = (types ?? []).filter(
-    (type) => !PROTECTED_SCHEMAS_WITHOUT_EXTENSIONS.includes(type.schema)
+    (type) => !protectedSchemas.find((s) => s.name === type.schema)
   )
 
   const { data: constraints } = useTableConstraintsQuery({
@@ -173,7 +175,7 @@ const ColumnEditor = ({
 
       if (isEmpty(errors)) {
         const payload = isNewRecord
-          ? generateCreateColumnPayload(selectedTable.id, columnFields)
+          ? generateCreateColumnPayload(selectedTable, columnFields)
           : generateUpdateColumnPayload(column!, selectedTable, columnFields)
         const configuration = {
           columnId: column?.id,
@@ -246,7 +248,7 @@ const ColumnEditor = ({
                   icon={<ExternalLink size={14} strokeWidth={2} />}
                 >
                   <Link
-                    href="https://supabase.com/docs/guides/database/tables#data-types"
+                    href={`${DOCS_URL}/guides/database/tables#data-types`}
                     target="_blank"
                     rel="noreferrer"
                   >

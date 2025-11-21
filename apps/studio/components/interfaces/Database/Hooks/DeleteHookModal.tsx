@@ -1,21 +1,27 @@
 import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface DeleteHookModalProps {
   visible: boolean
   selectedHook?: PostgresTrigger
   onClose: () => void
+  onDeleteStart?: (hookId: string) => void
 }
 
-const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProps) => {
-  const { id, name, schema } = selectedHook ?? {}
+const DeleteHookModal = ({
+  selectedHook,
+  visible,
+  onClose,
+  onDeleteStart,
+}: DeleteHookModalProps) => {
+  const { name, schema } = selectedHook ?? {}
 
-  const { project } = useProjectContext()
-  const { mutate: deleteDatabaseTrigger, isLoading: isDeleting } = useDatabaseTriggerDeleteMutation(
+  const { data: project } = useSelectedProjectQuery()
+  const { mutate: deleteDatabaseTrigger, isPending: isDeleting } = useDatabaseTriggerDeleteMutation(
     {
       onSuccess: () => {
         toast.success(`Successfully deleted ${name}`)
@@ -28,12 +34,13 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
     if (!project) {
       return console.error('Project ref is required')
     }
-    if (!id) {
+    if (!selectedHook) {
       return toast.error('Unable find selected hook')
     }
 
+    onDeleteStart?.(selectedHook.id.toString())
     deleteDatabaseTrigger({
-      id,
+      trigger: selectedHook,
       projectRef: project.ref,
       connectionString: project.connectionString,
     })
@@ -53,9 +60,8 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
       confirmString={name || ''}
       text={
         <>
-          This will delete the webhook
-          <span className="text-bold text-foreground">{name}</span> rom the schema
-          <span className="text-bold text-foreground">{schema}</span>
+          This will delete the webhook <span className="text-bold text-foreground">{name}</span>{' '}
+          from the schema <span className="text-bold text-foreground">{schema}</span>
         </>
       }
       alert={{ title: 'You cannot recover this webhook once deleted.' }}

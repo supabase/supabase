@@ -47,14 +47,19 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetRespons
   (select version()) as version,
   (select current_setting('server_version_num')) as version_number;`,
         schema_version: '1',
-        favorite: false,
       } as any,
       favorite: false,
       inserted_at: '',
       project_id: 0,
       updated_at: '',
-      owner: {},
-      updated_by: {},
+      owner: {
+        id: 1,
+        username: 'default',
+      },
+      updated_by: {
+        id: 1,
+        username: 'default',
+      },
     },
   ]
   return res.status(200).json({ data: snippets })

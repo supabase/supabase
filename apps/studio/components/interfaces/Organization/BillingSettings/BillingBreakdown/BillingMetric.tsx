@@ -1,14 +1,15 @@
 import Link from 'next/link'
 
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import type { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { formatCurrency } from 'lib/helpers'
+import { ChevronRight } from 'lucide-react'
 import { useMemo } from 'react'
-import { Button, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
+import { cn, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 import { billingMetricUnit, formatUsage } from '../helpers'
 import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
-import { ChevronRight } from 'lucide-react'
 
 export interface BillingMetricProps {
   idx: number
@@ -17,14 +18,16 @@ export interface BillingMetricProps {
   usage: OrgUsageResponse
   subscription: OrgSubscription
   relativeToSubscription: boolean
+  className?: string
 }
 
-const BillingMetric = ({
+export const BillingMetric = ({
   slug,
   metric,
   usage,
   subscription,
   relativeToSubscription,
+  className,
 }: BillingMetricProps) => {
   const usageMeta = usage.usages.find((x) => x.metric === metric.key)
 
@@ -79,29 +82,41 @@ const BillingMetric = ({
   return (
     <HoverCard openDelay={50} closeDelay={200}>
       <HoverCardTrigger asChild>
-        <div className="flex items-center justify-between">
-          <Link href={`/org/${slug}/usage#${metric.anchor}`} className="block w-full group">
-            {metric.anchor ? (
+        <div className={cn('flex items-center justify-between', className)}>
+          {metric.anchor ? (
+            <Link href={`/org/${slug}/usage#${metric.anchor}`} className="block w-full group">
               <div className="group flex items-center gap-1">
                 <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                   {metric.name}
                 </p>
                 {usageMeta.available_in_plan && (
-                  <span className="transition inline-block group-hover:transform group-hover:translate-x-0.5">
+                  <span className="text-foreground-muted transition inline-block group-hover:transform group-hover:translate-x-0.5">
                     <ChevronRight strokeWidth={1.5} size={16} className="transition" />
                   </span>
                 )}
               </div>
-            ) : (
-              <p className="text-xs text-foreground-light flex space-x-1">{metric.name}</p>
-            )}
-            <span className="text-sm">{usageLabel}</span>&nbsp;
-            {relativeToSubscription && usageMeta.cost && usageMeta.cost > 0 ? (
-              <span className="text-sm">({formatCurrency(usageMeta.cost)})</span>
-            ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
-              <span className="text-sm">{percentageLabel}</span>
-            ) : null}
-          </Link>
+              <span className="text-sm">{usageLabel}</span>&nbsp;
+              {relativeToSubscription && usageMeta.cost && usageMeta.cost > 0 ? (
+                <span className="text-sm" translate="no">
+                  ({formatCurrency(usageMeta.cost)})
+                </span>
+              ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
+                <span className="text-sm">{percentageLabel}</span>
+              ) : null}
+            </Link>
+          ) : (
+            <div className="block w-full">
+              <p className="text-sm text-foreground-light flex space-x-1">{metric.name}</p>
+              <span className="text-sm">{usageLabel}</span>&nbsp;
+              {relativeToSubscription && usageMeta.cost && usageMeta.cost > 0 ? (
+                <span className="text-sm" translate="no">
+                  ({formatCurrency(usageMeta.cost)})
+                </span>
+              ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
+                <span className="text-sm">{percentageLabel}</span>
+              ) : null}
+            </div>
+          )}
 
           {usageMeta.available_in_plan ? (
             <div>
@@ -142,21 +157,19 @@ const BillingMetric = ({
             </div>
           ) : (
             <div>
-              <Button type="default" asChild>
-                <Link
-                  href={`/org/${slug}/billing?panel=subscriptionPlan&source=billingBreakdownUsage${metric.anchor}`}
-                >
-                  Upgrade
-                </Link>
-              </Button>
+              <UpgradePlanButton source={`billingBreakdownUsage${metric.anchor}`}>
+                Upgrade
+              </UpgradePlanButton>
             </div>
           )}
         </div>
       </HoverCardTrigger>
       {usageMeta.available_in_plan && (
-        <HoverCardContent side="bottom" align="center" className="w-[500px]" animate="slide-in">
+        <HoverCardContent side="bottom" align="end" className="w-[500px]" animate="slide-in">
           <div className="text-sm">
-            <p className="font-medium">{usageMeta.unit_price_desc}</p>
+            <p className="font-medium" translate="no">
+              {usageMeta.unit_price_desc}
+            </p>
 
             {metric.tip && (
               <div className="my-2">
@@ -225,5 +238,3 @@ const BillingMetric = ({
     </HoverCard>
   )
 }
-
-export default BillingMetric

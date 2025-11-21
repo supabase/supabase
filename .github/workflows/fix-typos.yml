@@ -17,12 +17,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           ref: master
-      - uses: sobolevn/misspell-fixer-action@master
-      - uses: peter-evans/create-pull-request@v4
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+      - uses: sobolevn/misspell-fixer-action@06ff0b508d4f4c0ba70d15f9a628232c0aade536 # v0.1.0
+      - uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

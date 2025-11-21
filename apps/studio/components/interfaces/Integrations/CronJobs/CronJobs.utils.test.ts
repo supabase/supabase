@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { cronPattern, parseCronJobCommand, secondsPattern } from './CronJobs.utils'
+import { cronPattern, secondsPattern } from './CronJobs.constants'
+import { parseCronJobCommand } from './CronJobs.utils'
 
 describe('parseCronJobCommand', () => {
   it('should return a default object when the command is null', () => {
@@ -30,25 +31,74 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return a sql function command when the command is SELECT public.test_fn(1, 2)', () => {
-    const command = 'SELECT public.test_fn(1, 2)'
+  it('should return a sql function command when the command is SELECT auth.jwt () and ends with ;', () => {
+    const command = 'SELECT auth.jwt ();'
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       type: 'sql_function',
-      schema: 'public',
-      functionName: 'test_fn',
+      schema: 'auth',
+      functionName: 'jwt',
+      snippet: command,
+    })
+  })
+
+  it('should return a sql snippet command when the command is SELECT public.test_fn(1, 2)', () => {
+    const command = 'SELECT public.test_fn(1, 2)'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_snippet',
       snippet: command,
     })
   })
 
   it('should return a edge function config when the command posts to its own supabase.co project', () => {
-    const command = `select net.http_post( url:='https://random_project_ref.supabase.co/functions/v1/_', headers:=jsonb_build_object(), body:='', timeout_milliseconds:=5000 );`
+    const command = `select net.http_post( url:='https://random_project_ref.supabase.co/functions/v1/_', headers:=jsonb_build_object('Authorization', 'Bearer something'), body:='', timeout_milliseconds:=5000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       edgeFunctionName: 'https://random_project_ref.supabase.co/functions/v1/_',
       method: 'POST',
-      httpHeaders: [],
+      httpHeaders: [
+        {
+          name: 'Authorization',
+          value: 'Bearer something',
+        },
+      ],
       httpBody: '',
       timeoutMs: 5000,
       type: 'edge_function',
+      snippet: command,
+    })
+  })
+
+  it('should return a edge function config when the body is missing', () => {
+    const command = `select net.http_post( url:='https://random_project_ref.supabase.co/functions/v1/_', headers:=jsonb_build_object('Authorization', 'Bearer something'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      edgeFunctionName: 'https://random_project_ref.supabase.co/functions/v1/_',
+      method: 'POST',
+      httpHeaders: [
+        {
+          name: 'Authorization',
+          value: 'Bearer something',
+        },
+      ],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'edge_function',
+      snippet: command,
+    })
+  })
+
+  it("should return a HTTP request config when there's a query parameter or hash in the URL (also handles edge function)", () => {
+    const command = `select net.http_post( url:='https://random_project_ref.supabase.co/functions/v1/_?first=1#second=2', headers:=jsonb_build_object('Authorization', 'Bearer something'), timeout_milliseconds:=5000 )`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://random_project_ref.supabase.co/functions/v1/_?first=1#second=2',
+      method: 'POST',
+      httpHeaders: [
+        {
+          name: 'Authorization',
+          value: 'Bearer something',
+        },
+      ],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
       snippet: command,
     })
   })
@@ -149,6 +199,14 @@ describe('parseCronJobCommand', () => {
       httpBody: '{"key": "value"}',
       timeoutMs: 5000,
       type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should return SQL snippet type if the command is a HTTP request that cannot be parsed properly due to positional notationa', () => {
+    const command = `SELECT net.http_post( 'https://webhook.site/dacc2028-a588-462c-9597-c8968e61d0fa', '{"message":"Hello from Supabase"}'::jsonb, '{}'::jsonb, '{"Content-Type":"application/json"}'::jsonb );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_snippet',
       snippet: command,
     })
   })

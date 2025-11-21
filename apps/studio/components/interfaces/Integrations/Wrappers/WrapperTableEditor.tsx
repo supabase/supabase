@@ -2,7 +2,6 @@ import { Check, ChevronsUpDown, Database, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import {
@@ -28,6 +27,7 @@ import {
 import WrapperDynamicColumns from './WrapperDynamicColumns'
 import type { Table, TableOption } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 export type WrapperTableEditorProps = {
   visible: boolean
@@ -216,7 +216,7 @@ const TableForm = ({
   onSubmit: OnSubmitFn
   initialData: any
 }) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const {
     data: schemas,
     isLoading,

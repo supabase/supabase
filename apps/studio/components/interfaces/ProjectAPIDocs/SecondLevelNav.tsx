@@ -1,6 +1,13 @@
 import { useParams } from 'common'
-import Link from 'next/link'
 import { useState } from 'react'
+
+import { DocsButton } from 'components/ui/DocsButton'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
+import { useBucketsQuery } from 'data/storage/buckets-query'
+import { DOCS_URL } from 'lib/constants'
+import { ChevronLeft, Code } from 'lucide-react'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -14,16 +21,9 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
-import { useBucketsQuery } from 'data/storage/buckets-query'
-import { useAppStateSnapshot } from 'state/app-state'
 import { useIsAPIDocsSidePanelEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { navigateToSection } from './Content/Content.utils'
 import { DOCS_RESOURCE_CONTENT } from './ProjectAPIDocs.constants'
-import { ChevronLeft, Code, ExternalLink } from 'lucide-react'
-import { DocsButton } from 'components/ui/DocsButton'
 
 const SecondLevelNav = () => {
   const { ref } = useParams()
@@ -44,22 +44,22 @@ const SecondLevelNav = () => {
     entities: {
       title: 'Tables & Views',
       options: tables,
-      docsUrl: 'https://supabase.com/docs/reference/javascript/select',
+      docsUrl: `${DOCS_URL}/reference/javascript/select`,
     },
     'stored-procedures': {
       title: 'Stored Procedures',
       options: functions,
-      docsUrl: 'https://supabase.com/docs/reference/javascript/rpc',
+      docsUrl: `${DOCS_URL}/reference/javascript/rpc`,
     },
     storage: {
       title: 'Storage',
       options: buckets ?? [],
-      docsUrl: 'https://supabase.com/docs/reference/javascript/storage-createbucket',
+      docsUrl: `${DOCS_URL}/reference/javascript/storage-createbucket`,
     },
     'edge-functions': {
       title: 'Edge Functions',
       options: edgeFunctions ?? [],
-      docsUrl: 'https://supabase.com/docs/reference/javascript/functions-invoke',
+      docsUrl: `${DOCS_URL}/reference/javascript/functions-invoke`,
     },
   }
 

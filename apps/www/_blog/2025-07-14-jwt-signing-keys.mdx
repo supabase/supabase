@@ -1,0 +1,147 @@
+---
+title: 'Introducing JWT Signing Keys'
+description: "A new JWT signing keys system based on public key cryptography to improve your project's security and performance."
+categories:
+  - product
+  - launch-week
+tags:
+  - launch-week
+date: '2025-07-14:00:00'
+toc_depth: 3
+author: stojan
+image: launch-week-15/day-1-jwt-signing-keys/og.jpg
+thumb: launch-week-15/day-1-jwt-signing-keys/thumb.jpg
+launchweek: '15'
+---
+
+Today we're announcing some long awaited changes in Supabase:
+
+- Support for [asymmetric JWTs with Supabase Auth](/docs/guides/auth/signing-keys).
+- [New API keys](/docs/guides/api/api-keys) to help you transition to asymmetric JWTs and improve the security of your apps.
+
+<div className="video-container mb-8">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/rwnOal_xRtM"
+    title="Introducing JWT Signing Keys"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  />
+</div>
+
+## JWT as Open Source Auth
+
+Over the last decade, [JSON Web Tokens](https://jwt.io/introduction) (JWTs) have surfaced as the [universal language](https://supabase.com/docs/guides/auth/sessions#what-are-the-benefits-of-using-access-and-refresh-tokens-instead-of-traditional-sessions) between your business logic and your Auth servers.
+
+Supabase has embraced JWTs since inception. It's the backbone that makes Postgres [Row-Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) (RLS) policies work. Supabase Auth checks that your users say who they are and issues many JWTs while they use your app. These JWTs are then used by your application or other Supabase products (e.g., Data API, Storage, Realtime) to allow or reject access to your application's data.
+
+To uphold our promise of “scale to billions” we’re making changes to how JWTs are managed for your project.
+
+## Why symmetric JWTs can be risky
+
+Until now, Supabase Auth used **symmetric keys** to sign JWTs. This means a shared secret is used to both create and verify the token. It’s simple and fast, but it comes with serious tradeoffs at scale:
+
+- **You had to call** `supabase.auth.getUser()` **to check if a session was valid**, because only the Auth server could safely verify the token. This added network latency and created a dependency on the Auth server being online.
+- **Server-side apps and custom APIs depended on the Auth server**, which made apps hosted on the edge slower and more fragile.
+- **To improve performance, you were forced to manually manage the shared secret.** If it leaks, anyone can forge tokens and bypass Row-Level Security. This meant it was hard to keep aligned with security compliance frameworks like SOC2 in your apps.
+
+A better approach is utilizing [**public key cryptography**](https://en.wikipedia.org/wiki/Public-key_cryptography). It provides the ability to use two separate (hence asymmetric) keys when working with JWTs:
+
+- A **private key** to create and sign JWTs (known only to Supabase Auth and not extractable)
+- A **public key** to verify and decode the JWT (irreversible and safe to publish on the web)
+
+This model is secure and scalable. You can now verify tokens at any place in your application, without relying on the Auth server. Key revocation and rotation is made safer as you can pull the public keys for your project from the `/auth/v1/.well-known/jwks.json` endpoint.
+
+We’ve based the implementation to match the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API) ensuring wide compatibility and the best-in-class security standards. Both RSA and Elliptic Curves (ECC) signing algorithms can be used.
+
+It took us a while, but we're making this available today for all projects!
+
+## Start using asymmetric JWTs today
+
+Asymmetric JWT support is available today as an opt-in feature. Starting October 1, 2025, all _new projects_ will use asymmetric JWTs by default. Existing projects can opt-in at any time. You’re not required to change your JWT secret unless you choose to.
+
+We’ve taken great care to ensure each step is safe and reversible, ensuring zero-downtime key rotations.
+
+### 1. Migrate to get started
+
+Use the [Supabase dashboard](https://supabase.com/dashboard/project/_/settings/jwt/signing-keys) to migrate your existing JWT secret to the new JWT signing keys system.
+
+<Img
+  alt="Geo-routing diagram"
+  src={{
+    dark: '/images/blog/launch-week-15/day-1-jwt-signing-keys/jwt-signing-keys-migration-dark.png',
+    light:
+      '/images/blog/launch-week-15/day-1-jwt-signing-keys/jwt-signing-keys-migration-light.png',
+  }}
+/>
+
+Your project continues using its existing symmetric JWT secret, but under the hood, Supabase has prepared your project for asymmetric JWTs.
+
+### 2. A new key pair is generated
+
+Supabase generates a new **standby** key pair: one private key (used to create and sign) and one public key (used to verify tokens). At this point the key is made available for discovery, but no JWT is signedcreated with it yet.
+
+### 3. Rotate to asymmetric JWTs
+
+When you’re ready, rotate the keys. This tells Supabase Auth to begin issuing JWTs signed with the new private key.
+
+Importantly though, `anon`, `service_role` and any existing non-expired Auth JWT **remain valid and accepted**.
+
+### 4. Revoke the old JWT secret
+
+Once you've verified everything is working as expected, you can **revoke the legacy JWT secret**. From that point forward:
+
+- `anon`, `service_role`, and any JWTs signed with the old secret will be rejected.
+- Only JWTs signed with the new asymmetric key will be accepted.
+
+## Getting the most benefit
+
+We're providing you with a new client library function:
+
+```tsx
+supabase.auth.getClaims()
+```
+
+It’s a faster alternative to `getUser()` that you can switch to today! If using a symmetric JWT, it reaches out to the Auth server each time. But, when using an asymmetric key it’ll use the Web Crypto API to verify tokens directly.
+
+It automatically discovers and caches the public key on the edge and in memory, significantly improving your app’s performance while remaining secure and without taking additional risks.
+
+You can also use any other JWT library. Here's an example using the popular `jose` library:
+
+```tsx
+import { createRemoteJWKSet, jwtVerify } from 'jose'
+
+const SUPABASE_JWT_ISSUER = 'https://project.supabase.co/auth/v1'
+const SUPABASE_JWT_KEYS = createRemoteJWKSet(
+  new URL(SUPABASE_JWT_ISSUER + '/.well-known/jwks.json')
+)
+
+function verifySupabaseJWT(jwt: string) {
+  return jwtVerify(token, SUPABASE_JWT_KEYS, { issuer: SUPABASE_JWT_ISSUER })
+}
+```
+
+## API keys to fix `anon` and `service_role`
+
+Instead of `anon` and `service_role` we're also launching support for:
+
+- A `publishable` key, to replace the `anon` key.
+- `secret` keys, to replace the `service_role` key.
+
+`anon` and `service_role` are your project's legacy API keys. They identify what _application_ (as opposed to which _user_) is accessing your data.
+
+Sadly they're JWTs that expire 10 years after you create your project. And as you're probably guessing, rotating and then revoking the legacy JWT secret will reject them. This is why we're also launching revamped API keys. (And why this took so long!)
+
+You should switch to publishable/secret keys even if you're not taking advantage of the new JWT signing keys feature, as they provide security improvements from feedback collected over the last few years. Plus, we’ve got big plans on adding additional features to these.
+
+They work in place of the `anon` and `service_role` keys for the most part. Check the docs on how best to take advantage of them.
+
+## Timelines
+
+Both of these features are currently released as opt-in. We'd love to hear your feedback on them. Over the next 12 months we'll progressively require switching to the new API keys, while leaving you with a choice whether to use asymmetric JWTs.
+
+| Date              | Event                                                                                                                                                                                                                                           |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1st October 2025  | All existing projects will have the legacy JWT secret automatically migrated to the new JWT signing keys system. All existing secrets remain unchanged -- no action needed.                                                                     |
+| 1st November 2025 | We will start sending you periodic reminders to start using the new API keys (publishable, secret) instead of `anon` and `service_role`. Projects restored after this date will no longer have an `anon` and `service_role` JWT-based API keys. |
+| Late 2026, TBC    | All projects will be required to move away from `anon` and `service_role` keys and use the new API keys instead. JWT secret does not need to be rotated, though this is encouraged.                                                             |

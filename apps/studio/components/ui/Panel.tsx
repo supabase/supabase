@@ -5,6 +5,7 @@ import { Badge, Button, cn, Loading } from 'ui'
 
 interface PanelProps {
   className?: string
+  id?: string
   footer?: JSX.Element | false
   loading?: boolean
   noMargin?: boolean
@@ -12,8 +13,12 @@ interface PanelProps {
   wrapWithLoading?: boolean
   noHideOverflow?: boolean
   titleClasses?: string
+  footerClasses?: string
 }
 
+/**
+ * @deprecated Use Card component from ui package instead
+ */
 function Panel(props: PropsWithChildren<PanelProps>) {
   const content = (
     <div
@@ -24,11 +29,12 @@ function Panel(props: PropsWithChildren<PanelProps>) {
         props.noMargin ? '' : 'mb-4 md:mb-8',
         props.className
       )}
+      id={props.id}
     >
       {props.title && (
         <div
           className={cn(
-            'bg-surface-100 border-b border-default flex items-center px-4 md:px-6 py-4',
+            'bg-surface-100 border-b border-default flex items-center px-4 py-4',
             props.titleClasses
           )}
         >
@@ -36,7 +42,7 @@ function Panel(props: PropsWithChildren<PanelProps>) {
         </div>
       )}
       {props.children}
-      {props.footer && <Footer>{props.footer}</Footer>}
+      {props.footer && <Footer className={props.footerClasses}>{props.footer}</Footer>}
     </div>
   )
 
@@ -48,13 +54,13 @@ function Panel(props: PropsWithChildren<PanelProps>) {
 }
 
 function Content({ children, className }: { children: ReactNode; className?: string | false }) {
-  return <div className={cn('px-4 md:px-6 py-4', className)}>{children}</div>
+  return <div className={cn('px-4 py-4', className)}>{children}</div>
 }
 
-function Footer({ children }: { children: ReactNode; className?: string }) {
+function Footer({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className="bg-surface-100 border-t border-default">
-      <div className="flex h-12 items-center px-4 md:px-6">{children}</div>
+    <div className={cn('bg-surface-100 border-t border-default', className)}>
+      <div className="flex h-12 items-center px-4">{children}</div>
     </div>
   )
 }
@@ -89,7 +95,7 @@ const PanelNotice = forwardRef<
         ref={ref}
         {...props}
         className={cn(
-          'relative px-4 md:px-6 py-5 bg-studio flex flex-col lg:flex-row lg:justify-between gap-6 overflow-hidden lg:items-center',
+          'relative px-4 py-5 bg-studio flex flex-col lg:flex-row lg:justify-between gap-6 overflow-hidden lg:items-center',
           layout === 'vertical' && '!flex-col !items-start gap-y-2',
           className
         )}

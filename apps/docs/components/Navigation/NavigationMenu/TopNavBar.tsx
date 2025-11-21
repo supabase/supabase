@@ -1,22 +1,30 @@
-import { Command, Search, Menu } from 'lucide-react'
+import { Command, Menu, Search } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { FC } from 'react'
 import { memo, useState } from 'react'
+// End of third-party imports
 
-import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
+import { isFeatureEnabled } from 'common/enabled-features'
 import { Button, buttonVariants, cn } from 'ui'
-import { CommandMenuTrigger } from 'ui-patterns/CommandMenu'
-
+import { AuthenticatedDropdownMenu, CommandMenuTriggerInput } from 'ui-patterns'
+import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
+import useDropdownMenu from './useDropdownMenu'
+
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
 const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
+
+const largeLogo = isFeatureEnabled('branding:large_logo')
 
 const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const user = useUser()
+  const menu = useDropdownMenu(user)
 
   return (
     <>
@@ -35,36 +43,14 @@ const TopNavBar: FC = () => {
             </div>
 
             <div className="flex gap-2 items-center">
-              <CommandMenuTrigger>
-                <button
-                  className={cn(
-                    'group',
-                    'flex-grow md:w-44 xl:w-56 h-[30px] rounded-md',
-                    'pl-1.5 md:pl-2 pr-1',
-                    'flex items-center justify-between',
-                    'bg-surface-100/75 text-foreground-lighter border',
-                    'hover:bg-opacity-100 hover:border-strong',
-                    'focus-visible:!outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600',
-                    'transition'
-                  )}
-                >
-                  <div className="flex items-center space-x-2 text-foreground-muted">
-                    <Search size={18} strokeWidth={2} />
-                    <p className="flex text-sm pr-2">
-                      Search<span className="hidden xl:inline ml-1"> docs...</span>
-                    </p>
-                  </div>
-                  <div className="hidden md:flex items-center space-x-1">
-                    <div
-                      aria-hidden="true"
-                      className="md:flex items-center justify-center h-full px-1 border rounded bg-surface-300 gap-0.5"
-                    >
-                      <Command size={12} strokeWidth={1.5} />
-                      <span className="text-[12px]">K</span>
-                    </div>
-                  </div>
-                </button>
-              </CommandMenuTrigger>
+              <CommandMenuTriggerInput
+                placeholder={
+                  <>
+                    Search
+                    <span className="hidden xl:inline ml-1"> docs...</span>
+                  </>
+                }
+              />
               <button
                 title="Menu dropdown button"
                 className={cn(
@@ -80,12 +66,7 @@ const TopNavBar: FC = () => {
           <div className="hidden lg:flex items-center justify-end gap-3">
             {!isUserLoading && (
               <Button asChild>
-                <a
-                  href="https://supabase.com/dashboard"
-                  className="h-[30px]"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
+                <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
                   {isLoggedIn ? 'Dashboard' : 'Sign up'}
                 </a>
               </Button>
@@ -95,7 +76,11 @@ const TopNavBar: FC = () => {
                 <Link href="/dev-secret-auth">Dev-only secret sign-in</Link>
               </Button>
             )}
-            <TopNavDropdown />
+            {isLoggedIn ? (
+              <AuthenticatedDropdownMenu menu={menu} user={user} site="docs" />
+            ) : (
+              <TopNavDropdown />
+            )}
           </div>
         </div>
       </nav>
@@ -105,6 +90,8 @@ const TopNavBar: FC = () => {
 }
 
 const HeaderLogo = memo(() => {
+  const { navigationLogo } = getCustomContent(['navigation:logo'])
+
   return (
     <Link
       href="/"
@@ -114,21 +101,21 @@ const HeaderLogo = memo(() => {
       )}
     >
       <Image
-        className="hidden dark:block !m-0"
-        src="/docs/supabase-dark.svg"
+        className={cn('hidden dark:block !m-0', largeLogo && 'h-[36px]')}
+        src={navigationLogo?.dark ?? '/docs/supabase-dark.svg'}
         priority={true}
         loading="eager"
-        width={96}
-        height={18}
+        width={navigationLogo?.width ?? 96}
+        height={navigationLogo?.height ?? 18}
         alt="Supabase wordmark"
       />
       <Image
-        className="block dark:hidden !m-0"
-        src="/docs/supabase-light.svg"
+        className={cn('block dark:hidden !m-0', largeLogo && 'h-[36px]')}
+        src={navigationLogo?.light ?? '/docs/supabase-light.svg'}
         priority={true}
         loading="eager"
-        width={96}
-        height={18}
+        width={navigationLogo?.width ?? 96}
+        height={navigationLogo?.height ?? 18}
         alt="Supabase wordmark"
       />
       <span className="font-mono text-sm font-medium text-brand-link mb-px">DOCS</span>

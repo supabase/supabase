@@ -2,30 +2,36 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from 'data/auth/auth-hooks-update-mutation'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cn } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AddHookDropdown } from './AddHookDropdown'
 import { CreateHookSheet } from './CreateHookSheet'
 import { HookCard } from './HookCard'
-import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
+import { HOOKS_DEFINITIONS, Hook } from './hooks.constants'
 import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
 
 export const HooksListing = () => {
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
-  const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
+  const { data: project } = useSelectedProjectQuery()
+  const {
+    data: authConfig,
+    error: authConfigError,
+    isError,
+    isLoading,
+  } = useAuthConfigQuery({ projectRef })
 
-  const [selectedHook, setSelectedHook] = useState<HOOK_DEFINITION_TITLE | null>(null)
   const [selectedHookForDeletion, setSelectedHookForDeletion] = useState<Hook | null>(null)
 
-  const { mutate: updateAuthHooks, isLoading: isDeletingAuthHook } = useAuthHooksUpdateMutation({
+  const { mutate: updateAuthHooks, isPending: isDeletingAuthHook } = useAuthHooksUpdateMutation({
     onSuccess: async () => {
       if (!selectedHookForDeletion) return
 
@@ -58,12 +64,33 @@ export const HooksListing = () => {
     }
   })
 
+  const { setValue: setSelectedHook, value: selectedHook } = useQueryStateWithSelect({
+    urlKey: 'hook',
+    select: (id: string) => {
+      if (!id) return null
+      const hook = hooks.find((h) => h.id === id)
+      return hook ? hook.title : undefined
+    },
+    enabled: !!hooks && hooks.length > 0,
+    onError: () => toast.error(`Hook not found`),
+  })
+
   if (isError) {
     return (
-      <AlertError
-        error={authConfigError}
-        subject="Failed to retrieve auth configuration for hooks"
-      />
+      <ScaffoldSection isFullWidth>
+        <AlertError
+          error={authConfigError}
+          subject="Failed to retrieve auth configuration for hooks"
+        />
+      </ScaffoldSection>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <ScaffoldSection isFullWidth>
+        <GenericSkeletonLoader />
+      </ScaffoldSection>
     )
   }
 
@@ -71,7 +98,12 @@ export const HooksListing = () => {
     <ScaffoldSection isFullWidth>
       <div className="flex justify-between items-center mb-4">
         <ScaffoldSectionTitle>All hooks</ScaffoldSectionTitle>
-        <AddHookDropdown onSelectHook={setSelectedHook} />
+        <AddHookDropdown
+          onSelectHook={(title) => {
+            const hook = hooks.find((h) => h.title === title)
+            if (hook) setSelectedHook(hook.id)
+          }}
+        />
       </div>
 
       {hooks.filter((h) => isValidHook(h)).length === 0 && (
@@ -85,7 +117,10 @@ export const HooksListing = () => {
           <AddHookDropdown
             align="center"
             buttonText="Add a new hook"
-            onSelectHook={setSelectedHook}
+            onSelectHook={(title) => {
+              const hook = hooks.find((h) => h.title === title)
+              if (hook) setSelectedHook(hook.id)
+            }}
           />
         </div>
       )}
@@ -98,14 +133,14 @@ export const HooksListing = () => {
               <HookCard
                 key={hook.enabledKey}
                 hook={hook}
-                onSelect={() => setSelectedHook(hook.title)}
+                onSelect={() => setSelectedHook(hook.id)}
               />
             )
           })}
       </div>
 
       <CreateHookSheet
-        title={selectedHook}
+        title={selectedHook ?? null}
         visible={!!selectedHook}
         onDelete={() => {
           const hook = hooks.find((h) => h.title === selectedHook)

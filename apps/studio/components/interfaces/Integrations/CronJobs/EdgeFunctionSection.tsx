@@ -2,8 +2,8 @@ import Link from 'next/link'
 import { UseFormReturn } from 'react-hook-form'
 
 import { useParams } from 'common/hooks'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useEffect, useMemo } from 'react'
 import {
   Button,
@@ -21,7 +21,7 @@ import {
   SheetSection,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { CreateCronJobForm } from './CreateCronJobSheet'
+import { CreateCronJobForm } from './CreateCronJobSheet/CreateCronJobSheet.constants'
 
 interface HTTPRequestFieldsProps {
   form: UseFormReturn<CreateCronJobForm>
@@ -34,8 +34,8 @@ const buildFunctionUrl = (slug: string, projectRef: string, restUrl?: string) =>
 }
 
 export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
-  const { project: selectedProject } = useProjectContext()
   const { ref } = useParams()
+  const { data: selectedProject } = useSelectedProjectQuery()
   const { data: functions, isSuccess, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
 
   const edgeFunctions = useMemo(() => functions ?? [], [functions])
@@ -52,6 +52,7 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
       form.setValue('values.edgeFunctionName', functionUrl)
     }
   }, [edgeFunctions, form, isSuccess, selectedProject?.ref, selectedProject?.restUrl])
+
   return (
     <SheetSection className="flex flex-col gap-6">
       <FormField_Shadcn_

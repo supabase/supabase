@@ -140,7 +140,7 @@ If you're [connecting](/docs/guides/database/connecting-to-postgres) to your Pos
 ```sql
 select * from pgmq.send(
   queue_name  => 'foo',
-  msg         => '{ "hello": "world" }',
+  msg         => '{ "hello": "world" }'
 );
 ```
 
@@ -174,7 +174,7 @@ By default, Queues are only accessible via SQL and not exposed over the Supabase
 
 Beyond RLS, Postgres roles can be granted granular permissions to interact with Queues.
 
-For example, the following permissions allow authenticated users can fully manipulate messages, whereas anonymous users can only add/retrieve messages:
+For example, the following permissions allow authenticated users can fully manipulate messages, whereas anonymous users can only retrieve messages:
 
 <Img
   alt="Queue permissions"

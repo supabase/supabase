@@ -1,10 +1,10 @@
-import { Forward, Wrench, Building } from 'lucide-react'
+import { Building, Forward, Wrench } from 'lucide-react'
 import { useMemo } from 'react'
 
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
 import { IS_PLATFORM } from 'common'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
+import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 
 const PROJECT_SWITCHER_PAGE_NAME = 'Switch project'
@@ -13,11 +13,11 @@ const ORGANIZATION_SWITCHER_PAGE_NAME = 'Configure organization'
 export function useProjectSwitchCommand() {
   const setPage = useSetPage()
 
-  const { data: _projects } = useProjectsQuery({ enabled: IS_PLATFORM })
-  const projects = useMemo(
-    () => (_projects ?? []).map(({ name, ref }) => ({ name, ref })),
-    [_projects]
-  )
+  // [Joshen] Using paginated data here which means we won't be showing all projects
+  // Ideally we somehow support searching with Cmd K if we want to make this ideal
+  // e.g Cmd K input to support async searching while in "switch project" state
+  const { data } = useProjectsInfiniteQuery({}, { enabled: IS_PLATFORM })
+  const projects = useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
 
   useRegisterPage(
     PROJECT_SWITCHER_PAGE_NAME,

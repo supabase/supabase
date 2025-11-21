@@ -1,3 +1,4 @@
+import { DOCS_URL } from 'lib/constants'
 import type { SQLTemplate } from './SQLEditor.types'
 
 export const SQL_TEMPLATES: SQLTemplate[] = [
@@ -901,7 +902,7 @@ create table profiles (
   constraint username_length check (char_length(username) >= 3)
 );
 -- Set up Row Level Security (RLS)
--- See https://supabase.com/docs/guides/auth/row-level-security for more details.
+-- See ${DOCS_URL}/guides/auth/row-level-security for more details.
 alter table profiles
   enable row level security;
 
@@ -915,7 +916,7 @@ create policy "Users can update own profile." on profiles
   for update using ((select auth.uid()) = id);
 
 -- This trigger automatically creates a profile entry when a new user signs up via Supabase Auth.
--- See https://supabase.com/docs/guides/auth/managing-user-data#using-triggers for more details.
+-- See ${DOCS_URL}/guides/auth/managing-user-data#using-triggers for more details.
 create function public.handle_new_user()
 returns trigger
 set search_path = ''
@@ -935,7 +936,7 @@ insert into storage.buckets (id, name)
   values ('avatars', 'avatars');
 
 -- Set up access controls for storage.
--- See https://supabase.com/docs/guides/storage#policy-examples for more details.
+-- See ${DOCS_URL}/guides/storage#policy-examples for more details.
 create policy "Avatar images are publicly accessible." on storage.objects
   for select using (bucket_id = 'avatars');
 

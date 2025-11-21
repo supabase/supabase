@@ -11,7 +11,7 @@ export const TROUBLESHOOTING_DATA_ATTRIBUTES = {
   ERRORS_LIST_ATTRIBUTE: 'data-errors',
 }
 
-export function formatError(error: ITroubleshootingEntry['data']['errors'][number]) {
+export function formatError(error: NonNullable<ITroubleshootingEntry['data']['errors']>[number]) {
   return `${error.http_status_code ?? ''}${!!error.http_status_code && !!error.code ? ' ' : ''}${error.code ?? ''}`
 }
 

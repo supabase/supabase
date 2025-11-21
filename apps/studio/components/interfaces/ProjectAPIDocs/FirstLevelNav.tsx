@@ -7,7 +7,7 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { Book, BookOpen } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Button } from 'ui'
@@ -171,7 +171,7 @@ const FirstLevelNav = () => {
         </Button>
         <Button block asChild type="text" size="small" icon={<BookOpen />}>
           <Link
-            href="https://supabase.com/docs/guides/graphql"
+            href={`${DOCS_URL}/guides/graphql`}
             target="_blank"
             rel="noreferrer"
             className="!justify-start"
@@ -183,18 +183,13 @@ const FirstLevelNav = () => {
 
       <div className="px-2 py-4">
         <Button block asChild type="text" size="small" icon={<Book />}>
-          <Link
-            href="https://supabase.com/docs"
-            target="_blank"
-            rel="noreferrer"
-            className="!justify-start"
-          >
+          <Link href={`${DOCS_URL}`} target="_blank" rel="noreferrer" className="!justify-start">
             Documentation
           </Link>
         </Button>
         <Button block asChild type="text" size="small" icon={<BookOpen />}>
           <Link
-            href="https://supabase.com/docs/guides/api"
+            href={`${DOCS_URL}/guides/api`}
             target="_blank"
             rel="noreferrer"
             className="!justify-start"

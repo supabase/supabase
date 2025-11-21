@@ -1,36 +1,26 @@
 import { AnimatePresence, motion, MotionProps } from 'framer-motion'
 import { isUndefined } from 'lodash'
-import {
-  ArrowUpRight,
-  Blocks,
-  Boxes,
-  ChartArea,
-  PanelLeftDashed,
-  Receipt,
-  Settings,
-  Users,
-} from 'lucide-react'
+import { Blocks, Boxes, ChartArea, PanelLeftDashed, Receipt, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag, useIsMFAEnabled, useParams } from 'common'
 import {
   generateOtherRoutes,
   generateProductRoutes,
   generateSettingsRoutes,
   generateToolRoutes,
 } from 'components/layouts/ProjectLayout/NavigationBar/NavigationBar.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLints } from 'hooks/misc/useLints'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Home } from 'icons'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
@@ -46,18 +36,15 @@ import {
   SidebarContent as SidebarContentPrimitive,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   Sidebar as SidebarPrimitive,
-  SidebarSeparator,
   useSidebar,
 } from 'ui'
 import {
   useIsAPIDocsSidePanelEnabled,
-  useIsNewLayoutEnabled,
-  useIsSQLEditorTabsEnabled,
+  useUnifiedLogsPreview,
 } from './App/FeaturePreview/FeaturePreviewContext'
 
 export const ICON_SIZE = 32
@@ -65,7 +52,7 @@ export const ICON_STROKE_WIDTH = 1.5
 export type SidebarBehaviourType = 'expandable' | 'open' | 'closed'
 export const DEFAULT_SIDEBAR_BEHAVIOR = 'expandable'
 
-const SidebarMotion = motion(SidebarPrimitive) as FC<
+const SidebarMotion = motion.create(SidebarPrimitive) as FC<
   ComponentProps<typeof SidebarPrimitive> & {
     transition?: MotionProps['transition']
   }
@@ -74,10 +61,6 @@ const SidebarMotion = motion(SidebarPrimitive) as FC<
 export interface SidebarProps extends ComponentPropsWithoutRef<typeof SidebarPrimitive> {}
 
 export const Sidebar = ({ className, ...props }: SidebarProps) => {
-  const newLayoutPreview = useIsNewLayoutEnabled()
-
-  const { ref } = useParams()
-
   const { setOpen } = useSidebar()
   const hideSideBar = useHideSidebar()
 
@@ -92,63 +75,56 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
     if (sidebarBehaviour === 'closed') setOpen(false)
   }, [sidebarBehaviour, setOpen])
 
-  if (!newLayoutPreview && !ref) {
-    return null
-  }
-
   return (
-    <>
-      <AnimatePresence>
-        {!hideSideBar && (
-          <SidebarMotion
-            {...props}
-            transition={{ delay: 0.4, duration: 0.4 }}
-            overflowing={sidebarBehaviour === 'expandable'}
-            collapsible="icon"
-            variant="sidebar"
-            onMouseEnter={() => {
-              if (sidebarBehaviour === 'expandable') setOpen(true)
-            }}
-            onMouseLeave={() => {
-              if (sidebarBehaviour === 'expandable') setOpen(false)
-            }}
-          >
-            <SidebarContent
-              footer={
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      type="text"
-                      className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? '!px-2' : ''}`}
-                      icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
-                    />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent side="top" align="start" className="w-40">
-                    <DropdownMenuRadioGroup
-                      value={sidebarBehaviour}
-                      onValueChange={(value) => setSidebarBehaviour(value as SidebarBehaviourType)}
-                    >
-                      <DropdownMenuLabel>Sidebar control</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuRadioItem value="open">Expanded</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="closed">Collapsed</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="expandable">
-                        Expand on hover
-                      </DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              }
-            />
-          </SidebarMotion>
-        )}
-      </AnimatePresence>
-    </>
+    <AnimatePresence>
+      {!hideSideBar && (
+        <SidebarMotion
+          {...props}
+          transition={{ delay: 0.4, duration: 0.4 }}
+          overflowing={sidebarBehaviour === 'expandable'}
+          collapsible="icon"
+          variant="sidebar"
+          onMouseEnter={() => {
+            if (sidebarBehaviour === 'expandable') setOpen(true)
+          }}
+          onMouseLeave={() => {
+            if (sidebarBehaviour === 'expandable') setOpen(false)
+          }}
+        >
+          <SidebarContent
+            footer={
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="text"
+                    className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? '!px-2' : ''}`}
+                    icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="top" align="start" className="w-40">
+                  <DropdownMenuRadioGroup
+                    value={sidebarBehaviour}
+                    onValueChange={(value) => setSidebarBehaviour(value as SidebarBehaviourType)}
+                  >
+                    <DropdownMenuLabel>Sidebar control</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuRadioItem value="open">Expanded</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="closed">Collapsed</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="expandable">
+                      Expand on hover
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            }
+          />
+        </SidebarMotion>
+      )}
+    </AnimatePresence>
   )
 }
 
 export const SidebarContent = ({ footer }: { footer?: ReactNode }) => {
-  const newLayoutPreview = useIsNewLayoutEnabled()
   const { ref: projectRef } = useParams()
 
   return (
@@ -167,7 +143,7 @@ export const SidebarContent = ({ footer }: { footer?: ReactNode }) => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
             >
-              {newLayoutPreview ? <OrganizationLinks /> : <HomePageLinks />}
+              <OrganizationLinks />
             </motion.div>
           )}
         </SidebarContentPrimitive>
@@ -183,10 +159,12 @@ export function SideBarNavLink({
   route,
   active,
   onClick,
+  disabled,
   ...props
 }: {
   route: any
   active?: boolean
+  disabled?: boolean
   onClick?: () => void
 } & ComponentPropsWithoutRef<typeof SidebarMenuButton>) {
   const [sidebarBehaviour] = useLocalStorageQuery(
@@ -195,6 +173,7 @@ export function SideBarNavLink({
   )
 
   const buttonProps = {
+    disabled,
     tooltip: sidebarBehaviour === 'closed' ? route.label : '',
     isActive: active,
     className: cn('text-sm', sidebarBehaviour === 'open' ? '!px-2' : ''),
@@ -213,7 +192,7 @@ export function SideBarNavLink({
 
   return (
     <SidebarMenuItem>
-      {route.link ? (
+      {route.link && !disabled ? (
         <SidebarMenuButton {...buttonProps} asChild>
           <Link href={route.link}>{content}</Link>
         </SidebarMenuButton>
@@ -242,13 +221,15 @@ const ActiveDot = (errorArray: any[], warningArray: any[]) => {
 const ProjectLinks = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const snap = useAppStateSnapshot()
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { securityLints, errorLints } = useLints()
+  const showReports = useIsFeatureEnabled('reports:all')
+  const { mutate: sendEvent } = useSendEventMutation()
 
-  const showWarehouse = useFlag('warehouse')
-  const isSqlEditorTabsEnabled = useIsSQLEditorTabsEnabled()
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -264,16 +245,20 @@ const ProjectLinks = () => {
     'realtime:all',
   ])
 
-  const toolRoutes = generateToolRoutes(ref, project, {
-    sqlEditorTabs: isSqlEditorTabsEnabled,
-  })
+  const authOverviewPageEnabled = useFlag('authOverviewPage')
+
+  const toolRoutes = generateToolRoutes(ref, project)
   const productRoutes = generateProductRoutes(ref, project, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     realtime: realtimeEnabled,
+    authOverviewPage: authOverviewPageEnabled,
   })
-  const otherRoutes = generateOtherRoutes(ref, project)
+  const otherRoutes = generateOtherRoutes(ref, project, {
+    unifiedLogs: isUnifiedLogsEnabled,
+    showReports,
+  })
   const settingsRoutes = generateSettingsRoutes(ref, project)
 
   return (
@@ -284,7 +269,7 @@ const ProjectLinks = () => {
           active={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
           route={{
             key: 'HOME',
-            label: 'Project overview',
+            label: 'Project Overview',
             icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: `/project/${ref}`,
             linkElement: <ProjectIndexPageLink projectRef={ref} />,
@@ -311,18 +296,37 @@ const ProjectLinks = () => {
       <Separator className="w-[calc(100%-1rem)] mx-auto" />
       <SidebarGroup className="gap-0.5">
         {otherRoutes.map((route, i) => {
-          if (route.key === 'api' && isNewAPIDocsEnabled) {
+          if (route.key === 'api') {
+            const handleApiClick = () => {
+              if (isNewAPIDocsEnabled) {
+                snap.setShowProjectApiDocs(true)
+              }
+              sendEvent({
+                action: 'api_docs_opened',
+                properties: {
+                  source: 'sidebar',
+                },
+                groups: {
+                  project: ref ?? 'Unknown',
+                  organization: org?.slug ?? 'Unknown',
+                },
+              })
+            }
+
             return (
               <SideBarNavLink
                 key={`other-routes-${i}`}
-                route={{
-                  label: route.label,
-                  icon: route.icon,
-                  key: route.key,
-                }}
-                onClick={() => {
-                  snap.setShowProjectApiDocs(true)
-                }}
+                route={
+                  isNewAPIDocsEnabled
+                    ? {
+                        label: route.label,
+                        icon: route.icon,
+                        key: route.key,
+                      }
+                    : route
+                }
+                active={activeRoute === route.key}
+                onClick={handleApiClick}
               />
             )
           } else if (route.key === 'advisors') {
@@ -337,14 +341,11 @@ const ProjectLinks = () => {
               </div>
             )
           } else if (route.key === 'logs') {
-            // TODO: Undo this when warehouse flag is removed
-            const label = showWarehouse ? 'Logs & Analytics' : route.label
-            const newRoute = { ...route, label }
             return (
               <SideBarNavLink
                 key={`other-routes-${i}`}
-                route={newRoute}
-                active={activeRoute === newRoute.key}
+                route={route}
+                active={activeRoute === route.key}
               />
             )
           } else {
@@ -372,118 +373,58 @@ const ProjectLinks = () => {
   )
 }
 
-const HomePageLinks = () => {
-  const { data: organizations = [] } = useOrganizationsQuery()
-  const organizationLinks = organizations.map((org) => {
-    return { label: org.name, href: `/org/${org.slug}/general`, key: org.slug }
-  })
-  const accountLinks = [
-    { label: 'Preferences', href: `/account/me`, key: 'preferences' },
-    { label: 'Access Tokens', href: `/account/tokens`, key: 'account-tokens' },
-    { label: 'Security', href: `/account/security`, key: 'security' },
-    { label: 'Audit Logs', href: `/account/audit`, key: 'audit-logs' },
-  ]
-  const docsLinks = [
-    { label: 'Guides', href: `https://supabase.com/docs`, key: 'guides', icon: <ArrowUpRight /> },
-    {
-      label: 'API Reference',
-      href: `https://supabase.com/docs/guides/api`,
-      key: 'api-reference',
-      icon: <ArrowUpRight />,
-    },
-  ]
-
-  return (
-    <SidebarMenu className="flex flex-col gap-y-1 items-start">
-      <SidebarGroupLabel className="px-4 h-auto pt-4">Organizations</SidebarGroupLabel>
-      <SidebarGroup className="gap-0.5">
-        {organizationLinks.map((x) => (
-          <SideBarNavLink
-            key={x.key}
-            active={false}
-            route={{
-              label: x.label,
-              link: x.href,
-              key: x.label,
-            }}
-          />
-        ))}
-      </SidebarGroup>
-      <SidebarSeparator className="!bg-border-overlay w-full mx-0" />
-      <SidebarGroupLabel className="px-4 h-auto pt-4">Account</SidebarGroupLabel>
-      <SidebarGroup className="gap-0.5">
-        {accountLinks.map((x) => (
-          <SideBarNavLink
-            key={x.key}
-            active={false}
-            route={{
-              label: x.label,
-              link: x.href,
-              key: x.label,
-            }}
-          />
-        ))}
-      </SidebarGroup>
-      <SidebarSeparator className="!bg-border-overlay w-full mx-0" />
-      <SidebarGroupLabel className="px-4 h-auto pt-4">Documentation</SidebarGroupLabel>
-      <SidebarGroup className="gap-0.5">
-        {docsLinks.map((x) => (
-          <SideBarNavLink
-            key={x.key}
-            active={false}
-            route={{
-              label: x.label,
-              link: x.href,
-              key: x.label,
-              icon: x.icon,
-            }}
-          />
-        ))}
-      </SidebarGroup>
-    </SidebarMenu>
-  )
-}
-
 const OrganizationLinks = () => {
   const router = useRouter()
   const { slug } = useParams()
+
+  const organizationSlug: string = slug ?? (router.query.orgSlug as string) ?? ''
+
+  const { data: org } = useSelectedOrganizationQuery()
+  const isUserMFAEnabled = useIsMFAEnabled()
+  const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
+
+  const showBilling = useIsFeatureEnabled('billing:all')
 
   const activeRoute = router.pathname.split('/')[3]
 
   const navMenuItems = [
     {
       label: 'Projects',
-      href: `/org/${slug}`,
+      href: `/org/${organizationSlug}`,
       key: 'projects',
       icon: <Boxes size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
       label: 'Team',
-      href: `/org/${slug}/team`,
+      href: `/org/${organizationSlug}/team`,
       key: 'team',
       icon: <Users size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
       label: 'Integrations',
-      href: `/org/${slug}/integrations`,
+      href: `/org/${organizationSlug}/integrations`,
       key: 'integrations',
       icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
       label: 'Usage',
-      href: `/org/${slug}/usage`,
+      href: `/org/${organizationSlug}/usage`,
       key: 'usage',
       icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
-    {
-      label: 'Billing',
-      href: `/org/${slug}/billing`,
-      key: 'billing',
-      icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-    },
+    ...(showBilling
+      ? [
+          {
+            label: 'Billing',
+            href: `/org/${organizationSlug}/billing`,
+            key: 'billing',
+            icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+          },
+        ]
+      : []),
     {
       label: 'Organization settings',
-      href: `/org/${slug}/general`,
+      href: `/org/${organizationSlug}/general`,
       key: 'settings',
       icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
@@ -495,6 +436,7 @@ const OrganizationLinks = () => {
         {navMenuItems.map((item, i) => (
           <SideBarNavLink
             key={item.key}
+            disabled={disableAccessMfa}
             active={
               i === 0
                 ? activeRoute === undefined
@@ -502,7 +444,8 @@ const OrganizationLinks = () => {
                   ? router.pathname.includes('/general') ||
                     router.pathname.includes('/apps') ||
                     router.pathname.includes('/audit') ||
-                    router.pathname.includes('/documents')
+                    router.pathname.includes('/documents') ||
+                    router.pathname.includes('/security')
                   : activeRoute === item.key
             }
             route={{

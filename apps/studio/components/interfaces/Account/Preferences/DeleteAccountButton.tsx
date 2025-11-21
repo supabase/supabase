@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { NO_PROJECT_MARKER } from 'components/interfaces/Support/SupportForm.utils'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProfile } from 'lib/profile'
@@ -64,7 +65,7 @@ export const DeleteAccountButton = () => {
   })
   const { account } = form.watch()
 
-  const { mutate: submitSupportTicket, isLoading } = useSendSupportTicketMutation({
+  const { mutate: submitSupportTicket, isPending } = useSendSupportTicketMutation({
     onSuccess: () => {
       setIsOpen(false)
       setDeletionRequestFlag()
@@ -92,7 +93,7 @@ export const DeleteAccountButton = () => {
       severity: 'Low',
       allowSupportAccess: false,
       verified: true,
-      projectRef: 'no-project',
+      projectRef: NO_PROJECT_MARKER,
     }
 
     submitSupportTicket(payload)
@@ -170,7 +171,7 @@ export const DeleteAccountButton = () => {
                               autoFocus
                               {...field}
                               autoComplete="off"
-                              disabled={isLoading}
+                              disabled={isPending}
                               placeholder="Enter the account above"
                             />
                           </FormControl_Shadcn_>
@@ -185,8 +186,8 @@ export const DeleteAccountButton = () => {
                       size="small"
                       type="danger"
                       htmlType="submit"
-                      loading={isLoading}
-                      disabled={account !== accountEmail || isLoading}
+                      loading={isPending}
+                      disabled={account !== accountEmail || isPending}
                     >
                       Submit request for account deletion
                     </Button>
