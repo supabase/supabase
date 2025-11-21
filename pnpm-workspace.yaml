@@ -49,9 +49,10 @@ onlyBuiltDependencies:
   - supabase
 
 overrides:
+  '@eslint/eslintrc>js-yaml': ^4.1.1
   '@react-router/dev>vite-node': 3.2.4
   '@redocly/respect-core>form-data': ^4.0.4
-  '@supabase/supabase-js>@supabase/auth-js': 'catalog:'
+  '@redocly/respect-core>js-yaml': ^4.1.1
   '@tanstack/directive-functions-plugin>vite': 'catalog:'
   '@tanstack/react-start-plugin>vite': 'catalog:'
   'vinxi>vite': 'catalog:'
