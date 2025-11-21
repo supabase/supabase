@@ -1147,7 +1147,7 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/database/replication' },
         {
-          name: 'Managed destinations',
+          name: 'Managed Destinations',
           url: '/guides/database/replication/etl-replication-setup' as `/${string}`,
           items: [
             {
@@ -1166,7 +1166,7 @@ export const database: NavMenuConstant = {
           ],
         },
         {
-          name: 'Manual destinations',
+          name: 'Manual Destinations',
           url: '/guides/database/replication/manual-replication-setup' as `/${string}`,
           items: [
             {
