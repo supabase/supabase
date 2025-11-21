@@ -21,6 +21,7 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
+import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
 
 interface FunctionListProps {
   schema: string
@@ -31,6 +32,7 @@ interface FunctionListProps {
   duplicateFunction: (fn: any) => void
   editFunction: (fn: any) => void
   deleteFunction: (fn: any) => void
+  functions: DatabaseFunction[]
 }
 
 const FunctionList = ({
@@ -42,16 +44,12 @@ const FunctionList = ({
   duplicateFunction = noop,
   editFunction = noop,
   deleteFunction = noop,
+  functions,
 }: FunctionListProps) => {
   const router = useRouter()
   const { data: selectedProject } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
-
-  const { data: functions } = useDatabaseFunctionsQuery({
-    projectRef: selectedProject?.ref,
-    connectionString: selectedProject?.connectionString,
-  })
 
   const filteredFunctions = (functions ?? []).filter((x) => {
     const matchesName = includes(x.name.toLowerCase(), filterString.toLowerCase())

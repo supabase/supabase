@@ -34,6 +34,8 @@ import {
 } from './QueryPerformance.constants'
 import { QueryPerformanceRow } from './QueryPerformance.types'
 import { formatDuration } from './QueryPerformance.utils'
+import { parseAsString, parseAsArrayOf, parseAsJson, useQueryStates } from 'nuqs'
+import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 
 interface QueryPerformanceGridProps {
   aggregatedData: QueryPerformanceRow[]
@@ -72,7 +74,17 @@ export const QueryPerformanceGrid = ({
 }: QueryPerformanceGridProps) => {
   const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
-  const { sort: urlSort, order, roles, search, minCalls } = useParams()
+  const { sort: urlSort, order } = useParams()
+  const [{ search, roles, callsFilter }] = useQueryStates({
+    search: parseAsString.withDefault(''),
+    roles: parseAsArrayOf(parseAsString).withDefault([]),
+    callsFilter: parseAsJson<NumericFilter | null>(
+      (value) => value as NumericFilter | null
+    ).withDefault({
+      operator: '>=',
+      value: 0,
+    } as NumericFilter),
+  })
   const dataGridContainerRef = useRef<HTMLDivElement>(null)
 
   const [view, setView] = useState<'details' | 'suggestion'>('details')
@@ -341,9 +353,27 @@ export const QueryPerformanceGrid = ({
       data = data.filter((row) => row.rolname && roles.includes(row.rolname))
     }
 
-    const minCallsNum = Number(minCalls)
-    if (!Number.isNaN(minCallsNum) && minCallsNum > 0) {
-      data = data.filter((row) => (row.calls || 0) >= minCallsNum)
+    if (callsFilter) {
+      const { operator, value } = callsFilter
+      data = data.filter((row) => {
+        const calls = row.calls || 0
+        switch (operator) {
+          case '=':
+            return calls === value
+          case '>=':
+            return calls >= value
+          case '<=':
+            return calls <= value
+          case '>':
+            return calls > value
+          case '<':
+            return calls < value
+          case '!=':
+            return calls !== value
+          default:
+            return true
+        }
+      })
     }
 
     if (sort?.column === 'prop_total_time') {
@@ -365,7 +395,7 @@ export const QueryPerformanceGrid = ({
     }
 
     return data
-  }, [aggregatedData, sort, search, roles, minCalls])
+  }, [aggregatedData, sort, search, roles, callsFilter])
 
   const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
   const query = (selectedQuery ?? '').trim().toLowerCase()
@@ -377,7 +407,7 @@ export const QueryPerformanceGrid = ({
 
   useEffect(() => {
     setSelectedRow(undefined)
-  }, [search, roles, urlSort, order, minCalls])
+  }, [search, roles, urlSort, order, callsFilter])
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {

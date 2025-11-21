@@ -62,7 +62,7 @@ const RedirectToTemplates = () => {
 
   const { data: authConfig, isLoading: isLoadingConfig } = useAuthConfigQuery({ projectRef })
 
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation({
+  const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to update settings: ${error?.message}`)
     },
@@ -234,7 +234,7 @@ const RedirectToTemplates = () => {
             <ScaffoldSection isFullWidth>
               {/* Only show title if there is an another section above */}
               {showConfigurationSection && (
-                <ScaffoldSectionTitle className="mb-4">Contents</ScaffoldSectionTitle>
+                <ScaffoldSectionTitle className="mb-4">Content</ScaffoldSectionTitle>
               )}
               <Card>
                 <TemplateEditor template={template} />

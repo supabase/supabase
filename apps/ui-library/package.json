@@ -73,7 +73,7 @@
     "react-hook-form": "^7.45.0",
     "react-markdown": "^10.1.0",
     "react-wrap-balancer": "^1.1.0",
-    "recharts": "^2.8.0",
+    "recharts": "catalog:",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-pretty-code": "^0.9.0",
     "rehype-slug": "^6.0.0",

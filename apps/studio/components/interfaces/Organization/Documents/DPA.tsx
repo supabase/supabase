@@ -22,7 +22,7 @@ export const DPA = () => {
   const [isOpen, setIsOpen] = useState(false)
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutate: requestDpa, isLoading: isRequesting } = useDpaRequestMutation({
+  const { mutate: requestDpa, isPending: isRequesting } = useDpaRequestMutation({
     onSuccess: () => {
       toast.success('DPA request sent successfully')
       setIsOpen(false)

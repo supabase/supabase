@@ -1,4 +1,5 @@
 import { Children } from 'react'
+import { cn } from 'ui'
 
 export const FormSection = ({
   children,
@@ -39,7 +40,7 @@ export const FormSectionLabel = ({
 }) => {
   if (description !== undefined) {
     return (
-      <div className={`flex flex-col space-y-2 col-span-12 lg:col-span-5 ${className}`}>
+      <div className={cn('flex flex-col space-y-2 col-span-12 lg:col-span-5', className)}>
         <label className="text-foreground text-sm">{children}</label>
         {description}
       </div>

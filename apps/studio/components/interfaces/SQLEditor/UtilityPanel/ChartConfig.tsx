@@ -206,7 +206,7 @@ export const ChartConfig = ({
             <Tooltip>
               <TooltipTrigger
                 onClick={() => setAcknowledged(true)}
-                className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-3 right-3 opacity-30 group-hover:opacity-100 transition-opacity"
               >
                 <X size={14} className="text-foreground-light" />
               </TooltipTrigger>
