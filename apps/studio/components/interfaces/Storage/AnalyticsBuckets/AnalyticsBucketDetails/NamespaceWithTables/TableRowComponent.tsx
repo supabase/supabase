@@ -241,11 +241,13 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
     }
   }
 
-  const connectedForeignTablesInNamespace =
-    icebergWrapper?.tables.filter((x) => x.options[0].includes(`table=${namespace}.`)) ?? []
+  const connectedForeignTablesInNamespace = (icebergWrapper?.tables ?? []).filter((x) =>
+    x.options[0].includes(`table=${namespace}.`)
+  )
 
-  const connectedForeignTables =
-    icebergWrapper?.tables.filter((x) => x.options[0] === `table=${namespace}.${table.name}`) ?? []
+  const connectedForeignTables = (icebergWrapper?.tables ?? []).filter(
+    (x) => x.options[0] === `table=${namespace}.${table.name}`
+  )
 
   // [Joshen] For purely Analytics Bucket context
   const onConfirmRemoveNamespaceTable = async () => {
