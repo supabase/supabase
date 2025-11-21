@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
@@ -13,6 +12,14 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import {
+  PageSection,
+  PageSectionAside,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { AddHookDropdown } from './AddHookDropdown'
 import { CreateHookSheet } from './CreateHookSheet'
 import { HookCard } from './HookCard'
@@ -77,126 +84,135 @@ export const HooksListing = () => {
 
   if (isError) {
     return (
-      <ScaffoldSection isFullWidth>
-        <AlertError
-          error={authConfigError}
-          subject="Failed to retrieve auth configuration for hooks"
-        />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <AlertError
+            error={authConfigError}
+            subject="Failed to retrieve auth configuration for hooks"
+          />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   if (isLoading) {
     return (
-      <ScaffoldSection isFullWidth>
-        <GenericSkeletonLoader />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <GenericSkeletonLoader />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   return (
-    <ScaffoldSection isFullWidth>
-      <div className="flex justify-between items-center mb-4">
-        <ScaffoldSectionTitle>All hooks</ScaffoldSectionTitle>
-        <AddHookDropdown
-          onSelectHook={(title) => {
-            const hook = hooks.find((h) => h.title === title)
-            if (hook) setSelectedHook(hook.id)
-          }}
-        />
-      </div>
-
-      {hooks.filter((h) => isValidHook(h)).length === 0 && (
-        <div
-          className={[
-            'border rounded border-default px-20 py-16',
-            'flex flex-col items-center justify-center space-y-4',
-          ].join(' ')}
-        >
-          <p className="text-sm text-foreground-light">No hooks configured yet</p>
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>All hooks</PageSectionTitle>
+        </PageSectionSummary>
+        <PageSectionAside>
           <AddHookDropdown
-            align="center"
-            buttonText="Add a new hook"
             onSelectHook={(title) => {
               const hook = hooks.find((h) => h.title === title)
               if (hook) setSelectedHook(hook.id)
             }}
           />
-        </div>
-      )}
+        </PageSectionAside>
+      </PageSectionMeta>
+      <PageSectionContent>
+        {hooks.filter((h) => isValidHook(h)).length === 0 && (
+          <div
+            className={[
+              'border rounded border-default px-20 py-16',
+              'flex flex-col items-center justify-center space-y-4',
+            ].join(' ')}
+          >
+            <p className="text-sm text-foreground-light">No hooks configured yet</p>
+            <AddHookDropdown
+              align="center"
+              buttonText="Add a new hook"
+              onSelectHook={(title) => {
+                const hook = hooks.find((h) => h.title === title)
+                if (hook) setSelectedHook(hook.id)
+              }}
+            />
+          </div>
+        )}
 
-      <div className="-space-y-px">
-        {hooks
-          .filter((h) => isValidHook(h))
-          .map((hook) => {
-            return (
-              <HookCard
-                key={hook.enabledKey}
-                hook={hook}
-                onSelect={() => setSelectedHook(hook.id)}
-              />
-            )
-          })}
-      </div>
-
-      <CreateHookSheet
-        title={selectedHook ?? null}
-        visible={!!selectedHook}
-        onDelete={() => {
-          const hook = hooks.find((h) => h.title === selectedHook)
-          if (hook) setSelectedHookForDeletion(hook)
-        }}
-        onClose={() => setSelectedHook(null)}
-        authConfig={authConfig!}
-      />
-
-      <ConfirmationModal
-        visible={!!selectedHookForDeletion}
-        size="large"
-        variant="destructive"
-        loading={isDeletingAuthHook}
-        title={`Confirm to delete ${selectedHookForDeletion?.title}`}
-        confirmLabel="Delete"
-        confirmLabelLoading="Deleting"
-        onCancel={() => setSelectedHookForDeletion(null)}
-        onConfirm={() => {
-          if (!selectedHookForDeletion) return
-          updateAuthHooks({
-            projectRef: projectRef!,
-            config: {
-              [selectedHookForDeletion.enabledKey]: false,
-              [selectedHookForDeletion.uriKey]: null,
-              [selectedHookForDeletion.secretsKey]: null,
-            },
-          })
-        }}
-      >
-        <div>
-          <p className="text-sm text-foreground-light">
-            Are you sure you want to delete the {selectedHookForDeletion?.title}?
-          </p>
-          {selectedHookForDeletion?.method.type === 'postgres' && (
-            <>
-              <p className="text-sm text-foreground-light">
-                The following statements will be executed on the{' '}
-                {selectedHookForDeletion?.method.schema}.
-                {selectedHookForDeletion?.method.functionName} function:
-              </p>
-              <div className={cn('mt-4', 'h-72')}>
-                <CodeEditor
-                  id="deletion-hook-editor"
-                  isReadOnly={true}
-                  language="pgsql"
-                  value={getRevokePermissionStatements(
-                    selectedHookForDeletion?.method.schema,
-                    selectedHookForDeletion?.method.functionName
-                  ).join('\n\n')}
+        <div className="-space-y-px">
+          {hooks
+            .filter((h) => isValidHook(h))
+            .map((hook) => {
+              return (
+                <HookCard
+                  key={hook.enabledKey}
+                  hook={hook}
+                  onSelect={() => setSelectedHook(hook.id)}
                 />
-              </div>
-            </>
-          )}
+              )
+            })}
         </div>
-      </ConfirmationModal>
-    </ScaffoldSection>
+
+        <CreateHookSheet
+          title={selectedHook ?? null}
+          visible={!!selectedHook}
+          onDelete={() => {
+            const hook = hooks.find((h) => h.title === selectedHook)
+            if (hook) setSelectedHookForDeletion(hook)
+          }}
+          onClose={() => setSelectedHook(null)}
+          authConfig={authConfig!}
+        />
+
+        <ConfirmationModal
+          visible={!!selectedHookForDeletion}
+          size="large"
+          variant="destructive"
+          loading={isDeletingAuthHook}
+          title={`Confirm to delete ${selectedHookForDeletion?.title}`}
+          confirmLabel="Delete"
+          confirmLabelLoading="Deleting"
+          onCancel={() => setSelectedHookForDeletion(null)}
+          onConfirm={() => {
+            if (!selectedHookForDeletion) return
+            updateAuthHooks({
+              projectRef: projectRef!,
+              config: {
+                [selectedHookForDeletion.enabledKey]: false,
+                [selectedHookForDeletion.uriKey]: null,
+                [selectedHookForDeletion.secretsKey]: null,
+              },
+            })
+          }}
+        >
+          <div>
+            <p className="text-sm text-foreground-light">
+              Are you sure you want to delete the {selectedHookForDeletion?.title}?
+            </p>
+            {selectedHookForDeletion?.method.type === 'postgres' && (
+              <>
+                <p className="text-sm text-foreground-light">
+                  The following statements will be executed on the{' '}
+                  {selectedHookForDeletion?.method.schema}.
+                  {selectedHookForDeletion?.method.functionName} function:
+                </p>
+                <div className={cn('mt-4', 'h-72')}>
+                  <CodeEditor
+                    id="deletion-hook-editor"
+                    isReadOnly={true}
+                    language="pgsql"
+                    value={getRevokePermissionStatements(
+                      selectedHookForDeletion?.method.schema,
+                      selectedHookForDeletion?.method.functionName
+                    ).join('\n\n')}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        </ConfirmationModal>
+      </PageSectionContent>
+    </PageSection>
   )
 }
