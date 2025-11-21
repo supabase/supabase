@@ -1242,6 +1242,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/database/query/read-only': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * [Beta] Run a sql query as supabase_read_only_user
+     * @description All entity references must be schema qualified.
+     */
+    post: operations['v1-read-only-query']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/database/webhooks/enable': {
     parameters: {
       query?: never
@@ -3440,12 +3460,20 @@ export interface components {
       features: {
         icebergCatalog?: {
           enabled: boolean
+          maxCatalogs: number
+          maxNamespaces: number
+          maxTables: number
         }
         imageTransformation: {
           enabled: boolean
         }
         s3Protocol: {
           enabled: boolean
+        }
+        vectorBuckets?: {
+          enabled: boolean
+          maxBuckets: number
+          maxIndexes: number
         }
       }
       /** Format: int64 */
@@ -3928,12 +3956,20 @@ export interface components {
       features?: {
         icebergCatalog?: {
           enabled: boolean
+          maxCatalogs: number
+          maxNamespaces: number
+          maxTables: number
         }
         imageTransformation: {
           enabled: boolean
         }
         s3Protocol: {
           enabled: boolean
+        }
+        vectorBuckets?: {
+          enabled: boolean
+          maxBuckets: number
+          maxIndexes: number
         }
       }
       /** Format: int64 */
@@ -4415,6 +4451,10 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+    }
+    V1ReadOnlyQueryBody: {
+      parameters?: unknown[]
+      query: string
     }
     V1RestorePitrBody: {
       /** Format: int64 */
@@ -9127,6 +9167,58 @@ export interface operations {
         content?: never
       }
       /** @description Failed to run sql query */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-read-only-query': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1ReadOnlyQueryBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to run read-only sql query */
       500: {
         headers: {
           [name: string]: unknown
