@@ -106,7 +106,7 @@ EdgeFunctionsPage.getLayout = (page: React.ReactElement) => {
     return (
       <div className="w-full min-h-full flex flex-col items-stretch">
         <PageHeader size="large">
-          <PageHeaderMeta size="large">
+          <PageHeaderMeta>
             <PageHeaderSummary>
               <PageHeaderTitle>Edge Functions</PageHeaderTitle>
               <PageHeaderDescription>

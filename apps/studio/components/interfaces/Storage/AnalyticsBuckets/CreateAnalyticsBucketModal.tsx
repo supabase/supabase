@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -103,28 +104,33 @@ export const CreateAnalyticsBucketModal = ({
   const { extension: wrappersExtension, state: wrappersExtensionState } =
     useIcebergWrapperExtension()
 
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
-  const { data: buckets = [] } = useAnalyticsBucketsQuery({ projectRef: ref })
+  const { data: buckets = [], isLoading } = useAnalyticsBucketsQuery({ projectRef: ref })
   const icebergCatalogEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
   const wrappersExtenstionNeedsUpgrading = wrappersExtensionState === 'needs-upgrade'
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { mutateAsync: createAnalyticsBucket, isLoading: isCreatingAnalyticsBucket } =
+  const { mutateAsync: createAnalyticsBucket, isPending: isCreatingAnalyticsBucket } =
     useAnalyticsBucketCreateMutation({
       // [Joshen] Silencing the error here as it's being handled in onSubmit
       onError: () => {},
     })
 
-  const { mutateAsync: createIcebergWrapper, isLoading: isCreatingIcebergWrapper } =
+  const { mutateAsync: createIcebergWrapper, isPending: isCreatingIcebergWrapper } =
     useIcebergWrapperCreateMutation()
 
-  const { mutateAsync: enableExtension, isLoading: isEnablingExtension } =
+  const { mutateAsync: enableExtension, isPending: isEnablingExtension } =
     useDatabaseExtensionEnableMutation()
 
   const config = BUCKET_TYPES['analytics']
   const isCreating = isEnablingExtension || isCreatingIcebergWrapper || isCreatingAnalyticsBucket
+  const isDisabled =
+    !canCreateBuckets || !icebergCatalogEnabled || isLoading || buckets.length >= 2 || disabled
 
   const form = useForm<CreateAnalyticsBucketForm>({
     resolver: zodResolver(FormSchema),
@@ -136,7 +142,7 @@ export const CreateAnalyticsBucketModal = ({
     if (!project) return console.error('Project details is required')
     if (!wrappersExtension) return console.error('Unable to find wrappers extension')
 
-    const hasExistingBucket = buckets.some((x) => x.id === values.name)
+    const hasExistingBucket = buckets.some((x) => x.name === values.name)
     if (hasExistingBucket) return toast.error('Bucket name already exists')
 
     try {
@@ -192,7 +198,8 @@ export const CreateAnalyticsBucketModal = ({
           type={buttonType}
           className={buttonClassName}
           icon={<Plus size={14} />}
-          disabled={!canCreateBuckets || !icebergCatalogEnabled || disabled}
+          disabled={isDisabled}
+          tabIndex={isDisabled ? -1 : 0}
           style={{ justifyContent: 'start' }}
           onClick={() => setVisible(true)}
           tooltip={{
@@ -203,7 +210,9 @@ export const CreateAnalyticsBucketModal = ({
                 ? 'Analytics buckets are not enabled for your project. Please contact support to enable it.'
                 : !canCreateBuckets
                   ? 'You need additional permissions to create buckets'
-                  : tooltip?.content?.text,
+                  : buckets.length >= 2
+                    ? 'Bucket limit reached'
+                    : tooltip?.content?.text,
             },
           }}
         >

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { useTemporaryAPIKeyQuery } from 'data/api-keys/temp-api-keys-query'
 import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageKeys } from './keys'
@@ -8,50 +9,40 @@ import { storageKeys } from './keys'
 type CreateIcebergNamespaceVariables = {
   catalogUri: string
   warehouse: string
-  token: string
   namespace: string
 }
 
-// [Joshen] Investigate if we can use the temp API keys here
+const errorPrefix = 'Failed to create Iceberg namespace'
+
 async function createIcebergNamespace({
   catalogUri,
   warehouse,
-  token,
   namespace,
-}: CreateIcebergNamespaceVariables) {
-  let headers = new Headers()
-  // handle both secret key and service role key
-  if (token.startsWith('sb_secret_')) {
+  tempApiKey,
+}: CreateIcebergNamespaceVariables & { tempApiKey?: string }) {
+  try {
+    if (!tempApiKey) throw new Error(`${errorPrefix}: API Key missing`)
+
+    let headers = new Headers()
     headers = await constructHeaders({
       'Content-Type': 'application/json',
-      apikey: `${token}`,
+      apikey: tempApiKey,
     })
     headers.delete('Authorization')
-  } else {
-    headers = await constructHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    })
-  }
 
-  const url = `${catalogUri}/v1/${warehouse}/namespaces`.replaceAll(/(?<!:)\/\//g, '/')
+    const url = `${catalogUri}/v1/${warehouse}/namespaces`.replaceAll(/(?<!:)\/\//g, '/')
 
-  try {
     const response = await fetchHandler(url, {
       headers,
       method: 'POST',
-      body: JSON.stringify({
-        namespace: namespace,
-      }),
+      body: JSON.stringify({ namespace: namespace }),
     })
-
     const result = await response.json()
     if (result.error) {
-      if (result.error.message) {
-        throw new Error(result.error.message)
-      }
-      throw new Error('Failed to create Iceberg namespace')
+      if (result.error.message) throw new Error(`${errorPrefix}: ${result.error.message}`)
+      else throw new Error(errorPrefix)
     }
+
     return result
   } catch (error) {
     handleError(error)
@@ -61,10 +52,11 @@ async function createIcebergNamespace({
 type IcebergNamespaceCreateData = Awaited<ReturnType<typeof createIcebergNamespace>>
 
 export const useIcebergNamespaceCreateMutation = ({
+  projectRef,
   onSuccess,
   onError,
   ...options
-}: Omit<
+}: { projectRef?: string } & Omit<
   UseCustomMutationOptions<
     IcebergNamespaceCreateData,
     ResponseError,
@@ -73,9 +65,11 @@ export const useIcebergNamespaceCreateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const { data } = useTemporaryAPIKeyQuery({ projectRef })
+  const tempApiKey = data?.api_key
 
   return useMutation<IcebergNamespaceCreateData, ResponseError, CreateIcebergNamespaceVariables>({
-    mutationFn: (vars) => createIcebergNamespace(vars),
+    mutationFn: (vars) => createIcebergNamespace({ ...vars, tempApiKey }),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({
         queryKey: storageKeys.icebergNamespace(
@@ -85,7 +79,10 @@ export const useIcebergNamespaceCreateMutation = ({
         ),
       })
       await queryClient.invalidateQueries({
-        queryKey: storageKeys.icebergNamespaces(variables.catalogUri, variables.warehouse),
+        queryKey: storageKeys.icebergNamespaces({
+          catalog: variables.catalogUri,
+          warehouse: variables.warehouse,
+        }),
       })
       await onSuccess?.(data, variables, context)
     },

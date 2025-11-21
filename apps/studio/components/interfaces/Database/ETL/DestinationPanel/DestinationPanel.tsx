@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useFlag, useParams } from 'common'
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -92,22 +93,22 @@ export const DestinationPanel = ({
   )
   const [isFormInteracting, setIsFormInteracting] = useState(false)
 
-  const { mutateAsync: createDestinationPipeline, isLoading: creatingDestinationPipeline } =
+  const { mutateAsync: createDestinationPipeline, isPending: creatingDestinationPipeline } =
     useCreateDestinationPipelineMutation({
       onSuccess: () => form.reset(defaultValues),
     })
 
-  const { mutateAsync: updateDestinationPipeline, isLoading: updatingDestinationPipeline } =
+  const { mutateAsync: updateDestinationPipeline, isPending: updatingDestinationPipeline } =
     useUpdateDestinationPipelineMutation({
       onSuccess: () => form.reset(defaultValues),
     })
 
-  const { mutateAsync: startPipeline, isLoading: startingPipeline } = useStartPipelineMutation()
+  const { mutateAsync: startPipeline, isPending: startingPipeline } = useStartPipelineMutation()
 
-  const { mutateAsync: createS3AccessKey, isLoading: isCreatingS3AccessKey } =
+  const { mutateAsync: createS3AccessKey, isPending: isCreatingS3AccessKey } =
     useS3AccessKeyCreateMutation()
 
-  const { mutateAsync: createNamespace, isLoading: isCreatingNamespace } =
+  const { mutateAsync: createNamespace, isPending: isCreatingNamespace } =
     useIcebergNamespaceCreateMutation()
 
   const {
@@ -126,7 +127,11 @@ export const DestinationPanel = ({
     pipelineId: existingDestination?.pipelineId,
   })
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef, reveal: true })
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: apiKeys } = useAPIKeysQuery(
+    { projectRef, reveal: true },
+    { enabled: canReadAPIKeys }
+  )
   const { serviceKey } = getKeys(apiKeys)
   const catalogToken = serviceKey?.api_key ?? ''
 
@@ -225,7 +230,6 @@ export const DestinationPanel = ({
       await createNamespace({
         catalogUri,
         warehouse: data.warehouseName!,
-        token: catalogToken,
         namespace: data.newNamespaceName,
       })
 

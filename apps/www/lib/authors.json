@@ -486,6 +486,14 @@
     "author_image_url": "https://github.com/chrischandler.png"
   },
   {
+    "author_id": "chris_caruso",
+    "author": "Chris Caruso",
+    "position": "Senior Solutions Architect",
+    "company": "Supabase",
+    "author_url": "https://www.linkedin.com/in/carusochristian/",
+    "author_image_url": "https://github.com/carusocv.png"
+  },
+  {
     "author_id": "bdon",
     "author": "Brandon Liu",
     "username": "bdon",
@@ -723,5 +731,13 @@
     "company": "Supabase",
     "author_url": "https://www.linkedin.com/in/david-wilson-285564140",
     "author_image_url": "/images/avatars/dave-wilson.jpg"
+  },
+  {
+    "author_id": "seth_kramer",
+    "author": "Seth Kramer",
+    "position": "Founder",
+    "company": "No Code MBA",
+    "author_url": "https://www.linkedin.com/in/seth-kramer-62806b63/",
+    "author_image_url": "/images/avatars/seth-kramer.jpeg"
   }
 ]

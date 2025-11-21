@@ -116,7 +116,7 @@ export const SubscriptionPlanUpdateDialog = ({
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   }
 
-  const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
+  const { mutate: updateOrgSubscription, isPending: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
       onSuccess: (data) => {
         if (data.pending_payment_intent_secret) {
@@ -133,7 +133,7 @@ export const SubscriptionPlanUpdateDialog = ({
     }
   )
 
-  const { mutate: confirmPendingSubscriptionChange, isLoading: isConfirming } =
+  const { mutate: confirmPendingSubscriptionChange, isPending: isConfirming } =
     useConfirmPendingSubscriptionChangeMutation({
       onSuccess: () => {
         onSuccessfulPlanChange()
@@ -672,19 +672,6 @@ export const SubscriptionPlanUpdateDialog = ({
                         </div>
                       ))}
                     </div>
-
-                    {currentPlanMeta.id === 'free' && selectedTier !== 'tier_free' && (
-                      <div className="mb-4">
-                        <Admonition type="note">
-                          <p>
-                            Please note: Existing support cases will remain in the Free support
-                            queue after your subscription is upgraded. For faster assistance under
-                            your new plan, please open a new support case once the upgrade is
-                            complete.
-                          </p>
-                        </Admonition>
-                      </div>
-                    )}
                   </div>
                 )}
           </div>

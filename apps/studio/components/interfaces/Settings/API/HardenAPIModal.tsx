@@ -47,14 +47,14 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
   const isAPISchemaExposed = exposedSchemas.includes('api')
   const isPublicSchemaExposed = exposedSchemas.includes('public')
 
-  const { mutate: createAndExposeAPISchema, isLoading: isCreatingAPISchema } =
+  const { mutate: createAndExposeAPISchema, isPending: isCreatingAPISchema } =
     useCreateAndExposeAPISchemaMutation({
       onSuccess: () => {
         toast.success(`Successfully created api schema and exposed via Data API`)
       },
     })
 
-  const { mutate: updatePostgrestConfig, isLoading: isUpdatingConfig } =
+  const { mutate: updatePostgrestConfig, isPending: isUpdatingConfig } =
     useProjectPostgrestConfigUpdateMutation({
       onSuccess: () => {
         toast.success('Success removed public schema from exposed schemas')

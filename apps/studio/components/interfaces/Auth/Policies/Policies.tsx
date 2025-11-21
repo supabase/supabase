@@ -59,6 +59,7 @@ export const Policies = ({
       closeConfirmModal()
     },
   })
+
   const { mutate: deleteDatabasePolicy } = useDatabasePolicyDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted policy!')

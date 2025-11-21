@@ -1,26 +1,26 @@
+import { Button, Card, CardContent } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
+  PageHeaderDescription,
   PageHeaderMeta,
   PageHeaderSummary,
   PageHeaderTitle,
-  PageHeaderDescription,
 } from 'ui-patterns/PageHeader'
 import {
   PageSection,
+  PageSectionContent,
+  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-  PageSectionDescription,
-  PageSectionContent,
 } from 'ui-patterns/PageSection'
-import { Button, Card, CardContent } from 'ui'
 
 export default function PageLayoutDetail() {
   return (
     <div className="w-full">
       <PageHeader size="large">
-        <PageHeaderMeta size="large">
+        <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Billing</PageHeaderTitle>
             <PageHeaderDescription>
@@ -70,7 +70,7 @@ export default function PageLayoutDetail() {
         <PageSection orientation="horizontal">
           <PageSectionMeta>
             <PageSectionSummary>
-              <PageSectionTitle>Cost Control</PageSectionTitle>
+              <PageSectionTitle>Cost control</PageSectionTitle>
               <PageSectionDescription>
                 Set spending limits and alerts to manage your organization's costs.
               </PageSectionDescription>

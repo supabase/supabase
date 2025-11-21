@@ -46,7 +46,7 @@ const BannedIPs = () => {
     },
   })
 
-  const { mutate: unbanIPs, isLoading: isUnbanning } = useBannedIPsDeleteMutation({
+  const { mutate: unbanIPs, isPending: isUnbanning } = useBannedIPsDeleteMutation({
     onSuccess: () => {
       toast.success('IP address successfully unbanned')
       setSelectedIPToUnban(null) // Reset the selected IP for unban
