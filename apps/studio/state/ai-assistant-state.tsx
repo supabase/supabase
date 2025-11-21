@@ -315,7 +315,7 @@ export const createAiAssistantState = (): AiAssistantState => {
     },
 
     newChat: (
-      options?: { name?: string } & Partial<
+      options?: { name?: string; initialMessage?: string } & Partial<
         Pick<AiAssistantData, 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
       >
     ) => {
@@ -335,7 +335,17 @@ export const createAiAssistantState = (): AiAssistantState => {
       state.activeChatId = chatId
       
       // Create new chat instance
-      state.chatInstances[chatId] = ref(createChatInstance(state, { id: chatId, initialMessages: [] }))
+      // Create new chat instance
+      const chatInstance = createChatInstance(state, { id: chatId, initialMessages: [] })
+
+      state.chatInstances[chatId] = ref(chatInstance)
+
+      // If initialMessage is provided, append it to the chat instance
+      if (options?.initialMessage) {
+        chatInstance.sendMessage({
+          text: options.initialMessage,
+        })
+      }
 
       // Update non-chat related state based on options, falling back to current state, then initial
       state.initialInput = options?.initialInput ?? INITIAL_AI_ASSISTANT.initialInput
@@ -508,7 +518,7 @@ export type AiAssistantState = AiAssistantData & {
   setContext: (context: Partial<AiAssistantContext>) => void
   setModel: (model: AssistantModel) => void
   newChat: (
-    options?: { name?: string } & Partial<
+    options?: { name?: string; initialMessage?: string } & Partial<
       Pick<AiAssistantData, 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
     >
   ) => string
