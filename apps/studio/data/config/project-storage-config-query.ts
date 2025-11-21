@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useFlag } from 'common'
 import { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from 'lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
@@ -54,13 +55,15 @@ export const useProjectStorageConfigQuery = <TData = ProjectStorageConfigData>(
   })
 
 export const useIsAnalyticsBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
+  const { storageAnalytics } = useIsFeatureEnabled(['storage:analytics'])
   const { data } = useProjectStorageConfigQuery({ projectRef })
   const isIcebergCatalogEnabled = !!data?.features.icebergCatalog?.enabled
-  return isIcebergCatalogEnabled
+  return storageAnalytics && isIcebergCatalogEnabled
 }
 
 export const useIsVectorBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
+  const { storageVectors } = useIsFeatureEnabled(['storage:vectors'])
   // [Joshen] Temp using feature flag - will need to shift to storage config like analytics bucket once ready
   const isVectorBucketsEnabled = useFlag('storageAnalyticsVector')
-  return isVectorBucketsEnabled
+  return storageVectors && isVectorBucketsEnabled
 }

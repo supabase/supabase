@@ -1,19 +1,28 @@
-import { ChevronRight, Info, Loader2, Plus, RefreshCw } from 'lucide-react'
+import { ChevronRight, Info, Loader2, MoreVertical, Plus, RefreshCw, Trash } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import type { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { FormattedWrapperTable } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { ImportForeignSchemaDialog } from 'components/interfaces/Storage/ImportForeignSchemaDialog'
+import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useFDWDropForeignTableMutation } from 'data/fdw/fdw-drop-foreign-table-mutation'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
-import { FDW } from 'data/fdw/fdws-query'
+import { useIcebergNamespaceDeleteMutation } from 'data/storage/iceberg-namespace-delete-mutation'
+import { useIcebergNamespaceTableDeleteMutation } from 'data/storage/iceberg-namespace-table-delete-mutation'
 import { useIcebergNamespaceTablesQuery } from 'data/storage/iceberg-namespace-tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH } from 'lib/constants'
 import {
   Button,
   Card,
   CardHeader,
   CardTitle,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   LoadingLine,
   Table,
   TableBody,
@@ -25,40 +34,44 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { HIDE_REPLICATION_USER_FLOW } from '../AnalyticsBucketDetails.constants'
 import { getNamespaceTableNameFromPostgresTableName } from '../AnalyticsBucketDetails.utils'
+import { InitializeForeignSchemaDialog } from '../InitializeForeignSchemaDialog'
+import { UpdateForeignSchemaDialog } from '../UpdateForeignSchemaDialog'
 import { useAnalyticsBucketAssociatedEntities } from '../useAnalyticsBucketAssociatedEntities'
 import { TableRowComponent } from './TableRowComponent'
 
 type NamespaceWithTablesProps = {
-  bucketName?: string
   namespace: string
   sourceType: 'replication' | 'direct'
   schema: string
   tables: (FormattedWrapperTable & { id: number })[]
-  wrapperInstance: FDW
   wrapperValues: Record<string, string>
-  wrapperMeta: WrapperMeta
   pollIntervalNamespaceTables: number
   setPollIntervalNamespaceTables: (value: number) => void
 }
 
 export const NamespaceWithTables = ({
-  bucketName,
   namespace,
   sourceType = 'direct',
   schema,
   tables,
-  wrapperInstance,
   wrapperValues,
-  wrapperMeta,
   pollIntervalNamespaceTables,
   setPollIntervalNamespaceTables,
 }: NamespaceWithTablesProps) => {
   const { ref: projectRef, bucketId } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [importForeignSchemaShown, setImportForeignSchemaShown] = useState(false)
+  const [showConfirmDeleteNamespace, setShowConfirmDeleteNamespace] = useState(false)
+  const [isDeletingNamespace, setIsDeletingNamespace] = useState(false)
 
-  const { publication } = useAnalyticsBucketAssociatedEntities({ projectRef, bucketId })
+  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
+  const { publication, icebergWrapper } = useAnalyticsBucketAssociatedEntities({
+    projectRef,
+    bucketId,
+  })
 
   const {
     data: tablesData = [],
@@ -90,6 +103,17 @@ export const NamespaceWithTables = ({
     }
   )
 
+  const connectedForeignTablesForNamespace = (icebergWrapper?.tables ?? []).filter((x) =>
+    x.options[0].startsWith(`table=${namespace}.`)
+  )
+  const tablesWithConnectedForeignTables = connectedForeignTablesForNamespace.reduce((a, b) => {
+    const table = b.options[0].split(`table=${namespace}.`)[1]
+    a.add(table)
+    return a
+  }, new Set<string>())
+  const unconnectedTables = tablesData.filter((x) => !tablesWithConnectedForeignTables.has(x))
+  const hasUnconnectedForeignTablesForNamespace = unconnectedTables.length > 0
+
   const publicationTables = publication?.tables ?? []
   const publicationTablesNotSyncedToNamespaceTables = publicationTables.filter(
     (x) => !tablesData.includes(getNamespaceTableNameFromPostgresTableName(x))
@@ -99,12 +123,19 @@ export const NamespaceWithTables = ({
 
   const { mutateAsync: importForeignSchema, isPending: isImportingForeignSchema } =
     useFDWImportForeignSchemaMutation()
+  const { mutateAsync: deleteNamespace } = useIcebergNamespaceDeleteMutation({ projectRef })
+  const { mutateAsync: dropForeignTable } = useFDWDropForeignTableMutation()
+  const { mutateAsync: deleteNamespaceTable } = useIcebergNamespaceTableDeleteMutation({
+    projectRef,
+  })
 
   const rescanNamespace = async () => {
+    if (!icebergWrapper) return console.error('Iceberg wrapper cannot be found')
+
     await importForeignSchema({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      serverName: wrapperInstance.server_name,
+      serverName: icebergWrapper.server_name,
       sourceSchema: namespace,
       targetSchema: schema,
     })
@@ -142,14 +173,57 @@ export const NamespaceWithTables = ({
     return !hasClashes
   }, [schema, tables.length])
 
-  // Determine what schema name to display
   const displaySchema = useMemo(() => {
-    // If we have a target schema, use it
+    // If we have a target schema, use it, otherwise show the incoming schema (namespace name)
     if (schema) return schema
-
-    // Otherwise, show the incoming schema (namespace name)
     return `fdw_analytics_${namespace.replaceAll('-', '_')}`
   }, [schema, namespace])
+
+  const onConfirmDeleteNamespace = async () => {
+    if (!bucketId) return console.error('Bucket ID is required')
+    // Construct catalog URI for namespace creation
+    const protocol = projectSettings?.app_config?.protocol ?? 'https'
+    const endpoint =
+      projectSettings?.app_config?.storage_endpoint || projectSettings?.app_config?.endpoint
+    const catalogUri = getCatalogURI(project?.ref ?? '', protocol, endpoint)
+
+    try {
+      setIsDeletingNamespace(true)
+
+      // [Joshen] Delete all namespace tables
+      await Promise.all(
+        allTables.map((table) =>
+          deleteNamespaceTable({
+            catalogUri,
+            warehouse: bucketId,
+            namespace,
+            table: table.name,
+          })
+        )
+      )
+
+      // Delete all foreign tables that corresponding to the namespace tables
+      await Promise.all(
+        tables.map((table) =>
+          dropForeignTable({
+            projectRef,
+            connectionString: project?.connectionString,
+            schemaName: table.schema_name,
+            tableName: table.table_name,
+          })
+        )
+      )
+
+      await deleteNamespace({ catalogUri, warehouse: bucketId, namespace })
+
+      toast.success(`Successfully deleted namespace "${namespace}"`)
+      setShowConfirmDeleteNamespace(false)
+    } catch (error: any) {
+      toast.error(`Failed to delete namespace: ${error.message}`)
+    } finally {
+      setIsDeletingNamespace(false)
+    }
+  }
 
   useEffect(() => {
     if (isSuccessNamespaceTables && !isSyncedPublicationTablesAndNamespaceTables) {
@@ -160,40 +234,46 @@ export const NamespaceWithTables = ({
 
   return (
     <Card>
-      <CardHeader className="flex flex-row justify-between items-center px-4 py-5 space-y-0">
+      <CardHeader className="flex flex-row justify-between items-center px-4 py-4 space-y-0">
         <CardTitle className="text-sm font-normal font-sans normal-case leading-none flex flex-row items-center gap-x-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="flex flex-row items-center gap-x-1 text-foreground-lighter">
-                {sourceType === 'direct' ? namespace : 'public'}
-                <ChevronRight size={12} className="text-foreground-muted" />
-              </span>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">
-              <p>{sourceType === 'direct' ? 'Analytics' : 'Postgres'} schema</p>
-            </TooltipContent>
-          </Tooltip>
-          {validSchema && (
-            <Tooltip>
-              <TooltipTrigger
-                asChild
-                className={tables.length === 0 ? `flex flex-row items-center gap-x-1` : undefined}
-              >
-                <span
-                  className={
-                    tables.length > 0
-                      ? `text-foreground`
-                      : `text-foreground-muted flex flex-row items-center gap-x-1`
-                  }
+          <div className="flex flex-row items-center gap-x-3 text-foreground">
+            <img
+              src={`${BASE_PATH}/img/icons/iceberg-icon.svg`}
+              alt="Apache Iceberg icon"
+              className="w-5 h-5"
+            />
+            <div className="flex flex-col gap-y-0.5">
+              <p className="text-xs font-mono uppercase text-foreground-lighter">
+                Iceberg namespace
+              </p>
+              <p className="text-sm">{namespace}</p>
+            </div>
+          </div>
+
+          {!HIDE_REPLICATION_USER_FLOW && validSchema && (
+            <>
+              <ChevronRight size={12} className="text-foreground-muted" />
+              <Tooltip>
+                <TooltipTrigger
+                  asChild
+                  className={tables.length === 0 ? `flex flex-row items-center gap-x-1` : undefined}
                 >
-                  {displaySchema}
-                  {tables.length === 0 && <Info size={12} />}
-                </span>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p>Postgres schema{tables.length === 0 && ' that will be created'}</p>
-              </TooltipContent>
-            </Tooltip>
+                  <span
+                    className={
+                      tables.length > 0
+                        ? `text-foreground`
+                        : `text-foreground-muted flex flex-row items-center gap-x-1`
+                    }
+                  >
+                    {displaySchema}
+                    {tables.length === 0 && <Info size={12} />}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>Postgres schema{tables.length === 0 && ' that will be created'}</p>
+                </TooltipContent>
+              </Tooltip>
+            </>
           )}
         </CardTitle>
 
@@ -220,17 +300,43 @@ export const NamespaceWithTables = ({
               </TooltipContent>
             </Tooltip>
           )}
-          {missingTables.length > 0 && (
-            <Button
-              type={schema ? 'default' : 'warning'}
-              size="tiny"
-              icon={schema ? <RefreshCw /> : <Plus size={14} />}
-              onClick={() => (schema ? rescanNamespace() : setImportForeignSchemaShown(true))}
-              loading={isImportingForeignSchema || isLoadingNamespaceTables}
-            >
-              {schema ? 'Sync tables' : `Connect to table${missingTables.length > 1 ? 's' : ''}`}
-            </Button>
-          )}
+
+          <div className="flex items-center gap-x-2">
+            {HIDE_REPLICATION_USER_FLOW ? (
+              <>
+                {/* Is this just the import foreign schema dialog then? */}
+                {connectedForeignTablesForNamespace.length === 0 ? (
+                  <InitializeForeignSchemaDialog namespace={namespace} />
+                ) : hasUnconnectedForeignTablesForNamespace ? (
+                  <UpdateForeignSchemaDialog namespace={namespace} tables={unconnectedTables} />
+                ) : null}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button type="default" className="w-7" icon={<MoreVertical />} />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-fit min-w-[180px]">
+                    <DropdownMenuItem
+                      className="flex items-center gap-x-2"
+                      onClick={() => setShowConfirmDeleteNamespace(true)}
+                    >
+                      <Trash size={12} className="text-foreground-lighter" />
+                      <p>Delete namespace</p>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : missingTables.length > 0 ? (
+              <Button
+                type={schema ? 'default' : 'warning'}
+                size="tiny"
+                icon={schema ? <RefreshCw /> : <Plus size={14} />}
+                onClick={() => (schema ? rescanNamespace() : setImportForeignSchemaShown(true))}
+                loading={isImportingForeignSchema || isLoadingNamespaceTables}
+              >
+                {schema ? 'Sync tables' : `Connect to table${missingTables.length > 1 ? 's' : ''}`}
+              </Button>
+            ) : null}
+          </div>
         </div>
       </CardHeader>
 
@@ -240,7 +346,7 @@ export const NamespaceWithTables = ({
         <TableHeader>
           <TableRow>
             <TableHead className={allTables.length === 0 ? 'text-foreground-muted' : undefined}>
-              Name
+              <span className="pl-8">Table name</span>
             </TableHead>
             {!!publication && (
               <TableHead className={allTables.length === 0 ? 'hidden' : undefined}>
@@ -269,20 +375,34 @@ export const NamespaceWithTables = ({
                 table={table}
                 namespace={namespace}
                 schema={displaySchema}
-                isLoading={isImportingForeignSchema || isLoadingNamespaceTables}
               />
             ))
           )}
         </TableBody>
       </Table>
+
       <ImportForeignSchemaDialog
-        bucketName={bucketName ?? ''}
         namespace={namespace}
         circumstance="clash"
-        wrapperMeta={wrapperMeta}
         visible={importForeignSchemaShown}
         onClose={() => setImportForeignSchemaShown(false)}
       />
+
+      <ConfirmationModal
+        size="medium"
+        variant="warning"
+        loading={isDeletingNamespace}
+        title={`Confirm to delete "${namespace}"`}
+        description="This action cannot be undone."
+        visible={showConfirmDeleteNamespace}
+        onCancel={() => setShowConfirmDeleteNamespace(false)}
+        onConfirm={() => onConfirmDeleteNamespace()}
+      >
+        <p className="text-sm">
+          This will remove all Iceberg tables under the namespace, as well as any associated foreign
+          tables. Are you sure?
+        </p>
+      </ConfirmationModal>
     </Card>
   )
 }

@@ -11,14 +11,13 @@ type GetNamespacesVariables = {
   projectRef?: string
 }
 
-const errorPrefix = 'Failed to delete Iceberg namespaces'
+const errorPrefix = 'Failed to retrieve Iceberg namespaces'
 
 async function getNamespaces({
   catalogUri,
   warehouse,
   tempApiKey,
 }: GetNamespacesVariables & { tempApiKey?: string }) {
-  console.log('getNamespaces', { warehouse })
   try {
     if (!tempApiKey) throw new Error(`${errorPrefix}: API Key missing`)
 
