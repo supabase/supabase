@@ -79,7 +79,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
   const { mutateAsync: updateFDW } = useFDWUpdateMutation()
   const { mutateAsync: dropForeignTable } = useFDWDropForeignTableMutation()
   const { mutateAsync: deleteNamespaceTable, isLoading: isDeletingNamespaceTable } =
-    useIcebergNamespaceTableDeleteMutation({ projectRef, onError: () => {} })
+    useIcebergNamespaceTableDeleteMutation({ onError: () => {} })
   const { mutateAsync: updatePublication } = useUpdatePublicationMutation()
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
 
@@ -226,6 +226,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
 
       const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
       await deleteNamespaceTable({
+        projectRef,
         catalogUri: wrapperValues.catalog_uri,
         warehouse: wrapperValues.warehouse,
         namespace: namespace,
@@ -255,6 +256,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
       setIsRemovingTable(true)
       const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
       await deleteNamespaceTable({
+        projectRef,
         catalogUri: wrapperValues.catalog_uri,
         warehouse: wrapperValues.warehouse,
         namespace: namespace,
