@@ -50,7 +50,7 @@ export const ErrorDetailsButton = ({ tableName, reason, solution }: ErrorDetails
             )}
             language="bash"
             value={reason}
-            className="[&_code]:text-xs [&_code]:text-foreground"
+            className="[&_code]:text-xs [&_code]:text-foreground [&_span]:!text-foreground"
           />
           {/* Solution if available */}
           {solution && (
