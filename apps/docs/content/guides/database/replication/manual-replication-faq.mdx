@@ -1,21 +1,22 @@
 ---
 id: 'replication-faq'
-title: 'FAQs'
-description: 'Considerations and FAQs when setting up replication'
-sidebar_label: 'FAQs'
+title: 'Replication FAQ'
+description: 'Frequently asked questions about manual database replication.'
+subtitle: 'Common questions and considerations when setting up manual replication.'
+sidebar_label: 'FAQ'
 ---
 
-# Which connection string should be used?
+## Which connection string should be used?
 
 Always use the direct connection string for logical replication.
 
 Connections through a pooler, such as Supavisor, will not work.
 
-# The tool in use does not support IPv6
+## The tool in use does not support IPv6
 
 You can enable the [IPv4 add-on](/docs/guides/platform/ipv4-address) for your project.
 
-# What is XMIN and should it be used?
+## What is XMIN and should it be used?
 
 Xmin is a different form of replication from logical replication and should only be used if logical replication is not available for your database (i.e. older versions of Postgres).
 
@@ -23,15 +24,15 @@ Xmin performs replication by checking the [xmin system column](https://www.postg
 
 It does not capture deletion of data and is **not recommended**, particularly for larger databases.
 
-# Can replication be configured in the Dashboard?
+## Can replication be configured in the Dashboard?
 
 You can view [publications](/dashboard/project/default/database/publications) in the Dashboard but all steps to configure replication must be done using the [SQL Editor](/dashboard/project/default/sql/new) or a CLI tool of your choice.
 
-# How to configure database settings for replication?
+## How to configure database settings for replication?
 
 Yes. Using the Supabase CLI, you can [configure database settings](/docs/guides/database/custom-postgres-config#cli-configurable-settings) to optimize them for your replication needs. These values can vary depending on the activity of your database size and activity.
 
-# What are some important configuration options?
+## What are some important configuration options?
 
 Some of the more important options to be aware of are:
 

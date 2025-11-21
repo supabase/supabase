@@ -25,6 +25,7 @@ import { useReplicationPipelineByIdQuery } from 'data/etl/pipeline-by-id-query'
 import { useReplicationPipelineReplicationStatusQuery } from 'data/etl/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from 'data/etl/pipeline-status-query'
 import { useReplicationPipelineVersionQuery } from 'data/etl/pipeline-version-query'
+import { useRestartPipelineHelper } from 'data/etl/restart-pipeline-helper'
 import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/etl/stop-pipeline-mutation'
 import {
@@ -105,6 +106,7 @@ export const ReplicationPipelineStatus = () => {
 
   const { mutateAsync: startPipeline, isPending: isStartingPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline, isPending: isStoppingPipeline } = useStopPipelineMutation()
+  const { restartPipeline } = useRestartPipelineHelper()
 
   const destinationName = pipeline?.destination_name
   const statusName = getStatusName(pipelineStatusData?.status)
@@ -169,7 +171,7 @@ export const ReplicationPipelineStatus = () => {
         await stopPipeline({ projectRef, pipelineId: pipeline.id })
       } else if (statusName === 'failed') {
         setRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
-        await startPipeline({ projectRef, pipelineId: pipeline.id })
+        await restartPipeline({ projectRef, pipelineId: pipeline.id })
       }
     } catch (error) {
       toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
@@ -411,7 +413,7 @@ export const ReplicationPipelineStatus = () => {
                                 Status unavailable while pipeline is {config.badge.toLowerCase()}
                               </p>
                             ) : (
-                              <div className="space-y-3">
+                              <div className="flex flex-col gap-y-2">
                                 <div className="text-sm text-foreground">
                                   {statusConfig.description}
                                 </div>
@@ -459,6 +461,7 @@ export const ReplicationPipelineStatus = () => {
           </div>
         )}
       </div>
+
       <UpdateVersionModal
         visible={showUpdateVersionModal}
         pipeline={pipeline}

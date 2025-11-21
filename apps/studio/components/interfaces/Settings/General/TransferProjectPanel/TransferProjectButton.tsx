@@ -61,7 +61,8 @@ export const TransferProjectButton = () => {
         queryKey: projectKeys.projectTransferPreview(projectRef, selectedOrg),
       })
     }
-  }, [isOpen, projectRef, selectedOrg, queryClient])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen])
 
   const { can: canTransferProject } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,

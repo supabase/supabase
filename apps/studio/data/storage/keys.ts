@@ -18,8 +18,17 @@ export const storageKeys = {
     catalog: string
     warehouse: string
   }) => [projectRef, 'catalog', catalog, 'warehouse', warehouse, 'namespaces'] as const,
-  icebergNamespace: (catalog: string, warehouse: string, namespace: string) =>
-    ['catalog', catalog, 'warehouse', warehouse, 'namespaces', namespace] as const,
+  icebergNamespace: ({
+    projectRef,
+    catalog,
+    warehouse,
+    namespace,
+  }: {
+    projectRef?: string
+    catalog: string
+    warehouse: string
+    namespace: string
+  }) => [projectRef, 'catalog', catalog, 'warehouse', warehouse, 'namespaces', namespace] as const,
   icebergNamespaceTables: ({
     projectRef,
     catalog,
