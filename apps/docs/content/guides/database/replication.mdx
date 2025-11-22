@@ -1,39 +1,55 @@
 ---
-title: 'Replication and change data capture'
-description: 'An introduction to logical replication and change data capture'
+id: 'replication'
+title: 'Database Replication'
+description: 'Replicate your database to external destinations using ETL or manual replication.'
+subtitle: 'An introduction to database replication and change data capture.'
+sidebar_label: 'Overview'
 ---
 
 Replication is the process of copying changes from your database to another location. It's also referred to as change data capture (CDC): capturing all the changes that occur to your data.
 
 ## Use cases
 
-You might use replication for:
+You might use database replication for:
 
 - **Analytics and Data Warehousing**: Replicate your operational database to analytics platforms for complex analysis without impacting your application's performance.
 - **Data Integration**: Keep your data synchronized across different systems and services in your tech stack.
 - **Backup and Disaster Recovery**: Maintain up-to-date copies of your data in different locations.
-- **Read Scaling**: Distribute read operations across multiple database instances to improve performance.
 
-## Replication in Postgres
+## Replication methods
 
-Postgres comes with built-in support for replication via publications and replication slots. Refer to the [Concepts and terms](#concepts-and-terms) section to learn how replication works.
+Supabase supports two methods for replicating your database to external destinations:
 
-## Setting up and monitoring replication in Supabase
+### ETL replication
 
-- [Setting up replication](/docs/guides/database/replication/setting-up-replication)
-- [Monitoring replication](/docs/guides/database/replication/monitoring-replication)
+<Admonition type="caution" label="Private Alpha">
 
-<Admonition type="tip">
-
-If you want to set up a read replica, see [Read Replicas](/docs/guides/platform/read-replicas) instead. If you want to sync your data in real time to a client such as a browser or mobile app, see [Realtime](/docs/guides/realtime) instead. For configuring replication to an ETL destination, use the [Dashboard](/dashboard/project/_/database/replication).
+ETL Replication is currently in private alpha. Access is limited and features may change.
 
 </Admonition>
+
+Use Supabase ETL to automatically replicate data to supported systems.
+
+- [Set up ETL Replication](/docs/guides/database/replication/etl-replication-setup)
+
+### Manual replication
+
+Configure your own replication using external tools and Postgres's native logical replication. This gives you full control over the replication process and allows you to use any tool that supports Postgres logical replication.
+
+- [Set up Manual Replication](/docs/guides/database/replication/manual-replication-setup)
+
+## Related features
+
+Choose the data syncing method based on your use case:
+
+- For realtime features and syncing data to clients (browsers, mobile apps), see [Realtime](/docs/guides/realtime)
+- For deploying read-only databases across multiple regions, see [Read Replicas](/docs/guides/platform/read-replicas)
 
 ## Concepts and terms
 
 ### Write-Ahead Log (WAL)
 
-Postgres uses a system called the Write-Ahead Log (WAL) to manage changes to the database. As you make changes, they are appended to the WAL (which is a series of files (also called "segments"), where the file size can be specified). Once one segment is full, Postgres will start appending to a new segment. After a period of time, a checkpoint occurs and Postgres synchronizes the WAL with your database. Once the checkpoint is complete, then the WAL files can be removed from disk and free up space.
+Postgres uses a system called the Write-Ahead Log (WAL) to manage changes to the database. As you make changes, they are appended to the WAL, which is a series of files (also called "segments") where the file size can be specified. Once one segment is full, Postgres will start appending to a new segment. After a period of time, a checkpoint occurs and Postgres synchronizes the WAL with your database. Once the checkpoint is complete, then the WAL files can be removed from disk and free up space.
 
 ### Logical replication and WAL
 
