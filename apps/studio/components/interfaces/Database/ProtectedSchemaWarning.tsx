@@ -84,8 +84,8 @@ export const ProtectedSchemaWarning = ({
         </p>
       ) : reason === 'fdw' && fdwType === 's3_vectors' ? (
         <p>
-          The <code className="text-xs">{schema}</code> schema is used by Supabase to connect to
-          vector buckets and is read-only through the dashboard.
+          The <code className="text-code-inline">{schema}</code> schema is used by Supabase to
+          connect to vector buckets and is read-only through the dashboard.
         </p>
       ) : (
         <>
