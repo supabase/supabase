@@ -255,7 +255,6 @@ export const EditorTabs = () => {
               </motion.button>
             )}
           </AnimatePresence>
-
           <div className="grow h-full border-b pr-6" />
         </TabsList_Shadcn_>
       </Tabs_Shadcn_>
