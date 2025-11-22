@@ -1,0 +1,77 @@
+{
+  "name": "supabase-llm-docs",
+  "version": "1.0.0",
+  "description": "Generate LLM-optimized documentation from Supabase SDK specifications (TypeScript version)",
+  "type": "module",
+  "keywords": [
+    "supabase",
+    "documentation",
+    "llm",
+    "openref",
+    "claude",
+    "gpt",
+    "ai",
+    "typescript"
+  ],
+  "author": "Zyepher",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "bin": {
+    "supabase-llm-docs": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "config",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "dev": "tsx src/cli.ts",
+    "build": "tsup src/cli.ts src/index.ts --format esm --dts --clean --minify",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src tests --ext .ts",
+    "lint:fix": "eslint src tests --ext .ts --fix",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "type-check": "tsc --noEmit",
+    "generate": "tsx src/cli.ts generate",
+    "list": "tsx src/cli.ts list-sdks",
+    "validate": "tsx src/cli.ts validate",
+    "prepublishOnly": "npm run build && npm run test",
+    "clean": "rm -rf dist output/*/",
+    "benchmark": "tsx tests/benchmark.ts"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.0.0",
+    "js-yaml": "^4.1.0",
+    "ora": "^8.0.1",
+    "undici": "^6.6.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.11.19",
+    "@typescript-eslint/eslint-plugin": "^7.0.1",
+    "@typescript-eslint/parser": "^7.0.1",
+    "@vitest/coverage-v8": "^1.2.2",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "prettier": "^3.2.5",
+    "tsup": "^8.0.2",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.2"
+  }
+}

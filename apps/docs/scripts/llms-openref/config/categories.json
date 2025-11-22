@@ -1,0 +1,103 @@
+{
+  "categories": {
+    "introduction": {
+      "title": "Introduction",
+      "description": "Getting started with the Supabase SDK",
+      "systemPrompt": "This is the introduction section for Supabase {sdk_name}.",
+      "operations": [],
+      "order": 1
+    },
+    "installing": {
+      "title": "Installing",
+      "description": "Installation and setup instructions",
+      "systemPrompt": "This section covers installation for Supabase {sdk_name}.",
+      "operations": [],
+      "order": 2
+    },
+    "initializing": {
+      "title": "Initializing",
+      "description": "Initialize the Supabase client",
+      "systemPrompt": "This section covers client initialization for Supabase {sdk_name}.",
+      "operations": ["initializing"],
+      "order": 3
+    },
+    "database": {
+      "title": "Database Operations",
+      "description": "Query and manipulate data using PostgREST",
+      "systemPrompt": "This is the developer documentation for Supabase {sdk_name} - Database Operations.",
+      "operations": [
+        "select", "insert", "update", "upsert", "delete", "rpc",
+        "using-filters", "eq", "neq", "gt", "gte", "lt", "lte",
+        "like", "ilike", "is", "in", "contains", "containedBy", "contained-by",
+        "overlaps", "rangeLt", "rangeGt", "rangeGte", "rangeLte",
+        "rangeAdjacent", "range-lt", "range-gt", "range-gte", "range-lte", "range-adjacent",
+        "textSearch", "text-search", "match", "not", "or", "filter",
+        "using-modifiers", "db-modifiers-select", "order", "limit",
+        "range", "max-affected", "single", "maybe-single", "stream", "csv", "explain"
+      ],
+      "order": 4
+    },
+    "auth": {
+      "title": "Authentication",
+      "description": "User authentication and session management",
+      "systemPrompt": "This is the developer documentation for Supabase {sdk_name} - Authentication.",
+      "operations": [
+        "auth-api", "sign-up", "sign-in-with-password", "sign-in-with-otp",
+        "sign-in-with-oauth", "sign-in-anonymously", "sign-in-with-id-token",
+        "sign-in-with-sso", "sign-out", "verify-otp", "get-session", "get-user",
+        "update-user", "reset-password-email", "auth-reset-password-for-email",
+        "generate-link", "on-auth-state-change",
+        "get-user-identities", "link-identity", "link-identity-with-id-token",
+        "unlink-identity", "send-password-reauthentication",
+        "resend-email-or-phone-otps", "set-session", "refresh-session",
+        "get-claims", "start-auto-refresh", "stop-auto-refresh",
+        "exchange-code-for-session", "auth-mfa-api", "mfa-enroll",
+        "mfa-challenge", "mfa-verify", "mfa-challenge-and-verify",
+        "mfa-unenroll", "mfa-get-authenticator-assurance-level",
+        "mfa-list-factors", "admin-api", "delete-user", "get-user-by-id",
+        "list-users", "create-user", "update-user-by-id",
+        "invite-user-by-email", "admin-oauth-list-clients",
+        "admin-oauth-create-client", "admin-oauth-get-client",
+        "admin-oauth-delete-client", "admin-oauth-regenerate-client-secret"
+      ],
+      "order": 5
+    },
+    "storage": {
+      "title": "Storage",
+      "description": "File upload, download, and management",
+      "systemPrompt": "This is the developer documentation for Supabase {sdk_name} - Storage.",
+      "operations": [
+        "list-buckets", "get-bucket", "create-bucket", "update-bucket",
+        "delete-bucket", "empty-bucket", "from-upload", "from-update",
+        "from-move", "from-copy", "from-create-signed-url",
+        "from-create-signed-urls", "from-create-signed-upload-url",
+        "from-upload-to-signed-url", "from-get-public-url",
+        "from-download", "from-remove", "from-list"
+      ],
+      "order": 6
+    },
+    "realtime": {
+      "title": "Realtime",
+      "description": "Real-time subscriptions and broadcasts",
+      "systemPrompt": "This is the developer documentation for Supabase {sdk_name} - Realtime.",
+      "operations": [
+        "subscribe", "remove-channel", "remove-all-channels", "get-channels"
+      ],
+      "order": 7
+    },
+    "edge-functions": {
+      "title": "Edge Functions",
+      "description": "Invoke serverless edge functions",
+      "systemPrompt": "This is the developer documentation for Supabase {sdk_name} - Edge Functions.",
+      "operations": ["invoke"],
+      "order": 8
+    },
+    "upgrade-guide": {
+      "title": "Upgrade Guide",
+      "description": "Migration guide for version upgrades",
+      "systemPrompt": "This is the upgrade guide for Supabase {sdk_name}.",
+      "operations": [],
+      "order": 9
+    }
+  }
+}
