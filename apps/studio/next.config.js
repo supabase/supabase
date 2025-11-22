@@ -442,7 +442,7 @@ const nextConfig = {
       ...(process.env.MAINTENANCE_MODE === 'true'
         ? [
             {
-              source: '/((?!maintenance).*)', // Redirect all paths except /maintenance
+              source: '/((?!maintenance|img).*)', // Redirect all paths except /maintenance and /img
               destination: '/maintenance',
               permanent: false,
             },
