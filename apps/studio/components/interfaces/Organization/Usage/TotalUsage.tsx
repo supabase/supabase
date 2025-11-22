@@ -17,6 +17,7 @@ import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/B
 import { BillingMetric } from '../BillingSettings/BillingBreakdown/BillingMetric'
 import { ComputeMetric } from '../BillingSettings/BillingBreakdown/ComputeMetric'
 import { SectionContent } from './SectionContent'
+import { DocsPopover } from 'components/ui/DocsPopover'
 
 export interface ComputeProps {
   orgSlug: string
@@ -189,6 +190,32 @@ export const TotalUsage = ({
             )}
             <div className="grid grid-cols-2 mt-3 gap-[1px] bg-border">
               {sortedBillingMetrics.map((metric, i) => {
+                if (metric.key === PricingMetric.MONTHLY_ACTIVE_THIRD_PARTY_USERS) {
+                  return (
+                    <div
+                      key={metric.key}
+                      className={cn('col-span-2 md:col-span-1 bg-sidebar space-y-4 py-4')}
+                    >
+                      <BillingMetric
+                        idx={i}
+                        slug={orgSlug}
+                        metric={metric}
+                        name={''}
+                        usage={usage}
+                        subscription={subscription!}
+                        relativeToSubscription={showRelationToSubscription}
+                        docsLink={
+                          <DocsPopover
+                            href={`${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users-third-party`}
+                            label="Monthly Active Third-Party Users"
+                          />
+                        }
+                        className={cn(i % 2 === 0 ? 'md:pr-4' : 'md:pl-4')}
+                      />
+                    </div>
+                  )
+                }
+
                 return (
                   <div
                     key={metric.key}
@@ -198,6 +225,7 @@ export const TotalUsage = ({
                       idx={i}
                       slug={orgSlug}
                       metric={metric}
+                      name={metric.name}
                       usage={usage}
                       subscription={subscription!}
                       relativeToSubscription={showRelationToSubscription}
