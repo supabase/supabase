@@ -104,7 +104,7 @@ export const FilesBuckets = () => {
                   />
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button tabIndex={0} type="default" icon={<ArrowDownNarrowWide />}>
+                      <Button type="default" icon={<ArrowDownNarrowWide />}>
                         Sorted by {snap.sortBucket === 'alphabetical' ? 'name' : 'created at'}
                       </Button>
                     </DropdownMenuTrigger>
