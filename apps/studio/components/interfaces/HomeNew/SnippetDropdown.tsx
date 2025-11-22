@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { useContentInfiniteQuery } from 'data/content/content-infinite-query'
 import type { Content } from 'data/content/content-query'
 import { SNIPPET_PAGE_LIMIT } from 'data/content/sql-folders-query'
@@ -56,7 +57,7 @@ export const SnippetDropdown = ({
         limit: SNIPPET_PAGE_LIMIT,
         name: search.length === 0 ? search : debouncedSearch,
       },
-      { keepPreviousData: true }
+      { placeholderData: keepPreviousData }
     )
 
   const snippets = useMemo(() => {

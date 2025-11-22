@@ -130,9 +130,6 @@ const DeployNewReplicaPanel = ({
     {
       refetchInterval,
       refetchOnWindowFocus: false,
-      onSuccess: (data) => {
-        if (data.is_physical_backups_enabled) setRefetchInterval(false)
-      },
     }
   )
 

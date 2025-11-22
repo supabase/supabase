@@ -56,7 +56,7 @@ export const useJwtSecretUpdatingStatusQuery = <TData = JwtSecretUpdatingStatusD
 ) => {
   const client = useQueryClient()
 
-  const query = useQuery<JwtSecretUpdatingStatusData, JwtSecretUpdatingStatusError, TData>({
+  const query = useQuery({
     queryKey: configKeys.jwtSecretUpdatingStatus(projectRef),
     queryFn: ({ signal }) => getJwtSecretUpdatingStatus({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',

@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Check, ChevronsUpDown, ChevronRight } from 'lucide-react'
+import { Check, ChevronRight, ChevronsUpDown } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import type { SubmitHandler } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import { useLinkSupportTicketMutation } from 'data/feedback/link-support-ticket-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import {
@@ -17,9 +18,9 @@ import {
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   DialogSectionSeparator,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -28,16 +29,14 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Switch,
-  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { CATEGORY_OPTIONS, type ExtendedSupportCategories } from './Support.constants'
 import {
   LinkSupportTicketFormSchema,
   type LinkSupportTicketFormValues,
 } from './LinkSupportTicketForm.schema'
+import { CATEGORY_OPTIONS } from './Support.constants'
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
 
 interface LinkSupportTicketFormProps {
@@ -61,7 +60,7 @@ export function LinkSupportTicketForm({ conversationId }: LinkSupportTicketFormP
     reValidateMode: 'onBlur',
   })
 
-  const { mutate: linkSupportTicket, isLoading } = useLinkSupportTicketMutation({
+  const { mutate: linkSupportTicket, isPending } = useLinkSupportTicketMutation({
     onSuccess: () => {
       toast.success('Support ticket linked successfully!')
       router.push('/')
@@ -345,14 +344,7 @@ export function LinkSupportTicketForm({ conversationId }: LinkSupportTicketFormP
         />
 
         <div className="px-6 pt-2">
-          <Button
-            type="primary"
-            htmlType="submit"
-            size="large"
-            block
-            disabled={isLoading}
-            loading={isLoading}
-          >
+          <Button type="primary" htmlType="submit" size="large" block loading={isPending}>
             Link support ticket to account
           </Button>
         </div>

@@ -28,6 +28,7 @@ import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 import { convertByteaToHex } from '../RowEditor.utils'
 import Pagination from './Pagination'
 import SelectorGrid from './SelectorGrid'
+import { keepPreviousData } from '@tanstack/react-query'
 
 const FOREIGN_ROW_SELECTOR_TABLE_NAME_SUFFIX = '__frselector'
 
@@ -111,7 +112,7 @@ const ForeignRowSelector = ({
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
-      keepPreviousData: true,
+      placeholderData: keepPreviousData,
     }
   )
 

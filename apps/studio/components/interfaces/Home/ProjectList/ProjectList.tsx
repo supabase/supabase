@@ -36,6 +36,7 @@ import {
 import { ProjectCard } from './ProjectCard'
 import { ProjectTableRow } from './ProjectTableRow'
 import { ShimmeringCard } from './ShimmeringCard'
+import { keepPreviousData } from '@tanstack/react-query'
 
 export interface ProjectListProps {
   organization?: Organization
@@ -75,7 +76,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
       statuses: filterStatus,
     },
     {
-      keepPreviousData: true,
+      placeholderData: keepPreviousData,
     }
   )
   const orgProjects =

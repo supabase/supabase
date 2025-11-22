@@ -74,6 +74,7 @@ export const TriggersList = () => {
     error,
     isLoading,
     isError,
+    isSuccess,
   } = useDatabaseTriggersQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -175,8 +176,9 @@ execute function function_name();`)
   if (isLoading) {
     return <GenericSkeletonLoader />
   }
+  isSuccess
 
-  if (isError) {
+  if (isError || !isSuccess) {
     return <AlertError error={error} subject="Failed to retrieve database triggers" />
   }
 

@@ -1,6 +1,7 @@
 import { Loader2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
@@ -39,7 +40,7 @@ export const SearchList = ({ search }: SearchListProps) => {
         limit: SNIPPET_PAGE_LIMIT,
         name: search.length === 0 ? undefined : search,
       },
-      { keepPreviousData: true }
+      { placeholderData: keepPreviousData }
     )
 
   const { data: count, isLoading: isLoadingCount } = useContentCountQuery(
@@ -48,7 +49,7 @@ export const SearchList = ({ search }: SearchListProps) => {
       type: 'sql',
       name: search,
     },
-    { keepPreviousData: true }
+    { placeholderData: keepPreviousData }
   )
   const totalNumber = count ? count.private + count.shared : 0
 

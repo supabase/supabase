@@ -68,7 +68,13 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     isSuccess: isSuccessOrganizations,
     isLoading: isLoadingOrganizations,
   } = useOrganizationsQuery()
-  const { data: requester, isLoading, isError, error } = useApiAuthorizationQuery({ id: auth_id })
+  const {
+    data: requester,
+    isLoading,
+    isError,
+    isSuccess,
+    error,
+  } = useApiAuthorizationQuery({ id: auth_id })
   const isApproved = (requester?.approved_at ?? null) !== null
   const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
   const isMcpClient = requester?.registration_type === 'dynamic'
@@ -157,7 +163,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     )
   }
 
-  if (isError) {
+  if (isError || !isSuccess) {
     return (
       <Card>
         <CardHeader>Authorize API access</CardHeader>

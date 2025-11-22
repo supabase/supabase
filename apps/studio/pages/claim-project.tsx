@@ -36,6 +36,7 @@ const ClaimProjectPage: NextPageWithLayout = () => {
   const {
     data: requester,
     isLoading: isLoadingRequester,
+    isSuccess: isSuccessRequester,
     isError: isErrorRequester,
     error: errorRequester,
   } = useApiAuthorizationQuery({ id: auth_id })
@@ -73,7 +74,10 @@ const ClaimProjectPage: NextPageWithLayout = () => {
     )
   }
 
-  if ((selectedOrgSlug && claimToken && isErrorProjectClaim) || isErrorRequester) {
+  if (
+    (selectedOrgSlug && claimToken && isErrorProjectClaim) ||
+    (isErrorRequester && !isSuccessRequester)
+  ) {
     return (
       <ProjectClaimLayout title="Claim a project" className="py-6">
         <Admonition

@@ -14,6 +14,7 @@ import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { keepPreviousData } from '@tanstack/react-query'
 
 interface ReferenceRecordPeekProps {
   table: PostgresTable
@@ -34,7 +35,7 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
       page: 1,
       limit: 10,
     },
-    { keepPreviousData: true }
+    { placeholderData: keepPreviousData }
   )
 
   const primaryKeys = table.primary_keys.map((x) => x.name)

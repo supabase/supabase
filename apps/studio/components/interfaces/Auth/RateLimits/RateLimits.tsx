@@ -141,14 +141,6 @@ export const RateLimits = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess])
 
-  if (isError) {
-    return (
-      <ScaffoldSection isFullWidth>
-        <AlertError error={error} subject="Failed to retrieve auth configuration" />
-      </ScaffoldSection>
-    )
-  }
-
   if (!canReadConfig) {
     return (
       <ScaffoldSection isFullWidth>
@@ -161,6 +153,14 @@ export const RateLimits = () => {
     return (
       <ScaffoldSection isFullWidth>
         <GenericSkeletonLoader />
+      </ScaffoldSection>
+    )
+  }
+
+  if (isError || !isSuccess) {
+    return (
+      <ScaffoldSection isFullWidth>
+        <AlertError error={error} subject="Failed to retrieve auth configuration" />
       </ScaffoldSection>
     )
   }

@@ -1,8 +1,8 @@
 import type { OAuthClient } from '@supabase/supabase-js'
 import { MoreVertical, Plus, RotateCw, Search, Trash } from 'lucide-react'
 import Link from 'next/link'
-import { useRef, useState } from 'react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -14,8 +14,8 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useOAuthServerAppDeleteMutation } from 'data/oauth-server-apps/oauth-server-app-delete-mutation'
 import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
-import { useQueryStateWithSelect, handleErrorOnDelete } from 'hooks/misc/useQueryStateWithSelect'
 import {
   Badge,
   Button,
@@ -96,7 +96,7 @@ export const OAuthAppsList = () => {
       handleErrorOnDelete(deletingOAuthAppIdRef, selectedId, `OAuth App not found`),
   })
 
-  const { mutate: deleteOAuthApp, isLoading: isDeletingApp } = useOAuthServerAppDeleteMutation({
+  const { mutate: deleteOAuthApp, isPending: isDeletingApp } = useOAuthServerAppDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted OAuth app`)
       setSelectedAppToDelete(null)

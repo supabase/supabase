@@ -19,6 +19,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { DropdownControl } from '../../common/DropdownControl'
 import { formatEstimatedCount } from './Pagination.utils'
+import { keepPreviousData } from '@tanstack/react-query'
 
 const rowsPerPageOptions = [
   { value: 100, label: '100 rows' },
@@ -89,7 +90,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
-      keepPreviousData: true,
+      placeholderData: keepPreviousData,
       enabled: !isForeignTableSelected,
     }
   )

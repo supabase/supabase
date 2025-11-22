@@ -78,7 +78,7 @@ export const ReportBlock = ({
   const {
     mutate: executeSql,
     error: executeSqlError,
-    isLoading: executeSqlLoading,
+    isPending: executeSqlLoading,
   } = useExecuteSqlMutation({
     onError: () => {
       // Silence the error toast because the error will be displayed inline

@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
@@ -24,6 +25,7 @@ import {
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
@@ -32,7 +34,6 @@ import {
   Button,
   WarningIcon,
 } from 'ui'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 const logsUpgradeError = 'upgrade to Team or Enterprise Plan to access audit logs.'
 
@@ -97,7 +98,7 @@ export const AuditLogs = () => {
     fetchNextPage,
   } = useOrgProjectsInfiniteQuery(
     { slug, search: search.length === 0 ? search : debouncedSearch },
-    { keepPreviousData: true, enabled: showFilters }
+    { placeholderData: keepPreviousData, enabled: showFilters }
   )
   const { data: organizations } = useOrganizationsQuery({
     enabled: showFilters,

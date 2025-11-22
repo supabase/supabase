@@ -110,14 +110,13 @@ export const ServiceStatus = () => {
   const { data: status, isLoading } = useProjectServiceStatusQuery(
     { projectRef: ref },
     {
-      refetchInterval: (data) => {
-        return data?.some((service) => !service.healthy) ? 5000 : false
-      },
+      refetchInterval: (query) =>
+        query.state.data?.some((service) => !service.healthy) ? 5000 : false,
     }
   )
   const { data: edgeFunctionsStatus } = useEdgeFunctionServiceStatusQuery(
     { projectRef: ref },
-    { refetchInterval: (data) => (!data?.healthy ? 5000 : false) }
+    { refetchInterval: (query) => (!query.state.data?.healthy ? 5000 : false) }
   )
 
   const authStatus = status?.find((service) => service.name === 'auth')

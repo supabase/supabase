@@ -16,6 +16,7 @@ import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { Button } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
+import { keepPreviousData } from '@tanstack/react-query'
 
 export const AuditLogs = () => {
   const currentTime = dayjs().utc().set('millisecond', 0)
@@ -43,7 +44,7 @@ export const AuditLogs = () => {
     fetchNextPage,
   } = useProjectsInfiniteQuery(
     { search: search.length === 0 ? search : debouncedSearch },
-    { keepPreviousData: true }
+    { placeholderData: keepPreviousData }
   )
   const projects =
     useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
