@@ -74,6 +74,7 @@ export const PolicyTableRowHeader = ({
                 type="default"
                 disabled={!canToggleRLS}
                 onClick={() => onSelectToggleRLS(table)}
+                data-testid={`${table.name}-toggle-rls`}
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -90,6 +91,7 @@ export const PolicyTableRowHeader = ({
               type="default"
               disabled={!canToggleRLS || !canCreatePolicies}
               onClick={() => onSelectCreatePolicy(table)}
+              data-testid={`${table.name}-create-policy`}
               tooltip={{
                 content: {
                   side: 'bottom',

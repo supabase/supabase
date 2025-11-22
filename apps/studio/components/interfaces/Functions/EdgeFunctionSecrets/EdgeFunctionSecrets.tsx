@@ -18,22 +18,25 @@ import AddNewSecretForm from './AddNewSecretForm'
 import EdgeFunctionSecret from './EdgeFunctionSecret'
 import { EditSecretSheet } from './EditSecretSheet'
 
-const EdgeFunctionSecrets = () => {
+export const EdgeFunctionSecrets = () => {
   const { ref: projectRef } = useParams()
   const [searchString, setSearchString] = useState('')
 
   // Track the ID being deleted to exclude it from error checking
   const deletingSecretNameRef = useRef<string | null>(null)
 
-  const { can: canReadSecrets, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.SECRETS_READ,
+  const { can: canReadSecrets, isLoading: isLoadingSecretsPermissions } = useAsyncCheckPermissions(
+    PermissionAction.FUNCTIONS_SECRET_READ,
     '*'
   )
   const { can: canUpdateSecrets } = useAsyncCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
 
-  const { data, error, isLoading, isSuccess, isError } = useSecretsQuery({
-    projectRef: projectRef,
-  })
+  const { data, error, isLoading, isSuccess, isError } = useSecretsQuery(
+    {
+      projectRef: projectRef,
+    },
+    { enabled: canReadSecrets }
+  )
 
   const { setValue: setSelectedSecretToEdit, value: selectedSecretToEdit } =
     useQueryStateWithSelect({
@@ -82,10 +85,14 @@ const EdgeFunctionSecrets = () => {
     <TableHead key="actions" />,
   ]
 
+  const showLoadingState = isLoadingSecretsPermissions || (canReadSecrets && isLoading)
+
   return (
     <>
-      {isLoading || isLoadingPermissions ? (
+      {showLoadingState ? (
         <GenericSkeletonLoader />
+      ) : !canReadSecrets ? (
+        <NoPermission resourceText="view this project's edge function secrets" />
       ) : (
         <>
           {isError && <AlertError error={error} subject="Failed to retrieve project secrets" />}
@@ -187,5 +194,3 @@ const EdgeFunctionSecrets = () => {
     </>
   )
 }
-
-export default EdgeFunctionSecrets

@@ -154,7 +154,12 @@ export const Policies = ({
             {tables.map((table) => {
               const isVisible = visibleTableIds.has(table.id)
               return (
-                <section key={table.id} hidden={!isVisible} aria-hidden={!isVisible}>
+                <section
+                  key={table.id}
+                  hidden={!isVisible}
+                  aria-hidden={!isVisible}
+                  data-testid={`policy-table-${table.name}`}
+                >
                   <PolicyTableRow
                     table={table}
                     isLocked={schema === 'realtime' ? true : isLocked}
