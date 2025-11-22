@@ -23,6 +23,9 @@ import {
   Tabs_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { CollapseButton } from './CollapseButton'
@@ -133,6 +136,26 @@ export const EditorTabs = () => {
         onValueChange={handleTabChange}
       >
         <CollapseButton hideTabs={false} />
+        <AnimatePresence initial={false}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <motion.button
+                className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0 border-b border-l"
+                onClick={handleCloseAll}
+                initial={{ opacity: 0, scale: 0.8, x: -10 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <X
+                  size={16}
+                  strokeWidth={1.5}
+                  className="text-foreground-lighter hover:text-foreground-light"
+                />
+              </motion.button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Close all tabs</TooltipContent>
+          </Tooltip>
+        </AnimatePresence>
         <TabsList_Shadcn_
           className={cn(
             'rounded-b-none gap-0 h-10 flex items-center w-full z-[1]',
@@ -232,6 +255,7 @@ export const EditorTabs = () => {
               </motion.button>
             )}
           </AnimatePresence>
+
           <div className="grow h-full border-b pr-6" />
         </TabsList_Shadcn_>
       </Tabs_Shadcn_>
