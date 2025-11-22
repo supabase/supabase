@@ -739,5 +739,19 @@
     "company": "No Code MBA",
     "author_url": "https://www.linkedin.com/in/seth-kramer-62806b63/",
     "author_image_url": "/images/avatars/seth-kramer.jpeg"
+  },
+  {
+    "author_id": "fady",
+    "author": "Fady Abdelmalik",
+    "position": "Engineering",
+    "author_url": "https://github.com/issuedat",
+    "author_image_url": "https://github.com/issuedat.png"
+  },
+  {
+    "author_id": "danny",
+    "author": "Danny White",
+    "position": "Product Design",
+    "author_url": "https://github.com/dnywh",
+    "author_image_url": "https://github.com/dnywh.png"
   }
 ]
