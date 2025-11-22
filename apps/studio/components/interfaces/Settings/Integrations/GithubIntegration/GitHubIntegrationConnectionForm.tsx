@@ -42,6 +42,9 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -556,14 +559,25 @@ const GitHubIntegrationConnectionForm = ({
                     label="Supabase directory"
                     description="Relative path to your supabase folder"
                   >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
-                        {...field}
-                        placeholder="supabase"
-                        autoComplete="off"
-                        disabled={disabled || !canUpdateGitHubConnection}
-                      />
-                    </FormControl_Shadcn_>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div>
+                          <FormControl_Shadcn_>
+                            <Input_Shadcn_
+                              {...field}
+                              placeholder="supabase"
+                              autoComplete="off"
+                              disabled={disabled || !canUpdateGitHubConnection}
+                            />
+                          </FormControl_Shadcn_>
+                        </div>
+                      </TooltipTrigger>
+                      {!canUpdateGitHubConnection && !disabled && (
+                        <TooltipContent side="bottom">
+                          You need additional permissions to update the GitHub connection
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
                   </FormItemLayout>
                 )}
               />
@@ -580,13 +594,24 @@ const GitHubIntegrationConnectionForm = ({
                       label="Deploy to production"
                       description="Deploy changes to production on push including PR merges"
                     >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={disabled || !canUpdateGitHubConnection}
-                        />
-                      </FormControl_Shadcn_>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div>
+                            <FormControl_Shadcn_>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                disabled={disabled || !canUpdateGitHubConnection}
+                              />
+                            </FormControl_Shadcn_>
+                          </div>
+                        </TooltipTrigger>
+                        {!canUpdateGitHubConnection && !disabled && (
+                          <TooltipContent side="bottom">
+                            You need additional permissions to update the GitHub connection
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
                     </FormItemLayout>
                   )}
                 />
@@ -606,20 +631,29 @@ const GitHubIntegrationConnectionForm = ({
                         label="Production branch name"
                         description="The GitHub branch to sync with your production database (e.g., main, master)"
                       >
-                        <div className="relative w-full">
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_
-                              {...field}
-                              autoComplete="off"
-                              disabled={
-                                disabled || !canUpdateGitHubConnection || !enableProductionSync
-                              }
-                            />
-                          </FormControl_Shadcn_>
-                          <div className="absolute top-2.5 right-3 flex items-center gap-2">
-                            {isCheckingBranch && <Loader2 size={14} className="animate-spin" />}
-                          </div>
-                        </div>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="relative w-full">
+                              <FormControl_Shadcn_>
+                                <Input_Shadcn_
+                                  {...field}
+                                  autoComplete="off"
+                                  disabled={
+                                    disabled || !canUpdateGitHubConnection || !enableProductionSync
+                                  }
+                                />
+                              </FormControl_Shadcn_>
+                              <div className="absolute top-2.5 right-3 flex items-center gap-2">
+                                {isCheckingBranch && <Loader2 size={14} className="animate-spin" />}
+                              </div>
+                            </div>
+                          </TooltipTrigger>
+                          {!canUpdateGitHubConnection && !disabled && enableProductionSync && (
+                            <TooltipContent side="bottom">
+                              You need additional permissions to update the GitHub connection
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
                       </FormItemLayout>
                     )}
                   />
@@ -638,13 +672,24 @@ const GitHubIntegrationConnectionForm = ({
                       label="Automatic branching"
                       description="Create preview branches for every pull request"
                     >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={disabled || !canCreateGitHubConnection}
-                        />
-                      </FormControl_Shadcn_>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div>
+                            <FormControl_Shadcn_>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                disabled={disabled || !canCreateGitHubConnection}
+                              />
+                            </FormControl_Shadcn_>
+                          </div>
+                        </TooltipTrigger>
+                        {!canCreateGitHubConnection && !disabled && (
+                          <TooltipContent side="bottom">
+                            You need additional permissions to create GitHub connections
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
                     </FormItemLayout>
                   )}
                 />
@@ -664,14 +709,25 @@ const GitHubIntegrationConnectionForm = ({
                         label="Branch limit"
                         description="Maximum number of preview branches"
                       >
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            {...field}
-                            type="number"
-                            autoComplete="off"
-                            disabled={!newBranchPerPr || disabled || !canUpdateGitHubConnection}
-                          />
-                        </FormControl_Shadcn_>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div>
+                              <FormControl_Shadcn_>
+                                <Input_Shadcn_
+                                  {...field}
+                                  type="number"
+                                  autoComplete="off"
+                                  disabled={!newBranchPerPr || disabled || !canUpdateGitHubConnection}
+                                />
+                              </FormControl_Shadcn_>
+                            </div>
+                          </TooltipTrigger>
+                          {!canUpdateGitHubConnection && !disabled && newBranchPerPr && (
+                            <TooltipContent side="bottom">
+                              You need additional permissions to update the GitHub connection
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
                       </FormItemLayout>
                     )}
                   />
@@ -685,13 +741,24 @@ const GitHubIntegrationConnectionForm = ({
                         label="Supabase changes only"
                         description="Only create branches when Supabase files change"
                       >
-                        <FormControl_Shadcn_>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={(val) => field.onChange(val)}
-                            disabled={!newBranchPerPr || disabled || !canUpdateGitHubConnection}
-                          />
-                        </FormControl_Shadcn_>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div>
+                              <FormControl_Shadcn_>
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={(val) => field.onChange(val)}
+                                  disabled={!newBranchPerPr || disabled || !canUpdateGitHubConnection}
+                                />
+                              </FormControl_Shadcn_>
+                            </div>
+                          </TooltipTrigger>
+                          {!canUpdateGitHubConnection && !disabled && newBranchPerPr && (
+                            <TooltipContent side="bottom">
+                              You need additional permissions to update the GitHub connection
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
                       </FormItemLayout>
                     )}
                   />
@@ -713,32 +780,57 @@ const GitHubIntegrationConnectionForm = ({
               </div>
               <div className="flex space-x-2">
                 {githubSettingsForm.formState.isDirty && (
-                  <Button
-                    type="default"
-                    onClick={() => {
-                      githubSettingsForm.reset()
-                    }}
-                    disabled={disabled || !canUpdateGitHubConnection}
-                  >
-                    Cancel
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div>
+                        <Button
+                          type="default"
+                          onClick={() => {
+                            githubSettingsForm.reset()
+                          }}
+                          disabled={disabled || !canUpdateGitHubConnection}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </TooltipTrigger>
+                    {!canUpdateGitHubConnection && !disabled && (
+                      <TooltipContent side="bottom">
+                        You need additional permissions to update the GitHub connection
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
                 )}
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  disabled={
-                    disabled ||
-                    (!connection && !canCreateGitHubConnection) ||
-                    (connection && !canUpdateGitHubConnection) ||
-                    isCheckingBranch ||
-                    isLoading ||
-                    (!connection && !githubSettingsForm.getValues().repositoryId) ||
-                    (connection && !githubSettingsForm.formState.isDirty)
-                  }
-                  loading={isCheckingBranch || isLoading}
-                >
-                  {connection ? 'Save changes' : 'Enable integration'}
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        disabled={
+                          disabled ||
+                          (!connection && !canCreateGitHubConnection) ||
+                          (connection && !canUpdateGitHubConnection) ||
+                          isCheckingBranch ||
+                          isLoading ||
+                          (!connection && !githubSettingsForm.getValues().repositoryId) ||
+                          (connection && !githubSettingsForm.formState.isDirty)
+                        }
+                        loading={isCheckingBranch || isLoading}
+                      >
+                        {connection ? 'Save changes' : 'Enable integration'}
+                      </Button>
+                    </div>
+                  </TooltipTrigger>
+                  {!disabled &&
+                    ((connection && !canUpdateGitHubConnection) ||
+                      (!connection && !canCreateGitHubConnection)) && (
+                      <TooltipContent side="bottom">
+                        You need additional permissions to{' '}
+                        {connection ? 'update' : 'create'} the GitHub connection
+                      </TooltipContent>
+                    )}
+                </Tooltip>
               </div>
             </CardFooter>
           </Card>
