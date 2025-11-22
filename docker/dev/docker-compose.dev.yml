@@ -8,6 +8,20 @@ services:
       target: dev
     ports:
       - 8082:8082
+    develop:
+      watch:
+        - action: sync
+          path: ../apps/studio
+          target: /app/apps/studio
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
+    environment:
+      - EDGE_FUNCTIONS_MANAGEMENT_FOLDER=/app/edge-functions
+    volumes:
+      - ./volumes/functions:/app/edge-functions:Z
+
   mail:
     container_name: supabase-mail
     image: inbucket/inbucket:3.0.3
