@@ -29,5 +29,5 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(response.code ?? 500).json({ message: response.message })
   }
 
-  return res.status(200).json(response)
+  return res.status(200).json({ types: response })
 }
