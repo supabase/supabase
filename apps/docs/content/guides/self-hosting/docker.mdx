@@ -14,6 +14,7 @@ Docker is the easiest way to get started with self-hosted Supabase. It should on
 3. [Accessing your services](#accessing-supabase-studio)
 4. [Updating your services](#updating-your-services)
 5. [Securing your services](#securing-your-services)
+6. [Changing passwords and secrets](#changing-passwords-and-secrets)
 
 ## Before you begin
 
@@ -297,6 +298,389 @@ Some suggested systems include:
 - [Secrets Manager](https://aws.amazon.com/secrets-manager/) by AWS
 - [Secrets Manager](https://cloud.google.com/secret-manager) by GCP
 - [Vault](https://www.hashicorp.com/products/vault) by HashiCorp
+
+## Changing Passwords and Secrets
+
+When self-hosting Supabase, you may need to update passwords and secrets after initial deployment. This section provides comprehensive guidance on safely rotating credentials without disrupting your services.
+
+### Understanding Secret Dependencies
+
+Multiple Supabase services share common secrets. Understanding these dependencies is critical before making changes:
+
+- **JWT_SECRET** - Used by Kong, GoTrue (Auth), PostgREST, Realtime, and Storage
+- **POSTGRES_PASSWORD** - Used by all services that connect to the database
+- **ANON_KEY & SERVICE_ROLE_KEY** - JWT tokens signed with your JWT_SECRET
+- **DASHBOARD_PASSWORD** - Protects Studio access
+
+<Admonition type="caution">
+
+All services must use identical JWT secrets for token validation to work correctly. Mismatched secrets will cause authentication failures.
+
+</Admonition>
+
+### Changing the Postgres Password
+
+The Postgres password is used by multiple services to connect to the database. Follow these steps to update it safely:
+
+#### Step 1: Update Environment Variables
+
+Edit your `.env` file and update the password:
+
+```bash
+# Before
+POSTGRES_PASSWORD=your-super-secret-and-long-postgres-password
+
+# After
+POSTGRES_PASSWORD=new-strong-password-min-32-chars
+```
+
+Also update any connection strings that include the password:
+
+```bash
+DATABASE_URL=postgresql://postgres:new-strong-password-min-32-chars@db:5432/postgres
+```
+
+#### Step 2: Change the Database Password
+
+Connect to your Postgres container and update the password:
+
+```bash
+docker exec -it supabase-db psql -U postgres -c "ALTER USER postgres WITH PASSWORD 'new-strong-password-min-32-chars';"
+```
+
+#### Step 3: Restart Services
+
+```bash
+docker compose down
+docker compose up -d
+```
+
+#### Step 4: Verify the Change
+
+Test the connection:
+
+```bash
+docker exec -it supabase-db psql -U postgres -c "SELECT version();"
+```
+
+<Admonition type="warning">
+
+Ensure you update the password in both the environment variables AND the actual database. Mismatched passwords will prevent services from starting.
+
+</Admonition>
+
+### Changing the JWT Secret
+
+The JWT secret is used to sign and verify all authentication tokens. Changing it invalidates all existing user sessions.
+
+#### Step 1: Generate a New JWT Secret
+
+Create a secure random string (minimum 32 characters):
+
+```bash
+openssl rand -base64 32
+```
+
+#### Step 2: Update the Environment Variable
+
+Edit your `.env` file:
+
+```bash
+# Before
+JWT_SECRET=your-super-secret-jwt-token-with-at-least-32-characters-long
+
+# After
+JWT_SECRET=A7b9C2d4E6f8G1h3J5k7M9n2P4q6R8s0T
+```
+
+#### Step 3: Regenerate API Keys
+
+After changing the JWT secret, you must regenerate your `ANON_KEY` and `SERVICE_ROLE_KEY` to match. Use the [JWT Generator](#generate-api-keys) above or generate them programmatically:
+
+```javascript
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET = 'your-new-jwt-secret-here';
+
+// Generate anonymous key
+const anonKey = jwt.sign(
+  {
+    role: 'anon',
+    iss: 'supabase',
+    iat: Math.floor(Date.now() / 1000),
+    exp: Math.floor(Date.now() / 1000) + (10 * 365 * 24 * 60 * 60), // 10 years
+  },
+  JWT_SECRET
+);
+
+// Generate service role key
+const serviceKey = jwt.sign(
+  {
+    role: 'service_role',
+    iss: 'supabase',
+    iat: Math.floor(Date.now() / 1000),
+    exp: Math.floor(Date.now() / 1000) + (10 * 365 * 24 * 60 * 60), // 10 years
+  },
+  JWT_SECRET
+);
+
+console.log('ANON_KEY:', anonKey);
+console.log('SERVICE_ROLE_KEY:', serviceKey);
+```
+
+Update your `.env` file with the new keys:
+
+```bash
+ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...new-anon-key
+SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...new-service-key
+```
+
+#### Step 4: Restart All Services
+
+```bash
+docker compose down
+docker compose up -d
+```
+
+<Admonition type="danger">
+
+**Critical Impact:** Changing the JWT secret immediately invalidates all existing user sessions and tokens. All users will be logged out and must re-authenticate.
+
+</Admonition>
+
+### Changing API Keys
+
+When you update `ANON_KEY` or `SERVICE_ROLE_KEY`, you must also update all applications using these keys.
+
+#### What Needs to Be Updated
+
+1. **Client Applications** - Web, mobile, and desktop apps
+2. **Server-Side Code** - Backend APIs, scheduled jobs, webhooks
+3. **Edge Functions** - Update environment variables and redeploy
+4. **CI/CD Pipelines** - Update secrets in deployment platforms
+
+#### Example: Updating Client Code
+
+```javascript
+// Before
+const supabase = createClient(
+  'https://your-project.example.com',
+  'old-anon-key'
+);
+
+// After
+const supabase = createClient(
+  'https://your-project.example.com',
+  'new-anon-key'
+);
+```
+
+<Admonition type="warning">
+
+Client applications using old keys will receive 401 Unauthorized errors. Plan updates during maintenance windows.
+
+</Admonition>
+
+### Changing the Dashboard Password
+
+Update the Studio dashboard password:
+
+#### Step 1: Update Environment Variable
+
+Edit your `.env` file:
+
+```bash
+# Before
+DASHBOARD_PASSWORD=this_password_is_insecure_and_should_be_updated
+
+# After
+DASHBOARD_PASSWORD=your-new-secure-dashboard-password
+```
+
+#### Step 2: Restart Studio
+
+```bash
+docker compose restart studio
+```
+
+You can also add multiple users by editing `./docker/volumes/api/kong.yml`:
+
+```yaml
+basicauth_credentials:
+  - consumer: DASHBOARD
+    username: admin
+    password: new-admin-password
+  - consumer: DASHBOARD
+    username: developer
+    password: new-developer-password
+```
+
+### Changing Storage Secrets
+
+If using S3-compatible storage backends, update the credentials:
+
+```bash
+# Update in .env
+STORAGE_S3_ACCESS_KEY_ID=new-access-key
+STORAGE_S3_SECRET_ACCESS_KEY=new-secret-key
+```
+
+Restart the storage service:
+
+```bash
+docker compose restart storage
+```
+
+### Changing SMTP Credentials
+
+Update email server credentials:
+
+```bash
+# Update in .env
+SMTP_USER=new-smtp-username
+SMTP_PASS=new-smtp-password
+```
+
+Restart the auth service:
+
+```bash
+docker compose restart auth
+```
+
+### Complete Secret Rotation Example
+
+Here's a complete workflow for rotating all major secrets:
+
+#### Before (`.env` file)
+
+```bash
+POSTGRES_PASSWORD=old-postgres-password
+JWT_SECRET=old-jwt-secret-min-32-characters
+ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.old-anon
+SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.old-service
+DASHBOARD_PASSWORD=old-dashboard-pass
+```
+
+#### After (`.env` file)
+
+```bash
+POSTGRES_PASSWORD=Zx9#mK2$pL8@qW5&nR7!tY4^uI3*oP6
+JWT_SECRET=A7b9C2d4E6f8G1h3J5k7M9n2P4q6R8s0T
+ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.new-anon
+SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.new-service
+DASHBOARD_PASSWORD=NewSecure#Dashboard$Password2024!
+```
+
+#### Rotation Steps
+
+```bash
+# 1. Stop all services
+docker compose down
+
+# 2. Update Postgres password in the database
+docker compose up -d db
+sleep 10
+docker exec -it supabase-db psql -U postgres -c "ALTER USER postgres WITH PASSWORD 'Zx9#mK2$pL8@qW5&nR7!tY4^uI3*oP6';"
+
+# 3. Update .env with all new secrets (shown above)
+
+# 4. Generate new ANON_KEY and SERVICE_ROLE_KEY with the new JWT_SECRET
+
+# 5. Start all services
+docker compose up -d
+
+# 6. Verify services are healthy
+docker compose ps
+docker compose logs --tail=50
+```
+
+### Best Practices for Secret Management
+
+#### Password Requirements
+
+- **Minimum length:** 32 characters for production
+- **Complexity:** Mix uppercase, lowercase, numbers, and special characters
+- **Uniqueness:** Never reuse passwords across different secrets
+- **Generation:** Use cryptographically secure random generators
+
+Generate secure passwords:
+
+```bash
+# Using OpenSSL
+openssl rand -base64 32
+
+# Using /dev/urandom (Linux/Mac)
+cat /dev/urandom | LC_ALL=C tr -dc 'a-zA-Z0-9!@#$%^&*' | fold -w 32 | head -n 1
+```
+
+#### Rotation Schedule
+
+- **Production systems:** Every 90 days
+- **Development/staging:** Every 180 days
+- **After team member departure:** Immediately
+- **After suspected compromise:** Immediately
+
+#### Security Checklist
+
+Before changing secrets:
+
+- [ ] Schedule a maintenance window
+- [ ] Notify users of potential downtime
+- [ ] Backup your `.env` file securely
+- [ ] Test in staging environment first
+
+After changing secrets:
+
+- [ ] Verify all services started successfully
+- [ ] Test user authentication
+- [ ] Test API access with new keys
+- [ ] Update all client applications
+- [ ] Store new secrets in a password manager
+
+### Troubleshooting Common Issues
+
+#### Services Won't Start
+
+Check logs for specific services:
+
+```bash
+docker compose logs auth
+docker compose logs kong
+docker compose logs rest
+```
+
+Common causes:
+
+- Mismatched JWT_SECRET between services
+- Incorrect Postgres password in connection strings
+- Typos in environment variables
+
+#### 401 Unauthorized Errors
+
+Causes:
+
+- Client using old `ANON_KEY` or `SERVICE_ROLE_KEY`
+- JWT_SECRET mismatch between services
+- Cached tokens with old JWT_SECRET
+
+Solutions:
+
+- Clear browser cache and local storage
+- Update client applications with new keys
+- Ensure all services restarted with new `.env` values
+
+#### Database Connection Refused
+
+Verify the password matches:
+
+```bash
+# Check environment variables
+grep POSTGRES_PASSWORD .env
+grep DATABASE_URL .env
+
+# Test connection
+docker exec -it supabase-db psql -U postgres
+```
 
 ## Advanced
 
