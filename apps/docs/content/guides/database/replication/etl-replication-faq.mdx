@@ -1,20 +1,27 @@
 ---
 id: 'etl-replication-faq'
-title: 'ETL Replication FAQ'
-description: 'Frequently asked questions about ETL replication.'
-subtitle: 'Common questions and answers about ETL replication.'
+title: 'Managed Destinations FAQ'
+description: 'Frequently asked questions about replication to managed destinations.'
+subtitle: 'Common questions and answers about replication to managed destinations.'
 sidebar_label: 'FAQ'
 ---
 
 <Admonition type="caution" label="Private Alpha">
 
-ETL Replication is currently in private alpha. Access is limited and features may change.
+Managed destinations are currently in private alpha. Access is limited and features may change.
 
 </Admonition>
 
-## What destinations are supported?
+## What managed destinations are supported?
 
-ETL Replication currently supports Iceberg (Analytics Buckets). See the [ETL Destinations guide](/docs/guides/database/replication/etl-destinations) for details.
+Supabase supports managed replication to:
+
+- **Analytics Buckets**: S3-compatible storage using Apache Iceberg open table format
+- **BigQuery**: Google's fully managed data warehouse
+
+Both destinations are supported, but availability varies based on our planned roll-out strategy. The destinations you can access depend on your project and access level.
+
+For detailed setup instructions, see the [Managed Destinations Setup guide](/docs/guides/database/replication/etl-replication-setup).
 
 ## Why is a table not being replicated?
 
@@ -29,7 +36,7 @@ Check your publication settings and verify your table meets the requirements.
 
 ## Why aren't publication changes reflected after adding or removing tables?
 
-After modifying your publication, you must restart the ETL pipeline for changes to take effect. See [Adding or removing tables](/docs/guides/database/replication/etl-replication-setup#adding-or-removing-tables) for instructions.
+After modifying your Postgres publication, you must restart the replication pipeline for changes to take effect. See [Adding or removing tables](/docs/guides/database/replication/etl-replication-setup#adding-or-removing-tables) for instructions.
 
 ## Why is a pipeline in failed state?
 
@@ -55,7 +62,7 @@ Check the [Database](/dashboard/project/_/database/etl) → **ETL Replication** 
 3. Ensure all tables show **Live** state (actively replicating)
 4. Monitor replication lag metrics
 
-See the [ETL Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring) for comprehensive monitoring instructions.
+See the [Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring) for comprehensive monitoring instructions.
 
 ## What are the main limitations?
 
@@ -65,7 +72,7 @@ Key limitations to be aware of:
 - **Custom data types**: Not supported
 - **Schema changes**: Not automatically handled
 
-Destination-specific limitations may also apply. See the [Iceberg](/docs/guides/database/replication/etl-iceberg#limitations) destination page for details.
+Destination-specific limitations (such as Iceberg's append-only log format or BigQuery's ingestion latency) are detailed in the [Managed Destinations Setup guide](/docs/guides/database/replication/etl-replication-setup#step-3-add-a-destination).
 
 ## How to stop or pause replication
 
@@ -77,11 +84,11 @@ Note: Stopping replication will cause changes to queue up in the WAL.
 
 Yes, data duplicates can occur in certain scenarios when stopping a pipeline.
 
-When you stop a pipeline (for restarts or updates), ETL Replication tries to finish processing any transactions that are currently being sent to your destination. It waits up to a few minutes to allow these in-progress transactions to complete cleanly before stopping.
+When you stop a pipeline (for restarts or updates), the replication system tries to finish processing any transactions that are currently being sent to your destination. It waits up to a few minutes to allow these in-progress transactions to complete cleanly before stopping.
 
-However, if a transaction in your database takes longer than this waiting period to complete, the pipeline will stop before that entire transaction has been fully processed. When the pipeline starts again, it must restart the incomplete transaction from the beginning to maintain transaction boundaries, which results in some data being sent twice to your destination.
+However, if a Postgres transaction in your database takes longer than this waiting period to complete, the pipeline will stop before that entire transaction has been fully processed. When the pipeline starts again, it must restart the incomplete transaction from the beginning to maintain transaction boundaries (a requirement of Postgres logical replication), which results in some data being sent twice to your destination.
 
-**Understanding transaction boundaries**: A transaction is a group of database changes that happen together (for example, all changes within a `BEGIN...COMMIT` block). ETL Replication must process entire transactions - it cannot process part of a transaction, stop, and then continue from the middle. This means if a transaction is interrupted, the whole transaction must be replayed when the pipeline resumes.
+**Understanding transaction boundaries**: A transaction is a group of database changes that happen together in Postgres (for example, all changes within a `BEGIN...COMMIT` block). Postgres logical replication must process entire transactions - it cannot process part of a transaction, stop, and then continue from the middle. This means if a transaction is interrupted, the whole transaction must be replayed when the pipeline resumes.
 
 **Example scenario**: Suppose you have a batch operation that updates 10,000 rows within a single transaction. If this operation takes 10 minutes to complete and you stop the pipeline after 5 minutes (when 5,000 rows have been processed), the pipeline cannot resume from row 5,001. Instead, when it restarts, it must reprocess all 10,000 rows from the beginning, resulting in the first 5,000 rows being sent to your destination twice.
 
@@ -95,6 +102,6 @@ Navigate to [Logs](/dashboard/project/_/logs/explorer) → **ETL Replication** t
 
 If you need assistance:
 
-1. Check the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup) and [ETL Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring)
+1. Check the [Managed Destinations Setup guide](/docs/guides/database/replication/etl-replication-setup) and [Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring)
 2. Review this FAQ for common issues
 3. Contact support with your error details and logs
