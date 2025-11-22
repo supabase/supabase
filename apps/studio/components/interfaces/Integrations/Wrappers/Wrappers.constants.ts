@@ -1425,7 +1425,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'S3VectorsFdw',
     label: 'S3 Vectors',
     docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/s3-vectors`,
-    minimumExtensionVersion: '0.5.6',
+    minimumExtensionVersion: '0.5.7',
     server: {
       options: [
         {
