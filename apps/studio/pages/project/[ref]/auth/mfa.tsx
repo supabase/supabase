@@ -4,14 +4,21 @@ import { useParams } from 'common'
 import { MfaAuthSettingsForm } from 'components/interfaces/Auth/MfaAuthSettingsForm/MfaAuthSettingsForm'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const MfaPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -31,28 +38,35 @@ const MfaPage: NextPageWithLayout = () => {
   }
 
   return (
-    <ScaffoldContainer>
-      {!isPermissionsLoaded ? (
-        <ScaffoldSection isFullWidth>
-          <GenericSkeletonLoader />
-        </ScaffoldSection>
-      ) : (
-        <MfaAuthSettingsForm />
-      )}
-    </ScaffoldContainer>
+    <>
+      <PageHeader size="default">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Multi-Factor Authentication (MFA)</PageHeaderTitle>
+            <PageHeaderDescription>
+              Requires users to provide additional verification factors to authenticate
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="default">
+        {!isPermissionsLoaded ? (
+          <PageSection>
+            <PageSectionContent>
+              <GenericSkeletonLoader />
+            </PageSectionContent>
+          </PageSection>
+        ) : (
+          <MfaAuthSettingsForm />
+        )}
+      </PageContainer>
+    </>
   )
 }
 
 MfaPage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>
-      <PageLayout
-        title="Multi-Factor Authentication (MFA)"
-        subtitle="Requires users to provide additional verification factors to authenticate"
-      >
-        {page}
-      </PageLayout>
-    </AuthLayout>
+    <AuthLayout>{page}</AuthLayout>
   </DefaultLayout>
 )
 

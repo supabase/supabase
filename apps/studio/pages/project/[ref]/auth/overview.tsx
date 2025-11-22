@@ -3,14 +3,20 @@ import { OverviewLearnMore } from 'components/interfaces/Auth/Overview/OverviewL
 import { OverviewMetrics } from 'components/interfaces/Auth/Overview/OverviewMetrics'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
 import { DOCS_URL } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
 import { useAuthOverviewQuery } from 'data/auth/auth-overview-query'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 
 const AuthOverview: NextPageWithLayout = () => {
   const router = useRouter()
@@ -36,33 +42,33 @@ const AuthOverview: NextPageWithLayout = () => {
   }
 
   return (
-    <ScaffoldContainer size="large">
-      <div className="mb-4 flex flex-col gap-2">
+    <>
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Overview</PageHeaderTitle>
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-foreground-light">
+                <span className="text-foreground">Last 24 hours</span>
+              </span>
+              <DocsButton href={`${DOCS_URL}/guides/auth`} />
+            </div>
+          </PageHeaderAside>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="large">
         <OverviewMetrics metrics={metrics} isLoading={isLoading} error={error} />
         <OverviewLearnMore />
-      </div>
-    </ScaffoldContainer>
+      </PageContainer>
+    </>
   )
 }
 
 AuthOverview.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>
-      <PageLayout
-        title="Overview"
-        secondaryActions={
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-foreground-light">
-              <span className="text-foreground">Last 24 hours</span>
-            </span>
-            <DocsButton href={`${DOCS_URL}/guides/auth`} />
-          </div>
-        }
-        size="large"
-      >
-        {page}
-      </PageLayout>
-    </AuthLayout>
+    <AuthLayout>{page}</AuthLayout>
   </DefaultLayout>
 )
 

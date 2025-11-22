@@ -4,8 +4,6 @@ import { useParams } from 'common'
 import { RateLimits } from 'components/interfaces/Auth/RateLimits/RateLimits'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -14,6 +12,16 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const RateLimitsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -33,33 +41,40 @@ const RateLimitsPage: NextPageWithLayout = () => {
   }
 
   return (
-    <ScaffoldContainer>
-      {!isPermissionsLoaded ? (
-        <ScaffoldSection isFullWidth>
-          <GenericSkeletonLoader />
-        </ScaffoldSection>
-      ) : (
-        <RateLimits />
-      )}
-    </ScaffoldContainer>
+    <>
+      <PageHeader size="default">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Rate Limits</PageHeaderTitle>
+            <PageHeaderDescription>
+              Safeguard against bursts of incoming traffic to prevent abuse and maximize stability
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            <DocsButton
+              href={`${DOCS_URL}/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention`}
+            />
+          </PageHeaderAside>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="default">
+        {!isPermissionsLoaded ? (
+          <PageSection>
+            <PageSectionContent>
+              <GenericSkeletonLoader />
+            </PageSectionContent>
+          </PageSection>
+        ) : (
+          <RateLimits />
+        )}
+      </PageContainer>
+    </>
   )
 }
 
 RateLimitsPage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>
-      <PageLayout
-        title="Rate Limits"
-        subtitle="Safeguard against bursts of incoming traffic to prevent abuse and maximize stability"
-        primaryActions={
-          <DocsButton
-            href={`${DOCS_URL}/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention`}
-          />
-        }
-      >
-        {page}
-      </PageLayout>
-    </AuthLayout>
+    <AuthLayout>{page}</AuthLayout>
   </DefaultLayout>
 )
 
