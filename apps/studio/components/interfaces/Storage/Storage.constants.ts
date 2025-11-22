@@ -89,5 +89,5 @@ export const BUCKET_TYPES = {
     docsUrl: `${DOCS_URL}/guides/storage/vectors`,
   },
 }
-
+export const BUCKET_TYPE_KEYS = Object.keys(BUCKET_TYPES) as Array<keyof typeof BUCKET_TYPES>
 export const DEFAULT_BUCKET_TYPE: keyof typeof BUCKET_TYPES = 'files'

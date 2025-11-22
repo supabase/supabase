@@ -1878,142 +1878,200 @@ export const storage: NavMenuConstant = {
   url: '/guides/storage',
   items: [
     { name: 'Overview', url: '/guides/storage' },
-    { name: 'Quickstart', url: '/guides/storage/quickstart' },
     {
-      name: 'Buckets',
+      name: 'File Buckets',
       url: undefined,
       items: [
+        { name: 'Quickstart', url: '/guides/storage/quickstart' },
         { name: 'Fundamentals', url: '/guides/storage/buckets/fundamentals' },
         {
           name: 'Creating Buckets',
           url: '/guides/storage/buckets/creating-buckets' as `/${string}`,
         },
-      ],
-    },
-    {
-      name: 'Security',
-      url: undefined,
-      items: [
         {
-          name: 'Ownership',
-          url: '/guides/storage/security/ownership' as `/${string}`,
+          name: 'Security',
+          url: '/guides/storage/security',
+          items: [
+            {
+              name: 'Ownership',
+              url: '/guides/storage/security/ownership' as `/${string}`,
+            },
+            {
+              name: 'Access Control',
+              url: '/guides/storage/security/access-control' as `/${string}`,
+            },
+          ],
         },
         {
-          name: 'Access Control',
-          url: '/guides/storage/security/access-control' as `/${string}`,
-        },
-      ],
-    },
-    {
-      name: 'Uploads',
-      url: undefined,
-      items: [
-        {
-          name: 'Standard Uploads',
-          url: '/guides/storage/uploads/standard-uploads' as `/${string}`,
-        },
-        {
-          name: 'Resumable Uploads',
-          url: '/guides/storage/uploads/resumable-uploads' as `/${string}`,
-        },
-        {
-          name: 'S3 Uploads',
-          url: '/guides/storage/uploads/s3-uploads' as `/${string}`,
-        },
-        { name: 'Limits', url: '/guides/storage/uploads/file-limits', enabled: billingEnabled },
-      ],
-    },
-    {
-      name: 'Serving',
-      url: undefined,
-      items: [
-        { name: 'Serving assets', url: '/guides/storage/serving/downloads' },
-        {
-          name: 'Image Transformations',
-          url: '/guides/storage/serving/image-transformations' as `/${string}`,
+          name: 'Uploads',
+          url: '/guides/storage/uploads',
+          items: [
+            {
+              name: 'Standard Uploads',
+              url: '/guides/storage/uploads/standard-uploads' as `/${string}`,
+            },
+            {
+              name: 'Resumable Uploads',
+              url: '/guides/storage/uploads/resumable-uploads' as `/${string}`,
+            },
+            {
+              name: 'S3 Uploads',
+              url: '/guides/storage/uploads/s3-uploads' as `/${string}`,
+            },
+            { name: 'Limits', url: '/guides/storage/uploads/file-limits', enabled: billingEnabled },
+          ],
         },
         {
-          name: 'Bandwidth & Storage Egress',
-          url: '/guides/storage/serving/bandwidth' as `/${string}`,
-          enabled: billingEnabled,
+          name: 'Serving',
+          url: '/guides/storage/serving',
+          items: [
+            { name: 'Serving assets', url: '/guides/storage/serving/downloads' },
+            {
+              name: 'Image Transformations',
+              url: '/guides/storage/serving/image-transformations' as `/${string}`,
+            },
+            {
+              name: 'Bandwidth & Storage Egress',
+              url: '/guides/storage/serving/bandwidth' as `/${string}`,
+              enabled: billingEnabled,
+            },
+          ],
         },
-      ],
-    },
-    {
-      name: 'Management',
-      url: undefined,
-      items: [
-        { name: 'Copy / Move Objects', url: '/guides/storage/management/copy-move-objects' },
-        { name: 'Delete Objects', url: '/guides/storage/management/delete-objects' },
+        {
+          name: 'Management',
+          url: '/guides/storage/management',
+          items: [
+            { name: 'Copy / Move Objects', url: '/guides/storage/management/copy-move-objects' },
+            { name: 'Delete Objects', url: '/guides/storage/management/delete-objects' },
+          ],
+        },
+        {
+          name: 'S3',
+          url: '/guides/storage/s3',
+          items: [
+            { name: 'Authentication', url: '/guides/storage/s3/authentication' },
+            { name: 'API Compatibility', url: '/guides/storage/s3/compatibility' },
+          ],
+        },
+        {
+          name: 'CDN',
+          url: '/guides/storage/cdn',
+          items: [
+            { name: 'Fundamentals', url: '/guides/storage/cdn/fundamentals' },
+            { name: 'Smart CDN', url: '/guides/storage/cdn/smart-cdn' },
+            { name: 'Metrics', url: '/guides/storage/cdn/metrics' },
+          ],
+        },
+        {
+          name: 'Debugging',
+          url: '/guides/storage/debugging',
+          items: [
+            { name: 'Logs', url: '/guides/storage/debugging/logs' },
+            { name: 'Error Codes', url: '/guides/storage/debugging/error-codes' },
+            { name: 'Troubleshooting', url: '/guides/storage/troubleshooting' },
+          ],
+        },
+        {
+          name: 'Schema',
+          url: '/guides/storage/schema',
+          items: [
+            { name: 'Database Design', url: '/guides/storage/schema/design' },
+            {
+              name: 'Helper Functions',
+              url: '/guides/storage/schema/helper-functions' as `/${string}`,
+            },
+            { name: 'Custom Roles', url: '/guides/storage/schema/custom-roles' },
+          ],
+        },
+        {
+          name: 'Going to production',
+          url: '/guides/storage/production',
+          items: [{ name: 'Scaling', url: '/guides/storage/production/scaling' }],
+        },
         {
           name: 'Pricing',
-          url: '/guides/storage/management/pricing' as `/${string}`,
+          url: '/guides/storage/pricing' as `/${string}`,
           enabled: billingEnabled,
         },
-      ],
-    },
-    {
-      name: 'S3',
-      url: undefined,
-      items: [
-        { name: 'Authentication', url: '/guides/storage/s3/authentication' },
-        { name: 'API Compatibility', url: '/guides/storage/s3/compatibility' },
       ],
     },
     {
       name: 'Analytics Buckets',
-      url: undefined,
       items: [
         { name: 'Introduction', url: '/guides/storage/analytics/introduction' },
         {
-          name: 'Creating Analytics Buckets',
+          name: 'Creating Buckets',
           url: '/guides/storage/analytics/creating-analytics-buckets' as `/${string}`,
         },
         {
-          name: 'Connecting to Analytics Buckets',
+          name: 'Iceberg Catalog',
           url: '/guides/storage/analytics/connecting-to-analytics-bucket' as `/${string}`,
+        },
+        {
+          name: 'Realtime Data-Sync',
+          url: '/guides/storage/analytics/etl' as `/${string}`,
+        },
+        {
+          name: 'Query with Postgres',
+          url: '/guides/storage/analytics/query-with-postgres' as `/${string}`,
+        },
+        {
+          name: 'Examples',
+          url: '/guides/storage/analytics/examples' as `/${string}`,
+          items: [
+            {
+              name: 'Using DuckDB',
+              url: '/guides/storage/analytics/examples/duckdb',
+            },
+            {
+              name: 'Using PyIceberg',
+              url: '/guides/storage/analytics/examples/pyiceberg',
+            },
+            {
+              name: 'Using Apache Spark',
+              url: '/guides/storage/analytics/examples/apache-spark',
+            },
+          ],
         },
         {
           name: 'Limits',
           url: '/guides/storage/analytics/limits' as `/${string}`,
           enabled: billingEnabled,
         },
-      ],
-    },
-    {
-      name: 'CDN',
-      url: undefined,
-      items: [
-        { name: 'Fundamentals', url: '/guides/storage/cdn/fundamentals' },
-        { name: 'Smart CDN', url: '/guides/storage/cdn/smart-cdn' },
-        { name: 'Metrics', url: '/guides/storage/cdn/metrics' },
-      ],
-    },
-    {
-      name: 'Debugging',
-      url: undefined,
-      items: [
-        { name: 'Logs', url: '/guides/storage/debugging/logs' },
-        { name: 'Error Codes', url: '/guides/storage/debugging/error-codes' },
-        { name: 'Troubleshooting', url: '/guides/storage/troubleshooting' },
-      ],
-    },
-    {
-      name: 'Schema',
-      url: undefined,
-      items: [
-        { name: 'Database Design', url: '/guides/storage/schema/design' },
         {
-          name: 'Helper Functions',
-          url: '/guides/storage/schema/helper-functions' as `/${string}`,
+          name: 'Pricing',
+          url: '/guides/storage/analytics/pricing' as `/${string}`,
+          enabled: billingEnabled,
         },
-        { name: 'Custom Roles', url: '/guides/storage/schema/custom-roles' },
       ],
     },
     {
-      name: 'Going to production',
-      url: undefined,
-      items: [{ name: 'Scaling', url: '/guides/storage/production/scaling' }],
+      name: 'Vector Buckets',
+      url: '/guides/storage/vector',
+      items: [
+        { name: 'Introduction', url: '/guides/storage/vector/introduction' },
+        {
+          name: 'Creating Buckets',
+          url: '/guides/storage/vector/creating-vector-buckets' as `/${string}`,
+        },
+        {
+          name: 'Working with Indexes',
+          url: '/guides/storage/vector/working-with-indexes' as `/${string}`,
+        },
+        {
+          name: 'Storing Vectors',
+          url: '/guides/storage/vector/storing-vectors' as `/${string}`,
+        },
+        {
+          name: 'Querying Vectors',
+          url: '/guides/storage/vector/querying-vectors' as `/${string}`,
+        },
+        {
+          name: 'Limits',
+          url: '/guides/storage/vector/limits' as `/${string}`,
+          enabled: billingEnabled,
+        },
+      ],
     },
   ],
 }
