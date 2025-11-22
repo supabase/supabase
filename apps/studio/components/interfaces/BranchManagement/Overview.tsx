@@ -103,31 +103,38 @@ export const Overview = ({
       {/* Persistent Branches Section */}
       <BranchManagementSection header="Persistent branches">
         {(isLoading || isLoadingEntitlement) && <BranchLoader />}
-        {isSuccess && !isLoadingEntitlement && !hasAccessToPersistentBranching && IS_PLATFORM && persistentBranches.length === 0 && (
-          <div className="px-6 py-10 flex items-center justify-between">
-            <div className="flex flex-col gap-1">
-              <p className="text-sm">Upgrade to unlock persistent branches</p>
-              <p className="text-sm text-foreground-light">
-                Persistent branches are long-lived branches that won't be automatically paused or
-                deleted, ideal for staging environments
+        {isSuccess &&
+          !isLoadingEntitlement &&
+          !hasAccessToPersistentBranching &&
+          IS_PLATFORM &&
+          persistentBranches.length === 0 && (
+            <div className="px-6 py-10 flex items-center justify-between">
+              <div className="flex flex-col gap-1">
+                <p className="text-sm">Upgrade to unlock persistent branches</p>
+                <p className="text-sm text-foreground-light">
+                  Persistent branches are long-lived, cannot be reset, and are ideal for staging
+                  environments.
+                </p>
+              </div>
+              <Button type="primary" asChild>
+                <Link href={`/org/${selectedOrg?.slug}/billing?panel=subscriptionPlan`}>
+                  Upgrade
+                </Link>
+              </Button>
+            </div>
+          )}
+        {isSuccess &&
+          !isLoadingEntitlement &&
+          hasAccessToPersistentBranching &&
+          persistentBranches.length === 0 && (
+            <div className="flex items-center flex-col justify-center w-full py-10">
+              <p>No persistent branches</p>
+              <p className="text-foreground-light text-center">
+                Persistent branches are long-lived, cannot be reset, and are ideal for staging
+                environments.
               </p>
             </div>
-            <Button type="primary" asChild>
-              <Link href={`/org/${selectedOrg?.slug}/billing?panel=subscriptionPlan`}>
-                Upgrade
-              </Link>
-            </Button>
-          </div>
-        )}
-        {isSuccess && !isLoadingEntitlement && hasAccessToPersistentBranching && persistentBranches.length === 0 && (
-          <div className="flex items-center flex-col justify-center w-full py-10">
-            <p>No persistent branches</p>
-            <p className="text-foreground-light text-center">
-              Persistent branches are long-lived, cannot be reset, and are ideal for staging
-              environments.
-            </p>
-          </div>
-        )}
+          )}
         {isSuccess &&
           !isLoadingEntitlement &&
           persistentBranches.map((branch) => {
@@ -288,7 +295,9 @@ const PreviewBranchActions = ({
 
           <DropdownMenuItemTooltip
             className="gap-x-2"
-            disabled={!isBranchActiveHealthy || (!branch.persistent && !hasAccessToPersistentBranching)}
+            disabled={
+              !isBranchActiveHealthy || (!branch.persistent && !hasAccessToPersistentBranching)
+            }
             onSelect={(e) => {
               e.stopPropagation()
               setShowBranchModeSwitch(true)
