@@ -2,13 +2,14 @@
 
 import { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react'
 import { SupabaseEvent, SUPABASE_HOST } from '~/lib/eventsTypes'
-import { cover } from 'three/src/extras/TextureUtils.js'
 
 interface EventsContextValue {
   // Events data
   allEvents: SupabaseEvent[]
   filteredEvents: SupabaseEvent[]
+  filteredOnDemandEvents: SupabaseEvent[]
   staticEvents: SupabaseEvent[]
+  onDemandEvents: SupabaseEvent[]
   lumaEvents: SupabaseEvent[]
   featuredEvent: SupabaseEvent | undefined
 
@@ -30,9 +31,10 @@ const EventsContext = createContext<EventsContextValue | undefined>(undefined)
 interface EventsProviderProps {
   children: ReactNode
   staticEvents: SupabaseEvent[]
+  onDemandEvents: SupabaseEvent[]
 }
 
-export function EventsProvider({ children, staticEvents }: EventsProviderProps) {
+export function EventsProvider({ children, staticEvents, onDemandEvents }: EventsProviderProps) {
   const [lumaEvents, setLumaEvents] = useState<SupabaseEvent[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -99,9 +101,12 @@ export function EventsProvider({ children, staticEvents }: EventsProviderProps) 
   }, [staticEvents, lumaEvents])
 
   // Calculate categories with counts
+  // - Webinar: count only upcoming webinars (not on-demand)
+  // - On-demand: count only on-demand events
   const categories = useMemo(() => {
     const categoryCounts: { [key: string]: number } = { all: 0 }
 
+    // Count upcoming events (excluding on-demand)
     allEvents.forEach((event) => {
       categoryCounts.all += 1
 
@@ -110,8 +115,15 @@ export function EventsProvider({ children, staticEvents }: EventsProviderProps) 
       })
     })
 
+    // Count on-demand events separately
+    onDemandEvents.forEach((event) => {
+      categoryCounts.all += 1
+      // Add to 'on-demand' category instead of 'webinar'
+      categoryCounts['on-demand'] = (categoryCounts['on-demand'] || 0) + 1
+    })
+
     return categoryCounts
-  }, [allEvents])
+  }, [allEvents, onDemandEvents])
 
   // Toggle category selection
   const toggleCategory = (category: string) => {
@@ -135,8 +147,13 @@ export function EventsProvider({ children, staticEvents }: EventsProviderProps) 
     })
   }
 
-  // Filter events by search query and category
+  // Filter upcoming events by search query and category
   const filteredEvents = useMemo(() => {
+    // If 'on-demand' is selected, don't show upcoming events
+    if (selectedCategories.includes('on-demand') && !selectedCategories.includes('all')) {
+      return []
+    }
+
     let filtered = allEvents
 
     // Filter by categories (multiple selection)
@@ -166,6 +183,31 @@ export function EventsProvider({ children, staticEvents }: EventsProviderProps) 
       return dateA - dateB
     })
   }, [allEvents, selectedCategories, searchQuery])
+
+  // Filter on-demand events separately by search query and category
+  const filteredOnDemandEvents = useMemo(() => {
+    // If specific categories are selected (not 'all' and not 'on-demand'), don't show on-demand events
+    if (!selectedCategories.includes('all') && !selectedCategories.includes('on-demand')) {
+      return []
+    }
+
+    let filtered = onDemandEvents
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter((event) => {
+        const titleMatch = event.title?.toLowerCase().includes(query)
+        const descriptionMatch = event.description?.toLowerCase().includes(query)
+        const locationMatch = event.location?.toLowerCase().includes(query)
+        const tagsMatch = event.tags?.some((tag) => tag.toLowerCase().includes(query))
+
+        return titleMatch || descriptionMatch || locationMatch || tagsMatch
+      })
+    }
+
+    return filtered
+  }, [onDemandEvents, selectedCategories, searchQuery])
 
   // Featured event: nearest upcoming event, or if none, the most recent past event
   const featuredEvent = useMemo(() => {
@@ -208,7 +250,9 @@ export function EventsProvider({ children, staticEvents }: EventsProviderProps) 
   const value: EventsContextValue = {
     allEvents,
     filteredEvents,
+    filteredOnDemandEvents,
     staticEvents,
+    onDemandEvents,
     lumaEvents,
     isLoading,
     searchQuery,

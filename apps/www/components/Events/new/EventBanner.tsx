@@ -3,7 +3,7 @@
 import { CalendarIcon, MapPinIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { cn, Button } from 'ui'
+import { cn, Button, Badge } from 'ui'
 import { useEvents } from '~/app/events/context'
 import { formatHosts } from '~/lib/eventsUtils'
 
@@ -17,7 +17,9 @@ export function EventBanner() {
   if (!featuredEvent) return null
 
   return (
-    <section className={cn('grid md:grid-cols-[minmax(320px,35%),1fr] gap-6 lg:gap-12')}>
+    <section
+      className={cn('grid md:grid-cols-[minmax(320px,35%),1fr] items-start gap-6 lg:gap-12')}
+    >
       <CoverImage url={featuredEvent.cover_url} />
 
       <article className="flex flex-col md:justify-center gap-6 lg:py-2">
@@ -140,14 +142,20 @@ const LocationWidget = ({ location }: { location?: string }) => {
 const CoverImage = ({ url }: { url?: string }) => {
   if (!url)
     return (
-      <div className="w-full bg-surface-100 aspect-square border rounded-lg hidden md:grid place-items-center">
+      <div className="w-full bg-surface-100 aspect-square border rounded-lg hidden md:grid place-items-center relative">
         <Logo />
+        <Badge variant="brand" className="absolute bottom-4 right-4">
+          Upcoming
+        </Badge>
       </div>
     )
 
   return (
     <div className="w-full bg-surface-100 hidden md:block aspect-square border rounded-lg overflow-hidden relative">
       <img src={url} alt="Event Cover" className="object-cover object-center w-full" />
+      <Badge variant="brand" className="absolute bottom-4 right-4">
+        Upcoming
+      </Badge>
     </div>
   )
 }
