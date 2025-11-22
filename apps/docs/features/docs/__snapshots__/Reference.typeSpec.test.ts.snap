@@ -85983,6 +85983,12 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         },
         "comment": {
           "shortText": "Creates a new StorageAnalyticsClient instance\\n\\n**Public alpha:** This API is part of a public alpha release and may not be available to your account type.",
+          "tags": [
+            {
+              "tag": "alpha",
+              "text": ""
+            }
+          ],
           "examples": [
             {
               "id": "example-1",
@@ -86109,6 +86115,12 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         },
         "comment": {
           "shortText": "Creates a new analytics bucket using Iceberg tables\\nAnalytics buckets are optimized for analytical queries and data processing\\n\\n**Public alpha:** This API is part of a public alpha release and may not be available to your account type.",
+          "tags": [
+            {
+              "tag": "alpha",
+              "text": ""
+            }
+          ],
           "examples": [
             {
               "id": "create-analytics-bucket",
@@ -86192,6 +86204,12 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         },
         "comment": {
           "shortText": "Deletes an existing analytics bucket\\nA bucket can't be deleted with existing objects inside it\\nYou must first empty the bucket before deletion\\n\\n**Public alpha:** This API is part of a public alpha release and may not be available to your account type.",
+          "tags": [
+            {
+              "tag": "alpha",
+              "text": ""
+            }
+          ],
           "examples": [
             {
               "id": "delete-analytics-bucket",
@@ -86405,6 +86423,12 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         },
         "comment": {
           "shortText": "Retrieves the details of all Analytics Storage buckets within an existing project\\nOnly returns buckets of type 'ANALYTICS'\\n\\n**Public alpha:** This API is part of a public alpha release and may not be available to your account type.",
+          "tags": [
+            {
+              "tag": "alpha",
+              "text": ""
+            }
+          ],
           "examples": [
             {
               "id": "list-analytics-buckets",
@@ -86425,7 +86449,13 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }\\n\\n**Public alpha:** This API is part of a public alpha release and may not be available to your account type."
+          "shortText": "Enable throwing errors instead of returning them in the response\\nWhen enabled, failed operations will throw instead of returning { data: null, error }\\n\\n**Public alpha:** This API is part of a public alpha release and may not be available to your account type.",
+          "tags": [
+            {
+              "tag": "alpha",
+              "text": ""
+            }
+          ]
         }
       },
       "@supabase/storage-js.packages/StorageBucketApi.default.constructor": {
