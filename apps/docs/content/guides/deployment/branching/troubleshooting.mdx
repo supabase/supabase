@@ -35,6 +35,16 @@ A deployment might fail for various reasons, including invalid SQL statements an
 
 To check the error message, see the Supabase workflow run for your branch under the [View logs](/dashboard/project/_/branches) section.
 
+### Incorrect Integration
+
+If using [Branching with Github](/docs/guides/deployment/branching/github-integration) ensure that the folder in the connected repo that you are pointing to is not the path that ends in `/supabase`, but the root level where this folder lives. Otherwise you may see errors inside of your branch logs such as `INFO Config file not found... path=supabase/supabase/config.toml` which indicates it is looking at the wrong level for configuration/migration files.
+
+Similarly, if using [Branching via Dashboard](/docs/guides/deployment/branching/dashboard), ensure you are not also using the github integration as you will be prompted to point to a branch inside of the connected repo.
+
+### Missing Extensions
+
+If using an extension such as pgmq, you should enable the pgmq extension from your migration files to ensure the schema in the preview branch matches your main databse.
+
 ### Network restrictions
 
 If you enable [network restrictions](/docs/guides/platform/network-restrictions) on your project, the branching cluster will be blocked from connecting to your project by default. This often results in database connection failures when migrating your production project after merging a development branch.
