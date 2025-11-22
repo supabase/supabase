@@ -1,7 +1,11 @@
+import { useRef } from 'react'
+
 import { VirtualizedTable, VirtualizedTableBody } from 'components/ui/VirtualizedTable'
 import { Bucket } from 'data/storage/buckets-query'
 import { Table, TableBody } from 'ui'
 import { BucketTableEmptyState, BucketTableHeader, BucketTableRow } from './BucketTable'
+import { LoadMoreRow } from './BucketsTable.LoadMoreRow'
+import type { BucketsTablePaginationProps } from './BucketsTable.types'
 
 type BucketsTableProps = {
   buckets: Bucket[]
@@ -9,6 +13,7 @@ type BucketsTableProps = {
   filterString: string
   formattedGlobalUploadLimit: string
   getPolicyCount: (bucketName: string) => number
+  pagination: BucketsTablePaginationProps
 }
 
 export const BucketsTable = (props: BucketsTableProps) => {
@@ -26,12 +31,18 @@ const BucketsTableUnvirtualized = ({
   filterString,
   formattedGlobalUploadLimit,
   getPolicyCount,
+  pagination: { hasMore = false, isLoadingMore = false, onLoadMore },
 }: BucketsTableProps) => {
   const showSearchEmptyState = buckets.length === 0 && filterString.length > 0
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null)
 
   return (
     <Table
-      containerProps={{ containerClassName: 'h-full overflow-auto', className: 'overflow-visible' }}
+      containerProps={{
+        containerClassName: 'h-full overflow-auto',
+        className: 'overflow-visible',
+        outerContainerRef: scrollContainerRef,
+      }}
     >
       <BucketTableHeader mode="standard" hasBuckets={buckets.length > 0} />
       <TableBody>
@@ -49,6 +60,14 @@ const BucketsTableUnvirtualized = ({
             />
           ))
         )}
+        <LoadMoreRow
+          mode="standard"
+          colSpan={6}
+          scrollableParent={scrollContainerRef.current}
+          hasMore={hasMore}
+          isLoadingMore={isLoadingMore}
+          onLoadMore={onLoadMore}
+        />
       </TableBody>
     </Table>
   )
@@ -60,11 +79,18 @@ const BucketsTableVirtualized = ({
   filterString,
   formattedGlobalUploadLimit,
   getPolicyCount,
+  pagination: { hasMore = false, isLoadingMore = false, onLoadMore },
 }: BucketsTableProps) => {
   const showSearchEmptyState = buckets.length === 0 && filterString.length > 0
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   return (
-    <VirtualizedTable data={buckets} estimateSize={() => 59} getItemKey={(bucket) => bucket.id}>
+    <VirtualizedTable
+      data={buckets}
+      estimateSize={() => 59}
+      getItemKey={(bucket) => bucket.id}
+      scrollContainerRef={scrollContainerRef}
+    >
       <BucketTableHeader mode="virtualized" hasBuckets={buckets.length > 0} />
       <VirtualizedTableBody<Bucket>
         paddingColSpan={5}
@@ -72,6 +98,16 @@ const BucketsTableVirtualized = ({
           showSearchEmptyState ? (
             <BucketTableEmptyState mode="virtualized" filterString={filterString} />
           ) : undefined
+        }
+        trailingContent={
+          <LoadMoreRow
+            mode="virtualized"
+            colSpan={6}
+            scrollableParent={scrollContainerRef.current}
+            hasMore={hasMore}
+            isLoadingMore={isLoadingMore}
+            onLoadMore={onLoadMore}
+          />
         }
       >
         {(bucket) => (
