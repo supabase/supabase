@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
-    <title>Resumable Upload Supabase + UppyJS</title>
-    <link href="https://releases.transloadit.com/uppy/v3.6.1/uppy.min.css" rel="stylesheet" />
+    <title>Upload de Imagens | Supabase + UppyJS</title>
+    <link
+      href="https://releases.transloadit.com/uppy/v3.6.1/uppy.min.css"
+      rel="stylesheet"
+    />
 
     <style>
       html {
@@ -11,53 +14,63 @@
       }
       body {
         height: 100vh;
-        background: radial-gradient(72.03% 66.03% at 50% 69.72%, #dbb8bf 0, transparent 100%);
+        background: radial-gradient(
+          72.03% 66.03% at 50% 69.72%,
+          #dbb8bf 0,
+          transparent 100%
+        );
         display: flex;
         align-items: center;
         justify-content: center;
         flex-direction: column;
+        font-family: sans-serif;
       }
       a {
         display: block;
         margin: 10px;
         text-decoration: none;
+        color: #fff;
       }
       #logo {
         max-width: 150px;
+        filter: brightness(0) invert(1);
       }
       #drag-drop-area {
         margin-top: 40px;
+        width: 400px;
       }
     </style>
   </head>
   <body>
-    <img id="logo" src="supabase-logo-wordmark--dark.png" />
+    <img id="logo" src="https://supabase.com/icons/supabase-logo-wordmark--dark.png" />
     <div id="drag-drop-area"></div>
-    <a href="https://supabase.com/docs/guides/storage/uploads/resumable-uploads" target="_blank"
-      >Read the docs.</a
+    <a
+      href="https://supabase.com/docs/guides/storage/uploads/resumable-uploads"
+      target="_blank"
+      >📘 Documentação oficial</a
     >
 
     <script type="module">
-      import {
-        Uppy,
-        Dashboard,
-        Tus,
-      } from 'https://releases.transloadit.com/uppy/v3.6.1/uppy.min.mjs'
+      import { Uppy, Dashboard, Tus } from "https://releases.transloadit.com/uppy/v3.6.1/uppy.min.mjs";
 
-      const SUPABASE_ANON_KEY = 'replace-with-your-publishable-key'
-      const SUPABASE_PROJECT_ID = 'replace-with-your-project-id'
-      const STORAGE_BUCKET = 'replace-with-your-bucket-id'
-      const BEARER_TOKEN='replace-with-your-bearer-token'
+      // ⚙️ CONFIGURAÇÕES (preencha com seus dados)
+      const SUPABASE_ANON_KEY = "SUA_CHAVE_PUBLICA_AQUI";
+      const SUPABASE_PROJECT_ID = "SEU_PROJECT_ID_AQUI";
+      const STORAGE_BUCKET = "NOME_DO_BUCKET_AQUI";
 
-      const folder = ''
-      const supabaseStorageURL = `https://${SUPABASE_PROJECT_ID}.supabase.co/storage/v1/upload/resumable`
+      // 🔒 Token opcional (use o mesmo que o anon key se quiser manter simples)
+      const BEARER_TOKEN = SUPABASE_ANON_KEY;
 
-      var uppy = new Uppy()
+      // URL base do Supabase Storage
+      const supabaseStorageURL = `https://${SUPABASE_PROJECT_ID}.supabase.co/storage/v1/upload/resumable`;
+
+      const uppy = new Uppy()
         .use(Dashboard, {
           inline: true,
-          limit: 10,
-          target: '#drag-drop-area',
+          target: "#drag-drop-area",
           showProgressDetails: true,
+          proudlyDisplayPoweredByUppy: false,
+          note: "Arraste suas imagens aqui ou clique para selecionar.",
         })
         .use(Tus, {
           endpoint: supabaseStorageURL,
@@ -66,31 +79,27 @@
             apikey: SUPABASE_ANON_KEY,
           },
           uploadDataDuringCreation: true,
-          chunkSize: 6 * 1024 * 1024,
-          allowedMetaFields: ['bucketName', 'objectName', 'contentType', 'cacheControl'],
-          onError: function (error) {
-            console.log('Failed because: ' + error)
+          chunkSize: 6 * 1024 * 1024, // 6MB
+          allowedMetaFields: ["bucketName", "objectName", "contentType"],
+          onError: (error) => {
+            console.error("Falha no upload:", error);
           },
-        })
+        });
 
-      uppy.on('file-added', (file) => {
-        const supabaseMetadata = {
+      uppy.on("file-added", (file) => {
+        const metadata = {
           bucketName: STORAGE_BUCKET,
-          objectName: folder ? `${folder}/${file.name}` : file.name,
+          objectName: file.name,
           contentType: file.type,
-        }
+        };
+        file.meta = { ...file.meta, ...metadata };
+        console.log("Arquivo adicionado:", file);
+      });
 
-        file.meta = {
-          ...file.meta,
-          ...supabaseMetadata,
-        }
-
-        console.log('file added', file)
-      })
-
-      uppy.on('complete', (result) => {
-        console.log('Upload complete! We’ve uploaded these files:', result.successful)
-      })
+      uppy.on("complete", (result) => {
+        console.log("Upload concluído! Arquivos enviados:", result.successful);
+        alert("✅ Upload completo! Verifique no painel do Supabase.");
+      });
     </script>
   </body>
 </html>
