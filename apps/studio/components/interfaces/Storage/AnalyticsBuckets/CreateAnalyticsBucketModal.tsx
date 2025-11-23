@@ -262,10 +262,10 @@ export const CreateAnalyticsBucketModal = ({
                   title="Wrappers extension must be updated for Iceberg Wrapper support"
                 >
                   <p className="prose max-w-full text-sm !leading-normal">
-                    Update the <code className="text-xs">wrappers</code> extension by disabling and
-                    enabling it in{' '}
-                    <InlineLink href={`/project/${ref}/database/extensions?filter=wrappers`}>
-                      database extensions
+                    Update the <code className="text-xs">wrappers</code> extension by upgrading your
+                    project from your{' '}
+                    <InlineLink href={`/project/${ref}/settings/infrastructure`}>
+                      project settings
                     </InlineLink>{' '}
                     before creating an Analytics bucket.{' '}
                     <InlineLink href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}>

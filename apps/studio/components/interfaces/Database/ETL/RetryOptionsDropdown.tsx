@@ -3,8 +3,8 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { useRestartPipelineHelper } from 'data/etl/restart-pipeline-helper'
 import { RollbackType, useRollbackTableMutation } from 'data/etl/rollback-table-mutation'
-import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
 import {
   Button,
   DropdownMenu,
@@ -36,28 +36,33 @@ interface RetryOptionsDropdownProps {
 export const RetryOptionsDropdown = ({ tableId, tableName }: RetryOptionsDropdownProps) => {
   const { ref: projectRef, pipelineId: _pipelineId } = useParams()
   const [isOpen, setIsOpen] = useState(false)
+  const [isRestartingPipeline, setIsRestartingPipeline] = useState(false)
+
+  const { restartPipeline } = useRestartPipelineHelper()
 
   const { mutate: rollbackTable, isPending: isRollingBack } = useRollbackTableMutation({
-    onSuccess: (_, vars) => {
-      const { projectRef, pipelineId } = vars
-      toast.success(`Table "${tableName}" rolled back successfully and pipeline is being restarted`)
-      startPipeline({ projectRef, pipelineId })
+    onSuccess: async (_, vars) => {
+      const { projectRef, pipelineId, rollbackType } = vars
+      toast.success(
+        `Table "${tableName}" ${rollbackType === 'full' ? 'reset' : 'rolled back'} successfully and pipeline is being restarted`
+      )
+
+      setIsRestartingPipeline(true)
+      try {
+        await restartPipeline({ projectRef, pipelineId })
+        toast.success('Pipeline restarted successfully')
+      } catch (error: any) {
+        toast.error(`Failed to restart pipeline: ${error.message}`)
+      } finally {
+        setIsRestartingPipeline(false)
+        setIsOpen(false)
+      }
     },
     onError: (error, vars) => {
       const { rollbackType } = vars
       toast.error(
         `Failed to ${rollbackType === 'full' ? 'reset' : 'rollback'} table: ${error.message}`
       )
-    },
-  })
-  const { mutate: startPipeline, isPending: isRestartingPipeline } = useStartPipelineMutation({
-    onSuccess: () => {
-      toast.success('Pipeline restarted successfully')
-      setIsOpen(false)
-    },
-    onError: (error) => {
-      toast.error(`Failed to restart pipeline: ${error.message}`)
-      setIsOpen(false)
     },
   })
 
