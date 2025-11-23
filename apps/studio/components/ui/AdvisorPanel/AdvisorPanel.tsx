@@ -12,6 +12,7 @@ import { useNotificationsV2UpdateMutation } from 'data/notifications/notificatio
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
 import { AdvisorSeverity, AdvisorTab, useAdvisorStateSnapshot } from 'state/advisor-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AdvisorDetail } from './AdvisorDetail'
@@ -49,6 +50,7 @@ const notificationPriorityToSeverity = (priority: string | null | undefined): Ad
 }
 
 export const AdvisorPanel = () => {
+  const track = useTrack()
   const {
     activeTab,
     severityFilters,
@@ -250,12 +252,28 @@ export const AdvisorPanel = () => {
 
   const handleItemClick = (item: AdvisorItem) => {
     setSelectedItem(item.id, item.source)
+
     if (item.source === 'notification') {
       const notification = item.original as Notification
       if (notification.status === 'new' && !markedRead.current.includes(notification.id)) {
         markedRead.current.push(notification.id)
       }
     }
+
+    const advisorCategory =
+      item.source === 'lint' && 'categories' in item.original
+        ? item.original.categories[0]
+        : undefined
+    const advisorLevel =
+      item.source === 'lint' && 'level' in item.original ? item.original.level : undefined
+
+    track('advisor_detail_opened', {
+      origin: 'advisor_panel',
+      advisorCategory,
+      advisorSource: item.source,
+      advisorType: item.original.name,
+      advisorLevel,
+    })
   }
 
   const handleUpdateNotificationStatus = (id: string, status: 'archived' | 'seen') => {
