@@ -141,6 +141,19 @@ export const OAuthServerSettingsForm = () => {
   const onSubmit = async (values: OAuthServerSettings) => {
     if (!projectRef) return console.error('Project ref is required')
 
+    // Check if authorizationUrl is empty when OAuth Server is enabled
+    if (values.OAUTH_SERVER_ENABLED) {
+      const authorizationPath = values.OAUTH_SERVER_AUTHORIZATION_PATH || '/oauth/consent'
+      const authorizationUrl = `${authConfig?.SITE_URL || ''}${authorizationPath}`
+
+      if (!authorizationUrl || authorizationUrl.trim() === '' || !authConfig?.SITE_URL) {
+        toast.error(
+          'Authorization URL cannot be empty. Please configure Site URL and Authorization Path.'
+        )
+        return
+      }
+    }
+
     const config = {
       OAUTH_SERVER_ENABLED: values.OAUTH_SERVER_ENABLED,
       OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: values.OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION,
