@@ -264,7 +264,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                           <FormField_Shadcn_
                             control={form.control}
                             name="client_id"
-                            render={({ field }) => (
+                            render={() => (
                               <FormItemLayout label="Client ID">
                                 <FormControl_Shadcn_>
                                   <Input
@@ -283,7 +283,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                           <FormField_Shadcn_
                             control={form.control}
                             name="client_secret"
-                            render={({ field }) => (
+                            render={() => (
                               <FormItemLayout
                                 label="Client Secret"
                                 description="Client secret is hidden for security. Use the regenerate button to create a new one."

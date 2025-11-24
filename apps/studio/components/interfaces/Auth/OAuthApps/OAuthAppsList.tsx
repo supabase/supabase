@@ -250,7 +250,7 @@ export const OAuthAppsList = () => {
                           {app.client_name}
                         </Button>
                       </TableCell>
-                      <TableCell className="max-w-40" title={app.client_id}>
+                      <TableCell title={app.client_id}>
                         <Badge className="font-mono">{app.client_id}</Badge>
                       </TableCell>
                       <TableCell className="max-w-40">
