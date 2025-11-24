@@ -1,6 +1,6 @@
 ---
 title: 'Storing Vectors'
-subtitle: 'Insert and update vector embeddings with metadata using the JavaScript SDK or PostgreSQL.'
+subtitle: 'Insert and update vector embeddings with metadata using the JavaScript SDK or Postgres.'
 ---
 
 <Admonition type="caution" title="This feature is in alpha">
@@ -11,7 +11,7 @@ Expect rapid changes, limited features, and possible breaking updates. [Share fe
 
 Once you've created a bucket and index, you can start storing vectors. Vectors can include optional metadata for filtering and enrichment during queries.
 
-## Basic Vector Insertion
+## Basic vector insertion
 
 <Tabs
   scrollable
@@ -93,7 +93,7 @@ VALUES
 </TabPanel>
 </Tabs>
 
-## Storing Vectors from Embeddings API
+## Storing vectors from Embeddings API
 
 Generate embeddings using an LLM API and store them directly:
 
@@ -189,7 +189,7 @@ VALUES
 </TabPanel>
 </Tabs>
 
-## Updating Vectors
+## Updating vectors
 
 <Tabs
   scrollable
@@ -243,7 +243,7 @@ VALUES (
 </TabPanel>
 </Tabs>
 
-## Deleting Vectors
+## Deleting vectors
 
 <Tabs
   scrollable
@@ -280,7 +280,7 @@ WHERE key IN ('doc-1', 'doc-2');
 </TabPanel>
 </Tabs>
 
-## Metadata Best Practices
+## Metadata best practices
 
 Metadata makes vectors more useful by enabling filtering and context:
 
@@ -315,14 +315,14 @@ const vectors = [
 const { error } = await index.putVectors({ vectors })
 ```
 
-### Metadata Field Guidelines
+### Metadata field guidelines
 
 - **Keep it lightweight** - Metadata is returned with query results, so large values increase response size
 - **Use consistent types** - Store the same field with consistent data types across vectors
 - **Index key fields** - Mark fields you'll filter by to improve query performance
 - **Avoid nested objects** - While supported, flat structures are easier to filter
 
-## Batch Processing Large Datasets
+## Batch processing large datasets
 
 For storing large numbers of vectors efficiently:
 
@@ -371,9 +371,9 @@ for (let i = 0; i < vectors.length; i += BATCH_SIZE) {
 console.log('✓ All vectors stored successfully')
 ```
 
-## Performance Optimization
+## Performance optimization
 
-### Batch Operations
+### Batch operations
 
 Always use batch operations for better performance:
 
@@ -387,7 +387,7 @@ for (const vector of vectors) {
 await index.putVectors({ vectors })
 ```
 
-### Metadata Considerations
+### Metadata considerations
 
 Keep metadata concise:
 
@@ -406,7 +406,7 @@ metadata: {
 }
 ```
 
-## Next Steps
+## Next steps
 
 - [Query vectors with similarity search](/docs/guides/storage/vector/querying-vectors)
 - [Work with vector indexes](/docs/guides/storage/vector/working-with-indexes)

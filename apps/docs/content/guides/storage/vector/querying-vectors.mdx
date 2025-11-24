@@ -9,9 +9,9 @@ Expect rapid changes, limited features, and possible breaking updates. [Share fe
 
 </Admonition>
 
-Vector similarity search finds vectors most similar to a query vector using distance metrics. You can query vectors using the JavaScript SDK or directly from PostgreSQL using SQL.
+Vector similarity search finds vectors most similar to a query vector using distance metrics. You can query vectors using the JavaScript SDK or directly from Postgres using SQL.
 
-## Basic Similarity Search
+## Basic similarity search
 
 <Tabs
   scrollable
@@ -78,7 +78,7 @@ LIMIT 5;
 </TabPanel>
 </Tabs>
 
-## Semantic Search
+## Semantic search
 
 Find documents similar to a query by embedding the query text:
 
@@ -164,7 +164,7 @@ LIMIT 5;
 </TabPanel>
 </Tabs>
 
-## Filtered Similarity Search
+## Filtered similarity search
 
 <Tabs
   scrollable
@@ -219,7 +219,7 @@ LIMIT 10;
 </TabPanel>
 </Tabs>
 
-## Retrieving Specific Vectors
+## Retrieving specific vectors
 
 <Tabs
   scrollable
@@ -265,7 +265,7 @@ WHERE key IN ('doc-1', 'doc-2', 'doc-3');
 </TabPanel>
 </Tabs>
 
-## Listing Vectors
+## Listing vectors
 
 <Tabs
   scrollable
@@ -326,7 +326,7 @@ OFFSET 0;
 </TabPanel>
 </Tabs>
 
-## Hybrid Search: Vectors + Relational Data
+## Hybrid search: Vectors + relational data
 
 Combine similarity search with SQL filtering and joins:
 
@@ -398,9 +398,9 @@ LIMIT 50;
 </TabPanel>
 </Tabs>
 
-## Real-World Examples
+## Real-world examples
 
-### RAG (Retrieval-Augmented Generation)
+### RAG (Retrieval-augmented generation)
 
 ```typescript
 import OpenAI from 'openai'
@@ -449,7 +449,7 @@ async function retrieveContextForLLM(userQuery) {
 }
 ```
 
-### Product Recommendations
+### Product recommendations
 
 ```typescript
 async function recommendProducts(userEmbedding, topK = 5) {
@@ -477,7 +477,7 @@ async function recommendProducts(userEmbedding, topK = 5) {
 }
 ```
 
-### Filtering Before Similarity Search
+### Filtering before similarity search
 
 ```typescript
 // Use metadata filters to reduce search scope
@@ -490,7 +490,7 @@ const { data } = await index.queryVectors({
 })
 ```
 
-## Next Steps
+## Next steps
 
 - [Store vectors](/docs/guides/storage/vector/storing-vectors)
 - [Work with vector indexes](/docs/guides/storage/vector/working-with-indexes)
