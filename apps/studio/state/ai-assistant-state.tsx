@@ -332,7 +332,6 @@ export const createAiAssistantState = (): AiAssistantState => {
       state.activeChatId = chatId
 
       // Create new chat instance
-      // Create new chat instance
       const chatInstance = createChatInstance(state, { id: chatId, initialMessages: [] })
 
       state.chatInstances[chatId] = ref(chatInstance)
