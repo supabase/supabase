@@ -260,7 +260,7 @@ export const RealtimeSettings = () => {
                                         <p className="prose max-w-full text-sm">
                                           Private mode is {isSettingToPrivate ? 'being ' : ''}
                                           enabled, but no RLS policies exists on the{' '}
-                                          <code className="text-xs">realtime.messages</code> table.
+                                          <code className="text-code-inline"e-inline">realtime.messages</code> table.
                                           No messages will be received by users.
                                         </p>
 
