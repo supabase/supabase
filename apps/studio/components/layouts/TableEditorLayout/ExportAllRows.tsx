@@ -19,8 +19,7 @@ import { isTableLike } from 'data/table-editor/table-editor-types'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { useStaticEffectEvent } from 'hooks/useStaticEffectEvent'
 import type { RoleImpersonationState } from 'lib/role-impersonation'
-import { AlertTriangle } from 'lucide-react'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   BlobCreationError,
   DownloadSaveError,
@@ -100,12 +99,12 @@ const fetchAllRows = async ({
   ) {
     return {
       status: 'require_confirmation',
-      reason: `You're exporting a view, which may cause performance issues on very large views. If possible, we recommend exporting the underlying table instead.`,
+      reason: `Exporting a view may cause performance issues on very large views. If possible, we recommend exporting the underlying table instead.`,
     }
   } else if (type === ENTITY_TYPE.FOREIGN_TABLE && !bypassConfirmation) {
     return {
       status: 'require_confirmation',
-      reason: `You're exporting a foreign table, which may cause performance issues on very large tables.`,
+      reason: `Exporting a foreign table, which may cause performance issues on very large tables.`,
     }
   }
 
@@ -349,16 +348,15 @@ export const useExportAllRowsGeneric = (
     exportInDesiredFormat,
     confirmationModal: confirmationMessage ? (
       <ConfirmationModal
-        title="Confirm export"
+        title="Confirm to export data"
         visible={true}
         onCancel={onCancelExport}
         onConfirm={onConfirmExport}
-      >
-        <div className="flex items-center gap-4">
-          <AlertTriangle aria-label="warning" className="shrink-0 text-foreground-lighter" />
-          <p className="text-sm text-foreground-lighter">{confirmationMessage}</p>
-        </div>
-      </ConfirmationModal>
+        alert={{
+          base: { className: '[&>div>div>h5]:font-normal border-x-0 border-t-0 rounded-none mb-0' },
+          title: confirmationMessage,
+        }}
+      />
     ) : null,
   }
 }

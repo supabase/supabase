@@ -1,5 +1,6 @@
 import { Copy, Download, Edit, Lock, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
+import { type CSSProperties } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -15,7 +16,6 @@ import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { formatSql } from 'lib/formatSql'
-import { type CSSProperties } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
