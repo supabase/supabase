@@ -66,7 +66,7 @@ export type CreateBucketForm = z.infer<typeof FormSchema>
 export const CreateVectorBucketButton = ({
   onClick,
 }: {
-  onClick: MouseEventHandler<HTMLButtonElement>
+  onClick?: MouseEventHandler<HTMLButtonElement>
 }) => {
   const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
