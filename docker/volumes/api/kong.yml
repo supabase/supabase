@@ -188,6 +188,9 @@ services:
   - name: functions-v1
     _comment: 'Edge Functions: /functions/v1/* -> http://functions:9000/*'
     url: http://functions:9000/
+    read_timeout: 310000
+    write_timeout: 310000
+    connect_timeout: 10000
     routes:
       - name: functions-v1-all
         strip_path: true

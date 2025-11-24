@@ -81,6 +81,9 @@ services:
       KONG_PLUGINS: request-transformer,cors,key-auth,acl,basic-auth,request-termination,ip-restriction
       KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
       KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
+      # Increase upstream timeouts for long-running edge functions
+      KONG_UPSTREAM_KEEPALIVE_MAX_REQUESTS: 1000
+      KONG_UPSTREAM_KEEPALIVE_POOL_SIZE: 60
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
       DASHBOARD_USERNAME: ${DASHBOARD_USERNAME}
@@ -327,13 +330,20 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.69.23
+    image: supabase/edge-runtime:v1.69.24
     restart: unless-stopped
     volumes:
       - ./volumes/functions:/home/deno/functions:Z
     depends_on:
       analytics:
         condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2'
+        reservations:
+          memory: 512M
     environment:
       JWT_SECRET: ${JWT_SECRET}
       SUPABASE_URL: http://kong:8000
@@ -342,11 +352,21 @@ services:
       SUPABASE_DB_URL: postgresql://postgres:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       # TODO: Allow configuring VERIFY_JWT per function. This PR might help: https://github.com/supabase/cli/pull/786
       VERIFY_JWT: "${FUNCTIONS_VERIFY_JWT}"
+      EDGE_RUNTIME_REQUEST_TIMEOUT: "${FUNCTIONS_REQUEST_TIMEOUT_SEC:-150}"
+      EDGE_RUNTIME_WORKER_TIMEOUT_MS: "${FUNCTIONS_WORKER_TIMEOUT_MS:-150000}"
+      DENO_MEMORY_LIMIT: "${FUNCTIONS_MEMORY_LIMIT_MB:-1024}"
+      EDGE_RUNTIME_WALL_CLOCK_LIMIT_MS: "${FUNCTIONS_WORKER_TIMEOUT_MS:-150000}"
     command:
       [
         "start",
         "--main-service",
-        "/home/deno/functions/main"
+        "/home/deno/functions/main",
+        "--main-worker-request-idle-timeout",
+        "300000",
+        "--user-worker-request-idle-timeout",
+        "300000",
+        "--graceful-exit-timeout",
+        "310"
       ]
 
   analytics:
