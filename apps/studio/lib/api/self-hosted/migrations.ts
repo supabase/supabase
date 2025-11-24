@@ -21,6 +21,23 @@ alter table supabase_migrations.schema_migrations add column if not exists name 
 
 commit;`
 
+const ensurePgmqConsistency = () => `
+do $$
+declare
+  ext_exists boolean;
+  schema_exists boolean;
+begin
+  select exists(select 1 from pg_extension where extname = 'pgmq') into ext_exists;
+  select exists(select 1 from pg_namespace where nspname = 'pgmq') into schema_exists;
+  
+  if ext_exists or schema_exists then
+    execute 'drop extension if exists pgmq cascade';
+    execute 'drop schema if exists pgmq cascade';
+    execute 'create extension pgmq';
+  end if;
+end $$;
+`
+
 const applyAndTrackMigrationsQuery = (query: string, name?: string) => {
   // Escapes literals using postgres dollar quoted string
   const dollar = `$${makeRandomString(20)}$`
@@ -99,6 +116,15 @@ export async function applyAndTrackMigrations<T = unknown>({
 
   if (initializeResponse.error) {
     return initializeResponse
+  }
+
+  const cleanupResponse = await executeQuery<void>({
+    query: ensurePgmqConsistency(),
+    headers,
+  })
+
+  if (cleanupResponse.error) {
+    return cleanupResponse
   }
 
   const applyAndTrackResponse = await executeQuery<T>({
