@@ -46,6 +46,7 @@ allow_list = [
     "[Cc]ryptography",
     "[Cc]ryptosystem",
     "[Cc]utover",
+	"[Dd]ata[Ff]rames?",
     "[Dd]atasets?",
     "[Dd]atasources?",
     "[Dd]e facto",

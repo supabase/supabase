@@ -25,23 +25,18 @@ Vector similarity search finds vectors most similar to a query vector using dist
 ```typescript
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  'https://your-project.supabase.co',
-  'your-service-key'
-)
+const supabase = createClient('https://your-project.supabase.co', 'your-service-key')
 
-const index = supabase.storage.vectors
-  .from('embeddings')
-  .index('documents-openai')
+const index = supabase.storage.vectors.from('embeddings').index('documents-openai')
 
 // Query with a vector embedding
 const { data, error } = await index.queryVectors({
   queryVector: {
-    float32: [0.1, 0.2, 0.3, /* ... embedding of 1536 dimensions ... */]
+    float32: [0.1, 0.2, 0.3 /* ... embedding of 1536 dimensions ... */],
   },
   topK: 5,
   returnDistance: true,
-  returnMetadata: true
+  returnMetadata: true,
 })
 
 if (error) {
@@ -231,14 +226,12 @@ LIMIT 10;
 <TabPanel id="javascript" label="JavaScript">
 
 ```typescript
-const index = supabase.storage.vectors
-  .from('embeddings')
-  .index('documents-openai')
+const index = supabase.storage.vectors.from('embeddings').index('documents-openai')
 
 const { data, error } = await index.getVectors({
   keys: ['doc-1', 'doc-2', 'doc-3'],
   returnData: true,
-  returnMetadata: true
+  returnMetadata: true,
 })
 
 if (!error) {
@@ -277,9 +270,7 @@ WHERE key IN ('doc-1', 'doc-2', 'doc-3');
 <TabPanel id="javascript" label="JavaScript">
 
 ```typescript
-const index = supabase.storage.vectors
-  .from('embeddings')
-  .index('documents-openai')
+const index = supabase.storage.vectors.from('embeddings').index('documents-openai')
 
 let nextToken = undefined
 let pageCount = 0
@@ -289,7 +280,7 @@ do {
     maxResults: 100,
     nextToken,
     returnData: false, // Don't return embeddings for faster response
-    returnMetadata: true
+    returnMetadata: true,
   })
 
   if (error) break
@@ -341,9 +332,7 @@ Combine similarity search with SQL filtering and joins:
 
 ```typescript
 async function hybridSearch(queryVector, filters) {
-  const index = supabase.storage.vectors
-    .from('embeddings')
-    .index('documents-openai')
+  const index = supabase.storage.vectors.from('embeddings').index('documents-openai')
 
   // Get similar vectors with filters
   const { data: vectorResults } = await index.queryVectors({
@@ -351,21 +340,24 @@ async function hybridSearch(queryVector, filters) {
     topK: 100,
     filter: filters,
     returnDistance: true,
-    returnMetadata: true
+    returnMetadata: true,
   })
 
   // Get additional details from relational database
   const { data: details } = await supabase
     .from('documents')
     .select('*')
-    .in('id', vectorResults.vectors.map(v => v.metadata?.doc_id))
+    .in(
+      'id',
+      vectorResults.vectors.map((v) => v.metadata?.doc_id)
+    )
 
   // Merge results
-  return vectorResults.vectors.map(vector => {
-    const detail = details?.find(d => d.id === vector.metadata?.doc_id)
+  return vectorResults.vectors.map((vector) => {
+    const detail = details?.find((d) => d.id === vector.metadata?.doc_id)
     return {
       ...vector,
-      ...detail
+      ...detail,
     }
   })
 }
@@ -400,7 +392,7 @@ LIMIT 50;
 
 ## Real-world examples
 
-### RAG (Retrieval-augmented generation)
+### RAG (retrieval-augmented generation)
 
 ```typescript
 import OpenAI from 'openai'
@@ -485,8 +477,8 @@ const { data } = await index.queryVectors({
   queryVector,
   topK: 100,
   filter: {
-    category: 'electronics' // Pre-filter by category
-  }
+    category: 'electronics', // Pre-filter by category
+  },
 })
 ```
 

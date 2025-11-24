@@ -38,10 +38,7 @@ Think of an index as a table in a traditional database. It has a schema (dimensi
 ```typescript
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  'https://your-project.supabase.co',
-  'your-service-key'
-)
+const supabase = createClient('https://your-project.supabase.co', 'your-service-key')
 
 const bucket = supabase.storage.vectors.from('embeddings')
 
@@ -50,7 +47,7 @@ const { data, error } = await bucket.createIndex({
   indexName: 'documents-openai',
   dataType: 'float32',
   dimension: 1536,
-  distanceMetric: 'cosine'
+  distanceMetric: 'cosine',
 })
 
 if (error) {
@@ -86,7 +83,7 @@ await bucket.createIndex({
   indexName: 'documents-openai',
   dimension: 1536,
   distanceMetric: 'cosine',
-  dataType: 'float32'
+  dataType: 'float32',
 })
 
 // Index for Cohere embeddings
@@ -94,7 +91,7 @@ await bucket.createIndex({
   indexName: 'documents-cohere',
   dimension: 1024,
   distanceMetric: 'cosine',
-  dataType: 'float32'
+  dataType: 'float32',
 })
 
 // Index for different use case
@@ -102,7 +99,7 @@ await bucket.createIndex({
   indexName: 'images-openai',
   dimension: 1536,
   distanceMetric: 'cosine',
-  dataType: 'float32'
+  dataType: 'float32',
 })
 
 // List all indexes
@@ -166,7 +163,7 @@ if (error) {
 
 ### Before deleting an index
 
- **Warning**: Deleting an index is permanent and cannot be undone.
+**Warning**: Deleting an index is permanent and cannot be undone.
 
 - **Backup important data** - Export vectors before deletion if needed
 - **Update applications** - Ensure no code references the deleted index
@@ -192,7 +189,7 @@ await index.putVectors({ vectors: batch })
 const { data } = await index.queryVectors({
   queryVector,
   topK: 5,
-  filter: { category: 'electronics' }
+  filter: { category: 'electronics' },
 })
 
 // Avoid - Single vector inserts
@@ -204,7 +201,7 @@ for (const vector of vectors) {
 const { data } = await index.queryVectors({
   queryVector,
   topK: 1000, // Too many results
-  returnData: true // Include large embeddings
+  returnData: true, // Include large embeddings
 })
 ```
 

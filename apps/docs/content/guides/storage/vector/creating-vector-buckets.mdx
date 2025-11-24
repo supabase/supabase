@@ -30,10 +30,7 @@ Your vector bucket is now ready. The next step is to create indexes within it.
 ```typescript
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  'https://your-project.supabase.co',
-  'your-service-key'
-)
+const supabase = createClient('https://your-project.supabase.co', 'your-service-key')
 
 // Create a vector bucket
 await supabase.storage.vectors.createBucket('embeddings')
@@ -64,7 +61,7 @@ await bucket.createIndex({
   indexName: 'documents-openai',
   dataType: 'float32',
   dimension: 1536,
-  distanceMetric: 'cosine'
+  distanceMetric: 'cosine',
 })
 
 console.log('✓ Index created: documents-openai')

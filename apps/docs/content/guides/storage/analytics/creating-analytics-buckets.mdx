@@ -20,10 +20,7 @@ You can create an analytics bucket using either the Supabase SDK or the Supabase
 ```ts
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  'https://your-project.supabase.co',
-  'your-service-key'
-)
+const supabase = createClient('https://your-project.supabase.co', 'your-service-key')
 
 const { data, error } = await supabase.storage.analytics.createBucket('analytics-data')
 

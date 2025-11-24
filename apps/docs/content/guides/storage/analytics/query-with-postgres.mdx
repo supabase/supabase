@@ -22,37 +22,38 @@ The dashboard provides the easiest setup experience:
 2. Locate the namespace you want to query and click **Query with Postgres**.
 
 <Image
-    alt="Query with PostgreSQL button on analytics bucket page"
-    src="/docs/img/storage/query-analytics-with-postgres.png"
+  alt="Query with PostgreSQL button on analytics bucket page"
+  src="/docs/img/storage/query-analytics-with-postgres.png"
 />
 
 3. Enter the **Postgres schema** where you want to create the foreign tables.
 
 <Image
-    alt="Select destination PostgreSQL schema"
-    src="/docs/img/storage/query-analytics-schema-name.png"
+  alt="Select destination PostgreSQL schema"
+  src="/docs/img/storage/query-analytics-schema-name.png"
 />
 
 4. Click **Connect**. The wrapper is now configured.
 
-## Querying Your Data
+## Querying your data
 
 Once the foreign data wrapper is installed, you can query your Iceberg tables using standard SQL:
 
 ```sql
-SELECT * FROM schema_name.table_name
-LIMIT 100;
+select *
+from schema_name.table_name
+limit 100;
 ```
 
-### Common Query Examples
+### Common query examples
 
 Get the latest events:
 
 ```sql
-SELECT event_id, event_name, event_timestamp
-FROM analytics.events
-ORDER BY event_timestamp DESC
-LIMIT 1000;
+select event_id, event_name, event_timestamp
+from analytics.events
+order by event_timestamp desc
+limit 1000;
 ```
 
 Join with transactional data:

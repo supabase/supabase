@@ -25,10 +25,7 @@ Once you've created a bucket and index, you can start storing vectors. Vectors c
 ```typescript
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  'https://your-project.supabase.co',
-  'your-service-key'
-)
+const supabase = createClient('https://your-project.supabase.co', 'your-service-key')
 
 // Get bucket and index
 const bucket = supabase.storage.vectors.from('embeddings')
@@ -40,24 +37,24 @@ const { error } = await index.putVectors({
     {
       key: 'doc-1',
       data: {
-        float32: [0.1, 0.2, 0.3, /* ... rest of embedding ... */]
+        float32: [0.1, 0.2, 0.3 /* ... rest of embedding ... */],
       },
       metadata: {
         title: 'Getting Started with Vector Buckets',
-        source: 'documentation'
-      }
+        source: 'documentation',
+      },
     },
     {
       key: 'doc-2',
       data: {
-        float32: [0.4, 0.5, 0.6, /* ... rest of embedding ... */]
+        float32: [0.4, 0.5, 0.6 /* ... rest of embedding ... */],
       },
       metadata: {
         title: 'Advanced Vector Search',
-        source: 'blog'
-      }
-    }
-  ]
+        source: 'blog',
+      },
+    },
+  ],
 })
 
 if (error) {
@@ -110,39 +107,40 @@ Generate embeddings using an LLM API and store them directly:
 import { createClient } from '@supabase/supabase-js'
 import OpenAI from 'openai'
 
-const supabase = createClient(
-  'https://your-project.supabase.co',
-  'your-service-key'
-)
+const supabase = createClient('https://your-project.supabase.co', 'your-service-key')
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY,
 })
 
 // Documents to embed and store
 const documents = [
   { id: '1', title: 'How to Train Your AI', content: 'Guide for training models...' },
   { id: '2', title: 'Vector Search Best Practices', content: 'Tips for semantic search...' },
-  { id: '3', title: 'Building RAG Systems', content: 'Implementing retrieval-augmented generation...' }
+  {
+    id: '3',
+    title: 'Building RAG Systems',
+    content: 'Implementing retrieval-augmented generation...',
+  },
 ]
 
 // Generate embeddings
 const embeddings = await openai.embeddings.create({
   model: 'text-embedding-3-small',
-  input: documents.map(doc => doc.content)
+  input: documents.map((doc) => doc.content),
 })
 
 // Prepare vectors for storage
 const vectors = documents.map((doc, index) => ({
   key: doc.id,
   data: {
-    float32: embeddings.data[index].embedding
+    float32: embeddings.data[index].embedding,
   },
   metadata: {
     title: doc.title,
     source: 'knowledge_base',
-    created_at: new Date().toISOString()
-  }
+    created_at: new Date().toISOString(),
+  },
 }))
 
 // Store vectors in batches (max 500 per request)
@@ -209,14 +207,14 @@ const { error } = await index.putVectors({
     {
       key: 'doc-1',
       data: {
-        float32: [0.15, 0.25, 0.35, /* ... updated embedding ... */]
+        float32: [0.15, 0.25, 0.35 /* ... updated embedding ... */],
       },
       metadata: {
         title: 'Getting Started with Vector Buckets - Updated',
-        updated_at: new Date().toISOString()
-      }
-    }
-  ]
+        updated_at: new Date().toISOString(),
+      },
+    },
+  ],
 })
 
 if (!error) {
@@ -259,7 +257,7 @@ const index = bucket.index('documents-openai')
 
 // Delete specific vectors
 const { error } = await index.deleteVectors({
-  keys: ['doc-1', 'doc-2']
+  keys: ['doc-1', 'doc-2'],
 })
 
 if (!error) {
