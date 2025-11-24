@@ -140,8 +140,8 @@ const CustomDomainVerify = () => {
             </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
               Please add a CAA record allowing "digicert.com" to issue certificates for{' '}
-              <code className="text-xs">{customDomain?.hostname}</code>. For example:{' '}
-              <code className="text-xs">0 issue "digicert.com"</code>
+              <code className="text-code-inline">{customDomain?.hostname}</code>. For example:{' '}
+              <code className="text-code-inline">0 issue "digicert.com"</code>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}

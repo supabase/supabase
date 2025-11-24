@@ -165,7 +165,7 @@ const ForeignRowSelector = ({
       header={
         <div>
           Select a record to reference from{' '}
-          <code className="font-mono text-sm">
+          <code className="text-code-inline !text-sm">
             {schemaName}.{tableName}
           </code>
         </div>

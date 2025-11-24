@@ -152,10 +152,10 @@ export const ColumnList = ({
                       )}
                     </Table.td>
                     <Table.td>
-                      <code className="text-xs">{x.data_type}</code>
+                      <code className="text-code-inline">{x.data_type}</code>
                     </Table.td>
                     <Table.td className="font-mono text-xs">
-                      <code className="text-xs">{x.format}</code>
+                      <code className="text-code-inline">{x.format}</code>
                     </Table.td>
                     <Table.td className="font-mono text-xs">
                       {x.is_nullable ? (
