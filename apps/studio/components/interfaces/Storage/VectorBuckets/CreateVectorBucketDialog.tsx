@@ -1,19 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { Plus } from 'lucide-react'
+import { MouseEventHandler, useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-
-import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
-import { useS3VectorsWrapperCreateMutation } from 'data/storage/s3-vectors-wrapper-create-mutation'
-import { useVectorBucketCreateMutation } from 'data/storage/vector-bucket-create-mutation'
-import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   Dialog,
@@ -23,15 +14,28 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import { validVectorBucketName } from './CreateVectorBucketDialog.utils'
 import { useS3VectorsWrapperExtension } from './useS3VectorsWrapper'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
+import { useS3VectorsWrapperCreateMutation } from '@/data/storage/s3-vectors-wrapper-create-mutation'
+import { useVectorBucketCreateMutation } from '@/data/storage/vector-bucket-create-mutation'
+import { useVectorBucketsQuery } from '@/data/storage/vector-buckets-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 const FormSchema = z.object({
   name: z
@@ -80,6 +84,35 @@ const FormSchema = z.object({
 const formId = 'create-storage-bucket-form'
 
 export type CreateBucketForm = z.infer<typeof FormSchema>
+
+export const CreateVectorBucketButton = ({
+  onClick,
+}: {
+  onClick: MouseEventHandler<HTMLButtonElement>
+}) => {
+  const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+
+  return (
+    <ButtonTooltip
+      block
+      size="tiny"
+      type="primary"
+      className="w-fit"
+      icon={<Plus size={14} />}
+      disabled={!canCreateBuckets}
+      tabIndex={!canCreateBuckets ? -1 : 0}
+      onClick={onClick}
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text: !canCreateBuckets ? 'You need additional permissions to create buckets' : undefined,
+        },
+      }}
+    >
+      New bucket
+    </ButtonTooltip>
+  )
+}
 
 export const CreateVectorBucketDialog = ({
   visible,
