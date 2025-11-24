@@ -131,16 +131,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       orgSlug: selectedOrganizationRef.current?.slug,
       connectionString: project?.connectionString || undefined,
     })
-  }, [
-    project?.ref,
-    project?.connectionString,
-    selectedOrganizationRef.current?.slug,
-    state,
-  ])
+  }, [project?.ref, project?.connectionString, selectedOrganizationRef.current?.slug, state])
 
   const { mutate: sendEvent } = useSendEventMutation()
-
-
 
   const {
     messages: chatMessages,
