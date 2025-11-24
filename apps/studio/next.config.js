@@ -243,6 +243,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        permanent: true,
+        source: '/project/:ref/settings/jwt/signing-keys',
+        destination: '/project/:ref/settings/jwt',
+      },
+      {
         source: '/project/:ref/database/api-logs',
         destination: '/project/:ref/logs/edge-logs',
         permanent: true,
