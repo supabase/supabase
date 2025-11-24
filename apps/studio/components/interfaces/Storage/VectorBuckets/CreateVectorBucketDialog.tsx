@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { MouseEventHandler, useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
@@ -116,13 +116,16 @@ export const CreateVectorBucketDialog = ({
     onError: () => {},
   })
 
-  const { state: wrappersExtensionState } = useS3VectorsWrapperExtension()
+  const { extension: wrappersExtension, state: wrappersExtensionState } =
+    useS3VectorsWrapperExtension()
 
   const { mutateAsync: createS3VectorsWrapper } = useS3VectorsWrapperCreateMutation()
 
   const { mutateAsync: createSchema } = useSchemaCreateMutation({
     onError: () => {},
   })
+
+  const { mutateAsync: enableExtension } = useDatabaseExtensionEnableMutation()
 
   const onSubmit: SubmitHandler<CreateBucketForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
@@ -142,7 +145,25 @@ export const CreateVectorBucketDialog = ({
     }
 
     try {
-      if (wrappersExtensionState === 'installed') {
+      if (!wrappersExtension) throw new Error('Unable to find wrappers extension.')
+      if (wrappersExtensionState === 'not-installed') {
+        // when it's not installed, we need to enable the extension and create the wrapper
+        await enableExtension({
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
+          name: wrappersExtension.name,
+          schema: wrappersExtension.schema ?? 'extensions',
+          version: wrappersExtension.default_version,
+        })
+
+        await createS3VectorsWrapper({ bucketName: values.name })
+
+        await createSchema({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          name: getVectorBucketFDWSchemaName(values.name),
+        })
+      } else if (wrappersExtensionState === 'installed') {
         await createS3VectorsWrapper({ bucketName: values.name })
 
         await createSchema({
@@ -170,7 +191,7 @@ export const CreateVectorBucketDialog = ({
 
   useEffect(() => {
     if (!visible) form.reset()
-  }, [visible])
+  }, [visible, form])
 
   return (
     <Dialog open={visible} onOpenChange={setVisible}>
