@@ -20,7 +20,7 @@ pip install pyspark
 
 For detailed Spark setup instructions, see the [Apache Spark documentation](https://spark.apache.org/docs/latest/).
 
-## Basic Setup
+## Basic setup
 
 Here's a complete example showing how to configure Spark with your Supabase analytics bucket:
 
@@ -68,7 +68,7 @@ spark = SparkSession.builder \
 print("✓ Spark session initialized with Iceberg")
 ```
 
-## Creating Tables
+## Creating tables
 
 ```python
 # Create a namespace for organization
@@ -89,7 +89,7 @@ spark.sql("""
 print("✓ Created table: analytics.events")
 ```
 
-## Writing Data
+## Writing data
 
 ```python
 # Insert data into the table
@@ -105,7 +105,7 @@ spark.sql("""
 print("✓ Inserted 4 rows into analytics.events")
 ```
 
-## Reading Data
+## Reading data
 
 ```python
 # Read the entire table
@@ -133,9 +133,9 @@ summary_df = spark.sql("""
 summary_df.show()
 ```
 
-## Advanced Operations
+## Advanced operations
 
-### Working with DataFrames
+### Working with dataframes
 
 ```python
 # Read as DataFrame
@@ -155,7 +155,7 @@ monthly_events = events_df \
 monthly_events.show()
 ```
 
-### Joining Tables
+### Joining tables
 
 ```python
 # Create another table
@@ -191,7 +191,7 @@ joined_df = spark.sql("""
 joined_df.show(truncate=False)
 ```
 
-### Exporting Results
+### Exporting results
 
 ```python
 # Export to Parquet
@@ -216,7 +216,7 @@ spark.sql("""
 print("✓ Results exported")
 ```
 
-## Performance Best Practices
+## Performance best practices
 
 - **Partition tables** - Partition large tables by date or region for faster queries
 - **Select columns** - Only select columns you need to reduce I/O
@@ -224,7 +224,7 @@ print("✓ Results exported")
 - **Cache frequently accessed tables** - Use `spark.catalog.cacheTable()` for tables accessed multiple times
 - **Cluster mode** - Use cluster mode for production workloads instead of local mode
 
-## Complete Example: Data Processing Pipeline
+## Complete example: Data processing pipeline
 
 ```python
 from pyspark.sql import SparkSession
@@ -258,8 +258,8 @@ print("✓ Pipeline completed")
 monthly_summary.show()
 ```
 
-## Next Steps
+## Next steps
 
-- [Query with PostgreSQL](/docs/guides/storage/analytics/query-with-postgres)
+- [Query with Postgres](/docs/guides/storage/analytics/query-with-postgres)
 - [Connect with PyIceberg](/docs/guides/storage/analytics/examples/pyiceberg)
 - [Explore with DuckDB](/docs/guides/storage/analytics/examples/duckdb)

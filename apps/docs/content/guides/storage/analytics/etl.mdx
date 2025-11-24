@@ -9,15 +9,15 @@ Expect rapid changes, limited features, and possible breaking updates. [Share fe
 
 </Admonition>
 
-By combining Supabase's **ETL service** with **Analytics Buckets**, you can build an end-to-end data warehouse solution that automatically syncs changes from your PostgreSQL database to Iceberg tables.
+By combining Supabase's **ETL service** with **Analytics Buckets**, you can build an end-to-end data warehouse solution that automatically syncs changes from your Postgres database to Iceberg tables.
 
-## How It Works
+## How it works
 
-The ETL pipeline captures changes (INSERT, UPDATE, DELETE) from your PostgreSQL database in real-time and writes them to your analytics bucket. This allows you to maintain an always-up-to-date data warehouse without impacting your production workloads.
+The ETL pipeline captures changes (INSERT, UPDATE, DELETE) from your Postgres database in real-time and writes them to your analytics bucket. This allows you to maintain an always-up-to-date data warehouse without impacting your production workloads.
 
-## Setup Steps
+## Setup steps
 
-### Step 1: Create an Analytics Bucket
+### Step 1: Create an Analytics bucket
 
 First, create a new analytics bucket to store your replicated data:
 
@@ -33,7 +33,7 @@ First, create a new analytics bucket to store your replicated data:
     zoomable
 />
 
-### Step 2: Create a Publication
+### Step 2: Create a publication
 
 A publication defines which tables and change types will be replicated. Create one using SQL in the Supabase SQL Editor:
 
@@ -45,7 +45,7 @@ CREATE PUBLICATION pub_warehouse
 
 This publication will track all changes (INSERT, UPDATE, DELETE) for the specified tables. For advanced use cases, see the [Replication Configuration Guide](/docs/guides/database/replication/etl-replication-setup).
 
-### Step 3: Create the ETL Pipeline
+### Step 3: Create the ETL pipeline
 
 Now set up the pipeline to sync data to your analytics bucket:
 
@@ -62,7 +62,7 @@ Now set up the pipeline to sync data to your analytics bucket:
     zoomable
 />
 
-## Monitoring Your Pipeline
+## Monitoring your pipeline
 
 Once started, you can monitor the pipeline status directly in the **Database > Replication** section:
 
@@ -70,11 +70,11 @@ Once started, you can monitor the pipeline status directly in the **Database > R
 - **Sync Progress** - View the number of records replicated
 - **Logs** - Check detailed logs for troubleshooting
 
-## Next Steps
+## Next steps
 
 Once data is flowing to your analytics bucket, you can:
 
-- [Query with SQL via PostgreSQL](/docs/guides/storage/analytics/query-with-postgres)
+- [Query with SQL via Postgres](/docs/guides/storage/analytics/query-with-postgres)
 - [Connect with PyIceberg](/docs/guides/storage/analytics/examples/pyiceberg)
 - [Analyze with Apache Spark](/docs/guides/storage/analytics/examples/apache-spark)
 

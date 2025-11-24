@@ -18,7 +18,7 @@ Install DuckDB and the Iceberg extension:
 pip install duckdb duckdb-iceberg
 ```
 
-## Connecting to Analytics Buckets
+## Connecting to Analytics buckets
 
 Here's a complete example of connecting to your Supabase analytics bucket and querying Iceberg tables:
 
@@ -93,9 +93,9 @@ analytics = conn.execute("""
 print(analytics)
 ```
 
-## Key Features with DuckDB
+## Key features with DuckDB
 
-### Efficient Data Exploration
+### Efficient data exploration
 
 DuckDB's lazy evaluation means it only scans the data you need:
 
@@ -110,7 +110,7 @@ events = conn.execute("""
 
 ### Converting to Pandas
 
-Easily convert results to Pandas DataFrames for further analysis:
+Convert results to Pandas DataFrames for further analysis:
 
 ```python
 df = conn.execute("""
@@ -122,7 +122,7 @@ df = conn.execute("""
 print(df.describe())
 ```
 
-### Exporting Results
+### Exporting results
 
 Save your analytical results to various formats:
 
@@ -144,15 +144,15 @@ conn.execute("""
 """)
 ```
 
-## Best Practices
+## Best practices
 
 - **Connection pooling** - Reuse connections for multiple queries
 - **Partition pruning** - Filter by partition columns to improve query performance
 - **Column selection** - Only select columns you need to reduce I/O
 - **Limit results** - Use LIMIT during exploration to avoid processing large datasets
 
-## Next Steps
+## Next steps
 
-- [Query with PostgreSQL](/docs/guides/storage/analytics/query-with-postgres)
+- [Query with Postgres](/docs/guides/storage/analytics/query-with-postgres)
 - [Connect with PyIceberg](/docs/guides/storage/analytics/examples/pyiceberg)
 - [Analyze with Apache Spark](/docs/guides/storage/analytics/examples/apache-spark)

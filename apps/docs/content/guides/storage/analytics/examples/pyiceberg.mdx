@@ -16,7 +16,7 @@ PyIceberg is a Python client for Apache Iceberg that enables programmatic intera
 pip install pyiceberg pyarrow
 ```
 
-## Basic Setup
+## Basic setup
 
 Here's a complete example showing how to connect to your Supabase analytics bucket and perform operations:
 
@@ -59,7 +59,7 @@ catalog = load_catalog(
 print("✓ Successfully connected to Iceberg catalog")
 ```
 
-## Creating Tables
+## Creating tables
 
 ```python
 # Create a namespace for organization
@@ -83,7 +83,7 @@ table = catalog.create_table_if_not_exists(
 print("✓ Created table: analytics.events")
 ```
 
-## Writing Data
+## Writing data
 
 ```python
 import datetime
@@ -109,7 +109,7 @@ table.append(data)
 print("✓ Appended 5 rows to analytics.events")
 ```
 
-## Reading Data
+## Reading data
 
 ```python
 # Scan the entire table
@@ -130,7 +130,7 @@ selected = table.scan(
 print(selected.head())
 ```
 
-## Advanced Operations
+## Advanced operations
 
 ### Listing Tables and Namespaces
 
@@ -149,7 +149,7 @@ print("Schema:", table_metadata.schema())
 print("Partitions:", table_metadata.partitions())
 ```
 
-### Handling Errors
+### Handling errors
 
 ```python
 try:
@@ -170,7 +170,7 @@ except Exception:
     table = catalog.create_table((namespace, table_name), schema=schema)
 ```
 
-## Performance Tips
+## Performance tips
 
 - **Batch writes** - Insert data in batches rather than row-by-row for better performance
 - **Partition strategies** - Use partitioning for large tables to improve query performance
@@ -216,8 +216,8 @@ result = table.scan().to_pandas()
 print(result.describe())
 ```
 
-## Next Steps
+## Next steps
 
-- [Query with PostgreSQL](/docs/guides/storage/analytics/query-with-postgres)
+- [Query with Postgres](/docs/guides/storage/analytics/query-with-postgres)
 - [Analyze with Apache Spark](/docs/guides/storage/analytics/examples/apache-spark)
 - [Explore with DuckDB](/docs/guides/storage/analytics/examples/duckdb)
