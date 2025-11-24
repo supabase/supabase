@@ -60,7 +60,7 @@ const VercelIntegrationConnectionForm = ({
     },
   })
 
-  const { mutate: updateVercelConnection, isLoading } = useVercelConnectionUpdateMutation({
+  const { mutate: updateVercelConnection, isPending } = useVercelConnectionUpdateMutation({
     onSuccess: () => {
       form.reset(form.getValues())
       toast.success(`Updated Vercel connection`)
@@ -265,7 +265,7 @@ const VercelIntegrationConnectionForm = ({
             disabled={disabled}
             form={vercelConnectionFormId}
             hasChanges={form.formState.isDirty}
-            isSubmitting={isLoading}
+            isSubmitting={isPending}
             handleReset={() => form.reset()}
           />
         </div>

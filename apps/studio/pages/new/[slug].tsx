@@ -241,7 +241,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const {
     mutate: createProject,
-    isLoading: isCreatingNewProject,
+    isPending: isCreatingNewProject,
     isSuccess: isSuccessNewProject,
   } = useProjectCreateMutation({
     onSuccess: (res) => {

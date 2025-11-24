@@ -37,7 +37,7 @@ const AddRestrictionModal = ({
   const ipv6Restrictions = data?.config?.dbAllowedCidrsV6 ?? []
   const restrictedIps = ipv4Restrictions.concat(ipv6Restrictions)
 
-  const { mutate: applyNetworkRestrictions, isLoading: isApplying } =
+  const { mutate: applyNetworkRestrictions, isPending: isApplying } =
     useNetworkRestrictionsApplyMutation({
       onSuccess: () => {
         toast.success('Successfully added restriction')

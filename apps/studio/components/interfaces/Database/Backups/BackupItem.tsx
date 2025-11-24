@@ -25,7 +25,7 @@ export const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupI
     'queue_job.restore.prepare'
   )
 
-  const { mutate: downloadBackup, isLoading: isDownloading } = useBackupDownloadMutation({
+  const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
     onSuccess: (res) => {
       const { fileUrl } = res
 

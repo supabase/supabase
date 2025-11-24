@@ -8,7 +8,7 @@ import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSecretsDeleteMutation } from 'data/secrets/secrets-delete-mutation'
-import { ProjectSecret, useSecretsQuery } from 'data/secrets/secrets-query'
+import { useSecretsQuery } from 'data/secrets/secrets-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { Badge, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
@@ -18,22 +18,25 @@ import AddNewSecretForm from './AddNewSecretForm'
 import EdgeFunctionSecret from './EdgeFunctionSecret'
 import { EditSecretSheet } from './EditSecretSheet'
 
-const EdgeFunctionSecrets = () => {
+export const EdgeFunctionSecrets = () => {
   const { ref: projectRef } = useParams()
   const [searchString, setSearchString] = useState('')
 
   // Track the ID being deleted to exclude it from error checking
   const deletingSecretNameRef = useRef<string | null>(null)
 
-  const { can: canReadSecrets, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.SECRETS_READ,
+  const { can: canReadSecrets, isLoading: isLoadingSecretsPermissions } = useAsyncCheckPermissions(
+    PermissionAction.FUNCTIONS_SECRET_READ,
     '*'
   )
   const { can: canUpdateSecrets } = useAsyncCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
 
-  const { data, error, isLoading, isSuccess, isError } = useSecretsQuery({
-    projectRef: projectRef,
-  })
+  const { data, error, isLoading, isSuccess, isError } = useSecretsQuery(
+    {
+      projectRef: projectRef,
+    },
+    { enabled: canReadSecrets }
+  )
 
   const { setValue: setSelectedSecretToEdit, value: selectedSecretToEdit } =
     useQueryStateWithSelect({
@@ -54,7 +57,7 @@ const EdgeFunctionSecrets = () => {
         handleErrorOnDelete(deletingSecretNameRef, selectedId, `Secret not found`),
     })
 
-  const { mutate: deleteSecret, isLoading: isDeleting } = useSecretsDeleteMutation({
+  const { mutate: deleteSecret, isPending: isDeleting } = useSecretsDeleteMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully deleted ${variables.secrets[0]}`)
       setSelectedSecretToDelete(null)
@@ -82,10 +85,14 @@ const EdgeFunctionSecrets = () => {
     <TableHead key="actions" />,
   ]
 
+  const showLoadingState = isLoadingSecretsPermissions || (canReadSecrets && isLoading)
+
   return (
     <>
-      {isLoading || isLoadingPermissions ? (
+      {showLoadingState ? (
         <GenericSkeletonLoader />
+      ) : !canReadSecrets ? (
+        <NoPermission resourceText="view this project's edge function secrets" />
       ) : (
         <>
           {isError && <AlertError error={error} subject="Failed to retrieve project secrets" />}
@@ -187,5 +194,3 @@ const EdgeFunctionSecrets = () => {
     </>
   )
 }
-
-export default EdgeFunctionSecrets

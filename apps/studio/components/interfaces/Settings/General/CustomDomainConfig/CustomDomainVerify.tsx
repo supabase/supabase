@@ -33,14 +33,14 @@ const CustomDomainVerify = () => {
   const isSSLCertificateDeploying =
     customDomain?.ssl.status !== undefined && customDomain.ssl.txt_name === undefined
 
-  const { mutate: reverifyCustomDomain, isLoading: isReverifyLoading } =
+  const { mutate: reverifyCustomDomain, isPending: isReverifyLoading } =
     useCustomDomainReverifyMutation({
       onSuccess: (res) => {
         if (res.status === '2_initiated') setIsNotVerifiedYet(true)
       },
     })
 
-  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation({
+  const { mutate: deleteCustomDomain, isPending: isDeleting } = useCustomDomainDeleteMutation({
     onSuccess: () => {
       toast.success(
         'Custom domain setup cancelled successfully. It may take a few seconds before your custom domain is fully removed, so you may need to refresh your browser.'

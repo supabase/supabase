@@ -101,7 +101,7 @@ export const CreateKeyDialog = ({
     return null
   }, [privateKey, newKeyAlgorithm])
 
-  const { mutate, isLoading: isLoadingMutation } = useJWTSigningKeyCreateMutation({
+  const { mutate, isPending: isPendingMutation } = useJWTSigningKeyCreateMutation({
     onSuccess: () => {
       toast.success('Standby key created successfully')
       onClose()
@@ -234,8 +234,8 @@ export const CreateKeyDialog = ({
       <DialogFooter>
         <Button
           onClick={() => handleAddNewStandbyKey()}
-          disabled={isLoadingMutation || !!privateKeyMessage}
-          loading={isLoadingMutation}
+          disabled={isPendingMutation || !!privateKeyMessage}
+          loading={isPendingMutation}
         >
           Create standby key
         </Button>

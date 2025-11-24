@@ -61,7 +61,7 @@ const CodePage = () => {
   )
   const [files, setFiles] = useState<EdgeFunctionFile[]>([])
 
-  const { mutate: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
+  const { mutate: deployFunction, isPending: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
       toast.success('Successfully updated edge function')
       setShowDeployWarning(false)

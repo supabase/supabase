@@ -34,7 +34,7 @@ const SSLConfiguration = () => {
   } = useSSLEnforcementQuery({
     projectRef: ref,
   })
-  const { mutate: updateSSLEnforcement, isLoading: isSubmitting } = useSSLEnforcementUpdateMutation(
+  const { mutate: updateSSLEnforcement, isPending: isSubmitting } = useSSLEnforcementUpdateMutation(
     {
       onSuccess: () => {
         toast.success('Successfully updated SSL configuration')

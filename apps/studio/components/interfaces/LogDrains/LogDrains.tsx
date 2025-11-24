@@ -29,6 +29,7 @@ import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { LogDrainsCard } from './LogDrainsCard'
 import { LogDrainsEmpty } from './LogDrainsEmpty'
 import { VoteLink } from './VoteLink'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 export function LogDrains({
   onNewDrainClick,
@@ -37,8 +38,8 @@ export function LogDrains({
   onNewDrainClick: (src: LogDrainType) => void
   onUpdateDrainClick: (drain: LogDrainData) => void
 }) {
-  const { isLoading: orgPlanLoading, plan } = useCurrentOrgPlan()
-  const logDrainsEnabled = !orgPlanLoading && (plan?.id === 'team' || plan?.id === 'enterprise')
+  const { hasAccess: hasAccessToLogDrains, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('log_drains')
   const track = useTrack()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedLogDrain, setSelectedLogDrain] = useState<LogDrainData | null>(null)
@@ -52,7 +53,7 @@ export function LogDrains({
   } = useLogDrainsQuery(
     { ref },
     {
-      enabled: logDrainsEnabled,
+      enabled: hasAccessToLogDrains,
     }
   )
   const sentryEnabled = useFlag('SentryLogDrain')
@@ -70,16 +71,16 @@ export function LogDrains({
     },
   })
 
-  if (!orgPlanLoading && !logDrainsEnabled) {
-    return <LogDrainsEmpty />
-  }
-
-  if (isLoading || orgPlanLoading) {
+  if (isLoading || isLoadingEntitlement) {
     return (
       <div>
         <GenericSkeletonLoader />
       </div>
     )
+  }
+
+  if (!isLoadingEntitlement && !hasAccessToLogDrains) {
+    return <LogDrainsEmpty />
   }
 
   if (!isLoading && !hasLogDrains) {

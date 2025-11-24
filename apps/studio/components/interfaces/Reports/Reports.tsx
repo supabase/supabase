@@ -67,7 +67,7 @@ const Reports = () => {
     projectRef: ref,
     type: 'report',
   })
-  const { mutate: upsertContent, isLoading: isSaving } = useContentUpsertMutation({
+  const { mutate: upsertContent, isPending: isSaving } = useContentUpsertMutation({
     onSuccess: (_, vars) => {
       setHasEdits(false)
       if (vars.payload.type === 'report') toast.success('Successfully saved report!')
