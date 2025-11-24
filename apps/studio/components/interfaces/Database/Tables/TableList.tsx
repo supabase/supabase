@@ -427,7 +427,11 @@ export const TableList = ({
                           {x.rows !== undefined ? x.rows.toLocaleString() : '-'}
                         </TableCell>
                         <TableCell className="hidden text-right xl:table-cell">
-                          {x.size !== undefined ? <code className="text-xs">{x.size}</code> : '-'}
+                          {x.size !== undefined ? (
+                            <code className="text-code-inline">{x.size}</code>
+                          ) : (
+                            '-'
+                          )}
                         </TableCell>
                         <TableCell className="hidden xl:table-cell text-center">
                           {(realtimePublication?.tables ?? []).find(

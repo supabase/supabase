@@ -187,7 +187,7 @@ export const CreateHookSheet = ({
     return permissionChanges
   }, [hook, values.postgresValues.schema, values.postgresValues.functionName])
 
-  const { mutate: updateAuthHooks, isLoading: isUpdatingAuthHooks } = useAuthHooksUpdateMutation({
+  const { mutate: updateAuthHooks, isPending: isUpdatingAuthHooks } = useAuthHooksUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully created ${values.hookType}.`)
       if (statements.length > 0) {

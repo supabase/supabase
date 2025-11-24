@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { useTemporaryAPIKeyQuery } from 'data/api-keys/temp-api-keys-query'
+import { getOrRefreshTemporaryApiKey } from 'data/api-keys/temp-api-keys-utils'
 import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { storageKeys } from './keys'
@@ -11,15 +11,14 @@ type GetNamespacesVariables = {
   projectRef?: string
 }
 
-const errorPrefix = 'Failed to delete Iceberg namespaces'
+const errorPrefix = 'Failed to retrieve Iceberg namespaces'
 
-async function getNamespaces({
-  catalogUri,
-  warehouse,
-  tempApiKey,
-}: GetNamespacesVariables & { tempApiKey?: string }) {
+async function getNamespaces({ projectRef, catalogUri, warehouse }: GetNamespacesVariables) {
   try {
-    if (!tempApiKey) throw new Error(`${errorPrefix}: API Key missing`)
+    if (!projectRef) throw new Error(`${errorPrefix}: projectRef is required`)
+
+    const tempApiKeyObj = await getOrRefreshTemporaryApiKey(projectRef)
+    const tempApiKey = tempApiKeyObj.apiKey
 
     let headers = new Headers()
     headers = await constructHeaders({
@@ -56,8 +55,6 @@ export const useIcebergNamespacesQuery = <TData = IcebergNamespacesData>(
   }: UseCustomQueryOptions<IcebergNamespacesData, IcebergNamespacesError, TData> = {}
 ) => {
   const { projectRef, catalogUri, warehouse } = params
-  const { data } = useTemporaryAPIKeyQuery({ projectRef })
-  const tempApiKey = data?.api_key
 
   return useQuery<IcebergNamespacesData, IcebergNamespacesError, TData>({
     queryKey: storageKeys.icebergNamespaces({
@@ -65,13 +62,14 @@ export const useIcebergNamespacesQuery = <TData = IcebergNamespacesData>(
       warehouse,
       catalog: catalogUri,
     }),
-    queryFn: () => getNamespaces({ ...params, tempApiKey }),
+    queryFn: () => getNamespaces({ ...params }),
     enabled:
       options &&
       typeof projectRef !== 'undefined' &&
-      typeof tempApiKey !== 'undefined' &&
       typeof catalogUri !== 'undefined' &&
-      typeof warehouse !== 'undefined',
+      catalogUri.length > 0 &&
+      typeof warehouse !== 'undefined' &&
+      warehouse.length > 0,
     ...options,
   })
 }

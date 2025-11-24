@@ -15,8 +15,8 @@ import { DocsButton } from 'components/ui/DocsButton'
 import InformationBox from 'components/ui/InformationBox'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useTablesQuery } from 'data/tables/tables-query'
 import { useTablesQuery as useTableRetrieveQuery } from 'data/tables/table-retrieve-query'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
@@ -306,7 +306,7 @@ export const ForeignKeySelector = ({
                 <div className="flex flex-col gap-y-3">
                   <label className="text-foreground-light text-sm">
                     Select columns from{' '}
-                    <code className="text-xs">
+                    <code className="text-code-inline">
                       {fk.schema}.{fk.table}
                     </code>{' '}
                     to reference to
@@ -421,9 +421,9 @@ export const ForeignKeySelector = ({
                             if (x === undefined) return null
                             return (
                               <li key={`type-error-${idx}`}>
-                                <code className="text-xs">{fk.columns[idx]?.source}</code> (
-                                {x.sourceType}) and{' '}
-                                <code className="text-xs">{fk.columns[idx]?.target}</code>(
+                                <code className="text-code-inline">{fk.columns[idx]?.source}</code>{' '}
+                                ({x.sourceType}) and{' '}
+                                <code className="text-code-inline">{fk.columns[idx]?.target}</code>(
                                 {x.targetType})
                               </li>
                             )
@@ -444,7 +444,9 @@ export const ForeignKeySelector = ({
                             return (
                               <li key={`type-error-${idx}`}>
                                 <div className="flex items-center gap-x-1">
-                                  <code className="text-xs">{fk.columns[idx]?.source}</code>{' '}
+                                  <code className="text-code-inline">
+                                    {fk.columns[idx]?.source}
+                                  </code>{' '}
                                   <ArrowRight size={14} /> {x.targetType}
                                 </div>
                               </li>
@@ -472,18 +474,18 @@ export const ForeignKeySelector = ({
                         </p>
                         <ul className="mt-2 list-disc pl-4 space-y-1">
                           <li>
-                            <code className="text-xs">Cascade</code>: if the referencing table
-                            represents something that is a component of what is represented by the
-                            referenced table and cannot exist independently
+                            <code className="text-code-inline">Cascade</code>: if the referencing
+                            table represents something that is a component of what is represented by
+                            the referenced table and cannot exist independently
                           </li>
                           <li>
-                            <code className="text-xs">Restrict</code> or{' '}
-                            <code className="text-xs">No action</code>: if the two tables represent
-                            independent objects
+                            <code className="text-code-inline">Restrict</code> or{' '}
+                            <code className="text-code-inline">No action</code>: if the two tables
+                            represent independent objects
                           </li>
                           <li>
-                            <code className="text-xs">Set NULL</code> or{' '}
-                            <code className="text-xs">Set default</code>: if a foreign-key
+                            <code className="text-code-inline">Set NULL</code> or{' '}
+                            <code className="text-code-inline">Set default</code>: if a foreign-key
                             relationship represents optional information
                           </li>
                         </ul>

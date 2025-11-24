@@ -46,7 +46,7 @@ interface SmtpFormValues {
 export const SmtpForm = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const [enableSmtp, setEnableSmtp] = useState(false)
   const [hidden, setHidden] = useState(true)
@@ -149,7 +149,15 @@ export const SmtpForm = () => {
 
   const onSubmit = (values: SmtpFormValues) => {
     const { ENABLE_SMTP, ...rest } = values
-    const payload = ENABLE_SMTP ? rest : defaultDisabledSmtpFormValues
+    const basePayload = ENABLE_SMTP ? rest : defaultDisabledSmtpFormValues
+
+    // When enabling SMTP, set RATE_LIMIT_EMAIL_SENT to 30
+    // When disabling, backend will handle resetting to default
+    const isEnablingSmtp = ENABLE_SMTP && !isSmtpEnabled(authConfig)
+    const payload = {
+      ...basePayload,
+      ...(isEnablingSmtp && { RATE_LIMIT_EMAIL_SENT: 30 }),
+    }
 
     // Format payload: Convert port to string
     if (payload.SMTP_PORT) {

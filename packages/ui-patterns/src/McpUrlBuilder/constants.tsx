@@ -108,7 +108,7 @@ export const MCP_CLIENTS: McpClient[] = [
         },
       }
     },
-    alternateInstructions: () => (
+    alternateInstructions: (_config, _onCopy) => (
       <p className="text-xs text-foreground-light">
         Windsurf does not currently support remote MCP servers over HTTP transport. You need to use
         the mcp-remote package as a proxy.
@@ -131,7 +131,7 @@ export const MCP_CLIENTS: McpClient[] = [
         },
       }
     },
-    primaryInstructions: (_config) => {
+    primaryInstructions: (_config, onCopy) => {
       const config = _config as ClaudeCodeMcpConfig
       const command = `claude mcp add --scope project --transport http supabase "${config.mcpServers.supabase.url}"`
       return (
@@ -146,17 +146,24 @@ export const MCP_CLIENTS: McpClient[] = [
             // This is a no-op but the CodeBlock component is designed to output
             // inline code if no className is given
             className="block"
+            onCopyCallback={() => onCopy?.('command')}
           />
         </div>
       )
     },
-    alternateInstructions: () => (
+    alternateInstructions: (_config, onCopy) => (
       <div className="space-y-2">
         <p className="text-xs text-foreground-light">
           After configuring the MCP server, you need to authenticate. In a regular terminal (not the
           IDE extension) run:
         </p>
-        <CodeBlock value="claude /mcp" language="bash" focusable={false} className="block" />
+        <CodeBlock
+          value="claude /mcp"
+          language="bash"
+          focusable={false}
+          className="block"
+          onCopyCallback={() => onCopy?.('command')}
+        />
         <p className="text-xs text-foreground-light">
           Select the "supabase" server, then "Authenticate" to begin the authentication flow.
         </p>
