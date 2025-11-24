@@ -2,11 +2,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
-import { parseAsBoolean, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -262,8 +261,8 @@ export const CreateAnalyticsBucketModal = ({
                   title="Wrappers extension must be updated for Iceberg Wrapper support"
                 >
                   <p className="prose max-w-full text-sm !leading-normal">
-                    Update the <code className="text-xs">wrappers</code> extension by upgrading your
-                    project from your{' '}
+                    Update the <code className="text-code-inline">wrappers</code> extension by
+                    upgrading your project from your{' '}
                     <InlineLink href={`/project/${ref}/settings/infrastructure`}>
                       project settings
                     </InlineLink>{' '}
