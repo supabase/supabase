@@ -160,6 +160,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        permanent: true,
+        source: '/project/:ref/settings/api-keys/new',
+        destination: '/project/:ref/settings/api-keys',
+      },
+      {
         source: '/project/:ref/settings/storage',
         destination: '/project/:ref/storage/files/settings',
         permanent: true,
