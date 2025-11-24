@@ -1,5 +1,5 @@
 import type { OAuthClient } from '@supabase/supabase-js'
-import { MoreVertical, Plus, RotateCw, Search, Trash } from 'lucide-react'
+import { MoreVertical, Edit, Plus, RotateCw, Search, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRef, useState } from 'react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
@@ -35,7 +35,7 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
-import { CreateOAuthAppSheet } from './CreateOAuthAppSheet'
+import { CreateOrUpdateOAuthAppSheet } from './CreateOrUpdateOAuthAppSheet'
 import { DeleteOAuthAppModal } from './DeleteOAuthAppModal'
 import { NewOAuthAppBanner } from './NewOAuthAppBanner'
 
@@ -82,10 +82,21 @@ export const OAuthAppsList = () => {
 
   const oAuthApps = data?.clients || []
 
+  console.log('oAuthApps', oAuthApps)
+
   const [showCreateSheet, setShowCreateSheet] = useQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
+
+  const { setValue: setSelectedAppToEdit, value: appToEdit } = useQueryStateWithSelect({
+    urlKey: 'edit',
+    select: (client_id: string) =>
+      client_id ? oAuthApps?.find((app) => app.client_id === client_id) : undefined,
+    enabled: !!oAuthApps?.length,
+    onError: (_error, selectedId) =>
+      handleErrorOnDelete(deletingOAuthAppIdRef, selectedId, `OAuth App not found`),
+  })
 
   const { setValue: setSelectedAppToDelete, value: appToDelete } = useQueryStateWithSelect({
     urlKey: 'delete',
@@ -108,6 +119,10 @@ export const OAuthAppsList = () => {
 
   const handleDeleteClick = (app: OAuthClient) => {
     setSelectedAppToDelete(app.client_id)
+  }
+
+  const handleEditClick = (app: OAuthClient) => {
+    setSelectedAppToEdit(app.client_id)
   }
 
   const [filterString, setFilterString] = useState<string>('')
@@ -254,18 +269,27 @@ export const OAuthAppsList = () => {
                               <DropdownMenuItem
                                 className="space-x-2"
                                 onClick={() => {
+                                  handleEditClick(app)
+                                }}
+                              >
+                                <Edit size={12} />
+                                <p>Update</p>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="space-x-2"
+                                onClick={() => {
                                   setSelectedApp(app)
                                   setShowRegenerateDialog(true)
                                 }}
                               >
-                                <RotateCw size={14} />
+                                <RotateCw size={12} />
                                 <p>Regenerate client secret</p>
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 className="space-x-2"
                                 onClick={() => handleDeleteClick(app)}
                               >
-                                <Trash size={14} />
+                                <Trash size={12} />
                                 <p>Delete</p>
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -280,15 +304,18 @@ export const OAuthAppsList = () => {
         </div>
       </div>
 
-      <CreateOAuthAppSheet
-        visible={showCreateSheet}
+      <CreateOrUpdateOAuthAppSheet
+        visible={showCreateSheet || !!appToEdit}
+        appToEdit={appToEdit}
         onSuccess={(app) => {
           setShowCreateSheet(false)
+          setSelectedAppToEdit(null)
           setSelectedApp(undefined)
           setNewOAuthApp(app)
         }}
         onCancel={() => {
           setShowCreateSheet(false)
+          setSelectedAppToEdit(null)
           setSelectedApp(undefined)
         }}
       />

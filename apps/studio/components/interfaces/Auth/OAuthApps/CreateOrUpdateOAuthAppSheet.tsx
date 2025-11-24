@@ -1,5 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { CreateOAuthClientParams, OAuthClient } from '@supabase/supabase-js'
+import type {
+  CreateOAuthClientParams,
+  OAuthClient,
+  UpdateOAuthClientParams,
+} from '@supabase/supabase-js'
 import { Plus, Trash2, X } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
@@ -9,6 +13,7 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { useOAuthServerAppCreateMutation } from 'data/oauth-server-apps/oauth-server-app-create-mutation'
+import { useOAuthServerAppUpdateMutation } from 'data/oauth-server-apps/oauth-server-app-update-mutation'
 import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
 import {
   Button,
@@ -33,8 +38,9 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-interface CreateOAuthAppSheetProps {
+interface CreateOrUpdateOAuthAppSheetProps {
   visible: boolean
+  appToEdit?: OAuthClient
   onSuccess: (app: OAuthClient) => void
   onCancel: () => void
 }
@@ -65,8 +71,14 @@ const initialValues = {
   is_public: false,
 }
 
-export const CreateOAuthAppSheet = ({ visible, onSuccess, onCancel }: CreateOAuthAppSheetProps) => {
+export const CreateOrUpdateOAuthAppSheet = ({
+  visible,
+  appToEdit,
+  onSuccess,
+  onCancel,
+}: CreateOrUpdateOAuthAppSheetProps) => {
   const { ref: projectRef } = useParams()
+  const isEditMode = !!appToEdit
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -94,11 +106,34 @@ export const CreateOAuthAppSheet = ({ visible, onSuccess, onCancel }: CreateOAut
     },
   })
 
+  const { mutateAsync: updateOAuthApp, isPending: isUpdating } = useOAuthServerAppUpdateMutation({
+    onSuccess: (data) => {
+      toast.success(`Successfully updated OAuth app "${data.client_name}"`)
+      onSuccess(data)
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
+
   useEffect(() => {
     if (visible) {
-      form.reset(initialValues)
+      if (appToEdit) {
+        // Populate form with existing app data
+        form.reset({
+          name: appToEdit.client_name,
+          type: 'manual' as const,
+          redirect_uris:
+            appToEdit.redirect_uris && appToEdit.redirect_uris.length > 0
+              ? appToEdit.redirect_uris.map((uri) => ({ value: uri }))
+              : [{ value: '' }],
+          is_public: appToEdit.client_type === 'public',
+        })
+      } else {
+        form.reset(initialValues)
+      }
     }
-  }, [visible])
+  }, [visible, appToEdit, form])
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     // Filter out empty redirect URIs
@@ -106,18 +141,32 @@ export const CreateOAuthAppSheet = ({ visible, onSuccess, onCancel }: CreateOAut
       .map((uri) => uri.value.trim())
       .filter((uri) => uri !== '')
 
-    const payload: CreateOAuthClientParams = {
-      client_name: data.name,
-      client_uri: '',
-      // scope: data.scope,
-      redirect_uris: validRedirectUris,
-    }
+    if (isEditMode && appToEdit) {
+      const payload: UpdateOAuthClientParams = {
+        client_name: data.name,
+        redirect_uris: validRedirectUris,
+      }
 
-    createOAuthApp({
-      projectRef,
-      supabaseClient: supabaseClientData?.supabaseClient,
-      ...payload,
-    })
+      updateOAuthApp({
+        projectRef,
+        supabaseClient: supabaseClientData?.supabaseClient,
+        clientId: appToEdit.client_id,
+        ...payload,
+      })
+    } else {
+      const payload: CreateOAuthClientParams = {
+        client_name: data.name,
+        client_uri: '',
+        // scope: data.scope,
+        redirect_uris: validRedirectUris,
+      }
+
+      createOAuthApp({
+        projectRef,
+        supabaseClient: supabaseClientData?.supabaseClient,
+        ...payload,
+      })
+    }
   }
 
   const onClose = () => {
@@ -147,7 +196,9 @@ export const CreateOAuthAppSheet = ({ visible, onSuccess, onCancel }: CreateOAut
                 <X className="h-3 w-3" />
                 <span className="sr-only">Close</span>
               </SheetClose>
-              <SheetTitle className="truncate">Create a new OAuth app</SheetTitle>
+              <SheetTitle className="truncate">
+                {isEditMode ? 'Update OAuth app' : 'Create a new OAuth app'}
+              </SheetTitle>
             </div>
           </SheetHeader>
           <SheetSection className="overflow-auto flex-grow px-0">
@@ -292,11 +343,11 @@ export const CreateOAuthAppSheet = ({ visible, onSuccess, onCancel }: CreateOAut
             </Form_Shadcn_>
           </SheetSection>
           <SheetFooter>
-            <Button type="default" disabled={isCreating} onClick={onClose}>
+            <Button type="default" disabled={isCreating || isUpdating} onClick={onClose}>
               Cancel
             </Button>
-            <Button htmlType="submit" form={FORM_ID} loading={isCreating}>
-              Create app
+            <Button htmlType="submit" form={FORM_ID} loading={isCreating || isUpdating}>
+              {isEditMode ? 'Update app' : 'Create app'}
             </Button>
           </SheetFooter>
         </SheetContent>
