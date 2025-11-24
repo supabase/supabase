@@ -1,24 +1,15 @@
-// [Joshen] These are referenced from the storage API directly here
-// https://github.com/supabase/storage/blob/69e4a40799a9d10be0a63a37cbb46d7d9bea0e17/src/storage/limits.ts#L59
-
-// only allow s3 safe characters and characters which require special handling for now
-// the slash restriction come from bucket naming rules
-// and the rest of the validation rules are based on S3 object key validation.
-// https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
-// https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html
-
+/**
+ * Rules: https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-buckets-naming.html?i
+ * Bucket names must be between 3 and 63 characters long.
+ * Bucket names can consist only of lowercase letters, numbers, and hyphens (-).
+ * Bucket names must begin and end with a letter or number.
+ * Bucket names must not contain any underscores (_) or periods (.).
+ * Bucket names must not start with any of the following reserved prefixes: 
+    xn--, sthree-, amzn-s3-demo-, aws
+ * Bucket names must not end with any of the following reserved suffixes:
+    -s3alias, --ol-s3, --x-s3, --table-s3
+ */
 export const reservedPrefixes = /^(?:xn--|sthree-|amzn-s3-demo-|aws)/
 export const reservedSuffixes = /(?:-s3alias|--ol-s3|--x-s3|--table-s3)$/
-
-// 1) only lowercase letters, digits, hyphens
-// 2) must start and end with a letter or digit
 export const validBucketNameRegex = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/
 export const invalidBucketNameRegex = /[^a-z0-9-]/
-
-// export const validBucketNameRegex = /^(\w|!|-|\.|\*|'|\(|\)| |&|\$|@|=|;|:|\+|,|\?)*$/
-// export const inverseValidBucketNameRegex = /[^A-Za-z0-9_!\-.*'() &$@=;:+,?]/
-
-// only allow s3 safe characters and characters which require special handling for now
-// https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
-export const validObjectKeyRegex = /^(\w|\/|!|-|\.|\*|'|\(|\)| |&|\$|@|=|;|:|\+|,|\?)*$/
-export const inverseValidObjectKeyRegex = /[^A-Za-z0-9_\/!\-.*'() &$@=;:+,?]/
