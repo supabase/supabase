@@ -1,70 +1,39 @@
-import JWTSettings from 'components/interfaces/JwtSecrets/jwt-settings'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
+import { JWTSecretKeysTable } from 'components/interfaces/JwtSecrets/jwt-secret-keys-table'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import JWTKeysLayout from 'components/layouts/JWTKeys/JWTKeysLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
+import NoPermission from 'components/ui/NoPermission'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 
-import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
-import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from 'components/interfaces/JwtSecrets/jwt.constants'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { configKeys } from 'data/config/keys'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useEffect, useRef } from 'react'
-import { toast } from 'sonner'
-
-const JWTKeysLegacyPage: NextPageWithLayout = () => {
-  const client = useQueryClient()
-  const { ref: projectRef } = useParams()
-  const { projectSettingsLegacyJwtKeys } = useIsFeatureEnabled(['project_settings:legacy_jwt_keys'])
-
-  const { data } = useJwtSecretUpdatingStatusQuery(
-    { projectRef },
-    { enabled: projectSettingsLegacyJwtKeys }
+const JWTSigningKeysPage: NextPageWithLayout = () => {
+  const { can: canReadAPIKeys, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'auth_signing_keys'
   )
-  const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
-  const jwtSecretUpdateError = data?.jwtSecretUpdateError
-
-  const previousJwtSecretUpdateStatus = useRef<JwtSecretUpdateStatus>()
-  const { Failed, Updated, Updating } = JwtSecretUpdateStatus
-  const jwtSecretUpdateErrorMessage =
-    JWT_SECRET_UPDATE_ERROR_MESSAGES[jwtSecretUpdateError as JwtSecretUpdateError]
-
-  useEffect(() => {
-    if (previousJwtSecretUpdateStatus.current === Updating) {
-      switch (jwtSecretUpdateStatus) {
-        case Updated:
-          client.invalidateQueries({ queryKey: configKeys.api(projectRef) })
-          client.invalidateQueries({ queryKey: configKeys.settings(projectRef) })
-          client.invalidateQueries({ queryKey: configKeys.postgrest(projectRef) })
-          toast.success('Successfully updated JWT secret')
-          break
-        case Failed:
-          toast.error(`JWT secret update failed: ${jwtSecretUpdateErrorMessage}`)
-          break
-      }
-    }
-
-    previousJwtSecretUpdateStatus.current = jwtSecretUpdateStatus
-  }, [jwtSecretUpdateStatus])
-
-  if (!projectSettingsLegacyJwtKeys) {
-    return <UnknownInterface urlBack={`/project/${projectRef}/settings/jwt/signing-keys`} />
-  }
 
   return (
-    <JWTKeysLayout>
-      <JWTSettings />
-    </JWTKeysLayout>
+    <>
+      {!isPermissionsLoaded ? (
+        <GenericSkeletonLoader />
+      ) : !canReadAPIKeys ? (
+        <NoPermission isFullPage resourceText="access your project's API keys" />
+      ) : (
+        <JWTSecretKeysTable />
+      )}
+    </>
   )
 }
 
-JWTKeysLegacyPage.getLayout = (page) => (
+JWTSigningKeysPage.getLayout = (page) => (
   <DefaultLayout>
-    <SettingsLayout>{page}</SettingsLayout>
+    <SettingsLayout>
+      <JWTKeysLayout>{page}</JWTKeysLayout>
+    </SettingsLayout>
   </DefaultLayout>
 )
 
-export default JWTKeysLegacyPage
+export default JWTSigningKeysPage
