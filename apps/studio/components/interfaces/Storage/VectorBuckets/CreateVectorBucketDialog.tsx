@@ -5,11 +5,11 @@ import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
-import { parseAsBoolean, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
+import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
 import { useS3VectorsWrapperCreateMutation } from 'data/storage/s3-vectors-wrapper-create-mutation'
 import { useVectorBucketCreateMutation } from 'data/storage/vector-bucket-create-mutation'
@@ -28,7 +28,6 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  DialogTrigger,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -64,17 +63,46 @@ const formId = 'create-storage-bucket-form'
 
 export type CreateBucketForm = z.infer<typeof FormSchema>
 
-export const CreateVectorBucketDialog = () => {
+export const CreateVectorBucketButton = ({
+  onClick,
+}: {
+  onClick: MouseEventHandler<HTMLButtonElement>
+}) => {
+  const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+
+  return (
+    <ButtonTooltip
+      block
+      size="tiny"
+      type="primary"
+      className="w-fit"
+      icon={<Plus size={14} />}
+      disabled={!canCreateBuckets}
+      tabIndex={!canCreateBuckets ? -1 : 0}
+      onClick={onClick}
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text: !canCreateBuckets ? 'You need additional permissions to create buckets' : undefined,
+        },
+      }}
+    >
+      New bucket
+    </ButtonTooltip>
+  )
+}
+
+export const CreateVectorBucketDialog = ({
+  visible,
+  setVisible,
+}: {
+  visible: boolean
+  setVisible: (visible: boolean) => void
+}) => {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
   const [isLoading, setIsLoading] = useState(false)
-
-  const [visible, setVisible] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
-  const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const { data } = useVectorBucketsQuery({ projectRef: ref })
 
@@ -146,29 +174,6 @@ export const CreateVectorBucketDialog = () => {
 
   return (
     <Dialog open={visible} onOpenChange={setVisible}>
-      <DialogTrigger asChild>
-        <ButtonTooltip
-          block
-          size="tiny"
-          type="primary"
-          className="w-fit"
-          icon={<Plus size={14} />}
-          disabled={!canCreateBuckets}
-          tabIndex={!canCreateBuckets ? -1 : 0}
-          onClick={() => setVisible(true)}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: !canCreateBuckets
-                ? 'You need additional permissions to create buckets'
-                : undefined,
-            },
-          }}
-        >
-          New bucket
-        </ButtonTooltip>
-      </DialogTrigger>
-
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create vector bucket</DialogTitle>
