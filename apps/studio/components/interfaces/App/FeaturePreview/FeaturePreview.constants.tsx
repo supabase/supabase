@@ -3,8 +3,8 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 export const FEATURE_PREVIEWS = [
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS,
-    name: 'Security notification templates',
-    discussionsUrl: undefined,
+    name: 'Security notification emails',
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/40349',
     isNew: true,
     isPlatformOnly: true,
   },

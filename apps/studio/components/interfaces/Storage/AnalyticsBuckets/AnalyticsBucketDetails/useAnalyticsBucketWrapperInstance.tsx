@@ -1,4 +1,3 @@
-import { snakeCase } from 'lodash'
 import { useMemo } from 'react'
 
 import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
@@ -6,12 +5,13 @@ import {
   getWrapperMetaForWrapper,
   wrapperMetaComparator,
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { type FDW, useFDWsQuery } from 'data/fdw/fdws-query'
+import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { getAnalyticsBucketFDWName } from './AnalyticsBucketDetails.utils'
 
 export const useAnalyticsBucketWrapperInstance = (
   { bucketId }: { bucketId?: string },
-  options?: { enabled?: boolean; refetchInterval?: (data: FDW[] | undefined) => number | false }
+  options?: { enabled?: boolean }
 ) => {
   const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
 
@@ -21,11 +21,7 @@ export const useAnalyticsBucketWrapperInstance = (
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    {
-      enabled: defaultEnabled && !!bucketId,
-      refetchInterval: (data) =>
-        !!options?.refetchInterval ? options.refetchInterval(data) : false,
-    }
+    { enabled: defaultEnabled && !!bucketId }
   )
 
   const icebergWrapper = useMemo(() => {
@@ -36,7 +32,7 @@ export const useAnalyticsBucketWrapperInstance = (
           wrapper
         )
       )
-      .find((w) => w.name === snakeCase(`${bucketId}_fdw`))
+      .find((w) => w.name === getAnalyticsBucketFDWName(bucketId ?? ''))
   }, [data, bucketId])
 
   const icebergWrapperMeta = getWrapperMetaForWrapper(icebergWrapper)
@@ -44,6 +40,6 @@ export const useAnalyticsBucketWrapperInstance = (
   return {
     data: icebergWrapper,
     meta: icebergWrapperMeta,
-    isLoading: isLoadingProject || isLoadingFDWs,
+    isLoading: isLoadingProject || isLoadingFDWs || !bucketId,
   }
 }

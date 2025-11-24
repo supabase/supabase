@@ -22,8 +22,8 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
   const [isActivateConfirmModalVisible, setIsActivateConfirmModalVisible] = useState(false)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const { mutate: checkCNAMERecord, isLoading: isCheckingRecord } = useCheckCNAMERecordMutation()
-  const { mutate: activateCustomDomain, isLoading: isActivating } = useCustomDomainActivateMutation(
+  const { mutate: checkCNAMERecord, isPending: isCheckingRecord } = useCheckCNAMERecordMutation()
+  const { mutate: activateCustomDomain, isPending: isActivating } = useCustomDomainActivateMutation(
     {
       onSuccess: () => {
         toast.success(`Successfully activated custom domain`)
@@ -31,7 +31,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
       },
     }
   )
-  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation({
+  const { mutate: deleteCustomDomain, isPending: isDeleting } = useCustomDomainDeleteMutation({
     onSuccess: () => {
       toast.success(
         'Custom domain setup cancelled successfully. It may take a few seconds before your custom domain is fully removed, so you may need to refresh your browser.'
@@ -78,8 +78,8 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
               <AlertDescription_Shadcn_>
                 <p className="col-span-12 text-sm lg:col-span-7 leading-6">
                   Your custom domain CNAME record for{' '}
-                  <code className="text-xs">{customDomain.hostname}</code>
-                  should resolve to{' '}
+                  <code className="text-code-inline">{customDomain.hostname}</code> should resolve
+                  to{' '}
                   {endpoint ? (
                     <code className="text-xs">{endpoint}</code>
                   ) : (

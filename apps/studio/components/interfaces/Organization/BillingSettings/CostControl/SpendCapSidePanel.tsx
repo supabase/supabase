@@ -53,7 +53,7 @@ const SpendCapSidePanel = () => {
   const onClose = () => snap.setPanelKey(undefined)
 
   const { data: subscription, isLoading } = useOrgSubscriptionQuery({ orgSlug: slug })
-  const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
+  const { mutate: updateOrgSubscription, isPending: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
       onSuccess: () => {
         toast.success(`Successfully ${isTurningOnCap ? 'enabled' : 'disabled'} spend cap`)

@@ -122,11 +122,14 @@ const EntityListItem = ({
   ).hasLint
 
   const formatTooltipText = (entityType: string) => {
-    return Object.entries(ENTITY_TYPE)
-      .find(([, value]) => value === entityType)?.[0]
-      ?.toLowerCase()
-      ?.split('_')
-      ?.join(' ')
+    const text =
+      Object.entries(ENTITY_TYPE)
+        .find(([, value]) => value === entityType)?.[0]
+        ?.toLowerCase()
+        ?.split('_')
+        ?.join(' ') || ''
+    // Return sentence case (capitalize first letter only)
+    return text.charAt(0).toUpperCase() + text.slice(1)
   }
 
   const exportTableAsCSV = async () => {

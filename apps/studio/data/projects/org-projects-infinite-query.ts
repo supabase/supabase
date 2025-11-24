@@ -1,4 +1,5 @@
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback } from 'react'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
@@ -93,11 +94,8 @@ export const getComputeSize = (project: OrgProject) => {
 
 export const useInvalidateProjectsInfiniteQuery = () => {
   const queryClient = useQueryClient()
-  const invalidateProjectsQuery = () => {
-    // [Joshen] Temporarily for completeness while we still have UIs depending on the old endpoint (Org teams)
-    // Can be removed once we completely deprecate projects-query (Old unpaginated endpoint)
-    queryClient.invalidateQueries({ queryKey: projectKeys.list() })
+  const invalidateProjectsQuery = useCallback(() => {
     return queryClient.invalidateQueries({ queryKey: [INFINITE_PROJECTS_KEY_PREFIX] })
-  }
+  }, [queryClient])
   return { invalidateProjectsQuery }
 }

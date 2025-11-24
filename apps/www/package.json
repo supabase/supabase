@@ -73,7 +73,7 @@
     "react-syntax-highlighter": "^15.6.6",
     "react-transition-group": "^4.4.1",
     "react-use": "^17.4.0",
-    "recharts": "^2.8.0",
+    "recharts": "catalog:",
     "rehype-slug": "^5.1.0",
     "remark": "^15.0.1",
     "remark-gfm": "^3.0.1",

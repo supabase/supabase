@@ -147,7 +147,7 @@ export const Grid = memo(
           {(rows ?? []).length === 0 && (
             <div
               className={cn(
-                'absolute top-9 p-2 w-full z-[1]',
+                'absolute top-9 p-2 w-full z-[1] pointer-events-none',
                 isTableEmpty && isDraggedOver && 'border-2 border-dashed',
                 isValidFileDraggedOver ? 'border-brand-600' : 'border-destructive-600'
               )}
@@ -177,7 +177,7 @@ export const Grid = memo(
                     </div>
                   ) : (filters ?? []).length === 0 ? (
                     <div className="flex flex-col items-center justify-center col-span-full h-full">
-                      <p className="text-sm text-light">
+                      <p className="text-sm text-light pointer-events-auto">
                         {isDraggedOver ? (
                           isValidFileDraggedOver ? (
                             'Drop your CSV file here'
@@ -190,7 +190,7 @@ export const Grid = memo(
                       </p>
                       {tableEntityType === ENTITY_TYPE.FOREIGN_TABLE ? (
                         <div className="flex items-center space-x-2 mt-4">
-                          <p className="text-sm text-light">
+                          <p className="text-sm text-light pointer-events-auto">
                             This table is a foreign table. Add data to the connected source to get
                             started.
                           </p>
@@ -215,7 +215,7 @@ export const Grid = memo(
                             >
                               Import data from CSV
                             </Button>
-                            <p className="text-xs text-foreground-light">
+                            <p className="text-xs text-foreground-light pointer-events-auto">
                               or drag and drop a CSV file here
                             </p>
                           </div>
@@ -224,7 +224,7 @@ export const Grid = memo(
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center col-span-full h-full">
-                      <p className="text-sm text-light">
+                      <p className="text-sm text-light pointer-events-auto">
                         The filters applied have returned no results from this table
                       </p>
                       <div className="flex items-center space-x-2 mt-4">

@@ -19,7 +19,7 @@ const DropReplicaConfirmationModal = ({
 }: DropReplicaConfirmationModalProps) => {
   const { ref: projectRef } = useParams()
   const formattedId = formatDatabaseID(selectedReplica?.identifier ?? '')
-  const { mutate: removeReadReplica, isLoading: isRemoving } = useReadReplicaRemoveMutation({
+  const { mutate: removeReadReplica, isPending: isRemoving } = useReadReplicaRemoveMutation({
     onSuccess: () => {
       toast.success(`Tearing down read replica (ID: ${formattedId})`)
       onSuccess()

@@ -10,7 +10,6 @@ export const generateDatabaseMenu = (
     pgNetExtensionExists: boolean
     pitrEnabled: boolean
     columnLevelPrivileges: boolean
-    enablePgReplicate: boolean
     showPgReplicate: boolean
     showRoles: boolean
     showWrappers: boolean
@@ -21,7 +20,6 @@ export const generateDatabaseMenu = (
     pgNetExtensionExists,
     pitrEnabled,
     columnLevelPrivileges,
-    enablePgReplicate,
     showPgReplicate,
     showRoles,
     showWrappers,
@@ -178,7 +176,7 @@ export const generateDatabaseMenu = (
         {
           name: 'Query Performance',
           key: 'query-performance',
-          url: `/project/${ref}/reports/query-performance`,
+          url: `/project/${ref}/observability/query-performance`,
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           items: [],
         },
