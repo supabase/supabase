@@ -206,7 +206,7 @@ export const CreateIcebergWrapperSheet = ({
                           (values?.wrapper_name ?? '').length > 0 ? (
                             <>
                               Your wrapper's server name will be{' '}
-                              <code className="text-xs">{values.wrapper_name}_server</code>
+                              <code className="text-code-inline">{values.wrapper_name}_server</code>
                             </>
                           ) : (
                             ''

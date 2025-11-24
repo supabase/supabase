@@ -248,7 +248,7 @@ export const PostgrestConfig = () => {
                               </p>
                               <p>
                                 You will see errors from the Postgrest endpoint
-                                <code className="text-xs">/rest/v1/</code>.
+                                <code className="text-code-inline">/rest/v1/</code>.
                               </p>
                             </AlertDescription_Shadcn_>
                           </Alert_Shadcn_>
@@ -316,14 +316,15 @@ export const PostgrestConfig = () => {
                                   <>
                                     <p className="prose text-sm">
                                       You will not be able to query tables and views in the{' '}
-                                      <code className="text-xs">public</code> schema via supabase-js
-                                      or HTTP clients.
+                                      <code className="text-code-inline">public</code> schema via
+                                      supabase-js or HTTP clients.
                                     </p>
                                     {isGraphqlExtensionEnabled && (
                                       <>
                                         <p className="prose text-sm mt-2">
-                                          Tables in the <code className="text-xs">public</code>{' '}
-                                          schema are still exposed over our GraphQL endpoints.
+                                          Tables in the{' '}
+                                          <code className="text-code-inline">public</code> schema
+                                          are still exposed over our GraphQL endpoints.
                                         </p>
                                         <Button asChild type="default" className="mt-2">
                                           <Link href={`/project/${projectRef}/database/extensions`}>

@@ -127,21 +127,21 @@ export const DisplayApiSettings = ({
             <FormLayout
               layout="horizontal"
               label={
-                <>
+                <div className="flex items-center space-x-1">
                   {x.tags?.split(',').map((x, i: number) => (
-                    <code key={`${x}${i}`} className="text-xs text-code">
+                    <code key={`${x}${i}`} className="text-code-inline">
                       {x}
                     </code>
                   ))}
                   {x.tags === 'service_role' && (
                     <>
-                      <code className="text-xs text-code !bg-destructive !text-white !border-destructive">
+                      <code className="text-code-inline !bg-destructive !text-white !border-destructive">
                         secret
                       </code>
                     </>
                   )}
-                  {x.tags === 'anon' && <code className="text-xs text-code">public</code>}
-                </>
+                  {x.tags === 'anon' && <code className="text-code-inline">public</code>}
+                </div>
               }
               description={
                 x.tags === 'service_role' ? (
