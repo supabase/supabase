@@ -352,9 +352,8 @@ export const SubscriptionPlanUpdateDialog = ({
                           <div className="w-[520px] p-6">
                             <h3 className="font-medium mb-2">Your new monthly invoice</h3>
                             <p className="prose text-xs mb-2">
-                              Paid projects run 24/7 without pausing. First project uses Compute
-                              Credits; additional projects start at <span translate="no">$10</span>
-                              /month regardless of usage.{' '}
+                              First project included. Additional projects cost{' '}
+                              <span translate="no">$10</span>+/month regardless of activity.{' '}
                               <Link
                                 href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                                 target="_blank"
@@ -587,17 +586,16 @@ export const SubscriptionPlanUpdateDialog = ({
                   <div className="pb-2">
                     <Admonition type="note">
                       <div className="text-sm prose">
-                        Paid projects run 24/7 without pausing. First project uses Compute Credits;
-                        additional projects cost <span translate="no">$10+</span>
-                        /month regardless of usage.{' '}
+                        First project included. Additional projects cost{' '}
+                        <span translate="no">$10</span>+/month regardless of activity.{' '}
+                        <Link
+                          href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
+                          target="_blank"
+                          className="underline"
+                        >
+                          Learn more
+                        </Link>
                       </div>
-                      <Link
-                        href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
-                        target="_blank"
-                        className="underline"
-                      >
-                        Learn more
-                      </Link>
                     </Admonition>
                   </div>
                 )}

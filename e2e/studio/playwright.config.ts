@@ -58,5 +58,6 @@ export default defineConfig({
     command: 'pnpm --workspace-root run e2e:setup',
     port: WEB_SERVER_PORT,
     timeout: WEB_SERVER_TIMEOUT,
+    reuseExistingServer: true,
   },
 })

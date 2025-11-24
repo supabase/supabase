@@ -508,7 +508,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
         variant="warning"
         visible={showStartReplicationModal}
         loading={isUpdatingReplication}
-        title="Confirm to enable replication for table"
+        title="Enable replication for table"
         confirmLabel="Enable replication"
         onCancel={() => setShowStartReplicationModal(false)}
         onConfirm={() => onConfirmStartReplication()}
