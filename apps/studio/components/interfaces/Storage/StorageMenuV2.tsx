@@ -5,6 +5,7 @@ import {
   useIsAnalyticsBucketsEnabled,
   useIsVectorBucketsEnabled,
 } from 'data/config/project-storage-config-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Badge, Menu } from 'ui'
 import { BUCKET_TYPES } from './Storage.constants'
 import { useStorageV2Page } from './Storage.utils'
@@ -13,8 +14,19 @@ export const StorageMenuV2 = () => {
   const { ref } = useParams()
   const page = useStorageV2Page()
 
+  const { storageAnalytics, storageVectors } = useIsFeatureEnabled([
+    'storage:analytics',
+    'storage:vectors',
+  ])
+
   const isAnalyticsBucketsEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
   const isVectorBucketsEnabled = useIsVectorBucketsEnabled({ projectRef: ref })
+
+  const bucketTypes = Object.entries(BUCKET_TYPES).filter(([key, config]) => {
+    if (key === 'analytics') return storageAnalytics
+    if (key === 'vectors') return storageVectors
+    return IS_PLATFORM || (!IS_PLATFORM && !config.platformOnly)
+  })
 
   return (
     <Menu type="pills" className="my-6 flex flex-grow flex-col">
@@ -22,29 +34,27 @@ export const StorageMenuV2 = () => {
         <div className="mx-3">
           <Menu.Group title={<span className="uppercase font-mono">Manage</span>} />
 
-          {Object.entries(BUCKET_TYPES)
-            .filter(([_, config]) => IS_PLATFORM || (!IS_PLATFORM && !config.platformOnly))
-            .map(([type, config]) => {
-              const isSelected = page === type
-              const isAlphaEnabled =
-                (type === 'analytics' && isAnalyticsBucketsEnabled) ||
-                (type === 'vectors' && isVectorBucketsEnabled)
+          {bucketTypes.map(([type, config]) => {
+            const isSelected = page === type
+            const isAlphaEnabled =
+              (type === 'analytics' && isAnalyticsBucketsEnabled) ||
+              (type === 'vectors' && isVectorBucketsEnabled)
 
-              return (
-                <Link key={type} href={`/project/${ref}/storage/${type}`}>
-                  <Menu.Item rounded active={isSelected}>
-                    <div className="flex items-center justify-between">
-                      <p className="truncate">{config.displayName}</p>
-                      {isAlphaEnabled && (
-                        <Badge variant="default" size="small">
-                          New
-                        </Badge>
-                      )}
-                    </div>
-                  </Menu.Item>
-                </Link>
-              )
-            })}
+            return (
+              <Link key={type} href={`/project/${ref}/storage/${type}`}>
+                <Menu.Item rounded active={isSelected}>
+                  <div className="flex items-center justify-between">
+                    <p className="truncate">{config.displayName}</p>
+                    {isAlphaEnabled && (
+                      <Badge variant="default" size="small">
+                        New
+                      </Badge>
+                    )}
+                  </div>
+                </Menu.Item>
+              </Link>
+            )
+          })}
         </div>
 
         {IS_PLATFORM && (

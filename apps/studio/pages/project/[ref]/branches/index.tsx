@@ -77,6 +77,8 @@ const BranchesPage: NextPageWithLayout = () => {
   const isLoading = isLoadingConnections || isLoadingBranches
   const isSuccess = isSuccessConnections && isSuccessBranches
 
+  const isGithubConnected = githubConnection !== undefined
+
   const { mutate: deleteBranch, isPending: isDeleting } = useBranchDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted branch')
@@ -149,6 +151,7 @@ const BranchesPage: NextPageWithLayout = () => {
 
                   {!isError && (
                     <Overview
+                      isGithubConnected={isGithubConnected}
                       isLoading={isLoading}
                       isSuccess={isSuccess}
                       repo={repo}
