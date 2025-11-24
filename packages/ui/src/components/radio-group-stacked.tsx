@@ -32,12 +32,10 @@ interface RadioGroupStackedItemProps {
 const RadioGroupStackedItem = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Item>,
   RadioGroupStackedItemProps & React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
->(({ image, label, showIndicator = true, disabled, ...props }, ref) => {
+>(({ image, label, showIndicator = true, ...props }, ref) => {
   return (
     <RadioGroupPrimitive.Item
       ref={ref}
-      disabled={disabled}
-      tabIndex={disabled ? -1 : 0}
       {...props}
       className={cn(
         'flex flex-col gap-2',
