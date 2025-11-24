@@ -37,6 +37,20 @@ All interactive page elements should be reachable by keyboard. They should also 
 
 Consider also affordances like `ctrl` and `meta` key support for opening in a new tab. Anything that you can do with a mouse input should be replicable by keyboard.
 
+### Radio groups
+
+Single-select option groups such as `<input type="radio">` should behave as a single control. Only the first item of radio groups should become focused with the Tab key. The next Tab should move focus from the group to the next focusable control.
+
+Individual options inside of a group can be reached by arrow keys (↑ ↓ ← →). Space is the canonical key to activate radio options, with Enter being a secondary affordance.
+
+### Jumping ahead
+
+Some keyboard-navigable content may be contain hundreds or thousands of items. Help users jump to specific content with the following mitigation strategies:
+
+- Search and filtering
+- Pagination or virtualization
+- “Jump to” shortcuts to skip ahead
+
 ## Screen reader support
 
 Textual elements are supported out-of-the-box by screen readers. Imagery of course should be described by `alt` tags.
