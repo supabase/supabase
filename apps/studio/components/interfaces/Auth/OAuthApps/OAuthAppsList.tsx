@@ -241,7 +241,14 @@ export const OAuthAppsList = () => {
                   oAuthApps.map((app) => (
                     <TableRow key={app.client_id} className="w-full">
                       <TableCell className="w-100 max-w-64 truncate" title={app.client_name}>
-                        {app.client_name}
+                        <Button
+                          type="text"
+                          className="text-link-table-cell text-sm p-0 hover:bg-transparent title"
+                          onClick={() => handleEditClick(app)}
+                          title={app.client_name}
+                        >
+                          {app.client_name}
+                        </Button>
                       </TableCell>
                       <TableCell className="max-w-40" title={app.client_id}>
                         <Badge className="font-mono">{app.client_id}</Badge>

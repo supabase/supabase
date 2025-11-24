@@ -6,13 +6,14 @@ import type {
 } from '@supabase/supabase-js'
 import { Plus, Trash2, X } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
 import { useOAuthServerAppCreateMutation } from 'data/oauth-server-apps/oauth-server-app-create-mutation'
+import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useOAuthServerAppUpdateMutation } from 'data/oauth-server-apps/oauth-server-app-update-mutation'
 import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
 import {
@@ -36,7 +37,10 @@ import {
   Switch,
   cn,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import Panel from 'components/ui/Panel'
 
 interface CreateOrUpdateOAuthAppSheetProps {
   visible: boolean
@@ -59,6 +63,8 @@ const FormSchema = z.object({
     .array()
     .min(1, 'At least one redirect URI is required'),
   is_public: z.boolean().default(false),
+  client_id: z.string().optional(),
+  client_secret: z.string().optional(),
 })
 
 const FORM_ID = 'create-or-update-oauth-app-form'
@@ -69,6 +75,8 @@ const initialValues = {
   // scope: 'email',
   redirect_uris: [{ value: '' }],
   is_public: false,
+  client_id: '',
+  client_secret: '',
 }
 
 export const CreateOrUpdateOAuthAppSheet = ({
@@ -79,6 +87,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
 }: CreateOrUpdateOAuthAppSheetProps) => {
   const { ref: projectRef } = useParams()
   const isEditMode = !!appToEdit
+  const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -116,6 +125,20 @@ export const CreateOrUpdateOAuthAppSheet = ({
     },
   })
 
+  const { mutateAsync: regenerateSecret, isPending: isRegenerating } =
+    useOAuthServerAppRegenerateSecretMutation({
+      onSuccess: (data) => {
+        if (data) {
+          toast.success(`Successfully regenerated client secret for "${appToEdit?.client_name}"`)
+          onSuccess(data)
+          setShowRegenerateDialog(false)
+        }
+      },
+      onError: (error) => {
+        toast.error(error.message)
+      },
+    })
+
   useEffect(() => {
     if (visible) {
       if (appToEdit) {
@@ -128,6 +151,8 @@ export const CreateOrUpdateOAuthAppSheet = ({
               ? appToEdit.redirect_uris.map((uri) => ({ value: uri }))
               : [{ value: '' }],
           is_public: appToEdit.client_type === 'public',
+          client_id: appToEdit.client_id,
+          client_secret: '****************************************************************',
         })
       } else {
         form.reset(initialValues)
@@ -174,6 +199,20 @@ export const CreateOrUpdateOAuthAppSheet = ({
     onCancel()
   }
 
+  const handleRegenerateSecret = () => {
+    setShowRegenerateDialog(true)
+  }
+
+  const handleConfirmRegenerate = () => {
+    if (appToEdit?.client_id) {
+      regenerateSecret({
+        projectRef,
+        supabaseClient: supabaseClientData?.supabaseClient,
+        clientId: appToEdit.client_id,
+      })
+    }
+  }
+
   return (
     <>
       <Sheet open={visible} onOpenChange={() => onCancel()}>
@@ -216,46 +255,65 @@ export const CreateOrUpdateOAuthAppSheet = ({
                   )}
                 />
 
-                {/* <FormField_Shadcn_
-                  control={form.control}
-                  name="scope"
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Scope"
-                      layout="vertical"
-                      description={
-                        <>
-                          Select the permissions your app will request from users.{' '}
-                          <Link
-                            href="https://supabase.com/docs/guides/auth/oauth/oauth-apps#scope"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-foreground-light underline hover:text-foreground transition"
+                {isEditMode && appToEdit && (
+                  <>
+                    <Separator />
+                    <div className="px-5">
+                      <Panel>
+                        <Panel.Content className="space-y-4">
+                          <FormField_Shadcn_
+                            control={form.control}
+                            name="client_id"
+                            render={({ field }) => (
+                              <FormItemLayout label="Client ID">
+                                <FormControl_Shadcn_>
+                                  <Input
+                                    copy
+                                    readOnly
+                                    className="input-mono"
+                                    value={appToEdit.client_id}
+                                    onChange={() => {}}
+                                    onCopy={() => toast.success('Client ID copied to clipboard')}
+                                  />
+                                </FormControl_Shadcn_>
+                              </FormItemLayout>
+                            )}
+                          />
+
+                          <FormField_Shadcn_
+                            control={form.control}
+                            name="client_secret"
+                            render={({ field }) => (
+                              <FormItemLayout
+                                label="Client Secret"
+                                description="Client secret is hidden for security. Use the regenerate button to create a new one."
+                              >
+                                <FormControl_Shadcn_>
+                                  <Input
+                                    readOnly
+                                    type="password"
+                                    className="input-mono"
+                                    value="****************************************************************"
+                                    onChange={() => {}}
+                                  />
+                                </FormControl_Shadcn_>
+                              </FormItemLayout>
+                            )}
+                          />
+
+                          <Button
+                            type="default"
+                            onClick={handleRegenerateSecret}
+                            className="w-full"
+                            disabled={isRegenerating}
                           >
-                            Learn more
-                          </Link>
-                        </>
-                      }
-                      className={'px-5'}
-                    >
-                      <FormControl_Shadcn_>
-                        <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger_Shadcn_ className="w-full">
-                            <SelectValue_Shadcn_ placeholder="Select scope..." />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
-                            {OAUTH_APP_SCOPE_OPTIONS.map((scope) => (
-                              <SelectItem_Shadcn_ key={scope.value} value={scope.value}>
-                                {scope.name}
-                              </SelectItem_Shadcn_>
-                            ))}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                /> */}
+                            Regenerate Client Secret
+                          </Button>
+                        </Panel.Content>
+                      </Panel>
+                    </div>
+                  </>
+                )}
 
                 <div className="px-5 gap-2 flex flex-col">
                   <FormLabel_Shadcn_ className="text-foreground">Redirect URIs</FormLabel_Shadcn_>
@@ -352,6 +410,21 @@ export const CreateOrUpdateOAuthAppSheet = ({
           </SheetFooter>
         </SheetContent>
       </Sheet>
+
+      <ConfirmationModal
+        variant="warning"
+        visible={showRegenerateDialog}
+        loading={isRegenerating}
+        title="Confirm regenerating client secret"
+        confirmLabel="Confirm"
+        onCancel={() => setShowRegenerateDialog(false)}
+        onConfirm={handleConfirmRegenerate}
+      >
+        <p className="text-sm text-foreground-light">
+          Are you sure you wish to regenerate the client secret for "{appToEdit?.client_name}"?
+          You'll need to update it in all applications that use it. This action cannot be undone.
+        </p>
+      </ConfirmationModal>
     </>
   )
 }
