@@ -36,8 +36,6 @@ export type AiAssistantContext = {
   projectRef?: string
   orgSlug?: string
   connectionString?: string
-  schema?: string
-  table?: string
 }
 
 type AiAssistantData = {
@@ -251,11 +249,11 @@ function createChatInstance(
             messages: cleanedMessages,
             projectRef: state.context.projectRef,
             connectionString: state.context.connectionString,
-            schema: state.context.schema,
-            table: state.context.table,
             chatName: chat?.name,
             orgSlug: state.context.orgSlug,
+            context: state.context,
             model: state.model,
+            ...opts.body,
           },
           ...(IS_PLATFORM ? { headers: { Authorization: authorizationHeader ?? '' } } : {}),
         }

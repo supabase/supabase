@@ -129,16 +129,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     state.setContext({
       projectRef: project?.ref,
       orgSlug: selectedOrganizationRef.current?.slug,
-      connectionString: project?.connectionString,
-      schema: currentSchema,
-      table: currentTable?.name,
+      connectionString: project?.connectionString || undefined,
     })
   }, [
     project?.ref,
-    selectedOrganizationRef.current?.slug,
     project?.connectionString,
-    currentSchema,
-    currentTable?.name,
+    selectedOrganizationRef.current?.slug,
     state,
   ])
 
@@ -325,7 +321,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
     snap.clearSqlSnippets()
     lastUserMessageRef.current = payload
-    sendMessage(payload)
+    sendMessage(payload, {
+      body: {
+        schema: currentSchema,
+        table: currentTable?.name,
+      },
+    })
     setValue('')
 
     if (finalContent.includes('Help me to debug')) {
@@ -348,17 +349,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   }
 
   const handleClearMessages = () => {
+    if (isChatLoading) stop()
     snap.clearMessages()
-    // We also need to clear the chat instance messages if possible, or create a new chat.
-    // snap.clearMessages() clears the state messages.
-    // But chatInstance has its own messages.
-    // We should probably just create a new chat instance or reset it.
-    // But snap.clearMessages() updates the state.
-    // If we are using the same chat ID, we need to update chatInstance.
-    // But chatInstance doesn't have a clear method exposed easily?
-    // Actually, if we clear messages in state, we should probably re-initialize the chat instance
-    // or just rely on the fact that we are starting fresh.
-    // But useChat keeps the messages.
     setMessages([])
     lastUserMessageRef.current = null
     setEditingMessageId(null)
@@ -595,7 +587,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               // to save partial responses from the AI
               const lastMessage = chatMessages[chatMessages.length - 1]
               if (lastMessage && lastMessage.role === 'assistant') {
-                handleChatFinish({ message: lastMessage })
+                state.updateMessage(lastMessage)
               }
             }}
             sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
