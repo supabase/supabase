@@ -28,6 +28,7 @@ import { useS3VectorsWrapperExtension } from './useS3VectorsWrapper'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
+import { createSchema } from '@/data/database/schema-create-mutation'
 import { useS3VectorsWrapperCreateMutation } from '@/data/storage/s3-vectors-wrapper-create-mutation'
 import { useVectorBucketCreateMutation } from '@/data/storage/vector-bucket-create-mutation'
 import { useVectorBucketsQuery } from '@/data/storage/vector-buckets-query'
@@ -171,6 +172,24 @@ export const CreateVectorBucketDialog = ({
           connectionString: project?.connectionString,
           name: wrappersExtension.name,
           schema: wrappersExtension.schema ?? 'extensions',
+          version: wrappersExtension.default_version,
+        })
+
+        await createS3VectorsWrapper({ bucketName: values.name })
+
+        await createSchema({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          name: wrappersExtension.name,
+          version: wrappersExtension.default_version,
+        })
+      } else if (wrappersExtensionState === 'installed') {
+        await createS3VectorsWrapper({ bucketName: values.name })
+
+        await createSchema({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          name: wrappersExtension.name,
           version: wrappersExtension.default_version,
         })
       }
