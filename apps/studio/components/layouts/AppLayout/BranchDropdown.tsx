@@ -100,11 +100,7 @@ export const BranchDropdown = () => {
   } as unknown as Branch
 
   const mainBranch = branches?.find((branch) => branch.is_default)
-  const [_scheduledForDeletionBranches, activeBranches] = partition(
-    branches,
-    (branch) => branch.deletion_scheduled_at !== undefined
-  )
-  const restOfBranches = activeBranches
+  const restOfBranches = branches.filter((branch) => branch.deletion_scheduled_at !== undefined))
     ?.filter((branch) => !branch.is_default)
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
