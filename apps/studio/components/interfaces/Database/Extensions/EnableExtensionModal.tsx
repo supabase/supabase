@@ -124,8 +124,8 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
       size="small"
       header={
         <div className="flex items-baseline gap-2">
-          <h5 className="text-foreground">Confirm to enable</h5>
-          <code className="text-xs">{extension.name}</code>
+          <h5 className="text-foreground">Enable</h5>
+          <code className="text-code-inline">{extension.name}</code>
         </div>
       }
     >

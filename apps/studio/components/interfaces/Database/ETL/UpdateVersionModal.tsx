@@ -125,11 +125,11 @@ export const UpdateVersionModal = ({
           <div className="flex flex-col gap-y-2 mt-2 pb-2">
             <div className="text-sm text-foreground prose max-w-full">
               <p className="text-foreground-light mb-1">Current version:</p>{' '}
-              <code className="text-xs">{currentVersionName ?? 'Unknown'}</code>
+              <code className="text-code-inline">{currentVersionName ?? 'Unknown'}</code>
             </div>
             <div className="text-sm text-foreground prose max-w-full">
               <p className="text-foreground-light mb-1">New version:</p>{' '}
-              <code className="text-xs">{newVersionName ?? 'Unknown'}</code>
+              <code className="text-code-inline">{newVersionName ?? 'Unknown'}</code>
             </div>
           </div>
         </CollapsibleContent_Shadcn_>
