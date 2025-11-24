@@ -70,7 +70,8 @@ export const EntityTypeIcon = ({
         type === ENTITY_TYPE.FOREIGN_TABLE &&
           'text-warning-600/80 dark:text-yellow-900 bg-yellow-500',
         type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1000 bg-purple-500',
-        type === ENTITY_TYPE.PARTITIONED_TABLE && 'text-foreground-light bg-border-stronger'
+        type === ENTITY_TYPE.PARTITIONED_TABLE &&
+          'text-foreground-light bg-surface-400 dark:bg-border-stronger'
       )}
     >
       {Object.entries(ENTITY_TYPE)
