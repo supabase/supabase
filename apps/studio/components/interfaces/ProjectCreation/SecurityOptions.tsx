@@ -116,7 +116,8 @@ export const SecurityOptions = ({
                           // @ts-ignore
                           description={
                             <>
-                              Query all tables in the <code className="text-code-inline">public</code> schema
+                              Query all tables in the{' '}
+                              <code className="text-code-inline">public</code> schema
                             </>
                           }
                           className="[&>div>div>p]:text-left [&>div>div>p]:text-xs"
