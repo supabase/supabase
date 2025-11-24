@@ -49,7 +49,6 @@ type AiAssistantData = {
   context: AiAssistantContext
 }
 
-
 // Data structure stored in IndexedDB
 type StoredAiAssistantState = {
   projectRef: string
@@ -331,7 +330,7 @@ export const createAiAssistantState = (): AiAssistantState => {
         [chatId]: newChat,
       }
       state.activeChatId = chatId
-      
+
       // Create new chat instance
       // Create new chat instance
       const chatInstance = createChatInstance(state, { id: chatId, initialMessages: [] })
@@ -359,9 +358,11 @@ export const createAiAssistantState = (): AiAssistantState => {
         state.activeChatId = id
         const chat = state.chats[id]
         if (chat) {
-           if (!state.chatInstances[id]) {
-             state.chatInstances[id] = ref(createChatInstance(state, { id, initialMessages: chat.messages }))
-           }
+          if (!state.chatInstances[id]) {
+            state.chatInstances[id] = ref(
+              createChatInstance(state, { id, initialMessages: chat.messages })
+            )
+          }
         }
       }
     },
@@ -373,12 +374,14 @@ export const createAiAssistantState = (): AiAssistantState => {
       if (id === state.activeChatId) {
         const remainingChatIds = Object.keys(remainingChats)
         state.activeChatId = remainingChatIds.length > 0 ? remainingChatIds[0] : undefined
-        
+
         if (state.activeChatId) {
-           const chat = state.chats[state.activeChatId]
-           if (!state.chatInstances[state.activeChatId]) {
-             state.chatInstances[state.activeChatId] = ref(createChatInstance(state, { id: state.activeChatId, initialMessages: chat.messages }))
-           }
+          const chat = state.chats[state.activeChatId]
+          if (!state.chatInstances[state.activeChatId]) {
+            state.chatInstances[state.activeChatId] = ref(
+              createChatInstance(state, { id: state.activeChatId, initialMessages: chat.messages })
+            )
+          }
         }
       }
     },
@@ -489,14 +492,16 @@ export const createAiAssistantState = (): AiAssistantState => {
           state.newChat()
         }
       }
-      
+
       // Initialize chat instance for the active chat
       if (state.activeChatId && state.chats[state.activeChatId]) {
         if (!state.chatInstances[state.activeChatId]) {
-          state.chatInstances[state.activeChatId] = ref(createChatInstance(state, { 
-              id: state.activeChatId, 
-              initialMessages: state.chats[state.activeChatId].messages 
-          }))
+          state.chatInstances[state.activeChatId] = ref(
+            createChatInstance(state, {
+              id: state.activeChatId,
+              initialMessages: state.chats[state.activeChatId].messages,
+            })
+          )
         }
       }
     },
