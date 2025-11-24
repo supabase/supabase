@@ -22,11 +22,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 type EdgeFunctionsResponse = components['schemas']['FunctionResponse']
 
-const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { store, error } = getFunctionsArtifactStore()
-  if (!store || error) {
-    return res.status(500).json({ error })
-  }
+const handleGetAll = async (_req: NextApiRequest, res: NextApiResponse) => {
+  const store = getFunctionsArtifactStore()
 
   const functionsArtifacts = await store.getFunctions()
   if (!functionsArtifacts) return res.status(200).json([])

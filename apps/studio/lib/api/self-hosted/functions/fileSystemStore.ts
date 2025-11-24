@@ -1,23 +1,11 @@
 import path from 'path'
 import type { Dirent } from 'fs'
-import { readdir, stat } from 'fs/promises'
-import { FunctionArtifact, NewFunctionArtifactStore, IFunctionsArtifactStore } from './types'
 import { pathToFileURL } from 'url'
+import { readdir, stat } from 'fs/promises'
+import { FunctionArtifact } from './types'
 
-export class FileSystemFunctionsArtifactStore implements IFunctionsArtifactStore {
+export class FileSystemFunctionsArtifactStore {
   constructor(private folderPath: string) {}
-
-  static new(): NewFunctionArtifactStore {
-    const folder = process.env.EDGE_FUNCTIONS_MANAGEMENT_FOLDER
-    if (!folder)
-      return {
-        store: undefined,
-        error:
-          "'EDGE_FUNCTIONS_MANAGEMENT_FOLDER' is required to use 'FileSystemFunctionsArtifactStore'",
-      }
-
-    return { store: new FileSystemFunctionsArtifactStore(folder), error: undefined }
-  }
 
   async getFunctions(): Promise<FunctionArtifact[]> {
     const dirEntries = await readdir(this.folderPath, { withFileTypes: true })
