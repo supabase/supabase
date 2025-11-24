@@ -52,7 +52,7 @@ const FormSchema = z
       .string()
       .trim()
       .min(3, 'Bucket name should be at least 3 characters')
-      .max(63, 'Bucket name should be below 63 characters')
+      .max(63, 'Bucket name should be up to 63 characters')
       .refine(
         (value) => !value.endsWith(' '),
         'The name of the bucket cannot end with a whitespace'
@@ -78,6 +78,14 @@ const FormSchema = z
         path: ['name'],
         code: z.ZodIssueCode.custom,
         message: `Bucket name cannot end with "${match}"`,
+      })
+    }
+
+    if (/[A-Z]/.test(data.name)) {
+      return ctx.addIssue({
+        path: ['name'],
+        code: z.ZodIssueCode.custom,
+        message: 'Bucket name can only be lowercase characters',
       })
     }
 

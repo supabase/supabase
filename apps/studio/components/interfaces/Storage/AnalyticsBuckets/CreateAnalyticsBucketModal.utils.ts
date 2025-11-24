@@ -12,4 +12,3 @@
 export const reservedPrefixes = /^(?:xn--|sthree-|amzn-s3-demo-|aws)/
 export const reservedSuffixes = /(?:-s3alias|--ol-s3|--x-s3|--table-s3)$/
 export const validBucketNameRegex = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/
-export const invalidBucketNameRegex = /[^a-z0-9-]/
