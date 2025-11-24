@@ -69,7 +69,7 @@ serve(async (req: Request) => {
 
   // Configuration for edge function workers
   const memoryLimitMb = 2048              // 2GB memory limit
-  const workerTimeoutMs = 5 * 60 * 1000   // 5 minutes (300 seconds)
+  const workerTimeoutMs = 6 * 60 * 1000   // 6 minutes (360 seconds)
   const cpuTimeSoftLimitMs = 10 * 60 * 1000
   const cpuTimeHardLimitMs = 10 * 60 * 1000
   const noModuleCache = false

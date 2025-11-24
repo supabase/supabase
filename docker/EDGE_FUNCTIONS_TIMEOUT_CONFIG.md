@@ -6,7 +6,7 @@ This guide explains how to configure timeout settings for Supabase Edge Function
 
 ## Current Configuration
 
-- **Timeout**: 5 minutes (300 seconds)
+- **Timeout**: 6 minutes (360 seconds)
 - **Memory**: 2GB (2048MB)
 - **Status**: ✅ Tested and working (90s, 150s, 240s all successful)
 
@@ -21,7 +21,7 @@ This guide explains how to configure timeout settings for Supabase Edge Function
 **Line 72 - Change this value:**
 
 ```typescript
-const workerTimeoutMs = 5 * 60 * 1000   // 5 minutes (300 seconds)
+const workerTimeoutMs = 6 * 60 * 1000   // 6 minutes (360 seconds)
 ```
 
 **Common timeout values:**
@@ -30,8 +30,8 @@ const workerTimeoutMs = 5 * 60 * 1000   // 5 minutes (300 seconds)
 // 1 minute
 const workerTimeoutMs = 1 * 60 * 1000   // 60,000ms
 
-// 5 minutes (current)
-const workerTimeoutMs = 5 * 60 * 1000   // 300,000ms
+// 6 minutes (current)
+const workerTimeoutMs = 6 * 60 * 1000   // 360,000ms
 
 // 10 minutes
 const workerTimeoutMs = 10 * 60 * 1000  // 600,000ms
@@ -50,15 +50,15 @@ const workerTimeoutMs = 15 * 60 * 1000  // 900,000ms
 services:
   - name: functions-v1
     url: http://functions:9000/
-    read_timeout: 310000      # workerTimeoutMs + 10 seconds
-    write_timeout: 310000     # workerTimeoutMs + 10 seconds
+    read_timeout: 370000      # workerTimeoutMs + 10 seconds
+    write_timeout: 370000     # workerTimeoutMs + 10 seconds
     connect_timeout: 10000
 ```
 
 **Formula:** Kong timeout = `workerTimeoutMs + 10000` (add 10-second buffer)
 
 **Examples:**
-- 5 min worker → Kong: `310000` (310s)
+- 6 min worker → Kong: `370000` (370s)
 - 10 min worker → Kong: `610000` (610s)
 - 15 min worker → Kong: `910000` (910s)
 
@@ -75,11 +75,11 @@ command:
     "--main-service",
     "/home/deno/functions/main",
     "--main-worker-request-idle-timeout",
-    "300000",                    # Match workerTimeoutMs
+    "360000",                    # Match workerTimeoutMs
     "--user-worker-request-idle-timeout",
-    "300000",                    # Match workerTimeoutMs
+    "360000",                    # Match workerTimeoutMs
     "--graceful-exit-timeout",
-    "310"
+    "370"
   ]
 ```
 
@@ -109,7 +109,7 @@ docker compose up -d functions
 ```typescript
 // Extended timeout configuration for long-running operations
 const memoryLimitMb = 2048              // 2GB memory limit
-const workerTimeoutMs = 5 * 60 * 1000   // 5 minutes (300 seconds)
+const workerTimeoutMs = 6 * 60 * 1000   // 6 minutes (360 seconds)
 const cpuTimeSoftLimitMs = 10 * 60 * 1000 // 10 minutes
 const cpuTimeHardLimitMs = 10 * 60 * 1000 // 10 minutes
 
@@ -156,8 +156,8 @@ const worker = await EdgeRuntime.userWorkers.create({
 - name: functions-v1
   _comment: 'Edge Functions: /functions/v1/* -> http://functions:9000/*'
   url: http://functions:9000/
-  read_timeout: 310000      # Must be >= workerTimeoutMs + 10000
-  write_timeout: 310000     # Must be >= workerTimeoutMs + 10000
+  read_timeout: 370000      # Must be >= workerTimeoutMs + 10000
+  write_timeout: 370000     # Must be >= workerTimeoutMs + 10000
   connect_timeout: 10000
   routes:
     - name: functions-v1-all
@@ -212,11 +212,11 @@ functions:
       "--main-service",
       "/home/deno/functions/main",
       "--main-worker-request-idle-timeout",
-      "300000",
+      "360000",
       "--user-worker-request-idle-timeout",
-      "300000",
+      "360000",
       "--graceful-exit-timeout",
-      "310"
+      "370"
     ]
 ```
 
@@ -244,8 +244,8 @@ deploy:
 
 ```env
 # Edge Functions Configuration
-FUNCTIONS_REQUEST_TIMEOUT_SEC=300
-FUNCTIONS_WORKER_TIMEOUT_MS=300000
+FUNCTIONS_REQUEST_TIMEOUT_SEC=360
+FUNCTIONS_WORKER_TIMEOUT_MS=360000
 FUNCTIONS_MEMORY_LIMIT_MB=2048
 ```
 
@@ -274,23 +274,23 @@ write_timeout: 130000
 --user-worker-request-idle-timeout 120000
 ```
 
-### Example 2: Medium Operations (5 minutes) ← Current
+### Example 2: Medium Operations (6 minutes) ← Current
 
 **main/index.ts:**
 ```typescript
-const workerTimeoutMs = 5 * 60 * 1000   // 300,000ms
+const workerTimeoutMs = 6 * 60 * 1000   // 360,000ms
 ```
 
 **kong.yml:**
 ```yaml
-read_timeout: 310000
-write_timeout: 310000
+read_timeout: 370000
+write_timeout: 370000
 ```
 
 **docker-compose.yml:**
 ```yaml
---main-worker-request-idle-timeout 300000
---user-worker-request-idle-timeout 300000
+--main-worker-request-idle-timeout 360000
+--user-worker-request-idle-timeout 360000
 ```
 
 ### Example 3: Long Processing (10 minutes)
@@ -411,7 +411,7 @@ docker logs supabase-edge-functions | Select-String "CONFIG"
 |---------|----------------|-----------------|--------------|----------|
 | 1 min | 60,000 | 70,000 | 60000 | Quick tasks |
 | 2 min | 120,000 | 130,000 | 120000 | API calls |
-| 5 min | 300,000 | 310,000 | 300000 | Data processing |
+| 6 min | 360,000 | 370,000 | 360000 | Data processing |
 | 10 min | 600,000 | 610,000 | 600000 | Heavy computation |
 | 15 min | 900,000 | 910,000 | 900000 | Long operations |
 
@@ -509,7 +509,7 @@ response = requests.post(url, timeout=360)  # 6 minutes
 
    Should show:
    ```
-   [CONFIG] Creating worker with timeout: 300000ms (300s)
+   [CONFIG] Creating worker with timeout: 360000ms (360s)
    ```
 
 ### Problem: Kong gateway timeout
@@ -518,8 +518,8 @@ response = requests.post(url, timeout=360)  # 6 minutes
 
 ```yaml
 # kong.yml
-read_timeout: 310000  # workerTimeoutMs + 10000
-write_timeout: 310000
+read_timeout: 370000  # workerTimeoutMs + 10000
+write_timeout: 370000
 ```
 
 Then restart Kong:

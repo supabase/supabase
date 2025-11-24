@@ -362,11 +362,11 @@ services:
         "--main-service",
         "/home/deno/functions/main",
         "--main-worker-request-idle-timeout",
-        "300000",
+        "360000",
         "--user-worker-request-idle-timeout",
-        "300000",
+        "360000",
         "--graceful-exit-timeout",
-        "310"
+        "370"
       ]
 
   analytics:
