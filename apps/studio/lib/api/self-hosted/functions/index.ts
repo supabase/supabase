@@ -1,10 +1,13 @@
-import { IS_PLATFORM } from 'common'
+import assert from 'node:assert'
 import { FileSystemFunctionsArtifactStore } from './fileSystemStore'
-import { NewFunctionArtifactStore } from './types'
+import { assertSelfHosted } from '../util'
 
-export function getFunctionsArtifactStore(): NewFunctionArtifactStore {
-  if (IS_PLATFORM)
-    return { store: undefined, error: "custom 'FunctionsArtifactStore'not available on platform" }
+export function getFunctionsArtifactStore() {
+  assertSelfHosted()
+  assert(
+    process.env.EDGE_FUNCTIONS_MANAGEMENT_FOLDER,
+    'EDGE_FUNCTIONS_MANAGEMENT_FOLDER is required'
+  )
 
-  return FileSystemFunctionsArtifactStore.new()
+  return new FileSystemFunctionsArtifactStore(process.env.EDGE_FUNCTIONS_MANAGEMENT_FOLDER)
 }
