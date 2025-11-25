@@ -1,5 +1,5 @@
 import type { OAuthClient } from '@supabase/supabase-js'
-import { MoreVertical, Edit, Plus, RotateCw, Search, Trash } from 'lucide-react'
+import { MoreVertical, Edit, Plus, RotateCw, Search, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRef, useState } from 'react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
@@ -38,17 +38,11 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { CreateOrUpdateOAuthAppSheet } from './CreateOrUpdateOAuthAppSheet'
 import { DeleteOAuthAppModal } from './DeleteOAuthAppModal'
 import { NewOAuthAppBanner } from './NewOAuthAppBanner'
-
-export const OAUTH_APP_SCOPE_OPTIONS = [
-  { name: 'email', value: 'email' },
-  { name: 'profile', value: 'profile' },
-  { name: 'openid', value: 'openid' },
-]
-
-export const OAUTH_APP_TYPE_OPTIONS = [
-  { name: 'Manual', value: 'manual' },
-  { name: 'Dynamic', value: 'dynamic' },
-]
+import {
+  filterOAuthApps,
+  OAUTH_APP_CLIENT_TYPE_OPTIONS,
+  OAUTH_APP_REGISTRATION_TYPE_OPTIONS,
+} from './oauthApps.utils'
 
 export const OAuthAppsList = () => {
   const { ref: projectRef } = useParams()
@@ -57,12 +51,11 @@ export const OAuthAppsList = () => {
   const [newOAuthApp, setNewOAuthApp] = useState<OAuthClient | undefined>(undefined)
   const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
   const [selectedApp, setSelectedApp] = useState<OAuthClient>()
-  const [filteredAppTypes, setFilteredAppTypes] = useState<string[]>([])
-  const [filteredAppScopes, setFilteredAppScopes] = useState<string[]>([])
+  const [filteredRegistrationTypes, setFilteredRegistrationTypes] = useState<string[]>([])
+  const [filteredClientTypes, setFilteredClientTypes] = useState<string[]>([])
   const deletingOAuthAppIdRef = useRef<string | null>(null)
 
   const { data: supabaseClientData } = useSupabaseClientQuery({ projectRef })
-
   const { data, isLoading, isError, error } = useOAuthServerAppsQuery(
     {
       projectRef,
@@ -115,15 +108,28 @@ export const OAuthAppsList = () => {
     },
   })
 
-  const handleDeleteClick = (app: OAuthClient) => {
-    setSelectedAppToDelete(app.client_id)
-  }
-
-  const handleEditClick = (app: OAuthClient) => {
-    setSelectedAppToEdit(app.client_id)
-  }
+  const handleEditClick = (app: OAuthClient) => setSelectedAppToEdit(app.client_id)
+  const handleDeleteClick = (app: OAuthClient) => setSelectedAppToDelete(app.client_id)
 
   const [filterString, setFilterString] = useState<string>('')
+
+  const filteredOAuthApps = filterOAuthApps({
+    apps: oAuthApps,
+    searchString: filterString,
+    registrationTypes: filteredRegistrationTypes,
+    clientTypes: filteredClientTypes,
+  })
+
+  const hasActiveFilters =
+    filterString.length > 0 ||
+    filteredRegistrationTypes.length > 0 ||
+    filteredClientTypes.length > 0
+
+  const handleResetFilters = () => {
+    setFilterString('')
+    setFilteredRegistrationTypes([])
+    setFilteredClientTypes([])
+  }
 
   if (isAuthConfigLoading || (isOAuthServerEnabled && isLoading)) {
     return <GenericSkeletonLoader />
@@ -170,29 +176,38 @@ export const OAuthAppsList = () => {
               onChange={(e) => setFilterString(e.target.value)}
             />
             <FilterPopover
-              name="Type"
-              options={OAUTH_APP_TYPE_OPTIONS}
+              name="Registration Type"
+              options={OAUTH_APP_REGISTRATION_TYPE_OPTIONS}
               labelKey="name"
               valueKey="value"
               iconKey="icon"
-              activeOptions={filteredAppTypes}
+              activeOptions={filteredRegistrationTypes}
               labelClass="text-xs text-foreground-light"
               maxHeightClass="h-[190px]"
               className="w-52"
-              onSaveFilters={setFilteredAppTypes}
+              onSaveFilters={setFilteredRegistrationTypes}
             />
             <FilterPopover
-              name="Scope"
-              options={OAUTH_APP_SCOPE_OPTIONS}
+              name="Client Type"
+              options={OAUTH_APP_CLIENT_TYPE_OPTIONS}
               labelKey="name"
               valueKey="value"
               iconKey="icon"
-              activeOptions={filteredAppScopes}
+              activeOptions={filteredClientTypes}
               labelClass="text-xs text-foreground-light"
               maxHeightClass="h-[190px]"
               className="w-52"
-              onSaveFilters={setFilteredAppScopes}
+              onSaveFilters={setFilteredClientTypes}
             />
+            {hasActiveFilters && (
+              <Button
+                type="default"
+                size="tiny"
+                className="px-1"
+                icon={<X />}
+                onClick={handleResetFilters}
+              />
+            )}
           </div>
           <div className="flex items-center gap-x-2">
             <ButtonTooltip
@@ -221,24 +236,24 @@ export const OAuthAppsList = () => {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Client ID</TableHead>
-                  <TableHead>Registration</TableHead>
-                  <TableHead>Type</TableHead>
+                  <TableHead>Registration Type</TableHead>
+                  <TableHead>Client Type</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="w-8 px-0">
-                    <div className="!bg-200 px-4 w-full h-full flex items-center border-l @[846px]:border-l-0" />
+                    <div className="!bg-200 px-4 w-full h-full flex items-center border-l @[904px]:border-l-0" />
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {oAuthApps.length === 0 && (
+                {filteredOAuthApps.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={6}>
                       <p className="text-foreground-lighter">No OAuth apps found</p>
                     </TableCell>
                   </TableRow>
                 )}
-                {oAuthApps.length > 0 &&
-                  oAuthApps.map((app) => (
+                {filteredOAuthApps.length > 0 &&
+                  filteredOAuthApps.map((app) => (
                     <TableRow key={app.client_id} className="w-full">
                       <TableCell className="w-100 max-w-64 truncate" title={app.client_name}>
                         <Button
@@ -262,8 +277,8 @@ export const OAuthAppsList = () => {
                       <TableCell className="text-xs text-foreground-light min-w-28 max-w-40 w-1/6">
                         <TimestampInfo utcTimestamp={app.created_at} labelFormat="D MMM, YYYY" />
                       </TableCell>
-                      <TableCell className="max-w-20 bg-surface-100 @[846px]:hover:bg-surface-200 px-6">
-                        <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l @[846px]:border-l-0">
+                      <TableCell className="max-w-20 bg-surface-100 @[904px]:hover:bg-surface-200 px-6">
+                        <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l @[904px]:border-l-0">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button type="default" className="px-1" icon={<MoreVertical />} />
