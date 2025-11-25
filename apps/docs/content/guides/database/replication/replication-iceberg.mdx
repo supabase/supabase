@@ -18,7 +18,7 @@ Iceberg replication is currently incomplete. It provides an append-only log list
 
 </Admonition>
 
-Apache Iceberg is an open table format for analytic datasets. Replication, powered by Supabase ETL, to Iceberg uses Supabase [Analytics Buckets](/docs/guides/storage/analytics) to store your replicated data.
+Apache Iceberg is an open table format for analytic datasets. Replication powered by [Supabase ETL](https://github.com/supabase/etl) to Iceberg uses Supabase [Analytics Buckets](/docs/guides/storage/analytics) to store your replicated data.
 
 <Admonition type="tip">
 
@@ -28,7 +28,7 @@ This page covers Iceberg-specific configuration. For complete setup instructions
 
 ### Setup
 
-Setting up Iceberg replication requires two steps: creating an Analytics Bucket, then configuring it as an ETL destination.
+Setting up Iceberg replication requires two steps: creating an Analytics Bucket, then configuring it as a destination.
 
 #### Step 1: Create an Analytics bucket
 
@@ -43,7 +43,7 @@ First, create an Analytics Bucket to store your replicated data:
      zoomable
    />
 
-#### Step 2: Add Iceberg as an ETL destination
+#### Step 2: Add Iceberg as a destination
 
 After clicking **New bucket**, fill in the bucket details and copy the credentials:
 
@@ -79,7 +79,7 @@ Iceberg-specific limitations:
 
 - **Append-only log**: Currently provides an append-only log format rather than a full table representation
 
-For general Replication limitations that apply to all destinations, see the [Replication Setup guide](/docs/guides/database/replication/replication-setup#limitations).
+For general replication limitations that apply to all destinations, see the [Replication Setup guide](/docs/guides/database/replication/replication-setup#limitations).
 
 ### Next steps
 

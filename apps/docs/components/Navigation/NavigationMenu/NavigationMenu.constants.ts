@@ -2013,7 +2013,7 @@ export const storage: NavMenuConstant = {
         },
         {
           name: 'Realtime Data-Sync',
-          url: '/guides/storage/analytics/etl' as `/${string}`,
+          url: '/guides/storage/analytics/replication' as `/${string}`,
         },
         {
           name: 'Query with Postgres',

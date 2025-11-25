@@ -12,7 +12,7 @@ Replication is currently in private alpha. Access is limited and features may ch
 
 </Admonition>
 
-Replication, powered by Supabase ETL, requires two main components: a **publication** (source) and a **destination**. Follow these steps to set up your replication pipeline.
+Replication powered by [Supabase ETL](https://github.com/supabase/etl) requires two main components: a **publication** (source) and a **destination**. Follow these steps to set up your replication pipeline.
 
 <Admonition type="tip">
 
@@ -111,7 +111,7 @@ Once replication is enabled and you have a publication, you can add a destinatio
 
 #### Available destinations
 
-For a complete list of available destinations and how to choose the right one for your needs, see [ETL Destinations](/docs/guides/database/replication/replication-destinations).
+For a complete list of available destinations and how to choose the right one for your needs, see [Destinations](/docs/guides/database/replication/replication-destinations).
 
 #### Configuration
 
@@ -125,10 +125,10 @@ For a complete list of available destinations and how to choose the right one fo
    - **Destination type**: Choose from available destination types
 
    **Destination-specific settings:**
-   Each destination type requires different configuration. See the [ETL Destinations guide](/docs/guides/database/replication/replication-destinations) for configuration details specific to your chosen destination.
+   Each destination type requires different configuration. See the [Destinations guide](/docs/guides/database/replication/replication-destinations) for configuration details specific to your chosen destination.
 
 <Image
-  alt="Add ETL Destination"
+  alt="Add Destination"
   src="/docs/img/database/replication/replication-add-destination.png"
   zoomable
 />
@@ -144,7 +144,7 @@ For a complete list of available destinations and how to choose the right one fo
 After creating a destination, the pipeline will start and appear in the destinations list. You can monitor the pipeline's status and performance from the Dashboard.
 
 <Image
-  alt="ETL Destinations List"
+  alt="Destinations List"
   src="/docs/img/database/replication/replication-destinations-list.png"
   zoomable
 />
@@ -171,11 +171,11 @@ Available actions:
 
 ### Adding or removing tables
 
-If you need to modify which tables are replicated after your ETL pipeline is already running, follow these steps:
+If you need to modify which tables are replicated after your pipeline is already running, follow these steps:
 
 <Admonition type="note">
 
-If your publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, new tables in that scope are automatically included in the publication. However, you still **must restart the ETL pipeline** for the changes to take effect.
+If your publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, new tables in that scope are automatically included in the publication. However, you still **must restart the pipeline** for the changes to take effect.
 
 </Admonition>
 
@@ -191,7 +191,7 @@ If your publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, new tables 
    alter publication pub_users_orders add table products, categories;
    ```
 
-2. **Restart the ETL pipeline** using the actions menu (see [Managing your pipeline](#managing-your-pipeline)) for the changes to take effect.
+2. **Restart the pipeline** using the actions menu (see [Managing your pipeline](#managing-your-pipeline)) for the changes to take effect.
 
 #### Removing tables from replication
 
@@ -205,11 +205,11 @@ If your publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, new tables 
    alter publication pub_users_orders drop table orders, products;
    ```
 
-2. **Restart the ETL pipeline** using the actions menu (see [Managing your pipeline](#managing-your-pipeline)) for the changes to take effect.
+2. **Restart the pipeline** using the actions menu (see [Managing your pipeline](#managing-your-pipeline)) for the changes to take effect.
 
 ### How it works
 
-Once configured, Replication:
+Once configured, replication:
 
 1. **Captures** changes from your database using the publication
 2. **Loads** the data to your destination in near real-time batches
@@ -252,7 +252,7 @@ Replication is actively being developed. Planned improvements include:
 - **DDL support**: Automatic handling of schema changes (ALTER TABLE, ADD COLUMN, etc.)
 - **Additional destinations**: Support for more data warehouses and analytics platforms
 
-We don't have public timelines for these features, but they represent our roadmap for making Replication more robust and flexible.
+We don't have public timelines for these features, but they represent our roadmap for making replication more robust and flexible.
 
 ### Next steps
 

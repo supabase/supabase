@@ -1,7 +1,7 @@
 ---
 id: 'replication-bigquery'
 title: 'Replicate to BigQuery'
-description: 'Replicate your Supabase database to Google BigQuery using Replication.'
+description: 'Replicate your Supabase database to Google BigQuery using replication.'
 subtitle: 'Stream data changes to BigQuery in real-time.'
 sidebar_label: 'BigQuery'
 ---
@@ -12,7 +12,7 @@ Replication is currently in private alpha. Access is limited and features may ch
 
 </Admonition>
 
-BigQuery is Google's fully managed data warehouse. Replication, powered by Supabase ETL, allows you to automatically sync your Supabase database tables to BigQuery for analytics and reporting.
+BigQuery is Google's fully managed data warehouse. Replication powered by [Supabase ETL](https://github.com/supabase/etl) allows you to automatically sync your Supabase database tables to BigQuery for analytics and reporting.
 
 <Admonition type="tip">
 
@@ -68,7 +68,7 @@ After preparing your GCP resources, configure BigQuery as a destination:
 
 ### How it works
 
-Once configured, Replication to BigQuery:
+Once configured, replication to BigQuery:
 
 1. Captures changes from your Postgres database (INSERT, UPDATE, DELETE operations)
 2. Batches changes for optimal performance
@@ -117,7 +117,7 @@ BigQuery-specific limitations:
 - **Ingestion latency**: BigQuery's streaming API has inherent latency (typically seconds to minutes)
 - **Row size**: Limited to 10 MB per row due to BigQuery Storage Write API constraints
 
-For general Replication limitations that apply to all destinations, see the [Replication Setup guide](/docs/guides/database/replication/replication-setup#limitations).
+For general replication limitations that apply to all destinations, see the [Replication Setup guide](/docs/guides/database/replication/replication-setup#limitations).
 
 ### Next steps
 

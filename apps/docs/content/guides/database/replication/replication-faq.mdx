@@ -14,7 +14,7 @@ Replication is currently in private alpha. Access is limited and features may ch
 
 ## What destinations are supported?
 
-Replication currently supports Iceberg (Analytics Buckets). See the [ETL Destinations guide](/docs/guides/database/replication/replication-destinations) for details.
+Replication currently supports Iceberg (Analytics Buckets). See the [Destinations guide](/docs/guides/database/replication/replication-destinations) for details.
 
 ## Why is a table not being replicated?
 
@@ -29,7 +29,7 @@ Check your publication settings and verify your table meets the requirements.
 
 ## Why aren't publication changes reflected after adding or removing tables?
 
-After modifying your publication, you must restart the ETL pipeline for changes to take effect. See [Adding or removing tables](/docs/guides/database/replication/replication-setup#adding-or-removing-tables) for instructions.
+After modifying your publication, you must restart the pipeline for changes to take effect. See [Adding or removing tables](/docs/guides/database/replication/replication-setup#adding-or-removing-tables) for instructions.
 
 ## Why is a pipeline in failed state?
 
@@ -77,7 +77,7 @@ Note: Stopping replication will cause changes to queue up in the WAL.
 
 Yes, data duplicates can occur in certain scenarios when stopping a pipeline.
 
-When you stop a pipeline (for restarts or updates), Replication tries to finish processing any transactions that are currently being sent to your destination. It waits up to a few minutes to allow these in-progress transactions to complete cleanly before stopping.
+When you stop a pipeline (for restarts or updates), replication tries to finish processing any transactions that are currently being sent to your destination. It waits up to a few minutes to allow these in-progress transactions to complete cleanly before stopping.
 
 However, if a transaction in your database takes longer than this waiting period to complete, the pipeline will stop before that entire transaction has been fully processed. When the pipeline starts again, it must restart the incomplete transaction from the beginning to maintain transaction boundaries, which results in some data being sent twice to your destination.
 
