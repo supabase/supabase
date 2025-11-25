@@ -24,6 +24,11 @@ interface EdgeFunctionsSortDropdownProps {
   onChange: (value: EdgeFunctionsSort) => void
 }
 
+function getSortLabel(value: EdgeFunctionsSort) {
+  const [sortCol] = value.split(':')
+  return sortCol.replace('_', ' ')
+}
+
 export const EdgeFunctionsSortDropdown = ({ value, onChange }: EdgeFunctionsSortDropdownProps) => {
   return (
     <DropdownMenu>
@@ -38,7 +43,7 @@ export const EdgeFunctionsSortDropdown = ({ value, onChange }: EdgeFunctionsSort
             )
           }
         >
-          Sorted by {value.split(':')[0].replace('_', ' ')}
+          Sorted by {getSortLabel(value)}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-48">
