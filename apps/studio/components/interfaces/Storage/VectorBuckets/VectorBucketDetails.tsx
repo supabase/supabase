@@ -269,7 +269,7 @@ export const VectorBucketDetails = () => {
                                   <DropdownMenuTrigger asChild>
                                     <Button
                                       type="default"
-                                      className="px-1"
+                                      className="w-7"
                                       icon={<MoreVertical />}
                                       onClick={(e) => e.stopPropagation()}
                                     />
@@ -287,7 +287,10 @@ export const VectorBucketDetails = () => {
                                           )}?schema=${getVectorBucketFDWSchemaName(bucketId!)}`}
                                           onClick={(e) => e.stopPropagation()}
                                         >
-                                          <TableEditor size={12} />
+                                          <TableEditor
+                                            size={12}
+                                            className="text-foreground-lighter"
+                                          />
                                           <p>View in Table Editor</p>
                                         </Link>
                                       </DropdownMenuItem>
@@ -299,7 +302,7 @@ export const VectorBucketDetails = () => {
                                         setSelectedTableToDelete(index.indexName)
                                       }}
                                     >
-                                      <Trash2 size={12} />
+                                      <Trash2 size={12} className="text-foreground-lighter" />
                                       <p>Delete table</p>
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
@@ -378,7 +381,7 @@ const VectorBucketTableExamplesDialog = ({ index }: VectorBucketTableExamplesDia
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button type="default" icon={<ListPlus size={12} />}>
+        <Button type="default" icon={<ListPlus size={12} className="text-foreground-lighter" />}>
           Insert vectors
         </Button>
       </SheetTrigger>
