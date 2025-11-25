@@ -264,7 +264,7 @@ export const VectorBucketDetails = () => {
                             </TableCell>
                             <TableCell>
                               <div className="flex flex-row justify-end gap-2">
-                                <VectorBucketTableExamplesDialog index={index} />
+                                <VectorBucketTableExamplesSheet index={index} />
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button
@@ -382,11 +382,11 @@ export const VectorBucketDetails = () => {
   )
 }
 
-interface VectorBucketTableExamplesDialogProps {
+interface VectorBucketTableExamplesSheetProps {
   index: VectorBucketIndex
 }
 
-const VectorBucketTableExamplesDialog = ({ index }: VectorBucketTableExamplesDialogProps) => {
+const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamplesSheetProps) => {
   const metadataKeys = index.metadataConfiguration?.nonFilterableMetadataKeys ?? []
   const [language, setLanguage] = useState<'javascript' | 'sql'>('javascript')
   const [showLanguage, setShowLanguage] = useState(false)
