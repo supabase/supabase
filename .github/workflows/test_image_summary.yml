@@ -21,7 +21,7 @@ jobs:
 
       - name: Create job summary
         run: |
-          echo "**Published Docker Tags:**" >> $GITHUB_STEP_SUMMARY
+          echo "Published Docker Tags" >> $GITHUB_STEP_SUMMARY
           echo '' >> $GITHUB_STEP_SUMMARY
           echo "| Tag | Link |" >> $GITHUB_STEP_SUMMARY
           echo "|-----|------|" >> $GITHUB_STEP_SUMMARY
