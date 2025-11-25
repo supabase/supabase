@@ -45,6 +45,7 @@ import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector/RoleImpersonationPopover'
 import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
+import MaterializedViewEntityAutofixSecurityModal from './MaterializedViewEntityAutofixSecurityModal'
 
 export interface GridHeaderActionsProps {
   table: Entity
@@ -441,7 +442,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
             <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
               <PopoverTrigger_Shadcn_ asChild>
                 <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
-                  Security Definer view
+                  Materialized View in API
                 </Button>
               </PopoverTrigger_Shadcn_>
               <PopoverContent_Shadcn_
@@ -451,18 +452,18 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                 align="end"
               >
                 <h3 className="flex items-center gap-2">
-                  <Unlock size={16} /> Secure your View
+                  <Unlock size={16} /> Secure your Materialized View
                 </h3>
                 <div className="grid gap-2 mt-4 text-foreground-light text-sm">
                   <p>
-                    This view is defined with the Security Definer property, giving it permissions
-                    of the view's creator (Postgres), rather than the permissions of the querying
-                    user.
+                    Because materialized views do not automatically enforce RLS policies from their
+                    source tables, exposing them through the API may reveal data that would
+                    otherwise be protected.
                   </p>
 
                   <p>
-                    Since this view is in the public schema, it is accessible via your project's
-                    APIs.
+                    Since this materialized view is in a schema accessible to API roles, it can be
+                    queried through your project's APIs.
                   </p>
 
                   <div className="mt-2">
