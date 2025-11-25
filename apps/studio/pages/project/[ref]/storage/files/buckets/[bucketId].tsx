@@ -1,8 +1,8 @@
 import { ChevronDown, FolderOpen, Settings, Shield, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -17,7 +17,7 @@ import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { Bucket } from 'data/storage/buckets-query'
 import { useStoragePolicyCounts } from 'hooks/storage/useStoragePolicyCounts'
-import { Bucket as BucketIcon } from 'icons'
+import { FilesBucket as FilesBucketIcon } from 'icons'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
@@ -69,7 +69,7 @@ const BucketPage: NextPageWithLayout = () => {
         isCompact
         icon={
           <div className="shrink-0 w-10 h-10 relative bg-surface-100 border rounded-md flex items-center justify-center">
-            <BucketIcon size={20} className="text-foreground-light" />
+            <FilesBucketIcon size={20} className="text-foreground-light" />
           </div>
         }
         className="[&>div:first-child]:!border-b-0" // Override the border-b from ScaffoldContainer
