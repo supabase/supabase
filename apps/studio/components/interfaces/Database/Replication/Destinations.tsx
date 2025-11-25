@@ -143,8 +143,8 @@ export const Destinations = () => {
             <div className="flex flex-col gap-y-1">
               <h3>Replicate data to external destinations in real-time</h3>
               <p className="text-sm text-foreground-light">
-                {isPaidPlan ? 'Enable replication' : 'Upgrade to the Pro plan'} to start
-                replicating your database changes to data warehouses and analytics platforms
+                {isPaidPlan ? 'Enable replication' : 'Upgrade to the Pro plan'} to start replicating
+                your database changes to data warehouses and analytics platforms
               </p>
             </div>
             <div className="flex gap-x-2">
