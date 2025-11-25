@@ -51,6 +51,8 @@ By default, Supabase uses HS256 (symmetric) for signing JWTs. For OAuth use case
 
 Learn more about [configuring JWT signing keys](/docs/guides/auth/signing-keys).
 
+**Note:** If you plan to use OpenID Connect ID tokens (by requesting the `openid` scope), asymmetric signing algorithms are **required**. ID token generation will fail with HS256.
+
 </Admonition>
 
 ## Configure your authorization path
@@ -86,9 +88,11 @@ Your authorization UI should:
 
 1. **Extract authorization_id** - Get the `authorization_id` from the URL query parameters
 2. **Authenticate the user** - If not already logged in, redirect to your login page (preserving the authorization_id)
-3. **Retrieve authorization details** - Use `supabase.auth.oauth.getAuthorizationDetails(authorization_id)` to get client information
-4. **Display consent screen** - Show the user what app is requesting access and what permissions
+3. **Retrieve authorization details** - Use `supabase.auth.oauth.getAuthorizationDetails(authorization_id)` to get client information including requested scopes
+4. **Display consent screen** - Show the user what app is requesting access and what scopes/permissions are being requested
 5. **Handle user decision** - Call either `approveAuthorization(authorization_id)` or `denyAuthorization(authorization_id)` based on user choice
+
+The authorization details include a `scopes` field that contains the scopes requested by the client (e.g., `["openid", "email", "profile"]`). You should display these scopes to the user so they understand what information will be shared.
 
 <Admonition type="note">
 
@@ -170,6 +174,16 @@ export default async function ConsentPage({
         <p>
           <strong>Redirect URI:</strong> {authDetails.redirect_uri}
         </p>
+        {authDetails.scopes && authDetails.scopes.length > 0 && (
+          <div>
+            <strong>Requested permissions:</strong>
+            <ul>
+              {authDetails.scopes.map((scope) => (
+                <li key={scope}>{scope}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       <form action="/api/oauth/decision" method="POST">
@@ -330,6 +344,16 @@ export function OAuthConsent() {
         <p>
           <strong>Redirect URI:</strong> {authDetails.redirect_uri}
         </p>
+        {authDetails.scopes && authDetails.scopes.length > 0 && (
+          <div>
+            <strong>Requested permissions:</strong>
+            <ul>
+              {authDetails.scopes.map((scope) => (
+                <li key={scope}>{scope}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       <div>
@@ -460,7 +484,7 @@ This section is about **OAuth client redirect URIs** - where to send users after
 
 **Exact matches only - No wildcards or patterns**
 
-OAuth client redirect URIs require exact, complete URL matches. Unlike general redirect URLs (which support wildcards), OAuth client redirect URIs do NOT support wildcards, patterns, or partial URLs. You must register the full, exact callback URL for each environment.
+OAuth client redirect URIs require exact, complete URL matches. Unlike general redirect URLs (which support wildcards), OAuth client redirect URIs do NOT support wildcards, patterns, or partial URLs. You must register the full, exact callback URL.
 
 </Admonition>
 
@@ -514,8 +538,8 @@ When running locally, your OAuth endpoints will be:
 
 - **Authorization endpoint**: `http://localhost:54321/auth/v1/oauth/authorize`
 - **Token endpoint**: `http://localhost:54321/auth/v1/oauth/token`
-- **JWKS endpoint**: `http://localhost:54321/auth/v1/oauth/jwks`
-- **Discovery endpoint**: `http://localhost:54321/.well-known/oauth-authorization-server`
+- **JWKS endpoint**: `http://localhost:54321/auth/v1/.well-known/jwks.json`
+- **Discovery endpoint**: `http://localhost:54321/.well-known/oauth-authorization-server/auth/v1`
 
 ## Next steps
 

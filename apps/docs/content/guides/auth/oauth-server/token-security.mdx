@@ -6,6 +6,16 @@ description: 'Secure your data with Row Level Security policies for OAuth client
 
 When you enable OAuth 2.1 in your Supabase project, third-party applications can access user data on their behalf. Row Level Security (RLS) policies are crucial for controlling exactly what data each OAuth client can access.
 
+<Admonition type="important">
+
+**Scopes control OIDC data, not database access**
+
+The OAuth scopes (`openid`, `email`, `profile`, `phone`) control what user information is included in ID tokens and returned by the UserInfo endpoint. They do **not** control access to your database tables or API endpoints.
+
+Use RLS to define which OAuth clients can access which data, regardless of the scopes they requested.
+
+</Admonition>
+
 ## How OAuth tokens work with RLS
 
 OAuth access tokens issued by Supabase Auth are JWTs that include all standard Supabase claims plus OAuth-specific claims. This means your existing RLS policies continue to work, and you can add OAuth-specific logic to create granular access controls.

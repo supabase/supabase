@@ -35,7 +35,8 @@ Access tokens are standard Supabase JWTs that include `user_id`, `role`, and `cl
 ### Supported standards
 
 - **OAuth 2.1**: Latest OAuth specification with mandatory PKCE
-- **OpenID Connect**: ID tokens, UserInfo endpoint, and OIDC discovery
+- **OpenID Connect**: ID tokens (with `openid` scope), UserInfo endpoint, and OIDC discovery
+- **Standard scopes**: `openid`, `email`, `profile`, and `phone` scopes for controlling data access
 - **Dynamic client registration**: Automatic registration for MCP-compatible clients
 - **JWKS endpoint**: Public keys for third parties to validate tokens
 
