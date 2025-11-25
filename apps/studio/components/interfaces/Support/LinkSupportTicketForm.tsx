@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Check, ChevronsUpDown, ChevronRight } from 'lucide-react'
+import { Check, ChevronsUpDown, ChevronRight, Link2 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import type { SubmitHandler } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -42,10 +41,10 @@ import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
 
 interface LinkSupportTicketFormProps {
   conversationId: string
+  onSuccess: () => void
 }
 
-export function LinkSupportTicketForm({ conversationId }: LinkSupportTicketFormProps) {
-  const router = useRouter()
+export function LinkSupportTicketForm({ conversationId, onSuccess }: LinkSupportTicketFormProps) {
   const { data: organizations } = useOrganizationsQuery()
 
   const form = useForm<LinkSupportTicketFormValues>({
@@ -64,10 +63,17 @@ export function LinkSupportTicketForm({ conversationId }: LinkSupportTicketFormP
   const { mutate: linkSupportTicket, isLoading } = useLinkSupportTicketMutation({
     onSuccess: () => {
       toast.success('Support ticket linked successfully!')
-      router.push('/')
+      onSuccess()
     },
     onError: (error) => {
-      toast.error(`Failed to link support ticket: ${error.message}`)
+      let errorMessage = error.message
+      try {
+        const parsed = JSON.parse(error.message)
+        errorMessage = parsed?._error?.message || parsed?.message || error.message
+      } catch {
+        // If parsing fails, use the original message
+      }
+      toast.error(`Failed to link support ticket: ${errorMessage}`)
     },
   })
 
@@ -350,6 +356,7 @@ export function LinkSupportTicketForm({ conversationId }: LinkSupportTicketFormP
             htmlType="submit"
             size="large"
             block
+            icon={<Link2 />}
             disabled={isLoading}
             loading={isLoading}
           >
