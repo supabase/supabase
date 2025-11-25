@@ -24,6 +24,7 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 import { hasIndexRecommendations } from './IndexAdvisor/index-advisor.utils'
+import { useIndexAdvisorStatus } from './hooks/useIsIndexAdvisorStatus'
 import { IndexSuggestionIcon } from './IndexAdvisor/IndexSuggestionIcon'
 import { QueryDetail } from './QueryDetail'
 import { QueryIndexes } from './QueryIndexes'
@@ -86,6 +87,7 @@ export const QueryPerformanceGrid = ({
     } as NumericFilter),
   })
   const dataGridContainerRef = useRef<HTMLDivElement>(null)
+  const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
   const [view, setView] = useState<'details' | 'suggestion'>('details')
   const [selectedRow, setSelectedRow] = useState<number>()
@@ -399,11 +401,11 @@ export const QueryPerformanceGrid = ({
 
   const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
   const query = (selectedQuery ?? '').trim().toLowerCase()
-  const showIndexSuggestions =
-    (query.startsWith('select') ||
-      query.startsWith('with pgrst_source') ||
-      query.startsWith('with pgrst_payload')) &&
-    hasIndexRecommendations(reportData[selectedRow!]?.index_advisor_result, true)
+  // const showIndexSuggestions =
+  //   (query.startsWith('select') ||
+  //     query.startsWith('with pgrst_source') ||
+  //     query.startsWith('with pgrst_payload')) &&
+  //   hasIndexRecommendations(reportData[selectedRow!]?.index_advisor_result, true)
 
   useEffect(() => {
     setSelectedRow(undefined)
@@ -549,7 +551,7 @@ export const QueryPerformanceGrid = ({
                 >
                   Query details
                 </TabsTrigger_Shadcn_>
-                {showIndexSuggestions && (
+                {isIndexAdvisorEnabled && (
                   <TabsTrigger_Shadcn_
                     value="suggestion"
                     className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
