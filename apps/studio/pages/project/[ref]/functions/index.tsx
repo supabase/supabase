@@ -1,4 +1,4 @@
-import { ExternalLink, Search } from 'lucide-react'
+import { ExternalLink, Search, X } from 'lucide-react'
 import React, { useMemo, useState } from 'react'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 
@@ -45,6 +45,7 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -103,15 +104,24 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-2">
                           <div className="relative">
-                            <Search
-                              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
-                              size={14}
-                            />
-                            <Input_Shadcn_
+                            <Input
                               placeholder="Search function names"
-                              className="pl-9 h-7 w-52"
+                              icon={<Search size={12} />}
+                              size="tiny"
+                              className="w-32 md:w-64 pl-8 [&>div>div>div>input]:!pl-7 [&>div>div>div>div]:!pl-2"
                               value={search}
-                              onChange={(e) => setSearch(e.target.value)}
+                              onChange={(event) => setSearch(event.target.value)}
+                              actions={[
+                                search && (
+                                  <Button
+                                    size="tiny"
+                                    type="text"
+                                    icon={<X />}
+                                    onClick={() => setSearch('')}
+                                    className="p-0 h-5 w-5"
+                                  />
+                                ),
+                              ]}
                             />
                           </div>
                         </div>
