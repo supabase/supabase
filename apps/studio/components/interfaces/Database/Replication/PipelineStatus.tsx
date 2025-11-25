@@ -3,7 +3,7 @@ import { AlertTriangle, Loader2 } from 'lucide-react'
 import { useParams } from 'common'
 import { DotPing } from 'components/ui/DotPing'
 import { InlineLink } from 'components/ui/InlineLink'
-import { ReplicationPipelineStatusData } from 'data/etl/pipeline-status-query'
+import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 import type { ResponseError } from 'types'
 import { cn, Tooltip, TooltipContent, TooltipTrigger, WarningIcon } from 'ui'
@@ -134,10 +134,10 @@ export const PipelineStatus = ({
   const statusConfig = getStatusConfig()
 
   const pipelineLogsUrl = pipelineId
-    ? `/project/${ref}/logs/etl-replication-logs?f=${encodeURIComponent(
+    ? `/project/${ref}/logs/replication-logs?f=${encodeURIComponent(
         JSON.stringify({ pipeline_id: pipelineId })
       )}`
-    : `/project/${ref}/logs/etl-replication-logs`
+    : `/project/${ref}/logs/replication-logs`
 
   return (
     <>

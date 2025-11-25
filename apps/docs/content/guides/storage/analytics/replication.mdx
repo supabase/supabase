@@ -9,11 +9,11 @@ Expect rapid changes, limited features, and possible breaking updates. [Share fe
 
 </Admonition>
 
-By combining Supabase's **ETL service** with **Analytics Buckets**, you can build an end-to-end data warehouse solution that automatically syncs changes from your Postgres database to Iceberg tables.
+By combining replication powered by [Supabase ETL](https://github.com/supabase/etl) with **Analytics Buckets**, you can build an end-to-end data warehouse solution that automatically syncs changes from your Postgres database to Iceberg tables.
 
 ## How it works
 
-The ETL pipeline captures changes (INSERT, UPDATE, DELETE) from your Postgres database in real-time and writes them to your analytics bucket. This allows you to maintain an always-up-to-date data warehouse without impacting your production workloads.
+The replication pipeline captures changes (INSERT, UPDATE, DELETE) from your Postgres database in real-time and writes them to your analytics bucket. This allows you to maintain an always-up-to-date data warehouse without impacting your production workloads.
 
 ## Setup steps
 
@@ -29,7 +29,7 @@ First, create a new analytics bucket to store your replicated data:
 
 <Image
   alt="Creating a new analytics bucket"
-  src="/docs/img/database/replication/etl-iceberg-new-bucket.png"
+  src="/docs/img/database/replication/replication-iceberg-new-bucket.png"
   zoomable
 />
 
@@ -43,9 +43,9 @@ CREATE PUBLICATION pub_warehouse
   FOR TABLE users, orders, products;
 ```
 
-This publication will track all changes (INSERT, UPDATE, DELETE) for the specified tables. For advanced use cases, see the [Replication Configuration Guide](/docs/guides/database/replication/etl-replication-setup).
+This publication will track all changes (INSERT, UPDATE, DELETE) for the specified tables. For advanced use cases, see the [Replication Configuration Guide](/docs/guides/database/replication/replication-setup).
 
-### Step 3: Create the ETL pipeline
+### Step 3: Create the replication pipeline
 
 Now set up the pipeline to sync data to your analytics bucket:
 
@@ -57,8 +57,8 @@ Now set up the pipeline to sync data to your analytics bucket:
 6. Click **Create and Start**.
 
 <Image
-  alt="ETL pipeline configuration"
-  src="/docs/img/database/replication/etl-iceberg-details.png"
+  alt="Replication pipeline configuration"
+  src="/docs/img/database/replication/replication-iceberg-details.png"
   zoomable
 />
 
@@ -78,4 +78,4 @@ Once data is flowing to your analytics bucket, you can:
 - [Connect with PyIceberg](/docs/guides/storage/analytics/examples/pyiceberg)
 - [Analyze with Apache Spark](/docs/guides/storage/analytics/examples/apache-spark)
 
-For advanced topics, see the [ETL Replication Monitoring Guide](/docs/guides/database/replication/etl-replication-monitoring).
+For advanced topics, see the [Replication Monitoring Guide](/docs/guides/database/replication/replication-monitoring).

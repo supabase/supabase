@@ -12,10 +12,10 @@ import {
 import { getDecryptedParameters } from 'components/interfaces/Storage/ImportForeignSchemaDialog.utils'
 import { DotPing } from 'components/ui/DotPing'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { useReplicationPipelineStatusQuery } from 'data/etl/pipeline-status-query'
-import { useUpdatePublicationMutation } from 'data/etl/publication-update-mutation'
-import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
-import { useReplicationTablesQuery } from 'data/etl/tables-query'
+import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
+import { useUpdatePublicationMutation } from 'data/replication/publication-update-mutation'
+import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
+import { useReplicationTablesQuery } from 'data/replication/tables-query'
 import { useFDWDropForeignTableMutation } from 'data/fdw/fdw-drop-foreign-table-mutation'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { useIcebergNamespaceTableDeleteMutation } from 'data/storage/iceberg-namespace-table-delete-mutation'
@@ -342,7 +342,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
                       {!!inferredPostgresTable && (
                         <DropdownMenuItem asChild className="flex items-center gap-x-2">
                           <Link
-                            href={`/project/${projectRef}/database/etl/${pipeline?.id}?search=${inferredPostgresTable.schema}.${inferredPostgresTable.name}`}
+                            href={`/project/${projectRef}/database/replication/${pipeline?.id}?search=${inferredPostgresTable.schema}.${inferredPostgresTable.name}`}
                           >
                             <Eye size={12} className="text-foreground-lighter" />
                             <p>View replication</p>

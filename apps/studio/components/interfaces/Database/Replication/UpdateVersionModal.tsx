@@ -1,11 +1,11 @@
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useReplicationPipelineStatusQuery } from 'data/etl/pipeline-status-query'
-import { useReplicationPipelineVersionQuery } from 'data/etl/pipeline-version-query'
-import { Pipeline } from 'data/etl/pipelines-query'
-import { useRestartPipelineHelper } from 'data/etl/restart-pipeline-helper'
-import { useUpdatePipelineVersionMutation } from 'data/etl/update-pipeline-version-mutation'
+import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
+import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
+import { Pipeline } from 'data/replication/pipelines-query'
+import { useRestartPipelineHelper } from 'data/replication/restart-pipeline-helper'
+import { useUpdatePipelineVersionMutation } from 'data/replication/update-pipeline-version-mutation'
 import { ChevronDown } from 'lucide-react'
 import {
   PipelineStatusRequestStatus,
