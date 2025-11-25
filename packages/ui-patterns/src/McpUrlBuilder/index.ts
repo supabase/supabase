@@ -10,10 +10,12 @@ export {
   MCP_CLIENTS,
 } from './constants'
 export { getMcpUrl } from './utils/getMcpUrl'
+export { createMcpCopyHandler, type McpCopyType } from './utils/createMcpCopyHandler'
 export { McpConfigPanel, type McpConfigPanelProps } from './McpConfigPanel'
 export type {
   McpClient,
   McpClientBaseConfig as McpClientConfig,
   McpFeatureGroup,
+  McpOnCopyCallback,
   McpUrlBuilderConfig,
 } from './types'
