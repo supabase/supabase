@@ -4,7 +4,7 @@ import { ExternalLink } from 'lucide-react'
 import Image from 'next/image'
 import { Button, cn } from 'ui'
 import { CodeBlock } from 'ui/src/components/CodeBlock'
-import type { McpClient, McpClientConfig } from '../types'
+import type { McpClient, McpClientConfig, McpOnCopyCallback } from '../types'
 import { getMcpButtonData } from '../utils/getMcpButtonData'
 
 interface McpConfigurationDisplayProps {
@@ -13,7 +13,7 @@ interface McpConfigurationDisplayProps {
   className?: string
   theme?: 'light' | 'dark'
   basePath: string
-  onCopyCallback?: (type?: 'url' | 'json' | 'command') => void
+  onCopyCallback: (type?: McpOnCopyCallback) => void
   onInstallCallback?: () => void
 }
 
@@ -79,7 +79,7 @@ export function McpConfigurationDisplay({
         language="json"
         className="max-h-64 overflow-y-auto"
         focusable={false}
-        onCopyCallback={() => onCopyCallback?.('json')}
+        onCopyCallback={() => onCopyCallback?.('config')}
       />
 
       {selectedClient.alternateInstructions &&
