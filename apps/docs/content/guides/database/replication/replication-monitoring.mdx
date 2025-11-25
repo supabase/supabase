@@ -18,13 +18,13 @@ After setting up replication to managed destinations, you can monitor the status
 
 To monitor your replication pipelines:
 
-1. Navigate to the [Database](/dashboard/project/_/database/etl) section in your Supabase Dashboard
-2. Select the **ETL Replication** tab
+1. Navigate to the [Database](/dashboard/project/_/database/replication) section in your Supabase Dashboard
+2. Select the **replication** tab
 3. You'll see a list of all your destinations with their pipeline status
 
 <Image
   alt="Destinations List"
-  src="/docs/img/database/replication/etl-destinations-list.png"
+  src="/docs/img/database/replication/replication-destinations-list.png"
   zoomable
 />
 
@@ -46,7 +46,7 @@ For detailed information about a specific pipeline, click **View status** on the
 
 <Image
   alt="Pipeline Status View"
-  src="/docs/img/database/replication/etl-view-status.png"
+  src="/docs/img/database/replication/replication-view-status.png"
   zoomable
 />
 
@@ -76,7 +76,7 @@ Table errors occur during the copy phase and affect individual tables. These err
 
 <Image
   alt="Table Error Details"
-  src="/docs/img/database/replication/etl-pipeline-table-error.png"
+  src="/docs/img/database/replication/replication-pipeline-table-error.png"
   zoomable
 />
 
@@ -96,7 +96,7 @@ Pipeline errors occur during the streaming phase (Live state) and affect the ent
 
 <Image
   alt="Pipeline Error Details"
-  src="/docs/img/database/replication/etl-pipeline-error.png"
+  src="/docs/img/database/replication/replication-pipeline-error.png"
   zoomable
 />
 
@@ -122,7 +122,7 @@ To see detailed logs for all your replication pipelines:
 2. Select **Replication** from the log source filter
 3. You'll see all logs from your replication pipelines
 
-<Image alt="Replication Logs" src="/docs/img/database/replication/etl-logs.png" zoomable />
+<Image alt="Replication Logs" src="/docs/img/database/replication/replication-logs.png" zoomable />
 
 <Admonition type="note">
 
@@ -134,7 +134,7 @@ Logs contain diagnostic information that may be too technical for most users. If
 
 #### Checking if replication is healthy
 
-1. Navigate to [Database](/dashboard/project/_/database/etl) → **ETL Replication**
+1. Navigate to [Database](/dashboard/project/_/database/replication) → **replication**
 2. Verify your destination shows **Running** status
 3. Click **View status** to check replication lag and table states
 4. Ensure all tables show **Live** state

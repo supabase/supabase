@@ -1,6 +1,6 @@
 ---
-id: 'monitoring-replication'
-title: 'Monitoring Replication'
+id: 'manual-replication-monitoring'
+title: 'Manual Replication Monitoring'
 description: 'Monitor replication lag and status for manual replication setups.'
 subtitle: 'Track replication health and performance.'
 sidebar_label: 'Monitoring'
@@ -16,7 +16,7 @@ Monitoring replication lag is important and there are 3 ways to do this:
 3. [Metrics](/docs/guides/telemetry/metrics) - Using the prometheus endpoint for your project
    - replication_slots_max_lag_bytes - this is the more important one
    - pg_stat_replication_replay_lag - lag to replay WAL files from the source DB on the target DB (throttled by disk or high activity)
-   - pg_stat_replication_send_lag - lag in sending WAL files from the source DB (a high lag means that the publisher is not being asked to send new WAL files OR a network issues)
+   - pg_stat_replication_send_lag - lag in sending WAL files from the source DB (a high lag means that the publisher is not being asked to send new WAL files OR network issues)
 
 ### Primary
 

@@ -1,9 +1,9 @@
 ---
 id: 'replication-setup'
-title: 'Managed Destinations Setup'
+title: 'Replication Setup'
 description: 'Set up replication to managed destinations using Postgres logical replication.'
-subtitle: 'Configure publications and destinations for managed replication.'
-sidebar_label: 'Managed Destinations'
+subtitle: 'Configure publications and destinations for replication.'
+sidebar_label: 'Setting up'
 ---
 
 <Admonition type="caution" label="Private Alpha">
@@ -99,13 +99,13 @@ After creating a publication via SQL, you can view it in the Supabase Dashboard:
 
 Before adding destinations, you need to enable replication to managed destinations for your project:
 
-1. Navigate to the [Database](/dashboard/project/_/database/etl) section in your Supabase Dashboard
-2. Select the **ETL Replication** tab
+1. Navigate to the [Database](/dashboard/project/_/database/replication) section in your Supabase Dashboard
+2. Select the **replication** tab
 3. Click **Enable replication** to activate replication for your project
 
 <Image
   alt="Enable Replication"
-  src="/docs/img/database/replication/etl-enable-replication.png"
+  src="/docs/img/database/replication/replication-enable-replication.png"
   zoomable
 />
 
@@ -139,7 +139,7 @@ First, create an analytics bucket to store your replicated data:
 
    <Image
      alt="Create new analytics bucket"
-     src="/docs/img/database/replication/etl-iceberg-new-bucket.png"
+     src="/docs/img/database/replication/replication-iceberg-new-bucket.png"
      zoomable
    />
 
@@ -147,7 +147,7 @@ First, create an analytics bucket to store your replicated data:
 
    <Image
      alt="Analytics bucket details"
-     src="/docs/img/database/replication/etl-iceberg-details.png"
+     src="/docs/img/database/replication/replication-iceberg-details.png"
      zoomable
    />
 
@@ -163,12 +163,12 @@ First, create an analytics bucket to store your replicated data:
 
 ##### Step 2: Configure analytics buckets as a destination
 
-1. Navigate to [Database](/dashboard/project/_/database/etl) → **ETL Replication** in your Supabase Dashboard
+1. Navigate to [Database](/dashboard/project/_/database/replication) → **replication** in your Supabase Dashboard
 2. Click **Add destination**
 
    <Image
      alt="Add Destination"
-     src="/docs/img/database/replication/etl-add-destination.png"
+     src="/docs/img/database/replication/replication-add-destination.png"
      zoomable
    />
 
@@ -208,7 +208,7 @@ Once configured, replication to Analytics Buckets:
 Replicated tables use a changelog structure:
 
 - Tables are created with a `_changelog` suffix in the name (e.g., `users_changelog`)
-- Each table contains a `cdc_operation` column indicating the operation type: `INSERT`, `UPDATE`, or `DELETE`
+- Each table contains a `cdc_operation` column indicating the operation type: `INSERT`, `UPDATE`, `DELETE`, or `TRUNCATE`
 - This append-only format preserves the complete history of all changes
 
 ##### Limitations
@@ -224,7 +224,7 @@ Replicated tables use a changelog structure:
 </TabPanel>
 <TabPanel id="bigquery" label="BigQuery">
 
-[BigQuery](https://cloud.google.com/bigquery) is Google's fully managed data warehouse. Replication to BigQuery allows you to sync your database tables for analytics and reporting.
+[BigQuery](https://cloud.google.com/bigquery) is Google's fully managed data warehouse. You can replicate your database tables to BigQuery for analytics and reporting.
 
 ##### Step 1: Prepare GCP resources
 
@@ -257,12 +257,12 @@ Before configuring BigQuery as a destination, set up the following in Google Clo
 
 ##### Step 2: Configure BigQuery as a destination
 
-1. Navigate to [Database](/dashboard/project/_/database/etl) → **ETL Replication** in your Supabase Dashboard
+1. Navigate to [Database](/dashboard/project/_/database/replication) → **replication** in your Supabase Dashboard
 2. Click **Add destination**
 
    <Image
      alt="BigQuery Configuration Settings"
-     src="/docs/img/database/replication/etl-bigquery-details.png"
+     src="/docs/img/database/replication/replication-bigquery-details.png"
      zoomable
    />
 
@@ -329,7 +329,7 @@ After creating a destination, the replication pipeline will start and appear in 
 
 <Image
   alt="Replication Destinations List"
-  src="/docs/img/database/replication/etl-destinations-list.png"
+  src="/docs/img/database/replication/replication-destinations-list.png"
   zoomable
 />
 
@@ -341,7 +341,7 @@ You can manage your pipeline from the destinations list using the actions menu.
 
 <Image
   alt="Pipeline Actions"
-  src="/docs/img/database/replication/etl-pipeline-actions.png"
+  src="/docs/img/database/replication/replication-pipeline-actions.png"
   zoomable
 />
 
@@ -405,7 +405,7 @@ Once configured, replication to managed destinations:
 2. **Streams** the changes through Supabase ETL's replication pipeline
 3. **Loads** the data to your destination in near real-time batches
 
-Changes are sent in batches to optimize performance and reduce costs. The batch size and timing can be adjusted using the advanced settings. Replication currently performs data extraction and loading only, without transformation - your data is replicated as-is to the destination.
+Changes are sent in batches to optimize performance and reduce costs. The batch size and timing can be adjusted using the advanced settings. The replication pipeline currently performs data extraction and loading only, without transformation - your data is replicated as-is to the destination.
 
 ### Troubleshooting
 

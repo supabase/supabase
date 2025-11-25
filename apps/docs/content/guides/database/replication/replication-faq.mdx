@@ -25,7 +25,6 @@ Common reasons:
 - **Missing primary key**: Tables must have a primary key to be replicated (Postgres logical replication requirement)
 - **Not in publication**: Ensure the table is included in your Postgres publication
 - **Unsupported data types**: Tables with custom data types are not supported
-- **Partitioned tables**: Not currently supported
 
 Check your publication settings and verify your table meets the requirements.
 
@@ -50,7 +49,7 @@ Table errors occur during the copy phase. To recover, click **View status**, fin
 
 ## How to verify replication is working
 
-Check the [Database](/dashboard/project/_/database/etl) → **ETL Replication** page:
+Check the [Database](/dashboard/project/_/database/replication) → **replication** page:
 
 1. Verify your pipeline shows **Running** status
 2. Click **View status** to check table states
@@ -67,7 +66,7 @@ Key limitations to be aware of:
 - **Custom data types**: Not supported
 - **Schema changes**: Not automatically handled (DDL changes require manual intervention)
 
-Destination-specific limitations (such as Analytics Buckets' append-only log format or BigQuery's row size limits) are detailed in the [Setup guide](/docs/guides/database/replication/replication-setup#step-3-add-a-destination).
+For a complete list of limitations including destination-specific ones, see the [Setup guide](/docs/guides/database/replication/replication-setup#limitations).
 
 ## How to stop or pause replication
 
