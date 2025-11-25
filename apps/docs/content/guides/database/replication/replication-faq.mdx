@@ -64,9 +64,9 @@ You can manage your pipeline using the actions menu in the destinations list. Se
 
 Note: Stopping replication will cause changes to queue up in the WAL.
 
-## What happens if I delete a table at the destination?
+## What happens if a table is deleted at the destination?
 
-If you delete a table downstream at your destination (e.g., in your Analytics Bucket or BigQuery dataset), the replication pipeline will automatically recreate it.
+If a table is deleted downstream at the destination (e.g., in your Analytics Bucket or BigQuery dataset), the replication pipeline will automatically recreate it.
 
 This behavior is by design to prevent the pipeline from breaking if tables are accidentally deleted. The pipeline ensures that all tables in your publication are always present at the destination.
 
@@ -75,11 +75,13 @@ This behavior is by design to prevent the pipeline from breaking if tables are a
 You have two options:
 
 **Option 1: Pause the pipeline first**
+
 1. Pause or delete your replication pipeline
 2. Delete the table at your destination
 3. The table will not be recreated since the pipeline is not running
 
 **Option 2: Remove from publication first**
+
 1. Remove the table from your Postgres publication using `ALTER PUBLICATION ... DROP TABLE`
 2. Restart your replication pipeline to apply the change (the table at the destination will remain but stop receiving new changes)
 3. Delete the table at your destination
