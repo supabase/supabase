@@ -35,10 +35,10 @@ export const GenericSkeletonLoader = ({ className }: GenericSkeletonLoaderProps)
 )
 
 export const GenericTableLoader = ({
-  headers,
+  headers = [],
   numRows = 3,
 }: {
-  headers: (string | null)[]
+  headers?: (string | null)[]
   numRows?: number
 }) => {
   return (
@@ -46,9 +46,11 @@ export const GenericTableLoader = ({
       <Table>
         <TableHeader>
           <TableRow>
-            {headers.map((h, i) => (
-              <TableHead key={`${h}_${i}`}>{h}</TableHead>
-            ))}
+            {headers.length === 0 ? (
+              <TableHead />
+            ) : (
+              headers.map((h, i) => <TableHead key={`${h}_${i}`}>{h}</TableHead>)
+            )}
           </TableRow>
         </TableHeader>
         <TableBody>

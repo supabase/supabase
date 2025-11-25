@@ -5,7 +5,7 @@ import {
   VirtualizedTableRow,
 } from 'components/ui/VirtualizedTable'
 import { Bucket } from 'data/storage/buckets-query'
-import { Bucket as BucketIcon } from 'icons'
+import { FilesBucket as FilesBucketIcon } from 'icons'
 import { formatBytes } from 'lib/helpers'
 import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -114,7 +114,7 @@ export const BucketTableRow = ({
       tabIndex={0}
     >
       <BucketTableCell className="w-2 pr-1">
-        <BucketIcon aria-label="bucket icon" size={16} className="text-foreground-muted" />
+        <FilesBucketIcon aria-label="bucket icon" size={16} className="text-foreground-muted" />
       </BucketTableCell>
       <BucketTableCell className="flex-1">
         <div className="flex items-center gap-2.5">

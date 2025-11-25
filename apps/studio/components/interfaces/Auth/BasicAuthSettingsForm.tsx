@@ -247,14 +247,15 @@ export const BasicAuthSettingsForm = () => {
                     <WarningIcon />
                     <div>
                       <AlertTitle_Shadcn_>
-                        Anonymous users will use the <code className="text-xs">authenticated</code>{' '}
-                        role when signing in
+                        Anonymous users will use the{' '}
+                        <code className="text-code-inline">authenticated</code> role when signing in
                       </AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
                         <p>
                           As a result, anonymous users will be subjected to RLS policies that apply
-                          to the <code className="text-xs">public</code> and{' '}
-                          <code className="text-xs">authenticated</code> roles. We strongly advise{' '}
+                          to the <code className="text-code-inline">public</code> and{' '}
+                          <code className="text-code-inline">authenticated</code> roles. We strongly
+                          advise{' '}
                           <Link
                             href={`/project/${projectRef}/auth/policies`}
                             className="text-foreground underline"

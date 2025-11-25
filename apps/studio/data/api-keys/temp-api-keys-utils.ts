@@ -6,13 +6,13 @@ const projectApiKeys = new Map<ProjectRef, Promise<TemporaryApiKey>>()
 
 export interface TemporaryApiKey {
   apiKey: string
-  expiryTime: number
+  expiryTimeMs: number
 }
 
 export function createTemporaryApiKey(apiKey: string, expiryInSeconds: number): TemporaryApiKey {
   return {
     apiKey,
-    expiryTime: Date.now() + expiryInSeconds * 1000,
+    expiryTimeMs: Date.now() + expiryInSeconds * 1000,
   }
 }
 
@@ -22,8 +22,8 @@ export function isTemporaryApiKeyValid(
   if (!key) return false
 
   const now = Date.now()
-  const timeRemaining = key.expiryTime - now
-  return timeRemaining > 60000 // More than 60 seconds remaining
+  const timeRemaining = key.expiryTimeMs - now
+  return timeRemaining > 20_000 // More than 20 seconds remaining
 }
 
 const checkOrRefreshTemporaryApiKey = async (
@@ -31,11 +31,12 @@ const checkOrRefreshTemporaryApiKey = async (
   existingKey: Promise<TemporaryApiKey> | undefined
 ): Promise<TemporaryApiKey> => {
   const resolvedKey = await existingKey
+
   if (isTemporaryApiKeyValid(resolvedKey)) {
     return resolvedKey
   }
 
-  const expiryInSeconds = 600
+  const expiryInSeconds = 60
   const fetchedKey = getTemporaryAPIKey({
     projectRef,
     expiry: expiryInSeconds,
@@ -47,9 +48,7 @@ const checkOrRefreshTemporaryApiKey = async (
 // This function should never be marked as async, it should always return a promise.
 export function getOrRefreshTemporaryApiKey(projectRef: ProjectRef): Promise<TemporaryApiKey> {
   const existingKey = projectApiKeys.get(projectRef)
-  if (!existingKey) {
-    const data = checkOrRefreshTemporaryApiKey(projectRef, undefined)
-    projectApiKeys.set(projectRef, data)
-  }
-  return projectApiKeys.get(projectRef)!
+  const data = checkOrRefreshTemporaryApiKey(projectRef, existingKey)
+  projectApiKeys.set(projectRef, data)
+  return data
 }
