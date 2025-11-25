@@ -1,4 +1,4 @@
-import { Eye, MoreVertical, Search, Trash2 } from 'lucide-react'
+import { BookOpen, ChevronDown, ListPlus, MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
@@ -26,7 +26,7 @@ import {
 } from 'data/storage/vector-buckets-indexes-query'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { SqlEditor } from 'icons'
+import { SqlEditor, TableEditor } from 'icons'
 import { DOCS_URL } from 'lib/constants'
 import {
   Button,
@@ -34,25 +34,29 @@ import {
   CardContent,
   cn,
   CodeBlock,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  Command_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
+  SheetTrigger,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -260,31 +264,55 @@ export const VectorBucketDetails = () => {
                             </TableCell>
                             <TableCell>
                               <div className="flex flex-row justify-end gap-2">
-                                {wrapperInstance ? (
-                                  <Button
-                                    asChild
-                                    icon={<Eye size={14} className="text-foreground-lighter" />}
-                                    type="default"
-                                  >
-                                    {/* TODO: Proper URL for table editor */}
-                                    <Link
-                                      href={`/project/${projectRef}/editor/${encodeURIComponent(name)}?schema=${getVectorBucketFDWSchemaName(bucketId!)}`}
-                                    >
-                                      Table Editor
-                                    </Link>
-                                  </Button>
-                                ) : null}
                                 <VectorBucketTableExamplesDialog index={index} />
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button
                                       type="default"
-                                      className="px-1"
+                                      className="w-7"
                                       icon={<MoreVertical />}
                                       onClick={(e) => e.stopPropagation()}
                                     />
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent side="bottom" align="end" className="w-40">
+                                    {wrapperInstance ? (
+                                      <>
+                                        <DropdownMenuItem
+                                          className="flex items-center space-x-2"
+                                          asChild
+                                        >
+                                          {/* TODO: Proper URL for sql editor */}
+                                          <Link
+                                            href={`/project/${projectRef}/sql/new?content=${encodeURIComponent(`select * from "${getVectorBucketFDWSchemaName(bucketId!)}"."${name}";`)}`}
+                                            onClick={(e) => e.stopPropagation()}
+                                          >
+                                            <SqlEditor
+                                              size={12}
+                                              className="text-foreground-lighter"
+                                            />
+                                            <p>Query in SQL Editor</p>
+                                          </Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                          className="flex items-center space-x-2"
+                                          asChild
+                                        >
+                                          {/* TODO: Proper URL for table editor */}
+                                          <Link
+                                            href={`/project/${projectRef}/editor/${encodeURIComponent(
+                                              name
+                                            )}?schema=${getVectorBucketFDWSchemaName(bucketId!)}`}
+                                            onClick={(e) => e.stopPropagation()}
+                                          >
+                                            <TableEditor
+                                              size={12}
+                                              className="text-foreground-lighter"
+                                            />
+                                            <p>View in Table Editor</p>
+                                          </Link>
+                                        </DropdownMenuItem>
+                                      </>
+                                    ) : null}
                                     <DropdownMenuItem
                                       className="flex items-center space-x-2"
                                       onClick={(e) => {
@@ -292,7 +320,7 @@ export const VectorBucketDetails = () => {
                                         setSelectedTableToDelete(index.indexName)
                                       }}
                                     >
-                                      <Trash2 size={12} />
+                                      <Trash2 size={12} className="text-foreground-lighter" />
                                       <p>Delete table</p>
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
@@ -360,26 +388,46 @@ interface VectorBucketTableExamplesDialogProps {
 
 const VectorBucketTableExamplesDialog = ({ index }: VectorBucketTableExamplesDialogProps) => {
   const metadataKeys = index.metadataConfiguration?.nonFilterableMetadataKeys ?? []
+  const [language, setLanguage] = useState<'javascript' | 'sql'>('javascript')
+  const [showLanguage, setShowLanguage] = useState(false)
+
+  const updateLanguage = (value: 'javascript' | 'sql') => {
+    setLanguage(value)
+    setShowLanguage(false)
+  }
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button type="primary" icon={<Eye size={14} className="text-foreground-lighter" />}>
-          Quick start
+    <Sheet>
+      {/* Move into overflow menu after vectors added */}
+      <SheetTrigger asChild>
+        <Button type="default" icon={<ListPlus size={12} className="text-foreground-lighter" />}>
+          Insert vectors
         </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>How to add vectors to the database</DialogTitle>
-        </DialogHeader>
-        <VectorBucketIndexExamples
-          bucketName={index.vectorBucketName}
-          indexName={index.indexName}
-          dimension={index.dimension}
-          metadataKeys={metadataKeys}
-        />
-      </DialogContent>
-    </Dialog>
+      </SheetTrigger>
+      <SheetContent tabIndex={undefined}>
+        <div className="flex flex-col h-full" tabIndex={-1}>
+          <SheetHeader>
+            <SheetTitle>
+              Insert vectors into{' '}
+              <code className="text-code-inline !text-sm">{index.indexName}</code>
+            </SheetTitle>
+          </SheetHeader>
+
+          <div className="overflow-auto flex-grow">
+            <VectorBucketIndexExamples
+              bucketName={index.vectorBucketName}
+              indexName={index.indexName}
+              dimension={index.dimension}
+              metadataKeys={metadataKeys}
+              language={language}
+              onLanguageChange={updateLanguage}
+              showLanguage={showLanguage}
+              onShowLanguageChange={setShowLanguage}
+            />
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
   )
 }
 
@@ -388,6 +436,10 @@ interface VectorBucketIndexExamplesProps {
   indexName: string
   dimension: number
   metadataKeys: string[]
+  language: 'javascript' | 'sql'
+  onLanguageChange: (value: 'javascript' | 'sql') => void
+  showLanguage: boolean
+  onShowLanguageChange: (show: boolean) => void
 }
 
 function VectorBucketIndexExamples({
@@ -395,43 +447,111 @@ function VectorBucketIndexExamples({
   indexName,
   dimension,
   metadataKeys,
+  language,
+  onLanguageChange,
+  showLanguage,
+  onShowLanguageChange,
 }: VectorBucketIndexExamplesProps) {
   const { ref: projectRef } = useParams()
+
+  const dimensionExample = (startValue: number) => {
+    if (dimension === 1) {
+      return `${startValue.toFixed(1)}`
+    } else if (dimension === 2) {
+      return `${startValue.toFixed(1)}, ${(startValue + 0.1).toFixed(1)}`
+    } else if (dimension === 3) {
+      return `${startValue.toFixed(1)}, ${(startValue + 0.1).toFixed(1)}, ${(startValue + 0.2).toFixed(1)}`
+    } else {
+      return `${startValue.toFixed(1)}, ${(startValue + 0.1).toFixed(1)}, ${(startValue + 0.2).toFixed(1)}, ...`
+    }
+  }
+
+  const dimensionLabel = `${dimension} dimension${dimension > 1 ? 's' : ''}`
+
   const sqlCode = `-- Insert multiple vectors
 insert into
   "${bucketName}"."${indexName}" (key, data, metadata)
 values
   (
-    'product_001',
-    '[${dimension === 1 ? '0.2' : `0.2, ...${dimension - 1} more floats`}]'::embd,
+    'doc-1',
+    '[${dimensionExample(0.2)}]'::embd,
     '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb
   ),
   (
-    'product_002',
-    '[${dimension === 1 ? '0.2' : `0.2, ...${dimension - 1} more floats`}]'::embd,
+    'doc-2',
+    '[${dimensionExample(0.4)}]'::embd,
     '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb
   );`
 
   return (
-    <div className="flex flex-col gap-1">
-      <p className="text-sm text-foreground-light px-4 py-2">
-        You can use the following code to add vectors to the database. Copy the following code into
-        your Javascript code (or use the SQL Editor) to add vectors to the database. The data
-        property should contains the vector data.
+    <SheetSection className="flex flex-col gap-6">
+      <p className="text-sm text-foreground-light">
+        Use the following code snippet to insert vectors into your table. The{' '}
+        <code className="text-code-inline">data</code> property should contain all of your vector
+        data.
       </p>
-      <Tabs_Shadcn_ defaultValue="javascript" className="">
-        <TabsList_Shadcn_ className="grid w-full grid-cols-2">
-          <TabsTrigger_Shadcn_ value="javascript">Javascript</TabsTrigger_Shadcn_>
-          <TabsTrigger_Shadcn_ value="sql">SQL</TabsTrigger_Shadcn_>
-        </TabsList_Shadcn_>
-        <TabsContent_Shadcn_ value="javascript">
-          <div className="flex flex-col gap-2 px-4 pb-4">
-            <CodeBlock
-              hideLineNumbers
-              wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-3')}
-              className="[&_code]:text-[12px] [&_code]:text-foreground"
-              language="js"
-              value={`import { createClient } from '@supabase/supabase-js'
+      <div className="flex flex-col gap-2">
+        <div className="flex justify-between">
+          <Popover_Shadcn_ modal={false} open={showLanguage} onOpenChange={onShowLanguageChange}>
+            <PopoverTrigger_Shadcn_ asChild>
+              <div className="flex cursor-pointer">
+                <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
+                  Language
+                </span>
+                <Button
+                  type="default"
+                  iconRight={<ChevronDown size={14} strokeWidth={2} />}
+                  className="rounded-l-none"
+                >
+                  {language === 'javascript' ? 'JavaScript' : 'SQL'}
+                </Button>
+              </div>
+            </PopoverTrigger_Shadcn_>
+            <PopoverContent_Shadcn_ className="p-0 w-32" side="bottom" align="end">
+              <Command_Shadcn_>
+                <CommandList_Shadcn_>
+                  <CommandGroup_Shadcn_>
+                    <CommandItem_Shadcn_
+                      className="cursor-pointer"
+                      onSelect={() => onLanguageChange('javascript')}
+                      onClick={() => onLanguageChange('javascript')}
+                    >
+                      <p>JavaScript</p>
+                    </CommandItem_Shadcn_>
+                    <CommandItem_Shadcn_
+                      className="cursor-pointer"
+                      onSelect={() => onLanguageChange('sql')}
+                      onClick={() => onLanguageChange('sql')}
+                    >
+                      <p>SQL</p>
+                    </CommandItem_Shadcn_>
+                  </CommandGroup_Shadcn_>
+                </CommandList_Shadcn_>
+              </Command_Shadcn_>
+            </PopoverContent_Shadcn_>
+          </Popover_Shadcn_>
+
+          <Button
+            type="default"
+            icon={<BookOpen size={12} className="text-foreground-lighter" />}
+            asChild
+          >
+            <Link
+              target="_blank"
+              rel="noreferrer"
+              href={`${DOCS_URL}/reference/javascript/vectordataapi-putvectors`}
+            >
+              Docs
+            </Link>
+          </Button>
+        </div>
+        {language === 'javascript' ? (
+          <CodeBlock
+            hideLineNumbers
+            wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-3')}
+            className="[&_code]:text-foreground"
+            language="js"
+            value={`import { createClient } from '@supabase/supabase-js'
 
 const client = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -445,48 +565,46 @@ const index = client.storage.vectors
 const result = await index.putVectors({
   vectors: [
     {
-      key: 'product_001',
-      data: { float32: [${dimension === 1 ? '0.2' : `0.2, ...${dimension - 1} more floats`}] },
+      key: 'doc-1',
+      data: { float32: [${dimensionExample(0.2)}] }, // ${dimensionLabel}
       metadata: { ${metadataKeys.map((key) => `${key}: "${key} value"`).join(', ')} },
     },
     {
-      key: 'product_002',
-      data: { float32: [${dimension === 1 ? '0.2' : `0.2, ...${dimension - 1} more floats`}] },
+      key: 'doc-2',
+      data: { float32: [${dimensionExample(0.4)}] }, // ${dimensionLabel}
       metadata: { ${metadataKeys.map((key) => `${key}: "${key} value"`).join(', ')} },
     },
   ],
 })`}
-            />
-          </div>
-        </TabsContent_Shadcn_>
-        <TabsContent_Shadcn_ value="sql">
-          <div className="flex flex-col gap-2 px-4 pb-4">
+          />
+        ) : (
+          <>
             <CodeBlock
               hideLineNumbers
               wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-3')}
-              className="[&_code]:text-[12px] [&_code]:text-foreground"
+              className="[&_code]:text-foreground"
               language="sql"
               value={sqlCode}
             />
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-2">
               <Button
                 type="default"
                 asChild
                 icon={<SqlEditor size={12} className="text-foreground-lighter" />}
               >
-                <a
+                <Link
                   target="_blank"
                   rel="noreferrer"
                   href={`/project/${projectRef}/sql/new?content=${encodeURIComponent(sqlCode)}`}
                 >
-                  <p>Query in SQL Editor</p>
-                </a>
+                  Query in SQL Editor
+                </Link>
               </Button>
             </div>
-          </div>
-        </TabsContent_Shadcn_>
-      </Tabs_Shadcn_>
-    </div>
+          </>
+        )}
+      </div>
+    </SheetSection>
   )
 }
 
