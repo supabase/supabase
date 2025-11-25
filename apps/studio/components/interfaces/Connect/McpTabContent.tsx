@@ -4,8 +4,8 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { BASE_PATH } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
 import { useTheme } from 'next-themes'
-import { useState } from 'react'
-import { McpConfigPanel, type McpClient } from 'ui-patterns/McpUrlBuilder'
+import { useMemo, useState } from 'react'
+import { createMcpCopyHandler, McpConfigPanel, type McpClient } from 'ui-patterns/McpUrlBuilder'
 import type { projectKeys } from './Connect.types'
 
 export const McpTabContent = ({ projectKeys }: { projectKeys: projectKeys }) => {
@@ -42,28 +42,16 @@ const McpTabContentInnerLoaded = ({
   const track = useTrack()
   const [selectedClient, setSelectedClient] = useState<McpClient | null>(null)
 
-  const handleCopy = (type?: 'url' | 'json' | 'command') => {
-    let connectionType: string
-    switch (type) {
-      case 'command':
-        connectionType = 'Command Line'
-        break
-      case 'json':
-        connectionType = 'JSON'
-        break
-      case 'url':
-      default:
-        connectionType = 'MCP URL'
-        break
-    }
-
-    track('connection_string_copied', {
-      connectionTab: 'MCP',
-      selectedItem: selectedClient?.label,
-      connectionType,
-      source: 'studio',
-    })
-  }
+  const handleCopy = useMemo(
+    () =>
+      createMcpCopyHandler({
+        selectedClient,
+        source: 'studio',
+        onTrack: (event) => track(event.action, event.properties, event.groups),
+        projectRef,
+      }),
+    [selectedClient, track, projectRef]
+  )
 
   const handleInstall = () => {
     if (selectedClient?.label) {
