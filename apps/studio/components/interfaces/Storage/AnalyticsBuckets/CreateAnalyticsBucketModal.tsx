@@ -38,17 +38,21 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { inverseValidBucketNameRegex, validBucketNameRegex } from '../CreateBucketModal.utils'
 import { BUCKET_TYPES } from '../Storage.constants'
 import { useIcebergWrapperExtension } from './AnalyticsBucketDetails/useIcebergWrapper'
+import {
+  reservedPrefixes,
+  reservedSuffixes,
+  validBucketNameRegex,
+} from './CreateAnalyticsBucketModal.utils'
 
 const FormSchema = z
   .object({
     name: z
       .string()
       .trim()
-      .min(1, 'Please provide a name for your bucket')
-      .max(100, 'Bucket name should be below 100 characters')
+      .min(3, 'Bucket name should be at least 3 characters')
+      .max(63, 'Bucket name should be up to 63 characters')
       .refine(
         (value) => !value.endsWith(' '),
         'The name of the bucket cannot end with a whitespace'
@@ -59,9 +63,51 @@ const FormSchema = z
       ),
   })
   .superRefine((data, ctx) => {
+    if (reservedPrefixes.test(data.name)) {
+      const [match] = data.name.match(reservedPrefixes) ?? []
+      return ctx.addIssue({
+        path: ['name'],
+        code: z.ZodIssueCode.custom,
+        message: `Bucket name cannot start with "${match}"`,
+      })
+    }
+
+    if (reservedSuffixes.test(data.name)) {
+      const [match] = data.name.match(reservedSuffixes) ?? []
+      return ctx.addIssue({
+        path: ['name'],
+        code: z.ZodIssueCode.custom,
+        message: `Bucket name cannot end with "${match}"`,
+      })
+    }
+
+    if (/[A-Z]/.test(data.name)) {
+      return ctx.addIssue({
+        path: ['name'],
+        code: z.ZodIssueCode.custom,
+        message: 'Bucket name can only be lowercase characters',
+      })
+    }
+
     if (!validBucketNameRegex.test(data.name)) {
-      const [match] = data.name.match(inverseValidBucketNameRegex) ?? []
-      ctx.addIssue({
+      if (!/^[a-z0-9]/.test(data.name)) {
+        return ctx.addIssue({
+          path: ['name'],
+          code: z.ZodIssueCode.custom,
+          message: 'Bucket name must start with a lowercase letter or number.',
+        })
+      }
+
+      if (!/[a-z0-9]$/.test(data.name)) {
+        return ctx.addIssue({
+          path: ['name'],
+          code: z.ZodIssueCode.custom,
+          message: 'Bucket name must end with a lowercase letter or number.',
+        })
+      }
+
+      const [match] = data.name.match(/[^a-z0-9-]/) ?? []
+      return ctx.addIssue({
         path: ['name'],
         code: z.ZodIssueCode.custom,
         message: !!match
@@ -238,7 +284,7 @@ export const CreateAnalyticsBucketModal = ({
                     name="name"
                     label="Bucket name"
                     labelOptional="Cannot be changed after creation"
-                    description="Must be between 3–63 characters. Only lowercase letters, numbers, dots, and hyphens are allowed."
+                    description="Must be between 3–63 characters. Only lowercase letters, numbers, and hyphens are allowed."
                   >
                     <FormControl_Shadcn_>
                       <Input_Shadcn_
