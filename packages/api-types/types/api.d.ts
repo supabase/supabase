@@ -20,7 +20,7 @@ export interface paths {
     post?: never
     /**
      * Delete a database branch
-     * @description Deletes the specified database branch
+     * @description Deletes the specified database branch. By default, deletes immediately. Use force=false to schedule deletion with 1-hour grace period (only when soft deletion is enabled).
      */
     delete: operations['v1-delete-a-branch']
     options?: never
@@ -106,6 +106,26 @@ export interface paths {
      * @description Resets the specified database branch
      */
     post: operations['v1-reset-a-branch']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/branches/{branch_id_or_ref}/restore': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Restore a scheduled branch deletion
+     * @description Cancels scheduled deletion and restores the branch to active state
+     */
+    post: operations['v1-restore-a-branch']
     delete?: never
     options?: never
     head?: never
@@ -471,9 +491,11 @@ export interface paths {
      * Gets project's logs
      * @description Executes a SQL query on the project's logs.
      *
-     *     Either the 'iso_timestamp_start' and 'iso_timestamp_end' parameters must be provided.
+     *     Either the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.
      *     If both are not provided, only the last 1 minute of logs will be queried.
      *     The timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.
+     *
+     *     Note: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer:~:text=logs%20from%20the-,Sources,-drop%2Ddown%3A) for all available sources.
      *
      */
     get: operations['v1-get-project-logs']
@@ -1169,10 +1191,38 @@ export interface paths {
      * @description Only available to selected partner OAuth apps
      */
     post: operations['v1-apply-a-migration']
-    delete?: never
+    /**
+     * [Beta] Rollback database migrations and remove them from history table
+     * @description Only available to selected partner OAuth apps
+     */
+    delete: operations['v1-rollback-migrations']
     options?: never
     head?: never
     patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/migrations/{version}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * [Beta] Fetch an existing entry from migration history
+     * @description Only available to selected partner OAuth apps
+     */
+    get: operations['v1-get-a-migration']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /**
+     * [Beta] Patch an existing entry in migration history
+     * @description Only available to selected partner OAuth apps
+     */
+    patch: operations['v1-patch-a-migration']
     trace?: never
   }
   '/v1/projects/{ref}/database/query': {
@@ -1898,8 +1948,6 @@ export interface components {
     AuthConfigResponse: {
       api_max_request_duration: number | null
       db_max_pool_size: number | null
-      /** @enum {string|null} */
-      db_max_pool_size_unit: 'connections' | 'percent' | null
       disable_signup: boolean | null
       external_anonymous_users_enabled: boolean | null
       external_apple_additional_client_ids: string | null
@@ -2173,6 +2221,8 @@ export interface components {
     BranchResponse: {
       /** Format: date-time */
       created_at: string
+      /** Format: date-time */
+      deletion_scheduled_at?: string
       git_branch?: string
       /** Format: uuid */
       id: string
@@ -2189,6 +2239,23 @@ export interface components {
       persistent: boolean
       /** Format: int32 */
       pr_number?: number
+      /** @enum {string} */
+      preview_project_status?:
+        | 'INACTIVE'
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'UNKNOWN'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTORING'
+        | 'UPGRADING'
+        | 'PAUSING'
+        | 'RESTORE_FAILED'
+        | 'RESTARTING'
+        | 'PAUSE_FAILED'
+        | 'RESIZING'
       project_ref: string
       /** Format: date-time */
       review_requested_at?: string
@@ -2203,6 +2270,10 @@ export interface components {
       /** Format: date-time */
       updated_at: string
       with_data: boolean
+    }
+    BranchRestoreResponse: {
+      /** @enum {string} */
+      message: 'Branch restoration initiated'
     }
     BranchUpdateResponse: {
       /** @enum {string} */
@@ -2539,6 +2610,7 @@ export interface components {
       /** @enum {string} */
       message: 'ok'
     }
+    DeleteSecretsBody: string[]
     DeployFunctionResponse: {
       /** Format: int64 */
       created_at?: number
@@ -3081,13 +3153,21 @@ export interface components {
       }[]
     }
     OrganizationResponseV1: {
+      /**
+       * @deprecated
+       * @description Deprecated: Use `slug` instead.
+       */
       id: string
       name: string
+      /** @description Organization slug */
+      slug: string
     }
     PgsodiumConfigResponse: {
       root_key: string
     }
     PostgresConfigResponse: {
+      /** @description Default unit: s */
+      checkpoint_timeout?: string
       effective_cache_size?: string
       hot_standby_feedback?: boolean
       logical_decoding_work_mem?: string
@@ -3107,10 +3187,12 @@ export interface components {
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
+      /** @description Default unit: ms */
       statement_timeout?: string
       track_activity_query_size?: string
       track_commit_timestamp?: boolean
       wal_keep_size?: string
+      /** @description Default unit: ms */
       wal_sender_timeout?: string
       work_mem?: string
     }
@@ -3350,6 +3432,7 @@ export interface components {
         iceberg_catalog: boolean
         list_v2: boolean
       }
+      databasePoolMode: string
       external: {
         /** @enum {string} */
         upstreamTarget: 'main' | 'canary'
@@ -3367,6 +3450,7 @@ export interface components {
       }
       /** Format: int64 */
       fileSizeLimit: number
+      migrationVersion: string
     }
     StreamableFile: Record<string, never>
     SubdomainAvailabilityResponse: {
@@ -3414,8 +3498,6 @@ export interface components {
     UpdateAuthConfigBody: {
       api_max_request_duration?: number | null
       db_max_pool_size?: number | null
-      /** @enum {string|null} */
-      db_max_pool_size_unit: 'connections' | 'percent' | null
       disable_signup?: boolean | null
       external_anonymous_users_enabled?: boolean | null
       external_apple_additional_client_ids?: string | null
@@ -3729,6 +3811,8 @@ export interface components {
       root_key: string
     }
     UpdatePostgresConfigBody: {
+      /** @description Default unit: s */
+      checkpoint_timeout?: string
       effective_cache_size?: string
       hot_standby_feedback?: boolean
       logical_decoding_work_mem?: string
@@ -3749,10 +3833,12 @@ export interface components {
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
+      /** @description Default unit: ms */
       statement_timeout?: string
       track_activity_query_size?: string
       track_commit_timestamp?: boolean
       wal_keep_size?: string
+      /** @description Default unit: ms */
       wal_sender_timeout?: string
       work_mem?: string
     }
@@ -3894,6 +3980,7 @@ export interface components {
     V1CreateMigrationBody: {
       name?: string
       query: string
+      rollback?: string
     }
     V1CreateProjectBody: {
       /** @description Database password */
@@ -3927,8 +4014,13 @@ export interface components {
       kps_enabled?: boolean
       /** @description Name of your project */
       name: string
-      /** @description Slug of your organization */
-      organization_id: string
+      /**
+       * @deprecated
+       * @description Deprecated: Use `organization_slug` instead.
+       */
+      organization_id?: string
+      /** @description Organization slug */
+      organization_slug: string
       /**
        * @deprecated
        * @description Subscription Plan is now set on organization level and is ignored in this request
@@ -4019,6 +4111,14 @@ export interface components {
        * @example https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone
        */
       template_url?: string
+    }
+    V1GetMigrationResponse: {
+      created_by?: string
+      idempotency_key?: string
+      name?: string
+      rollback?: string[]
+      statements?: string[]
+      version: string
     }
     V1GetUsageApiCountResponse: {
       error?:
@@ -4134,6 +4234,10 @@ export interface components {
       /** @enum {string} */
       plan?: 'free' | 'pro' | 'team' | 'enterprise'
     }
+    V1PatchMigrationBody: {
+      name?: string
+      rollback?: string
+    }
     V1PgbouncerConfigResponse: {
       connection_string?: string
       default_pool_size?: number
@@ -4218,12 +4322,22 @@ export interface components {
        * @example 2023-03-29T16:32:59Z
        */
       created_at: string
-      /** @description Id of your project */
+      /**
+       * @deprecated
+       * @description Deprecated: Use `ref` instead.
+       */
       id: string
       /** @description Name of your project */
       name: string
-      /** @description Slug of your organization */
+      /**
+       * @deprecated
+       * @description Deprecated: Use `organization_slug` instead.
+       */
       organization_id: string
+      /** @description Organization slug */
+      organization_slug: string
+      /** @description Project ref */
+      ref: string
       /**
        * @description Region of your project
        * @example us-east-1
@@ -4263,12 +4377,22 @@ export interface components {
         /** @description Database version */
         version: string
       }
-      /** @description Id of your project */
+      /**
+       * @deprecated
+       * @description Deprecated: Use `ref` instead.
+       */
       id: string
       /** @description Name of your project */
       name: string
-      /** @description Slug of your organization */
+      /**
+       * @deprecated
+       * @description Deprecated: Use `organization_slug` instead.
+       */
       organization_id: string
+      /** @description Organization slug */
+      organization_slug: string
+      /** @description Project ref */
+      ref: string
       /**
        * @description Region of your project
        * @example us-east-1
@@ -4302,7 +4426,7 @@ export interface components {
     V1RestorePointResponse: {
       name: string
       /** @enum {string} */
-      status: 'AVAILABLE' | 'PENDING' | 'REMOVED'
+      status: 'AVAILABLE' | 'PENDING' | 'REMOVED' | 'FAILED'
     }
     V1RunQueryBody: {
       parameters?: unknown[]
@@ -4365,6 +4489,7 @@ export interface components {
     V1UpsertMigrationBody: {
       name?: string
       query: string
+      rollback?: string
     }
     VanitySubdomainBody: {
       vanity_subdomain: string
@@ -4414,7 +4539,10 @@ export interface operations {
   }
   'v1-delete-a-branch': {
     parameters: {
-      query?: never
+      query?: {
+        /** @description If set to false, schedule deletion with 1-hour grace period (only when soft deletion is enabled). */
+        force?: boolean
+      }
       header?: never
       path: {
         /** @description Branch ID */
@@ -4596,6 +4724,35 @@ export interface operations {
         }
       }
       /** @description Failed to reset database branch */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-restore-a-branch': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Branch ID */
+        branch_id_or_ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BranchRestoreResponse']
+        }
+      }
+      /** @description Failed to restore database branch */
       500: {
         headers: {
           [name: string]: unknown
@@ -5519,6 +5676,7 @@ export interface operations {
       query?: {
         iso_timestamp_end?: string
         iso_timestamp_start?: string
+        /** @description Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details. */
         sql?: string
       }
       header?: never
@@ -8770,6 +8928,161 @@ export interface operations {
       }
     }
   }
+  'v1-rollback-migrations': {
+    parameters: {
+      query: {
+        /** @description Rollback migrations greater or equal to this version */
+        gte: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to rollback database migration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-a-migration': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+        version: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V1GetMigrationResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get database migration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-patch-a-migration': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+        version: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1PatchMigrationBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to patch database migration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-run-a-query': {
     parameters: {
       query?: never
@@ -10401,7 +10714,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': string[]
+        'application/json': components['schemas']['DeleteSecretsBody']
       }
     }
     responses: {
