@@ -493,15 +493,17 @@ export const createAiAssistantState = (): AiAssistantState => {
       }
 
       // Initialize chat instance for the active chat
-      if (state.activeChatId && state.chats[state.activeChatId]) {
-        if (!state.chatInstances[state.activeChatId]) {
-          state.chatInstances[state.activeChatId] = ref(
-            createChatInstance(state, {
-              id: state.activeChatId,
-              initialMessages: state.chats[state.activeChatId].messages,
-            })
-          )
-        }
+      if (
+        state.activeChatId &&
+        state.chats[state.activeChatId] &&
+        !state.chatInstances[state.activeChatId]
+      ) {
+        state.chatInstances[state.activeChatId] = ref(
+          createChatInstance(state, {
+            id: state.activeChatId,
+            initialMessages: state.chats[state.activeChatId].messages,
+          })
+        )
       }
     },
 
