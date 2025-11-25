@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Plus, Trash2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
-import { parseAsBoolean, useQueryState } from 'nuqs'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -211,7 +211,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
         </ButtonTooltip>
       </SheetTrigger>
 
-      <SheetContent size="lg" className="flex flex-col gap-0 p-0">
+      <SheetContent size="default" className="flex flex-col gap-0 p-0">
         <SheetHeader>
           <SheetTitle>Create vector table</SheetTitle>
         </SheetHeader>
