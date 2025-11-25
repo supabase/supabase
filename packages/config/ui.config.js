@@ -347,10 +347,10 @@ const uiConfig = {
           'mask-image': 'linear-gradient(to left, white 98%, transparent 100%)',
         },
         'input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button':
-        {
-          '-webkit-appearance': 'none',
-          margin: '0',
-        },
+          {
+            '-webkit-appearance': 'none',
+            margin: '0',
+          },
       })
       addVariant('data-open-parent', '[data-state="open"] &')
       addVariant('data-closed-parent', '[data-state="closed"] &')
