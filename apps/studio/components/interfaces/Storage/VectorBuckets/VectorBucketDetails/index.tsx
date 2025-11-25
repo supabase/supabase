@@ -1,12 +1,10 @@
-import { BookOpen, ChevronDown, ListPlus, MoreVertical, Search, Trash2 } from 'lucide-react'
+import { MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useRef, useState } from 'react'
-import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import {
   ScaffoldContainer,
   ScaffoldHeader,
@@ -15,42 +13,18 @@ import {
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
-import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
-import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
-import { useS3VectorsWrapperCreateMutation } from 'data/storage/s3-vectors-wrapper-create-mutation'
 import { useVectorBucketQuery } from 'data/storage/vector-bucket-query'
-import {
-  useVectorBucketsIndexesQuery,
-  VectorBucketIndex,
-} from 'data/storage/vector-buckets-indexes-query'
+import { useVectorBucketsIndexesQuery } from 'data/storage/vector-buckets-indexes-query'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { SqlEditor, TableEditor } from 'icons'
-import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   Card,
   CardContent,
-  cn,
-  CodeBlock,
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetSection,
-  SheetTitle,
-  SheetTrigger,
   Table,
   TableBody,
   TableCell,
@@ -60,14 +34,19 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { Admonition } from 'ui-patterns/admonition'
-import { CreateVectorTableSheet } from './CreateVectorTableSheet'
-import { DeleteVectorBucketModal } from './DeleteVectorBucketModal'
-import { DeleteVectorTableModal } from './DeleteVectorTableModal'
-import { getVectorBucketFDWSchemaName } from './VectorBuckets.utils'
-import { useS3VectorsWrapperExtension } from './useS3VectorsWrapper'
-import { useS3VectorsWrapperInstance } from './useS3VectorsWrapperInstance'
-import { useSelectedVectorBucket } from './useSelectedVectorBuckets'
+import { CreateVectorTableSheet } from '../CreateVectorTableSheet'
+import { DeleteVectorBucketModal } from '../DeleteVectorBucketModal'
+import { DeleteVectorTableModal } from '../DeleteVectorTableModal'
+import { getVectorBucketFDWSchemaName } from '../VectorBuckets.utils'
+import { useS3VectorsWrapperExtension } from '../useS3VectorsWrapper'
+import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'
+import { useSelectedVectorBucket } from '../useSelectedVectorBuckets'
+import {
+  ExtensionNeedsUpgrade,
+  ExtensionNotInstalled,
+  WrapperMissing,
+} from './VectorBucketCallouts'
+import { VectorBucketTableExamplesSheet } from './VectorBucketTableExamplesSheet'
 
 export const VectorBucketDetails = () => {
   const router = useRouter()
@@ -166,7 +145,6 @@ export const VectorBucketDetails = () => {
 
             {state === 'not-installed' && (
               <ExtensionNotInstalled
-                bucketName={bucket?.vectorBucketName}
                 projectRef={projectRef!}
                 wrapperMeta={wrapperMeta!}
                 wrappersExtension={wrappersExtension!}
@@ -174,7 +152,6 @@ export const VectorBucketDetails = () => {
             )}
             {state === 'needs-upgrade' && (
               <ExtensionNeedsUpgrade
-                bucketName={bucket?.vectorBucketName}
                 projectRef={projectRef!}
                 wrapperMeta={wrapperMeta!}
                 wrappersExtension={wrappersExtension!}
@@ -377,357 +354,5 @@ export const VectorBucketDetails = () => {
         }}
       />
     </>
-  )
-}
-
-interface VectorBucketTableExamplesSheetProps {
-  index: VectorBucketIndex
-}
-
-const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamplesSheetProps) => {
-  const metadataKeys = index.metadataConfiguration?.nonFilterableMetadataKeys ?? []
-  const [language, setLanguage] = useState<'javascript' | 'sql'>('javascript')
-  const [showLanguage, setShowLanguage] = useState(false)
-
-  const updateLanguage = (value: 'javascript' | 'sql') => {
-    setLanguage(value)
-    setShowLanguage(false)
-  }
-
-  return (
-    <Sheet>
-      {/* Move into overflow menu after vectors added */}
-      <SheetTrigger asChild>
-        <Button type="default" icon={<ListPlus size={12} className="text-foreground-lighter" />}>
-          Insert vectors
-        </Button>
-      </SheetTrigger>
-      <SheetContent tabIndex={undefined}>
-        <div className="flex flex-col h-full" tabIndex={-1}>
-          <SheetHeader>
-            <SheetTitle>
-              Insert vectors into{' '}
-              <code className="text-code-inline !text-sm">{index.indexName}</code>
-            </SheetTitle>
-          </SheetHeader>
-
-          <div className="overflow-auto flex-grow">
-            <VectorBucketIndexExamples
-              bucketName={index.vectorBucketName}
-              indexName={index.indexName}
-              dimension={index.dimension}
-              metadataKeys={metadataKeys}
-              language={language}
-              onLanguageChange={updateLanguage}
-              showLanguage={showLanguage}
-              onShowLanguageChange={setShowLanguage}
-            />
-          </div>
-        </div>
-      </SheetContent>
-    </Sheet>
-  )
-}
-
-interface VectorBucketIndexExamplesProps {
-  bucketName: string
-  indexName: string
-  dimension: number
-  metadataKeys: string[]
-  language: 'javascript' | 'sql'
-  onLanguageChange: (value: 'javascript' | 'sql') => void
-  showLanguage: boolean
-  onShowLanguageChange: (show: boolean) => void
-}
-
-function VectorBucketIndexExamples({
-  bucketName,
-  indexName,
-  dimension,
-  metadataKeys,
-  language,
-  onLanguageChange,
-  showLanguage,
-  onShowLanguageChange,
-}: VectorBucketIndexExamplesProps) {
-  const { ref: projectRef } = useParams()
-
-  const dimensionExample = (startValue: number) => {
-    if (dimension === 1) {
-      return `${startValue.toFixed(1)}`
-    } else if (dimension === 2) {
-      return `${startValue.toFixed(1)}, ${(startValue + 0.1).toFixed(1)}`
-    } else if (dimension === 3) {
-      return `${startValue.toFixed(1)}, ${(startValue + 0.1).toFixed(1)}, ${(startValue + 0.2).toFixed(1)}`
-    } else {
-      return `${startValue.toFixed(1)}, ${(startValue + 0.1).toFixed(1)}, ${(startValue + 0.2).toFixed(1)}, ...`
-    }
-  }
-
-  const dimensionLabel = `${dimension} dimension${dimension > 1 ? 's' : ''}`
-
-  const sqlCode = `-- Insert multiple vectors
-insert into
-  "${bucketName}"."${indexName}" (key, data, metadata)
-values
-  (
-    'doc-1',
-    '[${dimensionExample(0.2)}]'::embd,
-    '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb
-  ),
-  (
-    'doc-2',
-    '[${dimensionExample(0.4)}]'::embd,
-    '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb
-  );`
-
-  return (
-    <SheetSection className="flex flex-col gap-6">
-      <p className="text-sm text-foreground-light">
-        Use the following code snippet to insert vectors into your table. The{' '}
-        <code className="text-code-inline">data</code> property should contain all of your vector
-        data.
-      </p>
-      <div className="flex flex-col gap-2">
-        <div className="flex justify-between">
-          <Popover_Shadcn_ modal={false} open={showLanguage} onOpenChange={onShowLanguageChange}>
-            <PopoverTrigger_Shadcn_ asChild>
-              <div className="flex cursor-pointer">
-                <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
-                  Language
-                </span>
-                <Button
-                  type="default"
-                  iconRight={<ChevronDown size={14} strokeWidth={2} />}
-                  className="rounded-l-none"
-                >
-                  {language === 'javascript' ? 'JavaScript' : 'SQL'}
-                </Button>
-              </div>
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="p-0 w-32" side="bottom" align="end">
-              <Command_Shadcn_>
-                <CommandList_Shadcn_>
-                  <CommandGroup_Shadcn_>
-                    <CommandItem_Shadcn_
-                      className="cursor-pointer"
-                      onSelect={() => onLanguageChange('javascript')}
-                      onClick={() => onLanguageChange('javascript')}
-                    >
-                      <p>JavaScript</p>
-                    </CommandItem_Shadcn_>
-                    <CommandItem_Shadcn_
-                      className="cursor-pointer"
-                      onSelect={() => onLanguageChange('sql')}
-                      onClick={() => onLanguageChange('sql')}
-                    >
-                      <p>SQL</p>
-                    </CommandItem_Shadcn_>
-                  </CommandGroup_Shadcn_>
-                </CommandList_Shadcn_>
-              </Command_Shadcn_>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
-
-          <Button
-            type="default"
-            icon={<BookOpen size={12} className="text-foreground-lighter" />}
-            asChild
-          >
-            <Link
-              target="_blank"
-              rel="noreferrer"
-              href={`${DOCS_URL}/reference/javascript/vectordataapi-putvectors`}
-            >
-              Docs
-            </Link>
-          </Button>
-        </div>
-        {language === 'javascript' ? (
-          <CodeBlock
-            hideLineNumbers
-            wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-3')}
-            className="[&_code]:text-foreground"
-            language="js"
-            value={`import { createClient } from '@supabase/supabase-js'
-
-const client = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-)
-
-const index = client.storage.vectors
-  .from('${bucketName}')
-  .index('${indexName}')
-
-const result = await index.putVectors({
-  vectors: [
-    {
-      key: 'doc-1',
-      data: { float32: [${dimensionExample(0.2)}] }, // ${dimensionLabel}
-      metadata: { ${metadataKeys.map((key) => `${key}: "${key} value"`).join(', ')} },
-    },
-    {
-      key: 'doc-2',
-      data: { float32: [${dimensionExample(0.4)}] }, // ${dimensionLabel}
-      metadata: { ${metadataKeys.map((key) => `${key}: "${key} value"`).join(', ')} },
-    },
-  ],
-})`}
-          />
-        ) : (
-          <>
-            <CodeBlock
-              hideLineNumbers
-              wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-3')}
-              className="[&_code]:text-foreground"
-              language="sql"
-              value={sqlCode}
-            />
-            <div className="flex justify-end gap-2">
-              <Button
-                type="default"
-                asChild
-                icon={<SqlEditor size={12} className="text-foreground-lighter" />}
-              >
-                <Link
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`/project/${projectRef}/sql/new?content=${encodeURIComponent(sqlCode)}`}
-                >
-                  Query in SQL Editor
-                </Link>
-              </Button>
-            </div>
-          </>
-        )}
-      </div>
-    </SheetSection>
-  )
-}
-
-const ExtensionNotInstalled = ({
-  bucketName,
-  projectRef,
-  wrapperMeta,
-  wrappersExtension,
-}: {
-  bucketName?: string
-  projectRef: string
-  wrapperMeta: WrapperMeta
-  wrappersExtension: DatabaseExtension
-}) => {
-  const databaseNeedsUpgrading =
-    (wrappersExtension?.default_version ?? '') < (wrapperMeta.minimumExtensionVersion ?? '')
-
-  return (
-    <ScaffoldSection isFullWidth>
-      <Admonition type="warning" title="Missing required extension" className="mb-0">
-        <p>
-          The Wrappers extension is required in order to query vector tables.{' '}
-          {databaseNeedsUpgrading &&
-            'Please first upgrade your database and then install the extension.'}{' '}
-          <InlineLink
-            href={`${DOCS_URL}/guides/database/extensions/wrappers/s3_vectors`}
-            target="_blank"
-          >
-            Learn more
-          </InlineLink>
-        </p>
-        <Button type="default" asChild className="mt-2">
-          <Link
-            href={
-              databaseNeedsUpgrading
-                ? `/project/${projectRef}/settings/infrastructure`
-                : `/project/${projectRef}/database/extensions?filter=wrappers`
-            }
-          >
-            {databaseNeedsUpgrading ? 'Upgrade database' : 'Install extension'}
-          </Link>
-        </Button>
-      </Admonition>
-    </ScaffoldSection>
-  )
-}
-
-const ExtensionNeedsUpgrade = ({
-  bucketName,
-  projectRef,
-  wrapperMeta,
-  wrappersExtension,
-}: {
-  bucketName?: string
-  projectRef: string
-  wrapperMeta: WrapperMeta
-  wrappersExtension: DatabaseExtension
-}) => {
-  // [Joshen] Default version is what's on the DB, so if the installed version is already the default version
-  // but still doesnt meet the minimum extension version, then DB upgrade is required
-  const databaseNeedsUpgrading =
-    wrappersExtension?.installed_version === wrappersExtension?.default_version
-
-  return (
-    <ScaffoldSection isFullWidth>
-      <Admonition type="warning" title="Outdated extension version" className="mb-0">
-        <p>
-          The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
-          {wrapperMeta.minimumExtensionVersion}. You have version{' '}
-          {wrappersExtension?.installed_version} installed. Please{' '}
-          {databaseNeedsUpgrading && 'first upgrade your database, and then '}update the extension
-          by disabling and enabling the Wrappers extension.
-        </p>
-        <p>
-          Before reinstalling the wrapper extension, you must first remove all existing wrappers.
-          Afterward, you can recreate the wrappers.
-        </p>
-        <Button asChild type="default">
-          <Link
-            href={
-              databaseNeedsUpgrading
-                ? `/project/${projectRef}/settings/infrastructure`
-                : `/project/${projectRef}/database/extensions?filter=wrappers`
-            }
-          >
-            {databaseNeedsUpgrading ? 'Upgrade database' : 'Extensions'}
-          </Link>
-        </Button>
-      </Admonition>
-    </ScaffoldSection>
-  )
-}
-
-const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
-  const { data: project } = useSelectedProjectQuery()
-  const { mutateAsync: createS3VectorsWrapper, isPending: isCreatingS3VectorsWrapper } =
-    useS3VectorsWrapperCreateMutation()
-  const { mutateAsync: createSchema, isPending: isCreatingSchema } = useSchemaCreateMutation()
-
-  const onSetupWrapper = async () => {
-    if (!bucketName) return console.error('Bucket name is required')
-    try {
-      await createS3VectorsWrapper({ bucketName })
-      await createSchema({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        name: getVectorBucketFDWSchemaName(bucketName),
-      })
-    } catch (error) {
-      toast.error(
-        `Failed to install wrapper: ${error instanceof Error ? error.message : 'Unknown error'}`
-      )
-    }
-  }
-
-  const isLoading = isCreatingS3VectorsWrapper || isCreatingSchema
-
-  return (
-    <ScaffoldSection isFullWidth>
-      <Admonition type="warning" title="Missing integration" className="mb-0">
-        <p>The S3 Vectors Wrapper integration is required in order to query vector tables.</p>
-        <Button type="default" loading={isLoading} onClick={onSetupWrapper}>
-          Install wrapper
-        </Button>
-      </Admonition>
-    </ScaffoldSection>
   )
 }
