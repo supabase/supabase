@@ -526,8 +526,11 @@ export const QueryPerformanceGrid = ({
           }
         }}
         modal={false}
+        aria-describedby="query-performance-details-sheet"
       >
-        <SheetTitle className="sr-only">Query details</SheetTitle>
+        <SheetTitle className="sr-only" id="query-performance-details-sheet">
+          Query details
+        </SheetTitle>
         <SheetContent
           side="right"
           className="flex flex-col h-full bg-studio border-l lg:!w-[calc(100vw-802px)] max-w-[700px] w-full"
