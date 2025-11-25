@@ -270,7 +270,7 @@ export const OAuthAppsList = () => {
                       <TableCell className="text-xs text-foreground-light min-w-28 max-w-40 w-1/6">
                         <TimestampInfo utcTimestamp={app.created_at} labelFormat="D MMM, YYYY" />
                       </TableCell>
-                      <TableCell className="max-w-20 sticky bg-surface-100 right-0 px-6">
+                      <TableCell className="max-w-20 bg-surface-100 @[954px]:hover:bg-surface-200 px-6">
                         <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l @[954px]:border-l-0">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
