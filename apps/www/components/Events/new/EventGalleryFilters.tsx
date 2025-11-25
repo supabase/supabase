@@ -24,7 +24,7 @@ export function EventGalleryFilters() {
         <SearchIcon className="absolute left-3 top-[9px] size-4 text-foreground-muted" />
         <Input
           placeholder="Search events"
-          className="pl-10"
+          className="pl-9"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
