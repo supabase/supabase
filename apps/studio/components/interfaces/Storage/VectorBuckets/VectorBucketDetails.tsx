@@ -1,4 +1,4 @@
-import { BookOpen, ChevronDown, Eye, MoreVertical, Search, Trash2 } from 'lucide-react'
+import { BookOpen, ChevronDown, ListPlus, MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
@@ -26,7 +26,7 @@ import {
 } from 'data/storage/vector-buckets-indexes-query'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { SqlEditor } from 'icons'
+import { SqlEditor, TableEditor } from 'icons'
 import { DOCS_URL } from 'lib/constants'
 import {
   Button,
@@ -264,22 +264,6 @@ export const VectorBucketDetails = () => {
                             </TableCell>
                             <TableCell>
                               <div className="flex flex-row justify-end gap-2">
-                                {wrapperInstance ? (
-                                  <Button
-                                    asChild
-                                    icon={<Eye size={14} className="text-foreground-lighter" />}
-                                    type="default"
-                                  >
-                                    {/* TODO: Proper URL for table editor */}
-                                    <Link
-                                      href={`/project/${projectRef}/editor/${encodeURIComponent(
-                                        name
-                                      )}?schema=${getVectorBucketFDWSchemaName(bucketId!)}`}
-                                    >
-                                      Table Editor
-                                    </Link>
-                                  </Button>
-                                ) : null}
                                 <VectorBucketTableExamplesDialog index={index} />
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
@@ -291,6 +275,23 @@ export const VectorBucketDetails = () => {
                                     />
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent side="bottom" align="end" className="w-40">
+                                    {wrapperInstance ? (
+                                      <DropdownMenuItem
+                                        className="flex items-center space-x-2"
+                                        asChild
+                                      >
+                                        {/* TODO: Proper URL for table editor */}
+                                        <Link
+                                          href={`/project/${projectRef}/editor/${encodeURIComponent(
+                                            name
+                                          )}?schema=${getVectorBucketFDWSchemaName(bucketId!)}`}
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          <TableEditor size={12} />
+                                          <p>View in Table Editor</p>
+                                        </Link>
+                                      </DropdownMenuItem>
+                                    ) : null}
                                     <DropdownMenuItem
                                       className="flex items-center space-x-2"
                                       onClick={(e) => {
@@ -377,7 +378,9 @@ const VectorBucketTableExamplesDialog = ({ index }: VectorBucketTableExamplesDia
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button type="default">Insert vectors</Button>
+        <Button type="default" icon={<ListPlus size={12} />}>
+          Insert vectors
+        </Button>
       </SheetTrigger>
       <SheetContent tabIndex={undefined}>
         <div className="flex flex-col h-full" tabIndex={-1}>
@@ -512,7 +515,7 @@ values
           <CodeBlock
             hideLineNumbers
             wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-3')}
-            className="[&_code]:text-[12px] [&_code]:text-foreground"
+            className="[&_code]:text-foreground"
             language="js"
             value={`import { createClient } from '@supabase/supabase-js'
 
@@ -545,7 +548,7 @@ const result = await index.putVectors({
             <CodeBlock
               hideLineNumbers
               wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-3')}
-              className="[&_code]:text-[12px] [&_code]:text-foreground"
+              className="[&_code]:text-foreground"
               language="sql"
               value={sqlCode}
             />
