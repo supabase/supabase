@@ -1,28 +1,28 @@
 ---
-id: 'etl-bigquery'
-title: 'ETL to BigQuery'
-description: 'Replicate your Supabase database to Google BigQuery using ETL Replication.'
+id: 'replication-bigquery'
+title: 'Replicate to BigQuery'
+description: 'Replicate your Supabase database to Google BigQuery using replication.'
 subtitle: 'Stream data changes to BigQuery in real-time.'
 sidebar_label: 'BigQuery'
 ---
 
 <Admonition type="caution" label="Private Alpha">
 
-ETL Replication is currently in private alpha. Access is limited and features may change.
+Replication is currently in private alpha. Access is limited and features may change.
 
 </Admonition>
 
-BigQuery is Google's fully managed data warehouse. ETL Replication allows you to automatically sync your Supabase database tables to BigQuery for analytics and reporting.
+BigQuery is Google's fully managed data warehouse. Replication powered by [Supabase ETL](https://github.com/supabase/etl) allows you to automatically sync your Supabase database tables to BigQuery for analytics and reporting.
 
 <Admonition type="tip">
 
-This page covers BigQuery-specific configuration. For complete setup instructions including publications, general settings, and pipeline management, see the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup).
+This page covers BigQuery-specific configuration. For complete setup instructions including publications, general settings, and pipeline management, see the [Replication Setup guide](/docs/guides/database/replication/replication-setup).
 
 </Admonition>
 
 ### Setup
 
-Setting up BigQuery replication requires preparing your GCP resources, then configuring BigQuery as an ETL destination.
+Setting up BigQuery replication requires preparing your GCP resources, then configuring BigQuery as a destination.
 
 #### Step 1: Prepare GCP resources
 
@@ -32,17 +32,17 @@ Before configuring BigQuery as a destination, set up the following in Google Clo
 2. **BigQuery dataset**: Create a [BigQuery dataset](https://cloud.google.com/bigquery/docs/datasets-intro) in your GCP project
 3. **GCP service account key**: Create a [service account](https://cloud.google.com/iam/docs/keys-create-delete) with the **BigQuery Data Editor** role and download the JSON key file
 
-#### Step 2: Add BigQuery as an ETL destination
+#### Step 2: Add BigQuery as a destination
 
-After preparing your GCP resources, configure BigQuery as an ETL destination:
+After preparing your GCP resources, configure BigQuery as a destination:
 
-1. Navigate to [Database](/dashboard/project/_/database/etl) → **ETL Replication** in your Supabase Dashboard
+1. Navigate to [Database](/dashboard/project/_/database/replication) → **Replication** in your Supabase Dashboard
 2. Click **Add destination**
 3. Configure the destination:
 
    <Image
      alt="BigQuery Configuration Settings"
-     src="/docs/img/database/replication/etl-bigquery-details.png"
+     src="/docs/img/database/replication/replication-bigquery-details.png"
      zoomable
    />
 
@@ -64,11 +64,11 @@ After preparing your GCP resources, configure BigQuery as an ETL destination:
      - `bigquery.tables.update`
      - `bigquery.tables.updateData`
 
-4. Complete the remaining configuration following the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup)
+4. Complete the remaining configuration following the [Replication Setup guide](/docs/guides/database/replication/replication-setup)
 
 ### How it works
 
-Once configured, ETL Replication to BigQuery:
+Once configured, replication to BigQuery:
 
 1. Captures changes from your Postgres database (INSERT, UPDATE, DELETE operations)
 2. Batches changes for optimal performance
@@ -117,10 +117,10 @@ BigQuery-specific limitations:
 - **Ingestion latency**: BigQuery's streaming API has inherent latency (typically seconds to minutes)
 - **Row size**: Limited to 10 MB per row due to BigQuery Storage Write API constraints
 
-For general ETL Replication limitations that apply to all destinations, see the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup#limitations).
+For general replication limitations that apply to all destinations, see the [Replication Setup guide](/docs/guides/database/replication/replication-setup#limitations).
 
 ### Next steps
 
-- [Set up ETL Replication](/docs/guides/database/replication/etl-replication-setup)
-- [Monitor ETL Replication](/docs/guides/database/replication/etl-replication-monitoring)
-- [View ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq)
+- [Set up replication](/docs/guides/database/replication/replication-setup)
+- [Monitor replication](/docs/guides/database/replication/replication-monitoring)
+- [View replication FAQ](/docs/guides/database/replication/replication-faq)

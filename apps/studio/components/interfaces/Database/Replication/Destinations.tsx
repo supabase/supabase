@@ -7,11 +7,11 @@ import Table from 'components/to-be-cleaned/Table'
 import { AlertError } from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
-import { useReplicationDestinationsQuery } from 'data/etl/destinations-query'
-import { replicationKeys } from 'data/etl/keys'
-import { fetchReplicationPipelineVersion } from 'data/etl/pipeline-version-query'
-import { useReplicationPipelinesQuery } from 'data/etl/pipelines-query'
-import { useReplicationSourcesQuery } from 'data/etl/sources-query'
+import { useReplicationDestinationsQuery } from 'data/replication/destinations-query'
+import { replicationKeys } from 'data/replication/keys'
+import { fetchReplicationPipelineVersion } from 'data/replication/pipeline-version-query'
+import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
+import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
 import { Button, cn, Input_Shadcn_ } from 'ui'
@@ -143,8 +143,8 @@ export const Destinations = () => {
             <div className="flex flex-col gap-y-1">
               <h3>Replicate data to external destinations in real-time</h3>
               <p className="text-sm text-foreground-light">
-                {isPaidPlan ? 'Enable ETL replication' : 'Upgrade to the Pro plan'} to start
-                replicating your database changes to data warehouses and analytics platforms
+                {isPaidPlan ? 'Enable replication' : 'Upgrade to the Pro plan'} to start replicating
+                your database changes to data warehouses and analytics platforms
               </p>
             </div>
             <div className="flex gap-x-2">

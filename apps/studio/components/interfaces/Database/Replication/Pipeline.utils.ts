@@ -1,7 +1,7 @@
 import {
   ReplicationPipelineStatus,
   ReplicationPipelineStatusData,
-} from 'data/etl/pipeline-status-query'
+} from 'data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 import { PipelineStatusName } from './Replication.constants'
 

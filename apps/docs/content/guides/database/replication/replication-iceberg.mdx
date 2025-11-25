@@ -1,6 +1,6 @@
 ---
-id: 'etl-iceberg'
-title: 'ETL to Iceberg (Analytics Buckets)'
+id: 'replication-iceberg'
+title: 'Replicate to Iceberg (Analytics Buckets)'
 description: 'Replicate your Supabase database to Iceberg format using Analytics Buckets.'
 subtitle: 'Stream data to Analytics Buckets.'
 sidebar_label: 'Iceberg'
@@ -8,7 +8,7 @@ sidebar_label: 'Iceberg'
 
 <Admonition type="caution" label="Private Alpha">
 
-ETL Replication is currently in private alpha. Access is limited and features may change.
+Replication is currently in private alpha. Access is limited and features may change.
 
 </Admonition>
 
@@ -18,17 +18,17 @@ Iceberg replication is currently incomplete. It provides an append-only log list
 
 </Admonition>
 
-Apache Iceberg is an open table format for analytic datasets. ETL Replication to Iceberg uses Supabase [Analytics Buckets](/docs/guides/storage/analytics) to store your replicated data.
+Apache Iceberg is an open table format for analytic datasets. Replication powered by [Supabase ETL](https://github.com/supabase/etl) to Iceberg uses Supabase [Analytics Buckets](/docs/guides/storage/analytics) to store your replicated data.
 
 <Admonition type="tip">
 
-This page covers Iceberg-specific configuration. For complete setup instructions including publications, general settings, and pipeline management, see the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup).
+This page covers Iceberg-specific configuration. For complete setup instructions including publications, general settings, and pipeline management, see the [Replication Setup guide](/docs/guides/database/replication/replication-setup).
 
 </Admonition>
 
 ### Setup
 
-Setting up Iceberg replication requires two steps: creating an Analytics Bucket, then configuring it as an ETL destination.
+Setting up Iceberg replication requires two steps: creating an Analytics Bucket, then configuring it as a destination.
 
 #### Step 1: Create an Analytics bucket
 
@@ -39,11 +39,11 @@ First, create an Analytics Bucket to store your replicated data:
 
    <Image
      alt="Create New Analytics Bucket"
-     src="/docs/img/database/replication/etl-iceberg-new-bucket.png"
+     src="/docs/img/database/replication/replication-iceberg-new-bucket.png"
      zoomable
    />
 
-#### Step 2: Add Iceberg as an ETL destination
+#### Step 2: Add Iceberg as a destination
 
 After clicking **New bucket**, fill in the bucket details and copy the credentials:
 
@@ -51,7 +51,7 @@ After clicking **New bucket**, fill in the bucket details and copy the credentia
 
    <Image
      alt="Analytics Bucket Details"
-     src="/docs/img/database/replication/etl-iceberg-details.png"
+     src="/docs/img/database/replication/replication-iceberg-details.png"
      zoomable
    />
 
@@ -60,7 +60,7 @@ After clicking **New bucket**, fill in the bucket details and copy the credentia
 
 2. Click **Create bucket**
 3. **Copy the credentials** displayed after bucket creation (Catalog Token, S3 Access Key ID, S3 Secret Access Key). You'll need these in the next steps.
-4. Navigate to [Database](/dashboard/project/_/database/etl) → **ETL Replication** in your Supabase Dashboard
+4. Navigate to [Database](/dashboard/project/_/database/replication) → **Replication** in your Supabase Dashboard
 5. Click **Add destination**
 6. Configure the destination:
    - **Destination type**: Select **Iceberg (Analytics Bucket)**
@@ -69,7 +69,7 @@ After clicking **New bucket**, fill in the bucket details and copy the credentia
    - **Catalog Token**: Authentication token for accessing the Iceberg catalog (copied in Step 3)
    - **S3 Access Key ID**: Access key for S3-compatible storage (copied in Step 3)
    - **S3 Secret Access Key**: Secret key for S3-compatible storage (copied in Step 3)
-7. Complete the remaining configuration following the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup)
+7. Complete the remaining configuration following the [Replication Setup guide](/docs/guides/database/replication/replication-setup)
 
 For more information about Analytics Buckets, see the [Analytics Buckets documentation](/docs/guides/storage/analytics).
 
@@ -79,10 +79,10 @@ Iceberg-specific limitations:
 
 - **Append-only log**: Currently provides an append-only log format rather than a full table representation
 
-For general ETL Replication limitations that apply to all destinations, see the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup#limitations).
+For general replication limitations that apply to all destinations, see the [Replication Setup guide](/docs/guides/database/replication/replication-setup#limitations).
 
 ### Next steps
 
-- [Set up ETL Replication](/docs/guides/database/replication/etl-replication-setup)
-- [Monitor ETL Replication](/docs/guides/database/replication/etl-replication-monitoring)
-- [View ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq)
+- [Set up replication](/docs/guides/database/replication/replication-setup)
+- [Monitor replication](/docs/guides/database/replication/replication-monitoring)
+- [View replication FAQ](/docs/guides/database/replication/replication-faq)
