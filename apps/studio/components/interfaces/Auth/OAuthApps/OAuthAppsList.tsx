@@ -283,7 +283,7 @@ export const OAuthAppsList = () => {
                             <DropdownMenuTrigger asChild>
                               <Button type="default" className="px-1" icon={<MoreVertical />} />
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent side="bottom" align="end" className="w-52">
+                            <DropdownMenuContent side="bottom" align="end" className="w-48">
                               <DropdownMenuItem
                                 className="space-x-2"
                                 onClick={() => {
@@ -293,16 +293,18 @@ export const OAuthAppsList = () => {
                                 <Edit size={12} />
                                 <p>Update</p>
                               </DropdownMenuItem>
-                              <DropdownMenuItem
-                                className="space-x-2"
-                                onClick={() => {
-                                  setSelectedApp(app)
-                                  setShowRegenerateDialog(true)
-                                }}
-                              >
-                                <RotateCw size={12} />
-                                <p>Regenerate client secret</p>
-                              </DropdownMenuItem>
+                              {app.client_type === 'confidential' && (
+                                <DropdownMenuItem
+                                  className="space-x-2"
+                                  onClick={() => {
+                                    setSelectedApp(app)
+                                    setShowRegenerateDialog(true)
+                                  }}
+                                >
+                                  <RotateCw size={12} />
+                                  <p>Regenerate client secret</p>
+                                </DropdownMenuItem>
+                              )}
                               <DropdownMenuItem
                                 className="space-x-2"
                                 onClick={() => handleDeleteClick(app)}
