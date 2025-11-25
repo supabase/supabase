@@ -21,7 +21,7 @@ jobs:
 
       - name: Create job summary
         run: |
-          echo '# Published Docker Images' >> $GITHUB_STEP_SUMMARY
+          echo "**Published Docker Images:**" >> $GITHUB_STEP_SUMMARY
           echo '' >> $GITHUB_STEP_SUMMARY
-          echo '- \`supabase/studio:${{ steps.version.outputs.version }}\` ([Docker Hub](https://hub.docker.com/r/supabase/studio/tags?name=${{ steps.version.outputs.version }}))' >> $GITHUB_STEP_SUMMARY
-          echo '- \`supabase/studio:latest\` ([Docker Hub](https://hub.docker.com/r/supabase/studio/tags?name=latest))' >> $GITHUB_STEP_SUMMARY
+          echo "- \`supabase/studio:${{ steps.version.outputs.version }}\` - [View on Docker Hub](https://hub.docker.com/r/supabase/studio/tags?name=${{ steps.version.outputs.version }})" >> $GITHUB_STEP_SUMMARY
+          echo "- \`supabase/studio:latest\` - [View on Docker Hub](https://hub.docker.com/r/supabase/studio/tags?name=latest)" >> $GITHUB_STEP_SUMMARY
