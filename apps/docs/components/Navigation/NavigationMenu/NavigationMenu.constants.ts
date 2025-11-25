@@ -2841,26 +2841,22 @@ export const integrations: NavMenuConstant = {
       name: 'Build Your Own',
       items: [
         {
-          name: 'Build a Supabase integration',
-          url: '/guides/integrations/build-a-supabase-integration',
-        },
-        {
-          name: 'OAuth scopes',
-          url: '/guides/integrations/build-a-supabase-integration/oauth-scopes',
+          name: 'Supabase OAuth Integration',
+          url: '/guides/integrations/build-a-supabase-oauth-integration',
+          items: [
+            {
+              name: 'Overview',
+              url: '/guides/integrations/build-a-supabase-oauth-integration',
+            },
+            {
+              name: 'OAuth scopes',
+              url: '/guides/integrations/build-a-supabase-oauth-integration/oauth-scopes',
+            },
+          ],
         },
         {
           name: 'Supabase as a Service',
           url: '/guides/integrations/platform-as-a-service',
-          items: [
-            {
-              name: 'Overview',
-              url: '/guides/integrations/build-a-supabase-integration' as `/${string}`,
-            },
-            {
-              name: 'OAuth scopes',
-              url: '/guides/integrations/build-a-supabase-integration/oauth-scopes' as `/${string}`,
-            },
-          ],
         },
       ],
     },
