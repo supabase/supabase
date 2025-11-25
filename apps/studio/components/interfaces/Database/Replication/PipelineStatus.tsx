@@ -134,10 +134,10 @@ export const PipelineStatus = ({
   const statusConfig = getStatusConfig()
 
   const pipelineLogsUrl = pipelineId
-    ? `/project/${ref}/logs/etl-replication-logs?f=${encodeURIComponent(
+    ? `/project/${ref}/logs/replication-logs?f=${encodeURIComponent(
         JSON.stringify({ pipeline_id: pipelineId })
       )}`
-    : `/project/${ref}/logs/etl-replication-logs`
+    : `/project/${ref}/logs/replication-logs`
 
   return (
     <>

@@ -134,7 +134,7 @@ export const ReplicationPipelineStatus = () => {
       ? `${Math.round(STATUS_REFRESH_FREQUENCY_MS / 1000)}s`
       : `${STATUS_REFRESH_FREQUENCY_MS}ms`
 
-  const logsUrl = `/project/${projectRef}/logs/etl-replication-logs${
+  const logsUrl = `/project/${projectRef}/logs/replication-logs${
     pipelineId ? `?f=${encodeURIComponent(JSON.stringify({ pipeline_id: pipelineId }))}` : ''
   }`
 

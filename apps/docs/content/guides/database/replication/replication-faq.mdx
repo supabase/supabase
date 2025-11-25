@@ -1,5 +1,5 @@
 ---
-id: 'etl-replication-faq'
+id: 'replication-faq'
 title: 'Replication FAQ'
 description: 'Frequently asked questions about replication.'
 subtitle: 'Common questions and answers about replication.'
@@ -14,7 +14,7 @@ Replication is currently in private alpha. Access is limited and features may ch
 
 ## What destinations are supported?
 
-Replication currently supports Iceberg (Analytics Buckets). See the [ETL Destinations guide](/docs/guides/database/replication/etl-destinations) for details.
+Replication currently supports Iceberg (Analytics Buckets). See the [ETL Destinations guide](/docs/guides/database/replication/replication-destinations) for details.
 
 ## Why is a table not being replicated?
 
@@ -29,7 +29,7 @@ Check your publication settings and verify your table meets the requirements.
 
 ## Why aren't publication changes reflected after adding or removing tables?
 
-After modifying your publication, you must restart the ETL pipeline for changes to take effect. See [Adding or removing tables](/docs/guides/database/replication/etl-replication-setup#adding-or-removing-tables) for instructions.
+After modifying your publication, you must restart the ETL pipeline for changes to take effect. See [Adding or removing tables](/docs/guides/database/replication/replication-setup#adding-or-removing-tables) for instructions.
 
 ## Why is a pipeline in failed state?
 
@@ -40,7 +40,7 @@ Pipeline failures occur during the streaming phase when an error happens while r
 3. Fix the underlying issue (e.g., schema mismatches, destination connectivity)
 4. Restart the pipeline
 
-See [Handling errors](/docs/guides/database/replication/etl-replication-monitoring#handling-errors) for more details.
+See [Handling errors](/docs/guides/database/replication/replication-monitoring#handling-errors) for more details.
 
 ## Why is a table in error state?
 
@@ -55,7 +55,7 @@ Check the [Database](/dashboard/project/_/database/replication) → **Replicatio
 3. Ensure all tables show **Live** state (actively replicating)
 4. Monitor replication lag metrics
 
-See the [Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring) for comprehensive monitoring instructions.
+See the [Replication Monitoring guide](/docs/guides/database/replication/replication-monitoring) for comprehensive monitoring instructions.
 
 ## What are the main limitations?
 
@@ -65,11 +65,11 @@ Key limitations to be aware of:
 - **Custom data types**: Not supported
 - **Schema changes**: Not automatically handled
 
-Destination-specific limitations may also apply. See the [Iceberg](/docs/guides/database/replication/etl-iceberg#limitations) destination page for details.
+Destination-specific limitations may also apply. See the [Iceberg](/docs/guides/database/replication/replication-iceberg#limitations) destination page for details.
 
 ## How to stop or pause replication
 
-You can manage your pipeline using the actions menu in the destinations list. See [Managing your pipeline](/docs/guides/database/replication/etl-replication-setup#managing-your-pipeline) for details on available actions.
+You can manage your pipeline using the actions menu in the destinations list. See [Managing your pipeline](/docs/guides/database/replication/replication-setup#managing-your-pipeline) for details on available actions.
 
 Note: Stopping replication will cause changes to queue up in the WAL.
 
@@ -95,6 +95,6 @@ Navigate to [Logs](/dashboard/project/_/logs/explorer) → **Replication** to se
 
 If you need assistance:
 
-1. Check the [Replication Setup guide](/docs/guides/database/replication/etl-replication-setup) and [Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring)
+1. Check the [Replication Setup guide](/docs/guides/database/replication/replication-setup) and [Replication Monitoring guide](/docs/guides/database/replication/replication-monitoring)
 2. Review this FAQ for common issues
 3. Contact support with your error details and logs

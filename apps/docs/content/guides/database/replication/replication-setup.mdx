@@ -1,5 +1,5 @@
 ---
-id: 'etl-replication-setup'
+id: 'replication-setup'
 title: 'Replication Setup'
 description: 'Set up replication to automatically sync your database to external destinations.'
 subtitle: 'Configure publications and destinations for replication.'
@@ -12,11 +12,11 @@ Replication is currently in private alpha. Access is limited and features may ch
 
 </Admonition>
 
-Replication requires two main components: a **publication** (source) and a **destination**. Follow these steps to set up your replication pipeline.
+Replication, powered by Supabase ETL, requires two main components: a **publication** (source) and a **destination**. Follow these steps to set up your replication pipeline.
 
 <Admonition type="tip">
 
-If you already have a publication set up, you can skip to [Step 2: Enable Replication](#step-2-enable-etl-replication).
+If you already have a publication set up, you can skip to [Step 2: Enable Replication](#step-2-enable-replication).
 
 </Admonition>
 
@@ -101,7 +101,7 @@ Before adding destinations, you need to enable replication for your project:
 
 <Image
   alt="Enable Replication"
-  src="/docs/img/database/replication/etl-enable-replication.png"
+  src="/docs/img/database/replication/replication-enable-replication.png"
   zoomable
 />
 
@@ -111,7 +111,7 @@ Once replication is enabled and you have a publication, you can add a destinatio
 
 #### Available destinations
 
-For a complete list of available destinations and how to choose the right one for your needs, see [ETL Destinations](/docs/guides/database/replication/etl-destinations).
+For a complete list of available destinations and how to choose the right one for your needs, see [ETL Destinations](/docs/guides/database/replication/replication-destinations).
 
 #### Configuration
 
@@ -125,11 +125,11 @@ For a complete list of available destinations and how to choose the right one fo
    - **Destination type**: Choose from available destination types
 
    **Destination-specific settings:**
-   Each destination type requires different configuration. See the [ETL Destinations guide](/docs/guides/database/replication/etl-destinations) for configuration details specific to your chosen destination.
+   Each destination type requires different configuration. See the [ETL Destinations guide](/docs/guides/database/replication/replication-destinations) for configuration details specific to your chosen destination.
 
 <Image
   alt="Add ETL Destination"
-  src="/docs/img/database/replication/etl-add-destination.png"
+  src="/docs/img/database/replication/replication-add-destination.png"
   zoomable
 />
 
@@ -145,11 +145,11 @@ After creating a destination, the pipeline will start and appear in the destinat
 
 <Image
   alt="ETL Destinations List"
-  src="/docs/img/database/replication/etl-destinations-list.png"
+  src="/docs/img/database/replication/replication-destinations-list.png"
   zoomable
 />
 
-For comprehensive monitoring instructions including pipeline states, metrics, and logs, see the [Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring).
+For comprehensive monitoring instructions including pipeline states, metrics, and logs, see the [Replication Monitoring guide](/docs/guides/database/replication/replication-monitoring).
 
 ### Managing your pipeline
 
@@ -157,7 +157,7 @@ You can manage your pipeline from the destinations list using the actions menu.
 
 <Image
   alt="Pipeline Actions"
-  src="/docs/img/database/replication/etl-pipeline-actions.png"
+  src="/docs/img/database/replication/replication-pipeline-actions.png"
   zoomable
 />
 
@@ -231,7 +231,7 @@ If you encounter issues during setup:
 - **Pipeline failed to start**: Check the error message in the status view for specific details
 - **No data being replicated**: Verify your publication includes the correct tables and event types
 
-For more troubleshooting help, see the [Replication FAQ](/docs/guides/database/replication/etl-replication-faq).
+For more troubleshooting help, see the [Replication FAQ](/docs/guides/database/replication/replication-faq).
 
 ### Limitations
 
@@ -241,9 +241,9 @@ Replication has the following limitations that apply to all destinations:
 - **Custom data types**: Not supported
 - **Schema changes**: Not automatically handled
 - **No data transformation**: Data is replicated as-is without transformation
-- **Data duplicates**: Duplicates can occur when stopping a pipeline if your database has transactions that take longer than a few minutes to complete. See [Can data duplicates occur?](/docs/guides/database/replication/etl-replication-faq#can-data-duplicates-occur-during-pipeline-operations) for details
+- **Data duplicates**: Duplicates can occur when stopping a pipeline if your database has transactions that take longer than a few minutes to complete. See [Can data duplicates occur?](/docs/guides/database/replication/replication-faq#can-data-duplicates-occur-during-pipeline-operations) for details
 
-Destination-specific limitations may also apply. See the [Iceberg](/docs/guides/database/replication/etl-iceberg#limitations) destination page for details.
+Destination-specific limitations may also apply. See the [Iceberg](/docs/guides/database/replication/replication-iceberg#limitations) destination page for details.
 
 ### Future work
 
@@ -256,5 +256,5 @@ We don't have public timelines for these features, but they represent our roadma
 
 ### Next steps
 
-- [Monitor Replication](/docs/guides/database/replication/etl-replication-monitoring)
-- [View Replication FAQ](/docs/guides/database/replication/etl-replication-faq)
+- [Monitor Replication](/docs/guides/database/replication/replication-monitoring)
+- [View Replication FAQ](/docs/guides/database/replication/replication-faq)

@@ -29,7 +29,7 @@ First, create a new analytics bucket to store your replicated data:
 
 <Image
   alt="Creating a new analytics bucket"
-  src="/docs/img/database/replication/etl-iceberg-new-bucket.png"
+  src="/docs/img/database/replication/replication-iceberg-new-bucket.png"
   zoomable
 />
 
@@ -43,7 +43,7 @@ CREATE PUBLICATION pub_warehouse
   FOR TABLE users, orders, products;
 ```
 
-This publication will track all changes (INSERT, UPDATE, DELETE) for the specified tables. For advanced use cases, see the [Replication Configuration Guide](/docs/guides/database/replication/etl-replication-setup).
+This publication will track all changes (INSERT, UPDATE, DELETE) for the specified tables. For advanced use cases, see the [Replication Configuration Guide](/docs/guides/database/replication/replication-setup).
 
 ### Step 3: Create the ETL pipeline
 
@@ -58,7 +58,7 @@ Now set up the pipeline to sync data to your analytics bucket:
 
 <Image
   alt="ETL pipeline configuration"
-  src="/docs/img/database/replication/etl-iceberg-details.png"
+  src="/docs/img/database/replication/replication-iceberg-details.png"
   zoomable
 />
 
@@ -78,4 +78,4 @@ Once data is flowing to your analytics bucket, you can:
 - [Connect with PyIceberg](/docs/guides/storage/analytics/examples/pyiceberg)
 - [Analyze with Apache Spark](/docs/guides/storage/analytics/examples/apache-spark)
 
-For advanced topics, see the [ETL Replication Monitoring Guide](/docs/guides/database/replication/etl-replication-monitoring).
+For advanced topics, see the [ETL Replication Monitoring Guide](/docs/guides/database/replication/replication-monitoring).
