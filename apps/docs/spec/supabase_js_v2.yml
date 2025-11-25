@@ -7993,8 +7993,10 @@ functions:
 
   - id: storagevectors-list-buckets
     $ref: '@supabase/storage-js.index.StorageVectorsClient.listBuckets'
+  
   - id: storagevectors-from
     $ref: '@supabase/storage-js.StorageVectorsClient.from'
+  
   - id: vectorbucket-index
     $ref: '@supabase/storage-js.index.VectorBucketScope.index'
 
@@ -8030,16 +8032,6 @@ functions:
   - id: vectorbucket-listindexes
     title: VectorBucketScope.listIndexes()
     $ref: '@supabase/storage-js.VectorBucketScope.listIndexes'
-
-  - id: vector-data
-    title: 'Overview'
-    notes: |
-      This section contains methods for working with Vector Data.
-
-  - id: vector-index
-    title: 'Overview'
-    notes: |
-      This section contains methods for working with Vector Index.
 
   - id: vectorindex-deletevectors
     $ref: '@supabase/storage-js.VectorIndexScope.deleteVectors'

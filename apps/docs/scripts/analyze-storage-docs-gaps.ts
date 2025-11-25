@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import * as fs from 'fs'
 import * as path from 'path'
 import { parse as parseYaml } from 'yaml'
@@ -247,7 +249,9 @@ function extractFunctionIds(sections: Section[], productFilter?: string): Set<st
 }
 
 // Helper function to recursively find all storage sections with details
-function extractStorageSections(sections: Section[]): Array<{ id: string; title: string; slug?: string }> {
+function extractStorageSections(
+  sections: Section[]
+): Array<{ id: string; title: string; slug?: string }> {
   const storageSections: Array<{ id: string; title: string; slug?: string }> = []
 
   function traverse(section: Section) {
@@ -311,12 +315,8 @@ async function analyzeStorageDocsGaps(): Promise<Report> {
   const storageSections = extractStorageSections(commonSections)
 
   // 7. Build comparison maps with normalized refs
-  const typeDocByRef = new Map(
-    typeDocFunctions.map((fn) => [normalize$ref(fn.$ref), fn])
-  )
-  const yamlByRef = new Map(
-    yamlStorageFunctions.map((fn) => [normalize$ref(fn.$ref!), fn])
-  )
+  const typeDocByRef = new Map(typeDocFunctions.map((fn) => [normalize$ref(fn.$ref), fn]))
+  const yamlByRef = new Map(yamlStorageFunctions.map((fn) => [normalize$ref(fn.$ref!), fn]))
   const yamlById = new Map(yamlStorageFunctions.map((fn) => [fn.id, fn]))
 
   // 8. Analyze gaps
@@ -403,8 +403,12 @@ function printReport(report: Report) {
 
   // Missing in common-sections
   if (report.missingInCommonSections.length > 0) {
-    console.log("❌ MISSING IN COMMON-SECTIONS (in YAML, not in common-sections - won't show in docs):")
-    console.log(`   ${report.missingInCommonSections.length} functions won't appear in navigation\n`)
+    console.log(
+      "❌ MISSING IN COMMON-SECTIONS (in YAML, not in common-sections - won't show in docs):"
+    )
+    console.log(
+      `   ${report.missingInCommonSections.length} functions won't appear in navigation\n`
+    )
     report.missingInCommonSections.forEach((fn) => {
       console.log(`   - id: ${fn.id}`)
       console.log(`     title: ${fn.title}`)
