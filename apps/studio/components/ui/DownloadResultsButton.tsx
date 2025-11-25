@@ -43,7 +43,7 @@ export const DownloadResultsButton = ({
 }: DownloadResultsButtonProps) => {
   const { ref } = useParams()
   const pathname = usePathname()
-  const isLogs = pathname.includes('/logs')
+  const isLogs = pathname?.includes('/logs')
   // [Joshen] Ensure JSON values are stringified for CSV and Markdown
   const formattedResults = results.map((row) => {
     const r = { ...row }
