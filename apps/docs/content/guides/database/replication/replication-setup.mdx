@@ -115,13 +115,7 @@ Once replication is enabled and you have a Postgres publication, you can add a d
 
 #### Choose and configure your destination
 
-Follow these steps to configure your destination. The specific configuration depends on which destination type you choose.
-
-<Admonition type="note">
-
-Both Analytics Buckets and BigQuery destinations are supported. However, availability varies based on our planned roll-out strategy. The destinations you can access depend on your project and access level.
-
-</Admonition>
+Follow these steps to configure your destination. The specific configuration depends on which destination type you choose. Both Analytics Buckets and BigQuery destinations are supported, though availability varies based on our planned roll-out strategy.
 
 <Tabs
   scrollable
@@ -397,6 +391,12 @@ If your Postgres publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, ne
 
 2. **Restart the replication pipeline** using the actions menu (see [Managing your pipeline](#managing-your-pipeline)) for the changes to take effect.
 
+<Admonition type="note">
+
+Deleted tables are automatically recreated by the pipeline. To permanently delete a table, pause the pipeline first or remove it from the publication before deleting. See the [FAQ](/docs/guides/database/replication/replication-faq#what-happens-if-i-delete-a-table-at-the-destination) for details.
+
+</Admonition>
+
 ### How it works
 
 Once configured, replication to managed destinations:
@@ -405,19 +405,7 @@ Once configured, replication to managed destinations:
 2. **Streams** the changes through Supabase ETL's replication pipeline
 3. **Loads** the data to your destination in near real-time batches
 
-Changes are sent in batches to optimize performance and reduce costs. The batch size and timing can be adjusted using the advanced settings.
-
-<Admonition type="note">
-
-Replication to managed destinations currently performs data extraction and loading only, without transformation. Your data is replicated as-is to the destination.
-
-</Admonition>
-
-<Admonition type="note">
-
-Deleted tables are automatically recreated by the pipeline. To permanently delete a table, pause the pipeline first or remove it from the publication before deleting. See the [FAQ](/docs/guides/database/replication/replication-faq#what-happens-if-i-delete-a-table-at-the-destination) for details.
-
-</Admonition>
+Changes are sent in batches to optimize performance and reduce costs. The batch size and timing can be adjusted using the advanced settings. Replication currently performs data extraction and loading only, without transformation - your data is replicated as-is to the destination.
 
 ### Troubleshooting
 
