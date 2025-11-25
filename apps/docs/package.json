@@ -9,6 +9,7 @@
     "build:llms": "tsx --conditions=react-server ./scripts/llms.ts",
     "build:sitemap": "tsx ./internals/generate-sitemap.ts",
     "clean": "rimraf .next .turbo node_modules features/docs/generated examples __generated__",
+    "analyze:storage-gaps": "tsx scripts/analyze-storage-docs-gaps.ts",
     "codegen:examples": "shx cp -r ../../examples ./examples",
     "codegen:graphql": "tsx --conditions=react-server ./scripts/graphqlSchema.ts && graphql-codegen --config codegen.ts",
     "codegen:references": "tsx features/docs/Reference.generated.script.ts",
