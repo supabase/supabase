@@ -16,7 +16,7 @@ Managed destinations are currently in private alpha. Access is limited and featu
 
 Replication to managed destinations currently supports Analytics Buckets (Iceberg format) and BigQuery. See the destination tabs in the [Setup guide](/docs/guides/database/replication/replication-setup#step-3-add-a-destination) for configuration details.
 
-Availability varies based on our planned roll-out strategy. The destinations you can access depend on your project and access level.
+Availability varies based on the planned roll-out strategy. The destinations you can access depend on your project and access level.
 
 ## Why is a table not being replicated?
 
@@ -98,7 +98,7 @@ However, if a transaction in your database takes longer than this waiting period
 
 **Example scenario**: Suppose you have a batch operation that updates 10,000 rows within a single transaction. If this operation takes 10 minutes to complete and you stop the pipeline after 5 minutes (when 5,000 rows have been processed), the pipeline cannot resume from row 5,001. Instead, when it restarts, it must reprocess all 10,000 rows from the beginning, resulting in the first 5,000 rows being sent to your destination twice.
 
-**Important**: We are not currently planning to implement automatic deduplication. If your use case requires guaranteed exactly-once delivery, you should implement deduplication logic in your downstream systems based on primary keys or other unique identifiers.
+**Important**: There are currently no plans to implement automatic deduplication. If your use case requires guaranteed exactly-once delivery, you should implement deduplication logic in your downstream systems based on primary keys or other unique identifiers.
 
 ## Where to find replication logs
 

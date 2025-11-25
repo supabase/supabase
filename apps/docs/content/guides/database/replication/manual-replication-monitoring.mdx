@@ -51,7 +51,7 @@ The WAL size can be checked using the `pg_ls_waldir()` function:
 select * from pg_ls_waldir();
 ```
 
-#### Check LSN
+#### Check the LSN
 
 ```sql
 select pg_current_wal_lsn();
@@ -91,7 +91,7 @@ ORDER BY
     table_name;
 ```
 
-#### Check LSN
+#### Check the LSN
 
 ```sql
 select pg_last_wal_replay_lsn();
