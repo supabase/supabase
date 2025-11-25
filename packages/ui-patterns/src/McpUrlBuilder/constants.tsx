@@ -234,7 +234,13 @@ export const MCP_CLIENTS: McpClient[] = [
           <p className="text-xs text-foreground-light">
             Add the Supabase MCP server to Gemini CLI:
           </p>
-          <CodeBlock value={command} language="bash" focusable={false} className="block" onCopyCallback={() => onCopy('command')} />
+          <CodeBlock
+            value={command}
+            language="bash"
+            focusable={false}
+            className="block"
+            onCopyCallback={() => onCopy('command')}
+          />
         </div>
       )
     },
