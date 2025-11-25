@@ -178,46 +178,36 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
 }
 
 EdgeFunctionsPage.getLayout = (page: React.ReactElement) => {
-  const EdgeFunctionsPageLayout = () => {
-    const secondaryActions = [
-      <DocsButton key="docs" href={`${DOCS_URL}/guides/functions`} />,
-      <Button asChild key="edge-function-examples" type="default" icon={<ExternalLink />}>
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
-        >
-          Examples
-        </a>
-      </Button>,
-    ]
-
-    return (
-      <div className="w-full min-h-full flex flex-col items-stretch">
-        <PageHeader size="large">
-          <PageHeaderMeta>
-            <PageHeaderSummary>
-              <PageHeaderTitle>Edge Functions</PageHeaderTitle>
-              <PageHeaderDescription>
-                Deploy edge functions to handle complex business logic
-              </PageHeaderDescription>
-            </PageHeaderSummary>
-            <PageHeaderAside>
-              {secondaryActions.map((action) => action)}
-              {IS_PLATFORM && <DeployEdgeFunctionButton />}
-            </PageHeaderAside>
-          </PageHeaderMeta>
-        </PageHeader>
-
-        {page}
-      </div>
-    )
-  }
-
   return (
     <DefaultLayout>
       <EdgeFunctionsLayout>
-        <EdgeFunctionsPageLayout />
+        <div className="w-full min-h-full flex flex-col items-stretch">
+          <PageHeader size="large">
+            <PageHeaderMeta>
+              <PageHeaderSummary>
+                <PageHeaderTitle>Edge Functions</PageHeaderTitle>
+                <PageHeaderDescription>
+                  Deploy edge functions to handle complex business logic
+                </PageHeaderDescription>
+              </PageHeaderSummary>
+              <PageHeaderAside>
+                <DocsButton href={`${DOCS_URL}/guides/functions`} />
+                <Button asChild type="default" icon={<ExternalLink />}>
+                  <a
+                    target="_blank"
+                    rel="noreferrer"
+                    href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
+                  >
+                    Examples
+                  </a>
+                </Button>
+                {IS_PLATFORM && <DeployEdgeFunctionButton />}
+              </PageHeaderAside>
+            </PageHeaderMeta>
+          </PageHeader>
+
+          {page}
+        </div>
       </EdgeFunctionsLayout>
     </DefaultLayout>
   )
