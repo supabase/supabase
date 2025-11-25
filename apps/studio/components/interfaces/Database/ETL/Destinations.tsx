@@ -113,11 +113,18 @@ export const Destinations = () => {
               />
             </div>
           </div>
-          {!!sourceId && (
-            <Button type="default" icon={<Plus />} onClick={() => setShowNewDestinationPanel(true)}>
-              Add destination
-            </Button>
-          )}
+          <div className="flex items-center gap-x-2">
+            {!!sourceId && (
+              <Button
+                type="default"
+                icon={<Plus />}
+                onClick={() => setShowNewDestinationPanel(true)}
+              >
+                Add destination
+              </Button>
+            )}
+            <DocsButton href="https://supabase.com/docs/guides/database/replication" />
+          </div>
         </div>
       </div>
 

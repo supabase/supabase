@@ -37,7 +37,7 @@ export const EnableIndexAdvisorButton = () => {
   })
   const { hypopg, indexAdvisor } = getIndexAdvisorExtensions(extensions)
 
-  const { mutateAsync: enableExtension, isLoading: isEnablingExtension } =
+  const { mutateAsync: enableExtension, isPending: isEnablingExtension } =
     useDatabaseExtensionEnableMutation()
 
   const onEnableIndexAdvisor = async () => {

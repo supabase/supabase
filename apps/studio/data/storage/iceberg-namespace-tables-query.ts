@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { useTemporaryAPIKeyQuery } from 'data/api-keys/temp-api-keys-query'
+import { getOrRefreshTemporaryApiKey } from 'data/api-keys/temp-api-keys-utils'
 import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { storageKeys } from './keys'
@@ -15,13 +15,16 @@ type GetNamespaceTablesVariables = {
 const errorPrefix = 'Failed to retrieve Iceberg namespace tables'
 
 async function getNamespaceTables({
+  projectRef,
   catalogUri,
   warehouse,
   namespace,
-  tempApiKey,
-}: GetNamespaceTablesVariables & { tempApiKey?: string }) {
+}: GetNamespaceTablesVariables) {
   try {
-    if (!tempApiKey) throw new Error(`${errorPrefix}: API Key missing`)
+    if (!projectRef) throw new Error(`${errorPrefix}: projectRef is required`)
+
+    const tempApiKeyObj = await getOrRefreshTemporaryApiKey(projectRef)
+    const tempApiKey = tempApiKeyObj.apiKey
 
     let headers = new Headers()
     headers = await constructHeaders({
@@ -61,8 +64,6 @@ export const useIcebergNamespaceTablesQuery = <TData = IcebergNamespaceTablesDat
   }: UseCustomQueryOptions<IcebergNamespaceTablesData, IcebergNamespaceTablesError, TData> = {}
 ) => {
   const { projectRef, catalogUri, warehouse, namespace } = params
-  const { data } = useTemporaryAPIKeyQuery({ projectRef })
-  const tempApiKey = data?.api_key
 
   return useQuery<IcebergNamespaceTablesData, IcebergNamespaceTablesError, TData>({
     queryKey: storageKeys.icebergNamespaceTables({
@@ -71,11 +72,10 @@ export const useIcebergNamespaceTablesQuery = <TData = IcebergNamespaceTablesDat
       namespace,
       catalog: catalogUri,
     }),
-    queryFn: () => getNamespaceTables({ ...params, tempApiKey }),
+    queryFn: () => getNamespaceTables({ ...params }),
     enabled:
       enabled &&
       typeof projectRef !== 'undefined' &&
-      typeof tempApiKey !== 'undefined' &&
       typeof warehouse !== 'undefined' &&
       typeof namespace !== 'undefined' &&
       typeof catalogUri !== 'undefined',

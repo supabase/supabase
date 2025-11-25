@@ -33,14 +33,14 @@ const CustomDomainVerify = () => {
   const isSSLCertificateDeploying =
     customDomain?.ssl.status !== undefined && customDomain.ssl.txt_name === undefined
 
-  const { mutate: reverifyCustomDomain, isLoading: isReverifyLoading } =
+  const { mutate: reverifyCustomDomain, isPending: isReverifyLoading } =
     useCustomDomainReverifyMutation({
       onSuccess: (res) => {
         if (res.status === '2_initiated') setIsNotVerifiedYet(true)
       },
     })
 
-  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation({
+  const { mutate: deleteCustomDomain, isPending: isDeleting } = useCustomDomainDeleteMutation({
     onSuccess: () => {
       toast.success(
         'Custom domain setup cancelled successfully. It may take a few seconds before your custom domain is fully removed, so you may need to refresh your browser.'
@@ -140,8 +140,8 @@ const CustomDomainVerify = () => {
             </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
               Please add a CAA record allowing "digicert.com" to issue certificates for{' '}
-              <code className="text-xs">{customDomain?.hostname}</code>. For example:{' '}
-              <code className="text-xs">0 issue "digicert.com"</code>
+              <code className="text-code-inline">{customDomain?.hostname}</code>. For example:{' '}
+              <code className="text-code-inline">0 issue "digicert.com"</code>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}

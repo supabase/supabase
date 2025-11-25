@@ -114,7 +114,7 @@ export const CreateBucketModal = ({
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutateAsync: createBucket, isLoading: isCreatingBucket } = useBucketCreateMutation({
+  const { mutateAsync: createBucket, isPending: isCreatingBucket } = useBucketCreateMutation({
     // [Joshen] Silencing the error here as it's being handled in onSubmit
     onError: () => {},
   })
