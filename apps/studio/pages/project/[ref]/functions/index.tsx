@@ -5,7 +5,9 @@ import { useParams } from 'common'
 import { DeployEdgeFunctionButton } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionButton'
 import {
   EdgeFunctionsSort,
+  EdgeFunctionsSortColumn,
   EdgeFunctionsSortDropdown,
+  EdgeFunctionsSortOrder,
 } from 'components/interfaces/EdgeFunctions/EdgeFunctionsSortDropdown'
 import { EdgeFunctionsListItem } from 'components/interfaces/Functions/EdgeFunctionsListItem'
 import {
@@ -59,7 +61,10 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     const temp = (functions ?? []).filter((x) =>
       x.name.toLowerCase().includes(searchString.toLowerCase())
     )
-    const [sortCol, sortOrder] = sort.split(':')
+    const [sortCol, sortOrder] = sort.split(':') as [
+      EdgeFunctionsSortColumn,
+      EdgeFunctionsSortOrder,
+    ]
     const orderMultiplier = sortOrder === 'asc' ? 1 : -1
 
     return temp.sort((a, b) => {

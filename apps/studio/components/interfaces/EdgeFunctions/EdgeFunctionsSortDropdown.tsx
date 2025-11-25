@@ -11,13 +11,10 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-export type EdgeFunctionsSort =
-  | 'name:asc'
-  | 'name:desc'
-  | 'created_at:asc'
-  | 'created_at:desc'
-  | 'updated_at:asc'
-  | 'updated_at:desc'
+export type EdgeFunctionsSortColumn = 'name' | 'created_at' | 'updated_at'
+export type EdgeFunctionsSortOrder = 'asc' | 'desc'
+
+export type EdgeFunctionsSort = `${EdgeFunctionsSortColumn}:${EdgeFunctionsSortOrder}`
 
 interface EdgeFunctionsSortDropdownProps {
   value: EdgeFunctionsSort
