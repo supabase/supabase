@@ -62,7 +62,7 @@ const FormSchema = z.object({
     })
     .array()
     .min(1, 'At least one redirect URI is required'),
-  is_public: z.boolean().default(false),
+  client_type: z.enum(['public', 'confidential']).default('confidential'),
   client_id: z.string().optional(),
   client_secret: z.string().optional(),
 })
@@ -72,9 +72,8 @@ const FORM_ID = 'create-or-update-oauth-app-form'
 const initialValues = {
   name: '',
   type: 'manual' as const,
-  // scope: 'email',
   redirect_uris: [{ value: '' }],
-  is_public: false,
+  client_type: 'confidential' as const,
   client_id: '',
   client_secret: '',
 }
@@ -150,7 +149,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
             appToEdit.redirect_uris && appToEdit.redirect_uris.length > 0
               ? appToEdit.redirect_uris.map((uri) => ({ value: uri }))
               : [{ value: '' }],
-          is_public: appToEdit.client_type === 'public',
+          client_type: appToEdit.client_type,
           client_id: appToEdit.client_id,
           client_secret: '****************************************************************',
         })
@@ -182,7 +181,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
       const payload: CreateOAuthClientParams = {
         client_name: data.name,
         client_uri: '',
-        // scope: data.scope,
+        client_type: data.client_type,
         redirect_uris: validRedirectUris,
       }
 
@@ -260,7 +259,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                     <Separator />
                     <div className="px-5">
                       <Panel>
-                        <Panel.Content className="space-y-4">
+                        <Panel.Content className="space-y-2">
                           <FormField_Shadcn_
                             control={form.control}
                             name="client_id"
@@ -369,16 +368,17 @@ export const CreateOrUpdateOAuthAppSheet = ({
                 <Separator />
                 <FormField_Shadcn_
                   control={form.control}
-                  name="is_public"
+                  name="client_type"
                   render={({ field }) => (
                     <FormItemLayout
-                      label="Public"
+                      label="Public Client"
                       layout="flex"
                       description={
                         <>
                           If enabled, the Authorization Code with PKCE (Proof Key for Code Exchange)
                           flow can be used, particularly beneficial for applications that cannot
-                          securely store Client Secrets, such as native and mobile apps.{' '}
+                          securely store Client Secrets, such as native and mobile apps. This cannot
+                          be changed after creation.{' '}
                           <Link
                             href="https://supabase.com/docs/guides/auth/oauth/public-oauth-apps"
                             target="_blank"
@@ -392,7 +392,13 @@ export const CreateOrUpdateOAuthAppSheet = ({
                       className={'px-5'}
                     >
                       <FormControl_Shadcn_>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                        <Switch
+                          checked={field.value === 'public'}
+                          onCheckedChange={(checked) =>
+                            field.onChange(checked ? 'public' : 'confidential')
+                          }
+                          disabled={isEditMode}
+                        />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}

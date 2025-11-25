@@ -82,8 +82,6 @@ export const OAuthAppsList = () => {
 
   const oAuthApps = data?.clients || []
 
-  console.log('oAuthApps', oAuthApps)
-
   const [showCreateSheet, setShowCreateSheet] = useQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
@@ -217,16 +215,19 @@ export const OAuthAppsList = () => {
         </div>
 
         <div className="w-full overflow-hidden overflow-x-auto">
-          <Card>
-            <Table>
+          <Card className="@container">
+            <Table containerProps={{ stickyLastColumn: true }}>
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Client ID</TableHead>
+                  <TableHead>Registration</TableHead>
                   <TableHead>Type</TableHead>
                   <TableHead>Scope</TableHead>
                   <TableHead>Created</TableHead>
-                  <TableHead className="w-8"></TableHead>
+                  <TableHead className="w-8 px-0">
+                    <div className="!bg-200 px-4 w-full h-full flex items-center border-l @[954px]:border-l-0" />
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -253,21 +254,24 @@ export const OAuthAppsList = () => {
                       <TableCell title={app.client_id}>
                         <Badge className="font-mono">{app.client_id}</Badge>
                       </TableCell>
-                      <TableCell className="max-w-40">
-                        {app.client_type === 'public' ? 'Public' : 'Private'}
+                      <TableCell className="text-xs text-foreground-light max-w-28 capitalize">
+                        {app.registration_type}
                       </TableCell>
-                      <TableCell className="max-w-40">
+                      <TableCell className="text-xs text-foreground-light max-w-28 capitalize">
+                        {app.client_type}
+                      </TableCell>
+                      <TableCell className="min-w-28 max-w-40">
                         {app.scope ? (
                           <Badge>{app.scope}</Badge>
                         ) : (
                           <span className="text-xs text-foreground-light">N/A</span>
                         )}
                       </TableCell>
-                      <TableCell className="text-xs text-foreground-light w-1/6">
+                      <TableCell className="text-xs text-foreground-light min-w-28 max-w-40 w-1/6">
                         <TimestampInfo utcTimestamp={app.created_at} labelFormat="D MMM, YYYY" />
                       </TableCell>
-                      <TableCell>
-                        <div className="flex justify-end items-center">
+                      <TableCell className="max-w-20 sticky bg-surface-100 right-0 px-6">
+                        <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l @[954px]:border-l-0">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button type="default" className="px-1" icon={<MoreVertical />} />
