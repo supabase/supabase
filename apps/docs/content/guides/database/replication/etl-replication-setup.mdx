@@ -1,22 +1,22 @@
 ---
 id: 'etl-replication-setup'
-title: 'ETL Replication Setup'
-description: 'Set up ETL replication to automatically sync your database to external destinations.'
-subtitle: 'Configure publications and destinations for ETL replication.'
+title: 'Replication Setup'
+description: 'Set up replication to automatically sync your database to external destinations.'
+subtitle: 'Configure publications and destinations for replication.'
 sidebar_label: 'Setting up'
 ---
 
 <Admonition type="caution" label="Private Alpha">
 
-ETL Replication is currently in private alpha. Access is limited and features may change.
+Replication is currently in private alpha. Access is limited and features may change.
 
 </Admonition>
 
-ETL Replication requires two main components: a **publication** (source) and a **destination**. Follow these steps to set up your replication pipeline.
+Replication requires two main components: a **publication** (source) and a **destination**. Follow these steps to set up your replication pipeline.
 
 <Admonition type="tip">
 
-If you already have a publication set up, you can skip to [Step 2: Enable ETL Replication](#step-2-enable-etl-replication).
+If you already have a publication set up, you can skip to [Step 2: Enable Replication](#step-2-enable-etl-replication).
 
 </Admonition>
 
@@ -91,16 +91,16 @@ After creating a publication via SQL, you can view it in the Supabase Dashboard:
 1. Navigate to **Database** → [Publications](/dashboard/project/_/database/publications) in your Supabase Dashboard
 2. You'll see all your publications listed with their tables
 
-### Step 2: Enable ETL replication
+### Step 2: Enable replication
 
-Before adding destinations, you need to enable ETL replication for your project:
+Before adding destinations, you need to enable replication for your project:
 
-1. Navigate to the [Database](/dashboard/project/_/database/etl) section in your Supabase Dashboard
-2. Select the **ETL Replication** tab
-3. Click **Enable replication** to activate ETL replication for your project
+1. Navigate to the [Database](/dashboard/project/_/database/replication) section in your Supabase Dashboard
+2. Select the **Replication** tab
+3. Click **Enable replication** to activate replication for your project
 
 <Image
-  alt="Enable ETL Replication"
+  alt="Enable Replication"
   src="/docs/img/database/replication/etl-enable-replication.png"
   zoomable
 />
@@ -115,7 +115,7 @@ For a complete list of available destinations and how to choose the right one fo
 
 #### Configuration
 
-1. In the ETL Replication tab, click **Add destination**
+1. In the Replication tab, click **Add destination**
 2. Configure the destination settings:
 
    **General Settings:**
@@ -149,7 +149,7 @@ After creating a destination, the pipeline will start and appear in the destinat
   zoomable
 />
 
-For comprehensive monitoring instructions including pipeline states, metrics, and logs, see the [ETL Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring).
+For comprehensive monitoring instructions including pipeline states, metrics, and logs, see the [Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring).
 
 ### Managing your pipeline
 
@@ -209,7 +209,7 @@ If your publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, new tables 
 
 ### How it works
 
-Once configured, ETL Replication:
+Once configured, Replication:
 
 1. **Captures** changes from your database using the publication
 2. **Loads** the data to your destination in near real-time batches
@@ -218,7 +218,7 @@ Changes are sent in batches to optimize performance and reduce costs. The batch 
 
 <Admonition type="note">
 
-ETL Replication currently performs data extraction and loading only, without transformation. Your data is replicated as-is to the destination.
+Replication currently performs data extraction and loading only, without transformation. Your data is replicated as-is to the destination.
 
 </Admonition>
 
@@ -231,11 +231,11 @@ If you encounter issues during setup:
 - **Pipeline failed to start**: Check the error message in the status view for specific details
 - **No data being replicated**: Verify your publication includes the correct tables and event types
 
-For more troubleshooting help, see the [ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq).
+For more troubleshooting help, see the [Replication FAQ](/docs/guides/database/replication/etl-replication-faq).
 
 ### Limitations
 
-ETL Replication has the following limitations that apply to all destinations:
+Replication has the following limitations that apply to all destinations:
 
 - **Primary keys required**: Tables must have primary keys
 - **Custom data types**: Not supported
@@ -247,14 +247,14 @@ Destination-specific limitations may also apply. See the [Iceberg](/docs/guides/
 
 ### Future work
 
-ETL Replication is actively being developed. Planned improvements include:
+Replication is actively being developed. Planned improvements include:
 
 - **DDL support**: Automatic handling of schema changes (ALTER TABLE, ADD COLUMN, etc.)
 - **Additional destinations**: Support for more data warehouses and analytics platforms
 
-We don't have public timelines for these features, but they represent our roadmap for making ETL Replication more robust and flexible.
+We don't have public timelines for these features, but they represent our roadmap for making Replication more robust and flexible.
 
 ### Next steps
 
-- [Monitor ETL Replication](/docs/guides/database/replication/etl-replication-monitoring)
-- [View ETL Replication FAQ](/docs/guides/database/replication/etl-replication-faq)
+- [Monitor Replication](/docs/guides/database/replication/etl-replication-monitoring)
+- [View Replication FAQ](/docs/guides/database/replication/etl-replication-faq)

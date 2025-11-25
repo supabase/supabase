@@ -1,20 +1,20 @@
 ---
 id: 'etl-replication-faq'
-title: 'ETL Replication FAQ'
-description: 'Frequently asked questions about ETL replication.'
-subtitle: 'Common questions and answers about ETL replication.'
+title: 'Replication FAQ'
+description: 'Frequently asked questions about replication.'
+subtitle: 'Common questions and answers about replication.'
 sidebar_label: 'FAQ'
 ---
 
 <Admonition type="caution" label="Private Alpha">
 
-ETL Replication is currently in private alpha. Access is limited and features may change.
+Replication is currently in private alpha. Access is limited and features may change.
 
 </Admonition>
 
 ## What destinations are supported?
 
-ETL Replication currently supports Iceberg (Analytics Buckets). See the [ETL Destinations guide](/docs/guides/database/replication/etl-destinations) for details.
+Replication currently supports Iceberg (Analytics Buckets). See the [ETL Destinations guide](/docs/guides/database/replication/etl-destinations) for details.
 
 ## Why is a table not being replicated?
 
@@ -48,14 +48,14 @@ Table errors occur during the copy phase. To recover, click **View status**, fin
 
 ## How to verify replication is working
 
-Check the [Database](/dashboard/project/_/database/etl) → **ETL Replication** page:
+Check the [Database](/dashboard/project/_/database/replication) → **Replication** page:
 
 1. Verify your pipeline shows **Running** status
 2. Click **View status** to check table states
 3. Ensure all tables show **Live** state (actively replicating)
 4. Monitor replication lag metrics
 
-See the [ETL Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring) for comprehensive monitoring instructions.
+See the [Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring) for comprehensive monitoring instructions.
 
 ## What are the main limitations?
 
@@ -77,11 +77,11 @@ Note: Stopping replication will cause changes to queue up in the WAL.
 
 Yes, data duplicates can occur in certain scenarios when stopping a pipeline.
 
-When you stop a pipeline (for restarts or updates), ETL Replication tries to finish processing any transactions that are currently being sent to your destination. It waits up to a few minutes to allow these in-progress transactions to complete cleanly before stopping.
+When you stop a pipeline (for restarts or updates), Replication tries to finish processing any transactions that are currently being sent to your destination. It waits up to a few minutes to allow these in-progress transactions to complete cleanly before stopping.
 
 However, if a transaction in your database takes longer than this waiting period to complete, the pipeline will stop before that entire transaction has been fully processed. When the pipeline starts again, it must restart the incomplete transaction from the beginning to maintain transaction boundaries, which results in some data being sent twice to your destination.
 
-**Understanding transaction boundaries**: A transaction is a group of database changes that happen together (for example, all changes within a `BEGIN...COMMIT` block). ETL Replication must process entire transactions - it cannot process part of a transaction, stop, and then continue from the middle. This means if a transaction is interrupted, the whole transaction must be replayed when the pipeline resumes.
+**Understanding transaction boundaries**: A transaction is a group of database changes that happen together (for example, all changes within a `BEGIN...COMMIT` block). Replication must process entire transactions - it cannot process part of a transaction, stop, and then continue from the middle. This means if a transaction is interrupted, the whole transaction must be replayed when the pipeline resumes.
 
 **Example scenario**: Suppose you have a batch operation that updates 10,000 rows within a single transaction. If this operation takes 10 minutes to complete and you stop the pipeline after 5 minutes (when 5,000 rows have been processed), the pipeline cannot resume from row 5,001. Instead, when it restarts, it must reprocess all 10,000 rows from the beginning, resulting in the first 5,000 rows being sent to your destination twice.
 
@@ -89,12 +89,12 @@ However, if a transaction in your database takes longer than this waiting period
 
 ## Where to find replication logs
 
-Navigate to [Logs](/dashboard/project/_/logs/explorer) → **ETL Replication** to see all pipeline logs. Logs contain diagnostic information. If you're experiencing issues, contact support with your error details.
+Navigate to [Logs](/dashboard/project/_/logs/explorer) → **Replication** to see all pipeline logs. Logs contain diagnostic information. If you're experiencing issues, contact support with your error details.
 
 ## How to get help
 
 If you need assistance:
 
-1. Check the [ETL Replication Setup guide](/docs/guides/database/replication/etl-replication-setup) and [ETL Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring)
+1. Check the [Replication Setup guide](/docs/guides/database/replication/etl-replication-setup) and [Replication Monitoring guide](/docs/guides/database/replication/etl-replication-monitoring)
 2. Review this FAQ for common issues
 3. Contact support with your error details and logs

@@ -8,13 +8,13 @@ import {
   useFeaturePreviewModal,
   useUnifiedLogsPreview,
 } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useIsETLPrivateAlpha } from 'components/interfaces/Database/ETL/useIsETLPrivateAlpha'
+import { useIsETLPrivateAlpha } from 'components/interfaces/Database/Replication/useIsETLPrivateAlpha'
 import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
 import SavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from 'components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useContentQuery } from 'data/content/content-query'
-import { useReplicationSourcesQuery } from 'data/etl/sources-query'
+import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {

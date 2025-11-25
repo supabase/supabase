@@ -73,16 +73,6 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/publications`,
           items: [],
         },
-        ...(showPgReplicate
-          ? [
-              {
-                name: 'ETL Replication',
-                key: 'etl',
-                url: `/project/${ref}/database/etl`,
-                items: [],
-              },
-            ]
-          : []),
       ],
     },
     {
@@ -150,6 +140,16 @@ export const generateDatabaseMenu = (
                 key: 'hooks',
                 url: `/project/${ref}/integrations/webhooks/overview`,
                 rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+                items: [],
+              },
+            ]
+          : []),
+        ...(showPgReplicate
+          ? [
+              {
+                name: 'Replication',
+                key: 'replication',
+                url: `/project/${ref}/database/replication`,
                 items: [],
               },
             ]

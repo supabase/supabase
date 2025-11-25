@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useTableReset } from 'data/etl/use-table-reset'
+import { useTableReset } from 'data/replication/use-table-reset'
 import {
   AlertDialog,
   AlertDialogAction,
