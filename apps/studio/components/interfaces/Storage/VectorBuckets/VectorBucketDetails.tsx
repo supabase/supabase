@@ -1,4 +1,4 @@
-import { ChevronUp, Eye, MoreVertical, Search, Trash2 } from 'lucide-react'
+import { BookOpen, ChevronDown, Eye, MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
@@ -28,33 +28,35 @@ import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQuer
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { SqlEditor } from 'icons'
 import { DOCS_URL } from 'lib/constants'
-import ReactMarkdown from 'react-markdown'
 import {
-  Badge,
   Button,
   Card,
   CardContent,
   cn,
   CodeBlock,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  Command_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
+  SheetTrigger,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -128,10 +130,10 @@ export const VectorBucketDetails = () => {
   const state = isLoading
     ? 'loading'
     : extensionState === 'installed'
-    ? wrapperInstance
-      ? 'added'
-      : 'missing'
-    : extensionState
+      ? wrapperInstance
+        ? 'added'
+        : 'missing'
+      : extensionState
 
   return (
     <>
@@ -364,26 +366,46 @@ interface VectorBucketTableExamplesDialogProps {
 
 const VectorBucketTableExamplesDialog = ({ index }: VectorBucketTableExamplesDialogProps) => {
   const metadataKeys = index.metadataConfiguration?.nonFilterableMetadataKeys ?? []
+  const [language, setLanguage] = useState<'javascript' | 'sql'>('javascript')
+  const [showLanguage, setShowLanguage] = useState(false)
+
+  const updateLanguage = (value: 'javascript' | 'sql') => {
+    setLanguage(value)
+    setShowLanguage(false)
+  }
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button type="primary" icon={<Eye size={14} className="text-foreground-lighter" />}>
-          Quick start
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>How to add vectors to the database</DialogTitle>
-        </DialogHeader>
-        <VectorBucketIndexExamples
-          bucketName={index.vectorBucketName}
-          indexName={index.indexName}
-          dimension={index.dimension}
-          metadataKeys={metadataKeys}
-        />
-      </DialogContent>
-    </Dialog>
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button type="default">Insert vectors</Button>
+      </SheetTrigger>
+      <SheetContent tabIndex={undefined}>
+        <div className="flex flex-col h-full" tabIndex={-1}>
+          <SheetHeader>
+            <SheetTitle>
+              Insert vectors into{' '}
+              <code className="text-code-inline !text-sm">{index.indexName}</code>
+            </SheetTitle>
+            {/* <SheetDescription>
+              Insert vectors into <code className="text-code-inline">{index.vectorBucketName}</code>
+            </SheetDescription> */}
+          </SheetHeader>
+
+          <div className="overflow-auto flex-grow">
+            <VectorBucketIndexExamples
+              bucketName={index.vectorBucketName}
+              indexName={index.indexName}
+              dimension={index.dimension}
+              metadataKeys={metadataKeys}
+              language={language}
+              onLanguageChange={updateLanguage}
+              showLanguage={showLanguage}
+              onShowLanguageChange={setShowLanguage}
+            />
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
   )
 }
 
@@ -392,6 +414,10 @@ interface VectorBucketIndexExamplesProps {
   indexName: string
   dimension: number
   metadataKeys: string[]
+  language: 'javascript' | 'sql'
+  onLanguageChange: (value: 'javascript' | 'sql') => void
+  showLanguage: boolean
+  onShowLanguageChange: (show: boolean) => void
 }
 
 function VectorBucketIndexExamples({
@@ -399,6 +425,10 @@ function VectorBucketIndexExamples({
   indexName,
   dimension,
   metadataKeys,
+  language,
+  onLanguageChange,
+  showLanguage,
+  onShowLanguageChange,
 }: VectorBucketIndexExamplesProps) {
   const { ref: projectRef } = useParams()
   const sqlCode = `-- Insert multiple vectors
@@ -417,19 +447,44 @@ values
   );`
 
   return (
-    <div className="flex flex-col gap-1">
-      <p className="text-sm text-foreground-light px-4 py-2">
-        You can use the following code to add vectors to the database. Copy the following code into
-        your Javascript code (or use the SQL Editor) to add vectors to the database. The data
-        property should contains the vector data.
+    <SheetSection className="flex flex-col gap-4">
+      <p className="text-sm text-foreground-light">
+        Use the following code snippet to insert vectors into your vector table.
       </p>
-      <Tabs_Shadcn_ defaultValue="javascript" className="">
-        <TabsList_Shadcn_ className="grid w-full grid-cols-2">
-          <TabsTrigger_Shadcn_ value="javascript">Javascript</TabsTrigger_Shadcn_>
-          <TabsTrigger_Shadcn_ value="sql">SQL</TabsTrigger_Shadcn_>
-        </TabsList_Shadcn_>
-        <TabsContent_Shadcn_ value="javascript">
-          <div className="flex flex-col gap-2 px-4 pb-4">
+      <div className="flex flex-col gap-2">
+        <div className="flex justify-end">
+          <Popover_Shadcn_ modal={false} open={showLanguage} onOpenChange={onShowLanguageChange}>
+            <PopoverTrigger_Shadcn_ asChild>
+              <Button type="default" iconRight={<ChevronDown size={14} strokeWidth={2} />}>
+                {language === 'javascript' ? 'JavaScript' : 'SQL'}
+              </Button>
+            </PopoverTrigger_Shadcn_>
+            <PopoverContent_Shadcn_ className="p-0 w-32" side="bottom" align="end">
+              <Command_Shadcn_>
+                <CommandList_Shadcn_>
+                  <CommandGroup_Shadcn_>
+                    <CommandItem_Shadcn_
+                      className="cursor-pointer"
+                      onSelect={() => onLanguageChange('javascript')}
+                      onClick={() => onLanguageChange('javascript')}
+                    >
+                      <p>JavaScript</p>
+                    </CommandItem_Shadcn_>
+                    <CommandItem_Shadcn_
+                      className="cursor-pointer"
+                      onSelect={() => onLanguageChange('sql')}
+                      onClick={() => onLanguageChange('sql')}
+                    >
+                      <p>SQL</p>
+                    </CommandItem_Shadcn_>
+                  </CommandGroup_Shadcn_>
+                </CommandList_Shadcn_>
+              </Command_Shadcn_>
+            </PopoverContent_Shadcn_>
+          </Popover_Shadcn_>
+        </div>
+        {language === 'javascript' ? (
+          <>
             <CodeBlock
               hideLineNumbers
               wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-3')}
@@ -461,10 +516,20 @@ const result = await index.putVectors({
   ],
 })`}
             />
-          </div>
-        </TabsContent_Shadcn_>
-        <TabsContent_Shadcn_ value="sql">
-          <div className="flex flex-col gap-2 px-4 pb-4">
+            <div className="flex justify-end">
+              <Button
+                type="default"
+                icon={<BookOpen size={12} className="text-foreground-lighter" />}
+                asChild
+              >
+                <a target="_blank" rel="noreferrer" href={`${DOCS_URL}/guides/storage/vectors`}>
+                  Docs
+                </a>
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
             <CodeBlock
               hideLineNumbers
               wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-3')}
@@ -472,25 +537,34 @@ const result = await index.putVectors({
               language="sql"
               value={sqlCode}
             />
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-2">
               <Button
                 type="default"
                 asChild
                 icon={<SqlEditor size={12} className="text-foreground-lighter" />}
               >
-                <a
+                <Link
                   target="_blank"
                   rel="noreferrer"
                   href={`/project/${projectRef}/sql/new?content=${encodeURIComponent(sqlCode)}`}
                 >
                   <p>Query in SQL Editor</p>
-                </a>
+                </Link>
+              </Button>
+              <Button
+                type="default"
+                icon={<BookOpen size={12} className="text-foreground-lighter" />}
+                asChild
+              >
+                <Link target="_blank" rel="noreferrer" href={`${DOCS_URL}/guides/storage/vectors`}>
+                  Docs
+                </Link>
               </Button>
             </div>
-          </div>
-        </TabsContent_Shadcn_>
-      </Tabs_Shadcn_>
-    </div>
+          </>
+        )}
+      </div>
+    </SheetSection>
   )
 }
 
