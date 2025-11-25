@@ -48,4 +48,6 @@ export const authKeys = {
 
   authConfig: (projectRef: string | undefined) => ['projects', projectRef, 'auth-config'] as const,
   accessToken: () => ['access-token'] as const,
+  overviewMetrics: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'auth-overview-metrics'] as const,
 }

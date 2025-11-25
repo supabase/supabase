@@ -6,6 +6,7 @@ import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useApiKeysVisibility } from '../APIKeys/hooks/useApiKeysVisibility'
 import { Bucket } from './Content/Bucket'
 import { EdgeFunction } from './Content/EdgeFunction'
 import { EdgeFunctions } from './Content/EdgeFunctions'
@@ -43,9 +44,10 @@ export const ProjectAPIDocs = () => {
   const [showKeys, setShowKeys] = useState(false)
   const language = snap.docsLanguage
 
+  const { canReadAPIKeys } = useApiKeysVisibility()
   const { data: apiKeys } = useAPIKeysQuery(
     { projectRef: ref },
-    { enabled: snap.showProjectApiDocs }
+    { enabled: snap.showProjectApiDocs && canReadAPIKeys }
   )
   const { data: settings } = useProjectSettingsV2Query(
     { projectRef: ref },

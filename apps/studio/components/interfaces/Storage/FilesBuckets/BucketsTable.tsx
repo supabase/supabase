@@ -8,8 +8,6 @@ type BucketsTableProps = {
   projectRef: string
   filterString: string
   formattedGlobalUploadLimit: string
-  setSelectedBucket: (bucket: Bucket) => void
-  setModal: (modal: 'edit' | 'empty' | 'delete' | null) => void
   getPolicyCount: (bucketName: string) => number
 }
 
@@ -27,8 +25,6 @@ const BucketsTableUnvirtualized = ({
   projectRef,
   filterString,
   formattedGlobalUploadLimit,
-  setSelectedBucket,
-  setModal,
   getPolicyCount,
 }: BucketsTableProps) => {
   const showSearchEmptyState = buckets.length === 0 && filterString.length > 0
@@ -37,7 +33,7 @@ const BucketsTableUnvirtualized = ({
     <Table
       containerProps={{ containerClassName: 'h-full overflow-auto', className: 'overflow-visible' }}
     >
-      <BucketTableHeader mode="standard" />
+      <BucketTableHeader mode="standard" hasBuckets={buckets.length > 0} />
       <TableBody>
         {showSearchEmptyState ? (
           <BucketTableEmptyState mode="standard" filterString={filterString} />
@@ -50,8 +46,6 @@ const BucketsTableUnvirtualized = ({
               projectRef={projectRef}
               formattedGlobalUploadLimit={formattedGlobalUploadLimit}
               getPolicyCount={getPolicyCount}
-              setSelectedBucket={setSelectedBucket}
-              setModal={setModal}
             />
           ))
         )}
@@ -65,15 +59,13 @@ const BucketsTableVirtualized = ({
   projectRef,
   filterString,
   formattedGlobalUploadLimit,
-  setSelectedBucket,
-  setModal,
   getPolicyCount,
 }: BucketsTableProps) => {
   const showSearchEmptyState = buckets.length === 0 && filterString.length > 0
 
   return (
     <VirtualizedTable data={buckets} estimateSize={() => 59} getItemKey={(bucket) => bucket.id}>
-      <BucketTableHeader mode="virtualized" />
+      <BucketTableHeader mode="virtualized" hasBuckets={buckets.length > 0} />
       <VirtualizedTableBody<Bucket>
         paddingColSpan={5}
         emptyContent={
@@ -90,8 +82,6 @@ const BucketsTableVirtualized = ({
             projectRef={projectRef}
             formattedGlobalUploadLimit={formattedGlobalUploadLimit}
             getPolicyCount={getPolicyCount}
-            setSelectedBucket={setSelectedBucket}
-            setModal={setModal}
           />
         )}
       </VirtualizedTableBody>

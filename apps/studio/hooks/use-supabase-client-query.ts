@@ -38,7 +38,7 @@ export const useSupabaseClientQuery = (
   { enabled = true, ...options } = {}
 ) => {
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const { data: temporaryApiKeyData } = useTemporaryAPIKeyQuery({ projectRef, expiry: 3600 })
+  const { data: temporaryApiKeyData } = useTemporaryAPIKeyQuery({ projectRef })
 
   const endpoint = settings
     ? `${settings?.app_config?.protocol ?? 'https'}://${settings?.app_config?.endpoint}`

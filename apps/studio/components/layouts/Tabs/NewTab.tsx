@@ -40,6 +40,8 @@ import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { ActionCard } from './ActionCard'
 import { RecentItems } from './RecentItems'
 import { SIDEBAR_KEYS } from '../ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 
 const NEW_PROJECT_THRESHOLD_DAYS = 7
 const TABLE_QUICKSTART_FLAG = 'tableQuickstart'
@@ -57,6 +59,8 @@ export function NewTab() {
   const { profile } = useProfile()
   const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
+  const { selectedSchema } = useQuerySchemaState()
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   const snap = useTableEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
@@ -161,16 +165,18 @@ export function NewTab() {
     }
   }
 
-  const tableEditorActions = [
-    {
-      icon: <Table2 className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
-      title: 'Create a table',
-      description: 'Design and create a new database table',
-      bgColor: 'bg-blue-500',
-      isBeta: false,
-      onClick: () => snap.onAddTable(),
-    },
-  ]
+  const tableEditorActions = isSchemaLocked
+    ? []
+    : [
+        {
+          icon: <Table2 className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
+          title: 'Create a table',
+          description: 'Design and create a new database table',
+          bgColor: 'bg-blue-500',
+          isBeta: false,
+          onClick: () => snap.onAddTable(),
+        },
+      ]
 
   const sqlEditorActions = [
     {

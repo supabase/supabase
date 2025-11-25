@@ -19,7 +19,6 @@ import {
 } from 'ui'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
-import { downloadFile } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
 import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
 
@@ -116,14 +115,13 @@ const PreviewFile = ({ item }: { item: StorageItem }) => {
 }
 
 export const PreviewPane = () => {
-  const { ref: projectRef, bucketId } = useParams()
-
   const {
     selectedBucket,
     selectedFilePreview: file,
     setSelectedItemsToDelete,
     setSelectedFilePreview,
     setSelectedFileCustomExpiry,
+    downloadFile,
   } = useStorageExplorerStateSnapshot()
   const { onCopyUrl } = useCopyUrl()
 
@@ -204,7 +202,7 @@ export const PreviewPane = () => {
               type="default"
               icon={<Download />}
               disabled={file.isCorrupted}
-              onClick={async () => await downloadFile({ projectRef, bucketId, file })}
+              onClick={() => downloadFile(file)}
             >
               Download
             </Button>

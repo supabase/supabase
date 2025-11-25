@@ -62,6 +62,7 @@ interface BranchRowProps {
   repo: string
   label?: string | ReactNode
   branch: Branch
+  isGithubConnected: boolean
   rowLink?: string
   external?: boolean
   rowActions?: ReactNode
@@ -69,6 +70,7 @@ interface BranchRowProps {
 
 export const BranchRow = ({
   branch,
+  isGithubConnected,
   label,
   repo,
   rowLink,
@@ -87,7 +89,7 @@ export const BranchRow = ({
   return (
     <div className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-surface-100">
       <div className="flex items-center gap-x-3">
-        {branch.git_branch && (
+        {branch.git_branch && isGithubConnected && (
           <ButtonTooltip
             asChild
             type="default"

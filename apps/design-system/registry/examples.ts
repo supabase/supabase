@@ -1079,6 +1079,51 @@ export const examples: Registry = [
     files: ['example/info-tooltip-demo.tsx'],
   },
   {
+    name: 'page-container-demo',
+    type: 'components:example',
+    files: ['example/page-container-demo.tsx'],
+  },
+  {
+    name: 'page-layout-detail',
+    type: 'components:example',
+    files: ['example/page-layout-detail.tsx'],
+  },
+  {
+    name: 'page-layout-list',
+    type: 'components:example',
+    files: ['example/page-layout-list.tsx'],
+  },
+  {
+    name: 'page-layout-list-simple',
+    type: 'components:example',
+    files: ['example/page-layout-list-simple.tsx'],
+  },
+  {
+    name: 'page-layout-settings',
+    type: 'components:example',
+    files: ['example/page-layout-settings.tsx'],
+  },
+  {
+    name: 'page-header-demo',
+    type: 'components:example',
+    files: ['example/page-header-demo.tsx'],
+  },
+  {
+    name: 'page-section-demo',
+    type: 'components:example',
+    files: ['example/page-section-demo.tsx'],
+  },
+  {
+    name: 'page-section-horizontal',
+    type: 'components:example',
+    files: ['example/page-section-horizontal.tsx'],
+  },
+  {
+    name: 'page-section-with-aside',
+    type: 'components:example',
+    files: ['example/page-section-with-aside.tsx'],
+  },
+  {
     name: 'inner-side-menu-demo',
     type: 'components:example',
     files: ['example/inner-side-menu-demo.tsx'],
@@ -1274,8 +1319,38 @@ export const examples: Registry = [
     files: ['example/empty-state-zero-items-table.tsx'],
   },
   {
-    name: 'empty-state-initial-state',
+    name: 'empty-state-initial-state-presentational',
     type: 'components:example',
-    files: ['example/empty-state-initial-state.tsx'],
+    files: ['example/empty-state-initial-state-presentational.tsx'],
+  },
+  {
+    name: 'empty-state-initial-state-informational',
+    type: 'components:example',
+    files: ['example/empty-state-initial-state-informational.tsx'],
+  },
+  {
+    name: 'empty-state-zero-items-data-grid',
+    type: 'components:example',
+    files: ['example/empty-state-zero-items-data-grid.tsx'],
+  },
+  {
+    name: 'metric-card',
+    type: 'components:example',
+    files: ['example/metric-card.tsx'],
+  },
+  {
+    name: 'metric-card-minimal',
+    type: 'components:example',
+    files: ['example/metric-card-minimal.tsx'],
+  },
+  {
+    name: 'metric-card-minimal-horizontal',
+    type: 'components:example',
+    files: ['example/metric-card-minimal-horizontal.tsx'],
+  },
+  {
+    name: 'metric-card-with-icon-link-tooltip',
+    type: 'components:example',
+    files: ['example/metric-card-with-icon-link-tooltip.tsx'],
   },
 ]
