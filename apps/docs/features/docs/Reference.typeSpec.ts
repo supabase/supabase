@@ -696,14 +696,14 @@ function parseReferenceType(type: any, map: Map<number, any>, typeArguments?: an
             type,
             referenced.type,
             map,
-            type.typeArguments
+            typeArguments ?? type.typeArguments
           )
-        : delegateParsing(type, referenced, map, type.typeArguments)
+        : delegateParsing(type, referenced, map, typeArguments ?? type.typeArguments)
 
     if (maybeType) {
       return maybeType
     } else if (isNewTypedoc(referenced) && referenced.kind === KIND_INTERFACE) {
-      return parseInterface(referenced, map)
+      return parseInterface(referenced, map, typeArguments ?? type.typeArguments)
     } else if (isNewTypedoc(referenced) && referenced.kind === KIND_CLASS) {
       // Class is too complicated to display here, just return its name
       return {
@@ -919,9 +919,13 @@ function parseTypeOperatorType(
   }
 }
 
-function parseInterface(type: any, map: Map<number, any>): CustomObjectType {
+function parseInterface(
+  type: any,
+  map: Map<number, any>,
+  typeArguments?: any
+): CustomObjectType {
   const properties = (type.children ?? [])
-    .map((child) => parseTypeInternals(child, map))
+    .map((child) => parseTypeInternals(child, map, typeArguments))
     .filter(Boolean)
 
   return {
