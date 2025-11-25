@@ -1155,14 +1155,6 @@ export const database: NavMenuConstant = {
               url: '/guides/database/replication/replication-setup' as `/${string}`,
             },
             {
-              name: 'Destinations',
-              url: '/guides/database/replication/replication-destinations' as `/${string}`,
-              items: [
-                { name: 'BigQuery', url: '/guides/database/replication/replication-bigquery' },
-                { name: 'Iceberg', url: '/guides/database/replication/replication-iceberg' },
-              ],
-            },
-            {
               name: 'Monitoring',
               url: '/guides/database/replication/replication-monitoring' as `/${string}`,
             },
@@ -1170,7 +1162,7 @@ export const database: NavMenuConstant = {
           ],
         },
         {
-          name: 'Manual Replication',
+          name: 'Manual replication',
           url: '/guides/database/replication/manual-replication-setup' as `/${string}`,
           items: [
             {

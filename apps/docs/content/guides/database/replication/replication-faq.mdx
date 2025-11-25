@@ -1,27 +1,29 @@
 ---
 id: 'replication-faq'
 title: 'Replication FAQ'
-description: 'Frequently asked questions about replication.'
+description: 'Frequently asked questions about replication to managed destinations.'
 subtitle: 'Common questions and answers about replication.'
 sidebar_label: 'FAQ'
 ---
 
 <Admonition type="caution" label="Private Alpha">
 
-Replication is currently in private alpha. Access is limited and features may change.
+Managed destinations are currently in private alpha. Access is limited and features may change.
 
 </Admonition>
 
 ## What destinations are supported?
 
-Replication currently supports Iceberg (Analytics Buckets). See the [Destinations guide](/docs/guides/database/replication/replication-destinations) for details.
+Replication to managed destinations currently supports Analytics Buckets (Iceberg format) and BigQuery. See the destination tabs in the [Setup guide](/docs/guides/database/replication/replication-setup#step-3-add-a-destination) for configuration details.
+
+Availability varies based on our planned roll-out strategy. The destinations you can access depend on your project and access level.
 
 ## Why is a table not being replicated?
 
 Common reasons:
 
-- **Missing primary key**: Tables must have a primary key to be replicated
-- **Not in publication**: Ensure the table is included in your publication
+- **Missing primary key**: Tables must have a primary key to be replicated (Postgres logical replication requirement)
+- **Not in publication**: Ensure the table is included in your Postgres publication
 - **Unsupported data types**: Tables with custom data types are not supported
 - **Partitioned tables**: Not currently supported
 
@@ -29,7 +31,7 @@ Check your publication settings and verify your table meets the requirements.
 
 ## Why aren't publication changes reflected after adding or removing tables?
 
-After modifying your publication, you must restart the pipeline for changes to take effect. See [Adding or removing tables](/docs/guides/database/replication/replication-setup#adding-or-removing-tables) for instructions.
+After modifying your Postgres publication, you must restart the replication pipeline for changes to take effect. See [Adding or removing tables](/docs/guides/database/replication/replication-setup#adding-or-removing-tables) for instructions.
 
 ## Why is a pipeline in failed state?
 
@@ -48,7 +50,7 @@ Table errors occur during the copy phase. To recover, click **View status**, fin
 
 ## How to verify replication is working
 
-Check the [Database](/dashboard/project/_/database/replication) → **Replication** page:
+Check the [Database](/dashboard/project/_/database/etl) → **ETL Replication** page:
 
 1. Verify your pipeline shows **Running** status
 2. Click **View status** to check table states
@@ -61,11 +63,11 @@ See the [Replication Monitoring guide](/docs/guides/database/replication/replica
 
 Key limitations to be aware of:
 
-- **Primary keys**: Required on all tables
+- **Primary keys**: Required on all tables (Postgres logical replication requirement)
 - **Custom data types**: Not supported
-- **Schema changes**: Not automatically handled
+- **Schema changes**: Not automatically handled (DDL changes require manual intervention)
 
-Destination-specific limitations may also apply. See the [Iceberg](/docs/guides/database/replication/replication-iceberg#limitations) destination page for details.
+Destination-specific limitations (such as Analytics Buckets' append-only log format or BigQuery's row size limits) are detailed in the [Setup guide](/docs/guides/database/replication/replication-setup#step-3-add-a-destination).
 
 ## How to stop or pause replication
 
@@ -77,11 +79,11 @@ Note: Stopping replication will cause changes to queue up in the WAL.
 
 Yes, data duplicates can occur in certain scenarios when stopping a pipeline.
 
-When you stop a pipeline (for restarts or updates), replication tries to finish processing any transactions that are currently being sent to your destination. It waits up to a few minutes to allow these in-progress transactions to complete cleanly before stopping.
+When you stop a pipeline (for restarts or updates), the replication process tries to finish processing any transactions that are currently being sent to your destination. It waits up to a few minutes to allow these in-progress transactions to complete cleanly before stopping.
 
 However, if a transaction in your database takes longer than this waiting period to complete, the pipeline will stop before that entire transaction has been fully processed. When the pipeline starts again, it must restart the incomplete transaction from the beginning to maintain transaction boundaries, which results in some data being sent twice to your destination.
 
-**Understanding transaction boundaries**: A transaction is a group of database changes that happen together (for example, all changes within a `BEGIN...COMMIT` block). Replication must process entire transactions - it cannot process part of a transaction, stop, and then continue from the middle. This means if a transaction is interrupted, the whole transaction must be replayed when the pipeline resumes.
+**Understanding transaction boundaries**: A transaction is a group of database changes that happen together (for example, all changes within a `BEGIN...COMMIT` block). Postgres logical replication must process entire transactions - it cannot process part of a transaction, stop, and then continue from the middle. This means if a transaction is interrupted, the whole transaction must be replayed when the pipeline resumes.
 
 **Example scenario**: Suppose you have a batch operation that updates 10,000 rows within a single transaction. If this operation takes 10 minutes to complete and you stop the pipeline after 5 minutes (when 5,000 rows have been processed), the pipeline cannot resume from row 5,001. Instead, when it restarts, it must reprocess all 10,000 rows from the beginning, resulting in the first 5,000 rows being sent to your destination twice.
 

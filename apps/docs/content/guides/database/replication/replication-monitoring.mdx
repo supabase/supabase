@@ -8,23 +8,23 @@ sidebar_label: 'Monitoring'
 
 <Admonition type="caution" label="Private Alpha">
 
-Replication is currently in private alpha. Access is limited and features may change.
+Managed destinations are currently in private alpha. Access is limited and features may change.
 
 </Admonition>
 
-After setting up replication, you can monitor the status and health of your replication pipelines directly from the Supabase Dashboard. The pipeline is the active process that continuously replicates changes from your database to your destination.
+After setting up replication to managed destinations, you can monitor the status and health of your replication pipelines directly from the Supabase Dashboard. The pipeline is the active Postgres replication process that continuously streams changes from your database to your destination.
 
 ### Viewing pipeline status
 
 To monitor your replication pipelines:
 
-1. Navigate to the [Database](/dashboard/project/_/database/replication) section in your Supabase Dashboard
-2. Select the **Replication** tab
+1. Navigate to the [Database](/dashboard/project/_/database/etl) section in your Supabase Dashboard
+2. Select the **ETL Replication** tab
 3. You'll see a list of all your destinations with their pipeline status
 
 <Image
   alt="Destinations List"
-  src="/docs/img/database/replication/replication-destinations-list.png"
+  src="/docs/img/database/replication/etl-destinations-list.png"
   zoomable
 />
 
@@ -46,7 +46,7 @@ For detailed information about a specific pipeline, click **View status** on the
 
 <Image
   alt="Pipeline Status View"
-  src="/docs/img/database/replication/replication-view-status.png"
+  src="/docs/img/database/replication/etl-view-status.png"
   zoomable
 />
 
@@ -76,7 +76,7 @@ Table errors occur during the copy phase and affect individual tables. These err
 
 <Image
   alt="Table Error Details"
-  src="/docs/img/database/replication/replication-pipeline-table-error.png"
+  src="/docs/img/database/replication/etl-pipeline-table-error.png"
   zoomable
 />
 
@@ -88,7 +88,7 @@ Table errors occur during the copy phase and affect individual tables. These err
 
 **Recovering from table errors:**
 
-When a table encounters an error during the copy phase, you can reset the table state (for some errors). This will restart the table copy from the beginning.
+When a table encounters an error during the copy phase, you can reset the table state. This will restart the table copy from the beginning.
 
 #### Pipeline errors
 
@@ -96,7 +96,7 @@ Pipeline errors occur during the streaming phase (Live state) and affect the ent
 
 <Image
   alt="Pipeline Error Details"
-  src="/docs/img/database/replication/replication-pipeline-error.png"
+  src="/docs/img/database/replication/etl-pipeline-error.png"
   zoomable
 />
 
@@ -122,7 +122,7 @@ To see detailed logs for all your replication pipelines:
 2. Select **Replication** from the log source filter
 3. You'll see all logs from your replication pipelines
 
-<Image alt="Replication Logs" src="/docs/img/database/replication/replication-logs.png" zoomable />
+<Image alt="Replication Logs" src="/docs/img/database/replication/etl-logs.png" zoomable />
 
 <Admonition type="note">
 
@@ -134,7 +134,7 @@ Logs contain diagnostic information that may be too technical for most users. If
 
 #### Checking if replication is healthy
 
-1. Navigate to [Database](/dashboard/project/_/database/replication) → **Replication**
+1. Navigate to [Database](/dashboard/project/_/database/etl) → **ETL Replication**
 2. Verify your destination shows **Running** status
 3. Click **View status** to check replication lag and table states
 4. Ensure all tables show **Live** state
@@ -164,8 +164,8 @@ If you notice issues with your replication:
 
 1. **Check pipeline state**: Ensure the pipeline is in **Running** state
 2. **Review table states**: Identify tables in **Error** state
-3. **Check logs**: Navigate to Logs → replication for detailed error information
-4. **Verify publication**: Ensure your publication is properly configured
+3. **Check logs**: Navigate to Logs → Replication for detailed error information
+4. **Verify publication**: Ensure your Postgres publication is properly configured
 5. **Monitor replication lag**: High lag may indicate performance issues
 
 For more troubleshooting tips, see the [Replication FAQ](/docs/guides/database/replication/replication-faq).
