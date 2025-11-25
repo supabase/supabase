@@ -398,6 +398,7 @@ const VectorBucketTableExamplesDialog = ({ index }: VectorBucketTableExamplesDia
 
   return (
     <Sheet>
+      {/* Move into overflow menu after vectors added */}
       <SheetTrigger asChild>
         <Button type="default" icon={<ListPlus size={12} className="text-foreground-lighter" />}>
           Insert vectors
@@ -410,9 +411,6 @@ const VectorBucketTableExamplesDialog = ({ index }: VectorBucketTableExamplesDia
               Insert vectors into{' '}
               <code className="text-code-inline !text-sm">{index.indexName}</code>
             </SheetTitle>
-            {/* <SheetDescription>
-              Insert vectors into <code className="text-code-inline">{index.vectorBucketName}</code>
-            </SheetDescription> */}
           </SheetHeader>
 
           <div className="overflow-auto flex-grow">
