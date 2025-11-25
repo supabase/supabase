@@ -23,9 +23,7 @@ About to push some code? At a minimum, check your work against this list:
 
 All interactive page elements should be reachable by keyboard. Given the below inconsistency between devices and browsers, add `tabIndex={0}` to all buttons, links, and non-text inputs, ideally at the component level. Consider tying the state of `tabIndex` to the `disabled` state of a component, if applicable.
 
-Chromium-based browsers and Firefox handle this automatically via the Tab key. Safari on macOS, by default, requires the Option key to also be held down.
-
-Enabling _Keyboard navigation_ on macOS Settings [removes this requirement](https://mayank.co/blog/safari-focus/#keyboard-navigation) but makes links non-tabbable as a result. To make things more difficult, Safari on iOS does not focus on interactive elements whatsoever.
+Chromium-based browsers and Firefox handle this automatically via the Tab key. Safari, by default, requires the Option key to also be held down. Enabling _Keyboard navigation_ on macOS Settings [removes this requirement](https://mayank.co/blog/safari-focus/#keyboard-navigation) but makes links non-tabbable as a result.
 
 Interactive page elements should also provide visual feedback upon selection via a `focus-visible` state. We use consistent focus styles such as `inset-focus` so users recognize this state instantly.
 
