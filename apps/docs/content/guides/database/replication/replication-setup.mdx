@@ -224,12 +224,13 @@ Replicated tables use a changelog structure:
 ##### Additional resources
 
 - [Analytics Buckets documentation](/docs/guides/storage/analytics/introduction) - Learn more about Analytics Buckets and S3-compatible storage
+- [Realtime Data Sync to Analytics Buckets](/docs/guides/storage/analytics/replication) - Step-by-step guide for replicating to Analytics Buckets
 - [Apache Iceberg](https://iceberg.apache.org/) - Official Iceberg documentation
 
 </TabPanel>
 <TabPanel id="bigquery" label="BigQuery">
 
-BigQuery is Google's fully managed data warehouse. Replication to BigQuery allows you to sync your database tables for analytics and reporting.
+[BigQuery](https://cloud.google.com/bigquery) is Google's fully managed data warehouse. Replication to BigQuery allows you to sync your database tables for analytics and reporting.
 
 ##### Step 1: Prepare GCP resources
 
@@ -409,6 +410,12 @@ Changes are sent in batches to optimize performance and reduce costs. The batch 
 <Admonition type="note">
 
 Replication to managed destinations currently performs data extraction and loading only, without transformation. Your data is replicated as-is to the destination.
+
+</Admonition>
+
+<Admonition type="note">
+
+Deleted tables are automatically recreated by the pipeline. To permanently delete a table, pause the pipeline first or remove it from the publication before deleting. See the [FAQ](/docs/guides/database/replication/replication-faq#what-happens-if-i-delete-a-table-at-the-destination) for details.
 
 </Admonition>
 
