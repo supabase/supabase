@@ -577,7 +577,7 @@ function parseType(type: any, map: Map<number, any>, typeArguments?: any, debug 
         return parseType(type.type, map, typeArguments)
       }
     case 'Interface':
-      return parseInterface(type, map)
+      return parseInterface(type, map, typeArguments)
     default:
       break
   }
@@ -599,7 +599,11 @@ function delegateParsing(
   const dereferencedType = parseType(referenced, map, typeArguments)
 
   if (dereferencedType) {
-    dereferencedType.name = nameOrAnonymous([original, dereferencedType])
+    // Don't override the name for intrinsic or literal types - they are concrete types
+    // with meaningful names (e.g., "undefined", "null", "string")
+    if (dereferencedType.type !== 'intrinsic' && dereferencedType.type !== 'literal') {
+      dereferencedType.name = nameOrAnonymous([original, dereferencedType])
+    }
   }
 
   if (original.comment) {
@@ -919,11 +923,7 @@ function parseTypeOperatorType(
   }
 }
 
-function parseInterface(
-  type: any,
-  map: Map<number, any>,
-  typeArguments?: any
-): CustomObjectType {
+function parseInterface(type: any, map: Map<number, any>, typeArguments?: any): CustomObjectType {
   const properties = (type.children ?? [])
     .map((child) => parseTypeInternals(child, map, typeArguments))
     .filter(Boolean)

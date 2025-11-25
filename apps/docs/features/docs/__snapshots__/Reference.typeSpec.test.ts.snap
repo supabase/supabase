@@ -75394,7 +75394,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 "name": "data",
                                 "type": {
                                   "type": "nameOnly",
-                                  "name": "@supabase/postgrest-js.PostgrestResponseSuccess.T"
+                                  "name": "T"
                                 }
                               },
                               {
@@ -76911,7 +76911,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 "name": "data",
                                 "type": {
                                   "type": "nameOnly",
-                                  "name": "@supabase/postgrest-js.PostgrestResponseSuccess.T"
+                                  "name": "T"
                                 }
                               },
                               {
@@ -81781,8 +81781,8 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "data",
                       "type": {
-                        "type": "nameOnly",
-                        "name": "@supabase/storage-js.SuccessResponse.T"
+                        "type": "intrinsic",
+                        "name": "T"
                       },
                       "comment": {
                         "shortText": "Response data of type T"
@@ -81876,8 +81876,8 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "data",
                       "type": {
-                        "type": "nameOnly",
-                        "name": "@supabase/storage-js.SuccessResponse.T"
+                        "type": "intrinsic",
+                        "name": "T"
                       },
                       "comment": {
                         "shortText": "Response data of type T"
@@ -82008,8 +82008,75 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "data",
                       "type": {
-                        "type": "nameOnly",
-                        "name": "@supabase/storage-js.SuccessResponse.T"
+                        "name": "T",
+                        "type": "object",
+                        "properties": [
+                          {
+                            "name": "vectorBucket",
+                            "type": {
+                              "type": "object",
+                              "name": "VectorBucket",
+                              "properties": [
+                                {
+                                  "name": "creationTime",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "number"
+                                  },
+                                  "isOptional": true,
+                                  "comment": {
+                                    "shortText": "Unix timestamp of when the bucket was created"
+                                  }
+                                },
+                                {
+                                  "name": "encryptionConfiguration",
+                                  "type": {
+                                    "type": "object",
+                                    "name": "EncryptionConfiguration",
+                                    "properties": [
+                                      {
+                                        "name": "kmsKeyArn",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "ARN of the KMS key used for encryption"
+                                        }
+                                      },
+                                      {
+                                        "name": "sseType",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "Server-side encryption type (e.g., 'KMS')"
+                                        }
+                                      }
+                                    ]
+                                  },
+                                  "isOptional": true,
+                                  "comment": {
+                                    "shortText": "Optional encryption settings"
+                                  }
+                                },
+                                {
+                                  "name": "vectorBucketName",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "comment": {
+                                    "shortText": "Unique name of the vector bucket"
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
                       },
                       "comment": {
                         "shortText": "Response data of type T"
@@ -82138,8 +82205,42 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "data",
                       "type": {
-                        "type": "nameOnly",
-                        "name": "@supabase/storage-js.SuccessResponse.T"
+                        "type": "object",
+                        "name": "T",
+                        "properties": [
+                          {
+                            "name": "nextToken",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "Token for fetching next page (if more results exist)"
+                            }
+                          },
+                          {
+                            "name": "vectorBuckets",
+                            "type": {
+                              "type": "array",
+                              "elemType": {
+                                "type": "object",
+                                "properties": [
+                                  {
+                                    "name": "vectorBucketName",
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "comment": {
+                              "shortText": "Array of bucket names"
+                            }
+                          }
+                        ]
                       },
                       "comment": {
                         "shortText": "Response data of type T"
@@ -82396,8 +82497,8 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "data",
                       "type": {
-                        "type": "nameOnly",
-                        "name": "@supabase/storage-js.SuccessResponse.T"
+                        "type": "intrinsic",
+                        "name": "T"
                       },
                       "comment": {
                         "shortText": "Response data of type T"
@@ -82491,8 +82592,8 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "data",
                       "type": {
-                        "type": "nameOnly",
-                        "name": "@supabase/storage-js.SuccessResponse.T"
+                        "type": "intrinsic",
+                        "name": "T"
                       },
                       "comment": {
                         "shortText": "Response data of type T"
@@ -82586,8 +82687,121 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "data",
                       "type": {
-                        "type": "nameOnly",
-                        "name": "@supabase/storage-js.SuccessResponse.T"
+                        "name": "T",
+                        "type": "object",
+                        "properties": [
+                          {
+                            "name": "index",
+                            "type": {
+                              "type": "object",
+                              "name": "VectorIndex",
+                              "properties": [
+                                {
+                                  "name": "creationTime",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "number"
+                                  },
+                                  "isOptional": true,
+                                  "comment": {
+                                    "shortText": "Unix timestamp of when the index was created"
+                                  }
+                                },
+                                {
+                                  "name": "dataType",
+                                  "type": {
+                                    "type": "literal",
+                                    "value": "float32"
+                                  },
+                                  "comment": {
+                                    "shortText": "Data type of vector components (currently only 'float32')"
+                                  }
+                                },
+                                {
+                                  "name": "dimension",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "number"
+                                  },
+                                  "comment": {
+                                    "shortText": "Dimensionality of vectors (e.g., 384, 768, 1536)"
+                                  }
+                                },
+                                {
+                                  "name": "distanceMetric",
+                                  "type": {
+                                    "type": "union",
+                                    "name": "DistanceMetric",
+                                    "subTypes": [
+                                      {
+                                        "type": "literal",
+                                        "value": "cosine"
+                                      },
+                                      {
+                                        "type": "literal",
+                                        "value": "euclidean"
+                                      },
+                                      {
+                                        "type": "literal",
+                                        "value": "dotproduct"
+                                      }
+                                    ]
+                                  },
+                                  "comment": {
+                                    "shortText": "Similarity metric used for queries"
+                                  }
+                                },
+                                {
+                                  "name": "indexName",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "comment": {
+                                    "shortText": "Unique name of the index within the bucket"
+                                  }
+                                },
+                                {
+                                  "name": "metadataConfiguration",
+                                  "type": {
+                                    "type": "object",
+                                    "name": "MetadataConfiguration",
+                                    "properties": [
+                                      {
+                                        "name": "nonFilterableMetadataKeys",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "Array of metadata keys that cannot be used in filters"
+                                        }
+                                      }
+                                    ]
+                                  },
+                                  "isOptional": true,
+                                  "comment": {
+                                    "shortText": "Configuration for metadata filtering"
+                                  }
+                                },
+                                {
+                                  "name": "vectorBucketName",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "comment": {
+                                    "shortText": "Name of the parent vector bucket"
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
                       },
                       "comment": {
                         "shortText": "Response data of type T"
@@ -82718,8 +82932,42 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "data",
                       "type": {
-                        "type": "nameOnly",
-                        "name": "@supabase/storage-js.SuccessResponse.T"
+                        "type": "object",
+                        "name": "T",
+                        "properties": [
+                          {
+                            "name": "indexes",
+                            "type": {
+                              "type": "array",
+                              "elemType": {
+                                "type": "object",
+                                "properties": [
+                                  {
+                                    "name": "indexName",
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "comment": {
+                              "shortText": "Array of index names"
+                            }
+                          },
+                          {
+                            "name": "nextToken",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "Token for fetching next page (if more results exist)"
+                            }
+                          }
+                        ]
                       },
                       "comment": {
                         "shortText": "Response data of type T"
@@ -82940,8 +83188,8 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "data",
                       "type": {
-                        "type": "nameOnly",
-                        "name": "@supabase/storage-js.SuccessResponse.T"
+                        "type": "intrinsic",
+                        "name": "T"
                       },
                       "comment": {
                         "shortText": "Response data of type T"
@@ -83035,8 +83283,91 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "data",
                       "type": {
-                        "type": "nameOnly",
-                        "name": "@supabase/storage-js.SuccessResponse.T"
+                        "type": "object",
+                        "name": "T",
+                        "properties": [
+                          {
+                            "name": "vectors",
+                            "type": {
+                              "type": "array",
+                              "elemType": {
+                                "type": "object",
+                                "name": "VectorMatch",
+                                "properties": [
+                                  {
+                                    "name": "data",
+                                    "type": {
+                                      "type": "object",
+                                      "name": "VectorData",
+                                      "properties": [
+                                        {
+                                          "name": "float32",
+                                          "type": {
+                                            "type": "array",
+                                            "elemType": {
+                                              "type": "intrinsic",
+                                              "name": "number"
+                                            }
+                                          },
+                                          "comment": {
+                                            "shortText": "Array of 32-bit floating point numbers"
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    "isOptional": true,
+                                    "comment": {
+                                      "shortText": "Vector embedding data (if requested)"
+                                    }
+                                  },
+                                  {
+                                    "name": "distance",
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "number"
+                                    },
+                                    "isOptional": true,
+                                    "comment": {
+                                      "shortText": "Similarity distance from query vector (if requested)"
+                                    }
+                                  },
+                                  {
+                                    "name": "key",
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    },
+                                    "comment": {
+                                      "shortText": "Unique identifier for the vector"
+                                    }
+                                  },
+                                  {
+                                    "name": "metadata",
+                                    "type": {
+                                      "type": "record",
+                                      "name": "VectorMetadata",
+                                      "keyType": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      },
+                                      "valueType": {
+                                        "type": "intrinsic",
+                                        "name": "any"
+                                      }
+                                    },
+                                    "isOptional": true,
+                                    "comment": {
+                                      "shortText": "Arbitrary metadata (if requested)"
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "comment": {
+                              "shortText": "Array of retrieved vector objects"
+                            }
+                          }
+                        ]
                       },
                       "comment": {
                         "shortText": "Response data of type T"
@@ -83130,8 +83461,102 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "data",
                       "type": {
-                        "type": "nameOnly",
-                        "name": "@supabase/storage-js.SuccessResponse.T"
+                        "type": "object",
+                        "name": "T",
+                        "properties": [
+                          {
+                            "name": "nextToken",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "Token for fetching next page (if more results exist)"
+                            }
+                          },
+                          {
+                            "name": "vectors",
+                            "type": {
+                              "type": "array",
+                              "elemType": {
+                                "type": "object",
+                                "name": "VectorMatch",
+                                "properties": [
+                                  {
+                                    "name": "data",
+                                    "type": {
+                                      "type": "object",
+                                      "name": "VectorData",
+                                      "properties": [
+                                        {
+                                          "name": "float32",
+                                          "type": {
+                                            "type": "array",
+                                            "elemType": {
+                                              "type": "intrinsic",
+                                              "name": "number"
+                                            }
+                                          },
+                                          "comment": {
+                                            "shortText": "Array of 32-bit floating point numbers"
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    "isOptional": true,
+                                    "comment": {
+                                      "shortText": "Vector embedding data (if requested)"
+                                    }
+                                  },
+                                  {
+                                    "name": "distance",
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "number"
+                                    },
+                                    "isOptional": true,
+                                    "comment": {
+                                      "shortText": "Similarity distance from query vector (if requested)"
+                                    }
+                                  },
+                                  {
+                                    "name": "key",
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    },
+                                    "comment": {
+                                      "shortText": "Unique identifier for the vector"
+                                    }
+                                  },
+                                  {
+                                    "name": "metadata",
+                                    "type": {
+                                      "type": "record",
+                                      "name": "VectorMetadata",
+                                      "keyType": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      },
+                                      "valueType": {
+                                        "type": "intrinsic",
+                                        "name": "any"
+                                      }
+                                    },
+                                    "isOptional": true,
+                                    "comment": {
+                                      "shortText": "Arbitrary metadata (if requested)"
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "comment": {
+                              "shortText": "Array of vector objects"
+                            }
+                          }
+                        ]
                       },
                       "comment": {
                         "shortText": "Response data of type T"
@@ -83225,8 +83650,8 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "data",
                       "type": {
-                        "type": "nameOnly",
-                        "name": "@supabase/storage-js.SuccessResponse.T"
+                        "type": "intrinsic",
+                        "name": "T"
                       },
                       "comment": {
                         "shortText": "Response data of type T"
@@ -83320,8 +83745,91 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "data",
                       "type": {
-                        "type": "nameOnly",
-                        "name": "@supabase/storage-js.SuccessResponse.T"
+                        "type": "object",
+                        "name": "T",
+                        "properties": [
+                          {
+                            "name": "matches",
+                            "type": {
+                              "type": "array",
+                              "elemType": {
+                                "type": "object",
+                                "name": "VectorMatch",
+                                "properties": [
+                                  {
+                                    "name": "data",
+                                    "type": {
+                                      "type": "object",
+                                      "name": "VectorData",
+                                      "properties": [
+                                        {
+                                          "name": "float32",
+                                          "type": {
+                                            "type": "array",
+                                            "elemType": {
+                                              "type": "intrinsic",
+                                              "name": "number"
+                                            }
+                                          },
+                                          "comment": {
+                                            "shortText": "Array of 32-bit floating point numbers"
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    "isOptional": true,
+                                    "comment": {
+                                      "shortText": "Vector embedding data (if requested)"
+                                    }
+                                  },
+                                  {
+                                    "name": "distance",
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "number"
+                                    },
+                                    "isOptional": true,
+                                    "comment": {
+                                      "shortText": "Similarity distance from query vector (if requested)"
+                                    }
+                                  },
+                                  {
+                                    "name": "key",
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    },
+                                    "comment": {
+                                      "shortText": "Unique identifier for the vector"
+                                    }
+                                  },
+                                  {
+                                    "name": "metadata",
+                                    "type": {
+                                      "type": "record",
+                                      "name": "VectorMetadata",
+                                      "keyType": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      },
+                                      "valueType": {
+                                        "type": "intrinsic",
+                                        "name": "any"
+                                      }
+                                    },
+                                    "isOptional": true,
+                                    "comment": {
+                                      "shortText": "Arbitrary metadata (if requested)"
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "comment": {
+                              "shortText": "Array of similar vectors ordered by distance"
+                            }
+                          }
+                        ]
                       },
                       "comment": {
                         "shortText": "Response data of type T"
