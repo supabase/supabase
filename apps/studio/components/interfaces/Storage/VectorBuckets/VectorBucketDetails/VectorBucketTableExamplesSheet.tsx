@@ -110,7 +110,7 @@ function VectorBucketIndexExamples({
     }
   }
 
-  const dimensionLabel = `${dimension} dimension${dimension > 1 ? 's' : ''}`
+  const dimensionLabel = `Data should match ${dimension} dimension${dimension > 1 ? 's' : ''}`
 
   const sqlCode = `-- Insert multiple vectors
 insert into
@@ -118,14 +118,40 @@ insert into
 values
   (
     'doc-1',
-    '[${dimensionExample(0.2)}]'::embd,
+    '[${dimensionExample(0.2)}]'::embd, -- ${dimensionLabel}
     '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb
   ),
   (
     'doc-2',
-    '[${dimensionExample(0.4)}]'::embd,
+    '[${dimensionExample(0.4)}]'::embd, -- ${dimensionLabel}
     '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb
   );`
+
+  const jsCode = `import { createClient } from '@supabase/supabase-js'
+
+const client = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+)
+
+const index = client.storage.vectors
+  .from('${bucketName}')
+  .index('${indexName}')
+
+const result = await index.putVectors({
+  vectors: [
+    {
+      key: 'doc-1',
+      data: { float32: [${dimensionExample(0.2)}] }, // ${dimensionLabel}
+      metadata: { ${metadataKeys.map((key) => `${key}: "${key} value"`).join(', ')} },
+    },
+    {
+      key: 'doc-2',
+      data: { float32: [${dimensionExample(0.4)}] }, // ${dimensionLabel}
+      metadata: { ${metadataKeys.map((key) => `${key}: "${key} value"`).join(', ')} },
+    },
+  ],
+})`
 
   return (
     <SheetSection className="flex flex-col gap-6">
@@ -195,31 +221,7 @@ values
             wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-3')}
             className="[&_code]:text-foreground"
             language="js"
-            value={`import { createClient } from '@supabase/supabase-js'
-
-const client = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-)
-
-const index = client.storage.vectors
-  .from('${bucketName}')
-  .index('${indexName}')
-
-const result = await index.putVectors({
-  vectors: [
-    {
-      key: 'doc-1',
-      data: { float32: [${dimensionExample(0.2)}] }, // ${dimensionLabel}
-      metadata: { ${metadataKeys.map((key) => `${key}: "${key} value"`).join(', ')} },
-    },
-    {
-      key: 'doc-2',
-      data: { float32: [${dimensionExample(0.4)}] }, // ${dimensionLabel}
-      metadata: { ${metadataKeys.map((key) => `${key}: "${key} value"`).join(', ')} },
-    },
-  ],
-})`}
+            value={jsCode}
           />
         ) : (
           <>
