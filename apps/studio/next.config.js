@@ -596,10 +596,6 @@ const nextConfig = {
     // For production, we run typechecks separate from the build command (pnpm typecheck && pnpm build)
     ignoreBuildErrors: true,
   },
-  eslint: {
-    // We are already running linting via GH action, this will skip linting during production build on Vercel
-    ignoreDuringBuilds: true,
-  },
 }
 
 // module.exports = withBundleAnalyzer(nextConfig)
