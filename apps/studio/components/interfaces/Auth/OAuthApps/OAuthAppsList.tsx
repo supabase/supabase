@@ -236,8 +236,8 @@ export const OAuthAppsList = () => {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Client ID</TableHead>
-                  <TableHead>Registration Type</TableHead>
                   <TableHead>Client Type</TableHead>
+                  <TableHead>Registration Type</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="w-8 px-0">
                     <div className="!bg-200 px-4 w-full h-full flex items-center border-l @[904px]:border-l-0" />
@@ -269,10 +269,10 @@ export const OAuthAppsList = () => {
                         <Badge className="font-mono">{app.client_id}</Badge>
                       </TableCell>
                       <TableCell className="text-xs text-foreground-light max-w-28 capitalize">
-                        {app.registration_type}
+                        {app.client_type}
                       </TableCell>
                       <TableCell className="text-xs text-foreground-light max-w-28 capitalize">
-                        {app.client_type}
+                        {app.registration_type}
                       </TableCell>
                       <TableCell className="text-xs text-foreground-light min-w-28 max-w-40 w-1/6">
                         <TimestampInfo utcTimestamp={app.created_at} labelFormat="D MMM, YYYY" />
