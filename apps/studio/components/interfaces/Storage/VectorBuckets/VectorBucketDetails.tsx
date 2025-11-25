@@ -276,24 +276,42 @@ export const VectorBucketDetails = () => {
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent side="bottom" align="end" className="w-40">
                                     {wrapperInstance ? (
-                                      <DropdownMenuItem
-                                        className="flex items-center space-x-2"
-                                        asChild
-                                      >
-                                        {/* TODO: Proper URL for table editor */}
-                                        <Link
-                                          href={`/project/${projectRef}/editor/${encodeURIComponent(
-                                            name
-                                          )}?schema=${getVectorBucketFDWSchemaName(bucketId!)}`}
-                                          onClick={(e) => e.stopPropagation()}
+                                      <>
+                                        <DropdownMenuItem
+                                          className="flex items-center space-x-2"
+                                          asChild
                                         >
-                                          <TableEditor
-                                            size={12}
-                                            className="text-foreground-lighter"
-                                          />
-                                          <p>View in Table Editor</p>
-                                        </Link>
-                                      </DropdownMenuItem>
+                                          {/* TODO: Proper URL for sql editor */}
+                                          <Link
+                                            href={`/project/${projectRef}/sql/new?content=${encodeURIComponent(`select * from "${getVectorBucketFDWSchemaName(bucketId!)}"."${name}";`)}`}
+                                            onClick={(e) => e.stopPropagation()}
+                                          >
+                                            <SqlEditor
+                                              size={12}
+                                              className="text-foreground-lighter"
+                                            />
+                                            <p>Query in SQL Editor</p>
+                                          </Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                          className="flex items-center space-x-2"
+                                          asChild
+                                        >
+                                          {/* TODO: Proper URL for table editor */}
+                                          <Link
+                                            href={`/project/${projectRef}/editor/${encodeURIComponent(
+                                              name
+                                            )}?schema=${getVectorBucketFDWSchemaName(bucketId!)}`}
+                                            onClick={(e) => e.stopPropagation()}
+                                          >
+                                            <TableEditor
+                                              size={12}
+                                              className="text-foreground-lighter"
+                                            />
+                                            <p>View in Table Editor</p>
+                                          </Link>
+                                        </DropdownMenuItem>
+                                      </>
                                     ) : null}
                                     <DropdownMenuItem
                                       className="flex items-center space-x-2"
