@@ -2,6 +2,9 @@ name: Test Image Summary
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - feat/image-summary
 
 jobs:
   test_summary:
