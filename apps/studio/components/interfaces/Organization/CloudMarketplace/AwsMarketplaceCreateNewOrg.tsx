@@ -28,7 +28,7 @@ const AwsMarketplaceCreateNewOrg = ({ onboardingInfo }: Props) => {
     query: { buyer_id: buyerId },
   } = router
 
-  const { mutate: createOrganization, isLoading: isCreatingOrganization } =
+  const { mutate: createOrganization, isPending: isCreatingOrganization } =
     useAwsManagedOrganizationCreateMutation({
       onSuccess: (org) => {
         //TODO(thomas): send tracking event?

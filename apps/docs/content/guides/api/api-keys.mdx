@@ -117,7 +117,7 @@ The secret key is an improvement over the old JWT-based `service_role` key, and 
 Below are some starting guidelines on how to securely work with secret keys:
 
 - Always work with secret keys on computers you fully own or control.
-- Use secure & encrypted send tools to share API keys with others (often provided by good password managers), but prefer the [API Keys](/dashboard/project/_/settings/api-keys/new) dashboard instead.
+- Use secure & encrypted send tools to share API keys with others (often provided by good password managers), but prefer the [API Keys](/dashboard/project/_/settings/api-keys) dashboard instead.
 - Prefer encrypting them when stored in files or environment variables.
 - Do not add in source control, especially for CI scripts and tools. Prefer using the tool's native secrets capability instead.
 - Prefer using a separate secret key for each separate backend component of your application, so that if one is found to be vulnerable or to have leaked the key you will only need to change it and not all.
@@ -129,7 +129,7 @@ Below are some starting guidelines on how to securely work with secret keys:
 
 Don't rush if this has happened, or you are suspecting it has. Make sure you have fully considered the situation and have remediated the root cause of the suspicion or vulnerability **first**. Consider using the [OWASP Risk Rating Methodology](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology) as an easy way to identify the severity of the incident and to plan your next steps.
 
-Rotating a secret key (`sb_secret_...`) is easy and painless. Use the [API Keys](/dashboard/project/_/settings/api-keys/new) dashboard to create a new secret API key, then replace it with the compromised key. Once all components are using the new key, delete the compromised one.
+Rotating a secret key (`sb_secret_...`) is easy and painless. Use the [API Keys](/dashboard/project/_/settings/api-keys) dashboard to create a new secret API key, then replace it with the compromised key. Once all components are using the new key, delete the compromised one.
 
 **Deleting a secret key is irreversible and once done it will be gone forever.**
 
@@ -154,7 +154,7 @@ As the publishable and secret keys are no longer JWT-based, there are some known
 
 If you know or suspect that the JWT secret itself is leaked, refer to the section on [rotating the JWT](#what-to-do-if-a-secret-key-or-servicerole-has-been-leaked-or-compromised).
 
-If the JWT secret is secure, prefer substituting the `service_role` JWT-based key with a new secret key which you can create in the [API Keys](/dashboard/project/_/settings/api-keys/new) dashboard. This will prevent downtime for your application.
+If the JWT secret is secure, prefer substituting the `service_role` JWT-based key with a new secret key which you can create in the [API Keys](/dashboard/project/_/settings/api-keys) dashboard. This will prevent downtime for your application.
 
 ### Can I still use my old `anon` and `service-role` API keys after enabling the publishable and secret keys?
 
@@ -162,7 +162,7 @@ Yes. This allows you to transition between the API keys with zero downtime by gr
 
 ### How do I deactivate the `anon` and `service_role` JWT-based API keys after moving to publishable and secret keys?
 
-You can do this in the [API Keys](/dashboard/project/_/settings/api-keys/new) dashboard. To prevent downtime in your application's components, use the last used indicators on the page to confirm that these are no longer used before deactivating.
+You can do this in the [API Keys](/dashboard/project/_/settings/api-keys) dashboard. To prevent downtime in your application's components, use the last used indicators on the page to confirm that these are no longer used before deactivating.
 
 You can re-activate them should you need to.
 

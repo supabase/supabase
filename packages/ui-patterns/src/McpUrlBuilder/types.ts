@@ -4,6 +4,8 @@ export interface McpFeatureGroup {
   description: string
 }
 
+export type McpOnCopyCallback = 'url' | 'config' | 'command'
+
 export interface McpClient {
   key: string
   label: string
@@ -13,8 +15,14 @@ export interface McpClient {
   configFile?: string
   generateDeepLink?: (config: McpClientConfig) => string | null
   transformConfig?: (config: McpClientBaseConfig) => McpClientConfig
-  primaryInstructions?: (config: McpClientConfig) => React.ReactNode
-  alternateInstructions?: (config: McpClientConfig) => React.ReactNode
+  primaryInstructions?: (
+    config: McpClientConfig,
+    onCopy: (type?: McpOnCopyCallback) => void
+  ) => React.ReactNode
+  alternateInstructions?: (
+    config: McpClientConfig,
+    onCopy: (type?: McpOnCopyCallback) => void
+  ) => React.ReactNode
 }
 
 export interface McpUrlBuilderConfig {

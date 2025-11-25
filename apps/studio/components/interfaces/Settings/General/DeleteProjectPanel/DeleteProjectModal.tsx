@@ -55,7 +55,7 @@ export const DeleteProjectModal = ({
     { value: 'None of the above' },
   ])
 
-  const { mutate: deleteProject, isLoading: isDeleting } = useProjectDeleteMutation({
+  const { mutate: deleteProject, isPending: isDeleting } = useProjectDeleteMutation({
     onSuccess: async () => {
       if (!isFree) {
         try {
@@ -77,7 +77,7 @@ export const DeleteProjectModal = ({
       else router.push('/organizations')
     },
   })
-  const { mutateAsync: sendExitSurvey, isLoading: isSending } = useSendDowngradeFeedbackMutation()
+  const { mutateAsync: sendExitSurvey, isPending: isSending } = useSendDowngradeFeedbackMutation()
   const isSubmitting = isDeleting || isSending
 
   async function handleDeleteProject() {

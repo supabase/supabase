@@ -9,7 +9,6 @@ import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
 import type { APIKeysData } from 'data/api-keys/api-keys-query'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { Card, EyeOffIcon } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -87,7 +86,7 @@ export const SecretAPIKeys = () => {
       handleErrorOnDelete(deletingAPIKeyIdRef, selectedId, `API Key not found`),
   })
 
-  const { mutate: deleteAPIKey, isLoading: isDeletingAPIKey } = useAPIKeyDeleteMutation({
+  const { mutate: deleteAPIKey, isPending: isDeletingAPIKey } = useAPIKeyDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted API key`)
       setAPIKeyToDelete(null)

@@ -94,7 +94,7 @@ const MergePage: NextPageWithLayout = () => {
     currentBranchCreatedAt: currentBranch?.created_at,
   })
 
-  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
+  const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to update branch: ${error.message}`)
     },
@@ -189,7 +189,7 @@ const MergePage: NextPageWithLayout = () => {
     })
   }, [router])
 
-  const { mutate: pushBranch, isLoading: isPushing } = useBranchPushMutation({
+  const { mutate: pushBranch, isPending: isPushing } = useBranchPushMutation({
     onSuccess: (data) => {
       toast.success('Branch update initiated!')
       if (data?.workflow_run_id) {
@@ -215,7 +215,7 @@ const MergePage: NextPageWithLayout = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { mutate: mergeBranch, isLoading: isMerging } = useBranchMergeMutation({
+  const { mutate: mergeBranch, isPending: isMerging } = useBranchMergeMutation({
     onSuccess: (data) => {
       setIsSubmitting(false)
       if (data.workflowRunId) {
@@ -256,7 +256,7 @@ const MergePage: NextPageWithLayout = () => {
     },
   })
 
-  const { mutate: deleteBranch, isLoading: isDeleting } = useBranchDeleteMutation({
+  const { mutate: deleteBranch, isPending: isDeleting } = useBranchDeleteMutation({
     onSuccess: () => {
       toast.success('Branch closed successfully')
       router.push(`/project/${parentProjectRef}/branches`)

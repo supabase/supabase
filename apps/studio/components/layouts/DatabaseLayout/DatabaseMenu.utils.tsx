@@ -73,16 +73,6 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/publications`,
           items: [],
         },
-        ...(showPgReplicate
-          ? [
-              {
-                name: 'ETL Replication',
-                key: 'etl',
-                url: `/project/${ref}/database/etl`,
-                items: [],
-              },
-            ]
-          : []),
       ],
     },
     {
@@ -114,6 +104,16 @@ export const generateDatabaseMenu = (
     {
       title: 'Platform',
       items: [
+        ...(showPgReplicate
+          ? [
+              {
+                name: 'Replication',
+                key: 'replication',
+                url: `/project/${ref}/database/replication`,
+                items: [],
+              },
+            ]
+          : []),
         ...(IS_PLATFORM
           ? [
               {

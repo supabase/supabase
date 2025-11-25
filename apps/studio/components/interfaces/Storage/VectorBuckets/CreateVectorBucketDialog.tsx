@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Plus } from 'lucide-react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -35,7 +36,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { inverseValidBucketNameRegex, validBucketNameRegex } from '../CreateBucketModal.utils'
+import { validVectorBucketName } from './CreateVectorBucketDialog.utils'
 import { useS3VectorsWrapperExtension } from './useS3VectorsWrapper'
 import { getVectorBucketFDWSchemaName } from './VectorBuckets.utils'
 
@@ -43,12 +44,36 @@ const FormSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, 'Please provide a name for your bucket')
-    .max(100, 'Bucket name should be below 100 characters')
+    .min(3, 'Bucket name should be at least 3 characters')
+    .max(63, 'Bucket name should be up to 63 characters')
     .superRefine((name, ctx) => {
-      if (!validBucketNameRegex.test(name)) {
-        const [match] = name.match(inverseValidBucketNameRegex) ?? []
-        ctx.addIssue({
+      if (!validVectorBucketName.test(name)) {
+        if (/[A-Z]/.test(name)) {
+          return ctx.addIssue({
+            path: [],
+            code: z.ZodIssueCode.custom,
+            message: 'Bucket name can only be lowercase characters',
+          })
+        }
+
+        if (!/^[a-z0-9]/.test(name)) {
+          return ctx.addIssue({
+            path: [],
+            code: z.ZodIssueCode.custom,
+            message: 'Bucket name must start with a lowercase letter or number.',
+          })
+        }
+
+        if (!/[a-z0-9]$/.test(name)) {
+          return ctx.addIssue({
+            path: [],
+            code: z.ZodIssueCode.custom,
+            message: 'Bucket name must end with a lowercase letter or number.',
+          })
+        }
+
+        const [match] = name.match(/[^a-z0-9-]/) ?? []
+        return ctx.addIssue({
           path: [],
           code: z.ZodIssueCode.custom,
           message: !!match
@@ -69,7 +94,10 @@ export const CreateVectorBucketDialog = () => {
   const { data: project } = useSelectedProjectQuery()
   const [isLoading, setIsLoading] = useState(false)
 
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const { data } = useVectorBucketsQuery({ projectRef: ref })
