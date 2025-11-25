@@ -171,7 +171,7 @@ export const TextConfirmModal = forwardRef<
                 name="confirmValue"
                 render={({ field }) => (
                   <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                    <FormLabel_Shadcn_ {...label} enableSelection>
+                    <FormLabel_Shadcn_ {...label}>
                       Type{' '}
                       <Button
                         type="default"
