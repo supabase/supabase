@@ -42,7 +42,10 @@ function LinkSupportTicketPageContent() {
       {isSuccess ? (
         <LinkSupportTicketSuccess />
       ) : (
-        <LinkSupportTicketForm conversationId={conversationId} onSuccess={() => setIsSuccess(true)} />
+        <LinkSupportTicketForm
+          conversationId={conversationId}
+          onSuccess={() => setIsSuccess(true)}
+        />
       )}
     </div>
   )
