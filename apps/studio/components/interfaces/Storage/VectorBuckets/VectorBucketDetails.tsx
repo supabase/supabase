@@ -299,9 +299,7 @@ export const VectorBucketDetails = () => {
                                         >
                                           {/* TODO: Proper URL for table editor */}
                                           <Link
-                                            href={`/project/${projectRef}/editor/${encodeURIComponent(
-                                              name
-                                            )}?schema=${getVectorBucketFDWSchemaName(bucketId!)}`}
+                                            href={`/project/${projectRef}/editor/?schema=${getVectorBucketFDWSchemaName(bucketId!)}`}
                                             onClick={(e) => e.stopPropagation()}
                                           >
                                             <TableEditor
