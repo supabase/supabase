@@ -7,7 +7,7 @@ import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'component
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
-import { Bucket as BucketIcon } from 'icons'
+import { VectorBucket as VectorBucketIcon } from 'icons'
 import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
@@ -132,7 +132,7 @@ export const VectorsBuckets = () => {
                             tabIndex={0}
                           >
                             <TableCell className="w-2 pr-1">
-                              <BucketIcon size={16} className="text-foreground-muted" />
+                              <VectorBucketIcon size={16} className="text-foreground-muted" />
                             </TableCell>
                             <TableCell>
                               <p className="whitespace-nowrap max-w-[512px] truncate">{name}</p>

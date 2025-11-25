@@ -69,11 +69,12 @@ const RadioGroupStackedItem = React.forwardRef<
               'group-focus:outline-none',
               'group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2',
               'flex items-center justify-center',
+              'relative',
               'transition'
             )}
           >
-            <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
-              <Circle className="h-2.5 w-2.5 fill-current text-current" />
+            <RadioGroupPrimitive.Indicator className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+              <Circle className="h-2 w-2 fill-current text-current" />
             </RadioGroupPrimitive.Indicator>
           </div>
         )}
@@ -91,7 +92,9 @@ const RadioGroupStackedItem = React.forwardRef<
             {label}
           </Label>
           {props.description && (
-            <p className="text-sm text-foreground-lighter">{props.description}</p>
+            <p className="text-left text-sm text-foreground-lighter text-balance">
+              {props.description}
+            </p>
           )}
           {props.children}
         </div>
