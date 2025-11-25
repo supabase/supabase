@@ -1,8 +1,12 @@
-import { ExternalLink } from 'lucide-react'
-import React from 'react'
+import { ExternalLink, Search } from 'lucide-react'
+import React, { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { DeployEdgeFunctionButton } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionButton'
+import {
+  EdgeFunctionsSort,
+  EdgeFunctionsSortDropdown,
+} from 'components/interfaces/EdgeFunctions/EdgeFunctionsSortDropdown'
 import { EdgeFunctionsListItem } from 'components/interfaces/Functions/EdgeFunctionsListItem'
 import {
   FunctionsEmptyState,
@@ -16,7 +20,17 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
-import { Button, Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
+import {
+  Button,
+  Card,
+  Input,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -38,6 +52,30 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     isSuccess,
   } = useEdgeFunctionsQuery({ projectRef: ref })
 
+  const [searchString, setSearchString] = useState('')
+  const [sort, setSort] = useState<EdgeFunctionsSort>('name:asc')
+
+  const filteredFunctions = useMemo(() => {
+    const temp = (functions ?? []).filter((x) =>
+      x.name.toLowerCase().includes(searchString.toLowerCase())
+    )
+    const [sortCol, sortOrder] = sort.split(':')
+    const orderMultiplier = sortOrder === 'asc' ? 1 : -1
+
+    return temp.sort((a, b) => {
+      if (sortCol === 'name') {
+        return a.name.localeCompare(b.name) * orderMultiplier
+      }
+      if (sortCol === 'created_at') {
+        return (a.created_at - b.created_at) * orderMultiplier
+      }
+      if (sortCol === 'updated_at') {
+        return (a.updated_at - b.updated_at) * orderMultiplier
+      }
+      return 0
+    })
+  }, [functions, searchString, sort])
+
   const hasFunctions = (functions ?? []).length > 0
 
   return (
@@ -51,28 +89,55 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
               {isSuccess && (
                 <>
                   {hasFunctions ? (
-                    <Card>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>URL</TableHead>
-                            <TableHead className="hidden 2xl:table-cell">Created</TableHead>
-                            <TableHead className="lg:table-cell">Last updated</TableHead>
-                            <TableHead className="lg:table-cell">Deployments</TableHead>
-                          </TableRow>
-                        </TableHeader>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
+                          <Input
+                            placeholder="Search function names"
+                            size="tiny"
+                            icon={<Search size={14} />}
+                            value={searchString}
+                            className="w-52"
+                            onChange={(e) => setSearchString(e.target.value)}
+                          />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <EdgeFunctionsSortDropdown value={sort} onChange={setSort} />
+                        </div>
+                      </div>
+                      <Card>
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Name</TableHead>
+                              <TableHead>URL</TableHead>
+                              <TableHead className="hidden 2xl:table-cell">Created</TableHead>
+                              <TableHead className="lg:table-cell">Last updated</TableHead>
+                              <TableHead className="lg:table-cell">Deployments</TableHead>
+                            </TableRow>
+                          </TableHeader>
 
-                        <TableBody>
-                          <>
-                            {functions.length > 0 &&
-                              functions.map((item) => (
-                                <EdgeFunctionsListItem key={item.id} function={item} />
-                              ))}
-                          </>
-                        </TableBody>
-                      </Table>
-                    </Card>
+                          <TableBody>
+                            <>
+                              {filteredFunctions.length > 0 ? (
+                                filteredFunctions.map((item) => (
+                                  <EdgeFunctionsListItem key={item.id} function={item} />
+                                ))
+                              ) : (
+                                <TableRow>
+                                  <TableCell colSpan={5}>
+                                    <p className="text-sm text-foreground">No results found</p>
+                                    <p className="text-sm text-foreground-light">
+                                      Your search for "{searchString}" did not return any results
+                                    </p>
+                                  </TableCell>
+                                </TableRow>
+                              )}
+                            </>
+                          </TableBody>
+                        </Table>
+                      </Card>
+                    </div>
                   ) : (
                     <FunctionsEmptyState />
                   )}
