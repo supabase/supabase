@@ -447,17 +447,28 @@ values
   );`
 
   return (
-    <SheetSection className="flex flex-col gap-4">
+    <SheetSection className="flex flex-col gap-6">
       <p className="text-sm text-foreground-light">
-        Use the following code snippet to insert vectors into your vector table.
+        Use the following code snippet to insert vectors into your table. The{' '}
+        <code className="text-code-inline">data</code> property should contain all of your vector
+        data.
       </p>
       <div className="flex flex-col gap-2">
-        <div className="flex justify-end">
+        <div className="flex justify-between">
           <Popover_Shadcn_ modal={false} open={showLanguage} onOpenChange={onShowLanguageChange}>
             <PopoverTrigger_Shadcn_ asChild>
-              <Button type="default" iconRight={<ChevronDown size={14} strokeWidth={2} />}>
-                {language === 'javascript' ? 'JavaScript' : 'SQL'}
-              </Button>
+              <div className="flex cursor-pointer">
+                <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
+                  Language
+                </span>
+                <Button
+                  type="default"
+                  iconRight={<ChevronDown size={14} strokeWidth={2} />}
+                  className="rounded-l-none"
+                >
+                  {language === 'javascript' ? 'JavaScript' : 'SQL'}
+                </Button>
+              </div>
             </PopoverTrigger_Shadcn_>
             <PopoverContent_Shadcn_ className="p-0 w-32" side="bottom" align="end">
               <Command_Shadcn_>
@@ -482,6 +493,20 @@ values
               </Command_Shadcn_>
             </PopoverContent_Shadcn_>
           </Popover_Shadcn_>
+
+          <Button
+            type="default"
+            icon={<BookOpen size={12} className="text-foreground-lighter" />}
+            asChild
+          >
+            <Link
+              target="_blank"
+              rel="noreferrer"
+              href={`${DOCS_URL}/reference/javascript/vectordataapi-putvectors`}
+            >
+              Docs
+            </Link>
+          </Button>
         </div>
         {language === 'javascript' ? (
           <>
@@ -516,17 +541,6 @@ const result = await index.putVectors({
   ],
 })`}
             />
-            <div className="flex justify-end">
-              <Button
-                type="default"
-                icon={<BookOpen size={12} className="text-foreground-lighter" />}
-                asChild
-              >
-                <a target="_blank" rel="noreferrer" href={`${DOCS_URL}/guides/storage/vectors`}>
-                  Docs
-                </a>
-              </Button>
-            </div>
           </>
         ) : (
           <>
@@ -549,15 +563,6 @@ const result = await index.putVectors({
                   href={`/project/${projectRef}/sql/new?content=${encodeURIComponent(sqlCode)}`}
                 >
                   <p>Query in SQL Editor</p>
-                </Link>
-              </Button>
-              <Button
-                type="default"
-                icon={<BookOpen size={12} className="text-foreground-lighter" />}
-                asChild
-              >
-                <Link target="_blank" rel="noreferrer" href={`${DOCS_URL}/guides/storage/vectors`}>
-                  Docs
                 </Link>
               </Button>
             </div>
