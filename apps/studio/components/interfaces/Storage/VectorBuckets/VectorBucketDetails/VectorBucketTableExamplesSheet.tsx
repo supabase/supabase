@@ -75,6 +75,14 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
   )
 }
 
+const generateDimensionExample = (startValue: number, dimension: number) => {
+  const maxDimension = Math.min(dimension, 10)
+  const exampleValues = Array.from({ length: maxDimension }, (_, i) =>
+    (startValue + i * 0.1).toFixed(1)
+  )
+  return `${exampleValues.join(', ')}${dimension > maxDimension ? '...' : ''}`
+}
+
 interface VectorBucketIndexExamplesProps {
   bucketName: string
   indexName: string
@@ -98,18 +106,6 @@ function VectorBucketIndexExamples({
 }: VectorBucketIndexExamplesProps) {
   const { ref: projectRef } = useParams()
 
-  const dimensionExample = (startValue: number) => {
-    if (dimension === 1) {
-      return `${startValue.toFixed(1)}`
-    } else if (dimension === 2) {
-      return `${startValue.toFixed(1)}, ${(startValue + 0.1).toFixed(1)}`
-    } else if (dimension === 3) {
-      return `${startValue.toFixed(1)}, ${(startValue + 0.1).toFixed(1)}, ${(startValue + 0.2).toFixed(1)}`
-    } else {
-      return `${startValue.toFixed(1)}, ${(startValue + 0.1).toFixed(1)}, ${(startValue + 0.2).toFixed(1)}, ...`
-    }
-  }
-
   const dimensionLabel = `Data should match ${dimension} dimension${dimension > 1 ? 's' : ''}`
 
   const sqlCode = `-- Insert multiple vectors
@@ -118,12 +114,12 @@ insert into
 values
   (
     'doc-1',
-    '[${dimensionExample(0.2)}]'::embd, -- ${dimensionLabel}
+    '[${generateDimensionExample(0.2, dimension)}]'::embd, -- ${dimensionLabel}
     '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb
   ),
   (
     'doc-2',
-    '[${dimensionExample(0.4)}]'::embd, -- ${dimensionLabel}
+    '[${generateDimensionExample(0.4, dimension)}]'::embd, -- ${dimensionLabel}
     '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb
   );`
 
@@ -142,12 +138,12 @@ const result = await index.putVectors({
   vectors: [
     {
       key: 'doc-1',
-      data: { float32: [${dimensionExample(0.2)}] }, // ${dimensionLabel}
+      data: { float32: [${generateDimensionExample(0.2, dimension)}] }, // ${dimensionLabel}
       metadata: { ${metadataKeys.map((key) => `${key}: "${key} value"`).join(', ')} },
     },
     {
       key: 'doc-2',
-      data: { float32: [${dimensionExample(0.4)}] }, // ${dimensionLabel}
+      data: { float32: [${generateDimensionExample(0.4, dimension)}] }, // ${dimensionLabel}
       metadata: { ${metadataKeys.map((key) => `${key}: "${key} value"`).join(', ')} },
     },
   ],
