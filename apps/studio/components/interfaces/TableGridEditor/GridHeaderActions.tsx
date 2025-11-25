@@ -85,6 +85,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const [showEnableRealtime, setShowEnableRealtime] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
   const [isAutofixViewSecurityModalOpen, setIsAutofixViewSecurityModalOpen] = useState(false)
+  const [isAutofixMaterializedViewSecurityModalOpen, setIsAutofixMaterializedViewSecurityModalOpen] = useState(false)
 
   const snap = useTableEditorTableStateSnapshot()
   const showHeaderActions = snap.selectedRows.size === 0
@@ -466,7 +467,15 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     queried through your project's APIs.
                   </p>
 
-                  <div className="mt-2">
+                  <div className="mt-2 flex items-center gap-2">
+                    <Button
+                      type="secondary"
+                      onClick={() => {
+                        setIsAutofixMaterializedViewSecurityModalOpen(true)
+                      }}
+                    >
+                      Autofix
+                    </Button>
                     <Button type="default" asChild>
                       <Link
                         target="_blank"
@@ -558,6 +567,12 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
         table={table}
         isAutofixViewSecurityModalOpen={isAutofixViewSecurityModalOpen}
         setIsAutofixViewSecurityModalOpen={setIsAutofixViewSecurityModalOpen}
+      />
+
+      <MaterializedViewEntityAutofixSecurityModal
+        table={table}
+        isAutofixMaterializedViewSecurityModalOpen={isAutofixMaterializedViewSecurityModalOpen}
+        setIsAutofixMaterializedViewSecurityModalOpen={setIsAutofixMaterializedViewSecurityModalOpen}
       />
 
       {isTable && (
