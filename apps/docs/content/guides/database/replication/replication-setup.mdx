@@ -1,18 +1,18 @@
 ---
 id: 'replication-setup'
 title: 'Replication Setup'
-description: 'Set up replication to managed destinations using Postgres logical replication.'
+description: 'Set up replication using Postgres logical replication.'
 subtitle: 'Configure publications and destinations for replication.'
 sidebar_label: 'Setting up'
 ---
 
 <Admonition type="caution" label="Private Alpha">
 
-Managed destinations are currently in private alpha. Access is limited and features may change.
+Replication is currently in private alpha. Access is limited and features may change.
 
 </Admonition>
 
-Managed destinations use **Postgres logical replication** to stream changes from your database. Supabase ETL, an [open source tool](https://github.com/supabase/etl) built for Postgres logical replication, provides a managed interface through the Dashboard to configure and monitor these replication pipelines.
+Replication uses **Postgres logical replication** to stream changes from your database. Powered by [Supabase ETL](https://github.com/supabase/etl), an open source tool built for Postgres logical replication, it provides a managed interface through the Dashboard to configure and monitor replication pipelines.
 
 ## Setup overview
 
@@ -97,7 +97,7 @@ After creating a publication via SQL, you can view it in the Supabase Dashboard:
 
 ### Step 2: Enable replication
 
-Before adding destinations, you need to enable replication to managed destinations for your project:
+Before adding destinations, you need to enable replication for your project:
 
 1. Navigate to the [Database](/dashboard/project/_/database/replication) section in your Supabase Dashboard
 2. Select the **replication** tab
@@ -399,10 +399,10 @@ Deleted tables are automatically recreated by the pipeline. To permanently delet
 
 ### How it works
 
-Once configured, replication to managed destinations:
+Once configured, replication:
 
 1. **Captures** changes from your Postgres database using Postgres publications and logical replication
-2. **Streams** the changes through Supabase ETL's replication pipeline
+2. **Streams** the changes through the replication pipeline
 3. **Loads** the data to your destination in near real-time batches
 
 Changes are sent in batches to optimize performance and reduce costs. The batch size and timing can be adjusted using the advanced settings. The replication pipeline currently performs data extraction and loading only, without transformation - your data is replicated as-is to the destination.
@@ -420,7 +420,7 @@ For more troubleshooting help, see the [Replication FAQ](/docs/guides/database/r
 
 ### Limitations
 
-Replication to managed destinations has the following limitations:
+Replication has the following limitations:
 
 - **Primary keys required**: Tables must have primary keys (Postgres logical replication requirement)
 - **Custom data types**: Not supported
@@ -432,7 +432,7 @@ Destination-specific limitations (such as Iceberg's append-only log format or Bi
 
 ### Future work
 
-Replication to managed destinations is actively being developed. Planned improvements include:
+Replication is actively being developed. Planned improvements include:
 
 - **DDL support**: Automatic handling of Postgres schema changes (ALTER TABLE, ADD COLUMN, etc.)
 - **Additional destinations**: Support for more data warehouses and analytics platforms
