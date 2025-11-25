@@ -80,7 +80,7 @@ export const EnableIndexAdvisorButton = () => {
       <Tooltip>
         <TooltipTrigger asChild>
           <AlertDialogTrigger asChild>
-            <Button type="outline" className={`rounded-full`} icon={<InfoIcon />}>
+            <Button type="outline" icon={<InfoIcon />}>
               Enable Index Advisor
             </Button>
           </AlertDialogTrigger>

@@ -17,7 +17,6 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { DocsButton } from 'components/ui/DocsButton'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
@@ -63,31 +62,28 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <FormHeader
-        className="py-4 px-6 !mb-0 xl:flex-row flex-col"
-        title="Query Performance"
-        actions={
-          <div className="flex items-center gap-2 flex-wrap">
-            <EnableIndexAdvisorButton />
-            <DocsButton
-              href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`}
+      <div className="w-full mb-0 flex lg:items-center justify-between gap-4 py-4 px-6 lg:flex-row flex-col">
+        <h3 className="text-foreground text-xl prose">Query Performance</h3>
+        <div className="flex items-center gap-2 flex-wrap">
+          <EnableIndexAdvisorButton />
+          <DocsButton
+            href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`}
+          />
+          <DatabaseSelector />
+          {isPgStatMonitorEnabled && (
+            <LogsDatePicker
+              value={datePickerValue}
+              helpers={datePickerHelpers.filter(
+                (h) =>
+                  h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES ||
+                  h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS ||
+                  h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS
+              )}
+              onSubmit={handleDatePickerChange}
             />
-            <DatabaseSelector />
-            {isPgStatMonitorEnabled && (
-              <LogsDatePicker
-                value={datePickerValue}
-                helpers={datePickerHelpers.filter(
-                  (h) =>
-                    h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES ||
-                    h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS ||
-                    h.text === REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS
-                )}
-                onSubmit={handleDatePickerChange}
-              />
-            )}
-          </div>
-        }
-      />
+          )}
+        </div>
+      </div>
       <QueryPerformance
         queryHitRate={queryHitRate}
         queryPerformanceQuery={queryPerformanceQuery}
