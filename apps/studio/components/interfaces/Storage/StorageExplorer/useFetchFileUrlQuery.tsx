@@ -47,7 +47,7 @@ export const useFetchFileUrlQuery = (
   const pathToFile = getPathAlongOpenedFolders(false)
   const formattedPathToFile = [pathToFile, file?.name].join('/')
 
-  return useQuery({
+  return useQuery<string, ResponseError, string>({
     queryKey: [projectRef, 'buckets', bucket.public, bucket.id, 'file', formattedPathToFile],
     queryFn: () =>
       fetchFileUrl(formattedPathToFile, projectRef, bucket.id, bucket.public, DEFAULT_EXPIRY),

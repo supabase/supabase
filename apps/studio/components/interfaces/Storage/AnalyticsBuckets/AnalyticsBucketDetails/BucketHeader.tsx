@@ -1,15 +1,14 @@
 import { noop } from 'lodash'
 
-import { useParams } from 'common'
 import { FormattedWrapperTable } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import {
   ScaffoldHeader,
   ScaffoldSectionDescription,
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
-import { useReplicationPipelineStatusQuery } from 'data/etl/pipeline-status-query'
+import { HIDE_REPLICATION_USER_FLOW } from './AnalyticsBucketDetails.constants'
 import { ConnectTablesDialog } from './ConnectTablesDialog'
-import { useAnalyticsBucketAssociatedEntities } from './useAnalyticsBucketAssociatedEntities'
+import { CreateTableInstructionsDialog } from './CreateTableInstructions/CreateTableInstructionsDialog'
 
 interface BucketHeaderProps {
   showActions?: boolean
@@ -26,13 +25,6 @@ export const BucketHeader = ({
   namespaces = [],
   onSuccessConnectTables = noop,
 }: BucketHeaderProps) => {
-  const { ref: projectRef, bucketId } = useParams()
-
-  const { pipeline } = useAnalyticsBucketAssociatedEntities({ projectRef, bucketId })
-  const { data } = useReplicationPipelineStatusQuery({ projectRef, pipelineId: pipeline?.id })
-  const pipelineStatus = data?.status.name
-  const isPipelineRunning = pipelineStatus === 'started'
-
   return (
     <ScaffoldHeader className="pt-0 flex flex-row justify-between items-end gap-x-8">
       <div>
@@ -44,7 +36,13 @@ export const BucketHeader = ({
       {showActions && (
         <div className="flex items-center gap-x-2">
           {namespaces.length > 0 && (
-            <ConnectTablesDialog onSuccessConnectTables={onSuccessConnectTables} />
+            <>
+              {HIDE_REPLICATION_USER_FLOW ? (
+                <CreateTableInstructionsDialog />
+              ) : (
+                <ConnectTablesDialog onSuccessConnectTables={onSuccessConnectTables} />
+              )}
+            </>
           )}
         </div>
       )}

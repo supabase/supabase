@@ -1,8 +1,8 @@
 import { Lock, Paintbrush, PlusCircle, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { parseAsBoolean, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { DeleteQueue } from 'components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
@@ -70,7 +70,7 @@ export const QueueTab = () => {
   )
   const messages = useMemo(() => data?.pages.flatMap((p) => p), [data?.pages])
 
-  const { mutate: updateTable, isLoading: isUpdatingTable } = useTableUpdateMutation({
+  const { mutate: updateTable, isPending: isUpdatingTable } = useTableUpdateMutation({
     onSettled: () => {
       toast.success(`Successfully enabled RLS for ${queueName}`)
       setRlsConfirmModalOpen(false)
@@ -261,7 +261,7 @@ You may opt to manage your queues via any Supabase client libraries or PostgREST
 
       <ConfirmationModal
         visible={rlsConfirmModalOpen}
-        title="Confirm to enable Row Level Security"
+        title="Enable Row Level Security"
         confirmLabel="Enable RLS"
         confirmLabelLoading="Enabling RLS"
         loading={isUpdatingTable}

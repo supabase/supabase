@@ -41,7 +41,7 @@ export const useAIOptInForm = (onSuccessCallback?: () => void) => {
     false
   )
 
-  const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
+  const { mutate: updateOrganization, isPending: isUpdating } = useOrganizationUpdateMutation()
 
   const form = useForm<AIOptInFormValues>({
     resolver: zodResolver(AIOptInSchema),

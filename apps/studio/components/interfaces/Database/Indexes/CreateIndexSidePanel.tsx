@@ -78,7 +78,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     connectionString: project?.connectionString,
   })
 
-  const { mutate: createIndex, isLoading: isExecuting } = useDatabaseIndexCreateMutation({
+  const { mutate: createIndex, isPending: isExecuting } = useDatabaseIndexCreateMutation({
     onSuccess: () => {
       onClose()
       toast.success(`Successfully created index`)

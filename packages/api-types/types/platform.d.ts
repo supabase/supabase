@@ -6882,6 +6882,7 @@ export interface components {
       invoice_pdf: string
       number: string
       payment_attempted: boolean
+      payment_is_processing: boolean
       period_end: number
       status: string
       subscription: string | null

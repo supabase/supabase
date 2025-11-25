@@ -25,9 +25,9 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
-import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { DOCS_URL } from 'lib/constants'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
@@ -206,6 +206,8 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
   const handleResetSearch = useCallback(() => setSearchString(''), [setSearchString])
 
+  const isUpdatingPolicy = !!selectedPolicyIdToEdit
+
   if (isPermissionsLoaded && !canReadPolicies) {
     return <NoPermission isFullPage resourceText="view this project's RLS policies" />
   }
@@ -276,28 +278,20 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           </PoliciesDataProvider>
         )}
 
-        {/* Create Policy */}
+        {/* Create or Edit Policy */}
         <PolicyEditorPanel
-          visible={showCreatePolicy}
+          visible={showCreatePolicy || isUpdatingPolicy}
           schema={schema}
           searchString={searchString}
-          selectedTable={selectedTable}
+          selectedTable={isUpdatingPolicy ? undefined : selectedTable}
+          selectedPolicy={isUpdatingPolicy ? selectedPolicyIdToEdit : undefined}
           onSelectCancel={() => {
             setSelectedTable(undefined)
-            setShowCreatePolicy(false)
-          }}
-          authContext="database"
-        />
-
-        {/* Edit Policy */}
-        <PolicyEditorPanel
-          visible={!!selectedPolicyIdToEdit}
-          schema={schema}
-          searchString={searchString}
-          selectedPolicy={selectedPolicyIdToEdit}
-          onSelectCancel={() => {
-            setSelectedTable(undefined)
-            setSelectedPolicyIdToEdit(null)
+            if (isUpdatingPolicy) {
+              setSelectedPolicyIdToEdit(null)
+            } else {
+              setShowCreatePolicy(false)
+            }
           }}
           authContext="database"
         />

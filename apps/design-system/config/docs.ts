@@ -26,6 +26,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Typography',
+          href: '/docs/typography',
+          items: [],
+        },
+        {
           title: 'Theming',
           href: '/docs/theming',
           items: [],
@@ -36,9 +41,9 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          items: [],
-          href: '/docs/ui-patterns/accessibility',
           title: 'Accessibility',
+          href: '/docs/accessibility',
+          items: [],
         },
       ],
     },

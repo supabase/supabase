@@ -120,24 +120,24 @@ const GitHubIntegrationConnectionForm = ({
     { enabled: !!selectedProject?.ref }
   )
 
-  const { mutateAsync: checkGithubBranchValidity, isLoading: isCheckingBranch } =
+  const { mutateAsync: checkGithubBranchValidity, isPending: isCheckingBranch } =
     useCheckGithubBranchValidity({ onError: () => {} })
 
-  const { mutate: createConnection, isLoading: isCreatingConnection } =
+  const { mutate: createConnection, isPending: isCreatingConnection } =
     useGitHubConnectionCreateMutation({
       onSuccess: () => {
         toast.success('GitHub integration successfully updated')
       },
     })
 
-  const { mutateAsync: deleteConnection, isLoading: isDeletingConnection } =
+  const { mutateAsync: deleteConnection, isPending: isDeletingConnection } =
     useGitHubConnectionDeleteMutation({
       onSuccess: () => {
         toast.success('Successfully removed GitHub integration')
       },
     })
 
-  const { mutate: updateConnectionSettings, isLoading: isUpdatingConnection } =
+  const { mutate: updateConnectionSettings, isPending: isUpdatingConnection } =
     useGitHubConnectionUpdateMutation()
 
   const githubRepos = useMemo(

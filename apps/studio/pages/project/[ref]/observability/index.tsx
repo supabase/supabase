@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
@@ -20,21 +20,20 @@ export const UserReportPage: NextPageWithLayout = () => {
   const { profile } = useProfile()
   const [showCreateReportModal, setShowCreateReportModal] = useState(false)
 
-  const { isLoading } = useContentQuery(
-    {
-      projectRef: ref,
-      type: 'report',
-    },
-    {
-      onSuccess: (data) => {
-        const reports = data.content
-          .filter((x) => x.type === 'report')
-          .sort((a, b) => a.name.localeCompare(b.name))
-        if (reports.length >= 1) router.push(`/project/${ref}/observability/${reports[0].id}`)
-        if (reports.length === 0) router.push(`/project/${ref}/observability/api-overview`)
-      },
-    }
-  )
+  const { isLoading, isSuccess, data } = useContentQuery({
+    projectRef: ref,
+    type: 'report',
+  })
+
+  useEffect(() => {
+    if (!isSuccess) return
+
+    const reports = data.content
+      .filter((x) => x.type === 'report')
+      .sort((a, b) => a.name.localeCompare(b.name))
+    if (reports.length >= 1) router.push(`/project/${ref}/observability/${reports[0].id}`)
+    if (reports.length === 0) router.push(`/project/${ref}/observability/api-overview`)
+  }, [isSuccess, data, router, ref])
 
   const { can: canCreateReport } = useAsyncCheckPermissions(
     PermissionAction.CREATE,

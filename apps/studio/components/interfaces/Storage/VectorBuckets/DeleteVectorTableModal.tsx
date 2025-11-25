@@ -24,7 +24,7 @@ export const DeleteVectorTableModal = ({
     onError: () => {},
   })
 
-  const { mutate: deleteIndex, isLoading: isDeleting } = useVectorBucketIndexDeleteMutation({
+  const { mutate: deleteIndex, isPending: isDeleting } = useVectorBucketIndexDeleteMutation({
     onSuccess: (_, vars) => {
       deleteForeignTable({
         projectRef: project?.ref,

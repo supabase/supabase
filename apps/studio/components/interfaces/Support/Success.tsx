@@ -47,7 +47,7 @@ export const Success = ({
         {selectedProject !== NO_PROJECT_MARKER && (
           <p className="text-sm text-foreground-light">
             Your ticket has been logged for the project{' '}
-            <span className="text-foreground">{projectName}</span>, reference ID:{' '}
+            <span className="text-foreground">{projectName}</span> with Project ID:{' '}
             <span className="text-foreground">{selectedProject}</span>.
           </p>
         )}
