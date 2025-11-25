@@ -7993,10 +7993,10 @@ functions:
 
   - id: storagevectors-list-buckets
     $ref: '@supabase/storage-js.index.StorageVectorsClient.listBuckets'
-  
+
   - id: storagevectors-from
     $ref: '@supabase/storage-js.StorageVectorsClient.from'
-  
+
   - id: vectorbucket-index
     $ref: '@supabase/storage-js.index.VectorBucketScope.index'
 

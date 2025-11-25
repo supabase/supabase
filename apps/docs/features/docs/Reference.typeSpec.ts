@@ -574,7 +574,7 @@ function parseType(type: any, map: Map<number, any>, typeArguments?: any, debug 
   switch (type.kindString) {
     case 'Type alias':
       if (typeof type.type === 'object') {
-        return parseType(type.type, map)
+        return parseType(type.type, map, typeArguments)
       }
     case 'Interface':
       return parseInterface(type, map)
