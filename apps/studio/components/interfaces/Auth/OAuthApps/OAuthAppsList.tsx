@@ -223,10 +223,9 @@ export const OAuthAppsList = () => {
                   <TableHead>Client ID</TableHead>
                   <TableHead>Registration</TableHead>
                   <TableHead>Type</TableHead>
-                  <TableHead>Scope</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="w-8 px-0">
-                    <div className="!bg-200 px-4 w-full h-full flex items-center border-l @[954px]:border-l-0" />
+                    <div className="!bg-200 px-4 w-full h-full flex items-center border-l @[846px]:border-l-0" />
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -260,18 +259,11 @@ export const OAuthAppsList = () => {
                       <TableCell className="text-xs text-foreground-light max-w-28 capitalize">
                         {app.client_type}
                       </TableCell>
-                      <TableCell className="min-w-28 max-w-40">
-                        {app.scope ? (
-                          <Badge>{app.scope}</Badge>
-                        ) : (
-                          <span className="text-xs text-foreground-light">N/A</span>
-                        )}
-                      </TableCell>
                       <TableCell className="text-xs text-foreground-light min-w-28 max-w-40 w-1/6">
                         <TimestampInfo utcTimestamp={app.created_at} labelFormat="D MMM, YYYY" />
                       </TableCell>
-                      <TableCell className="max-w-20 bg-surface-100 @[954px]:hover:bg-surface-200 px-6">
-                        <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l @[954px]:border-l-0">
+                      <TableCell className="max-w-20 bg-surface-100 @[846px]:hover:bg-surface-200 px-6">
+                        <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l @[846px]:border-l-0">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button type="default" className="px-1" icon={<MoreVertical />} />
@@ -319,10 +311,14 @@ export const OAuthAppsList = () => {
         visible={showCreateSheet || !!appToEdit}
         appToEdit={appToEdit}
         onSuccess={(app) => {
+          const isCreating = !appToEdit
           setShowCreateSheet(false)
           setSelectedAppToEdit(null)
           setSelectedApp(undefined)
-          setNewOAuthApp(app)
+          // Only show banner for new apps or regenerated secrets, not for simple edits
+          if (isCreating || app.client_secret) {
+            setNewOAuthApp(app)
+          }
         }}
         onCancel={() => {
           setShowCreateSheet(false)

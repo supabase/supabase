@@ -55,7 +55,6 @@ const FormSchema = z.object({
     .min(1, 'Please provide a name for your OAuth app')
     .max(100, 'Name must be less than 100 characters'),
   type: z.enum(['manual', 'dynamic']).default('manual'),
-  // scope: z.string().min(1, 'Please select a scope'),
   redirect_uris: z
     .object({
       value: z.string().trim().url('Please provide a valid URL'),
