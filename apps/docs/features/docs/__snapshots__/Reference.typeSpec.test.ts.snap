@@ -81760,6 +81760,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": {
               "type": "intrinsic",
               "name": "string"
+            },
+            "comment": {
+              "shortText": "Unique name for the vector bucket"
             }
           }
         ],
@@ -81828,11 +81831,18 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Creates a new vector bucket",
+          "shortText": "Creates a new vector bucket\\nVector buckets are containers for vector indexes and their data\\n\\n**Public alpha:** This API is part of a public alpha release and may not be available to your account type.",
           "tags": [
             {
               "tag": "alpha",
               "text": ""
+            }
+          ],
+          "examples": [
+            {
+              "id": "example-1",
+              "name": "Example 1",
+              "code": "\`\`\`typescript\\nconst { data, error } = await supabase\\n  .storage\\n  .vectors\\n  .createBucket('embeddings-prod')\\n\`\`\`"
             }
           ]
         }
@@ -81845,6 +81855,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": {
               "type": "intrinsic",
               "name": "string"
+            },
+            "comment": {
+              "shortText": "Name of the vector bucket to delete"
             }
           }
         ],
@@ -81913,11 +81926,18 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Deletes a vector bucket (must be empty first)",
+          "shortText": "Deletes a vector bucket (bucket must be empty)\\nAll indexes must be deleted before deleting the bucket\\n\\n**Public alpha:** This API is part of a public alpha release and may not be available to your account type.",
           "tags": [
             {
               "tag": "alpha",
               "text": ""
+            }
+          ],
+          "examples": [
+            {
+              "id": "example-1",
+              "name": "Example 1",
+              "code": "\`\`\`typescript\\nconst { data, error } = await supabase\\n  .storage\\n  .vectors\\n  .deleteBucket('embeddings-old')\\n\`\`\`"
             }
           ]
         }
@@ -81967,6 +81987,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": {
               "type": "intrinsic",
               "name": "string"
+            },
+            "comment": {
+              "shortText": "Name of the vector bucket"
             }
           }
         ],
@@ -82035,11 +82058,18 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Retrieves metadata for a specific vector bucket",
+          "shortText": "Retrieves metadata for a specific vector bucket\\n\\n**Public alpha:** This API is part of a public alpha release and may not be available to your account type.",
           "tags": [
             {
               "tag": "alpha",
               "text": ""
+            }
+          ],
+          "examples": [
+            {
+              "id": "example-1",
+              "name": "Example 1",
+              "code": "\`\`\`typescript\\nconst { data, error } = await supabase\\n  .storage\\n  .vectors\\n  .getBucket('embeddings-prod')\\n\\nconsole.log('Bucket created:', data?.vectorBucket.createdAt)\\n\`\`\`"
             }
           ]
         }
@@ -82087,6 +82117,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   }
                 }
               ]
+            },
+            "comment": {
+              "shortText": "Optional filters (prefix, maxResults, pageToken)"
             }
           }
         ],
@@ -82155,11 +82188,18 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Lists vector buckets with optional filtering and pagination",
+          "shortText": "Lists all vector buckets with optional filtering and pagination\\n\\n**Public alpha:** This API is part of a public alpha release and may not be available to your account type.",
           "tags": [
             {
               "tag": "alpha",
               "text": ""
+            }
+          ],
+          "examples": [
+            {
+              "id": "example-1",
+              "name": "Example 1",
+              "code": "\`\`\`typescript\\nconst { data, error } = await supabase\\n  .storage\\n  .vectors\\n  .listBuckets({ prefix: 'embeddings-' })\\n\\ndata?.vectorBuckets.forEach(bucket => {\\n  console.log(bucket.vectorBucketName)\\n})\\n\`\`\`"
             }
           ]
         }
