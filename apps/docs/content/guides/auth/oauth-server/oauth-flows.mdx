@@ -162,11 +162,11 @@ https://<project-ref>.supabase.co/auth/v1/oauth/authorize?
 
 #### Optional parameters
 
-| Parameter | Description                                                                                                                                                                                                                                                                                                               |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `state`   | Random string to prevent CSRF attacks (highly recommended)                                                                                                                                                                                                                                                                |
+| Parameter | Description                                                                                                                                                                                                                                                                                                                  |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `state`   | Random string to prevent CSRF attacks (highly recommended)                                                                                                                                                                                                                                                                   |
 | `scope`   | Space-separated list of scopes (e.g., `openid email profile phone`). Requested scopes will be included in the access token and control what information is returned by the UserInfo endpoint. Default scope when none provided is `email`. If the `openid` scope is requested, an ID token will be included in the response. |
-| `nonce`   | Random string for replay attack protection. If provided, will be included in the ID token.                                                                                                                                                                                                                                |
+| `nonce`   | Random string for replay attack protection. If provided, will be included in the ID token.                                                                                                                                                                                                                                   |
 
 <Admonition type="caution">
 
@@ -294,13 +294,13 @@ On success, Supabase Auth returns a JSON response with tokens:
 }
 ```
 
-| Field           | Description                                                                                           |
-| --------------- | ----------------------------------------------------------------------------------------------------- |
-| `access_token`  | JWT access token for accessing resources                                                              |
-| `token_type`    | Always `bearer`                                                                                       |
-| `expires_in`    | Token lifetime in seconds (default: 3600)                                                             |
-| `refresh_token` | Token for obtaining new access tokens                                                                 |
-| `scope`         | Granted scopes from the authorization request                                                         |
+| Field           | Description                                                                                          |
+| --------------- | ---------------------------------------------------------------------------------------------------- |
+| `access_token`  | JWT access token for accessing resources                                                             |
+| `token_type`    | Always `bearer`                                                                                      |
+| `expires_in`    | Token lifetime in seconds (default: 3600)                                                            |
+| `refresh_token` | Token for obtaining new access tokens                                                                |
+| `scope`         | Granted scopes from the authorization request                                                        |
 | `id_token`      | OpenID Connect ID token (included only if `openid` scope was requested in the authorization request) |
 
 ## Access token structure
@@ -346,12 +346,12 @@ All other claims follow the standard [Supabase JWT structure](/docs/guides/auth/
 
 The following scopes are currently supported:
 
-| Scope     | Description                                                                     |
-| --------- | ------------------------------------------------------------------------------- |
+| Scope     | Description                                                                           |
+| --------- | ------------------------------------------------------------------------------------- |
 | `openid`  | Enables OpenID Connect. When requested, an ID token will be included in the response. |
-| `email`   | Grants access to email and email_verified claims                                |
-| `profile` | Grants access to profile information (name, picture, etc.)                      |
-| `phone`   | Grants access to phone_number and phone_number_verified claims                  |
+| `email`   | Grants access to email and email_verified claims                                      |
+| `profile` | Grants access to profile information (name, picture, etc.)                            |
+| `phone`   | Grants access to phone_number and phone_number_verified claims                        |
 
 **Default scope:** When no scope is specified in the authorization request, the default scope is `email`.
 
@@ -503,6 +503,7 @@ curl 'https://<project-ref>.supabase.co/auth/v1/oauth/userinfo' \
 The information returned depends on the scopes granted in the access token. For example:
 
 **With `email` scope:**
+
 ```json
 {
   "sub": "user-uuid",
@@ -512,6 +513,7 @@ The information returned depends on the scopes granted in the access token. For 
 ```
 
 **With `email profile phone` scopes:**
+
 ```json
 {
   "sub": "user-uuid",
@@ -744,6 +746,7 @@ if (error) {
 ```
 
 After revoking access:
+
 - All refresh tokens for that client are deleted
 - The user will need to re-authorize the application to grant access again
 
