@@ -9,21 +9,21 @@ import { cn } from '../../lib/utils/cn'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
-  `relative 
+  `relative
   flex items-center justify-center
-  cursor-pointer 
-  inline-flex 
-  items-center 
-  space-x-2 
-  text-center 
-  font-regular 
-  ease-out 
-  duration-200 
+  cursor-pointer
+  inline-flex
+  items-center
+  space-x-2
+  text-center
+  font-regular
+  ease-out
+  duration-200
   rounded-md
-  outline-none 
-  transition-all 
-  outline-0 
-  focus-visible:outline-4 
+  outline-none
+  transition-all
+  outline-0
+  focus-visible:outline-4
   focus-visible:outline-offset-1
   border
   `,
@@ -31,7 +31,7 @@ const buttonVariants = cva(
     variants: {
       type: {
         primary: `
-          bg-brand-400 dark:bg-brand-500 
+          bg-brand-400 dark:bg-brand-500
           hover:bg-brand/80 dark:hover:bg-brand/50
           text-foreground
           border-brand-500/75 dark:border-brand/30

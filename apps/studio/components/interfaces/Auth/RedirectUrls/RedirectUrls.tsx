@@ -29,7 +29,7 @@ export const RedirectUrls = () => {
     isError,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const URI_ALLOW_LIST_ARRAY = useMemo(() => {
     return authConfig?.URI_ALLOW_LIST

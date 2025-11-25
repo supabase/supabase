@@ -2,7 +2,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
 import { JWTSigningKey } from 'data/jwt-signing-keys/jwt-signing-keys-query'
-import { ArrowRight, Info, Key, Timer, ExternalLink } from 'lucide-react'
+import { ArrowRight, ExternalLink, Info, Key, Timer } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -10,7 +10,6 @@ import {
   Button,
   Checkbox_Shadcn_,
   cn,
-  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -42,7 +41,7 @@ export function RotateKeyDialog({
     projectRef,
   })
 
-  const { mutate, isLoading: isLoadingMutation } = useJWTSigningKeyUpdateMutation({
+  const { mutate, isPending: isPendingMutation } = useJWTSigningKeyUpdateMutation({
     onSuccess: () => {
       toast.success('Signing key rotated successfully')
       onClose()
@@ -281,7 +280,7 @@ export function RotateKeyDialog({
             !isStandbyUnderstood ||
             (!!verifyJWTEdgeFunctions.length && !isEdgeFunctionsVerifyJWTUnderstood)
           }
-          loading={isLoadingMutation}
+          loading={isPendingMutation}
         >
           Rotate signing key
         </Button>

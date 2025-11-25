@@ -34,7 +34,7 @@ interface NewPublicationPanelProps {
 
 export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanelProps) => {
   const { ref: projectRef } = useParams()
-  const { mutateAsync: createPublication, isLoading: creatingPublication } =
+  const { mutateAsync: createPublication, isPending: creatingPublication } =
     useCreatePublicationMutation()
   const { data: tables } = useReplicationTablesQuery({
     projectRef,

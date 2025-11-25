@@ -98,7 +98,7 @@ export const AwsMarketplaceLinkExistingOrg = ({
   const [showOrgCreationDialog, setShowOrgCreationDialog] = useState(false)
   const [orgToRedirectTo, setOrgToRedirectTo] = useState('')
 
-  const { mutate: linkOrganization, isLoading: isLinkingOrganization } =
+  const { mutate: linkOrganization, isPending: isLinkingOrganization } =
     useOrganizationLinkAwsMarketplaceMutation({
       onSuccess: (_) => {
         //TODO(thomas): send tracking event?

@@ -31,10 +31,11 @@ export const useAnalyticsBucketAssociatedEntities = (
     '*'
   )
 
-  const { data: icebergWrapper, meta: icebergWrapperMeta } = useAnalyticsBucketWrapperInstance(
-    { bucketId },
-    { enabled: options.enabled }
-  )
+  const {
+    data: icebergWrapper,
+    meta: icebergWrapperMeta,
+    isLoading: isLoadingWrapperInstance,
+  } = useAnalyticsBucketWrapperInstance({ bucketId }, { enabled: options.enabled })
 
   const { data: s3AccessKeys } = useStorageCredentialsQuery(
     { projectRef },
@@ -75,6 +76,7 @@ export const useAnalyticsBucketAssociatedEntities = (
     publication,
     pipeline,
     destination,
+    isLoadingWrapperInstance,
   }
 }
 
@@ -97,15 +99,15 @@ export const useAnalyticsBucketDeleteCleanUp = ({
   } = useAnalyticsBucketAssociatedEntities({ projectRef, bucketId: bucketId })
 
   // Default error handlers from all mutations will be silenced
-  const { mutateAsync: deleteFDW, isLoading: isDeletingWrapper } = useFDWDeleteMutation({
+  const { mutateAsync: deleteFDW, isPending: isDeletingWrapper } = useFDWDeleteMutation({
     onError: () => {},
   })
-  const { mutateAsync: deleteS3AccessKey, isLoading: isDeletingKey } = useS3AccessKeyDeleteMutation(
+  const { mutateAsync: deleteS3AccessKey, isPending: isDeletingKey } = useS3AccessKeyDeleteMutation(
     { onError: () => {} }
   )
-  const { mutateAsync: deletePublication, isLoading: isDeletingPublication } =
+  const { mutateAsync: deletePublication, isPending: isDeletingPublication } =
     useDeletePublicationMutation({ onError: () => {} })
-  const { mutateAsync: deletePipeline, isLoading: isDeletingPipeline } =
+  const { mutateAsync: deletePipeline, isPending: isDeletingPipeline } =
     useDeleteDestinationPipelineMutation({ onError: () => {} })
 
   const isDeleting =
@@ -164,5 +166,5 @@ export const useAnalyticsBucketDeleteCleanUp = ({
     }
   }
 
-  return { mutateAsync, isLoading: isDeleting }
+  return { mutateAsync, isPending: isDeleting }
 }
