@@ -334,7 +334,8 @@ export interface paths {
     delete: operations['v1-delete-a-project']
     options?: never
     head?: never
-    patch?: never
+    /** Updates the given project */
+    patch: operations['v1-update-a-project']
     trace?: never
   }
   '/v1/projects/{ref}/actions': {
@@ -1225,6 +1226,23 @@ export interface paths {
     patch: operations['v1-patch-a-migration']
     trace?: never
   }
+  '/v1/projects/{ref}/database/password': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Updates the database password */
+    patch: operations['v1-update-database-password']
+    trace?: never
+  }
   '/v1/projects/{ref}/database/query': {
     parameters: {
       query?: never
@@ -1236,6 +1254,26 @@ export interface paths {
     put?: never
     /** [Beta] Run sql query */
     post: operations['v1-run-a-query']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/query/read-only': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * [Beta] Run a sql query as supabase_read_only_user
+     * @description All entity references must be schema qualified.
+     */
+    post: operations['v1-read-only-query']
     delete?: never
     options?: never
     head?: never
@@ -4416,6 +4454,10 @@ export interface components {
         | 'PAUSE_FAILED'
         | 'RESIZING'
     }
+    V1ReadOnlyQueryBody: {
+      parameters?: unknown[]
+      query: string
+    }
     V1RestorePitrBody: {
       /** Format: int64 */
       recovery_time_target_unix: number
@@ -4480,11 +4522,20 @@ export interface components {
       name?: string
       verify_jwt?: boolean
     }
+    V1UpdatePasswordBody: {
+      password: string
+    }
+    V1UpdatePasswordResponse: {
+      message: string
+    }
     V1UpdatePostgrestConfigBody: {
       db_extra_search_path?: string
       db_pool?: number
       db_schema?: string
       max_rows?: number
+    }
+    V1UpdateProjectBody: {
+      name: string
     }
     V1UpsertMigrationBody: {
       name?: string
@@ -5260,6 +5311,60 @@ export interface operations {
       }
       /** @description Rate limit exceeded */
       429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-update-a-project': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1UpdateProjectBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V1ProjectRefResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update project */
+      500: {
         headers: {
           [name: string]: unknown
         }
@@ -9083,6 +9188,60 @@ export interface operations {
       }
     }
   }
+  'v1-update-database-password': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1UpdatePasswordBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V1UpdatePasswordResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update database password */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-run-a-query': {
     parameters: {
       query?: never
@@ -9127,6 +9286,58 @@ export interface operations {
         content?: never
       }
       /** @description Failed to run sql query */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-read-only-query': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1ReadOnlyQueryBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to run read-only sql query */
       500: {
         headers: {
           [name: string]: unknown

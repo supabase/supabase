@@ -79,7 +79,6 @@ export const NamespaceWithTables = ({
     isSuccess: isSuccessNamespaceTables,
   } = useIcebergNamespaceTablesQuery(
     {
-      catalogUri: wrapperValues.catalog_uri,
       warehouse: wrapperValues.warehouse,
       namespace: namespace,
       projectRef,
