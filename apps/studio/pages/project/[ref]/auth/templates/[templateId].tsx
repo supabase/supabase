@@ -62,7 +62,7 @@ const RedirectToTemplates = () => {
 
   const { data: authConfig, isLoading: isLoadingConfig } = useAuthConfigQuery({ projectRef })
 
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation({
+  const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to update settings: ${error?.message}`)
     },

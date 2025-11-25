@@ -1,5 +1,9 @@
 ---
-title: 'Monitoring replication'
+id: 'monitoring-replication'
+title: 'Monitoring Replication'
+description: 'Monitor replication lag and status for manual replication setups.'
+subtitle: 'Track replication health and performance.'
+sidebar_label: 'Monitoring'
 ---
 
 Monitoring replication lag is important and there are 3 ways to do this:
@@ -14,9 +18,9 @@ Monitoring replication lag is important and there are 3 ways to do this:
    - pg_stat_replication_replay_lag - lag to replay WAL files from the source DB on the target DB (throttled by disk or high activity)
    - pg_stat_replication_send_lag - lag in sending WAL files from the source DB (a high lag means that the publisher is not being asked to send new WAL files OR a network issues)
 
-## Primary
+### Primary
 
-### Replication status and lag
+#### Replication status and lag
 
 The `pg_stat_replication` table shows the status of any replicas connected to the primary database.
 
@@ -25,7 +29,7 @@ select pid, application_name, state, sent_lsn, write_lsn, flush_lsn, replay_lsn,
 from pg_stat_replication;
 ```
 
-### Replication slot status
+#### Replication slot status
 
 A replication slot can be in one of three states:
 
@@ -39,7 +43,7 @@ The state can be checked using the `pg_replication_slots` table:
 select slot_name, active, state from pg_replication_slots;
 ```
 
-### WAL size
+#### WAL size
 
 The WAL size can be checked using the `pg_ls_waldir()` function:
 
@@ -47,15 +51,15 @@ The WAL size can be checked using the `pg_ls_waldir()` function:
 select * from pg_ls_waldir();
 ```
 
-### Check LSN
+#### Check LSN
 
 ```sql
 select pg_current_wal_lsn();
 ```
 
-## Subscriber
+### Subscriber
 
-### Subscription status
+#### Subscription status
 
 The `pg_subscription` table shows the status of any subscriptions on a replica and the `pg_subscription_rel` table shows the status of each table within a subscription.
 
@@ -87,7 +91,7 @@ ORDER BY
     table_name;
 ```
 
-### Check LSN
+#### Check LSN
 
 ```sql
 select pg_last_wal_replay_lsn();

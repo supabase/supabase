@@ -409,6 +409,15 @@
       "description": "Enable the Swift SDK"
     },
 
+    "storage:analytics": {
+      "type": "boolean",
+      "description": "Enable Analytics Buckets in Storage"
+    },
+    "storage:vectors": {
+      "type": "boolean",
+      "description": "Enable Vector Buckets in Storage"
+    },
+
     "search:fullIndex": {
       "type": "boolean",
       "description": "Enable the full search index. When true, uses the  full search; when false, uses the alternate search index."
@@ -509,6 +518,8 @@
     "sdk:kotlin",
     "sdk:python",
     "sdk:swift",
+    "storage:analytics",
+    "storage:vectors",
     "search:fullIndex"
   ],
   "additionalProperties": false

@@ -14,7 +14,7 @@ import {
 } from 'react'
 import { toast } from 'sonner'
 
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
@@ -87,7 +87,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     setCaptchaRef(node)
   }, [])
 
-  const { mutate: initSetupIntent, isLoading: setupIntentLoading } =
+  const { mutate: initSetupIntent, isPending: setupIntentLoading } =
     useOrganizationPaymentMethodSetupIntent({
       onSuccess: (intent) => {
         setSetupIntent(intent)

@@ -1,6 +1,7 @@
 {
   "name": "e2e-studio",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "e2e": "playwright test",

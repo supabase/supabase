@@ -84,7 +84,7 @@ export const CreateOAuthAppSheet = ({ visible, onSuccess, onCancel }: CreateOAut
 
   const { data: supabaseClientData } = useSupabaseClientQuery({ projectRef })
 
-  const { mutateAsync: createOAuthApp, isLoading: isCreating } = useOAuthServerAppCreateMutation({
+  const { mutateAsync: createOAuthApp, isPending: isCreating } = useOAuthServerAppCreateMutation({
     onSuccess: (data) => {
       toast.success(`Successfully created OAuth app "${data.client_name}"`)
       onSuccess(data)

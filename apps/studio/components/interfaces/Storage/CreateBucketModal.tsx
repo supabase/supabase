@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
@@ -99,7 +100,10 @@ export const CreateBucketModal = ({
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
 
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
   const [hasAllowedMimeTypes, setHasAllowedMimeTypes] = useState(false)
 
@@ -110,7 +114,7 @@ export const CreateBucketModal = ({
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutateAsync: createBucket, isLoading: isCreatingBucket } = useBucketCreateMutation({
+  const { mutateAsync: createBucket, isPending: isCreatingBucket } = useBucketCreateMutation({
     // [Joshen] Silencing the error here as it's being handled in onSubmit
     onError: () => {},
   })

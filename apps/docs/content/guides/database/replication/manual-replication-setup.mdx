@@ -1,11 +1,20 @@
 ---
-id: 'setting-up-replication'
-title: 'Setting up replication and CDC with Supabase'
-description: 'Performing Extract Transform Load (ETL) with Supabase'
-sidebar_label: 'Setting up replication and CDC'
+id: 'manual-replication-setup'
+title: 'Manual Replication Setup'
+description: 'Configure your own replication using external tools and Postgres logical replication.'
+subtitle: 'Set up replication with Airbyte, Estuary, Fivetran, and other tools.'
+sidebar_label: 'Setting up'
 ---
 
-## Prerequisites
+This guide covers setting up **manual replication** using external tools. If you prefer a simpler, managed solution, see [ETL Replication](/docs/guides/database/replication/etl-replication-setup) instead.
+
+<Admonition type="note">
+
+This guide is for replicating data to external systems using your own tools. For deploying read-only databases across multiple regions, see [Read Replicas](/docs/guides/platform/read-replicas) instead.
+
+</Admonition>
+
+### Prerequisites
 
 To set up replication, the following is recommended:
 
@@ -39,7 +48,7 @@ You can follow those steps with the following modifications:
 1. Use the `postgres` user
 2. Select `logical replication` as the replication method (`xmin` is possible, but not recommended)
 
-## Troubleshooting
+### Troubleshooting
 
 Airbyte has a known [issue](https://discuss.airbyte.io/t/postgres-source-replication-slot-safe-wal-size-only-reset-when-a-change-occurs/3263/7) where it does not clear WAL files on each successful sync. The recommended workaround is to have a `heartbeat` table that you write changes to once an hour.>
 

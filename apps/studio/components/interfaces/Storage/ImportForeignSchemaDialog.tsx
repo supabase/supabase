@@ -14,35 +14,35 @@ import { getFDWs } from 'data/fdw/fdws-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Form_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Modal, Separator } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import type { WrapperMeta } from '../Integrations/Wrappers/Wrappers.types'
 import { formatWrapperTables } from '../Integrations/Wrappers/Wrappers.utils'
 import SchemaEditor from '../TableGridEditor/SidePanelEditor/SchemaEditor'
 import { getAnalyticsBucketFDWServerName } from './AnalyticsBuckets/AnalyticsBucketDetails/AnalyticsBucketDetails.utils'
+import { useAnalyticsBucketAssociatedEntities } from './AnalyticsBuckets/AnalyticsBucketDetails/useAnalyticsBucketAssociatedEntities'
 import { getDecryptedParameters } from './ImportForeignSchemaDialog.utils'
 
 export interface ImportForeignSchemaDialogProps {
-  bucketName: string
   namespace: string
-  wrapperMeta: WrapperMeta
   circumstance?: 'fresh' | 'clash'
   visible: boolean
   onClose: () => void
 }
 
 export const ImportForeignSchemaDialog = ({
-  bucketName,
   namespace,
-  wrapperMeta,
   visible,
   onClose,
   circumstance = 'fresh',
 }: ImportForeignSchemaDialogProps) => {
-  const { ref } = useParams()
+  const { ref, bucketId: bucketName } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [loading, setLoading] = useState(false)
   const [createSchemaSheetOpen, setCreateSchemaSheetOpen] = useState(false)
 
   const { data: schemas } = useSchemasQuery({ projectRef: project?.ref! })
+  const { icebergWrapperMeta: wrapperMeta } = useAnalyticsBucketAssociatedEntities({
+    projectRef: ref,
+    bucketId: bucketName,
+  })
 
   const { mutateAsync: createSchema } = useSchemaCreateMutation()
   const { mutateAsync: importForeignSchema } = useFDWImportForeignSchemaMutation({})
@@ -83,6 +83,7 @@ export const ImportForeignSchemaDialog = ({
     const serverName = getAnalyticsBucketFDWServerName(values.bucketName)
 
     if (!ref) return console.error('Project ref is required')
+    if (!wrapperMeta) return console.error('Wrapper meta is required')
     setLoading(true)
 
     try {

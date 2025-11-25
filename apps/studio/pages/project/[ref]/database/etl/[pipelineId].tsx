@@ -19,7 +19,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (hasLoaded && !enablePgReplicate) {
-      router.replace(`/project/${projectRef}/database/etl}`)
+      router.replace(`/project/${projectRef}/database/etl`)
     }
   }, [router, hasLoaded, projectRef, enablePgReplicate])
 

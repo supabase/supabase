@@ -76,7 +76,7 @@ export const RealtimeSettings = () => {
   const hasRealtimeMessagesPolicies =
     realtimeMessagesPolicies && realtimeMessagesPolicies.length > 0
 
-  const { mutate: updateRealtimeConfig, isLoading: isUpdatingConfig } =
+  const { mutate: updateRealtimeConfig, isPending: isUpdatingConfig } =
     useRealtimeConfigurationUpdateMutation({
       onSuccess: () => {
         form.reset(form.getValues())
@@ -260,8 +260,10 @@ export const RealtimeSettings = () => {
                                         <p className="prose max-w-full text-sm">
                                           Private mode is {isSettingToPrivate ? 'being ' : ''}
                                           enabled, but no RLS policies exists on the{' '}
-                                          <code className="text-xs">realtime.messages</code> table.
-                                          No messages will be received by users.
+                                          <code className="text-code-inline">
+                                            realtime.messages
+                                          </code>{' '}
+                                          table. No messages will be received by users.
                                         </p>
 
                                         <Button asChild type="default" className="mt-2">

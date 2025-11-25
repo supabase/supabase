@@ -136,7 +136,7 @@ export const PolicyDetailsV2 = ({
                 <FormLabel_Shadcn_ className="flex items-center gap-x-4">
                   <p className="text-foreground-light text-sm">Table</p>
                   <p className="text-foreground-light text-sm">
-                    <code className="text-xs">on</code> clause
+                    <code className="text-code-inline">on</code> clause
                   </p>
                 </FormLabel_Shadcn_>
                 {authContext === 'database' && (
@@ -225,7 +225,7 @@ export const PolicyDetailsV2 = ({
                 <FormLabel_Shadcn_ className="flex items-center gap-x-4">
                   <p className="text-foreground-light text-sm">Policy Behavior</p>
                   <p className="text-foreground-light text-sm">
-                    <code className="text-xs">as</code> clause
+                    <code className="text-code-inline">as</code> clause
                   </p>
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
@@ -267,7 +267,7 @@ export const PolicyDetailsV2 = ({
                 <FormLabel_Shadcn_ className="flex items-center gap-x-4">
                   <p className="text-foreground-light text-sm">Policy Command</p>
                   <p className="text-foreground-light text-sm">
-                    <code className="text-xs">for</code> clause
+                    <code className="text-code-inline">for</code> clause
                   </p>
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
@@ -308,7 +308,7 @@ export const PolicyDetailsV2 = ({
                 <FormLabel_Shadcn_ className="flex items-center gap-x-4">
                   <p className="text-foreground-light text-sm">Target Roles</p>
                   <p className="text-foreground-light text-sm">
-                    <code className="text-xs">to</code> clause
+                    <code className="text-code-inline">to</code> clause
                   </p>
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>

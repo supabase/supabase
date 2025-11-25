@@ -2,7 +2,10 @@ import { components } from 'api-types'
 import { Badge, cn } from 'ui'
 
 interface ComputeBadgeProps extends React.ComponentProps<typeof Badge> {
-  infraComputeSize: components['schemas']['ProjectInfo']['infra_compute_size'] | '>16XL' | undefined
+  infraComputeSize:
+    | components['schemas']['ProjectDetailResponse']['infra_compute_size']
+    | '>16XL'
+    | undefined
 }
 
 export function ComputeBadge({ infraComputeSize, className, ...props }: ComputeBadgeProps) {
