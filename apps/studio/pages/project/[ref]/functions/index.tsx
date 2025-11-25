@@ -1,5 +1,6 @@
 import { ExternalLink, Search } from 'lucide-react'
 import React, { useMemo, useState } from 'react'
+import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { DeployEdgeFunctionButton } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionButton'
@@ -8,6 +9,7 @@ import {
   EdgeFunctionsSortColumn,
   EdgeFunctionsSortDropdown,
   EdgeFunctionsSortOrder,
+  EDGE_FUNCTIONS_SORT_VALUES,
 } from 'components/interfaces/EdgeFunctions/EdgeFunctionsSortDropdown'
 import { EdgeFunctionsListItem } from 'components/interfaces/Functions/EdgeFunctionsListItem'
 import {
@@ -25,7 +27,7 @@ import type { NextPageWithLayout } from 'types'
 import {
   Button,
   Card,
-  Input,
+  Input_Shadcn_,
   Table,
   TableBody,
   TableCell,
@@ -54,12 +56,15 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     isSuccess,
   } = useEdgeFunctionsQuery({ projectRef: ref })
 
-  const [searchString, setSearchString] = useState('')
-  const [sort, setSort] = useState<EdgeFunctionsSort>('name:asc')
+  const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
+  const [sort, setSortQueryParam] = useQueryState(
+    'sort',
+    parseAsStringLiteral<EdgeFunctionsSort>(EDGE_FUNCTIONS_SORT_VALUES).withDefault('name:asc')
+  )
 
   const filteredFunctions = useMemo(() => {
     const temp = (functions ?? []).filter((x) =>
-      x.name.toLowerCase().includes(searchString.toLowerCase())
+      x.name.toLowerCase().includes(search.toLowerCase())
     )
     const [sortCol, sortOrder] = sort.split(':') as [
       EdgeFunctionsSortColumn,
@@ -79,7 +84,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
       }
       return 0
     })
-  }, [functions, searchString, sort])
+  }, [functions, search, sort])
 
   const hasFunctions = (functions ?? []).length > 0
 
@@ -97,17 +102,21 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                     <div className="space-y-4">
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-2">
-                          <Input
-                            placeholder="Search function names"
-                            size="tiny"
-                            icon={<Search size={14} />}
-                            value={searchString}
-                            className="w-52"
-                            onChange={(e) => setSearchString(e.target.value)}
-                          />
+                          <div className="relative">
+                            <Search
+                              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
+                              size={14}
+                            />
+                            <Input_Shadcn_
+                              placeholder="Search function names"
+                              className="pl-9 h-7 w-52"
+                              value={search}
+                              onChange={(e) => setSearch(e.target.value)}
+                            />
+                          </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <EdgeFunctionsSortDropdown value={sort} onChange={setSort} />
+                          <EdgeFunctionsSortDropdown value={sort} onChange={setSortQueryParam} />
                         </div>
                       </div>
                       <Card>
@@ -133,7 +142,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                                   <TableCell colSpan={5}>
                                     <p className="text-sm text-foreground">No results found</p>
                                     <p className="text-sm text-foreground-light">
-                                      Your search for "{searchString}" did not return any results
+                                      Your search for "{search}" did not return any results
                                     </p>
                                   </TableCell>
                                 </TableRow>
