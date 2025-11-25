@@ -424,7 +424,7 @@ Replication to managed destinations has the following limitations:
 
 - **Primary keys required**: Tables must have primary keys (Postgres logical replication requirement)
 - **Custom data types**: Not supported
-- **Schema changes**: Not automatically handled (DDL changes require manual intervention)
+- **Schema changes**: Not automatically handled
 - **No data transformation**: Data is replicated as-is without transformation
 - **Data duplicates**: Duplicates can occur when stopping a pipeline if your database has transactions that take longer than a few minutes to complete. See [Can data duplicates occur?](/docs/guides/database/replication/replication-faq#can-data-duplicates-occur-during-pipeline-operations) for details
 
