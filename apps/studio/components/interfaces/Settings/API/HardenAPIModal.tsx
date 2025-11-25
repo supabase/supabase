@@ -105,8 +105,8 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
         <DialogHeader>
           <DialogTitle>Switch the default API schema</DialogTitle>
           <DialogDescription>
-            Expose a custom schema instead of the{' '}
-            <code className="text-xs text-foreground">public</code> schema
+            Expose a custom schema instead of the <code className="text-code-inline">public</code>{' '}
+            schema
           </DialogDescription>
         </DialogHeader>
 
@@ -114,10 +114,10 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
 
         <DialogSection className="text-sm text-foreground-light">
           <p>
-            By default, the <code className="text-xs text-foreground">public</code> schema is used
-            to generate API routes. In some cases, it's better to use a custom schema. This is
+            By default, the <code className="text-code-inline">public</code> schema is used to
+            generate API routes. In some cases, it's better to use a custom schema. This is
             important if you use tools that generate tables in the{' '}
-            <code className="text-xs text-foreground">public</code> schema to{' '}
+            <code className="text-code-inline">public</code> schema to{' '}
             <span className="text-brand">prevent accidental exposure of data</span>.
           </p>
           <DocsButton
@@ -132,8 +132,7 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
         <Collapsible_Shadcn_>
           <CollapsibleTrigger_Shadcn_ className="py-4 px-5 w-full flex items-center justify-between text-sm">
             <p>
-              1. Create a custom <code className="text-xs text-foreground">api</code> schema and
-              expose it
+              1. Create a custom <code className="text-code-inline">api</code> schema and expose it
             </p>
             {hasAPISchema && isAPISchemaExposed ? (
               <Check size={16} className="text-brand" />
@@ -147,10 +146,10 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
           <CollapsibleContent_Shadcn_ className="text-sm text-foreground-light flex flex-col gap-y-4">
             <p className="mx-5">
               Click the button below to create a new schema named{' '}
-              <code className="text-xs text-foreground">api</code> and grant the{' '}
-              <code className="text-xs text-foreground">anon</code> and{' '}
-              <code className="text-xs text-foreground">authenticated</code> roles usage privileges
-              on this schema. This schema will thereafter also be exposed to the Data API.
+              <code className="text-code-inline">api</code> and grant the{' '}
+              <code className="text-code-inline">anon</code> and{' '}
+              <code className="text-code-inline">authenticated</code> roles usage privileges on this
+              schema. This schema will thereafter also be exposed to the Data API.
             </p>
 
             <div className="px-5">
@@ -160,8 +159,8 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
                   <div className="flex flex-col gap-y-2">
                     <p>
                       The following query will be run to create the{' '}
-                      <code className="text-xs text-foreground">api</code> schema , as well as to
-                      grant the necessary privileges to the respective roles
+                      <code className="text-code-inline">api</code> schema , as well as to grant the
+                      necessary privileges to the respective roles
                     </p>
                     <CodeBlock
                       language="sql"
@@ -195,11 +194,11 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
 
             <div className="flex flex-col gap-y-4 px-5 pb-4">
               <p>
-                Under these new settings, the <code className="text-xs text-foreground">anon</code>{' '}
-                and <code className="text-xs text-foreground">authenticated</code> roles can execute
-                functions defined in the <code className="text-xs text-foreground">api</code>{' '}
-                schema, but they have no automatic permissions on any tables. On a table-by-table
-                basis, you can grant them permissions by running the following command:
+                Under these new settings, the <code className="text-code-inline">anon</code> and{' '}
+                <code className="text-code-inline">authenticated</code> roles can execute functions
+                defined in the <code className="text-code-inline">api</code> schema, but they have
+                no automatic permissions on any tables. On a table-by-table basis, you can grant
+                them permissions by running the following command:
               </p>
               <CodeBlock
                 language="sql"
@@ -216,8 +215,8 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
         <Collapsible_Shadcn_>
           <CollapsibleTrigger_Shadcn_ className="py-4 px-5 w-full flex items-center justify-between text-sm">
             <p>
-              2. Remove the <code className="text-xs text-foreground">public</code> schema from the
-              exposed schemas
+              2. Remove the <code className="text-code-inline">public</code> schema from the exposed
+              schemas
             </p>
             {!isPublicSchemaExposed ? (
               <Check size={16} className="text-brand" />
@@ -234,18 +233,18 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
                 <WarningIcon />
                 <AlertTitle_Shadcn_ className="text-foreground">
                   Ensure that your app is no longer using the{' '}
-                  <code className="text-xs text-foreground">public</code> schema
+                  <code className="text-code-inline">public</code> schema
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
-                  The <code className="text-xs text-foreground">public</code> schema will not be
-                  accessible via the API once its not exposed. You should be using the{' '}
-                  <code className="text-xs text-foreground">api</code> schema instead.
+                  The <code className="text-code-inline">public</code> schema will not be accessible
+                  via the API once its not exposed. You should be using the{' '}
+                  <code className="text-code-inline">api</code> schema instead.
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
               <p>
                 Click the button below to remove the{' '}
-                <code className="text-xs text-foreground">public</code> schema from both Exposed
-                schemas and Extra search path in your API configuration.
+                <code className="text-code-inline">public</code> schema from both Exposed schemas
+                and Extra search path in your API configuration.
               </p>
               <ButtonTooltip
                 type="primary"

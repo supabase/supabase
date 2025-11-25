@@ -24,6 +24,7 @@ import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   Form_Shadcn_,
@@ -36,7 +37,6 @@ import {
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { IS_PLATFORM } from 'lib/constants'
 
 // [Joshen] Not convinced with the UI and layout but getting the functionality out first
 
@@ -214,22 +214,24 @@ export const QueuesSettings = () => {
                           <>
                             <p className="max-w-2xl">
                               When enabled, you will be able to use the following functions from the{' '}
-                              <code className="text-xs">{QUEUES_SCHEMA}</code> schema to manage your
-                              queues via any Supabase client library or PostgREST endpoints:
+                              <code className="text-code-inline">{QUEUES_SCHEMA}</code> schema to
+                              manage your queues via any Supabase client library or PostgREST
+                              endpoints:
                             </p>
                             <p className="mt-2">
-                              <code className="text-xs">send</code>,{' '}
-                              <code className="text-xs">send_batch</code>,{' '}
-                              <code className="text-xs">read</code>,{' '}
-                              <code className="text-xs">pop</code>,
-                              <code className="text-xs">archive</code>, and{' '}
-                              <code className="text-xs">delete</code>
+                              <code className="text-code-inline">send</code>,{' '}
+                              <code className="text-code-inline">send_batch</code>,{' '}
+                              <code className="text-code-inline">read</code>,{' '}
+                              <code className="text-code-inline">pop</code>,
+                              <code className="text-code-inline">archive</code>, and{' '}
+                              <code className="text-code-inline">delete</code>
                             </p>
                             {!IS_PLATFORM ? (
                               <div className="mt-6 max-w-2xl">
                                 When running Supabase locally with the CLI or self-hosting using
                                 Docker Compose, you also need to update your configuration to expose
-                                the <code className="text-xs">{QUEUES_SCHEMA}</code> schema.
+                                the <code className="text-code-inline">{QUEUES_SCHEMA}</code>{' '}
+                                schema.
                                 <br />
                                 <TextLink
                                   target="_blank"
@@ -269,7 +271,7 @@ export const QueuesSettings = () => {
                             {tablesWithoutRLS.map((x) => {
                               return (
                                 <li key={x.name}>
-                                  <code className="text-xs">{x.name.slice(2)}</code>
+                                  <code className="text-code-inline">{x.name.slice(2)}</code>
                                 </li>
                               )
                             })}
@@ -291,27 +293,28 @@ export const QueuesSettings = () => {
                         <Admonition type="warning" className="mt-2">
                           <p>
                             Queues will be exposed and managed through the{' '}
-                            <code className="text-xs">{QUEUES_SCHEMA}</code> schema
+                            <code className="text-code-inline">{QUEUES_SCHEMA}</code> schema
                           </p>
                           <p className="text-foreground-light">
                             Database functions will be created in the{' '}
-                            <code className="text-xs">{QUEUES_SCHEMA}</code> schema upon enabling.
-                            Call these functions via any Supabase client library or PostgREST
-                            endpoint to manage your queues. Permissions on individual queues can
-                            also be further managed through privileges and row level security (RLS).
+                            <code className="text-code-inline">{QUEUES_SCHEMA}</code> schema upon
+                            enabling. Call these functions via any Supabase client library or
+                            PostgREST endpoint to manage your queues. Permissions on individual
+                            queues can also be further managed through privileges and row level
+                            security (RLS).
                           </p>
                         </Admonition>
                       )}
                       {formState.dirtyFields.enable && field.value === false && (
                         <Admonition type="warning" className="mt-2">
                           <p>
-                            The <code className="text-xs">{QUEUES_SCHEMA}</code> schema will be
-                            removed once disabled
+                            The <code className="text-code-inline">{QUEUES_SCHEMA}</code> schema
+                            will be removed once disabled
                           </p>
                           <p className="text-foreground-light">
                             Ensure that the database functions from the{' '}
-                            <code className="text-xs">{QUEUES_SCHEMA}</code> schema are not in use
-                            within your client applications before disabling.
+                            <code className="text-code-inline">{QUEUES_SCHEMA}</code> schema are not
+                            in use within your client applications before disabling.
                           </p>
                         </Admonition>
                       )}
@@ -347,7 +350,7 @@ export const QueuesSettings = () => {
 
       <ConfirmationModal
         visible={rlsConfirmModalOpen}
-        title="Confirm to enable Row Level Security"
+        title="Enable Row Level Security"
         confirmLabel="Enable RLS"
         confirmLabelLoading="Enabling RLS"
         loading={isUpdatingRls}
@@ -361,7 +364,7 @@ export const QueuesSettings = () => {
           {tablesWithoutRLS.map((x) => {
             return (
               <li key={x.id}>
-                <code className="text-xs">{x.name.slice(2)}</code>
+                <code className="text-code-inline">{x.name.slice(2)}</code>
               </li>
             )
           })}

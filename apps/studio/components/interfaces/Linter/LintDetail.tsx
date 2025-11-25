@@ -2,15 +2,15 @@ import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 
 import { createLintSummaryPrompt, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { Lint } from 'data/lint/lint-query'
 import { DOCS_URL } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
 import { ExternalLink } from 'lucide-react'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AiIconAnimation, Button } from 'ui'
 import { EntityTypeIcon, LintCTA, LintEntity } from './Linter.utils'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 interface LintDetailProps {
   lint: Lint
@@ -35,7 +35,7 @@ const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     snap.newChat({
       name: 'Summarize lint',
-      initialInput: createLintSummaryPrompt(lint),
+      initialMessage: createLintSummaryPrompt(lint),
     })
   }
 
