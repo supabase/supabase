@@ -11,6 +11,8 @@ Check updates, changelogs, and release notes for each service to learn more.
 
 ## Unreleased
 
+[...]
+
 ---
 
 ## [2025-11-25]
