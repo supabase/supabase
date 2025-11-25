@@ -509,13 +509,12 @@ values
           </Button>
         </div>
         {language === 'javascript' ? (
-          <>
-            <CodeBlock
-              hideLineNumbers
-              wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-3')}
-              className="[&_code]:text-[12px] [&_code]:text-foreground"
-              language="js"
-              value={`import { createClient } from '@supabase/supabase-js'
+          <CodeBlock
+            hideLineNumbers
+            wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-3')}
+            className="[&_code]:text-[12px] [&_code]:text-foreground"
+            language="js"
+            value={`import { createClient } from '@supabase/supabase-js'
 
 const client = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -540,8 +539,7 @@ const result = await index.putVectors({
     },
   ],
 })`}
-            />
-          </>
+          />
         ) : (
           <>
             <CodeBlock
@@ -562,7 +560,7 @@ const result = await index.putVectors({
                   rel="noreferrer"
                   href={`/project/${projectRef}/sql/new?content=${encodeURIComponent(sqlCode)}`}
                 >
-                  <p>Query in SQL Editor</p>
+                  Query in SQL Editor
                 </Link>
               </Button>
             </div>
