@@ -3,7 +3,6 @@ import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryStates } from 'n
 import { useParams } from 'common'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { useQueryPerformanceSort } from 'components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
-import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
 import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
 import {
   PRESET_CONFIG,
@@ -65,7 +64,6 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
       <div className="w-full mb-0 flex lg:items-center justify-between gap-4 py-4 px-6 lg:flex-row flex-col">
         <h3 className="text-foreground text-xl prose">Query Performance</h3>
         <div className="flex items-center gap-2 flex-wrap">
-          <EnableIndexAdvisorButton />
           <DocsButton
             href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`}
           />

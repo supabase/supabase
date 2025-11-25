@@ -1,11 +1,13 @@
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-
+import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { BASE_PATH } from 'lib/constants'
-import { Badge, Button } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { EnableIndexAdvisorButton } from './EnableIndexAdvisorButton'
 
 export const IndexAdvisorNotice = () => {
+  const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
+
+  if (!isIndexAdvisorAvailable || isIndexAdvisorEnabled) return null
+
   return (
     <div className="px-6">
       <Admonition showIcon={false} type="tip" className="relative overflow-hidden mb-4">
@@ -25,14 +27,13 @@ export const IndexAdvisorNotice = () => {
         <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-8 justify-between px-2 py-1">
           <div className="flex flex-col gap-y-0.5">
             <div className="flex flex-col gap-y-2 items-start">
-              <p className="text-sm font-medium">Index Advisor</p>
+              <p className="text-sm font-medium">Enable Index Advisor</p>
             </div>
             <p className="text-sm text-foreground-lighter text-balance">
-              Enable the Index Advisor plugin to get recommendations and optimizations on your
-              queries.
+              Recommends indexes to improve query performance.
             </p>
           </div>
-          <Button type="primary">Enable</Button>
+          <EnableIndexAdvisorButton />
         </div>
       </Admonition>
     </div>
