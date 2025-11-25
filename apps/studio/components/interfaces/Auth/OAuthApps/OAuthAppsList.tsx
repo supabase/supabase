@@ -240,7 +240,7 @@ export const OAuthAppsList = () => {
                   <TableHead>Registration Type</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="w-8 px-0">
-                    <div className="!bg-200 px-4 w-full h-full flex items-center border-l @[904px]:border-l-0" />
+                    <div className="!bg-200 px-4 w-full h-full flex items-center border-l @[944px]:border-l-0" />
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -255,10 +255,10 @@ export const OAuthAppsList = () => {
                 {filteredOAuthApps.length > 0 &&
                   filteredOAuthApps.map((app) => (
                     <TableRow key={app.client_id} className="w-full">
-                      <TableCell className="w-100 max-w-64 truncate" title={app.client_name}>
+                      <TableCell className="w-48 max-w-48 flex" title={app.client_name}>
                         <Button
                           type="text"
-                          className="text-link-table-cell text-sm p-0 hover:bg-transparent title"
+                          className="text-link-table-cell text-sm p-0 hover:bg-transparent title [&>span]:!w-full"
                           onClick={() => handleEditClick(app)}
                           title={app.client_name}
                         >
@@ -277,8 +277,8 @@ export const OAuthAppsList = () => {
                       <TableCell className="text-xs text-foreground-light min-w-28 max-w-40 w-1/6">
                         <TimestampInfo utcTimestamp={app.created_at} labelFormat="D MMM, YYYY" />
                       </TableCell>
-                      <TableCell className="max-w-20 bg-surface-100 @[904px]:hover:bg-surface-200 px-6">
-                        <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l @[904px]:border-l-0">
+                      <TableCell className="max-w-20 bg-surface-100 @[944px]:hover:bg-surface-200 px-6">
+                        <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l @[944px]:border-l-0">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button type="default" className="px-1" icon={<MoreVertical />} />
