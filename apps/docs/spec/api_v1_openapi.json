@@ -1976,6 +1976,43 @@
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
         "x-oauth-scope": "projects:write"
+      },
+      "patch": {
+        "operationId": "v1-update-a-project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/V1UpdateProjectBody" } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V1ProjectRefResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to update project" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Updates the given project",
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-oauth-scope": "projects:write"
       }
     },
     "/v1/projects/{ref}/secrets": {
@@ -4192,6 +4229,39 @@
         "x-oauth-scope": "database:write"
       }
     },
+    "/v1/projects/{ref}/database/query/read-only": {
+      "post": {
+        "description": "All entity references must be schema qualified.",
+        "operationId": "v1-read-only-query",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/V1ReadOnlyQueryBody" } }
+          }
+        },
+        "responses": {
+          "201": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to run read-only sql query" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "[Beta] Run a sql query as supabase_read_only_user",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-oauth-scope": "database:read"
+      }
+    },
     "/v1/projects/{ref}/database/webhooks/enable": {
       "post": {
         "operationId": "v1-enable-database-webhook",
@@ -4250,6 +4320,47 @@
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
         "x-oauth-scope": "projects:read"
+      }
+    },
+    "/v1/projects/{ref}/database/password": {
+      "patch": {
+        "operationId": "v1-update-database-password",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/V1UpdatePasswordBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V1UpdatePasswordResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to update database password" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Updates the database password",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/database/jit": {
@@ -6772,6 +6883,11 @@
         },
         "required": ["id", "ref", "name"]
       },
+      "V1UpdateProjectBody": {
+        "type": "object",
+        "properties": { "name": { "type": "string", "minLength": 1, "maxLength": 256 } },
+        "required": ["name"]
+      },
       "SecretResponse": {
         "type": "object",
         "properties": {
@@ -8875,6 +8991,14 @@
         },
         "required": ["query"]
       },
+      "V1ReadOnlyQueryBody": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string", "minLength": 1 },
+          "parameters": { "type": "array", "items": {} }
+        },
+        "required": ["query"]
+      },
       "GetProjectDbMetadataResponse": {
         "type": "object",
         "properties": {
@@ -8900,6 +9024,16 @@
           }
         },
         "required": ["databases"]
+      },
+      "V1UpdatePasswordBody": {
+        "type": "object",
+        "properties": { "password": { "type": "string", "minLength": 4 } },
+        "required": ["password"]
+      },
+      "V1UpdatePasswordResponse": {
+        "type": "object",
+        "properties": { "message": { "type": "string" } },
+        "required": ["message"]
       },
       "JitAccessResponse": {
         "type": "object",
