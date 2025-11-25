@@ -142,7 +142,7 @@ export const OAuthAppsList = () => {
   return (
     <>
       <div className="space-y-4">
-        {newOAuthApp && (
+        {newOAuthApp?.client_secret && (
           <NewOAuthAppBanner oauthApp={newOAuthApp} onClose={() => setNewOAuthApp(undefined)} />
         )}
         {!isOAuthServerEnabled && (

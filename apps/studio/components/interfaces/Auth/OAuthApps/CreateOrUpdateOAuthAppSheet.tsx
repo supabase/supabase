@@ -93,6 +93,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
   const [logoUrl, setLogoUrl] = useState<string>()
   const [logoRemoved, setLogoRemoved] = useState(false)
   const hasLogo = logoUrl !== undefined
+  const isPublicClient = appToEdit?.client_type === 'public'
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -109,7 +110,6 @@ export const CreateOrUpdateOAuthAppSheet = ({
   })
 
   const { data: supabaseClientData } = useSupabaseClientQuery({ projectRef })
-
   const { mutateAsync: createOAuthApp, isPending: isCreating } = useOAuthServerAppCreateMutation({
     onSuccess: (data) => {
       toast.success(`Successfully created OAuth app "${data.client_name}"`)
@@ -119,7 +119,6 @@ export const CreateOrUpdateOAuthAppSheet = ({
       toast.error(error.message)
     },
   })
-
   const { mutateAsync: updateOAuthApp, isPending: isUpdating } = useOAuthServerAppUpdateMutation({
     onSuccess: (data) => {
       toast.success(`Successfully updated OAuth app "${data.client_name}"`)
@@ -129,7 +128,6 @@ export const CreateOrUpdateOAuthAppSheet = ({
       toast.error(error.message)
     },
   })
-
   const { mutateAsync: regenerateSecret, isPending: isRegenerating } =
     useOAuthServerAppRegenerateSecretMutation({
       onSuccess: (data) => {
@@ -149,7 +147,6 @@ export const CreateOrUpdateOAuthAppSheet = ({
       setLogoFile(undefined)
       setLogoRemoved(false)
       if (appToEdit) {
-        // Populate form with existing app data
         form.reset({
           name: appToEdit.client_name,
           type: 'manual' as const,
@@ -183,26 +180,21 @@ export const CreateOrUpdateOAuthAppSheet = ({
   }
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    // Filter out empty redirect URIs
     const validRedirectUris = data.redirect_uris
       .map((uri) => uri.value.trim())
       .filter((uri) => uri !== '')
 
-    // Determine logo URI to send
     let uploadedLogoUri: string | undefined = undefined
 
     if (logoRemoved) {
-      // Explicitly set to empty string to clear the logo
       uploadedLogoUri = ''
     } else if (logoFile) {
-      // Convert logo file to data URL if present
       const reader = new FileReader()
       uploadedLogoUri = await new Promise<string>((resolve) => {
         reader.onloadend = () => resolve(reader.result as string)
         reader.readAsDataURL(logoFile)
       })
     } else if (logoUrl) {
-      // Keep existing logo URL
       uploadedLogoUri = logoUrl
     }
 
@@ -266,7 +258,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
     <>
       <Sheet open={visible} onOpenChange={() => onCancel()}>
         <SheetContent
-          size="default"
+          size="lg"
           showClose={false}
           className="flex flex-col gap-0"
           tabIndex={undefined}
@@ -382,35 +374,39 @@ export const CreateOrUpdateOAuthAppSheet = ({
                             )}
                           />
 
-                          <FormField_Shadcn_
-                            control={form.control}
-                            name="client_secret"
-                            render={() => (
-                              <FormItemLayout
-                                label="Client Secret"
-                                description="Client secret is hidden for security. Use the regenerate button to create a new one."
-                              >
-                                <FormControl_Shadcn_>
-                                  <Input
-                                    readOnly
-                                    type="password"
-                                    className="input-mono"
-                                    value="****************************************************************"
-                                    onChange={() => {}}
-                                  />
-                                </FormControl_Shadcn_>
-                              </FormItemLayout>
-                            )}
-                          />
+                          {!isPublicClient && (
+                            <>
+                              <FormField_Shadcn_
+                                control={form.control}
+                                name="client_secret"
+                                render={() => (
+                                  <FormItemLayout
+                                    label="Client Secret"
+                                    description="Client secret is hidden for security. Use the regenerate button to create a new one."
+                                  >
+                                    <FormControl_Shadcn_>
+                                      <Input
+                                        readOnly
+                                        type="password"
+                                        className="input-mono"
+                                        value="****************************************************************"
+                                        onChange={() => {}}
+                                      />
+                                    </FormControl_Shadcn_>
+                                  </FormItemLayout>
+                                )}
+                              />
 
-                          <Button
-                            type="default"
-                            onClick={handleRegenerateSecret}
-                            className="w-full"
-                            disabled={isRegenerating}
-                          >
-                            Regenerate Client Secret
-                          </Button>
+                              <Button
+                                type="default"
+                                onClick={handleRegenerateSecret}
+                                className="w-full"
+                                disabled={isRegenerating}
+                              >
+                                Regenerate Client Secret
+                              </Button>
+                            </>
+                          )}
                         </Panel.Content>
                       </Panel>
                     </div>
