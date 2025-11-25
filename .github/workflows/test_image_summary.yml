@@ -1,0 +1,32 @@
+name: Test Image Summary
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test_summary:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - name: Generate test image version
+        id: version
+        run: |
+          # Simulated image version
+          DATE=$(date +%Y.%m.%d)
+          SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          VERSION="${DATE}-sha-${SHA}"
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Create job summary
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          cat >> $GITHUB_STEP_SUMMARY <<EOF
+          # 📦 Published Docker Images
+
+          The following Docker images have been published:
+
+          - **Versioned tag**: \`supabase/studio:${VERSION}\`
+            - [View on Docker Hub](https://hub.docker.com/r/supabase/studio/tags?name=${VERSION})
+
+          - **Latest tag**: \`supabase/studio:latest\`
+            - [View on Docker Hub](https://hub.docker.com/r/supabase/studio/tags?name=latest)
+          EOF
