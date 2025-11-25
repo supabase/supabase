@@ -50,7 +50,7 @@ export const AccountIdentities = () => {
   const [selectedProviderUnlink, setSelectedProviderUnlink] = useState<string>()
   const [selectedProviderUpdateEmail, setSelectedProviderUpdateEmail] = useState<string>()
 
-  const { mutate: unlinkIdentity, isLoading: isUnlinking } = useUnlinkIdentityMutation({
+  const { mutate: unlinkIdentity, isPending: isUnlinking } = useUnlinkIdentityMutation({
     onSuccess: () => {
       toast.success(
         `Successfully unlinked ${getProviderName(selectedProviderUnlink ?? '')} identity!`

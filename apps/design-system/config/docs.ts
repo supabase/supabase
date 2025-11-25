@@ -26,6 +26,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Typography',
+          href: '/docs/typography',
+          items: [],
+        },
+        {
           title: 'Theming',
           href: '/docs/theming',
           items: [],
@@ -36,9 +41,9 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          items: [],
-          href: '/docs/ui-patterns/accessibility',
           title: 'Accessibility',
+          href: '/docs/accessibility',
+          items: [],
         },
       ],
     },
@@ -138,6 +143,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Logs Bar Chart',
           href: '/docs/fragments/logs-bar-chart',
+          items: [],
+        },
+        {
+          title: 'Metric Card',
+          href: '/docs/fragments/metric-card',
           items: [],
         },
         {

@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
@@ -23,10 +24,14 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
   const { data: org } = useSelectedOrganizationQuery()
   const snap = useRoleImpersonationStateSnapshot()
 
-  const { data: apiKeys } = useAPIKeysQuery({
-    projectRef: config.projectRef,
-    reveal: true,
-  })
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: apiKeys } = useAPIKeysQuery(
+    {
+      projectRef: config.projectRef,
+      reveal: true,
+    },
+    { enabled: canReadAPIKeys }
+  )
   const { anonKey, publishableKey } = getKeys(apiKeys)
 
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery(

@@ -4,9 +4,9 @@ import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -94,7 +94,7 @@ export const PublicationsTables = () => {
 
       {isSuccess &&
         (tables.length === 0 ? (
-          <NoSearchResults />
+          <NoSearchResults searchString={filterString} onResetFilter={() => setFilterString('')} />
         ) : (
           <Card>
             <Table>

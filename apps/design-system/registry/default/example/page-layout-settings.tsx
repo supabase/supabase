@@ -73,7 +73,7 @@ export default function PageLayoutSettings() {
   return (
     <div className="w-full">
       <PageHeader size="default">
-        <PageHeaderMeta size="default">
+        <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>User Sessions</PageHeaderTitle>
             <PageHeaderDescription>

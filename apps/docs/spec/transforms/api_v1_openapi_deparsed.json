@@ -62,7 +62,7 @@
     },
     {
       "name": "Storage",
-      "description": "Storage related endpoints"
+      "description": "Visit [https://supabase.github.io/storage/](https://supabase.github.io/storage/) for complete documentation."
     }
   ],
   "paths": {
@@ -862,11 +862,25 @@
                     "properties": {
                       "id": {
                         "type": "string",
-                        "description": "Id of your project"
+                        "deprecated": true,
+                        "description": "Deprecated: Use `ref` instead."
+                      },
+                      "ref": {
+                        "type": "string",
+                        "minLength": 20,
+                        "maxLength": 20,
+                        "pattern": "^[a-z]+$",
+                        "description": "Project ref"
                       },
                       "organization_id": {
                         "type": "string",
-                        "description": "Slug of your organization"
+                        "description": "Deprecated: Use `organization_slug` instead.",
+                        "deprecated": true
+                      },
+                      "organization_slug": {
+                        "type": "string",
+                        "pattern": "^[\\w-]+$",
+                        "description": "Organization slug"
                       },
                       "name": {
                         "type": "string",
@@ -927,7 +941,9 @@
                     },
                     "required": [
                       "id",
+                      "ref",
                       "organization_id",
+                      "organization_slug",
                       "name",
                       "region",
                       "created_at",
@@ -976,7 +992,13 @@
                   },
                   "organization_id": {
                     "type": "string",
-                    "description": "Slug of your organization"
+                    "description": "Deprecated: Use `organization_slug` instead.",
+                    "deprecated": true
+                  },
+                  "organization_slug": {
+                    "type": "string",
+                    "pattern": "^[\\w-]+$",
+                    "description": "Organization slug"
                   },
                   "plan": {
                     "type": "string",
@@ -1118,7 +1140,7 @@
                     "deprecated": true
                   }
                 },
-                "required": ["db_pass", "name", "organization_id"],
+                "required": ["db_pass", "name", "organization_slug"],
                 "additionalProperties": false,
                 "hideDefinitions": ["release_channel", "postgres_engine"]
               }
@@ -1135,11 +1157,25 @@
                   "properties": {
                     "id": {
                       "type": "string",
-                      "description": "Id of your project"
+                      "deprecated": true,
+                      "description": "Deprecated: Use `ref` instead."
+                    },
+                    "ref": {
+                      "type": "string",
+                      "minLength": 20,
+                      "maxLength": 20,
+                      "pattern": "^[a-z]+$",
+                      "description": "Project ref"
                     },
                     "organization_id": {
                       "type": "string",
-                      "description": "Slug of your organization"
+                      "description": "Deprecated: Use `organization_slug` instead.",
+                      "deprecated": true
+                    },
+                    "organization_slug": {
+                      "type": "string",
+                      "pattern": "^[\\w-]+$",
+                      "description": "Organization slug"
                     },
                     "name": {
                       "type": "string",
@@ -1176,7 +1212,16 @@
                       ]
                     }
                   },
-                  "required": ["id", "organization_id", "name", "region", "created_at", "status"]
+                  "required": [
+                    "id",
+                    "ref",
+                    "organization_id",
+                    "organization_slug",
+                    "name",
+                    "region",
+                    "created_at",
+                    "status"
+                  ]
                 }
               }
             }
@@ -1398,13 +1443,20 @@
                     "type": "object",
                     "properties": {
                       "id": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "Deprecated: Use `slug` instead.",
+                        "deprecated": true
+                      },
+                      "slug": {
+                        "type": "string",
+                        "pattern": "^[\\w-]+$",
+                        "description": "Organization slug"
                       },
                       "name": {
                         "type": "string"
                       }
                     },
-                    "required": ["id", "name"]
+                    "required": ["id", "slug", "name"]
                   }
                 }
               }
@@ -1458,13 +1510,20 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Deprecated: Use `slug` instead.",
+                      "deprecated": true
+                    },
+                    "slug": {
+                      "type": "string",
+                      "pattern": "^[\\w-]+$",
+                      "description": "Organization slug"
                     },
                     "name": {
                       "type": "string"
                     }
                   },
-                  "required": ["id", "name"]
+                  "required": ["id", "slug", "name"]
                 }
               }
             }
@@ -5836,11 +5895,25 @@
                   "properties": {
                     "id": {
                       "type": "string",
-                      "description": "Id of your project"
+                      "deprecated": true,
+                      "description": "Deprecated: Use `ref` instead."
+                    },
+                    "ref": {
+                      "type": "string",
+                      "minLength": 20,
+                      "maxLength": 20,
+                      "pattern": "^[a-z]+$",
+                      "description": "Project ref"
                     },
                     "organization_id": {
                       "type": "string",
-                      "description": "Slug of your organization"
+                      "description": "Deprecated: Use `organization_slug` instead.",
+                      "deprecated": true
+                    },
+                    "organization_slug": {
+                      "type": "string",
+                      "pattern": "^[\\w-]+$",
+                      "description": "Organization slug"
                     },
                     "name": {
                       "type": "string",
@@ -5901,7 +5974,9 @@
                   },
                   "required": [
                     "id",
+                    "ref",
                     "organization_id",
+                    "organization_slug",
                     "name",
                     "region",
                     "created_at",
@@ -8631,7 +8706,9 @@
                       "type": "string"
                     },
                     "statement_timeout": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Default unit: ms",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                     },
                     "track_commit_timestamp": {
                       "type": "boolean"
@@ -8640,15 +8717,17 @@
                       "type": "string"
                     },
                     "wal_sender_timeout": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Default unit: ms",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                     },
                     "work_mem": {
                       "type": "string"
                     },
                     "checkpoint_timeout": {
-                      "type": "integer",
-                      "minimum": 30,
-                      "maximum": 86400
+                      "type": "string",
+                      "description": "Default unit: s",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                     },
                     "hot_standby_feedback": {
                       "type": "boolean"
@@ -8777,7 +8856,9 @@
                     "type": "string"
                   },
                   "statement_timeout": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Default unit: ms",
+                    "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                   },
                   "track_commit_timestamp": {
                     "type": "boolean"
@@ -8786,15 +8867,17 @@
                     "type": "string"
                   },
                   "wal_sender_timeout": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Default unit: ms",
+                    "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                   },
                   "work_mem": {
                     "type": "string"
                   },
                   "checkpoint_timeout": {
-                    "type": "integer",
-                    "minimum": 30,
-                    "maximum": 86400
+                    "type": "string",
+                    "description": "Default unit: s",
+                    "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                   },
                   "hot_standby_feedback": {
                     "type": "boolean"
@@ -8884,7 +8967,9 @@
                       "type": "string"
                     },
                     "statement_timeout": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Default unit: ms",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                     },
                     "track_commit_timestamp": {
                       "type": "boolean"
@@ -8893,15 +8978,17 @@
                       "type": "string"
                     },
                     "wal_sender_timeout": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Default unit: ms",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                     },
                     "work_mem": {
                       "type": "string"
                     },
                     "checkpoint_timeout": {
-                      "type": "integer",
-                      "minimum": 30,
-                      "maximum": 86400
+                      "type": "string",
+                      "description": "Default unit: s",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
                     },
                     "hot_standby_feedback": {
                       "type": "boolean"
@@ -19594,11 +19681,25 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Id of your project"
+            "deprecated": true,
+            "description": "Deprecated: Use `ref` instead."
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 20,
+            "pattern": "^[a-z]+$",
+            "description": "Project ref"
           },
           "organization_id": {
             "type": "string",
-            "description": "Slug of your organization"
+            "description": "Deprecated: Use `organization_slug` instead.",
+            "deprecated": true
+          },
+          "organization_slug": {
+            "type": "string",
+            "pattern": "^[\\w-]+$",
+            "description": "Organization slug"
           },
           "name": {
             "type": "string",
@@ -19657,7 +19758,17 @@
             "required": ["host", "version", "postgres_engine", "release_channel"]
           }
         },
-        "required": ["id", "organization_id", "name", "region", "created_at", "status", "database"]
+        "required": [
+          "id",
+          "ref",
+          "organization_id",
+          "organization_slug",
+          "name",
+          "region",
+          "created_at",
+          "status",
+          "database"
+        ]
       },
       "V1CreateProjectBody": {
         "type": "object",
@@ -19673,7 +19784,13 @@
           },
           "organization_id": {
             "type": "string",
-            "description": "Slug of your organization"
+            "description": "Deprecated: Use `organization_slug` instead.",
+            "deprecated": true
+          },
+          "organization_slug": {
+            "type": "string",
+            "pattern": "^[\\w-]+$",
+            "description": "Organization slug"
           },
           "plan": {
             "type": "string",
@@ -19815,7 +19932,7 @@
             "deprecated": true
           }
         },
-        "required": ["db_pass", "name", "organization_id"],
+        "required": ["db_pass", "name", "organization_slug"],
         "additionalProperties": false,
         "hideDefinitions": ["release_channel", "postgres_engine"]
       },
@@ -19824,11 +19941,25 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Id of your project"
+            "deprecated": true,
+            "description": "Deprecated: Use `ref` instead."
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 20,
+            "pattern": "^[a-z]+$",
+            "description": "Project ref"
           },
           "organization_id": {
             "type": "string",
-            "description": "Slug of your organization"
+            "description": "Deprecated: Use `organization_slug` instead.",
+            "deprecated": true
+          },
+          "organization_slug": {
+            "type": "string",
+            "pattern": "^[\\w-]+$",
+            "description": "Organization slug"
           },
           "name": {
             "type": "string",
@@ -19865,7 +19996,16 @@
             ]
           }
         },
-        "required": ["id", "organization_id", "name", "region", "created_at", "status"]
+        "required": [
+          "id",
+          "ref",
+          "organization_id",
+          "organization_slug",
+          "name",
+          "region",
+          "created_at",
+          "status"
+        ]
       },
       "RegionsInfo": {
         "type": "object",
@@ -19980,13 +20120,20 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Deprecated: Use `slug` instead.",
+            "deprecated": true
+          },
+          "slug": {
+            "type": "string",
+            "pattern": "^[\\w-]+$",
+            "description": "Organization slug"
           },
           "name": {
             "type": "string"
           }
         },
-        "required": ["id", "name"]
+        "required": ["id", "slug", "name"]
       },
       "CreateOrganizationV1": {
         "type": "object",
@@ -21995,7 +22142,9 @@
             "type": "string"
           },
           "statement_timeout": {
-            "type": "string"
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
           },
           "track_commit_timestamp": {
             "type": "boolean"
@@ -22004,15 +22153,17 @@
             "type": "string"
           },
           "wal_sender_timeout": {
-            "type": "string"
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
           },
           "work_mem": {
             "type": "string"
           },
           "checkpoint_timeout": {
-            "type": "integer",
-            "minimum": 30,
-            "maximum": 86400
+            "type": "string",
+            "description": "Default unit: s",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
           },
           "hot_standby_feedback": {
             "type": "boolean"
@@ -22090,7 +22241,9 @@
             "type": "string"
           },
           "statement_timeout": {
-            "type": "string"
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
           },
           "track_commit_timestamp": {
             "type": "boolean"
@@ -22099,15 +22252,17 @@
             "type": "string"
           },
           "wal_sender_timeout": {
-            "type": "string"
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
           },
           "work_mem": {
             "type": "string"
           },
           "checkpoint_timeout": {
-            "type": "integer",
-            "minimum": 30,
-            "maximum": 86400
+            "type": "string",
+            "description": "Default unit: s",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
           },
           "hot_standby_feedback": {
             "type": "boolean"

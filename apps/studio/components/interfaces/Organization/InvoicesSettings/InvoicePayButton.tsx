@@ -8,7 +8,7 @@ interface InvoicePayButtonProps {
 }
 
 const InvoicePayButton = ({ slug, invoiceId }: InvoicePayButtonProps) => {
-  const { mutate, isLoading } = useInvoicePaymentLinkGetMutation({
+  const { mutate, isPending } = useInvoicePaymentLinkGetMutation({
     onSuccess(data) {
       toast.success('Redirecting to payment gateway...')
 
@@ -21,7 +21,7 @@ const InvoicePayButton = ({ slug, invoiceId }: InvoicePayButtonProps) => {
   }
 
   return (
-    <Button onClick={onPayNow} loading={isLoading} disabled={isLoading}>
+    <Button onClick={onPayNow} loading={isPending} disabled={isPending}>
       Pay Now
     </Button>
   )

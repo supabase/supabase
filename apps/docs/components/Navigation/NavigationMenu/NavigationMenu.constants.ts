@@ -392,7 +392,7 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/redwoodjs' as `/${string}`,
         },
         {
-          name: 'refine',
+          name: 'Refine',
           url: '/guides/getting-started/quickstarts/refine',
         },
       ],
@@ -438,7 +438,7 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/tutorials/with-sveltekit' as `/${string}`,
         },
         {
-          name: 'refine',
+          name: 'Refine',
           url: '/guides/getting-started/tutorials/with-refine' as `/${string}`,
         },
       ],
@@ -1147,14 +1147,39 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/database/replication' },
         {
-          name: 'Setting up replication',
-          url: '/guides/database/replication/setting-up-replication' as `/${string}`,
+          name: 'ETL Replication',
+          url: '/guides/database/replication/etl-replication-setup' as `/${string}`,
+          items: [
+            {
+              name: 'Setting up',
+              url: '/guides/database/replication/etl-replication-setup' as `/${string}`,
+            },
+            {
+              name: 'Destinations',
+              url: '/guides/database/replication/etl-destinations' as `/${string}`,
+            },
+            {
+              name: 'Monitoring',
+              url: '/guides/database/replication/etl-replication-monitoring' as `/${string}`,
+            },
+            { name: 'FAQ', url: '/guides/database/replication/etl-replication-faq' },
+          ],
         },
         {
-          name: 'Monitoring replication',
-          url: '/guides/database/replication/monitoring-replication' as `/${string}`,
+          name: 'Manual Replication',
+          url: '/guides/database/replication/manual-replication-setup' as `/${string}`,
+          items: [
+            {
+              name: 'Setting up',
+              url: '/guides/database/replication/manual-replication-setup' as `/${string}`,
+            },
+            {
+              name: 'Monitoring',
+              url: '/guides/database/replication/manual-replication-monitoring' as `/${string}`,
+            },
+            { name: 'FAQ', url: '/guides/database/replication/manual-replication-faq' },
+          ],
         },
-        { name: 'FAQ', url: '/guides/database/replication/faq' },
       ],
     },
     {
@@ -1407,6 +1432,10 @@ export const queues: NavMenuConstant = {
         {
           name: 'Consuming Messages with Edge Functions',
           url: '/guides/queues/consuming-messages-with-edge-functions',
+        },
+        {
+          name: 'Expose Queues for local and self-hosted Supabase',
+          url: '/guides/queues/expose-self-hosted-queues',
         },
       ],
     },

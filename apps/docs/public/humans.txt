@@ -4,6 +4,7 @@ Supabase is 100% remote.
 
 Aaron Byrne
 Adam Mokan
+Akash Manimaran
 Alaister Young
 Alan De Los Santos
 Aleksi Immonen
@@ -57,6 +58,7 @@ Eliot Whalan
 Emmett Folger
 Eric Kharitonashvili
 Etienne Stalmans
+Fabrizio Cataldo
 Fabrizio Fenoglio
 Fady A
 Felipe Stival
@@ -79,6 +81,7 @@ Jean-Paul Argudo
 Jeff Smick
 Jenny Kibiri
 Jess Shears
+Jim Brodeur
 Jim Chanco Jr
 Joakim Ahrlin
 John Pena
@@ -98,6 +101,7 @@ Katerina Skroumpelou
 Kemal Y
 Kevin Brolly
 Kevin Grüneberg
+Kostas Botsas
 Krishna Sai Vandavasi
 Lakshan Perera
 Laura C
@@ -110,10 +114,12 @@ Luca Forstner
 Manan Gupta
 Margarita Sandomirskaia
 Mark Burggraf
+Matthew Hambright
 Matt Johnston
 Matt Rossman
 Monica Khoury
 Mykhailo Mischa Lieibenson
+Nick B
 Nick Littman
 Nyannyacha
 Oli R
@@ -135,6 +141,7 @@ Rodrigo Mansueli
 Ronan Lehane
 Rory Wilding
 Ryan Goulet
+Ruan Maia
 Sam Meech-Ward
 Sam Rome
 Sam Rose
@@ -165,6 +172,7 @@ Wen Bo Xie
 Yorvi Arias
 Yuliya Marinova
 Yuri Santana
+Zach Marinov
 Zsolt Pazmandy
 ____________
 

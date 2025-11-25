@@ -175,7 +175,7 @@ export const StorageSettings = () => {
     buckets.find((x) => x.name === affectedBuckets[0])?.file_size_limit ?? 0
   )
 
-  const { mutate: updateStorageConfig, isLoading: isUpdating } =
+  const { mutate: updateStorageConfig, isPending: isUpdating } =
     useProjectStorageConfigUpdateUpdateMutation({
       onSuccess: () => {
         toast.success('Successfully updated storage settings')
