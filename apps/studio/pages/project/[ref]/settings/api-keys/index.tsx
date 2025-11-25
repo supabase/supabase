@@ -1,25 +1,34 @@
+import {
+  ApiKeysCreateCallout,
+  ApiKeysFeedbackBanner,
+} from 'components/interfaces/APIKeys/ApiKeysIllustrations'
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
+import { PublishableAPIKeys } from 'components/interfaces/APIKeys/PublishableAPIKeys'
+import { SecretAPIKeys } from 'components/interfaces/APIKeys/SecretAPIKeys'
 import ApiKeysLayout from 'components/layouts/APIKeys/APIKeysLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import { DisplayApiSettings } from 'components/ui/ProjectSettings/DisplayApiSettings'
-import { ToggleLegacyApiKeysPanel } from 'components/ui/ProjectSettings/ToggleLegacyApiKeys'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DisableInteraction } from 'components/ui/DisableInteraction'
 import type { NextPageWithLayout } from 'types'
+import { Separator } from 'ui'
 
-const ApiKeysLegacyPage: NextPageWithLayout = () => {
-  const { projectSettingsShowDisableLegacyApiKeys } = useIsFeatureEnabled([
-    'project_settings:show_disable_legacy_api_keys',
-  ])
+const ApiKeysNewPage: NextPageWithLayout = () => {
+  const { shouldDisableUI, canInitApiKeys } = useApiKeysVisibility()
 
   return (
     <>
-      <DisplayApiSettings showTitle={false} showNotice={false} />
-      {projectSettingsShowDisableLegacyApiKeys && <ToggleLegacyApiKeysPanel />}
+      {canInitApiKeys && <ApiKeysCreateCallout />}
+      <ApiKeysFeedbackBanner />
+      <DisableInteraction disabled={shouldDisableUI} className="flex flex-col gap-8">
+        <PublishableAPIKeys />
+        <Separator />
+        <SecretAPIKeys />
+      </DisableInteraction>
     </>
   )
 }
 
-ApiKeysLegacyPage.getLayout = (page) => (
+ApiKeysNewPage.getLayout = (page) => (
   <DefaultLayout>
     <SettingsLayout>
       <ApiKeysLayout>{page}</ApiKeysLayout>
@@ -27,4 +36,4 @@ ApiKeysLegacyPage.getLayout = (page) => (
   </DefaultLayout>
 )
 
-export default ApiKeysLegacyPage
+export default ApiKeysNewPage

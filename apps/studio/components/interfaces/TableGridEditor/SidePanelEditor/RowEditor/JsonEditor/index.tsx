@@ -55,7 +55,7 @@ export const JsonEditor = ({
   const jsonString = typeof value === 'object' ? JSON.stringify(value) : (value as string)
   const isTruncated = isValueTruncated(jsonString)
 
-  const { mutate: getCellValue, isLoading, isSuccess, reset } = useGetCellValueMutation()
+  const { mutate: getCellValue, isPending, isSuccess, reset } = useGetCellValueMutation()
 
   const validateJSON = async (resolve: () => void) => {
     try {
@@ -194,7 +194,7 @@ export const JsonEditor = ({
                 performance issues
               </p>
             </div>
-            <Button type="default" loading={isLoading} onClick={loadFullValue}>
+            <Button type="default" loading={isPending} onClick={loadFullValue}>
               Load full JSON data
             </Button>
           </div>

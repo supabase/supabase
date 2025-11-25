@@ -45,7 +45,7 @@ export const PITRSelection = () => {
 
   const {
     mutate: restoreFromPitr,
-    isLoading: isRestoring,
+    isPending: isRestoring,
     isSuccess: isSuccessPITR,
   } = usePitrRestoreMutation({
     onSuccess: (_, variables) => {

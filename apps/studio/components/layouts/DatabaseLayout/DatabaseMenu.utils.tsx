@@ -73,16 +73,6 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/publications`,
           items: [],
         },
-        ...(showPgReplicate
-          ? [
-              {
-                name: 'ETL Replication',
-                key: 'etl',
-                url: `/project/${ref}/database/etl`,
-                items: [],
-              },
-            ]
-          : []),
       ],
     },
     {
@@ -114,6 +104,16 @@ export const generateDatabaseMenu = (
     {
       title: 'Platform',
       items: [
+        ...(showPgReplicate
+          ? [
+              {
+                name: 'Replication',
+                key: 'replication',
+                url: `/project/${ref}/database/replication`,
+                items: [],
+              },
+            ]
+          : []),
         ...(IS_PLATFORM
           ? [
               {
@@ -176,7 +176,7 @@ export const generateDatabaseMenu = (
         {
           name: 'Query Performance',
           key: 'query-performance',
-          url: `/project/${ref}/reports/query-performance`,
+          url: `/project/${ref}/observability/query-performance`,
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           items: [],
         },

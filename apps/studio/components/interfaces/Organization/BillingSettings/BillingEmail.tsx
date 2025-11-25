@@ -65,7 +65,7 @@ const BillingEmail = () => {
   const { errors } = form.formState
   const additionalEmailsError = errors.additionalBillingEmails ?? []
 
-  const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
+  const { mutate: updateOrganization, isPending: isUpdating } = useOrganizationUpdateMutation()
 
   const onUpdateOrganizationEmail = async (values: z.infer<typeof formSchema>) => {
     if (!canUpdateOrganization) {

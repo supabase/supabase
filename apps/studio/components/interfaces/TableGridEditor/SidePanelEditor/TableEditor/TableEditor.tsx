@@ -325,6 +325,7 @@ export const TableEditor = ({
 
   return (
     <SidePanel
+      data-testid="table-editor-side-panel"
       size="large"
       key="TableEditor"
       visible={visible}

@@ -69,17 +69,53 @@ export interface ConnectionStringCopiedEvent {
   action: 'connection_string_copied'
   properties: {
     /**
-     * Method selected by user, e.g. URI, PSQL, SQLAlchemy, etc.
+     * Method selected by user, e.g. URI, PSQL, SQLAlchemy, MCP URL, Framework snippet, Command Line, JSON, etc.
+     * Required for Connection String, App Frameworks, and Mobile Frameworks tabs
      */
-    connectionType: string
+    connectionType?: string
     /**
-     * Language of the code block if selected, e.g. bash, go
+     * Language of the code block if selected, e.g. bash, go, http, typescript
+     * Required for Connection String, App Frameworks, and Mobile Frameworks tabs
      */
-    lang: string
+    lang?: string
     /**
      * Connection Method, e.g. direct, transaction_pooler, session_pooler
+     * Only used for Connection String tab
      */
-    connectionMethod: 'direct' | 'transaction_pooler' | 'session_pooler'
+    connectionMethod?: 'direct' | 'transaction_pooler' | 'session_pooler'
+    /**
+     * Tab from which the connection string was copied
+     */
+    connectionTab: 'Connection String' | 'App Frameworks' | 'Mobile Frameworks' | 'ORMs' | 'MCP'
+    /**
+     * Selected framework, tool, or client (e.g., 'Next.js', 'Prisma', 'Cursor')
+     */
+    selectedItem?: string
+    /**
+     * Source of the event, either 'studio' or 'docs'
+     */
+    source?: 'studio' | 'docs'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the MCP install button (one-click installation for Cursor or VS Code).
+ *
+ * @group Events
+ * @source studio, docs
+ */
+export interface McpInstallButtonClickedEvent {
+  action: 'mcp_install_button_clicked'
+  properties: {
+    /**
+     * The MCP client that was selected (e.g., 'Cursor', 'VS Code')
+     */
+    client: string
+    /**
+     * Source of the event, either 'studio' or 'docs'
+     */
+    source?: 'studio' | 'docs'
   }
   groups: TelemetryGroups
 }
@@ -89,7 +125,7 @@ export interface ConnectionStringCopiedEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/integrations/cron/jobs?dialog-shown=true
+ * @page /dashboard/project/{ref}/integrations/cron/jobs?new=true
  */
 export interface CronJobCreatedEvent {
   action: 'cron_job_created'
@@ -111,7 +147,7 @@ export interface CronJobCreatedEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/integrations/cron/jobs?dialog-shown=true
+ * @page /dashboard/project/{ref}/integrations/cron/jobs?new=true
  */
 export interface CronJobUpdatedEvent {
   action: 'cron_job_updated'
@@ -1581,24 +1617,6 @@ export interface HomeActivityStatClickedEvent {
 }
 
 /**
- * User clicked the main Ask Assistant button in the Advisor section of HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeAdvisorAskAssistantClickedEvent {
-  action: 'home_advisor_ask_assistant_clicked'
-  properties: {
-    /**
-     * Number of issues found by the advisor
-     */
-    issues_count: number
-  }
-  groups: TelemetryGroups
-}
-
-/**
  * User was exposed to the realtime experiment (shown or not shown the Enable Realtime button).
  *
  * @group Events
@@ -1620,51 +1638,6 @@ export interface RealtimeExperimentExposedEvent {
      * Days since project creation (to segment by new user cohorts)
      */
     days_since_project_creation: number
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked on an issue card in the Advisor section of HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeAdvisorIssueCardClickedEvent {
-  action: 'home_advisor_issue_card_clicked'
-  properties: {
-    /**
-     * Category of the issue (SECURITY or PERFORMANCE)
-     */
-    issue_category: string
-    /**
-     * Name/key of the lint issue
-     */
-    issue_name: string
-    issues_count: number
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked the Fix Issue button on an advisor card in HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeAdvisorFixIssueClickedEvent {
-  action: 'home_advisor_fix_issue_clicked'
-  properties: {
-    /**
-     * Category of the issue (SECURITY or PERFORMANCE)
-     */
-    issue_category: string
-    /**
-     * Name/key of the lint issue
-     */
-    issue_name: string
   }
   groups: TelemetryGroups
 }
@@ -2313,6 +2286,79 @@ export interface LogDrainConfirmButtonSubmittedEvent {
   groups: TelemetryGroups
 }
 
+type AdvisorCategory = 'PERFORMANCE' | 'SECURITY'
+type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
+
+/**
+ * User opened an advisor detail page to view a specific advisor (lint or notification).
+ * This tracks when users engage with advisor recommendations.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/advisors/security or home page or advisor panel sidebar
+ */
+export interface AdvisorDetailOpenedEvent {
+  action: 'advisor_detail_opened'
+  properties: {
+    /**
+     * Where the advisor was viewed from
+     */
+    origin: 'homepage' | 'advisor_panel' | 'advisors_page'
+    /**
+     * Source of the advisor
+     */
+    advisorSource: 'lint' | 'notification'
+    /**
+     * Category of the advisor (SECURITY or PERFORMANCE)
+     */
+    advisorCategory?: AdvisorCategory
+    /**
+     * Specific advisor type/name, e.g. missing_index, no_rls_policy
+     */
+    advisorType?: string
+    /**
+     * Severity level of the advisor (only for lints)
+     */
+    advisorLevel?: AdvisorLevel
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Assistant button to get AI help with an advisor issue.
+ * This opens the AI Assistant sidebar with a pre-filled prompt about the issue.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref} (homepage), /dashboard/project/{ref}/advisors/security or /dashboard/project/{ref}/advisors/performance (lint detail panel)
+ */
+export interface AdvisorAssistantButtonClickedEvent {
+  action: 'advisor_assistant_button_clicked'
+  properties: {
+    /**
+     * Where the button was clicked
+     */
+    origin: 'homepage' | 'lint_detail'
+    /**
+     * Category of the advisor (SECURITY or PERFORMANCE)
+     */
+    advisorCategory?: AdvisorCategory
+    /**
+     * Specific advisor type/name
+     */
+    advisorType?: string
+    /**
+     * Severity level of the advisor (only for lints)
+     */
+    advisorLevel?: AdvisorLevel
+    /**
+     * Number of issues found (only included when origin is 'homepage')
+     */
+    issuesCount?: number
+  }
+  groups: TelemetryGroups
+}
+
 /**
  * @hidden
  */
@@ -2320,6 +2366,7 @@ export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
   | ConnectionStringCopiedEvent
+  | McpInstallButtonClickedEvent
   | ApiDocsOpenedEvent
   | ApiDocsCodeCopyButtonClickedEvent
   | CronJobCreatedEvent
@@ -2414,9 +2461,6 @@ export type TelemetryEvent =
   | HomeGettingStartedClosedEvent
   | HomeSectionRowsMovedEvent
   | HomeActivityStatClickedEvent
-  | HomeAdvisorAskAssistantClickedEvent
-  | HomeAdvisorIssueCardClickedEvent
-  | HomeAdvisorFixIssueClickedEvent
   | RealtimeExperimentExposedEvent
   | HomeProjectUsageServiceClickedEvent
   | HomeProjectUsageChartClickedEvent
@@ -2443,3 +2487,5 @@ export type TelemetryEvent =
   | SidebarOpenedEvent
   | LogDrainSaveButtonClickedEvent
   | LogDrainConfirmButtonSubmittedEvent
+  | AdvisorDetailOpenedEvent
+  | AdvisorAssistantButtonClickedEvent

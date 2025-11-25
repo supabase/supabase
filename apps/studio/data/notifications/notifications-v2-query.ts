@@ -8,7 +8,7 @@ import { notificationKeys } from './keys'
 const NOTIFICATIONS_PAGE_LIMIT = 10
 
 export type NotificationVariables = {
-  page: number
+  page: number | undefined
   limit?: number
   status?: 'new' | 'seen' | 'archived'
   filters: {

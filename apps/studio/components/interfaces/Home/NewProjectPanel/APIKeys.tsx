@@ -152,8 +152,8 @@ export const APIKeys = () => {
                 <div className="space-y-2">
                   <p className="text-sm">API Key</p>
                   <div className="flex items-center space-x-1 -ml-1">
-                    <code className="text-xs">{anonKey?.name}</code>
-                    <code className="text-xs">public</code>
+                    <code className="text-code-inline">{anonKey?.name}</code>
+                    <code className="text-code-inline">public</code>
                   </div>
                 </div>
               }
