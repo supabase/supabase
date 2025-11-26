@@ -62,7 +62,7 @@ const Input = forwardRef<
     }
 
     let inputClasses: string[] = []
-    if (icon) inputClasses.push(__styles.with_icon)
+    if (icon) inputClasses.push(__styles.with_icon.tiny)
 
     return (
       <div className={cn('relative group', containerClassName)}>

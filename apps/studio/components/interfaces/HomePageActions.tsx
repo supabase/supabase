@@ -59,7 +59,7 @@ export const HomePageActions = ({
           placeholder="Search for a project"
           icon={<Search size={12} />}
           size="tiny"
-          className="w-32 md:w-64 pl-8 [&>div>div>div>input]:!pl-7 [&>div>div>div>div]:!pl-2"
+          className="w-32 md:w-64"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           actions={[
