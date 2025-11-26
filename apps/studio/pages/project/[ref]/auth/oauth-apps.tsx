@@ -3,16 +3,14 @@ import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
 const OAuthApps: NextPageWithLayout = () => (
   <ScaffoldContainer>
     <ScaffoldSection>
       <div className="col-span-12">
-        <FormHeader
-          title="OAuth Apps"
-          docsUrl="https://supabase.com/docs/guides/auth/oauth-server"
-        />
+        <FormHeader title="OAuth Apps" docsUrl={`${DOCS_URL}/guides/auth/oauth-server`} />
         <OAuthAppsList />
       </div>
     </ScaffoldSection>
