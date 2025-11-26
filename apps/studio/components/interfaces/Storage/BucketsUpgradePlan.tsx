@@ -12,11 +12,7 @@ export const BucketsUpgradePlan = ({ type }: { type: 'analytics' | 'vector' }) =
       <EmptyStatePresentational
         icon={type === 'analytics' ? AnalyticsBucketIcon : VectorBucketIcon}
         title={
-          type === 'analytics'
-            ? BUCKET_TYPES.analytics.valueProp
-            : type === 'vector'
-              ? BUCKET_TYPES.vectors.valueProp
-              : undefined
+          type === 'analytics' ? BUCKET_TYPES.analytics.valueProp : BUCKET_TYPES.vectors.valueProp
         }
         description={`Upgrade to Pro to use ${type} buckets for your project`}
       >
