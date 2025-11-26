@@ -12,10 +12,11 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import Panel from 'components/ui/Panel'
+import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
 import { useOAuthServerAppCreateMutation } from 'data/oauth-server-apps/oauth-server-app-create-mutation'
 import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useOAuthServerAppUpdateMutation } from 'data/oauth-server-apps/oauth-server-app-update-mutation'
-import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
 import {
   Button,
   FormControl_Shadcn_,
@@ -37,10 +38,9 @@ import {
   Switch,
   cn,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import Panel from 'components/ui/Panel'
 
 interface CreateOrUpdateOAuthAppSheetProps {
   visible: boolean
@@ -109,26 +109,21 @@ export const CreateOrUpdateOAuthAppSheet = ({
     control: form.control,
   })
 
-  const { data: supabaseClientData } = useSupabaseClientQuery({ projectRef })
-  const { mutateAsync: createOAuthApp, isPending: isCreating } = useOAuthServerAppCreateMutation({
+  const { data: endpointData } = useProjectEndpointQuery({ projectRef })
+
+  const { mutate: createOAuthApp, isPending: isCreating } = useOAuthServerAppCreateMutation({
     onSuccess: (data) => {
       toast.success(`Successfully created OAuth app "${data.client_name}"`)
       onSuccess(data)
     },
-    onError: (error) => {
-      toast.error(error.message)
-    },
   })
-  const { mutateAsync: updateOAuthApp, isPending: isUpdating } = useOAuthServerAppUpdateMutation({
+  const { mutate: updateOAuthApp, isPending: isUpdating } = useOAuthServerAppUpdateMutation({
     onSuccess: (data) => {
       toast.success(`Successfully updated OAuth app "${data.client_name}"`)
       onSuccess(data)
     },
-    onError: (error) => {
-      toast.error(error.message)
-    },
   })
-  const { mutateAsync: regenerateSecret, isPending: isRegenerating } =
+  const { mutate: regenerateSecret, isPending: isRegenerating } =
     useOAuthServerAppRegenerateSecretMutation({
       onSuccess: (data) => {
         if (data) {
@@ -136,9 +131,6 @@ export const CreateOrUpdateOAuthAppSheet = ({
           onSuccess(data)
           setShowRegenerateDialog(false)
         }
-      },
-      onError: (error) => {
-        toast.error(error.message)
       },
     })
 
@@ -207,8 +199,8 @@ export const CreateOrUpdateOAuthAppSheet = ({
 
       updateOAuthApp({
         projectRef,
-        supabaseClient: supabaseClientData?.supabaseClient,
         clientId: appToEdit.client_id,
+        clientEndpoint: endpointData?.endpoint,
         ...payload,
       })
     } else {
@@ -222,7 +214,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
 
       createOAuthApp({
         projectRef,
-        supabaseClient: supabaseClientData?.supabaseClient,
+        clientEndpoint: endpointData?.endpoint,
         ...payload,
       })
     }
@@ -238,13 +230,11 @@ export const CreateOrUpdateOAuthAppSheet = ({
   }
 
   const handleConfirmRegenerate = () => {
-    if (appToEdit?.client_id) {
-      regenerateSecret({
-        projectRef,
-        supabaseClient: supabaseClientData?.supabaseClient,
-        clientId: appToEdit.client_id,
-      })
-    }
+    regenerateSecret({
+      projectRef,
+      clientId: appToEdit?.client_id,
+      clientEndpoint: endpointData?.endpoint,
+    })
   }
 
   const handleUploadLogo = () => uploadButtonRef.current?.click()
