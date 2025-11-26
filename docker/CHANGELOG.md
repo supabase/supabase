@@ -126,6 +126,7 @@ Check updates for each service to learn more.
 ## [2025-10-27]
 
 ### Studio
+- No image update
 - Added Kong configuration for MCP server routes (requires `volumes/api/kong.yml` update) - PR [#39849](https://github.com/supabase/supabase/pull/39849)
 - Added [documentation page](https://supabase.com/docs/guides/self-hosting/enable-mcp) for MCP server configuration - PR [#39952](https://github.com/supabase/supabase/pull/39952)
 
