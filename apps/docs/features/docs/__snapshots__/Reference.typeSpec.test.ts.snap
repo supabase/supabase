@@ -81728,7 +81728,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             {
               "id": "example-1",
               "name": "Example 1",
-              "code": "\`\`\`typescript\\nconst { data, error } = await supabase\\n  .storage\\n  .vectors\\n  .getBucket('embeddings-prod')\\n\\nconsole.log('Bucket created:', data?.vectorBucket.createdAt)\\n\`\`\`"
+              "code": "\`\`\`typescript\\nconst { data, error } = await supabase\\n  .storage\\n  .vectors\\n  .getBucket('embeddings-prod')\\n\\nconsole.log('Bucket created:', data?.vectorBucket.creationTime)\\n\`\`\`"
             }
           ]
         }
@@ -81778,7 +81778,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               ]
             },
             "comment": {
-              "shortText": "Optional filters (prefix, maxResults, pageToken)"
+              "shortText": "Optional filters (prefix, maxResults, nextToken)"
             }
           }
         ],
@@ -84269,10 +84269,6 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     "subTypes": [
                       {
                         "type": "literal",
-                        "value": "id"
-                      },
-                      {
-                        "type": "literal",
                         "value": "name"
                       },
                       {
@@ -84287,7 +84283,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   },
                   "isOptional": true,
                   "comment": {
-                    "shortText": "Column to sort by ('id', 'name', 'created_at', 'updated_at')"
+                    "shortText": "Column to sort by ('name', 'created_at', 'updated_at')"
                   }
                 },
                 {
