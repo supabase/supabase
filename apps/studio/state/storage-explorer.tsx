@@ -37,7 +37,7 @@ import { convertFromBytes } from 'components/interfaces/Storage/StorageSettings/
 import { InlineLink } from 'components/ui/InlineLink'
 import { getOrRefreshTemporaryApiKey } from 'data/api-keys/temp-api-keys-utils'
 import { configKeys } from 'data/config/keys'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
 import { getQueryClient } from 'data/query-client'
 import { deleteBucketObject } from 'data/storage/bucket-object-delete-mutation'
@@ -1901,14 +1901,9 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))
   const stateRef = useLatest(state)
 
-  const { data: settings, isSuccess: isSuccessSettings } = useProjectSettingsV2Query({
+  const { data: endpointData, isSuccess: isSuccessSettings } = useProjectEndpointQuery({
     projectRef: project?.ref,
   })
-
-  const protocol = settings?.app_config?.protocol ?? 'https'
-  const endpoint = settings?.app_config?.endpoint
-  const resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}/storage/v1/upload/resumable`
-  const clientEndpoint = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}`
 
   // [Joshen] JFYI opting with the useEffect here as the storage explorer state was being loaded
   // before the project details were ready, hence the store kept returning project ref as undefined
@@ -1920,6 +1915,8 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     const storeAlreadyLoaded = state.projectRef === project?.ref
 
     if (!isPaused && hasDataReady && !storeAlreadyLoaded && isSuccessSettings) {
+      const clientEndpoint = endpointData.endpoint
+      const resumableUploadUrl = `${clientEndpoint}/storage/v1/upload/resumable`
       setState(
         createStorageExplorerState({
           projectRef: project?.ref ?? '',
@@ -1935,9 +1932,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     project?.connectionString,
     stateRef,
     isPaused,
-    resumableUploadUrl,
-    protocol,
-    endpoint,
+    endpointData?.endpoint,
     isSuccessSettings,
   ])
 
