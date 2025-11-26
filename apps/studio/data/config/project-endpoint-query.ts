@@ -3,9 +3,7 @@ import { ProjectSettingsVariables, useProjectSettingsV2Query } from './project-s
 
 export const useProjectEndpointQuery = ({ projectRef }: ProjectSettingsVariables) => {
   return useProjectSettingsV2Query(
-    {
-      projectRef: projectRef,
-    },
+    { projectRef },
     {
       select: (data) => {
         const protocol = data?.app_config?.protocol ?? 'https'
