@@ -599,9 +599,13 @@ function delegateParsing(
   const dereferencedType = parseType(referenced, map, typeArguments)
 
   if (dereferencedType) {
-    // Don't override the name for intrinsic or literal types - they are concrete types
-    // with meaningful names (e.g., "undefined", "null", "string")
-    if (dereferencedType.type !== 'intrinsic' && dereferencedType.type !== 'literal') {
+    // When resolving a type parameter (e.g., T -> undefined), don't override the name
+    // for intrinsic/literal types - they have their own meaningful names
+    const isTypeParameterResolution = original.refersToTypeParameter === true
+    const isConcreteType =
+      dereferencedType.type === 'intrinsic' || dereferencedType.type === 'literal'
+
+    if (!(isTypeParameterResolution && isConcreteType)) {
       dereferencedType.name = nameOrAnonymous([original, dereferencedType])
     }
   }

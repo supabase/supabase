@@ -36813,8 +36813,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       "name": "event",
                       "type": {
                         "type": "literal",
-                        "value": "*",
-                        "name": "T"
+                        "value": "*"
                       },
                       "comment": {
                         "shortText": "The type of database change to listen to."
@@ -36920,8 +36919,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       "name": "event",
                       "type": {
                         "type": "literal",
-                        "value": "INSERT",
-                        "name": "T"
+                        "value": "INSERT"
                       },
                       "comment": {
                         "shortText": "The type of database change to listen to."
@@ -37013,8 +37011,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       "name": "event",
                       "type": {
                         "type": "literal",
-                        "value": "UPDATE",
-                        "name": "T"
+                        "value": "UPDATE"
                       },
                       "comment": {
                         "shortText": "The type of database change to listen to."
@@ -37106,8 +37103,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       "name": "event",
                       "type": {
                         "type": "literal",
-                        "value": "DELETE",
-                        "name": "T"
+                        "value": "DELETE"
                       },
                       "comment": {
                         "shortText": "The type of database change to listen to."
@@ -78324,8 +78320,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       "name": "event",
                       "type": {
                         "type": "literal",
-                        "value": "*",
-                        "name": "T"
+                        "value": "*"
                       },
                       "comment": {
                         "shortText": "The type of database change to listen to."
@@ -78431,8 +78426,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       "name": "event",
                       "type": {
                         "type": "literal",
-                        "value": "INSERT",
-                        "name": "T"
+                        "value": "INSERT"
                       },
                       "comment": {
                         "shortText": "The type of database change to listen to."
@@ -78524,8 +78518,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       "name": "event",
                       "type": {
                         "type": "literal",
-                        "value": "UPDATE",
-                        "name": "T"
+                        "value": "UPDATE"
                       },
                       "comment": {
                         "shortText": "The type of database change to listen to."
@@ -78617,8 +78610,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       "name": "event",
                       "type": {
                         "type": "literal",
-                        "value": "DELETE",
-                        "name": "T"
+                        "value": "DELETE"
                       },
                       "comment": {
                         "shortText": "The type of database change to listen to."
@@ -81782,7 +81774,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       "name": "data",
                       "type": {
                         "type": "intrinsic",
-                        "name": "T"
+                        "name": "undefined"
                       },
                       "comment": {
                         "shortText": "Response data of type T"
@@ -81877,7 +81869,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       "name": "data",
                       "type": {
                         "type": "intrinsic",
-                        "name": "T"
+                        "name": "undefined"
                       },
                       "comment": {
                         "shortText": "Response data of type T"
@@ -82498,7 +82490,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       "name": "data",
                       "type": {
                         "type": "intrinsic",
-                        "name": "T"
+                        "name": "undefined"
                       },
                       "comment": {
                         "shortText": "Response data of type T"
@@ -82593,7 +82585,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       "name": "data",
                       "type": {
                         "type": "intrinsic",
-                        "name": "T"
+                        "name": "undefined"
                       },
                       "comment": {
                         "shortText": "Response data of type T"
@@ -83189,7 +83181,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       "name": "data",
                       "type": {
                         "type": "intrinsic",
-                        "name": "T"
+                        "name": "undefined"
                       },
                       "comment": {
                         "shortText": "Response data of type T"
@@ -83651,7 +83643,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       "name": "data",
                       "type": {
                         "type": "intrinsic",
-                        "name": "T"
+                        "name": "undefined"
                       },
                       "comment": {
                         "shortText": "Response data of type T"
