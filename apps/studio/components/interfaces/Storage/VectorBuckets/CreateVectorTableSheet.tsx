@@ -327,7 +327,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
             <SheetSection className="space-y-4">
               <div className="flex items-center justify-between">
                 <label className="text-sm text-foreground">Metadata keys</label>
-                <DocsButton href="https://supabase.com/docs/guides/storage/vector" />
+                <DocsButton href="https://supabase.com/docs/guides/storage/vector/introduction" />
               </div>
 
               <div className="space-y-2">
