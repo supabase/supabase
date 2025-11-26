@@ -238,7 +238,7 @@ function TextArea({
   style,
   rows = 4,
   limit,
-  size,
+  size = 'medium',
   borderless = false,
   validation,
   copy = false,
