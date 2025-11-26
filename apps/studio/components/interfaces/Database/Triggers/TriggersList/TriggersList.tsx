@@ -1,6 +1,6 @@
 import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { DatabaseZap, Plus, Search } from 'lucide-react'
+import { DatabaseZap, Search } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -12,7 +12,6 @@ import { TriggerSheet } from 'components/interfaces/Database/Triggers/TriggerShe
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 
 import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
@@ -26,16 +25,8 @@ import { useIsProtectedSchema, useProtectedSchemas } from 'hooks/useProtectedSch
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import {
-  AiIconAnimation,
-  Card,
-  Input,
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui'
+import { Card, Input, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
+import { CreateTriggerButtons } from './CreateTriggerButtons'
 import { TriggerList } from './TriggerList'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
 
@@ -205,69 +196,13 @@ execute function function_name();`)
             />
           </div>
           {!isSchemaLocked && (
-            <div className="flex items-center gap-x-2">
-              <ButtonTooltip
-                disabled={!hasTables || !canCreateTriggers}
-                icon={<Plus />}
-                onClick={() => createTrigger()}
-                className="flex-grow"
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: !hasTables
-                      ? 'Create a table first before creating triggers'
-                      : !canCreateTriggers
-                        ? 'You need additional permissions to create triggers'
-                        : undefined,
-                  },
-                }}
-              >
-                New trigger
-              </ButtonTooltip>
-
-              {hasTables && (
-                <ButtonTooltip
-                  type="default"
-                  disabled={!hasTables || !canCreateTriggers}
-                  className="px-1 pointer-events-auto"
-                  icon={<AiIconAnimation size={16} />}
-                  onClick={() => {
-                    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-                    aiSnap.newChat({
-                      name: 'Create new trigger',
-                      initialInput: `Create a new trigger for the schema ${selectedSchema} that does ...`,
-                      suggestions: {
-                        title:
-                          'I can help you create a new trigger, here are a few example prompts to get you started:',
-                        prompts: [
-                          {
-                            label: 'Log Changes',
-                            description: 'Create a trigger that logs changes to the users table',
-                          },
-                          {
-                            label: 'Update Timestamp',
-                            description: 'Create a trigger that updates updated_at timestamp',
-                          },
-                          {
-                            label: 'Validate Email',
-                            description:
-                              'Create a trigger that validates email format before insert',
-                          },
-                        ],
-                      },
-                    })
-                  }}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: !canCreateTriggers
-                        ? 'You need additional permissions to create triggers'
-                        : 'Create with Supabase Assistant',
-                    },
-                  }}
-                />
-              )}
-            </div>
+            <CreateTriggerButtons
+              hasTables={hasTables}
+              canCreateTriggers={canCreateTriggers}
+              selectedSchema={selectedSchema}
+              onCreateTrigger={createTrigger}
+              showPlusIcon={true}
+            />
           )}
         </div>
 
@@ -285,69 +220,14 @@ execute function function_name();`)
               </p>
             </div>
 
-            <div className="flex items-center gap-x-2">
-              <ButtonTooltip
-                type="default"
-                disabled={!hasTables || !canCreateTriggers}
-                onClick={() => createTrigger()}
-                className="flex-grow"
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: !hasTables
-                      ? 'Create a table first before creating triggers'
-                      : !canCreateTriggers
-                        ? 'You need additional permissions to create triggers'
-                        : undefined,
-                  },
-                }}
-              >
-                New trigger
-              </ButtonTooltip>
-
-              {hasTables && (
-                <ButtonTooltip
-                  type="default"
-                  disabled={!hasTables || !canCreateTriggers}
-                  className="px-1 pointer-events-auto"
-                  icon={<AiIconAnimation size={16} />}
-                  onClick={() => {
-                    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-                    aiSnap.newChat({
-                      name: 'Create new trigger',
-                      initialInput: `Create a new trigger for the schema ${selectedSchema} that does ...`,
-                      suggestions: {
-                        title:
-                          'I can help you create a new trigger, here are a few example prompts to get you started:',
-                        prompts: [
-                          {
-                            label: 'Log Changes',
-                            description: 'Create a trigger that logs changes to the users table',
-                          },
-                          {
-                            label: 'Update Timestamp',
-                            description: 'Create a trigger that updates updated_at timestamp',
-                          },
-                          {
-                            label: 'Validate Email',
-                            description:
-                              'Create a trigger that validates email format before insert',
-                          },
-                        ],
-                      },
-                    })
-                  }}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: !canCreateTriggers
-                        ? 'You need additional permissions to create triggers'
-                        : 'Create with Supabase Assistant',
-                    },
-                  }}
-                />
-              )}
-            </div>
+            <CreateTriggerButtons
+              hasTables={hasTables}
+              canCreateTriggers={canCreateTriggers}
+              selectedSchema={selectedSchema}
+              onCreateTrigger={createTrigger}
+              showPlusIcon={false}
+              buttonType="default"
+            />
           </aside>
         ) : (
           <div className="w-full overflow-hidden overflow-x-auto">
