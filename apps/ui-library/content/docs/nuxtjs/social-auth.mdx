@@ -48,17 +48,11 @@ This block uses the PKCE flow with GitHub as the provider. To switch providers, 
 1. Update the redirect paths in `login-form.vue` to point to your app’s logged-in routes. Our examples use `/protected`, but you can set this to whatever fits your app.
 1. Visit `http://your-site-url/auth/login` to see this component in action.
 
-<Callout type="info">
-
-You can use this block with the Pages router by simply moving the routes from the `app` folder into the `pages` folder and renaming them. Example instead of `app/login/page.tsx`, you'd create a `pages/login.tsx` file.
-
-</Callout>
-
 ### Combining social auth with password-based auth
 
 If you want to combine this block with the password-based auth, you need to:
 
-- Copy the `handleSocialLogin` function into the password-based `login-form.tsx` component and bind it to a "Login with ..." button.
+- Copy the `handleSocialLogin` function into the password-based `login-form.vue` component and bind it to a "Login with ..." button.
 - Copy the `@/server/routes/auth/oauth.ts` in your app under the same route.
 
 ## Further reading
