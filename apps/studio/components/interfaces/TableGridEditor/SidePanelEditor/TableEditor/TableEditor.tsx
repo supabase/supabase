@@ -3,26 +3,19 @@ import { isEmpty, isUndefined, noop } from 'lodash'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { CONSTRAINT_TYPE, useTableConstraintsQuery } from 'data/database/constraints-query'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { useTrack } from 'lib/telemetry/track'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+
 import { useChanged } from 'hooks/misc/useChanged'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useRealtimeExperiment, RealtimeButtonVariant } from 'hooks/misc/useRealtimeExperiment'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import { DOCS_URL } from 'lib/constants'
 import { type PlainObject } from 'lib/type-helpers'
 import { TableEditorStateContext, useTableEditorStateSnapshot } from 'state/table-editor'
-import { Badge, Checkbox, Input, SidePanel } from 'ui'
-import { Admonition } from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { Checkbox, Input, SidePanel } from 'ui'
 import ActionBar from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
@@ -32,7 +25,7 @@ import { SpreadsheetImport } from '../SpreadsheetImport/SpreadsheetImport'
 import ColumnManagement from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
 import HeaderTitle from './HeaderTitle'
-import RLSDisableModalContent from './RLSDisableModal'
+import { RLSManagement } from './RLSManagement/RLSManagement'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import type { ImportContent, TableField } from './TableEditor.types'
 import {
@@ -75,10 +68,6 @@ export const TableEditor = ({
   const { data: project } = useSelectedProjectQuery()
   const { selectedSchema } = useQuerySchemaState()
   const isNewRecord = isUndefined(table)
-  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
-  const track = useTrack()
-
-  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
@@ -101,20 +90,7 @@ export const TableEditor = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const realtimePublication = (publications ?? []).find(
-    (publication) => publication.name === 'supabase_realtime'
-  )
-  const realtimeEnabledTables = realtimePublication?.tables ?? []
-  const isRealtimeEnabled = isNewRecord
-    ? false
-    : realtimeEnabledTables.some((t) => t.id === table?.id)
-
-  const { activeVariant: activeRealtimeVariant } = useRealtimeExperiment({
-    projectInsertedAt: project?.inserted_at,
-    isTable: !isNewRecord,
-    isRealtimeEnabled,
-  })
-
+  const isRealtimeEnabled = false
   const [errors, setErrors] = useState<PlainObject>({})
   const [tableFields, setTableFields] = useState<TableField>()
   const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
@@ -122,7 +98,8 @@ export const TableEditor = ({
   const [isDuplicateRows, setIsDuplicateRows] = useState<boolean>(false)
   const [importContent, setImportContent] = useState<ImportContent>()
   const [isImportingSpreadsheet, setIsImportingSpreadsheet] = useState<boolean>(false)
-  const [rlsConfirmVisible, setRlsConfirmVisible] = useState<boolean>(false)
+
+  const [generateStartingPolicies, setGenerateStartingPolicies] = useState<boolean>(false)
 
   const { data: constraints } = useTableConstraintsQuery({
     projectRef: project?.ref,
@@ -186,7 +163,7 @@ export const TableEditor = ({
     setFkRelations(relations)
   }
 
-  const onSaveChanges = (resolve: () => void) => {
+  const onSaveChanges = async (resolve: () => void) => {
     if (tableFields) {
       const errors = validateFields(tableFields)
       if (errors.name) {
@@ -202,6 +179,20 @@ export const TableEditor = ({
       const isRlsEnabledChanged = tableFields.isRLSEnabled !== (table?.rls_enabled ?? false)
 
       if (isEmpty(errors)) {
+        const payload: any = {
+          name: tableFields.name.trim(),
+          comment: tableFields.comment?.trim(),
+        }
+
+        if (isNewRecord) {
+          payload.schema = selectedSchema
+        } else if (!isDuplicating) {
+          // Update mode: only include changed fields
+          if (!isNameChanged) delete payload.name
+          if (!isCommentChanged) delete payload.comment
+          if (isRlsEnabledChanged) payload.rls_enabled = tableFields.isRLSEnabled
+        }
+
         const configuration = {
           tableId: table?.id,
           importContent,
@@ -211,52 +202,23 @@ export const TableEditor = ({
           existingForeignKeyRelations: foreignKeys,
           primaryKey,
         }
-        const columns = tableFields.columns.map((column) => {
-          return { ...column, name: column.name.trim() }
-        })
 
-        if (isNewRecord) {
-          const payload: SaveTablePayloadFor<'create'> = {
-            name: tableFields.name.trim(),
-            schema: selectedSchema,
-            comment: tableFields.comment?.trim(),
-          }
-          saveChanges({
-            action: 'create',
-            payload,
-            configuration,
-            columns,
-            foreignKeyRelations: fkRelations,
-            resolve,
-          })
-        } else if (isDuplicating) {
-          const payload: SaveTablePayloadFor<'duplicate'> = {
-            name: tableFields.name.trim(),
-            comment: tableFields.comment?.trim(),
-          }
-          saveChanges({
-            action: 'duplicate',
-            payload,
-            configuration,
-            columns,
-            foreignKeyRelations: fkRelations,
-            resolve,
-          })
-        } else {
-          const payload: SaveTablePayloadFor<'update'> = {
-            ...(isNameChanged && { name: tableFields.name.trim() }),
-            ...(isCommentChanged && { comment: tableFields.comment?.trim() ?? '' }),
-            ...(isRlsEnabledChanged && { rls_enabled: tableFields.isRLSEnabled }),
-          }
-          saveChanges({
-            action: 'update',
-            payload,
-            configuration,
-            columns,
-            foreignKeyRelations: fkRelations,
-            resolve,
-          })
-        }
+        const columns = tableFields.columns.map((column) => ({
+          ...column,
+          name: column.name.trim(),
+        }))
+
+        const action = isNewRecord ? 'create' : isDuplicating ? 'duplicate' : 'update'
+
+        saveChanges({
+          action: action as any,
+          payload,
+          configuration,
+          columns,
+          foreignKeyRelations: fkRelations,
+          resolve,
+          generateStartingPolicies: isNewRecord ? generateStartingPolicies : false,
+        })
       } else {
         resolve()
       }
@@ -269,6 +231,7 @@ export const TableEditor = ({
       setErrors({})
       setImportContent(undefined)
       setIsDuplicateRows(false)
+      setGenerateStartingPolicies(false)
       if (isNewRecord) {
         const tableFields = generateTableField()
         if (templateData) {
@@ -361,86 +324,6 @@ export const TableEditor = ({
           onChange={(event: any) => onUpdateField({ comment: event.target.value })}
         />
       </SidePanel.Content>
-      <SidePanel.Separator />
-      <SidePanel.Content className="space-y-10 py-6">
-        <Checkbox
-          id="enable-rls"
-          // @ts-ignore
-          label={
-            <div className="flex items-center space-x-2">
-              <span>Enable Row Level Security (RLS)</span>
-              <Badge>Recommended</Badge>
-            </div>
-          }
-          description="Restrict access to your table by enabling RLS and writing Postgres policies."
-          checked={tableFields.isRLSEnabled}
-          onChange={() => {
-            // if isEnabled, show confirm modal to turn off
-            // if not enabled, allow turning on without modal confirmation
-            tableFields.isRLSEnabled
-              ? setRlsConfirmVisible(true)
-              : onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
-          }}
-          size="medium"
-        />
-
-        {tableFields.isRLSEnabled ? (
-          <Admonition
-            type="default"
-            className="!mt-3"
-            title="Policies are required to query data"
-            description={
-              <>
-                You need to create an access policy before you can query data from this table.
-                Without a policy, querying this table will return an{' '}
-                <u className="text-foreground">empty array</u> of results.{' '}
-                {isNewRecord ? 'You can create policies after saving this table.' : ''}
-              </>
-            }
-          >
-            <DocsButton
-              abbrev={false}
-              className="mt-2"
-              href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
-            />
-          </Admonition>
-        ) : (
-          <Admonition
-            type="warning"
-            className="!mt-3"
-            title="You are allowing anonymous access to your table"
-            description={
-              <>
-                {tableFields.name ? `The table ${tableFields.name}` : 'Your table'} will be publicly
-                writable and readable
-              </>
-            }
-          >
-            <DocsButton
-              abbrev={false}
-              className="mt-2"
-              href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
-            />
-          </Admonition>
-        )}
-
-        {activeRealtimeVariant !== RealtimeButtonVariant.HIDE_BUTTON && realtimeEnabled && (
-          <Checkbox
-            id="enable-realtime"
-            label="Enable Realtime"
-            description="Broadcast changes on this table to authorized subscribers"
-            checked={tableFields.isRealtimeEnabled}
-            onChange={() => {
-              track('realtime_toggle_table_clicked', {
-                newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
-                origin: 'tableSidePanel',
-              })
-              onUpdateField({ isRealtimeEnabled: !tableFields.isRealtimeEnabled })
-            }}
-            size="medium"
-          />
-        )}
-      </SidePanel.Content>
 
       <SidePanel.Separator />
 
@@ -485,20 +368,6 @@ export const TableEditor = ({
           }}
           closePanel={() => setIsImportingSpreadsheet(false)}
         />
-
-        <ConfirmationModal
-          visible={rlsConfirmVisible}
-          title="Turn off Row Level Security"
-          confirmLabel="Confirm"
-          size="medium"
-          onCancel={() => setRlsConfirmVisible(false)}
-          onConfirm={() => {
-            onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
-            setRlsConfirmVisible(false)
-          }}
-        >
-          <RLSDisableModalContent />
-        </ConfirmationModal>
       </SidePanel.Content>
 
       {!isDuplicating && (
@@ -515,6 +384,21 @@ export const TableEditor = ({
           </SidePanel.Content>
         </>
       )}
+
+      <SidePanel.Separator />
+
+      <SidePanel.Content className="space-y-10 py-6">
+        <RLSManagement
+          schema={table?.schema ?? selectedSchema ?? ''}
+          table={table}
+          isRlsEnabled={tableFields.isRLSEnabled}
+          onChangeRlsEnabled={(value) => onUpdateField({ isRLSEnabled: value })}
+          isNewRecord={isNewRecord}
+          isDuplicating={isDuplicating}
+          generateStartingPolicies={generateStartingPolicies}
+          onChangeGenerateStartingPolicies={setGenerateStartingPolicies}
+        />
+      </SidePanel.Content>
     </SidePanel>
   )
 }

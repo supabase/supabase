@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
@@ -20,17 +21,18 @@ import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-muta
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { tableKeys } from 'data/tables/keys'
 import { RetrieveTableResult } from 'data/tables/table-retrieve-query'
-import { getTables } from 'data/tables/tables-query'
+import { getTables, useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useTrack } from 'lib/telemetry/track'
+import Link from 'next/link'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import type { Dictionary } from 'types'
-import { SonnerProgress } from 'ui'
+import { Button, SonnerProgress } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import ColumnEditor from './ColumnEditor/ColumnEditor'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
@@ -43,14 +45,17 @@ import SchemaEditor from './SchemaEditor'
 import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import {
   createColumn,
+  createGeneratedPolicies,
   createTable,
   duplicateTable,
+  generateStartingPoliciesForTable,
   insertRowsViaSpreadsheet,
   insertTableRows,
   updateColumn,
   updateTable,
 } from './SidePanelEditor.utils'
 import { SpreadsheetImport } from './SpreadsheetImport/SpreadsheetImport'
+import { PolicyList } from './TableEditor/RLSManagement/PolicyListItem'
 import { TableEditor } from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
 
@@ -64,6 +69,7 @@ type SaveTableParamsBase = {
   columns: ColumnField[]
   foreignKeyRelations: ForeignKey[]
   resolve: () => void
+  generateStartingPolicies?: boolean
 }
 
 type SaveTableParamsNew = SaveTableParamsBase & {
@@ -164,6 +170,11 @@ export const SidePanelEditor = ({
   const { data: publications } = useDatabasePublicationsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+  })
+  const { data: allTables } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    includeColumns: true,
   })
   const { mutateAsync: createPublication } = useDatabasePublicationCreateMutation()
   const { mutateAsync: updatePublication } = useDatabasePublicationUpdateMutation({
@@ -475,7 +486,8 @@ export const SidePanelEditor = ({
   const saveTable = async (params: SaveTableParams) => {
     // action and payload are not destructured here to preserve type
     // narrowing later on
-    const { configuration, columns, foreignKeyRelations, resolve } = params
+    const { configuration, columns, foreignKeyRelations, resolve, generateStartingPolicies } =
+      params
 
     let toastId
     let saveTableError = false
@@ -505,14 +517,74 @@ export const SidePanelEditor = ({
         })
         if (isRealtimeEnabled) await updateTableRealtime(table, true)
 
-        await Promise.all([
+        // Generate and create policies if enabled
+        let policiesCreated: string[] = []
+        let generatedPolicies: { name: string; sql: string; command?: string }[] = []
+
+        if (generateStartingPolicies && isRLSEnabled && project?.ref && project?.connectionString) {
+          toast.loading('Generating policies...', { id: toastId })
+
+          generatedPolicies = await generateStartingPoliciesForTable({
+            table: { name: table.name, schema: table.schema },
+            foreignKeyRelations,
+            allTables: allTables ?? [],
+            columns,
+            projectRef: project.ref,
+            connectionString: project.connectionString,
+            orgSlug: org?.slug,
+          })
+
+          if (generatedPolicies.length > 0) {
+            toast.loading('Creating policies...', { id: toastId })
+            policiesCreated = await createGeneratedPolicies({
+              policies: generatedPolicies,
+              projectRef: project.ref,
+              connectionString: project.connectionString,
+            })
+          }
+        }
+
+        // Invalidate queries - include policies if they were created
+        const invalidateQueries = [
           queryClient.invalidateQueries({
             queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
           }),
           queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
-        ])
+        ]
 
-        toast.success(`Table ${table.name} is good to go!`, { id: toastId })
+        if (policiesCreated.length > 0) {
+          invalidateQueries.push(
+            queryClient.invalidateQueries({
+              queryKey: databasePoliciesKeys.list(project?.ref),
+            })
+          )
+        }
+
+        await Promise.all(invalidateQueries)
+
+        // Show result toast
+        if (policiesCreated.length > 0) {
+          const policiesForList = generatedPolicies
+            .filter((p) => policiesCreated.includes(p.name))
+            .map((p) => ({ name: p.name, command: p.command, sql: p.sql }))
+
+          toast.success(
+            <div className="flex flex-col gap-2">
+              <span>
+                Table created with {policiesCreated.length}{' '}
+                {policiesCreated.length === 1 ? 'policy' : 'policies'}
+              </span>
+              <PolicyList policies={policiesForList} />
+              <Button asChild type="default" size="tiny" className="mt-1 w-fit">
+                <Link href={`/project/${project?.ref}/auth/policies`}>Manage policies</Link>
+              </Button>
+            </div>,
+            { id: toastId, duration: 8000 }
+          )
+        } else {
+          toast.success(`Table ${table.name} is good to go!`, { id: toastId })
+        }
+
         onTableCreated(table)
       } else if (params.action === 'duplicate' && !!selectedTable) {
         const tableToDuplicate = selectedTable
