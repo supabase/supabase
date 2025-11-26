@@ -62,7 +62,6 @@ export const CONTEXT_MENU_KEYS = {
 
 export const BUCKET_TYPES = {
   files: {
-    platformOnly: false,
     displayName: 'Files',
     singularName: 'file',
     article: 'a',
@@ -71,7 +70,6 @@ export const BUCKET_TYPES = {
     docsUrl: `${DOCS_URL}/guides/storage/buckets/fundamentals`,
   },
   analytics: {
-    platformOnly: true,
     displayName: 'Analytics',
     singularName: 'analytics',
     article: 'an',
@@ -80,7 +78,6 @@ export const BUCKET_TYPES = {
     docsUrl: `${DOCS_URL}/guides/storage/analytics/introduction`,
   },
   vectors: {
-    platformOnly: true,
     displayName: 'Vectors',
     singularName: 'vector',
     article: 'a',
