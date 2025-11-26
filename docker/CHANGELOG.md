@@ -20,8 +20,10 @@ Check updates for each service to learn more.
 ## [2025-11-26]
 
 ### Studio
-- Updated to `2025.11.25-sha-8de52c4`
+- Updated to `2025.11.26-sha-8f096b5`
 - Fixed MCP `get_advisors` tool - PR [#40783](https://github.com/supabase/supabase/pull/40783)
+- Fixed AI Assistant request schema - PR [#40830](https://github.com/supabase/supabase/pull/40830)
+- Fixed log drains page - PR [#40835](https://github.com/supabase/supabase/pull/40835)
 
 ### Realtime
 - Updated to `v2.65.3` - [Release](https://github.com/supabase/realtime/releases/tag/v2.65.3)
@@ -38,7 +40,8 @@ Check updates for each service to learn more.
 - Updated to `2025.11.24-sha-d990ae8` - [Dashboard updates](https://github.com/orgs/supabase/discussions/40734)
 - Fixed Queues configuration UI and added [documentation for exposed queue schema](https://supabase.com/docs/guides/queues/expose-self-hosted-queues) - PR [#40078](https://github.com/supabase/supabase/pull/40078)
 - Fixed parameterized SQL queries in MCP tools - PR [#40499](https://github.com/supabase/supabase/pull/40499)
-- Fixed AI Assistant - PR [#40654](https://github.com/supabase/supabase/pull/40654)
+- Fixed Studio showing paid options for log drains - [PR #40510](https://github.com/supabase/supabase/pull/40510)
+- Fixed AI Assistant authentication - PR [#40654](https://github.com/supabase/supabase/pull/40654)
 
 ### Auth
 - Updated to `v2.183.0` - [Changelog](https://github.com/supabase/auth/blob/master/CHANGELOG.md) | [Release](https://github.com/supabase/auth/releases/tag/v2.183.0)
@@ -185,7 +188,7 @@ Check updates for each service to learn more.
 - Updated to `v0.91.6` - [Release](https://github.com/supabase/postgres-meta/releases/tag/v0.91.6)
 
 ### Analytics (Logflare)
-- Updated to `1.22.4` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.22.4)
+- Updated to `v1.22.4` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.22.4)
 
 ### Postgres
 - Updated to `15.8.1.085` - [Release](https://github.com/supabase/postgres/releases/tag/15.8.1.085)
