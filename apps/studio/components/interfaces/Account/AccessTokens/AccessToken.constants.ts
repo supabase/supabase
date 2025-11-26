@@ -1,4 +1,8 @@
 import dayjs from 'dayjs'
+import { components } from 'api-types'
+
+type ScopedAccessTokenPermission =
+  components['schemas']['CreateScopedAccessTokenBody']['permissions'][number]
 
 export const NON_EXPIRING_TOKEN_VALUE = 'never'
 export const CUSTOM_EXPIRY_VALUE = 'custom'
@@ -30,366 +34,325 @@ export const ExpiresAtOptions: Record<string, { value: string; label: string }> 
   },
 }
 
-// Simple direct mapping from resource-action to permission strings
-export const PERMISSION_MAP: Record<string, Record<string, string[]>> = {
+type ResourceAction = 'read' | 'write'
+type AccessLevel = 'read' | 'read-write' | 'no access'
+
+interface ResourceConfig {
+  scope: 'user' | 'organization' | 'project'
+  title: string
+  basePermission: string
+  actions: ResourceAction[]
+}
+
+// [kemal]: I don't necessarily like this approach, happy to hear a better one.
+const RESOURCE_CONFIGS: Record<string, ResourceConfig> = {
   'user:organizations': {
-    read: ['organizations_read'],
-    'read-write': ['organizations_read', 'organizations_write'],
-    'no access': [],
+    scope: 'user',
+    title: 'Access to organization information',
+    basePermission: 'organizations',
+    actions: ['read', 'write'],
   },
   'user:projects': {
-    read: ['projects_read'],
-    'no access': [],
+    scope: 'user',
+    title: 'Access to project information',
+    basePermission: 'projects',
+    actions: ['read'],
   },
   'user:available_regions': {
-    read: ['available_regions_read'],
-    'no access': [],
+    scope: 'user',
+    title: 'Access to available regions information',
+    basePermission: 'available_regions',
+    actions: ['read'],
   },
   'user:snippets': {
-    read: ['snippets_read'],
-    'no access': [],
+    scope: 'user',
+    title: 'Access to user snippets',
+    basePermission: 'snippets',
+    actions: ['read'],
   },
   'organization:admin': {
-    read: ['organization_admin_read'],
-    'read-write': ['organization_admin_read', 'organization_admin_write'],
-    'no access': [],
+    scope: 'organization',
+    title: 'Manage organization admin settings',
+    basePermission: 'organization_admin',
+    actions: ['read', 'write'],
   },
   'organization:members': {
-    read: ['members_read'],
-    'read-write': ['members_read', 'members_write'],
-    'no access': [],
+    scope: 'organization',
+    title: 'Manage organization members',
+    basePermission: 'members',
+    actions: ['read', 'write'],
   },
   'project:admin': {
-    read: ['project_admin_read'],
-    'read-write': ['project_admin_read', 'project_admin_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Full access to project admin settings',
+    basePermission: 'project_admin',
+    actions: ['read', 'write'],
   },
   'project:advisors': {
-    read: ['advisors_read'],
-    'no access': [],
+    scope: 'project',
+    title: 'View project advisor recommendations',
+    basePermission: 'advisors',
+    actions: ['read'],
   },
   'project:api_gateway:keys': {
-    read: ['api_gateway_keys_read'],
-    'read-write': ['api_gateway_keys_read', 'api_gateway_keys_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Manage API keys for the API gateway',
+    basePermission: 'api_gateway_keys',
+    actions: ['read', 'write'],
   },
   'project:auth:config': {
-    read: ['auth_config_read'],
-    'read-write': ['auth_config_read', 'auth_config_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'View or modify authentication settings',
+    basePermission: 'auth_config',
+    actions: ['read', 'write'],
   },
   'project:auth:signing_keys': {
-    read: ['auth_signing_keys_read'],
-    'read-write': ['auth_signing_keys_read', 'auth_signing_keys_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Access or rotate signing keys',
+    basePermission: 'auth_signing_keys',
+    actions: ['read', 'write'],
   },
   'project:backups': {
-    read: ['backups_read'],
-    'read-write': ['backups_read', 'backups_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'View or trigger project backups',
+    basePermission: 'backups',
+    actions: ['read', 'write'],
   },
   'project:branching:development': {
-    read: ['branching_development_read'],
-    'read-write': ['branching_development_read', 'branching_development_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Manage development branches',
+    basePermission: 'branching_development',
+    actions: ['read', 'write'],
   },
   'project:branching:production': {
-    read: ['branching_production_read'],
-    'read-write': ['branching_production_read', 'branching_production_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Manage production branches',
+    basePermission: 'branching_production',
+    actions: ['read', 'write'],
   },
   'project:custom_domain': {
-    read: ['custom_domain_read'],
-    'read-write': ['custom_domain_read', 'custom_domain_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Manage custom domains',
+    basePermission: 'custom_domain',
+    actions: ['read', 'write'],
   },
   'project:data_api:config': {
-    read: ['data_api_config_read'],
-    'read-write': ['data_api_config_read', 'data_api_config_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Modify PostgREST behavior and settings',
+    basePermission: 'data_api_config',
+    actions: ['read', 'write'],
   },
   'project:database': {
-    read: ['database_read'],
-    'read-write': ['database_read', 'database_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Read and write access to database data',
+    basePermission: 'database',
+    actions: ['read', 'write'],
   },
   'project:database:config': {
-    read: ['database_config_read'],
-    'read-write': ['database_config_read', 'database_config_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Manage core database configuration',
+    basePermission: 'database_config',
+    actions: ['read', 'write'],
   },
   'project:database:network_bans': {
-    read: ['database_network_bans_read'],
-    'read-write': ['database_network_bans_read', 'database_network_bans_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Manage banned IPs',
+    basePermission: 'database_network_bans',
+    actions: ['read', 'write'],
   },
   'project:database:network_restrictions': {
-    read: ['database_network_restrictions_read'],
-    'read-write': ['database_network_restrictions_read', 'database_network_restrictions_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Set or modify network restrictions',
+    basePermission: 'database_network_restrictions',
+    actions: ['read', 'write'],
   },
   'project:database:migrations': {
-    read: ['database_migrations_read'],
-    'read-write': ['database_migrations_read', 'database_migrations_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Manage database migrations',
+    basePermission: 'database_migrations',
+    actions: ['read', 'write'],
   },
   'project:database:pooling_config': {
-    read: ['database_pooling_config_read'],
-    'read-write': ['database_pooling_config_read', 'database_pooling_config_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Configure database connection pooling',
+    basePermission: 'database_pooling_config',
+    actions: ['read', 'write'],
   },
   'project:database:readonly_config': {
-    read: ['database_readonly_config_read'],
-    'read-write': ['database_readonly_config_read', 'database_readonly_config_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Manage database read only mode',
+    basePermission: 'database_readonly_config',
+    actions: ['read', 'write'],
   },
   'project:database:ssl_config': {
-    read: ['database_ssl_config_read'],
-    'read-write': ['database_ssl_config_read', 'database_ssl_config_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Configure SSL for the database',
+    basePermission: 'database_ssl_config',
+    actions: ['read', 'write'],
   },
   'project:database:webhooks_config': {
-    read: ['database_webhooks_config_read'],
-    'read-write': ['database_webhooks_config_read', 'database_webhooks_config_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Manage webhooks triggered from the database',
+    basePermission: 'database_webhooks_config',
+    actions: ['read', 'write'],
   },
   'project:edge_functions': {
-    read: ['edge_functions_read'],
-    'read-write': ['edge_functions_read', 'edge_functions_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Create and manage edge functions',
+    basePermission: 'edge_functions',
+    actions: ['read', 'write'],
   },
   'project:edge_functions:secrets': {
-    read: ['edge_functions_secrets_read'],
-    'read-write': ['edge_functions_secrets_read', 'edge_functions_secrets_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Manage secrets for edge functions',
+    basePermission: 'edge_functions_secrets',
+    actions: ['read', 'write'],
   },
   'project:infra:add-ons': {
-    read: ['infra_add-ons_read'],
-    'read-write': ['infra_add-ons_read', 'infra_add-ons_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Manage project infrastructure add-ons',
+    basePermission: 'infra_add-ons',
+    actions: ['read', 'write'],
   },
   'project:infra:read_replicas': {
-    read: ['infra_read_replicas_read'],
-    'read-write': ['infra_read_replicas_read', 'infra_read_replicas_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Configure read replicas',
+    basePermission: 'infra_read_replicas',
+    actions: ['read', 'write'],
   },
   'project:snippets': {
-    read: ['project_snippets_read'],
-    'read-write': ['project_snippets_read', 'project_snippets_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Manage project code snippets',
+    basePermission: 'project_snippets',
+    actions: ['read', 'write'],
   },
   'project:storage': {
-    read: ['storage_read'],
-    'read-write': ['storage_read', 'storage_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Read and write access to file storage',
+    basePermission: 'storage',
+    actions: ['read', 'write'],
   },
   'project:storage:config': {
-    read: ['storage_config_read'],
-    'read-write': ['storage_config_read', 'storage_config_write'],
-    'no access': [],
+    scope: 'project',
+    title: 'Manage storage bucket configuration',
+    basePermission: 'storage_config',
+    actions: ['read', 'write'],
   },
   'project:telemetry:logs': {
-    read: ['telemetry_logs_read'],
-    'no access': [],
+    scope: 'project',
+    title: 'View project log analytics',
+    basePermission: 'telemetry_logs',
+    actions: ['read'],
   },
   'project:telemetry:usage': {
-    read: ['telemetry_usage_read'],
-    'no access': [],
+    scope: 'project',
+    title: 'Access usage analytics data',
+    basePermission: 'telemetry_usage',
+    actions: ['read'],
   },
 }
 
-// Simple mapping function
-export const mapPermissionToFGA = (resource: string, action: string): string[] => {
-  return PERMISSION_MAP[resource]?.[action] || []
+function getPermissions(
+  basePermission: string,
+  action: ResourceAction
+): ScopedAccessTokenPermission[] {
+  const permissionString = `${basePermission}_${action}` as ScopedAccessTokenPermission
+  return [permissionString]
 }
 
-// Convert PERMISSION_MAP to UI format
+export const PERMISSION_MAP: Record<
+  string,
+  Record<string, ScopedAccessTokenPermission[]>
+> = Object.entries(RESOURCE_CONFIGS).reduce(
+  (acc, [resourceKey, config]) => {
+    const hasRead = config.actions.includes('read')
+    const hasWrite = config.actions.includes('write')
+
+    acc[resourceKey] = {
+      'no access': [],
+    }
+
+    if (hasRead) {
+      acc[resourceKey].read = getPermissions(config.basePermission, 'read')
+    }
+
+    if (hasRead && hasWrite) {
+      acc[resourceKey]['read-write'] = [
+        ...getPermissions(config.basePermission, 'read'),
+        ...getPermissions(config.basePermission, 'write'),
+      ]
+    }
+
+    return acc
+  },
+  {} as Record<string, Record<string, ScopedAccessTokenPermission[]>>
+)
+
 export const PERMISSIONS_UI = [
   {
     name: 'User permissions',
-    resources: [
-      {
-        resource: 'user:organizations',
-        title: 'Access to organization information',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'user:projects',
-        title: 'Access to project information',
-        actions: ['read', 'no access'],
-      },
-      {
-        resource: 'user:available_regions',
-        title: 'Access to available regions information',
-        actions: ['read', 'no access'],
-      },
-      {
-        resource: 'user:snippets',
-        title: 'Access to user snippets',
-        actions: ['read', 'no access'],
-      },
-    ],
+    resources: Object.entries(RESOURCE_CONFIGS)
+      .filter(([_, config]) => config.scope === 'user')
+      .map(([resource, config]) => {
+        const actions: AccessLevel[] = ['no access']
+        if (config.actions.includes('read')) {
+          actions.unshift('read')
+        }
+        if (config.actions.includes('read') && config.actions.includes('write')) {
+          actions.unshift('read-write')
+        }
+        return {
+          resource,
+          title: config.title,
+          actions,
+        }
+      }),
   },
   {
     name: 'Organization permissions',
-    resources: [
-      {
-        resource: 'organization:admin',
-        title: 'Manage organization admin settings',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'organization:members',
-        title: 'Manage organization members',
-        actions: ['read', 'read-write', 'no access'],
-      },
-    ],
+    resources: Object.entries(RESOURCE_CONFIGS)
+      .filter(([_, config]) => config.scope === 'organization')
+      .map(([resource, config]) => {
+        const actions: AccessLevel[] = ['no access']
+        if (config.actions.includes('read')) {
+          actions.unshift('read')
+        }
+        if (config.actions.includes('read') && config.actions.includes('write')) {
+          actions.unshift('read-write')
+        }
+        return {
+          resource,
+          title: config.title,
+          actions,
+        }
+      }),
   },
   {
     name: 'Project permissions',
-    resources: [
-      {
-        resource: 'project:admin',
-        title: 'Full access to project admin settings',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:advisors',
-        title: 'View project advisor recommendations',
-        actions: ['read', 'no access'],
-      },
-      {
-        resource: 'project:api_gateway:keys',
-        title: 'Manage API keys for the API gateway',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:auth:config',
-        title: 'View or modify authentication settings',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:auth:signing_keys',
-        title: 'Access or rotate signing keys',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:backups',
-        title: 'View or trigger project backups',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:branching:development',
-        title: 'Manage development branches',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:branching:production',
-        title: 'Manage production branches',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:custom_domain',
-        title: 'Manage custom domains',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:data_api:config',
-        title: 'Modify PostgREST behavior and settings',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:database',
-        title: 'Read and write access to database data',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:database:config',
-        title: 'Manage core database configuration',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:database:network_bans',
-        title: 'Manage banned IPs',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:database:network_restrictions',
-        title: 'Set or modify network restrictions',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:database:migrations',
-        title: 'Manage database migrations',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:database:pooling_config',
-        title: 'Configure database connection pooling',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:database:readonly_config',
-        title: 'Manage database read only mode',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:database:ssl_config',
-        title: 'Configure SSL for the database',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:database:webhooks_config',
-        title: 'Manage webhooks triggered from the database',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:edge_functions',
-        title: 'Create and manage edge functions',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:edge_functions:secrets',
-        title: 'Manage secrets for edge functions',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:infra:add-ons',
-        title: 'Manage project infrastructure add-ons',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:infra:read_replicas',
-        title: 'Configure read replicas',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:snippets',
-        title: 'Manage project code snippets',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:storage',
-        title: 'Read and write access to file storage',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:storage:config',
-        title: 'Manage storage bucket configuration',
-        actions: ['read', 'read-write', 'no access'],
-      },
-      {
-        resource: 'project:telemetry:logs',
-        title: 'View project log analytics',
-        actions: ['read', 'no access'],
-      },
-      {
-        resource: 'project:telemetry:usage',
-        title: 'Access usage analytics data',
-        actions: ['read', 'no access'],
-      },
-    ],
+    resources: Object.entries(RESOURCE_CONFIGS)
+      .filter(([_, config]) => config.scope === 'project')
+      .map(([resource, config]) => {
+        const actions: AccessLevel[] = ['no access']
+        if (config.actions.includes('read')) {
+          actions.unshift('read')
+        }
+        if (config.actions.includes('read') && config.actions.includes('write')) {
+          actions.unshift('read-write')
+        }
+        return {
+          resource,
+          title: config.title,
+          actions,
+        }
+      }),
   },
 ]
 
 export const ACCESS_TOKEN_PERMISSIONS = PERMISSIONS_UI
+
+export const mapPermissionToFGA = (
+  resource: string,
+  action: string
+): ScopedAccessTokenPermission[] => {
+  return PERMISSION_MAP[resource]?.[action] || []
+}

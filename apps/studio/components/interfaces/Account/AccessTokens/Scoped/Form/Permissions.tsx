@@ -180,9 +180,7 @@ export const Permissions = ({
                             onSelect={() => {
                               const defaultAction = resource.actions.includes('read-write')
                                 ? 'read-write'
-                                : resource.actions.includes('read-only')
-                                  ? 'read-only'
-                                  : resource.actions[0]
+                                : resource.actions[0]
                               const newRows = [
                                 ...permissionRows,
                                 { resource: resource.resource, action: defaultAction },
@@ -357,9 +355,7 @@ export const Permissions = ({
                               onSelect={() => {
                                 const defaultAction = resource.actions.includes('read-write')
                                   ? 'read-write'
-                                  : resource.actions.includes('read-only')
-                                    ? 'read-only'
-                                    : resource.actions[0]
+                                  : resource.actions[0]
                                 const newRows = [
                                   ...permissionRows,
                                   { resource: resource.resource, action: defaultAction },
