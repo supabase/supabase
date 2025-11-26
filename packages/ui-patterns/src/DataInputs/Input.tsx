@@ -12,7 +12,7 @@ import InputIconContainer from '../form/Layout/InputIconContainer'
 
 export const HIDDEN_PLACEHOLDER = '**** **** **** ****'
 
-export interface Props extends Omit<ComponentProps<typeof Input_Shadcn_>, 'size' | 'onCopy'> {
+export interface Props extends Omit<ComponentProps<typeof Input_Shadcn_>, 'onCopy'> {
   copy?: boolean
   showCopyOnHover?: boolean
   onCopy?: () => void
@@ -37,6 +37,7 @@ const Input = forwardRef<
       onCopy,
       iconContainerClassName,
       containerClassName,
+      size,
       ...props
     }: Props,
     ref
@@ -62,13 +63,15 @@ const Input = forwardRef<
     }
 
     let inputClasses: string[] = []
-    if (icon) inputClasses.push(__styles.with_icon.tiny)
+    if (size) inputClasses.push(__styles.size[size])
+    if (icon) inputClasses.push(__styles.with_icon[size ?? 'small'])
 
     return (
       <div className={cn('relative group', containerClassName)}>
         <Input_Shadcn_
           ref={ref}
           {...props}
+          size={size}
           onCopy={onCopy}
           value={reveal && hidden ? HIDDEN_PLACEHOLDER : props.value}
           disabled={reveal && hidden ? true : props.disabled}
