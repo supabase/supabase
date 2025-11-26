@@ -4738,6 +4738,7 @@ export interface components {
     CloudMarketplaceOnboardingInfoResponse: {
       aws_contract_auto_renewal: boolean
       aws_contract_end_date: string
+      aws_contract_is_private_offer: boolean
       aws_contract_settings_url: string
       aws_contract_start_date: string
       organization_linking_eligibility: {
@@ -4879,6 +4880,7 @@ export interface components {
         [key: string]: unknown
       }
       description?: string
+      /** @default false */
       favorite?: boolean
       /** Format: uuid */
       folder_id?: (null | (string | null)) | null
@@ -6746,6 +6748,7 @@ export interface components {
       HOOK_SEND_SMS_ENABLED: boolean
       HOOK_SEND_SMS_SECRETS: string
       HOOK_SEND_SMS_URI: string
+      INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST: boolean | null
       JWT_EXP: number
       MAILER_ALLOW_UNVERIFIED_EMAIL_SIGN_INS: boolean
       MAILER_AUTOCONFIRM: boolean
@@ -7624,6 +7627,9 @@ export interface components {
         type: string
       }[]
       defaultPaymentMethodId: string | null
+    }
+    PendingConfirmationResponse: {
+      message: string
     }
     PgbouncerConfigResponse: {
       connection_string: string
@@ -9739,6 +9745,7 @@ export interface components {
       HOOK_SEND_SMS_ENABLED?: boolean | null
       HOOK_SEND_SMS_SECRETS?: string | null
       HOOK_SEND_SMS_URI?: string | null
+      INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST?: boolean | null
       JWT_EXP?: number | null
       MAILER_ALLOW_UNVERIFIED_EMAIL_SIGN_INS?: boolean | null
       MAILER_AUTOCONFIRM?: boolean | null
@@ -10457,6 +10464,7 @@ export interface components {
         [key: string]: unknown
       }
       description?: string
+      /** @description A missing `favorite` value means that the value will remained unchanged for updates. Defaults to `false` for inserts. */
       favorite?: boolean
       /** Format: uuid */
       folder_id?: (null | (string | null)) | null
@@ -13814,6 +13822,14 @@ export interface operations {
         }
         content?: never
       }
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PendingConfirmationResponse']
+        }
+      }
       /** @description Unauthorized */
       401: {
         headers: {
@@ -16150,6 +16166,14 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['CreateOrganizationResponse']
+        }
+      }
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PendingConfirmationResponse']
         }
       }
       /** @description Failed to confirm subscription changes */
