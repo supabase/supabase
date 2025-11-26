@@ -365,7 +365,7 @@ export const UsersV2 = () => {
       isCountLoaded &&
       isCountWithinThresholdForSortBy
     ) {
-      if (specificFilterColumn === 'id' && localStorageFilter !== 'id') {
+      if (specificFilterColumn === 'email' && localStorageFilter !== 'email') {
         setSpecificFilterColumn(localStorageFilter)
       }
       if (sortByValue === 'id:asc' && localStorageSortByValue !== 'id:asc') {
