@@ -6078,6 +6078,91 @@
           }
         ],
         "x-oauth-scope": "projects:write"
+      },
+      "patch": {
+        "operationId": "v1-update-a-project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ref": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["id", "ref", "name"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to update project"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Updates the given project",
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:write"
       }
     },
     "/v1/projects/{ref}/secrets": {
@@ -8440,9 +8525,38 @@
                           "properties": {
                             "enabled": {
                               "type": "boolean"
+                            },
+                            "maxNamespaces": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "maxTables": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "maxCatalogs": {
+                              "type": "integer",
+                              "minimum": 0
                             }
                           },
-                          "required": ["enabled"]
+                          "required": ["enabled", "maxNamespaces", "maxTables", "maxCatalogs"]
+                        },
+                        "vectorBuckets": {
+                          "type": "object",
+                          "properties": {
+                            "enabled": {
+                              "type": "boolean"
+                            },
+                            "maxBuckets": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "maxIndexes": {
+                              "type": "integer",
+                              "minimum": 0
+                            }
+                          },
+                          "required": ["enabled", "maxBuckets", "maxIndexes"]
                         }
                       },
                       "required": ["imageTransformation", "s3Protocol"]
@@ -8564,9 +8678,38 @@
                         "properties": {
                           "enabled": {
                             "type": "boolean"
+                          },
+                          "maxNamespaces": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "maxTables": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "maxCatalogs": {
+                            "type": "integer",
+                            "minimum": 0
                           }
                         },
-                        "required": ["enabled"]
+                        "required": ["enabled", "maxNamespaces", "maxTables", "maxCatalogs"]
+                      },
+                      "vectorBuckets": {
+                        "type": "object",
+                        "properties": {
+                          "enabled": {
+                            "type": "boolean"
+                          },
+                          "maxBuckets": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "maxIndexes": {
+                            "type": "integer",
+                            "minimum": 0
+                          }
+                        },
+                        "required": ["enabled", "maxBuckets", "maxIndexes"]
                       }
                     },
                     "required": ["imageTransformation", "s3Protocol"]
@@ -9345,6 +9488,11 @@
                     },
                     "db_max_pool_size": {
                       "type": "integer",
+                      "nullable": true
+                    },
+                    "db_max_pool_size_unit": {
+                      "type": "string",
+                      "enum": ["connections", "percent"],
                       "nullable": true
                     },
                     "disable_signup": {
@@ -10238,6 +10386,7 @@
                   "required": [
                     "api_max_request_duration",
                     "db_max_pool_size",
+                    "db_max_pool_size_unit",
                     "disable_signup",
                     "external_anonymous_users_enabled",
                     "external_apple_additional_client_ids",
@@ -11394,6 +11543,11 @@
                     "type": "integer",
                     "nullable": true
                   },
+                  "db_max_pool_size_unit": {
+                    "type": "string",
+                    "enum": ["connections", "percent"],
+                    "nullable": true
+                  },
                   "api_max_request_duration": {
                     "type": "integer",
                     "nullable": true
@@ -11465,6 +11619,11 @@
                     },
                     "db_max_pool_size": {
                       "type": "integer",
+                      "nullable": true
+                    },
+                    "db_max_pool_size_unit": {
+                      "type": "string",
+                      "enum": ["connections", "percent"],
                       "nullable": true
                     },
                     "disable_signup": {
@@ -12358,6 +12517,7 @@
                   "required": [
                     "api_max_request_duration",
                     "db_max_pool_size",
+                    "db_max_pool_size_unit",
                     "disable_signup",
                     "external_anonymous_users_enabled",
                     "external_apple_additional_client_ids",
@@ -12610,6 +12770,240 @@
           }
         ],
         "x-oauth-scope": "auth:write"
+      }
+    },
+    "/v1/projects/{ref}/config/realtime": {
+      "get": {
+        "operationId": "v1-get-realtime-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gets project's realtime configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "private_only": {
+                      "type": "boolean",
+                      "nullable": true,
+                      "description": "Whether to only allow private channels"
+                    },
+                    "connection_pool": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 100,
+                      "nullable": true,
+                      "description": "Sets connection pool size for Realtime Authorization"
+                    },
+                    "max_concurrent_users": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 50000,
+                      "nullable": true,
+                      "description": "Sets maximum number of concurrent users rate limit"
+                    },
+                    "max_events_per_second": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 50000,
+                      "nullable": true,
+                      "description": "Sets maximum number of events per second rate per channel limit"
+                    },
+                    "max_bytes_per_second": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 10000000,
+                      "nullable": true,
+                      "description": "Sets maximum number of bytes per second rate per channel limit"
+                    },
+                    "max_channels_per_client": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 10000,
+                      "nullable": true,
+                      "description": "Sets maximum number of channels per client rate limit"
+                    },
+                    "max_joins_per_second": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 5000,
+                      "nullable": true,
+                      "description": "Sets maximum number of joins per second rate limit"
+                    },
+                    "max_presence_events_per_second": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 5000,
+                      "nullable": true,
+                      "description": "Sets maximum number of presence events per second rate limit"
+                    },
+                    "max_payload_size_in_kb": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 10000,
+                      "nullable": true,
+                      "description": "Sets maximum number of payload size in KB rate limit"
+                    },
+                    "suspend": {
+                      "type": "boolean",
+                      "nullable": true,
+                      "description": "Whether to suspend realtime"
+                    }
+                  },
+                  "required": [
+                    "private_only",
+                    "connection_pool",
+                    "max_concurrent_users",
+                    "max_events_per_second",
+                    "max_bytes_per_second",
+                    "max_channels_per_client",
+                    "max_joins_per_second",
+                    "max_presence_events_per_second",
+                    "max_payload_size_in_kb",
+                    "suspend"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Gets realtime configuration",
+        "tags": ["Realtime Config"]
+      },
+      "patch": {
+        "operationId": "v1-update-realtime-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "private_only": {
+                    "type": "boolean",
+                    "description": "Whether to only allow private channels"
+                  },
+                  "connection_pool": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100,
+                    "description": "Sets connection pool size for Realtime Authorization"
+                  },
+                  "max_concurrent_users": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 50000,
+                    "description": "Sets maximum number of concurrent users rate limit"
+                  },
+                  "max_events_per_second": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 50000,
+                    "description": "Sets maximum number of events per second rate per channel limit"
+                  },
+                  "max_bytes_per_second": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000000,
+                    "description": "Sets maximum number of bytes per second rate per channel limit"
+                  },
+                  "max_channels_per_client": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000,
+                    "description": "Sets maximum number of channels per client rate limit"
+                  },
+                  "max_joins_per_second": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5000,
+                    "description": "Sets maximum number of joins per second rate limit"
+                  },
+                  "max_presence_events_per_second": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5000,
+                    "description": "Sets maximum number of presence events per second rate limit"
+                  },
+                  "max_payload_size_in_kb": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000,
+                    "description": "Sets maximum number of payload size in KB rate limit"
+                  },
+                  "suspend": {
+                    "type": "boolean",
+                    "description": "Whether to suspend realtime"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Updates realtime configuration",
+        "tags": ["Realtime Config"]
       }
     },
     "/v1/projects/{ref}/config/auth/third-party-auth": {
@@ -15420,6 +15814,78 @@
         "x-oauth-scope": "database:write"
       }
     },
+    "/v1/projects/{ref}/database/query/read-only": {
+      "post": {
+        "description": "All entity references must be schema qualified.",
+        "operationId": "v1-read-only-query",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "parameters": {
+                    "type": "array",
+                    "items": {}
+                  }
+                },
+                "required": ["query"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to run read-only sql query"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "[Beta] Run a sql query as supabase_read_only_user",
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:read"
+      }
+    },
     "/v1/projects/{ref}/database/webhooks/enable": {
       "post": {
         "operationId": "v1-enable-database-webhook",
@@ -15553,6 +16019,86 @@
           }
         ],
         "x-oauth-scope": "projects:read"
+      }
+    },
+    "/v1/projects/{ref}/database/password": {
+      "patch": {
+        "operationId": "v1-update-database-password",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string",
+                    "minLength": 4
+                  }
+                },
+                "required": ["password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to update database password"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Updates the database password",
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/database/jit": {
@@ -21233,6 +21779,17 @@
         },
         "required": ["id", "ref", "name"]
       },
+      "V1UpdateProjectBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": ["name"]
+      },
       "SecretResponse": {
         "type": "object",
         "properties": {
@@ -21971,9 +22528,38 @@
                 "properties": {
                   "enabled": {
                     "type": "boolean"
+                  },
+                  "maxNamespaces": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "maxTables": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "maxCatalogs": {
+                    "type": "integer",
+                    "minimum": 0
                   }
                 },
-                "required": ["enabled"]
+                "required": ["enabled", "maxNamespaces", "maxTables", "maxCatalogs"]
+              },
+              "vectorBuckets": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "maxBuckets": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "maxIndexes": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": ["enabled", "maxBuckets", "maxIndexes"]
               }
             },
             "required": ["imageTransformation", "s3Protocol"]
@@ -22051,9 +22637,38 @@
                 "properties": {
                   "enabled": {
                     "type": "boolean"
+                  },
+                  "maxNamespaces": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "maxTables": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "maxCatalogs": {
+                    "type": "integer",
+                    "minimum": 0
                   }
                 },
-                "required": ["enabled"]
+                "required": ["enabled", "maxNamespaces", "maxTables", "maxCatalogs"]
+              },
+              "vectorBuckets": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "maxBuckets": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "maxIndexes": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": ["enabled", "maxBuckets", "maxIndexes"]
               }
             },
             "required": ["imageTransformation", "s3Protocol"]
@@ -22404,6 +23019,11 @@
           },
           "db_max_pool_size": {
             "type": "integer",
+            "nullable": true
+          },
+          "db_max_pool_size_unit": {
+            "type": "string",
+            "enum": ["connections", "percent"],
             "nullable": true
           },
           "disable_signup": {
@@ -23297,6 +23917,7 @@
         "required": [
           "api_max_request_duration",
           "db_max_pool_size",
+          "db_max_pool_size_unit",
           "disable_signup",
           "external_anonymous_users_enabled",
           "external_apple_additional_client_ids",
@@ -24402,6 +25023,11 @@
             "type": "integer",
             "nullable": true
           },
+          "db_max_pool_size_unit": {
+            "type": "string",
+            "enum": ["connections", "percent"],
+            "nullable": true
+          },
           "api_max_request_duration": {
             "type": "integer",
             "nullable": true
@@ -24455,6 +25081,151 @@
             "nullable": true
           }
         }
+      },
+      "RealtimeConfigResponse": {
+        "type": "object",
+        "properties": {
+          "private_only": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Whether to only allow private channels"
+          },
+          "connection_pool": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "nullable": true,
+            "description": "Sets connection pool size for Realtime Authorization"
+          },
+          "max_concurrent_users": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "nullable": true,
+            "description": "Sets maximum number of concurrent users rate limit"
+          },
+          "max_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "nullable": true,
+            "description": "Sets maximum number of events per second rate per channel limit"
+          },
+          "max_bytes_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000,
+            "nullable": true,
+            "description": "Sets maximum number of bytes per second rate per channel limit"
+          },
+          "max_channels_per_client": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "nullable": true,
+            "description": "Sets maximum number of channels per client rate limit"
+          },
+          "max_joins_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "nullable": true,
+            "description": "Sets maximum number of joins per second rate limit"
+          },
+          "max_presence_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "nullable": true,
+            "description": "Sets maximum number of presence events per second rate limit"
+          },
+          "max_payload_size_in_kb": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "nullable": true,
+            "description": "Sets maximum number of payload size in KB rate limit"
+          },
+          "suspend": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Whether to suspend realtime"
+          }
+        },
+        "required": [
+          "private_only",
+          "connection_pool",
+          "max_concurrent_users",
+          "max_events_per_second",
+          "max_bytes_per_second",
+          "max_channels_per_client",
+          "max_joins_per_second",
+          "max_presence_events_per_second",
+          "max_payload_size_in_kb",
+          "suspend"
+        ]
+      },
+      "UpdateRealtimeConfigBody": {
+        "type": "object",
+        "properties": {
+          "private_only": {
+            "type": "boolean",
+            "description": "Whether to only allow private channels"
+          },
+          "connection_pool": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Sets connection pool size for Realtime Authorization"
+          },
+          "max_concurrent_users": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "description": "Sets maximum number of concurrent users rate limit"
+          },
+          "max_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "description": "Sets maximum number of events per second rate per channel limit"
+          },
+          "max_bytes_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000,
+            "description": "Sets maximum number of bytes per second rate per channel limit"
+          },
+          "max_channels_per_client": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "description": "Sets maximum number of channels per client rate limit"
+          },
+          "max_joins_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "description": "Sets maximum number of joins per second rate limit"
+          },
+          "max_presence_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "description": "Sets maximum number of presence events per second rate limit"
+          },
+          "max_payload_size_in_kb": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "description": "Sets maximum number of payload size in KB rate limit"
+          },
+          "suspend": {
+            "type": "boolean",
+            "description": "Whether to suspend realtime"
+          }
+        },
+        "additionalProperties": false
       },
       "CreateThirdPartyAuthBody": {
         "type": "object",
@@ -25310,6 +26081,20 @@
         },
         "required": ["query"]
       },
+      "V1ReadOnlyQueryBody": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parameters": {
+            "type": "array",
+            "items": {}
+          }
+        },
+        "required": ["query"]
+      },
       "GetProjectDbMetadataResponse": {
         "type": "object",
         "properties": {
@@ -25341,6 +26126,25 @@
           }
         },
         "required": ["databases"]
+      },
+      "V1UpdatePasswordBody": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "minLength": 4
+          }
+        },
+        "required": ["password"]
+      },
+      "V1UpdatePasswordResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["message"]
       },
       "JitAccessResponse": {
         "type": "object",

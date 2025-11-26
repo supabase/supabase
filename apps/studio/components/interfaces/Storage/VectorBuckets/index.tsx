@@ -8,6 +8,7 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
 import { VectorBucket as VectorBucketIcon } from 'icons'
+import { BASE_PATH } from 'lib/constants'
 import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
@@ -45,7 +46,7 @@ export const VectorsBuckets = () => {
   const handleBucketNavigation = (bucketName: string, event: MouseEvent | KeyboardEvent) => {
     const url = `/project/${projectRef}/storage/vectors/buckets/${encodeURIComponent(bucketName)}`
     if (event.metaKey || event.ctrlKey) {
-      window.open(url, '_blank')
+      window.open(`${BASE_PATH}${url}`, '_blank')
     } else {
       router.push(url)
     }
