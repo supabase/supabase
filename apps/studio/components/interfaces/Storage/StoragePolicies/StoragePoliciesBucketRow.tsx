@@ -4,7 +4,7 @@ import { noop } from 'lodash'
 import { PolicyRow } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
 import { Bucket } from 'data/storage/buckets-query'
 
-import { Bucket as BucketIcon } from 'icons'
+import { FilesBucket as FilesBucketIcon } from 'icons'
 import {
   Badge,
   Button,
@@ -42,7 +42,7 @@ export const StoragePoliciesBucketRow = ({
     <Card>
       <CardHeader className="flex flex-row w-full items-center justify-between gap-2 space-y-0">
         <div className="flex flex-1 min-w-0 items-center gap-3">
-          <BucketIcon className="text-foreground-muted" size={16} strokeWidth={1.5} />
+          <FilesBucketIcon className="text-foreground-muted" size={16} strokeWidth={1.5} />
           <div className="flex flex-1 min-w-0 items-center gap-1.5">
             <CardTitle className="truncate">{label}</CardTitle>
             {bucket?.public && <Badge variant="warning">Public</Badge>}

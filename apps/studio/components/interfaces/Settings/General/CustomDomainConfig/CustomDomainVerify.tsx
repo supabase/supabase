@@ -1,6 +1,5 @@
 import { AlertCircle, HelpCircle, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -9,9 +8,9 @@ import Panel from 'components/ui/Panel'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
-import { useInterval } from 'hooks/misc/useInterval'
+import { useCustomDomainReverifyQuery } from 'data/custom-domains/custom-domains-reverify-query'
 import { DOCS_URL } from 'lib/constants'
+import { useEffect } from 'react'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -24,7 +23,6 @@ import { DNSTableHeaders } from './DNSTableHeaders'
 
 const CustomDomainVerify = () => {
   const { ref: projectRef } = useParams()
-  const [isNotVerifiedYet, setIsNotVerifiedYet] = useState(false)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
 
@@ -32,13 +30,6 @@ const CustomDomainVerify = () => {
   const customDomain = customDomainData?.customDomain
   const isSSLCertificateDeploying =
     customDomain?.ssl.status !== undefined && customDomain.ssl.txt_name === undefined
-
-  const { mutate: reverifyCustomDomain, isPending: isReverifyLoading } =
-    useCustomDomainReverifyMutation({
-      onSuccess: (res) => {
-        if (res.status === '2_initiated') setIsNotVerifiedYet(true)
-      },
-    })
 
   const { mutate: deleteCustomDomain, isPending: isDeleting } = useCustomDomainDeleteMutation({
     onSuccess: () => {
@@ -48,6 +39,28 @@ const CustomDomainVerify = () => {
     },
   })
 
+  const {
+    data: reverifyData,
+    refetch: refetchReverify,
+    isFetching: isReverifyLoading,
+    isError: isReverifyError,
+    error: reverifyError,
+  } = useCustomDomainReverifyQuery(
+    { projectRef },
+    {
+      // Poll every 10 seconds if the SSL certificate is being deployed
+      refetchInterval: isSSLCertificateDeploying && !isDeleting ? 10000 : false,
+    }
+  )
+
+  useEffect(() => {
+    if (isReverifyError) {
+      toast.error(reverifyError?.message)
+    }
+  }, [isReverifyError, reverifyError])
+
+  const isNotVerifiedYet = reverifyData?.status === '2_initiated'
+
   const hasCAAErrors = customDomain?.ssl.validation_errors?.reduce(
     (acc, error) => acc || error.message.includes('caa_error'),
     false
@@ -56,14 +69,8 @@ const CustomDomainVerify = () => {
 
   const onReverifyCustomDomain = () => {
     if (!projectRef) return console.error('Project ref is required')
-    reverifyCustomDomain({ projectRef })
+    refetchReverify()
   }
-
-  useInterval(
-    onReverifyCustomDomain,
-    // Poll every 5 seconds if the SSL certificate is being deployed
-    isSSLCertificateDeploying && !isDeleting ? 5000 : false
-  )
 
   const onCancelCustomDomain = async () => {
     if (!projectRef) return console.error('Project ref is required')

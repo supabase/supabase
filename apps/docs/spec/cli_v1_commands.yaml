@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.54.11
+  version: 2.61.2
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -78,7 +78,7 @@ flags:
     name: --workdir <string>
     description: path to a Supabase project directory
     default_value: ''
-  - id: 'yes'
+  - id: "yes"
     name: --yes
     description: answer yes to all prompts
     default_value: 'false'
@@ -605,6 +605,24 @@ commands:
         description: |
           URL pointing to a SAML 2.0 Metadata XML document describing the identity provider.
         default_value: ''
+      - id: name-id-format
+        name: --name-id-format <string>
+        description: |
+          URI reference representing the classification of string-based identifier information.
+        default_value: ''
+        accepted_values:
+          - id: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+            name: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+            type: string
+          - id: urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+            name: urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+            type: string
+          - id: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+            name: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+            type: string
+          - id: urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+            name: urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+            type: string
       - id: remove-domains
         name: --remove-domains <strings>
         description: |
@@ -767,6 +785,24 @@ commands:
         description: |
           URL pointing to a SAML 2.0 Metadata XML document describing the identity provider.
         default_value: ''
+      - id: name-id-format
+        name: --name-id-format <string>
+        description: |
+          URI reference representing the classification of string-based identifier information.
+        default_value: ''
+        accepted_values:
+          - id: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+            name: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+            type: string
+          - id: urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+            name: urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+            type: string
+          - id: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+            name: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+            type: string
+          - id: urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+            name: urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+            type: string
       - id: skip-url-validation
         name: --skip-url-validation
         description: |
@@ -1281,6 +1317,10 @@ commands:
     usage: supabase network-restrictions update [flags]
     subcommands: []
     flags:
+      - id: append
+        name: --append
+        description: Append to existing restrictions instead of replacing them.
+        default_value: 'false'
       - id: bypass-cidr-checks
         name: --bypass-cidr-checks
         description: Bypass some of the CIDR validation checks.
@@ -2559,14 +2599,14 @@ commands:
     usage: supabase functions download <Function name> [flags]
     subcommands: []
     flags:
-      - id: legacy-bundle
-        name: --legacy-bundle
-        description: Use legacy bundling mechanism.
-        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
         default_value: ''
+      - id: use-api
+        name: --use-api
+        description: Unbundle functions server-side without using Docker.
+        default_value: 'false'
   - id: supabase-functions-deploy
     title: supabase functions deploy
     summary: Deploy a Function to Supabase
@@ -2599,12 +2639,8 @@ commands:
         default_value: 'false'
       - id: use-api
         name: --use-api
-        description: Use Management API to bundle functions.
+        description: Bundle functions server-side without using Docker.
         default_value: 'false'
-      - id: use-docker
-        name: --use-docker
-        description: Use Docker to bundle functions.
-        default_value: 'true'
   - id: supabase-functions-delete
     title: supabase functions delete
     summary: Delete a Function from Supabase

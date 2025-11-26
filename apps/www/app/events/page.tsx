@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default async function EventsPage() {
   // This needs to be server-side as we use FS api.
-  const staticEvents = await getStaticEvents()
+  const { upcomingEvents, onDemandEvents } = await getStaticEvents()
 
-  return <EventClientRenderer staticEvents={staticEvents.upcomingEvents} />
+  return <EventClientRenderer staticEvents={upcomingEvents} onDemandEvents={onDemandEvents} />
 }

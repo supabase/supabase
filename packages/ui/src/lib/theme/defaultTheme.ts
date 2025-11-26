@@ -446,7 +446,7 @@ export default {
        `,
     },
     container: 'relative',
-    with_icon: 'pl-10',
+    with_icon: 'pl-7',
     size: {
       ...default__padding_and_text,
     },
@@ -492,7 +492,7 @@ export default {
        `,
     },
     container: 'relative',
-    with_icon: 'pl-10',
+    with_icon: 'pl-7',
     size: {
       ...default__padding_and_text,
     },
@@ -539,7 +539,7 @@ export default {
     },
     disabled: 'opacity-50',
     container: 'relative',
-    with_icon: 'pl-10',
+    with_icon: 'pl-7',
     size: {
       ...default__padding_and_text,
     },
@@ -803,8 +803,8 @@ export default {
             tiny: `pl-6`,
             small: `pl-6`,
             medium: `pl-7`,
-            large: `pl-10`,
-            xlarge: `pl-10`,
+            large: `pl-7`,
+            xlarge: `pl-7`,
           },
           align: {
             vertical: 'flex flex-col space-y-1',
@@ -1383,7 +1383,7 @@ export default {
   inputIconContainer: {
     base: `
     absolute inset-y-0
-    left-0 pl-3 flex
+    left-0 pl-2 flex
     items-center pointer-events-none
     text-foreground-light
     [&_svg]:stroke-[1.5]

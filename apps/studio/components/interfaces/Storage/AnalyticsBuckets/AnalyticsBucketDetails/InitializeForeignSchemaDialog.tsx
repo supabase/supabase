@@ -5,10 +5,12 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   Dialog,
@@ -113,13 +115,16 @@ export const InitializeForeignSchemaDialog = ({ namespace }: { namespace: string
                 )}
               />
             </DialogSection>
-            <DialogFooter>
-              <Button type="default" disabled={isCreating} onClick={() => setIsOpen(false)}>
-                Cancel
-              </Button>
-              <Button htmlType="submit" type="primary" loading={isCreating}>
-                Create schema
-              </Button>
+            <DialogFooter className="!justify-between">
+              <DocsButton href={`${DOCS_URL}/guides/storage/analytics/query-with-postgres`} />
+              <div className="flex items-center gap-x-2">
+                <Button type="default" disabled={isCreating} onClick={() => setIsOpen(false)}>
+                  Cancel
+                </Button>
+                <Button htmlType="submit" type="primary" loading={isCreating}>
+                  Create schema
+                </Button>
+              </div>
             </DialogFooter>
           </form>
         </Form_Shadcn_>
