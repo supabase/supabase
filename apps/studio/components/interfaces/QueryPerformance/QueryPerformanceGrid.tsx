@@ -555,14 +555,12 @@ export const QueryPerformanceGrid = ({
                 >
                   Query details
                 </TabsTrigger_Shadcn_>
-                {isIndexAdvisorEnabled && (
-                  <TabsTrigger_Shadcn_
-                    value="suggestion"
-                    className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
-                  >
-                    Indexes
-                  </TabsTrigger_Shadcn_>
-                )}
+                <TabsTrigger_Shadcn_
+                  value="suggestion"
+                  className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
+                >
+                  Indexes
+                </TabsTrigger_Shadcn_>
               </TabsList_Shadcn_>
             </div>
 

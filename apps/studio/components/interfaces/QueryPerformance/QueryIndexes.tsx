@@ -122,11 +122,27 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
     }
   }
 
+  if (!isLoadingExtensions && !isIndexAdvisorEnabled) {
+    return (
+      <QueryPanelContainer className="h-full">
+        <QueryPanelSection className="pt-2">
+          <div className="mb-4 flex flex-col gap-y-1">
+            <h4>Index Advisor</h4>
+            <p className="text-sm text-foreground-light">
+              Enable Index Advisor to view indexes in use and get recommendations for new indexes
+            </p>
+          </div>
+          <IndexAdvisorDisabledState />
+        </QueryPanelSection>
+      </QueryPanelContainer>
+    )
+  }
+
   return (
     <QueryPanelContainer className="h-full">
       <QueryPanelSection className="pt-2 mb-6">
         <div className="mb-4 flex flex-col gap-y-1">
-          <h4>Indexes in use</h4>
+          <h4 className="mb-2">Indexes in use</h4>
           <p className="text-sm text-foreground-light">
             This query is using the following index{(usedIndexes ?? []).length > 1 ? 's' : ''}:
           </p>
@@ -173,7 +189,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
       </QueryPanelSection>
       <QueryPanelSection className="flex flex-col gap-y-6 py-6 border-t">
         <div className="flex flex-col gap-y-1">
-          <h4>New index recommendations</h4>
+          <h4 className="mb-2">New index recommendations</h4>
           {isLoadingExtensions ? (
             <GenericSkeletonLoader />
           ) : !isIndexAdvisorEnabled ? (
@@ -252,8 +268,8 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
         <>
           <QueryPanelSection className="py-6 border-t">
             <div className="flex flex-col gap-y-1">
-              <h4>Query costs</h4>
-              <div className="border rounded-md flex flex-col bg-surface-100 mt-3">
+              <h4 className="mb-2">Query costs</h4>
+              <div className="border rounded-md flex flex-col bg-surface-100">
                 <QueryPanelScoreSection
                   name="Total cost of query"
                   description="An estimate of how long it will take to return all the rows (Includes start up cost)"
@@ -280,7 +296,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
           </QueryPanelSection>
           <QueryPanelSection className="py-6 border-t">
             <div className="flex flex-col gap-y-2">
-              <h4>FAQ</h4>
+              <h4 className="mb-2">FAQ</h4>
               <Accordion_Shadcn_ collapsible type="single" className="border rounded-md">
                 <AccordionItem_Shadcn_ value="1">
                   <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition [&[data-state=open]]:text-foreground">
