@@ -76,11 +76,24 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
 }
 
 const generateDimensionExample = (startValue: number, dimension: number) => {
-  const maxDimension = Math.min(dimension, 10)
-  const exampleValues = Array.from({ length: maxDimension }, (_, i) =>
-    (startValue + i * 0.1).toFixed(1)
-  )
-  return `${exampleValues.join(', ')}${dimension > maxDimension ? '...' : ''}`
+  if (dimension >= 3) {
+    // For 3+ dimensions, show only first 2 values with ellipsis
+    return `${startValue.toFixed(1)}, ${(startValue + 0.1).toFixed(1)}, ...`
+  } else if (dimension === 2) {
+    // For 2 dimensions, show both values
+    return `${startValue.toFixed(1)}, ${(startValue + 0.1).toFixed(1)}`
+  } else {
+    // For 1 dimension, show single value
+    return startValue.toFixed(1)
+  }
+}
+
+const generateDimensionComment = (dimension: number) => {
+  // Only add comment for 3+ dimensions
+  if (dimension >= 3) {
+    return ` // Data should match ${dimension} dimensions`
+  }
+  return ''
 }
 
 interface VectorBucketIndexExamplesProps {
@@ -107,6 +120,10 @@ function VectorBucketIndexExamples({
   const { ref: projectRef } = useParams()
 
   const dimensionLabel = `Data should match ${dimension} dimension${dimension > 1 ? 's' : ''}`
+  const startValue = 0.1
+  const dimensionComment = generateDimensionComment(dimension)
+  const dimensionExample = generateDimensionExample(startValue, dimension)
+  const sqlComment = dimension >= 3 ? ` -- ${dimensionLabel}` : ''
 
   const sqlCode = `-- Insert multiple vectors
 insert into
@@ -114,12 +131,12 @@ insert into
 values
   (
     'doc-1',
-    '[${generateDimensionExample(0.2, dimension)}]'::embd, -- ${dimensionLabel}
+    '[${dimensionExample}]'::embd${sqlComment},
     '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb
   ),
   (
     'doc-2',
-    '[${generateDimensionExample(0.4, dimension)}]'::embd, -- ${dimensionLabel}
+    '[${dimensionExample}]'::embd${sqlComment},
     '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb
   );`
 
@@ -138,12 +155,12 @@ const result = await index.putVectors({
   vectors: [
     {
       key: 'doc-1',
-      data: { float32: [${generateDimensionExample(0.2, dimension)}] }, // ${dimensionLabel}
+      data: { float32: [${dimensionExample}] }${dimensionComment},
       metadata: { ${metadataKeys.map((key) => `${key}: "${key} value"`).join(', ')} },
     },
     {
       key: 'doc-2',
-      data: { float32: [${generateDimensionExample(0.4, dimension)}] }, // ${dimensionLabel}
+      data: { float32: [${dimensionExample}] }${dimensionComment},
       metadata: { ${metadataKeys.map((key) => `${key}: "${key} value"`).join(', ')} },
     },
   ],
