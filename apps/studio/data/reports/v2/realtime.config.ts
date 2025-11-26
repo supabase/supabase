@@ -224,7 +224,7 @@ export const realtimeReports = ({
   },
   {
     id: 'realtime_payload_size',
-    label: 'Broadcast Payload Size',
+    label: 'Message Payload Size',
     valuePrecision: 2,
     showNewBadge: true,
     hide: false,
@@ -234,7 +234,7 @@ export const realtimeReports = ({
     showMaxValue: false,
     hideChartType: false,
     defaultChartStyle: 'line',
-    titleTooltip: 'Median size of broadcast payloads sent through realtime.',
+    titleTooltip: 'Median size of message payloads sent',
     availableIn: ['free', 'pro', 'team', 'enterprise'],
     YAxisProps: {
       width: 50,
