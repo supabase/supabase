@@ -32,7 +32,7 @@ interface VectorBucketTableExamplesSheetProps {
 
 export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamplesSheetProps) => {
   const metadataKeys = index.metadataConfiguration?.nonFilterableMetadataKeys ?? []
-  const [language, setLanguage] = useState<'javascript' | 'sql'>('javascript')
+  const [language, setLanguage] = useState<'javascript' | 'sql'>('sql')
   const [showLanguage, setShowLanguage] = useState(false)
 
   const updateLanguage = (value: 'javascript' | 'sql') => {
@@ -179,17 +179,17 @@ const result = await index.putVectors({
                   <CommandGroup_Shadcn_>
                     <CommandItem_Shadcn_
                       className="cursor-pointer"
-                      onSelect={() => onLanguageChange('javascript')}
-                      onClick={() => onLanguageChange('javascript')}
-                    >
-                      <p>JavaScript</p>
-                    </CommandItem_Shadcn_>
-                    <CommandItem_Shadcn_
-                      className="cursor-pointer"
                       onSelect={() => onLanguageChange('sql')}
                       onClick={() => onLanguageChange('sql')}
                     >
                       <p>SQL</p>
+                    </CommandItem_Shadcn_>
+                    <CommandItem_Shadcn_
+                      className="cursor-pointer"
+                      onSelect={() => onLanguageChange('javascript')}
+                      onClick={() => onLanguageChange('javascript')}
+                    >
+                      <p>JavaScript</p>
                     </CommandItem_Shadcn_>
                   </CommandGroup_Shadcn_>
                 </CommandList_Shadcn_>
