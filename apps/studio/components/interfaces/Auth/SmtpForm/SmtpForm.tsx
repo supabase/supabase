@@ -452,8 +452,10 @@ export const SmtpForm = () => {
                 <p className="text-sm text-foreground-light">
                   {enableSmtp ? (
                     <>
-                      Rate limit for sending emails will be increased to 30 and can be adjusted{' '}
-                      <InlineLink href={`/project/${projectRef}/auth/rate-limits`}>here</InlineLink>{' '}
+                      Rate limit for sending emails will be increased to 30 and{' '}
+                      <InlineLink href={`/project/${projectRef}/auth/rate-limits`}>
+                        can be adjusted
+                      </InlineLink>{' '}
                       after enabling custom SMTP
                     </>
                   ) : (
