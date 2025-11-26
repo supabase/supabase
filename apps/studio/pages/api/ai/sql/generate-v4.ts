@@ -1,5 +1,12 @@
 import pgMeta from '@supabase/pg-meta'
-import { convertToModelMessages, type ModelMessage, stepCountIs, streamText } from 'ai'
+import {
+  convertToModelMessages,
+  isToolUIPart,
+  type ModelMessage,
+  stepCountIs,
+  streamText,
+  type UIMessage,
+} from 'ai'
 import { source } from 'common-tags'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
@@ -55,7 +62,7 @@ const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
 export default wrapper
 
 const requestBodySchema = z.object({
-  messages: z.array(z.any()),
+  messages: z.array(z.custom<UIMessage>()),
   projectRef: z.string(),
   connectionString: z.string(),
   schema: z.string().optional(),
@@ -117,7 +124,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   // Only returns last 7 messages
   // Filters out tools with invalid states
   // Filters out tool outputs based on opt-in level using renderingToolOutputParser
-  const messages = (rawMessages || []).slice(-7).map((msg: any) => {
+  const messages = (rawMessages || []).slice(-7).map((msg) => {
     if (msg && msg.role === 'assistant' && 'results' in msg) {
       const cleanedMsg = { ...msg }
       delete cleanedMsg.results
@@ -125,14 +132,14 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
     if (msg && msg.role === 'assistant' && msg.parts) {
       const cleanedParts = msg.parts
-        .filter((part: any) => {
-          if (part.type.startsWith('tool-')) {
+        .filter((part) => {
+          if (isToolUIPart(part)) {
             const invalidStates = ['input-streaming', 'input-available', 'output-error']
             return !invalidStates.includes(part.state)
           }
           return true
         })
-        .map((part: any) => {
+        .map((part) => {
           return sanitizeMessagePart(part, aiOptInLevel)
         })
       return { ...msg, parts: cleanedParts }
