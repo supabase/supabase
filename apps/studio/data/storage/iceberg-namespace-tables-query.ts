@@ -5,8 +5,8 @@ import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { storageKeys } from './keys'
 
 type GetNamespaceTablesVariables = {
-  warehouse: string
-  namespace: string
+  warehouse?: string
+  namespace?: string
   projectRef?: string
 }
 
@@ -15,6 +15,8 @@ async function getNamespaceTables(
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
+  if (!namespace) throw new Error('namespace is required')
+  if (!warehouse) throw new Error('warehouse is required')
 
   const { data, error } = await get(
     '/platform/storage/{ref}/analytics-buckets/{id}/namespaces/{namespace}/tables',

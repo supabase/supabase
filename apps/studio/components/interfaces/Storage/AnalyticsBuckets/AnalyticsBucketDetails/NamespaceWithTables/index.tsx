@@ -5,7 +5,6 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { FormattedWrapperTable } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { ImportForeignSchemaDialog } from 'components/interfaces/Storage/ImportForeignSchemaDialog'
-import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useFDWDropForeignTableMutation } from 'data/fdw/fdw-drop-foreign-table-mutation'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
@@ -178,11 +177,6 @@ export const NamespaceWithTables = ({
 
   const onConfirmDeleteNamespace = async () => {
     if (!bucketId) return console.error('Bucket ID is required')
-    // Construct catalog URI for namespace creation
-    const protocol = projectSettings?.app_config?.protocol ?? 'https'
-    const endpoint =
-      projectSettings?.app_config?.storage_endpoint || projectSettings?.app_config?.endpoint
-    const catalogUri = getCatalogURI(project?.ref ?? '', protocol, endpoint)
 
     try {
       setIsDeletingNamespace(true)
@@ -192,7 +186,6 @@ export const NamespaceWithTables = ({
         allTables.map((table) =>
           deleteNamespaceTable({
             projectRef,
-            catalogUri,
             warehouse: bucketId,
             namespace,
             table: table.name,
@@ -212,7 +205,7 @@ export const NamespaceWithTables = ({
         )
       )
 
-      await deleteNamespace({ projectRef, catalogUri, warehouse: bucketId, namespace })
+      await deleteNamespace({ projectRef, warehouse: bucketId, namespace })
 
       toast.success(`Successfully deleted namespace "${namespace}"`)
       setShowConfirmDeleteNamespace(false)

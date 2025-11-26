@@ -5033,18 +5033,20 @@ export interface components {
         name: string
         required: boolean
         type:
-          | 'boolean'
-          | 'int'
-          | 'long'
-          | 'float'
-          | 'double'
-          | 'string'
-          | 'timestamp'
-          | 'date'
-          | 'time'
-          | 'timestamptz'
-          | 'uuid'
-          | 'binary'
+          | (
+              | 'boolean'
+              | 'int'
+              | 'long'
+              | 'float'
+              | 'double'
+              | 'string'
+              | 'timestamp'
+              | 'date'
+              | 'time'
+              | 'timestamptz'
+              | 'uuid'
+              | 'binary'
+            )
           | {
               precision: number
               scale: number
@@ -24877,7 +24879,10 @@ export interface operations {
   }
   StorageAnalyticsBucketNamespaceTableIdController_dropTable: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Boolean string, true or false */
+        purge?: boolean
+      }
       header?: never
       path: {
         /** @description Analytics Bucket ID */

@@ -1,7 +1,9 @@
+import { useFlag } from 'common'
 import { ChevronDown, Plus } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
+  cn,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -16,6 +18,8 @@ import { CreateTableInstructions } from './CreateTableInstructions'
 import { CreateTableSheet } from './CreateTableSheet'
 
 export const CreateTableInstructionsDialog = () => {
+  const enableCreationOfTablesFromDashboard = useFlag('analyticsBucketsTableCreation')
+
   const [showModal, setShowModal] = useState(false)
   const [showSheet, setShowSheet] = useState(false)
 
@@ -25,23 +29,28 @@ export const CreateTableInstructionsDialog = () => {
         <Button
           type="primary"
           icon={<Plus />}
-          className="rounded-r-none hover:z-10"
-          onClick={() => setShowSheet(true)}
+          className={cn(enableCreationOfTablesFromDashboard && 'rounded-r-none hover:z-10')}
+          onClick={() => {
+            if (enableCreationOfTablesFromDashboard) setShowSheet(true)
+            else setShowModal(true)
+          }}
         >
           Create table
         </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              type="primary"
-              className="w-7 rounded-l-none -ml-[1px]"
-              icon={<ChevronDown />}
-            />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-48" align="end">
-            <DropdownMenuItem onClick={() => setShowModal(true)}>Via Pyiceberg</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {enableCreationOfTablesFromDashboard && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="primary"
+                className="w-7 rounded-l-none -ml-[1px]"
+                icon={<ChevronDown />}
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-48" align="end">
+              <DropdownMenuItem onClick={() => setShowModal(true)}>Via Pyiceberg</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       <Dialog open={showModal} onOpenChange={setShowModal}>

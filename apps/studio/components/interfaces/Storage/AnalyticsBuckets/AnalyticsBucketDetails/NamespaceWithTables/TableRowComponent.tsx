@@ -12,12 +12,12 @@ import {
 import { getDecryptedParameters } from 'components/interfaces/Storage/ImportForeignSchemaDialog.utils'
 import { DotPing } from 'components/ui/DotPing'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { useFDWDropForeignTableMutation } from 'data/fdw/fdw-drop-foreign-table-mutation'
+import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import { useUpdatePublicationMutation } from 'data/replication/publication-update-mutation'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useReplicationTablesQuery } from 'data/replication/tables-query'
-import { useFDWDropForeignTableMutation } from 'data/fdw/fdw-drop-foreign-table-mutation'
-import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { useIcebergNamespaceTableDeleteMutation } from 'data/storage/iceberg-namespace-table-delete-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { SqlEditor, TableEditor } from 'icons'
@@ -78,7 +78,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
 
   const { mutateAsync: updateFDW } = useFDWUpdateMutation()
   const { mutateAsync: dropForeignTable } = useFDWDropForeignTableMutation()
-  const { mutateAsync: deleteNamespaceTable, isLoading: isDeletingNamespaceTable } =
+  const { mutateAsync: deleteNamespaceTable, isPending: isDeletingNamespaceTable } =
     useIcebergNamespaceTableDeleteMutation({ onError: () => {} })
   const { mutateAsync: updatePublication } = useUpdatePublicationMutation()
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
@@ -227,7 +227,6 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
       const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
       await deleteNamespaceTable({
         projectRef,
-        catalogUri: wrapperValues.catalog_uri,
         warehouse: wrapperValues.warehouse,
         namespace: namespace,
         table: table.name,
@@ -257,7 +256,6 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
       const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
       await deleteNamespaceTable({
         projectRef,
-        catalogUri: wrapperValues.catalog_uri,
         warehouse: wrapperValues.warehouse,
         namespace: namespace,
         table: table.name,

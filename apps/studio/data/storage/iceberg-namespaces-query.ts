@@ -5,8 +5,7 @@ import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { storageKeys } from './keys'
 
 type GetNamespacesVariables = {
-  catalogUri: string
-  warehouse: string
+  warehouse?: string
   projectRef?: string
 }
 
@@ -15,6 +14,7 @@ async function getNamespaces(
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
+  if (!warehouse) throw new Error('warehouse is required')
 
   const { data, error } = await get('/platform/storage/{ref}/analytics-buckets/{id}/namespaces', {
     params: { path: { ref: projectRef, id: warehouse } },
@@ -36,14 +36,14 @@ export const useIcebergNamespacesQuery = <TData = IcebergNamespacesData>(
     ...options
   }: UseCustomQueryOptions<IcebergNamespacesData, IcebergNamespacesError, TData> = {}
 ) => {
-  const { projectRef, catalogUri, warehouse } = params
+  const { projectRef, warehouse } = params
 
   return useQuery<IcebergNamespacesData, IcebergNamespacesError, TData>({
     queryKey: storageKeys.icebergNamespaces({
       projectRef,
       warehouse,
     }),
-    queryFn: ({ signal }) => getNamespaces({ projectRef, warehouse, catalogUri }, signal),
+    queryFn: ({ signal }) => getNamespaces({ projectRef, warehouse }, signal),
     enabled:
       options &&
       typeof projectRef !== 'undefined' &&
