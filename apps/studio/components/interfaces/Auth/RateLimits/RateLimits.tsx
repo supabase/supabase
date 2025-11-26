@@ -417,8 +417,8 @@ export const RateLimits = () => {
                 render={({ field }) => (
                   <FormItemLayout
                     layout="flex-row-reverse"
-                    label="Rate limit for sign ups and sign ins"
-                    description="Number of sign up and sign-in requests that can be made in a 5 minute interval per IP address (excludes anonymous users)"
+                    label="Rate limit for sign-ups and sign-ins"
+                    description="Number of sign-up and sign-in requests that can be made in a 5 minute interval per IP address (excludes anonymous users)"
                   >
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -460,8 +460,8 @@ export const RateLimits = () => {
                 render={({ field }) => (
                   <FormItemLayout
                     layout="flex-row-reverse"
-                    label="Rate limit for Web3 sign up and sign-in"
-                    description="Number of Web3 (Sign in with Solana) sign up or sign in requests that can be made per IP address in 5 minutes"
+                    label="Rate limit for Web3 sign-ups and sign-ins"
+                    description="Number of Web3 sign-up or sign-in requests that can be made per IP address in 5 minutes"
                   >
                     <Tooltip>
                       <TooltipTrigger asChild>

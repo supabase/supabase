@@ -21,30 +21,24 @@ export const authKeys = {
   usersInfinite: (
     projectRef: string | undefined,
     params?: {
-      keywords: string | undefined
-      filter: string | undefined
-      providers: string[] | undefined
-      sort: string | undefined
-      order: string | undefined
+      keywords?: string
+      filter?: string
+      providers?: string[]
+      sort?: string
+      order?: string
+      column?: OptimizedSearchColumns
     }
-  ) =>
-    [
-      'projects',
-      projectRef,
-      'users-infinite',
-      ...(params ? [params].filter(Boolean) : []),
-    ] as const,
+  ) => ['projects', projectRef, 'users-infinite', params] as const,
   usersCount: (
     projectRef: string | undefined,
     params?: {
-      keywords: string | undefined
-      filter: string | undefined
-      providers: string[] | undefined
+      keywords?: string
+      filter?: string
+      providers?: string[]
       forceExactCount?: boolean
       column?: OptimizedSearchColumns
     }
-  ) =>
-    ['projects', projectRef, 'users-count', ...(params ? [params].filter(Boolean) : [])] as const,
+  ) => ['projects', projectRef, 'users-count', params] as const,
 
   authConfig: (projectRef: string | undefined) => ['projects', projectRef, 'auth-config'] as const,
   accessToken: () => ['access-token'] as const,
