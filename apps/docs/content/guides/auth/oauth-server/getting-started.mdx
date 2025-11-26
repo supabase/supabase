@@ -25,7 +25,7 @@ Setting up OAuth 2.1 in your Supabase project involves these steps:
 
 <Admonition type="note">
 
-Testing OAuth flows is often easier on a Supabase project since it's already accessible on the web, no tunneling or additional configuration needed.
+Testing OAuth flows is often easier on a Supabase project since it's already accessible on the web, no tunnel or additional configuration needed.
 
 </Admonition>
 
@@ -101,7 +101,7 @@ Once enabled, your project will expose the necessary OAuth endpoints:
 
 ### Expose local instance to the world
 
-To test OAuth flows with external applications, you can expose your local Supabase instance using a tunneling solution (such as [ngrok](https://ngrok.com/), [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/), or [localtunnel](https://localtunnel.github.io/www/)).
+To test OAuth flows with external applications, you can expose your local Supabase instance using a tunnel solution (such as [ngrok](https://ngrok.com/) or [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/)).
 
 When using a tunnel, configure the `jwt_issuer` field in your `supabase/config.toml` to match your tunnel URL:
 
