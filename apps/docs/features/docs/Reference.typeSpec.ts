@@ -574,10 +574,10 @@ function parseType(type: any, map: Map<number, any>, typeArguments?: any, debug 
   switch (type.kindString) {
     case 'Type alias':
       if (typeof type.type === 'object') {
-        return parseType(type.type, map)
+        return parseType(type.type, map, typeArguments)
       }
     case 'Interface':
-      return parseInterface(type, map)
+      return parseInterface(type, map, typeArguments)
     default:
       break
   }
@@ -599,10 +599,16 @@ function delegateParsing(
   const dereferencedType = parseType(referenced, map, typeArguments)
 
   if (dereferencedType) {
-    dereferencedType.name = nameOrAnonymous([original, dereferencedType])
+    // When resolving a type parameter (e.g., T -> { vectorBucket: VectorBucket }),
+    // don't override the name or comment - let the resolved type speak for itself
+    const isTypeParameterResolution = original.refersToTypeParameter === true
+
+    if (!isTypeParameterResolution) {
+      dereferencedType.name = nameOrAnonymous([original, dereferencedType])
+    }
   }
 
-  if (original.comment) {
+  if (original.comment && !original.refersToTypeParameter) {
     dereferencedType.comment = {
       ...normalizeComment(dereferencedType.comment),
       ...normalizeComment(original.comment),
@@ -696,14 +702,14 @@ function parseReferenceType(type: any, map: Map<number, any>, typeArguments?: an
             type,
             referenced.type,
             map,
-            type.typeArguments
+            typeArguments ?? type.typeArguments
           )
-        : delegateParsing(type, referenced, map, type.typeArguments)
+        : delegateParsing(type, referenced, map, typeArguments ?? type.typeArguments)
 
     if (maybeType) {
       return maybeType
     } else if (isNewTypedoc(referenced) && referenced.kind === KIND_INTERFACE) {
-      return parseInterface(referenced, map)
+      return parseInterface(referenced, map, typeArguments ?? type.typeArguments)
     } else if (isNewTypedoc(referenced) && referenced.kind === KIND_CLASS) {
       // Class is too complicated to display here, just return its name
       return {
@@ -919,9 +925,9 @@ function parseTypeOperatorType(
   }
 }
 
-function parseInterface(type: any, map: Map<number, any>): CustomObjectType {
+function parseInterface(type: any, map: Map<number, any>, typeArguments?: any): CustomObjectType {
   const properties = (type.children ?? [])
-    .map((child) => parseTypeInternals(child, map))
+    .map((child) => parseTypeInternals(child, map, typeArguments))
     .filter(Boolean)
 
   return {
