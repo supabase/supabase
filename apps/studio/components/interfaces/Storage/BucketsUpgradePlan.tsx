@@ -19,8 +19,6 @@ export const BucketsUpgradePlan = ({ type }: { type: 'analytics' | 'vector' }) =
               : undefined
         }
         description={`Upgrade to Pro to use ${type} buckets for your project`}
-        contentClassName="gap-y-1"
-        className="gap-y-4"
       >
         <div className="flex items-center gap-x-2">
           <UpgradePlanButton type="primary" plan="Pro" />
