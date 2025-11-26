@@ -32,6 +32,7 @@ import {
   createIndexes,
   hasIndexRecommendations,
 } from './IndexAdvisor/index-advisor.utils'
+import { EnableIndexAdvisorButton } from './IndexAdvisor/EnableIndexAdvisorButton'
 
 interface QueryIndexesProps {
   selectedRow: any
@@ -126,13 +127,13 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
     return (
       <QueryPanelContainer className="h-full">
         <QueryPanelSection className="pt-2">
-          <div className="mb-4 flex flex-col gap-y-1">
-            <h4>Index Advisor</h4>
-            <p className="text-sm text-foreground-light">
+          <div className="border rounded border-dashed flex flex-col items-center justify-center py-4 px-12 gap-y-1 text-center">
+            <p className="text-sm text-foreground-light">Ena le Index Advisor</p>
+            <p className="text-center text-xs text-foreground-lighter">
               Enable Index Advisor to view indexes in use and get recommendations for new indexes
             </p>
+            <EnableIndexAdvisorButton />
           </div>
-          <IndexAdvisorDisabledState />
         </QueryPanelSection>
       </QueryPanelContainer>
     )
