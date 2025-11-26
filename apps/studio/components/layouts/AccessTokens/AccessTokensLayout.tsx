@@ -21,7 +21,11 @@ const AccessTokensLayout = ({ children }: PropsWithChildren) => {
   ]
 
   return (
-    <PageLayout title="Access Tokens" navigationItems={navigationItems}>
+    <PageLayout
+      title="Access Tokens"
+      navigationItems={navigationItems}
+      className="first:[&>div]:pt-0"
+    >
       <ScaffoldContainer className="flex flex-col py-8 gap-8" bottomPadding>
         {children}
       </ScaffoldContainer>
