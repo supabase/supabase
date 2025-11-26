@@ -10,17 +10,14 @@ To enable Figma Auth for your project, you need to set up a Figma OAuth applicat
 
 Setting up Figma logins for your application consists of 3 parts:
 
-- Create and configure a Figma App on the [Figma Developers page](https://www.figma.com/developers).
+- Create and configure a Figma App on the [Figma Developers page](https://www.figma.com/developers/app).
 - Add your Figma `client_id` and `client_secret` to your [Supabase Project](https://app.supabase.com).
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
 ## Access the Figma Developers page
 
-- Go to the [Figma Developers page](https://www.figma.com/developers)
-- Click on `My apps` at the top right
+- Go to the [Figma Developers page](https://www.figma.com/developers/app)
 - Log in (if necessary)
-
-![Figma Developers page](/docs/img/guides/auth-figma/figma_developers_page.png)
 
 ## Find your callback URL
 
@@ -28,17 +25,20 @@ Setting up Figma logins for your application consists of 3 parts:
 
 ## Create a Figma OAuth app
 
-- Enter your `App name`, `Website URL` and upload your app logo
-- Click on `Add callback`
-- Add your `Callback URL`
-- Click on `Save`
+1. Enter your `App name`, select the owner for the app and click `Create app` button
 
-![Create Figma app](/docs/img/guides/auth-figma/figma_create_app.png)
+   ![Create Figma app](/docs/img/guides/auth-figma/figma_app_credentials.png)
 
-- Copy and save your newly-generated `Client ID`
-- Copy and save your newly-generated `Client Secret`
+2. Copy and save your newly-generated `Client ID`
+3. Copy and save your newly-generated `Client Secret`
+4. Then, go to `OAuth credentials` and click on `Add a redirect URL` button
 
-![Get Figma app credentials](/docs/img/guides/auth-figma/figma_app_credentials.png)
+   ![Add redirect URL](/docs/img/guides/auth-figma/figma_app_redirect_uri.png)
+
+5. Add your URL from the previous step (callback URL on Supabase) and click on `Add` button
+6. Go to `OAuth scopes` and select `current_user:read` under `Users`.
+
+![Select OAuth scopes](/docs/img/guides/auth-figma/figma_app_scopes.png)
 
 ## Enter your Figma credentials into your Supabase project
 
