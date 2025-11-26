@@ -22,6 +22,7 @@ import { QueryPerformanceGrid } from '../QueryPerformanceGrid'
 import { transformStatementDataToRows } from './WithStatements.utils'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { IndexAdvisorNotice } from '../IndexAdvisor/IndexAdvisorNotice'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface WithStatementsProps {
   queryHitRate: PresetHookResult
@@ -73,23 +74,23 @@ export const WithStatements = ({
         showRolesFilter={true}
         actions={
           <>
-            <Button
+            <ButtonTooltip
               type="default"
               size="tiny"
               icon={<RefreshCw />}
               onClick={handleRefresh}
-              loading={isRefetching}
-            >
-              Refresh
-            </Button>
-            <Button
+              tooltip={{ content: { side: 'top', text: 'Refresh' } }}
+              className="w-[26px]"
+            />
+            <ButtonTooltip
               type="default"
               size="tiny"
               icon={<RotateCcw />}
               onClick={() => setShowResetgPgStatStatements(true)}
-            >
-              Reset report
-            </Button>
+              tooltip={{ content: { side: 'top', text: 'Reset report' } }}
+              className="w-[26px]"
+            />
+
             <DownloadResultsButton
               results={processedData}
               fileName={`Supabase Query Performance Statements (${ref})`}
