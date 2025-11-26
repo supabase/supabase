@@ -5,9 +5,11 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLinkClassName } from 'components/ui/InlineLink'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   Dialog,
@@ -153,13 +155,16 @@ export const UpdateForeignSchemaDialog = ({
                 </p>
               )}
             </DialogSection>
-            <DialogFooter>
-              <Button type="default" disabled={isUpdating} onClick={() => setIsOpen(false)}>
-                Cancel
-              </Button>
-              <Button htmlType="submit" type="primary" loading={isUpdating}>
-                Update schema
-              </Button>
+            <DialogFooter className="!justify-between">
+              <DocsButton href={`${DOCS_URL}/guides/storage/analytics/query-with-postgres`} />
+              <div className="flex items-center gap-x-2">
+                <Button type="default" disabled={isUpdating} onClick={() => setIsOpen(false)}>
+                  Cancel
+                </Button>
+                <Button htmlType="submit" type="primary" loading={isUpdating}>
+                  Update schema
+                </Button>
+              </div>
             </DialogFooter>
           </form>
         </Form_Shadcn_>

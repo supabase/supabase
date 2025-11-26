@@ -178,7 +178,6 @@ export const CreateVectorBucketDialog = () => {
           className="w-fit"
           icon={<Plus size={14} />}
           disabled={!canCreateBuckets}
-          tabIndex={!canCreateBuckets ? -1 : 0}
           onClick={() => setVisible(true)}
           tooltip={{
             content: {
