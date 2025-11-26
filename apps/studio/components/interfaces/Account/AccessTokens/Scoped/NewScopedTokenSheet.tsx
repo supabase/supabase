@@ -18,6 +18,7 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
+  SheetDescription,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { BasicInfo } from './Form/BasicInfo'
@@ -222,6 +223,9 @@ export const NewScopedTokenSheet = ({
           <SheetTitle>
             {tokenScope === 'V0' ? 'Generate token for experimental API' : 'Generate New Token'}
           </SheetTitle>
+          <SheetDescription className="sr-only">
+            A form to generate a new scoped access token.
+          </SheetDescription>
         </SheetHeader>
         <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
           <div className="flex flex-col overflow-visible">
