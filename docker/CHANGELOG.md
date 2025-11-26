@@ -11,14 +11,44 @@ Check updates, changelogs, and release notes for each service to learn more.
 
 ## Unreleased
 
+[...]
+
+---
+
+## [2025-11-25]
+
 ### Studio
-- Fixed PostgREST configuration UI and added [documentation for exposed queue schema](https://supabase.com/docs/guides/queues/expose-self-hosted-queues) - [PR #40078](https://github.com/supabase/supabase/pull/40078)
+- Updated to `2025.11.24-sha-d990ae8` - [Dashboard updates](https://github.com/orgs/supabase/discussions/40734)
+- Fixed Queues configuration UI and added [documentation for exposed queue schema](https://supabase.com/docs/guides/queues/expose-self-hosted-queues) - [PR #40078](https://github.com/supabase/supabase/pull/40078)
 - Fixed Studio showing paid options for log drains - [PR #40510](https://github.com/supabase/supabase/pull/40510)
+- Fixed parameterized SQL queries in MCP tools - [PR #40499](https://github.com/supabase/supabase/pull/40499)
+- Fixed AI Assistant - [PR #40654](https://github.com/supabase/supabase/pull/40654)
+
+### Auth
+- Updated to `v2.183.0` - [Changelog](https://github.com/supabase/auth/blob/master/CHANGELOG.md) | [Release](https://github.com/supabase/auth/releases/tag/v2.183.0)
+
+### Realtime
+- Updated to `v2.65.2` - [Release](https://github.com/supabase/realtime/releases/tag/v2.65.2)
+
+### Storage
+- Updated to `v1.32.0` - [Release](https://github.com/supabase/storage/releases/tag/v1.32.0)
+
+### Edge Runtime
+- Updated to `v1.69.25` - [Release](https://github.com/supabase/edge-runtime/releases/tag/v1.69.25)
+
+### Analytics (Logflare)
+- Updated to `1.26.12` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.26.12)
+- Fixed Auth logs query - [PR #2936](https://github.com/Logflare/logflare/pull/2936)
+- Fixed build configuration to prevent crashes with "Illegal instruction (core dumped)" - [PR #2942](https://github.com/Logflare/logflare/pull/2942)
+
+---
 
 ## [2025-11-17]
 
 ### Storage
 - Fixed resumable uploads for files larger than 6MB (requires `docker-compose.yml` update) - [PR #40500](https://github.com/supabase/supabase/pull/40500)
+
+---
 
 ## [2025-11-12]
 
@@ -57,7 +87,7 @@ Check updates, changelogs, and release notes for each service to learn more.
 ## [2025-10-28]
 
 ### Studio
-- Updated to `2025.10.27-sha-85b84e0` - [Dashboard updates](https://github.com/orgs/supabase/discussions/39709)
+- Updated to `2025.10.27-sha-85b84e0` - [Dashboard updates](https://github.com/orgs/supabase/discussions/40083)
 - Fixed broken authentication when uploading files to Storage - [PR #39829](https://github.com/supabase/supabase/pull/39829)
 
 ### Realtime
@@ -85,7 +115,7 @@ Check updates, changelogs, and release notes for each service to learn more.
 ## [2025-10-21]
 
 ### Studio
-- Updated to `2025.10.20-sha-5005fc6` - [Dashboard updates](https://github.com/orgs/supabase/discussions/40083)
+- Updated to `2025.10.20-sha-5005fc6` - [Dashboard updates](https://github.com/orgs/supabase/discussions/39709)
 - Fixed issues with Edge Functions and cron logs not being visible in Studio - [PR #39388](https://github.com/supabase/supabase/pull/39388), [PR #39704](https://github.com/supabase/supabase/pull/39704), [PR #39711](https://github.com/supabase/supabase/pull/39711)
 
 ### Realtime
@@ -117,7 +147,7 @@ Check updates, changelogs, and release notes for each service to learn more.
 ### Studio
 - Updated to `2025.10.01-sha-8460121` - [Dashboard updates](https://github.com/orgs/supabase/discussions/39709)
 - Added "local" remote MCP server - [PR #38797](https://github.com/supabase/supabase/pull/38797), [PR #39041](https://github.com/supabase/supabase/pull/39041)
-- ⚠️ Changed Studio connection method to `postgres-meta` - affects non-standard database port configurations, see fix in [2025-11-05]
+- ⚠️ Changed Studio connection method to `postgres-meta` - affects non-standard database port configurations
 
 ### Auth
 - Updated to `v2.180.0` - [Release](https://github.com/supabase/auth/releases/tag/v2.180.0)

@@ -1,6 +1,7 @@
 import { X } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
@@ -9,8 +10,8 @@ import { DEFAULT_CHART_CONFIG, QueryBlock } from 'components/ui/QueryBlock/Query
 import { AnalyticsInterval } from 'data/analytics/constants'
 import { useContentIdQuery } from 'data/content/content-id-query'
 import { usePrimaryDatabase } from 'data/read-replicas/replicas-query'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useChangedSync } from 'hooks/misc/useChanged'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { sqlKeys } from 'data/sql/keys'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { Dashboards, SqlSnippets } from 'types'
 import { DEPRECATED_REPORTS } from '../Reports.constants'
@@ -47,9 +48,15 @@ export const ReportBlock = ({
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
+  const [isWriteQuery, setIsWriteQuery] = useState(false)
+
   const isSnippet = item.attribute.startsWith('snippet_')
 
-  const { data, error, isLoading, isSuccess } = useContentIdQuery(
+  const {
+    data,
+    error: contentError,
+    isLoading: isLoadingContent,
+  } = useContentIdQuery(
     { projectRef, id: item.id },
     {
       enabled: isSnippet && !!item.id,
@@ -66,81 +73,65 @@ export const ReportBlock = ({
   const sql = isSnippet ? (data?.content as SqlSnippets.Content)?.sql : undefined
   const chartConfig = { ...DEFAULT_CHART_CONFIG, ...(item.chartConfig ?? {}) }
   const isDeprecatedChart = DEPRECATED_REPORTS.includes(item.attribute)
-  const snippetMissing = error?.message.includes('Content not found')
+  const snippetMissing = contentError?.message.includes('Content not found')
 
   const { database: primaryDatabase } = usePrimaryDatabase({ projectRef })
   const readOnlyConnectionString = primaryDatabase?.connection_string_read_only
   const postgresConnectionString = primaryDatabase?.connectionString
 
-  const [rows, setRows] = useState<any[] | undefined>(undefined)
-  const [isWriteQuery, setIsWriteQuery] = useState(false)
-
   const {
-    mutate: executeSql,
+    data: queryResult,
     error: executeSqlError,
     isLoading: executeSqlLoading,
-  } = useExecuteSqlMutation({
-    onError: () => {
-      // Silence the error toast because the error will be displayed inline
-    },
-  })
+    refetch,
+  } = useQuery({
+    queryKey: sqlKeys.query(projectRef, [
+      item.id,
+      sql,
+      readOnlyConnectionString,
+      postgresConnectionString,
+    ]),
+    queryFn: async () => {
+      if (!projectRef || !sql) return null
 
-  const runQuery = useCallback(
-    (queryType: 'select' | 'mutation' = 'select', sqlToRun?: string) => {
-      if (!projectRef || !sqlToRun) return false
-
-      const connectionString =
-        queryType === 'mutation'
-          ? postgresConnectionString
-          : readOnlyConnectionString ?? postgresConnectionString
+      const connectionString = readOnlyConnectionString ?? postgresConnectionString
 
       if (!connectionString) {
         toast.error('Unable to establish a database connection for this project.')
-        return false
+        return null
       }
 
-      if (queryType === 'mutation') {
-        setIsWriteQuery(true)
-      }
-      executeSql(
-        { projectRef, connectionString, sql: sqlToRun },
-        {
-          onSuccess: (data) => {
-            setRows(data.result)
-            setIsWriteQuery(queryType === 'mutation')
-          },
-          onError: (mutationError) => {
-            const lowerMessage = mutationError.message.toLowerCase()
-            const isReadOnlyError =
-              lowerMessage.includes('read-only transaction') ||
-              lowerMessage.includes('permission denied') ||
-              lowerMessage.includes('must be owner')
-
-            if (queryType === 'select' && isReadOnlyError) {
-              setIsWriteQuery(true)
-            }
-          },
-        }
-      )
-      return true
+      return executeSql({
+        projectRef,
+        connectionString,
+        sql,
+      })
     },
-    [projectRef, readOnlyConnectionString, postgresConnectionString, executeSql]
-  )
+    enabled: !isLoadingContent && contentError == null,
+    refetchOnWindowFocus: false,
+  })
+
+  const rows = queryResult?.result
 
   useEffect(() => {
-    if (!isSuccess) return
-    if (!isSnippet) return
-    const fetchedSql = (data?.content as SqlSnippets.Content | undefined)?.sql
-    if (fetchedSql) {
-      runQuery('select', fetchedSql)
-    }
-  }, [data, isSuccess, runQuery, isSnippet])
+    if (executeSqlError) {
+      const errorMessage = String(executeSqlError).toLowerCase()
+      const isReadOnlyError =
+        errorMessage.includes('read-only transaction') ||
+        errorMessage.includes('permission denied') ||
+        errorMessage.includes('must be owner')
 
-  const sqlHasChanged = useChangedSync(sql)
-  const isRefreshingChanged = useChangedSync(isRefreshing)
-  if (sqlHasChanged || (isRefreshingChanged && isRefreshing)) {
-    runQuery('select', sql)
-  }
+      if (isReadOnlyError) {
+        setIsWriteQuery(true)
+      }
+    }
+  }, [executeSqlError])
+
+  useEffect(() => {
+    if (isRefreshing) {
+      refetch()
+    }
+  }, [isRefreshing, refetch])
 
   return (
     <>
@@ -153,11 +144,17 @@ export const ReportBlock = ({
           sql={sql}
           results={rows}
           initialHideSql={true}
-          errorText={snippetMissing ? 'SQL snippet not found' : executeSqlError?.message}
+          errorText={
+            snippetMissing
+              ? 'SQL snippet not found'
+              : executeSqlError
+                ? String(executeSqlError)
+                : undefined
+          }
           isExecuting={executeSqlLoading}
           isWriteQuery={isWriteQuery}
           actions={
-            !isLoading && (
+            !isLoadingContent && (
               <ButtonTooltip
                 type="text"
                 icon={<X />}
@@ -168,11 +165,11 @@ export const ReportBlock = ({
             )
           }
           onExecute={(queryType) => {
-            runQuery(queryType, sql)
+            refetch()
           }}
           onUpdateChartConfig={onUpdateChart}
           onRemoveChart={() => onRemoveChart({ metric: { key: item.attribute } })}
-          disabled={isLoading || snippetMissing || !sql}
+          disabled={isLoadingContent || snippetMissing || !sql}
         />
       ) : isDeprecatedChart ? (
         <DeprecatedChartBlock
