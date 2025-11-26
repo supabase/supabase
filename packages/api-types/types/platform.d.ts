@@ -6636,6 +6636,8 @@ export interface components {
       API_MAX_REQUEST_DURATION: number | null
       AUDIT_LOG_DISABLE_POSTGRES: boolean | null
       DB_MAX_POOL_SIZE: number | null
+      /** @enum {string|null} */
+      DB_MAX_POOL_SIZE_UNIT: 'connections' | 'percent' | null
       DISABLE_SIGNUP: boolean
       EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean
       EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: string
@@ -9138,12 +9140,20 @@ export interface components {
       features: {
         icebergCatalog?: {
           enabled: boolean
+          maxCatalogs: number
+          maxNamespaces: number
+          maxTables: number
         }
         imageTransformation: {
           enabled: boolean
         }
         s3Protocol: {
           enabled: boolean
+        }
+        vectorBuckets?: {
+          enabled: boolean
+          maxBuckets: number
+          maxIndexes: number
         }
       }
       /** Format: int64 */
@@ -9632,6 +9642,8 @@ export interface components {
       API_MAX_REQUEST_DURATION?: number | null
       AUDIT_LOG_DISABLE_POSTGRES?: boolean | null
       DB_MAX_POOL_SIZE?: number | null
+      /** @enum {string|null} */
+      DB_MAX_POOL_SIZE_UNIT?: 'connections' | 'percent' | null
       DISABLE_SIGNUP?: boolean | null
       EXTERNAL_ANONYMOUS_USERS_ENABLED?: boolean | null
       EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS?: string | null
@@ -10364,12 +10376,20 @@ export interface components {
       features?: {
         icebergCatalog?: {
           enabled: boolean
+          maxCatalogs: number
+          maxNamespaces: number
+          maxTables: number
         }
         imageTransformation: {
           enabled: boolean
         }
         s3Protocol: {
           enabled: boolean
+        }
+        vectorBuckets?: {
+          enabled: boolean
+          maxBuckets: number
+          maxIndexes: number
         }
       }
       /** Format: int64 */
@@ -21130,6 +21150,8 @@ export interface operations {
           | 'realtime_channel_presence_events'
           | 'realtime_channel_db_events'
           | 'realtime_authorization_rls_execution_time'
+          | 'realtime_read_authorization_rls_execution_time'
+          | 'realtime_write_authorization_rls_execution_time'
           | 'realtime_payload_size'
           | 'realtime_replication_connection_lag'
           | 'realtime_sum_connections_connected'
@@ -21184,6 +21206,8 @@ export interface operations {
           | 'realtime_channel_presence_events'
           | 'realtime_channel_db_events'
           | 'realtime_authorization_rls_execution_time'
+          | 'realtime_read_authorization_rls_execution_time'
+          | 'realtime_write_authorization_rls_execution_time'
           | 'realtime_payload_size'
           | 'realtime_replication_connection_lag'
           | 'realtime_sum_connections_connected'

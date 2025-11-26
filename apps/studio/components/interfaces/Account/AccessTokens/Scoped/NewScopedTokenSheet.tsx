@@ -2,11 +2,13 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { useAccessTokenCreateMutation } from 'data/scoped-access-tokens/scoped-access-token-create-mutation'
 import {
   Button,
@@ -58,6 +60,12 @@ export const NewScopedTokenSheet = ({
   const [resourceSearchOpen, setResourceSearchOpen] = useState(false)
   const [customExpiryDate, setCustomExpiryDate] = useState<{ date: string } | undefined>(undefined)
   const [isCustomExpiry, setIsCustomExpiry] = useState(false)
+  const { data: organizations = [] } = useOrganizationsQuery()
+  const { data: projectsData } = useProjectsInfiniteQuery({ limit: 100 })
+  const projects = useMemo(
+    () => projectsData?.pages.flatMap((page) => page.projects) ?? [],
+    [projectsData]
+  )
 
   const form = useForm<z.infer<typeof TokenSchema>>({
     resolver: zodResolver(TokenSchema),
@@ -91,6 +99,44 @@ export const NewScopedTokenSheet = ({
       return
     }
 
+    if (values.resourceAccess === 'selected-orgs') {
+      const selectedOrgs = values.selectedOrganizations || []
+
+      if (selectedOrgs.length === 0) {
+        toast.error('Please select at least one organization.')
+        return
+      }
+
+      const availableOrgSlugs = organizations.map((org) => org.slug)
+      const invalidOrgs = selectedOrgs.filter((slug) => !availableOrgSlugs.includes(slug))
+
+      if (invalidOrgs.length > 0) {
+        toast.error(
+          `You don't have access to the following organization(s): ${invalidOrgs.join(', ')}`
+        )
+        return
+      }
+    }
+
+    if (values.resourceAccess === 'selected-projects') {
+      const selectedProjects = values.selectedProjects || []
+
+      if (selectedProjects.length === 0) {
+        toast.error('Please select at least one project.')
+        return
+      }
+
+      const availableProjectRefs = projects.map((project) => project.ref)
+      const invalidProjects = selectedProjects.filter((ref) => !availableProjectRefs.includes(ref))
+
+      if (invalidProjects.length > 0) {
+        toast.error(
+          `You don't have access to the following project(s): ${invalidProjects.join(', ')}`
+        )
+        return
+      }
+    }
+
     let finalExpiresAt = values.expiresAt
 
     if (isCustomExpiry && customExpiryDate) {
@@ -105,56 +151,53 @@ export const NewScopedTokenSheet = ({
       .filter(Boolean) as any
 
     if (!permissions || permissions.length === 0) {
-      console.error('=== VALIDATION ERROR ===')
-      console.error('Permissions array is empty or invalid')
-      console.error('Permission rows:', permissionRows)
-      console.error('Mapped permissions:', permissions)
-      console.error('=== END VALIDATION ERROR ===')
       toast.error('Please configure at least one valid permission.')
       return
     }
 
-    let organization_slugs: string[] | undefined
-    let project_refs: string[] | undefined
-
-    if (values.resourceAccess === 'selected-orgs') {
-      organization_slugs =
-        values.selectedOrganizations && values.selectedOrganizations.length > 0
-          ? values.selectedOrganizations
-          : undefined
-    } else if (values.resourceAccess === 'selected-projects') {
-      project_refs =
-        values.selectedProjects && values.selectedProjects.length > 0
-          ? values.selectedProjects
-          : undefined
-    }
-
-    // Log the final processed data that will be sent to the API
-
-    const finalPayload = {
+    const finalPayload: {
+      name: string
+      expires_at?: string
+      permissions: any
+      organization_slugs?: string[]
+      project_refs?: string[]
+    } = {
       name: values.tokenName,
-      expires_at: finalExpiresAt,
       permissions,
-      organization_slugs,
-      project_refs,
     }
 
-    // Validate the payload
+    if (finalExpiresAt) {
+      finalPayload.expires_at = finalExpiresAt
+    }
+
+    if (
+      values.resourceAccess === 'selected-orgs' &&
+      values.selectedOrganizations &&
+      values.selectedOrganizations.length > 0
+    ) {
+      finalPayload.organization_slugs = values.selectedOrganizations
+    } else if (
+      values.resourceAccess === 'selected-projects' &&
+      values.selectedProjects &&
+      values.selectedProjects.length > 0
+    ) {
+      finalPayload.project_refs = values.selectedProjects
+    }
+
     if (!finalPayload.name || finalPayload.name.trim() === '') {
-      console.error('=== VALIDATION ERROR ===')
-      console.error('Token name is required')
-      console.error('=== END VALIDATION ERROR ===')
       toast.error('Please enter a token name.')
       return
     }
 
     if (!finalPayload.permissions || finalPayload.permissions.length === 0) {
-      console.error('=== VALIDATION ERROR ===')
-      console.error('At least one permission is required')
-      console.error('=== END VALIDATION ERROR ===')
       toast.error('Please configure at least one permission.')
       return
     }
+
+    console.log('=== SUBMITTING PAYLOAD ===')
+    console.log('Resource Access Mode:', values.resourceAccess)
+    console.log('Payload:', JSON.stringify(finalPayload, null, 2))
+    console.log('=== END PAYLOAD ===')
 
     createAccessToken(finalPayload, {
       onSuccess: (data) => {
@@ -166,11 +209,16 @@ export const NewScopedTokenSheet = ({
         console.error('=== API ERROR ===')
         console.error('Error details:', error)
         console.error('Error message:', error.message)
-        console.error('Error code:', error.code)
-        console.error('Request ID:', error.requestId)
-        console.error('Full error object:', JSON.stringify(error, null, 2))
         console.error('Request payload:', finalPayload)
         console.error('=== END API ERROR ===')
+
+        if (error.message && error.message.includes("don't have access")) {
+          toast.error(
+            `Access Error: ${error.message}. Please verify you have access to the selected resources.`
+          )
+        } else {
+          toast.error(`Failed to create access token: ${error.message}`)
+        }
       },
     })
   }
