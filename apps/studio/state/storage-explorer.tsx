@@ -1,3 +1,4 @@
+import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { capitalize, chunk, compact, find, findIndex, has, isObject, uniq, uniqBy } from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { useLatest } from 'react-use'
@@ -5,8 +6,6 @@ import { toast } from 'sonner'
 import * as tus from 'tus-js-client'
 import { proxy, useSnapshot } from 'valtio'
 
-import { createClient } from '@supabase/supabase-js'
-import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import {
   inverseValidObjectKeyRegex,
@@ -49,6 +48,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { lookupMime } from 'lib/mime'
+import { createProjectSupabaseClient } from 'lib/project-supabase-client'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
 
 type UploadProgress = {
@@ -74,29 +74,6 @@ const STORAGE_PROGRESS_INFO_TEXT = "Do not close the browser until it's complete
 let abortController: any
 if (typeof window !== 'undefined') {
   abortController = new AbortController()
-}
-
-async function createSupabaseClient(projectRef: string, clientEndpoint: string) {
-  try {
-    const { apiKey } = await getOrRefreshTemporaryApiKey(projectRef)
-
-    return createClient(clientEndpoint, apiKey, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        detectSessionInUrl: false,
-        storage: {
-          getItem: (key) => {
-            return null
-          },
-          setItem: (key, value) => {},
-          removeItem: (key) => {},
-        },
-      },
-    })
-  } catch (error) {
-    throw error
-  }
 }
 
 function createStorageExplorerState({
@@ -313,8 +290,6 @@ function createStorageExplorerState({
       columnIndex: number
       onError?: () => void
     }) => {
-      const supabaseClient = await createSupabaseClient(state.projectRef, clientEndpoint)
-
       const autofix = false
       const formattedName = state.sanitizeNameForDuplicateInColumn({
         name: folderName,
@@ -347,7 +322,7 @@ function createStorageExplorerState({
       const formattedPathToEmptyPlaceholderFile =
         pathToFolder.length > 0 ? `${pathToFolder}/${emptyPlaceholderFile}` : emptyPlaceholderFile
 
-      const client = await createSupabaseClient(state.projectRef, clientEndpoint)
+      const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
       await client.storage
         .from(state.selectedBucket.name)
         .upload(
@@ -598,7 +573,7 @@ function createStorageExplorerState({
 
         if (data.length === 0) {
           const prefixToPlaceholder = `${parentFolderPrefix}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`
-          const client = await createSupabaseClient(state.projectRef, clientEndpoint)
+          const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
           await client.storage
             .from(state.selectedBucket.name)
             .upload(prefixToPlaceholder, new File([], EMPTY_FOLDER_PLACEHOLDER_FILE_NAME))
@@ -833,11 +808,8 @@ function createStorageExplorerState({
             >(async (resolve) => {
               try {
                 // Get authenticated Supabase client for Storage API access
-                const client = await createSupabaseClient(state.projectRef, clientEndpoint)
+                const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
 
-                if (!client) {
-                  throw new Error('Supabase client not available')
-                }
                 // Use Storage API directly instead of Management API to avoid throttling
                 const { data, error } = await client.storage
                   .from(state.selectedBucket.id)
@@ -1519,10 +1491,7 @@ function createStorageExplorerState({
       const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
 
       try {
-        const client = await createSupabaseClient(state.projectRef, clientEndpoint)
-        if (!client) {
-          throw new Error('Supabase client not available')
-        }
+        const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
 
         // Use Storage API directly instead of Management API to avoid throttling
         const { data, error } = await client.storage
@@ -1566,10 +1535,7 @@ function createStorageExplorerState({
       if (!file.path) return false
 
       try {
-        const client = await createSupabaseClient(state.projectRef, clientEndpoint)
-        if (!client) {
-          throw new Error('Supabase client not available')
-        }
+        const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
 
         const { data, error } = await client.storage
           .from(state.selectedBucket.id)
