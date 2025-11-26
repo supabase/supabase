@@ -19,7 +19,7 @@ export const LayoutSidebar = () => {
         minSize={30}
         maxSize={50}
         className={cn(
-          'border-l bg fixed z-[60] right-0 top-0 bottom-0',
+          'border-l bg fixed z-40 right-0 top-0 bottom-0',
           'w-screen h-[100dvh]',
           'md:absolute md:h-auto md:w-3/4',
           'xl:relative xl:border-l-0'
