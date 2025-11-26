@@ -112,7 +112,7 @@ export const generateDatabaseMenu = (
                 name: 'Replication',
                 key: 'replication',
                 url: `/project/${ref}/database/replication`,
-                label: enablePgReplicate ? 'ALPHA' : undefined,
+                label: enablePgReplicate ? 'New' : undefined,
                 items: [],
               },
             ]

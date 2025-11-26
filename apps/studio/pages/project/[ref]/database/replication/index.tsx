@@ -5,11 +5,12 @@ import { useIsETLPrivateAlpha } from 'components/interfaces/Database/Replication
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { AlphaNotice } from 'components/ui/AlphaNotice'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { PipelineRequestStatusProvider } from 'state/replication-pipeline-request-status'
 import type { NextPageWithLayout } from 'types'
-import { Badge } from 'ui'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -30,15 +31,16 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
                 <div className="w-full mb-6">
                   <div className="flex items-center gap-x-2 mb-1">
                     <h3 className="text-foreground text-xl prose">Replication</h3>
-                    <Badge variant="warning" className="uppercase">
-                      Private Alpha
-                    </Badge>
                   </div>
                   <p className="prose text-sm max-w-full">
                     Automatically replicate your database changes to external data warehouses and
                     analytics platforms in real-time
                   </p>
                 </div>
+                <AlphaNotice
+                  entity="Replication"
+                  feedbackUrl="https://github.com/orgs/supabase/discussions/39416"
+                />
                 <Destinations />
               </div>
             </ScaffoldSection>
