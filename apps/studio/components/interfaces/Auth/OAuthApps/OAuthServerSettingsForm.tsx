@@ -388,8 +388,8 @@ export const OAuthServerSettingsForm = () => {
           harder to identify trustworthy applications in your OAuth apps list.
         </p>
         <p className="text-sm text-foreground-lighter pb-4">
-          Only enable this if you have a specific use case requiring programmatic client registration
-          and understand the security implications.
+          Only enable this if you have a specific use case requiring programmatic client
+          registration and understand the security implications.
         </p>
       </ConfirmationModal>
 
