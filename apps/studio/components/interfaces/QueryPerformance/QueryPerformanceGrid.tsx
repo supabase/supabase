@@ -400,14 +400,6 @@ export const QueryPerformanceGrid = ({
     return data
   }, [aggregatedData, sort, search, roles, callsFilter])
 
-  const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
-  const query = (selectedQuery ?? '').trim().toLowerCase()
-  // const showIndexSuggestions =
-  //   (query.startsWith('select') ||
-  //     query.startsWith('with pgrst_source') ||
-  //     query.startsWith('with pgrst_payload')) &&
-  //   hasIndexRecommendations(reportData[selectedRow!]?.index_advisor_result, true)
-
   useEffect(() => {
     setSelectedRow(undefined)
   }, [search, roles, urlSort, order, callsFilter])
