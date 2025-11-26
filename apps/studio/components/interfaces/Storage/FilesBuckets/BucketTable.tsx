@@ -6,6 +6,7 @@ import {
 } from 'components/ui/VirtualizedTable'
 import { Bucket } from 'data/storage/buckets-query'
 import { FilesBucket as FilesBucketIcon } from 'icons'
+import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -93,7 +94,7 @@ export const BucketTableRow = ({
   ) => {
     const url = `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucketId)}`
     if (event.metaKey || event.ctrlKey) {
-      window.open(url, '_blank')
+      window.open(`${BASE_PATH}${url}`, '_blank')
     } else {
       router.push(url)
     }

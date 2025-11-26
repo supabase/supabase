@@ -94,6 +94,12 @@ When a table encounters an error during the copy phase, you can reset the table 
 
 Pipeline errors occur during the streaming phase (Live state) and affect the entire pipeline. When streaming data, if an error occurs, the entire pipeline will stop and enter a **Failed** state. This prevents data loss by ensuring no changes are skipped.
 
+<Admonition type="note">
+
+When a pipeline error occurs, you'll receive an email notification immediately. This ensures you're promptly notified of any issues so you can take action to resolve them.
+
+</Admonition>
+
 <Image
   alt="Pipeline Error Details"
   src="/docs/img/database/replication/replication-pipeline-error.png"
