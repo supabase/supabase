@@ -33,11 +33,12 @@ const ProductMenuItem = ({
     <Menu.Item icon={icon} rounded active={isActive} onClick={onClick}>
       <div className="flex w-full items-center justify-between gap-1">
         <div
+          className="flex items-center gap-1 min-w-0 flex-1"
           title={hoverText ? hoverText : typeof name === 'string' ? name : ''}
         >
-          <span className="truncate flex-1">{name}</span>
+          <span className="truncate flex-1 min-w-0">{name}</span>
           {label !== undefined && (
-            <Badge variant="warning" size="tiny">
+            <Badge variant="warning" size="tiny" className="flex-shrink-0">
               {label}
             </Badge>
           )}
