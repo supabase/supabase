@@ -599,18 +599,16 @@ function delegateParsing(
   const dereferencedType = parseType(referenced, map, typeArguments)
 
   if (dereferencedType) {
-    // When resolving a type parameter (e.g., T -> undefined), don't override the name
-    // for intrinsic/literal types - they have their own meaningful names
+    // When resolving a type parameter (e.g., T -> { vectorBucket: VectorBucket }),
+    // don't override the name or comment - let the resolved type speak for itself
     const isTypeParameterResolution = original.refersToTypeParameter === true
-    const isConcreteType =
-      dereferencedType.type === 'intrinsic' || dereferencedType.type === 'literal'
 
-    if (!(isTypeParameterResolution && isConcreteType)) {
+    if (!isTypeParameterResolution) {
       dereferencedType.name = nameOrAnonymous([original, dereferencedType])
     }
   }
 
-  if (original.comment) {
+  if (original.comment && !original.refersToTypeParameter) {
     dereferencedType.comment = {
       ...normalizeComment(dereferencedType.comment),
       ...normalizeComment(original.comment),
