@@ -6,7 +6,7 @@ import type {
   EntitlementConfig,
   EntitlementType,
 } from 'data/entitlements/entitlements-query'
-import { IS_PLATFORM } from 'lib/constants';
+import { IS_PLATFORM } from 'lib/constants'
 
 function isNumericConfig(
   config: EntitlementConfig,
@@ -101,7 +101,7 @@ export function useCheckEntitlements(
     : isSuccessEntitlements
 
   return {
-    hasAccess: !IS_PLATFORM ? true : entitlement?.hasAccess ?? false,
+    hasAccess: IS_PLATFORM ? entitlement?.hasAccess ?? false : true,
     isLoading,
     isSuccess,
     getEntitlementNumericValue: () => getEntitlementNumericValue(entitlement),
