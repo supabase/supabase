@@ -274,8 +274,6 @@ export const ServiceStatus = () => {
 
   const overallStatusLabel = getOverallStatusLabel()
 
-  console.log({ project })
-
   return (
     <Popover_Shadcn_>
       <PopoverTrigger_Shadcn_>
