@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import minify from 'pg-minify'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { QUEUES_SCHEMA } from './database-queues-toggle-postgrest-mutation'
 import { databaseQueuesKeys } from './keys'
 
@@ -35,13 +35,14 @@ export type DatabaseQueueError = ResponseError
 
 export const useQueuesExposePostgrestStatusQuery = <TData = DatabaseQueueData>(
   { projectRef, connectionString }: DatabaseQueuesVariables,
-  { enabled = true, ...options }: UseQueryOptions<DatabaseQueueData, DatabaseQueueError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<DatabaseQueueData, DatabaseQueueError, TData> = {}
 ) =>
-  useQuery<DatabaseQueueData, DatabaseQueueError, TData>(
-    databaseQueuesKeys.exposePostgrestStatus(projectRef),
-    () => getDatabaseQueuesExposePostgrestStatus({ projectRef, connectionString }),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabaseQueueData, DatabaseQueueError, TData>({
+    queryKey: databaseQueuesKeys.exposePostgrestStatus(projectRef),
+    queryFn: () => getDatabaseQueuesExposePostgrestStatus({ projectRef, connectionString }),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

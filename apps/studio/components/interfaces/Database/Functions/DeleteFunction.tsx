@@ -1,32 +1,34 @@
-import { toast } from 'sonner'
-
-import { useDatabaseFunctionDeleteMutation } from 'data/database-functions/database-functions-delete-mutation'
-import { DatabaseFunction } from 'data/database-functions/database-functions-query'
+import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface DeleteFunctionProps {
   func?: DatabaseFunction
   visible: boolean
-  setVisible: (value: boolean) => void
+  setVisible: (value: string | null) => void
+  onDelete: (params: {
+    func: DatabaseFunction
+    projectRef: string
+    connectionString?: string | null
+  }) => void
+  isLoading: boolean
 }
 
-const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
+export const DeleteFunction = ({
+  func,
+  visible,
+  setVisible,
+  onDelete,
+  isLoading,
+}: DeleteFunctionProps) => {
   const { data: project } = useSelectedProjectQuery()
   const { name, schema } = func ?? {}
-
-  const { mutate: deleteDatabaseFunction, isLoading } = useDatabaseFunctionDeleteMutation({
-    onSuccess: () => {
-      toast.success(`Successfully removed function ${name}`)
-      setVisible(false)
-    },
-  })
 
   async function handleDelete() {
     if (!func) return console.error('Function is required')
     if (!project) return console.error('Project is required')
 
-    deleteDatabaseFunction({
+    onDelete({
       func,
       projectRef: project.ref,
       connectionString: project.connectionString,
@@ -38,7 +40,7 @@ const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
       <TextConfirmModal
         variant={'warning'}
         visible={visible}
-        onCancel={() => setVisible(!visible)}
+        onCancel={() => setVisible(null)}
         onConfirm={handleDelete}
         title="Delete this function"
         loading={isLoading}
@@ -57,5 +59,3 @@ const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
     </>
   )
 }
-
-export default DeleteFunction

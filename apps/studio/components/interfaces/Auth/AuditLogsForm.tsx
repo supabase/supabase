@@ -57,7 +57,7 @@ export const AuditLogsForm = () => {
     isLoading,
   } = useAuthConfigQuery({ projectRef })
 
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation({
+  const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to update audit logs: ${error?.message}`)
     },
@@ -119,25 +119,25 @@ export const AuditLogsForm = () => {
                   render={({ field }) => (
                     <FormItemLayout
                       layout="flex-row-reverse"
-                      label="Disable writing auth audit logs to project database"
+                      label="Write audit logs to the database"
                       description={
                         <p className="text-sm prose text-foreground-lighter max-w-full">
-                          Audit logs will no longer be stored in the{' '}
+                          When enabled, audit logs are written to the{' '}
                           <InlineLink
                             target="_blank"
                             rel="noopener noreferrer"
                             href={`/project/${projectRef}/editor/${auditLogTable?.id}`}
                           >
-                            <code className="text-xs bg-surface-200 px-1 py-0.5 rounded">
-                              {AUDIT_LOG_ENTRIES_TABLE}
-                            </code>
+                            <code className="text-code-inline">{AUDIT_LOG_ENTRIES_TABLE}</code>
                           </InlineLink>{' '}
-                          table in your project's database, which will reduce database storage
-                          usage. Audit logs will subsequently still be available in the{' '}
+                          table.
+                          <br />
+                          You can disable this to reduce disk usage while still accessing logs
+                          through the{' '}
                           <InlineLink
                             href={`/project/${projectRef}/logs/explorer?q=select%0A++cast(timestamp+as+datetime)+as+timestamp%2C%0A++event_message%2C+metadata+%0Afrom+auth_audit_logs+%0Alimit+10%0A`}
                           >
-                            auth logs
+                            Auth logs
                           </InlineLink>
                           .
                         </p>
@@ -145,8 +145,8 @@ export const AuditLogsForm = () => {
                     >
                       <FormControl_Shadcn_>
                         <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
+                          checked={!field.value}
+                          onCheckedChange={(value) => field.onChange(!value)}
                           disabled={!canUpdateConfig}
                         />
                       </FormControl_Shadcn_>

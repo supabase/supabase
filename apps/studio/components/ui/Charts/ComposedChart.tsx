@@ -19,7 +19,7 @@ import {
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
 import { ChartHeader } from './ChartHeader'
-import { ChartHighlightActions, ChartHighlightAction } from './ChartHighlightActions'
+import { ChartHighlightAction, ChartHighlightActions } from './ChartHighlightActions'
 import {
   CHART_COLORS,
   DateTimeFormats,
@@ -39,6 +39,7 @@ import { ChartHighlight } from './useChartHighlight'
 import { useChartHoverState } from './useChartHoverState'
 
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
+  chartId?: string
   attributes: MultiAttribute[]
   yAxisKey: string
   xAxisKey: string
@@ -61,13 +62,17 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   titleTooltip?: string
   hideYAxis?: boolean
   hideHighlightedValue?: boolean
+  hideHighlightedLabel?: boolean
+  hideHighlightArea?: boolean
   syncId?: string
   docsUrl?: string
   sql?: string
   highlightActions?: ChartHighlightAction[]
+  showNewBadge?: boolean
 }
 
 export function ComposedChart({
+  chartId,
   data,
   attributes,
   yAxisKey,
@@ -99,10 +104,14 @@ export function ComposedChart({
   updateDateRange,
   hideYAxis,
   hideHighlightedValue,
+  hideHighlightedLabel = false,
+  hideHighlightArea = false,
   syncId,
   docsUrl,
   sql,
   highlightActions,
+  titleTooltip,
+  showNewBadge,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
   const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
@@ -296,12 +305,14 @@ export function ComposedChart({
   if (data.length === 0) {
     return (
       <NoDataPlaceholder
+        hideTotalPlaceholder={highlightedValue === undefined}
         message={emptyStateMessage}
         description="It may take up to 24 hours for data to refresh"
         size={size}
         className={className}
         attribute={title}
         format={format}
+        titleTooltip={titleTooltip}
       />
     )
   }
@@ -311,7 +322,11 @@ export function ComposedChart({
       <ChartHeader
         hideHighlightedValue={hideHighlightedValue}
         title={title}
+        showNewBadge={showNewBadge}
         format={format}
+        hideHighlightedLabel={hideHighlightedLabel}
+        hideHighlightArea={hideHighlightArea}
+        titleTooltip={titleTooltip}
         customDateFormat={customDateFormat}
         highlightedValue={formatHighlightedValue(resolvedHighlightedValue)}
         highlightedLabel={resolvedHighlightedLabel}
@@ -498,6 +513,7 @@ export function ComposedChart({
           chartHighlight={chartHighlight}
           updateDateRange={updateDateRange}
           actions={highlightActions}
+          chartId={chartId}
         />
       </Container>
       {data && (

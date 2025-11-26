@@ -4,7 +4,7 @@ import { ExternalLink } from 'lucide-react'
 import Image from 'next/image'
 import { Button, cn } from 'ui'
 import { CodeBlock } from 'ui/src/components/CodeBlock'
-import type { McpClient, McpClientConfig } from '../types'
+import type { McpClient, McpClientConfig, McpOnCopyCallback } from '../types'
 import { getMcpButtonData } from '../utils/getMcpButtonData'
 
 interface McpConfigurationDisplayProps {
@@ -13,6 +13,8 @@ interface McpConfigurationDisplayProps {
   className?: string
   theme?: 'light' | 'dark'
   basePath: string
+  onCopyCallback: (type?: McpOnCopyCallback) => void
+  onInstallCallback?: () => void
 }
 
 export function McpConfigurationDisplay({
@@ -21,6 +23,8 @@ export function McpConfigurationDisplay({
   className,
   theme = 'dark',
   basePath,
+  onCopyCallback,
+  onInstallCallback,
 }: McpConfigurationDisplayProps) {
   const mcpButtonData = getMcpButtonData({
     basePath,
@@ -40,6 +44,7 @@ export function McpConfigurationDisplay({
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 [&>span]:flex [&>span]:items-center [&>span]:gap-2"
+              onClick={onInstallCallback}
             >
               <Image
                 src={mcpButtonData.imageSrc}
@@ -54,9 +59,17 @@ export function McpConfigurationDisplay({
         </>
       )}
 
+      {selectedClient.primaryInstructions &&
+        selectedClient.primaryInstructions(clientConfig, onCopyCallback)}
+
       {selectedClient.configFile && (
         <div className="text-xs text-foreground-light">
-          {mcpButtonData ? 'Or add' : 'Add'} this configuration to{' '}
+          {selectedClient.primaryInstructions
+            ? 'Alternatively, add'
+            : mcpButtonData
+              ? 'Or add'
+              : 'Add'}{' '}
+          this configuration to{' '}
           <code className="px-1 py-0.5 bg-surface-200 rounded">{selectedClient.configFile}</code>:
         </div>
       )}
@@ -66,9 +79,11 @@ export function McpConfigurationDisplay({
         language="json"
         className="max-h-64 overflow-y-auto"
         focusable={false}
+        onCopyCallback={() => onCopyCallback?.('config')}
       />
 
-      {selectedClient.alternateInstructions && selectedClient.alternateInstructions(clientConfig)}
+      {selectedClient.alternateInstructions &&
+        selectedClient.alternateInstructions(clientConfig, onCopyCallback)}
 
       {(selectedClient.docsUrl || selectedClient.externalDocsUrl) && (
         <div className="flex items-center gap-2 text-xs text-foreground-light">

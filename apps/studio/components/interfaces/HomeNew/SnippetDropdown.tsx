@@ -1,4 +1,7 @@
-import { useIntersectionObserver } from '@uidotdev/usehooks'
+import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
+import { Plus } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useContentInfiniteQuery } from 'data/content/content-infinite-query'
@@ -6,7 +9,6 @@ import type { Content } from 'data/content/content-query'
 import { SNIPPET_PAGE_LIMIT } from 'data/content/sql-folders-query'
 import {
   Command_Shadcn_,
-  CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
@@ -14,7 +16,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
+  ScrollArea,
 } from 'ui'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 type SnippetDropdownProps = {
   projectRef?: string
@@ -37,8 +41,12 @@ export const SnippetDropdown = ({
   autoFocus = false,
   onSelect,
 }: SnippetDropdownProps) => {
-  const [snippetSearch, setSnippetSearch] = useState('')
+  const router = useRouter()
   const scrollRootRef = useRef<HTMLDivElement | null>(null)
+
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 500)
 
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useContentInfiniteQuery(
@@ -46,7 +54,7 @@ export const SnippetDropdown = ({
         projectRef,
         type: 'sql',
         limit: SNIPPET_PAGE_LIMIT,
-        name: snippetSearch.length === 0 ? undefined : snippetSearch,
+        name: search.length === 0 ? search : debouncedSearch,
       },
       { keepPreviousData: true }
     )
@@ -69,7 +77,7 @@ export const SnippetDropdown = ({
   }, [entry?.isIntersecting, hasNextPage, isFetchingNextPage, isLoading, fetchNextPage])
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
       <DropdownMenuContent
         side={side}
@@ -78,27 +86,62 @@ export const SnippetDropdown = ({
       >
         <Command_Shadcn_ shouldFilter={false}>
           <CommandInput_Shadcn_
+            showResetIcon
             autoFocus={autoFocus}
             placeholder="Search snippets..."
-            value={snippetSearch}
-            onValueChange={setSnippetSearch}
+            value={search}
+            onValueChange={setSearch}
+            handleReset={() => setSearch('')}
           />
           <CommandList_Shadcn_ ref={scrollRootRef}>
             {isLoading ? (
-              <CommandEmpty_Shadcn_>Loading...</CommandEmpty_Shadcn_>
-            ) : snippets.length === 0 ? (
-              <CommandEmpty_Shadcn_>No snippets found</CommandEmpty_Shadcn_>
-            ) : null}
+              <p className="text-xs text-center text-foreground-lighter py-3">Loading...</p>
+            ) : search.length > 0 && snippets.length === 0 ? (
+              <p className="text-xs text-center text-foreground-lighter py-3">No snippets found</p>
+            ) : (
+              <CommandGroup_Shadcn_>
+                <ScrollArea className={snippets.length > 7 ? 'h-[210px]' : ''}>
+                  {snippets.map((snippet) => (
+                    <CommandItem_Shadcn_
+                      key={snippet.id}
+                      value={snippet.id}
+                      onSelect={() => onSelect({ id: snippet.id, name: snippet.name })}
+                    >
+                      {snippet.name}
+                    </CommandItem_Shadcn_>
+                  ))}
+                  <div ref={sentinelRef} className="h-1 -mt-1" />
+                  {hasNextPage && (
+                    <div className="px-2 py-1">
+                      <ShimmeringLoader className="py-2" />
+                    </div>
+                  )}
+                </ScrollArea>
+              </CommandGroup_Shadcn_>
+            )}
+
+            <div className="h-px bg-border-overlay -mx-1" />
+
             <CommandGroup_Shadcn_>
-              {snippets.map((snippet) => (
-                <CommandItem_Shadcn_
-                  key={snippet.id}
-                  onSelect={() => onSelect({ id: snippet.id, name: snippet.name })}
+              <CommandItem_Shadcn_
+                className="cursor-pointer w-full"
+                onSelect={() => {
+                  setOpen(false)
+                  router.push(`/project/${projectRef}/sql/new`)
+                }}
+                onClick={() => setOpen(false)}
+              >
+                <Link
+                  href={`/project/${projectRef}/sql/new`}
+                  onClick={() => {
+                    setOpen(false)
+                  }}
+                  className="w-full flex items-center gap-2"
                 >
-                  {snippet.name}
-                </CommandItem_Shadcn_>
-              ))}
-              <div ref={sentinelRef} className="h-1" />
+                  <Plus size={14} strokeWidth={1.5} />
+                  <p>Create a report block with SQL</p>
+                </Link>
+              </CommandItem_Shadcn_>
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>

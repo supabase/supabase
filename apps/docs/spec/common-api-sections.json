@@ -245,6 +245,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-a-migration",
+        "title": "Get a migration",
+        "slug": "v1-get-a-migration",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-a-snippet",
         "title": "Get a snippet",
         "slug": "v1-get-a-snippet",
@@ -317,6 +323,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-patch-a-migration",
+        "title": "Patch a migration",
+        "slug": "v1-patch-a-migration",
+        "type": "operation"
+      },
+      {
         "id": "v1-remove-a-read-replica",
         "title": "Remove a read replica",
         "slug": "v1-remove-a-read-replica",
@@ -326,6 +338,12 @@
         "id": "v1-restore-pitr-backup",
         "title": "Restore pitr backup",
         "slug": "v1-restore-pitr-backup",
+        "type": "operation"
+      },
+      {
+        "id": "v1-rollback-migrations",
+        "title": "Rollback migrations",
+        "slug": "v1-rollback-migrations",
         "type": "operation"
       },
       {
@@ -569,6 +587,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-restore-a-branch",
+        "title": "Restore a branch",
+        "slug": "v1-restore-a-branch",
+        "type": "operation"
+      },
+      {
         "id": "v1-update-a-branch-config",
         "title": "Update a branch config",
         "slug": "v1-update-a-branch-config",
@@ -596,6 +620,12 @@
         "id": "v1-exchange-oauth-token",
         "title": "Exchange oauth token",
         "slug": "v1-exchange-oauth-token",
+        "type": "operation"
+      },
+      {
+        "id": "v1-oauth-authorize-project-claim",
+        "title": "Oauth authorize project claim",
+        "slug": "v1-oauth-authorize-project-claim",
         "type": "operation"
       },
       {
@@ -662,6 +692,18 @@
         "id": "v1-delete-network-bans",
         "title": "Delete network bans",
         "slug": "v1-delete-network-bans",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-all-projects-for-organization",
+        "title": "Get all projects for organization",
+        "slug": "v1-get-all-projects-for-organization",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-available-regions",
+        "title": "Get available regions",
+        "slug": "v1-get-available-regions",
         "type": "operation"
       },
       {

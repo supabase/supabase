@@ -20,7 +20,7 @@ export interface paths {
     post?: never
     /**
      * Delete a database branch
-     * @description Deletes the specified database branch
+     * @description Deletes the specified database branch. By default, deletes immediately. Use force=false to schedule deletion with 1-hour grace period (only when soft deletion is enabled).
      */
     delete: operations['v1-delete-a-branch']
     options?: never
@@ -106,6 +106,26 @@ export interface paths {
      * @description Resets the specified database branch
      */
     post: operations['v1-reset-a-branch']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/branches/{branch_id_or_ref}/restore': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Restore a scheduled branch deletion
+     * @description Cancels scheduled deletion and restores the branch to active state
+     */
+    post: operations['v1-restore-a-branch']
     delete?: never
     options?: never
     head?: never
@@ -250,6 +270,28 @@ export interface paths {
     put?: never
     /** Claims project for the specified organization */
     post: operations['v1-claim-project-for-organization']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/organizations/{slug}/projects': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Gets all projects for the given organization
+     * @description Returns a paginated list of projects for the specified organization.
+     *
+     *         This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
+     */
+    get: operations['v1-get-all-projects-for-organization']
+    put?: never
+    post?: never
     delete?: never
     options?: never
     head?: never
@@ -449,9 +491,11 @@ export interface paths {
      * Gets project's logs
      * @description Executes a SQL query on the project's logs.
      *
-     *     Either the 'iso_timestamp_start' and 'iso_timestamp_end' parameters must be provided.
+     *     Either the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.
      *     If both are not provided, only the last 1 minute of logs will be queried.
      *     The timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.
+     *
+     *     Note: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer:~:text=logs%20from%20the-,Sources,-drop%2Ddown%3A) for all available sources.
      *
      */
     get: operations['v1-get-project-logs']
@@ -1147,10 +1191,38 @@ export interface paths {
      * @description Only available to selected partner OAuth apps
      */
     post: operations['v1-apply-a-migration']
-    delete?: never
+    /**
+     * [Beta] Rollback database migrations and remove them from history table
+     * @description Only available to selected partner OAuth apps
+     */
+    delete: operations['v1-rollback-migrations']
     options?: never
     head?: never
     patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/migrations/{version}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * [Beta] Fetch an existing entry from migration history
+     * @description Only available to selected partner OAuth apps
+     */
+    get: operations['v1-get-a-migration']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /**
+     * [Beta] Patch an existing entry in migration history
+     * @description Only available to selected partner OAuth apps
+     */
+    patch: operations['v1-patch-a-migration']
     trace?: never
   }
   '/v1/projects/{ref}/database/query': {
@@ -1729,6 +1801,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/available-regions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** [Beta] Gets the list of available regions that can be used for a new project */
+    get: operations['v1-get-available-regions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/snippets': {
     parameters: {
       query?: never
@@ -1951,6 +2040,9 @@ export interface components {
       external_zoom_email_optional: boolean | null
       external_zoom_enabled: boolean | null
       external_zoom_secret: string | null
+      hook_after_user_created_enabled: boolean | null
+      hook_after_user_created_secrets: string | null
+      hook_after_user_created_uri: string | null
       hook_before_user_created_enabled: boolean | null
       hook_before_user_created_secrets: string | null
       hook_before_user_created_uri: string | null
@@ -1972,19 +2064,40 @@ export interface components {
       jwt_exp: number | null
       mailer_allow_unverified_email_sign_ins: boolean | null
       mailer_autoconfirm: boolean | null
+      mailer_notifications_email_changed_enabled: boolean | null
+      mailer_notifications_identity_linked_enabled: boolean | null
+      mailer_notifications_identity_unlinked_enabled: boolean | null
+      mailer_notifications_mfa_factor_enrolled_enabled: boolean | null
+      mailer_notifications_mfa_factor_unenrolled_enabled: boolean | null
+      mailer_notifications_password_changed_enabled: boolean | null
+      mailer_notifications_phone_changed_enabled: boolean | null
       mailer_otp_exp: number
       mailer_otp_length: number | null
       mailer_secure_email_change_enabled: boolean | null
       mailer_subjects_confirmation: string | null
       mailer_subjects_email_change: string | null
+      mailer_subjects_email_changed_notification: string | null
+      mailer_subjects_identity_linked_notification: string | null
+      mailer_subjects_identity_unlinked_notification: string | null
       mailer_subjects_invite: string | null
       mailer_subjects_magic_link: string | null
+      mailer_subjects_mfa_factor_enrolled_notification: string | null
+      mailer_subjects_mfa_factor_unenrolled_notification: string | null
+      mailer_subjects_password_changed_notification: string | null
+      mailer_subjects_phone_changed_notification: string | null
       mailer_subjects_reauthentication: string | null
       mailer_subjects_recovery: string | null
       mailer_templates_confirmation_content: string | null
       mailer_templates_email_change_content: string | null
+      mailer_templates_email_changed_notification_content: string | null
+      mailer_templates_identity_linked_notification_content: string | null
+      mailer_templates_identity_unlinked_notification_content: string | null
       mailer_templates_invite_content: string | null
       mailer_templates_magic_link_content: string | null
+      mailer_templates_mfa_factor_enrolled_notification_content: string | null
+      mailer_templates_mfa_factor_unenrolled_notification_content: string | null
+      mailer_templates_password_changed_notification_content: string | null
+      mailer_templates_phone_changed_notification_content: string | null
       mailer_templates_reauthentication_content: string | null
       mailer_templates_recovery_content: string | null
       mfa_max_enrolled_factors: number | null
@@ -2108,6 +2221,8 @@ export interface components {
     BranchResponse: {
       /** Format: date-time */
       created_at: string
+      /** Format: date-time */
+      deletion_scheduled_at?: string
       git_branch?: string
       /** Format: uuid */
       id: string
@@ -2118,10 +2233,29 @@ export interface components {
        */
       latest_check_run_id?: number
       name: string
+      /** Format: uri */
+      notify_url?: string
       parent_project_ref: string
       persistent: boolean
       /** Format: int32 */
       pr_number?: number
+      /** @enum {string} */
+      preview_project_status?:
+        | 'INACTIVE'
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'UNKNOWN'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTORING'
+        | 'UPGRADING'
+        | 'PAUSING'
+        | 'RESTORE_FAILED'
+        | 'RESTARTING'
+        | 'PAUSE_FAILED'
+        | 'RESIZING'
       project_ref: string
       /** Format: date-time */
       review_requested_at?: string
@@ -2136,6 +2270,10 @@ export interface components {
       /** Format: date-time */
       updated_at: string
       with_data: boolean
+    }
+    BranchRestoreResponse: {
+      /** @enum {string} */
+      message: 'Branch restoration initiated'
     }
     BranchUpdateResponse: {
       /** @enum {string} */
@@ -2211,6 +2349,11 @@ export interface components {
         | '48xlarge_high_memory'
       git_branch?: string
       is_default?: boolean
+      /**
+       * Format: uri
+       * @description HTTP endpoint to receive branch status updates.
+       */
+      notify_url?: string
       persistent?: boolean
       /**
        * @description Postgres engine version. If not provided, the latest version will be used.
@@ -2467,6 +2610,7 @@ export interface components {
       /** @enum {string} */
       message: 'ok'
     }
+    DeleteSecretsBody: string[]
     DeployFunctionResponse: {
       /** Format: int64 */
       created_at?: number
@@ -2879,10 +3023,11 @@ export interface components {
       redirect_uri?: string
       refresh_token?: string
       /**
+       * Format: uri
        * @description Resource indicator for MCP (Model Context Protocol) clients
-       * @enum {string}
        */
-      resource?: 'https://api.supabase.green/mcp' | 'https://mcp.supabase.green/mcp'
+      resource?: string
+      scope?: string
     }
     OAuthTokenResponse: {
       access_token: string
@@ -2911,8 +3056,6 @@ export interface components {
         }[]
         /** @enum {string} */
         source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise'
-        target_organization_eligible: boolean | null
-        target_organization_has_free_project_slots: boolean | null
         /** @enum {string|null} */
         target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | null
         valid: boolean
@@ -2926,15 +3069,107 @@ export interface components {
         ref: string
       }
     }
+    OrganizationProjectsResponse: {
+      pagination: {
+        /** @description Total number of projects. Use this to calculate the total number of pages. */
+        count: number
+        /** @description Maximum number of projects per page */
+        limit: number
+        /** @description Number of projects skipped in this response */
+        offset: number
+      }
+      projects: {
+        cloud_provider: string
+        databases: {
+          cloud_provider: string
+          disk_last_modified_at?: string
+          disk_throughput_mbps?: number
+          /** @enum {string} */
+          disk_type?: 'gp3' | 'io2'
+          disk_volume_size_gb?: number
+          identifier: string
+          /** @enum {string} */
+          infra_compute_size?:
+            | 'pico'
+            | 'nano'
+            | 'micro'
+            | 'small'
+            | 'medium'
+            | 'large'
+            | 'xlarge'
+            | '2xlarge'
+            | '4xlarge'
+            | '8xlarge'
+            | '12xlarge'
+            | '16xlarge'
+            | '24xlarge'
+            | '24xlarge_optimized_memory'
+            | '24xlarge_optimized_cpu'
+            | '24xlarge_high_memory'
+            | '48xlarge'
+            | '48xlarge_optimized_memory'
+            | '48xlarge_optimized_cpu'
+            | '48xlarge_high_memory'
+          region: string
+          /** @enum {string} */
+          status:
+            | 'ACTIVE_HEALTHY'
+            | 'ACTIVE_UNHEALTHY'
+            | 'COMING_UP'
+            | 'GOING_DOWN'
+            | 'INIT_FAILED'
+            | 'REMOVED'
+            | 'RESTORING'
+            | 'UNKNOWN'
+            | 'INIT_READ_REPLICA'
+            | 'INIT_READ_REPLICA_FAILED'
+            | 'RESTARTING'
+            | 'RESIZING'
+          /** @enum {string} */
+          type: 'PRIMARY' | 'READ_REPLICA'
+        }[]
+        inserted_at: string
+        is_branch: boolean
+        name: string
+        ref: string
+        region: string
+        /** @enum {string} */
+        status:
+          | 'INACTIVE'
+          | 'ACTIVE_HEALTHY'
+          | 'ACTIVE_UNHEALTHY'
+          | 'COMING_UP'
+          | 'UNKNOWN'
+          | 'GOING_DOWN'
+          | 'INIT_FAILED'
+          | 'REMOVED'
+          | 'RESTORING'
+          | 'UPGRADING'
+          | 'PAUSING'
+          | 'RESTORE_FAILED'
+          | 'RESTARTING'
+          | 'PAUSE_FAILED'
+          | 'RESIZING'
+      }[]
+    }
     OrganizationResponseV1: {
+      /**
+       * @deprecated
+       * @description Deprecated: Use `slug` instead.
+       */
       id: string
       name: string
+      /** @description Organization slug */
+      slug: string
     }
     PgsodiumConfigResponse: {
       root_key: string
     }
     PostgresConfigResponse: {
+      /** @description Default unit: s */
+      checkpoint_timeout?: string
       effective_cache_size?: string
+      hot_standby_feedback?: boolean
       logical_decoding_work_mem?: string
       maintenance_work_mem?: string
       max_connections?: number
@@ -2952,10 +3187,12 @@ export interface components {
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
+      /** @description Default unit: ms */
       statement_timeout?: string
       track_activity_query_size?: string
       track_commit_timestamp?: boolean
       wal_keep_size?: string
+      /** @description Default unit: ms */
       wal_sender_timeout?: string
       work_mem?: string
     }
@@ -3006,6 +3243,46 @@ export interface components {
       enabled: boolean
       override_active_until: string
       override_enabled: boolean
+    }
+    RegionsInfo: {
+      all: {
+        smartGroup: {
+          /** @enum {string} */
+          code: 'americas' | 'emea' | 'apac'
+          name: string
+          /** @enum {string} */
+          type: 'smartGroup'
+        }[]
+        specific: {
+          code: string
+          name: string
+          /** @enum {string} */
+          provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
+          /** @enum {string} */
+          status?: 'capacity' | 'other'
+          /** @enum {string} */
+          type: 'specific'
+        }[]
+      }
+      recommendations: {
+        smartGroup: {
+          /** @enum {string} */
+          code: 'americas' | 'emea' | 'apac'
+          name: string
+          /** @enum {string} */
+          type: 'smartGroup'
+        }
+        specific: {
+          code: string
+          name: string
+          /** @enum {string} */
+          provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
+          /** @enum {string} */
+          status?: 'capacity' | 'other'
+          /** @enum {string} */
+          type: 'specific'
+        }[]
+      }
     }
     RemoveNetworkBanRequest: {
       identifier?: string
@@ -3155,6 +3432,7 @@ export interface components {
         iceberg_catalog: boolean
         list_v2: boolean
       }
+      databasePoolMode: string
       external: {
         /** @enum {string} */
         upstreamTarget: 'main' | 'canary'
@@ -3172,6 +3450,7 @@ export interface components {
       }
       /** Format: int64 */
       fileSizeLimit: number
+      migrationVersion: string
     }
     StreamableFile: Record<string, never>
     SubdomainAvailabilityResponse: {
@@ -3311,6 +3590,9 @@ export interface components {
       external_zoom_email_optional?: boolean | null
       external_zoom_enabled?: boolean | null
       external_zoom_secret?: string | null
+      hook_after_user_created_enabled?: boolean | null
+      hook_after_user_created_secrets?: string | null
+      hook_after_user_created_uri?: string | null
       hook_before_user_created_enabled?: boolean | null
       hook_before_user_created_secrets?: string | null
       hook_before_user_created_uri?: string | null
@@ -3332,19 +3614,40 @@ export interface components {
       jwt_exp?: number | null
       mailer_allow_unverified_email_sign_ins?: boolean | null
       mailer_autoconfirm?: boolean | null
+      mailer_notifications_email_changed_enabled?: boolean | null
+      mailer_notifications_identity_linked_enabled?: boolean | null
+      mailer_notifications_identity_unlinked_enabled?: boolean | null
+      mailer_notifications_mfa_factor_enrolled_enabled?: boolean | null
+      mailer_notifications_mfa_factor_unenrolled_enabled?: boolean | null
+      mailer_notifications_password_changed_enabled?: boolean | null
+      mailer_notifications_phone_changed_enabled?: boolean | null
       mailer_otp_exp?: number
       mailer_otp_length?: number | null
       mailer_secure_email_change_enabled?: boolean | null
       mailer_subjects_confirmation?: string | null
       mailer_subjects_email_change?: string | null
+      mailer_subjects_email_changed_notification?: string | null
+      mailer_subjects_identity_linked_notification?: string | null
+      mailer_subjects_identity_unlinked_notification?: string | null
       mailer_subjects_invite?: string | null
       mailer_subjects_magic_link?: string | null
+      mailer_subjects_mfa_factor_enrolled_notification?: string | null
+      mailer_subjects_mfa_factor_unenrolled_notification?: string | null
+      mailer_subjects_password_changed_notification?: string | null
+      mailer_subjects_phone_changed_notification?: string | null
       mailer_subjects_reauthentication?: string | null
       mailer_subjects_recovery?: string | null
       mailer_templates_confirmation_content?: string | null
       mailer_templates_email_change_content?: string | null
+      mailer_templates_email_changed_notification_content?: string | null
+      mailer_templates_identity_linked_notification_content?: string | null
+      mailer_templates_identity_unlinked_notification_content?: string | null
       mailer_templates_invite_content?: string | null
       mailer_templates_magic_link_content?: string | null
+      mailer_templates_mfa_factor_enrolled_notification_content?: string | null
+      mailer_templates_mfa_factor_unenrolled_notification_content?: string | null
+      mailer_templates_password_changed_notification_content?: string | null
+      mailer_templates_phone_changed_notification_content?: string | null
       mailer_templates_reauthentication_content?: string | null
       mailer_templates_recovery_content?: string | null
       mfa_max_enrolled_factors?: number | null
@@ -3427,6 +3730,11 @@ export interface components {
     UpdateBranchBody: {
       branch_name?: string
       git_branch?: string
+      /**
+       * Format: uri
+       * @description HTTP endpoint to receive branch status updates.
+       */
+      notify_url?: string
       persistent?: boolean
       request_review?: boolean
       /**
@@ -3503,7 +3811,10 @@ export interface components {
       root_key: string
     }
     UpdatePostgresConfigBody: {
+      /** @description Default unit: s */
+      checkpoint_timeout?: string
       effective_cache_size?: string
+      hot_standby_feedback?: boolean
       logical_decoding_work_mem?: string
       maintenance_work_mem?: string
       max_connections?: number
@@ -3522,10 +3833,12 @@ export interface components {
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
+      /** @description Default unit: ms */
       statement_timeout?: string
       track_activity_query_size?: string
       track_commit_timestamp?: boolean
       wal_keep_size?: string
+      /** @description Default unit: ms */
       wal_sender_timeout?: string
       work_mem?: string
     }
@@ -3667,6 +3980,7 @@ export interface components {
     V1CreateMigrationBody: {
       name?: string
       query: string
+      rollback?: string
     }
     V1CreateProjectBody: {
       /** @description Database password */
@@ -3700,8 +4014,13 @@ export interface components {
       kps_enabled?: boolean
       /** @description Name of your project */
       name: string
-      /** @description Slug of your organization */
-      organization_id: string
+      /**
+       * @deprecated
+       * @description Deprecated: Use `organization_slug` instead.
+       */
+      organization_id?: string
+      /** @description Organization slug */
+      organization_slug: string
       /**
        * @deprecated
        * @description Subscription Plan is now set on organization level and is ignored in this request
@@ -3709,10 +4028,17 @@ export interface components {
        */
       plan?: 'free' | 'pro'
       /**
-       * @description Region you want your server to reside in
+       * @deprecated
+       * @description Postgres engine version. If not provided, the latest version will be used.
        * @enum {string}
        */
-      region:
+      postgres_engine?: '15' | '17' | '17-oriole'
+      /**
+       * @deprecated
+       * @description Region you want your server to reside in. Use region_selection instead.
+       * @enum {string}
+       */
+      region?:
         | 'us-east-1'
         | 'us-east-2'
         | 'us-west-1'
@@ -3732,11 +4058,67 @@ export interface components {
         | 'ap-south-1'
         | 'sa-east-1'
       /**
+       * @description Region selection. Only one of region or region_selection can be specified.
+       * @example { type: 'smartGroup', code: 'americas' }
+       */
+      region_selection?:
+        | {
+            /**
+             * @description Specific region code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.
+             * @enum {string}
+             */
+            code:
+              | 'us-east-1'
+              | 'us-east-2'
+              | 'us-west-1'
+              | 'us-west-2'
+              | 'ap-east-1'
+              | 'ap-southeast-1'
+              | 'ap-northeast-1'
+              | 'ap-northeast-2'
+              | 'ap-southeast-2'
+              | 'eu-west-1'
+              | 'eu-west-2'
+              | 'eu-west-3'
+              | 'eu-north-1'
+              | 'eu-central-1'
+              | 'eu-central-2'
+              | 'ca-central-1'
+              | 'ap-south-1'
+              | 'sa-east-1'
+            /** @enum {string} */
+            type: 'specific'
+          }
+        | {
+            /**
+             * @description The Smart Region Group's code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.
+             * @example apac
+             * @enum {string}
+             */
+            code: 'americas' | 'emea' | 'apac'
+            /** @enum {string} */
+            type: 'smartGroup'
+          }
+      /**
+       * @deprecated
+       * @description Release channel. If not provided, GA will be used.
+       * @enum {string}
+       */
+      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
+      /**
        * Format: uri
        * @description Template URL used to create the project from the CLI.
        * @example https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone
        */
       template_url?: string
+    }
+    V1GetMigrationResponse: {
+      created_by?: string
+      idempotency_key?: string
+      name?: string
+      rollback?: string[]
+      statements?: string[]
+      version: string
     }
     V1GetUsageApiCountResponse: {
       error?:
@@ -3785,6 +4167,54 @@ export interface components {
       name?: string
       version: string
     }[]
+    V1ListProjectsPaginatedResponse: {
+      pagination: {
+        /** @description Total number of projects. Use this to calculate the total number of pages. */
+        count: number
+        /** @description Maximum number of projects per page (actual number may be less) */
+        limit: number
+        /** @description Number of projects skipped in this response */
+        offset: number
+      }
+      projects: {
+        cloud_provider: string
+        disk_volume_size_gb?: number
+        id: number
+        /** @enum {string} */
+        infra_compute_size?:
+          | 'pico'
+          | 'nano'
+          | 'micro'
+          | 'small'
+          | 'medium'
+          | 'large'
+          | 'xlarge'
+          | '2xlarge'
+          | '4xlarge'
+          | '8xlarge'
+          | '12xlarge'
+          | '16xlarge'
+          | '24xlarge'
+          | '24xlarge_optimized_memory'
+          | '24xlarge_optimized_cpu'
+          | '24xlarge_high_memory'
+          | '48xlarge'
+          | '48xlarge_optimized_memory'
+          | '48xlarge_optimized_cpu'
+          | '48xlarge_high_memory'
+        inserted_at: string | null
+        is_branch_enabled: boolean
+        is_physical_backups_enabled: boolean | null
+        name: string
+        organization_id: number
+        organization_slug: string
+        preview_branch_refs: string[]
+        ref: string
+        region: string
+        status: string
+        subscription_id: string | null
+      }[]
+    }
     V1OrganizationMemberResponse: {
       email?: string
       mfa_enabled: boolean
@@ -3803,6 +4233,10 @@ export interface components {
       )[]
       /** @enum {string} */
       plan?: 'free' | 'pro' | 'team' | 'enterprise'
+    }
+    V1PatchMigrationBody: {
+      name?: string
+      rollback?: string
     }
     V1PgbouncerConfigResponse: {
       connection_string?: string
@@ -3888,12 +4322,22 @@ export interface components {
        * @example 2023-03-29T16:32:59Z
        */
       created_at: string
-      /** @description Id of your project */
+      /**
+       * @deprecated
+       * @description Deprecated: Use `ref` instead.
+       */
       id: string
       /** @description Name of your project */
       name: string
-      /** @description Slug of your organization */
+      /**
+       * @deprecated
+       * @description Deprecated: Use `organization_slug` instead.
+       */
       organization_id: string
+      /** @description Organization slug */
+      organization_slug: string
+      /** @description Project ref */
+      ref: string
       /**
        * @description Region of your project
        * @example us-east-1
@@ -3933,12 +4377,22 @@ export interface components {
         /** @description Database version */
         version: string
       }
-      /** @description Id of your project */
+      /**
+       * @deprecated
+       * @description Deprecated: Use `ref` instead.
+       */
       id: string
       /** @description Name of your project */
       name: string
-      /** @description Slug of your organization */
+      /**
+       * @deprecated
+       * @description Deprecated: Use `organization_slug` instead.
+       */
       organization_id: string
+      /** @description Organization slug */
+      organization_slug: string
+      /** @description Project ref */
+      ref: string
       /**
        * @description Region of your project
        * @example us-east-1
@@ -3972,9 +4426,10 @@ export interface components {
     V1RestorePointResponse: {
       name: string
       /** @enum {string} */
-      status: 'AVAILABLE' | 'PENDING' | 'REMOVED'
+      status: 'AVAILABLE' | 'PENDING' | 'REMOVED' | 'FAILED'
     }
     V1RunQueryBody: {
+      parameters?: unknown[]
       query: string
       read_only?: boolean
     }
@@ -3992,6 +4447,9 @@ export interface components {
             connected_cluster: number
             db_connected: boolean
             healthy: boolean
+          }
+        | {
+            db_schema: string
           }
       /** @enum {string} */
       name:
@@ -4031,6 +4489,7 @@ export interface components {
     V1UpsertMigrationBody: {
       name?: string
       query: string
+      rollback?: string
     }
     VanitySubdomainBody: {
       vanity_subdomain: string
@@ -4080,7 +4539,10 @@ export interface operations {
   }
   'v1-delete-a-branch': {
     parameters: {
-      query?: never
+      query?: {
+        /** @description If set to false, schedule deletion with 1-hour grace period (only when soft deletion is enabled). */
+        force?: boolean
+      }
       header?: never
       path: {
         /** @description Branch ID */
@@ -4270,6 +4732,35 @@ export interface operations {
       }
     }
   }
+  'v1-restore-a-branch': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Branch ID */
+        branch_id_or_ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BranchRestoreResponse']
+        }
+      }
+      /** @description Failed to restore database branch */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-authorize-user': {
     parameters: {
       query: {
@@ -4280,7 +4771,7 @@ export interface operations {
         organization_slug?: string
         redirect_uri: string
         /** @description Resource indicator for MCP (Model Context Protocol) clients */
-        resource?: 'https://api.supabase.green/mcp' | 'https://mcp.supabase.green/mcp'
+        resource?: string
         response_mode?: string
         response_type: 'code' | 'token' | 'id_token token'
         scope?: string
@@ -4592,6 +5083,48 @@ export interface operations {
       }
       /** @description Rate limit exceeded */
       429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-all-projects-for-organization': {
+    parameters: {
+      query?: {
+        /** @description Number of projects to return per page */
+        limit?: number
+        /** @description Number of projects to skip */
+        offset?: number
+        /** @description Search projects by name */
+        search?: string
+        /** @description Sort order for projects */
+        sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
+        /** @description A comma-separated list of project statuses to filter by.
+         *
+         *     The following values are supported: `ACTIVE_HEALTHY`, `INACTIVE`. */
+        statuses?: string
+      }
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OrganizationProjectsResponse']
+        }
+      }
+      /** @description Failed to retrieve projects */
+      500: {
         headers: {
           [name: string]: unknown
         }
@@ -5143,6 +5676,7 @@ export interface operations {
       query?: {
         iso_timestamp_end?: string
         iso_timestamp_start?: string
+        /** @description Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details. */
         sql?: string
       }
       header?: never
@@ -8394,6 +8928,161 @@ export interface operations {
       }
     }
   }
+  'v1-rollback-migrations': {
+    parameters: {
+      query: {
+        /** @description Rollback migrations greater or equal to this version */
+        gte: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to rollback database migration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-a-migration': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+        version: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V1GetMigrationResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get database migration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-patch-a-migration': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+        version: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1PatchMigrationBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to patch database migration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-run-a-query': {
     parameters: {
       query?: never
@@ -10025,7 +10714,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': string[]
+        'application/json': components['schemas']['DeleteSecretsBody']
       }
     }
     responses: {
@@ -10630,6 +11319,52 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  'v1-get-available-regions': {
+    parameters: {
+      query: {
+        /** @description Continent code to determine regional recommendations: NA (North America), SA (South America), EU (Europe), AF (Africa), AS (Asia), OC (Oceania), AN (Antarctica) */
+        continent?: 'NA' | 'SA' | 'EU' | 'AF' | 'AS' | 'OC' | 'AN'
+        /** @description Desired instance size */
+        desired_instance_size?:
+          | 'pico'
+          | 'nano'
+          | 'micro'
+          | 'small'
+          | 'medium'
+          | 'large'
+          | 'xlarge'
+          | '2xlarge'
+          | '4xlarge'
+          | '8xlarge'
+          | '12xlarge'
+          | '16xlarge'
+          | '24xlarge'
+          | '24xlarge_optimized_memory'
+          | '24xlarge_optimized_cpu'
+          | '24xlarge_high_memory'
+          | '48xlarge'
+          | '48xlarge_optimized_memory'
+          | '48xlarge_optimized_cpu'
+          | '48xlarge_high_memory'
+        /** @description Slug of your organization */
+        organization_slug: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RegionsInfo']
+        }
       }
     }
   }

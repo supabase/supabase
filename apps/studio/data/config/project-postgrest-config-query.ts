@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
 
 export type ProjectPostgrestConfigVariables = {
@@ -37,13 +37,11 @@ export const useProjectPostgrestConfigQuery = <TData = ProjectPostgrestConfigDat
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectPostgrestConfigData, ProjectPostgrestConfigError, TData> = {}
+  }: UseCustomQueryOptions<ProjectPostgrestConfigData, ProjectPostgrestConfigError, TData> = {}
 ) =>
-  useQuery<ProjectPostgrestConfigData, ProjectPostgrestConfigError, TData>(
-    configKeys.postgrest(projectRef),
-    ({ signal }) => getProjectPostgrestConfig({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectPostgrestConfigData, ProjectPostgrestConfigError, TData>({
+    queryKey: configKeys.postgrest(projectRef),
+    queryFn: ({ signal }) => getProjectPostgrestConfig({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

@@ -15,12 +15,14 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/ai/onboarding/design',
   '/ai/feedback/classify',
   '/ai/docs',
+  '/ai/table-quickstart/generate-schemas',
   '/get-ip-address',
   '/get-utc-time',
   '/get-deployment-commit',
   '/check-cname',
   '/edge-functions/test',
   '/edge-functions/body',
+  '/generate-attachment-url',
 ]
 
 export function middleware(request: NextRequest) {

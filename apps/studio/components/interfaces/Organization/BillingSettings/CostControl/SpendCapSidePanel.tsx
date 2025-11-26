@@ -53,7 +53,7 @@ const SpendCapSidePanel = () => {
   const onClose = () => snap.setPanelKey(undefined)
 
   const { data: subscription, isLoading } = useOrgSubscriptionQuery({ orgSlug: slug })
-  const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
+  const { mutate: updateOrgSubscription, isPending: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
       onSuccess: () => {
         toast.success(`Successfully ${isTurningOnCap ? 'enabled' : 'disabled'} spend cap`)
@@ -74,7 +74,6 @@ const SpendCapSidePanel = () => {
     if (visible && subscription !== undefined) {
       setSelectedOption(isSpendCapOn ? 'on' : 'off')
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, isLoading, subscription, isSpendCapOn])
 
   const onConfirm = async () => {

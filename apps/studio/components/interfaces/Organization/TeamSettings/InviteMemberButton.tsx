@@ -87,7 +87,7 @@ export const InviteMemberButton = () => {
       )
     )
 
-  const { mutate: inviteMember, isLoading: isInviting } = useOrganizationCreateInvitationMutation()
+  const { mutate: inviteMember, isPending: isInviting } = useOrganizationCreateInvitationMutation()
 
   const FormSchema = z.object({
     email: z.string().email('Must be a valid email address').min(1, 'Email is required'),
@@ -256,6 +256,7 @@ export const InviteMemberButton = () => {
                     >
                       <FormControl_Shadcn_>
                         <OrganizationProjectSelector
+                          fetchOnMount
                           sameWidthAsTrigger
                           checkPosition="left"
                           selectedRef={projectRef}

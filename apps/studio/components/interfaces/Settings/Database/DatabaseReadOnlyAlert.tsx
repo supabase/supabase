@@ -14,8 +14,9 @@ export const DatabaseReadOnlyAlert = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
-  const { data: resourceWarnings } = useResourceWarningsQuery()
-
+  const { data: resourceWarnings } = useResourceWarningsQuery({ ref: projectRef })
+  // [Joshen Cleanup] JFYI this can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
+  // No longer need to filter by ref on the client side
   const isReadOnlyMode =
     (resourceWarnings ?? [])?.find((warning) => warning.project === projectRef)
       ?.is_readonly_mode_enabled ?? false

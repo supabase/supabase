@@ -3,7 +3,7 @@ import { PropsWithChildren } from 'react'
 
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
+import { ProjectLayoutWithAuth } from '../ProjectLayout'
 
 const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   const { can: canReadTables, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(

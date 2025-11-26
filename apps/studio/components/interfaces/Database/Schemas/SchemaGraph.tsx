@@ -1,6 +1,6 @@
 import type { PostgresSchema } from '@supabase/postgres-meta'
 import { toPng, toSvg } from 'html-to-image'
-import { Check, Clipboard, Download, Loader2 } from 'lucide-react'
+import { Check, Copy, Download, Loader2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
@@ -207,7 +207,7 @@ export const SchemaGraph = () => {
             <div className="flex items-center gap-x-2">
               <ButtonTooltip
                 type="outline"
-                icon={copied ? <Check /> : <Clipboard />}
+                icon={copied ? <Check /> : <Copy />}
                 onClick={() => {
                   if (tables) {
                     copyToClipboard(tablesToSQL(tables))

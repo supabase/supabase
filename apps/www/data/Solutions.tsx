@@ -7,6 +7,8 @@ import {
   PointerIcon,
   PuzzleIcon,
   TrendingUpIcon,
+  UsersIcon,
+  ZapIcon,
 } from 'lucide-react'
 
 export type SolutionTypes = Solutions[keyof Solutions]
@@ -20,9 +22,11 @@ export enum Solutions {
   firebase = 'firebase',
   neon = 'neon',
   startups = 'startups',
+  agencies = 'agencies',
   enterprise = 'enterprise',
   hackathon = 'hackathon',
   innovationTeams = 'innovation-teams',
+  vibeCoders = 'vibe-coders',
 }
 
 export const skillBasedSolutions = {
@@ -90,6 +94,13 @@ export const skillBasedSolutions = {
         </svg>
       ),
     },
+    {
+      id: Solutions.vibeCoders,
+      text: 'Vibe Coders',
+      description: '',
+      url: '/solutions/vibe-coders',
+      icon: ZapIcon,
+    },
   ],
 }
 
@@ -109,6 +120,13 @@ export const useCaseSolutions = {
       description: '',
       url: '/solutions/startups',
       icon: TrendingUpIcon,
+    },
+    {
+      id: Solutions.agencies,
+      text: 'Agencies',
+      description: '',
+      url: '/solutions/agencies',
+      icon: UsersIcon,
     },
     {
       id: Solutions.enterprise,

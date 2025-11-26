@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseKeys } from './keys'
 
 type SupavisorConfigurationUpdateVariables = {
@@ -32,7 +32,7 @@ export const useSupavisorConfigurationUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     SupavisorConfigurationUpdateData,
     ResponseError,
     SupavisorConfigurationUpdateVariables
@@ -45,10 +45,11 @@ export const useSupavisorConfigurationUpdateMutation = ({
     SupavisorConfigurationUpdateData,
     ResponseError,
     SupavisorConfigurationUpdateVariables
-  >((vars) => updateSupavisorConfiguration(vars), {
+  >({
+    mutationFn: (vars) => updateSupavisorConfiguration(vars),
     async onSuccess(data, variables, context) {
       const { ref } = variables
-      await queryClient.invalidateQueries(databaseKeys.poolingConfiguration(ref))
+      await queryClient.invalidateQueries({ queryKey: databaseKeys.poolingConfiguration(ref) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

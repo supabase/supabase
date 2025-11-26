@@ -22,7 +22,7 @@ Vector similarity refers to a measure of the similarity between two related item
 
 ### Embeddings
 
-This is particularly useful if you're building on top of OpenAI's [GPT-3](https://openai.com/blog/gpt-3-apps/). You can create and store [embeddings](/docs/guides/ai/quickstarts/generate-text-embeddings) for retrieval augmented generation.
+This is particularly useful if you're building AI applications with large language models. You can create and store [embeddings](/docs/guides/ai/quickstarts/generate-text-embeddings) for retrieval augmented generation (RAG).
 
 ## Usage
 
@@ -70,7 +70,7 @@ create table posts (
   id serial primary key,
   title text not null,
   body text not null,
-  embedding vector(384)
+  embedding extensions.vector(384)
 );
 ```
 

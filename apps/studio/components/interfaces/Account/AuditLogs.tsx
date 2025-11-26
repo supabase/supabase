@@ -3,7 +3,7 @@ import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useDebounce } from '@uidotdev/usehooks'
-import { LogDetailsPanel } from 'components/interfaces/AuditLogs'
+import { LogDetailsPanel } from 'components/interfaces/AuditLogs/LogDetailsPanel'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -17,7 +17,7 @@ import { Button } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 
-const AuditLogs = () => {
+export const AuditLogs = () => {
   const currentTime = dayjs().utc().set('millisecond', 0)
 
   const [search, setSearch] = useState('')
@@ -294,5 +294,3 @@ const AuditLogs = () => {
     </>
   )
 }
-
-export default AuditLogs

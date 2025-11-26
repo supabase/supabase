@@ -29,7 +29,7 @@ export const DeleteOrganizationButton = () => {
     'organizations'
   )
 
-  const { mutate: deleteOrganization, isLoading: isDeleting } = useOrganizationDeleteMutation({
+  const { mutate: deleteOrganization, isPending: isDeleting } = useOrganizationDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted ${orgName}`)
       setLastVisitedOrganization('')

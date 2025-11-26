@@ -2,7 +2,13 @@ export * from './api/Badges'
 export { CommandHeader } from './api/CommandHeader'
 export { CommandInput } from './api/CommandInput'
 export { CommandList } from './api/CommandList'
-export { Breadcrumb, CommandMenu, CommandMenuTrigger, CommandWrapper } from './api/CommandMenu'
+export {
+  Breadcrumb,
+  CommandMenu,
+  CommandMenuTrigger,
+  CommandMenuTriggerInput,
+  CommandWrapper,
+} from './api/CommandMenu'
 export { CommandProvider } from './api/CommandProvider'
 export { TextHighlighter, TextHighlighterBase } from './api/TextHighlighter'
 export * from './api/hooks/commandsHooks'
@@ -10,6 +16,10 @@ export * from './api/hooks/pagesHooks'
 export * from './api/hooks/queryHooks'
 export { useCommandFilterState } from './api/hooks/useCommandFilterState'
 export { useCrossCompatRouter } from './api/hooks/useCrossCompatRouter'
+export {
+  useCommandMenuOpenedTelemetry,
+  useCommandMenuTelemetry,
+} from './api/hooks/useCommandMenuTelemetry'
 export { useHistoryKeys } from './api/hooks/useHistoryKeys'
 export * from './api/hooks/viewHooks'
 export * from './api/utils'

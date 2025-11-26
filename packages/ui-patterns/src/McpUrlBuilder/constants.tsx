@@ -51,7 +51,7 @@ export const FEATURE_GROUPS_PLATFORM: McpFeatureGroup[] = [
 ]
 
 export const FEATURE_GROUPS_NON_PLATFORM = FEATURE_GROUPS_PLATFORM.filter((group) =>
-  ['docs', 'database', 'development'].includes(group.id)
+  ['docs', 'database', 'development', 'debugging'].includes(group.id)
 )
 
 export const MCP_CLIENTS: McpClient[] = [
@@ -108,7 +108,7 @@ export const MCP_CLIENTS: McpClient[] = [
         },
       }
     },
-    alternateInstructions: () => (
+    alternateInstructions: (_config, _onCopy) => (
       <p className="text-xs text-foreground-light">
         Windsurf does not currently support remote MCP servers over HTTP transport. You need to use
         the mcp-remote package as a proxy.
@@ -119,7 +119,7 @@ export const MCP_CLIENTS: McpClient[] = [
     key: 'claude-code',
     label: 'Claude Code',
     icon: 'claude',
-    configFile: '~/.claude.json',
+    configFile: '.mcp.json',
     externalDocsUrl: 'https://docs.anthropic.com/en/docs/claude-code/mcp',
     transformConfig: (config): ClaudeCodeMcpConfig => {
       return {
@@ -131,24 +131,44 @@ export const MCP_CLIENTS: McpClient[] = [
         },
       }
     },
-    alternateInstructions: (_config) => {
+    primaryInstructions: (_config, onCopy) => {
       const config = _config as ClaudeCodeMcpConfig
-      const command = `claude mcp add --transport http supabase "${config.mcpServers.supabase.url}"`
+      const command = `claude mcp add --scope project --transport http supabase "${config.mcpServers.supabase.url}"`
       return (
         <div className="space-y-2">
           <p className="text-xs text-foreground-light">
-            Alternatively, add the MCP server using the command line:
+            Add the MCP server to your project config using the command line:
           </p>
           <CodeBlock
             value={command}
             language="bash"
+            focusable={false}
             // This is a no-op but the CodeBlock component is designed to output
             // inline code if no className is given
             className="block"
+            onCopyCallback={() => onCopy?.('command')}
           />
         </div>
       )
     },
+    alternateInstructions: (_config, onCopy) => (
+      <div className="space-y-2">
+        <p className="text-xs text-foreground-light">
+          After configuring the MCP server, you need to authenticate. In a regular terminal (not the
+          IDE extension) run:
+        </p>
+        <CodeBlock
+          value="claude /mcp"
+          language="bash"
+          focusable={false}
+          className="block"
+          onCopyCallback={() => onCopy?.('command')}
+        />
+        <p className="text-xs text-foreground-light">
+          Select the "supabase" server, then "Authenticate" to begin the authentication flow.
+        </p>
+      </div>
+    ),
   },
 ]
 

@@ -12,7 +12,7 @@ import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import {
   Button,
   cn,

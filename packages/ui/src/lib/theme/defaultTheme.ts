@@ -446,7 +446,7 @@ export default {
        `,
     },
     container: 'relative',
-    with_icon: 'pl-10',
+    with_icon: 'pl-7',
     size: {
       ...default__padding_and_text,
     },
@@ -492,7 +492,7 @@ export default {
        `,
     },
     container: 'relative',
-    with_icon: 'pl-10',
+    with_icon: 'pl-7',
     size: {
       ...default__padding_and_text,
     },
@@ -539,7 +539,7 @@ export default {
     },
     disabled: 'opacity-50',
     container: 'relative',
-    with_icon: 'pl-10',
+    with_icon: 'pl-7',
     size: {
       ...default__padding_and_text,
     },
@@ -803,8 +803,8 @@ export default {
             tiny: `pl-6`,
             small: `pl-6`,
             medium: `pl-7`,
-            large: `pl-10`,
-            xlarge: `pl-10`,
+            large: `pl-7`,
+            xlarge: `pl-7`,
           },
           align: {
             vertical: 'flex flex-col space-y-1',
@@ -1182,20 +1182,16 @@ export default {
           rounded: `rounded-md`,
         },
         pills: {
-          base: `
-            px-3 py-1
-          `,
+          base: `px-3 py-1`,
           normal: `
             font-normal
             border-default
             group-hover:border-foreground-muted`,
           active: `
             font-semibold
-            bg-surface-200
+            bg-sidebar-accent
             text-foreground-lighter
-            z-10
-
-            rounded-md
+            z-10 rounded-md
           `,
         },
       },
@@ -1387,7 +1383,7 @@ export default {
   inputIconContainer: {
     base: `
     absolute inset-y-0
-    left-0 pl-3 flex
+    left-0 pl-2 flex
     items-center pointer-events-none
     text-foreground-light
     [&_svg]:stroke-[1.5]

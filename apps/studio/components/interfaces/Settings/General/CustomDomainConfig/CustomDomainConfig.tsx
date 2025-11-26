@@ -1,13 +1,15 @@
 import { AlertCircle } from 'lucide-react'
-import Link from 'next/link'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { InlineLinkClassName } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import {
-  type CustomDomainsData,
   useCustomDomainsQuery,
+  type CustomDomainsData,
 } from 'data/custom-domains/custom-domains-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -37,10 +39,10 @@ export const CustomDomainConfig = () => {
   } = useCustomDomainsQuery(
     { projectRef: ref },
     {
-      refetchInterval(data) {
+      refetchInterval: (data) => {
         // while setting up the ssl certificate, we want to poll every 5 seconds
         if (data?.customDomain?.ssl.status) {
-          return 5000
+          return 10000 // 10 seconds
         }
 
         return false
@@ -91,9 +93,12 @@ export const CustomDomainConfig = () => {
               <AlertCircle size={16} strokeWidth={1.5} />
               <p className="text-sm text-foreground-light">
                 Failed to retrieve custom domain configuration. Please try again later or{' '}
-                <Link href={`/support/new?projectRef=${ref}&category=sales`} className="underline">
+                <SupportLink
+                  queryParams={{ projectRef: ref, category: SupportCategories.SALES_ENQUIRY }}
+                  className={InlineLinkClassName}
+                >
                   contact support
-                </Link>
+                </SupportLink>
                 .
               </p>
             </div>
@@ -133,7 +138,7 @@ export const CustomDomainConfig = () => {
 }
 
 interface CustomDomainConfigFallthroughProps {
-  fetchStatus: 'error' | 'success' | 'loading'
+  fetchStatus: 'error' | 'success' | 'pending'
   data: CustomDomainsData | undefined
 }
 

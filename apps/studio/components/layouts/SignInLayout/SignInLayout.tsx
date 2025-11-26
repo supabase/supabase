@@ -1,15 +1,14 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useTheme } from 'next-themes'
-import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 
-import { useFlag } from 'common'
+import { getAccessToken, useFlag } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
+import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
 import { tweets } from 'shared-data'
 
 type SignInLayoutProps = {
@@ -31,7 +30,15 @@ const SignInLayout = ({
   const { resolvedTheme } = useTheme()
   const ongoingIncident = useFlag('ongoingIncident')
 
-  const showTestimonial = useIsFeatureEnabled('dashboard_auth:show_testimonial')
+  const {
+    dashboardAuthShowTestimonial: showTestimonial,
+    brandingLargeLogo: largeLogo,
+    dashboardAuthShowTos: showTos,
+  } = useIsFeatureEnabled([
+    'dashboard_auth:show_testimonial',
+    'branding:large_logo',
+    'dashboard_auth:show_tos',
+  ])
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
   useEffect(() => {
@@ -79,9 +86,24 @@ const SignInLayout = ({
   } | null>(null)
 
   useEffect(() => {
-    const randomQuote = tweets[Math.floor(Math.random() * tweets.length)]
+    // Weighted random selection
+    // Calculate total weight (default weight is fallbackWeight for tweets without weight specified)
+    const fallbackWeight = 1
+    const totalWeight = tweets.reduce((sum, tweet) => sum + (tweet.weight ?? fallbackWeight), 0)
 
-    setQuote(randomQuote)
+    // Generate random number between 0 and totalWeight
+    const random = Math.random() * totalWeight
+
+    // Find the selected tweet based on cumulative weights
+    let accumulatedWeight = 0
+    for (const tweet of tweets) {
+      const weight = tweet.weight ?? fallbackWeight
+      accumulatedWeight += weight
+      if (random <= accumulatedWeight) {
+        setQuote(tweet)
+        break
+      }
+    }
   }, [])
 
   return (
@@ -96,15 +118,14 @@ const SignInLayout = ({
             <div className="flex items-center flex-grow flex-shrink-0 lg:flex-grow-0">
               <div className="flex items-center justify-between w-full md:w-auto">
                 <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/organizations'}>
-                  <Image
+                  <img
                     src={
                       resolvedTheme?.includes('dark')
                         ? `${BASE_PATH}/img/supabase-dark.svg`
                         : `${BASE_PATH}/img/supabase-light.svg`
                     }
                     alt="Supabase Logo"
-                    height={24}
-                    width={120}
+                    className={largeLogo ? 'h-[48px]' : 'h-[24px]'}
                   />
                 </Link>
               </div>
@@ -127,7 +148,7 @@ const SignInLayout = ({
               {children}
             </div>
 
-            {showDisclaimer && (
+            {showDisclaimer && showTos && (
               <div className="sm:text-center">
                 <p className="text-xs text-foreground-lighter sm:mx-auto sm:max-w-sm">
                   By continuing, you agree to Supabase's{' '}

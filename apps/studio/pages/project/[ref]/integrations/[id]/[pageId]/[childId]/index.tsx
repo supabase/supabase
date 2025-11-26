@@ -8,7 +8,7 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useRouter } from 'next/compat/router'
 import { useEffect, useMemo } from 'react'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
 
 const IntegrationPage: NextPageWithLayout = () => {

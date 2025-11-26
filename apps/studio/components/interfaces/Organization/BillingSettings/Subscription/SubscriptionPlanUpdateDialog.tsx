@@ -14,7 +14,7 @@ import {
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizations/organization-billing-subscription-preview'
-import { ProjectInfo } from 'data/projects/projects-query'
+import { OrgProject } from 'data/projects/org-projects-infinite-query'
 import { useConfirmPendingSubscriptionChangeMutation } from 'data/subscriptions/org-subscription-confirm-pending-change'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { SubscriptionTier } from 'data/subscriptions/types'
@@ -64,7 +64,7 @@ interface Props {
   subscriptionPreview: OrganizationBillingSubscriptionPreviewResponse | undefined
   subscription: any
   currentPlanMeta: any
-  projects: ProjectInfo[]
+  projects: OrgProject[]
 }
 
 export const SubscriptionPlanUpdateDialog = ({
@@ -116,7 +116,7 @@ export const SubscriptionPlanUpdateDialog = ({
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   }
 
-  const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
+  const { mutate: updateOrgSubscription, isPending: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
       onSuccess: (data) => {
         if (data.pending_payment_intent_secret) {
@@ -133,7 +133,7 @@ export const SubscriptionPlanUpdateDialog = ({
     }
   )
 
-  const { mutate: confirmPendingSubscriptionChange, isLoading: isConfirming } =
+  const { mutate: confirmPendingSubscriptionChange, isPending: isConfirming } =
     useConfirmPendingSubscriptionChangeMutation({
       onSuccess: () => {
         onSuccessfulPlanChange()
@@ -352,9 +352,8 @@ export const SubscriptionPlanUpdateDialog = ({
                           <div className="w-[520px] p-6">
                             <h3 className="font-medium mb-2">Your new monthly invoice</h3>
                             <p className="prose text-xs mb-2">
-                              Paid projects run 24/7 without pausing. First project uses Compute
-                              Credits; additional projects start at <span translate="no">$10</span>
-                              /month regardless of usage.{' '}
+                              First project included. Additional projects cost{' '}
+                              <span translate="no">$10</span>+/month regardless of activity.{' '}
                               <Link
                                 href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                                 target="_blank"
@@ -587,17 +586,16 @@ export const SubscriptionPlanUpdateDialog = ({
                   <div className="pb-2">
                     <Admonition type="note">
                       <div className="text-sm prose">
-                        Paid projects run 24/7 without pausing. First project uses Compute Credits;
-                        additional projects cost <span translate="no">$10+</span>
-                        /month regardless of usage.{' '}
+                        First project included. Additional projects cost{' '}
+                        <span translate="no">$10</span>+/month regardless of activity.{' '}
+                        <Link
+                          href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
+                          target="_blank"
+                          className="underline"
+                        >
+                          Learn more
+                        </Link>
                       </div>
-                      <Link
-                        href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
-                        target="_blank"
-                        className="underline"
-                      >
-                        Learn more
-                      </Link>
                     </Admonition>
                   </div>
                 )}

@@ -221,6 +221,7 @@ Update the `./docker/.env` file with your own secrets. In particular, these are 
 - `SMTP_*`: mail server credentials. You can use any SMTP server.
 - `POOLER_TENANT_ID`: the tenant-id that will be used by Supavisor pooler for your connection string
 - `PG_META_CRYPTO_KEY`: encryption key for securing connection strings between Studio and postgres-meta
+- `SECRET_KEY_BASE`: encryption key for securing Realtime and Supavisor communications. (Must be at least 64 characters; generate with `openssl rand -base64 48`)
 
 You will need to [restart](#restarting-all-services) the services for the changes to take effect.
 
