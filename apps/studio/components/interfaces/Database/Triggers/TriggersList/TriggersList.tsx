@@ -1,6 +1,6 @@
 import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { DatabaseZap, FunctionSquare, Plus, Search, Shield } from 'lucide-react'
+import { DatabaseZap, Plus, Search } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -10,6 +10,7 @@ import { ProtectedSchemaWarning } from 'components/interfaces/Database/Protected
 import { DeleteTrigger } from 'components/interfaces/Database/Triggers/DeleteTrigger'
 import { TriggerSheet } from 'components/interfaces/Database/Triggers/TriggerSheet'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
@@ -273,37 +274,81 @@ execute function function_name();`)
         {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
 
         {!isSchemaLocked && (schemaTriggers ?? []).length === 0 ? (
-          <Card className="grid grid-cols-1 @xl:grid-cols-3 bg divide-x @container">
-            <div className="flex flex-col h-full p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <DatabaseZap strokeWidth={1.5} size={16} className="text-foreground-light" />
-                <h3 className="heading-default">Create realtime experiences</h3>
-              </div>
-              <p className="text-foreground-light text-sm flex-1">
-                Keep your application in sync by automatically updating when data changes
+          <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-3 items-center text-center text-balance">
+            <DatabaseZap size={24} strokeWidth={1.5} className="text-foreground-muted" />
+
+            <div className="flex flex-col items-center text-center">
+              <h3>Add your first trigger</h3>
+              <p className="text-foreground-light text-sm max-w-[720px]">
+                Make your database reactive. Send updates in realtime, call edge functions, or
+                validate data as it comes in.
               </p>
             </div>
 
-            <div className="flex flex-col h-full p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <FunctionSquare strokeWidth={1.5} size={16} className="text-foreground-light" />
-                <h3 className="heading-default">Trigger an edge function</h3>
-              </div>
-              <p className="text-foreground-light text-sm flex-1">
-                Automatically invoke edge functions when database events occur
-              </p>
-            </div>
+            <div className="flex items-center gap-x-2">
+              <ButtonTooltip
+                type="default"
+                disabled={!hasTables || !canCreateTriggers}
+                onClick={() => createTrigger()}
+                className="flex-grow"
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: !hasTables
+                      ? 'Create a table first before creating triggers'
+                      : !canCreateTriggers
+                        ? 'You need additional permissions to create triggers'
+                        : undefined,
+                  },
+                }}
+              >
+                New trigger
+              </ButtonTooltip>
 
-            <div className="flex flex-col h-full p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <Shield strokeWidth={1.5} size={16} className="text-foreground-light" />
-                <h3 className="heading-default">Validate data</h3>
-              </div>
-              <p className="text-foreground-light text-sm flex-1">
-                Ensure data meets your requirements before it is inserted into the database
-              </p>
+              {hasTables && (
+                <ButtonTooltip
+                  type="default"
+                  disabled={!hasTables || !canCreateTriggers}
+                  className="px-1 pointer-events-auto"
+                  icon={<AiIconAnimation size={16} />}
+                  onClick={() => {
+                    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+                    aiSnap.newChat({
+                      name: 'Create new trigger',
+                      initialInput: `Create a new trigger for the schema ${selectedSchema} that does ...`,
+                      suggestions: {
+                        title:
+                          'I can help you create a new trigger, here are a few example prompts to get you started:',
+                        prompts: [
+                          {
+                            label: 'Log Changes',
+                            description: 'Create a trigger that logs changes to the users table',
+                          },
+                          {
+                            label: 'Update Timestamp',
+                            description: 'Create a trigger that updates updated_at timestamp',
+                          },
+                          {
+                            label: 'Validate Email',
+                            description:
+                              'Create a trigger that validates email format before insert',
+                          },
+                        ],
+                      },
+                    })
+                  }}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: !canCreateTriggers
+                        ? 'You need additional permissions to create triggers'
+                        : 'Create with Supabase Assistant',
+                    },
+                  }}
+                />
+              )}
             </div>
-          </Card>
+          </aside>
         ) : (
           <div className="w-full overflow-hidden overflow-x-auto">
             <Card>
