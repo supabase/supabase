@@ -5047,17 +5047,7 @@ export interface components {
               | 'uuid'
               | 'binary'
             )
-          | {
-              precision: number
-              scale: number
-              /** @enum {string} */
-              type: 'decimal'
-            }
-          | {
-              length: number
-              /** @enum {string} */
-              type: 'fixed'
-            }
+          | string
       }[]
       name: string
     }

@@ -109,16 +109,9 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
           name: column.name,
           type:
             column.type === 'decimal'
-              ? {
-                  type: 'decimal',
-                  precision: column.precision,
-                  scale: column.scale,
-                }
+              ? `decimal(${column.precision}, ${column.scale})`
               : column.type === 'fixed'
-                ? {
-                    type: 'fixed',
-                    length: column.length,
-                  }
+                ? `fixed[${column.length}]`
                 : column.type,
           required: false,
         }
@@ -320,6 +313,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                                           </div>
                                           <FormField_Shadcn_
                                             control={form.control}
+                                            key={`columns.${idx}.${x.name}`}
                                             name={`columns.${idx}.${x.name}` as any}
                                             render={({ field }) => (
                                               <FormControl_Shadcn_>
