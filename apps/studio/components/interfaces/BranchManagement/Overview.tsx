@@ -172,6 +172,7 @@ export const Overview = ({
           scheduledForDeletionBranches.map((branch) => {
             return (
               <BranchRow
+                isGithubConnected={isGithubConnected}
                 key={branch.id}
                 repo={repo}
                 branch={branch}
