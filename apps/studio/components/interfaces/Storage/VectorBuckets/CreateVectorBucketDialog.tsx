@@ -102,7 +102,6 @@ export const CreateVectorBucketButton = ({
       className="w-fit"
       icon={<Plus size={14} />}
       disabled={!canCreateBuckets}
-      tabIndex={!canCreateBuckets ? -1 : 0}
       onClick={onClick}
       tooltip={{
         content: {

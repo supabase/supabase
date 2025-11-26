@@ -23,8 +23,8 @@ import {
   DatabaseExtension,
   useDatabaseExtensionsQuery,
 } from 'data/database-extensions/database-extensions-query'
-import { useReplicationPipelineStatusQuery } from 'data/etl/pipeline-status-query'
-import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
+import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
+import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -270,7 +270,7 @@ export const AnalyticBucketDetails = () => {
                           <div className="flex items-center gap-x-2">
                             <Button asChild type="default">
                               <Link
-                                href={`/project/${projectRef}/database/etl/${pipeline.replicator_id}`}
+                                href={`/project/${projectRef}/database/replication/${pipeline.replicator_id}`}
                               >
                                 View replication
                               </Link>

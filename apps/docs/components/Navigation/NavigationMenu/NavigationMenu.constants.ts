@@ -1147,26 +1147,22 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/database/replication' },
         {
-          name: 'ETL Replication',
-          url: '/guides/database/replication/etl-replication-setup' as `/${string}`,
+          name: 'Replication',
+          url: '/guides/database/replication/replication-setup' as `/${string}`,
           items: [
             {
               name: 'Setting up',
-              url: '/guides/database/replication/etl-replication-setup' as `/${string}`,
-            },
-            {
-              name: 'Destinations',
-              url: '/guides/database/replication/etl-destinations' as `/${string}`,
+              url: '/guides/database/replication/replication-setup' as `/${string}`,
             },
             {
               name: 'Monitoring',
-              url: '/guides/database/replication/etl-replication-monitoring' as `/${string}`,
+              url: '/guides/database/replication/replication-monitoring' as `/${string}`,
             },
-            { name: 'FAQ', url: '/guides/database/replication/etl-replication-faq' },
+            { name: 'FAQ', url: '/guides/database/replication/replication-faq' },
           ],
         },
         {
-          name: 'Manual Replication',
+          name: 'Manual replication',
           url: '/guides/database/replication/manual-replication-setup' as `/${string}`,
           items: [
             {
@@ -2009,7 +2005,7 @@ export const storage: NavMenuConstant = {
         },
         {
           name: 'Realtime Data-Sync',
-          url: '/guides/storage/analytics/etl' as `/${string}`,
+          url: '/guides/storage/analytics/replication' as `/${string}`,
         },
         {
           name: 'Query with Postgres',
