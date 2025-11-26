@@ -3,13 +3,13 @@ import Link from 'next/link'
 
 import { ScaffoldSection } from 'components/layouts/Scaffold'
 import { Button } from 'ui'
-import { EmptyState } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns'
 import { BUCKET_TYPES } from './Storage.constants'
 
 export const BucketsComingSoon = ({ type }: { type: 'analytics' | 'vector' }) => {
   return (
     <ScaffoldSection isFullWidth>
-      <EmptyState
+      <EmptyStatePresentational
         icon={FolderClock}
         title="Coming soon"
         description={
@@ -31,7 +31,7 @@ export const BucketsComingSoon = ({ type }: { type: 'analytics' | 'vector' }) =>
             </Link>
           </Button>
         )}
-      </EmptyState>
+      </EmptyStatePresentational>
     </ScaffoldSection>
   )
 }

@@ -1,9 +1,9 @@
 import { DatabaseBackup } from 'lucide-react'
 
-import { EmptyState } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns'
 
 export const BackupsEmpty = () => {
   return (
-    <EmptyState icon={DatabaseBackup} title="No backups yet" description="Check again tomorrow." />
+    <EmptyStatePresentational icon={DatabaseBackup} title="No backups yet" description="Check again tomorrow." />
   )
 }

@@ -1,5 +1,5 @@
 import { BucketPlus } from 'icons'
-import { EmptyState } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns'
 import { CreateAnalyticsBucketModal } from './AnalyticsBuckets/CreateAnalyticsBucketModal'
 import { CreateBucketModal } from './CreateBucketModal'
 import { BUCKET_TYPES } from './Storage.constants'
@@ -14,7 +14,7 @@ export const EmptyBucketState = ({ bucketType, className }: EmptyBucketStateProp
   const config = BUCKET_TYPES[bucketType]
 
   return (
-    <EmptyState
+    <EmptyStatePresentational
       icon={BucketPlus}
       title={`Create ${config.article} ${config.singularName} bucket`}
       description={config.valueProp}
@@ -31,6 +31,6 @@ export const EmptyBucketState = ({ bucketType, className }: EmptyBucketStateProp
         />
       )}
       {bucketType === 'vectors' && <CreateVectorBucketDialog />}
-    </EmptyState>
+    </EmptyStatePresentational>
   )
 }

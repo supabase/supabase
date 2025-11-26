@@ -3,7 +3,7 @@ import { createElement, isValidElement, ReactNode } from 'react'
 
 import { cn } from 'ui'
 
-export interface EmptyStateProps {
+export interface EmptyStatePresentationalProps {
   icon?: LucideIcon | ReactNode
   title: string
   description?: string | ReactNode
@@ -15,7 +15,10 @@ export interface EmptyStateProps {
 }
 
 /**
- * EmptyState component for displaying empty states with icons, titles, descriptions, and optional actions.
+ * EmptyStatePresentational component for displaying presentational empty states with icons, titles, descriptions, and optional actions.
+ *
+ * This component is specifically designed for initial state scenarios where users are learning about a feature for the first time.
+ * It emphasizes value propositions and provides clear actions users can take.
  *
  * Supports both Lucide icons (component types) and custom ReactNode icons (like forwardRef components from 'icons' package).
  * Automatically handles rendering icons whether they're passed as component types or pre-rendered elements.
@@ -23,30 +26,30 @@ export interface EmptyStateProps {
  * @example
  * ```tsx
  * // With Lucide icon component type
- * <EmptyState
+ * <EmptyStatePresentational
  *   icon={DatabaseBackup}
  *   title="No backups yet"
  *   description="Check again tomorrow."
  * />
  *
  * // With custom icon element
- * <EmptyState
+ * <EmptyStatePresentational
  *   icon={<Loader2 className="animate-spin" />}
  *   title="Loading..."
  *   description="Please wait"
  * />
  *
  * // With action button
- * <EmptyState
+ * <EmptyStatePresentational
  *   icon={BucketPlus}
  *   title="Create a vector bucket"
  *   description="Store, index, and query your vector embeddings at scale."
  * >
  *   <Button>Create bucket</Button>
- * </EmptyState>
+ * </EmptyStatePresentational>
  * ```
  */
-export const EmptyState = ({
+export const EmptyStatePresentational = ({
   icon: Icon,
   title,
   description,
@@ -55,7 +58,7 @@ export const EmptyState = ({
   iconSize = 24,
   iconClassName,
   contentClassName,
-}: EmptyStateProps) => {
+}: EmptyStatePresentationalProps) => {
   // Extract content rendering to avoid duplication between icon and no-icon cases
   const textContent = (
     <div className={cn('flex flex-col items-center text-center text-balance', contentClassName)}>

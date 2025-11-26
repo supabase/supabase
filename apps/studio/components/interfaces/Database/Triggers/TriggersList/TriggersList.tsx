@@ -26,7 +26,7 @@ import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Card, Input, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
-import { EmptyState } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns'
 import { CreateTriggerButtons } from './CreateTriggerButtons'
 import { TriggerList } from './TriggerList'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
@@ -210,7 +210,7 @@ execute function function_name();`)
         {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
 
         {!isSchemaLocked && (schemaTriggers ?? []).length === 0 ? (
-          <EmptyState
+          <EmptyStatePresentational
             icon={DatabaseZap}
             title="Add your first trigger"
             description="Make your database reactive. Send updates in realtime, call edge functions, or validate data as it comes in."
@@ -223,7 +223,7 @@ execute function function_name();`)
               showPlusIcon={false}
               buttonType="default"
             />
-          </EmptyState>
+          </EmptyStatePresentational>
         ) : (
           <div className="w-full overflow-hidden overflow-x-auto">
             <Card>

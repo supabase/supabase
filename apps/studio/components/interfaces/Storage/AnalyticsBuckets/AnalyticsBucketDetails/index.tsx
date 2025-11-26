@@ -30,7 +30,7 @@ import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-cr
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { Button, Card, CardContent } from 'ui'
-import { EmptyState } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
@@ -217,7 +217,7 @@ export const AnalyticBucketDetails = () => {
                     {HIDE_REPLICATION_USER_FLOW ? (
                       <CreateTableInstructions />
                     ) : isPollingForData ? (
-                      <EmptyState
+                      <EmptyStatePresentational
                         icon={
                           <Loader2
                             size={24}
@@ -229,7 +229,7 @@ export const AnalyticBucketDetails = () => {
                         description="Tables will be shown here once the connection is complete"
                       />
                     ) : (
-                      <EmptyState
+                      <EmptyStatePresentational
                         icon={SquarePlus}
                         title="Connect database tables"
                         description="Stream table data for continuous backups and analysis"
@@ -240,7 +240,7 @@ export const AnalyticBucketDetails = () => {
                             setPollIntervalNamespaceTables(4000)
                           }}
                         />
-                      </EmptyState>
+                      </EmptyStatePresentational>
                     )}
                   </>
                 ) : (

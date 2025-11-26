@@ -1,7 +1,7 @@
 import { ScaffoldSection } from 'components/layouts/Scaffold'
 import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { AnalyticsBucket as AnalyticsBucketIcon, VectorBucket as VectorBucketIcon } from 'icons'
-import { EmptyState } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns'
 import { AlphaNotice } from './AlphaNotice'
 import { BUCKET_TYPES } from './Storage.constants'
 
@@ -9,7 +9,7 @@ export const BucketsUpgradePlan = ({ type }: { type: 'analytics' | 'vector' }) =
   return (
     <ScaffoldSection isFullWidth>
       <AlphaNotice type={type} />
-      <EmptyState
+      <EmptyStatePresentational
         icon={type === 'analytics' ? AnalyticsBucketIcon : VectorBucketIcon}
         title={
           type === 'analytics'
@@ -25,7 +25,7 @@ export const BucketsUpgradePlan = ({ type }: { type: 'analytics' | 'vector' }) =
         <div className="flex items-center gap-x-2">
           <UpgradePlanButton type="primary" plan="Pro" />
         </div>
-      </EmptyState>
+      </EmptyStatePresentational>
     </ScaffoldSection>
   )
 }
