@@ -205,7 +205,7 @@ const result = await index.putVectors({
             <Link
               target="_blank"
               rel="noreferrer"
-              href={`${DOCS_URL}/reference/javascript/vectordataapi-putvectors`}
+              href={`${DOCS_URL}/reference/javascript/vectorindex-putvectors`}
             >
               Docs
             </Link>
