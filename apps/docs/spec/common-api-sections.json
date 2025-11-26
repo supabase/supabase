@@ -812,6 +812,24 @@
   },
   {
     "type": "category",
+    "title": "Realtime Config",
+    "items": [
+      {
+        "id": "v1-get-realtime-config",
+        "title": "Get realtime config",
+        "slug": "v1-get-realtime-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-realtime-config",
+        "title": "Update realtime config",
+        "slug": "v1-update-realtime-config",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
     "title": "Rest",
     "items": [
       {
