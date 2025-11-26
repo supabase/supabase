@@ -2,8 +2,8 @@ import { uniq } from 'lodash'
 import { Loader2, SquarePlus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
@@ -18,7 +18,6 @@ import {
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { EmptyState } from 'components/ui/EmptyState'
 import { InlineLink } from 'components/ui/InlineLink'
 import {
   DatabaseExtension,
@@ -31,6 +30,7 @@ import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-cr
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { Button, Card, CardContent } from 'ui'
+import { EmptyState } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
@@ -218,7 +218,13 @@ export const AnalyticBucketDetails = () => {
                       <CreateTableInstructions />
                     ) : isPollingForData ? (
                       <EmptyState
-                        icon={<Loader2 size={24} strokeWidth={1.5} className="animate-spin text-foreground-muted" />}
+                        icon={
+                          <Loader2
+                            size={24}
+                            strokeWidth={1.5}
+                            className="animate-spin text-foreground-muted"
+                          />
+                        }
                         title="Connecting table(s) to bucket"
                         description="Tables will be shown here once the connection is complete"
                       />

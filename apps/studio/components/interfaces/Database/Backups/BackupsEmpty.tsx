@@ -1,6 +1,6 @@
 import { DatabaseBackup } from 'lucide-react'
 
-import { EmptyState } from 'components/ui/EmptyState'
+import { EmptyState } from 'ui-patterns'
 
 export const BackupsEmpty = () => {
   return (

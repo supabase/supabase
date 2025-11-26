@@ -1,7 +1,7 @@
 import { ScaffoldSection } from 'components/layouts/Scaffold'
-import { EmptyState } from 'components/ui/EmptyState'
 import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { AnalyticsBucket as AnalyticsBucketIcon, VectorBucket as VectorBucketIcon } from 'icons'
+import { EmptyState } from 'ui-patterns'
 import { AlphaNotice } from './AlphaNotice'
 import { BUCKET_TYPES } from './Storage.constants'
 

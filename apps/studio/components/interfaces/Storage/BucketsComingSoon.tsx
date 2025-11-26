@@ -2,8 +2,8 @@ import { ExternalLink, FolderClock } from 'lucide-react'
 import Link from 'next/link'
 
 import { ScaffoldSection } from 'components/layouts/Scaffold'
-import { EmptyState } from 'components/ui/EmptyState'
 import { Button } from 'ui'
+import { EmptyState } from 'ui-patterns'
 import { BUCKET_TYPES } from './Storage.constants'
 
 export const BucketsComingSoon = ({ type }: { type: 'analytics' | 'vector' }) => {

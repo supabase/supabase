@@ -2,8 +2,8 @@ import { Terminal } from 'lucide-react'
 
 import { useParams } from 'common'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
-import { EmptyState } from 'components/ui/EmptyState'
 import { Card, CardContent, CardHeader, CardTitle } from 'ui'
+import { EmptyState } from 'ui-patterns'
 
 export const MigrationsEmptyState = () => {
   const { ref } = useParams()
@@ -49,6 +49,7 @@ export const MigrationsEmptyState = () => {
       icon={Terminal}
       title="Run your first migration"
       description="Create and run your first migration using the Supabase CLI."
+      className="gap-y-6"
     >
       <Card>
         <CardHeader>
