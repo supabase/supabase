@@ -53,7 +53,7 @@ const MigrationsEmptyState = () => {
         <div className="flex flex-col items-center text-center text-balance">
           <h3>Run your first migration</h3>
           <p className="text-foreground-light text-sm max-w-[720px]">
-            Create and run your first migration using the Supabase CLI
+            Create and run your first migration using the Supabase CLI.
           </p>
         </div>
       </div>
