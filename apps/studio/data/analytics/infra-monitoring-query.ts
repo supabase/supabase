@@ -19,7 +19,6 @@ export type InfraMonitoringAttribute =
   | 'realtime_channel_db_events'
   | 'realtime_channel_presence_events'
   | 'realtime_channel_joins'
-  | 'realtime_authorization_rls_execution_time'
   | 'realtime_read_authorization_rls_execution_time'
   | 'realtime_write_authorization_rls_execution_time'
   | 'realtime_payload_size'
