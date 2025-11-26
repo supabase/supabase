@@ -73,8 +73,7 @@ export const CreateTriggerButtons = ({
                   },
                   {
                     label: 'Validate Email',
-                    description:
-                      'Create a trigger that validates email format before insert',
+                    description: 'Create a trigger that validates email format before insert',
                   },
                 ],
               },
@@ -93,4 +92,3 @@ export const CreateTriggerButtons = ({
     </div>
   )
 }
-
