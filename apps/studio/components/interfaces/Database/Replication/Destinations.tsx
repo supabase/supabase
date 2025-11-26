@@ -14,8 +14,8 @@ import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
-import { Badge, Button, cn, Input_Shadcn_ } from 'ui'
-import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import { Button, cn, Input_Shadcn_ } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationRow } from './DestinationRow'
 import { EnableReplicationModal } from './EnableReplicationModal'
@@ -97,24 +97,6 @@ export const Destinations = () => {
 
   return (
     <>
-      <Admonition type="default" className="mb-6">
-        <div className="flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-4 justify-between">
-          <div className="flex flex-col gap-y-1">
-            <div className="flex items-center gap-x-2">
-              <Badge variant="warning" className="uppercase">
-                Private Alpha
-              </Badge>
-              <p className="text-sm font-medium">Replication is currently in private alpha</p>
-            </div>
-            <p className="text-sm text-foreground-lighter">
-              Stream your database changes to external data warehouses and analytics platforms in
-              real-time. We are slowly onboarding customers to ensure stable data pipelines and gather
-              feedback as we expand destination support.
-            </p>
-          </div>
-        </div>
-      </Admonition>
-
       <div className="mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
