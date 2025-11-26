@@ -1,47 +1,41 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
+import { getOrRefreshTemporaryApiKey } from 'data/api-keys/temp-api-keys-utils'
 import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { storageKeys } from './keys'
 
 type GetNamespacesVariables = {
   catalogUri: string
   warehouse: string
-  token: string
+  projectRef?: string
 }
 
-// [Joshen] Investigate if we can use the temp API keys here
-async function getNamespaces({ catalogUri, warehouse, token }: GetNamespacesVariables) {
-  let headers = new Headers()
-  // handle both secret key and service role key
-  if (token.startsWith('sb_secret_')) {
+const errorPrefix = 'Failed to retrieve Iceberg namespaces'
+
+async function getNamespaces({ projectRef, catalogUri, warehouse }: GetNamespacesVariables) {
+  try {
+    if (!projectRef) throw new Error(`${errorPrefix}: projectRef is required`)
+
+    const tempApiKeyObj = await getOrRefreshTemporaryApiKey(projectRef)
+    const tempApiKey = tempApiKeyObj.apiKey
+
+    let headers = new Headers()
     headers = await constructHeaders({
       'Content-Type': 'application/json',
-      apikey: `${token}`,
+      apikey: tempApiKey,
     })
     headers.delete('Authorization')
-  } else {
-    headers = await constructHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    })
-  }
 
-  const url = `${catalogUri}/v1/${warehouse}/namespaces`.replaceAll(/(?<!:)\/\//g, '/')
+    const url = `${catalogUri}/v1/${warehouse}/namespaces`.replaceAll(/(?<!:)\/\//g, '/')
 
-  try {
-    const response = await fetchHandler(url, {
-      headers,
-      method: 'GET',
-    })
-
+    const response = await fetchHandler(url, { headers, method: 'GET' })
     const result = await response.json()
     if (result.error) {
-      if (result.error.message) {
-        throw new Error(result.error.message)
-      }
-      throw new Error('Failed to get iceberg namespaces')
+      if (result.error.message) throw new Error(`${errorPrefix}: ${result.error.message}`)
+      else throw new Error(errorPrefix)
     }
+
     const r = result as { namespaces: string[][] }
     return r.namespaces.flat()
   } catch (error) {
@@ -55,11 +49,27 @@ export type IcebergNamespacesError = ResponseError
 
 export const useIcebergNamespacesQuery = <TData = IcebergNamespacesData>(
   params: GetNamespacesVariables,
-  { ...options }: UseQueryOptions<IcebergNamespacesData, IcebergNamespacesError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<IcebergNamespacesData, IcebergNamespacesError, TData> = {}
 ) => {
-  return useQuery<IcebergNamespacesData, IcebergNamespacesError, TData>(
-    storageKeys.icebergNamespaces(params.catalogUri, params.warehouse),
-    () => getNamespaces(params),
-    { ...options }
-  )
+  const { projectRef, catalogUri, warehouse } = params
+
+  return useQuery<IcebergNamespacesData, IcebergNamespacesError, TData>({
+    queryKey: storageKeys.icebergNamespaces({
+      projectRef,
+      warehouse,
+      catalog: catalogUri,
+    }),
+    queryFn: () => getNamespaces({ ...params }),
+    enabled:
+      options &&
+      typeof projectRef !== 'undefined' &&
+      typeof catalogUri !== 'undefined' &&
+      catalogUri.length > 0 &&
+      typeof warehouse !== 'undefined' &&
+      warehouse.length > 0,
+    ...options,
+  })
 }

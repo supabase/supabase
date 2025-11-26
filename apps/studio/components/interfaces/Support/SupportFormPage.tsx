@@ -23,8 +23,8 @@ import type { SupportFormValues } from './SupportForm.schema'
 import {
   createInitialSupportFormState,
   type SupportFormActions,
-  type SupportFormState,
   supportFormReducer,
+  type SupportFormState,
 } from './SupportForm.state'
 import { SupportFormV2 } from './SupportFormV2'
 import { useSupportForm } from './useSupportForm'
@@ -125,7 +125,7 @@ function SupportFormHeader() {
       <div className="flex items-center gap-x-3">
         <Button asChild type="default" icon={<Wrench />}>
           <Link
-            href={`${DOCS_URL}/guides/platform/troubleshooting`}
+            href={`${DOCS_URL}/guides/troubleshooting?products=platform`}
             target="_blank"
             rel="noreferrer"
           >

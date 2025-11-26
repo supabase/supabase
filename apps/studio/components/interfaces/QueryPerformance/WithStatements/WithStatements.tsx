@@ -68,6 +68,7 @@ export const WithStatements = ({
     <>
       <QueryPerformanceMetrics />
       <QueryPerformanceFilterBar
+        showRolesFilter={true}
         actions={
           <>
             <Button

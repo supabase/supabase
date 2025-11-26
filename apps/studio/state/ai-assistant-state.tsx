@@ -1,9 +1,14 @@
-import type { UIMessage as MessageType } from '@ai-sdk/react'
+import { Chat, type UIMessage as MessageType } from '@ai-sdk/react'
+import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
+import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
+
+import { constructHeaders } from 'data/fetchers'
+import { prepareMessagesForAPI } from 'lib/ai/message-utils'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -27,8 +32,13 @@ type ChatSession = {
   updatedAt: Date
 }
 
+export type AiAssistantContext = {
+  projectRef?: string
+  orgSlug?: string
+  connectionString?: string
+}
+
 type AiAssistantData = {
-  open: boolean
   initialInput: string
   sqlSnippets?: SqlSnippet[]
   suggestions?: SuggestionsType
@@ -36,19 +46,18 @@ type AiAssistantData = {
   chats: Record<string, ChatSession>
   activeChatId?: string
   model: AssistantModel
+  context: AiAssistantContext
 }
 
 // Data structure stored in IndexedDB
 type StoredAiAssistantState = {
   projectRef: string
-  open: boolean
   activeChatId?: string
   chats: Record<string, ChatSession>
   model?: AssistantModel
 }
 
 const INITIAL_AI_ASSISTANT: AiAssistantData = {
-  open: false,
   initialInput: '',
   sqlSnippets: undefined,
   suggestions: undefined,
@@ -56,6 +65,7 @@ const INITIAL_AI_ASSISTANT: AiAssistantData = {
   chats: {},
   activeChatId: undefined,
   model: 'gpt-5',
+  context: {},
 }
 
 const DB_NAME = 'ai-assistant-db'
@@ -167,7 +177,6 @@ async function tryMigrateFromLocalStorage(
     if (parsedFromLocalStorage && typeof parsedFromLocalStorage.chats === 'object') {
       migratedState = {
         projectRef: projectRef,
-        open: parsedFromLocalStorage.open ?? false,
         activeChatId: parsedFromLocalStorage.activeChatId,
         chats: parsedFromLocalStorage.chats,
         model: parsedFromLocalStorage.model ?? INITIAL_AI_ASSISTANT.model,
@@ -199,15 +208,6 @@ async function tryMigrateFromLocalStorage(
 
 // Helper function to ensure an active chat exists or initialize a new one
 function ensureActiveChatOrInitialize(state: AiAssistantState) {
-  // Check URL param again to override loaded 'open' state if present
-  if (typeof window !== 'undefined') {
-    const urlParams = new URLSearchParams(window.location.search)
-    const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
-    if (aiAssistantPanelOpenParam !== null) {
-      state.open = aiAssistantPanelOpenParam === 'true'
-    }
-  }
-
   // Ensure an active chat exists after loading/migration
   if (!state.activeChatId || !state.chats[state.activeChatId]) {
     const chatIds = Object.keys(state.chats)
@@ -224,37 +224,82 @@ function ensureActiveChatOrInitialize(state: AiAssistantState) {
   }
 }
 
+function createChatInstance(
+  state: AiAssistantState,
+  options: { id: string; initialMessages: MessageType[] }
+) {
+  return new Chat<MessageType>({
+    id: options.id,
+    messages: options.initialMessages,
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+    transport: new DefaultChatTransport({
+      api: `${BASE_PATH}/api/ai/sql/generate-v4`,
+      async prepareSendMessagesRequest({ messages, ...opts }) {
+        const cleanedMessages = prepareMessagesForAPI(messages)
+        const headerData = await constructHeaders()
+        const authorizationHeader = headerData.get('Authorization')
+
+        // Get the chat specific to this request to ensure we have the correct name
+        const chat = state.chats[options.id]
+
+        return {
+          ...opts,
+          body: {
+            messages: cleanedMessages,
+            projectRef: state.context.projectRef,
+            connectionString: state.context.connectionString,
+            chatName: chat?.name,
+            orgSlug: state.context.orgSlug,
+            context: state.context,
+            model: state.model,
+            ...opts.body,
+          },
+          ...(IS_PLATFORM ? { headers: { Authorization: authorizationHeader ?? '' } } : {}),
+        }
+      },
+    }),
+    async onToolCall({ toolCall }) {
+      if (toolCall.dynamic) {
+        return
+      }
+
+      if (toolCall.toolName === 'rename_chat') {
+        const { newName } = toolCall.input as { newName: string }
+
+        if (options.id && newName?.trim()) {
+          state.renameChat(options.id, newName.trim())
+        }
+      }
+    },
+    onFinish(result) {
+      // Sync messages back to state
+      const chatInstance = state.chatInstances[options.id]
+      if (chatInstance) {
+        const messages = chatInstance.messages
+        const chat = state.chats[options.id]
+        if (chat) {
+          chat.messages = messages as AssistantMessageType[]
+          chat.updatedAt = new Date()
+        }
+      }
+    },
+  })
+}
+
 export const createAiAssistantState = (): AiAssistantState => {
   // Initialize with defaults, loading happens asynchronously in the provider
   const initialState = { ...INITIAL_AI_ASSISTANT }
 
-  // Check URL params for initial 'open' state, overriding any loaded state later if present
-  if (typeof window !== 'undefined') {
-    const urlParams = new URLSearchParams(window.location.search)
-    const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
-    if (aiAssistantPanelOpenParam !== null) {
-      initialState.open = aiAssistantPanelOpenParam === 'true'
-    }
-  }
-
   const state: AiAssistantState = proxy({
     ...initialState, // Spread initial values directly
+    chatInstances: {},
+
+    setContext: (context: Partial<AiAssistantContext>) => {
+      state.context = { ...state.context, ...context }
+    },
 
     resetAiAssistantPanel: () => {
       Object.assign(state, INITIAL_AI_ASSISTANT)
-    },
-
-    // Panel visibility
-    openAssistant: () => {
-      state.open = true
-    },
-
-    closeAssistant: () => {
-      state.open = false
-    },
-
-    toggleAssistant: () => {
-      state.open = !state.open
     },
 
     setModel: (model: AssistantModel) => {
@@ -267,8 +312,8 @@ export const createAiAssistantState = (): AiAssistantState => {
     },
 
     newChat: (
-      options?: { name?: string } & Partial<
-        Pick<AiAssistantData, 'open' | 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
+      options?: { name?: string; initialMessage?: string } & Partial<
+        Pick<AiAssistantData, 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
       >
     ) => {
       const chatId = uuidv4()
@@ -286,8 +331,19 @@ export const createAiAssistantState = (): AiAssistantState => {
       }
       state.activeChatId = chatId
 
+      // Create new chat instance
+      const chatInstance = createChatInstance(state, { id: chatId, initialMessages: [] })
+
+      state.chatInstances[chatId] = ref(chatInstance)
+
+      // If initialMessage is provided, append it to the chat instance
+      if (options?.initialMessage) {
+        chatInstance.sendMessage({
+          text: options.initialMessage,
+        })
+      }
+
       // Update non-chat related state based on options, falling back to current state, then initial
-      state.open = options?.open ?? state.open
       state.initialInput = options?.initialInput ?? INITIAL_AI_ASSISTANT.initialInput
       state.sqlSnippets = options?.sqlSnippets ?? INITIAL_AI_ASSISTANT.sqlSnippets
       state.suggestions = options?.suggestions ?? INITIAL_AI_ASSISTANT.suggestions
@@ -299,6 +355,14 @@ export const createAiAssistantState = (): AiAssistantState => {
     selectChat: (id: string) => {
       if (id !== state.activeChatId) {
         state.activeChatId = id
+        const chat = state.chats[id]
+        if (chat) {
+          if (!state.chatInstances[id]) {
+            state.chatInstances[id] = ref(
+              createChatInstance(state, { id, initialMessages: chat.messages })
+            )
+          }
+        }
       }
     },
 
@@ -309,6 +373,15 @@ export const createAiAssistantState = (): AiAssistantState => {
       if (id === state.activeChatId) {
         const remainingChatIds = Object.keys(remainingChats)
         state.activeChatId = remainingChatIds.length > 0 ? remainingChatIds[0] : undefined
+
+        if (state.activeChatId) {
+          const chat = state.chats[state.activeChatId]
+          if (!state.chatInstances[state.activeChatId]) {
+            state.chatInstances[state.activeChatId] = ref(
+              createChatInstance(state, { id: state.activeChatId, initialMessages: chat.messages })
+            )
+          }
+        }
       }
     },
 
@@ -399,25 +472,15 @@ export const createAiAssistantState = (): AiAssistantState => {
 
     // --- New function to load persisted state ---
     loadPersistedState: (persistedState: StoredAiAssistantState) => {
-      state.open = persistedState.open
       state.chats = persistedState.chats
       state.activeChatId = persistedState.activeChatId
       state.model = persistedState.model ?? INITIAL_AI_ASSISTANT.model
-
-      // Check URL param again to override loaded 'open' state if present
-      if (typeof window !== 'undefined') {
-        const urlParams = new URLSearchParams(window.location.search)
-        const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
-        if (aiAssistantPanelOpenParam !== null) {
-          state.open = aiAssistantPanelOpenParam === 'true'
-        }
-      }
 
       // Ensure an active chat exists after loading
       if (!state.activeChat) {
         const chatIds = Object.keys(state.chats)
         if (chatIds.length > 0) {
-          // Maybe select the most recently updated? For now, first.
+          // Select the most recently updated chat
           state.activeChatId = chatIds.sort(
             (a, b) =>
               (state.chats[b].updatedAt?.getTime() || 0) -
@@ -427,6 +490,20 @@ export const createAiAssistantState = (): AiAssistantState => {
           // If loaded state had no chats, create a new one
           state.newChat()
         }
+      }
+
+      // Initialize chat instance for the active chat
+      if (
+        state.activeChatId &&
+        state.chats[state.activeChatId] &&
+        !state.chatInstances[state.activeChatId]
+      ) {
+        state.chatInstances[state.activeChatId] = ref(
+          createChatInstance(state, {
+            id: state.activeChatId,
+            initialMessages: state.chats[state.activeChatId].messages,
+          })
+        )
       }
     },
 
@@ -440,14 +517,13 @@ export const createAiAssistantState = (): AiAssistantState => {
 
 export type AiAssistantState = AiAssistantData & {
   resetAiAssistantPanel: () => void
-  openAssistant: () => void
-  closeAssistant: () => void
-  toggleAssistant: () => void
   activeChat: ChatSession | undefined
+  chatInstances: Record<string, Chat<MessageType>>
+  setContext: (context: Partial<AiAssistantContext>) => void
   setModel: (model: AssistantModel) => void
   newChat: (
-    options?: { name?: string } & Partial<
-      Pick<AiAssistantData, 'open' | 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
+    options?: { name?: string; initialMessage?: string } & Partial<
+      Pick<AiAssistantData, 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
     >
   ) => string
   selectChat: (id: string) => void
@@ -522,7 +598,6 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
         // Prepare state for IndexedDB
         const stateToSave: StoredAiAssistantState = {
           projectRef: project?.ref,
-          open: snap.open,
           activeChatId: snap.activeChatId,
           model: snap.model,
           chats: snap.chats
@@ -557,4 +632,9 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
 export const useAiAssistantStateSnapshot = (options?: Parameters<typeof useSnapshot>[1]) => {
   const state = useContext(AiAssistantStateContext)
   return useSnapshot(state, options)
+}
+
+export const useAiAssistantState = () => {
+  const state = useContext(AiAssistantStateContext)
+  return state
 }

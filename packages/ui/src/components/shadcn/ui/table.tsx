@@ -1,10 +1,11 @@
+import type { ComponentProps } from 'react'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
 import { ShadowScrollArea } from '../../ShadowScrollArea'
 
 interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
-  containerProps?: React.HTMLAttributes<HTMLDivElement>
+  containerProps?: Partial<ComponentProps<typeof ShadowScrollArea>>
 }
 
 const Table = React.forwardRef<HTMLTableElement, TableProps>(
@@ -67,7 +68,7 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      'h-10 px-4 text-left align-middle heading-meta text-foreground-lighter [&:has([role=checkbox])]:pr-0',
+      'h-10 px-4 text-left align-middle heading-meta whitespace-nowrap text-foreground-lighter [&:has([role=checkbox])]:pr-0',
       className
     )}
     {...props}

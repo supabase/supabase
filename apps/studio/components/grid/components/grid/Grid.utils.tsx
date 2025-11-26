@@ -14,7 +14,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 
 export function useOnRowsChange(rows: SupaRow[]) {
   const queryClient = useQueryClient()
@@ -28,11 +28,11 @@ export function useOnRowsChange(rows: SupaRow[]) {
 
       const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: table.id } })
 
-      await queryClient.cancelQueries(queryKey)
+      await queryClient.cancelQueries({ queryKey })
 
-      const previousRowsQueries = queryClient.getQueriesData<TableRowsData>(queryKey)
+      const previousRowsQueries = queryClient.getQueriesData<TableRowsData>({ queryKey })
 
-      queryClient.setQueriesData<TableRowsData>(queryKey, (old) => {
+      queryClient.setQueriesData<TableRowsData>({ queryKey }, (old) => {
         return {
           rows:
             old?.rows.map((row) => {
@@ -67,9 +67,9 @@ export function useOnRowsChange(rows: SupaRow[]) {
 
       previousRowsQueries.forEach(([queryKey, previousRows]) => {
         if (previousRows) {
-          queryClient.setQueriesData(queryKey, previousRows)
+          queryClient.setQueriesData({ queryKey }, previousRows)
         }
-        queryClient.invalidateQueries(queryKey)
+        queryClient.invalidateQueries({ queryKey })
       })
 
       toast.error(error?.message ?? error)

@@ -1,12 +1,14 @@
 import { ArrowRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
+import { useEffect } from 'react'
 
 import { useParams } from 'common'
-import ClientLibrary from 'components/interfaces/Home/ClientLibrary'
+import { ClientLibrary } from 'components/interfaces/Home/ClientLibrary'
 import { ExampleProject } from 'components/interfaces/Home/ExampleProject'
 import { EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
+import { DisplayApiSettings } from 'components/ui/ProjectSettings/DisplayApiSettings'
+import { DisplayConfigSettings } from 'components/ui/ProjectSettings/DisplayConfigSettings'
 import { useInvalidateProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
@@ -29,21 +31,31 @@ const BuildingState = () => {
     'project_homepage:client_libraries',
   ])
 
-  useProjectStatusQuery(
+  const { data: projectStatusData, isSuccess: isProjectStatusSuccess } = useProjectStatusQuery(
     { projectRef: ref },
     {
       enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
-      refetchInterval: (res) => {
-        return res?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
-      },
-      onSuccess: async (res) => {
-        if (res.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
-          if (ref) await invalidateProjectDetailsQuery(ref)
-          await invalidateProjectsQuery()
-        }
+      refetchInterval: (data) => {
+        return data?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
       },
     }
   )
+
+  useEffect(() => {
+    if (!isProjectStatusSuccess) return
+    if (projectStatusData?.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
+      if (ref) {
+        invalidateProjectDetailsQuery(ref)
+      }
+      invalidateProjectsQuery()
+    }
+  }, [
+    isProjectStatusSuccess,
+    projectStatusData,
+    ref,
+    invalidateProjectDetailsQuery,
+    invalidateProjectsQuery,
+  ])
 
   if (project === undefined) return null
 

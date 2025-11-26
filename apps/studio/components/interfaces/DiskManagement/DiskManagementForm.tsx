@@ -24,6 +24,7 @@ import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AddonVariantId } from 'data/subscriptions/types'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
@@ -88,6 +89,10 @@ export function DiskManagementForm() {
       },
     })
 
+  const { hasAccess, isSuccess: isEntitlementsLoaded } = useCheckEntitlements(
+    'instances.compute_update_available_sizes'
+  )
+
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
   const [message, setMessageState] = useState<DiskManagementMessage | null>(null)
@@ -99,29 +104,10 @@ export function DiskManagementForm() {
     {
       refetchInterval,
       refetchOnWindowFocus: false,
-      onSuccess: (data) => {
-        // @ts-ignore
-        const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0 }
-        const formValues = {
-          storageType: type,
-          provisionedIOPS: iops,
-          throughput: throughput_mbps,
-          totalSize: size_gb,
-        }
-
-        if (!('requested_modification' in data)) {
-          if (refetchInterval !== false) {
-            form.reset(formValues)
-            setRefetchInterval(false)
-            toast.success('Disk configuration changes have been successfully applied!')
-          }
-        } else {
-          setRefetchInterval(2000)
-        }
-      },
       enabled: project != null && isAws,
     }
   )
+
   const { isSuccess: isAddonsSuccess } = useProjectAddonsQuery({ projectRef })
   const { isWithinCooldownWindow, isSuccess: isCooldownSuccess } =
     useRemainingDurationForDiskAttributeUpdate({
@@ -168,6 +154,28 @@ export function DiskManagementForm() {
     reValidateMode: 'onChange',
   })
 
+  useEffect(() => {
+    if (!isDiskAttributesSuccess) return
+    // @ts-ignore
+    const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0 }
+    const formValues = {
+      storageType: type,
+      provisionedIOPS: iops,
+      throughput: throughput_mbps,
+      totalSize: size_gb,
+    }
+
+    if (!('requested_modification' in data)) {
+      if (refetchInterval !== false) {
+        form.reset(formValues)
+        setRefetchInterval(false)
+        toast.success('Disk configuration changes have been successfully applied!')
+      }
+    } else {
+      setRefetchInterval(2000)
+    }
+  }, [data, isDiskAttributesSuccess, form, refetchInterval])
+
   const { computeSize: modifiedComputeSize } = form.watch()
 
   // We only support disk configurations for >=Large instances
@@ -192,7 +200,7 @@ export function DiskManagementForm() {
 
   const isRequestingChanges = data?.requested_modification !== undefined
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
-  const isPlanUpgradeRequired = org?.plan.id === 'free'
+  const isPlanUpgradeRequired = !hasAccess
 
   const { formState } = form
   const usedSize = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
@@ -200,8 +208,7 @@ export function DiskManagementForm() {
   const usedPercentage = (usedSize / totalSize) * 100
 
   const disableIopsThroughputConfig =
-    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) &&
-    org?.plan.id !== 'free'
+    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) && !hasAccess
 
   const isBranch = project?.parent_project_ref !== undefined
 
@@ -218,13 +225,13 @@ export function DiskManagementForm() {
   const isProjectRequestingDiskChanges = isRequestingChanges && !isProjectResizing
   const noPermissions = isPermissionsLoaded && !canUpdateDiskConfiguration
 
-  const { mutateAsync: updateDiskConfiguration, isLoading: isUpdatingDisk } =
+  const { mutateAsync: updateDiskConfiguration, isPending: isUpdatingDisk } =
     useUpdateDiskAttributesMutation({
       // this is to suppress to toast message
       onError: () => {},
       onSuccess: () => setRefetchInterval(2000),
     })
-  const { mutateAsync: updateSubscriptionAddon, isLoading: isUpdatingCompute } =
+  const { mutateAsync: updateSubscriptionAddon, isPending: isUpdatingCompute } =
     useProjectAddonUpdateMutation({
       // this is to suppress to toast message
       onError: () => {},
@@ -233,7 +240,7 @@ export function DiskManagementForm() {
         if (projectRef) setProjectStatus({ ref: projectRef, status: PROJECT_STATUS.RESIZING })
       },
     })
-  const { mutateAsync: updateDiskAutoscaleConfig, isLoading: isUpdatingDiskAutoscaleConfig } =
+  const { mutateAsync: updateDiskAutoscaleConfig, isPending: isUpdatingDiskAutoscaleConfig } =
     useUpdateDiskAutoscaleConfigMutation({
       // this is to suppress to toast message
       onError: () => {},
@@ -316,7 +323,7 @@ export function DiskManagementForm() {
         <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
           <NoticeBar
             type="default"
-            visible={isPlanUpgradeRequired}
+            visible={isEntitlementsLoaded && !hasAccess}
             title="Compute and Disk configuration is not available on the Free Plan"
             actions={<UpgradePlanButton source="diskManagementConfigure" plan="Pro" />}
             description="You will need to upgrade to at least the Pro Plan to configure compute and disk"

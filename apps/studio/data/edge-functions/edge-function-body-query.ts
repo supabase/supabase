@@ -1,22 +1,14 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { ResponseError } from 'types'
+import { getMultipartBoundary, parseMultipartStream } from '@mjackson/multipart-parser'
+import { useQuery } from '@tanstack/react-query'
+import { EdgeFunctionFile } from 'components/interfaces/EdgeFunctions/EdgeFunction.types'
+import { get, handleError } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { edgeFunctionsKeys } from './keys'
 
-export type EdgeFunctionBodyVariables = {
+type EdgeFunctionBodyVariables = {
   projectRef?: string
   slug?: string
-}
-
-export type EdgeFunctionFile = {
-  name: string
-  content: string
-}
-
-export type EdgeFunctionBodyResponse = {
-  version: number
-  files: EdgeFunctionFile[]
 }
 
 export async function getEdgeFunctionBody(
@@ -26,41 +18,31 @@ export async function getEdgeFunctionBody(
   if (!projectRef) throw new Error('projectRef is required')
   if (!slug) throw new Error('slug is required')
 
-  try {
-    // Get authorization headers
-    const headers = await constructHeaders({
-      'Content-Type': 'application/json',
-    })
+  const { data, response, error } = await get('/v1/projects/{ref}/functions/{function_slug}/body', {
+    params: { path: { ref: projectRef, function_slug: slug } },
+    headers: { Accept: 'multipart/form-data' },
+    parseAs: 'stream',
+    signal,
+  })
 
-    // Send to our API for processing (the API will handle the fetch from v1 endpoint)
-    const parseResponse = await fetchHandler(`${BASE_PATH}/api/edge-functions/body`, {
-      method: 'POST',
-      body: JSON.stringify({ projectRef, slug }),
-      headers,
-      credentials: 'include',
-      signal,
-    })
+  if (error) handleError(error)
 
-    if (!parseResponse.ok) {
-      const { error } = await parseResponse.json()
-      handleError(
-        typeof error === 'object'
-          ? error
-          : typeof error === 'string'
-            ? { message: error }
-            : { message: 'Unknown error' }
-      )
+  const contentTypeHeader = response.headers.get('content-type') ?? ''
+  const boundary = getMultipartBoundary(contentTypeHeader)
+  const files = []
+
+  if (!data || !boundary) return { files: [] }
+
+  for await (let part of parseMultipartStream(data, { boundary })) {
+    if (part.isFile) {
+      files.push({
+        name: part.filename,
+        content: part.text,
+      })
     }
-
-    const response = (await parseResponse.json()) as EdgeFunctionBodyResponse
-    return response
-  } catch (error) {
-    handleError(error)
-    return {
-      version: 0,
-      files: [],
-    } as EdgeFunctionBodyResponse
   }
+
+  return { files: files as Omit<EdgeFunctionFile, 'id' | 'selected'>[] }
 }
 
 export type EdgeFunctionBodyData = Awaited<ReturnType<typeof getEdgeFunctionBody>>
@@ -71,14 +53,12 @@ export const useEdgeFunctionBodyQuery = <TData = EdgeFunctionBodyData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<EdgeFunctionBodyData, EdgeFunctionBodyError, TData> = {}
+  }: UseCustomQueryOptions<EdgeFunctionBodyData, EdgeFunctionBodyError, TData> = {}
 ) =>
-  useQuery<EdgeFunctionBodyData, EdgeFunctionBodyError, TData>(
-    edgeFunctionsKeys.body(projectRef, slug),
-    ({ signal }) => getEdgeFunctionBody({ projectRef, slug }, signal),
-    {
-      enabled:
-        IS_PLATFORM && enabled && typeof projectRef !== 'undefined' && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<EdgeFunctionBodyData, EdgeFunctionBodyError, TData>({
+    queryKey: edgeFunctionsKeys.body(projectRef, slug),
+    queryFn: ({ signal }) => getEdgeFunctionBody({ projectRef, slug }, signal),
+    enabled:
+      IS_PLATFORM && enabled && typeof projectRef !== 'undefined' && typeof slug !== 'undefined',
+    ...options,
+  })

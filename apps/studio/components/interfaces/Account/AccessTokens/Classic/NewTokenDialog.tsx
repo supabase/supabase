@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import { ExternalLink } from 'lucide-react'
 import { useState } from 'react'
-import { type SubmitHandler, useForm } from 'react-hook-form'
+import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -67,7 +67,7 @@ export const NewTokenDialog = ({
     defaultValues: { tokenName: '', expiresAt: ExpiresAtOptions['month'].value },
     mode: 'onChange',
   })
-  const { mutate: createAccessToken, isLoading } = useAccessTokenCreateMutation()
+  const { mutate: createAccessToken, isPending } = useAccessTokenCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof TokenSchema>> = async (values) => {
     let expiresAt = values.expiresAt
@@ -212,16 +212,13 @@ export const NewTokenDialog = ({
                           selectsRange={false}
                           triggerButtonSize="small"
                           contentSide="top"
+                          to={customExpiryDate?.date}
                           minDate={new Date()}
                           maxDate={dayjs().add(1, 'year').toDate()}
                           onChange={(date) => {
                             if (date.to) handleCustomDateChange({ date: date.to })
                           }}
-                        >
-                          {customExpiryDate
-                            ? `${dayjs(customExpiryDate.date).format('DD MMM, HH:mm')}`
-                            : 'Select date'}
-                        </DatePicker>
+                        />
                       )}
                     </div>
                     {field.value === NON_EXPIRING_TOKEN_VALUE && (
@@ -241,7 +238,7 @@ export const NewTokenDialog = ({
         <DialogFooter>
           <Button
             type="default"
-            disabled={isLoading}
+            disabled={isPending}
             onClick={() => {
               form.reset()
               setCustomExpiryDate(undefined)
@@ -251,7 +248,7 @@ export const NewTokenDialog = ({
           >
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" loading={isLoading}>
+          <Button form={formId} htmlType="submit" loading={isPending}>
             Generate token
           </Button>
         </DialogFooter>

@@ -1,7 +1,57 @@
 import { useEntitlementsQuery } from 'data/entitlements/entitlements-query'
 import { useMemo } from 'react'
 import { useSelectedOrganizationQuery } from './useSelectedOrganization'
-import type { EntitlementConfig } from 'data/entitlements/entitlements-query'
+import type {
+  Entitlement,
+  EntitlementConfig,
+  EntitlementType,
+} from 'data/entitlements/entitlements-query'
+
+function isNumericConfig(
+  config: EntitlementConfig,
+  type: EntitlementType
+): config is { enabled: boolean; unlimited: boolean; value: number } {
+  return type === 'numeric'
+}
+
+function isSetConfig(
+  config: EntitlementConfig,
+  type: EntitlementType
+): config is { enabled: boolean; set: string[] } {
+  return type === 'set'
+}
+
+function isBooleanConfig(
+  config: EntitlementConfig,
+  type: EntitlementType
+): config is { enabled: boolean } {
+  return type === 'boolean'
+}
+
+function getEntitlementNumericValue(entitlement: Entitlement | null): number | undefined {
+  const entitlementConfig = entitlement?.config
+  return entitlementConfig &&
+    entitlement.type &&
+    isNumericConfig(entitlementConfig, entitlement.type)
+    ? entitlementConfig.value
+    : undefined
+}
+
+function isEntitlementUnlimited(entitlement: Entitlement | null): boolean {
+  const entitlementConfig = entitlement?.config
+  return entitlementConfig &&
+    entitlement.type &&
+    isNumericConfig(entitlementConfig, entitlement.type)
+    ? entitlementConfig.unlimited
+    : false
+}
+
+function getEntitlementSetValues(entitlement: Entitlement | null): string[] {
+  const entitlementConfig = entitlement?.config
+  return entitlementConfig && entitlement.type && isSetConfig(entitlementConfig, entitlement.type)
+    ? entitlementConfig.set
+    : []
+}
 
 export function useCheckEntitlements(
   featureKey: string,
@@ -29,21 +79,19 @@ export function useCheckEntitlements(
     isSuccess: isSuccessEntitlements,
   } = useEntitlementsQuery({ slug: finalOrgSlug! }, { enabled })
 
-  const { hasAccess, entitlementConfig } = useMemo((): {
-    hasAccess: boolean
-    entitlementConfig: EntitlementConfig
+  const { entitlement } = useMemo((): {
+    entitlement: Entitlement | null
   } => {
     // If no organization slug, no access
-    if (!finalOrgSlug) return { hasAccess: false, entitlementConfig: { enabled: false } }
+    if (!finalOrgSlug) return { entitlement: null }
 
     const entitlement = entitlementsData?.entitlements.find(
       (entitlement) => entitlement.feature.key === featureKey
     )
-    const entitlementConfig = entitlement?.config ?? { enabled: false }
 
-    if (!entitlement) return { hasAccess: false, entitlementConfig: { enabled: false } }
-
-    return { hasAccess: entitlement.hasAccess, entitlementConfig }
+    return {
+      entitlement: entitlement ?? null,
+    }
   }, [entitlementsData, featureKey, finalOrgSlug])
 
   const isLoading = shouldGetSelectedOrg ? isLoadingSelectedOrg : isLoadingEntitlements
@@ -51,5 +99,12 @@ export function useCheckEntitlements(
     ? isSuccessSelectedOrg && isSuccessEntitlements
     : isSuccessEntitlements
 
-  return { hasAccess, entitlementConfig, isLoading, isSuccess }
+  return {
+    hasAccess: entitlement?.hasAccess ?? false,
+    isLoading,
+    isSuccess,
+    getEntitlementNumericValue: () => getEntitlementNumericValue(entitlement),
+    isEntitlementUnlimited: () => isEntitlementUnlimited(entitlement),
+    getEntitlementSetValues: () => getEntitlementSetValues(entitlement),
+  }
 }

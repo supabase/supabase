@@ -16,6 +16,7 @@ import {
   CollapsibleTrigger_Shadcn_,
   Collapsible_Shadcn_,
 } from 'ui'
+import { useApiKeysVisibility } from '../APIKeys/hooks/useApiKeysVisibility'
 import type { Commands } from './Functions.types'
 
 interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Collapsible_Shadcn_> {
@@ -32,7 +33,8 @@ export const TerminalInstructions = forwardRef<
   const [showInstructions, setShowInstructions] = useState(!closable)
 
   const { data: tokens } = useAccessTokensQuery()
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef })
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 

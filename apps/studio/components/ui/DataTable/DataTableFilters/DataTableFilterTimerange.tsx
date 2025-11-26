@@ -1,30 +1,30 @@
 import { useMemo, useState } from 'react'
 import type { DateRange } from 'react-day-picker'
 
-import {
-  LogsDatePicker,
-  DatePickerValue,
-} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from 'components/interfaces/Reports/Reports.constants'
-import { maybeShowUpgradePrompt } from 'components/interfaces/Settings/Logs/Logs.utils'
+import {
+  DatePickerValue,
+  LogsDatePicker,
+} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import { maybeShowUpgradePromptIfNotEntitled } from 'components/interfaces/Settings/Logs/Logs.utils'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import type { DataTableTimerangeFilterField } from '../DataTable.types'
 import { isArrayOfDates } from '../DataTable.utils'
 import { useDataTable } from '../providers/DataTableProvider'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 export function DataTableFilterTimerange<TData>({
   value: _value,
-  presets,
-  dateRangeDisabled,
 }: DataTableTimerangeFilterField<TData>) {
   const value = _value as string
   const { table, columnFilters } = useDataTable()
   const column = table.getColumn(value)
   const filterValue = columnFilters.find((i) => i.id === value)?.value
 
-  const { plan: orgPlan } = useCurrentOrgPlan()
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
+
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
+  const entitledToAuditLogDays = getEntitlementNumericValue()
 
   const date: DateRange | undefined = useMemo(
     () =>
@@ -38,7 +38,10 @@ export function DataTableFilterTimerange<TData>({
 
   const handleDatePickerChange = (vals: DatePickerValue) => {
     // Check if the selected date range exceeds the plan limits
-    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(vals.from, orgPlan?.id)
+    const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+      vals.from,
+      entitledToAuditLogDays
+    )
 
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(true)

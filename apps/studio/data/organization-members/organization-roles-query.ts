@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import type { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { organizationKeys } from './keys'
 
 export const FIXED_ROLE_ORDER = ['Owner', 'Administrator', 'Developer', 'Read-only']
@@ -19,11 +19,14 @@ export async function getOrganizationRoles(
 
   const { data, error } = await get('/platform/organizations/{slug}/roles', {
     params: { path: { slug } },
+    headers: { Version: 2 },
     signal,
   })
 
   if (error) handleError(error)
-  return data
+
+  // [Joshen] Temp while API has versioning on this endpoint
+  return data as unknown as OrganizationRolesResponse
 }
 
 export type OrganizationRolesData = Awaited<ReturnType<typeof getOrganizationRoles>>
@@ -34,21 +37,19 @@ export const useOrganizationRolesV2Query = <TData = OrganizationRolesData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OrganizationRolesData, OrganizationRolesError, TData> = {}
+  }: UseCustomQueryOptions<OrganizationRolesData, OrganizationRolesError, TData> = {}
 ) =>
-  useQuery<OrganizationRolesData, OrganizationRolesError, TData>(
-    organizationKeys.rolesV2(slug),
-    ({ signal }) => getOrganizationRoles({ slug }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      select: (data) => {
-        return {
-          ...data,
-          org_scoped_roles: data.org_scoped_roles.sort((a, b) => {
-            return FIXED_ROLE_ORDER.indexOf(a.name) - FIXED_ROLE_ORDER.indexOf(b.name)
-          }),
-        } as any
-      },
-      ...options,
-    }
-  )
+  useQuery<OrganizationRolesData, OrganizationRolesError, TData>({
+    queryKey: organizationKeys.rolesV2(slug),
+    queryFn: ({ signal }) => getOrganizationRoles({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    select: (data) => {
+      return {
+        ...data,
+        org_scoped_roles: data.org_scoped_roles.sort((a, b) => {
+          return FIXED_ROLE_ORDER.indexOf(a.name) - FIXED_ROLE_ORDER.indexOf(b.name)
+        }),
+      } as any
+    },
+    ...options,
+  })

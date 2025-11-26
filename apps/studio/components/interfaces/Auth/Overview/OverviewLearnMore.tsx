@@ -6,6 +6,8 @@ import { Logs } from 'icons'
 import { BASE_PATH } from 'lib/constants'
 import { useParams } from 'common'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 
@@ -13,6 +15,7 @@ export const OverviewLearnMore = () => {
   const [isMounted, setIsMounted] = useState(false)
   const { ref } = useParams()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const { theme, resolvedTheme } = useTheme()
 
   useEffect(() => {
@@ -48,9 +51,9 @@ export const OverviewLearnMore = () => {
         {
           label: 'Ask Assistant',
           onClick: () => {
+            openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
             aiSnap.newChat({
               name: 'Auth Help',
-              open: true,
               initialInput:
                 'Look at my logs related to Supabase Auth and help me debug the recent errors.',
               suggestions: {

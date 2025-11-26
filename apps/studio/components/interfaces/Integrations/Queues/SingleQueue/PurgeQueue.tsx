@@ -13,7 +13,7 @@ interface PurgeQueueProps {
 export const PurgeQueue = ({ queueName, visible, onClose }: PurgeQueueProps) => {
   const { data: project } = useSelectedProjectQuery()
 
-  const { mutate: purgeDatabaseQueue, isLoading } = useDatabaseQueuePurgeMutation({
+  const { mutate: purgeDatabaseQueue, isPending } = useDatabaseQueuePurgeMutation({
     onSuccess: () => {
       toast.success(`Successfully purged queue ${queueName}`)
       onClose()
@@ -41,7 +41,7 @@ export const PurgeQueue = ({ queueName, visible, onClose }: PurgeQueueProps) => 
       onCancel={() => onClose()}
       onConfirm={handlePurge}
       title="Purge this queue"
-      loading={isLoading}
+      loading={isPending}
       confirmLabel={`Purge queue ${queueName}`}
       confirmPlaceholder="Type in name of queue"
       confirmString={queueName ?? 'Unknown'}

@@ -1,7 +1,8 @@
 import { noop } from 'lodash'
 import { Badge, Button, Checkbox, Modal } from 'ui'
 
-import { PolicyName, PolicyRoles } from 'components/interfaces/Auth/Policies/PolicyEditor'
+import { PolicyName } from 'components/interfaces/Auth/Policies/PolicyEditor/PolicyName'
+import { PolicyRoles } from 'components/interfaces/Auth/Policies/PolicyEditor/PolicyRoles'
 import SqlEditor from 'components/ui/SqlEditor'
 import { DOCS_URL } from 'lib/constants'
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'

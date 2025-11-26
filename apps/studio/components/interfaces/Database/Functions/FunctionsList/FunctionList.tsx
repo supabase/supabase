@@ -4,11 +4,13 @@ import { Copy, Edit, Edit2, FileText, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Button,
   DropdownMenu,
@@ -19,6 +21,7 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
+import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
 
 interface FunctionListProps {
   schema: string
@@ -29,6 +32,7 @@ interface FunctionListProps {
   duplicateFunction: (fn: any) => void
   editFunction: (fn: any) => void
   deleteFunction: (fn: any) => void
+  functions: DatabaseFunction[]
 }
 
 const FunctionList = ({
@@ -40,15 +44,12 @@ const FunctionList = ({
   duplicateFunction = noop,
   editFunction = noop,
   deleteFunction = noop,
+  functions,
 }: FunctionListProps) => {
   const router = useRouter()
   const { data: selectedProject } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
-
-  const { data: functions } = useDatabaseFunctionsQuery({
-    projectRef: selectedProject?.ref,
-    connectionString: selectedProject?.connectionString,
-  })
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const filteredFunctions = (functions ?? []).filter((x) => {
     const matchesName = includes(x.name.toLowerCase(), filterString.toLowerCase())
@@ -106,15 +107,19 @@ const FunctionList = ({
             <TableCell className="truncate">
               <Button
                 type="text"
-                className="text-foreground text-sm p-0 hover:bg-transparent"
+                className="text-link-table-cell text-sm p-0 hover:bg-transparent title"
                 onClick={() => editFunction(x)}
+                title={x.name}
               >
                 {x.name}
               </Button>
             </TableCell>
             <TableCell className="table-cell">
-              <p title={x.argument_types} className="truncate text-foreground-light">
-                {x.argument_types || '-'}
+              <p
+                title={x.argument_types}
+                className={`truncate ${x.argument_types ? 'text-foreground-light' : 'text-foreground-muted'}`}
+              >
+                {x.argument_types || '–'}
               </p>
             </TableCell>
             <TableCell className="table-cell">
@@ -168,9 +173,9 @@ const FunctionList = ({
                         <DropdownMenuItem
                           className="space-x-2"
                           onClick={() => {
+                            openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                             aiSnap.newChat({
                               name: `Update function ${x.name}`,
-                              open: true,
                               initialInput: 'Update this function to do...',
                               suggestions: {
                                 title:

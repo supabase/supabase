@@ -9,7 +9,7 @@
  * @module telemetry-frontend
  */
 
-type TelemetryGroups = {
+export type TelemetryGroups = {
   project: string
   organization: string
 }
@@ -69,17 +69,53 @@ export interface ConnectionStringCopiedEvent {
   action: 'connection_string_copied'
   properties: {
     /**
-     * Method selected by user, e.g. URI, PSQL, SQLAlchemy, etc.
+     * Method selected by user, e.g. URI, PSQL, SQLAlchemy, MCP URL, Framework snippet, Command Line, JSON, etc.
+     * Required for Connection String, App Frameworks, and Mobile Frameworks tabs
      */
-    connectionType: string
+    connectionType?: string
     /**
-     * Language of the code block if selected, e.g. bash, go
+     * Language of the code block if selected, e.g. bash, go, http, typescript
+     * Required for Connection String, App Frameworks, and Mobile Frameworks tabs
      */
-    lang: string
+    lang?: string
     /**
      * Connection Method, e.g. direct, transaction_pooler, session_pooler
+     * Only used for Connection String tab
      */
-    connectionMethod: 'direct' | 'transaction_pooler' | 'session_pooler'
+    connectionMethod?: 'direct' | 'transaction_pooler' | 'session_pooler'
+    /**
+     * Tab from which the connection string was copied
+     */
+    connectionTab: 'Connection String' | 'App Frameworks' | 'Mobile Frameworks' | 'ORMs' | 'MCP'
+    /**
+     * Selected framework, tool, or client (e.g., 'Next.js', 'Prisma', 'Cursor')
+     */
+    selectedItem?: string
+    /**
+     * Source of the event, either 'studio' or 'docs'
+     */
+    source?: 'studio' | 'docs'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the MCP install button (one-click installation for Cursor or VS Code).
+ *
+ * @group Events
+ * @source studio, docs
+ */
+export interface McpInstallButtonClickedEvent {
+  action: 'mcp_install_button_clicked'
+  properties: {
+    /**
+     * The MCP client that was selected (e.g., 'Cursor', 'VS Code')
+     */
+    client: string
+    /**
+     * Source of the event, either 'studio' or 'docs'
+     */
+    source?: 'studio' | 'docs'
   }
   groups: TelemetryGroups
 }
@@ -89,7 +125,7 @@ export interface ConnectionStringCopiedEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/integrations/cron/jobs?dialog-shown=true
+ * @page /dashboard/project/{ref}/integrations/cron/jobs?new=true
  */
 export interface CronJobCreatedEvent {
   action: 'cron_job_created'
@@ -111,7 +147,7 @@ export interface CronJobCreatedEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/integrations/cron/jobs?dialog-shown=true
+ * @page /dashboard/project/{ref}/integrations/cron/jobs?new=true
  */
 export interface CronJobUpdatedEvent {
   action: 'cron_job_updated'
@@ -423,6 +459,58 @@ export interface RealtimeToggleTableClickedEvent {
 }
 
 /**
+ * Realtime was enabled on a table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface TableRealtimeEnabledEvent {
+  action: 'table_realtime_enabled'
+  properties: {
+    /**
+     * The method used to enable realtime
+     */
+    method: 'ui' | 'sql_editor' | 'api'
+    /**
+     * Schema name
+     */
+    schema_name: string
+    /**
+     * Table name
+     */
+    table_name: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Realtime was disabled on a table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface TableRealtimeDisabledEvent {
+  action: 'table_realtime_disabled'
+  properties: {
+    /**
+     * The method used to disable realtime
+     */
+    method: 'ui' | 'sql_editor' | 'api'
+    /**
+     * Schema name
+     */
+    schema_name: string
+    /**
+     * Table name
+     */
+    table_name: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the quickstart card in the SQL editor.
  *
  * @group Events
@@ -698,17 +786,6 @@ export interface EventPageCtaClickedEvent {
  */
 export interface HomepageGitHubButtonClickedEvent {
   action: 'homepage_github_button_clicked'
-}
-
-/**
- * User clicked the GitHub Discussions button in the homepage community section.
- *
- * @group Events
- * @source www
- * @page /
- */
-export interface HomepageGitHubDiscussionsButtonClickedEvent {
-  action: 'homepage_github_discussions_button_clicked'
 }
 
 /**
@@ -1230,7 +1307,7 @@ export interface SupabaseUiCommandCopyButtonClickedEvent {
   properties: {
     templateTitle: string
     command: string
-    framework: 'nextjs' | 'react-router' | 'tanstack' | 'react'
+    framework: 'nextjs' | 'react-router' | 'tanstack' | 'react' | 'vue' | 'nuxtjs'
     packageManager: 'npm' | 'pnpm' | 'yarn' | 'bun'
   }
 }
@@ -1540,64 +1617,27 @@ export interface HomeActivityStatClickedEvent {
 }
 
 /**
- * User clicked the main Ask Assistant button in the Advisor section of HomeV2.
+ * User was exposed to the realtime experiment (shown or not shown the Enable Realtime button).
  *
  * @group Events
  * @source studio
- * @page /project/{ref}
+ * @page /dashboard/project/{ref}/editor
  */
-export interface HomeAdvisorAskAssistantClickedEvent {
-  action: 'home_advisor_ask_assistant_clicked'
+export interface RealtimeExperimentExposedEvent {
+  action: 'realtime_experiment_exposed'
   properties: {
     /**
-     * Number of issues found by the advisor
+     * The experiment variant shown to the user
      */
-    issues_count: number
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked on an issue card in the Advisor section of HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeAdvisorIssueCardClickedEvent {
-  action: 'home_advisor_issue_card_clicked'
-  properties: {
+    variant: 'control' | 'hide-button' | 'triggers'
     /**
-     * Category of the issue (SECURITY or PERFORMANCE)
+     * Whether the table already has realtime enabled
      */
-    issue_category: string
+    table_has_realtime_enabled: boolean
     /**
-     * Name/key of the lint issue
+     * Days since project creation (to segment by new user cohorts)
      */
-    issue_name: string
-    issues_count: number
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked the Fix Issue button on an advisor card in HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeAdvisorFixIssueClickedEvent {
-  action: 'home_advisor_fix_issue_clicked'
-  properties: {
-    /**
-     * Category of the issue (SECURITY or PERFORMANCE)
-     */
-    issue_category: string
-    /**
-     * Name/key of the lint issue
-     */
-    issue_name: string
+    days_since_project_creation: number
   }
   groups: TelemetryGroups
 }
@@ -1953,7 +1993,7 @@ export interface AuthUsersSearchSubmittedEvent {
  * User opened the command menu.
  *
  * @group Events
- * @source ui-patterns
+ * @source studio, docs, www
  * @page any
  */
 export interface CommandMenuOpenedEvent {
@@ -1979,7 +2019,7 @@ export interface CommandMenuOpenedEvent {
  * User typed a search term in the command menu input.
  *
  * @group Events
- * @source ui-patterns
+ * @source studio, docs, www
  * @page any
  */
 export interface CommandMenuSearchSubmittedEvent {
@@ -1998,17 +2038,17 @@ export interface CommandMenuSearchSubmittedEvent {
 }
 
 /**
- * User selected a command from the command menu.
+ * User clicked a command from the command menu.
  *
  * @group Events
- * @source ui-patterns
+ * @source studio, docs, www
  * @page any
  */
-export interface CommandMenuCommandSelectedEvent {
-  action: 'command_menu_command_selected'
+export interface CommandMenuCommandClickedEvent {
+  action: 'command_menu_command_clicked'
   properties: {
     /**
-     * The selected command
+     * The clicked command
      */
     command_name: string
     command_value?: string
@@ -2022,12 +2062,311 @@ export interface CommandMenuCommandSelectedEvent {
 }
 
 /**
+ * User opened a sidebar panel.
+ *
+ * @group Events
+ * @source studio
+ * @page Various pages with sidebar buttons
+ */
+export interface SidebarOpenedEvent {
+  action: 'sidebar_opened'
+  properties: {
+    /**
+     * The sidebar panel that was opened, e.g. ai-assistant, editor-panel, advisor-panel
+     */
+    sidebar: 'ai-assistant' | 'editor-panel' | 'advisor-panel'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User was exposed to the table quickstart experiment.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (NewTab)
+ */
+export interface TableQuickstartOpenedEvent {
+  action: 'table_quickstart_opened'
+  properties: {
+    /**
+     * Which variation the user was shown: ai, templates, assistant, or control
+     */
+    variant: 'ai' | 'templates' | 'assistant' | 'control'
+  }
+  groups: TelemetryGroups
+}
+/**
+ * User submitted a prompt in the AI quickstart variation.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartAIWidget)
+ */
+export interface TableQuickstartAIPromptSubmittedEvent {
+  action: 'table_quickstart_ai_prompt_submitted'
+  properties: {
+    /**
+     * Length of the AI prompt
+     */
+    promptLength: number
+    /**
+     * Whether this was triggered by a quick idea button
+     */
+    wasQuickIdea: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * AI table generation completed (success or failure).
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartAIWidget)
+ */
+export interface TableQuickstartAIGenerationCompletedEvent {
+  action: 'table_quickstart_ai_generation_completed'
+  properties: {
+    /**
+     * Whether generation succeeded
+     */
+    success: boolean
+    /**
+     * Number of tables generated (0 if failed)
+     */
+    tablesGenerated: number
+    /**
+     * Length of the prompt used
+     */
+    promptLength: number
+    /**
+     * Error message if failed
+     */
+    errorMessage?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked a quick idea button in the AI variation.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartAIWidget)
+ */
+export interface TableQuickstartQuickIdeaClickedEvent {
+  action: 'table_quickstart_quick_idea_clicked'
+  properties: {
+    /**
+     * Text of the quick idea clicked
+     */
+    ideaText: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User selected a category in the templates variation.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartTemplatesWidget)
+ */
+export interface TableQuickstartCategoryClickedEvent {
+  action: 'table_quickstart_category_clicked'
+  properties: {
+    /**
+     * Name of the category clicked
+     */
+    categoryName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User selected a table template from either AI-generated suggestions or pre-made templates.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartAIWidget, QuickstartTemplatesWidget)
+ */
+export interface TableQuickstartTemplateClickedEvent {
+  action: 'table_quickstart_template_clicked'
+  properties: {
+    /**
+     * Name of the table clicked
+     */
+    tableName: string
+    /**
+     * Number of columns in the template
+     */
+    columnCount: number
+    /**
+     * Source of the template clicked
+     */
+    source: 'ai' | 'templates'
+    /**
+     * Category the template belongs to (only present for templates source)
+     */
+    categoryName?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the assistant button in the assistant variation.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (NewTab)
+ */
+export interface TableQuickstartAssistantOpenedEvent {
+  action: 'table_quickstart_assistant_opened'
+  properties: {
+    /**
+     * Whether the assistant chat was successfully created
+     */
+    chatCreated: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User toggled the inline editor setting in account preferences.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/account/preferences
+ */
+export interface InlineEditorSettingClickedEvent {
+  action: 'inline_editor_setting_clicked'
+  properties: {
+    /**
+     * Whether the inline editor was enabled or disabled
+     */
+    enabled: boolean
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the save destination button in add log drains sheet.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/log-drains (LogDrainDestinationSheetForm)
+ */
+export interface LogDrainSaveButtonClickedEvent {
+  action: 'log_drain_save_button_clicked'
+  properties: {
+    /**
+     * Type of the destination saved
+     */
+    destination: 'webhook' | 'datadog' | 'loki' | 'sentry'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User confirmed addition of log drain destination.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/log-drains (LogDrains)
+ */
+export interface LogDrainConfirmButtonSubmittedEvent {
+  action: 'log_drain_confirm_button_submitted'
+  properties: {
+    /**
+     * Type of the destination confirmed
+     */
+    destination: 'webhook' | 'datadog' | 'loki' | 'sentry'
+  }
+  groups: TelemetryGroups
+}
+
+type AdvisorCategory = 'PERFORMANCE' | 'SECURITY'
+type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
+
+/**
+ * User opened an advisor detail page to view a specific advisor (lint or notification).
+ * This tracks when users engage with advisor recommendations.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/advisors/security or home page or advisor panel sidebar
+ */
+export interface AdvisorDetailOpenedEvent {
+  action: 'advisor_detail_opened'
+  properties: {
+    /**
+     * Where the advisor was viewed from
+     */
+    origin: 'homepage' | 'advisor_panel' | 'advisors_page'
+    /**
+     * Source of the advisor
+     */
+    advisorSource: 'lint' | 'notification'
+    /**
+     * Category of the advisor (SECURITY or PERFORMANCE)
+     */
+    advisorCategory?: AdvisorCategory
+    /**
+     * Specific advisor type/name, e.g. missing_index, no_rls_policy
+     */
+    advisorType?: string
+    /**
+     * Severity level of the advisor (only for lints)
+     */
+    advisorLevel?: AdvisorLevel
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Assistant button to get AI help with an advisor issue.
+ * This opens the AI Assistant sidebar with a pre-filled prompt about the issue.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref} (homepage), /dashboard/project/{ref}/advisors/security or /dashboard/project/{ref}/advisors/performance (lint detail panel)
+ */
+export interface AdvisorAssistantButtonClickedEvent {
+  action: 'advisor_assistant_button_clicked'
+  properties: {
+    /**
+     * Where the button was clicked
+     */
+    origin: 'homepage' | 'lint_detail'
+    /**
+     * Category of the advisor (SECURITY or PERFORMANCE)
+     */
+    advisorCategory?: AdvisorCategory
+    /**
+     * Specific advisor type/name
+     */
+    advisorType?: string
+    /**
+     * Severity level of the advisor (only for lints)
+     */
+    advisorLevel?: AdvisorLevel
+    /**
+     * Number of issues found (only included when origin is 'homepage')
+     */
+    issuesCount?: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
   | ConnectionStringCopiedEvent
+  | McpInstallButtonClickedEvent
   | ApiDocsOpenedEvent
   | ApiDocsCodeCopyButtonClickedEvent
   | CronJobCreatedEvent
@@ -2052,6 +2391,8 @@ export type TelemetryEvent =
   | RealtimeInspectorFiltersAppliedEvent
   | RealtimeInspectorDatabaseRoleUpdatedEvent
   | RealtimeToggleTableClickedEvent
+  | TableRealtimeEnabledEvent
+  | TableRealtimeDisabledEvent
   | SqlEditorQuickstartClickedEvent
   | SqlEditorTemplateClickedEvent
   | SqlEditorResultDownloadCsvClickedEvent
@@ -2069,7 +2410,6 @@ export type TelemetryEvent =
   | WwwPricingPlanCtaClickedEvent
   | EventPageCtaClickedEvent
   | HomepageGitHubButtonClickedEvent
-  | HomepageGitHubDiscussionsButtonClickedEvent
   | HomepageDiscordButtonClickedEvent
   | HomepageCustomerStoryCardClickedEvent
   | HomepageProjectTemplateCardClickedEvent
@@ -2121,9 +2461,7 @@ export type TelemetryEvent =
   | HomeGettingStartedClosedEvent
   | HomeSectionRowsMovedEvent
   | HomeActivityStatClickedEvent
-  | HomeAdvisorAskAssistantClickedEvent
-  | HomeAdvisorIssueCardClickedEvent
-  | HomeAdvisorFixIssueClickedEvent
+  | RealtimeExperimentExposedEvent
   | HomeProjectUsageServiceClickedEvent
   | HomeProjectUsageChartClickedEvent
   | HomeCustomReportBlockAddedEvent
@@ -2134,7 +2472,20 @@ export type TelemetryEvent =
   | TableCreatedEvent
   | TableDataAddedEvent
   | TableRLSEnabledEvent
+  | TableQuickstartOpenedEvent
+  | TableQuickstartAIPromptSubmittedEvent
+  | TableQuickstartAIGenerationCompletedEvent
+  | TableQuickstartQuickIdeaClickedEvent
+  | TableQuickstartCategoryClickedEvent
+  | TableQuickstartTemplateClickedEvent
+  | TableQuickstartAssistantOpenedEvent
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent
   | CommandMenuSearchSubmittedEvent
-  | CommandMenuCommandSelectedEvent
+  | CommandMenuCommandClickedEvent
+  | InlineEditorSettingClickedEvent
+  | SidebarOpenedEvent
+  | LogDrainSaveButtonClickedEvent
+  | LogDrainConfirmButtonSubmittedEvent
+  | AdvisorDetailOpenedEvent
+  | AdvisorAssistantButtonClickedEvent

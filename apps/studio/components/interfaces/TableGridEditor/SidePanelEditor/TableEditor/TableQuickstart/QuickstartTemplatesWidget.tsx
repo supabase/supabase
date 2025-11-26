@@ -1,11 +1,13 @@
 import { Columns3, Layers, Table2 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
+
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type { TableField } from '../TableEditor.types'
 import { tableTemplates } from './templates'
 import type { TableSuggestion } from './types'
 import { convertTableSuggestionToTableField } from './utils'
+import { useTrack } from 'lib/telemetry/track'
 
 interface QuickstartTemplatesWidgetProps {
   onSelectTemplate: (tableData: Partial<TableField>) => void
@@ -20,6 +22,7 @@ export const QuickstartTemplatesWidget = ({
   disabled,
 }: QuickstartTemplatesWidgetProps) => {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
+  const track = useTrack()
 
   useEffect(() => {
     if (activeCategory === null && CATEGORIES.length > 0) {
@@ -27,15 +30,32 @@ export const QuickstartTemplatesWidget = ({
     }
   }, [activeCategory])
 
+  const handleCategorySelect = useCallback(
+    (category: string) => {
+      setActiveCategory(category)
+      track('table_quickstart_category_clicked', {
+        categoryName: category,
+      })
+    },
+    [track]
+  )
+
   const handleSelectTemplate = useCallback(
     (template: TableSuggestion) => {
+      track('table_quickstart_template_clicked', {
+        tableName: template.tableName,
+        columnCount: template.fields.length,
+        source: 'templates',
+        categoryName: activeCategory ?? 'Unknown',
+      })
+
       const tableField = convertTableSuggestionToTableField(template)
       onSelectTemplate(tableField)
       toast.success(`Applied ${template.tableName} template. You can customize the fields below.`, {
         duration: SUCCESS_MESSAGE_DURATION_MS,
       })
     },
-    [onSelectTemplate]
+    [onSelectTemplate, track, activeCategory]
   )
 
   const displayedTemplates = activeCategory ? tableTemplates[activeCategory] || [] : []
@@ -57,7 +77,7 @@ export const QuickstartTemplatesWidget = ({
           {CATEGORIES.map((category) => (
             <button
               key={category}
-              onClick={() => setActiveCategory(category)}
+              onClick={() => handleCategorySelect(category)}
               disabled={disabled}
               role="tab"
               aria-selected={activeCategory === category}

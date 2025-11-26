@@ -4,7 +4,7 @@ import { useParams } from 'common'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { withAuth } from 'hooks/misc/withAuth'
-import { ProjectLayout } from '../ProjectLayout/ProjectLayout'
+import { ProjectLayout } from '../ProjectLayout'
 import ReportsMenu from './ReportsMenu'
 
 interface ReportsLayoutProps {

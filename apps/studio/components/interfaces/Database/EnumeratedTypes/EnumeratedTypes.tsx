@@ -1,16 +1,16 @@
 import { Edit, MoreVertical, Search, Trash } from 'lucide-react'
-import { useState } from 'react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useRef, useState } from 'react'
+import { toast } from 'sonner'
 
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import {
-  EnumeratedType,
-  useEnumeratedTypesQuery,
-} from 'data/enumerated-types/enumerated-types-query'
+import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
@@ -32,18 +32,37 @@ import CreateEnumeratedTypeSidePanel from './CreateEnumeratedTypeSidePanel'
 import DeleteEnumeratedTypeModal from './DeleteEnumeratedTypeModal'
 import EditEnumeratedTypeSidePanel from './EditEnumeratedTypeSidePanel'
 
-const EnumeratedTypes = () => {
+export const EnumeratedTypes = () => {
   const { data: project } = useSelectedProjectQuery()
   const [search, setSearch] = useState('')
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
-  const [showCreateTypePanel, setShowCreateTypePanel] = useState(false)
-  const [selectedTypeToEdit, setSelectedTypeToEdit] = useState<EnumeratedType>()
-  const [selectedTypeToDelete, setSelectedTypeToDelete] = useState<EnumeratedType>()
+  const deletingTypeIdRef = useRef<string | null>(null)
 
   const { data, error, isLoading, isError, isSuccess } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const [showCreateTypePanel, setShowCreateTypePanel] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const { value: typeToEdit, setValue: setSelectedTypeIdToEdit } = useQueryStateWithSelect({
+    urlKey: 'edit',
+    select: (id) => (id ? data?.find((type) => type.id.toString() === id) : undefined),
+    enabled: !!data,
+    onError: () => toast.error(`Enumerated Type not found`),
+  })
+
+  const { value: typeToDelete, setValue: setSelectedTypeIdToDelete } = useQueryStateWithSelect({
+    urlKey: 'delete',
+    select: (id) => (id ? data?.find((type) => type.id.toString() === id) : undefined),
+    enabled: !!data,
+    onError: (_error, selectedId) =>
+      handleErrorOnDelete(deletingTypeIdRef, selectedId, `Enumerated Type not found`),
+  })
+
   const enumeratedTypes = (data ?? []).filter((type) => type.enums.length > 0)
   const filteredEnumeratedTypes =
     search.length > 0
@@ -56,8 +75,8 @@ const EnumeratedTypes = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-2">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
           <SchemaSelector
             className="w-full lg:w-[180px]"
             size="tiny"
@@ -150,14 +169,14 @@ const EnumeratedTypes = () => {
                               <DropdownMenuContent side="bottom" align="end" className="w-32">
                                 <DropdownMenuItem
                                   className="space-x-2"
-                                  onClick={() => setSelectedTypeToEdit(type)}
+                                  onClick={() => setSelectedTypeIdToEdit(type.id.toString())}
                                 >
                                   <Edit size={14} />
                                   <p>Update type</p>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   className="space-x-2"
-                                  onClick={() => setSelectedTypeToDelete(type)}
+                                  onClick={() => setSelectedTypeIdToDelete(type.id.toString())}
                                 >
                                   <Trash size={14} />
                                   <p>Delete type</p>
@@ -182,18 +201,21 @@ const EnumeratedTypes = () => {
       />
 
       <EditEnumeratedTypeSidePanel
-        visible={selectedTypeToEdit !== undefined}
-        selectedEnumeratedType={selectedTypeToEdit}
-        onClose={() => setSelectedTypeToEdit(undefined)}
+        visible={!!typeToEdit}
+        selectedEnumeratedType={typeToEdit}
+        onClose={() => setSelectedTypeIdToEdit(null)}
       />
 
       <DeleteEnumeratedTypeModal
-        visible={selectedTypeToDelete !== undefined}
-        selectedEnumeratedType={selectedTypeToDelete}
-        onClose={() => setSelectedTypeToDelete(undefined)}
+        visible={!!typeToDelete}
+        selectedEnumeratedType={typeToDelete}
+        onClose={() => setSelectedTypeIdToDelete(null)}
+        onDelete={() => {
+          if (typeToDelete) {
+            deletingTypeIdRef.current = typeToDelete.id.toString()
+          }
+        }}
       />
     </div>
   )
 }
-
-export default EnumeratedTypes

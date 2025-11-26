@@ -1,11 +1,11 @@
 'use client'
 
 import dayjs from 'dayjs'
+import { formatBytes } from 'lib/helpers'
 import { useState } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
 import { numberFormatter } from './Charts.utils'
-import { formatBytes } from 'lib/helpers'
 
 export interface ReportAttributes {
   id?: string
@@ -129,7 +129,7 @@ export const calculateTotalChartAggregate = (
     ?.filter((p) => !ignoreAttributes?.includes(p.dataKey))
     .reduce((acc, curr) => acc + curr.value, 0)
 
-const CustomTooltip = ({
+export const CustomTooltip = ({
   active,
   payload,
   label,
@@ -259,7 +259,7 @@ interface CustomLabelProps {
   hiddenAttributes?: Set<string>
 }
 
-const CustomLabel = ({
+export const CustomLabel = ({
   payload,
   attributes,
   showMaxValue,
@@ -341,5 +341,3 @@ const CustomLabel = ({
     </div>
   )
 }
-
-export { CustomLabel, CustomTooltip }

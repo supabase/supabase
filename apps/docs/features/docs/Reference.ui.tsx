@@ -442,9 +442,11 @@ function ApiOperationRequestBodyDetailsInternal({
   ) {
     return <span className="font-mono text-sm font-medium text-foreground">{schema.type}</span>
   } else if (schema.type === 'array') {
+    const itemTypeDisplay = getTypeDisplayFromSchema(schema.items)
+    const displayName = itemTypeDisplay?.displayName ?? 'unknown'
     return (
       <>
-        <span className="font-mono text-sm font-medium text-foreground">{`Array of ${getTypeDisplayFromSchema(schema.items).displayName}`}</span>
+        <span className="font-mono text-sm font-medium text-foreground">{`Array of ${displayName}`}</span>
         {!(
           'type' in schema.items &&
           ['string', 'boolean', 'number', 'integer'].includes(schema.items.type)

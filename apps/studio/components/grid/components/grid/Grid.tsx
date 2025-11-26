@@ -26,6 +26,7 @@ const rowKeyGetter = (row: SupaRow) => {
 interface IGrid extends GridProps {
   rows: any[]
   error: any
+  isDisabled?: boolean
   isLoading: boolean
   isSuccess: boolean
   isError: boolean
@@ -45,6 +46,7 @@ export const Grid = memo(
         rowClass,
         rows,
         error,
+        isDisabled = false,
         isLoading,
         isSuccess,
         isError,
@@ -80,7 +82,12 @@ export const Grid = memo(
 
       const { mutate: sendEvent } = useSendEventMutation()
 
-      const { isDraggedOver, onDragOver, onFileDrop } = useCsvFileDrop({
+      const {
+        isValidFile: isValidFileDraggedOver,
+        isDraggedOver,
+        onDragOver,
+        onFileDrop,
+      } = useCsvFileDrop({
         enabled: isTableEmpty && !isForeignTable,
         onFileDropped: (file) => tableEditorSnap.onImportData(valtioRef(file)),
         onTelemetryEvent: (eventName) => {
@@ -133,23 +140,23 @@ export const Grid = memo(
 
       return (
         <div
-          className={cn(
-            'flex flex-col relative transition-colors',
-            containerClass,
-            isTableEmpty && isDraggedOver && 'border-2 border-dashed border-brand-600'
-          )}
+          className={cn('flex flex-col relative transition-colors', containerClass)}
           style={{ width: width || '100%', height: height || '50vh' }}
-          onDragOver={onDragOver}
-          onDragLeave={onDragOver}
-          onDrop={onFileDrop}
         >
           {/* Render no rows fallback outside of the DataGrid */}
           {(rows ?? []).length === 0 && (
             <div
+              className={cn(
+                'absolute top-9 p-2 w-full z-[1] pointer-events-none',
+                isTableEmpty && isDraggedOver && 'border-2 border-dashed',
+                isValidFileDraggedOver ? 'border-brand-600' : 'border-destructive-600'
+              )}
               style={{ height: `calc(100% - 35px)` }}
-              className="absolute top-9 p-2 w-full z-[1] pointer-events-none"
+              onDragOver={onDragOver}
+              onDragLeave={onDragOver}
+              onDrop={onFileDrop}
             >
-              {isLoading && <GenericSkeletonLoader />}
+              {isLoading && !isDisabled && <GenericSkeletonLoader />}
 
               {isError && <GridError error={error} />}
 
@@ -170,12 +177,20 @@ export const Grid = memo(
                     </div>
                   ) : (filters ?? []).length === 0 ? (
                     <div className="flex flex-col items-center justify-center col-span-full h-full">
-                      <p className="text-sm text-light">
-                        {isDraggedOver ? 'Drop your CSV file here' : 'This table is empty'}
+                      <p className="text-sm text-light pointer-events-auto">
+                        {isDraggedOver ? (
+                          isValidFileDraggedOver ? (
+                            'Drop your CSV file here'
+                          ) : (
+                            <span className="text-destructive">Only CSV files are accepted</span>
+                          )
+                        ) : (
+                          'This table is empty'
+                        )}
                       </p>
                       {tableEntityType === ENTITY_TYPE.FOREIGN_TABLE ? (
                         <div className="flex items-center space-x-2 mt-4">
-                          <p className="text-sm text-light">
+                          <p className="text-sm text-light pointer-events-auto">
                             This table is a foreign table. Add data to the connected source to get
                             started.
                           </p>
@@ -200,7 +215,7 @@ export const Grid = memo(
                             >
                               Import data from CSV
                             </Button>
-                            <p className="text-xs text-foreground-light">
+                            <p className="text-xs text-foreground-light pointer-events-auto">
                               or drag and drop a CSV file here
                             </p>
                           </div>
@@ -209,7 +224,7 @@ export const Grid = memo(
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center col-span-full h-full">
-                      <p className="text-sm text-light">
+                      <p className="text-sm text-light pointer-events-auto">
                         The filters applied have returned no results from this table
                       </p>
                       <div className="flex items-center space-x-2 mt-4">

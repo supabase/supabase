@@ -523,7 +523,7 @@ const EXTERNAL_PROVIDER_APPLE = {
     EXTERNAL_APPLE_CLIENT_ID: string()
       .matches(/^\S+$/, 'Client IDs should not contain spaces.')
       .matches(
-        /^([a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*(,[a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*)*)$/i,
+        /^([a-z0-9-]+(\.[a-z0-9-]+)*(,[a-z0-9-]+(\.[a-z0-9-]+)*)*)$/i,
         'Invalid characters. Each ID should follow a reverse-domain style string (e.g. com.example.app). Use commas to separate multiple IDs.'
       )
       .when('EXTERNAL_APPLE_ENABLED', {

@@ -19,11 +19,16 @@ import {
   ScrollArea,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { McpConfigPanel as McpConfigPanelBase } from 'ui-patterns/McpUrlBuilder'
+import {
+  createMcpCopyHandler,
+  McpConfigPanel as McpConfigPanelBase,
+  type McpClient,
+} from 'ui-patterns/McpUrlBuilder'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { useDebounce } from '~/hooks/useDebounce'
 import { useIntersectionObserver } from '~/hooks/useIntersectionObserver'
 import { useProjectsInfiniteQuery } from '~/lib/fetch/projects-infinite'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 type PlatformType = (typeof PLATFORMS)[number]['value']
 
@@ -260,10 +265,44 @@ function PlatformSelector({
 export function McpConfigPanel() {
   const [selectedProject, setSelectedProject] = useState<{ ref: string; name: string } | null>(null)
   const [selectedPlatform, setSelectedPlatform] = useState<'hosted' | 'local'>('hosted')
+  const [selectedClient, setSelectedClient] = useState<McpClient | null>(null)
   const { theme } = useTheme()
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   const isPlatform = selectedPlatform === 'hosted'
   const project = isPlatform ? selectedProject : null
+
+  const handleCopy = useMemo(
+    () =>
+      createMcpCopyHandler({
+        selectedClient,
+        source: 'docs',
+        onTrack: (event) => {
+          sendTelemetryEvent({
+            action: event.action,
+            properties: event.properties,
+            groups: (event.groups || {}) as any,
+          })
+        },
+        projectRef: project?.ref,
+      }),
+    [selectedClient, sendTelemetryEvent, project?.ref]
+  )
+
+  const handleInstall = () => {
+    if (selectedClient?.label) {
+      sendTelemetryEvent({
+        action: 'mcp_install_button_clicked',
+        properties: {
+          client: selectedClient.label,
+          source: 'docs',
+        },
+        groups: {
+          ...(project?.ref && { project: project.ref }),
+        } as any,
+      })
+    }
+  }
 
   return (
     <>
@@ -288,13 +327,16 @@ export function McpConfigPanel() {
           projectRef={project?.ref}
           theme={theme as 'light' | 'dark'}
           isPlatform={isPlatform}
+          onCopyCallback={handleCopy}
+          onInstallCallback={handleInstall}
+          onClientSelect={setSelectedClient}
         />
       </div>
       {isPlatform && (
         <Admonition type="note" title="Authentication" className="mt-3">
           <p>
             {
-              "Your MCP client will automatically prompt you to login to Supabase during setup. This will open a browser window where you can login to your Supabase account and grant access to the MCP client. Be sure to choose the organization that contains the project you wish to work with. In the future, we'll offer more fine grain control over these permissions."
+              "Some MCP clients will automatically prompt you to login during setup, while others may require manual authentication steps. Either authentication method will open a browser window where you can login to your Supabase account and grant organization access to the MCP client. In the future, we'll offer more fine grain control over these permissions."
             }
           </p>
           <p>

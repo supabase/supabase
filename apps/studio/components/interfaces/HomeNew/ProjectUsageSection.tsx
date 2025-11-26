@@ -8,7 +8,6 @@ import { useParams } from 'common'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import useProjectUsageStats from 'hooks/analytics/useProjectUsageStats'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -33,9 +32,9 @@ import {
 import { Row } from 'ui-patterns'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 import { useServiceStats } from './ProjectUsageSection.utils'
+import type { StatsLike } from './ProjectUsageSection.utils'
 import type { LogsBarChartDatum } from './ProjectUsage.metrics'
 import {
-  toLogsBarChartData,
   sumTotal,
   sumWarnings,
   sumErrors,
@@ -68,7 +67,7 @@ const CHART_INTERVALS: ChartIntervals[] = [
     label: 'Last 7 days',
     startValue: 7,
     startUnit: 'day',
-    format: 'MMM D',
+    format: 'MMM D, ha',
     availableIn: ['pro', 'team', 'enterprise'],
   },
 ]
@@ -90,7 +89,7 @@ type ServiceComputed = ServiceEntry & {
   total: number
   warn: number
   err: number
-  stats: ReturnType<typeof useProjectUsageStats>
+  stats: StatsLike
 }
 
 export const ProjectUsageSection = () => {
@@ -109,37 +108,12 @@ export const ProjectUsageSection = () => {
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
 
-  const { timestampStart, timestampEnd, datetimeFormat } = useMemo(() => {
-    const startDateLocal = dayjs().subtract(
-      selectedInterval.startValue,
-      selectedInterval.startUnit as dayjs.ManipulateType
-    )
-    const endDateLocal = dayjs()
+  const { datetimeFormat } = useMemo(() => {
     const format = selectedInterval.format || 'MMM D, ha'
+    return { datetimeFormat: format }
+  }, [selectedInterval])
 
-    return {
-      timestampStart: startDateLocal.toISOString(),
-      timestampEnd: endDateLocal.toISOString(),
-      datetimeFormat: format,
-    }
-  }, [selectedInterval]) // Only recalculate when interval changes
-
-  const { previousStart, previousEnd } = useMemo(() => {
-    const currentStart = dayjs(timestampStart)
-    const currentEnd = dayjs(timestampEnd)
-    const durationMs = currentEnd.diff(currentStart)
-    const prevEnd = currentStart
-    const prevStart = currentStart.subtract(durationMs, 'millisecond')
-    return { previousStart: prevStart.toISOString(), previousEnd: prevEnd.toISOString() }
-  }, [timestampStart, timestampEnd])
-
-  const statsByService = useServiceStats(
-    projectRef as string,
-    timestampStart,
-    timestampEnd,
-    previousStart,
-    previousEnd
-  )
+  const statsByService = useServiceStats(projectRef!, interval)
 
   const serviceBase: ServiceEntry[] = useMemo(
     () => [
@@ -185,7 +159,7 @@ export const ProjectUsageSection = () => {
     () =>
       serviceBase.map((s) => {
         const currentStats = statsByService[s.key].current
-        const data = toLogsBarChartData(currentStats.eventChartData)
+        const data = currentStats.eventChartData
         const total = sumTotal(data)
         const warn = sumWarnings(data)
         const err = sumErrors(data)
@@ -239,7 +213,7 @@ export const ProjectUsageSection = () => {
     () =>
       serviceBase.map((s) => {
         const previousStats = statsByService[s.key].previous
-        const data = toLogsBarChartData(previousStats.eventChartData)
+        const data = previousStats.eventChartData
         return {
           enabled: s.enabled,
           total: sumTotal(data),

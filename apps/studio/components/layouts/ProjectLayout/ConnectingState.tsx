@@ -91,7 +91,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
                 </Button>
                 <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                   <Link
-                    href={`${DOCS_URL}/guides/platform/troubleshooting#unable-to-connect-to-your-supabase-project`}
+                    href={`${DOCS_URL}/guides/troubleshooting?products=platform#unable-to-connect-to-your-supabase-project`}
                     className="translate-y-[1px]"
                   >
                     Troubleshooting

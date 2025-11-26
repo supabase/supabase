@@ -99,7 +99,7 @@ export const HeaderBanner = ({
           </span>
         </div>
         {link && (
-          <a
+          <Link
             href={link}
             className={cn(
               'lg:block hidden',
@@ -108,7 +108,7 @@ export const HeaderBanner = ({
             )}
           >
             View Details
-          </a>
+          </Link>
         )}
       </div>
     </motion.div>

@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
+import { SidePanelEditor } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
