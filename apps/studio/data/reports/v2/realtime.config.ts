@@ -258,7 +258,7 @@ export const realtimeReports = ({
   },
   {
     id: 'realtime_replication_connection_lag',
-    label: 'Replication Connection Lag',
+    label: 'Broadcast From Database Replication Lag',
     valuePrecision: 2,
     showNewBadge: true,
     hide: false,
