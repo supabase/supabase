@@ -23,21 +23,97 @@ Setting up OAuth 2.1 in your Supabase project involves these steps:
 3. Build your authorization UI (frontend)
 4. Register OAuth client applications
 
+<Admonition type="note">
+
+Testing OAuth flows is often easier on a Supabase project since it's already accessible on the web, no tunneling or additional configuration needed.
+
+</Admonition>
+
 ## Enable OAuth 2.1 server
 
 OAuth 2.1 server capabilities are available on all Supabase plans.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+  queryGroup="oauth-setup"
+>
+<TabPanel id="dashboard" label="Cloud">
 
 1. Go to your project dashboard
 2. Navigate to **Authentication** > **OAuth Server** in the sidebar
 3. Enable OAuth 2.1 server capabilities
 
+</TabPanel>
+<TabPanel id="cli" label="CLI">
+
+Edit your `supabase/config.toml` file and add the OAuth server configuration:
+
+```toml
+[auth.oauth_server]
+enabled = true
+authorization_url_path = "/oauth/consent"
+allow_dynamic_registration = false  # Optional: enable dynamic client registration
+```
+
+Start or restart your local Supabase instance:
+
+```bash
+supabase start
+# or if already running:
+supabase stop && supabase start
+```
+
+</TabPanel>
+</Tabs>
+
 Once enabled, your project will expose the necessary OAuth endpoints:
 
-- **Authorization endpoint**: `https://<project-ref>.supabase.co/auth/v1/oauth/authorize`
-- **Token endpoint**: `https://<project-ref>.supabase.co/auth/v1/oauth/token`
-- **JWKS endpoint**: `https://<project-ref>.supabase.co/auth/v1/oauth/jwks`
-- **Discovery endpoint**: `https://<project-ref>.supabase.co/.well-known/oauth-authorization-server`
-- **OIDC discovery**: `https://<project-ref>.supabase.co/.well-known/openid-configuration`
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+  queryGroup="oauth-setup"
+>
+<TabPanel id="dashboard" label="Cloud">
+
+| Endpoint                   | URL                                                                                |
+| -------------------------- | ---------------------------------------------------------------------------------- |
+| **Authorization endpoint** | `https://<project-ref>.supabase.co/auth/v1/oauth/authorize`                        |
+| **Token endpoint**         | `https://<project-ref>.supabase.co/auth/v1/oauth/token`                            |
+| **JWKS endpoint**          | `https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json`                  |
+| **Discovery endpoint**     | `https://<project-ref>.supabase.co/.well-known/oauth-authorization-server/auth/v1` |
+| **OIDC discovery**         | `https://<project-ref>.supabase.co/auth/v1/.well-known/openid-configuration`       |
+
+</TabPanel>
+<TabPanel id="cli" label="CLI">
+
+| Endpoint                   | URL                                                                     |
+| -------------------------- | ----------------------------------------------------------------------- |
+| **Authorization endpoint** | `http://localhost:54321/auth/v1/oauth/authorize`                        |
+| **Token endpoint**         | `http://localhost:54321/auth/v1/oauth/token`                            |
+| **JWKS endpoint**          | `http://localhost:54321/auth/v1/.well-known/jwks.json`                  |
+| **Discovery endpoint**     | `http://localhost:54321/.well-known/oauth-authorization-server/auth/v1` |
+| **OIDC discovery**         | `http://localhost:54321/auth/v1/.well-known/openid-configuration`       |
+
+### Expose local instance to the world
+
+To test OAuth flows with external applications, you can expose your local Supabase instance using a tunneling solution (such as [ngrok](https://ngrok.com/), [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/), or [localtunnel](https://localtunnel.github.io/www/)).
+
+When using a tunnel, configure the `jwt_issuer` field in your `supabase/config.toml` to match your tunnel URL:
+
+```toml
+[auth]
+jwt_issuer = "https://my-tunnel.url/auth/v1"
+```
+
+This ensures that JWTs issued by your local instance use the correct issuer claim for token validation, and serves the discovery endpoint at the correct location with accurate discovery information.
+
+</TabPanel>
+</Tabs>
 
 <Admonition type="tip">
 
@@ -385,7 +461,14 @@ export function OAuthConsent() {
 
 Before third-party applications can use your project as an identity provider, you need to register them as OAuth clients.
 
-### Via Dashboard
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+  queryGroup="oauth-setup"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
 1. Go to **Authentication** > **OAuth Apps** (under the **Manage** section)
 2. Click **Add a new client**
@@ -408,9 +491,12 @@ Store the client secret securely. It will only be shown once. If you lose it, yo
 
 </Admonition>
 
-### Programmatically
+</TabPanel>
+<TabPanel id="programmatically" label="Programmatically">
 
-You can also register clients programmatically by calling your project's auth server admin endpoint with a secret key:
+You can register clients programmatically by calling your project's auth server admin endpoint with a secret key:
+
+**Production:**
 
 ```bash
 curl -X POST 'https://<project-ref>.supabase.co/auth/v1/admin/oauth/clients' \
@@ -426,12 +512,25 @@ curl -X POST 'https://<project-ref>.supabase.co/auth/v1/admin/oauth/clients' \
   }'
 ```
 
+**Local development:**
+
+```bash
+curl -X POST 'http://localhost:54321/auth/v1/admin/oauth/clients' \
+  -H "Authorization: Bearer ${SUPABASE_SECRET_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Local Dev App",
+    "redirect_uris": ["http://localhost:3000/auth/callback"],
+    "client_type": "confidential"
+  }'
+```
+
 Response:
 
 ```json
 {
   "client_id": "9a8b7c6d-5e4f-3a2b-1c0d-9e8f7a6b5c4d",
-  "client_secret": "secret_1234567890abcdef...",
+  "client_secret": "verysecret-1234567890abcdef...",
   "name": "My Third-Party App",
   "redirect_uris": ["https://my-app.com/auth/callback", "https://my-app.com/auth/silent-callback"],
   "client_type": "confidential",
@@ -449,10 +548,22 @@ For complete API documentation, see the [OAuth Admin API reference](/todo).
 
 To view all registered OAuth clients:
 
+**Production:**
+
 ```bash
 curl 'https://<project-ref>.supabase.co/auth/v1/admin/oauth/clients' \
   -H "Authorization: Bearer ${SUPABASE_SECRET_KEY}"
 ```
+
+**Local development:**
+
+```bash
+curl 'http://localhost:54321/auth/v1/admin/oauth/clients' \
+  -H "Authorization: Bearer ${SUPABASE_SECRET_KEY}"
+```
+
+</TabPanel>
+</Tabs>
 
 ## Customizing tokens (optional)
 
@@ -493,53 +604,6 @@ OAuth client redirect URIs require exact, complete URL matches. Unlike general r
 - **Use HTTPS in production** - Always use HTTPS for redirect URIs in production
 - **Register exact, complete URLs** - Each redirect URI must be the full URL including protocol, domain, path, and port if needed
 - **Use separate OAuth clients per environment** - Create separate OAuth clients for development, staging, and production. This provides better security isolation, allows independent secret rotation, and improves auditability. If you need to use the same client across environments, you can register multiple redirect URIs, but separate clients are recommended.
-
-## Local development with Supabase CLI
-
-To use OAuth 2.1 server capabilities locally with the [Supabase CLI](/docs/guides/cli) (v2.54.11 or higher), you need to enable it in your configuration.
-
-### Enable OAuth server locally
-
-1. Edit your `supabase/config.toml` file and add the OAuth server configuration:
-
-```toml
-[auth.oauth_server]
-enabled = true
-authorization_url_path = "/oauth/consent"
-allow_dynamic_registration = false  # Optional: enable dynamic client registration
-```
-
-2. Start or restart your local Supabase instance:
-
-```bash
-supabase start
-# or if already running:
-supabase stop && supabase start
-```
-
-### Register OAuth clients locally
-
-Register OAuth clients using the admin endpoint (same as production):
-
-```bash
-curl -X POST 'http://localhost:54321/auth/v1/admin/oauth/clients' \
-  -H "Authorization: Bearer ${SUPABASE_SECRET_KEY}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Local Dev App",
-    "redirect_uris": ["http://localhost:3000/auth/callback"],
-    "client_type": "confidential"
-  }'
-```
-
-### Local OAuth endpoints
-
-When running locally, your OAuth endpoints will be:
-
-- **Authorization endpoint**: `http://localhost:54321/auth/v1/oauth/authorize`
-- **Token endpoint**: `http://localhost:54321/auth/v1/oauth/token`
-- **JWKS endpoint**: `http://localhost:54321/auth/v1/.well-known/jwks.json`
-- **Discovery endpoint**: `http://localhost:54321/.well-known/oauth-authorization-server/auth/v1`
 
 ## Next steps
 
