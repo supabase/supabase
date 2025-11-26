@@ -313,8 +313,6 @@ function createStorageExplorerState({
       columnIndex: number
       onError?: () => void
     }) => {
-      const supabaseClient = await createSupabaseClient(state.projectRef, clientEndpoint)
-
       const autofix = false
       const formattedName = state.sanitizeNameForDuplicateInColumn({
         name: folderName,
@@ -1758,7 +1756,10 @@ function createStorageExplorerState({
 
       if (hasSameNameInColumn) {
         if (autofix) {
-          const [fileName, fileExt] = name.split('.')
+          const fileNameSegments = name.split('.')
+          const fileName = fileNameSegments.slice(0, fileNameSegments.length - 1).join('.')
+          const fileExt = fileNameSegments[fileNameSegments.length - 1]
+
           const dupeNameRegex = new RegExp(
             `${fileName} \\([-0-9]+\\)${fileExt ? '.' + fileExt : ''}$`
           )
