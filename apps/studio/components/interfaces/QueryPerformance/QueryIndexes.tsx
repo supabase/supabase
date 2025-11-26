@@ -33,6 +33,8 @@ import {
   hasIndexRecommendations,
 } from './IndexAdvisor/index-advisor.utils'
 import { EnableIndexAdvisorButton } from './IndexAdvisor/EnableIndexAdvisorButton'
+import { DocsButton } from 'components/ui/DocsButton'
+import { DOCS_URL } from 'lib/constants'
 
 interface QueryIndexesProps {
   selectedRow: any
@@ -132,7 +134,10 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
             <p className="text-center text-xs text-foreground-lighter mb-2">
               Recommends indexes to improve query performance.
             </p>
-            <EnableIndexAdvisorButton />
+            <div className="flex items-center gap-x-2">
+              <DocsButton href={`${DOCS_URL}/guides/database/extensions/index_advisor`} />
+              <EnableIndexAdvisorButton />
+            </div>
           </div>
         </QueryPanelSection>
       </QueryPanelContainer>
