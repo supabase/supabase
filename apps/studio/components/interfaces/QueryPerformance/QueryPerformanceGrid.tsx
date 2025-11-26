@@ -463,10 +463,14 @@ export const QueryPerformanceGrid = ({
             const isSelected = idx === selectedRow
             const query = reportData[idx]?.query
             const isCharted = currentSelectedQuery ? currentSelectedQuery === query : false
+            const hasRecommendations = hasIndexRecommendations(
+              reportData[idx]?.index_advisor_result,
+              true
+            )
 
             return [
-              `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
-              `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:!border-l-foreground' : ''}`,
+              `${isSelected ? (hasRecommendations ? 'bg-warning/10 hover:bg-warning/20' : 'bg-surface-300 dark:bg-surface-300') : hasRecommendations ? 'bg-warning/10 hover:bg-warning/20' : 'bg-200 hover:bg-surface-200'} cursor-pointer`,
+              `${isSelected ? (hasRecommendations ? '[&>div:first-child]:border-l-4 border-l-warning [&>div]:border-l-warning' : '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:!border-l-foreground') : hasRecommendations ? '[&>div:first-child]:border-l-4 border-l-warning [&>div]:border-l-warning' : ''}`,
               `${isCharted ? 'bg-surface-200 dark:bg-surface-200' : ''}`,
               `${isCharted ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-brand' : ''}`,
               '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
@@ -492,7 +496,11 @@ export const QueryPerformanceGrid = ({
                       } else {
                         // Otherwise, open the detail panel
                         setSelectedRow(idx)
-                        setView('details')
+                        const hasRecommendations = hasIndexRecommendations(
+                          reportData[idx]?.index_advisor_result,
+                          true
+                        )
+                        setView(hasRecommendations ? 'suggestion' : 'details')
                         gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                       }
                     }
