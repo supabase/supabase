@@ -18,6 +18,7 @@ import {
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { EmptyState } from 'components/ui/EmptyState'
 import { InlineLink } from 'components/ui/InlineLink'
 import {
   DatabaseExtension,
@@ -216,35 +217,24 @@ export const AnalyticBucketDetails = () => {
                     {HIDE_REPLICATION_USER_FLOW ? (
                       <CreateTableInstructions />
                     ) : isPollingForData ? (
-                      <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-3 items-center text-center gap-1 text-balance">
-                        <Loader2
-                          size={24}
-                          strokeWidth={1.5}
-                          className="animate-spin text-foreground-muted"
-                        />
-                        <div className="flex flex-col items-center text-center">
-                          <h3>Connecting table(s) to bucket</h3>
-                          <p className="text-foreground-light text-sm">
-                            Tables will be shown here once the connection is complete
-                          </p>
-                        </div>
-                      </aside>
+                      <EmptyState
+                        icon={<Loader2 size={24} strokeWidth={1.5} className="animate-spin text-foreground-muted" />}
+                        title="Connecting table(s) to bucket"
+                        description="Tables will be shown here once the connection is complete"
+                      />
                     ) : (
-                      <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-3 items-center text-center gap-1 text-balance">
-                        <SquarePlus size={24} strokeWidth={1.5} className="text-foreground-muted" />
-                        <div className="flex flex-col items-center text-center">
-                          <h3>Connect database tables</h3>
-                          <p className="text-foreground-light text-sm">
-                            Stream table data for continuous backups and analysis
-                          </p>
-                        </div>
+                      <EmptyState
+                        icon={SquarePlus}
+                        title="Connect database tables"
+                        description="Stream table data for continuous backups and analysis"
+                      >
                         <ConnectTablesDialog
                           onSuccessConnectTables={() => {
                             setPollIntervalNamespaces(4000)
                             setPollIntervalNamespaceTables(4000)
                           }}
                         />
-                      </aside>
+                      </EmptyState>
                     )}
                   </>
                 ) : (

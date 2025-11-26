@@ -21,7 +21,7 @@ import {
   TableRow,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import MigrationsEmptyState from './MigrationsEmptyState'
+import { MigrationsEmptyState } from './MigrationsEmptyState'
 
 const Migrations = () => {
   const [search, setSearch] = useState('')

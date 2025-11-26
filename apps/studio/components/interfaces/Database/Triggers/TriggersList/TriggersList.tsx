@@ -12,6 +12,7 @@ import { TriggerSheet } from 'components/interfaces/Database/Triggers/TriggerShe
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 
 import AlertError from 'components/ui/AlertError'
+import { EmptyState } from 'components/ui/EmptyState'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
@@ -209,17 +210,11 @@ execute function function_name();`)
         {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
 
         {!isSchemaLocked && (schemaTriggers ?? []).length === 0 ? (
-          <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-3 items-center text-center text-balance">
-            <DatabaseZap size={24} strokeWidth={1.5} className="text-foreground-muted" />
-
-            <div className="flex flex-col items-center text-center">
-              <h3>Add your first trigger</h3>
-              <p className="text-foreground-light text-sm max-w-[720px]">
-                Make your database reactive. Send updates in realtime, call edge functions, or
-                validate data as it comes in.
-              </p>
-            </div>
-
+          <EmptyState
+            icon={DatabaseZap}
+            title="Add your first trigger"
+            description="Make your database reactive. Send updates in realtime, call edge functions, or validate data as it comes in."
+          >
             <CreateTriggerButtons
               hasTables={hasTables}
               canCreateTriggers={canCreateTriggers}
@@ -228,7 +223,7 @@ execute function function_name();`)
               showPlusIcon={false}
               buttonType="default"
             />
-          </aside>
+          </EmptyState>
         ) : (
           <div className="w-full overflow-hidden overflow-x-auto">
             <Card>

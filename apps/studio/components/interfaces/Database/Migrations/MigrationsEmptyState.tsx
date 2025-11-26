@@ -1,13 +1,12 @@
 import { Terminal } from 'lucide-react'
-import { useState } from 'react'
 
 import { useParams } from 'common'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
+import { EmptyState } from 'components/ui/EmptyState'
 import { Card, CardContent, CardHeader, CardTitle } from 'ui'
 
-const MigrationsEmptyState = () => {
+export const MigrationsEmptyState = () => {
   const { ref } = useParams()
-  const [showInstructions, setShowInstructions] = useState(false)
 
   const commands = [
     {
@@ -46,18 +45,11 @@ const MigrationsEmptyState = () => {
   ]
 
   return (
-    <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-6 items-center">
-      <div className="flex flex-col gap-y-3 items-center ">
-        <Terminal size={24} strokeWidth={1.5} className="text-foreground-muted" />
-
-        <div className="flex flex-col items-center text-center text-balance">
-          <h3>Run your first migration</h3>
-          <p className="text-foreground-light text-sm max-w-[720px]">
-            Create and run your first migration using the Supabase CLI.
-          </p>
-        </div>
-      </div>
-
+    <EmptyState
+      icon={Terminal}
+      title="Run your first migration"
+      description="Create and run your first migration using the Supabase CLI."
+    >
       <Card>
         <CardHeader>
           <CardTitle>Terminal instructions</CardTitle>
@@ -66,8 +58,6 @@ const MigrationsEmptyState = () => {
           <CommandRender commands={commands} />
         </CardContent>
       </Card>
-    </aside>
+    </EmptyState>
   )
 }
-
-export default MigrationsEmptyState
