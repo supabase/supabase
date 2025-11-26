@@ -31,7 +31,7 @@ export function SupportAccessToggle({ form }: SupportAccessToggleProps) {
   return (
     <FormField_Shadcn_
       name="allowSupportAccess"
-      control={form.control as any}
+      control={form.control}
       render={({ field }) => {
         return (
           <FormItemLayout
