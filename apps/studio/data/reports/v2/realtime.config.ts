@@ -140,7 +140,7 @@ export const realtimeReports = ({
 
       const transformedData = data?.map((p) => ({
         ...p,
-        realtime_channel_events: Number(p.realtime_channel_events) || 0,
+        realtime_channel_presence_events: Number(p.realtime_channel_presence_events) || 0,
       }))
 
       const attributes = [
@@ -179,7 +179,7 @@ export const realtimeReports = ({
 
       const transformedData = data?.map((p) => ({
         ...p,
-        realtime_channel_events: Number(p.realtime_channel_events) || 0,
+        realtime_channel_db_events: Number(p.realtime_channel_db_events) || 0,
       }))
 
       const attributes = [
