@@ -113,7 +113,7 @@ export const pricingTooltips: PricingTooltips = {
   'auth.auditLogs': {
     main: (
       <span className="prose text-xs">
-        Auth audit logs provide comprehensive tracking of authentication events. Audit logs are
+        Auth Audit Logs provide comprehensive tracking of authentication events. Audit logs are
         automatically captured for all authentication events and help you monitor user
         authentication activities, detect suspicious behavior, and maintain compliance with security
         requirements. Read more in our{' '}
