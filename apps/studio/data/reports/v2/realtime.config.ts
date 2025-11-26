@@ -58,14 +58,6 @@ export const realtimeReports = ({
         databaseIdentifier
       )
 
-      const transformedData = (data?.data ?? []).map((p) => {
-        const valueAsNumber = Number(p.realtime_sum_connections_connected)
-        return {
-          ...p,
-          realtime_sum_connections_connected: Number.isNaN(valueAsNumber) ? 0 : valueAsNumber,
-        }
-      })
-
       const attributes = [
         {
           attribute: 'realtime_sum_connections_connected',
@@ -73,7 +65,7 @@ export const realtimeReports = ({
         },
       ]
 
-      return { data: transformedData, attributes }
+      return { data: data?.data || [], attributes }
     },
   },
   {
