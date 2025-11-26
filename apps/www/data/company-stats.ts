@@ -3,7 +3,7 @@
 // Number is used for animated components (eg. AnimatedCounter)
 export const companyStats = {
   databasesManaged: {
-    number: `16_000_000,
+    number: 16_000_000,
     text: '16,000,000+',
     label: 'Databases Created',
   },
