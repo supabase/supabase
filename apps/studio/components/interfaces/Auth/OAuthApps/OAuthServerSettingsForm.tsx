@@ -321,7 +321,7 @@ export const OAuthServerSettingsForm = () => {
                                 Enable dynamic OAuth app registration. Apps can be registered
                                 programmatically via APIs.{' '}
                                 <Link
-                                  href="https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication#dynamic-client-registration"
+                                  href="https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication#oauth-client-setup"
                                   target="_blank"
                                   rel="noreferrer"
                                   className="text-foreground-light underline hover:text-foreground transition"
@@ -369,31 +369,27 @@ export const OAuthServerSettingsForm = () => {
         variant="warning"
         visible={showDynamicAppsConfirmation}
         size="large"
-        title="Enable dynamic client registration"
-        confirmLabel="Enable dynamic registration"
+        title="Enable dynamic OAuth app registration"
+        confirmLabel="Enable dynamic app registration"
         onConfirm={confirmDynamicApps}
         onCancel={cancelDynamicApps}
         alert={{
           title:
-            'By confirming, you acknowledge the risks and would like to move forward with enabling dynamic client registration.',
+            'By confirming, you acknowledge the risks and would like to move forward with enabling dynamic OAuth app registration.',
         }}
       >
         <p className="text-sm text-foreground-lighter pb-4">
-          Enabling dynamic client registration will open up a public API endpoint that anyone can
-          use to register OAuth applications with your app. This can be a security concern, as
-          attackers could register OAuth applications with legitimate-sounding names and send them
-          to your users for approval.
+          Dynamic OAuth apps (also known as dynamic client registration) exposes a public endpoint
+          allowing anyone to register OAuth clients. Bad actors could create malicious apps with
+          legitimate-sounding names to phish your users for authorization.
         </p>
         <p className="text-sm text-foreground-lighter pb-4">
-          If your users don't look carefully and accept, the attacker could potentially take over
-          the user's account. Attackers can also flood your application with thousands of OAuth
-          applications that cannot be attributed to anyone (as it's a public endpoint), and make it
-          difficult for you to find and shut them down, or even find legitimate ones.
+          You may also see spam registrations that are difficult to trace or moderate, making it
+          harder to identify trustworthy applications in your OAuth apps list.
         </p>
         <p className="text-sm text-foreground-lighter pb-4">
-          If dynamic client registration is enabled, the consent screen is forced to be enabled for
-          all OAuth flows and can no longer be disabled. Disabling the consent screen opens up a
-          CSRF vulnerability in your app.
+          Only enable this if you have a specific use case requiring programmatic client
+          registration and understand the security implications.
         </p>
       </ConfirmationModal>
 

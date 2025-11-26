@@ -329,6 +329,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-read-only-query",
+        "title": "Read only query",
+        "slug": "v1-read-only-query",
+        "type": "operation"
+      },
+      {
         "id": "v1-remove-a-read-replica",
         "title": "Remove a read replica",
         "slug": "v1-remove-a-read-replica",
@@ -356,6 +362,12 @@
         "id": "v1-setup-a-read-replica",
         "title": "Setup a read replica",
         "slug": "v1-setup-a-read-replica",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-database-password",
+        "title": "Update database password",
+        "slug": "v1-update-database-password",
         "type": "operation"
       },
       {
@@ -779,6 +791,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-update-a-project",
+        "title": "Update a project",
+        "slug": "v1-update-a-project",
+        "type": "operation"
+      },
+      {
         "id": "v1-update-network-restrictions",
         "title": "Update network restrictions",
         "slug": "v1-update-network-restrictions",
@@ -788,6 +806,24 @@
         "id": "v1-upgrade-postgres-version",
         "title": "Upgrade postgres version",
         "slug": "v1-upgrade-postgres-version",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Realtime Config",
+    "items": [
+      {
+        "id": "v1-get-realtime-config",
+        "title": "Get realtime config",
+        "slug": "v1-get-realtime-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-realtime-config",
+        "title": "Update realtime config",
+        "slug": "v1-update-realtime-config",
         "type": "operation"
       }
     ]
