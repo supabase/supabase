@@ -405,9 +405,13 @@ export const Permissions = ({
                         <Select_Shadcn_
                           value={row.action}
                           onValueChange={(value) => {
-                            const newRows = [...permissionRows]
-                            newRows[index] = { ...newRows[index], action: value }
-                            setValue('permissionRows', newRows)
+                            const newRows = permissionRows.map((r: any, i: number) =>
+                              i === index ? { resource: r.resource, action: value } : r
+                            )
+                            setValue('permissionRows', newRows, {
+                              shouldValidate: true,
+                              shouldDirty: true,
+                            })
                           }}
                         >
                           <SelectTrigger_Shadcn_ className="w-[150px] h-7">
