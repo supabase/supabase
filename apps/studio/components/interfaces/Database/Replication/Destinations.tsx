@@ -6,11 +6,13 @@ import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { AlertError } from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { useReplicationDestinationsQuery } from 'data/replication/destinations-query'
 import { replicationKeys } from 'data/replication/keys'
 import { fetchReplicationPipelineVersion } from 'data/replication/pipeline-version-query'
 import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
 import { Button, cn, Input_Shadcn_ } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
@@ -20,6 +22,9 @@ import { EnableReplicationModal } from './EnableReplicationModal'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 
 export const Destinations = () => {
+  const { data: organization } = useSelectedOrganizationQuery()
+  const isPaidPlan = organization?.plan.id !== 'free'
+
   const [showNewDestinationPanel, setShowNewDestinationPanel] = useState(false)
   const [filterString, setFilterString] = useState<string>('')
   const { ref: projectRef } = useParams()
@@ -108,17 +113,22 @@ export const Destinations = () => {
               />
             </div>
           </div>
-          {!!sourceId && (
-            <Button type="default" icon={<Plus />} onClick={() => setShowNewDestinationPanel(true)}>
-              Add destination
-            </Button>
-          )}
+          <div className="flex items-center gap-x-2">
+            {!!sourceId && (
+              <Button
+                type="default"
+                icon={<Plus />}
+                onClick={() => setShowNewDestinationPanel(true)}
+              >
+                Add destination
+              </Button>
+            )}
+            <DocsButton href="https://supabase.com/docs/guides/database/replication" />
+          </div>
         </div>
       </div>
 
       <div className="w-full overflow-hidden overflow-x-auto">
-        {(isSourcesLoading || isDestinationsLoading) && <GenericSkeletonLoader />}
-
         {(isSourcesError || isDestinationsError) && (
           <AlertError
             error={sourcesError || destinationsError}
@@ -126,17 +136,23 @@ export const Destinations = () => {
           />
         )}
 
-        {replicationNotEnabled ? (
+        {isSourcesLoading || isDestinationsLoading ? (
+          <GenericSkeletonLoader />
+        ) : replicationNotEnabled ? (
           <div className="border rounded-md p-4 md:p-12 flex flex-col gap-y-4">
             <div className="flex flex-col gap-y-1">
-              <h3>Stream data to external destinations in real-time</h3>
+              <h3>Replicate data to external destinations in real-time</h3>
               <p className="text-sm text-foreground-light">
-                Enable replication to start sending your database changes to data warehouses and
-                analytics platforms
+                {isPaidPlan ? 'Enable replication' : 'Upgrade to the Pro plan'} to start replicating
+                your database changes to data warehouses and analytics platforms
               </p>
             </div>
             <div className="flex gap-x-2">
-              <EnableReplicationModal />
+              {isPaidPlan ? (
+                <EnableReplicationModal />
+              ) : (
+                <UpgradePlanButton type="primary" plan="Pro" />
+              )}
               {/* [Joshen] Placeholder for when we have documentation */}
               <DocsButton href={`${DOCS_URL}`} />
             </div>
@@ -191,10 +207,10 @@ export const Destinations = () => {
               )}
             >
               <h4>Create your first destination</h4>
-              <p className="prose text-sm text-center mt-1 max-w-full">
+              <p className="prose text-sm text-center mt-1 max-w-[70ch]">
                 Destinations are external platforms where your database changes are automatically
-                sent. Connect to data warehouses like BigQuery or analytics buckets to enable
-                real-time data pipelines.
+                sent. Connect to various data warehouses and analytics platforms to enable real-time
+                data pipelines.
               </p>
               <Button
                 icon={<Plus />}

@@ -22,7 +22,7 @@ export const MergeRequestButton = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
+  const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onError: () => {
       toast.error(`Failed to open merge request`)
     },

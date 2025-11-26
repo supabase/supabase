@@ -1,5 +1,6 @@
 import { Lock, Paintbrush, PlusCircle, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -37,7 +38,10 @@ export const QueueTab = () => {
 
   const [openRlsPopover, setOpenRlsPopover] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
-  const [sendMessageModalShown, setSendMessageModalShown] = useState(false)
+  const [sendMessageModalShown, setSendMessageModalShown] = useQueryState(
+    'new-message',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   const [purgeQueueModalShown, setPurgeQueueModalShown] = useState(false)
   const [deleteQueueModalShown, setDeleteQueueModalShown] = useState(false)
   const [selectedTypes, setSelectedTypes] = useState<QUEUE_MESSAGE_TYPE[]>([])
@@ -74,7 +78,7 @@ export const QueueTab = () => {
   )
   const messages = useMemo(() => data?.pages.flatMap((p) => p), [data?.pages])
 
-  const { mutate: updateTable, isLoading: isUpdatingTable } = useTableUpdateMutation({
+  const { mutate: updateTable, isPending: isUpdatingTable } = useTableUpdateMutation({
     onSettled: () => {
       toast.success(`Successfully enabled RLS for ${queueName}`)
       setRlsConfirmModalOpen(false)
@@ -265,7 +269,7 @@ You may opt to manage your queues via any Supabase client libraries or PostgREST
 
       <ConfirmationModal
         visible={rlsConfirmModalOpen}
-        title="Confirm to enable Row Level Security"
+        title="Enable Row Level Security"
         confirmLabel="Enable RLS"
         confirmLabelLoading="Enabling RLS"
         loading={isUpdatingTable}

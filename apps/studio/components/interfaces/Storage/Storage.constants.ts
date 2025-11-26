@@ -60,31 +60,32 @@ export const CONTEXT_MENU_KEYS = {
   STORAGE_FOLDER: 'STORAGE_FOLDER',
 }
 
-// New bucket types configuration
-
 export const BUCKET_TYPES = {
   files: {
+    platformOnly: false,
     displayName: 'Files',
     singularName: 'file',
     article: 'a',
-    description: 'General file storage for most types of digital content.',
-    valueProp: 'Store images, videos, documents, and any other file type.',
+    description: 'General file storage for most types of digital content',
+    valueProp: 'Store images, videos, documents, and any other file type',
     docsUrl: `${DOCS_URL}/guides/storage/buckets/fundamentals`,
   },
   analytics: {
+    platformOnly: true,
     displayName: 'Analytics',
     singularName: 'analytics',
     article: 'an',
-    description: 'Purpose-built storage for analytical workloads.',
-    valueProp: 'Store large datasets for analytics and reporting.',
+    description: 'Purpose-built storage for analytical workloads',
+    valueProp: 'Store large datasets for analytics and reporting',
     docsUrl: `${DOCS_URL}/guides/storage/analytics/introduction`,
   },
   vectors: {
+    platformOnly: true,
     displayName: 'Vectors',
     singularName: 'vector',
     article: 'a',
-    description: 'Purpose-built storage for vector data.',
-    valueProp: 'Store, index, and query your vector embeddings at scale.',
+    description: 'Purpose-built storage for vector data',
+    valueProp: 'Store, index, and query your vector embeddings at scale',
     docsUrl: `${DOCS_URL}/guides/storage/vectors`,
   },
 }

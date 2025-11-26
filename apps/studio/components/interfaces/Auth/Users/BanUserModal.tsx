@@ -33,7 +33,7 @@ interface BanUserModalProps {
 export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
   const { ref: projectRef } = useParams()
 
-  const { mutate: updateUser, isLoading: isBanningUser } = useUserUpdateMutation({
+  const { mutate: updateUser, isPending: isBanningUser } = useUserUpdateMutation({
     onSuccess: (_, vars) => {
       const bannedUntil = dayjs()
         .add(Number(vars.banDuration), 'hours')
