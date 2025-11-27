@@ -25,7 +25,6 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 import { hasIndexRecommendations } from './IndexAdvisor/index-advisor.utils'
-import { useIndexAdvisorStatus } from './hooks/useIsIndexAdvisorStatus'
 import { IndexSuggestionIcon } from './IndexAdvisor/IndexSuggestionIcon'
 import { QueryDetail } from './QueryDetail'
 import { QueryIndexes } from './QueryIndexes'
@@ -42,8 +41,8 @@ import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFi
 interface QueryPerformanceGridProps {
   aggregatedData: QueryPerformanceRow[]
   isLoading: boolean
-  currentSelectedQuery?: string | null // Make optional
-  onCurrentSelectQuery?: (query: string) => void // Make optional
+  currentSelectedQuery?: string | null
+  onCurrentSelectQuery?: (query: string) => void
 }
 
 const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
@@ -77,7 +76,7 @@ export const QueryPerformanceGrid = ({
   const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
   const { sort: urlSort, order } = useParams()
-  const [{ search, roles, callsFilter }] = useQueryStates({
+  const [{ search, roles, callsFilter, indexAdvisor }] = useQueryStates({
     search: parseAsString.withDefault(''),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
     callsFilter: parseAsJson<NumericFilter | null>(
@@ -86,9 +85,9 @@ export const QueryPerformanceGrid = ({
       operator: '>=',
       value: 0,
     } as NumericFilter),
+    indexAdvisor: parseAsString.withDefault('false'),
   })
   const dataGridContainerRef = useRef<HTMLDivElement>(null)
-  const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
   const [view, setView] = useState<'details' | 'suggestion'>('details')
   const [selectedRow, setSelectedRow] = useState<number>()
@@ -379,6 +378,10 @@ export const QueryPerformanceGrid = ({
       })
     }
 
+    if (indexAdvisor === 'true') {
+      data = data.filter((row) => hasIndexRecommendations(row.index_advisor_result, true))
+    }
+
     if (sort?.column === 'prop_total_time') {
       data.sort((a, b) => {
         const aValue = a.prop_total_time || 0
@@ -398,11 +401,11 @@ export const QueryPerformanceGrid = ({
     }
 
     return data
-  }, [aggregatedData, sort, search, roles, callsFilter])
+  }, [aggregatedData, sort, search, roles, callsFilter, indexAdvisor])
 
   useEffect(() => {
     setSelectedRow(undefined)
-  }, [search, roles, urlSort, order, callsFilter])
+  }, [search, roles, urlSort, order, callsFilter, indexAdvisor])
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
