@@ -354,23 +354,29 @@ export function ComposedChart({
           data={data}
           syncId={syncId}
           style={{ cursor: 'crosshair' }}
-          onMouseMove={(e: any) => {
+          onMouseMove={(e) => {
+            const { activeTooltipIndex, activePayload } = e
+            if (!activeTooltipIndex) return
+
             setIsActiveHoveredChart(true)
-            if (e.activeTooltipIndex !== focusDataIndex) {
-              setFocusDataIndex(e.activeTooltipIndex)
-              setActivePayload(e.activePayload)
+            if (activeTooltipIndex !== focusDataIndex) {
+              setFocusDataIndex(activeTooltipIndex)
+              setActivePayload(activePayload ?? [])
             }
 
-            setHover(e.activeTooltipIndex)
+            setHover(activeTooltipIndex)
 
-            const activeTimestamp = data[e.activeTooltipIndex]?.timestamp
+            const activeTimestamp = data[activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseMove({
               activeLabel: activeTimestamp?.toString(),
               coordinates: e.activeLabel,
             })
           }}
-          onMouseDown={(e: any) => {
-            const activeTimestamp = data[e.activeTooltipIndex]?.timestamp
+          onMouseDown={(e) => {
+            const { activeTooltipIndex } = e
+            if (!activeTooltipIndex) return
+
+            const activeTimestamp = data[activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseDown({
               activeLabel: activeTimestamp?.toString(),
               coordinates: e.activeLabel,
