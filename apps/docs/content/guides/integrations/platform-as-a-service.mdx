@@ -7,7 +7,7 @@ subtitle: 'Use Supabase as a Platform for your own business and tools.'
 
 Supabase is a [Platform as a Service](https://en.wikipedia.org/wiki/Platform_as_a_service) (PaaS) that can be managed programmatically. You can use it to offer the key primitives to your own users, such as [Database](/docs/guides/database/overview), [Auth](/docs/guides/auth), [Edge Functions](/docs/guides/functions), [Storage](/docs/guides/storage), and [Realtime](/docs/guides/realtime). Supabase is commonly used as a platform by AI Builders and frameworks needing a backend.
 
-This document will guide you on best practices when using Supabase as a PaaS and assumes that Supabase projects are in a Supabase organization that you own. If you are interacting with projects through OAuth integration, navigate to [Supabase OAuth Integration](/docs/guides/integrations/build-a-supabase-oauth-integration) for more details.
+This document will guide you on best practices when using Supabase as a PaaS and assumes that Supabase projects are in a Supabase organization that you own. If you want to instead interact with projects through OAuth integration, navigate to [Supabase OAuth Integration](/docs/guides/integrations/build-a-supabase-oauth-integration) for more details.
 
 ![Platform as a Service](/docs/img/integrations/paas-intro.png)
 
@@ -127,7 +127,7 @@ Management API endpoints:
   - [`PATCH /v1/projects/{ref}/functions/{function_slug}`](https://api.supabase.com/api/v1#tag/edge-functions/patch/v1projectsreffunctionsfunction_slug)
   - [`PUT /v1/projects/{ref}/functions`](https://api.supabase.com/api/v1#tag/edge-functions/put/v1projectsreffunctions)
 - Storage: [`PATCH /v1/projects/{ref}/config/storage`](https://api.supabase.com/api/v1#tag/storage/patch/v1projectsrefconfigstorage)
-- Realtime: [`PATCH /v0/projects/{ref}/config/realtime`](https://api.supabase.com/api/v0#tag/projects-config/patch/v0projectsrefconfigrealtime) (moving to v1 soon)
+- Realtime: [`PATCH /v1/projects/{ref}/config/realtime`](https://api.supabase.com/api/v1#tag/realtime-config/patch/v1/projects/{ref}/config/realtime) (moving to v1 soon)
 
 You can manage the configuration of all services using the Management API.
 
@@ -344,13 +344,13 @@ curl https://api.supabase.com/v1/projects/database/backups/restore-pitr \
 }'
 ```
 
-## Project claim flow
+## Claim flow
 
 Management API endpoint: [`GET /v1/oauth/authorize/project-claim`](https://api.supabase.com/api/v1#tag/oauth/get/v1oauthauthorizeproject-claim)
 
 Your users may want to claim the project that currently lives in your org so that they can have more control over it.
 
-We've enabled transferring the project from your org to your user's org while you continue to retain access to interact with the project.
+We've enabled transferring the project from your org to your user's org while you continue to retain access to interact with the project through an [OAuth integration](/docs/guides/integrations/build-a-supabase-oauth-integration).
 
 ```sh
 curl -L "https://api.supabase.com/v1/oauth/authorize/project-claim?project_ref={ref}&client_id={oauth_client_id}&response_type=code&redirect_uri={redirect_uri}" \
@@ -362,7 +362,7 @@ The user is redirected to a Supabase UI:
 
 1.  Create a new Supabase account or sign in to an existing one
 2.  Create a new Supabase Organization or select an existing one
-3.  Review your OAuth app's permission scopes
+3.  Review your OAuth integration's permission scopes
 4.  Review the Project transfer details
 5.  Confirm the OAuth integration and the Project transfer for the selected Organization
 
@@ -391,3 +391,24 @@ Docs: https://supabase.com/ui/docs/platform/platform-kit
 </div>
 
 We've created Platform Kit, a collection of UI components that interact with Management API, as a lightweight version of Supabase Dashboard that you can embed directly in your app so your users never have to leave in order to interact with the project.
+
+## Debugging projects
+
+Management API endpoint: [`GET /v1/projects/{ref}/analytics/endpoints/logs.all`](https://api.supabase.com/api/v1#tag/analytics/get/v1/projects/{ref}/analytics/endpoints/logs.all)
+
+When you need to debug a project, you can query the project's logs to see if there are any errors and address them accordingly.
+
+```sh
+curl 'https://api.supabase.com/v1/projects/{ref}/analytics/endpoints/logs.all' \
+  --get \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
+  --data-urlencode 'sql=SELECT datetime(timestamp), status_code, path, event_message
+    FROM edge_logs
+    CROSS JOIN UNNEST(metadata) AS metadata
+    CROSS JOIN UNNEST(response) AS response
+    WHERE status_code >= 400
+    ORDER BY timestamp DESC
+    LIMIT 100' \
+  --data-urlencode 'iso_timestamp_start=2025-03-23T00:00:00Z' \
+  --data-urlencode 'iso_timestamp_end=2025-03-23T01:00:00Z'
+```
