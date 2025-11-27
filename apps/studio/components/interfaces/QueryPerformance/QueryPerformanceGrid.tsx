@@ -76,7 +76,7 @@ export const QueryPerformanceGrid = ({
   const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
   const { sort: urlSort, order } = useParams()
-  const [{ search, roles, callsFilter, indexAdvisor }] = useQueryStates({
+  const [{ search, roles, callsFilter }] = useQueryStates({
     search: parseAsString.withDefault(''),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
     callsFilter: parseAsJson<NumericFilter | null>(
@@ -85,7 +85,6 @@ export const QueryPerformanceGrid = ({
       operator: '>=',
       value: 0,
     } as NumericFilter),
-    indexAdvisor: parseAsString.withDefault('false'),
   })
   const dataGridContainerRef = useRef<HTMLDivElement>(null)
 
@@ -378,10 +377,6 @@ export const QueryPerformanceGrid = ({
       })
     }
 
-    if (indexAdvisor === 'true') {
-      data = data.filter((row) => hasIndexRecommendations(row.index_advisor_result, true))
-    }
-
     if (sort?.column === 'prop_total_time') {
       data.sort((a, b) => {
         const aValue = a.prop_total_time || 0
@@ -401,11 +396,11 @@ export const QueryPerformanceGrid = ({
     }
 
     return data
-  }, [aggregatedData, sort, search, roles, callsFilter, indexAdvisor])
+  }, [aggregatedData, sort, search, roles, callsFilter])
 
   useEffect(() => {
     setSelectedRow(undefined)
-  }, [search, roles, urlSort, order, callsFilter, indexAdvisor])
+  }, [search, roles, urlSort, order, callsFilter])
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {

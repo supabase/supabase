@@ -35,12 +35,13 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     handleDatePickerChange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
-  const [{ search: searchQuery, roles, minCalls }] = useQueryStates({
+  const [{ search: searchQuery, roles, minCalls, indexAdvisor }] = useQueryStates({
     sort: parseAsString,
     order: parseAsString,
     search: parseAsString.withDefault(''),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
     minCalls: parseAsInteger,
+    indexAdvisor: parseAsString.withDefault('false'),
   })
 
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
@@ -55,6 +56,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     roles,
     runIndexAdvisor: isIndexAdvisorEnabled,
     minCalls: minCalls ?? undefined,
+    filterIndexAdvisor: indexAdvisor === 'true',
   })
 
   const isPgStatMonitorEnabled = project?.dbVersion === '17.4.1.076-psml-1'
