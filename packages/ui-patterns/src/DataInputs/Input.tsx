@@ -37,7 +37,7 @@ const Input = forwardRef<
       onCopy,
       iconContainerClassName,
       containerClassName,
-      size,
+      size = 'small',
       ...props
     }: Props,
     ref
