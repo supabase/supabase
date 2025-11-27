@@ -160,6 +160,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        permanent: true,
+        source: '/project/:ref/settings/api-keys/new',
+        destination: '/project/:ref/settings/api-keys',
+      },
+      {
         source: '/project/:ref/settings/storage',
         destination: '/project/:ref/storage/files/settings',
         permanent: true,
@@ -236,6 +241,11 @@ const nextConfig = {
         source: '/project/:ref/settings/billing/subscription',
         destination: '/org/_/billing',
         permanent: true,
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/jwt/signing-keys',
+        destination: '/project/:ref/settings/jwt',
       },
       {
         source: '/project/:ref/database/api-logs',
@@ -438,6 +448,22 @@ const nextConfig = {
             },
           ]
         : []),
+
+      ...(process.env.MAINTENANCE_MODE === 'true'
+        ? [
+            {
+              source: '/((?!maintenance|img).*)', // Redirect all paths except /maintenance and /img
+              destination: '/maintenance',
+              permanent: false,
+            },
+          ]
+        : [
+            {
+              source: '/maintenance',
+              destination: '/',
+              permanent: false,
+            },
+          ]),
     ]
   },
   async headers() {

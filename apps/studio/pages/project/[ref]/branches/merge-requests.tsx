@@ -89,6 +89,8 @@ const MergeRequestsPage: NextPageWithLayout = () => {
 
   const isError = isErrorConnections || isErrorBranches
 
+  const isGithubConnected = githubConnection !== undefined
+
   const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
@@ -228,6 +230,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                             : `/project/${branch.project_ref}/merge`
                           return (
                             <BranchRow
+                              isGithubConnected={isGithubConnected}
                               key={branch.id}
                               label={
                                 <div className="flex items-center gap-x-4">
