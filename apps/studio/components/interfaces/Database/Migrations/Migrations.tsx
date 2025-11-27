@@ -21,7 +21,7 @@ import {
   TableRow,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import MigrationsEmptyState from './MigrationsEmptyState'
+import { MigrationsEmptyState } from './MigrationsEmptyState'
 
 const Migrations = () => {
   const [search, setSearch] = useState('')
@@ -83,15 +83,15 @@ const Migrations = () => {
 
             {data.length > 0 && (
               <>
-                <div className="w-80 mb-4">
-                  <Input
-                    size="small"
-                    placeholder="Search for a migration"
-                    value={search}
-                    onChange={(e: any) => setSearch(e.target.value)}
-                    icon={<Search size="14" />}
-                  />
-                </div>
+                <Input
+                  size="tiny"
+                  placeholder="Search for a migration"
+                  value={search}
+                  className="w-full lg:w-52"
+                  onChange={(e: any) => setSearch(e.target.value)}
+                  icon={<Search size="14" />}
+                />
+
                 <Card>
                   <Table>
                     <TableHeader>

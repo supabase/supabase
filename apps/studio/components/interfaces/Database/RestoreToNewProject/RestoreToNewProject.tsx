@@ -160,19 +160,17 @@ export const RestoreToNewProject = () => {
     return (
       <Admonition
         type="default"
-        title="Restore to new project requires physical backups"
+        title="Physical backups are required"
         description={
           <>
-            Physical backups must be enabled to restore your database to a new project.
-            <br /> Find out more about how backups work at supabase{' '}
+            Physical backups must be enabled to restore your database to a new project.{' '}
             <Link
               target="_blank"
               className="underline"
               href={`${DOCS_URL}/guides/platform/backups`}
             >
-              in our docs
+              Learn more
             </Link>
-            .
           </>
         }
       />
