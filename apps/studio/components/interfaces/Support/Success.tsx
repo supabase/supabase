@@ -68,7 +68,7 @@ export const Success = ({
             <Input
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              icon={<Search size={16} strokeWidth={1.5} />}
+              icon={<Search />}
               actions={[
                 <Button
                   asChild

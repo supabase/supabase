@@ -7,7 +7,6 @@ import { useDatabasePublicationsQuery } from 'data/database-publications/databas
 import { CONSTRAINT_TYPE, useTableConstraintsQuery } from 'data/database/constraints-query'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-
 import { useChanged } from 'hooks/misc/useChanged'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -16,7 +15,7 @@ import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { type PlainObject } from 'lib/type-helpers'
 import { TableEditorStateContext, useTableEditorStateSnapshot } from 'state/table-editor'
 import { Checkbox, Input, SidePanel } from 'ui'
-import ActionBar from '../ActionBar'
+import { ActionBar } from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 import type { SaveTableParams } from '../SidePanelEditor'
@@ -24,7 +23,7 @@ import type { ColumnField } from '../SidePanelEditor.types'
 import { SpreadsheetImport } from '../SpreadsheetImport/SpreadsheetImport'
 import ColumnManagement from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
-import HeaderTitle from './HeaderTitle'
+import { HeaderTitle } from './HeaderTitle'
 import { RLSManagement } from './RLSManagement/RLSManagement'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import type { ImportContent, TableField } from './TableEditor.types'
@@ -282,6 +281,7 @@ export const TableEditor = ({
       const importedColumns = formatImportedContentToColumnFields(importContent)
       onUpdateField({ columns: importedColumns })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [importContent])
 
   if (!tableFields) return null

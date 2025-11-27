@@ -5,18 +5,19 @@ import type {
   UpdateOAuthClientParams,
 } from '@supabase/supabase-js'
 import { Plus, Trash2, Upload, X } from 'lucide-react'
-import Link from 'next/link'
 import { type ChangeEvent, useEffect, useRef, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
 import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
 import { useOAuthServerAppCreateMutation } from 'data/oauth-server-apps/oauth-server-app-create-mutation'
 import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useOAuthServerAppUpdateMutation } from 'data/oauth-server-apps/oauth-server-app-update-mutation'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   FormControl_Shadcn_,
@@ -468,14 +469,9 @@ export const CreateOrUpdateOAuthAppSheet = ({
                           flow can be used, particularly beneficial for applications that cannot
                           securely store Client Secrets, such as native and mobile apps. This cannot
                           be changed after creation.{' '}
-                          <Link
-                            href="https://supabase.com/docs/guides/auth/oauth/public-oauth-apps"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-foreground-light underline hover:text-foreground transition"
-                          >
+                          <InlineLink href={`${DOCS_URL}/guides/auth/oauth/public-oauth-apps`}>
                             Learn more
-                          </Link>
+                          </InlineLink>
                         </>
                       }
                       className={'px-5'}

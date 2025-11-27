@@ -1060,6 +1060,13 @@
         "type": "function",
         "items": [
           {
+            "id": "storageanalytics-from",
+            "title": "Access an analytics bucket",
+            "slug": "storageanalytics-from",
+            "type": "function",
+            "product": "storage"
+          },
+          {
             "id": "storageanalytics-createbucket",
             "title": "Create a new analytics bucket",
             "slug": "storageanalytics-createbucket",

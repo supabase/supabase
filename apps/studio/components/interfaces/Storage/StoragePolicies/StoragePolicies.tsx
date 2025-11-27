@@ -243,13 +243,13 @@ export const StoragePolicies = () => {
                   size="tiny"
                   placeholder="Filter buckets"
                   className="block"
-                  containerClassName="w-full lg:w-52 [&>div>svg]:-mt-0.5"
+                  containerClassName="w-full lg:w-52"
                   value={searchString || ''}
                   onChange={(e) => {
                     const str = e.target.value
                     setSearchString(str)
                   }}
-                  icon={<Search size={14} />}
+                  icon={<Search />}
                   actions={
                     searchString ? (
                       <Button
