@@ -15,13 +15,13 @@ import { DocsButton } from 'components/ui/DocsButton'
 import InformationBox from 'components/ui/InformationBox'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useTablesQuery as useTableRetrieveQuery } from 'data/tables/table-retrieve-query'
+import { useTableQuery } from 'data/tables/table-retrieve-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
-import ActionBar from '../ActionBar'
+import { ActionBar } from '../ActionBar'
 import { NUMERICAL_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { FOREIGN_KEY_CASCADE_OPTIONS } from './ForeignKeySelector.constants'
@@ -77,18 +77,17 @@ export const ForeignKeySelector = ({
     includeColumns: false,
   })
 
-  const { data: selectedTable, isLoading: isLoadingSelectedTable } =
-    useTableRetrieveQuery<PostgresTable>(
-      {
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        schema: fk.schema,
-        name: fk.table,
-      },
-      {
-        enabled: !!project?.ref && !!fk.schema && !!fk.table,
-      }
-    )
+  const { data: selectedTable, isLoading: isLoadingSelectedTable } = useTableQuery<PostgresTable>(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: fk.schema,
+      name: fk.table,
+    },
+    {
+      enabled: !!project?.ref && !!fk.schema && !!fk.table,
+    }
+  )
 
   const disableApply = isLoadingSelectedTable || selectedTable === undefined || hasTypeErrors
 
