@@ -69,8 +69,8 @@ export const PublicationsTables = () => {
                 placeholder="Search for a table"
                 value={filterString}
                 onChange={(e) => setFilterString(e.target.value)}
-                icon={<Search size={12} />}
-                className="w-48 pl-8"
+                icon={<Search />}
+                className="w-48"
               />
             </div>
           </div>

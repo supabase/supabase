@@ -230,14 +230,13 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           <Input
             size="tiny"
             placeholder="Filter tables and policies"
-            className="block w-full lg:w-52"
-            containerClassName="[&>div>svg]:-mt-0.5"
+            className="w-full lg:w-52"
             value={searchString || ''}
             onChange={(e) => {
               const str = e.target.value
               setSearchString(str)
             }}
-            icon={<Search size={14} />}
+            icon={<Search />}
             actions={
               searchString ? (
                 <Button
