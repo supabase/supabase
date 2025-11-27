@@ -179,7 +179,7 @@ const InnerSideBarFilterSearchInput = forwardRef<
       <span className="sr-only">{props['aria-labelledby']}</span>
       <Input_Shadcn_
         ref={ref}
-        type="text"
+        size="tiny"
         className={cn(
           'h-[32px] md:h-[28px] w-full',
           'text-base md:text-xs',
@@ -204,8 +204,8 @@ const InnerSideBarFilterSearchInput = forwardRef<
         />
       ) : (
         <Search
-          className="absolute left-2 top-2 text-foreground-muted"
-          size={12}
+          className="absolute left-2 top-0 bottom-0 my-auto text-foreground-muted"
+          size={14}
           strokeWidth={1.5}
         />
       )}
