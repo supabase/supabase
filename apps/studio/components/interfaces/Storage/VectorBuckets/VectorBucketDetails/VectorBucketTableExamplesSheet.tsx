@@ -2,8 +2,11 @@ import { BookOpen, ChevronDown, ListPlus } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { VectorBucketIndex } from 'data/storage/vector-buckets-indexes-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { SqlEditor } from 'icons'
 import { DOCS_URL } from 'lib/constants'
 import {
@@ -119,6 +122,15 @@ function VectorBucketIndexExamples({
 }: VectorBucketIndexExamplesProps) {
   const { ref: projectRef } = useParams()
 
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'service_api_keys'
+  )
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
+  const { serviceKey, secretKey } = canReadAPIKeys
+    ? getKeys(apiKeys)
+    : { serviceKey: null, secretKey: null }
+
   const dimensionLabel = `Data should match ${dimension} dimension${dimension > 1 ? 's' : ''}`
   const startValue = 0.1
   const dimensionComment = generateDimensionComment(dimension)
@@ -142,9 +154,11 @@ values
 
   const jsCode = `import { createClient } from '@supabase/supabase-js'
 
+// Adding vector data needs a secret or service role key. 
+// This code SHOULD NOT be run on the client side, you'll be vulnerable to a data leak.
 const client = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  process.env.SUPABASE_URL,
+  process.env.${secretKey ? 'SUPABASE_SECRET_KEY' : 'SUPABASE_SERVICE_ROLE_KEY'},
 )
 
 const index = client.storage.vectors
