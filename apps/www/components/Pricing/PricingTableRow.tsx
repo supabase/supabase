@@ -131,7 +131,7 @@ export const pricingTooltips: PricingTooltips = {
         Any Platform API/Dashboard actions performed by organization members are logged
         automatically for auditing and security purposes. Includes actions such as creating a new
         project, inviting members or changing project settings. Read more in our{' '}
-        <Link href="/docs/guides/platform/audit-logs" target="_blank">
+        <Link href="/docs/guides/security/platform-audit-logs" target="_blank">
           docs
         </Link>
         .
