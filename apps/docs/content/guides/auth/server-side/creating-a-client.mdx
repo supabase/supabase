@@ -218,9 +218,9 @@ Create a `lib/supabase` folder at the root of your project, or inside the `./src
   </$CodeTabs>
 </div>
 
-### Hook up middleware
+### Hook up Proxy
 
-The code adds a [matcher](https://nextjs.org/docs/app/building-your-application/routing/middleware#matching-paths) so the Proxy doesn't run on routes that don't access Supabase.
+The code adds a [matcher](https://nextjs.org/docs/app/api-reference/file-conventions/proxy#matcher) so the Proxy doesn't run on routes that don't access Supabase.
 
 <Admonition type="danger">
 
@@ -239,7 +239,7 @@ It's safe to trust `getClaims()` because it validates the JWT signature against 
     <$CodeSample path="/auth/nextjs/proxy.ts" meta="name=proxy.ts" language="typescript" />
     <$CodeSample
       path="/auth/nextjs/lib/supabase/proxy.ts"
-      meta="name=lib/supabase/middleware.ts"
+      meta="name=lib/supabase/proxy.ts"
       language="typescript"
     />
   </$CodeTabs>
