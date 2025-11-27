@@ -12,7 +12,7 @@ import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { minifyJSON, prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
 import { Button, SidePanel, cn } from 'ui'
-import ActionBar from '../../ActionBar'
+import { ActionBar } from '../../ActionBar'
 import { isValueTruncated } from '../RowEditor.utils'
 import { DrilldownViewer } from './DrilldownViewer/DrilldownViewer'
 import { JsonCodeEditor } from './JsonCodeEditor'
