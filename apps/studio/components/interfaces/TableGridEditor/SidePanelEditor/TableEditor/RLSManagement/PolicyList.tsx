@@ -26,9 +26,9 @@ export const PolicyListItem = ({ policy, className }: PolicyListItemProps) => {
     <HoverCard_Shadcn_ openDelay={200} closeDelay={100}>
       <HoverCardTrigger_Shadcn_ asChild>
         <div
-          className={`flex items-center justify-between text-sm text-foreground py-2 px-3 hover:bg-surface-100 cursor-pointer transition-colors ${className ?? ''}`}
+          className={`flex items-center justify-between text-sm text-foreground py-2 px-3 hover:bg-surface-100 transition-colors ${className ?? ''}`}
         >
-          <p className="font-mono text-xs truncate max-w-[200px]">{policy.name}</p>
+          <p className="font-mono text-xs truncate">{policy.name}</p>
           {policy.command && <Badge variant="default">{policy.command}</Badge>}
         </div>
       </HoverCardTrigger_Shadcn_>

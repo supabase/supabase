@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { generateAndCreatePoliciesForTable } from 'components/interfaces/Auth/Policies/Policies.utils'
+import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
@@ -28,7 +29,6 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useTrack } from 'lib/telemetry/track'
-import { useBackgroundTasksState } from 'state/background-tasks'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
@@ -139,7 +139,6 @@ export const SidePanelEditor = ({
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const track = useTrack()
-  const backgroundTasksState = useBackgroundTasksState()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
 
@@ -517,40 +516,31 @@ export const SidePanelEditor = ({
         })
         if (isRealtimeEnabled) await updateTableRealtime(table, true)
 
+        // Generate policies synchronously if enabled (before closing panel)
+        if (generateStartingPolicies && isRLSEnabled && project?.ref) {
+          try {
+            await generateAndCreatePoliciesForTable({
+              projectRef: project.ref,
+              schema: table.schema,
+              tableName: table.name,
+            })
+          } catch (error: any) {
+            // Error is already handled and shown in generateAndCreatePoliciesForTable
+            // Continue to show table creation success even if policy generation fails
+          }
+        }
+
         // Invalidate queries for table creation
         await Promise.all([
           queryClient.invalidateQueries({
             queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
           }),
           queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
+          queryClient.invalidateQueries({ queryKey: databasePoliciesKeys.list(project?.ref) }),
         ])
 
-        // Show success toast and close panel immediately
+        // Show success toast after everything is complete
         toast.success(`Table ${table.name} is good to go!`, { id: toastId })
-
-        // Queue background task for policy generation if enabled
-        if (generateStartingPolicies && isRLSEnabled && project?.ref) {
-          const taskId = `generate-rls-policies-${table.schema}-${table.name}-${Date.now()}`
-          const projectRef = project.ref
-          const tableSchema = table.schema
-          const tableName = table.name
-
-          backgroundTasksState.addTask({
-            id: taskId,
-            type: 'generate-rls-policies',
-            metadata: {
-              tableName,
-              tableSchema,
-            },
-            execute: async () => {
-              await generateAndCreatePoliciesForTable({
-                projectRef,
-                schema: tableSchema,
-                tableName,
-              })
-            },
-          })
-        }
 
         onTableCreated(table)
       } else if (params.action === 'duplicate' && !!selectedTable) {

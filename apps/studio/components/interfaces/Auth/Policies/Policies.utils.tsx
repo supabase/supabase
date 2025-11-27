@@ -1,18 +1,12 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { has, isEmpty, isEqual } from 'lodash'
-import Link from 'next/link'
-import { toast } from 'sonner'
 
-import { PolicyList } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/RLSManagement/PolicyList'
 import { generateSqlPolicy } from 'data/ai/sql-policy-mutation'
-import { databasePoliciesKeys } from 'data/database-policies/keys'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { getForeignKeyConstraints } from 'data/database/foreign-key-constraints-query'
 import { getProjectDetail } from 'data/projects/project-detail-query'
-import { getQueryClient } from 'data/query-client'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { getTables } from 'data/tables/tables-query'
-import { Button } from 'ui'
 import {
   PolicyFormField,
   PolicyForReview,
@@ -451,17 +445,14 @@ export const generateAndCreatePoliciesForTable = async ({
   projectRef: string
   schema: string
   tableName: string
-}): Promise<void> => {
-  const toastId = toast.loading('Generating policies...')
-
+}): Promise<GeneratedPolicy[]> => {
   try {
     // Fetch project details to get connection string
     const project = await getProjectDetail({ ref: projectRef })
     const connectionString = project.connectionString
 
     if (!connectionString) {
-      toast.error('Connection string not available', { id: toastId })
-      return
+      return []
     }
 
     // Fetch table data and FK constraints in parallel
@@ -487,8 +478,7 @@ export const generateAndCreatePoliciesForTable = async ({
         : undefined
 
     if (!tableData || !tableColumns) {
-      toast.error(`Table ${tableName} not found or has no columns`, { id: toastId })
-      return
+      return []
     }
 
     const columns = tableColumns.map((col) => ({ name: col.name }))
@@ -503,62 +493,19 @@ export const generateAndCreatePoliciesForTable = async ({
     })
 
     if (generatedPolicies.length === 0) {
-      toast.dismiss(toastId)
-      return
+      return []
     }
 
     // Create policies in the database
-    toast.loading('Creating policies...', { id: toastId })
     const policiesCreated = await createGeneratedPolicies({
       policies: generatedPolicies,
       projectRef,
       connectionString,
     })
 
-    // Invalidate queries so UI updates
-    const queryClient = getQueryClient()
-    await queryClient.invalidateQueries({
-      queryKey: databasePoliciesKeys.list(projectRef),
-    })
-
-    // Show success toast with policy list
-    if (policiesCreated.length > 0) {
-      toast.success(
-        <div className="flex flex-col gap-2">
-          <p>
-            {policiesCreated.length} {policiesCreated.length === 1 ? 'policy' : 'policies'}{' '}
-            {policiesCreated.length === 1 ? 'has' : 'have'} been created for table {tableName}
-          </p>
-          <PolicyList policies={policiesCreated} />
-          <Button type="default" asChild>
-            <Link
-              href={`/project/${projectRef}/auth/policies?search=${tableName}&schema=${schema}`}
-            >
-              Manage policies
-            </Link>
-          </Button>
-        </div>,
-        { id: toastId, duration: 20000 }
-      )
-    } else {
-      toast.error(
-        <div className="flex flex-col gap-1">
-          <p>No policies were generated</p>
-          <Link
-            href={`/project/${projectRef}/auth/policies?search=${tableName}&schema=${schema}`}
-            className="text-foreground underline"
-          >
-            Manage policies
-          </Link>
-        </div>,
-        { id: toastId }
-      )
-    }
+    return policiesCreated
   } catch (error: any) {
-    toast.error(
-      `Failed to generate policies for table ${tableName}: ${error.message ?? 'Unknown error'}`,
-      { id: toastId }
-    )
-    throw error
+    console.error('Failed to generate and create policies:', error)
+    return []
   }
 }
