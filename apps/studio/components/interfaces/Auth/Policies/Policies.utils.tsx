@@ -529,7 +529,7 @@ export const generateAndCreatePoliciesForTable = async ({
             {policiesCreated.length} {policiesCreated.length === 1 ? 'policy' : 'policies'}{' '}
             {policiesCreated.length === 1 ? 'has' : 'have'} been created for table {tableName}
           </p>
-          <PolicyList policies={policiesCreated} className="border-l-0 border-r-0 rounded-none" />
+          <PolicyList policies={policiesCreated} />
           <Button type="default" asChild>
             <Link
               href={`/project/${projectRef}/auth/policies?search=${tableName}&schema=${schema}`}
