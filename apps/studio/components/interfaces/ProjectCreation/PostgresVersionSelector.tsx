@@ -131,7 +131,7 @@ export const PostgresVersionSelector = ({
                     <span className="text-foreground">{postgresVersion}</span>
                     <div>
                       {value.release_channel !== 'ga' && (
-                        <Badge variant="warning" className="mr-1 capitalize">
+                        <Badge variant="warning" className="mr-1">
                           {value.release_channel}
                         </Badge>
                       )}
