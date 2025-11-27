@@ -58,11 +58,11 @@ export const AdvancedConfiguration = ({
                         label={
                           <>
                             Postgres
-                            <Badge className="ml-2">Default</Badge>
+                            <Badge>Default</Badge>
                           </>
                         }
                         description="Recommended for production workloads"
-                        className="[&>div>div>p]:text-left [&>div>div>p]:text-xs"
+                        className="[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>label]:flex [&>div>div>label]:items-center [&>div>div>label]:gap-x-2"
                       />
                     </FormControl_Shadcn_>
                   </FormItem_Shadcn_>
@@ -74,14 +74,14 @@ export const AdvancedConfiguration = ({
                         label={
                           <>
                             Postgres with OrioleDB
-                            <Badge variant="warning" className="ml-2">
+                            <Badge variant="warning" className="mt-0">
                               Alpha
                             </Badge>
                           </>
                         }
                         description="Not recommended for production workloads"
                         className={cn(
-                          '[&>div>div>p]:text-left [&>div>div>p]:text-xs',
+                          '[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>label]:flex [&>div>div>label]:items-center [&>div>div>label]:gap-x-2',
                           form.getValues('useOrioleDb') ? '!rounded-b-none' : ''
                         )}
                       />

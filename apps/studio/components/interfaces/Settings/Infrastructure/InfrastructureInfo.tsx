@@ -162,7 +162,7 @@ const InfrastructureInfo = () => {
                             isOrioleDb && (
                               <Tooltip>
                                 <TooltipTrigger>
-                                  <Badge variant="default" className="mr-1">
+                                  <Badge variant="default" className="mr-1 mt-0">
                                     OrioleDB
                                   </Badge>
                                 </TooltipTrigger>
@@ -174,7 +174,7 @@ const InfrastructureInfo = () => {
                             isOnLatestVersion && (
                               <Tooltip>
                                 <TooltipTrigger>
-                                  <Badge variant="success" className="mr-1">
+                                  <Badge variant="success" className="mr-1 mt-0">
                                     Latest
                                   </Badge>
                                 </TooltipTrigger>

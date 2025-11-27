@@ -208,7 +208,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
                                         {definition.label}
                                       </p>
                                       {definition.value === 'partitioned' && (
-                                        <Badge variant="warning">Coming soon</Badge>
+                                        <Badge>Coming soon</Badge>
                                       )}
                                     </div>
                                     <p className="text-foreground-lighter text-left">

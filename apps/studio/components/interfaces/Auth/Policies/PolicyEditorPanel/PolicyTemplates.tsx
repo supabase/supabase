@@ -88,7 +88,7 @@ export const PolicyTemplates = ({
                   hideChevron
                   fixedHeight={false}
                   icon={
-                    <div className="min-w-16">
+                    <div className="min-w-16 flex items-start">
                       <Badge
                         className={cn(
                           '!rounded font-mono',

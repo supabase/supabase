@@ -382,13 +382,14 @@ export const PublishAppSidePanel = ({
 
               <Modal
                 hideFooter
+                showCloseButton={false}
                 className="!max-w-[600px]"
                 visible={showPreview}
                 onCancel={() => setShowPreview(false)}
               >
                 <Modal.Content>
-                  <div className="flex items-center justify-between">
-                    <p>Authorize API access for {values.name}</p>
+                  <div className="flex items-center gap-x-2 justify-between">
+                    <p className="truncate">Authorize API access for {values.name}</p>
                     <Badge variant="success">Preview</Badge>
                   </div>
                 </Modal.Content>

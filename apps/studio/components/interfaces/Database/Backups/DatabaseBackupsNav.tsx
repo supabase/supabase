@@ -30,7 +30,7 @@ function DatabaseBackupsNav({ active }: Props) {
       id: 'rtnp',
       label: (
         <div className="flex items-center gap-2">
-          Restore to new project <Badge>Beta</Badge>
+          Restore to new project <Badge variant="warning">Beta</Badge>
         </div>
       ),
       href: `/project/${ref}/database/backups/restore-to-new-project`,
