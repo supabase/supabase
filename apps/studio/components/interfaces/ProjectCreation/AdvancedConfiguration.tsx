@@ -58,9 +58,7 @@ export const AdvancedConfiguration = ({
                         label={
                           <>
                             Postgres
-                            <Badge color="scale" className="ml-2">
-                              Default
-                            </Badge>
+                            <Badge className="ml-2">Default</Badge>
                           </>
                         }
                         description="Recommended for production workloads"
@@ -76,7 +74,7 @@ export const AdvancedConfiguration = ({
                         label={
                           <>
                             Postgres with OrioleDB
-                            <Badge color="warning" className="ml-2">
+                            <Badge variant="warning" className="ml-2">
                               Alpha
                             </Badge>
                           </>

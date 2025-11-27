@@ -149,7 +149,7 @@ const InfrastructureInfo = () => {
                             isVisibleReleaseChannel && (
                               <Tooltip>
                                 <TooltipTrigger>
-                                  <Badge variant="warning" className="mr-1 capitalize">
+                                  <Badge variant="warning" className="mr-1">
                                     {isVisibleReleaseChannel}
                                   </Badge>
                                 </TooltipTrigger>

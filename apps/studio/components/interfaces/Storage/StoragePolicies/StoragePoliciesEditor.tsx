@@ -72,7 +72,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
         </div>
         <div className="flex w-5/6 flex-wrap">
           {Object.keys(STORAGE_CLIENT_LIBRARY_MAPPINGS).map((method) => (
-            <div key={method} className="mr-2 mt-2 font-mono">
+            <div key={method} className="mr-2 mt-2">
               <Badge variant={allowedClientLibraryMethods.includes(method) ? 'brand' : 'default'}>
                 {method}
               </Badge>
