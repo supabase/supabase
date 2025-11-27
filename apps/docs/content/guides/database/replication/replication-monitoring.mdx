@@ -12,14 +12,14 @@ Replication is currently in private alpha. Access is limited and features may ch
 
 </Admonition>
 
-After setting up replication, you can monitor the status and health of your replication pipelines directly from the Supabase Dashboard. The pipeline is the active process that continuously replicates changes from your database to your destination.
+After setting up replication, you can monitor the status and health of your replication pipelines directly from the Supabase Dashboard. The pipeline is the active Postgres replication process that continuously streams changes from your database to your destination.
 
 ### Viewing pipeline status
 
 To monitor your replication pipelines:
 
 1. Navigate to the [Database](/dashboard/project/_/database/replication) section in your Supabase Dashboard
-2. Select the **Replication** tab
+2. Select the **replication** tab
 3. You'll see a list of all your destinations with their pipeline status
 
 <Image
@@ -88,11 +88,17 @@ Table errors occur during the copy phase and affect individual tables. These err
 
 **Recovering from table errors:**
 
-When a table encounters an error during the copy phase, you can reset the table state (for some errors). This will restart the table copy from the beginning.
+When a table encounters an error during the copy phase, you can reset the table state. This will restart the table copy from the beginning.
 
 #### Pipeline errors
 
 Pipeline errors occur during the streaming phase (Live state) and affect the entire pipeline. When streaming data, if an error occurs, the entire pipeline will stop and enter a **Failed** state. This prevents data loss by ensuring no changes are skipped.
+
+<Admonition type="note">
+
+When a pipeline error occurs, you'll receive an email notification immediately. This ensures you're promptly notified of any issues so you can take action to resolve them.
+
+</Admonition>
 
 <Image
   alt="Pipeline Error Details"
@@ -134,7 +140,7 @@ Logs contain diagnostic information that may be too technical for most users. If
 
 #### Checking if replication is healthy
 
-1. Navigate to [Database](/dashboard/project/_/database/replication) → **Replication**
+1. Navigate to [Database](/dashboard/project/_/database/replication) → **replication**
 2. Verify your destination shows **Running** status
 3. Click **View status** to check replication lag and table states
 4. Ensure all tables show **Live** state
@@ -164,8 +170,8 @@ If you notice issues with your replication:
 
 1. **Check pipeline state**: Ensure the pipeline is in **Running** state
 2. **Review table states**: Identify tables in **Error** state
-3. **Check logs**: Navigate to Logs → replication for detailed error information
-4. **Verify publication**: Ensure your publication is properly configured
+3. **Check logs**: Navigate to Logs → Replication for detailed error information
+4. **Verify publication**: Ensure your Postgres publication is properly configured
 5. **Monitor replication lag**: High lag may indicate performance issues
 
 For more troubleshooting tips, see the [Replication FAQ](/docs/guides/database/replication/replication-faq).

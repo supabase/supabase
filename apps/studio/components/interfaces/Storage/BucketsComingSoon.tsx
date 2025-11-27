@@ -2,7 +2,6 @@ import { ExternalLink, FolderClock } from 'lucide-react'
 import Link from 'next/link'
 
 import { ScaffoldSection } from 'components/layouts/Scaffold'
-import { FilesBucket as FilesBucketIcon } from 'icons'
 import { Button } from 'ui'
 import { BUCKET_TYPES } from './Storage.constants'
 

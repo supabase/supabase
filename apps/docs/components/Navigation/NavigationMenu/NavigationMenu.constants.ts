@@ -801,6 +801,16 @@ export const auth: NavMenuConstant = {
       ],
     },
     {
+      name: 'OAuth 2.1 Server',
+      items: [
+        { name: 'Overview', url: '/guides/auth/oauth-server' },
+        { name: 'Getting Started', url: '/guides/auth/oauth-server/getting-started' },
+        { name: 'OAuth Flows', url: '/guides/auth/oauth-server/oauth-flows' },
+        { name: 'MCP Authentication', url: '/guides/auth/oauth-server/mcp-authentication' },
+        { name: 'Token Security & RLS', url: '/guides/auth/oauth-server/token-security' },
+      ],
+    },
+    {
       name: 'Third-party auth',
       enabled: allAuthProvidersEnabled,
       items: [
@@ -1155,14 +1165,6 @@ export const database: NavMenuConstant = {
               url: '/guides/database/replication/replication-setup' as `/${string}`,
             },
             {
-              name: 'Destinations',
-              url: '/guides/database/replication/replication-destinations' as `/${string}`,
-              items: [
-                { name: 'BigQuery', url: '/guides/database/replication/replication-bigquery' },
-                { name: 'Iceberg', url: '/guides/database/replication/replication-iceberg' },
-              ],
-            },
-            {
               name: 'Monitoring',
               url: '/guides/database/replication/replication-monitoring' as `/${string}`,
             },
@@ -1170,7 +1172,7 @@ export const database: NavMenuConstant = {
           ],
         },
         {
-          name: 'Manual Replication',
+          name: 'Manual replication',
           url: '/guides/database/replication/manual-replication-setup' as `/${string}`,
           items: [
             {
@@ -2407,6 +2409,7 @@ export const security: NavMenuConstant = {
         { name: 'Platform configuration', url: '/guides/security/platform-security' },
         { name: 'Product configuration', url: '/guides/security/product-security' },
         { name: 'Security testing', url: '/guides/security/security-testing' },
+        { name: 'Platform Audit Logs', url: '/guides/security/platform-audit-logs' },
       ],
     },
     {
