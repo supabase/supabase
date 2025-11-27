@@ -181,7 +181,9 @@ const RedirectToTemplates = () => {
         <PageHeaderBreadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href={`/project/${ref}/auth/templates`}>Emails</BreadcrumbLink>
+              <BreadcrumbLink asChild>
+                <Link href={`/project/${ref}/auth/templates`}>Emails</Link>
+              </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>

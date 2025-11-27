@@ -4,9 +4,11 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { DocsButton } from 'components/ui/DocsButton'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import { PageSection, PageSectionContent } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
+  PageHeaderAside,
   PageHeaderMeta,
   PageHeaderSummary,
   PageHeaderTitle,
@@ -18,12 +20,18 @@ const OAuthApps: NextPageWithLayout = () => (
       <PageHeaderMeta>
         <PageHeaderSummary>
           <PageHeaderTitle>OAuth Apps</PageHeaderTitle>
-          <DocsButton href={`${DOCS_URL}/guides/auth/oauth-server`} />
         </PageHeaderSummary>
+        <PageHeaderAside>
+          <DocsButton href={`${DOCS_URL}/guides/auth/oauth-server`} />
+        </PageHeaderAside>
       </PageHeaderMeta>
     </PageHeader>
     <PageContainer size="default">
-      <OAuthAppsList />
+      <PageSection>
+        <PageSectionContent>
+          <OAuthAppsList />
+        </PageSectionContent>
+      </PageSection>
     </PageContainer>
   </>
 )

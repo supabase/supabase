@@ -13,6 +13,7 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const ProvidersPage: NextPageWithLayout = () => {
   return (
@@ -25,13 +26,17 @@ const ProvidersPage: NextPageWithLayout = () => {
               Configure your project to act as an identity provider for third-party applications
             </PageHeaderDescription>
           </PageHeaderSummary>
+          <PageHeaderAside>
+            <DocsButton href={`${DOCS_URL}/guides/auth/oauth-server`} />
+          </PageHeaderAside>
         </PageHeaderMeta>
-        <PageHeaderAside>
-          <DocsButton href={`${DOCS_URL}/guides/auth/oauth-server`} />
-        </PageHeaderAside>
       </PageHeader>
       <PageContainer size="default">
-        <OAuthServerSettingsForm />
+        <PageSection>
+          <PageSectionContent>
+            <OAuthServerSettingsForm />
+          </PageSectionContent>
+        </PageSection>
       </PageContainer>
     </>
   )
