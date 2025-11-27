@@ -26,7 +26,7 @@ export function AdvisorsSidebarMenu({ page }: AdvisorsSidebarMenuProps) {
         className="mx-4 mt-4"
         title="Moving to the toolbar"
         description="Advisors are now available in the top toolbar for quicker access across the dashboard."
-        illustration={<Badge variant="brand">New</Badge>}
+        illustration={<Badge variant="success">New</Badge>}
         actions={
           <Button size="tiny" type="default" onClick={handleOpenAdvisor}>
             Try it now

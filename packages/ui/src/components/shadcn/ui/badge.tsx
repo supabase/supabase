@@ -12,33 +12,15 @@ const badgeVariants = cva(
         default: 'bg-surface-75 text-foreground-light border border-strong',
         warning: 'bg-warning bg-opacity-10 text-warning border border-warning-500',
         success: 'bg-brand bg-opacity-10 text-brand-600 border border-brand-500',
-        // brand is the same as success, deprecate
-        brand: 'bg-brand bg-opacity-10 text-brand-600 border border-brand-500',
         destructive:
           'bg-destructive bg-opacity-10 text-destructive-600 border border-destructive-500',
-        // Deprecated?
+        // Secondary is invisible
         secondary:
-          'bg-secondary bg-opacity-10 hover:bg-secondary/80 border-transparent text-secondary-foreground',
-        // Deprecated, use default
-        outline: 'bg-transparent text border border-foreground-muted',
-      },
-      size: {
-        // Deprecated
-        // tiny: 'px-1.5 py-[3px]'T,
-        // small: 'px-2 py-0.5',
-        // large: 'px-3 py-0.5 text-xs',
-        tiny: '',
-        small: '',
-        large: '',
-      },
-      dot: {
-        // Deprecated
-        true: '-ml-0.5 mr-1.5 h-2 w-2',
+          'bg-secondary bg-opacity-50 hover:bg-secondary/80 border-transparent text-secondary-foreground',
       },
     },
     defaultVariants: {
       variant: 'default',
-      size: 'small',
     },
   }
 )
@@ -47,24 +29,12 @@ export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof badgeVariants> {}
 
-function Badge({
-  className,
-  variant = 'default',
-  size = 'small',
-  dot = false,
-  children,
-  ...props
-}: BadgeProps) {
+function Badge({ className, variant = 'default', children, ...props }: BadgeProps) {
   return (
-    <div className={cn(badgeVariants({ variant, size }), className)} {...props}>
-      {dot && (
-        <svg className={badgeVariants({ dot })} fill="currentColor" viewBox="0 0 8 8">
-          <circle cx="4" cy="4" r="3" />
-        </svg>
-      )}
+    <div className={cn(badgeVariants({ variant }), className)} {...props}>
       {children}
     </div>
   )
 }
 
-export { Badge, badgeVariants }
+export { Badge }

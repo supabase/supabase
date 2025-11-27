@@ -188,7 +188,7 @@ export const RolesList = () => {
         <div>
           <div className="bg-surface-100 border border-default px-4 md:px-6 py-3 rounded-t flex items-center space-x-4">
             <p className="text-sm text-foreground-light">Roles managed by Supabase</p>
-            <Badge variant="brand">Protected</Badge>
+            <Badge variant="success">Protected</Badge>
           </div>
 
           {isLoading

@@ -126,7 +126,7 @@ export const ProjectCreationFooter = ({
                           <span className="truncate">
                             {form.getValues('projectName') || 'New project'}
                           </span>
-                          <Badge variant="brand">New</Badge>
+                          <Badge variant="success">New</Badge>
                         </TableCell>
                         <TableCell className="text-center">{instanceLabel(instanceSize)}</TableCell>
                         <TableCell className="text-right">

@@ -498,7 +498,7 @@ export const DatabaseConnectionString = () => {
                           >
                             <div className="text-xs flex items-center py-2 px-1">
                               <span>Using the Shared Pooler</span>
-                              <Badge variant={'brand'} size={'small'} className="ml-2">
+                              <Badge variant={'success'} className="ml-2">
                                 IPv4 compatible
                               </Badge>
                             </div>

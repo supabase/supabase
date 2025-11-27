@@ -270,7 +270,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
                         label={
                           <div className="flex items-center gap-x-2">
                             <p>Enable Row Level Security (RLS)</p>
-                            <Badge variant="brand">Recommended</Badge>
+                            <Badge variant="success">Recommended</Badge>
                           </div>
                         }
                         description="Restrict access to your queue by enabling RLS and writing Postgres policies to control access for each role."

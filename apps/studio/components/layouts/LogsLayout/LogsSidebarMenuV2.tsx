@@ -253,7 +253,7 @@ export function LogsSidebarMenuV2() {
           className="mx-4 mt-4"
           title="Introducing unified logs"
           description="A unified view across all services with improved filtering and real-time updates."
-          illustration={<Badge variant="brand">New</Badge>}
+          illustration={<Badge variant="success">New</Badge>}
           actions={
             <>
               <Button

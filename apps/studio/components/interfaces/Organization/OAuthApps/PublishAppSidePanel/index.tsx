@@ -389,7 +389,7 @@ export const PublishAppSidePanel = ({
                 <Modal.Content>
                   <div className="flex items-center justify-between">
                     <p>Authorize API access for {values.name}</p>
-                    <Badge variant="brand">Preview</Badge>
+                    <Badge variant="success">Preview</Badge>
                   </div>
                 </Modal.Content>
                 <Modal.Separator />
