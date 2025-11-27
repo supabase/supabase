@@ -129,7 +129,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     state.setContext({
       projectRef: project?.ref,
       orgSlug: selectedOrganizationRef.current?.slug,
-      connectionString: project?.connectionString || undefined,
+      connectionString: project?.connectionString ?? '',
     })
   }, [project?.ref, project?.connectionString, selectedOrganizationRef.current?.slug, state])
 
