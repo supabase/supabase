@@ -123,7 +123,7 @@ export const Destinations = () => {
                 Add destination
               </Button>
             )}
-            <DocsButton href="https://supabase.com/docs/guides/database/replication" />
+            <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
           </div>
         </div>
       </div>

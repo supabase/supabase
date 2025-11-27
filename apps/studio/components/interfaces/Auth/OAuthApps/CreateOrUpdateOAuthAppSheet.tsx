@@ -5,17 +5,19 @@ import type {
   UpdateOAuthClientParams,
 } from '@supabase/supabase-js'
 import { Plus, Trash2, Upload, X } from 'lucide-react'
-import Link from 'next/link'
 import { type ChangeEvent, useEffect, useRef, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
+import Panel from 'components/ui/Panel'
+import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
 import { useOAuthServerAppCreateMutation } from 'data/oauth-server-apps/oauth-server-app-create-mutation'
 import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useOAuthServerAppUpdateMutation } from 'data/oauth-server-apps/oauth-server-app-update-mutation'
-import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   FormControl_Shadcn_,
@@ -37,10 +39,9 @@ import {
   Switch,
   cn,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import Panel from 'components/ui/Panel'
 
 interface CreateOrUpdateOAuthAppSheetProps {
   visible: boolean
@@ -109,26 +110,21 @@ export const CreateOrUpdateOAuthAppSheet = ({
     control: form.control,
   })
 
-  const { data: supabaseClientData } = useSupabaseClientQuery({ projectRef })
-  const { mutateAsync: createOAuthApp, isPending: isCreating } = useOAuthServerAppCreateMutation({
+  const { data: endpointData } = useProjectEndpointQuery({ projectRef })
+
+  const { mutate: createOAuthApp, isPending: isCreating } = useOAuthServerAppCreateMutation({
     onSuccess: (data) => {
       toast.success(`Successfully created OAuth app "${data.client_name}"`)
       onSuccess(data)
     },
-    onError: (error) => {
-      toast.error(error.message)
-    },
   })
-  const { mutateAsync: updateOAuthApp, isPending: isUpdating } = useOAuthServerAppUpdateMutation({
+  const { mutate: updateOAuthApp, isPending: isUpdating } = useOAuthServerAppUpdateMutation({
     onSuccess: (data) => {
       toast.success(`Successfully updated OAuth app "${data.client_name}"`)
       onSuccess(data)
     },
-    onError: (error) => {
-      toast.error(error.message)
-    },
   })
-  const { mutateAsync: regenerateSecret, isPending: isRegenerating } =
+  const { mutate: regenerateSecret, isPending: isRegenerating } =
     useOAuthServerAppRegenerateSecretMutation({
       onSuccess: (data) => {
         if (data) {
@@ -136,9 +132,6 @@ export const CreateOrUpdateOAuthAppSheet = ({
           onSuccess(data)
           setShowRegenerateDialog(false)
         }
-      },
-      onError: (error) => {
-        toast.error(error.message)
       },
     })
 
@@ -207,8 +200,8 @@ export const CreateOrUpdateOAuthAppSheet = ({
 
       updateOAuthApp({
         projectRef,
-        supabaseClient: supabaseClientData?.supabaseClient,
         clientId: appToEdit.client_id,
+        clientEndpoint: endpointData?.endpoint,
         ...payload,
       })
     } else {
@@ -222,7 +215,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
 
       createOAuthApp({
         projectRef,
-        supabaseClient: supabaseClientData?.supabaseClient,
+        clientEndpoint: endpointData?.endpoint,
         ...payload,
       })
     }
@@ -238,13 +231,11 @@ export const CreateOrUpdateOAuthAppSheet = ({
   }
 
   const handleConfirmRegenerate = () => {
-    if (appToEdit?.client_id) {
-      regenerateSecret({
-        projectRef,
-        supabaseClient: supabaseClientData?.supabaseClient,
-        clientId: appToEdit.client_id,
-      })
-    }
+    regenerateSecret({
+      projectRef,
+      clientId: appToEdit?.client_id,
+      clientEndpoint: endpointData?.endpoint,
+    })
   }
 
   const handleUploadLogo = () => uploadButtonRef.current?.click()
@@ -478,14 +469,9 @@ export const CreateOrUpdateOAuthAppSheet = ({
                           flow can be used, particularly beneficial for applications that cannot
                           securely store Client Secrets, such as native and mobile apps. This cannot
                           be changed after creation.{' '}
-                          <Link
-                            href="https://supabase.com/docs/guides/auth/oauth/public-oauth-apps"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-foreground-light underline hover:text-foreground transition"
-                          >
+                          <InlineLink href={`${DOCS_URL}/guides/auth/oauth/public-oauth-apps`}>
                             Learn more
-                          </Link>
+                          </InlineLink>
                         </>
                       }
                       className={'px-5'}

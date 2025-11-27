@@ -1,8 +1,8 @@
 import type { OAuthClient } from '@supabase/supabase-js'
-import { MoreVertical, Edit, Plus, RotateCw, Search, Trash, X } from 'lucide-react'
+import { Edit, MoreVertical, Plus, RotateCw, Search, Trash, X } from 'lucide-react'
 import Link from 'next/link'
-import { useRef, useState } from 'react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -11,11 +11,11 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
 import { useOAuthServerAppDeleteMutation } from 'data/oauth-server-apps/oauth-server-app-delete-mutation'
 import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
-import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
-import { useQueryStateWithSelect, handleErrorOnDelete } from 'hooks/misc/useQueryStateWithSelect'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import {
   Badge,
   Button,
@@ -55,12 +55,8 @@ export const OAuthAppsList = () => {
   const [filteredClientTypes, setFilteredClientTypes] = useState<string[]>([])
   const deletingOAuthAppIdRef = useRef<string | null>(null)
 
-  const { data: supabaseClientData } = useSupabaseClientQuery({ projectRef })
   const { data, isLoading, isError, error } = useOAuthServerAppsQuery(
-    {
-      projectRef,
-      supabaseClient: supabaseClientData?.supabaseClient,
-    },
+    { projectRef },
     { enabled: isOAuthServerEnabled }
   )
 
@@ -72,6 +68,8 @@ export const OAuthAppsList = () => {
         }
       },
     })
+
+  const { data: endpointData } = useProjectEndpointQuery({ projectRef })
 
   const oAuthApps = data?.clients || []
 
@@ -107,9 +105,6 @@ export const OAuthAppsList = () => {
       deletingOAuthAppIdRef.current = null
     },
   })
-
-  const handleEditClick = (app: OAuthClient) => setSelectedAppToEdit(app.client_id)
-  const handleDeleteClick = (app: OAuthClient) => setSelectedAppToDelete(app.client_id)
 
   const [filterString, setFilterString] = useState<string>('')
 
@@ -259,7 +254,7 @@ export const OAuthAppsList = () => {
                         <Button
                           type="text"
                           className="text-link-table-cell text-sm p-0 hover:bg-transparent title [&>span]:!w-full"
-                          onClick={() => handleEditClick(app)}
+                          onClick={() => setSelectedAppToEdit(app.client_id)}
                           title={app.client_name}
                         >
                           {app.client_name}
@@ -287,7 +282,7 @@ export const OAuthAppsList = () => {
                               <DropdownMenuItem
                                 className="space-x-2"
                                 onClick={() => {
-                                  handleEditClick(app)
+                                  setSelectedAppToEdit(app.client_id)
                                 }}
                               >
                                 <Edit size={12} />
@@ -307,7 +302,7 @@ export const OAuthAppsList = () => {
                               )}
                               <DropdownMenuItem
                                 className="space-x-2"
-                                onClick={() => handleDeleteClick(app)}
+                                onClick={() => setSelectedAppToDelete(app.client_id)}
                               >
                                 <Trash size={12} />
                                 <p>Delete</p>
@@ -363,13 +358,11 @@ export const OAuthAppsList = () => {
         confirmLabel="Confirm"
         onCancel={() => setShowRegenerateDialog(false)}
         onConfirm={() => {
-          if (selectedApp?.client_id) {
-            regenerateSecret({
-              projectRef,
-              supabaseClient: supabaseClientData?.supabaseClient,
-              clientId: selectedApp.client_id,
-            })
-          }
+          regenerateSecret({
+            projectRef,
+            clientId: selectedApp?.client_id,
+            clientEndpoint: endpointData?.endpoint,
+          })
           setShowRegenerateDialog(false)
         }}
       >
