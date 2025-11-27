@@ -8,8 +8,8 @@ export default function InputIconContainer({
 }: {
   icon: React.ReactNode
   className?: string
-  size: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge' | 'xxxlarge'
+  size: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge' | 'xxxlarge' | null
 }) {
   const __styles = styleHandler('inputIconContainer')
-  return <div className={cn(__styles.base, __styles.size[size], className)}>{icon}</div>
+  return <div className={cn(__styles.base, __styles.size[size ?? 'small'], className)}>{icon}</div>
 }
