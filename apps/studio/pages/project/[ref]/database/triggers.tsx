@@ -36,7 +36,7 @@ const TriggersPage: NextPageWithLayout = () => {
           <PageHeaderSummary>
             <PageHeaderTitle>Database Triggers</PageHeaderTitle>
             <PageHeaderDescription>
-              Execute a set of actions automatically on specified table events
+              Execute actions automatically when table events occur
             </PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
