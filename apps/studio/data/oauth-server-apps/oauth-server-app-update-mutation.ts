@@ -1,26 +1,29 @@
-import { UpdateOAuthClientParams, SupabaseClient } from '@supabase/supabase-js'
+import { UpdateOAuthClientParams } from '@supabase/supabase-js'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError } from 'data/fetchers'
+import { createProjectSupabaseClient } from 'lib/project-supabase-client'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { oauthServerAppKeys } from './keys'
 
 export type OAuthServerAppUpdateVariables = UpdateOAuthClientParams & {
-  clientId: string
-  projectRef?: string
-  supabaseClient?: SupabaseClient<any>
+  clientId: string | undefined
+  projectRef: string | undefined
+  clientEndpoint: string | undefined
 }
 
 export async function updateOAuthServerApp({
   clientId,
   projectRef,
-  supabaseClient,
+  clientEndpoint,
   ...params
 }: OAuthServerAppUpdateVariables) {
   if (!projectRef) throw new Error('Project reference is required')
-  if (!supabaseClient) throw new Error('Supabase client is required')
+  if (!clientEndpoint) throw new Error('Client endpoint is required')
+  if (!clientId) throw new Error('Client ID is required')
 
+  const supabaseClient = await createProjectSupabaseClient(projectRef, clientEndpoint)
   const { data, error } = await supabaseClient.auth.admin.oauth.updateClient(clientId, params)
 
   if (error) return handleError(error)
@@ -42,9 +45,9 @@ export const useOAuthServerAppUpdateMutation = ({
   return useMutation<OAuthAppUpdateData, ResponseError, OAuthServerAppUpdateVariables>({
     mutationFn: (vars) => updateOAuthServerApp(vars),
     onSuccess: async (data, variables, context) => {
-      const { projectRef } = variables
+      const { projectRef, clientEndpoint } = variables
       await queryClient.invalidateQueries({
-        queryKey: oauthServerAppKeys.list(projectRef),
+        queryKey: oauthServerAppKeys.list(projectRef, clientEndpoint),
       })
       await onSuccess?.(data, variables, context)
     },

@@ -6,6 +6,7 @@ import { useState, type KeyboardEvent, type MouseEvent } from 'react'
 import { useParams } from 'common'
 import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { AlphaNotice } from 'components/ui/AlphaNotice'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
 import { VectorBucket as VectorBucketIcon } from 'icons'
@@ -13,7 +14,6 @@ import { BASE_PATH } from 'lib/constants'
 import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
-import { AlphaNotice } from '../AlphaNotice'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateVectorBucketButton, CreateVectorBucketDialog } from './CreateVectorBucketDialog'
 
@@ -59,7 +59,10 @@ export const VectorsBuckets = () => {
 
   return (
     <ScaffoldSection isFullWidth>
-      <AlphaNotice type="vector" />
+      <AlphaNotice
+        entity="Vector buckets"
+        feedbackUrl="https://github.com/orgs/supabase/discussions/40815"
+      />
 
       {isLoadingBuckets && <GenericSkeletonLoader />}
 

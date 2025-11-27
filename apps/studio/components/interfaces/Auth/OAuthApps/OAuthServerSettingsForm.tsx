@@ -18,7 +18,6 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
 import {
   Button,
   Card,
@@ -100,12 +99,7 @@ export const OAuthServerSettingsForm = () => {
     isSuccess: isPermissionsLoaded,
   } = useAsyncCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
 
-  const { data: supabaseClientData } = useSupabaseClientQuery({ projectRef })
-
-  const { data: oAuthAppsData } = useOAuthServerAppsQuery({
-    projectRef,
-    supabaseClient: supabaseClientData?.supabaseClient,
-  })
+  const { data: oAuthAppsData } = useOAuthServerAppsQuery({ projectRef })
 
   const oauthApps = oAuthAppsData?.clients || []
 
