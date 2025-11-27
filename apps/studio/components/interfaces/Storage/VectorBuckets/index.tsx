@@ -15,7 +15,8 @@ import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } f
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { EmptyBucketState } from '../EmptyBucketState'
-import { CreateVectorBucketButton, CreateVectorBucketDialog } from './CreateVectorBucketDialog'
+import { CreateBucketButton } from '../NewBucketButton'
+import { CreateVectorBucketDialog } from './CreateVectorBucketDialog'
 
 /**
  * [Joshen] Low-priority refactor: We should use a virtualized table here as per how we do it
@@ -88,8 +89,7 @@ export const VectorsBuckets = () => {
                   onChange={(e) => setFilterString(e.target.value)}
                   icon={<Search size={12} />}
                 />
-
-                <CreateVectorBucketButton onClick={() => setVisible(true)} />
+                <CreateBucketButton onClick={() => setVisible(true)} />
               </div>
 
               {isLoadingBuckets ? (

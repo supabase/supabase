@@ -1,5 +1,6 @@
 import { ChevronRight, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 
 import { useParams } from 'common'
@@ -25,6 +26,7 @@ import {
 import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { EmptyBucketState } from '../EmptyBucketState'
+import { CreateBucketButton } from '../NewBucketButton'
 import { CreateAnalyticsBucketModal } from './CreateAnalyticsBucketModal'
 
 export const AnalyticsBuckets = () => {
@@ -32,6 +34,11 @@ export const AnalyticsBuckets = () => {
   const router = useRouter()
 
   const [filterString, setFilterString] = useState('')
+
+  const [visible, setVisible] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const {
     data: buckets = [],
@@ -78,7 +85,7 @@ export const AnalyticsBuckets = () => {
       {isSuccessBuckets && (
         <>
           {hasNoBuckets ? (
-            <EmptyBucketState bucketType="analytics" />
+            <EmptyBucketState bucketType="analytics" onCreateBucket={() => setVisible(true)} />
           ) : (
             <div className="flex flex-col gap-y-4">
               <ScaffoldHeader className="py-0 flex flex-row items-center gap-x-2">
@@ -107,7 +114,7 @@ export const AnalyticsBuckets = () => {
                   onChange={(e) => setFilterString(e.target.value)}
                   icon={<Search size={12} />}
                 />
-                <CreateAnalyticsBucketModal buttonType="primary" buttonClassName="w-fit" />
+                <CreateBucketButton onClick={() => setVisible(true)} />
               </div>
 
               {isLoadingBuckets ? (
@@ -186,6 +193,8 @@ export const AnalyticsBuckets = () => {
           )}
         </>
       )}
+
+      <CreateAnalyticsBucketModal open={visible} onOpenChange={setVisible} />
     </ScaffoldSection>
   )
 }

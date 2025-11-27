@@ -11,6 +11,7 @@ import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useStoragePolicyCounts } from 'hooks/storage/useStoragePolicyCounts'
 import { IS_PLATFORM } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
@@ -25,6 +26,7 @@ import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { CreateBucketModal } from '../CreateBucketModal'
 import { EmptyBucketState } from '../EmptyBucketState'
+import { CreateBucketButton } from '../NewBucketButton'
 import { STORAGE_BUCKET_SORT } from '../Storage.constants'
 import { BucketsTable } from './BucketsTable'
 
@@ -32,6 +34,11 @@ export const FilesBuckets = () => {
   const { ref } = useParams()
   const snap = useStorageExplorerStateSnapshot()
   const [filterString, setFilterString] = useState('')
+
+  const [visible, setVisible] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const {
@@ -89,7 +96,7 @@ export const FilesBuckets = () => {
       {isSuccessBuckets && (
         <>
           {hasNoBuckets ? (
-            <EmptyBucketState bucketType="files" />
+            <EmptyBucketState bucketType="files" onCreateBucket={() => setVisible(true)} />
           ) : (
             <>
               <div className="flex flex-grow justify-between gap-x-2 items-center">
@@ -123,7 +130,7 @@ export const FilesBuckets = () => {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-                <CreateBucketModal buttonType="primary" buttonClassName="w-fit" />
+                <CreateBucketButton onClick={() => setVisible(true)} />
               </div>
 
               <Card>
@@ -139,6 +146,8 @@ export const FilesBuckets = () => {
           )}
         </>
       )}
+
+      <CreateBucketModal open={visible} onOpenChange={setVisible} />
     </ScaffoldSection>
   )
 }
