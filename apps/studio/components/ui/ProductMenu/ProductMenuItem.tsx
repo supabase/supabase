@@ -38,7 +38,10 @@ const ProductMenuItem = ({
         >
           <span className="truncate flex-1 min-w-0">{name}</span>
           {label !== undefined && (
-            <Badge variant="warning" className="flex-shrink-0">
+            <Badge
+              variant={label.toLowerCase() === 'new' ? 'success' : 'warning'}
+              className="flex-shrink-0"
+            >
               {label}
             </Badge>
           )}
