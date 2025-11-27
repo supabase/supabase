@@ -175,7 +175,7 @@ export const CronjobsTab = () => {
               size="tiny"
               className="w-52"
               placeholder="Search for a job"
-              icon={<Search size={14} />}
+              icon={<Search />}
               value={search ?? ''}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {

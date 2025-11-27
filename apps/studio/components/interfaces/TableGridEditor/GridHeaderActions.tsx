@@ -563,7 +563,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
         <ConfirmModal
           danger={table.rls_enabled}
           visible={rlsConfirmModalOpen}
-          title="Confirm to enable Row Level Security"
+          title="Enable Row Level Security"
           description="Are you sure you want to enable Row Level Security for this table?"
           buttonLabel="Enable RLS"
           buttonLoadingLabel="Updating"

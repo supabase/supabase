@@ -84,6 +84,9 @@ export const LOCAL_STORAGE_KEYS = {
   // Project sidebar hotkeys
   HOTKEY_SIDEBAR: (sidebarId: string) => `supabase-dashboard-hotkey-sidebar-${sidebarId}`,
 
+  // Index Advisor notice dismissed
+  INDEX_ADVISOR_NOTICE_DISMISSED: (ref: string) => `index-advisor-notice-dismissed-${ref}`,
+
   /**
    * COMMON
    */

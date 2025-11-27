@@ -40,7 +40,7 @@ export const TeamSettings = () => {
             <Input
               size="tiny"
               autoComplete="off"
-              icon={<Search size={12} />}
+              icon={<Search />}
               value={searchString}
               onChange={(e: any) => setSearchString(e.target.value)}
               name="email"
