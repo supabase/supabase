@@ -2,11 +2,20 @@ import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/ho
 import { BASE_PATH } from 'lib/constants'
 import { Admonition } from 'ui-patterns'
 import { EnableIndexAdvisorButton } from './EnableIndexAdvisorButton'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { useParams } from 'common/hooks'
+import { Button } from 'ui'
 
 export const IndexAdvisorNotice = () => {
+  const { ref } = useParams()
   const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
+  const [isDismissed, setIsDismissed] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.INDEX_ADVISOR_NOTICE_DISMISSED(ref ?? ''),
+    false
+  )
 
-  if (!isIndexAdvisorAvailable || isIndexAdvisorEnabled) return null
+  if (!isIndexAdvisorAvailable || isIndexAdvisorEnabled || isDismissed) return null
 
   return (
     <div className="px-6">
@@ -33,7 +42,17 @@ export const IndexAdvisorNotice = () => {
               Recommends indexes to improve query performance.
             </p>
           </div>
-          <EnableIndexAdvisorButton />
+          <div className="flex items-center gap-x-2">
+            <Button
+              type="default"
+              size="tiny"
+              onClick={() => setIsDismissed(true)}
+              aria-label="Dismiss notification"
+            >
+              Dismiss
+            </Button>
+            <EnableIndexAdvisorButton />
+          </div>
         </div>
       </Admonition>
     </div>
