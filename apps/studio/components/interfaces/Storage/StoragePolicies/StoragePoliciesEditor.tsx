@@ -47,7 +47,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
           .
         </p>
       </div>
-      <div className="md:w-2/3">
+      <div className="md:w-2/3 flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
           <Checkbox
             label="SELECT"

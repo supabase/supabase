@@ -234,7 +234,6 @@ export const Addons = () => {
                       <div className="flex py-3">
                         <ComputeBadge
                           infraComputeSize={selectedProject?.infra_compute_size}
-                          size={'large'}
                         />
                       </div>
                     )}

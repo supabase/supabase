@@ -1,17 +1,14 @@
+import type { HTMLAttributes } from 'react'
+
 import { components } from 'api-types'
-import * as React from 'react'
 
 import { cn } from 'ui'
 
-interface ComputeBadgeProps extends React.HTMLAttributes<HTMLDivElement> {
+interface ComputeBadgeProps extends HTMLAttributes<HTMLDivElement> {
   infraComputeSize:
     | components['schemas']['ProjectDetailResponse']['infra_compute_size']
     | '>16XL'
     | undefined
-  /**
-   * @deprecated Size prop is no longer used. Kept for backward compatibility.
-   */
-  size?: 'tiny' | 'small' | 'large'
 }
 
 export function ComputeBadge({ infraComputeSize, className, ...props }: ComputeBadgeProps) {
