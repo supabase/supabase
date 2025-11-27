@@ -5,7 +5,12 @@ import { BASE_PATH } from 'lib/constants'
 import { Badge, Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 
-export const AlphaNotice = ({ type }: { type: 'analytics' | 'vector' }) => {
+interface AlphaNoticeProps {
+  entity: string
+  feedbackUrl: string
+}
+
+export const AlphaNotice = ({ entity, feedbackUrl }: AlphaNoticeProps) => {
   return (
     <Admonition showIcon={false} type="tip" className="relative mb-6 overflow-hidden">
       <div className="absolute -inset-16 z-0 opacity-50">
@@ -28,25 +33,16 @@ export const AlphaNotice = ({ type }: { type: 'analytics' | 'vector' }) => {
             <Badge variant="success" className="-ml-0.5 uppercase">
               New
             </Badge>
-            <p className="text-sm font-medium">Introducing {type} buckets</p>
+            <p className="text-sm font-medium">Introducing {entity.toLocaleLowerCase()}</p>
           </div>
           <p className="text-sm text-foreground-lighter text-balance">
-            <span className="capitalize">{type}</span> buckets are now in private alpha. Expect
-            rapid changes, limited features, and possible breaking updates. Please share feedback as
-            we refine the experience and expand access.
+            {entity} {entity.endsWith('s') ? 'are' : 'is'} now in private alpha. Expect rapid
+            changes, limited features, and possible breaking updates. Please share feedback as we
+            refine the experience and expand access.
           </p>
         </div>
         <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />} className="mt-2">
-          <Link
-            target="_blank"
-            rel="noopener noreferrer"
-            href={
-              type === 'analytics'
-                ? 'https://github.com/orgs/supabase/discussions/40116'
-                : // [Joshen] To update with Vector specific GH discussion
-                  'https://github.com/orgs/supabase/discussions/40815'
-            }
-          >
+          <Link target="_blank" rel="noopener noreferrer" href={feedbackUrl}>
             Share feedback
           </Link>
         </Button>
