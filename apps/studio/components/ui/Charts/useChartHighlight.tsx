@@ -56,11 +56,21 @@ export function useChartHighlight(): ChartHighlight {
     }
   }
 
-  const handleMouseUp = (e: any) => {
+  const handleMouseUp = (e: unknown) => {
     if (!isSelecting) return
     setIsSelecting(false)
-    setPopoverPosition({ x: e.chartX, y: e.chartY })
     setInitialPoint(undefined)
+
+    if (
+      typeof e === 'object' &&
+      e !== null &&
+      'chartX' in e &&
+      'chartY' in e &&
+      typeof e.chartX === 'number' &&
+      typeof e.chartY === 'number'
+    ) {
+      setPopoverPosition({ x: e.chartX, y: e.chartY })
+    }
   }
 
   const clearHighlight = () => {
