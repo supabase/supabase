@@ -1,14 +1,21 @@
 import { ScaffoldSection } from 'components/layouts/Scaffold'
+import { AlphaNotice } from 'components/ui/AlphaNotice'
 import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { AnalyticsBucket as AnalyticsBucketIcon, VectorBucket as VectorBucketIcon } from 'icons'
 import { EmptyStatePresentational } from 'ui-patterns'
-import { AlphaNotice } from './AlphaNotice'
 import { BUCKET_TYPES } from './Storage.constants'
 
 export const BucketsUpgradePlan = ({ type }: { type: 'analytics' | 'vector' }) => {
   return (
     <ScaffoldSection isFullWidth>
-      <AlphaNotice type={type} />
+      <AlphaNotice
+        entity={type === 'analytics' ? 'Analytics buckets' : 'Vector buckets'}
+        feedbackUrl={
+          type === 'analytics'
+            ? 'https://github.com/orgs/supabase/discussions/40116'
+            : 'https://github.com/orgs/supabase/discussions/40815'
+        }
+      />
       <EmptyStatePresentational
         icon={type === 'analytics' ? AnalyticsBucketIcon : VectorBucketIcon}
         title={
