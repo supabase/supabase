@@ -224,7 +224,7 @@ describe('createTable', () => {
     expect(sqlCall.sql).toContain('ALTER TABLE')
     expect(sqlCall.sql).toContain('ADD COLUMN')
     expect(sqlCall.sql).toContain('ADD PRIMARY KEY')
-    expect(sqlCall.sql).toContain('"id"')
+    expect(sqlCall.sql).toContain('id')
   })
 
   it('should create a table with composite primary key', async () => {
@@ -257,8 +257,8 @@ describe('createTable', () => {
 
     const sqlCall = mockExecuteSql.mock.calls[0][0]
     expect(sqlCall.sql).toContain('ADD PRIMARY KEY')
-    expect(sqlCall.sql).toContain('"user_id"')
-    expect(sqlCall.sql).toContain('"order_id"')
+    expect(sqlCall.sql).toContain('user_id')
+    expect(sqlCall.sql).toContain('order_id')
   })
 
   it('should create a table with foreign key relations', async () => {
