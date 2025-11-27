@@ -1,0 +1,82 @@
+---
+title: Mermaid
+description: Render diagrams from text using Mermaid syntax.
+component: true
+---
+
+<ComponentPreview name="mermaid-demo" peekCode wide />
+
+## Installation
+
+The Mermaid component is available from the `ui` package:
+
+```tsx
+import { Mermaid } from 'ui'
+```
+
+## Usage
+
+```tsx
+import { Mermaid } from 'ui'
+```
+
+```tsx
+<Mermaid
+  chart={`
+graph TD
+    A[Start] --> B[End]
+`}
+/>
+```
+
+## Examples
+
+### Supabase Architecture
+
+<ComponentPreview name="mermaid-demo" peekCode wide />
+
+---
+
+### Flowchart
+
+<ComponentPreview name="mermaid-flowchart" peekCode wide />
+
+---
+
+### ER Diagram
+
+<ComponentPreview name="mermaid-er-diagram" peekCode wide />
+
+---
+
+### Async Streaming (FDW)
+
+<ComponentPreview name="mermaid-sequence-async" peekCode wide />
+
+---
+
+### Sync Blocking (FDW)
+
+<ComponentPreview name="mermaid-sequence-sync" peekCode wide />
+
+## Props
+
+| Prop        | Type     | Description                          |
+| ----------- | -------- | ------------------------------------ |
+| `chart`     | `string` | The Mermaid diagram definition       |
+| `className` | `string` | Optional CSS class for the container |
+
+## Supported Diagram Types
+
+Mermaid supports many diagram types including:
+
+- **Flowcharts** - `flowchart` or `graph`
+- **Sequence Diagrams** - `sequenceDiagram`
+- **Class Diagrams** - `classDiagram`
+- **State Diagrams** - `stateDiagram-v2`
+- **ER Diagrams** - `erDiagram`
+- **Gantt Charts** - `gantt`
+- **Pie Charts** - `pie`
+- **Git Graphs** - `gitGraph`
+
+See the [Mermaid documentation](https://mermaid.js.org/intro/) for full syntax reference.

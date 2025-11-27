@@ -1353,4 +1353,34 @@ export const examples: Registry = [
     type: 'components:example',
     files: ['example/metric-card-with-icon-link-tooltip.tsx'],
   },
+  {
+    name: 'mermaid-demo',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-demo.tsx'],
+  },
+  {
+    name: 'mermaid-flowchart',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-flowchart.tsx'],
+  },
+  {
+    name: 'mermaid-er-diagram',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-er-diagram.tsx'],
+  },
+  {
+    name: 'mermaid-sequence-async',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-sequence-async.tsx'],
+  },
+  {
+    name: 'mermaid-sequence-sync',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-sequence-sync.tsx'],
+  },
 ]

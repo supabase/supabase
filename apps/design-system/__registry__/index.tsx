@@ -16,6 +16,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "EmptyStatePresentational": {
+      name: "EmptyStatePresentational",
+      type: "components:fragment",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/../../packages/ui-patterns/src/EmptyStatePresentational")),
+      source: "",
+      files: ["registry/default//EmptyStatePresentational/index.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "TextConfirmModal": {
       name: "TextConfirmModal",
       type: "components:fragment",
@@ -2520,6 +2531,61 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/metric-card-with-icon-link-tooltip")),
       source: "",
       files: ["registry/default/example/metric-card-with-icon-link-tooltip.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-demo": {
+      name: "mermaid-demo",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-demo")),
+      source: "",
+      files: ["registry/default/example/mermaid-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-flowchart": {
+      name: "mermaid-flowchart",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-flowchart")),
+      source: "",
+      files: ["registry/default/example/mermaid-flowchart.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-er-diagram": {
+      name: "mermaid-er-diagram",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-er-diagram")),
+      source: "",
+      files: ["registry/default/example/mermaid-er-diagram.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-sequence-async": {
+      name: "mermaid-sequence-async",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-sequence-async")),
+      source: "",
+      files: ["registry/default/example/mermaid-sequence-async.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-sequence-sync": {
+      name: "mermaid-sequence-sync",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-sequence-sync")),
+      source: "",
+      files: ["registry/default/example/mermaid-sequence-sync.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

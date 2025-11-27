@@ -1,0 +1,278 @@
+'use client'
+
+import 'react-medium-image-zoom/dist/styles.css'
+
+import { useEffect, useRef, useState } from 'react'
+import mermaid from 'mermaid'
+import { useTheme } from 'next-themes'
+import Zoom from 'react-medium-image-zoom'
+import { cn } from '../../lib/utils/cn'
+
+const darkThemeVariables = {
+  background: 'transparent',
+  mainBkg: '#171717',
+  primaryTextColor: '#ededed',
+  secondaryTextColor: '#a0a0a0',
+  tertiaryTextColor: '#ededed',
+  textColor: '#ededed',
+  primaryColor: '#3ecf8e',
+  primaryBorderColor: '#3ecf8e',
+  secondaryColor: '#9333ea',
+  secondaryBorderColor: '#a855f7',
+  tertiaryColor: '#262626',
+  tertiaryBorderColor: '#404040',
+  lineColor: '#525252',
+  border1: '#404040',
+  border2: '#525252',
+  noteBkgColor: '#1a3a2a',
+  noteTextColor: '#ededed',
+  noteBorderColor: '#3ecf8e',
+  actorBkg: '#171717',
+  actorBorder: '#525252',
+  actorTextColor: '#ededed',
+  actorLineColor: '#525252',
+  activationBkgColor: '#9333ea',
+  activationBorderColor: '#a855f7',
+  signalColor: '#ededed',
+  signalTextColor: '#ededed',
+  sequenceNumberColor: '#171717',
+  nodeBkg: '#262626',
+  nodeBorder: '#404040',
+  clusterBkg: '#1a1a1a',
+  clusterBorder: '#404040',
+  defaultLinkColor: '#3ecf8e',
+  edgeLabelBackground: '#171717',
+  // ER diagram specific
+  attributeBackgroundColorOdd: '#262626',
+  attributeBackgroundColorEven: '#171717',
+  rowOdd: '#262626',
+  rowEven: '#171717',
+  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+  fontSize: '14px',
+}
+
+const lightThemeVariables = {
+  background: 'transparent',
+  mainBkg: '#ffffff',
+  primaryTextColor: '#1c1c1c',
+  secondaryTextColor: '#6b7280',
+  tertiaryTextColor: '#1c1c1c',
+  textColor: '#1c1c1c',
+  primaryColor: '#3ecf8e',
+  primaryBorderColor: '#3ecf8e',
+  secondaryColor: '#9333ea',
+  secondaryBorderColor: '#a855f7',
+  tertiaryColor: '#f5f5f5',
+  tertiaryBorderColor: '#e5e5e5',
+  lineColor: '#d4d4d4',
+  border1: '#e5e5e5',
+  border2: '#d4d4d4',
+  noteBkgColor: '#ecfdf5',
+  noteTextColor: '#1c1c1c',
+  noteBorderColor: '#3ecf8e',
+  actorBkg: '#ffffff',
+  actorBorder: '#d4d4d4',
+  actorTextColor: '#1c1c1c',
+  actorLineColor: '#d4d4d4',
+  activationBkgColor: '#9333ea',
+  activationBorderColor: '#a855f7',
+  signalColor: '#1c1c1c',
+  signalTextColor: '#1c1c1c',
+  sequenceNumberColor: '#ffffff',
+  nodeBkg: '#f5f5f5',
+  nodeBorder: '#e5e5e5',
+  clusterBkg: '#fafafa',
+  clusterBorder: '#e5e5e5',
+  defaultLinkColor: '#3ecf8e',
+  edgeLabelBackground: '#ffffff',
+  // ER diagram specific
+  attributeBackgroundColorOdd: '#f5f5f5',
+  attributeBackgroundColorEven: '#ffffff',
+  rowOdd: '#f5f5f5',
+  rowEven: '#ffffff',
+  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+  fontSize: '13px',
+}
+
+export interface MermaidProps {
+  chart: string
+  className?: string
+  zoomable?: boolean
+}
+
+export function Mermaid({ chart, className, zoomable = true }: MermaidProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [svg, setSvg] = useState<string>('')
+  const [error, setError] = useState<string | null>(null)
+  const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  const isDark = resolvedTheme === 'dark'
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return
+
+    // Re-initialize mermaid with current theme
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: isDark ? darkThemeVariables : lightThemeVariables,
+      sequence: {
+        useMaxWidth: false,
+        actorMargin: 150,
+        messageMargin: 60,
+        noteMargin: 20,
+      },
+      flowchart: {
+        useMaxWidth: false,
+      },
+      er: {
+        useMaxWidth: false,
+      },
+    })
+
+    const renderChart = async () => {
+      try {
+        const id = `mermaid-${Math.random().toString(36).substring(2, 11)}`
+        const { svg } = await mermaid.render(id, chart.trim())
+
+        // Post-process SVG
+        const parser = new DOMParser()
+        const doc = parser.parseFromString(svg, 'image/svg+xml')
+        const svgEl = doc.querySelector('svg')
+
+        // Add diagonal line pattern definition
+        let defs = svgEl?.querySelector('defs')
+        if (!defs) {
+          defs = doc.createElementNS('http://www.w3.org/2000/svg', 'defs')
+          svgEl?.insertBefore(defs, svgEl.firstChild)
+        }
+
+        const pattern = doc.createElementNS('http://www.w3.org/2000/svg', 'pattern')
+        pattern.setAttribute('id', 'diagonalLines')
+        pattern.setAttribute('patternUnits', 'userSpaceOnUse')
+        pattern.setAttribute('width', '8')
+        pattern.setAttribute('height', '8')
+        pattern.setAttribute('patternTransform', 'rotate(45)')
+
+        const patternBg = doc.createElementNS('http://www.w3.org/2000/svg', 'rect')
+        patternBg.setAttribute('width', '8')
+        patternBg.setAttribute('height', '8')
+        patternBg.setAttribute('fill', isDark ? '#171717' : '#ffffff')
+        pattern.appendChild(patternBg)
+
+        const line = doc.createElementNS('http://www.w3.org/2000/svg', 'line')
+        line.setAttribute('x1', '0')
+        line.setAttribute('y1', '0')
+        line.setAttribute('x2', '0')
+        line.setAttribute('y2', '8')
+        line.setAttribute('stroke', isDark ? '#3a3a3a' : '#c0c0c0')
+        line.setAttribute('stroke-width', '3')
+        pattern.appendChild(line)
+
+        defs.appendChild(pattern)
+
+        // Remove roundedness from all rects (we'll add it back for pills)
+        const allRects = doc.querySelectorAll('rect')
+        allRects.forEach((rect) => {
+          rect.setAttribute('rx', '0')
+          rect.setAttribute('ry', '0')
+        })
+
+        // Style actor boxes (rect.actor-top and rect.actor-bottom) with diagonal lines
+        const actorRects = doc.querySelectorAll('rect.actor-top, rect.actor-bottom')
+        actorRects.forEach((rect) => {
+          // Check if this is a Postgres box by finding sibling text
+          const parent = rect.parentElement
+          const text = parent?.querySelector('text')
+          const isPostgres = text?.textContent?.toLowerCase().includes('postgres')
+
+          rect.setAttribute('fill', 'url(#diagonalLines)')
+          rect.setAttribute('stroke', isPostgres ? '#336791' : isDark ? '#525252' : '#d4d4d4')
+        })
+
+        // Add pill backgrounds to message text (skip notes - they already have backgrounds)
+        const messageTexts = doc.querySelectorAll('.messageText')
+        messageTexts.forEach((text) => {
+          // Skip if there's already a sibling rect (notes have background rects)
+          const parent = text.parentElement
+          if (parent?.querySelector('rect')) return
+
+          const x = parseFloat(text.getAttribute('x') || '0')
+          const y = parseFloat(text.getAttribute('y') || '0')
+          const dy = text.getAttribute('dy')
+          // Parse dy (e.g., "1em" -> 16px)
+          const dyOffset = dy ? parseFloat(dy) * 16 : 0
+
+          const textContent = text.textContent || ''
+          const estimatedWidth = textContent.length * 9
+          const height = 28
+          const paddingX = 16
+
+          const rect = doc.createElementNS('http://www.w3.org/2000/svg', 'rect')
+          rect.setAttribute('x', String(x - estimatedWidth / 2 - paddingX))
+          rect.setAttribute('y', String(y + dyOffset - height / 2))
+          rect.setAttribute('width', String(estimatedWidth + paddingX * 2))
+          rect.setAttribute('height', String(height))
+          rect.setAttribute('rx', '14')
+          rect.setAttribute('fill', isDark ? '#262626' : '#f5f5f5')
+          rect.setAttribute('class', 'messageTextBg')
+
+          text.parentNode?.insertBefore(rect, text)
+        })
+
+        const serializer = new XMLSerializer()
+        const processedSvg = serializer.serializeToString(doc)
+        setSvg(processedSvg)
+        setError(null)
+      } catch (err) {
+        console.error('Mermaid rendering error:', err)
+        setError(err instanceof Error ? err.message : 'Failed to render diagram')
+      }
+    }
+
+    renderChart()
+  }, [chart, isDark, mounted])
+
+  if (!mounted) {
+    return <div className={cn('my-6 rounded-lg bg-muted p-6 animate-pulse h-64', className)} />
+  }
+
+  if (error) {
+    return (
+      <div
+        className={cn(
+          'my-4 p-4 bg-destructive-200 border border-destructive-400 rounded-md',
+          className
+        )}
+      >
+        <p className="text-destructive-600 text-sm font-mono">Mermaid Error: {error}</p>
+        <pre className="mt-2 text-xs text-foreground-lighter overflow-auto">{chart}</pre>
+      </div>
+    )
+  }
+
+  const content = (
+    <div
+      ref={containerRef}
+      className={cn(
+        'my-6 flex justify-center rounded-lg border p-6 pb-8',
+        isDark ? 'bg-[#171717] border-[#333]' : 'bg-white border-[#e5e5e5]',
+        '[&_svg]:h-auto [&_svg]:max-w-full',
+        zoomable && 'cursor-zoom-in',
+        className
+      )}
+      dangerouslySetInnerHTML={{ __html: svg }}
+    />
+  )
+
+  if (zoomable) {
+    return <Zoom zoomMargin={40}>{content}</Zoom>
+  }
+
+  return content
+}
