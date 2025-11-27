@@ -22,10 +22,10 @@ export const StorageMenuV2 = () => {
   const isAnalyticsBucketsEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
   const isVectorBucketsEnabled = useIsVectorBucketsEnabled({ projectRef: ref })
 
-  const bucketTypes = Object.entries(BUCKET_TYPES).filter(([key, config]) => {
-    if (key === 'analytics') return storageAnalytics
-    if (key === 'vectors') return storageVectors
-    return IS_PLATFORM || (!IS_PLATFORM && !config.platformOnly)
+  const bucketTypes = Object.entries(BUCKET_TYPES).filter(([key]) => {
+    if (key === 'analytics') return IS_PLATFORM && storageAnalytics
+    if (key === 'vectors') return IS_PLATFORM && storageVectors
+    return true
   })
 
   return (

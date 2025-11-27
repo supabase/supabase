@@ -44,7 +44,7 @@ export const AlphaNotice = ({ type }: { type: 'analytics' | 'vector' }) => {
               type === 'analytics'
                 ? 'https://github.com/orgs/supabase/discussions/40116'
                 : // [Joshen] To update with Vector specific GH discussion
-                  'https://github.com/orgs/supabase/discussions/40116'
+                  'https://github.com/orgs/supabase/discussions/40815'
             }
           >
             Share feedback
