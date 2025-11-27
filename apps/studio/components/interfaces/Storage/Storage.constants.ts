@@ -66,7 +66,7 @@ export const BUCKET_TYPES = {
     singularName: 'file',
     article: 'a',
     description: 'General file storage for most types of digital content',
-    valueProp: 'Store images, videos, documents, and any other file type',
+    valueProp: 'Store images, videos, documents, and any other file type.',
     docsUrl: `${DOCS_URL}/guides/storage/buckets/fundamentals`,
   },
   analytics: {
@@ -74,7 +74,7 @@ export const BUCKET_TYPES = {
     singularName: 'analytics',
     article: 'an',
     description: 'Purpose-built storage for analytical workloads',
-    valueProp: 'Store large datasets for analytics and reporting',
+    valueProp: 'Store large datasets for analytics and reporting.',
     docsUrl: `${DOCS_URL}/guides/storage/analytics/introduction`,
   },
   vectors: {
@@ -82,7 +82,7 @@ export const BUCKET_TYPES = {
     singularName: 'vector',
     article: 'a',
     description: 'Purpose-built storage for vector data',
-    valueProp: 'Store, index, and query your vector embeddings at scale',
+    valueProp: 'Store, index, and query your vector embeddings at scale.',
     docsUrl: `${DOCS_URL}/guides/storage/vector/introduction`,
   },
 }

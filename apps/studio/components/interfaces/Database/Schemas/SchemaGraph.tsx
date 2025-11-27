@@ -1,14 +1,16 @@
 import type { PostgresSchema } from '@supabase/postgres-meta'
 import { toPng, toSvg } from 'html-to-image'
-import { Check, Copy, Download, Loader2 } from 'lucide-react'
+import { Check, Copy, Download, Loader2, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { toast } from 'sonner'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
@@ -281,16 +283,17 @@ export const SchemaGraph = () => {
       {isSuccessTables && (
         <>
           {tables.length === 0 ? (
-            <div className="h-full flex items-center justify-center">
-              <ProductEmptyState
-                title="No tables created yet"
-                ctaButtonLabel="Create a new table"
-                ctaUrl={`/project/${ref}/editor?create=table`}
+            <div className="flex items-center justify-center w-full h-full">
+              <Admonition
+                type="default"
+                className="max-w-md"
+                title="No tables in schema"
+                description={`The “${selectedSchema}” schema doesn’t have any tables.`}
               >
-                <p className="text-sm text-foreground-light">
-                  There are no tables found in the schema "{selectedSchema}"
-                </p>
-              </ProductEmptyState>
+                <Button asChild className="mt-2" type="default" icon={<Plus />}>
+                  <Link href={`/project/${ref}/editor?create=table`}>New table</Link>
+                </Button>
+              </Admonition>
             </div>
           ) : (
             <div className="w-full h-full">

@@ -11600,8 +11600,7 @@
                     "type": "string",
                     "nullable": true
                   }
-                },
-                "required": ["db_max_pool_size_unit"]
+                }
               }
             }
           }
@@ -25081,8 +25080,7 @@
             "type": "string",
             "nullable": true
           }
-        },
-        "required": ["db_max_pool_size_unit"]
+        }
       },
       "RealtimeConfigResponse": {
         "type": "object",

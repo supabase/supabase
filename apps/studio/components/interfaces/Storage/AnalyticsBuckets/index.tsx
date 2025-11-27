@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { AlphaNotice } from 'components/ui/AlphaNotice'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import { AnalyticsBucket as AnalyticsBucketIcon } from 'icons'
@@ -23,7 +24,6 @@ import {
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { AlphaNotice } from '../AlphaNotice'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateAnalyticsBucketModal } from './CreateAnalyticsBucketModal'
 
@@ -64,7 +64,10 @@ export const AnalyticsBuckets = () => {
 
   return (
     <ScaffoldSection isFullWidth>
-      <AlphaNotice type="analytics" />
+      <AlphaNotice
+        entity="Analytics buckets"
+        feedbackUrl="https://github.com/orgs/supabase/discussions/40116"
+      />
 
       {isLoadingBuckets && <GenericSkeletonLoader />}
 

@@ -11192,14 +11192,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                             }
                           },
                           {
-                            "name": "redirect_uri",
+                            "name": "redirect_url",
                             "type": {
                               "type": "intrinsic",
                               "name": "string"
                             },
                             "isOptional": true,
                             "comment": {
-                              "shortText": "Redirect URI - present if user already consented (can be used to trigger immediate redirect)"
+                              "shortText": "Redirect URL - present if user already consented (can be used to trigger immediate redirect)"
                             }
                           },
                           {
@@ -50643,14 +50643,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                             }
                           },
                           {
-                            "name": "redirect_uri",
+                            "name": "redirect_url",
                             "type": {
                               "type": "intrinsic",
                               "name": "string"
                             },
                             "isOptional": true,
                             "comment": {
-                              "shortText": "Redirect URI - present if user already consented (can be used to trigger immediate redirect)"
+                              "shortText": "Redirect URL - present if user already consented (can be used to trigger immediate redirect)"
                             }
                           },
                           {

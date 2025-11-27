@@ -1,12 +1,10 @@
-import { Eye, MoreVertical, Search, Trash2 } from 'lucide-react'
+import { MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useRef, useState } from 'react'
-import { toast } from 'sonner'
 import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useRef, useState } from 'react'
 
 import { useParams } from 'common'
-import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import {
   ScaffoldContainer,
   ScaffoldHeader,
@@ -15,18 +13,10 @@ import {
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
-import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
-import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
-import { useS3VectorsWrapperCreateMutation } from 'data/storage/s3-vectors-wrapper-create-mutation'
 import { useVectorBucketQuery } from 'data/storage/vector-bucket-query'
-import {
-  useVectorBucketsIndexesQuery,
-  VectorBucketIndex,
-} from 'data/storage/vector-buckets-indexes-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useVectorBucketsIndexesQuery } from 'data/storage/vector-buckets-indexes-query'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
-import { DOCS_URL } from 'lib/constants'
+import { SqlEditor, TableEditor } from 'icons'
 import {
   Button,
   Card,
@@ -44,14 +34,19 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { Admonition } from 'ui-patterns/admonition'
-import { CreateVectorTableSheet } from './CreateVectorTableSheet'
-import { DeleteVectorBucketModal } from './DeleteVectorBucketModal'
-import { DeleteVectorTableModal } from './DeleteVectorTableModal'
-import { getVectorBucketFDWSchemaName } from './VectorBuckets.utils'
-import { useS3VectorsWrapperExtension } from './useS3VectorsWrapper'
-import { useS3VectorsWrapperInstance } from './useS3VectorsWrapperInstance'
-import { useSelectedVectorBucket } from './useSelectedVectorBuckets'
+import { CreateVectorTableSheet } from '../CreateVectorTableSheet'
+import { DeleteVectorBucketModal } from '../DeleteVectorBucketModal'
+import { DeleteVectorTableModal } from '../DeleteVectorTableModal'
+import { getVectorBucketFDWSchemaName } from '../VectorBuckets.utils'
+import { useS3VectorsWrapperExtension } from '../useS3VectorsWrapper'
+import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'
+import { useSelectedVectorBucket } from '../useSelectedVectorBuckets'
+import {
+  ExtensionNeedsUpgrade,
+  ExtensionNotInstalled,
+  WrapperMissing,
+} from './VectorBucketCallouts'
+import { VectorBucketTableExamplesSheet } from './VectorBucketTableExamplesSheet'
 
 export const VectorBucketDetails = () => {
   const router = useRouter()
@@ -150,7 +145,6 @@ export const VectorBucketDetails = () => {
 
             {state === 'not-installed' && (
               <ExtensionNotInstalled
-                bucketName={bucket?.vectorBucketName}
                 projectRef={projectRef!}
                 wrapperMeta={wrapperMeta!}
                 wrappersExtension={wrappersExtension!}
@@ -158,7 +152,6 @@ export const VectorBucketDetails = () => {
             )}
             {state === 'needs-upgrade' && (
               <ExtensionNeedsUpgrade
-                bucketName={bucket?.vectorBucketName}
                 projectRef={projectRef!}
                 wrapperMeta={wrapperMeta!}
                 wrappersExtension={wrappersExtension!}
@@ -228,30 +221,53 @@ export const VectorBucketDetails = () => {
                             </TableCell>
                             <TableCell>
                               <div className="flex flex-row justify-end gap-2">
-                                {wrapperInstance ? (
-                                  <Button
-                                    asChild
-                                    icon={<Eye size={14} className="text-foreground-lighter" />}
-                                    type="default"
-                                  >
-                                    {/* TODO: Proper URL for table editor */}
-                                    <Link
-                                      href={`/project/${projectRef}/editor/${encodeURIComponent(name)}?schema=${getVectorBucketFDWSchemaName(bucketId!)}`}
-                                    >
-                                      Table Editor
-                                    </Link>
-                                  </Button>
-                                ) : null}
+                                <VectorBucketTableExamplesSheet index={index} />
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button
                                       type="default"
-                                      className="px-1"
+                                      className="w-7"
                                       icon={<MoreVertical />}
                                       onClick={(e) => e.stopPropagation()}
                                     />
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent side="bottom" align="end" className="w-40">
+                                    {wrapperInstance ? (
+                                      <>
+                                        <DropdownMenuItem
+                                          className="flex items-center space-x-2"
+                                          asChild
+                                        >
+                                          {/* TODO: Proper URL for sql editor */}
+                                          <Link
+                                            href={`/project/${projectRef}/sql/new?content=${encodeURIComponent(`select * from "${getVectorBucketFDWSchemaName(bucketId!)}"."${name}";`)}`}
+                                            onClick={(e) => e.stopPropagation()}
+                                          >
+                                            <SqlEditor
+                                              size={12}
+                                              className="text-foreground-lighter"
+                                            />
+                                            <p>Query in SQL Editor</p>
+                                          </Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                          className="flex items-center space-x-2"
+                                          asChild
+                                        >
+                                          {/* TODO: Proper URL for table editor */}
+                                          <Link
+                                            href={`/project/${projectRef}/editor/?schema=${getVectorBucketFDWSchemaName(bucketId!)}`}
+                                            onClick={(e) => e.stopPropagation()}
+                                          >
+                                            <TableEditor
+                                              size={12}
+                                              className="text-foreground-lighter"
+                                            />
+                                            <p>View in Table Editor</p>
+                                          </Link>
+                                        </DropdownMenuItem>
+                                      </>
+                                    ) : null}
                                     <DropdownMenuItem
                                       className="flex items-center space-x-2"
                                       onClick={(e) => {
@@ -259,7 +275,7 @@ export const VectorBucketDetails = () => {
                                         setSelectedTableToDelete(index.indexName)
                                       }}
                                     >
-                                      <Trash2 size={12} />
+                                      <Trash2 size={12} className="text-foreground-lighter" />
                                       <p>Delete table</p>
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
@@ -318,131 +334,5 @@ export const VectorBucketDetails = () => {
         }}
       />
     </>
-  )
-}
-
-const ExtensionNotInstalled = ({
-  bucketName,
-  projectRef,
-  wrapperMeta,
-  wrappersExtension,
-}: {
-  bucketName?: string
-  projectRef: string
-  wrapperMeta: WrapperMeta
-  wrappersExtension: DatabaseExtension
-}) => {
-  const databaseNeedsUpgrading =
-    (wrappersExtension?.default_version ?? '') < (wrapperMeta.minimumExtensionVersion ?? '')
-
-  return (
-    <ScaffoldSection isFullWidth>
-      <Admonition type="warning" title="Missing required extension" className="mb-0">
-        <p>
-          The Wrappers extension is required in order to query vector tables.{' '}
-          {databaseNeedsUpgrading &&
-            'Please first upgrade your database and then install the extension.'}{' '}
-          <InlineLink
-            href={`${DOCS_URL}/guides/database/extensions/wrappers/s3_vectors`}
-            target="_blank"
-          >
-            Learn more
-          </InlineLink>
-        </p>
-        <Button type="default" asChild className="mt-2">
-          <Link
-            href={
-              databaseNeedsUpgrading
-                ? `/project/${projectRef}/settings/infrastructure`
-                : `/project/${projectRef}/database/extensions?filter=wrappers`
-            }
-          >
-            {databaseNeedsUpgrading ? 'Upgrade database' : 'Install extension'}
-          </Link>
-        </Button>
-      </Admonition>
-    </ScaffoldSection>
-  )
-}
-
-const ExtensionNeedsUpgrade = ({
-  bucketName,
-  projectRef,
-  wrapperMeta,
-  wrappersExtension,
-}: {
-  bucketName?: string
-  projectRef: string
-  wrapperMeta: WrapperMeta
-  wrappersExtension: DatabaseExtension
-}) => {
-  // [Joshen] Default version is what's on the DB, so if the installed version is already the default version
-  // but still doesnt meet the minimum extension version, then DB upgrade is required
-  const databaseNeedsUpgrading =
-    wrappersExtension?.installed_version === wrappersExtension?.default_version
-
-  return (
-    <ScaffoldSection isFullWidth>
-      <Admonition type="warning" title="Outdated extension version" className="mb-0">
-        <p>
-          The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
-          {wrapperMeta.minimumExtensionVersion}. You have version{' '}
-          {wrappersExtension?.installed_version} installed. Please{' '}
-          {databaseNeedsUpgrading && 'first upgrade your database, and then '}update the extension
-          by disabling and enabling the Wrappers extension.
-        </p>
-        <p>
-          Before reinstalling the wrapper extension, you must first remove all existing wrappers.
-          Afterward, you can recreate the wrappers.
-        </p>
-        <Button asChild type="default">
-          <Link
-            href={
-              databaseNeedsUpgrading
-                ? `/project/${projectRef}/settings/infrastructure`
-                : `/project/${projectRef}/database/extensions?filter=wrappers`
-            }
-          >
-            {databaseNeedsUpgrading ? 'Upgrade database' : 'Extensions'}
-          </Link>
-        </Button>
-      </Admonition>
-    </ScaffoldSection>
-  )
-}
-
-const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
-  const { data: project } = useSelectedProjectQuery()
-  const { mutateAsync: createS3VectorsWrapper, isPending: isCreatingS3VectorsWrapper } =
-    useS3VectorsWrapperCreateMutation()
-  const { mutateAsync: createSchema, isPending: isCreatingSchema } = useSchemaCreateMutation()
-
-  const onSetupWrapper = async () => {
-    if (!bucketName) return console.error('Bucket name is required')
-    try {
-      await createS3VectorsWrapper({ bucketName })
-      await createSchema({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        name: getVectorBucketFDWSchemaName(bucketName),
-      })
-    } catch (error) {
-      toast.error(
-        `Failed to install wrapper: ${error instanceof Error ? error.message : 'Unknown error'}`
-      )
-    }
-  }
-
-  const isLoading = isCreatingS3VectorsWrapper || isCreatingSchema
-
-  return (
-    <ScaffoldSection isFullWidth>
-      <Admonition type="warning" title="Missing integration" className="mb-0">
-        <p>The S3 Vectors Wrapper integration is required in order to query vector tables.</p>
-        <Button type="default" loading={isLoading} onClick={onSetupWrapper}>
-          Install wrapper
-        </Button>
-      </Admonition>
-    </ScaffoldSection>
   )
 }

@@ -2,8 +2,10 @@
 
 import { ExternalLink } from 'lucide-react'
 import Image from 'next/image'
+import yaml from 'js-yaml'
+import { stringify as stringifyToml } from '@std/toml/stringify'
 import { Button, cn } from 'ui'
-import { CodeBlock } from 'ui/src/components/CodeBlock'
+import { CodeBlock, type CodeBlockLang } from 'ui/src/components/CodeBlock'
 import type { McpClient, McpClientConfig, McpOnCopyCallback } from '../types'
 import { getMcpButtonData } from '../utils/getMcpButtonData'
 
@@ -16,6 +18,8 @@ interface McpConfigurationDisplayProps {
   onCopyCallback: (type?: McpOnCopyCallback) => void
   onInstallCallback?: () => void
 }
+
+type ConfigFormat = CodeBlockLang | 'toml'
 
 export function McpConfigurationDisplay({
   selectedClient,
@@ -32,6 +36,34 @@ export function McpConfigurationDisplay({
     client: selectedClient,
     clientConfig,
   })
+
+  // Extract file extension and determine format
+  const fileExtension = selectedClient.configFile?.split('.').pop()?.toLowerCase()
+  // If the file extension is not 'json', 'yaml', or 'toml', default to 'txt'
+  let configFormat: ConfigFormat | undefined
+  if (['json', 'yaml', 'toml'].includes(fileExtension ?? '')) {
+    configFormat = fileExtension as ConfigFormat
+  }
+
+  // Serialize config based on format
+  let configValue: string
+  switch (configFormat) {
+    case 'yaml':
+      configValue = yaml.dump(clientConfig, { indent: 2, lineWidth: -1 })
+      break
+    case 'toml':
+      configValue = stringifyToml(clientConfig as Record<string, any>).trim()
+      break
+    case 'json':
+      configValue = JSON.stringify(clientConfig, null, 2)
+      break
+    default:
+      configValue = String(clientConfig)
+  }
+
+  // Toml will default to undefined display language
+  const displayLanguage: CodeBlockLang | undefined =
+    configFormat === 'toml' ? undefined : configFormat
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -75,8 +107,8 @@ export function McpConfigurationDisplay({
       )}
 
       <CodeBlock
-        value={JSON.stringify(clientConfig, null, 2)}
-        language="json"
+        value={configValue}
+        language={displayLanguage}
         className="max-h-64 overflow-y-auto"
         focusable={false}
         onCopyCallback={() => onCopyCallback?.('config')}
