@@ -25,6 +25,7 @@ import { executeWithRetry } from 'data/table-rows/table-rows-query'
 import { tableKeys } from 'data/tables/keys'
 import {
   getTable,
+  getTableQuery,
   RetrievedTableColumn,
   RetrieveTableResult,
 } from 'data/tables/table-retrieve-query'
@@ -51,15 +52,27 @@ const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
  * The functions below are basically just queries but may be supported directly
  * from the pg-meta library in the future
  */
-export const addPrimaryKey = async (
+const getAddPrimaryKeySQL = ({
+  schema,
+  table,
+  columns,
+}: {
+  schema: string
+  table: string
+  columns: string[]
+}) => {
+  const primaryKeyColumns = columns.join('","')
+  return `ALTER TABLE "${schema}"."${table}" ADD PRIMARY KEY (${primaryKeyColumns})`
+}
+
+const addPrimaryKey = async (
   projectRef: string,
   connectionString: string | undefined | null,
   schema: string,
   table: string,
   columns: string[]
 ) => {
-  const primaryKeyColumns = columns.join('","')
-  const query = `ALTER TABLE "${schema}"."${table}" ADD PRIMARY KEY ("${primaryKeyColumns}")`
+  const query = getAddPrimaryKeySQL({ schema, table, columns })
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
@@ -68,7 +81,7 @@ export const addPrimaryKey = async (
   })
 }
 
-export const dropConstraint = async (
+const dropConstraint = async (
   projectRef: string,
   connectionString: string | undefined | null,
   schema: string,
@@ -84,7 +97,7 @@ export const dropConstraint = async (
   })
 }
 
-export const getAddForeignKeySQL = ({
+const getAddForeignKeySQL = ({
   table,
   foreignKeys,
 }: {
@@ -127,7 +140,7 @@ export const getAddForeignKeySQL = ({
   )
 }
 
-export const addForeignKey = async ({
+const addForeignKey = async ({
   projectRef,
   connectionString,
   table,
@@ -147,7 +160,7 @@ export const addForeignKey = async ({
   })
 }
 
-export const getRemoveForeignKeySQL = ({
+const getRemoveForeignKeySQL = ({
   table,
   foreignKeys,
 }: {
@@ -168,7 +181,7 @@ DROP CONSTRAINT IF EXISTS "${relation.name}"
   )
 }
 
-export const removeForeignKey = async ({
+const removeForeignKey = async ({
   projectRef,
   connectionString,
   table,
@@ -188,7 +201,7 @@ export const removeForeignKey = async ({
   })
 }
 
-export const updateForeignKey = async ({
+const updateForeignKey = async ({
   projectRef,
   connectionString,
   table,
@@ -213,10 +226,28 @@ export const updateForeignKey = async ({
   })
 }
 
+const getUpdateIdentitySequenceSQL = ({
+  schema,
+  table,
+  column,
+}: {
+  schema: string
+  table: string
+  column: string
+}) => {
+  return `SELECT setval('"${schema}"."${table}_${column}_seq"', (SELECT COALESCE(MAX("${column}"), 1) FROM "${schema}"."${table}"))`
+}
+
+const getEnableRLSSQL = ({ schema, table }: { schema: string; table: string }) => {
+  return `ALTER TABLE "${schema}"."${table}" ENABLE ROW LEVEL SECURITY`
+}
+
 /**
  * The methods below involve several contexts due to the UI flow of the
  * dashboard and hence do not sit within their own stores
  */
+
+/** TODO: Refactor to do in a single transaction */
 export const createColumn = async ({
   projectRef,
   connectionString,
@@ -292,6 +323,7 @@ export const createColumn = async ({
   }
 }
 
+/** TODO: Refactor to do in a single transaction */
 export const updateColumn = async ({
   projectRef,
   connectionString,
@@ -371,6 +403,7 @@ export const updateColumn = async ({
   }
 }
 
+/** TODO: Refactor to do in a single transaction */
 export const duplicateTable = async (
   projectRef: string,
   connectionString: string | undefined | null,
@@ -490,9 +523,8 @@ export const createTable = async ({
 
   // 2. Enable RLS if configured
   if (isRLSEnabled) {
-    sqlStatements.push(
-      `ALTER TABLE "${payload.schema}"."${payload.name}" ENABLE ROW LEVEL SECURITY`
-    )
+    const enableRLSSQL = getEnableRLSSQL({ schema: payload.schema, table: payload.name })
+    sqlStatements.push(enableRLSSQL)
   }
 
   // 3. Add columns SQL (without primary keys - those are added as constraints)
@@ -501,7 +533,7 @@ export const createTable = async ({
       { schema: payload.schema, name: payload.name } as RetrieveTableResult,
       { ...column, isPrimaryKey: false }
     )
-    const { sql: columnSql } = pgMeta.columns.create({
+    const { sql: columnSQL } = pgMeta.columns.create({
       schema: columnPayload.schema,
       table: columnPayload.table,
       name: columnPayload.name,
@@ -515,7 +547,7 @@ export const createTable = async ({
       comment: columnPayload.comment,
       check: columnPayload.check,
     })
-    sqlStatements.push(columnSql)
+    sqlStatements.push(columnSQL)
   }
 
   // 4. Add primary key constraint (supports composite keys)
@@ -523,10 +555,12 @@ export const createTable = async ({
     .filter((column) => column.isPrimaryKey)
     .map((column) => column.name)
   if (primaryKeyColumns.length > 0) {
-    const pkColumns = primaryKeyColumns.map((col) => `"${col}"`).join(', ')
-    sqlStatements.push(
-      `ALTER TABLE "${payload.schema}"."${payload.name}" ADD PRIMARY KEY (${pkColumns})`
-    )
+    const primaryKeySQL = getAddPrimaryKeySQL({
+      schema: payload.schema,
+      table: payload.name,
+      columns: primaryKeyColumns,
+    })
+    sqlStatements.push(primaryKeySQL)
   }
 
   // 5. Add foreign key constraints
@@ -588,13 +622,11 @@ export const createTable = async ({
   }
 
   // Fetch the created table
-  const table = await queryClient.fetchQuery({
-    queryKey: tableKeys.retrieve(projectRef, payload.name, payload.schema),
-    queryFn: ({ signal }) =>
-      getTable(
-        { projectRef, connectionString, name: payload.name, schema: payload.schema },
-        signal
-      ),
+  const table = await getTableQuery({
+    projectRef,
+    connectionString,
+    name: payload.name,
+    schema: payload.schema,
   })
 
   // If the user is importing data via a spreadsheet
@@ -626,26 +658,8 @@ export const createTable = async ({
         }
       )
 
-      // For identity columns, manually raise the sequences (batched for performance)
-      const identityColumns = columns.filter((column) => column.isIdentity)
-      if (identityColumns.length > 0) {
-        const sequenceSql = identityColumns
-          .map(
-            (column) =>
-              `SELECT setval('"${table.schema}"."${table.name}_${column.name}_seq"', (SELECT COALESCE(MAX("${column.name}"), 1) FROM "${table.schema}"."${table.name}"))`
-          )
-          .join(';\n')
-        await executeSql({
-          projectRef,
-          connectionString,
-          sql: sequenceSql,
-          queryKey: ['sequences', 'update-batch'],
-        })
-      }
-
       if (error !== undefined) {
         toast.error('Do check your spreadsheet if there are any discrepancies.')
-
         const message = `Table ${table.name} has been created but we ran into an error while inserting rows: ${error.message}`
         toast.error(message)
         console.error('Error:', { error, message })
@@ -676,23 +690,26 @@ export const createTable = async ({
           )
         }
       )
+    }
 
-      // For identity columns, manually raise the sequences (batched for performance)
-      const identityColumns = columns.filter((column) => column.isIdentity)
-      if (identityColumns.length > 0) {
-        const sequenceSql = identityColumns
-          .map(
-            (column) =>
-              `SELECT setval('"${table.schema}"."${table.name}_${column.name}_seq"', (SELECT COALESCE(MAX("${column.name}"), 1) FROM "${table.schema}"."${table.name}"))`
-          )
-          .join(';\n')
-        await executeSql({
-          projectRef,
-          connectionString,
-          sql: sequenceSql,
-          queryKey: ['sequences', 'update-batch'],
-        })
-      }
+    // For identity columns, manually raise the sequences (batched for performance)
+    const identityColumns = columns.filter((column) => column.isIdentity)
+    if (identityColumns.length > 0) {
+      const updateSequenceSQL = identityColumns
+        .map((column) =>
+          getUpdateIdentitySequenceSQL({
+            schema: table.schema,
+            table: table.name,
+            column: column.name,
+          })
+        )
+        .join(';\n')
+      await executeSql({
+        projectRef,
+        connectionString,
+        sql: updateSequenceSQL,
+        queryKey: ['sequences', 'update-batch'],
+      })
     }
   }
 
@@ -707,6 +724,7 @@ export const createTable = async ({
   return table
 }
 
+/** TODO: Refactor to do in a single transaction */
 export const updateTable = async ({
   projectRef,
   connectionString,
