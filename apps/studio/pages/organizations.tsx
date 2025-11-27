@@ -75,7 +75,7 @@ const OrganizationsPage: NextPageWithLayout = () => {
             <Input
               size="tiny"
               placeholder="Search for an organization"
-              icon={<Search size={12} />}
+              icon={<Search />}
               className="w-full flex-1 md:w-64"
               value={search}
               onChange={(event) => setSearch(event.target.value)}

@@ -103,7 +103,7 @@ export const Destinations = () => {
             <Input
               placeholder="Filter destinations"
               size="tiny"
-              icon={<Search size="14" />}
+              icon={<Search />}
               value={filterString}
               className="w-full lg:w-52"
               onChange={(e) => setFilterString(e.target.value)}

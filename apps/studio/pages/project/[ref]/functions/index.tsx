@@ -106,7 +106,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                           <div className="relative">
                             <Input
                               placeholder="Search function names"
-                              icon={<Search size={12} />}
+                              icon={<Search />}
                               size="tiny"
                               className="w-32 md:w-64"
                               value={search}

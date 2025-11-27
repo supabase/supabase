@@ -89,7 +89,7 @@ const Migrations = () => {
                     placeholder="Search for a migration"
                     value={search}
                     onChange={(e: any) => setSearch(e.target.value)}
-                    icon={<Search size="14" />}
+                    icon={<Search />}
                   />
                 </div>
                 <Card>

@@ -63,6 +63,7 @@ const Input = forwardRef<
     }
 
     let inputClasses: string[] = []
+    if (size) inputClasses.push(__styles.size[size])
     if (icon) inputClasses.push(__styles.with_icon[size ?? 'small'])
 
     return (
@@ -76,7 +77,7 @@ const Input = forwardRef<
           disabled={reveal && hidden ? true : props.disabled}
           className={cn(...inputClasses, props.className)}
         />
-        {icon && <InputIconContainer icon={icon} className={iconContainerClassName} />}
+        {icon && <InputIconContainer size={size} icon={icon} className={iconContainerClassName} />}
         {copy || actions ? (
           <div className={__styles.actions_container}>
             {copy && !(reveal && hidden) ? (
