@@ -1,3 +1,4 @@
+import pgMeta from '@supabase/pg-meta'
 import type { PostgresPrimaryKey } from '@supabase/postgres-meta'
 import { chunk, find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
@@ -22,8 +23,6 @@ import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { tableRowKeys } from 'data/table-rows/keys'
 import { executeWithRetry } from 'data/table-rows/table-rows-query'
 import { tableKeys } from 'data/tables/keys'
-import { createTable as createTableMutation } from 'data/tables/table-create-mutation'
-import { deleteTable as deleteTableMutation } from 'data/tables/table-delete-mutation'
 import {
   getTable,
   RetrievedTableColumn,
@@ -481,18 +480,98 @@ export const createTable = async ({
 }) => {
   const queryClient = getQueryClient()
 
-  // Create the table first. Error may be thrown.
-  await createTableMutation({
-    projectRef: projectRef,
-    connectionString: connectionString,
-    payload: payload,
+  // Build all SQL statements for table creation, columns, and constraints
+  // to execute in a single transaction for better performance and atomicity
+  const sqlStatements: string[] = []
+
+  // 1. Create table SQL
+  const { sql: createTableSql } = pgMeta.tables.create(payload)
+  sqlStatements.push(createTableSql)
+
+  // 2. Enable RLS if configured
+  if (isRLSEnabled) {
+    sqlStatements.push(
+      `ALTER TABLE "${payload.schema}"."${payload.name}" ENABLE ROW LEVEL SECURITY`
+    )
+  }
+
+  // 3. Add columns SQL (without primary keys - those are added as constraints)
+  for (const column of columns) {
+    const columnPayload = generateCreateColumnPayload(
+      { schema: payload.schema, name: payload.name } as RetrieveTableResult,
+      { ...column, isPrimaryKey: false }
+    )
+    const { sql: columnSql } = pgMeta.columns.create({
+      schema: columnPayload.schema,
+      table: columnPayload.table,
+      name: columnPayload.name,
+      type: columnPayload.type,
+      default_value: columnPayload.defaultValue,
+      default_value_format: columnPayload.defaultValueFormat,
+      is_identity: columnPayload.isIdentity,
+      is_nullable: columnPayload.isNullable,
+      is_primary_key: columnPayload.isPrimaryKey,
+      is_unique: columnPayload.isUnique,
+      comment: columnPayload.comment,
+      check: columnPayload.check,
+    })
+    sqlStatements.push(columnSql)
+  }
+
+  // 4. Add primary key constraint (supports composite keys)
+  const primaryKeyColumns = columns
+    .filter((column) => column.isPrimaryKey)
+    .map((column) => column.name)
+  if (primaryKeyColumns.length > 0) {
+    const pkColumns = primaryKeyColumns.map((col) => `"${col}"`).join(', ')
+    sqlStatements.push(
+      `ALTER TABLE "${payload.schema}"."${payload.name}" ADD PRIMARY KEY (${pkColumns})`
+    )
+  }
+
+  // 5. Add foreign key constraints
+  if (foreignKeyRelations.length > 0) {
+    const fkSql = getAddForeignKeySQL({
+      table: { schema: payload.schema, name: payload.name },
+      foreignKeys: foreignKeyRelations,
+    })
+    // Remove trailing semicolon since we join with semicolons
+    sqlStatements.push(fkSql.replace(/;+$/, ''))
+  }
+
+  // Execute all table creation SQL in a single transaction
+  toast.loading(`Creating table ${payload.name}...`, { id: toastId })
+
+  await executeSql({
+    projectRef,
+    connectionString,
+    sql: sqlStatements.join(';\n'),
+    queryKey: ['table', 'create-with-columns'],
   })
 
-  // Track table creation event
-  try {
-    await sendEvent({
+  // Track table creation event (fire-and-forget to avoid blocking)
+  sendEvent({
+    event: {
+      action: 'table_created',
+      properties: {
+        method: 'table_editor',
+        schema_name: payload.schema,
+        table_name: payload.name,
+      },
+      groups: {
+        project: projectRef,
+        ...(organizationSlug && { organization: organizationSlug }),
+      },
+    },
+  }).catch((error) => {
+    console.error('Failed to track table creation event:', error)
+  })
+
+  // Track RLS enablement event if enabled (fire-and-forget)
+  if (isRLSEnabled) {
+    sendEvent({
       event: {
-        action: 'table_created',
+        action: 'table_rls_enabled',
         properties: {
           method: 'table_editor',
           schema_name: payload.schema,
@@ -503,11 +582,12 @@ export const createTable = async ({
           ...(organizationSlug && { organization: organizationSlug }),
         },
       },
+    }).catch((error) => {
+      console.error('Failed to track RLS enablement event:', error)
     })
-  } catch (error) {
-    console.error('Failed to track table creation event:', error)
   }
 
+  // Fetch the created table
   const table = await queryClient.fetchQuery({
     queryKey: tableKeys.retrieve(projectRef, payload.name, payload.schema),
     queryFn: ({ signal }) =>
@@ -517,183 +597,114 @@ export const createTable = async ({
       ),
   })
 
-  // If we face any errors during this process after the actual table creation
-  // We'll delete the table as a way to clean up and not leave behind bits that
-  // got through successfully. This is so that the user can continue editing in
-  // the table side panel editor conveniently
-  try {
-    // Toggle RLS if configured to be
-    if (isRLSEnabled) {
-      await updateTableMutation({
+  // If the user is importing data via a spreadsheet
+  if (importContent !== undefined) {
+    if (importContent.file && importContent.rowCount > 0) {
+      // Via a CSV file
+      const { error }: any = await insertRowsViaSpreadsheet(
         projectRef,
         connectionString,
-        id: table.id,
-        name: table.name,
-        schema: table.schema,
-        payload: { rls_enabled: isRLSEnabled },
-      })
+        importContent.file,
+        table,
+        importContent.selectedHeaders,
+        (progress: number) => {
+          toast.loading(
+            <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
+              <SparkBar
+                value={progress}
+                max={100}
+                type="horizontal"
+                barClass="bg-brand"
+                labelBottom={`Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}`}
+                labelBottomClass=""
+                labelTop={`${progress.toFixed(2)}%`}
+                labelTopClass="tabular-nums"
+              />
+            </div>,
+            { id: toastId }
+          )
+        }
+      )
 
-      // Track RLS enablement event
-      try {
-        await sendEvent({
-          event: {
-            action: 'table_rls_enabled',
-            properties: {
-              method: 'table_editor',
-              schema_name: table.schema,
-              table_name: table.name,
-            },
-            groups: {
-              project: projectRef,
-              ...(organizationSlug && { organization: organizationSlug }),
-            },
-          },
+      // For identity columns, manually raise the sequences (batched for performance)
+      const identityColumns = columns.filter((column) => column.isIdentity)
+      if (identityColumns.length > 0) {
+        const sequenceSql = identityColumns
+          .map(
+            (column) =>
+              `SELECT setval('"${table.schema}"."${table.name}_${column.name}_seq"', (SELECT COALESCE(MAX("${column.name}"), 1) FROM "${table.schema}"."${table.name}"))`
+          )
+          .join(';\n')
+        await executeSql({
+          projectRef,
+          connectionString,
+          sql: sequenceSql,
+          queryKey: ['sequences', 'update-batch'],
         })
-      } catch (error) {
-        console.error('Failed to track RLS enablement event:', error)
       }
-    }
 
-    // Then insert the columns - we don't do Promise.all as we want to keep the integrity
-    // of the column order during creation. Note that we add primary key constraints separately
-    // via the query endpoint to support composite primary keys as pg-meta does not support that OOB
-    toast.loading(`Adding ${columns.length} columns to ${table.name}...`, { id: toastId })
+      if (error !== undefined) {
+        toast.error('Do check your spreadsheet if there are any discrepancies.')
 
-    for (const column of columns) {
-      // We create all columns without primary keys first
-      const columnPayload = generateCreateColumnPayload(table, {
-        ...column,
-        isPrimaryKey: false,
-      })
-      await createDatabaseColumn({
+        const message = `Table ${table.name} has been created but we ran into an error while inserting rows: ${error.message}`
+        toast.error(message)
+        console.error('Error:', { error, message })
+      }
+    } else {
+      // Via text copy and paste
+      await insertTableRows(
         projectRef,
         connectionString,
-        payload: columnPayload,
-      })
-    }
+        table,
+        importContent.rows,
+        importContent.selectedHeaders,
+        (progress: number) => {
+          toast.loading(
+            <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
+              <SparkBar
+                value={progress}
+                max={100}
+                type="horizontal"
+                barClass="bg-brand"
+                labelBottom={`Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`}
+                labelBottomClass=""
+                labelTop={`${progress.toFixed(2)}%`}
+                labelTopClass="tabular-nums"
+              />
+            </div>,
+            { id: toastId }
+          )
+        }
+      )
 
-    // Then add the primary key constraints here to support composite keys
-    const primaryKeyColumns = columns
-      .filter((column) => column.isPrimaryKey)
-      .map((column) => column.name)
-    if (primaryKeyColumns.length > 0) {
-      await addPrimaryKey(projectRef, connectionString, table.schema, table.name, primaryKeyColumns)
-    }
-
-    // Then add the foreign key constraints here
-    if (foreignKeyRelations.length > 0) {
-      await addForeignKey({
-        projectRef,
-        connectionString,
-        table: { schema: table.schema, name: table.name },
-        foreignKeys: foreignKeyRelations,
-      })
-    }
-
-    // If the user is importing data via a spreadsheet
-    if (importContent !== undefined) {
-      if (importContent.file && importContent.rowCount > 0) {
-        // Via a CSV file
-        const { error }: any = await insertRowsViaSpreadsheet(
+      // For identity columns, manually raise the sequences (batched for performance)
+      const identityColumns = columns.filter((column) => column.isIdentity)
+      if (identityColumns.length > 0) {
+        const sequenceSql = identityColumns
+          .map(
+            (column) =>
+              `SELECT setval('"${table.schema}"."${table.name}_${column.name}_seq"', (SELECT COALESCE(MAX("${column.name}"), 1) FROM "${table.schema}"."${table.name}"))`
+          )
+          .join(';\n')
+        await executeSql({
           projectRef,
           connectionString,
-          importContent.file,
-          table,
-          importContent.selectedHeaders,
-          (progress: number) => {
-            toast.loading(
-              <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
-                <SparkBar
-                  value={progress}
-                  max={100}
-                  type="horizontal"
-                  barClass="bg-brand"
-                  labelBottom={`Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}`}
-                  labelBottomClass=""
-                  labelTop={`${progress.toFixed(2)}%`}
-                  labelTopClass="tabular-nums"
-                />
-              </div>,
-              { id: toastId }
-            )
-          }
-        )
-
-        // For identity columns, manually raise the sequences
-        const identityColumns = columns.filter((column) => column.isIdentity)
-        for (const column of identityColumns) {
-          await executeSql({
-            projectRef,
-            connectionString,
-            sql: `SELECT setval('${table.name}_${column.name}_seq', (SELECT MAX("${column.name}") FROM "${table.name}"));`,
-          })
-        }
-
-        if (error !== undefined) {
-          toast.error('Do check your spreadsheet if there are any discrepancies.')
-
-          const message = `Table ${table.name} has been created but we ran into an error while inserting rows: ${error.message}`
-          toast.error(message)
-          console.error('Error:', { error, message })
-        }
-      } else {
-        // Via text copy and paste
-        await insertTableRows(
-          projectRef,
-          connectionString,
-          table,
-          importContent.rows,
-          importContent.selectedHeaders,
-          (progress: number) => {
-            toast.loading(
-              <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
-                <SparkBar
-                  value={progress}
-                  max={100}
-                  type="horizontal"
-                  barClass="bg-brand"
-                  labelBottom={`Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`}
-                  labelBottomClass=""
-                  labelTop={`${progress.toFixed(2)}%`}
-                  labelTopClass="tabular-nums"
-                />
-              </div>,
-              { id: toastId }
-            )
-          }
-        )
-
-        // For identity columns, manually raise the sequences
-        const identityColumns = columns.filter((column) => column.isIdentity)
-        for (const column of identityColumns) {
-          await executeSql({
-            projectRef,
-            connectionString,
-            sql: `SELECT setval('${table.name}_${column.name}_seq', (SELECT MAX("${column.name}") FROM "${table.name}"));`,
-          })
-        }
+          sql: sequenceSql,
+          queryKey: ['sequences', 'update-batch'],
+        })
       }
     }
-
-    await prefetchEditorTablePage({
-      queryClient,
-      projectRef,
-      connectionString,
-      id: table.id,
-    })
-
-    // Finally, return the created table
-    return table
-  } catch (error) {
-    deleteTableMutation({
-      projectRef,
-      connectionString,
-      id: table.id,
-      name: table.name,
-      schema: table.schema,
-    })
-    throw error
   }
+
+  await prefetchEditorTablePage({
+    queryClient,
+    projectRef,
+    connectionString,
+    id: table.id,
+  })
+
+  // Finally, return the created table
+  return table
 }
 
 export const updateTable = async ({
