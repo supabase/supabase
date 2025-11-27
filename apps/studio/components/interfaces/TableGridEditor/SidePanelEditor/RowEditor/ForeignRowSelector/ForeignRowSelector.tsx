@@ -38,7 +38,7 @@ export interface ForeignRowSelectorProps {
   closePanel: () => void
 }
 
-const ForeignRowSelector = ({
+export const ForeignRowSelector = ({
   visible,
   foreignKey,
   onSelect,
@@ -269,5 +269,3 @@ const ForeignRowSelector = ({
     </SidePanel>
   )
 }
-
-export default ForeignRowSelector

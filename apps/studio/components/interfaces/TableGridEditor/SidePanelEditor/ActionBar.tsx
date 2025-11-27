@@ -13,7 +13,7 @@ interface ActionBarProps {
   formId?: string
 }
 
-const ActionBar = ({
+export const ActionBar = ({
   loading = false,
   disableApply = false,
   hideApply = false,

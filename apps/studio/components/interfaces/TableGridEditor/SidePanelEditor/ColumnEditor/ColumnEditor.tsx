@@ -62,7 +62,7 @@ export interface ColumnEditorProps {
   updateEditorDirty: () => void
 }
 
-const ColumnEditor = ({
+export const ColumnEditor = ({
   column,
   selectedTable,
   visible = false,
@@ -373,5 +373,3 @@ const ColumnEditor = ({
     </SidePanel>
   )
 }
-
-export default ColumnEditor
