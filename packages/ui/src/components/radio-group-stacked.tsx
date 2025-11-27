@@ -38,22 +38,22 @@ const RadioGroupStackedItem = React.forwardRef<
       ref={ref}
       {...props}
       className={cn(
-        'flex flex-col gap-2',
-        'w-full',
-        'bg-overlay/50 disabled:opacity-50',
-        'border',
+        // Base layout and sizing
+        'flex flex-col gap-2 w-full',
+        // Base styles
+        'bg-overlay/50 border shadow-sm',
         'first-of-type:rounded-t-lg last-of-type:rounded-b-lg',
-        'shadow-sm',
-        'enabled:hover:bg-surface-300',
-        'enabled:hover:border-foreground-muted',
-        'enabled:cursor-pointer disabled:cursor-not-allowed',
-        'hover:z-[1] focus-visible:z-[1]',
-        'data-[state=checked]:z-[1]',
+        // Disabled state
+        'disabled:opacity-50 disabled:cursor-not-allowed',
+        // Enabled/hover states
+        'enabled:cursor-pointer enabled:hover:bg-surface-300 enabled:hover:border-foreground-muted',
+        // Z-index for interactions
+        'hover:z-[1] focus-visible:z-[1] data-[state=checked]:z-[1]',
+        // Checked state
         'data-[state=checked]:ring-1 data-[state=checked]:ring-border',
-        'data-[state=checked]:bg-surface-300',
-        'data-[state=checked]:border-foreground-muted',
-        'transition',
-        'group',
+        'data-[state=checked]:bg-surface-300 data-[state=checked]:border-foreground-muted',
+        // Transitions and group
+        'transition group',
         props.className
       )}
     >
@@ -61,20 +61,19 @@ const RadioGroupStackedItem = React.forwardRef<
         {showIndicator && (
           <div
             className={cn(
-              'aspect-square h-4 w-4 min-w-4 min-h-4',
-              'rounded-full border group-data-[state=checked]:border-foreground-muted',
-              'group-focus:border-foreground-muted',
-              'group-hover:border-foreground-muted',
-              'ring-offset-background',
-              'group-focus:outline-none',
-              'group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2',
+              // Base styles
+              'aspect-square h-4 w-4 min-w-4 min-h-4 rounded-full border relative',
               'flex items-center justify-center',
-              'relative',
-              'transition'
+              'ring-offset-background transition',
+              // States
+              'group-data-[state=checked]:border-foreground-muted',
+              'group-focus:border-foreground-muted group-focus:outline-none',
+              'group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2',
+              'group-hover:border-foreground-muted'
             )}
           >
             <RadioGroupPrimitive.Indicator className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-              <Circle className="h-2 w-2 fill-current text-current" />
+              <Circle size={10} strokeWidth={0} className="fill-current text-current" />
             </RadioGroupPrimitive.Indicator>
           </div>
         )}
@@ -82,10 +81,11 @@ const RadioGroupStackedItem = React.forwardRef<
           <Label
             htmlFor={props.value}
             className={cn(
-              'block',
-              '-mt-[0.15rem]',
-              'text-sm transition-colors text-left',
-              'text-light',
+              // Base styles
+              'block -mt-[0.15rem] text-sm text-left text-light',
+              // Transitions
+              'transition-colors',
+              // States
               'enabled:group-hover:text-foreground group-data-[state=checked]:text-foreground'
             )}
           >

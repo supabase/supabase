@@ -42,7 +42,7 @@ Perhaps the user has not yet created any data. The presentation of this empty st
 
 #### Presentational
 
-The user may be learning about a feature for the first time, and this experience benefits from user education or onboarding. In cases like these, the empty state should put more focus on the feature’s value proposition and an action the user can take.
+The user may be learning about a feature for the first time, and could benefit from lightweight feature education or onboarding. Use the dedicated [EmptyStatePresentational](../fragments/empty-state-presentational) component in this case, putting emphasis on an action the user can take.
 
 <ComponentPreview name="empty-state-initial-state-presentational" peekCode wide />
 
@@ -56,7 +56,9 @@ Keep in mind that empty states will likely appear after a visual loading state. 
 
 ## Components
 
-There is not yet a shared empty state UI component. The context and needs for each placement differ enough to warrant custom components for each placement.
+For presentational empty states (initial states with value propositions and actions), use the [EmptyStatePresentational](../fragments/empty-state-presentational) component from `ui-patterns`. This component provides a consistent structure with support for icons, titles, descriptions, and action buttons.
+
+For other empty state scenarios (zero results, missing routes, etc), custom components may still be appropriate as the context and needs for each placement can differ significantly.
 
 ## External references
 
