@@ -51,11 +51,14 @@ interface PolicyListProps {
 }
 
 /**
- * A list of policies for use in toast notifications
+ * A list of policies with hover previews
+ * Used in RLSManagement and toast notifications
  */
 export const PolicyList = ({ policies, className }: PolicyListProps) => {
   return (
-    <div className={`rounded border border-default overflow-hidden ${className ?? ''}`}>
+    <div
+      className={`rounded border border-default overflow-hidden bg-surface-100 ${className ?? ''}`}
+    >
       {policies.map((policy, idx) => (
         <PolicyListItem
           key={`${policy.name}-${idx}`}

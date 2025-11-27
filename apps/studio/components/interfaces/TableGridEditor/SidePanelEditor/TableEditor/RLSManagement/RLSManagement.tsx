@@ -6,24 +6,13 @@ import { useDatabasePoliciesQuery } from 'data/database-policies/database-polici
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { toast } from 'sonner'
 import type { ResponseError } from 'types'
-import {
-  Badge,
-  Button,
-  Card,
-  CardContent,
-  cn,
-  HoverCard_Shadcn_,
-  HoverCardContent_Shadcn_,
-  HoverCardTrigger_Shadcn_,
-  Label_Shadcn_,
-  SimpleCodeBlock,
-  Switch,
-} from 'ui'
+import { Button, Card, CardContent, cn, Label_Shadcn_, Switch } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { generatePolicyUpdateSQL } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
+import { PolicyList, type PolicyListItemData } from './PolicyList'
 
 interface RLSManagementProps {
   schema: string
@@ -34,15 +23,6 @@ interface RLSManagementProps {
   isDuplicating: boolean
   generateStartingPolicies?: boolean
   onChangeGenerateStartingPolicies?: (enabled: boolean) => void
-}
-
-type PolicyListItem = {
-  id: string
-  name: string
-  source: 'existing' | 'generated'
-  action?: string | null
-  command?: string | null
-  definition?: string | null
 }
 
 export const RLSManagement = ({
@@ -69,15 +49,12 @@ export const RLSManagement = ({
     (policy) => policy.schema === table?.schema && policy.table === table?.name
   )
 
-  const existingPoliciesList = useMemo<PolicyListItem[]>(
+  const existingPoliciesList = useMemo<PolicyListItemData[]>(
     () =>
       (tablePolicies ?? []).map((policy) => ({
-        id: String(policy.id),
         name: policy.name,
-        action: policy.action,
-        command: policy.command,
-        definition: generatePolicyUpdateSQL(policy),
-        source: 'existing' as const,
+        command: policy.action ?? policy.command,
+        sql: generatePolicyUpdateSQL(policy),
       })),
     [tablePolicies]
   )
@@ -125,35 +102,7 @@ export const RLSManagement = ({
       )
     }
 
-    return (
-      <CardContent className="p-0">
-        {existingPoliciesList.map((policy) => (
-          <HoverCard_Shadcn_ key={policy.id} openDelay={200} closeDelay={100}>
-            <HoverCardTrigger_Shadcn_ asChild>
-              <CardContent className="flex items-center justify-between text-sm text-foreground hover:bg-surface-100 cursor-pointer transition-colors">
-                <div className="space-y-1">
-                  <p className="font-mono text-xs">{policy.name}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  {(policy.action || policy.command) && (
-                    <Badge variant="default">{policy.action ?? policy.command}</Badge>
-                  )}
-                </div>
-              </CardContent>
-            </HoverCardTrigger_Shadcn_>
-            <HoverCardContent_Shadcn_ className="w-96">
-              {policy.definition ? (
-                <SimpleCodeBlock className="language-sql" showCopy={false}>
-                  {policy.definition}
-                </SimpleCodeBlock>
-              ) : (
-                <p className="text-xs text-foreground-lighter">No definition available.</p>
-              )}
-            </HoverCardContent_Shadcn_>
-          </HoverCard_Shadcn_>
-        ))}
-      </CardContent>
-    )
+    return <PolicyList policies={existingPoliciesList} className="border-0 rounded-none" />
   }
 
   if (!project) return null

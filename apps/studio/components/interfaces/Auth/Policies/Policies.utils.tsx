@@ -3,7 +3,7 @@ import { has, isEmpty, isEqual } from 'lodash'
 import Link from 'next/link'
 import { toast } from 'sonner'
 
-import { PolicyList } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/RLSManagement/PolicyListItem'
+import { PolicyList } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/RLSManagement/PolicyList'
 import { generateSqlPolicy } from 'data/ai/sql-policy-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
@@ -529,7 +529,7 @@ export const generateAndCreatePoliciesForTable = async ({
             {policiesCreated.length} {policiesCreated.length === 1 ? 'policy' : 'policies'}{' '}
             {policiesCreated.length === 1 ? 'has' : 'have'} been created for table {tableName}
           </p>
-          <PolicyList policies={policiesCreated} />
+          <PolicyList policies={policiesCreated} className="border-l-0 border-r-0 rounded-none" />
           <Button type="default" asChild>
             <Link
               href={`/project/${projectRef}/auth/policies?search=${tableName}&schema=${schema}`}
