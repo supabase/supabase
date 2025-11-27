@@ -25,6 +25,7 @@ import {
   Input_Shadcn_,
   PrePostTab,
   Switch,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -149,7 +150,15 @@ export const SmtpForm = () => {
 
   const onSubmit = (values: SmtpFormValues) => {
     const { ENABLE_SMTP, ...rest } = values
-    const payload = ENABLE_SMTP ? rest : defaultDisabledSmtpFormValues
+    const basePayload = ENABLE_SMTP ? rest : defaultDisabledSmtpFormValues
+
+    // When enabling SMTP, set RATE_LIMIT_EMAIL_SENT to 30
+    // When disabling, backend will handle resetting to default
+    const isEnablingSmtp = ENABLE_SMTP && !isSmtpEnabled(authConfig)
+    const payload = {
+      ...basePayload,
+      ...(isEnablingSmtp && { RATE_LIMIT_EMAIL_SENT: 30 }),
+    }
 
     // Format payload: Convert port to string
     if (payload.SMTP_PORT) {
@@ -436,20 +445,45 @@ export const SmtpForm = () => {
               </>
             )}
 
-            <CardFooter className="justify-end space-x-2">
+            <CardFooter
+              className={cn(form.formState.isDirty ? 'justify-between' : 'justify-end', 'gap-x-2')}
+            >
               {form.formState.isDirty && (
-                <Button type="default" onClick={() => form.reset()}>
-                  Cancel
-                </Button>
+                <p className="text-sm text-foreground-light">
+                  {enableSmtp ? (
+                    <>
+                      Rate limit for sending emails will be increased to 30 and{' '}
+                      <InlineLink href={`/project/${projectRef}/auth/rate-limits`}>
+                        can be adjusted
+                      </InlineLink>{' '}
+                      after enabling custom SMTP
+                    </>
+                  ) : (
+                    'Rate limit for sending emails will be reduced to 2 after disabling custom SMTP'
+                  )}
+                </p>
               )}
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={isUpdatingConfig}
-                disabled={!canUpdateConfig || !form.formState.isDirty}
-              >
-                Save changes
-              </Button>
+              <div className="flex items-center gap-x-2">
+                {form.formState.isDirty && (
+                  <Button
+                    type="default"
+                    onClick={() => {
+                      form.reset()
+                      setEnableSmtp(isSmtpEnabled(authConfig))
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                )}
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={isUpdatingConfig}
+                  disabled={!canUpdateConfig || !form.formState.isDirty}
+                >
+                  Save changes
+                </Button>
+              </div>
             </CardFooter>
           </Card>
         </form>
