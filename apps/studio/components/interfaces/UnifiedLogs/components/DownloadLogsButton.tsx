@@ -40,7 +40,7 @@ interface DownloadLogsButtonProps {
 export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps) => {
   const { ref } = useParams()
   const pathname = usePathname()
-  const isLogs = pathname?.includes('/logs')
+  const isLogs = pathname?.includes?.('/logs') ?? false
   const [numRows, setNumRows] = useState(DEFAULT_NUM_ROWS)
   const [numHours, setNumHours] = useState(DEFAULT_NUM_ROWS)
   const [selectedFormat, setSelectedFormat] = useState<'csv' | 'json'>()
