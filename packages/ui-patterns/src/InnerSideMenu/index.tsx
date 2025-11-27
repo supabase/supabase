@@ -205,7 +205,7 @@ const InnerSideBarFilterSearchInput = forwardRef<
       ) : (
         <Search
           className="absolute left-2 top-2 text-foreground-muted"
-          size={14}
+          size={12}
           strokeWidth={1.5}
         />
       )}
