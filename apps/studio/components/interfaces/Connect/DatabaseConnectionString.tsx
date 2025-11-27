@@ -1,7 +1,6 @@
 import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
-import Link from 'next/link'
 
 import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
@@ -15,7 +14,7 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
+import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -335,15 +334,13 @@ export const DatabaseConnectionString = () => {
         <p className="text-xs inline-flex items-center gap-1 text-foreground-lighter">
           <BookOpen size={12} strokeWidth={1.5} className="-mb-px" /> Learn how to connect to your
           Postgres databases.
-          <Link
-            href="https://supabase.com/docs/guides/database/connecting-to-postgres"
-            className="underline transition hover:text-foreground inline-flex items-center gap-1"
-            target="_blank"
-            rel="noreferrer"
+          <InlineLink
             title="Read docs"
+            className="flex items-center gap-x-1"
+            href={`${DOCS_URL}/guides/database/connecting-to-postgres`}
           >
             Read docs <ExternalLink size={12} strokeWidth={1.5} />
-          </Link>
+          </InlineLink>
         </p>
       </div>
 

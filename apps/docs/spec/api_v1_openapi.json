@@ -8532,8 +8532,7 @@
           "mfa_phone_template": { "type": "string", "nullable": true },
           "nimbus_oauth_client_id": { "type": "string", "nullable": true },
           "nimbus_oauth_client_secret": { "type": "string", "nullable": true }
-        },
-        "required": ["db_max_pool_size_unit"]
+        }
       },
       "RealtimeConfigResponse": {
         "type": "object",
