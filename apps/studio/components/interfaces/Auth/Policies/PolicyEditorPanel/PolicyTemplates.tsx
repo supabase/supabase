@@ -98,9 +98,9 @@ export const PolicyTemplates = ({
                         )}
                         variant={
                           template.command === 'ALL'
-                            ? 'outline'
+                            ? 'default'
                             : template.command === 'SELECT'
-                              ? 'brand'
+                              ? 'success'
                               : template.command === 'UPDATE'
                                 ? 'default'
                                 : template.command === 'DELETE'
