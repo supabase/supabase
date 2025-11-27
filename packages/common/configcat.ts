@@ -64,8 +64,12 @@ async function getClient() {
   }
 }
 
-export async function getFlags(userEmail: string = '', customAttributes?: Record<string, string>) {
+export async function getFlags(userEmail: string = '', _customAttributes?: Record<string, string>) {
   const client = await getClient()
+  const customAttributes = {
+    ..._customAttributes,
+    is_staff: !!userEmail ? userEmail.includes('@supabase.').toString() : 'false',
+  }
 
   if (!client) {
     return []
