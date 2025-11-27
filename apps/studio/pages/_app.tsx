@@ -164,7 +164,9 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                     </RouteValidationWrapper>
                   </TooltipProvider>
                   <Telemetry />
-                  {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom" />}
+                  {!isTestEnv && (
+                    <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
+                  )}
                 </ProfileProvider>
               </FeatureFlagProvider>
             </AuthProvider>
