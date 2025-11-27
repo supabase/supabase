@@ -56,6 +56,6 @@ export const useGetIndexAdvisorResult = <TData = GetIndexAdvisorResultData>(
         typeof projectRef !== 'undefined' &&
         typeof query !== 'undefined' &&
         (query.startsWith('select') || query.startsWith('SELECT'))) ||
-      query.trim().toLowerCase().startsWith('with pgrst_source'),
+      (typeof query === 'string' && query.trim().toLowerCase().startsWith('with pgrst_source')),
     ...options,
   })
