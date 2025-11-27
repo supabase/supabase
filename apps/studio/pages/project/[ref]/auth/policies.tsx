@@ -236,7 +236,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               const str = e.target.value
               setSearchString(str)
             }}
-            icon={<Search size={12} />}
+            icon={<Search />}
             actions={
               searchString ? (
                 <Button
