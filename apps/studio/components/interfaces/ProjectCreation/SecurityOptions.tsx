@@ -116,7 +116,8 @@ export const SecurityOptions = ({
                           // @ts-ignore
                           description={
                             <>
-                              Query all tables in the <code className="text-xs">public</code> schema
+                              Query all tables in the{' '}
+                              <code className="text-code-inline">public</code> schema
                             </>
                           }
                           className="[&>div>div>p]:text-left [&>div>div>p]:text-xs"
@@ -132,7 +133,7 @@ export const SecurityOptions = ({
                           description={
                             <>
                               Query allowlisted tables in a dedicated{' '}
-                              <code className="text-xs">api</code> schema
+                              <code className="text-code-inline">api</code> schema
                             </>
                           }
                           className="[&>div>div>p]:text-left [&>div>div>p]:text-xs"

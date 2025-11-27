@@ -32,6 +32,15 @@ const MaintenancePage: NextPageWithLayout = () => {
             We are currently improving our services. The dashboard will be back online shortly.
           </p>
         </div>
+        <p className="text-sm text-foreground-lighter max-w-xs mx-auto">
+          If you need support while the dashboard is inaccessible, you can email us at{' '}
+          <a
+            href="mailto:support+maintenance@supabase.io"
+            className="text-foreground-light underline hover:text-foreground"
+          >
+            support+maintenance@supabase.io
+          </a>
+        </p>
         <div className="flex flex-col items-center gap-2 mt-4">
           <p className="text-sm text-foreground-lighter">
             Reload the page to check if the maintenance window has ended

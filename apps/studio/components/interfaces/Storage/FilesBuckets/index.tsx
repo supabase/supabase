@@ -100,11 +100,11 @@ export const FilesBuckets = () => {
                     placeholder="Search for a bucket"
                     value={filterString}
                     onChange={(e) => setFilterString(e.target.value)}
-                    icon={<Search size={12} />}
+                    icon={<Search />}
                   />
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button tabIndex={0} type="default" icon={<ArrowDownNarrowWide />}>
+                      <Button type="default" icon={<ArrowDownNarrowWide />}>
                         Sorted by {snap.sortBucket === 'alphabetical' ? 'name' : 'created at'}
                       </Button>
                     </DropdownMenuTrigger>

@@ -84,7 +84,7 @@ export const RolesList = () => {
             size="tiny"
             className="w-52"
             placeholder="Search for a role"
-            icon={<Search size={12} />}
+            icon={<Search />}
             value={filterString}
             onChange={(event: any) => setFilterString(event.target.value)}
             actions={

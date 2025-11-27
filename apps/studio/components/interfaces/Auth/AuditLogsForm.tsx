@@ -128,9 +128,7 @@ export const AuditLogsForm = () => {
                             rel="noopener noreferrer"
                             href={`/project/${projectRef}/editor/${auditLogTable?.id}`}
                           >
-                            <code className="text-xs bg-surface-200 px-1 py-0.5 rounded">
-                              {AUDIT_LOG_ENTRIES_TABLE}
-                            </code>
+                            <code className="text-code-inline">{AUDIT_LOG_ENTRIES_TABLE}</code>
                           </InlineLink>{' '}
                           table.
                           <br />
