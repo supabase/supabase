@@ -103,7 +103,7 @@ const FeaturePreviewModal = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-x-2">
                 <p>{selectedFeature?.name}</p>
-                {selectedFeature?.isNew && <Badge color="green">New</Badge>}
+                {selectedFeature?.isNew && <Badge variant="brand">New</Badge>}
               </div>
               <div className="flex items-center gap-x-2">
                 {selectedFeature?.discussionsUrl !== undefined && (
