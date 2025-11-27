@@ -5,18 +5,21 @@ import OpenAI from 'openai'
 import createClient from 'openapi-fetch'
 
 const openai = new OpenAI({
+  // eslint-disable-next-line turbo/no-undeclared-env-vars
   apiKey: process.env.OPENAI_API_KEY,
 })
 
 const client = createClient<paths>({
   baseUrl: 'https://api.supabase.com',
   headers: {
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
     Authorization: `Bearer ${process.env.SUPABASE_MANAGEMENT_API_TOKEN}`,
   },
 })
 
 // Function to get database schema
 async function getDbSchema(projectRef: string) {
+  // eslint-disable-next-line turbo/no-undeclared-env-vars
   const token = process.env.SUPABASE_MANAGEMENT_API_TOKEN
   if (!token) {
     throw new Error('Supabase Management API token is not configured.')
