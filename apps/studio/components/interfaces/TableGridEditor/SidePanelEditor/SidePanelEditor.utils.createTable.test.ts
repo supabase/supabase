@@ -27,6 +27,7 @@ vi.mock('data/sql/execute-sql-query', () => ({
 
 vi.mock('data/tables/table-retrieve-query', () => ({
   getTable: (...args: unknown[]) => mockGetTable(...args),
+  getTableQuery: (...args: unknown[]) => mockGetTable(...args),
 }))
 
 vi.mock('data/telemetry/send-event-mutation', () => ({
