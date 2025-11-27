@@ -20,9 +20,9 @@ import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import {
@@ -365,7 +365,7 @@ export const UsersV2 = () => {
       isCountLoaded &&
       isCountWithinThresholdForSortBy
     ) {
-      if (specificFilterColumn === 'id' && localStorageFilter !== 'id') {
+      if (specificFilterColumn === 'email' && localStorageFilter !== 'email') {
         setSpecificFilterColumn(localStorageFilter)
       }
       if (sortByValue === 'id:asc' && localStorageSortByValue !== 'id:asc') {
