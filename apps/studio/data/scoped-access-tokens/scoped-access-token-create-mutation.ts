@@ -36,22 +36,20 @@ export const useAccessTokenCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<NewScopedAccessToken, ResponseError, ScopedAccessTokenCreateVariables>(
-    (vars) => createScopedAccessToken(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(scopedAccessTokenKeys.list())
+  return useMutation<NewScopedAccessToken, ResponseError, ScopedAccessTokenCreateVariables>({
+    mutationFn: (vars) => createScopedAccessToken(vars),
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries({ queryKey: scopedAccessTokenKeys.list() })
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create access token: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create access token: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

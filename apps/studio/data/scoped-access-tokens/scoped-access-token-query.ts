@@ -38,11 +38,12 @@ export const useScopedAccessTokensQuery = <TData = ScopedAccessTokensData>({
   enabled = true,
   ...options
 }: UseQueryOptions<ScopedAccessTokensData, ScopedAccessTokensError, TData> = {}) =>
-  useQuery<ScopedAccessTokensData, ScopedAccessTokensError, TData>(
-    scopedAccessTokenKeys.list(),
-    ({ signal }) => getScopedAccessTokens(signal),
-    options
-  )
+  useQuery<ScopedAccessTokensData, ScopedAccessTokensError, TData>({
+    queryKey: scopedAccessTokenKeys.list(),
+    queryFn: ({ signal }) => getScopedAccessTokens(signal),
+    enabled,
+    ...options,
+  })
 
 export const useScopedAccessTokenQuery = <TData = ScopedAccessTokenData>(
   { id }: { id: string },
@@ -51,11 +52,9 @@ export const useScopedAccessTokenQuery = <TData = ScopedAccessTokenData>(
     ...options
   }: UseQueryOptions<ScopedAccessTokenData, ScopedAccessTokensError, TData> = {}
 ) =>
-  useQuery<ScopedAccessTokenData, ScopedAccessTokensError, TData>(
-    scopedAccessTokenKeys.detail(id),
-    ({ signal }) => getScopedAccessToken({ id }, signal),
-    {
-      enabled: enabled && typeof id !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ScopedAccessTokenData, ScopedAccessTokensError, TData>({
+    queryKey: scopedAccessTokenKeys.detail(id),
+    queryFn: ({ signal }) => getScopedAccessToken({ id }, signal),
+    enabled: enabled && typeof id !== 'undefined',
+    ...options,
+  })
