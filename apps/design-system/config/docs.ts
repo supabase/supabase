@@ -86,6 +86,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'EmptyStatePresentational',
+          href: '/docs/fragments/empty-state-presentational',
+          items: [],
+        },
+        {
           title: 'Modal',
           href: '/docs/fragments/modal',
           items: [],
