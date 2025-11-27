@@ -27,6 +27,8 @@ export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
 
   function onEditRowClick(p: ItemParams) {
     const { props } = p
+    if (!props) return
+
     const { rowIdx } = props
     const row = rows[rowIdx]
     tableEditorSnap.onEditRow(row)
@@ -35,6 +37,7 @@ export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
   const onCopyCellContent = useCallback(
     (p: ItemParams) => {
       const { props } = p
+      if (!props) return
 
       if (!snap.selectedCellPosition || !props) {
         return
@@ -57,6 +60,8 @@ export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
   const onCopyRowContent = useCallback(
     (p: ItemParams) => {
       const { props } = p
+      if (!props) return
+
       const { rowIdx } = props
       const row = rows[rowIdx]
       copyToClipboard(JSON.stringify(row))
