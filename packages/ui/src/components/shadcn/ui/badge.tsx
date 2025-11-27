@@ -5,21 +5,25 @@ import { cn } from '../../../lib/utils/cn'
 
 const badgeVariants = cva(
   // mt to optically push down the badge to align next to text
-  'mt-[1px] inline-flex items-center justify-center rounded-full font-normal whitespace-nowrap tracking-[0.07em] uppercase font-medium text-[9.5px] leading-[1.1] px-[5.5px] py-[3px]',
+  'mt-[1px] inline-flex items-center gap-1 justify-center rounded-full font-normal whitespace-nowrap tracking-[0.07em] uppercase font-medium text-[9.5px] leading-[1.1] px-[5.5px] py-[3px]',
   {
     variants: {
       variant: {
         default: 'bg-surface-75 text-foreground-light border border-strong',
         warning: 'bg-warning bg-opacity-10 text-warning border border-warning-500',
         success: 'bg-brand bg-opacity-10 text-brand-600 border border-brand-500',
+        // brand is the same as success, deprecate
+        brand: 'bg-brand bg-opacity-10 text-brand-600 border border-brand-500',
         destructive:
           'bg-destructive bg-opacity-10 text-destructive-600 border border-destructive-500',
-        brand: 'bg-brand bg-opacity-10 text-brand-600 border border-brand-500',
+        // Deprecated?
         secondary:
           'bg-secondary bg-opacity-10 hover:bg-secondary/80 border-transparent text-secondary-foreground',
+        // Deprecated, use default
         outline: 'bg-transparent text border border-foreground-muted',
       },
       size: {
+        // Deprecated
         // tiny: 'px-1.5 py-[3px]'T,
         // small: 'px-2 py-0.5',
         // large: 'px-3 py-0.5 text-xs',
@@ -28,6 +32,7 @@ const badgeVariants = cva(
         large: '',
       },
       dot: {
+        // Deprecated
         true: '-ml-0.5 mr-1.5 h-2 w-2',
       },
     },
