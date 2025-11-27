@@ -881,13 +881,6 @@
     "title": "Storage",
     "items": [
       {
-        "id": "storageclient-constructor",
-        "title": "Create a storage client",
-        "slug": "storageclient-constructor",
-        "type": "function",
-        "product": "storage"
-      },
-      {
         "id": "file-buckets",
         "isFunc": false,
         "title": "File Buckets",
@@ -1027,6 +1020,34 @@
             "slug": "storage-from-list",
             "product": "storage",
             "type": "function"
+          },
+          {
+            "id": "storagefile-exists",
+            "title": "Check if file exists",
+            "slug": "storage-from-exists",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "storagefile-info",
+            "title": "Get file metadata",
+            "slug": "storage-from-info",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "storagefile-list-v2",
+            "title": "List files (v2)",
+            "slug": "storage-from-listv2",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "storagefile-to-base64",
+            "title": "Convert file to base64",
+            "slug": "storage-from-tobase64",
+            "type": "function",
+            "product": "storage"
           }
         ]
       },
@@ -1039,23 +1060,23 @@
         "type": "function",
         "items": [
           {
-            "id": "storageanalyticsclient-createbucket",
+            "id": "storageanalytics-createbucket",
             "title": "Create a new analytics bucket",
-            "slug": "storageanalyticsclient-createbucket",
+            "slug": "storageanalytics-createbucket",
             "type": "function",
             "product": "storage"
           },
           {
-            "id": "storageanalyticsclient-listbuckets",
+            "id": "storageanalytics-listbuckets",
             "title": "List analytics buckets",
-            "slug": "storageanalyticsclient-listbuckets",
+            "slug": "storageanalytics-listbuckets",
             "type": "function",
             "product": "storage"
           },
           {
-            "id": "storageanalyticsclient-deletebucket",
+            "id": "storageanalytics-deletebucket",
             "title": "Delete an analytics bucket",
-            "slug": "storageanalyticsclient-deletebucket",
+            "slug": "storageanalytics-deletebucket",
             "type": "function",
             "product": "storage"
           }
@@ -1070,249 +1091,109 @@
         "type": "function",
         "items": [
           {
-            "id": "storagevectorsclient-constructor",
-            "title": "Create a vectors client",
-            "slug": "storagevectorsclient-constructor",
-            "type": "function",
-            "product": "storage"
-          },
-          {
-            "id": "storagevectorsclient-from",
+            "id": "storagevectors-from",
             "title": "Access a vector bucket",
-            "slug": "storagevectorsclient-from",
+            "slug": "storagevectors-from",
             "type": "function",
             "product": "storage"
           },
           {
-            "id": "vectorbucketapi-constructor",
-            "title": "Create a vector bucket API instance",
-            "slug": "vectorbucketapi-constructor",
-            "type": "function",
-            "product": "storage"
-          },
-          {
-            "id": "vectorbucketapi-createbucket",
+            "id": "storagevectors-create-bucket",
             "title": "Create a vector bucket",
-            "slug": "vectorbucketapi-createbucket",
+            "slug": "storagevectors-createbucket",
             "type": "function",
             "product": "storage"
           },
           {
-            "id": "vectorbucketapi-deletebucket",
+            "id": "storagevectors-delete-bucket",
             "title": "Delete a vector bucket",
-            "slug": "vectorbucketapi-deletebucket",
+            "slug": "storagevectors-deletebucket",
             "type": "function",
             "product": "storage"
           },
           {
-            "id": "vectorbucketapi-getbucket",
+            "id": "storagevectors-get-bucket",
             "title": "Retrieve a vector bucket",
-            "slug": "vectorbucketapi-getbucket",
+            "slug": "storagevectors-getbucket",
             "type": "function",
             "product": "storage"
           },
           {
-            "id": "vectorbucketapi-listbuckets",
+            "id": "storagevectors-list-buckets",
             "title": "List all vector buckets",
-            "slug": "vectorbucketapi-listbuckets",
+            "slug": "storagevectors-listbuckets",
             "type": "function",
             "product": "storage"
           },
           {
-            "id": "vectorbucketapi-throwonerror",
-            "title": "Enable error throwing",
-            "slug": "vectorbucketapi-throwonerror",
-            "type": "function",
-            "product": "storage"
-          },
-          {
-            "id": "vectorbucketscope-constructor",
-            "title": "Create a vector bucket scope",
-            "slug": "vectorbucketscope-constructor",
-            "type": "function",
-            "product": "storage"
-          },
-          {
-            "id": "vectorbucketscope-createindex",
+            "id": "vectorbucket-createindex",
             "title": "Create a vector index",
-            "slug": "vectorbucketscope-createindex",
+            "slug": "vectorbucket-createindex",
             "type": "function",
             "product": "storage"
           },
           {
-            "id": "vectorbucketscope-deleteindex",
+            "id": "vectorbucket-deleteindex",
             "title": "Delete a vector index",
-            "slug": "vectorbucketscope-deleteindex",
+            "slug": "vectorbucket-deleteindex",
             "type": "function",
             "product": "storage"
           },
           {
-            "id": "vectorbucketscope-getindex",
+            "id": "vectorbucket-getindex",
             "title": "Retrieve a vector index",
-            "slug": "vectorbucketscope-getindex",
+            "slug": "vectorbucket-getindex",
             "type": "function",
             "product": "storage"
           },
           {
-            "id": "vectorbucketscope-listindexes",
+            "id": "vectorbucket-listindexes",
             "title": "List all vector indexes",
-            "slug": "vectorbucketscope-listindexes",
+            "slug": "vectorbucket-listindexes",
             "type": "function",
             "product": "storage"
           },
           {
-            "id": "vector-data",
-            "isFunc": false,
-            "title": "Vector Data",
-            "slug": "vector-data",
-            "product": "storage",
+            "id": "vectorbucket-index",
+            "title": "Access a vector index",
+            "slug": "vectorbucket-index",
             "type": "function",
-            "items": [
-              {
-                "id": "vectordataapi-constructor",
-                "title": "Create a vector data API instance",
-                "slug": "vectordataapi-constructor",
-                "type": "function",
-                "product": "storage"
-              },
-              {
-                "id": "vectordataapi-deletevectors",
-                "title": "Delete vectors",
-                "slug": "vectordataapi-deletevectors",
-                "type": "function",
-                "product": "storage"
-              },
-              {
-                "id": "vectordataapi-getvectors",
-                "title": "Retrieve vectors",
-                "slug": "vectordataapi-getvectors",
-                "type": "function",
-                "product": "storage"
-              },
-              {
-                "id": "vectordataapi-listvectors",
-                "title": "List all vectors",
-                "slug": "vectordataapi-listvectors",
-                "type": "function",
-                "product": "storage"
-              },
-              {
-                "id": "vectordataapi-putvectors",
-                "title": "Insert or update vectors",
-                "slug": "vectordataapi-putvectors",
-                "type": "function",
-                "product": "storage"
-              },
-              {
-                "id": "vectordataapi-queryvectors",
-                "title": "Query vectors",
-                "slug": "vectordataapi-queryvectors",
-                "type": "function",
-                "product": "storage"
-              },
-              {
-                "id": "vectordataapi-throwonerror",
-                "title": "Enable error throwing",
-                "slug": "vectordataapi-throwonerror",
-                "type": "function",
-                "product": "storage"
-              }
-            ]
+            "product": "storage"
           },
           {
-            "id": "vector-index",
-            "isFunc": false,
-            "title": "Vector Index",
-            "slug": "vector-index",
-            "product": "storage",
+            "id": "vectorindex-deletevectors",
+            "title": "Delete vectors from index",
+            "slug": "vectorindex-deletevectors",
             "type": "function",
-            "items": [
-              {
-                "id": "vectorindexapi-constructor",
-                "title": "Create a vector index API instance",
-                "slug": "vectorindexapi-constructor",
-                "type": "function",
-                "product": "storage"
-              },
-
-              {
-                "id": "vectorindexapi-createindex",
-                "title": "Create an index",
-                "slug": "vectorindexapi-createindex",
-                "type": "function",
-                "product": "storage"
-              },
-              {
-                "id": "vectorindexapi-deleteindex",
-                "title": "Delete an index",
-                "slug": "vectorindexapi-deleteindex",
-                "type": "function",
-                "product": "storage"
-              },
-              {
-                "id": "vectorindexapi-getindex",
-                "title": "Retrieve an index",
-                "slug": "vectorindexapi-getindex",
-                "type": "function",
-                "product": "storage"
-              },
-              {
-                "id": "vectorindexapi-listindexes",
-                "title": "List all indexes",
-                "slug": "vectorindexapi-listindexes",
-                "type": "function",
-                "product": "storage"
-              },
-              {
-                "id": "vectorindexapi-throwonerror",
-                "title": "Enable error throwing",
-                "slug": "vectorindexapi-throwonerror",
-                "type": "function",
-                "product": "storage"
-              },
-              {
-                "id": "vectorindexscope-constructor",
-                "title": "Create a vector index scope",
-                "slug": "vectorindexscope-constructor",
-                "type": "function",
-                "product": "storage"
-              },
-              {
-                "id": "vectorindexscope-deletevectors",
-                "title": "Delete vectors from index",
-                "slug": "vectorindexscope-deletevectors",
-                "type": "function",
-                "product": "storage"
-              },
-              {
-                "id": "vectorindexscope-getvectors",
-                "title": "Retrieve vectors from index",
-                "slug": "vectorindexscope-getvectors",
-                "type": "function",
-                "product": "storage"
-              },
-              {
-                "id": "vectorindexscope-listvectors",
-                "title": "List vectors in index",
-                "slug": "vectorindexscope-listvectors",
-                "type": "function",
-                "product": "storage"
-              },
-              {
-                "id": "vectorindexscope-putvectors",
-                "title": "Add vectors to index",
-                "slug": "vectorindexscope-putvectors",
-                "type": "function",
-                "product": "storage"
-              },
-              {
-                "id": "vectorindexscope-queryvectors",
-                "title": "Search vectors in index",
-                "slug": "vectorindexscope-queryvectors",
-                "type": "function",
-                "product": "storage"
-              }
-            ]
+            "product": "storage"
+          },
+          {
+            "id": "vectorindex-getvectors",
+            "title": "Retrieve vectors from index",
+            "slug": "vectorindex-getvectors",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "vectorindex-listvectors",
+            "title": "List vectors in index",
+            "slug": "vectorindex-listvectors",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "vectorindex-putvectors",
+            "title": "Add vectors to index",
+            "slug": "vectorindex-putvectors",
+            "type": "function",
+            "product": "storage"
+          },
+          {
+            "id": "vectorindex-queryvectors",
+            "title": "Search vectors in index",
+            "slug": "vectorindex-queryvectors",
+            "type": "function",
+            "product": "storage"
           }
         ]
       }
