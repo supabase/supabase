@@ -255,7 +255,7 @@ export const CreateTableInstructions = ({
       <CardFooter className="bg">
         <p className="text-xs text-foreground-light">
           Connecting to bucket with other Iceberg clients? Read more in our{' '}
-          <InlineLink href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}>
+          <InlineLink href={`${DOCS_URL}/guides/storage/analytics/examples/pyiceberg`}>
             documentation
           </InlineLink>
           .

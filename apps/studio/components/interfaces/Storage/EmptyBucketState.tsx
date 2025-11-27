@@ -1,4 +1,4 @@
-import { BucketAdd } from 'icons'
+import { BucketPlus } from 'icons'
 import { cn } from 'ui'
 import { CreateAnalyticsBucketModal } from './AnalyticsBuckets/CreateAnalyticsBucketModal'
 import { CreateBucketModal } from './CreateBucketModal'
@@ -20,7 +20,7 @@ export const EmptyBucketState = ({ bucketType, className }: EmptyBucketStateProp
         className
       )}
     >
-      <BucketAdd size={24} strokeWidth={1.5} className="text-foreground-muted" />
+      <BucketPlus size={24} strokeWidth={1.5} className="text-foreground-muted" />
 
       <div className="flex flex-col items-center text-center">
         <h3>

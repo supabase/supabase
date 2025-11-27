@@ -1,6 +1,6 @@
 import { ScaffoldSection } from 'components/layouts/Scaffold'
 import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
-import { Bucket } from 'icons'
+import { AnalyticsBucket as AnalyticsBucketIcon, VectorBucket as VectorBucketIcon } from 'icons'
 import { AlphaNotice } from './AlphaNotice'
 import { BUCKET_TYPES } from './Storage.constants'
 
@@ -9,7 +9,11 @@ export const BucketsUpgradePlan = ({ type }: { type: 'analytics' | 'vector' }) =
     <ScaffoldSection isFullWidth>
       <AlphaNotice type={type} />
       <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-4 items-center text-center gap-1 text-balance">
-        <Bucket size={24} strokeWidth={1.5} className="text-foreground-light" />
+        {type === 'analytics' ? (
+          <AnalyticsBucketIcon size={24} strokeWidth={1.5} className="text-foreground-muted" />
+        ) : (
+          <VectorBucketIcon size={24} strokeWidth={1.5} className="text-foreground-muted" />
+        )}
         <div className="flex flex-col gap-y-1 items-center text-center">
           <h3>
             {type === 'analytics'

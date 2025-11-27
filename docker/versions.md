@@ -1,5 +1,13 @@
 # Docker Image Versions
 
+## 2025-11-25
+- supabase/studio:2025.11.24-sha-d990ae8 (prev supabase/studio:2025.11.10-sha-5291fe3)
+- supabase/gotrue:v2.183.0 (prev supabase/gotrue:v2.182.1)
+- supabase/realtime:v2.65.2 (prev supabase/realtime:v2.63.0)
+- supabase/storage-api:v1.32.0 (prev supabase/storage-api:v1.29.0)
+- supabase/edge-runtime:v1.69.25 (prev supabase/edge-runtime:v1.69.23)
+- supabase/logflare:1.26.12 (prev supabase/logflare:1.22.6)
+
 ## 2025-11-12
 - supabase/studio:2025.11.10-sha-5291fe3 (prev 2025.10.27-sha-85b84e0)
 - supabase/gotrue:v2.182.1 (prev v2.180.0)

@@ -33,7 +33,6 @@ import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityO
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import Panel from 'components/ui/Panel'
-import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
@@ -55,7 +54,6 @@ import { withAuth } from 'hooks/misc/withAuth'
 import {
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   DOCS_URL,
-  MANAGED_BY,
   PROJECT_STATUS,
   PROVIDERS,
   useDefaultProvider,
@@ -93,7 +91,6 @@ const Wizard: NextPageWithLayout = () => {
   const isHomeNew = useFlag('homeNew')
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
-  const isManagedByVercel = currentOrg?.managed_by === 'vercel-marketplace'
   const isNotOnTeamOrEnterprisePlan = !['team', 'enterprise'].includes(currentOrg?.plan.id ?? '')
 
   // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
@@ -225,8 +222,7 @@ const Wizard: NextPageWithLayout = () => {
         ? availableRegionsData?.recommendations.smartGroup.name
         : _defaultRegion
 
-  const canCreateProject =
-    isAdmin && !freePlanWithExceedingLimits && !isManagedByVercel && !hasOutstandingInvoices
+  const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
 
   const dbRegionExact = smartRegionToExactRegion(dbRegion)
 
@@ -236,7 +232,7 @@ const Wizard: NextPageWithLayout = () => {
       dbRegion: smartRegionEnabled ? dbRegionExact : dbRegion,
       organizationSlug: organization,
     },
-    { enabled: currentOrg !== null && !isManagedByVercel }
+    { enabled: currentOrg !== null }
   )
 
   const {
@@ -468,17 +464,6 @@ const Wizard: NextPageWithLayout = () => {
                   slug && (
                     <FreeProjectLimitWarning membersExceededLimit={membersExceededLimit || []} />
                   )
-                ) : isManagedByVercel ? (
-                  <Panel.Content>
-                    <PartnerManagedResource
-                      managedBy={MANAGED_BY.VERCEL_MARKETPLACE}
-                      resource="Projects"
-                      cta={{
-                        installationId: currentOrg?.partner_id,
-                        message: 'Visit Vercel to create a project',
-                      }}
-                    />
-                  </Panel.Content>
                 ) : hasOutstandingInvoices ? (
                   <Panel.Content>
                     <Admonition
