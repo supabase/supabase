@@ -117,7 +117,7 @@ export const BucketTableRow = ({
         <FilesBucketIcon aria-label="bucket icon" size={16} className="text-foreground-muted" />
       </BucketTableCell>
       <BucketTableCell className="flex-1">
-        <div className="flex items-baseline gap-2.5">
+        <div className="flex items-center gap-2.5">
           <p className="whitespace-nowrap max-w-[512px] truncate">{bucket.id}</p>
           {bucket.public && <Badge variant="warning">Public</Badge>}
         </div>

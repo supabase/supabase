@@ -213,7 +213,7 @@ export const ChartConfig = ({
               <TooltipContent side="bottom">Dismiss</TooltipContent>
             </Tooltip>
             <div className="flex items-center gap-x-2">
-              <Badge variant="success">NEW</Badge>
+              <Badge variant="success">New</Badge>
               <p className="text-xs">Add this chart to custom reports</p>
             </div>
             <p className="text-xs text-foreground-light mt-1">
