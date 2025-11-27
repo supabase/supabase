@@ -349,6 +349,14 @@ export const PERMISSIONS_UI = [
 ]
 
 export const ACCESS_TOKEN_PERMISSIONS = PERMISSIONS_UI
+export const PERMISSION_TO_FGA_RELATION_MAP: Record<string, string> = {
+  'infra_add-ons_read': 'infra_addons_read',
+  'infra_add-ons_write': 'infra_addons_write',
+}
+
+export const getFGARelationName = (permission: ScopedAccessTokenPermission): string => {
+  return PERMISSION_TO_FGA_RELATION_MAP[permission] || permission
+}
 
 export const mapPermissionToFGA = (
   resource: string,
