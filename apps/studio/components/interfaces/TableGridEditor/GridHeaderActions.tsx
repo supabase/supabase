@@ -85,7 +85,10 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const [showEnableRealtime, setShowEnableRealtime] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
   const [isAutofixViewSecurityModalOpen, setIsAutofixViewSecurityModalOpen] = useState(false)
-  const [isAutofixMaterializedViewSecurityModalOpen, setIsAutofixMaterializedViewSecurityModalOpen] = useState(false)
+  const [
+    isAutofixMaterializedViewSecurityModalOpen,
+    setIsAutofixMaterializedViewSecurityModalOpen,
+  ] = useState(false)
 
   const snap = useTableEditorTableStateSnapshot()
   const showHeaderActions = snap.selectedRows.size === 0
@@ -572,7 +575,9 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       <MaterializedViewEntityAutofixSecurityModal
         table={table}
         isAutofixMaterializedViewSecurityModalOpen={isAutofixMaterializedViewSecurityModalOpen}
-        setIsAutofixMaterializedViewSecurityModalOpen={setIsAutofixMaterializedViewSecurityModalOpen}
+        setIsAutofixMaterializedViewSecurityModalOpen={
+          setIsAutofixMaterializedViewSecurityModalOpen
+        }
       />
 
       {isTable && (

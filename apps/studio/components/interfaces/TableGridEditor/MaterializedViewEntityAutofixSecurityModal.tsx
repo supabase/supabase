@@ -13,7 +13,9 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 interface MaterializedViewEntityAutofixSecurityModalProps {
   table: Entity
   isAutofixMaterializedViewSecurityModalOpen: boolean
-  setIsAutofixMaterializedViewSecurityModalOpen: (isIsAutofixMaterializedViewSecurityModalOpen: boolean) => void
+  setIsAutofixMaterializedViewSecurityModalOpen: (
+    isIsAutofixMaterializedViewSecurityModalOpen: boolean
+  ) => void
 }
 
 export default function MaterializedViewEntityAutofixSecurityModal({
@@ -71,11 +73,10 @@ export default function MaterializedViewEntityAutofixSecurityModal({
       onConfirm={() => handleConfirm()}
     >
       <p className="text-sm text-foreground-light">
-        Revoking <code>select</code> access from API
-        roles <code>anon</code> and <code>authenticated</code> mitigates the risk of exposing
-        sensitive data to all users.
+        Revoking <code>select</code> access from API roles <code>anon</code> and{' '}
+        <code>authenticated</code> mitigates the risk of exposing sensitive data to all users.
       </p>
-      
+
       <div className="border rounded-md mt-8">
         <ScrollArea className="h-[225px] px-4 py-2">
           {isLoading && <GenericSkeletonLoader />}
