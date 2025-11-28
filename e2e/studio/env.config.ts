@@ -14,12 +14,12 @@ const toBoolean = (value?: string) => {
 }
 
 export const env = {
-  STUDIO_URL: process.env.STUDIO_URL,
+  STUDIO_URL: process.env.STUDIO_URL || 'http://localhost:8082',
   API_URL: process.env.API_URL || 'https://api.supabase.green',
   AUTHENTICATION: toBoolean(process.env.AUTHENTICATION),
   EMAIL: process.env.EMAIL,
   PASSWORD: process.env.PASSWORD,
-  PROJECT_REF: process.env.PROJECT_REF || 'default',
+  PROJECT_REF: process.env.PROJECT_REF || undefined,
   IS_PLATFORM: process.env.IS_PLATFORM || 'false',
   VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO:
     process.env.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO || 'false',

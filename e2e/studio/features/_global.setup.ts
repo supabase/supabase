@@ -71,7 +71,7 @@ To start API locally, run:
   /**
    * If running on platform, create a project and set the project ref as an environment variable
    */
-  if (IS_PLATFORM) {
+  if (IS_PLATFORM && !env.PROJECT_REF) {
     const platformClient = new PlatformClient({
       url: env.API_URL,
       accessToken: env.SUPA_V0_KEY,
@@ -96,7 +96,7 @@ To start API locally, run:
     }
   }
 
-  const signInUrl = `${studioUrl}/sign-in`
+  const signInUrl = `${studioUrl}/dashboard/sign-in`
   console.log(`\n 🔑 Navigating to sign in page: ${signInUrl}`)
 
   await page.goto(signInUrl, { waitUntil: 'networkidle' })
@@ -143,7 +143,7 @@ To start API locally, run:
 
   // Wait for form elements with increased timeout
   const emailInput = page.getByLabel('Email')
-  const passwordInput = page.getByLabel('Password')
+  const passwordInput = page.locator('input[type="password"]')
   const signInButton = page.getByRole('button', { name: 'Sign In' })
 
   // if found click opt out on telemetry
@@ -166,7 +166,13 @@ To start API locally, run:
   await passwordInput.fill(auth.password ?? '')
   await signInButton.click()
 
-  await page.waitForURL('**/organizations')
+  // Wait for successful sign-in by checking we've navigated away from sign-in page
+  // Could redirect to /organizations, /org/[slug], /new, or /project/default depending on configuration
+  await page.waitForURL((url) => !url.pathname.includes('/sign-in'), {
+    timeout: 60_000,
+  })
+
+  console.log(`\n ✅ Successfully signed in, redirected to: ${page.url()}`)
 
   await page.context().storageState({ path: STORAGE_STATE_PATH })
 })
