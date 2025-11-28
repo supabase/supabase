@@ -4,7 +4,7 @@ interface HeaderTitleProps {
   isDuplicating: boolean
 }
 
-const HeaderTitle = ({ schema, table, isDuplicating }: HeaderTitleProps) => {
+export const HeaderTitle = ({ schema, table, isDuplicating }: HeaderTitleProps) => {
   if (!table) {
     return (
       <>
@@ -25,5 +25,3 @@ const HeaderTitle = ({ schema, table, isDuplicating }: HeaderTitleProps) => {
     </>
   )
 }
-
-export default HeaderTitle

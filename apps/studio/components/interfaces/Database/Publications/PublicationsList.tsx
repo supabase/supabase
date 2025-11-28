@@ -100,8 +100,8 @@ export const PublicationsList = () => {
           <div className="flex items-center">
             <Input
               size="tiny"
-              icon={<Search size={12} />}
-              className="w-48 pl-8"
+              icon={<Search />}
+              className="w-48"
               placeholder="Search for a publication"
               value={filterString}
               onChange={(e) => setFilterString(e.target.value)}
