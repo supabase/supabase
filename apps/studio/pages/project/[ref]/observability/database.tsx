@@ -150,8 +150,10 @@ const DatabaseUsage = () => {
       setIsRefreshing(true)
       refresh()
       const { period_start, period_end, interval } = selectedDateRange
-      REPORT_ATTRIBUTES.forEach((chart: any) => {
-        chart.attributes.forEach((attr: any) => {
+
+      REPORT_ATTRIBUTES.flatMap((chart) => chart.attributes || [])
+        .filter((attr): attr is MultiAttribute => attr !== false)
+        .forEach((attr) => {
           queryClient.invalidateQueries({
             queryKey: analyticsKeys.infraMonitoring(ref, {
               attribute: attr.attribute,
@@ -162,7 +164,7 @@ const DatabaseUsage = () => {
             }),
           })
         })
-      })
+
       if (isReplicaSelected) {
         queryClient.invalidateQueries({
           queryKey: analyticsKeys.infraMonitoring(ref, {
