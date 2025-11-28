@@ -132,14 +132,22 @@ export const BranchDropdown = () => {
             </span>
             {isBranchingEnabled ? (
               selectedBranch?.is_default ? (
-                <Badge variant="warning">Production</Badge>
+                <Badge variant="warning" className="mt-[1px]">
+                  Production
+                </Badge>
               ) : selectedBranch?.persistent ? (
-                <Badge variant="success">Persistent</Badge>
+                <Badge variant="success" className="mt-[1px]">
+                  Persistent
+                </Badge>
               ) : (
-                <Badge variant="success">Preview</Badge>
+                <Badge variant="success" className="mt-[1px]">
+                  Preview
+                </Badge>
               )
             ) : (
-              <Badge variant="warning">Production</Badge>
+              <Badge variant="warning" className="mt-[1px]">
+                Production
+              </Badge>
             )}
           </Link>
           <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>

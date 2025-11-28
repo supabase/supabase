@@ -64,7 +64,7 @@ export const OrganizationSelector = ({ form }: OrganizationSelectorProps) => {
                       <SelectItem_Shadcn_ key={x.id} value={x.slug}>
                         <div className="flex justify-between items-center gap-2 w-full">
                           <span>{x.name}</span>
-                          <Badge>{x.plan.name}</Badge>
+                          <Badge className="mt-[1px]">{x.plan.name}</Badge>
                         </div>
                       </SelectItem_Shadcn_>
                     ))}
