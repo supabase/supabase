@@ -16,8 +16,10 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { useApiReport } from 'data/reports/api-report-query'
-import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
+import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { useCallback, useEffect, useState } from 'react'
 import type { NextPageWithLayout } from 'types'
+import { cn } from 'lib/utils'
 
 export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()
@@ -42,35 +44,51 @@ export const ApiReport: NextPageWithLayout = () => {
     setShowUpgradePrompt,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
-  const handleDatepickerChange = (vals: DatePickerValue) => {
-    const promptShown = handleDatePickerChangeFromHook(vals)
-    if (!promptShown) {
+  const handleDatepickerChange = useCallback(
+    (vals: DatePickerValue) => {
+      const promptShown = handleDatePickerChangeFromHook(vals)
+      if (!promptShown) {
+        mergeParams({
+          iso_timestamp_start: vals.from ?? '',
+          iso_timestamp_end: vals.to ?? '',
+        })
+      }
+    },
+    [handleDatePickerChangeFromHook, mergeParams]
+  )
+
+  const handleDatepickerChangeForRefresh = useCallback(
+    (vals: DatePickerValue) => {
+      handleDatePickerChangeFromHook(vals)
       mergeParams({
         iso_timestamp_start: vals.from ?? '',
         iso_timestamp_end: vals.to ?? '',
       })
-    }
-  }
+      handleDatepickerChange(vals)
+    },
+    [handleDatePickerChangeFromHook, mergeParams, handleDatepickerChange]
+  )
 
-  const handleDatepickerChangeForRefresh = (vals: DatePickerValue) => {
-    handleDatePickerChangeFromHook(vals)
-    mergeParams({
-      iso_timestamp_start: vals.from ?? '',
-      iso_timestamp_end: vals.to ?? '',
-    })
-  }
-
-  const refreshWithParams = async () => {
+  const refreshWithParams = useCallback(async () => {
     await new Promise((resolve) => setTimeout(resolve, 0))
     refresh()
-  }
+  }, [refresh])
 
-  const onRefreshReport = useRefreshHandler(
-    datePickerValue,
-    datePickerHelpers,
-    handleDatepickerChangeForRefresh,
-    refreshWithParams
-  )
+  const onRefreshReport = useCallback(async () => {
+    if (datePickerValue.isHelper && datePickerValue.text) {
+      const selectedHelper = datePickerHelpers.find((h) => h.text === datePickerValue.text)
+      if (selectedHelper) {
+        handleDatepickerChangeForRefresh({
+          from: selectedHelper.calcFrom(),
+          to: selectedHelper.calcTo(),
+          isHelper: true,
+          text: selectedHelper.text,
+        })
+      }
+    }
+
+    await refreshWithParams()
+  }, [datePickerValue, datePickerHelpers, handleDatepickerChangeForRefresh, refreshWithParams])
 
   return (
     <ReportPadding>
