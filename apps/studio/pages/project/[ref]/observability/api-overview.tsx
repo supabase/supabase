@@ -52,11 +52,24 @@ export const ApiReport: NextPageWithLayout = () => {
     }
   }
 
+  const handleDatepickerChangeForRefresh = (vals: DatePickerValue) => {
+    handleDatePickerChangeFromHook(vals)
+    mergeParams({
+      iso_timestamp_start: vals.from || '',
+      iso_timestamp_end: vals.to || '',
+    })
+  }
+
+  const refreshWithParams = async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    refresh()
+  }
+
   const onRefreshReport = createRefreshHandler(
     datePickerValue,
     datePickerHelpers,
-    handleDatepickerChange,
-    refresh
+    handleDatepickerChangeForRefresh,
+    refreshWithParams
   )
 
   return (
