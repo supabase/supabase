@@ -6,6 +6,7 @@ import { customRender as render } from 'tests/lib/custom-render'
 
 test(`Render static elements`, async () => {
   render(<ApiReport dehydratedState={{}} />)
+  await screen.findByText('Requests by Country')
   await screen.findByText('Total Requests')
   await screen.findByText('Response Errors')
   await screen.findByText('Response Speed')
