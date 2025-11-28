@@ -2458,13 +2458,35 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "empty-state-initial-state-presentational": {
-      name: "empty-state-initial-state-presentational",
+    "empty-state-presentational-demo": {
+      name: "empty-state-presentational-demo",
       type: "components:example",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/empty-state-initial-state-presentational")),
+      component: React.lazy(() => import("@/registry/default/example/empty-state-presentational-demo")),
       source: "",
-      files: ["registry/default/example/empty-state-initial-state-presentational.tsx"],
+      files: ["registry/default/example/empty-state-presentational-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "empty-state-presentational-buttons": {
+      name: "empty-state-presentational-buttons",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/empty-state-presentational-buttons")),
+      source: "",
+      files: ["registry/default/example/empty-state-presentational-buttons.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "empty-state-presentational-icon": {
+      name: "empty-state-presentational-icon",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/empty-state-presentational-icon")),
+      source: "",
+      files: ["registry/default/example/empty-state-presentational-icon.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

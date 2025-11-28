@@ -89,9 +89,8 @@ const Migrations = () => {
                   value={search}
                   className="w-full lg:w-52"
                   onChange={(e: any) => setSearch(e.target.value)}
-                  icon={<Search size="14" />}
+                  icon={<Search />}
                 />
-
                 <Card>
                   <Table>
                     <TableHeader>

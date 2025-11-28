@@ -100,7 +100,7 @@ export const FilesBuckets = () => {
                     placeholder="Search for a bucket"
                     value={filterString}
                     onChange={(e) => setFilterString(e.target.value)}
-                    icon={<Search size={12} />}
+                    icon={<Search />}
                   />
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

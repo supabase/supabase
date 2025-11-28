@@ -360,7 +360,7 @@ limit 12
     queries: {
       mostFrequentlyInvoked: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false) => `
+        sql: (_params, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => `
         -- reports-query-performance-most-frequently-invoked
 set search_path to public, extensions;
 
@@ -416,7 +416,7 @@ select
       },
       mostTimeConsuming: {
         queryType: 'db',
-        sql: (_, where, orderBy, runIndexAdvisor = false) => `
+        sql: (_, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => `
         -- reports-query-performance-most-time-consuming
 set search_path to public, extensions;
 
@@ -454,7 +454,7 @@ select
       },
       slowestExecutionTime: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false) => `
+        sql: (_params, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => `
         -- reports-query-performance-slowest-execution-time
 set search_path to public, extensions;
 
@@ -513,59 +513,68 @@ select
       },
       unified: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false) => `
+        sql: (_params, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => {
+          const baseQuery = `
         -- reports-query-performance-unified
         set search_path to public, extensions;
 
-        select
-            auth.rolname,
-            statements.query,
-            statements.calls,
-            -- -- Postgres 13, 14, 15
-            statements.total_exec_time + statements.total_plan_time as total_time,
-            statements.min_exec_time + statements.min_plan_time as min_time,
-            statements.max_exec_time + statements.max_plan_time as max_time,
-            statements.mean_exec_time + statements.mean_plan_time as mean_time,
-            -- -- Postgres <= 12
-            -- total_time,
-            -- min_time,
-            -- max_time,
-            -- mean_time,
-            statements.rows / statements.calls as avg_rows,
-            statements.rows as rows_read,
-            statements.shared_blks_hit as debug_hit,
-            statements.shared_blks_read as debug_read,
-            case 
-              when (statements.shared_blks_hit + statements.shared_blks_read) > 0 
-              then (statements.shared_blks_hit::numeric * 100.0) / 
-                   (statements.shared_blks_hit + statements.shared_blks_read)
-              else 0
-            end as cache_hit_rate,
-            ((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) OVER()) * 100 as prop_total_time${
-              runIndexAdvisor
-                ? `,
-            case
-              when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
-              then (
-                select json_build_object(
-                  'has_suggestion', array_length(index_statements, 1) > 0,
-                  'startup_cost_before', startup_cost_before,
-                  'startup_cost_after', startup_cost_after,
-                  'total_cost_before', total_cost_before,
-                  'total_cost_after', total_cost_after,
-                  'index_statements', index_statements
+        with query_results as (
+          select
+              auth.rolname,
+              statements.query,
+              statements.calls,
+              -- -- Postgres 13, 14, 15
+              statements.total_exec_time + statements.total_plan_time as total_time,
+              statements.min_exec_time + statements.min_plan_time as min_time,
+              statements.max_exec_time + statements.max_plan_time as max_time,
+              statements.mean_exec_time + statements.mean_plan_time as mean_time,
+              -- -- Postgres <= 12
+              -- total_time,
+              -- min_time,
+              -- max_time,
+              -- mean_time,
+              statements.rows / statements.calls as avg_rows,
+              statements.rows as rows_read,
+              statements.shared_blks_hit as debug_hit,
+              statements.shared_blks_read as debug_read,
+              case 
+                when (statements.shared_blks_hit + statements.shared_blks_read) > 0 
+                then (statements.shared_blks_hit::numeric * 100.0) / 
+                     (statements.shared_blks_hit + statements.shared_blks_read)
+                else 0
+              end as cache_hit_rate,
+              ((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) OVER()) * 100 as prop_total_time${
+                runIndexAdvisor
+                  ? `,
+              case
+                when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
+                then (
+                  select json_build_object(
+                    'has_suggestion', array_length(index_statements, 1) > 0,
+                    'startup_cost_before', startup_cost_before,
+                    'startup_cost_after', startup_cost_after,
+                    'total_cost_before', total_cost_before,
+                    'total_cost_after', total_cost_after,
+                    'index_statements', index_statements
+                  )
+                  from index_advisor(statements.query)
                 )
-                from index_advisor(statements.query)
-              )
-              else null
-            end as index_advisor_result`
-                : ''
-            }
-          from pg_stat_statements as statements
-            inner join pg_authid as auth on statements.userid = auth.oid
-          ${where || ''}
-          ${orderBy || 'order by statements.total_exec_time + statements.total_plan_time desc'}
-          limit 20`,
+                else null
+              end as index_advisor_result`
+                  : ''
+              }
+            from pg_stat_statements as statements
+              inner join pg_authid as auth on statements.userid = auth.oid
+            ${where || ''}
+          )
+          select *
+          from query_results
+          ${filterIndexAdvisor && runIndexAdvisor ? `where (index_advisor_result->>'has_suggestion')::boolean = true` : ''}
+          ${orderBy || 'order by total_time desc'}
+          limit 20`
+
+          return baseQuery
+        },
       },
       slowQueriesCount: {
         queryType: 'db',
@@ -580,7 +589,7 @@ select
       },
       queryMetrics: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false) => `
+        sql: (_params, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => `
         -- reports-query-performance-metrics
         set search_path to public, extensions;
       

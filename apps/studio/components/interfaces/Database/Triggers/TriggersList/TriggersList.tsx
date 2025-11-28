@@ -190,7 +190,7 @@ execute function function_name();`)
             <Input
               placeholder="Search for a trigger"
               size="tiny"
-              icon={<Search size="14" />}
+              icon={<Search />}
               value={filterString}
               className="w-full lg:w-52"
               onChange={(e) => setFilterString(e.target.value)}

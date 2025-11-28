@@ -68,6 +68,10 @@ const CodePage = () => {
     },
   })
 
+  const fileExists = (filePath: string | undefined): boolean => {
+    return filePath ? files.some((file) => file.name === filePath) : false
+  }
+
   const onUpdate = async () => {
     if (isDeploying || !ref || !functionSlug || !selectedFunction || files.length === 0) return
 
@@ -75,14 +79,17 @@ const CodePage = () => {
       const newEntrypointPath = selectedFunction.entrypoint_path?.split('/').pop()
       const newImportMapPath = selectedFunction.import_map_path?.split('/').pop()
 
+      const entrypointExists = fileExists(newEntrypointPath)
+      const importMapExists = fileExists(newImportMapPath)
+
       deployFunction({
         projectRef: ref,
         slug: selectedFunction.slug,
         metadata: {
           name: selectedFunction.name,
           verify_jwt: selectedFunction.verify_jwt,
-          entrypoint_path: newEntrypointPath,
-          import_map_path: newImportMapPath,
+          ...(entrypointExists && { entrypoint_path: newEntrypointPath }),
+          ...(importMapExists && { import_map_path: newImportMapPath }),
         },
         files: files.map(({ name, content }) => ({ name, content })),
       })

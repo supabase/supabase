@@ -454,14 +454,14 @@ export const FileExplorerHeader = ({
               size="tiny"
               autoFocus
               className="w-52"
-              icon={<Search size={14} strokeWidth={2} />}
+              icon={<Search />}
               actions={[
-                <X
-                  key="close"
-                  className="mx-2 cursor-pointer text-foreground"
-                  size={14}
-                  strokeWidth={2}
+                <Button
+                  size="tiny"
+                  type="text"
+                  icon={<X />}
                   onClick={onCancelSearch}
+                  className="p-0 h-5 w-5"
                 />,
               ]}
               placeholder="Search for a file or folder"
@@ -471,7 +471,7 @@ export const FileExplorerHeader = ({
             />
           ) : (
             <Button
-              icon={<Search size={16} strokeWidth={2} />}
+              icon={<Search />}
               size="tiny"
               type="text"
               className="px-1"

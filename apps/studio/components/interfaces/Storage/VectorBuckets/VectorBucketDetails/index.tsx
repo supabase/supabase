@@ -137,7 +137,7 @@ export const VectorBucketDetails = () => {
                 placeholder="Search for a table"
                 value={filterString}
                 onChange={(e) => setFilterString(e.target.value)}
-                icon={<Search size={12} />}
+                icon={<Search />}
                 className="w-48"
               />
               <CreateVectorTableSheet bucketName={bucket?.vectorBucketName} />
