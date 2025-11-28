@@ -100,20 +100,37 @@ function TableHeadInner<TColumn extends string = string>(
   const getSortIcon = () => {
     if (!sortable || !column || !currentSort) return null
 
-    const iconClassName = 'w-3 h-3'
     const [currentCol, currentOrder] = currentSort.split(':')
+    const isActive = currentCol === column
+    const isAsc = isActive && currentOrder === 'asc'
+    const isDesc = isActive && currentOrder === 'desc'
+    const baseIconClass = 'w-3 h-3 absolute inset-0'
 
-    if (currentCol === column) {
-      return currentOrder === 'asc' ? (
-        <ArrowUp className={iconClassName} />
-      ) : (
-        <ArrowDown className={iconClassName} />
-      )
-    }
-    if (isHovered) {
-      return <ChevronUp className={iconClassName} />
-    }
-    return <div className={iconClassName} />
+    return (
+      <>
+        <ArrowUp
+          className={cn(
+            baseIconClass,
+            'transition-transform',
+            isAsc ? 'translate-y-0' : 'translate-y-full'
+          )}
+        />
+        <ArrowDown
+          className={cn(
+            baseIconClass,
+            'transition-transform',
+            isDesc ? 'translate-y-0' : '-translate-y-full'
+          )}
+        />
+        <ChevronUp
+          className={cn(
+            baseIconClass,
+            'transition-opacity',
+            !isActive && isHovered ? 'opacity-100' : 'opacity-0'
+          )}
+        />
+      </>
+    )
   }
 
   const handleClick = (e: React.MouseEvent<HTMLTableCellElement>) => {
@@ -151,7 +168,7 @@ function TableHeadInner<TColumn extends string = string>(
   const content = sortable ? (
     <div className="flex items-center gap-1 !bg-transparent">
       {children}
-      {getSortIcon()}
+      <div className="w-3 h-3 relative overflow-hidden">{getSortIcon()}</div>
     </div>
   ) : (
     children
