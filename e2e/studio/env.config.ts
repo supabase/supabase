@@ -1,4 +1,11 @@
+import dotenv from 'dotenv'
 import path from 'path'
+
+// Load .env.local before reading process.env
+dotenv.config({
+  path: path.resolve(import.meta.dirname, '.env.local'),
+  override: true,
+})
 
 const toBoolean = (value?: string) => {
   if (value == null) return false

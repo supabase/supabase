@@ -1,14 +1,20 @@
 import { defineConfig } from '@playwright/test'
-import dotenv from 'dotenv'
-import path from 'path'
 import { env, STORAGE_STATE_PATH } from './env.config.js'
 
-dotenv.config({ path: path.resolve(import.meta.dirname, '.env.local') })
-
 const IS_CI = !!process.env.CI
+const IS_PLATFORM = env.IS_PLATFORM === 'true'
 
 const WEB_SERVER_TIMEOUT = Number(process.env.WEB_SERVER_TIMEOUT) || 10 * 60 * 1000
 const WEB_SERVER_PORT = Number(process.env.WEB_SERVER_PORT) || 8082
+
+const webServer = !IS_PLATFORM
+  ? {
+      command: 'pnpm --workspace-root run e2e:setup:selfhosted',
+      port: WEB_SERVER_PORT,
+      timeout: WEB_SERVER_TIMEOUT,
+      reuseExistingServer: true,
+    }
+  : undefined
 
 export default defineConfig({
   timeout: 120 * 1000,
@@ -54,10 +60,5 @@ export default defineConfig({
     ['html', { open: 'never' }],
     ['json', { outputFile: 'test-results/test-results.json' }],
   ],
-  webServer: {
-    command: 'pnpm --workspace-root run e2e:setup',
-    port: WEB_SERVER_PORT,
-    timeout: WEB_SERVER_TIMEOUT,
-    reuseExistingServer: true,
-  },
+  webServer,
 })
