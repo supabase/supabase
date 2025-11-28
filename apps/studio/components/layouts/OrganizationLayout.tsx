@@ -3,14 +3,14 @@ import { type PropsWithChildren } from 'react'
 
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
+import { useAwsRedirectQuery } from 'data/integrations/aws-redirect-query'
 import { useVercelRedirectQuery } from 'data/integrations/vercel-redirect-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
-import { useAwsRedirectQuery } from 'data/integrations/aws-redirect-query'
 import { MANAGED_BY } from 'lib/constants/infrastructure'
+import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
 
-const OrganizationLayoutContent = ({ children }: PropsWithChildren<{}>) => {
+const OrganizationLayoutContent = ({ children }: PropsWithChildren) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const vercelQuery = useVercelRedirectQuery(
@@ -53,12 +53,12 @@ const OrganizationLayoutContent = ({ children }: PropsWithChildren<{}>) => {
           </Button>
         </Alert_Shadcn_>
       )}
-      <main className="h-full w-full overflow-y-auto">{children}</main>
+      <main className="h-full w-full overflow-y-auto flex flex-col">{children}</main>
     </div>
   )
 }
 
-const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
+const OrganizationLayout = ({ children }: PropsWithChildren) => {
   return <OrganizationLayoutContent>{children}</OrganizationLayoutContent>
 }
 

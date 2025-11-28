@@ -74,8 +74,8 @@ const ReportWidget = (props: ReportWidgetProps) => {
                       query.content = props.resolvedSql
                     } else {
                       query.q = props.params?.sql
-                      query.its = props.params!.iso_timestamp_start
-                      query.ite = props.params!.iso_timestamp_end
+                      query.its = props.params?.iso_timestamp_start || ''
+                      query.ite = props.params?.iso_timestamp_end || ''
                     }
 
                     router.push({ pathname, query })

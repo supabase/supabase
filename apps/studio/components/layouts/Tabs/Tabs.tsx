@@ -12,7 +12,7 @@ import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
 import { editorEntityTypes, useTabsStateSnapshot, type Tab } from 'state/tabs'
 import {
   cn,
@@ -32,7 +32,7 @@ import { TabPreview } from './TabPreview'
 export const EditorTabs = () => {
   const { ref, id } = useParams()
   const router = useRouter()
-  const appSnap = useAppStateSnapshot()
+  const { setLastVisitedSnippet, setLastVisitedTable } = useDashboardHistory()
 
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
@@ -68,8 +68,10 @@ export const EditorTabs = () => {
   }
 
   const onClearDashboardHistory = () => {
-    if (ref && editor) {
-      appSnap.setDashboardHistory(ref, editor === 'table' ? 'editor' : editor, undefined)
+    if (editor === 'table') {
+      setLastVisitedTable(undefined)
+    } else if (editor === 'sql') {
+      setLastVisitedSnippet(undefined)
     }
   }
 
@@ -114,8 +116,15 @@ export const EditorTabs = () => {
           ? tabs.openTabs.filter((x) => !x.startsWith('sql'))
           : tabs.openTabs.filter((x) => x.startsWith('sql'))
       const tabIdx = openedTabs.indexOf(tabId)
+      const activeTabIdx = openedTabs.indexOf(tabs.activeTab!)
       const tabsToClose = openedTabs.slice(tabIdx + 1)
       tabs.removeTabs(tabsToClose)
+
+      const isActiveTabClosed = tabIdx < activeTabIdx
+      if (isActiveTabClosed) {
+        const id = editor === 'table' ? tabId.split('-')[1] : tabId.split('sql-')[1]
+        router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}/${id}`)
+      }
     }
   }
 

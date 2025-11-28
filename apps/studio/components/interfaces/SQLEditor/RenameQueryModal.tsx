@@ -51,7 +51,7 @@ const RenameQueryModal = ({
   const [nameInput, setNameInput] = useState(name)
   const [descriptionInput, setDescriptionInput] = useState(description)
 
-  const { mutate: titleSql, isLoading: isTitleGenerationLoading } = useSqlTitleGenerateMutation({
+  const { mutate: titleSql, isPending: isTitleGenerationLoading } = useSqlTitleGenerateMutation({
     onSuccess: (data) => {
       const { title, description } = data
       setNameInput(title)

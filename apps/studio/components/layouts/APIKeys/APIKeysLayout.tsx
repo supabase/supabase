@@ -9,14 +9,14 @@ const ApiKeysLayout = ({ children }: PropsWithChildren) => {
 
   const navigationItems = [
     {
-      label: 'Legacy API Keys',
+      label: 'Publishable and secret API keys',
       href: `/project/${projectRef}/settings/api-keys`,
-      id: 'legacy-keys',
+      id: 'new-keys',
     },
     {
-      label: 'API Keys',
-      href: `/project/${projectRef}/settings/api-keys/new`,
-      id: 'new-keys',
+      label: 'Legacy anon, service_role API keys',
+      href: `/project/${projectRef}/settings/api-keys/legacy`,
+      id: 'legacy-keys',
     },
   ]
 

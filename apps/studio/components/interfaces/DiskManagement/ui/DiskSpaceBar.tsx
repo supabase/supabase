@@ -19,7 +19,7 @@ interface DiskSpaceBarProps {
   form: UseFormReturn<DiskStorageSchemaType>
 }
 
-export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
+export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
   const { ref } = useParams()
   const { resolvedTheme } = useTheme()
   const { formState, watch } = form
@@ -94,7 +94,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
         <div
           className={cn(
             'h-[35px] relative border rounded-sm w-full transition',
-            showNewSize ? 'bg-selection border border-brand-button' : 'bg-surface-300'
+            showNewSize ? 'bg-selection border border-brand' : 'bg-surface-300'
           )}
         >
           <AnimatePresence>

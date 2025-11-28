@@ -17,7 +17,9 @@ hideToc: true
 
     <StepHikeCompact.Details title="Create a Nuxt app">
 
-    Create a Nuxt app using the `npx nuxi` command.
+    - Create a Nuxt app using the `npx nuxi` command.
+
+    <$Partial path="uiLibCta.mdx" />
 
     </StepHikeCompact.Details>
 
@@ -56,7 +58,8 @@ hideToc: true
     Create a `.env` file and populate with your Supabase connection variables:
 
     <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="anonKey" />
+    <ProjectConfigVariables variable="publishable" />
+    <ProjectConfigVariables variable="anon" />
 
     </StepHikeCompact.Details>
 
@@ -74,7 +77,7 @@ hideToc: true
           runtimeConfig: {
             public: {
               supabaseUrl: process.env.SUPABASE_URL,
-              supabaseAnonKey: process.env.SUPABASE_PUBLISHABLE_KEY,
+              supabasePublishableKey: process.env.SUPABASE_PUBLISHABLE_KEY,
             },
           },
         });
@@ -99,7 +102,7 @@ hideToc: true
       <script setup>
       import { createClient } from '@supabase/supabase-js'
       const config = useRuntimeConfig()
-      const supabase = createClient(config.public.supabaseUrl, config.public.supabaseAnonKey)
+      const supabase = createClient(config.public.supabaseUrl, config.public.supabasePublishableKey)
       const instruments = ref([])
 
       async function getInstruments() {

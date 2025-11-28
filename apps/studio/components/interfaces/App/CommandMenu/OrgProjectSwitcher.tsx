@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 
 import { IS_PLATFORM } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 
@@ -13,11 +13,11 @@ const ORGANIZATION_SWITCHER_PAGE_NAME = 'Configure organization'
 export function useProjectSwitchCommand() {
   const setPage = useSetPage()
 
-  const { data } = useProjectsQuery({ enabled: IS_PLATFORM })
-  const projects = useMemo(
-    () => (data?.projects ?? []).map(({ name, ref }) => ({ name, ref })),
-    [data]
-  )
+  // [Joshen] Using paginated data here which means we won't be showing all projects
+  // Ideally we somehow support searching with Cmd K if we want to make this ideal
+  // e.g Cmd K input to support async searching while in "switch project" state
+  const { data } = useProjectsInfiniteQuery({}, { enabled: IS_PLATFORM })
+  const projects = useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
 
   useRegisterPage(
     PROJECT_SWITCHER_PAGE_NAME,

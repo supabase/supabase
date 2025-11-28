@@ -1,7 +1,8 @@
 import dayjs from 'dayjs'
-import Link from 'next/link'
 import { useState } from 'react'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
@@ -20,7 +21,7 @@ import {
   TableRow,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import MigrationsEmptyState from './MigrationsEmptyState'
+import { MigrationsEmptyState } from './MigrationsEmptyState'
 
 const Migrations = () => {
   const [search, setSearch] = useState('')
@@ -64,11 +65,15 @@ const Migrations = () => {
             }
           >
             <Button key="contact-support" asChild type="default">
-              <Link
-                href={`/support/new?projectRef=${project?.ref}&category=dashboard_bug&subject=Unable%20to%20view%20database%20migrations`}
+              <SupportLink
+                queryParams={{
+                  projectRef: project?.ref,
+                  category: SupportCategories.DASHBOARD_BUG,
+                  subject: 'Unable to view database migrations',
+                }}
               >
                 Contact support
-              </Link>
+              </SupportLink>
             </Button>
           </Admonition>
         )}
@@ -78,15 +83,14 @@ const Migrations = () => {
 
             {data.length > 0 && (
               <>
-                <div className="w-80 mb-4">
-                  <Input
-                    size="small"
-                    placeholder="Search for a migration"
-                    value={search}
-                    onChange={(e: any) => setSearch(e.target.value)}
-                    icon={<Search size="14" />}
-                  />
-                </div>
+                <Input
+                  size="tiny"
+                  placeholder="Search for a migration"
+                  value={search}
+                  className="w-full lg:w-52"
+                  onChange={(e: any) => setSearch(e.target.value)}
+                  icon={<Search />}
+                />
                 <Card>
                   <Table>
                     <TableHeader>

@@ -1,6 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { UseCustomQueryOptions } from 'types'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
-import { CREATE_PG_GET_TABLEDEF_SQL } from './database-query-constants'
+import { CREATE_PG_GET_TABLEDEF_SQL } from './database-table-definition'
 import { databaseKeys } from './keys'
 
 type GetTableDefinitionArgs = {
@@ -68,14 +69,12 @@ export const useTableDefinitionQuery = <TData = TableDefinitionData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<TableDefinitionData, TableDefinitionError, TData> = {}
+  }: UseCustomQueryOptions<TableDefinitionData, TableDefinitionError, TData> = {}
 ) =>
-  useQuery<TableDefinitionData, TableDefinitionError, TData>(
-    databaseKeys.tableDefinition(projectRef, id),
-    ({ signal }) => getTableDefinition({ projectRef, connectionString, id }, signal),
-    {
-      enabled:
-        enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined' && !isNaN(id),
-      ...options,
-    }
-  )
+  useQuery<TableDefinitionData, TableDefinitionError, TData>({
+    queryKey: databaseKeys.tableDefinition(projectRef, id),
+    queryFn: ({ signal }) => getTableDefinition({ projectRef, connectionString, id }, signal),
+    enabled:
+      enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined' && !isNaN(id),
+    ...options,
+  })

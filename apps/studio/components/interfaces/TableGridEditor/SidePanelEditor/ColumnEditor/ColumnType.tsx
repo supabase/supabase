@@ -66,6 +66,7 @@ const ColumnType = ({
   description,
   showRecommendation = false,
   onOptionSelect = noop,
+  error,
 }: ColumnTypeProps) => {
   const [open, setOpen] = useState(false)
   const availableTypes = POSTGRES_DATA_TYPES.concat(
@@ -167,7 +168,7 @@ const ColumnType = ({
       <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
         <PopoverTrigger_Shadcn_ asChild>
           <Button
-            type="default"
+            type={error ? 'danger' : 'default'}
             role="combobox"
             size={'small'}
             aria-expanded={open}
@@ -276,15 +277,14 @@ const ColumnType = ({
           <CriticalIcon />
           <AlertTitle_Shadcn_>
             {' '}
-            It is recommended to use <code className="text-xs">
-              {recommendation.alternative}
-            </code>{' '}
-            instead
+            It is recommended to use{' '}
+            <code className="text-code-inline">{recommendation.alternative}</code> instead
           </AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
             <p>
               Postgres recommends against using the data type{' '}
-              <code className="text-xs">{value}</code> unless you have a very specific use case.
+              <code className="text-code-inline">{value}</code> unless you have a very specific use
+              case.
             </p>
             <div className="flex items-center space-x-2 mt-3">
               <Button asChild type="default" icon={<ExternalLink />}>

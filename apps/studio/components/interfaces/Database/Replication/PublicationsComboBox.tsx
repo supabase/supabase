@@ -1,7 +1,9 @@
 import { Check, ChevronsUpDown, Loader2, Plus } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { ControllerRenderProps } from 'react-hook-form'
 import {
   Button,
+  cn,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
@@ -14,18 +16,19 @@ import {
   PopoverTrigger_Shadcn_,
   ScrollArea,
 } from 'ui'
-import { ControllerRenderProps } from 'react-hook-form'
 
 interface PublicationsComboBoxProps {
   publications: string[]
-  loading: boolean
+  isLoadingPublications: boolean
+  isLoadingCheck: boolean
   onNewPublicationClick: () => void
   field: ControllerRenderProps<any, 'publicationName'>
 }
 
-const PublicationsComboBox = ({
+export const PublicationsComboBox = ({
   publications,
-  loading,
+  isLoadingPublications,
+  isLoadingCheck,
   onNewPublicationClick,
   field,
 }: PublicationsComboBoxProps) => {
@@ -33,15 +36,15 @@ const PublicationsComboBox = ({
   const [selectedPublication, setSelectedPublication] = useState<string>(field?.value || '')
   const [searchTerm, setSearchTerm] = useState('')
 
-  function handleSearchChange(value: string) {
-    setSearchTerm(value)
-  }
-
   function handlePublicationSelect(pub: string) {
     setSelectedPublication(pub)
     setDropdownOpen(false)
     field.onChange(pub)
   }
+
+  useEffect(() => {
+    setSelectedPublication(field?.value || '')
+  }, [field?.value])
 
   return (
     <Popover_Shadcn_
@@ -58,13 +61,16 @@ const PublicationsComboBox = ({
         <Button
           type="default"
           size="medium"
-          className={`w-full [&>span]:w-full text-left`}
+          className={cn(
+            'w-full [&>span]:w-full text-left',
+            !selectedPublication && 'text-foreground-muted'
+          )}
           iconRight={
-            <ChevronsUpDown
-              className="text-foreground-muted"
-              strokeWidth={2}
-              size={14}
-            ></ChevronsUpDown>
+            isLoadingCheck ? (
+              <Loader2 className="animate-spin" size={14} />
+            ) : (
+              <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
+            )
           }
           name={field.name}
           onBlur={field.onBlur}
@@ -77,11 +83,11 @@ const PublicationsComboBox = ({
           <CommandInput_Shadcn_
             placeholder="Find publication..."
             value={searchTerm}
-            onValueChange={handleSearchChange}
-          ></CommandInput_Shadcn_>
+            onValueChange={setSearchTerm}
+          />
           <CommandList_Shadcn_>
             <CommandEmpty_Shadcn_>
-              {loading ? (
+              {isLoadingPublications ? (
                 <div className="flex items-center gap-2 text-center justify-center">
                   <Loader2 size={12} className="animate-spin" />
                   Loading...
@@ -90,7 +96,13 @@ const PublicationsComboBox = ({
                 'No publications found'
               )}
             </CommandEmpty_Shadcn_>
+
             <CommandGroup_Shadcn_>
+              {publications.length === 0 && (
+                <p className="text-foreground-lighter text-xs py-3 px-2">
+                  No publications available
+                </p>
+              )}
               <ScrollArea className={publications.length > 7 ? 'h-[210px]' : ''}>
                 {publications.map((pub) => (
                   <CommandItem_Shadcn_
@@ -111,7 +123,9 @@ const PublicationsComboBox = ({
                 ))}
               </ScrollArea>
             </CommandGroup_Shadcn_>
+
             <CommandSeparator_Shadcn_ />
+
             <CommandGroup_Shadcn_>
               <CommandItem_Shadcn_
                 className="cursor-pointer w-full"
@@ -128,5 +142,3 @@ const PublicationsComboBox = ({
     </Popover_Shadcn_>
   )
 }
-
-export default PublicationsComboBox

@@ -1,25 +1,34 @@
 import { defineConfig } from '@playwright/test'
-import { env, STORAGE_STATE_PATH } from './env.config'
 import dotenv from 'dotenv'
 import path from 'path'
+import { env, STORAGE_STATE_PATH } from './env.config.js'
 
-dotenv.config({ path: path.resolve(__dirname, '.env.local') })
+dotenv.config({ path: path.resolve(import.meta.dirname, '.env.local') })
 
 const IS_CI = !!process.env.CI
 
+const WEB_SERVER_TIMEOUT = Number(process.env.WEB_SERVER_TIMEOUT) || 10 * 60 * 1000
+const WEB_SERVER_PORT = Number(process.env.WEB_SERVER_PORT) || 8082
+
 export default defineConfig({
-  timeout: 60 * 1000,
+  timeout: 120 * 1000,
   testDir: './features',
   testMatch: /.*\.spec\.ts/,
   forbidOnly: IS_CI,
-  retries: IS_CI ? 3 : 0,
+  retries: IS_CI ? 5 : 0,
+  maxFailures: 3,
+  fullyParallel: true,
   use: {
     baseURL: env.STUDIO_URL,
     screenshot: 'off',
     video: 'retain-on-failure',
-    headless: IS_CI,
+    headless: true || IS_CI,
     trace: 'retain-on-failure',
     permissions: ['clipboard-read', 'clipboard-write'],
+    extraHTTPHeaders: {
+      'x-vercel-protection-bypass': process.env.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO,
+      'x-vercel-set-bypass-cookie': 'true',
+    },
   },
   projects: [
     {
@@ -34,7 +43,9 @@ export default defineConfig({
       use: {
         browserName: 'chromium',
         screenshot: 'off',
-        storageState: STORAGE_STATE_PATH,
+        // Only use storage state if authentication is enabled. When AUTHENTICATION=false
+        // we should not require a pre-generated storage state file.
+        storageState: env.AUTHENTICATION ? STORAGE_STATE_PATH : undefined,
       },
     },
   ],
@@ -43,4 +54,10 @@ export default defineConfig({
     ['html', { open: 'never' }],
     ['json', { outputFile: 'test-results/test-results.json' }],
   ],
+  webServer: {
+    command: 'pnpm --workspace-root run e2e:setup',
+    port: WEB_SERVER_PORT,
+    timeout: WEB_SERVER_TIMEOUT,
+    reuseExistingServer: true,
+  },
 })

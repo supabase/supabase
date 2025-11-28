@@ -38,7 +38,7 @@ export default function ViewEntityAutofixSecurityModal({
     onSuccess: async () => {
       toast.success('View security changed successfully')
       setIsAutofixViewSecurityModalOpen(false)
-      await queryClient.invalidateQueries(lintKeys.lint(project?.ref))
+      await queryClient.invalidateQueries({ queryKey: lintKeys.lint(project?.ref) })
     },
     onError: (error) => {
       toast.error(`Failed to autofix view security: ${error.message}`)

@@ -19,7 +19,7 @@ import { METRICS } from 'lib/constants/metrics'
 import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { Dashboards } from 'types'
+import type { Dashboards } from 'types'
 import { WarningIcon } from 'ui'
 import { METRIC_THRESHOLDS } from './ReportBlock.constants'
 import { ReportBlockContainer } from './ReportBlockContainer'
@@ -74,10 +74,8 @@ export const ChartBlock = ({
     {
       projectRef: ref as string,
       attribute: attribute as ProjectDailyStatsAttribute,
-      startDate,
-      endDate,
-      interval: interval as AnalyticsInterval,
-      databaseIdentifier,
+      startDate: dayjs(startDate).format('YYYY-MM-DD'),
+      endDate: dayjs(endDate).format('YYYY-MM-DD'),
     },
     { enabled: provider === 'daily-stats' }
   )

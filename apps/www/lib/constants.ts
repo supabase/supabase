@@ -32,6 +32,15 @@ export const SITE_ORIGIN =
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
       : 'http://localhost:3000'
 
+export const CMS_SITE_ORIGIN =
+  process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
+    ? // In production, use the actual CMS domain
+      process.env.CMS_SITE_ORIGIN || 'https://cms.supabase.com'
+    : process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL &&
+        typeof process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL === 'string'
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL.replace('zone-www-dot-com-git-', 'cms-git-')}`
+      : 'http://localhost:3030'
+
 export const LW_URL = `${SITE_ORIGIN}/launch-week`
 
 export const LW12_DATE = 'August 12-16 / 7am PT'
@@ -54,3 +63,5 @@ export const LW15_TWEET_TEXT =
 export const LW15_URL = `${SITE_ORIGIN}/launch-week`
 
 export const SITE_NAME = 'Supabase'
+
+export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''

@@ -39,7 +39,7 @@ export const AIOptInLevelSelector = ({
             value: 'disabled',
             title: 'Disabled',
             description:
-              'You do not consent to sharing any database information with Amazon Bedrock and understand that responses will be generic and not tailored to your database',
+              'You do not consent to sharing any database information with third-party AI providers and understand that responses will be generic and not tailored to your database',
           },
         ]
       : []),
@@ -49,7 +49,7 @@ export const AIOptInLevelSelector = ({
             value: 'schema',
             title: 'Schema Only',
             description:
-              'You consent to sharing your database’s schema metadata (such as table and column names, data types, and relationships—but not actual database data) with Amazon Bedrock',
+              'You consent to sharing your database’s schema metadata (such as table and column names, data types, and relationships—but not actual database data) with third-party AI providers',
           },
         ]
       : []),
@@ -59,7 +59,7 @@ export const AIOptInLevelSelector = ({
             value: 'schema_and_log',
             title: 'Schema & Logs',
             description:
-              'You consent to sharing your schema and logs (which may contain PII/database data) with Amazon Bedrock for better results',
+              'You consent to sharing your schema and logs (which may contain PII/database data) with third-party AI providers for better results',
           },
         ]
       : []),
@@ -69,7 +69,7 @@ export const AIOptInLevelSelector = ({
             value: 'schema_and_log_and_data',
             title: 'Schema, Logs & Database Data',
             description:
-              'You consent to give Amazon Bedrock  full access to run database read only queries and analyze results for optimal results',
+              'You consent to give third-party AI providers full access to run database read-only queries and analyze results for optimal results',
           },
         ]
       : []),
@@ -83,10 +83,13 @@ export const AIOptInLevelSelector = ({
         <div className="flex flex-col gap-y-4 my-4 max-w-xl">
           <p>
             Supabase AI can provide more relevant answers if you choose to share different levels of
-            data. This feature is powered by Amazon Bedrock which does not store or log your prompts
-            and completions, nor does it use them to train AWS models or distribute them to third
-            parties. This is an organization-wide setting, so please select the level of data you
-            are comfortable sharing.
+            data. This feature is powered by third-party AI providers. This is an organization-wide
+            setting, so please select the level of data you are comfortable sharing.
+          </p>
+          <p>
+            For organizations with HIPAA compliance enabled in their Supabase configuration, any
+            consented information will only be shared with third-party AI providers with whom
+            Supabase has established a Business Associate Agreement (BAA).
           </p>
           <OptInToOpenAIToggle />
         </div>

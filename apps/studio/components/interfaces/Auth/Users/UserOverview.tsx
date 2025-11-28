@@ -15,7 +15,7 @@ import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mut
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
 import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
 import { User } from 'data/auth/users-infinite-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
 import { timeout } from 'lib/helpers'
@@ -45,6 +45,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const isEmailAuth = user.email !== null
   const isPhoneAuth = user.phone !== null
   const isBanned = user.banned_until !== null
+  const isVerified = user.confirmed_at != null
 
   const { authenticationSignInProviders } = useIsFeatureEnabled([
     'authentication:sign_in_providers',
@@ -64,24 +65,21 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
     }
   )
 
-  const { can: canUpdateUser } = useAsyncCheckProjectPermissions(PermissionAction.AUTH_EXECUTE, '*')
-  const { can: canSendMagicLink } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateUser } = useAsyncCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
+  const { can: canSendMagicLink } = useAsyncCheckPermissions(
     PermissionAction.AUTH_EXECUTE,
     'send_magic_link'
   )
-  const { can: canSendRecovery } = useAsyncCheckProjectPermissions(
+  const { can: canSendRecovery } = useAsyncCheckPermissions(
     PermissionAction.AUTH_EXECUTE,
     'send_recovery'
   )
-  const { can: canSendOtp } = useAsyncCheckProjectPermissions(
-    PermissionAction.AUTH_EXECUTE,
-    'send_otp'
-  )
-  const { can: canRemoveUser } = useAsyncCheckProjectPermissions(
+  const { can: canSendOtp } = useAsyncCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_otp')
+  const { can: canRemoveUser } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_DELETE,
     'auth.users'
   )
-  const { can: canRemoveMFAFactors } = useAsyncCheckProjectPermissions(
+  const { can: canRemoveMFAFactors } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_DELETE,
     'auth.mfa_factors'
   )
@@ -101,7 +99,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const seconds = Math.floor(mailerOtpExpiry % 60)
   const formattedExpiry = `${mailerOtpExpiry > 60 ? `${minutes} minute${minutes > 1 ? 's' : ''} ${seconds > 0 ? 'and' : ''} ` : ''}${seconds > 0 ? `${seconds} second${seconds > 1 ? 's' : ''}` : ''}`
 
-  const { mutate: resetPassword, isLoading: isResettingPassword } = useUserResetPasswordMutation({
+  const { mutate: resetPassword, isPending: isResettingPassword } = useUserResetPasswordMutation({
     onSuccess: (_, vars) => {
       setSuccessAction('send_recovery')
       toast.success(`Sent password recovery to ${vars.user.email}`)
@@ -110,16 +108,24 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       toast.error(`Failed to send password recovery: ${err.message}`)
     },
   })
-  const { mutate: sendMagicLink, isLoading: isSendingMagicLink } = useUserSendMagicLinkMutation({
+  const { mutate: sendMagicLink, isPending: isSendingMagicLink } = useUserSendMagicLinkMutation({
     onSuccess: (_, vars) => {
       setSuccessAction('send_magic_link')
-      toast.success(`Sent magic link to ${vars.user.email}`)
+      toast.success(
+        isVerified
+          ? `Sent magic link to ${vars.user.email}`
+          : `Sent confirmation email to ${vars.user.email}`
+      )
     },
     onError: (err) => {
-      toast.error(`Failed to send magic link: ${err.message}`)
+      toast.error(
+        isVerified
+          ? `Failed to send magic link: ${err.message}`
+          : `Failed to send confirmation email: ${err.message}`
+      )
     },
   })
-  const { mutate: sendOTP, isLoading: isSendingOTP } = useUserSendOTPMutation({
+  const { mutate: sendOTP, isPending: isSendingOTP } = useUserSendOTPMutation({
     onSuccess: (_, vars) => {
       setSuccessAction('send_otp')
       toast.success(`Sent OTP to ${vars.user.phone}`)
@@ -134,7 +140,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       setIsDeleteFactorsModalOpen(false)
     },
   })
-  const { mutate: updateUser, isLoading: isUpdatingUser } = useUserUpdateMutation({
+  const { mutate: updateUser, isPending: isUpdatingUser } = useUserUpdateMutation({
     onSuccess: () => {
       toast.success('Successfully unbanned user')
       setIsUnbanModalOpen(false)
@@ -297,11 +303,15 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 }
               />
               <RowAction
-                title="Send magic link"
-                description="Passwordless login via email for the user"
+                title={isVerified ? 'Send Magic Link' : 'Send confirmation email'}
+                description={
+                  isVerified
+                    ? 'Passwordless login via email for the user'
+                    : 'Send a confirmation email to the user'
+                }
                 button={{
                   icon: <Mail />,
-                  text: 'Send magic link',
+                  text: isVerified ? 'Send magic link' : 'Send confirmation email',
                   isLoading: isSendingMagicLink,
                   disabled: !canSendMagicLink,
                   onClick: () => {
@@ -311,8 +321,10 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 success={
                   successAction === 'send_magic_link'
                     ? {
-                        title: 'Magic link sent',
-                        description: `The link in the email is valid for ${formattedExpiry}`,
+                        title: isVerified ? 'Magic link sent' : 'Confirmation email sent',
+                        description: isVerified
+                          ? `The link in the email is valid for ${formattedExpiry}`
+                          : 'The confirmation email has been sent to the user',
                       }
                     : undefined
                 }

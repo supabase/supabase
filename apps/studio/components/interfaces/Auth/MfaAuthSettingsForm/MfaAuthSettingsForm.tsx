@@ -3,19 +3,18 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { number, object, string, boolean } from 'yup'
+import { boolean, number, object, string } from 'yup'
 
 import { useParams } from 'common'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import {
-  AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
@@ -35,8 +34,16 @@ import {
   Switch,
   WarningIcon,
 } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 function determineMFAStatus(verifyEnabled: boolean, enrollEnabled: boolean) {
   return verifyEnabled ? (enrollEnabled ? 'Enabled' : 'Verify Enabled') : 'Disabled'
@@ -84,9 +91,14 @@ const securitySchema = object({
   MFA_ALLOW_LOW_AAL: boolean().required(),
 })
 
-const MfaAuthSettingsForm = () => {
+export const MfaAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
-  const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
+  const {
+    data: authConfig,
+    error: authConfigError,
+    isError,
+    isLoading,
+  } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
   // Separate loading states for each form
@@ -96,11 +108,11 @@ const MfaAuthSettingsForm = () => {
 
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false)
 
-  const { can: canReadConfig } = useAsyncCheckProjectPermissions(
+  const { can: canReadConfig } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'custom_config_gotrue'
   )
-  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
@@ -253,16 +265,32 @@ const MfaAuthSettingsForm = () => {
 
   if (isError) {
     return (
-      <Alert_Shadcn_ variant="destructive">
-        <WarningIcon />
-        <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+      <PageSection>
+        <PageSectionContent>
+          <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   if (!canReadConfig) {
-    return <NoPermission resourceText="view auth configuration settings" />
+    return (
+      <PageSection>
+        <PageSectionContent>
+          <NoPermission resourceText="view auth configuration settings" />
+        </PageSectionContent>
+      </PageSection>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <PageSection>
+        <PageSectionContent>
+          <GenericSkeletonLoader />
+        </PageSectionContent>
+      </PageSection>
+    )
   }
 
   const phoneMFAIsEnabled =
@@ -280,226 +308,234 @@ const MfaAuthSettingsForm = () => {
 
   return (
     <>
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">
-          Multi-Factor Authentication (MFA)
-        </ScaffoldSectionTitle>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Multi-Factor Authentication (MFA)</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Form_Shadcn_ {...totpForm}>
+            <form onSubmit={totpForm.handleSubmit(onSubmitTotpForm)} className="space-y-4">
+              <Card>
+                <CardContent className="pt-6">
+                  <FormField_Shadcn_
+                    control={totpForm.control}
+                    name="MFA_TOTP"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="TOTP (App Authenticator)"
+                        description="Control use of TOTP (App Authenticator) factors"
+                      >
+                        <FormControl_Shadcn_>
+                          <Select_Shadcn_
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            disabled={!canUpdateConfig}
+                          >
+                            <SelectTrigger_Shadcn_>
+                              <SelectValue_Shadcn_ placeholder="Select status" />
+                            </SelectTrigger_Shadcn_>
+                            <SelectContent_Shadcn_>
+                              {MFAFactorSelectionOptions.map((option) => (
+                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem_Shadcn_>
+                              ))}
+                            </SelectContent_Shadcn_>
+                          </Select_Shadcn_>
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
 
-        <Form_Shadcn_ {...totpForm}>
-          <form onSubmit={totpForm.handleSubmit(onSubmitTotpForm)} className="space-y-4">
-            <Card>
-              <CardContent className="pt-6">
-                <FormField_Shadcn_
-                  control={totpForm.control}
-                  name="MFA_TOTP"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="TOTP (App Authenticator)"
-                      description="Control use of TOTP (App Authenticator) factors"
-                    >
-                      <FormControl_Shadcn_>
-                        <Select_Shadcn_
-                          value={field.value}
-                          onValueChange={field.onChange}
-                          disabled={!canUpdateConfig}
-                        >
-                          <SelectTrigger_Shadcn_>
-                            <SelectValue_Shadcn_ placeholder="Select status" />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
-                            {MFAFactorSelectionOptions.map((option) => (
-                              <SelectItem_Shadcn_ key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem_Shadcn_>
-                            ))}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={totpForm.control}
+                    name="MFA_MAX_ENROLLED_FACTORS"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Maximum number of per-user MFA factors"
+                        description="How many MFA factors can be enrolled at once per user."
+                      >
+                        <FormControl_Shadcn_>
+                          <PrePostTab postTab="factors">
+                            <Input_Shadcn_
+                              type="number"
+                              min={0}
+                              max={30}
+                              {...field}
+                              disabled={!canUpdateConfig}
+                            />
+                          </PrePostTab>
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+
+                <CardFooter className="justify-end space-x-2">
+                  {totpForm.formState.isDirty && (
+                    <Button type="default" onClick={() => totpForm.reset()}>
+                      Cancel
+                    </Button>
                   )}
-                />
-              </CardContent>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={!canUpdateConfig || isUpdatingTotpForm || !totpForm.formState.isDirty}
+                    loading={isUpdatingTotpForm}
+                  >
+                    Save changes
+                  </Button>
+                </CardFooter>
+              </Card>
+            </form>
+          </Form_Shadcn_>
+        </PageSectionContent>
+      </PageSection>
 
-              <CardContent>
-                <FormField_Shadcn_
-                  control={totpForm.control}
-                  name="MFA_MAX_ENROLLED_FACTORS"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Maximum number of per-user MFA factors"
-                      description="How many MFA factors can be enrolled at once per user."
-                    >
-                      <FormControl_Shadcn_>
-                        <PrePostTab postTab="factors">
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>SMS MFA</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Form_Shadcn_ {...phoneForm}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                maybeConfirmPhoneMFAOrSubmit()
+              }}
+              className="space-y-4"
+            >
+              <Card>
+                <CardContent className="pt-6">
+                  {promptProPlanUpgrade && (
+                    <div className="mb-4">
+                      <UpgradeToPro
+                        primaryText="Upgrade to Pro"
+                        secondaryText="Advanced MFA requires the Pro Plan"
+                      />
+                    </div>
+                  )}
+
+                  <FormField_Shadcn_
+                    control={phoneForm.control}
+                    name="MFA_PHONE"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Phone"
+                        description="Control use of phone factors"
+                      >
+                        <FormControl_Shadcn_>
+                          <Select_Shadcn_
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            disabled={!canUpdateConfig || !isProPlanAndUp}
+                          >
+                            <SelectTrigger_Shadcn_>
+                              <SelectValue_Shadcn_ placeholder="Select status" />
+                            </SelectTrigger_Shadcn_>
+                            <SelectContent_Shadcn_>
+                              {MFAFactorSelectionOptions.map((option) => (
+                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem_Shadcn_>
+                              ))}
+                            </SelectContent_Shadcn_>
+                          </Select_Shadcn_>
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+
+                  {!hasValidMFAProvider && phoneMFAIsEnabled && (
+                    <Alert_Shadcn_ variant="warning" className="mt-3">
+                      <WarningIcon />
+                      <AlertTitle_Shadcn_>
+                        To use MFA with Phone you should set up a Phone provider or Send SMS Hook.
+                      </AlertTitle_Shadcn_>
+                    </Alert_Shadcn_>
+                  )}
+                </CardContent>
+
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={phoneForm.control}
+                    name="MFA_PHONE_OTP_LENGTH"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Phone OTP Length"
+                        description="Number of digits in OTP"
+                      >
+                        <FormControl_Shadcn_>
                           <Input_Shadcn_
                             type="number"
-                            min={0}
+                            min={6}
                             max={30}
                             {...field}
-                            disabled={!canUpdateConfig}
+                            disabled={!canUpdateConfig || !isProPlanAndUp}
                           />
-                        </PrePostTab>
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
 
-              <CardFooter className="justify-end space-x-2">
-                {totpForm.formState.isDirty && (
-                  <Button type="default" onClick={() => totpForm.reset()}>
-                    Cancel
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={phoneForm.control}
+                    name="MFA_PHONE_TEMPLATE"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Phone verification message"
+                        description="To format the OTP code use `{{ .Code }}`"
+                      >
+                        <FormControl_Shadcn_>
+                          <Input_Shadcn_
+                            type="text"
+                            {...field}
+                            disabled={!canUpdateConfig || !isProPlanAndUp}
+                          />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+
+                <CardFooter className="justify-end space-x-2">
+                  {phoneForm.formState.isDirty && (
+                    <Button type="default" onClick={() => phoneForm.reset()}>
+                      Cancel
+                    </Button>
+                  )}
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={
+                      !canUpdateConfig ||
+                      isUpdatingPhoneForm ||
+                      !phoneForm.formState.isDirty ||
+                      !isProPlanAndUp
+                    }
+                    loading={isUpdatingPhoneForm}
+                  >
+                    Save changes
                   </Button>
-                )}
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  disabled={!canUpdateConfig || isUpdatingTotpForm || !totpForm.formState.isDirty}
-                  loading={isUpdatingTotpForm}
-                >
-                  Save changes
-                </Button>
-              </CardFooter>
-            </Card>
-          </form>
-        </Form_Shadcn_>
-      </ScaffoldSection>
-
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">SMS MFA</ScaffoldSectionTitle>
-
-        <Form_Shadcn_ {...phoneForm}>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              maybeConfirmPhoneMFAOrSubmit()
-            }}
-            className="space-y-4"
-          >
-            <Card>
-              <CardContent className="pt-6">
-                {promptProPlanUpgrade && (
-                  <div className="mb-4">
-                    <UpgradeToPro
-                      primaryText="Upgrade to Pro"
-                      secondaryText="Advanced MFA requires the Pro Plan"
-                    />
-                  </div>
-                )}
-
-                <FormField_Shadcn_
-                  control={phoneForm.control}
-                  name="MFA_PHONE"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Phone"
-                      description="Control use of phone factors"
-                    >
-                      <FormControl_Shadcn_>
-                        <Select_Shadcn_
-                          value={field.value}
-                          onValueChange={field.onChange}
-                          disabled={!canUpdateConfig || !isProPlanAndUp}
-                        >
-                          <SelectTrigger_Shadcn_>
-                            <SelectValue_Shadcn_ placeholder="Select status" />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
-                            {MFAFactorSelectionOptions.map((option) => (
-                              <SelectItem_Shadcn_ key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem_Shadcn_>
-                            ))}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-
-                {!hasValidMFAProvider && phoneMFAIsEnabled && (
-                  <Alert_Shadcn_ variant="warning" className="mt-3">
-                    <WarningIcon />
-                    <AlertTitle_Shadcn_>
-                      To use MFA with Phone you should set up a Phone provider or Send SMS Hook.
-                    </AlertTitle_Shadcn_>
-                  </Alert_Shadcn_>
-                )}
-              </CardContent>
-
-              <CardContent>
-                <FormField_Shadcn_
-                  control={phoneForm.control}
-                  name="MFA_PHONE_OTP_LENGTH"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Phone OTP Length"
-                      description="Number of digits in OTP"
-                    >
-                      <FormControl_Shadcn_>
-                        <Input_Shadcn_
-                          type="number"
-                          min={6}
-                          max={30}
-                          {...field}
-                          disabled={!canUpdateConfig || !isProPlanAndUp}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
-
-              <CardContent>
-                <FormField_Shadcn_
-                  control={phoneForm.control}
-                  name="MFA_PHONE_TEMPLATE"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Phone verification message"
-                      description="To format the OTP code use `{{ .Code }}`"
-                    >
-                      <FormControl_Shadcn_>
-                        <Input_Shadcn_
-                          type="text"
-                          {...field}
-                          disabled={!canUpdateConfig || !isProPlanAndUp}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
-
-              <CardFooter className="justify-end space-x-2">
-                {phoneForm.formState.isDirty && (
-                  <Button type="default" onClick={() => phoneForm.reset()}>
-                    Cancel
-                  </Button>
-                )}
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  disabled={
-                    !canUpdateConfig ||
-                    isUpdatingPhoneForm ||
-                    !phoneForm.formState.isDirty ||
-                    !isProPlanAndUp
-                  }
-                  loading={isUpdatingPhoneForm}
-                >
-                  Save changes
-                </Button>
-              </CardFooter>
-            </Card>
-          </form>
-        </Form_Shadcn_>
-      </ScaffoldSection>
+                </CardFooter>
+              </Card>
+            </form>
+          </Form_Shadcn_>
+        </PageSectionContent>
+      </PageSection>
 
       <ConfirmationModal
         visible={isConfirmationModalVisible}
@@ -521,56 +557,59 @@ const MfaAuthSettingsForm = () => {
         </p>
       </ConfirmationModal>
 
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">Enhanced MFA Security</ScaffoldSectionTitle>
-
-        <Form_Shadcn_ {...securityForm}>
-          <form onSubmit={securityForm.handleSubmit(onSubmitSecurityForm)} className="space-y-4">
-            <Card>
-              <CardContent className="pt-6">
-                <FormField_Shadcn_
-                  control={securityForm.control}
-                  name="MFA_ALLOW_LOW_AAL"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Limit duration of AAL1 sessions"
-                      description="A user's session will be terminated unless they verify one of their factors within 15 minutes of initial sign in. Recommendation: ON"
-                    >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          checked={!field.value}
-                          onCheckedChange={(value) => field.onChange(!value)}
-                          disabled={!canUpdateConfig}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Enhanced MFA Security</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Form_Shadcn_ {...securityForm}>
+            <form onSubmit={securityForm.handleSubmit(onSubmitSecurityForm)} className="space-y-4">
+              <Card>
+                <CardContent className="pt-6">
+                  <FormField_Shadcn_
+                    control={securityForm.control}
+                    name="MFA_ALLOW_LOW_AAL"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Limit duration of AAL1 sessions"
+                        description="A user's session will be terminated unless they verify one of their factors within 15 minutes of initial sign in. Recommendation: ON"
+                      >
+                        <FormControl_Shadcn_>
+                          <Switch
+                            checked={!field.value}
+                            onCheckedChange={(value) => field.onChange(!value)}
+                            disabled={!canUpdateConfig}
+                          />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+                <CardFooter className="justify-end space-x-2">
+                  {securityForm.formState.isDirty && (
+                    <Button type="default" onClick={() => securityForm.reset()}>
+                      Cancel
+                    </Button>
                   )}
-                />
-              </CardContent>
-              <CardFooter className="justify-end space-x-2">
-                {securityForm.formState.isDirty && (
-                  <Button type="default" onClick={() => securityForm.reset()}>
-                    Cancel
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={
+                      !canUpdateConfig || isUpdatingSecurityForm || !securityForm.formState.isDirty
+                    }
+                    loading={isUpdatingPhoneForm}
+                  >
+                    Save changes
                   </Button>
-                )}
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  disabled={
-                    !canUpdateConfig || isUpdatingSecurityForm || !securityForm.formState.isDirty
-                  }
-                  loading={isUpdatingPhoneForm}
-                >
-                  Save changes
-                </Button>
-              </CardFooter>
-            </Card>
-          </form>
-        </Form_Shadcn_>
-      </ScaffoldSection>
+                </CardFooter>
+              </Card>
+            </form>
+          </Form_Shadcn_>
+        </PageSectionContent>
+      </PageSection>
     </>
   )
 }
-
-export default MfaAuthSettingsForm

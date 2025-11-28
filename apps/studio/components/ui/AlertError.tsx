@@ -1,4 +1,5 @@
-import Link from 'next/link'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { PropsWithChildren } from 'react'
 
 import {
@@ -15,25 +16,20 @@ export interface AlertErrorProps {
   error?: { message: string } | null
   className?: string
   showIcon?: boolean
+  additionalActions?: React.ReactNode
 }
 
 // [Joshen] To standardize the language for all error UIs
 
-const AlertError = ({
+export const AlertError = ({
   projectRef,
   subject,
   error,
   className,
   showIcon = true,
   children,
+  additionalActions,
 }: PropsWithChildren<AlertErrorProps>) => {
-  const subjectString = subject?.replace(/ /g, '%20')
-  let href = `/support/new?category=dashboard_bug`
-
-  if (projectRef) href += `&ref=${projectRef}`
-  if (subjectString) href += `&subject=${subjectString}`
-  if (error) href += `&error=${error.message}`
-
   const formattedErrorMessage = error?.message?.includes('503')
     ? '503 Service Temporarily Unavailable'
     : error?.message
@@ -51,9 +47,21 @@ const AlertError = ({
           </p>
         </div>
         {children}
-        <Button asChild type="warning" className="w-min">
-          <Link href={href}>Contact support</Link>
-        </Button>
+        <div className="flex gap-2">
+          {additionalActions}
+          <Button asChild type="warning" className="w-min">
+            <SupportLink
+              queryParams={{
+                category: SupportCategories.DASHBOARD_BUG,
+                projectRef,
+                subject,
+                error: error?.message,
+              }}
+            >
+              Contact support
+            </SupportLink>
+          </Button>
+        </div>
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>
   )

@@ -1,0 +1,47 @@
+---
+title: Data Input
+description: Set, read, or copy a value on a single line.
+component: true
+---
+
+<ComponentPreview name="data-input-demo" peekCode wide />
+
+Referred to as `Input` in code, not `DataInput`. Also not to be confused with the atomic [Input](../components/input) component.
+
+## Usage
+
+### Read-only values
+
+Input should be used for read-only values that can be copied or otherwise interacted with, as the input element is both keyboard and mouse-friendly.
+
+<ComponentPreview name="data-input-with-copy" peekCode wide />
+
+### Sensitive values
+
+Inputs with sensitive values can be both revealed _and_ copied, but only in succession. This reduces the amount of actions on screen, thus simplifying the interface.
+
+<ComponentPreview name="data-input-with-reveal-copy" peekCode wide />
+
+You can also partially truncate the value by overriding the placeholder value.
+
+Consider if the value needs to be revealed in the first place, as only copying is sufficient in most cases.
+
+A happy medium might be to display a partially masked value but saving the actual value in the clipboard. To do this, pass a pre-masked string as the `value` prop and override the `onCopy` callback to copy the real value.
+
+<ComponentPreview name="data-input-with-copy-secret" peekCode wide />
+
+### Password managers
+
+In some cases, you may need to add the following attribute to your input to prevent password managers from applying their widgets and dropdowns to the input:
+
+```jsx
+<Input
+  readOnly
+  copy
+  value={name}
+  data-1p-ignore // 1Password
+  data-lpignore="true" // LastPass
+  data-form-type="other" // Dashlane
+  data-bwignore // Bitwarden
+/>
+```

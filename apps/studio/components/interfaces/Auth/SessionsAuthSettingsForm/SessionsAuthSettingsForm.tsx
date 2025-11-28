@@ -6,18 +6,15 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Card,
   CardContent,
@@ -28,9 +25,16 @@ import {
   Input_Shadcn_,
   PrePostTab,
   Switch,
-  WarningIcon,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 function HoursOrNeverText({ value }: { value: number }) {
   if (value === 0) {
@@ -44,10 +48,7 @@ function HoursOrNeverText({ value }: { value: number }) {
 
 const RefreshTokenSchema = z.object({
   REFRESH_TOKEN_ROTATION_ENABLED: z.boolean(),
-  SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: z.coerce
-    .number()
-    .positive()
-    .min(0, 'Must be a value more than 0'),
+  SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: z.coerce.number().min(0, 'Must be a value more than 0'),
 })
 
 const UserSessionsSchema = z.object({
@@ -59,20 +60,25 @@ const UserSessionsSchema = z.object({
   SESSIONS_SINGLE_PER_USER: z.boolean(),
 })
 
-const SessionsAuthSettingsForm = () => {
+export const SessionsAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
-  const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
+  const {
+    data: authConfig,
+    error: authConfigError,
+    isError,
+    isLoading,
+  } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
   // Separate loading states for each form
   const [isUpdatingRefreshTokens, setIsUpdatingRefreshTokens] = useState(false)
   const [isUpdatingUserSessions, setIsUpdatingUserSessions] = useState(false)
 
-  const { can: canReadConfig } = useAsyncCheckProjectPermissions(
+  const { can: canReadConfig } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'custom_config_gotrue'
   )
-  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
@@ -158,51 +164,70 @@ const SessionsAuthSettingsForm = () => {
 
   if (isError) {
     return (
-      <Alert_Shadcn_ variant="destructive">
-        <WarningIcon />
-        <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+      <PageSection>
+        <PageSectionContent>
+          <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   if (!canReadConfig) {
-    return <NoPermission resourceText="view auth configuration settings" />
+    return (
+      <PageSection>
+        <PageSectionContent>
+          <NoPermission resourceText="view auth configuration settings" />
+        </PageSectionContent>
+      </PageSection>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <PageSection>
+        <PageSectionContent>
+          <GenericSkeletonLoader />
+        </PageSectionContent>
+      </PageSection>
+    )
   }
 
   return (
     <>
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">Refresh Tokens</ScaffoldSectionTitle>
-
-        <Form_Shadcn_ {...refreshTokenForm}>
-          <form
-            onSubmit={refreshTokenForm.handleSubmit(onSubmitRefreshTokens)}
-            className="space-y-4"
-          >
-            <Card>
-              <CardContent className="pt-6">
-                <FormField_Shadcn_
-                  control={refreshTokenForm.control}
-                  name="REFRESH_TOKEN_ROTATION_ENABLED"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Detect and revoke potentially compromised refresh tokens"
-                      description="Prevent replay attacks from potentially compromised refresh tokens."
-                    >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={!canUpdateConfig}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
-              {refreshTokenForm.watch('REFRESH_TOKEN_ROTATION_ENABLED') && (
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Refresh Tokens</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Form_Shadcn_ {...refreshTokenForm}>
+            <form
+              onSubmit={refreshTokenForm.handleSubmit(onSubmitRefreshTokens)}
+              className="space-y-4"
+            >
+              <Card>
+                <CardContent className="pt-6">
+                  <FormField_Shadcn_
+                    control={refreshTokenForm.control}
+                    name="REFRESH_TOKEN_ROTATION_ENABLED"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Detect and revoke potentially compromised refresh tokens"
+                        description="Prevent replay attacks from potentially compromised refresh tokens."
+                      >
+                        <FormControl_Shadcn_>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={!canUpdateConfig}
+                          />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
                 <CardContent>
                   <FormField_Shadcn_
                     control={refreshTokenForm.control}
@@ -227,148 +252,151 @@ const SessionsAuthSettingsForm = () => {
                     )}
                   />
                 </CardContent>
-              )}
-              <CardFooter className="justify-end space-x-2">
-                {refreshTokenForm.formState.isDirty && (
-                  <Button type="default" onClick={() => refreshTokenForm.reset()}>
-                    Cancel
+                <CardFooter className="justify-end space-x-2">
+                  {refreshTokenForm.formState.isDirty && (
+                    <Button type="default" onClick={() => refreshTokenForm.reset()}>
+                      Cancel
+                    </Button>
+                  )}
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={
+                      !canUpdateConfig ||
+                      isUpdatingRefreshTokens ||
+                      !refreshTokenForm.formState.isDirty
+                    }
+                    loading={isUpdatingRefreshTokens}
+                  >
+                    Save changes
                   </Button>
-                )}
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  disabled={
-                    !canUpdateConfig ||
-                    isUpdatingRefreshTokens ||
-                    !refreshTokenForm.formState.isDirty
-                  }
-                  loading={isUpdatingRefreshTokens}
-                >
-                  Save changes
-                </Button>
-              </CardFooter>
-            </Card>
-          </form>
-        </Form_Shadcn_>
-      </ScaffoldSection>
+                </CardFooter>
+              </Card>
+            </form>
+          </Form_Shadcn_>
+        </PageSectionContent>
+      </PageSection>
 
-      <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">User Sessions</ScaffoldSectionTitle>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>User Sessions</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Form_Shadcn_ {...userSessionsForm}>
+            <form
+              onSubmit={userSessionsForm.handleSubmit(onSubmitUserSessions)}
+              className="space-y-4"
+            >
+              <Card>
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={userSessionsForm.control}
+                    name="SESSIONS_SINGLE_PER_USER"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Enforce single session per user"
+                        description="If enabled, all but a user's most recently active session will be terminated."
+                      >
+                        <FormControl_Shadcn_>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={!canUpdateConfig || !isProPlanAndUp}
+                          />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
 
-        <Form_Shadcn_ {...userSessionsForm}>
-          <form
-            onSubmit={userSessionsForm.handleSubmit(onSubmitUserSessions)}
-            className="space-y-4"
-          >
-            <Card>
-              <CardContent>
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={userSessionsForm.control}
+                    name="SESSIONS_TIMEBOX"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Time-box user sessions"
+                        description="The amount of time before a user is forced to sign in again. Use 0 for never."
+                      >
+                        <div className="flex items-center">
+                          <FormControl_Shadcn_>
+                            <PrePostTab postTab={<HoursOrNeverText value={field.value || 0} />}>
+                              <Input_Shadcn_
+                                type="number"
+                                min={0}
+                                {...field}
+                                disabled={!canUpdateConfig || !isProPlanAndUp}
+                              />
+                            </PrePostTab>
+                          </FormControl_Shadcn_>
+                        </div>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={userSessionsForm.control}
+                    name="SESSIONS_INACTIVITY_TIMEOUT"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Inactivity timeout"
+                        description="The amount of time a user needs to be inactive to be forced to sign in again. Use 0 for never."
+                      >
+                        <div className="flex items-center">
+                          <FormControl_Shadcn_>
+                            <PrePostTab postTab={<HoursOrNeverText value={field.value || 0} />}>
+                              <Input_Shadcn_
+                                type="number"
+                                {...field}
+                                disabled={!canUpdateConfig || !isProPlanAndUp}
+                              />
+                            </PrePostTab>
+                          </FormControl_Shadcn_>
+                        </div>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+
                 {promptProPlanUpgrade && (
-                  <div className="mb-4">
-                    <UpgradeToPro
-                      primaryText="Upgrade to Pro"
-                      secondaryText="Configuring user sessions requires the Pro Plan."
-                    />
-                  </div>
+                  <UpgradeToPro
+                    fullWidth
+                    primaryText="Configuring user sessions is only available on the Pro Plan and above"
+                    secondaryText="Upgrade to the Pro plan to configure settings for user sessions"
+                  />
                 )}
 
-                <FormField_Shadcn_
-                  control={userSessionsForm.control}
-                  name="SESSIONS_SINGLE_PER_USER"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Enforce single session per user"
-                      description="If enabled, all but a user's most recently active session will be terminated."
-                    >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={!canUpdateConfig || !isProPlanAndUp}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
+                <CardFooter className="justify-end space-x-2">
+                  {userSessionsForm.formState.isDirty && (
+                    <Button type="default" onClick={() => userSessionsForm.reset()}>
+                      Cancel
+                    </Button>
                   )}
-                />
-              </CardContent>
-
-              <CardContent>
-                <FormField_Shadcn_
-                  control={userSessionsForm.control}
-                  name="SESSIONS_TIMEBOX"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Time-box user sessions"
-                      description="The amount of time before a user is forced to sign in again. Use 0 for never."
-                    >
-                      <div className="flex items-center">
-                        <FormControl_Shadcn_>
-                          <PrePostTab postTab={<HoursOrNeverText value={field.value || 0} />}>
-                            <Input_Shadcn_
-                              type="number"
-                              min={0}
-                              {...field}
-                              disabled={!canUpdateConfig || !isProPlanAndUp}
-                            />
-                          </PrePostTab>
-                        </FormControl_Shadcn_>
-                      </div>
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
-
-              <CardContent>
-                <FormField_Shadcn_
-                  control={userSessionsForm.control}
-                  name="SESSIONS_INACTIVITY_TIMEOUT"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Inactivity timeout"
-                      description="The amount of time a user needs to be inactive to be forced to sign in again. Use 0 for never."
-                    >
-                      <div className="flex items-center">
-                        <FormControl_Shadcn_>
-                          <PrePostTab postTab={<HoursOrNeverText value={field.value || 0} />}>
-                            <Input_Shadcn_
-                              type="number"
-                              {...field}
-                              disabled={!canUpdateConfig || !isProPlanAndUp}
-                            />
-                          </PrePostTab>
-                        </FormControl_Shadcn_>
-                      </div>
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
-              <CardFooter className="justify-end space-x-2">
-                {userSessionsForm.formState.isDirty && (
-                  <Button type="default" onClick={() => userSessionsForm.reset()}>
-                    Cancel
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={
+                      !canUpdateConfig ||
+                      isUpdatingUserSessions ||
+                      !userSessionsForm.formState.isDirty
+                    }
+                    loading={isUpdatingUserSessions}
+                  >
+                    Save changes
                   </Button>
-                )}
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  disabled={
-                    !canUpdateConfig ||
-                    isUpdatingUserSessions ||
-                    !userSessionsForm.formState.isDirty
-                  }
-                  loading={isUpdatingUserSessions}
-                >
-                  Save changes
-                </Button>
-              </CardFooter>
-            </Card>
-          </form>
-        </Form_Shadcn_>
-      </ScaffoldSection>
+                </CardFooter>
+              </Card>
+            </form>
+          </Form_Shadcn_>
+        </PageSectionContent>
+      </PageSection>
     </>
   )
 }
-
-export default SessionsAuthSettingsForm

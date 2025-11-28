@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import LintPageTabs from 'components/interfaces/Linter/LintPageTabs'
@@ -6,12 +6,13 @@ import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import LinterDataGrid from 'components/interfaces/Linter/LinterDataGrid'
 import LinterFilters from 'components/interfaces/Linter/LinterFilters'
-import LinterPageFooter from 'components/interfaces/Linter/LinterPageFooter'
+import { LinterPageFooter } from 'components/interfaces/Linter/LinterPageFooter'
 import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { LoadingLine } from 'ui'
 
@@ -28,13 +29,16 @@ const ProjectLints: NextPageWithLayout = () => {
   const [currentTab, setCurrentTab] = useState<LINTER_LEVELS>(
     (preset as LINTER_LEVELS) ?? LINTER_LEVELS.ERROR
   )
-  const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
-
   const { data, isLoading, isRefetching, refetch } = useProjectLintsQuery({
     projectRef: project?.ref,
   })
 
   const activeLints = (data ?? []).filter((lint) => lint.categories.includes('SECURITY'))
+  // hide vulnerable_postgres_version lint temporarily
+  // https://linear.app/supabase/project/pg-minor-version-upgrade-for-security-vulnerabilities-0124b2c2dcf5
+  // https://github.com/supabase/supabase/pull/38280/files
+  //.filter((lint) => lint.name !== 'vulnerable_postgres_version')
+
   const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
     []) as string[]
   const filteredLints = activeLints
@@ -50,9 +54,8 @@ const ProjectLints: NextPageWithLayout = () => {
       value: type.name,
     }))
 
-  useEffect(() => {
-    // check the URL for an ID and set the selected lint
-    if (id) setSelectedLint(activeLints.find((lint) => lint.cache_key === id) ?? null)
+  const selectedLint: Lint | null = useMemo(() => {
+    return activeLints.find((lint) => lint.cache_key === id) ?? null
   }, [id, activeLints])
 
   return (
@@ -60,14 +63,13 @@ const ProjectLints: NextPageWithLayout = () => {
       <FormHeader
         className="py-4 px-6 !mb-0"
         title="Security Advisor"
-        docsUrl="https://supabase.com/docs/guides/database/database-linter"
+        docsUrl={`${DOCS_URL}/guides/database/database-linter`}
       />
       <LintPageTabs
         activeLints={activeLints}
         isLoading={isLoading}
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
-        setSelectedLint={setSelectedLint}
       />
       <LinterFilters
         filterOptions={filterOptions}
@@ -84,7 +86,6 @@ const ProjectLints: NextPageWithLayout = () => {
         filteredLints={filteredLints}
         currentTab={currentTab}
         selectedLint={selectedLint}
-        setSelectedLint={setSelectedLint}
         isLoading={isLoading}
       />
       <LinterPageFooter

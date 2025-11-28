@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useMemo } from 'react'
 
 import { InputVariants } from '@ui/components/shadcn/ui/input'
@@ -6,8 +5,17 @@ import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { cn, EyeOffIcon, Input_Shadcn_, Skeleton, WarningIcon } from 'ui'
+import {
+  cn,
+  EyeOffIcon,
+  Input_Shadcn_,
+  Skeleton,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  WarningIcon,
+} from 'ui'
+import { useApiKeysVisibility } from './hooks/useApiKeysVisibility'
 
 // to add in later with follow up PR
 // import CreatePublishableAPIKeyDialog from './CreatePublishableAPIKeyDialog'
@@ -16,20 +24,17 @@ import { cn, EyeOffIcon, Input_Shadcn_, Skeleton, WarningIcon } from 'ui'
 
 export const PublishableAPIKeys = () => {
   const { ref: projectRef } = useParams()
+
+  const { canReadAPIKeys, isLoading: isLoadingVisibility } = useApiKeysVisibility()
   const {
     data: apiKeysData,
     isLoading: isLoadingApiKeys,
     error,
-  } = useAPIKeysQuery({ projectRef, reveal: false })
+  } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
 
   const publishableApiKeys = useMemo(
     () => apiKeysData?.filter(({ type }) => type === 'publishable') ?? [],
     [apiKeysData]
-  )
-
-  const { can: canReadAPIKeys, isLoading: isPermissionsLoading } = useAsyncCheckProjectPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    '*'
   )
 
   // The default publisahble key will always be the first one
@@ -47,14 +52,25 @@ export const PublishableAPIKeys = () => {
             <span className="text-sm">Publishable key</span>
             <div className="flex items-center gap-2">
               <ApiKeyInput />
-              <CopyButton
-                iconOnly
-                size="tiny"
-                type="default"
-                className="px-2 rounded-full"
-                disabled={isPermissionsLoading || isLoadingApiKeys || !canReadAPIKeys}
-                text={apiKey?.api_key}
-              />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <CopyButton
+                    iconOnly
+                    size="tiny"
+                    type="default"
+                    className="px-2 rounded-full"
+                    disabled={isLoadingVisibility || isLoadingApiKeys || !canReadAPIKeys}
+                    text={apiKey?.api_key}
+                  />
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  {!canReadAPIKeys
+                    ? 'You need additional permissions to copy publishable keys'
+                    : isLoadingApiKeys
+                      ? 'Loading permissions...'
+                      : 'Copy publishable key'}
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
           {error && canReadAPIKeys ? (
@@ -75,20 +91,16 @@ export const PublishableAPIKeys = () => {
 const ApiKeyInput = () => {
   const { ref: projectRef } = useParams()
 
+  const { canReadAPIKeys, isLoading: isPermissionsLoading } = useApiKeysVisibility()
   const {
     data: apiKeysData,
     isLoading: isApiKeysLoading,
     error,
-  } = useAPIKeysQuery({ projectRef, reveal: false })
+  } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
 
   const publishableApiKeys = useMemo(
     () => apiKeysData?.filter(({ type }) => type === 'publishable') ?? [],
     [apiKeysData]
-  )
-
-  const { can: canReadAPIKeys, isLoading: isPermissionsLoading } = useAsyncCheckProjectPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    '*'
   )
   // The default publisahble key will always be the first one
   const apiKey = publishableApiKeys[0]
@@ -97,19 +109,19 @@ const ApiKeyInput = () => {
     'flex-1 grow gap-1 rounded-full min-w-0 max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:min-w-[24rem]'
   const size = 'tiny'
 
-  if (isApiKeysLoading || isPermissionsLoading) {
-    return (
-      <div className={cn(InputVariants({ size }), baseClasses, 'items-center')}>
-        <Skeleton className="h-2 w-48 rounded-full bg-foreground-muted" />
-      </div>
-    )
-  }
-
-  if (!canReadAPIKeys) {
+  if (!canReadAPIKeys && !isPermissionsLoading) {
     return (
       <div className={cn(InputVariants({ size }), baseClasses, 'items-center gap-2 font-normal')}>
         <EyeOffIcon />
         You do not have permission to read API Key
+      </div>
+    )
+  }
+
+  if (isApiKeysLoading || isPermissionsLoading) {
+    return (
+      <div className={cn(InputVariants({ size }), baseClasses, 'items-center')}>
+        <Skeleton className="h-2 w-48 rounded-full bg-foreground-muted" />
       </div>
     )
   }

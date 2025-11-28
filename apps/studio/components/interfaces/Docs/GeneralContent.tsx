@@ -10,7 +10,7 @@ interface GeneralContentProps {
   showApiKey: string
 }
 
-const GeneralContent = ({ selectedLang, page, showApiKey }: GeneralContentProps) => {
+export const GeneralContent = ({ selectedLang, page, showApiKey }: GeneralContentProps) => {
   let selected = page?.toLowerCase()
   if (selected == 'intro' || selected == null) return <Introduction selectedLang={selectedLang} />
   if (selected == 'auth')
@@ -27,5 +27,3 @@ const GeneralContent = ({ selectedLang, page, showApiKey }: GeneralContentProps)
       </div>
     )
 }
-
-export default GeneralContent

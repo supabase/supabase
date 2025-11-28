@@ -1,8 +1,11 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import * as z from 'zod'
 
 import { useParams } from 'common'
 import { AuthorizeRequesterDetails } from 'components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
@@ -24,6 +27,11 @@ import {
   CardFooter,
   CardHeader,
   CheckIcon,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormMessage_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -41,7 +49,19 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const { auth_id, organization_slug } = useParams()
   const [isApproving, setIsApproving] = useState(false)
   const [isDeclining, setIsDeclining] = useState(false)
-  const [selectedOrgSlug, setSelectedOrgSlug] = useState<string>()
+
+  const formSchema = z.object({
+    selectedOrgSlug: z.string().min(1, 'Please select an organization'),
+  })
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { selectedOrgSlug: '' },
+    mode: 'onSubmit',
+    reValidateMode: 'onBlur',
+  })
+
+  const selectedOrgSlug = form.watch('selectedOrgSlug')
 
   const {
     data: organizations,
@@ -51,6 +71,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const { data: requester, isLoading, isError, error } = useApiAuthorizationQuery({ id: auth_id })
   const isApproved = (requester?.approved_at ?? null) !== null
   const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
+  const isMcpClient = requester?.registration_type === 'dynamic'
 
   const searchParams =
     typeof window !== 'undefined' ? new URLSearchParams(location.search) : new URLSearchParams()
@@ -75,36 +96,38 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     },
   })
 
-  const onApproveRequest = async () => {
+  const onApproveRequest = form.handleSubmit((values) => {
     if (!auth_id) {
       return toast.error('Unable to approve request: auth_id is missing ')
     }
-    if (!selectedOrgSlug) {
-      return toast.error('Unable to approve request: No organization selected')
-    }
 
     setIsApproving(true)
-    approveRequest({ id: auth_id, slug: selectedOrgSlug }, { onError: () => setIsApproving(false) })
-  }
+    approveRequest(
+      { id: auth_id, slug: values.selectedOrgSlug },
+      { onError: () => setIsApproving(false) }
+    )
+  })
 
-  const onDeclineRequest = async () => {
+  const onDeclineRequest = form.handleSubmit((values) => {
     if (!auth_id) {
       return toast.error('Unable to decline request: auth_id is missing ')
     }
-    if (!selectedOrgSlug) {
-      return toast.error('Unable to decline request: No organization selected')
-    }
 
     setIsDeclining(true)
-    declineRequest({ id: auth_id, slug: selectedOrgSlug }, { onError: () => setIsDeclining(false) })
-  }
+    declineRequest(
+      { id: auth_id, slug: values.selectedOrgSlug },
+      { onError: () => setIsDeclining(false) }
+    )
+  })
 
   useEffect(() => {
     if (isSuccessOrganizations && organizations.length > 0) {
       if (organization_slug) {
-        setSelectedOrgSlug(organizations.find(({ slug }) => slug === organization_slug)?.slug)
-      } else {
-        setSelectedOrgSlug(organizations[0].slug)
+        const preselected = organizations.find(({ slug }) => slug === organization_slug)?.slug
+        if (preselected) form.setValue('selectedOrgSlug', preselected)
+      } else if (!form.getValues('selectedOrgSlug') && organizations.length === 1) {
+        // If user only has one organization and none pre-selected via URL, default to it
+        form.setValue('selectedOrgSlug', organizations[0].slug)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -193,6 +216,18 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     <Card>
       <CardHeader>Authorize API access for {requester?.name}</CardHeader>
       <CardContent className="space-y-8">
+        {isMcpClient && (
+          <Alert_Shadcn_ variant="warning">
+            <WarningIcon />
+            <AlertTitle_Shadcn_>MCP Client Connection</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              This is an MCP (Model Context Protocol) client designed to connect with AI
+              applications. Please ensure you trust this application before granting access to your
+              organization's data.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        )}
+
         <AuthorizeRequesterDetails
           icon={requester.icon}
           name={requester.name}
@@ -240,43 +275,56 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         ) : (
-          <FormLayout
-            label={
-              organization_slug
-                ? 'API access will be granted to pre-selected organization:'
-                : 'Select an organization to grant API access to:'
-            }
-          >
-            <Select_Shadcn_
-              value={selectedOrgSlug}
-              disabled={isExpired || Boolean(organization_slug)}
-              onValueChange={setSelectedOrgSlug}
-            >
-              <SelectTrigger_Shadcn_ size="small">
-                <SelectValue_Shadcn_>
-                  {organizations?.find((x) => x.slug === selectedOrgSlug)?.name}
-                </SelectValue_Shadcn_>
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                {(organizations ?? []).map((organization) => (
-                  <SelectItem_Shadcn_
-                    key={organization?.slug}
-                    value={organization?.slug}
-                    className="text-xs"
+          <Form_Shadcn_ {...form}>
+            <FormField_Shadcn_
+              control={form.control}
+              name="selectedOrgSlug"
+              render={({ field }) => (
+                <FormItem_Shadcn_>
+                  <FormLayout
+                    label="Organization to grant API access to"
+                    description={
+                      organization_slug
+                        ? `This organization has been pre-selected by ${requester?.name}.`
+                        : undefined
+                    }
+                    isReactForm
                   >
-                    {organization.name}
-                  </SelectItem_Shadcn_>
-                ))}
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
-          </FormLayout>
+                    <FormControl_Shadcn_>
+                      <Select_Shadcn_
+                        value={field.value || undefined}
+                        disabled={isExpired || Boolean(organization_slug)}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger_Shadcn_ size="small">
+                          <SelectValue_Shadcn_ placeholder="Select an organization" />
+                        </SelectTrigger_Shadcn_>
+                        <SelectContent_Shadcn_>
+                          {(organizations ?? []).map((organization) => (
+                            <SelectItem_Shadcn_
+                              key={organization?.slug}
+                              value={organization?.slug}
+                              className="text-xs"
+                            >
+                              {organization.name}
+                            </SelectItem_Shadcn_>
+                          ))}
+                        </SelectContent_Shadcn_>
+                      </Select_Shadcn_>
+                    </FormControl_Shadcn_>
+                  </FormLayout>
+                  <FormMessage_Shadcn_ />
+                </FormItem_Shadcn_>
+              )}
+            />
+          </Form_Shadcn_>
         )}
       </CardContent>
       <CardFooter className="justify-end space-x-2">
         <Button
           type="default"
           loading={isDeclining}
-          disabled={isApproving || isExpired || (Boolean(organization_slug) && !selectedOrgSlug)}
+          disabled={isApproving || isExpired}
           onClick={onDeclineRequest}
         >
           Decline

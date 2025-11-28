@@ -184,7 +184,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
               <div className="md:flex md:gap-6">
                 <div className="md:w-1/2">
                   <div>
-                    <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1px]">
+                    <h2 className="text-2xl pb-2 sm:text-3xl xl:text-4xl tracking-[-1px]">
                       What is Supabase
                     </h2>
                     <p className="text-foreground-light text-sm lg:text-lg pt-2 sm:max-w-md xl:max-w-lg">
@@ -199,7 +199,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                   <div className="md:w-full rounded-md mt-10 md:mt-36 lg:mt-40">
                     <div className="relative w-full aspect-[148/125]">
                       <Image
-                        src="/images/career/team.jpg"
+                        src="/images/career/team.jpeg"
                         alt="supabase team"
                         fill
                         sizes="(min-width: 767px) 45vw, 100vw"
@@ -214,7 +214,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                     <div className="w-full md:w-5/6 rounded-md mt-6">
                       <div className="relative w-full aspect-[29/22]">
                         <Image
-                          src="/images/career/founders.jpg"
+                          src="/images/career/founders.jpeg"
                           alt="supabase founders"
                           fill
                           sizes="(min-width: 767px) 45vw, 100vw"
@@ -313,7 +313,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
             <SectionContainer className="!pb-0">
               <div className="text-center">
                 <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] xl:max-w-none mx-auto tracking-[-1px]">
-                  1,000+ Contributors building Supabase
+                  1,500+ Contributors building Supabase
                 </h2>
                 <p className="text-foreground-light text-sm lg:text-base sm:max-w-lg lg:max-w-2xl mx-auto pt-3">
                   We're building a community of communities, bringing together developers from many

@@ -14,9 +14,9 @@ We'll create a database table called `todos` for storing tasks. This creates a c
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Set up a Supabase project with a 'todos' table">
 
-    [Create a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
+    [Create a new project](/dashboard) in the Supabase Dashboard.
 
-    After your project is ready, create a table in your Supabase database. You can do this with either the Table interface or the [SQL Editor](https://supabase.com/dashboard/project/_/sql).
+    After your project is ready, create a table in your Supabase database. You can do this with either the Table interface or the [SQL Editor](/dashboard/project/_/sql).
 
     </StepHikeCompact.Details>
 
@@ -109,7 +109,7 @@ We'll create a database table called `todos` for storing tasks. This creates a c
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Fetch the data">
 
-    Find your API URL and Keys in your Dashboard [API Settings](https://supabase.com/dashboard/project/_/settings/api). You can now query your "todos" table by appending `/rest/v1/todos` to the API URL.
+    Find your API URL and Keys in your Dashboard [API Settings](/dashboard/project/_/settings/api). You can now query your "todos" table by appending `/rest/v1/todos` to the API URL.
 
     Copy this block of code, substitute `<PROJECT_REF>` and `<ANON_KEY>`, then run it from a terminal.
 
@@ -156,6 +156,7 @@ const { data, error } = await supabase.from('todos').select()
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -163,6 +164,8 @@ final data = await supabase.from('todos').select('*');
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -170,6 +173,8 @@ response = supabase.table('todos').select("*").execute()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -177,4 +182,5 @@ let response = try await supabase.from("todos").select()
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>

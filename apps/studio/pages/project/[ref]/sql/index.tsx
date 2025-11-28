@@ -6,35 +6,39 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
 import { useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
-const TableEditorPage: NextPageWithLayout = () => {
+const SQLEditorIndexPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const store = useTabsStateSnapshot()
-  const appSnap = useAppStateSnapshot()
+
+  const { history, isHistoryLoaded } = useDashboardHistory()
 
   useEffect(() => {
-    // Handle redirect to last opened snippet tab, or last snippet tab
-    const lastOpenedTab = appSnap.dashboardHistory.sql
-    const lastTabId = store.openTabs.find((id) => store.tabsMap[id]?.type === 'sql')
-    if (lastOpenedTab !== undefined) {
-      router.push(`/project/${projectRef}/sql/${appSnap.dashboardHistory.sql}`)
-    } else if (lastTabId) {
-      const lastTab = store.tabsMap[lastTabId]
-      if (lastTab) router.push(`/project/${projectRef}/sql/${lastTab.id.replace('sql-', '')}`)
-    } else {
-      router.push(`/project/${projectRef}/sql/new`)
+    if (isHistoryLoaded) {
+      // Handle redirect to last opened snippet tab, or last snippet tab
+      const lastOpenedTab = history.sql
+      const lastTabId = store.openTabs.find((id) => store.tabsMap[id]?.type === 'sql')
+
+      if (lastOpenedTab !== undefined) {
+        router.push(`/project/${projectRef}/sql/${history.sql}`)
+      } else if (lastTabId) {
+        const lastTab = store.tabsMap[lastTabId]
+        if (lastTab) router.push(`/project/${projectRef}/sql/${lastTab.id.replace('sql-', '')}`)
+      } else {
+        router.push(`/project/${projectRef}/sql/new`)
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [isHistoryLoaded])
 
   return null
 }
 
-TableEditorPage.getLayout = (page) => (
+SQLEditorIndexPage.getLayout = (page) => (
   <DefaultLayout>
     <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
       <SQLEditorLayout>{page}</SQLEditorLayout>
@@ -42,4 +46,4 @@ TableEditorPage.getLayout = (page) => (
   </DefaultLayout>
 )
 
-export default TableEditorPage
+export default SQLEditorIndexPage

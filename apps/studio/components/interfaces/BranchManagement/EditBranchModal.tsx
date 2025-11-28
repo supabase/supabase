@@ -69,12 +69,12 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   })
 
   const { data: branches } = useBranchesQuery({ projectRef })
-  const { mutateAsync: checkGithubBranchValidity, isLoading: isChecking } =
+  const { mutateAsync: checkGithubBranchValidity, isPending: isChecking } =
     useCheckGithubBranchValidity({
       onError: () => {},
     })
 
-  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
+  const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onSuccess: (data) => {
       toast.success(`Successfully updated branch "${data.name}"`)
       onClose()
@@ -147,16 +147,16 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!branch?.id) return console.error('Branch ID is required')
+    if (!ref) return console.error('Branch ref is required')
 
     const payload: {
+      branchRef: string
       projectRef: string
-      id: string
       branchName: string
       gitBranch?: string
     } = {
+      branchRef: ref,
       projectRef,
-      id: branch.id,
       branchName: data.branchName,
     }
 

@@ -13,6 +13,10 @@ import { EMPTY_ARR } from 'lib/void'
 import { basename } from 'path'
 import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
 
+const EMPTY_FUNCTION_BODY: EdgeFunctionBodyData = {
+  files: EMPTY_ARR,
+}
+
 interface EdgeFunctionsDiffPanelProps {
   diffResults: EdgeFunctionsDiffResult
   currentBranchRef?: string
@@ -81,17 +85,21 @@ const FunctionDiff = ({
     }
   }, [allFileKeys, activeFileKey])
 
-  const currentFile = currentBody.find(
-    (f: EdgeFunctionBodyData[number]) => fileKey(f.name) === activeFileKey
+  const currentFile = currentBody.files.find(
+    (f: EdgeFunctionBodyData['files'][number]) => fileKey(f.name) === activeFileKey
   )
-  const mainFile = mainBody.find(
-    (f: EdgeFunctionBodyData[number]) => fileKey(f.name) === activeFileKey
+  const mainFile = mainBody.files.find(
+    (f: EdgeFunctionBodyData['files'][number]) => fileKey(f.name) === activeFileKey
   )
 
   const language = useMemo(() => {
     if (!activeFileKey) return 'plaintext'
-    if (activeFileKey.endsWith('.ts') || activeFileKey.endsWith('.tsx')) return 'typescript'
-    if (activeFileKey.endsWith('.js') || activeFileKey.endsWith('.jsx')) return 'javascript'
+    if (activeFileKey.endsWith('.ts') || activeFileKey.endsWith('.tsx')) {
+      return 'typescript'
+    }
+    if (activeFileKey.endsWith('.js') || activeFileKey.endsWith('.jsx')) {
+      return 'javascript'
+    }
     if (activeFileKey.endsWith('.json')) return 'json'
     if (activeFileKey.endsWith('.sql')) return 'sql'
     return 'plaintext'
@@ -189,7 +197,7 @@ const EdgeFunctionsDiffPanel = ({
                 key={slug}
                 functionSlug={slug}
                 currentBody={diffResults.addedBodiesMap[slug]!}
-                mainBody={EMPTY_ARR}
+                mainBody={EMPTY_FUNCTION_BODY}
                 currentBranchRef={currentBranchRef}
                 fileInfos={diffResults.functionFileInfo[slug] || EMPTY_ARR}
               />

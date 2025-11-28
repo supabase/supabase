@@ -1,36 +1,39 @@
 import { AnalyticsInterval } from 'data/analytics/constants'
 import { YAxisProps } from 'recharts'
 
-type ReportDataProviderFilter = {
-  functionIds?: string[]
+export type ReportDataProviderAttribute = {
+  attribute: string
+  label: string
+  color?: { light: string; dark: string }
 }
 
-export interface ReportDataProvider {
+export interface ReportDataProvider<FiltersType> {
   (
     projectRef: string,
     startDate: string,
     endDate: string,
     interval: AnalyticsInterval,
-    functionIds?: string[],
-    edgeFnIdToName?: (id: string) => string | undefined,
-    filters?: ReportDataProviderFilter[]
+    filters?: FiltersType
   ): Promise<{
     data: any
-    attributes?: {
-      attribute: string
-      label: string
-      color?: { light: string; dark: string }
-    }[]
+    attributes?: ReportDataProviderAttribute[]
     query?: string // The SQL used to fetch the data if any
-  }> // [jordi] would be cool to have a type that forces data keys to match the attributes
+  }>
 }
 
-export interface ReportConfig {
+export interface ReportConfig<FiltersType = any> {
   id: string
   label: string
-  dataProvider: ReportDataProvider
+  /**
+   * dataProvider should handle *fetching* and *transforming* the data to the components.
+   * Avoid transforming data inside components.
+   * Functions can be extracted to helpers for transforming the data, which will make it easier to test.
+   */
+  dataProvider: ReportDataProvider<FiltersType>
   valuePrecision: number
   hide: boolean
+  hideHighlightedValue?: boolean
+  showSumAsDefaultHighlight?: boolean
   showTooltip: boolean
   showLegend: boolean
   showMaxValue: boolean
@@ -42,4 +45,5 @@ export interface ReportConfig {
   YAxisProps?: YAxisProps
   xAxisKey?: string
   yAxisKey?: string
+  showNewBadge?: boolean
 }

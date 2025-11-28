@@ -55,11 +55,18 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const user = useUser()
   const userMenu = useDropdownMenu(user)
 
-  const isLaunchWeekPage = pathname?.includes('/launch-week')
   const isLaunchWeekXPage = pathname === '/launch-week/x'
+  const isLaunchWeek12Page = pathname === '/launch-week/12'
+  const isLaunchWeek13Page = pathname === '/launch-week/13'
   const isGAWeekSection = pathname?.startsWith('/ga-week')
-  const disableStickyNav = isLaunchWeekXPage || isGAWeekSection || isLaunchWeekPage || !stickyNavbar
-  const showLaunchWeekNavMode = !isLaunchWeekXPage && (isLaunchWeekPage || isGAWeekSection) && !open
+  const disableStickyNav =
+    isLaunchWeekXPage ||
+    isGAWeekSection ||
+    isLaunchWeekXPage ||
+    isLaunchWeek12Page ||
+    isLaunchWeek13Page ||
+    !stickyNavbar
+  const showLaunchWeekNavMode = (isGAWeekSection || isLaunchWeekXPage) && !open
 
   React.useEffect(() => {
     if (open) {

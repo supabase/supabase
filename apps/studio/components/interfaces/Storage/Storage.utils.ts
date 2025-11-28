@@ -1,4 +1,8 @@
-import { groupBy, difference } from 'lodash'
+import { PostgresPolicy } from '@supabase/postgres-meta'
+import { difference, groupBy } from 'lodash'
+import { useRouter } from 'next/router'
+
+import { Bucket } from 'data/storage/buckets-query'
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from './Storage.constants'
 import type { StoragePolicyFormField } from './Storage.types'
 
@@ -18,8 +22,8 @@ const shortHash = (str: string) => {
  * Output: [{ bucket: <string>, policies: <Policy[]> }]
  * @param {Array} policies: All policies from a table in a schema
  */
-export const formatPoliciesForStorage = (buckets: any[], policies: any[]) => {
-  if (policies.length === 0) return policies
+export const formatPoliciesForStorage = (buckets: Bucket[], policies: PostgresPolicy[]) => {
+  if (policies.length === 0) return []
 
   /**
    * Format policies from storage objects to:
@@ -187,4 +191,9 @@ export const createSQLPolicies = (
 
 export const applyBucketIdToTemplateDefinition = (definition: string, bucketId: any) => {
   return definition.replace('{bucket_id}', `'${bucketId}'`)
+}
+
+export const useStorageV2Page = () => {
+  const router = useRouter()
+  return router.pathname.split('/')[4] as undefined | 'files' | 'analytics' | 'vectors' | 's3'
 }

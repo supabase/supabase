@@ -1,21 +1,17 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { NoProjectsOnPaidOrgInfo } from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
 import {
   ScaffoldContainer,
   ScaffoldSection,
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import OrganizationDeletePanel from './OrganizationDeletePanel'
+import { OrganizationDeletePanel } from './OrganizationDeletePanel'
 
 import { DataPrivacyForm } from './DataPrivacyForm'
 import { OrganizationDetailsForm } from './OrganizationDetailsForm'
 
-const GeneralSettings = () => {
+export const GeneralSettings = () => {
   const organizationDeletionEnabled = useIsFeatureEnabled('organizations:delete')
-
-  const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
   return (
     <ScaffoldContainer>
@@ -31,9 +27,7 @@ const GeneralSettings = () => {
         <DataPrivacyForm />
       </ScaffoldSection>
 
-      {organizationDeletionEnabled && canDeleteOrganization && <OrganizationDeletePanel />}
+      {organizationDeletionEnabled && <OrganizationDeletePanel />}
     </ScaffoldContainer>
   )
 }
-
-export default GeneralSettings

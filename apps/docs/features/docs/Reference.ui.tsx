@@ -221,7 +221,7 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
         />
         {/* @ts-ignore */}
         {paramOrType?.comment?.tags?.some((tag) => tag.tag === 'deprecated') && (
-          <span className="text-xs text-warning-600">Deprecated</span>
+          <span className="text-xs text-warning">Deprecated</span>
         )}
         <span className="text-xs text-foreground-muted">{getTypeName(paramOrType)}</span>
       </div>
@@ -353,7 +353,7 @@ export function ApiSchemaParamDetails({ param }: { param: IApiEndPoint['paramete
           {param.name}
         </span>
         <RequiredBadge isOptional={!param.required} />
-        {param.schema?.deprecated && <span className="text-xs text-warning-600">Deprecated</span>}
+        {param.schema?.deprecated && <span className="text-xs text-warning">Deprecated</span>}
         {param.schema && (
           <span className="text-xs text-foreground-muted">
             {getTypeDisplayFromSchema(param.schema)?.displayName ?? ''}
@@ -442,9 +442,11 @@ function ApiOperationRequestBodyDetailsInternal({
   ) {
     return <span className="font-mono text-sm font-medium text-foreground">{schema.type}</span>
   } else if (schema.type === 'array') {
+    const itemTypeDisplay = getTypeDisplayFromSchema(schema.items)
+    const displayName = itemTypeDisplay?.displayName ?? 'unknown'
     return (
       <>
-        <span className="font-mono text-sm font-medium text-foreground">{`Array of ${getTypeDisplayFromSchema(schema.items).displayName}`}</span>
+        <span className="font-mono text-sm font-medium text-foreground">{`Array of ${displayName}`}</span>
         {!(
           'type' in schema.items &&
           ['string', 'boolean', 'number', 'integer'].includes(schema.items.type)

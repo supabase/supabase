@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 type OrganizationProjectClaimVariables = {
   slug: string
@@ -24,7 +24,7 @@ export const useOrganizationProjectClaimMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     ClaimOrganizationProjectData,
     ResponseError,
     OrganizationProjectClaimVariables
@@ -35,7 +35,8 @@ export const useOrganizationProjectClaimMutation = ({
     ClaimOrganizationProjectData,
     ResponseError,
     OrganizationProjectClaimVariables
-  >((vars) => claimOrganizationProject(vars), {
+  >({
+    mutationFn: (vars) => claimOrganizationProject(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
     },

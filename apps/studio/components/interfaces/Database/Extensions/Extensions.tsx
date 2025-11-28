@@ -4,13 +4,13 @@ import { AlertCircle, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
 import InformationBox from 'components/ui/InformationBox'
-import NoSearchResults from 'components/ui/NoSearchResults'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Card,
   Input,
@@ -51,8 +51,10 @@ export const Extensions = () => {
     (ext) => !isNull(ext.installed_version)
   )
 
-  const { can: canUpdateExtensions, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckProjectPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
+  const { can: canUpdateExtensions, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'extensions'
+  )
 
   useEffect(() => {
     if (filter !== undefined) setFilterString(filter as string)
@@ -61,17 +63,14 @@ export const Extensions = () => {
   return (
     <>
       <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <Input
-            size="tiny"
-            placeholder="Search for an extension"
-            value={filterString}
-            onChange={(e) => setFilterString(e.target.value)}
-            className="w-52"
-            icon={<Search size={14} />}
-          />
-          <DocsButton href="https://supabase.com/docs/guides/database/extensions" />
-        </div>
+        <Input
+          size="tiny"
+          placeholder="Search for an extension"
+          value={filterString}
+          onChange={(e) => setFilterString(e.target.value)}
+          className="w-52"
+          icon={<Search />}
+        />
       </div>
 
       {isPermissionsLoaded && !canUpdateExtensions && (

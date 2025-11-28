@@ -1,9 +1,10 @@
 import matter from 'gray-matter'
 import { promises as fs } from 'node:fs'
-import { join, relative } from 'node:path'
+import { join, relative, resolve } from 'node:path'
 
 import { extractMessageFromAnyError, FileNotFoundError, MultiError } from '~/app/api/utils'
 import { preprocessMdxWithDefaults } from '~/features/directives/utils'
+import { checkGuidePageEnabled } from '~/features/docs/NavigationPageStatus.utils'
 import { Both, Result } from '~/features/helpers.fn'
 import { GUIDES_DIRECTORY } from '~/lib/docs'
 import { processMdx } from '~/scripts/helpers.mdx'
@@ -17,6 +18,24 @@ import { GuideModel } from './guideModel'
  */
 function isHiddenFile(path: string): boolean {
   return path.split('/').some((part) => part.startsWith('_'))
+}
+
+/**
+ * Determines if a guide file is disabled in the navigation configuration.
+ *
+ * @param relPath - Relative path to the .mdx file within the base directory
+ * @param baseDir - Base directory to calculate relPath from
+ * @returns true if the page is disabled, false if enabled
+ */
+function isDisabledGuide(relPath: string, baseDir: string): boolean {
+  const fullPath = resolve(baseDir, relPath)
+  if (!fullPath.startsWith(GUIDES_DIRECTORY)) return false
+
+  const relGuidePath = relative(GUIDES_DIRECTORY, fullPath)
+  const urlPath = relGuidePath.replace(/\.mdx?$/, '').replace(/\/index$/, '')
+  const guidesPath = `/guides/${urlPath}`
+
+  return !checkGuidePageEnabled(guidesPath)
 }
 
 /**
@@ -40,7 +59,10 @@ async function walkMdxFiles(
           continue
         }
 
-        // Only include .mdx files
+        if (isDisabledGuide(relativePath, dir)) {
+          continue
+        }
+
         if (relativePath.endsWith('.mdx')) {
           mdxFiles.push(join(dir, relativePath))
         }

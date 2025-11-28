@@ -1,0 +1,35 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "supabase-client-nuxtjs",
+  "type": "registry:lib",
+  "title": "Supabase Client for Nuxt.js",
+  "description": "",
+  "registryDependencies": [],
+  "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+  "docs": "You'll need to set the following environment variables in your project: `NUXT_PUBLIC_SUPABASE_URL` and `NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+  "envVars": {
+    "NUXT_PUBLIC_SUPABASE_URL": "",
+    "NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+  },
+  "files": [
+    {
+      "path": "registry/default/clients/nuxtjs/lib/supabase/client.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/nuxtjs/server/middleware/is-authenticated.ts",
+      "type": "registry:file",
+      "target": "server/middleware/is-authenticated.ts"
+    },
+    {
+      "path": "registry/default/clients/nuxtjs/server/api/profile.get.ts",
+      "type": "registry:file",
+      "target": "server/api/profile.get.ts"
+    },
+    {
+      "path": "registry/default/clients/nuxtjs/server/supabase/client.ts",
+      "type": "registry:file",
+      "target": "server/supabase/client.ts"
+    }
+  ]
+}

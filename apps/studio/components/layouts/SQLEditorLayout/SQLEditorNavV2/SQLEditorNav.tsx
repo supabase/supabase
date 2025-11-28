@@ -19,8 +19,8 @@ import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from 'data/content/
 import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import uuidv4 from 'lib/uuid'
 import { useSnippetFolders, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { TreeView } from 'ui'
@@ -294,7 +294,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     },
   })
 
-  const { mutate: deleteFolder, isLoading: isDeletingFolder } = useSQLSnippetFoldersDeleteMutation({
+  const { mutate: deleteFolder, isPending: isDeletingFolder } = useSQLSnippetFoldersDeleteMutation({
     onSuccess: (_, vars) => {
       toast.success('Successfully deleted folder')
       const { ids } = vars

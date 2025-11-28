@@ -86,10 +86,10 @@ export const useEdgeFunctionsDiff = ({
   const {
     added = [],
     removed = [],
-    overlap = [],
+    modified = [],
   } = useMemo(() => {
     if (!currentBranchFunctions || !mainBranchFunctions) {
-      return { added: [], removed: [], overlap: [] as typeof currentBranchFunctions }
+      return { added: [], removed: [], modified: [] }
     }
 
     const currentFuncs = currentBranchFunctions ?? []
@@ -97,18 +97,22 @@ export const useEdgeFunctionsDiff = ({
 
     const added = currentFuncs.filter((c) => !mainFuncs.find((m) => m.slug === c.slug))
     const removed = mainFuncs.filter((m) => !currentFuncs.find((c) => c.slug === m.slug))
-    const overlap = currentFuncs.filter((c) => mainFuncs.find((m) => m.slug === c.slug))
+    const modified = currentFuncs.filter((c) =>
+      mainFuncs.find(
+        (m) => m.slug === c.slug && (m.ezbr_sha256 === undefined || m.ezbr_sha256 !== c.ezbr_sha256)
+      )
+    )
 
-    return { added, removed, overlap }
+    return { added, removed, modified }
   }, [currentBranchFunctions, mainBranchFunctions])
 
-  const overlapSlugs = overlap.map((f) => f.slug)
   const addedSlugs = added.map((f) => f.slug)
   const removedSlugs = removed.map((f) => f.slug)
+  const maybeModifiedSlugs = modified.map((f) => f.slug)
 
   // Fetch function bodies ---------------------------------------------------
   const currentBodiesQueries = useQueries({
-    queries: overlapSlugs.map((slug) => ({
+    queries: maybeModifiedSlugs.map((slug) => ({
       queryKey: ['edge-function-body', currentBranchRef, slug],
       queryFn: ({ signal }: { signal?: AbortSignal }) =>
         getEdgeFunctionBody({ projectRef: currentBranchRef, slug }, signal),
@@ -118,7 +122,7 @@ export const useEdgeFunctionsDiff = ({
   })
 
   const mainBodiesQueries = useQueries({
-    queries: overlapSlugs.map((slug) => ({
+    queries: maybeModifiedSlugs.map((slug) => ({
       queryKey: ['edge-function-body', mainBranchRef, slug],
       queryFn: ({ signal }: { signal?: AbortSignal }) =>
         getEdgeFunctionBody({ projectRef: mainBranchRef, slug }, signal),
@@ -173,12 +177,12 @@ export const useEdgeFunctionsDiff = ({
   // Build lookup maps --------------------------------------------------------
   const currentBodiesMap: Record<string, EdgeFunctionBodyData | undefined> = {}
   currentBodiesQueries.forEach((q, idx) => {
-    if (q.data) currentBodiesMap[overlapSlugs[idx]] = q.data
+    if (q.data) currentBodiesMap[maybeModifiedSlugs[idx]] = q.data
   })
 
   const mainBodiesMap: Record<string, EdgeFunctionBodyData | undefined> = {}
   mainBodiesQueries.forEach((q, idx) => {
-    if (q.data) mainBodiesMap[overlapSlugs[idx]] = q.data
+    if (q.data) mainBodiesMap[maybeModifiedSlugs[idx]] = q.data
   })
 
   const addedBodiesMap: Record<string, EdgeFunctionBodyData | undefined> = {}
@@ -196,18 +200,20 @@ export const useEdgeFunctionsDiff = ({
   const functionFileInfo: FunctionFileInfo = {}
 
   // Process overlapping functions to determine modifications and file info
-  overlapSlugs.forEach((slug) => {
+  maybeModifiedSlugs.forEach((slug) => {
     const currentBody = currentBodiesMap[slug]
     const mainBody = mainBodiesMap[slug]
     if (!currentBody || !mainBody) return
 
-    const allFileKeys = new Set([...currentBody, ...mainBody].map((f) => fileKey(f.name)))
+    const allFileKeys = new Set(
+      [...currentBody.files, ...mainBody.files].map((f) => fileKey(f.name))
+    )
     const fileInfos: FileInfo[] = []
     let hasModifications = false
 
     for (const key of allFileKeys) {
-      const currentFile = currentBody.find((f) => fileKey(f.name) === key)
-      const mainFile = mainBody.find((f) => fileKey(f.name) === key)
+      const currentFile = currentBody.files.find((f) => fileKey(f.name) === key)
+      const mainFile = mainBody.files.find((f) => fileKey(f.name) === key)
 
       let status: FileStatus = 'unchanged'
 
@@ -227,16 +233,15 @@ export const useEdgeFunctionsDiff = ({
 
     if (hasModifications) {
       modifiedSlugs.push(slug)
+      functionFileInfo[slug] = fileInfos
     }
-
-    functionFileInfo[slug] = fileInfos
   })
 
   // Add file info for added functions
   addedSlugs.forEach((slug) => {
     const body = addedBodiesMap[slug]
     if (body) {
-      functionFileInfo[slug] = body.map((file) => ({
+      functionFileInfo[slug] = body.files.map((file) => ({
         key: fileKey(file.name),
         status: 'added' as FileStatus,
       }))
@@ -247,7 +252,7 @@ export const useEdgeFunctionsDiff = ({
   removedSlugs.forEach((slug) => {
     const body = removedBodiesMap[slug]
     if (body) {
-      functionFileInfo[slug] = body.map((file) => ({
+      functionFileInfo[slug] = body.files.map((file) => ({
         key: fileKey(file.name),
         status: 'removed' as FileStatus,
       }))
