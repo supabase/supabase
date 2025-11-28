@@ -6,11 +6,6 @@ import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
 import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
@@ -25,6 +20,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import {
   AuthErrorCodeRow,
   fetchTopAuthErrorCodes,
@@ -218,7 +220,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
 
   return (
     <>
-      <ScaffoldSection isFullWidth>
+      <PageSection>
         {!!error && (
           <AlertError
             className="mb-4"
@@ -228,18 +230,22 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
             }}
           />
         )}
-        <div className="flex items-center justify-between mb-4">
-          <ScaffoldSectionTitle>Usage</ScaffoldSectionTitle>
-          <Link
-            href={`/project/${ref}/observability/auth?its=${startDate}&ite=${endDate}&isHelper=true&helperText=Last+24+hours`}
-            className="text-sm text-link inline-flex items-center gap-x-1.5"
-          >
-            <Telescope size={14} />
-            <span>Go to observability</span>
-            <ChevronRight size={14} />
-          </Link>
-        </div>
-        <ScaffoldSectionContent className="gap-4">
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <div className="flex items-center justify-between">
+              <PageSectionTitle>Usage</PageSectionTitle>
+              <Link
+                href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}&isHelper=true&helperText=Last+24+hours`}
+                className="text-sm text-link inline-flex items-center gap-x-1.5"
+              >
+                <Telescope size={14} />
+                <span>Go to observability</span>
+                <ChevronRight size={14} />
+              </Link>
+            </div>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <StatCard
               title="Auth Activity"
@@ -257,15 +263,17 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
               href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#usage`}
             />
           </div>
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
+        </PageSectionContent>
+      </PageSection>
 
-      <ScaffoldSection isFullWidth>
-        <div className="flex items-center justify-between mb-4">
-          <ScaffoldSectionTitle>Monitoring</ScaffoldSectionTitle>
-        </div>
-        <ScaffoldSectionContent className="gap-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Monitoring</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
             <StatCard
               title="Auth API Success Rate"
               current={apiSuccessRateCurrent}
@@ -391,8 +399,8 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
               </CardContent>
             </Card>
           </div>
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
+        </PageSectionContent>
+      </PageSection>
     </>
   )
 }
