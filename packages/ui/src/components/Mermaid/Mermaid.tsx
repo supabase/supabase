@@ -92,24 +92,37 @@ const lightThemeVariables = {
 }
 
 export interface MermaidProps {
+  /** Mermaid diagram definition (e.g. flowchart, sequence, erDiagram) */
   chart: string
+  /** Additional CSS classes for the container */
   className?: string
 }
 
+/**
+ * Renders a Mermaid diagram from text.
+ *
+ * Supports flowcharts, sequence diagrams, ER diagrams, and other Mermaid syntax.
+ * Automatically adapts to light/dark theme.
+ *
+ * @example
+ * ```tsx
+ * <Mermaid chart={`
+ *   flowchart LR
+ *     A[Start] --> B[End]
+ * `} />
+ * ```
+ *
+ * @see https://mermaid.js.org/intro/
+ */
 export function Mermaid({ chart, className }: MermaidProps) {
   const [svg, setSvg] = useState<string>('')
   const [error, setError] = useState<string | null>(null)
   const { resolvedTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
 
   const isDark = resolvedTheme === 'dark'
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  useEffect(() => {
-    if (!mounted) return
+    if (!resolvedTheme) return
 
     // Re-initialize mermaid with current theme
     mermaid.initialize({
@@ -124,7 +137,6 @@ export function Mermaid({ chart, className }: MermaidProps) {
       },
       flowchart: {
         useMaxWidth: false,
-        curve: 'linear',
       },
       er: {
         useMaxWidth: false,
@@ -133,80 +145,23 @@ export function Mermaid({ chart, className }: MermaidProps) {
 
     const renderChart = async () => {
       try {
+        // Mermaid requires a unique ID per render to avoid DOM conflicts
         const id = `mermaid-${Math.random().toString(36).substring(2, 11)}`
         const { svg } = await mermaid.render(id, chart.trim())
-
-        // Post-process SVG
-        // Fix <br> tags to be self-closing for XML compatibility
-        const fixedSvg = svg.replace(/<br\s*>/gi, '<br/>')
-        const parser = new DOMParser()
-        const doc = parser.parseFromString(fixedSvg, 'image/svg+xml')
-        const svgEl = doc.querySelector('svg')
-
-        // Add diagonal line pattern definition
-        let defs = svgEl?.querySelector('defs')
-        if (!defs) {
-          defs = doc.createElementNS('http://www.w3.org/2000/svg', 'defs')
-          svgEl?.insertBefore(defs, svgEl.firstChild)
-        }
-
-        const pattern = doc.createElementNS('http://www.w3.org/2000/svg', 'pattern')
-        pattern.setAttribute('id', 'diagonalLines')
-        pattern.setAttribute('patternUnits', 'userSpaceOnUse')
-        pattern.setAttribute('width', '8')
-        pattern.setAttribute('height', '8')
-        pattern.setAttribute('patternTransform', 'rotate(45)')
-
-        const patternBg = doc.createElementNS('http://www.w3.org/2000/svg', 'rect')
-        patternBg.setAttribute('width', '8')
-        patternBg.setAttribute('height', '8')
-        patternBg.setAttribute('fill', isDark ? '#171717' : '#ffffff')
-        pattern.appendChild(patternBg)
-
-        const line = doc.createElementNS('http://www.w3.org/2000/svg', 'line')
-        line.setAttribute('x1', '0')
-        line.setAttribute('y1', '0')
-        line.setAttribute('x2', '0')
-        line.setAttribute('y2', '8')
-        line.setAttribute('stroke', isDark ? '#3a3a3a' : '#c0c0c0')
-        line.setAttribute('stroke-width', '3')
-        pattern.appendChild(line)
-
-        defs.appendChild(pattern)
-
-        // Remove roundedness from all rects (we'll add it back for pills)
-        const allRects = doc.querySelectorAll('rect')
-        allRects.forEach((rect) => {
-          rect.setAttribute('rx', '0')
-          rect.setAttribute('ry', '0')
-        })
-
-        // Style actor boxes (rect.actor-top and rect.actor-bottom) with diagonal lines
-        const actorRects = doc.querySelectorAll('rect.actor-top, rect.actor-bottom')
-        actorRects.forEach((rect) => {
-          // Check if this is a Postgres box by finding sibling text
-          const parent = rect.parentElement
-          const text = parent?.querySelector('text')
-          const isPostgres = text?.textContent?.toLowerCase().includes('postgres')
-
-          rect.setAttribute('fill', 'url(#diagonalLines)')
-          rect.setAttribute('stroke', isPostgres ? '#336791' : isDark ? '#525252' : '#d4d4d4')
-        })
-
-        const serializer = new XMLSerializer()
-        const processedSvg = serializer.serializeToString(doc)
-        setSvg(processedSvg)
+        // Mermaid outputs <br> which isn't valid XML - fix for browser compatibility
+        setSvg(svg.replace(/<br\s*>/gi, '<br/>'))
         setError(null)
       } catch (err) {
+        // Invalid chart syntax throws - display error instead of crashing
         console.error('Mermaid rendering error:', err)
         setError(err instanceof Error ? err.message : 'Failed to render diagram')
       }
     }
 
     renderChart()
-  }, [chart, isDark, mounted])
+  }, [chart, resolvedTheme])
 
-  if (!mounted) {
+  if (!resolvedTheme) {
     return <div className={cn('my-6 rounded-lg bg-muted p-6 animate-pulse h-64', className)} />
   }
 
@@ -225,7 +180,7 @@ export function Mermaid({ chart, className }: MermaidProps) {
   }
 
   return (
-    <div
+    <figure
       className={cn(
         'my-6 w-full flex justify-center rounded-lg border p-6',
         'bg-white border-[#e5e5e5] dark:bg-[#171717] dark:border-[#333]',
