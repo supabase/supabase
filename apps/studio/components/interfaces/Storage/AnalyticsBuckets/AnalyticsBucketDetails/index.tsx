@@ -2,8 +2,8 @@ import { uniq } from 'lodash'
 import { Loader2, SquarePlus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
@@ -30,6 +30,7 @@ import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-cr
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { Button, Card, CardContent } from 'ui'
+import { EmptyStatePresentational } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
@@ -216,35 +217,30 @@ export const AnalyticBucketDetails = () => {
                     {HIDE_REPLICATION_USER_FLOW ? (
                       <CreateTableInstructions />
                     ) : isPollingForData ? (
-                      <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-3 items-center text-center gap-1 text-balance">
-                        <Loader2
-                          size={24}
-                          strokeWidth={1.5}
-                          className="animate-spin text-foreground-muted"
-                        />
-                        <div className="flex flex-col items-center text-center">
-                          <h3>Connecting table(s) to bucket</h3>
-                          <p className="text-foreground-light text-sm">
-                            Tables will be shown here once the connection is complete
-                          </p>
-                        </div>
-                      </aside>
+                      <EmptyStatePresentational
+                        icon={
+                          <Loader2
+                            size={24}
+                            strokeWidth={1.5}
+                            className="animate-spin text-foreground-muted"
+                          />
+                        }
+                        title="Connecting table(s) to bucket"
+                        description="Tables will be shown here once the connection is complete"
+                      />
                     ) : (
-                      <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-3 items-center text-center gap-1 text-balance">
-                        <SquarePlus size={24} strokeWidth={1.5} className="text-foreground-muted" />
-                        <div className="flex flex-col items-center text-center">
-                          <h3>Connect database tables</h3>
-                          <p className="text-foreground-light text-sm">
-                            Stream table data for continuous backups and analysis
-                          </p>
-                        </div>
+                      <EmptyStatePresentational
+                        icon={SquarePlus}
+                        title="Connect database tables"
+                        description="Stream table data for continuous backups and analysis"
+                      >
                         <ConnectTablesDialog
                           onSuccessConnectTables={() => {
                             setPollIntervalNamespaces(4000)
                             setPollIntervalNamespaceTables(4000)
                           }}
                         />
-                      </aside>
+                      </EmptyStatePresentational>
                     )}
                   </>
                 ) : (
