@@ -112,7 +112,7 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
                           <div className="flex flex-col gap-0 items-start">
                             <div className="flex gap-2 items-center">
                               <span className="text-sm text-foreground">{item.name}</span>{' '}
-                              <Badge variant="default" className="font-mono mt-0">
+                              <Badge variant="default" className="font-mono">
                                 {item.type}
                               </Badge>
                             </div>
