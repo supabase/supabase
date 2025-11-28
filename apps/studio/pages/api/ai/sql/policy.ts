@@ -13,6 +13,19 @@ import apiWrapper from 'lib/api/apiWrapper'
 const policySchema = z.object({
   sql: z.string().describe('The generated Postgres CREATE POLICY statement.'),
   name: z.string().describe('The name of the policy.'),
+  command: z
+    .enum(['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'ALL'])
+    .describe('The SQL command this policy applies to.'),
+  definition: z
+    .string()
+    .optional()
+    .describe('The USING clause expression (for SELECT, UPDATE, DELETE).'),
+  check: z.string().optional().describe('The WITH CHECK clause expression (for INSERT, UPDATE).'),
+  action: z
+    .enum(['PERMISSIVE', 'RESTRICTIVE'])
+    .default('PERMISSIVE')
+    .describe('Whether the policy is PERMISSIVE or RESTRICTIVE.'),
+  roles: z.array(z.string()).default(['public']).describe('The roles this policy applies to.'),
 })
 
 const requestBodySchema = z.object({
@@ -107,8 +120,11 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
         Requirements:
         - Use the available planning and schema tools (like "list_policies" or "getSchemaTables") to inspect the "${schema}" schema and existing policies before generating new ones.
-        - Return a curated list of recommended CREATE POLICY statements as JSON, where each entry contains "name" and "sql".
-        - Policies should cover the most relevant operations (SELECT, INSERT, UPDATE, DELETE) and use auth.uid() when referencing the current user.
+        - Return a curated list of recommended CREATE POLICY statements as JSON.
+        - Each policy must include: name, sql, command (SELECT/INSERT/UPDATE/DELETE/ALL), action (PERMISSIVE/RESTRICTIVE), roles (array of role names).
+        - Include "definition" (USING clause expression without the USING keyword) for SELECT, UPDATE, DELETE policies.
+        - Include "check" (WITH CHECK clause expression without the WITH CHECK keywords) for INSERT, UPDATE policies.
+        - Policies should cover the most relevant operations and use auth.uid() when referencing the current user.
         - Avoid duplicating existing policies and reference the public schema and typical Supabase best practices when deciding the coverage.
         - Only output SQL statements that can be executed directly (no explanations or markdown).
         - Prefer PERMISSIVE policies unless a RESTRICTIVE policy is explicitly required.
@@ -121,7 +137,14 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       }),
     })
 
-    return res.json(experimental_output?.policies ?? [])
+    // Add table and schema to each policy from the request
+    const policies = (experimental_output?.policies ?? []).map((policy) => ({
+      ...policy,
+      table: tableName,
+      schema,
+    }))
+
+    return res.json(policies)
   } catch (error) {
     if (error instanceof Error) {
       console.error(`AI policy generation failed: ${error.message}`)

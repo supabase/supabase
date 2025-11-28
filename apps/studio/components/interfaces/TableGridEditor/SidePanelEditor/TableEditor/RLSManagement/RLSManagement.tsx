@@ -1,49 +1,84 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import { ToggleRlsButton } from 'components/ui/ToggleRlsButton'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { toast } from 'sonner'
 import type { ResponseError } from 'types'
-import { Button, Card, CardContent, cn, Label_Shadcn_, Switch } from 'ui'
+import { Button, Card, CardContent, cn } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
+import {
+  generateStartingPoliciesForTable,
+  type GeneratedPolicy,
+} from 'components/interfaces/Auth/Policies/Policies.utils'
 import { generatePolicyUpdateSQL } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import {
+  useForeignKeyConstraintsQuery,
+  type ForeignKeyConstraint,
+} from 'data/database/foreign-key-constraints-query'
+import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
+import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
+import type { ColumnField } from '../../SidePanelEditor.types'
 import { PolicyList, type PolicyListItemData } from './PolicyList'
 
 interface RLSManagementProps {
   schema: string
   table?: PostgresTable
+  tableName?: string // For new tables
+  columns?: ColumnField[] // For new tables
+  foreignKeyRelations?: ForeignKey[] // For new tables
   isRlsEnabled: boolean
   onChangeRlsEnabled?: (isEnabled: boolean) => void
   isNewRecord: boolean
   isDuplicating: boolean
-  generateStartingPolicies?: boolean
-  onChangeGenerateStartingPolicies?: (enabled: boolean) => void
+  generatedPolicies?: GeneratedPolicy[]
+  onGeneratedPoliciesChange?: (policies: GeneratedPolicy[]) => void
 }
 
 export const RLSManagement = ({
   schema,
   table,
+  tableName,
+  columns = [],
+  foreignKeyRelations = [],
   isRlsEnabled,
   onChangeRlsEnabled,
   isNewRecord,
   isDuplicating,
-  generateStartingPolicies = false,
-  onChangeGenerateStartingPolicies,
+  generatedPolicies = [],
+  onGeneratedPoliciesChange,
 }: RLSManagementProps) => {
   const { data: project } = useSelectedProjectQuery()
-
+  const [isGenerating, setIsGenerating] = useState(false)
+  const { includeSchemaMetadata } = useOrgAiOptInLevel()
   const isExistingTable = !!table && !isNewRecord && !isDuplicating
   const rlsEnabled = isRlsEnabled ?? true
 
-  const { data: policies } = useDatabasePoliciesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data: policies } = useDatabasePoliciesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      enabled: !isNewRecord && !isDuplicating,
+    }
+  )
+
+  // Fetch foreign key constraints for policy generation BFS traversal
+  const { data: schemaForeignKeys } = useForeignKeyConstraintsQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: schema,
+    },
+    {
+      enabled: isNewRecord && !isDuplicating && !!schema,
+    }
+  )
 
   const tablePolicies = (policies ?? []).filter(
     (policy) => policy.schema === table?.schema && policy.table === table?.name
@@ -55,10 +90,100 @@ export const RLSManagement = ({
         name: policy.name,
         command: policy.action ?? policy.command,
         sql: generatePolicyUpdateSQL(policy),
+        isNew: false,
       })),
     [tablePolicies]
   )
-  const hasPolicies = existingPoliciesList.length > 0
+
+  // Convert generated policies to PolicyListItemData format
+  const generatedPoliciesList = useMemo<PolicyListItemData[]>(
+    () =>
+      generatedPolicies.map((policy) => ({
+        name: policy.name,
+        command: policy.command,
+        sql: policy.sql,
+        isNew: true,
+      })),
+    [generatedPolicies]
+  )
+
+  const allPoliciesList = useMemo<PolicyListItemData[]>(
+    () => [...existingPoliciesList, ...generatedPoliciesList],
+    [existingPoliciesList, generatedPoliciesList]
+  )
+
+  const hasPolicies = allPoliciesList.length > 0
+
+  const convertForeignKeysToConstraints = (fks: ForeignKey[]): ForeignKeyConstraint[] => {
+    if (!tableName || !schema) {
+      return []
+    }
+
+    return fks
+      .filter((fk) => fk.columns && fk.columns.length > 0) // Only include FKs with columns
+      .map((fk) => ({
+        id: typeof fk.id === 'number' ? fk.id : 0,
+        constraint_name: fk.name || '',
+        source_id: typeof fk.tableId === 'number' ? fk.tableId : 0,
+        source_schema: schema.trim(),
+        source_table: tableName.trim(),
+        source_columns: fk.columns.map((col: { source: string; target: string }) =>
+          col.source.trim()
+        ),
+        target_id: 0,
+        target_schema: fk.schema.trim(),
+        target_table: fk.table.trim(),
+        target_columns: fk.columns.map((col: { source: string; target: string }) =>
+          col.target.trim()
+        ),
+        deletion_action: fk.deletionAction || 'NO ACTION',
+        update_action: fk.updateAction || 'NO ACTION',
+      }))
+  }
+
+  const handleGeneratePolicies = async () => {
+    if (!project?.ref || !tableName || columns.length === 0) {
+      toast.error('Unable to generate policies. Please ensure table name and columns are set.')
+      return
+    }
+
+    setIsGenerating(true)
+    try {
+      const trimmedTableName = tableName.trim()
+      const trimmedSchema = schema.trim()
+
+      const newTableForeignKeys = convertForeignKeysToConstraints(foreignKeyRelations)
+
+      const allForeignKeys = [
+        ...newTableForeignKeys,
+        ...(schemaForeignKeys ?? []).filter(
+          (existingFk) =>
+            !(
+              existingFk.source_schema === trimmedSchema &&
+              existingFk.source_table === trimmedTableName
+            )
+        ),
+      ]
+
+      const tableColumns = columns.map((col) => ({ name: col.name.trim() }))
+
+      const policies = await generateStartingPoliciesForTable({
+        table: { name: trimmedTableName, schema: trimmedSchema },
+        foreignKeyConstraints: allForeignKeys,
+        columns: tableColumns,
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        enableAi: includeSchemaMetadata,
+      })
+
+      onGeneratedPoliciesChange?.(policies)
+    } catch (error: any) {
+      console.error('Failed to generate policies:', error)
+      toast.error(error.message || 'Failed to generate policies')
+    } finally {
+      setIsGenerating(false)
+    }
+  }
 
   const handleRlsToggleSuccess = (nextIsEnabled: boolean) => {
     onChangeRlsEnabled?.(nextIsEnabled)
@@ -77,16 +202,18 @@ export const RLSManagement = ({
     if (!project || !table || !isExistingTable) return null
     return (
       <ToggleRlsButton
-        type="default"
-        size="tiny"
-        schema={table.schema ?? schema}
-        tableName={table.name}
-        isRlsEnabled={rlsEnabled}
-        projectRef={project.ref}
-        connectionString={project.connectionString ?? null}
-        onSuccess={handleRlsToggleSuccess}
-        onError={handleRlsToggleError}
-        className="w-fit mt-4"
+        {...({
+          type: 'default',
+          size: 'tiny',
+          schema: table.schema ?? schema,
+          tableName: table.name,
+          isRlsEnabled: rlsEnabled,
+          projectRef: project.ref,
+          connectionString: project.connectionString ?? null,
+          onSuccess: handleRlsToggleSuccess,
+          onError: handleRlsToggleError,
+          className: 'w-fit mt-4',
+        } as any)}
       />
     )
   }
@@ -95,6 +222,30 @@ export const RLSManagement = ({
 
   const renderPolicies = () => {
     if (!hasPolicies) {
+      if (isNewRecord && !isDuplicating) {
+        return (
+          <CardContent className="flex flex-col items-center justify-center py-8">
+            <div className="flex flex-col items-center gap-4 text-center max-w-md">
+              <div className="flex flex-col gap-1">
+                <h4 className="text-sm text-foreground">No policies yet</h4>
+                <p className="text-sm text-foreground-lighter">
+                  Generate starting policies based on your table schema and relationships. Policies
+                  will be created after the table is saved.
+                </p>
+              </div>
+              <Button
+                type="default"
+                size="tiny"
+                onClick={handleGeneratePolicies}
+                loading={isGenerating}
+                disabled={isGenerating || !isRlsEnabled}
+              >
+                {isGenerating ? 'Generating policies...' : 'Generate policies'}
+              </Button>
+            </div>
+          </CardContent>
+        )
+      }
       return (
         <CardContent>
           <p className="text-sm text-foreground-lighter">No policies exist for this table</p>
@@ -102,42 +253,43 @@ export const RLSManagement = ({
       )
     }
 
-    return <PolicyList policies={existingPoliciesList} className="border-0 rounded-none" />
+    const handleRemoveGeneratedPolicy = (index: number) => {
+      // Find the index in generatedPoliciesList that corresponds to the allPoliciesList index
+      const generatedIndex = index - existingPoliciesList.length
+      if (generatedIndex >= 0 && generatedIndex < generatedPolicies.length) {
+        const updatedPolicies = generatedPolicies.filter((_, i) => i !== generatedIndex)
+        onGeneratedPoliciesChange?.(updatedPolicies)
+      }
+    }
+
+    return (
+      <PolicyList
+        policies={allPoliciesList}
+        className="border-0 rounded-none"
+        onRemove={isNewRecord && !isDuplicating ? handleRemoveGeneratedPolicy : undefined}
+      />
+    )
   }
 
   if (!project) return null
 
-  // For new tables, show the switch to generate starting policies
   if (isNewRecord && !isDuplicating) {
     return (
       <div>
-        <h3 className="mb-4">Policies</h3>
-        <div className="flex flex-col-reverse gap-2 md:gap-6 md:flex-row-reverse md:justify-between">
-          <div className="flex flex-col justify-center items-start md:items-end shrink-0">
-            <Switch
-              id="generate-starting-policies"
-              checked={generateStartingPolicies}
-              onCheckedChange={onChangeGenerateStartingPolicies}
-            />
-          </div>
-          <div className="flex flex-col min-w-0">
-            <Label_Shadcn_
-              htmlFor="generate-starting-policies"
-              className="text-foreground cursor-pointer"
-            >
-              Generate starting policies
-            </Label_Shadcn_>
-            <p className="text-sm text-foreground-light mt-1">
-              Policies are auto-generated from your schema and can be customized after table
-              creation.
+        <div className="flex items-center mb-4 gap-2">
+          <div className="flex-1">
+            <h3>Policies</h3>
+            <p className="text-sm text-foreground-lighter">
+              Set rules around who can read and write data to this table
             </p>
           </div>
         </div>
+
+        <Card>{renderPolicies()}</Card>
       </div>
     )
   }
 
-  // For existing tables, show the policies list
   return (
     <div>
       <div className="flex items-center mb-4 gap-2">

@@ -2,11 +2,8 @@ import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { has, isEmpty, isEqual } from 'lodash'
 
 import { generateSqlPolicy } from 'data/ai/sql-policy-mutation'
+import type { CreatePolicyBody } from 'data/database-policies/database-policy-create-mutation'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
-import { getForeignKeyConstraints } from 'data/database/foreign-key-constraints-query'
-import { getProjectDetail } from 'data/projects/project-detail-query'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { getTables } from 'data/tables/tables-query'
 import {
   PolicyFormField,
   PolicyForReview,
@@ -161,11 +158,17 @@ export const createPayloadForUpdatePolicy = (
 
 // --- Policy Generation ---
 
-export type GeneratedPolicy = {
-  name: string
-  sql: string
-  command?: string
-}
+/**
+ * Generated policy extends CreatePolicyBody with additional fields for display.
+ * - sql: Full CREATE POLICY SQL statement for preview
+ * - Required fields that are optional in CreatePolicyBody
+ */
+export type GeneratedPolicy = Required<
+  Pick<CreatePolicyBody, 'name' | 'table' | 'schema' | 'action' | 'roles'>
+> &
+  Pick<CreatePolicyBody, 'command' | 'definition' | 'check'> & {
+    sql: string
+  }
 
 type Relationship = {
   source_schema: string
@@ -309,7 +312,21 @@ const buildPoliciesForPath = (
           ? `${base} USING (${expression}) WITH CHECK (${expression});`
           : `${base} USING (${expression});`
 
-    return { name, sql, command }
+    // Structured data for mutation API
+    const definition = command === 'INSERT' ? undefined : expression
+    const check = command === 'SELECT' || command === 'DELETE' ? undefined : expression
+
+    return {
+      name,
+      sql,
+      command,
+      table: table.name,
+      schema: table.schema,
+      definition,
+      check,
+      action: 'PERMISSIVE' as const,
+      roles: ['public'],
+    }
   })
 }
 
@@ -325,11 +342,12 @@ export const generateProgrammaticPoliciesForTable = ({
 }): GeneratedPolicy[] => {
   try {
     const path = findPathToAuthUsers(table, foreignKeyConstraints)
+
     if (path?.length) {
       return buildPoliciesForPath(table, path)
     }
   } catch (error) {
-    console.error('Programmatic policy generation failed:', error)
+    // Silently fail - caller will handle empty result
   }
 
   return []
@@ -361,7 +379,8 @@ export const generateAiPoliciesForTable = async ({
       projectRef,
       connectionString,
     })
-    return aiPolicies.map((p) => ({ ...p, command: undefined }))
+    // AI response now includes all structured fields
+    return aiPolicies as GeneratedPolicy[]
   } catch (error) {
     console.error('AI policy generation failed:', error)
     return []
@@ -379,12 +398,14 @@ export const generateStartingPoliciesForTable = async ({
   columns,
   projectRef,
   connectionString,
+  enableAi,
 }: {
   table: { name: string; schema: string }
   foreignKeyConstraints: ForeignKeyConstraint[]
   columns: { name: string }[]
   projectRef: string
   connectionString?: string | null
+  enableAi: boolean
 }): Promise<GeneratedPolicy[]> => {
   // Try programmatic generation first
   const programmaticPolicies = generateProgrammaticPoliciesForTable({
@@ -397,115 +418,14 @@ export const generateStartingPoliciesForTable = async ({
   }
 
   // Fall back to AI generation
-  return await generateAiPoliciesForTable({
-    table,
-    columns,
-    projectRef,
-    connectionString,
-  })
-}
-
-/** Creates policies in the database. Returns successfully created policies. */
-export const createGeneratedPolicies = async ({
-  policies,
-  projectRef,
-  connectionString,
-}: {
-  policies: GeneratedPolicy[]
-  projectRef: string
-  connectionString?: string | null
-}): Promise<GeneratedPolicy[]> => {
-  if (policies.length === 0) {
-    return []
-  }
-
-  // Combine all policy SQL statements into a single transaction
-  const combinedSql = ['BEGIN;', ...policies.map((policy) => policy.sql), 'COMMIT;'].join('\n\n')
-
-  try {
-    await executeSql({ projectRef, connectionString, sql: combinedSql })
-    // If successful, return all policies
-    return policies
-  } catch (error) {
-    console.error('Failed to create policies:', error)
-    // If batch creation fails, return empty array (no policies were created)
-    return []
-  }
-}
-
-/**
- * Generates and creates RLS policies for a table.
- * Fetches project details, table columns, and FK constraints directly from the database.
- */
-export const generateAndCreatePoliciesForTable = async ({
-  projectRef,
-  schema,
-  tableName,
-}: {
-  projectRef: string
-  schema: string
-  tableName: string
-}): Promise<GeneratedPolicy[]> => {
-  try {
-    // Fetch project details to get connection string
-    const project = await getProjectDetail({ ref: projectRef })
-    const connectionString = project.connectionString
-
-    if (!connectionString) {
-      return []
-    }
-
-    // Fetch table data and FK constraints in parallel
-    const [tables, foreignKeyConstraints] = await Promise.all([
-      getTables({
-        projectRef,
-        connectionString,
-        schema,
-        includeColumns: true,
-      }),
-      getForeignKeyConstraints({
-        projectRef,
-        connectionString,
-        schema,
-      }),
-    ])
-
-    // Find the specific table to get its columns
-    const tableData = tables.find((t) => t.schema === schema && t.name === tableName)
-    const tableColumns =
-      tableData && 'columns' in tableData && Array.isArray(tableData.columns)
-        ? (tableData.columns as { name: string }[])
-        : undefined
-
-    if (!tableData || !tableColumns) {
-      return []
-    }
-
-    const columns = tableColumns.map((col) => ({ name: col.name }))
-
-    // Generate policies
-    const generatedPolicies = await generateStartingPoliciesForTable({
-      table: { name: tableName, schema },
-      foreignKeyConstraints: foreignKeyConstraints ?? [],
+  if (enableAi) {
+    return await generateAiPoliciesForTable({
+      table,
       columns,
       projectRef,
       connectionString,
     })
-
-    if (generatedPolicies.length === 0) {
-      return []
-    }
-
-    // Create policies in the database
-    const policiesCreated = await createGeneratedPolicies({
-      policies: generatedPolicies,
-      projectRef,
-      connectionString,
-    })
-
-    return policiesCreated
-  } catch (error: any) {
-    console.error('Failed to generate and create policies:', error)
-    return []
   }
+
+  return []
 }

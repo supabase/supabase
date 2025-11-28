@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import type { CreatePolicyBody } from 'data/database-policies/database-policy-create-mutation'
 import { fetchPost } from 'data/fetchers'
 import type { ResponseError } from 'types'
 
@@ -14,7 +15,15 @@ export type SqlPolicyGenerateVariables = {
   message?: string
 }
 
-export type SqlPolicyGenerateResponse = { sql: string; name: string }[]
+/**
+ * AI-generated policy response extends CreatePolicyBody with required fields and sql for display.
+ */
+export type SqlPolicyGenerateResponse = (Required<
+  Pick<CreatePolicyBody, 'name' | 'table' | 'schema' | 'action' | 'roles'>
+> &
+  Pick<CreatePolicyBody, 'command' | 'definition' | 'check'> & {
+    sql: string
+  })[]
 
 export async function generateSqlPolicy({
   tableName,

@@ -1,3 +1,4 @@
+import { X } from 'lucide-react'
 import {
   Badge,
   HoverCard_Shadcn_,
@@ -10,26 +11,49 @@ export interface PolicyListItemData {
   name: string
   command?: string | null
   sql?: string | null
+  isNew?: boolean
 }
 
 interface PolicyListItemProps {
   policy: PolicyListItemData
   className?: string
+  onRemove?: () => void
 }
 
 /**
  * A shared component for displaying policy items with hover preview
  * Used in RLSManagement and policy creation toast notifications
  */
-export const PolicyListItem = ({ policy, className }: PolicyListItemProps) => {
+export const PolicyListItem = ({ policy, className, onRemove }: PolicyListItemProps) => {
   return (
     <HoverCard_Shadcn_ openDelay={200} closeDelay={100}>
       <HoverCardTrigger_Shadcn_ asChild>
         <div
           className={`flex items-center justify-between text-sm text-foreground py-2 px-3 hover:bg-surface-100 transition-colors ${className ?? ''}`}
         >
-          <p className="font-mono text-xs truncate">{policy.name}</p>
-          {policy.command && <Badge variant="default">{policy.command}</Badge>}
+          <p className="font-mono text-xs truncate flex-1">{policy.name}</p>
+
+          <div className="flex items-center gap-2">
+            {policy.command && <Badge variant="default">{policy.command}</Badge>}
+            {policy.isNew && (
+              <Badge variant="success" size="tiny">
+                New
+              </Badge>
+            )}
+            {onRemove && policy.isNew && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onRemove()
+                }}
+                className="flex items-center justify-center hover:bg-surface-200 rounded p-0.5 transition-colors"
+                aria-label="Remove policy"
+              >
+                <X size={16} strokeWidth={1.5} className="text-foreground-lighter" />
+              </button>
+            )}
+          </div>
         </div>
       </HoverCardTrigger_Shadcn_>
       <HoverCardContent_Shadcn_ className="w-96" side="left">
@@ -48,13 +72,14 @@ export const PolicyListItem = ({ policy, className }: PolicyListItemProps) => {
 interface PolicyListProps {
   policies: PolicyListItemData[]
   className?: string
+  onRemove?: (index: number) => void
 }
 
 /**
  * A list of policies with hover previews
  * Used in RLSManagement and toast notifications
  */
-export const PolicyList = ({ policies, className }: PolicyListProps) => {
+export const PolicyList = ({ policies, className, onRemove }: PolicyListProps) => {
   return (
     <div
       className={`rounded border border-default overflow-hidden bg-surface-100 ${className ?? ''}`}
@@ -64,6 +89,7 @@ export const PolicyList = ({ policies, className }: PolicyListProps) => {
           key={`${policy.name}-${idx}`}
           policy={policy}
           className={idx < policies.length - 1 ? 'border-b border-default' : ''}
+          onRemove={onRemove ? () => onRemove(idx) : undefined}
         />
       ))}
     </div>

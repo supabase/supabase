@@ -3,6 +3,7 @@ import { isEmpty, isUndefined, noop } from 'lodash'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
+import type { GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { CONSTRAINT_TYPE, useTableConstraintsQuery } from 'data/database/constraints-query'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
@@ -98,7 +99,7 @@ export const TableEditor = ({
   const [importContent, setImportContent] = useState<ImportContent>()
   const [isImportingSpreadsheet, setIsImportingSpreadsheet] = useState<boolean>(false)
 
-  const [generateStartingPolicies, setGenerateStartingPolicies] = useState<boolean>(false)
+  const [generatedPolicies, setGeneratedPolicies] = useState<GeneratedPolicy[]>([])
 
   const { data: constraints } = useTableConstraintsQuery({
     projectRef: project?.ref,
@@ -110,11 +111,16 @@ export const TableEditor = ({
   )
 
   const { data: foreignKeyMeta, isSuccess: isSuccessForeignKeyMeta } =
-    useForeignKeyConstraintsQuery({
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      schema: table?.schema,
-    })
+    useForeignKeyConstraintsQuery(
+      {
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        schema: table?.schema,
+      },
+      {
+        enabled: !isNewRecord && !!table?.schema,
+      }
+    )
   const foreignKeys = useMemo(
     () =>
       (foreignKeyMeta ?? []).filter(
@@ -216,7 +222,7 @@ export const TableEditor = ({
           columns,
           foreignKeyRelations: fkRelations,
           resolve,
-          generateStartingPolicies: isNewRecord ? generateStartingPolicies : false,
+          generatedPolicies: isNewRecord ? generatedPolicies : [],
         })
       } else {
         resolve()
@@ -230,7 +236,7 @@ export const TableEditor = ({
       setErrors({})
       setImportContent(undefined)
       setIsDuplicateRows(false)
-      setGenerateStartingPolicies(false)
+      setGeneratedPolicies([])
       if (isNewRecord) {
         const tableFields = generateTableField()
         if (templateData) {
@@ -391,12 +397,15 @@ export const TableEditor = ({
         <RLSManagement
           schema={table?.schema ?? selectedSchema ?? ''}
           table={table}
+          tableName={isNewRecord ? tableFields.name : undefined}
+          columns={isNewRecord ? tableFields.columns : undefined}
+          foreignKeyRelations={isNewRecord ? fkRelations : undefined}
           isRlsEnabled={tableFields.isRLSEnabled}
           onChangeRlsEnabled={(value) => onUpdateField({ isRLSEnabled: value })}
           isNewRecord={isNewRecord}
           isDuplicating={isDuplicating}
-          generateStartingPolicies={generateStartingPolicies}
-          onChangeGenerateStartingPolicies={setGenerateStartingPolicies}
+          generatedPolicies={generatedPolicies}
+          onGeneratedPoliciesChange={setGeneratedPolicies}
         />
       </SidePanel.Content>
     </SidePanel>

@@ -5,7 +5,8 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { generateAndCreatePoliciesForTable } from 'components/interfaces/Auth/Policies/Policies.utils'
+import { type GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
+import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
@@ -67,7 +68,7 @@ type SaveTableParamsBase = {
   columns: ColumnField[]
   foreignKeyRelations: ForeignKey[]
   resolve: () => void
-  generateStartingPolicies?: boolean
+  generatedPolicies?: GeneratedPolicy[]
 }
 
 type SaveTableParamsNew = SaveTableParamsBase & {
@@ -178,6 +179,9 @@ export const SidePanelEditor = ({
   const { mutateAsync: createPublication } = useDatabasePublicationCreateMutation()
   const { mutateAsync: updatePublication } = useDatabasePublicationUpdateMutation({
     onError: () => {},
+  })
+  const { mutateAsync: createPolicy } = useDatabasePolicyCreateMutation({
+    onError: () => {}, // Errors handled inline
   })
 
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
@@ -485,8 +489,7 @@ export const SidePanelEditor = ({
   const saveTable = async (params: SaveTableParams) => {
     // action and payload are not destructured here to preserve type
     // narrowing later on
-    const { configuration, columns, foreignKeyRelations, resolve, generateStartingPolicies } =
-      params
+    const { configuration, columns, foreignKeyRelations, resolve, generatedPolicies = [] } = params
 
     let toastId
     let saveTableError = false
@@ -516,17 +519,28 @@ export const SidePanelEditor = ({
         })
         if (isRealtimeEnabled) await updateTableRealtime(table, true)
 
-        // Generate policies synchronously if enabled (before closing panel)
-        if (generateStartingPolicies && isRLSEnabled && project?.ref) {
-          try {
-            await generateAndCreatePoliciesForTable({
-              projectRef: project.ref,
-              schema: table.schema,
-              tableName: table.name,
-            })
-          } catch (error: any) {
-            // Error is already handled and shown in generateAndCreatePoliciesForTable
-            // Continue to show table creation success even if policy generation fails
+        // Create generated policies after table creation
+        if (generatedPolicies.length > 0 && isRLSEnabled && project?.ref) {
+          for (const policy of generatedPolicies) {
+            try {
+              await createPolicy({
+                projectRef: project.ref,
+                connectionString: project.connectionString,
+                payload: {
+                  name: policy.name,
+                  table: policy.table,
+                  schema: policy.schema,
+                  definition: policy.definition,
+                  check: policy.check,
+                  action: policy.action,
+                  command: policy.command,
+                  roles: policy.roles,
+                },
+              })
+            } catch (error: any) {
+              // Continue to show table creation success even if policy creation fails
+              console.error(`Failed to create policy "${policy.name}":`, error)
+            }
           }
         }
 
