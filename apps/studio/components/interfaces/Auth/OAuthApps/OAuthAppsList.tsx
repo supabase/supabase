@@ -1,16 +1,5 @@
 import type { OAuthClient } from '@supabase/supabase-js'
-import {
-  ArrowDown,
-  ArrowUp,
-  ChevronUp,
-  Edit,
-  MoreVertical,
-  Plus,
-  RotateCw,
-  Search,
-  Trash,
-  X,
-} from 'lucide-react'
+import { Edit, MoreVertical, Plus, RotateCw, Search, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useMemo, useRef, useState } from 'react'
@@ -197,45 +186,6 @@ export const OAuthAppsList = () => {
     }
   }
 
-  const getSortIcon = (column: OAuthAppsSortColumn, isHovered: boolean) => {
-    const [currentCol, currentOrder] = sort.split(':')
-    if (currentCol === column) {
-      return currentOrder === 'asc' ? (
-        <ArrowUp className="w-3 h-3" />
-      ) : (
-        <ArrowDown className="w-3 h-3" />
-      )
-    }
-    if (isHovered) {
-      return <ChevronUp className="w-3 h-3" />
-    }
-    return <div className="w-3 h-3 not-sr-only" />
-  }
-
-  const SortableTableHead = ({
-    column,
-    children,
-  }: {
-    column: OAuthAppsSortColumn
-    children: React.ReactNode
-  }) => {
-    const [isHovered, setIsHovered] = useState(false)
-
-    return (
-      <TableHead
-        className="cursor-pointer select-none"
-        onClick={() => handleSortChange(column)}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <div className="flex items-center gap-1 !bg-transparent">
-          {children}
-          {getSortIcon(column, isHovered)}
-        </div>
-      </TableHead>
-    )
-  }
-
   if (isAuthConfigLoading || (isOAuthServerEnabled && isLoading)) {
     return <GenericSkeletonLoader />
   }
@@ -339,13 +289,46 @@ export const OAuthAppsList = () => {
             <Table containerProps={{ stickyLastColumn: true }}>
               <TableHeader>
                 <TableRow>
-                  <SortableTableHead column="name">Name</SortableTableHead>
-                  <SortableTableHead column="client_id">Client ID</SortableTableHead>
-                  <SortableTableHead column="client_type">Client Type</SortableTableHead>
-                  <SortableTableHead column="registration_type">
+                  <TableHead
+                    sortable
+                    column="name"
+                    currentSort={sort}
+                    onSortChange={handleSortChange}
+                  >
+                    Name
+                  </TableHead>
+                  <TableHead
+                    sortable
+                    column="client_id"
+                    currentSort={sort}
+                    onSortChange={handleSortChange}
+                  >
+                    Client ID
+                  </TableHead>
+                  <TableHead
+                    sortable
+                    column="client_type"
+                    currentSort={sort}
+                    onSortChange={handleSortChange}
+                  >
+                    Client Type
+                  </TableHead>
+                  <TableHead
+                    sortable
+                    column="registration_type"
+                    currentSort={sort}
+                    onSortChange={handleSortChange}
+                  >
                     Registration Type
-                  </SortableTableHead>
-                  <SortableTableHead column="created_at">Created</SortableTableHead>
+                  </TableHead>
+                  <TableHead
+                    sortable
+                    column="created_at"
+                    currentSort={sort}
+                    onSortChange={handleSortChange}
+                  >
+                    Created
+                  </TableHead>
                   <TableHead className="w-8 px-0">
                     <div className="!bg-200 px-4 w-full h-full flex items-center border-l @[944px]:border-l-0" />
                   </TableHead>
