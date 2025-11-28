@@ -17,7 +17,7 @@ import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
@@ -265,14 +265,14 @@ export const CreateBranchModal = () => {
         <Form_Shadcn_ {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
             {promptProPlanUpgrade && (
-              <>
-                <UpgradeToPro
-                  primaryText="Upgrade to unlock branching"
-                  secondaryText="Create and test schema changes, functions, and more in a separate, temporary instance without affecting production"
-                  source="create-branch"
-                />
-                <DialogSectionSeparator />
-              </>
+              <UpgradeToPro
+                fullWidth
+                layout="vertical"
+                source="create-branch"
+                featureProposition="enable branching"
+                primaryText="Upgrade to unlock branching"
+                secondaryText="Create and test schema changes, functions, and more in a separate, temporary instance without affecting production"
+              />
             )}
 
             <DialogSection

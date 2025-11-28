@@ -315,6 +315,7 @@ export function DiskManagementForm() {
     if (isDiskAttributesSuccess || isSuccess) {
       form.reset(defaultValues, {})
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess, isDiskAttributesSuccess])
 
   return (
@@ -325,7 +326,13 @@ export function DiskManagementForm() {
             type="default"
             visible={isEntitlementsLoaded && !hasAccess}
             title="Compute and Disk configuration is not available on the Free Plan"
-            actions={<UpgradePlanButton source="diskManagementConfigure" plan="Pro" />}
+            actions={
+              <UpgradePlanButton
+                source="diskManagementConfigure"
+                plan="Pro"
+                featureProposition="configure compute and disk"
+              />
+            }
             description="You will need to upgrade to at least the Pro Plan to configure compute and disk"
           />
 

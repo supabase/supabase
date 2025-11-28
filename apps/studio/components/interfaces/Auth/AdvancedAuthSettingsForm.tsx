@@ -9,7 +9,7 @@ import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { StringNumberOrNull } from 'components/ui/Forms/Form.constants'
 import NoPermission from 'components/ui/NoPermission'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -108,6 +108,7 @@ export const AdvancedAuthSettingsForm = () => {
         })
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authConfig, isUpdatingRequestDurationForm, isUpdatingDatabaseForm])
 
   const onSubmitRequestDurationForm = (values: any) => {
@@ -190,6 +191,9 @@ export const AdvancedAuthSettingsForm = () => {
       {promptTeamsEnterpriseUpgrade && (
         <div className="my-4">
           <UpgradeToPro
+            source="authAdvanced"
+            featureProposition="configure advanced Auth server settings"
+            plan="Team"
             primaryText="Upgrade to Team or Enterprise"
             secondaryText="Advanced Auth server settings are only available on the Team Plan and up."
             buttonText="Upgrade to Team"

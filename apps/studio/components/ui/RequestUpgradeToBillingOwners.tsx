@@ -6,6 +6,7 @@ import { useOrganizationRolesV2Query } from 'data/organization-members/organizat
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { PropsWithChildren } from 'react'
 import {
   Button,
   Dialog,
@@ -29,21 +30,64 @@ const FormSchema = z.object({
   note: z.string().optional(),
 })
 
-interface RequestUpgradeToPaidProps {
+interface RequestUpgradeToBillingOwnersProps {
   plan?: 'Pro' | 'Team' | 'Enterprise'
-  feature?: string
+  addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+  /** Used in the default message template, e.g: "Upgrade to ..." */
+  featureProposition?: string
 }
 
-export const RequestUpgradeToPaid = ({ plan = 'Pro', feature }: RequestUpgradeToPaidProps) => {
+export const RequestUpgradeToBillingOwners = ({
+  plan = 'Pro',
+  addon,
+  featureProposition,
+  children,
+}: PropsWithChildren<RequestUpgradeToBillingOwnersProps>) => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
+  const isFreePlan = organization?.plan?.id === 'free'
 
   const { data: members = [] } = useOrganizationMembersQuery({ slug: organization?.slug })
   const { data: roles } = useOrganizationRolesV2Query({ slug: organization?.slug })
   const orgRoles = roles?.org_scoped_roles ?? []
 
+  const formattedAddonName =
+    addon === 'pitr' ? 'PITR' : addon === 'customDomain' ? 'Custom Domain' : ''
+
+  const target = !!project
+    ? `for the project "${project?.name}"`
+    : !!organization
+      ? `for the organization "${organization.name}"`
+      : ''
+  const action =
+    addon === 'spendCap'
+      ? `disable spend cap`
+      : addon === 'computeSize'
+        ? `change the compute size`
+        : `enable the ${formattedAddonName} add-on`
+  const titleText = !!addon
+    ? addon === 'spendCap'
+      ? `Request to disable spend cap`
+      : addon === 'computeSize'
+        ? 'Request to change compute size'
+        : `Request to enable the ${formattedAddonName} add-on`
+    : `Request an upgrade for the ${plan} Plan`
+  const buttonText = !!children
+    ? children
+    : !!addon
+      ? addon === 'spendCap'
+        ? 'Request to disable spend cap'
+        : addon === 'computeSize'
+          ? 'Request to change compute'
+          : 'Request to enable addon'
+      : `Request upgrade to ${plan}`
+
   const defaultValues = {
-    note: `We'd like to upgrade to the ${plan} plan to use ${feature ?? 'a feature'} for the project "${project?.name}"`,
+    note: !!addon
+      ? addon === 'spendCap'
+        ? `We'd like to ${isFreePlan ? 'upgrade to Pro and ' : ''}${action} ${target} so that we can ${featureProposition}`
+        : `We'd like to ${isFreePlan ? 'upgrade to Pro and ' : ''}${action} ${target} so that we can ${featureProposition}`
+      : `We'd like to upgrade to the ${plan} plan to ${featureProposition ?? 'use a feature'} ${target}`,
   }
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -69,13 +113,13 @@ export const RequestUpgradeToPaid = ({ plan = 'Pro', feature }: RequestUpgradeTo
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="primary">Request upgrade to {plan}</Button>
+        <Button type="primary">{buttonText}</Button>
       </DialogTrigger>
       <DialogContent>
         <Form_Shadcn_ {...form}>
           <form id="request-upgrade-form" onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
-              <DialogTitle>Request an upgrade for the {plan} Plan</DialogTitle>
+              <DialogTitle>{titleText}</DialogTitle>
               <DialogDescription>
                 Let your organization's billing owners know your interest in this
               </DialogDescription>
@@ -111,7 +155,13 @@ export const RequestUpgradeToPaid = ({ plan = 'Pro', feature }: RequestUpgradeTo
                         id="note"
                         {...field}
                         rows={3}
-                        placeholder="e.g We need to upgrade to the Pro plan to use this feature"
+                        placeholder={
+                          !!addon
+                            ? addon === 'spendCap'
+                              ? 'e.g. We need to disabled spend cap on this project to do something'
+                              : 'e.g. We need to enable this add-on to do something with the project'
+                            : 'e.g. We need to upgrade to the Pro plan to use this feature'
+                        }
                       />
                     </FormControl_Shadcn_>
                   </FormItemLayout>

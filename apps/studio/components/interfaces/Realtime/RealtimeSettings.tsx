@@ -415,7 +415,11 @@ export const RealtimeSettings = () => {
                                     </div>
                                     <div className="flex-grow flex items-center justify-end">
                                       {isFreePlan ? (
-                                        <UpgradePlanButton source="realtimeSettings" plan="Pro" />
+                                        <UpgradePlanButton
+                                          source="realtimeSettings"
+                                          addon="spendCap"
+                                          featureProposition="configure the max events per second parameter of realtime settings"
+                                        />
                                       ) : (
                                         <ToggleSpendCapButton />
                                       )}
@@ -477,7 +481,11 @@ export const RealtimeSettings = () => {
                                     </div>
                                     <div className="flex-grow flex items-center justify-end">
                                       {isFreePlan ? (
-                                        <UpgradePlanButton source="realtimeSettings" plan="Pro" />
+                                        <UpgradePlanButton
+                                          source="realtimeSettings"
+                                          addon="spendCap"
+                                          featureProposition="configure the max presence events per second parameter of realtime settings"
+                                        />
                                       ) : (
                                         <ToggleSpendCapButton />
                                       )}
@@ -539,7 +547,11 @@ export const RealtimeSettings = () => {
                                     </div>
                                     <div className="flex-grow flex items-center justify-end">
                                       {isFreePlan ? (
-                                        <UpgradePlanButton source="realtimeSettings" plan="Pro" />
+                                        <UpgradePlanButton
+                                          addon="spendCap"
+                                          source="realtimeSettings"
+                                          featureProposition="configure the max payload size parameter of realtime settings"
+                                        />
                                       ) : (
                                         <ToggleSpendCapButton />
                                       )}
