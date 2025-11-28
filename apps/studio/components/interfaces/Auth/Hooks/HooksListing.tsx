@@ -11,7 +11,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cn } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { EmptyStatePresentational, GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AddHookDropdown } from './AddHookDropdown'
 import { CreateHookSheet } from './CreateHookSheet'
@@ -97,7 +97,7 @@ export const HooksListing = () => {
   return (
     <ScaffoldSection isFullWidth>
       <div className="flex justify-between items-center mb-4">
-        <ScaffoldSectionTitle>All hooks</ScaffoldSectionTitle>
+        <ScaffoldSectionTitle>Hooks</ScaffoldSectionTitle>
         <AddHookDropdown
           onSelectHook={(title) => {
             const hook = hooks.find((h) => h.title === title)
@@ -107,22 +107,19 @@ export const HooksListing = () => {
       </div>
 
       {hooks.filter((h) => isValidHook(h)).length === 0 && (
-        <div
-          className={[
-            'border rounded border-default px-20 py-16',
-            'flex flex-col items-center justify-center space-y-4',
-          ].join(' ')}
+        <EmptyStatePresentational
+          title="Create an auth hook"
+          description="Use Postgres functions or HTTP endpoints to customize your authentication flow."
         >
-          <p className="text-sm text-foreground-light">No hooks configured yet</p>
           <AddHookDropdown
+            type="default"
             align="center"
-            buttonText="Add a new hook"
             onSelectHook={(title) => {
               const hook = hooks.find((h) => h.title === title)
               if (hook) setSelectedHook(hook.id)
             }}
           />
-        </div>
+        </EmptyStatePresentational>
       )}
 
       <div className="-space-y-px">

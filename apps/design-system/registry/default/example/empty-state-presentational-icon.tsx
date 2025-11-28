@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react'
 import { Button } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
 
-export default function EmptyStateInitialStatePresentational() {
+export default function EmptyStatePresentationalIcon() {
   return (
     <EmptyStatePresentational
       icon={BucketPlus}

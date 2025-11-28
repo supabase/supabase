@@ -1,12 +1,32 @@
 ---
 title: EmptyStatePresentational
-description: An initial state with value propositions and actions.
+description: An empty state for encouraging action.
 component: true
 fragment: true
 ---
 
-<ComponentPreview name="empty-state-initial-state-presentational" peekCode />
+<ComponentPreview name="empty-state-presentational-icon" peekCode />
 
-Supports both Lucide icons and custom icon components from the `icons` package. Expects a title, description, and optional action buttons or other children.
+Expects a title, description, and optional action buttons or other children.
+
+## Props
+
+### Text
+
+All text should be written using active language. The title should prompt the user to take an action, and the description should clearly explain the value of doing so.
+
+### Icon
+
+Supports both Lucide icons and [custom icons](../icons) via the `icons` package. If neither are passed, EmptyStatePresentational falls back to Lucide’s `SquarePlus`.
+
+<ComponentPreview name="empty-state-presentational-demo" peekCode />
 
 See also [Empty States](../ui-patterns/empty-states).
+
+## Examples
+
+It’s okay (and encouraged) to repeat buttons inside of EmptyStatePresentational that are also available outside of it. The alternative—conditionally loading button placement during empty state determination—often leads to confusing layout shift.
+
+When repeating buttons, set the `type` to `default` so the original `primary`, button remains the only `primary` action on display.
+
+<ComponentPreview name="empty-state-presentational-buttons" peekCode />

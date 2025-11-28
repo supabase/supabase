@@ -21,12 +21,14 @@ import { extractMethod, isValidHook } from './hooks.utils'
 interface AddHookDropdownProps {
   buttonText?: string
   align?: 'end' | 'center'
+  type?: 'primary' | 'default'
   onSelectHook: (hook: HOOK_DEFINITION_TITLE) => void
 }
 
 export const AddHookDropdown = ({
   buttonText = 'Add hook',
   align = 'end',
+  type = 'primary',
   onSelectHook,
 }: AddHookDropdownProps) => {
   const { ref: projectRef } = useParams()
@@ -56,7 +58,7 @@ export const AddHookDropdown = ({
     return (
       <ButtonTooltip
         disabled
-        type="primary"
+        type={type}
         tooltip={{
           content: { side: 'bottom', text: 'You need additional permissions to add auth hooks' },
         }}
@@ -69,7 +71,7 @@ export const AddHookDropdown = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="primary" iconRight={<ChevronDown className="w-4 h-4" strokeWidth={1} />}>
+        <Button type={type} iconRight={<ChevronDown size={14} strokeWidth={1} />}>
           {buttonText}
         </Button>
       </DropdownMenuTrigger>
@@ -91,7 +93,7 @@ export const AddHookDropdown = ({
               The following hooks are not available on{' '}
               <a
                 target="_href"
-                href={`https://supabase.com/dashboard/org/${organization?.slug ?? '_'}/billing`}
+                href={`/org/${organization?.slug ?? '_'}/billing`}
                 className="underline"
               >
                 your plan

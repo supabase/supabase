@@ -3,7 +3,6 @@ import { X } from 'lucide-react'
 import randomBytes from 'randombytes'
 import { useEffect, useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
@@ -459,11 +458,13 @@ export const CreateHookSheet = ({
                       <FormItemLayout
                         label="Secret"
                         description={
-                          <ReactMarkdown>
-                            It should be a base64 encoded hook secret with a prefix `v1,whsec_`.
-                            `v1` denotes the signature version, and `whsec_` signifies a symmetric
-                            secret.
-                          </ReactMarkdown>
+                          <p>
+                            Should be a base64 encoded hook secret with a prefix
+                            <code className="text-code-inline">v1,whsec_</code>.{' '}
+                            <code className="text-code-inline">v1</code> denotes the signature
+                            version and <code className="text-code-inline">whsec_</code> signifies a
+                            symmetric secret.
+                          </p>
                         }
                       >
                         <FormControl_Shadcn_>
@@ -472,7 +473,7 @@ export const CreateHookSheet = ({
                             <Button
                               type="default"
                               size="small"
-                              className="rounded-l-none"
+                              className="rounded-l-none text-xs"
                               onClick={() => {
                                 const authHookSecret = generateAuthHookSecret()
                                 form.setValue('httpsValues.secret', authHookSecret)
