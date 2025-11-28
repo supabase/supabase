@@ -16,8 +16,6 @@ const getOrDefaultBoolean = (key: string, defaultValue: boolean): boolean => {
   return value ? value === 'true' : defaultValue
 }
 
-type NODE_ENV = 'prod' | 'staging' | 'local'
-
 export const CONFIG = {
   SUPA_PLATFORM_URI: getOrThrow('SUPA_PLATFORM_URI'),
   SUPA_V0_KEY: getOrThrow('SUPA_V0_KEY'),

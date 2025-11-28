@@ -1,9 +1,9 @@
 import assert from 'assert'
 
-import { PlatformClient } from './common/platform.js'
-import { sleep } from './common/helpers.js'
+import { PlatformClient } from './platform.js'
+import { sleep } from './helpers.js'
 
-import { CONFIG } from './common/config.js'
+import { CONFIG } from './config.js'
 
 const checkHealth = async (ref: string) => {
   const platformClient = new PlatformClient({

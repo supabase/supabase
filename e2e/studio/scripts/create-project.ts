@@ -1,11 +1,8 @@
-import '@dotenvx/dotenvx/config'
-
 import assert from 'assert'
-import fs from 'fs'
 import { faker } from '@faker-js/faker'
 
 import { waitForProjectStatus } from './common/helpers.js'
-import { waitForHealthyServices } from './wait-healthy-services.js'
+import { waitForHealthyServices } from './common/wait-healthy-services.js'
 import { platformClientV0 } from './common/platform.js'
 
 const apiKey = process.env.SUPA_V0_KEY
