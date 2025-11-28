@@ -58,7 +58,7 @@ export const HooksList = ({
         <Input
           placeholder="Search for a webhook"
           size="tiny"
-          icon={<Search size="14" />}
+          icon={<Search />}
           value={filterString}
           className="w-52"
           onChange={(e) => setFilterString(e.target.value)}
