@@ -373,6 +373,10 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/sveltekit' as `/${string}`,
         },
         {
+          name: 'TanStack Start',
+          url: '/guides/getting-started/quickstarts/tanstack' as `/${string}`,
+        },
+        {
           name: 'Laravel PHP',
           url: '/guides/getting-started/quickstarts/laravel' as `/${string}`,
           enabled: !jsOnly,
