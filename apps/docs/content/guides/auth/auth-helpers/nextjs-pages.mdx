@@ -613,7 +613,13 @@ export default ProtectedRoute
 </TabPanel>
 </Tabs>
 
-## Auth with Next.js Proxy
+## Auth with Next.js Middleware/Proxy
+
+<Admonition type="tip">
+
+Since NextJs 16, the `middleware.ts` is deprecated and was replaced by `proxy.ts`
+
+</Admonition>
 
 As an alternative to protecting individual pages you can use a [Next.js Proxy](https://nextjs.org/docs/app/getting-started/proxy) to protect the entire directory or those that match the config object. In the following example, all requests to `/proxy-protected/*` will check whether a user is signed in, if successful the request will be forwarded to the destination route, otherwise the user will be redirected:
 
@@ -622,6 +628,7 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+// NextJs `middleware.ts` is deprecated and was replaced by `proxy.ts` - https://nextjs.org/docs/app/getting-started/proxy
 export async function proxy(req: NextRequest) {
   // We need to create a response and hand it to the supabase client to be able to modify the response headers.
   const res = NextResponse.next()
