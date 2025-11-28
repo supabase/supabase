@@ -135,66 +135,64 @@ export const General = () => {
           }}
         </Form>
       )}
+      <div className="mt-6" id="restart-project">
+        <FormPanel>
+          <div className="flex flex-col px-8 py-4">
+            <div className="flex flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4">
+              <div>
+                <p className="text-sm">
+                  {projectSettingsRestartProject ? 'Restart project' : 'Restart database'}
+                </p>
+                <div className="max-w-[420px]">
+                  <p className="text-sm text-foreground-light">
+                    Your project will not be available for a few minutes.
+                  </p>
+                </div>
+              </div>
+              <RestartServerButton />
+            </div>
+          </div>
+          <div
+            className="flex w-full flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4 px-8 py-4"
+            id="pause-project"
+          >
+            <div>
+              <p className="text-sm">Pause project</p>
+              <div className="max-w-[420px]">
+                <p className="text-sm text-foreground-light">
+                  Your project will not be accessible while it is paused.
+                </p>
+              </div>
+            </div>
+            <PauseProjectButton />
+          </div>
+        </FormPanel>
+      </div>
       {!isBranch && (
-        <>
-          <div className="mt-6" id="restart-project">
-            <FormPanel>
-              <div className="flex flex-col px-8 py-4">
-                <div className="flex flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4">
+        <div className="mt-6">
+          <Panel>
+            <Panel.Content>
+              <div className="flex flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4">
+                <div className="flex space-x-4">
+                  <BarChart2 strokeWidth={2} />
                   <div>
-                    <p className="text-sm">
-                      {projectSettingsRestartProject ? 'Restart project' : 'Restart database'}
+                    <p className="text-sm">Project usage statistics have been moved</p>
+                    <p className="text-foreground-light text-sm">
+                      You may view your project's usage under your organization's settings
                     </p>
-                    <div className="max-w-[420px]">
-                      <p className="text-sm text-foreground-light">
-                        Your project will not be available for a few minutes.
-                      </p>
-                    </div>
                   </div>
-                  <RestartServerButton />
                 </div>
-              </div>
-              <div
-                className="flex w-full flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4 px-8 py-4"
-                id="pause-project"
-              >
                 <div>
-                  <p className="text-sm">Pause project</p>
-                  <div className="max-w-[420px]">
-                    <p className="text-sm text-foreground-light">
-                      Your project will not be accessible while it is paused.
-                    </p>
-                  </div>
+                  <Button asChild type="default">
+                    <Link href={`/org/${organization?.slug}/usage?projectRef=${project?.ref}`}>
+                      View project usage
+                    </Link>
+                  </Button>
                 </div>
-                <PauseProjectButton />
               </div>
-            </FormPanel>
-          </div>
-          <div className="mt-6">
-            <Panel>
-              <Panel.Content>
-                <div className="flex flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4">
-                  <div className="flex space-x-4">
-                    <BarChart2 strokeWidth={2} />
-                    <div>
-                      <p className="text-sm">Project usage statistics have been moved</p>
-                      <p className="text-foreground-light text-sm">
-                        You may view your project's usage under your organization's settings
-                      </p>
-                    </div>
-                  </div>
-                  <div>
-                    <Button asChild type="default">
-                      <Link href={`/org/${organization?.slug}/usage?projectRef=${project?.ref}`}>
-                        View project usage
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </Panel.Content>
-            </Panel>
-          </div>
-        </>
+            </Panel.Content>
+          </Panel>
+        </div>
       )}
     </div>
   )
