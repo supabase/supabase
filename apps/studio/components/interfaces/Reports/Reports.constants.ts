@@ -301,6 +301,23 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           timestamp ASC
         `,
       },
+      requestsByCountry: {
+        queryType: 'logs',
+        sql: (filters) => `
+        -- reports-api-requests-by-country
+        select
+          cf.country as country,
+          count(t.id) as count
+        from edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.request) as request
+          cross join unnest(request.cf) as cf
+        group by
+          cf.country
+        order by
+          count desc
+        `,
+      },
     },
   },
   [Presets.AUTH]: {

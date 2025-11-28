@@ -1,6 +1,6 @@
 import sumBy from 'lodash/sumBy'
 import { ChevronRight } from 'lucide-react'
-import { Fragment, useState } from 'react'
+import { Fragment, useRef, useState } from 'react'
 
 import { useParams } from 'common'
 import {
@@ -25,6 +25,11 @@ import {
 } from 'ui'
 import { queryParamsToObject } from '../Reports.utils'
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
+import { ComposableMap, Geographies, Geography } from 'react-simple-maps'
+import GeographyData from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/MapData.json'
+import { ZoomableGroup } from 'react-simple-maps'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { COUNTRIES } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/BillingAddress.constants'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
@@ -385,3 +390,159 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
     </CollapsibleContent_Shadcn_>
   </Collapsible_Shadcn_>
 )
+
+export const RequestsByCountryMapRenderer = (
+  props: ReportWidgetProps<{
+    country: string | null
+    count: number
+  }>
+) => {
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const [hoverInfo, setHoverInfo] = useState<{
+    x: number
+    y: number
+    title: string
+    subtitle: string
+    visible: boolean
+  }>({ x: 0, y: 0, title: '', subtitle: '', visible: false })
+  // Build a quick lookup: ISO alpha-2 -> count
+  const countsByIso2: Record<string, number> = {}
+  let max = 0
+  for (const row of props.data) {
+    if (!row.country) continue
+    const code = row.country.toUpperCase()
+    countsByIso2[code] = (countsByIso2[code] || 0) + Number(row.count || 0)
+    if (countsByIso2[code] > max) max = countsByIso2[code]
+  }
+
+  // Build ISO2 -> Country Name map from existing constants
+  const iso2ToName: Record<string, string> = {}
+  for (const c of COUNTRIES) {
+    iso2ToName[c.code] = c.name
+  }
+  // Some common name normalizations between our map data and billing list
+  iso2ToName['US'] = 'United States of America'
+  iso2ToName['RU'] = 'Russia' // MapData uses "Russia"
+  iso2ToName['CD'] = 'Democratic Republic of the Congo'
+  iso2ToName['CG'] = 'Republic of the Congo'
+  iso2ToName['CI'] = "Côte d'Ivoire"
+  iso2ToName['BO'] = 'Bolivia'
+  iso2ToName['BN'] = 'Brunei'
+  iso2ToName['IR'] = 'Iran'
+  iso2ToName['LA'] = 'Laos'
+  iso2ToName['KR'] = 'South Korea'
+  iso2ToName['KP'] = 'North Korea'
+  iso2ToName['SY'] = 'Syria'
+  iso2ToName['TZ'] = 'Tanzania'
+  iso2ToName['VE'] = 'Venezuela'
+  iso2ToName['VN'] = 'Vietnam'
+
+  const getFill = (val: number) => {
+    if (max <= 0 || !val) return 'hsla(var(--brand-200), 0.15)' // muted brand tint
+    const ratio = val / max
+    // 5-step scale using Supabase brand tokens
+    if (ratio > 0.8) return 'hsl(var(--brand-600))'
+    if (ratio > 0.6) return 'hsl(var(--brand-500))'
+    if (ratio > 0.4) return 'hsl(var(--brand-400))'
+    if (ratio > 0.2) return 'hsl(var(--brand-300))'
+    return 'hsl(var(--brand-200))'
+  }
+
+  return (
+    <div ref={containerRef} className="w-full h-[560px] relative">
+      <ComposableMap projectionConfig={{ scale: 155 }} className="w-full h-full">
+        <ZoomableGroup minZoom={1} maxZoom={5} zoom={1.3}>
+          <Geographies geography={GeographyData as any}>
+            {({ geographies }) =>
+              geographies.map((geo) => {
+                const title =
+                  (geo.properties?.NAME as string) || (geo.properties?.name as string) || 'Unknown'
+                // Lookup by country name resolved from ISO2 code counts
+                // Find any ISO2 that maps to this topo country name
+                // Precompute direct lookup for performance
+                let value = 0
+                // Direct match by name
+                // Try common path: find code whose mapped name equals this title
+                // Avoid O(n^2) by building a reverse map on first run
+                // For simplicity here, do a small linear scan of keys; dataset is small (<= 250)
+                for (const code in countsByIso2) {
+                  const name = iso2ToName[code] || code
+                  if (name === title) {
+                    value = countsByIso2[code]
+                    break
+                  }
+                }
+                const tooltipTitle = title
+                const tooltipSubtitle = `${value.toLocaleString()} requests`
+                return (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    onMouseMove={(e) => {
+                      const rect = containerRef.current?.getBoundingClientRect()
+                      const x = (rect ? e.clientX - rect.left : e.clientX) + 12
+                      const y = (rect ? e.clientY - rect.top : e.clientY) + 12
+                      setHoverInfo({
+                        x,
+                        y,
+                        title: tooltipTitle,
+                        subtitle: tooltipSubtitle,
+                        visible: true,
+                      })
+                    }}
+                    onMouseEnter={(e) => {
+                      const rect = containerRef.current?.getBoundingClientRect()
+                      const x = (rect ? e.clientX - rect.left : e.clientX) + 12
+                      const y = (rect ? e.clientY - rect.top : e.clientY) + 12
+                      setHoverInfo({
+                        x,
+                        y,
+                        title: tooltipTitle,
+                        subtitle: tooltipSubtitle,
+                        visible: true,
+                      })
+                    }}
+                    onMouseLeave={() => setHoverInfo((prev) => ({ ...prev, visible: false }))}
+                    style={{
+                      default: {
+                        fill: getFill(value),
+                        stroke: 'hsla(var(--brand-300), 0.6)',
+                        strokeWidth: 0.4,
+                        outline: 'none',
+                        cursor: 'default',
+                      },
+                      hover: {
+                        fill: getFill(value),
+                        stroke: 'hsl(var(--brand-500))',
+                        strokeWidth: 0.6,
+                        outline: 'none',
+                        cursor: 'default',
+                      },
+                      pressed: {
+                        fill: getFill(value),
+                        stroke: 'hsl(var(--brand-500))',
+                        strokeWidth: 0.6,
+                        outline: 'none',
+                        cursor: 'default',
+                      },
+                    }}
+                    aria-label={`${tooltipTitle} — ${tooltipSubtitle}`}
+                  />
+                )
+              })
+            }
+          </Geographies>
+        </ZoomableGroup>
+      </ComposableMap>
+      {hoverInfo.visible && (
+        <div
+          className="pointer-events-none absolute z-10 rounded bg-surface-100 px-3 py-2 shadow border border-surface-200"
+          style={{ left: hoverInfo.x, top: hoverInfo.y }}
+        >
+          <div className="text-foreground">{hoverInfo.title}</div>
+          <div className="text-foreground-lighter">{hoverInfo.subtitle}</div>
+        </div>
+      )}
+    </div>
+  )
+}
