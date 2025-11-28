@@ -104,7 +104,7 @@ const PostgrestReport = () => {
 
   return (
     <>
-      <ReportHeader showDatabaseSelector={false} title="PostgREST" />
+      <ReportHeader showDatabaseSelector={false} title="Data API" />
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2">
