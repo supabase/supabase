@@ -1,14 +1,18 @@
 'use client'
 
 import 'react-medium-image-zoom/dist/styles.css'
-import './mermaid-zoom.css'
 
 import { useEffect, useRef, useState } from 'react'
 import mermaid from 'mermaid'
 import { useTheme } from 'next-themes'
+import { useBreakpoint } from 'common'
 import Zoom from 'react-medium-image-zoom'
+import ZoomContent from '../Image/ZoomContent'
 import { cn } from '../../lib/utils/cn'
 
+// @mildtomato - 28/12/2025
+// for now the colors are hardcoded because the theme variables are not working
+// ideally we would use the css theme variables
 const darkThemeVariables = {
   background: 'transparent',
   mainBkg: '#171717',
@@ -51,6 +55,9 @@ const darkThemeVariables = {
   fontSize: '14px',
 }
 
+// @mildtomato - 28/12/2025
+// for now the colors are hardcoded because the theme variables are not working
+// ideally we would use the css theme variables
 const lightThemeVariables = {
   background: 'transparent',
   mainBkg: '#ffffff',
@@ -105,6 +112,7 @@ export function Mermaid({ chart, className, zoomable = true }: MermaidProps) {
   const [error, setError] = useState<string | null>(null)
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const isLessThanLgBreakpoint = useBreakpoint()
 
   const isDark = resolvedTheme === 'dark'
 
@@ -239,7 +247,7 @@ export function Mermaid({ chart, className, zoomable = true }: MermaidProps) {
     const svgDataUrl = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`
     return (
       <div ref={containerRef} className={containerClassName}>
-        <Zoom zoomMargin={40}>
+        <Zoom ZoomContent={ZoomContent} zoomMargin={isLessThanLgBreakpoint ? 20 : 80}>
           <img src={svgDataUrl} alt="Mermaid diagram" className="h-auto max-w-full" />
         </Zoom>
       </div>
