@@ -37,7 +37,7 @@ import { getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useReportDateRange, createRefreshHandler } from 'hooks/misc/useReportDateRange'
+import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
@@ -140,7 +140,7 @@ const DatabaseUsage = () => {
     },
   })
 
-  const onRefreshReport = createRefreshHandler(
+  const onRefreshReport = useRefreshHandler(
     datePickerValue,
     datePickerHelpers,
     handleDatePickerChange,

@@ -15,7 +15,7 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useReportDateRange, createRefreshHandler } from 'hooks/misc/useReportDateRange'
+import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
@@ -95,7 +95,7 @@ const PostgrestReport = () => {
     handleDatePickerChangeFromHook(values)
   }
 
-  const onRefreshReport = createRefreshHandler(
+  const onRefreshReport = useRefreshHandler(
     datePickerValue,
     datePickerHelpers,
     handleDatePickerChange,

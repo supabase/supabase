@@ -273,13 +273,13 @@ export const useReportDateRange = (
   }
 }
 
-export function createRefreshHandler(
+export function useRefreshHandler(
   datePickerValue: DatePickerValue,
   datePickerHelpers: ReportsDatetimeHelper[],
   handleDatePickerChange: (value: DatePickerValue) => boolean | void,
   refresh: () => void | Promise<void>
 ): () => void | Promise<void> {
-  return async () => {
+  return useCallback(async () => {
     if (datePickerValue.isHelper && datePickerValue.text) {
       const selectedHelper = datePickerHelpers.find((h) => h.text === datePickerValue.text)
       if (selectedHelper) {
@@ -293,5 +293,5 @@ export function createRefreshHandler(
     }
 
     await refresh()
-  }
+  }, [datePickerValue, datePickerHelpers, handleDatePickerChange, refresh])
 }

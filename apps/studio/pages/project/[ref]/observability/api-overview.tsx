@@ -16,7 +16,7 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { useApiReport } from 'data/reports/api-report-query'
-import { useReportDateRange, createRefreshHandler } from 'hooks/misc/useReportDateRange'
+import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
 import type { NextPageWithLayout } from 'types'
 
 export const ApiReport: NextPageWithLayout = () => {
@@ -65,7 +65,7 @@ export const ApiReport: NextPageWithLayout = () => {
     refresh()
   }
 
-  const onRefreshReport = createRefreshHandler(
+  const onRefreshReport = useRefreshHandler(
     datePickerValue,
     datePickerHelpers,
     handleDatepickerChangeForRefresh,

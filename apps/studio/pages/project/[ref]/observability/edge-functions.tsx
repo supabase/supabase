@@ -27,7 +27,7 @@ import { edgeFunctionReports } from 'data/reports/v2/edge-functions.config'
 
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import { useReportDateRange, createRefreshHandler } from 'hooks/misc/useReportDateRange'
+import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
 
 import { EDGE_FUNCTION_REGIONS } from 'components/interfaces/Reports/Reports.constants'
 import { ReportSettings } from 'components/ui/Charts/ReportSettings'
@@ -117,7 +117,7 @@ const EdgeFunctionsUsage = () => {
     executionTimeFilter,
   ])
 
-  const onRefreshReport = createRefreshHandler(
+  const onRefreshReport = useRefreshHandler(
     datePickerValue,
     datePickerHelpers,
     handleDatePickerChange,

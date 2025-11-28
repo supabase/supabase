@@ -27,7 +27,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useStorageReport } from 'data/reports/storage-report-query'
-import { useReportDateRange, createRefreshHandler } from 'hooks/misc/useReportDateRange'
+import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
@@ -65,7 +65,7 @@ export const StorageReport: NextPageWithLayout = () => {
     }
   }
 
-  const onRefreshReport = createRefreshHandler(
+  const onRefreshReport = useRefreshHandler(
     datePickerValue,
     datePickerHelpers,
     handleDatepickerChange,
