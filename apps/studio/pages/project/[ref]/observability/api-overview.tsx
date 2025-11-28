@@ -46,8 +46,8 @@ export const ApiReport: NextPageWithLayout = () => {
     const promptShown = handleDatePickerChangeFromHook(vals)
     if (!promptShown) {
       mergeParams({
-        iso_timestamp_start: vals.from || '',
-        iso_timestamp_end: vals.to || '',
+        iso_timestamp_start: vals.from ?? '',
+        iso_timestamp_end: vals.to ?? '',
       })
     }
   }
@@ -55,8 +55,8 @@ export const ApiReport: NextPageWithLayout = () => {
   const handleDatepickerChangeForRefresh = (vals: DatePickerValue) => {
     handleDatePickerChangeFromHook(vals)
     mergeParams({
-      iso_timestamp_start: vals.from || '',
-      iso_timestamp_end: vals.to || '',
+      iso_timestamp_start: vals.from ?? '',
+      iso_timestamp_end: vals.to ?? '',
     })
   }
 
