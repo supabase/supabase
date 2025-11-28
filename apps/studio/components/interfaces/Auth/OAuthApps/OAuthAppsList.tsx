@@ -1,7 +1,9 @@
 import type { OAuthClient } from '@supabase/supabase-js'
-import { MoreVertical, Plus, RotateCw, Search, Trash } from 'lucide-react'
+import { Edit, MoreVertical, Plus, RotateCw, Search, Trash, X } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useRef, useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -9,9 +11,11 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
+import { useOAuthServerAppDeleteMutation } from 'data/oauth-server-apps/oauth-server-app-delete-mutation'
 import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
-import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import {
   Badge,
   Button,
@@ -31,46 +35,32 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
-import { CreateOAuthAppSheet } from './CreateOAuthAppSheet'
+import { CreateOrUpdateOAuthAppSheet } from './CreateOrUpdateOAuthAppSheet'
 import { DeleteOAuthAppModal } from './DeleteOAuthAppModal'
 import { NewOAuthAppBanner } from './NewOAuthAppBanner'
-
-export const OAUTH_APP_SCOPE_OPTIONS = [
-  { name: 'email', value: 'email' },
-  { name: 'profile', value: 'profile' },
-  { name: 'openid', value: 'openid' },
-]
-
-export const OAUTH_APP_TYPE_OPTIONS = [
-  { name: 'Manual', value: 'manual' },
-  { name: 'Dynamic', value: 'dynamic' },
-]
+import {
+  filterOAuthApps,
+  OAUTH_APP_CLIENT_TYPE_OPTIONS,
+  OAUTH_APP_REGISTRATION_TYPE_OPTIONS,
+} from './oauthApps.utils'
 
 export const OAuthAppsList = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig, isLoading: isAuthConfigLoading } = useAuthConfigQuery({ projectRef })
   const isOAuthServerEnabled = !!authConfig?.OAUTH_SERVER_ENABLED
   const [newOAuthApp, setNewOAuthApp] = useState<OAuthClient | undefined>(undefined)
-
-  // State for OAuth apps
-  const [showCreateSheet, setShowCreateSheet] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
   const [selectedApp, setSelectedApp] = useState<OAuthClient>()
-  const [filteredAppTypes, setFilteredAppTypes] = useState<string[]>([])
-  const [filteredAppScopes, setFilteredAppScopes] = useState<string[]>([])
-
-  const { data: supabaseClientData } = useSupabaseClientQuery({ projectRef })
+  const [filteredRegistrationTypes, setFilteredRegistrationTypes] = useState<string[]>([])
+  const [filteredClientTypes, setFilteredClientTypes] = useState<string[]>([])
+  const deletingOAuthAppIdRef = useRef<string | null>(null)
 
   const { data, isLoading, isError, error } = useOAuthServerAppsQuery(
-    {
-      projectRef,
-      supabaseClient: supabaseClientData?.supabaseClient,
-    },
+    { projectRef },
     { enabled: isOAuthServerEnabled }
   )
 
-  const { mutateAsync: regenerateSecret, isLoading: isRegenerating } =
+  const { mutateAsync: regenerateSecret, isPending: isRegenerating } =
     useOAuthServerAppRegenerateSecretMutation({
       onSuccess: (data) => {
         if (data) {
@@ -79,14 +69,62 @@ export const OAuthAppsList = () => {
       },
     })
 
+  const { data: endpointData } = useProjectEndpointQuery({ projectRef })
+
   const oAuthApps = data?.clients || []
 
-  const handleDeleteClick = (app: OAuthClient) => {
-    setSelectedApp(app)
-    setShowDeleteModal(true)
-  }
+  const [showCreateSheet, setShowCreateSheet] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const { setValue: setSelectedAppToEdit, value: appToEdit } = useQueryStateWithSelect({
+    urlKey: 'edit',
+    select: (client_id: string) =>
+      client_id ? oAuthApps?.find((app) => app.client_id === client_id) : undefined,
+    enabled: !!oAuthApps?.length,
+    onError: (_error, selectedId) =>
+      handleErrorOnDelete(deletingOAuthAppIdRef, selectedId, `OAuth App not found`),
+  })
+
+  const { setValue: setSelectedAppToDelete, value: appToDelete } = useQueryStateWithSelect({
+    urlKey: 'delete',
+    select: (client_id: string) =>
+      client_id ? oAuthApps?.find((app) => app.client_id === client_id) : undefined,
+    enabled: !!oAuthApps?.length,
+    onError: (_error, selectedId) =>
+      handleErrorOnDelete(deletingOAuthAppIdRef, selectedId, `OAuth App not found`),
+  })
+
+  const { mutate: deleteOAuthApp, isLoading: isDeletingApp } = useOAuthServerAppDeleteMutation({
+    onSuccess: () => {
+      toast.success(`Successfully deleted OAuth app`)
+      setSelectedAppToDelete(null)
+    },
+    onError: () => {
+      deletingOAuthAppIdRef.current = null
+    },
+  })
 
   const [filterString, setFilterString] = useState<string>('')
+
+  const filteredOAuthApps = filterOAuthApps({
+    apps: oAuthApps,
+    searchString: filterString,
+    registrationTypes: filteredRegistrationTypes,
+    clientTypes: filteredClientTypes,
+  })
+
+  const hasActiveFilters =
+    filterString.length > 0 ||
+    filteredRegistrationTypes.length > 0 ||
+    filteredClientTypes.length > 0
+
+  const handleResetFilters = () => {
+    setFilterString('')
+    setFilteredRegistrationTypes([])
+    setFilteredClientTypes([])
+  }
 
   if (isAuthConfigLoading || (isOAuthServerEnabled && isLoading)) {
     return <GenericSkeletonLoader />
@@ -99,7 +137,7 @@ export const OAuthAppsList = () => {
   return (
     <>
       <div className="space-y-4">
-        {newOAuthApp && (
+        {newOAuthApp?.client_secret && (
           <NewOAuthAppBanner oauthApp={newOAuthApp} onClose={() => setNewOAuthApp(undefined)} />
         )}
         {!isOAuthServerEnabled && (
@@ -127,35 +165,44 @@ export const OAuthAppsList = () => {
             <Input
               placeholder="Search oAuth apps"
               size="tiny"
-              icon={<Search size="14" />}
+              icon={<Search />}
               value={filterString}
               className="w-full lg:w-52"
               onChange={(e) => setFilterString(e.target.value)}
             />
             <FilterPopover
-              name="Type"
-              options={OAUTH_APP_TYPE_OPTIONS}
+              name="Registration Type"
+              options={OAUTH_APP_REGISTRATION_TYPE_OPTIONS}
               labelKey="name"
               valueKey="value"
               iconKey="icon"
-              activeOptions={filteredAppTypes}
+              activeOptions={filteredRegistrationTypes}
               labelClass="text-xs text-foreground-light"
               maxHeightClass="h-[190px]"
               className="w-52"
-              onSaveFilters={setFilteredAppTypes}
+              onSaveFilters={setFilteredRegistrationTypes}
             />
             <FilterPopover
-              name="Scope"
-              options={OAUTH_APP_SCOPE_OPTIONS}
+              name="Client Type"
+              options={OAUTH_APP_CLIENT_TYPE_OPTIONS}
               labelKey="name"
               valueKey="value"
               iconKey="icon"
-              activeOptions={filteredAppScopes}
+              activeOptions={filteredClientTypes}
               labelClass="text-xs text-foreground-light"
               maxHeightClass="h-[190px]"
               className="w-52"
-              onSaveFilters={setFilteredAppScopes}
+              onSaveFilters={setFilteredClientTypes}
             />
+            {hasActiveFilters && (
+              <Button
+                type="default"
+                size="tiny"
+                className="px-1"
+                icon={<X />}
+                onClick={handleResetFilters}
+              />
+            )}
           </div>
           <div className="flex items-center gap-x-2">
             <ButtonTooltip
@@ -178,70 +225,86 @@ export const OAuthAppsList = () => {
         </div>
 
         <div className="w-full overflow-hidden overflow-x-auto">
-          <Card>
-            <Table>
+          <Card className="@container">
+            <Table containerProps={{ stickyLastColumn: true }}>
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Client ID</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Scope</TableHead>
+                  <TableHead>Client Type</TableHead>
+                  <TableHead>Registration Type</TableHead>
                   <TableHead>Created</TableHead>
-                  <TableHead className="w-8"></TableHead>
+                  <TableHead className="w-8 px-0">
+                    <div className="!bg-200 px-4 w-full h-full flex items-center border-l @[944px]:border-l-0" />
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {oAuthApps.length === 0 && (
+                {filteredOAuthApps.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={6}>
                       <p className="text-foreground-lighter">No OAuth apps found</p>
                     </TableCell>
                   </TableRow>
                 )}
-                {oAuthApps.length > 0 &&
-                  oAuthApps.map((app) => (
+                {filteredOAuthApps.length > 0 &&
+                  filteredOAuthApps.map((app) => (
                     <TableRow key={app.client_id} className="w-full">
-                      <TableCell className="w-100 max-w-64 truncate" title={app.client_name}>
-                        {app.client_name}
+                      <TableCell className="w-48 max-w-48 flex" title={app.client_name}>
+                        <Button
+                          type="text"
+                          className="text-link-table-cell text-sm p-0 hover:bg-transparent title [&>span]:!w-full"
+                          onClick={() => setSelectedAppToEdit(app.client_id)}
+                          title={app.client_name}
+                        >
+                          {app.client_name}
+                        </Button>
                       </TableCell>
-                      <TableCell className="max-w-40" title={app.client_id}>
-                        <Badge>{app.client_id}</Badge>
+                      <TableCell title={app.client_id}>
+                        <Badge className="font-mono">{app.client_id}</Badge>
                       </TableCell>
-                      <TableCell className="max-w-40">
-                        {app.client_type === 'public' ? 'Public' : 'Private'}
+                      <TableCell className="text-xs text-foreground-light max-w-28 capitalize">
+                        {app.client_type}
                       </TableCell>
-                      <TableCell className="max-w-40">
-                        {app.scope ? (
-                          <Badge>{app.scope}</Badge>
-                        ) : (
-                          <span className="text-xs text-foreground-light">N/A</span>
-                        )}
+                      <TableCell className="text-xs text-foreground-light max-w-28 capitalize">
+                        {app.registration_type}
                       </TableCell>
-                      <TableCell className="text-xs text-foreground-light w-1/6">
+                      <TableCell className="text-xs text-foreground-light min-w-28 max-w-40 w-1/6">
                         <TimestampInfo utcTimestamp={app.created_at} labelFormat="D MMM, YYYY" />
                       </TableCell>
-                      <TableCell>
-                        <div className="flex justify-end items-center">
+                      <TableCell className="max-w-20 bg-surface-100 @[944px]:hover:bg-surface-200 px-6">
+                        <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l @[944px]:border-l-0">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button type="default" className="px-1" icon={<MoreVertical />} />
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent side="bottom" align="end" className="w-52">
+                            <DropdownMenuContent side="bottom" align="end" className="w-48">
                               <DropdownMenuItem
                                 className="space-x-2"
                                 onClick={() => {
-                                  setSelectedApp(app)
-                                  setShowRegenerateDialog(true)
+                                  setSelectedAppToEdit(app.client_id)
                                 }}
                               >
-                                <RotateCw size={14} />
-                                <p>Regenerate client secret</p>
+                                <Edit size={12} />
+                                <p>Update</p>
                               </DropdownMenuItem>
+                              {app.client_type === 'confidential' && (
+                                <DropdownMenuItem
+                                  className="space-x-2"
+                                  onClick={() => {
+                                    setSelectedApp(app)
+                                    setShowRegenerateDialog(true)
+                                  }}
+                                >
+                                  <RotateCw size={12} />
+                                  <p>Regenerate client secret</p>
+                                </DropdownMenuItem>
+                              )}
                               <DropdownMenuItem
                                 className="space-x-2"
-                                onClick={() => handleDeleteClick(app)}
+                                onClick={() => setSelectedAppToDelete(app.client_id)}
                               >
-                                <Trash size={14} />
+                                <Trash size={12} />
                                 <p>Delete</p>
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -256,23 +319,35 @@ export const OAuthAppsList = () => {
         </div>
       </div>
 
-      <CreateOAuthAppSheet
-        visible={showCreateSheet}
+      <CreateOrUpdateOAuthAppSheet
+        visible={showCreateSheet || !!appToEdit}
+        appToEdit={appToEdit}
         onSuccess={(app) => {
+          const isCreating = !appToEdit
           setShowCreateSheet(false)
+          setSelectedAppToEdit(null)
           setSelectedApp(undefined)
-          setNewOAuthApp(app)
+          // Only show banner for new apps or regenerated secrets, not for simple edits
+          if (isCreating || app.client_secret) {
+            setNewOAuthApp(app)
+          }
         }}
         onCancel={() => {
           setShowCreateSheet(false)
+          setSelectedAppToEdit(null)
           setSelectedApp(undefined)
         }}
       />
 
       <DeleteOAuthAppModal
-        visible={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        selectedApp={selectedApp}
+        visible={!!appToDelete}
+        selectedApp={appToDelete}
+        setVisible={setSelectedAppToDelete}
+        onDelete={(params: Parameters<typeof deleteOAuthApp>[0]) => {
+          deletingOAuthAppIdRef.current = params.clientId ?? null
+          deleteOAuthApp(params)
+        }}
+        isLoading={isDeletingApp}
       />
 
       <ConfirmationModal
@@ -285,15 +360,15 @@ export const OAuthAppsList = () => {
         onConfirm={() => {
           regenerateSecret({
             projectRef,
-            supabaseClient: supabaseClientData?.supabaseClient,
-            clientId: selectedApp?.client_id!,
+            clientId: selectedApp?.client_id,
+            clientEndpoint: endpointData?.endpoint,
           })
           setShowRegenerateDialog(false)
         }}
       >
         <p className="text-sm text-foreground-light">
           Are you sure you wish to regenerate the client secret for "{selectedApp?.client_name}"?
-          All existing sessions will be invalidated. This action cannot be undone.
+          You'll need to update it in all applications that use it. This action cannot be undone.
         </p>
       </ConfirmationModal>
     </>

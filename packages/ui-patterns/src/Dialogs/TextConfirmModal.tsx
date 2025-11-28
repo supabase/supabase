@@ -1,7 +1,8 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ReactNode, forwardRef, useEffect } from 'react'
+import { Check, Copy } from 'lucide-react'
+import { ReactNode, forwardRef, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Alert_Shadcn_,
@@ -20,6 +21,7 @@ import {
   Form_Shadcn_,
   Input_Shadcn_,
   cn,
+  copyToClipboard,
 } from 'ui'
 import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 import { z } from 'zod'
@@ -51,7 +53,7 @@ export interface TextConfirmModalProps {
   errorMessage?: string
 }
 
-const TextConfirmModal = forwardRef<
+export const TextConfirmModal = forwardRef<
   React.ElementRef<typeof DialogContent>,
   React.ComponentPropsWithoutRef<typeof Dialog> & TextConfirmModalProps
 >(
@@ -81,6 +83,8 @@ const TextConfirmModal = forwardRef<
     },
     ref
   ) => {
+    const [showCopied, setShowCopied] = useState(false)
+
     const formSchema = z.object({
       confirmValue: z.preprocess(
         (val) => (typeof val === 'string' ? val.trim() : val),
@@ -99,6 +103,8 @@ const TextConfirmModal = forwardRef<
       },
     })
 
+    const isFormValid = form.formState.isValid
+
     // 2. Define a submit handler.
     function onSubmit(values: z.infer<typeof formSchema>) {
       // Do something with the form values.
@@ -109,6 +115,12 @@ const TextConfirmModal = forwardRef<
     useEffect(() => {
       if (confirmString) form.reset()
     }, [confirmString])
+
+    useEffect(() => {
+      if (!showCopied) return
+      const timer = setTimeout(() => setShowCopied(false), 2000)
+      return () => clearTimeout(timer)
+    }, [showCopied])
 
     return (
       <Dialog
@@ -161,9 +173,19 @@ const TextConfirmModal = forwardRef<
                   <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                     <FormLabel_Shadcn_ {...label}>
                       Type{' '}
-                      <span className="text-foreground break-all whitespace-pre">
+                      <Button
+                        type="default"
+                        className="h-[23px] px-1.5 py-0 border-muted text-sm whitespace-pre break-all"
+                        iconRight={
+                          showCopied ? <Check strokeWidth={2} className="text-brand" /> : <Copy />
+                        }
+                        onClick={() => {
+                          setShowCopied(true)
+                          copyToClipboard(confirmString)
+                        }}
+                      >
                         {confirmString}
-                      </span>{' '}
+                      </Button>{' '}
                       to confirm.
                     </FormLabel_Shadcn_>
                     <FormControl_Shadcn_>
@@ -197,7 +219,7 @@ const TextConfirmModal = forwardRef<
                   }
                   htmlType="submit"
                   loading={loading}
-                  disabled={loading}
+                  disabled={!isFormValid || loading}
                   className="truncate"
                 >
                   {confirmLabel}

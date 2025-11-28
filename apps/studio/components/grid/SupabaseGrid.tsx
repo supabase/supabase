@@ -5,6 +5,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import { createPortal } from 'react-dom'
 
 import { useParams } from 'common'
+import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import { EMPTY_ARR } from 'lib/void'
@@ -22,6 +23,7 @@ import { GridProps } from './types'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
+import { validateMsSqlSorting } from './MsSqlValidation'
 
 export const SupabaseGrid = ({
   customHeader,
@@ -47,6 +49,11 @@ export const SupabaseGrid = ({
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
+  const msSqlWarning = isMsSqlForeignTable(snap.originalTable)
+    ? validateMsSqlSorting({ filters, sorts, table: snap.originalTable })
+    : { warning: null }
+  const tableQueriesEnabled = msSqlWarning.warning === null
+
   const { data, error, isSuccess, isError, isLoading, isRefetching } = useTableRowsQuery(
     {
       projectRef: project?.ref,
@@ -60,6 +67,7 @@ export const SupabaseGrid = ({
     },
     {
       keepPreviousData: true,
+      enabled: tableQueriesEnabled,
       retry: (_, error: any) => {
         const doesNotExistError = error && error.message?.includes('does not exist')
         if (doesNotExistError) onApplySorts([])
@@ -77,7 +85,13 @@ export const SupabaseGrid = ({
   return (
     <DndProvider backend={HTML5Backend} context={window}>
       <div className="sb-grid h-full flex flex-col">
-        <Header customHeader={customHeader} isRefetching={isRefetching} />
+        <Header
+          customHeader={customHeader}
+          isRefetching={isRefetching}
+          tableQueriesEnabled={tableQueriesEnabled}
+        />
+
+        {msSqlWarning.warning !== null && <msSqlWarning.Component />}
 
         {children || (
           <>
@@ -86,13 +100,14 @@ export const SupabaseGrid = ({
               {...gridProps}
               rows={rows}
               error={error}
+              isDisabled={!tableQueriesEnabled}
               isLoading={isLoading}
               isSuccess={isSuccess}
               isError={isError}
               filters={filters}
               onApplyFilters={onApplyFilters}
             />
-            <Footer />
+            <Footer enableForeignRowsQuery={tableQueriesEnabled} />
             <Shortcuts gridRef={gridRef} rows={rows} />
           </>
         )}

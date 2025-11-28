@@ -32,7 +32,7 @@ export const BooleanEditor = <TRow, TSummaryRow = unknown>({
       size="small"
       onBlur={onBlur}
       onChange={onChange}
-      defaultValue={value === null ? 'null' : value.toString()}
+      defaultValue={!!value ? value.toString() : 'null'}
       style={{ width: `${column.width}px` }}
     >
       <Select.Option value="true">TRUE</Select.Option>

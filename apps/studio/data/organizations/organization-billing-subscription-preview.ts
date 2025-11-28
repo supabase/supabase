@@ -88,21 +88,4 @@ export const useOrganizationBillingSubscriptionPreview = <
     queryFn: () => previewOrganizationBillingSubscription({ organizationSlug, tier }),
     enabled: enabled && typeof organizationSlug !== 'undefined' && typeof tier !== 'undefined',
     ...options,
-    retry: (failureCount, error) => {
-      // Don't retry on 400s
-      if (
-        typeof error === 'object' &&
-        error !== null &&
-        'code' in error &&
-        (error as any).code === 400
-      ) {
-        return false
-      }
-
-      if (failureCount < 3) {
-        return true
-      }
-
-      return false
-    },
   })

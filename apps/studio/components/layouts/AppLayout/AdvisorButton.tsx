@@ -1,14 +1,11 @@
 import { Lightbulb } from 'lucide-react'
-
-import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { cn } from 'ui'
 
-export const AdvisorButton = () => {
-  const { ref: projectRef } = useParams()
+export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const { toggleSidebar, activeSidebar } = useSidebarManagerSnapshot()
   const { data: lints } = useProjectLintsQuery({ projectRef })
 

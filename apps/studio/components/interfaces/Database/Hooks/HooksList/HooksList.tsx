@@ -7,7 +7,7 @@ import { useState } from 'react'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
-import NoSearchResults from 'components/ui/NoSearchResults'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -58,7 +58,7 @@ export const HooksList = ({
         <Input
           placeholder="Search for a webhook"
           size="tiny"
-          icon={<Search size="14" />}
+          icon={<Search />}
           value={filterString}
           className="w-52"
           onChange={(e) => setFilterString(e.target.value)}
