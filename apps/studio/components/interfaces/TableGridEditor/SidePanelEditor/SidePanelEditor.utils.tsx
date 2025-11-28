@@ -496,6 +496,7 @@ export const createTable = async ({
   isRLSEnabled,
   importContent,
   organizationSlug,
+  hasGeneratedPolicies = false,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -510,6 +511,7 @@ export const createTable = async ({
   isRLSEnabled: boolean
   importContent?: ImportContent
   organizationSlug?: string
+  hasGeneratedPolicies?: boolean
 }) => {
   const queryClient = getQueryClient()
 
@@ -591,6 +593,7 @@ export const createTable = async ({
         method: 'table_editor',
         schema_name: payload.schema,
         table_name: payload.name,
+        has_generated_policies: hasGeneratedPolicies,
       },
       groups: {
         project: projectRef,

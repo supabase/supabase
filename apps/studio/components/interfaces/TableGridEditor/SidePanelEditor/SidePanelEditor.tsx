@@ -516,32 +516,38 @@ export const SidePanelEditor = ({
           isRLSEnabled,
           importContent,
           organizationSlug: org?.slug,
+          hasGeneratedPolicies: generatedPolicies.length > 0 && isRLSEnabled,
         })
         if (isRealtimeEnabled) await updateTableRealtime(table, true)
 
         // Create generated policies after table creation
         if (generatedPolicies.length > 0 && isRLSEnabled && project?.ref) {
-          for (const policy of generatedPolicies) {
-            try {
-              await createPolicy({
-                projectRef: project.ref,
-                connectionString: project.connectionString,
-                payload: {
-                  name: policy.name,
-                  table: policy.table,
-                  schema: policy.schema,
-                  definition: policy.definition,
-                  check: policy.check,
-                  action: policy.action,
-                  command: policy.command,
-                  roles: policy.roles,
-                },
-              })
-            } catch (error: any) {
-              // Continue to show table creation success even if policy creation fails
-              console.error(`Failed to create policy "${policy.name}":`, error)
-            }
-          }
+          await Promise.all(
+            generatedPolicies.map(async (policy) => {
+              try {
+                await createPolicy({
+                  projectRef: project.ref,
+                  connectionString: project.connectionString,
+                  payload: {
+                    name: policy.name,
+                    table: policy.table,
+                    schema: policy.schema,
+                    definition: policy.definition,
+                    check: policy.check,
+                    action: policy.action,
+                    command: policy.command,
+                    roles: policy.roles,
+                  },
+                })
+              } catch (error: any) {
+                // Continue to show table creation success even if policy creation fails
+                console.error(`Failed to create policy "${policy.name}":`, error)
+              }
+            })
+          )
+
+          // Track successful policy creation
+          track('rls_generated_policies_created')
         }
 
         // Invalidate queries for table creation

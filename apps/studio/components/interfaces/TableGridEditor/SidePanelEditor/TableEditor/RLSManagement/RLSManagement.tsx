@@ -19,6 +19,7 @@ import {
   type ForeignKeyConstraint,
 } from 'data/database/foreign-key-constraints-query'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { useTrack } from 'lib/telemetry/track'
 import { ExternalLink, InfoIcon } from 'lucide-react'
 import Link from 'next/link'
 import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
@@ -56,6 +57,7 @@ export const RLSManagement = ({
   const [isGenerating, setIsGenerating] = useState(false)
   const [generateFailed, setGenerateFailed] = useState(false)
   const { includeSchemaMetadata } = useOrgAiOptInLevel()
+  const track = useTrack()
   const isExistingTable = !!table && !isNewRecord && !isDuplicating
   const rlsEnabled = isRlsEnabled ?? true
 
@@ -147,6 +149,8 @@ export const RLSManagement = ({
       toast.error('Unable to generate policies. Please ensure table name and columns are set.')
       return
     }
+
+    track('rls_generate_policies_clicked')
 
     setIsGenerating(true)
     try {
@@ -274,6 +278,11 @@ export const RLSManagement = ({
       if (generatedIndex >= 0 && generatedIndex < generatedPolicies.length) {
         const updatedPolicies = generatedPolicies.filter((_, i) => i !== generatedIndex)
         onGeneratedPoliciesChange?.(updatedPolicies)
+
+        // Track policy removal
+        if (project?.ref) {
+          track('rls_generated_policy_removed')
+        }
       }
     }
 
