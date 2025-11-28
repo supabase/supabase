@@ -377,7 +377,7 @@ export const generateAiPoliciesForTable = async ({
       schema: table.schema,
       columns: columns.map((col) => col.name.trim()),
       projectRef,
-      connectionString,
+      connectionString: connectionString ?? '',
     })
     // AI response now includes all structured fields
     return aiPolicies as GeneratedPolicy[]
