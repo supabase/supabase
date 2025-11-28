@@ -34,8 +34,7 @@ export const General = () => {
   // [Joshen] Need to refactor to use RHF so we don't need manual error handlers like this
   const [nameError, setNameError] = useState<string>()
 
-  const { data: parentProject } = useProjectDetailQuery({ ref: project?.parent_project_ref })
-  const isBranch = parentProject !== undefined
+  const isBranch = Boolean(project?.parent_project_ref)
 
   const { projectSettingsRestartProject } = useIsFeatureEnabled([
     'project_settings:restart_project',
@@ -81,7 +80,10 @@ export const General = () => {
           <AlertDescription_Shadcn_>
             Certain settings are not available while you're on a preview branch. To adjust your
             project settings, you may return to your{' '}
-            <Link href={`/project/${parentProject.ref}/settings/general`} className="text-brand">
+            <Link
+              href={`/project/${project?.parent_project_ref}/settings/general`}
+              className="text-brand"
+            >
               main branch
             </Link>
             .
