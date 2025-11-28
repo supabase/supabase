@@ -11,6 +11,7 @@ import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-
 import { useChanged } from 'hooks/misc/useChanged'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useTableCreateGeneratePolicies } from 'hooks/misc/useTableCreateGeneratePolicies'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { type PlainObject } from 'lib/type-helpers'
@@ -68,6 +69,7 @@ export const TableEditor = ({
   const { data: project } = useSelectedProjectQuery()
   const { selectedSchema } = useQuerySchemaState()
   const isNewRecord = isUndefined(table)
+  const { enabled: generatePoliciesEnabled } = useTableCreateGeneratePolicies({ isNewRecord })
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
@@ -391,23 +393,27 @@ export const TableEditor = ({
         </>
       )}
 
-      <SidePanel.Separator />
+      {generatePoliciesEnabled && (
+        <>
+          <SidePanel.Separator />
 
-      <SidePanel.Content className="space-y-10 py-6">
-        <RLSManagement
-          schema={table?.schema ?? selectedSchema ?? ''}
-          table={table}
-          tableName={isNewRecord ? tableFields.name : undefined}
-          columns={isNewRecord ? tableFields.columns : undefined}
-          foreignKeyRelations={isNewRecord ? fkRelations : undefined}
-          isRlsEnabled={tableFields.isRLSEnabled}
-          onChangeRlsEnabled={(value) => onUpdateField({ isRLSEnabled: value })}
-          isNewRecord={isNewRecord}
-          isDuplicating={isDuplicating}
-          generatedPolicies={generatedPolicies}
-          onGeneratedPoliciesChange={setGeneratedPolicies}
-        />
-      </SidePanel.Content>
+          <SidePanel.Content className="space-y-10 py-6">
+            <RLSManagement
+              schema={table?.schema ?? selectedSchema ?? ''}
+              table={table}
+              tableName={isNewRecord ? tableFields.name : undefined}
+              columns={isNewRecord ? tableFields.columns : undefined}
+              foreignKeyRelations={isNewRecord ? fkRelations : undefined}
+              isRlsEnabled={tableFields.isRLSEnabled}
+              onChangeRlsEnabled={(value) => onUpdateField({ isRLSEnabled: value })}
+              isNewRecord={isNewRecord}
+              isDuplicating={isDuplicating}
+              generatedPolicies={generatedPolicies}
+              onGeneratedPoliciesChange={setGeneratedPolicies}
+            />
+          </SidePanel.Content>
+        </>
+      )}
     </SidePanel>
   )
 }

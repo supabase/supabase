@@ -19,7 +19,7 @@ import {
   type ForeignKeyConstraint,
 } from 'data/database/foreign-key-constraints-query'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, InfoIcon } from 'lucide-react'
 import Link from 'next/link'
 import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from '../../SidePanelEditor.types'
@@ -54,6 +54,7 @@ export const RLSManagement = ({
 }: RLSManagementProps) => {
   const { data: project } = useSelectedProjectQuery()
   const [isGenerating, setIsGenerating] = useState(false)
+  const [generateFailed, setGenerateFailed] = useState(false)
   const { includeSchemaMetadata } = useOrgAiOptInLevel()
   const isExistingTable = !!table && !isNewRecord && !isDuplicating
   const rlsEnabled = isRlsEnabled ?? true
@@ -176,7 +177,12 @@ export const RLSManagement = ({
         enableAi: includeSchemaMetadata,
       })
 
-      onGeneratedPoliciesChange?.(policies)
+      if (policies.length === 0) {
+        setGenerateFailed(true)
+      } else {
+        setGenerateFailed(false)
+        onGeneratedPoliciesChange?.(policies)
+      }
     } catch (error: any) {
       console.error('Failed to generate policies:', error)
       toast.error(error.message || 'Failed to generate policies')
@@ -227,10 +233,15 @@ export const RLSManagement = ({
           <CardContent className="flex flex-col items-center justify-center py-8">
             <div className="flex flex-col items-center gap-4 text-center max-w-md">
               <div className="flex flex-col gap-1">
-                <h4 className="text-sm text-foreground">No policies yet</h4>
+                <h4 className="text-sm text-foreground">
+                  {generateFailed
+                    ? 'We could not generate policies for this table'
+                    : 'No policies yet'}
+                </h4>
                 <p className="text-sm text-foreground-lighter">
-                  Generate starting policies based on your table schema and relationships. Policies
-                  will be created after the table is saved.
+                  {generateFailed
+                    ? 'Update your table schema and try again or add policies manually after the table is created.'
+                    : 'Generate starting policies based on your table schema and relationships. Policies will be created after the table is saved.'}
                 </p>
               </div>
               <Button
@@ -240,7 +251,11 @@ export const RLSManagement = ({
                 loading={isGenerating}
                 disabled={isGenerating || !isRlsEnabled}
               >
-                {isGenerating ? 'Generating policies...' : 'Generate policies'}
+                {isGenerating
+                  ? 'Generating policies...'
+                  : generateFailed
+                    ? 'Try generating again'
+                    : 'Generate policies'}
               </Button>
             </div>
           </CardContent>
@@ -286,6 +301,12 @@ export const RLSManagement = ({
         </div>
 
         <Card>{renderPolicies()}</Card>
+        {generatedPolicies?.length > 0 && (
+          <p className="text-xs text-foreground-lighter mt-4 flex items-center gap-2">
+            <InfoIcon size={16} strokeWidth={1.5} />
+            Review the policies generated before creating your table
+          </p>
+        )}
       </div>
     )
   }

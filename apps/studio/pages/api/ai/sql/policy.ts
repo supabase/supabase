@@ -7,6 +7,7 @@ import { z } from 'zod'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
+import { RLS_PROMPT } from 'lib/ai/prompts'
 import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
 
@@ -118,16 +119,17 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
         ${message ? `User request: ${message}` : ''}
 
+        RLS Guide: ${RLS_PROMPT}
+
         Requirements:
-        - Use the available planning and schema tools (like "list_policies" or "getSchemaTables") to inspect the "${schema}" schema and existing policies before generating new ones.
+        - Use the available planning and schema tools (like "list_policies" or "list_tables") to inspect the "${schema}" schema and existing policies before generating new ones.
+        - Ensure policies stricly adhere to the existing schema
         - Return a curated list of recommended CREATE POLICY statements as JSON.
         - Each policy must include: name, sql, command (SELECT/INSERT/UPDATE/DELETE/ALL), action (PERMISSIVE/RESTRICTIVE), roles (array of role names).
         - Include "definition" (USING clause expression without the USING keyword) for SELECT, UPDATE, DELETE policies.
         - Include "check" (WITH CHECK clause expression without the WITH CHECK keywords) for INSERT, UPDATE policies.
-        - Policies should cover the most relevant operations and use auth.uid() when referencing the current user.
         - Avoid duplicating existing policies and reference the public schema and typical Supabase best practices when deciding the coverage.
-        - Only output SQL statements that can be executed directly (no explanations or markdown).
-        - Prefer PERMISSIVE policies unless a RESTRICTIVE policy is explicitly required.
+        - Prefer PERMISSIVE policies unless a RESTRICTIVE policy is explicitly required
       `,
       tools,
       experimental_output: Output.object({
