@@ -22,6 +22,14 @@ const AWSReInvent2025: NextPage = () => {
           title: data.metadata.metaTitle,
           description: data.metadata.metaDescription,
           url: `https://supabase.com/aws-reinvent-2025`,
+          images: [
+            {
+              url: `https://supabase.com/images/og/re_invent.png`,
+              width: 1280,
+              height: 685,
+              alt: 'Supabase AWS Re:Invent 2025',
+            },
+          ],
         }}
       />
       <Layout className="overflow-visible">
