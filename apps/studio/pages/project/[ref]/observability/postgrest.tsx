@@ -15,7 +15,7 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { useReportDateRange, createRefreshHandler } from 'hooks/misc/useReportDateRange'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
@@ -95,6 +95,13 @@ const PostgrestReport = () => {
     handleDatePickerChangeFromHook(values)
   }
 
+  const onRefreshReport = createRefreshHandler(
+    datePickerValue,
+    datePickerHelpers,
+    handleDatePickerChange,
+    refetch
+  )
+
   return (
     <>
       <ReportHeader showDatabaseSelector={false} title="PostgREST" />
@@ -108,7 +115,7 @@ const PostgrestReport = () => {
                 icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
                 className="w-7"
                 tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-                onClick={() => refetch()}
+                onClick={onRefreshReport}
               />
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
