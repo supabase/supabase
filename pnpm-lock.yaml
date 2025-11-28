@@ -822,8 +822,8 @@ importers:
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.52.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@next/bundle-analyzer':
-        specifier: 15.3.1
-        version: 15.3.1
+        specifier: ^16.0.3
+        version: 16.0.3
       '@number-flow/react':
         specifier: ^0.3.2
         version: 0.3.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -4826,6 +4826,9 @@ packages:
 
   '@next/bundle-analyzer@15.3.1':
     resolution: {integrity: sha512-NqUZrjVruGbdQaPE3OSEXP+ZuULqumeHVTuU9pOX1V0/9BWY9FOck3jgQGFdBtG41nOYuO8+CoHKDQAVIPQJrw==}
+
+  '@next/bundle-analyzer@16.0.3':
+    resolution: {integrity: sha512-6Xo8f8/ZXtASfTPa6TH1aUn+xDg9Pkyl1YHVxu+89cVdLH7MnYjxv3rPOfEJ9BwCZCU2q4Flyw5MwltfD2pGbA==}
 
   '@next/env@15.3.3':
     resolution: {integrity: sha512-OdiMrzCl2Xi0VTjiQQUK0Xh7bJHnOuET2s+3V+Y40WJBAXrJeGA3f+I8MZJ/YQ3mVGi5XGR1L66oFlgqXhQ4Vw==}
@@ -23032,6 +23035,13 @@ snapshots:
     optional: true
 
   '@next/bundle-analyzer@15.3.1':
+    dependencies:
+      webpack-bundle-analyzer: 4.10.1
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
+  '@next/bundle-analyzer@16.0.3':
     dependencies:
       webpack-bundle-analyzer: 4.10.1
     transitivePeerDependencies:
