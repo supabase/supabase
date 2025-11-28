@@ -49,7 +49,6 @@ const supaRegion = process.env.SUPA_REGION || 'us-east-1'
 
   // wait for project to be ready
   await waitForProjectStatus('ACTIVE_HEALTHY', ref)
-  console.log(`${await getCurrentAmiVersion(ref)}`)
 
   // wait for all services to be healthy
   console.log('waiting for healthy services ...')
