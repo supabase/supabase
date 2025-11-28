@@ -2399,7 +2399,7 @@ Yes. You can pull your production schema into declarative files by running \`sup
 
 The schema diff tool handles most Postgres objects, but some entities (like DML statements) are not captured and may still require manual migrations.
 
-For detailed instructions and best practices, see the [Declarative Schemas documentation](https://supabase.com/docs/guides/database/declarative-schemas).
+For detailed instructions and best practices, see the [Declarative Schemas documentation](https://supabase.com/docs/guides/local-development/declarative-database-schemas).
 `,
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],

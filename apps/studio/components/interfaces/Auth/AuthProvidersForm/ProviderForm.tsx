@@ -38,7 +38,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
   const [urlProvider, setUrlProvider] = useQueryState('provider', { defaultValue: '' })
 
   const [open, setOpen] = useState(false)
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -196,12 +196,20 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                       />
 
                       {Object.keys(provider.properties).map((x: string) => {
+                        let description = provider.properties[x].description
+                        if (description && projectRef) {
+                          description = description.replace(
+                            /\(\.\.\/auth\/(.*?)\)/g,
+                            `(/project/${projectRef}/auth/$1)`
+                          )
+                        }
+
                         const properties = {
                           ...provider.properties[x],
                           description:
                             provider.properties[x].isPaid && isFreePlan
-                              ? `${provider.properties[x].description} Only available on [Pro plan](/org/${organization.slug}/billing?panel=subscriptionPlan) and above.`
-                              : provider.properties[x].description,
+                              ? `${description} Only available on [Pro plan](/org/${organization.slug}/billing?panel=subscriptionPlan) and above.`
+                              : description,
                         }
                         const isDisabledDueToPlan = properties.isPaid && isFreePlan
 

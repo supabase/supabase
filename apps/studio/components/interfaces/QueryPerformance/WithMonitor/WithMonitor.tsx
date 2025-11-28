@@ -14,6 +14,7 @@ import {
 } from './WithMonitor.utils'
 import { useParams } from 'common'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
+import { IndexAdvisorNotice } from '../IndexAdvisor/IndexAdvisorNotice'
 
 dayjs.extend(utc)
 
@@ -81,6 +82,7 @@ export const WithMonitor = ({ dateRange, onDateRangeChange }: WithMonitorProps) 
 
   return (
     <>
+      <IndexAdvisorNotice />
       <QueryPerformanceChart
         dateRange={dateRange}
         onDateRangeChange={onDateRangeChange}

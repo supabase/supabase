@@ -46,14 +46,21 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   return useInfiniteQuery<UsersData, UsersError, TData>({
-    queryKey: authKeys.usersInfinite(projectRef, { keywords, filter, providers, sort, order }),
+    queryKey: authKeys.usersInfinite(projectRef, {
+      keywords,
+      filter,
+      providers,
+      sort,
+      order,
+      column,
+    }),
     queryFn: ({ signal, pageParam }) => {
       return executeSql(
         {
           projectRef,
           connectionString,
           sql: getPaginatedUsersSQL({
-            page: column ? undefined : pageParam,
+            page: column ? undefined : (pageParam as number),
             verified: filter,
             keywords,
             providers,
@@ -61,9 +68,8 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
             order: order ?? 'asc',
             limit: USERS_PAGE_LIMIT,
             column,
-            startAt: column ? pageParam : undefined,
+            startAt: column ? (pageParam as string) : undefined,
           }),
-          queryKey: authKeys.usersInfinite(projectRef),
         },
         signal
       )

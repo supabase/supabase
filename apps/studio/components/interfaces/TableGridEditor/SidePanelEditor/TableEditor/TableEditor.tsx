@@ -8,21 +8,22 @@ import { useDatabasePublicationsQuery } from 'data/database-publications/databas
 import { CONSTRAINT_TYPE, useTableConstraintsQuery } from 'data/database/constraints-query'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useChanged } from 'hooks/misc/useChanged'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { RealtimeButtonVariant, useRealtimeExperiment } from 'hooks/misc/useRealtimeExperiment'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
 import { type PlainObject } from 'lib/type-helpers'
 import { TableEditorStateContext, useTableEditorStateSnapshot } from 'state/table-editor'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import ActionBar from '../ActionBar'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ActionBar } from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 import type { SaveTableParams } from '../SidePanelEditor'
@@ -30,7 +31,7 @@ import type { ColumnField } from '../SidePanelEditor.types'
 import { SpreadsheetImport } from '../SpreadsheetImport/SpreadsheetImport'
 import ColumnManagement from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
-import HeaderTitle from './HeaderTitle'
+import { HeaderTitle } from './HeaderTitle'
 import RLSDisableModalContent from './RLSDisableModal'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import type { ImportContent, TableField } from './TableEditor.types'
@@ -72,14 +73,12 @@ export const TableEditor = ({
   const snap = useTableEditorStateSnapshot()
 
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
   const { selectedSchema } = useQuerySchemaState()
-
-  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
-  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
-  const { mutate: sendEvent } = useSendEventMutation()
-
   const isNewRecord = isUndefined(table)
+  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
+  const track = useTrack()
+
+  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
@@ -109,6 +108,12 @@ export const TableEditor = ({
   const isRealtimeEnabled = isNewRecord
     ? false
     : realtimeEnabledTables.some((t) => t.id === table?.id)
+
+  const { activeVariant: activeRealtimeVariant } = useRealtimeExperiment({
+    projectInsertedAt: project?.inserted_at,
+    isTable: !isNewRecord,
+    isRealtimeEnabled,
+  })
 
   const [errors, setErrors] = useState<PlainObject>({})
   const [tableFields, setTableFields] = useState<TableField>()
@@ -258,8 +263,9 @@ export const TableEditor = ({
     }
   }
 
+  const visibleChanged = useChanged(visible)
   useEffect(() => {
-    if (visible) {
+    if (visibleChanged && visible) {
       setErrors({})
       setImportContent(undefined)
       setIsDuplicateRows(false)
@@ -281,7 +287,28 @@ export const TableEditor = ({
         setTableFields(tableFields)
       }
     }
-  }, [visible, templateData])
+  }, [
+    visible,
+    templateData,
+    foreignKeyMeta,
+    isRealtimeEnabled,
+    isNewRecord,
+    isDuplicating,
+    table,
+    visibleChanged,
+  ])
+
+  useEffect(() => {
+    if (!isNewRecord) {
+      const tableFields = generateTableFieldFromPostgresTable(
+        table,
+        foreignKeyMeta ?? [],
+        isDuplicating,
+        isRealtimeEnabled
+      )
+      setTableFields(tableFields)
+    }
+  }, [isNewRecord, table, foreignKeyMeta, isDuplicating, isRealtimeEnabled])
 
   useEffect(() => {
     if (isSuccessForeignKeyMeta) setFkRelations(formatForeignKeys(foreignKeys))
@@ -292,12 +319,14 @@ export const TableEditor = ({
       const importedColumns = formatImportedContentToColumnFields(importContent)
       onUpdateField({ columns: importedColumns })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [importContent])
 
   if (!tableFields) return null
 
   return (
     <SidePanel
+      data-testid="table-editor-side-panel"
       size="large"
       key="TableEditor"
       visible={visible}
@@ -396,23 +425,16 @@ export const TableEditor = ({
           </Admonition>
         )}
 
-        {realtimeEnabled && (
+        {activeRealtimeVariant !== RealtimeButtonVariant.HIDE_BUTTON && realtimeEnabled && (
           <Checkbox
             id="enable-realtime"
             label="Enable Realtime"
             description="Broadcast changes on this table to authorized subscribers"
             checked={tableFields.isRealtimeEnabled}
             onChange={() => {
-              sendEvent({
-                action: 'realtime_toggle_table_clicked',
-                properties: {
-                  newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
-                  origin: 'tableSidePanel',
-                },
-                groups: {
-                  project: project?.ref ?? 'Unknown',
-                  organization: org?.slug ?? 'Unknown',
-                },
+              track('realtime_toggle_table_clicked', {
+                newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
+                origin: 'tableSidePanel',
               })
               onUpdateField({ isRealtimeEnabled: !tableFields.isRealtimeEnabled })
             }}
