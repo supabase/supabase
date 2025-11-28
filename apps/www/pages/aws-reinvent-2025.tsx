@@ -21,7 +21,7 @@ const AWSReInvent2025: NextPage = () => {
         openGraph={{
           title: data.metadata.metaTitle,
           description: data.metadata.metaDescription,
-          url: `https://supabase.com/aws-reinvent-2025`,
+          url: window.origin + `/aws-reinvent-2025`,
           images: [
             {
               url: `https://supabase.com/images/og/re_invent.png`,
