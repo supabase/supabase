@@ -26,10 +26,9 @@ import {
 import { queryParamsToObject } from '../Reports.utils'
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps'
-import GeographyData from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/MapData.json'
 import { ZoomableGroup } from 'react-simple-maps'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { COUNTRIES } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/BillingAddress.constants'
+import { BASE_PATH } from 'lib/constants'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
@@ -397,6 +396,7 @@ export const RequestsByCountryMapRenderer = (
     count: number
   }>
 ) => {
+  const WORLD_TOPO_URL = `${BASE_PATH}/json/worldmap.json`
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [hoverInfo, setHoverInfo] = useState<{
     x: number
@@ -449,14 +449,18 @@ export const RequestsByCountryMapRenderer = (
   }
 
   return (
-    <div ref={containerRef} className="w-full h-[560px] relative">
-      <ComposableMap projectionConfig={{ scale: 155 }} className="w-full h-full">
+    <div ref={containerRef} className="w-full h-[560px] relative border border-border-muted">
+      <ComposableMap
+        projection="geoMercator"
+        projectionConfig={{ scale: 155 }}
+        className="w-full h-full"
+      >
         <ZoomableGroup minZoom={1} maxZoom={5} zoom={1.3}>
-          <Geographies geography={GeographyData as any}>
+          <Geographies geography={WORLD_TOPO_URL}>
             {({ geographies }) =>
               geographies.map((geo) => {
                 const title =
-                  (geo.properties?.NAME as string) || (geo.properties?.name as string) || 'Unknown'
+                  (geo.properties?.name as string) || (geo.properties?.NAME as string) || 'Unknown'
                 // Lookup by country name resolved from ISO2 code counts
                 // Find any ISO2 that maps to this topo country name
                 // Precompute direct lookup for performance
@@ -536,11 +540,11 @@ export const RequestsByCountryMapRenderer = (
       </ComposableMap>
       {hoverInfo.visible && (
         <div
-          className="pointer-events-none absolute z-10 rounded bg-surface-100 px-3 py-2 shadow border border-surface-200"
+          className="pointer-events-none absolute z-10 rounded bg-surface-100 p-1.5 border border-surface-200 text-sm"
           style={{ left: hoverInfo.x, top: hoverInfo.y }}
         >
-          <div className="text-foreground">{hoverInfo.title}</div>
-          <div className="text-foreground-lighter">{hoverInfo.subtitle}</div>
+          <h3 className="text-foreground-lighter text-sm">{hoverInfo.title}</h3>
+          <p className="text-foreground text-sm">{hoverInfo.subtitle}</p>
         </div>
       )}
     </div>
