@@ -7,12 +7,14 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   Card,
@@ -198,14 +200,9 @@ export const OAuthServerSettingsForm = () => {
                       <>
                         Enable OAuth server functionality for your project to create and manage
                         OAuth applications.{' '}
-                        <Link
-                          href="https://supabase.com/docs/guides/auth/oauth-server"
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-foreground-light underline hover:text-foreground transition"
-                        >
+                        <InlineLink href={`${DOCS_URL}/guides/auth/oauth-server`}>
                           Learn more
-                        </Link>
+                        </InlineLink>
                       </>
                     }
                   >
@@ -296,14 +293,11 @@ export const OAuthServerSettingsForm = () => {
                           <>
                             Enable dynamic OAuth app registration. Apps can be registered
                             programmatically via APIs.{' '}
-                            <Link
-                              href="https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication#oauth-client-setup"
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-foreground-light underline hover:text-foreground transition"
+                            <InlineLink
+                              href={`${DOCS_URL}/guides/auth/oauth-server/mcp-authentication#oauth-client-setup`}
                             >
                               Learn more
-                            </Link>
+                            </InlineLink>
                           </>
                         }
                       >

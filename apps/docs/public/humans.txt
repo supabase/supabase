@@ -10,6 +10,7 @@ Alan De Los Santos
 Aleksi Immonen
 Alexander Korotkov
 Ali Waseem
+Allan S
 Amy Q
 Andrew Valleteau
 Andrey A
@@ -111,6 +112,7 @@ Leonardo Santiago
 Long Hoang
 Luca Forstner
 Łukasz Niemier
+Maksym Ionutsa
 Manan Gupta
 Margarita Sandomirskaia
 Mark Burggraf
