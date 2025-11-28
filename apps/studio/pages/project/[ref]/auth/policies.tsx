@@ -190,7 +190,6 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
   const handleSelectEditPolicy = useCallback(
     (policy: PostgresPolicy) => {
-      setSelectedPolicyIdToEdit(policy.id.toString())
       setSelectedTable(undefined)
 
       if (isInlineEditorEnabled) {
