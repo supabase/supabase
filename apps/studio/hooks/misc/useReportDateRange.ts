@@ -16,6 +16,7 @@ export const DATERANGE_LIMITS: { [key: string]: number } = {
   pro: 7,
   team: 28,
   enterprise: 90,
+  platform: 1,
 }
 
 export interface ReportDateRange {
