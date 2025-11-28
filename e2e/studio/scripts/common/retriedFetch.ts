@@ -1,4 +1,4 @@
-import timeoutFetch from './timeoutFetch'
+import timeoutFetch from './timeoutFetch.js'
 
 export default async function retriedFetch(
   input: RequestInfo,

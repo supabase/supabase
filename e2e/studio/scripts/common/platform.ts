@@ -1,4 +1,4 @@
-import { SupabaseClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 import { CONFIG, SECRET } from './config.js'
 import retriedFetch from './retriedFetch.js'
 
@@ -53,7 +53,7 @@ export const platformClientV0 = new PlatformClient({
 })
 
 export const getMiddlewareClient = async () => {
-  return new SupabaseClient(CONFIG.MW_READ_ONLY, (await SECRET()).MW_READ_ONLY_KEY)
+  return createClient(CONFIG.MW_READ_ONLY, (await SECRET()).MW_READ_ONLY_KEY)
 }
 
 export class AdminApiClient {

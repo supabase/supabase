@@ -27,7 +27,7 @@ export async function waitForProjectStatus(
 
   for (let i = 0; i < retries; i++) {
     try {
-      const statusResp = await platformClient.send(`/projects/${ref}/status`, {}, undefined, 0)
+      const statusResp = await platformClient.send(`/projects/${ref}`, {}, undefined, 0)
       if (statusResp.status != 200) {
         console.log(
           `Failed to get project status ${statusResp.statusText} ${
