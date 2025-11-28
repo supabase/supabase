@@ -14,7 +14,7 @@ import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
-import { Button, cn, Input_Shadcn_ } from 'ui'
+import { Button, cn, Input } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationRow } from './DestinationRow'
@@ -100,18 +100,14 @@ export const Destinations = () => {
       <div className="mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <div className="relative">
-              <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
-                size={14}
-              />
-              <Input_Shadcn_
-                className="pl-9 h-7"
-                placeholder={'Filter destinations'}
-                value={filterString}
-                onChange={(e) => setFilterString(e.target.value)}
-              />
-            </div>
+            <Input
+              placeholder="Filter destinations"
+              size="tiny"
+              icon={<Search />}
+              value={filterString}
+              className="w-full lg:w-52"
+              onChange={(e) => setFilterString(e.target.value)}
+            />
           </div>
           <div className="flex items-center gap-x-2">
             {!!sourceId && (

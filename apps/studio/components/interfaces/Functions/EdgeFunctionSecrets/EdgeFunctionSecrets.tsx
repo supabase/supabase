@@ -117,7 +117,7 @@ export const EdgeFunctionSecrets = () => {
                       placeholder="Search for a secret"
                       value={searchString}
                       onChange={(e: any) => setSearchString(e.target.value)}
-                      icon={<Search size={14} />}
+                      icon={<Search />}
                     />
                   </div>
 
