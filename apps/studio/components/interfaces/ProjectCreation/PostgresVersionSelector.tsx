@@ -129,16 +129,17 @@ export const PostgresVersionSelector = ({
                 >
                   <div className="flex flex-row items-center justify-between w-full">
                     <span className="text-foreground">{postgresVersion}</span>
-                    {value.release_channel !== 'ga' && (
-                      <Badge variant="warning" className="mt-0">
-                        {value.release_channel}
-                      </Badge>
-                    )}
-                    {value.postgres_engine.includes('oriole') && (
-                      <Badge variant="default" className="mt-0">
-                        OrioleDB
-                      </Badge>
-                    )}
+                    {value.release_channel !== 'ga' ||
+                      (value.postgres_engine.includes('oriole') && (
+                        <div className="flex flex-row gap-x-2">
+                          {value.release_channel !== 'ga' && (
+                            <Badge variant="warning">{value.release_channel}</Badge>
+                          )}
+                          {value.postgres_engine.includes('oriole') && (
+                            <Badge variant="default">OrioleDB</Badge>
+                          )}
+                        </div>
+                      ))}
                   </div>
                 </SelectItem_Shadcn_>
               )

@@ -74,9 +74,7 @@ export const AdvancedConfiguration = ({
                         label={
                           <>
                             Postgres with OrioleDB
-                            <Badge variant="warning" className="mt-0">
-                              Alpha
-                            </Badge>
+                            <Badge variant="warning">Alpha</Badge>
                           </>
                         }
                         description="Not recommended for production workloads"
