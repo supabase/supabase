@@ -177,9 +177,13 @@ export const OAuthAppsList = () => {
   const handleSortChange = (column: OAuthAppsSortColumn) => {
     const [currentCol, currentOrder] = sort.split(':') as [OAuthAppsSortColumn, OAuthAppsSortOrder]
     if (currentCol === column) {
-      // Toggle order
-      const newOrder = currentOrder === 'asc' ? 'desc' : 'asc'
-      setSort(`${column}:${newOrder}` as OAuthAppsSort)
+      // Cycle through: asc -> desc -> no sort (default)
+      if (currentOrder === 'asc') {
+        setSort(`${column}:desc` as OAuthAppsSort)
+      } else {
+        // Reset to default sort (name:asc)
+        setSort('name:asc')
+      }
     } else {
       // New column, start with asc
       setSort(`${column}:asc` as OAuthAppsSort)

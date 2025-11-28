@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react'
 import * as React from 'react'
-import { ArrowDown, ArrowUp, ChevronUp } from 'lucide-react'
+import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react'
 
 import { cn } from '../../../lib/utils/cn'
 import { ShadowScrollArea } from '../../ShadowScrollArea'
@@ -122,11 +122,11 @@ function TableHeadInner<TColumn extends string = string>(
             isDesc ? 'translate-y-0' : '-translate-y-full'
           )}
         />
-        <ChevronUp
+        <ChevronsUpDown
           className={cn(
             baseIconClass,
             'transition-opacity',
-            !isActive && isHovered ? 'opacity-100' : 'opacity-0'
+            !isActive && isHovered ? 'opacity-80' : 'opacity-0'
           )}
         />
       </>
