@@ -16,7 +16,7 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { useApiReport } from 'data/reports/api-report-query'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { useReportDateRange, createRefreshHandler } from 'hooks/misc/useReportDateRange'
 import type { NextPageWithLayout } from 'types'
 
 export const ApiReport: NextPageWithLayout = () => {
@@ -52,6 +52,13 @@ export const ApiReport: NextPageWithLayout = () => {
     }
   }
 
+  const onRefreshReport = createRefreshHandler(
+    datePickerValue,
+    datePickerHelpers,
+    handleDatepickerChange,
+    refresh
+  )
+
   return (
     <ReportPadding>
       <ReportHeader title="API Gateway" showDatabaseSelector={false} />
@@ -64,7 +71,7 @@ export const ApiReport: NextPageWithLayout = () => {
               datepickerFrom={params.totalRequests.iso_timestamp_start}
               datepickerTo={params.totalRequests.iso_timestamp_end}
               onAddFilter={addFilter}
-              onRefresh={refresh}
+              onRefresh={onRefreshReport}
               isLoading={isLoading}
               filters={filters}
               datepickerHelpers={datePickerHelpers}
