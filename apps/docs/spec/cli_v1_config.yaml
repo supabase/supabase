@@ -1467,9 +1467,9 @@ parameters:
     required: false
     default: 'false'
     description: |
-      Enable third-party auth with AWS Cognito (Amplify)
+      Enable third party auth with AWS Cognito (Amplify)
     links:
-      - name: 'Third-Party Auth (Cognito)'
+      - name: 'Third Party Auth (Cognito)'
         link: 'https://supabase.com/docs/guides/auth/third-party/aws-cognito'
 
   - id: 'auth.third_party.aws_cognito.user_pool_id'
@@ -1480,7 +1480,7 @@ parameters:
     description: |
       User Pool ID for AWS Cognito (Amplify) that you are integrating with
     links:
-      - name: 'Third-Party Auth (Cognito)'
+      - name: 'Third Party Auth (Cognito)'
         link: 'https://supabase.com/docs/guides/auth/third-party/aws-cognito'
 
   - id: 'auth.third_party.aws_cognito.user_pool_region'
@@ -1491,7 +1491,7 @@ parameters:
     description: |
       User Pool region for AWS Cognito (Amplify) that you are integrating with. Example values: 'ap-southeast-1', 'us-east-1'
     links:
-      - name: 'Third-Party Auth (Cognito)'
+      - name: 'Third Party Auth (Cognito)'
         link: 'https://supabase.com/docs/guides/auth/third-party/aws-cognito'
 
   - id: 'auth.third_party.auth0.enabled'
@@ -1500,9 +1500,9 @@ parameters:
     required: false
     default: 'false'
     description: |
-      Enable third-party auth with Auth0
+      Enable third party auth with Auth0
     links:
-      - name: 'Third-Party Auth (Auth0)'
+      - name: 'Third Party Auth (Auth0)'
         link: 'https://supabase.com/docs/guides/auth/third-party/auth0'
 
   - id: 'auth.third_party.auth0.tenant'
@@ -1513,7 +1513,7 @@ parameters:
     description: |
       Tenant Identifier for Auth0 instance that you are integrating with
     links:
-      - name: 'Third-Party Auth (Auth0)'
+      - name: 'Third Party Auth (Auth0)'
         link: 'https://supabase.com/docs/guides/auth/third-party/auth0'
 
   - id: 'auth.third_party.auth0.tenant_region'
@@ -1524,7 +1524,7 @@ parameters:
     description: |
       Tenant region for Auth0 instance that you are integrating with
     links:
-      - name: 'Third-Party Auth (Auth0)'
+      - name: 'Third Party Auth (Auth0)'
         link: 'https://supabase.com/docs/guides/auth/third-party/auth0'
 
   - id: 'auth.third_party.firebase.enabled'
@@ -1533,9 +1533,9 @@ parameters:
     required: false
     default: 'false'
     description: |
-      Enable third-party auth with Firebase
+      Enable third party auth with Firebase
     links:
-      - name: 'Third-Party Auth (Firebase)'
+      - name: 'Third Party Auth (Firebase)'
         link: 'https://supabase.com/docs/guides/auth/third-party/firebase-auth'
 
   - id: 'auth.third_party.firebase.project_id'
@@ -1546,7 +1546,7 @@ parameters:
     description: |
       Project ID for Firebase instance that you are integrating with
     links:
-      - name: 'Third-Party Auth (Firebase)'
+      - name: 'Third Party Auth (Firebase)'
         link: 'https://supabase.com/docs/guides/auth/third-party/firebase-auth'
 
   - id: 'edge_runtime.enabled'

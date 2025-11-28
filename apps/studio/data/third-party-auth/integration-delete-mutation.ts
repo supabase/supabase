@@ -54,7 +54,7 @@ export const useDeleteThirdPartyAuthIntegrationMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to delete third-party auth integration: ${data.message}`)
+        toast.error(`Failed to delete third party auth integration: ${data.message}`)
       } else {
         onError(data, variables, context)
       }
