@@ -95,18 +95,6 @@ const RealtimeUsage = () => {
 
       setIsRefreshing(true)
 
-      if (datePickerValue.isHelper && datePickerValue.text) {
-        const selectedHelper = datePickerHelpers.find((h) => h.text === datePickerValue.text)
-        if (selectedHelper) {
-          handleDatePickerChange({
-            from: selectedHelper.calcFrom(),
-            to: selectedHelper.calcTo(),
-            isHelper: true,
-            text: selectedHelper.text,
-          })
-        }
-      }
-
       queryClient.invalidateQueries({
         queryKey: ['projects', ref, 'report-v2', { queryGroup: 'realtime' }],
       })
