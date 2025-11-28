@@ -72,7 +72,8 @@ export const UpgradePlanButton = ({
     </SupportLink>
   )
 
-  if (!canUpdateSubscription) {
+  // !canUpdateSubscription
+  if (true) {
     return (
       <RequestUpgradeToBillingOwners
         plan={plan}

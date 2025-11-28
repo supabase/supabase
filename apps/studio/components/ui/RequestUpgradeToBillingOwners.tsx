@@ -1,16 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PropsWithChildren, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import z from 'zod'
 
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
+import {
+  PlanRequest,
+  useSendUpgradeRequestMutation,
+} from 'data/organizations/request-upgrade-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PropsWithChildren } from 'react'
 import {
+  Badge,
   Button,
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -23,6 +28,9 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   TextArea_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -31,7 +39,7 @@ const FormSchema = z.object({
 })
 
 interface RequestUpgradeToBillingOwnersProps {
-  plan?: 'Pro' | 'Team' | 'Enterprise'
+  plan?: PlanRequest
   addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
   /** Used in the default message template, e.g: "Upgrade to ..." */
   featureProposition?: string
@@ -43,13 +51,22 @@ export const RequestUpgradeToBillingOwners = ({
   featureProposition,
   children,
 }: PropsWithChildren<RequestUpgradeToBillingOwnersProps>) => {
+  const [open, setOpen] = useState(false)
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
+  const slug = organization?.slug
   const isFreePlan = organization?.plan?.id === 'free'
 
   const { data: members = [] } = useOrganizationMembersQuery({ slug: organization?.slug })
   const { data: roles } = useOrganizationRolesV2Query({ slug: organization?.slug })
   const orgRoles = roles?.org_scoped_roles ?? []
+
+  const { mutate: sendUpgradeRequest, isPending: isSubmitting } = useSendUpgradeRequestMutation({
+    onSuccess: () => {
+      toast.success('Successfully sent request to billing owners!')
+      setOpen(false)
+    },
+  })
 
   const formattedAddonName =
     addon === 'pitr' ? 'PITR' : addon === 'customDomain' ? 'Custom Domain' : ''
@@ -106,12 +123,12 @@ export const RequestUpgradeToBillingOwners = ({
   })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
-    // TBD API implementation
-    console.log('Submit')
+    if (!slug) return console.error('Slug is required')
+    sendUpgradeRequest({ slug, plan, note: values.note })
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button type="primary">{buttonText}</Button>
       </DialogTrigger>
@@ -128,18 +145,33 @@ export const RequestUpgradeToBillingOwners = ({
             <DialogSectionSeparator />
 
             <DialogSection className="flex flex-col gap-y-6">
-              <div>
+              <div className="flex flex-col gap-y-2">
                 <p className="text-sm">
                   Your request will be sent to the following emails, who are billing owners of your
                   organization:
                 </p>
-                <ul className="list-disc pl-6 mt-2">
-                  {billingOwners.map((member) => (
-                    <li key={member.gotrue_id} className="text-sm">
-                      {member.primary_email}
-                    </li>
-                  ))}
-                </ul>
+                <div className="text-sm flex gap-x-2">
+                  <p>
+                    {billingOwners
+                      .slice(0, 2)
+                      .map((x) => x.primary_email)
+                      .join(', ')}
+                  </p>
+                  {billingOwners.length > 2 && (
+                    <Tooltip>
+                      <TooltipTrigger tabIndex={-1}>
+                        <Badge>+1 others</Badge>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        <ul className="">
+                          {billingOwners.slice(2).map((x) => (
+                            <li key={x.gotrue_id}>{x.primary_email}</li>
+                          ))}
+                        </ul>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </div>
               </div>
               <FormField_Shadcn_
                 control={form.control}
@@ -170,12 +202,12 @@ export const RequestUpgradeToBillingOwners = ({
             </DialogSection>
 
             <DialogFooter>
-              <DialogClose asChild>
-                <Button type="default" className="opacity-100">
-                  Cancel
-                </Button>
-              </DialogClose>
-              <Button htmlType="submit">Submit request</Button>
+              <Button type="default" disabled={isSubmitting} onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+              <Button htmlType="submit" loading={isSubmitting}>
+                Submit request
+              </Button>
             </DialogFooter>
           </form>
         </Form_Shadcn_>

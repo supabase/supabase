@@ -1,15 +1,14 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { LucideIcon } from 'lucide-react'
-import { ComponentProps } from 'react'
+import { type ComponentProps, type ReactNode } from 'react'
 
 import { Admonition } from 'ui-patterns'
 
 interface NoticeBarProps extends Omit<ComponentProps<typeof Admonition>, 'description'> {
   title?: string
   description?: string
-  icon?: LucideIcon
+  icon?: ReactNode
   visible: boolean
-  actions?: React.ReactNode
+  actions?: ReactNode
 }
 export function NoticeBar({ visible, description, actions, ...props }: NoticeBarProps) {
   return (
