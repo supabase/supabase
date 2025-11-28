@@ -243,12 +243,36 @@ export function Mermaid({ chart, className, zoomable = true }: MermaidProps) {
   )
 
   if (zoomable) {
-    // Convert SVG to data URL for react-medium-image-zoom compatibility
-    const svgDataUrl = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`
+    // react-medium-image-zoom requires <img>. To zoom the container WITH the diagram,
+    // we bake the container (background + border) into the SVG itself.
+    const tempDiv = document.createElement('div')
+    tempDiv.innerHTML = svg
+    const svgEl = tempDiv.querySelector('svg')
+    const svgWidth = parseInt(svgEl?.getAttribute('width') || '400')
+    const svgHeight = parseInt(svgEl?.getAttribute('height') || '300')
+
+    const padding = 24
+    const totalWidth = svgWidth + padding * 2
+    const totalHeight = svgHeight + padding * 2
+    const bgColor = isDark ? '#171717' : '#ffffff'
+    const borderColor = isDark ? '#333333' : '#e5e5e5'
+
+    // SVG with background rect (including border stroke) and mermaid diagram inside
+    const wrappedSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="${totalHeight}">
+      <rect x="0.5" y="0.5" width="${totalWidth - 1}" height="${totalHeight - 1}" rx="8" fill="${bgColor}" stroke="${borderColor}" stroke-width="1"/>
+      <g transform="translate(${padding}, ${padding})">${svg}</g>
+    </svg>`
+
+    const dataUrl = `data:image/svg+xml,${encodeURIComponent(wrappedSvg)}`
+
     return (
-      <div ref={containerRef} className={containerClassName}>
-        <Zoom ZoomContent={ZoomContent} zoomMargin={isLessThanLgBreakpoint ? 20 : 80}>
-          <img src={svgDataUrl} alt="Mermaid diagram" className="h-auto max-w-full" />
+      <div className="my-6">
+        <Zoom ZoomContent={ZoomContent} zoomMargin={isLessThanLgBreakpoint ? 80 : 200}>
+          <img
+            src={dataUrl}
+            alt="Mermaid diagram"
+            className="w-full h-auto max-h-[600px] object-contain cursor-zoom-in"
+          />
         </Zoom>
       </div>
     )
