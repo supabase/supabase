@@ -354,8 +354,7 @@ export function ComposedChart({
           data={data}
           syncId={syncId}
           style={{ cursor: 'crosshair' }}
-          onMouseMove={(e) => {
-            const { activeTooltipIndex, activePayload } = e
+          onMouseMove={({ activeLabel, activeTooltipIndex, activePayload }) => {
             if (!activeTooltipIndex) return
 
             setIsActiveHoveredChart(true)
@@ -369,21 +368,20 @@ export function ComposedChart({
             const activeTimestamp = data[activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseMove({
               activeLabel: activeTimestamp?.toString(),
-              coordinates: e.activeLabel,
+              coordinates: activeLabel,
             })
           }}
-          onMouseDown={(e) => {
-            const { activeTooltipIndex } = e
+          onMouseDown={({ activeLabel, activeTooltipIndex }) => {
             if (!activeTooltipIndex) return
 
             const activeTimestamp = data[activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseDown({
               activeLabel: activeTimestamp?.toString(),
-              coordinates: e.activeLabel,
+              coordinates: activeLabel,
             })
           }}
           onMouseUp={chartHighlight?.handleMouseUp}
-          onMouseLeave={(e) => {
+          onMouseLeave={() => {
             setIsActiveHoveredChart(false)
             setFocusDataIndex(null)
             setActivePayload(null)
