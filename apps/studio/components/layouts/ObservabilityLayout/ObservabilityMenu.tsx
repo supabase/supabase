@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useFlag, useParams } from 'common'
@@ -275,9 +275,9 @@ const ObservabilityMenu = () => {
           </div>
 
           {menuItems.map((item, idx) => (
-            <>
+            <Fragment key={idx}>
               <div className="h-px w-full bg-border-overlay first:hidden" />
-              <div key={item.key + '-menu-group'}>
+              <div>
                 {item.items ? (
                   <div className="px-2">
                     <Menu.Group title={<span className="uppercase font-mono">{item.title}</span>} />
@@ -305,7 +305,7 @@ const ObservabilityMenu = () => {
                   </div>
                 ) : null}
               </div>
-            </>
+            </Fragment>
           ))}
 
           <UpdateCustomReportModal

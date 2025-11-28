@@ -7502,22 +7502,22 @@ functions:
     title: 'Overview'
     notes: |
       This section contains methods for working with Analytics Buckets.
+  - id: storageanalytics-from
+    $ref: '@supabase/storage-js.packages/StorageAnalyticsClient.default.from'
+
   - id: storageanalytics-createbucket
-    title: Create a new analytics bucket
     $ref: '@supabase/storage-js.packages/StorageAnalyticsClient.default.createBucket'
     notes: |
       - Creates a new analytics bucket using Iceberg tables
       - Analytics buckets are optimized for analytical queries and data processing
 
   - id: storageanalytics-listbuckets
-    title: List analytics buckets
     $ref: '@supabase/storage-js.packages/StorageAnalyticsClient.default.listBuckets'
     notes: |
       - Retrieves the details of all Analytics Storage buckets within an existing project
       - Only returns buckets of type 'ANALYTICS'
 
   - id: storageanalytics-deletebucket
-    title: Delete an analytics bucket
     $ref: '@supabase/storage-js.packages/StorageAnalyticsClient.default.deleteBucket'
     notes: |
       - Deletes an analytics bucket

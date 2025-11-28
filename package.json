@@ -29,7 +29,7 @@
     "test:ui-patterns": "turbo run test --filter=ui-patterns",
     "test:studio": "turbo run test --filter=studio",
     "test:studio:watch": "turbo run test --filter=studio -- watch",
-    "e2e:setup:cli": "supabase start --exclude studio && supabase db reset && supabase status --output json > keys.json && node scripts/generateLocalEnv.js",
+    "e2e:setup:cli": "supabase stop --all --no-backup ; supabase start --exclude studio && supabase db reset && supabase status --output json > keys.json && node scripts/generateLocalEnv.js",
     "e2e:setup": "SKIP_ASSET_UPLOAD=1 pnpm e2e:setup:cli && NODE_ENV=test NODE_OPTIONS=\"--max-old-space-size=4096\" pnpm run build:studio && NODE_ENV=test pnpm --prefix ./apps/studio start --port 8082",
     "e2e": "pnpm --prefix e2e/studio run e2e",
     "e2e:ui": "pnpm --prefix e2e/studio run e2e:ui",
@@ -41,7 +41,7 @@
     "knip": "pnpx knip@~5.50.0"
   },
   "devDependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.410.0",
+    "@aws-sdk/client-secrets-manager": "^3.823.0",
     "@types/node": "catalog:",
     "eslint": "^9.0.0",
     "prettier": "3.2.4",
