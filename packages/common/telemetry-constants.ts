@@ -1942,6 +1942,28 @@ export interface RLSGeneratedPoliciesCreatedEvent {
 }
 
 /**
+ * User was exposed to the generate policies experiment (shown or not shown the Generate Policies button).
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface TableCreateGeneratePoliciesExperimentExposedEvent {
+  action: 'table_create_generate_policies_experiment_exposed'
+  properties: {
+    /**
+     * Whether the generate policies feature is enabled
+     */
+    enabled: boolean
+    /**
+     * Days since project creation (to segment by new user cohorts)
+     */
+    days_since_project_creation: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User opened API docs panel.
  *
  * @group Events
@@ -2515,6 +2537,7 @@ export type TelemetryEvent =
   | RLSGeneratePoliciesClickedEvent
   | RLSGeneratedPolicyRemovedEvent
   | RLSGeneratedPoliciesCreatedEvent
+  | TableCreateGeneratePoliciesExperimentExposedEvent
   | TableQuickstartOpenedEvent
   | TableQuickstartAIPromptSubmittedEvent
   | TableQuickstartAIGenerationCompletedEvent

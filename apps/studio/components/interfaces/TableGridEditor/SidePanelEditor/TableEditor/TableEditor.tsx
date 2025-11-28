@@ -69,7 +69,10 @@ export const TableEditor = ({
   const { data: project } = useSelectedProjectQuery()
   const { selectedSchema } = useQuerySchemaState()
   const isNewRecord = isUndefined(table)
-  const { enabled: generatePoliciesEnabled } = useTableCreateGeneratePolicies({ isNewRecord })
+  const { enabled: generatePoliciesEnabled } = useTableCreateGeneratePolicies({
+    isNewRecord,
+    projectInsertedAt: project?.inserted_at,
+  })
 
   const [params, setParams] = useUrlState()
   useEffect(() => {

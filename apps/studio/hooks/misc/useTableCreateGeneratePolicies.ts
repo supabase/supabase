@@ -1,14 +1,22 @@
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import { useEffect, useMemo, useRef } from 'react'
 
 import { usePHFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
 
+dayjs.extend(utc)
+
 interface UseTableCreateGeneratePoliciesOptions {
   /**
    * Whether this is a new table being created
    */
   isNewRecord?: boolean
+  /**
+   * Project creation timestamp
+   */
+  projectInsertedAt?: string
 }
 
 interface UseTableCreateGeneratePoliciesResult {
@@ -27,6 +35,7 @@ interface UseTableCreateGeneratePoliciesResult {
  */
 export function useTableCreateGeneratePolicies({
   isNewRecord = false,
+  projectInsertedAt,
 }: UseTableCreateGeneratePoliciesOptions): UseTableCreateGeneratePoliciesResult {
   const track = useTrack()
   const tableCreateGeneratePoliciesFlag = usePHFlag<boolean>('tableCreateGeneratePolicies')
@@ -43,20 +52,26 @@ export function useTableCreateGeneratePolicies({
     if (hasTrackedExposure.current) return
     if (!isNewRecord) return
     if (tableCreateGeneratePoliciesFlag === undefined) return
+    if (!projectInsertedAt) return
 
     hasTrackedExposure.current = true
 
     try {
-      track('table_create_generate_policies_exposed', {
+      const insertedDate = dayjs.utc(projectInsertedAt)
+      if (!insertedDate.isValid()) return
+
+      const daysSinceCreation = dayjs.utc().diff(insertedDate, 'day')
+
+      track('table_create_generate_policies_experiment_exposed', {
         enabled: tableCreateGeneratePoliciesFlag,
+        days_since_project_creation: daysSinceCreation,
       })
     } catch {
       hasTrackedExposure.current = false
     }
-  }, [isNewRecord, tableCreateGeneratePoliciesFlag, track])
+  }, [isNewRecord, tableCreateGeneratePoliciesFlag, projectInsertedAt, track])
 
   return {
     enabled,
   }
 }
-
