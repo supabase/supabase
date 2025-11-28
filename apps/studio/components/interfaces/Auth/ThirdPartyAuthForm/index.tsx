@@ -20,6 +20,7 @@ import {
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
 import { cn } from 'ui'
+import { EmptyStatePresentational } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AddIntegrationDropdown } from './AddIntegrationDropdown'
 import { CreateAuth0IntegrationDialog } from './CreateAuth0Dialog'
@@ -59,34 +60,30 @@ export const ThirdPartyAuthForm = () => {
     return (
       <AlertError
         error={error}
-        subject="Failed to retrieve auth configuration for Third Party Auth Integrations"
+        subject="Failed to retrieve auth configuration for Third-Party Auth Integrations"
       />
     )
   }
 
   return (
     <ScaffoldSection isFullWidth>
-      <div className="flex justify-between gap-4">
+      <div className="flex justify-between gap-12">
         <div>
-          <ScaffoldSectionTitle>Third Party Auth</ScaffoldSectionTitle>
+          <ScaffoldSectionTitle>Third-Party Auth</ScaffoldSectionTitle>
           <ScaffoldSectionDescription className="mb-6">
-            Use third-party authentication (TPA) systems based on JWTs to access your project.
-            <br />
             Billing is based on the number of monthly active users (MAUs) requesting your API
-            throughout the billing period. Refer to our{' '}
+            throughout the billing period.{' '}
             <InlineLink
               href={`${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users-third-party`}
             >
-              billing docs
-            </InlineLink>{' '}
-            for more information.
+              Learn more
+            </InlineLink>
           </ScaffoldSectionDescription>
         </div>
         <div className="flex items-center gap-2 ">
           <DocsButton href={`${DOCS_URL}/guides/auth/third-party/overview`} />
-          {integrations.length !== 0 && (
-            <AddIntegrationDropdown onSelectIntegrationType={setSelectedIntegration} />
-          )}
+
+          <AddIntegrationDropdown onSelectIntegrationType={setSelectedIntegration} />
         </div>
       </div>
 
@@ -102,18 +99,16 @@ export const ThirdPartyAuthForm = () => {
 
       {isSuccess ? (
         integrations.length === 0 ? (
-          <div
-            className={cn(
-              'border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4'
-            )}
+          <EmptyStatePresentational
+            title="Add an authentication provider"
+            description="Use third-party authentication systems based on JWTs to access your project."
           >
-            <p className="text-sm text-foreground-light">No providers configured yet</p>
             <AddIntegrationDropdown
               align="center"
-              buttonText="Add a new integration"
+              type="default"
               onSelectIntegrationType={setSelectedIntegration}
             />
-          </div>
+          </EmptyStatePresentational>
         ) : (
           <div className="-space-y-px">
             {integrations.map((integration) => {

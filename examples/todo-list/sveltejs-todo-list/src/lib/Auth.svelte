@@ -31,7 +31,7 @@
   };
 
   const handleOAuthLogin = async (provider: Provider) => {
-    // You need to enable the third party auth you want in Authentication > Settings
+    // You need to enable the third-party auth you want in Authentication > Settings
     // Read more on: https://supabase.com/docs/guides/auth#third-party-logins
     let { error } = await supabase.auth.signInWithOAuth({ provider });
     if (error) console.log("Error: ", error.message);
