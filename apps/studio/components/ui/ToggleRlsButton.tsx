@@ -13,6 +13,7 @@ export type ToggleRlsButtonChildProps = {
 }
 
 type ToggleRlsButtonBaseProps = {
+  tableId: number
   schema: string
   tableName: string
   /**
@@ -32,7 +33,10 @@ type ToggleRlsButtonBaseProps = {
 }
 
 type ToggleRlsButtonDefaultProps = ToggleRlsButtonBaseProps &
-  Omit<ButtonProps, 'children' | 'asChild' | 'onClick' | 'disabled'>
+  Omit<
+    ButtonProps,
+    'children' | 'asChild' | 'onClick' | 'disabled' | 'onError' | 'onSuccess' | 'onSettled'
+  >
 
 type ToggleRlsButtonCustomChildProps = ToggleRlsButtonBaseProps & {
   asChild: true
@@ -44,6 +48,7 @@ export type ToggleRlsButtonProps = ToggleRlsButtonDefaultProps | ToggleRlsButton
 export const ToggleRlsButton = (props: ToggleRlsButtonProps): ReactNode => {
   const {
     // Query information
+    tableId,
     schema,
     tableName,
     isRlsEnabled,
@@ -74,6 +79,7 @@ export const ToggleRlsButton = (props: ToggleRlsButtonProps): ReactNode => {
   const handleUpdate = () => {
     updateTable(
       {
+        id: tableId,
         projectRef,
         connectionString,
         schema,

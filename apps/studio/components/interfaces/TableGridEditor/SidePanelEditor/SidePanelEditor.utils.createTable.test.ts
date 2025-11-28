@@ -141,6 +141,7 @@ describe('createTable', () => {
       event: {
         action: 'table_created',
         properties: {
+          has_generated_policies: false,
           method: 'table_editor',
           schema_name: 'public',
           table_name: 'test_table',

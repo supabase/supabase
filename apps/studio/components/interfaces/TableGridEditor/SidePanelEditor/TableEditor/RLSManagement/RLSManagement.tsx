@@ -212,18 +212,17 @@ export const RLSManagement = ({
     if (!project || !table || !isExistingTable) return null
     return (
       <ToggleRlsButton
-        {...({
-          type: 'default',
-          size: 'tiny',
-          schema: table.schema ?? schema,
-          tableName: table.name,
-          isRlsEnabled: rlsEnabled,
-          projectRef: project.ref,
-          connectionString: project.connectionString ?? null,
-          onSuccess: handleRlsToggleSuccess,
-          onError: handleRlsToggleError,
-          className: 'w-fit mt-4',
-        } as any)}
+        tableId={table.id}
+        type="default"
+        size="tiny"
+        schema={table.schema ?? schema}
+        tableName={table.name}
+        isRlsEnabled={rlsEnabled}
+        projectRef={project.ref}
+        connectionString={project.connectionString ?? null}
+        onSuccess={handleRlsToggleSuccess}
+        onError={handleRlsToggleError}
+        className="w-fit mt-4"
       />
     )
   }

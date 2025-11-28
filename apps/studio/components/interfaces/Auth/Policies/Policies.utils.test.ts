@@ -17,9 +17,7 @@ import {
 } from './Policies.utils'
 
 // Helper to create a foreign key constraint
-const createForeignKey = (
-  overrides: Partial<ForeignKeyConstraint> = {}
-): ForeignKeyConstraint => ({
+const createForeignKey = (overrides: Partial<ForeignKeyConstraint> = {}): ForeignKeyConstraint => ({
   id: 1,
   constraint_name: 'fk_constraint',
   source_id: 100,
@@ -454,4 +452,3 @@ describe('Policies.utils - Policy Generation', () => {
     })
   })
 })
-
