@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev": "next dev --turbopack -p 8082",
+    "dev": "next dev -p 8082",
     "build": "next build && if [ \"$SKIP_ASSET_UPLOAD\" != \"1\" ]; then ./../../scripts/upload-static-assets.sh; fi",
     "start": "next start -p 8082",
     "lint": "eslint .",
