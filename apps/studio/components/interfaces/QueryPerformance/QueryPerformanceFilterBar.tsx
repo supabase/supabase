@@ -79,7 +79,7 @@ export const QueryPerformanceFilterBar = ({
           <Input
             size="tiny"
             autoComplete="off"
-            icon={<Search size={12} />}
+            icon={<Search />}
             value={inputValue}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
             name="keyword"

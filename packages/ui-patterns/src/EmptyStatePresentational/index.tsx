@@ -1,4 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
+import { SquarePlus } from 'lucide-react'
 import { createElement, isValidElement, ReactNode } from 'react'
 
 import { cn } from 'ui'
@@ -59,6 +60,9 @@ export const EmptyStatePresentational = ({
   iconClassName,
   contentClassName,
 }: EmptyStatePresentationalProps) => {
+  // Use SquarePlus as default icon if none is provided
+  const iconToRender = Icon || SquarePlus
+
   // Extract content rendering to avoid duplication between icon and no-icon cases
   const textContent = (
     <div className={cn('flex flex-col items-center text-center text-balance', contentClassName)}>
@@ -74,30 +78,28 @@ export const EmptyStatePresentational = ({
         className
       )}
     >
-      {Icon ? (
-        <div className="flex flex-col gap-y-3 items-center">
-          {/* 
-            Handle different icon types:
-            1. If it's already a React element (pre-rendered), render it directly
-            2. If it's a function (LucideIcon component type) or forwardRef component (has $$typeof),
-               instantiate it with createElement and apply default props
-            3. Otherwise, render as-is (fallback for other ReactNode types)
-          */}
-          {isValidElement(Icon)
-            ? Icon
-            : typeof Icon === 'function' ||
-                (typeof Icon === 'object' && Icon !== null && '$$typeof' in Icon)
-              ? createElement(Icon as LucideIcon, {
-                  size: iconSize,
-                  strokeWidth: 1.5,
-                  className: cn('text-foreground-muted', iconClassName),
-                })
-              : Icon}
-          {textContent}
-        </div>
-      ) : (
-        textContent
-      )}
+      <div className="flex flex-col gap-y-3 items-center">
+        {/* 
+          Handle different icon types:
+          1. If it's already a React element (pre-rendered), render it directly
+          2. If it's a function (LucideIcon component type) or forwardRef component (has $$typeof),
+             instantiate it with createElement and apply default props
+          3. Otherwise, render as-is (fallback for other ReactNode types)
+        */}
+        {isValidElement(iconToRender)
+          ? iconToRender
+          : typeof iconToRender === 'function' ||
+              (typeof iconToRender === 'object' &&
+                iconToRender !== null &&
+                '$$typeof' in iconToRender)
+            ? createElement(iconToRender as LucideIcon, {
+                size: iconSize,
+                strokeWidth: 1.5,
+                className: cn('text-foreground-muted', iconClassName),
+              })
+            : iconToRender}
+        {textContent}
+      </div>
 
       {/* Optional children (typically action buttons) */}
       {children}

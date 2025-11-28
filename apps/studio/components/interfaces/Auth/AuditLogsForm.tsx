@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import { boolean, object } from 'yup'
 
 import { useParams } from 'common'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
@@ -26,6 +25,13 @@ import {
 } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 const schema = object({
   AUDIT_LOG_DISABLE_POSTGRES: boolean().required(),
@@ -87,28 +93,35 @@ export const AuditLogsForm = () => {
 
   if (isError) {
     return (
-      <ScaffoldSection isFullWidth>
-        <AlertError
-          error={authConfigError}
-          subject="Failed to retrieve auth configuration for hooks"
-        />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <AlertError
+            error={authConfigError}
+            subject="Failed to retrieve auth configuration for hooks"
+          />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   if (isLoading) {
     return (
-      <ScaffoldSection isFullWidth>
-        <GenericSkeletonLoader />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <GenericSkeletonLoader />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   return (
-    <ScaffoldSection isFullWidth>
-      <div className="space-y-4">
-        <ScaffoldSectionTitle className="mb-4">Settings</ScaffoldSectionTitle>
-
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Settings</PageSectionTitle>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
         <Form_Shadcn_ {...form}>
           <form onSubmit={form.handleSubmit(onSubmitAuditLogs)} className="space-y-4">
             <Card>
@@ -193,7 +206,7 @@ export const AuditLogsForm = () => {
             </Card>
           </form>
         </Form_Shadcn_>
-      </div>
-    </ScaffoldSection>
+      </PageSectionContent>
+    </PageSection>
   )
 }
