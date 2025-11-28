@@ -239,7 +239,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                   <AlertCircle strokeWidth={2} />
                   <AlertTitle_Shadcn_>
                     Changes to column privileges will not be reflected in migrations when running{' '}
-                    <code className="text-xs">supabase db diff</code>.
+                    <code className="text-code-inline">supabase db diff</code>.
                   </AlertTitle_Shadcn_>
                   <AlertDescription_Shadcn_>
                     Column privileges are not supported in the current version of the Supabase CLI.
@@ -269,10 +269,12 @@ const PrivilegesPage: NextPageWithLayout = () => {
                     If you remove a column privilege for a role, that role will lose all access to
                     that column.
                     <br />
-                    All operations selecting <code className="text-xs">*</code> (including{' '}
-                    <code className="text-xs">returning *</code> for{' '}
-                    <code className="text-xs">insert</code>, <code className="text-xs">update</code>
-                    , and <code className="text-xs">delete</code>) will fail.
+                    All operations selecting <code className="text-code-inline">
+                      *
+                    </code> (including <code className="text-code-inline">returning *</code> for{' '}
+                    <code className="text-code-inline">insert</code>,{' '}
+                    <code className="text-code-inline">update</code>, and{' '}
+                    <code className="text-code-inline">delete</code>) will fail.
                   </AlertDescription_Shadcn_>
                   <Button
                     type="outline"

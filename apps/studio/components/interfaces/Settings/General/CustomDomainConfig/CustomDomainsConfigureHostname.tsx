@@ -101,13 +101,13 @@ const CustomDomainsConfigureHostname = () => {
                 <p className="col-span-12 text-sm lg:col-span-7 leading-6">
                   Set up a CNAME record for{' '}
                   {values.domain ? (
-                    <code className="text-xs">{values.domain}</code>
+                    <code className="text-code-inline">{values.domain}</code>
                   ) : (
                     'your custom domain'
                   )}{' '}
                   resolving to{' '}
                   {endpoint ? (
-                    <code className="text-xs">{endpoint}</code>
+                    <code className="text-code-inline">{endpoint}</code>
                   ) : (
                     "your project's API URL"
                   )}{' '}

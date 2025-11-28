@@ -5,9 +5,10 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { AlphaNotice } from 'components/ui/AlphaNotice'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
-import { Bucket as BucketIcon } from 'icons'
+import { AnalyticsBucket as AnalyticsBucketIcon } from 'icons'
 import { BASE_PATH } from 'lib/constants'
 import {
   Card,
@@ -23,7 +24,6 @@ import {
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { AlphaNotice } from '../AlphaNotice'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateAnalyticsBucketModal } from './CreateAnalyticsBucketModal'
 
@@ -64,7 +64,10 @@ export const AnalyticsBuckets = () => {
 
   return (
     <ScaffoldSection isFullWidth>
-      <AlphaNotice type="analytics" />
+      <AlphaNotice
+        entity="Analytics buckets"
+        feedbackUrl="https://github.com/orgs/supabase/discussions/40116"
+      />
 
       {isLoadingBuckets && <GenericSkeletonLoader />}
 
@@ -102,7 +105,7 @@ export const AnalyticsBuckets = () => {
                   placeholder="Search for a bucket"
                   value={filterString}
                   onChange={(e) => setFilterString(e.target.value)}
-                  icon={<Search size={12} />}
+                  icon={<Search />}
                 />
                 <CreateAnalyticsBucketModal buttonType="primary" buttonClassName="w-fit" />
               </div>
@@ -151,7 +154,7 @@ export const AnalyticsBuckets = () => {
                           tabIndex={0}
                         >
                           <TableCell className="w-2 pr-1">
-                            <BucketIcon size={16} className="text-foreground-muted" />
+                            <AnalyticsBucketIcon size={16} className="text-foreground-muted" />
                           </TableCell>
                           <TableCell>
                             <p className="whitespace-nowrap max-w-[512px] truncate">

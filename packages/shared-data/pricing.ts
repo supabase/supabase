@@ -45,7 +45,7 @@ export type FeatureKey =
   | 'auth.socialOAuthProviders'
   | 'auth.customSMTPServer'
   | 'auth.removeSupabaseBranding'
-  | 'auth.auditTrails'
+  | 'auth.auditLogs'
   | 'auth.basicMFA'
   | 'auth.advancedMFAPhone'
   | 'auth.thirdPartyMAUs'
@@ -69,7 +69,7 @@ export type FeatureKey =
   | 'realtime.messagesPerMonth'
   | 'realtime.maxMessageSize'
   | 'dashboard.teamMembers'
-  | 'dashboard.auditTrails'
+  | 'security.platformAuditLogs'
   | 'security.byoc'
   | 'security.logRetention'
   | 'security.logDrain'
@@ -289,8 +289,8 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        key: 'auth.auditTrails',
-        title: 'Audit trails',
+        key: 'auth.auditLogs',
+        title: 'Auth Audit Logs',
         plans: {
           free: '1 hour',
           pro: '7 days',
@@ -556,17 +556,6 @@ export const pricing: Pricing = {
         },
         usage_based: false,
       },
-      {
-        key: 'dashboard.auditTrails',
-        title: 'Audit trails',
-        plans: {
-          free: false,
-          pro: false,
-          team: true,
-          enterprise: true,
-        },
-        usage_based: false,
-      },
     ],
   },
   security: {
@@ -605,6 +594,17 @@ export const pricing: Pricing = {
           enterprise: 'Custom',
         },
         usage_based: true,
+      },
+      {
+        key: 'security.platformAuditLogs',
+        title: 'Platform Audit Logs',
+        plans: {
+          free: false,
+          pro: false,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
       },
       {
         key: 'security.metricsEndpoint',

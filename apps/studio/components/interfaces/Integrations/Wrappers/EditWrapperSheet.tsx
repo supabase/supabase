@@ -215,12 +215,12 @@ export const EditWrapperSheet = ({
                           values.wrapper_name !== initialValues.wrapper_name ? (
                             <>
                               Your wrapper's server name will be updated to{' '}
-                              <code className="text-xs">{values.wrapper_name}_server</code>
+                              <code className="text-code-inline">{values.wrapper_name}_server</code>
                             </>
                           ) : (
                             <>
                               Your wrapper's server name is{' '}
-                              <code className="text-xs">{values.wrapper_name}_server</code>
+                              <code className="text-code-inline">{values.wrapper_name}_server</code>
                             </>
                           )
                         }
