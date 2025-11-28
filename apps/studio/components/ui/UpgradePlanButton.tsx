@@ -63,7 +63,7 @@ export const UpgradePlanButton = ({
         : `/project/${ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
     : '/'
 
-  const linkChildren = children || `Upgrade to ${plan}`
+  const linkChildren = children || (!!addon ? 'Enable add-on' : `Upgrade to ${plan}`)
   const link = billingAll ? (
     <Link href={href}>{linkChildren}</Link>
   ) : (
