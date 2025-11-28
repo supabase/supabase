@@ -14,12 +14,6 @@ import { slugifyTitle } from 'components/interfaces/Auth/EmailTemplates/EmailTem
 import { TemplateEditor } from 'components/interfaces/Auth/EmailTemplates/TemplateEditor'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldSection,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
@@ -39,6 +33,30 @@ import {
 } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderBreadcrumb,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+import {
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from 'ui/src/components/shadcn/ui/breadcrumb'
 
 const TemplatePage: NextPageWithLayout = () => {
   return <RedirectToTemplates />
@@ -158,92 +176,120 @@ const RedirectToTemplates = () => {
   }
 
   return (
-    <PageLayout
-      title={template.title}
-      subtitle={template.purpose || 'Configure and customize email templates.'}
-      breadcrumbs={[
-        {
-          label: 'Emails',
-          href: `/project/${ref}/auth/templates`,
-        },
-      ]}
-      secondaryActions={[
-        <DocsButton
-          key="docs"
-          href={`${DOCS_URL}/guides/local-development/customizing-email-templates#${isSecurityTemplate ? 'security' : 'auth'}emailtemplate${templateIdForDocs}`}
-        />,
-      ]}
-    >
-      <ScaffoldContainer bottomPadding>
+    <>
+      <PageHeader size="default">
+        <PageHeaderBreadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href={`/project/${ref}/auth/templates`}>Emails</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{template.title}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </PageHeaderBreadcrumb>
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>{template.title}</PageHeaderTitle>
+            <PageHeaderDescription>
+              {template.purpose || 'Configure and customize email templates.'}
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            <DocsButton
+              href={`${DOCS_URL}/guides/local-development/customizing-email-templates#${isSecurityTemplate ? 'security' : 'auth'}emailtemplate${templateIdForDocs}`}
+            />
+          </PageHeaderAside>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="default" className="pb-16">
         {!isPermissionsLoaded || isLoadingConfig ? (
-          <ScaffoldSection isFullWidth>
-            <GenericSkeletonLoader />
-          </ScaffoldSection>
+          <PageSection>
+            <PageSectionContent>
+              <GenericSkeletonLoader />
+            </PageSectionContent>
+          </PageSection>
         ) : (
           <>
             {showConfigurationSection && (
-              <ScaffoldSection isFullWidth>
-                <ScaffoldSectionTitle className="mb-4">Configuration</ScaffoldSectionTitle>
-                <Form_Shadcn_ {...templateForm}>
-                  <form onSubmit={templateForm.handleSubmit(onSubmit)} className="space-y-4">
-                    <Card>
-                      <CardContent>
-                        <FormField_Shadcn_
-                          control={templateForm.control}
-                          name={templateEnabledKey as keyof z.infer<typeof TemplateFormSchema>}
-                          render={({ field }) => (
-                            <FormItemLayout
-                              layout="flex-row-reverse"
-                              label="Enable notification"
-                              description="Send this email to users when triggered"
-                            >
-                              <FormControl_Shadcn_>
-                                <Switch
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                  disabled={!canUpdateConfig}
-                                />
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
+              <PageSection>
+                <PageSectionMeta>
+                  <PageSectionSummary>
+                    <PageSectionTitle>Configuration</PageSectionTitle>
+                  </PageSectionSummary>
+                </PageSectionMeta>
+                <PageSectionContent>
+                  <Form_Shadcn_ {...templateForm}>
+                    <form onSubmit={templateForm.handleSubmit(onSubmit)} className="space-y-4">
+                      <Card>
+                        <CardContent>
+                          <FormField_Shadcn_
+                            control={templateForm.control}
+                            name={templateEnabledKey as keyof z.infer<typeof TemplateFormSchema>}
+                            render={({ field }) => (
+                              <FormItemLayout
+                                layout="flex-row-reverse"
+                                label="Enable notification"
+                                description="Send this email to users when triggered"
+                              >
+                                <FormControl_Shadcn_>
+                                  <Switch
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                    disabled={!canUpdateConfig}
+                                  />
+                                </FormControl_Shadcn_>
+                              </FormItemLayout>
+                            )}
+                          />
+                        </CardContent>
+                        <CardFooter className="justify-end space-x-2">
+                          {templateForm.formState.isDirty && (
+                            <Button type="default" onClick={() => templateForm.reset()}>
+                              Cancel
+                            </Button>
                           )}
-                        />
-                      </CardContent>
-                      <CardFooter className="justify-end space-x-2">
-                        {templateForm.formState.isDirty && (
-                          <Button type="default" onClick={() => templateForm.reset()}>
-                            Cancel
+                          <Button
+                            type="primary"
+                            htmlType="submit"
+                            disabled={
+                              !canUpdateConfig ||
+                              isUpdatingConfig ||
+                              !templateForm.formState.isDirty
+                            }
+                            loading={isUpdatingConfig}
+                          >
+                            Save changes
                           </Button>
-                        )}
-                        <Button
-                          type="primary"
-                          htmlType="submit"
-                          disabled={
-                            !canUpdateConfig || isUpdatingConfig || !templateForm.formState.isDirty
-                          }
-                          loading={isUpdatingConfig}
-                        >
-                          Save changes
-                        </Button>
-                      </CardFooter>
-                    </Card>
-                  </form>
-                </Form_Shadcn_>
-              </ScaffoldSection>
+                        </CardFooter>
+                      </Card>
+                    </form>
+                  </Form_Shadcn_>
+                </PageSectionContent>
+              </PageSection>
             )}
 
-            <ScaffoldSection isFullWidth>
-              {/* Only show title if there is an another section above */}
+            <PageSection>
               {showConfigurationSection && (
-                <ScaffoldSectionTitle className="mb-4">Content</ScaffoldSectionTitle>
+                <PageSectionMeta>
+                  <PageSectionSummary>
+                    <PageSectionTitle>Content</PageSectionTitle>
+                  </PageSectionSummary>
+                </PageSectionMeta>
               )}
-              <Card>
-                <TemplateEditor template={template} />
-              </Card>
-            </ScaffoldSection>
+              <PageSectionContent>
+                <Card>
+                  <TemplateEditor template={template} />
+                </Card>
+              </PageSectionContent>
+            </PageSection>
           </>
         )}
-      </ScaffoldContainer>
-    </PageLayout>
+      </PageContainer>
+    </>
   )
 }
 
