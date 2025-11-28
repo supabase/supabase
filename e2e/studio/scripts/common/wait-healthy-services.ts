@@ -3,14 +3,7 @@ import assert from 'assert'
 import { PlatformClient } from './platform.js'
 import { sleep } from './helpers.js'
 
-import { CONFIG } from './config.js'
-
-const checkHealth = async (ref: string) => {
-  const platformClient = new PlatformClient({
-    url: CONFIG.SUPA_PLATFORM_URI_V1,
-    accessToken: CONFIG.SUPA_V1_KEY,
-  })
-
+const checkHealth = async (platformClient: PlatformClient, ref: string) => {
   // get health of services
   const healthResp = await platformClient.send(
     `/projects/${ref}/health?services=db,pooler,auth,realtime,rest,storage`
@@ -34,11 +27,11 @@ type Health = {
   error?: unknown
 }
 
-export const waitForHealthyServices = async (ref: string) => {
+export const waitForHealthyServices = async (platformClient: PlatformClient, ref: string) => {
   // check health 600 times every 2 seconds; 20mins
   for (let i = 0; i < 600; i++) {
     try {
-      const health = await checkHealth(ref)
+      const health = await checkHealth(platformClient, ref)
       // check if all services are healthy
       if (health.every((h) => h.healthy)) {
         return

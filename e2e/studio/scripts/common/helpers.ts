@@ -1,7 +1,6 @@
 import assert from 'assert'
 import { setTimeout } from 'timers/promises'
 
-import { CONFIG } from './config.js'
 import { PlatformClient } from './platform.js'
 
 const statusWaiterMilliSeconds = parseInt(process.env.STATUS_WAITER_MILLI_SECONDS ?? '3000')
@@ -11,16 +10,18 @@ const statusWaiterRetries = parseInt(
 
 export const sleep = (ms: number) => setTimeout(ms)
 
-export async function waitForProjectStatus(
-  expectedStatus: string,
-  ref: string,
-  retries = statusWaiterRetries
-) {
-  const platformClient = new PlatformClient({
-    url: CONFIG.SUPA_PLATFORM_URI,
-    accessToken: CONFIG.SUPA_V0_KEY,
-  })
-
+export type WaitForProjectStatusParams = {
+  platformClient: PlatformClient
+  ref: string
+  expectedStatus: string
+  retries?: number
+}
+export async function waitForProjectStatus({
+  platformClient,
+  ref,
+  expectedStatus,
+  retries = statusWaiterRetries,
+}: WaitForProjectStatusParams) {
   for (let i = 0; i < retries; i++) {
     try {
       const statusResp = await platformClient.send(`/projects/${ref}`, {}, undefined, 0)
