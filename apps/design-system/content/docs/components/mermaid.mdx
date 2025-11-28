@@ -25,7 +25,7 @@ This is automatically rendered as a diagram. No imports needed.
 
 ### As a Component
 
-For more control (custom className, disabling zoom), import and use the component directly:
+For more control, import and use the component directly:
 
 ```tsx
 import { Mermaid } from 'ui'
@@ -44,7 +44,7 @@ flowchart LR
 }
 ```
 
-Use the component when you need to pass props like `className` or `zoomable`, conditionally render, or integrate with React logic.
+Use the component when you need to pass props like `className`, conditionally render, or integrate with React logic.
 
 ## Flowcharts
 
@@ -111,16 +111,11 @@ Contrasts with async by showing traditional blocking FDW behavior where all rows
 
 ## Props
 
-| Prop        | Type      | Default | Description                          |
-| ----------- | --------- | ------- | ------------------------------------ |
-| `chart`     | `string`  | —       | The Mermaid diagram definition       |
-| `className` | `string`  | —       | Optional CSS class for the container |
-| `zoomable`  | `boolean` | `true`  | Enable click-to-zoom on the diagram  |
+| Prop        | Type     | Description                          |
+| ----------- | -------- | ------------------------------------ |
+| `chart`     | `string` | The Mermaid diagram definition       |
+| `className` | `string` | Optional CSS class for the container |
 
 ## Learn More
 
 See the [Mermaid documentation](https://mermaid.js.org/intro/) for full syntax reference and additional diagram types.
-
-```
-
-```

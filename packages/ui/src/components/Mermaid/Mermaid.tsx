@@ -1,18 +1,12 @@
 'use client'
 
-import 'react-medium-image-zoom/dist/styles.css'
-
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import mermaid from 'mermaid'
 import { useTheme } from 'next-themes'
-import { useBreakpoint } from 'common'
-import Zoom from 'react-medium-image-zoom'
-import ZoomContent from '../Image/ZoomContent'
 import { cn } from '../../lib/utils/cn'
 
-// @mildtomato - 28/12/2025
-// for now the colors are hardcoded because the theme variables are not working
-// ideally we would use the css theme variables
+// @mildtomato - 28/11/2025
+// Colors are hardcoded because Mermaid's parser doesn't support CSS variables
 const darkThemeVariables = {
   background: 'transparent',
   mainBkg: '#171717',
@@ -55,9 +49,6 @@ const darkThemeVariables = {
   fontSize: '14px',
 }
 
-// @mildtomato - 28/12/2025
-// for now the colors are hardcoded because the theme variables are not working
-// ideally we would use the css theme variables
 const lightThemeVariables = {
   background: 'transparent',
   mainBkg: '#ffffff',
@@ -103,16 +94,13 @@ const lightThemeVariables = {
 export interface MermaidProps {
   chart: string
   className?: string
-  zoomable?: boolean
 }
 
-export function Mermaid({ chart, className, zoomable = true }: MermaidProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
+export function Mermaid({ chart, className }: MermaidProps) {
   const [svg, setSvg] = useState<string>('')
   const [error, setError] = useState<string | null>(null)
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
-  const isLessThanLgBreakpoint = useBreakpoint()
 
   const isDark = resolvedTheme === 'dark'
 
@@ -236,34 +224,14 @@ export function Mermaid({ chart, className, zoomable = true }: MermaidProps) {
     )
   }
 
-  const containerClassName = cn(
-    'my-6 flex justify-center rounded-lg border p-6 pb-8',
-    isDark ? 'bg-[#171717] border-[#333]' : 'bg-white border-[#e5e5e5]',
-    className
-  )
-
-  if (zoomable) {
-    // Zoom the entire container (w-full div with background + border + diagram)
-    return (
-      <Zoom zoomMargin={isLessThanLgBreakpoint ? 80 : 200}>
-        <div
-          ref={containerRef}
-          className={cn(
-            'my-6 w-full flex justify-center rounded-lg border p-6 cursor-zoom-in',
-            isDark ? 'bg-[#171717] border-[#333]' : 'bg-white border-[#e5e5e5]',
-            '[&_svg]:h-auto [&_svg]:max-w-full [&_svg]:max-h-[600px]',
-            className
-          )}
-          dangerouslySetInnerHTML={{ __html: svg }}
-        />
-      </Zoom>
-    )
-  }
-
   return (
     <div
-      ref={containerRef}
-      className={cn(containerClassName, '[&_svg]:h-auto [&_svg]:max-w-full')}
+      className={cn(
+        'my-6 w-full flex justify-center rounded-lg border p-6',
+        'bg-white border-[#e5e5e5] dark:bg-[#171717] dark:border-[#333]',
+        '[&_svg]:h-auto [&_svg]:max-w-full',
+        className
+      )}
       dangerouslySetInnerHTML={{ __html: svg }}
     />
   )
