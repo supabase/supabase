@@ -5,6 +5,7 @@ packages:
   - e2e/*
 
 catalog:
+  '@sentry/nextjs': ^10.26.0
   '@supabase/auth-js': 2.86.0
   '@supabase/realtime-js': 2.86.0
   '@supabase/supabase-js': 2.86.0
