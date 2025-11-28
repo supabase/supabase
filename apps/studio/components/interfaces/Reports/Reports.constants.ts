@@ -314,8 +314,6 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(request.cf) as cf
         group by
           cf.country
-        order by
-          count desc
         `,
       },
     },

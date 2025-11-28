@@ -25,10 +25,12 @@ import {
 } from 'ui'
 import { queryParamsToObject } from '../Reports.utils'
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
-import { ComposableMap, Geographies, Geography } from 'react-simple-maps'
+import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps'
 import { ZoomableGroup } from 'react-simple-maps'
 import { COUNTRIES } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/BillingAddress.constants'
+import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { BASE_PATH } from 'lib/constants'
+import { geoCentroid } from 'd3-geo'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
@@ -448,6 +450,25 @@ export const RequestsByCountryMapRenderer = (
     return 'hsl(var(--brand-200))'
   }
 
+  // Micro/city-states that are visually tiny on world maps - render markers for visibility
+  const MICRO_COUNTRIES = new Set([
+    'Singapore',
+    'Monaco',
+    'Andorra',
+    'Liechtenstein',
+    'San Marino',
+    'Vatican',
+    'Vatican City',
+    'Luxembourg',
+    'Malta',
+    'Bahrain',
+    'Brunei',
+    'Qatar',
+    'Kuwait',
+    'Hong Kong',
+    'Macau',
+  ])
+
   return (
     <div ref={containerRef} className="w-full h-[560px] relative border border-border-muted">
       <ComposableMap
@@ -457,84 +478,199 @@ export const RequestsByCountryMapRenderer = (
       >
         <ZoomableGroup minZoom={1} maxZoom={5} zoom={1.3}>
           <Geographies geography={WORLD_TOPO_URL}>
-            {({ geographies }) =>
-              geographies.map((geo) => {
-                const title =
-                  (geo.properties?.name as string) || (geo.properties?.NAME as string) || 'Unknown'
-                // Lookup by country name resolved from ISO2 code counts
-                // Find any ISO2 that maps to this topo country name
-                // Precompute direct lookup for performance
-                let value = 0
-                // Direct match by name
-                // Try common path: find code whose mapped name equals this title
-                // Avoid O(n^2) by building a reverse map on first run
-                // For simplicity here, do a small linear scan of keys; dataset is small (<= 250)
-                for (const code in countsByIso2) {
-                  const name = iso2ToName[code] || code
-                  if (name === title) {
-                    value = countsByIso2[code]
-                    break
+            {({ geographies }) => (
+              <>
+                {geographies.map((geo) => {
+                  const title =
+                    (geo.properties?.name as string) ||
+                    (geo.properties?.NAME as string) ||
+                    'Unknown'
+                  // Lookup by country name resolved from ISO2 code counts
+                  // Find any ISO2 that maps to this topo country name
+                  // Precompute direct lookup for performance
+                  let value = 0
+                  // Direct match by name
+                  // Try common path: find code whose mapped name equals this title
+                  // Avoid O(n^2) by building a reverse map on first run
+                  // For simplicity here, do a small linear scan of keys; dataset is small (<= 250)
+                  for (const code in countsByIso2) {
+                    const name = iso2ToName[code] || code
+                    if (name === title) {
+                      value = countsByIso2[code]
+                      break
+                    }
                   }
-                }
-                const tooltipTitle = title
-                const tooltipSubtitle = `${value.toLocaleString()} requests`
-                return (
-                  <Geography
-                    key={geo.rsmKey}
-                    geography={geo}
-                    onMouseMove={(e) => {
-                      const rect = containerRef.current?.getBoundingClientRect()
-                      const x = (rect ? e.clientX - rect.left : e.clientX) + 12
-                      const y = (rect ? e.clientY - rect.top : e.clientY) + 12
-                      setHoverInfo({
-                        x,
-                        y,
-                        title: tooltipTitle,
-                        subtitle: tooltipSubtitle,
-                        visible: true,
-                      })
-                    }}
-                    onMouseEnter={(e) => {
-                      const rect = containerRef.current?.getBoundingClientRect()
-                      const x = (rect ? e.clientX - rect.left : e.clientX) + 12
-                      const y = (rect ? e.clientY - rect.top : e.clientY) + 12
-                      setHoverInfo({
-                        x,
-                        y,
-                        title: tooltipTitle,
-                        subtitle: tooltipSubtitle,
-                        visible: true,
-                      })
-                    }}
-                    onMouseLeave={() => setHoverInfo((prev) => ({ ...prev, visible: false }))}
-                    style={{
-                      default: {
-                        fill: getFill(value),
-                        stroke: 'hsla(var(--brand-300), 0.6)',
-                        strokeWidth: 0.4,
-                        outline: 'none',
-                        cursor: 'default',
-                      },
-                      hover: {
-                        fill: getFill(value),
-                        stroke: 'hsl(var(--brand-500))',
-                        strokeWidth: 0.6,
-                        outline: 'none',
-                        cursor: 'default',
-                      },
-                      pressed: {
-                        fill: getFill(value),
-                        stroke: 'hsl(var(--brand-500))',
-                        strokeWidth: 0.6,
-                        outline: 'none',
-                        cursor: 'default',
-                      },
-                    }}
-                    aria-label={`${tooltipTitle} — ${tooltipSubtitle}`}
-                  />
-                )
-              })
-            }
+                  const tooltipTitle = title
+                  const tooltipSubtitle = `${value.toLocaleString()} requests`
+                  return (
+                    <Geography
+                      key={geo.rsmKey}
+                      geography={geo}
+                      onMouseMove={(e) => {
+                        const rect = containerRef.current?.getBoundingClientRect()
+                        const x = (rect ? e.clientX - rect.left : e.clientX) + 12
+                        const y = (rect ? e.clientY - rect.top : e.clientY) + 12
+                        setHoverInfo({
+                          x,
+                          y,
+                          title: tooltipTitle,
+                          subtitle: tooltipSubtitle,
+                          visible: true,
+                        })
+                      }}
+                      onMouseEnter={(e) => {
+                        const rect = containerRef.current?.getBoundingClientRect()
+                        const x = (rect ? e.clientX - rect.left : e.clientX) + 12
+                        const y = (rect ? e.clientY - rect.top : e.clientY) + 12
+                        setHoverInfo({
+                          x,
+                          y,
+                          title: tooltipTitle,
+                          subtitle: tooltipSubtitle,
+                          visible: true,
+                        })
+                      }}
+                      onMouseLeave={() => setHoverInfo((prev) => ({ ...prev, visible: false }))}
+                      style={{
+                        default: {
+                          fill: getFill(value),
+                          stroke: 'hsla(var(--brand-300), 0.6)',
+                          strokeWidth: 0.4,
+                          outline: 'none',
+                          cursor: 'default',
+                        },
+                        hover: {
+                          fill: getFill(value),
+                          stroke: 'hsl(var(--brand-500))',
+                          strokeWidth: 0.6,
+                          outline: 'none',
+                          cursor: 'default',
+                        },
+                        pressed: {
+                          fill: getFill(value),
+                          stroke: 'hsl(var(--brand-500))',
+                          strokeWidth: 0.6,
+                          outline: 'none',
+                          cursor: 'default',
+                        },
+                      }}
+                      aria-label={`${tooltipTitle} — ${tooltipSubtitle}`}
+                    />
+                  )
+                })}
+
+                {geographies.map((geo) => {
+                  const title =
+                    (geo.properties?.name as string) ||
+                    (geo.properties?.NAME as string) ||
+                    'Unknown'
+                  if (!MICRO_COUNTRIES.has(title)) return null
+                  let value = 0
+                  for (const code in countsByIso2) {
+                    const name = iso2ToName[code] || code
+                    if (name === title) {
+                      value = countsByIso2[code]
+                      break
+                    }
+                  }
+                  if (value <= 0) return null
+                  const [lon, lat] = geoCentroid(geo)
+                  const r = max > 0 ? Math.max(1.5, Math.min(4, (value / max) * 4)) : 2
+                  const tooltipTitle = title
+                  const tooltipSubtitle = `${value.toLocaleString()} requests`
+                  return (
+                    <Marker
+                      key={`marker-${geo.rsmKey}`}
+                      coordinates={[lon, lat]}
+                      onMouseMove={(e) => {
+                        const rect = containerRef.current?.getBoundingClientRect()
+                        const x = (rect ? e.clientX - rect.left : e.clientX) + 12
+                        const y = (rect ? e.clientY - rect.top : e.clientY) + 12
+                        setHoverInfo({
+                          x,
+                          y,
+                          title: tooltipTitle,
+                          subtitle: tooltipSubtitle,
+                          visible: true,
+                        })
+                      }}
+                      onMouseEnter={(e) => {
+                        const rect = containerRef.current?.getBoundingClientRect()
+                        const x = (rect ? e.clientX - rect.left : e.clientX) + 12
+                        const y = (rect ? e.clientY - rect.top : e.clientY) + 12
+                        setHoverInfo({
+                          x,
+                          y,
+                          title: tooltipTitle,
+                          subtitle: tooltipSubtitle,
+                          visible: true,
+                        })
+                      }}
+                      onMouseLeave={() => setHoverInfo((prev) => ({ ...prev, visible: false }))}
+                    >
+                      <circle r={r} fill="hsl(var(--brand-500))" />
+                    </Marker>
+                  )
+                })}
+
+                {(() => {
+                  const present = new Set<string>()
+                  for (const g of geographies) {
+                    const n =
+                      (g.properties?.name as string) || (g.properties?.NAME as string) || undefined
+                    if (n) present.add(n)
+                  }
+
+                  const markers: JSX.Element[] = []
+                  for (const iso2 in countsByIso2) {
+                    const count = countsByIso2[iso2]
+                    if (count <= 0) continue
+                    const countryName = iso2ToName[iso2] || iso2
+                    if (present.has(countryName)) continue
+                    const ll = COUNTRY_LAT_LON[iso2 as keyof typeof COUNTRY_LAT_LON]
+                    if (!ll) continue
+                    const r = max > 0 ? Math.max(1.5, Math.min(4, (count / max) * 4)) : 2
+                    const tooltipTitle = countryName
+                    const tooltipSubtitle = `${count.toLocaleString()} requests`
+                    markers.push(
+                      <Marker
+                        key={`fallback-${iso2}`}
+                        coordinates={[ll.lon as number, ll.lat as number]}
+                        onMouseMove={(e) => {
+                          const rect = containerRef.current?.getBoundingClientRect()
+                          const x = (rect ? e.clientX - rect.left : e.clientX) + 12
+                          const y = (rect ? e.clientY - rect.top : e.clientY) + 12
+                          setHoverInfo({
+                            x,
+                            y,
+                            title: tooltipTitle,
+                            subtitle: tooltipSubtitle,
+                            visible: true,
+                          })
+                        }}
+                        onMouseEnter={(e) => {
+                          const rect = containerRef.current?.getBoundingClientRect()
+                          const x = (rect ? e.clientX - rect.left : e.clientX) + 12
+                          const y = (rect ? e.clientY - rect.top : e.clientY) + 12
+                          setHoverInfo({
+                            x,
+                            y,
+                            title: tooltipTitle,
+                            subtitle: tooltipSubtitle,
+                            visible: true,
+                          })
+                        }}
+                        onMouseLeave={() => setHoverInfo((prev) => ({ ...prev, visible: false }))}
+                      >
+                        <circle r={r} fill="hsl(var(--brand-500))" />
+                      </Marker>
+                    )
+                  }
+
+                  return markers
+                })()}
+              </>
+            )}
           </Geographies>
         </ZoomableGroup>
       </ComposableMap>
