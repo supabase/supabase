@@ -1,19 +1,21 @@
 import { ChevronRight, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState, type KeyboardEvent, type MouseEvent } from 'react'
 
 import { useParams } from 'common'
 import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { AlphaNotice } from 'components/ui/AlphaNotice'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
 import { VectorBucket as VectorBucketIcon } from 'icons'
+import { BASE_PATH } from 'lib/constants'
 import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
-import { AlphaNotice } from '../AlphaNotice'
 import { EmptyBucketState } from '../EmptyBucketState'
-import { CreateVectorBucketDialog } from './CreateVectorBucketDialog'
+import { CreateVectorBucketButton, CreateVectorBucketDialog } from './CreateVectorBucketDialog'
 
 /**
  * [Joshen] Low-priority refactor: We should use a virtualized table here as per how we do it
@@ -25,6 +27,10 @@ export const VectorsBuckets = () => {
   const router = useRouter()
 
   const [filterString, setFilterString] = useState('')
+  const [visible, setVisible] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const {
     data,
@@ -45,7 +51,7 @@ export const VectorsBuckets = () => {
   const handleBucketNavigation = (bucketName: string, event: MouseEvent | KeyboardEvent) => {
     const url = `/project/${projectRef}/storage/vectors/buckets/${encodeURIComponent(bucketName)}`
     if (event.metaKey || event.ctrlKey) {
-      window.open(url, '_blank')
+      window.open(`${BASE_PATH}${url}`, '_blank')
     } else {
       router.push(url)
     }
@@ -53,7 +59,10 @@ export const VectorsBuckets = () => {
 
   return (
     <ScaffoldSection isFullWidth>
-      <AlphaNotice type="vector" />
+      <AlphaNotice
+        entity="Vector buckets"
+        feedbackUrl="https://github.com/orgs/supabase/discussions/40815"
+      />
 
       {isLoadingBuckets && <GenericSkeletonLoader />}
 
@@ -64,7 +73,7 @@ export const VectorsBuckets = () => {
       {isSuccessBuckets && (
         <>
           {bucketsList.length === 0 ? (
-            <EmptyBucketState bucketType="vectors" />
+            <EmptyBucketState bucketType="vectors" onCreateBucket={() => setVisible(true)} />
           ) : (
             <div className="flex flex-col gap-y-4">
               <ScaffoldHeader className="py-0">
@@ -77,9 +86,10 @@ export const VectorsBuckets = () => {
                   placeholder="Search for a bucket"
                   value={filterString}
                   onChange={(e) => setFilterString(e.target.value)}
-                  icon={<Search size={12} />}
+                  icon={<Search />}
                 />
-                <CreateVectorBucketDialog />
+
+                <CreateVectorBucketButton onClick={() => setVisible(true)} />
               </div>
 
               {isLoadingBuckets ? (
@@ -161,6 +171,7 @@ export const VectorsBuckets = () => {
           )}
         </>
       )}
+      <CreateVectorBucketDialog visible={visible} setVisible={setVisible} />
     </ScaffoldSection>
   )
 }

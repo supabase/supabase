@@ -1,15 +1,15 @@
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
-import { Card, CardContent, CardHeader, CardTitle, Button, AiIconAnimation, Image } from 'ui'
-import Link from 'next/link'
-import { BookOpen } from 'lucide-react'
-import { Logs } from 'icons'
-import { BASE_PATH } from 'lib/constants'
 import { useParams } from 'common'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import { Logs } from 'icons'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
+import { BookOpen } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { AiIconAnimation, Button, Card, CardContent, CardHeader, CardTitle, Image } from 'ui'
 
 export const OverviewLearnMore = () => {
   const [isMounted, setIsMounted] = useState(false)
@@ -35,7 +35,7 @@ export const OverviewLearnMore = () => {
       actions: [
         {
           label: 'Docs',
-          href: 'https://supabase.com/docs/guides/auth',
+          href: `${DOCS_URL}/guides/auth`,
           icon: <BookOpen />,
         },
       ],

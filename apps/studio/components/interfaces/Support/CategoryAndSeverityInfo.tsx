@@ -27,8 +27,10 @@ import { NO_PROJECT_MARKER } from './SupportForm.utils'
 interface CategoryAndSeverityInfoProps {
   form: UseFormReturn<SupportFormValues>
   category: ExtendedSupportCategories
-  severity: string
+  severity?: string
   projectRef: string
+  showSeverity?: boolean
+  showIssueSuggestion?: boolean
 }
 
 export function CategoryAndSeverityInfo({
@@ -36,14 +38,19 @@ export function CategoryAndSeverityInfo({
   category,
   severity,
   projectRef,
+  showSeverity = true,
+  showIssueSuggestion = true,
 }: CategoryAndSeverityInfoProps) {
   return (
-    <div className={cn('grid sm:grid-cols-2 sm:grid-rows-1 gap-4 grid-cols-1 grid-rows-2')}>
+    <div
+      className={cn(
+        'grid sm:grid-rows-1 gap-4 grid-cols-1 grid-rows-2',
+        showSeverity ? 'sm:grid-cols-2' : 'sm:grid-cols-1'
+      )}
+    >
       <CategorySelector form={form} />
-      <SeveritySelector form={form} />
-
-      <IssueSuggestion category={category} projectRef={projectRef} />
-
+      {showSeverity && <SeveritySelector form={form} />}
+      {showIssueSuggestion && <IssueSuggestion category={category} projectRef={projectRef} />}
       {(severity === 'Urgent' || severity === 'High') && (
         <Admonition
           type="default"
