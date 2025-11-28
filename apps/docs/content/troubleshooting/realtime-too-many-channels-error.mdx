@@ -6,8 +6,9 @@ topics = [ "realtime" ]
 keywords = [ "channels", "useEffect", "react", "memory leak", "quota", "TooManyChannels", "ChannelRateLimitReached", "unsubscribe", "cleanup" ]
 database_id = ""
 ---
-
+{/* supa-mdx-lint-disable Rule003Spelling */}
 **What is the TooManyChannels error?**
+{/* supa-mdx-lint-enable Rule003Spelling */}
 
 The TooManyChannels error occurs when your application tries to create more than the allowed number of Realtime channels. When you exceed this limit, you'll see an error with the code `ChannelRateLimitReached`.
 
@@ -17,16 +18,19 @@ This limit exists to protect both your application and Supabase servers from res
 
 The most common cause is accidentally creating channels without cleaning them up, especially in React applications. This happens when:
 
+{/* supa-mdx-lint-disable Rule003Spelling */}
 - Components create channels on every render without unsubscribing
 - `useEffect` runs multiple times due to missing or incorrect dependencies
 - Components unmount without cleaning up their channels
 - Development mode in React (StrictMode) causes effects to run twice
+{/* supa-mdx-lint-enable Rule003Spelling */}
 
 Each time you call `supabase.channel('topic').subscribe()`, a new channel is created unless you properly clean it up.
 
 **Common culprits: React useEffect and component re-renders**
-
+{/* supa-mdx-lint-disable Rule003Spelling */}
 Here's the most common mistake that causes TooManyChannels errors:
+{/* supa-mdx-lint-enable Rule003Spelling */}
 
 ```tsx
 // ❌ WRONG - Creates new channel on every render
@@ -50,6 +54,7 @@ function ChatRoom() {
 ```
 
 Why this fails:
+
 - Creating `supabase` client inside component causes it to change on every render
 - Missing `supabase` from dependencies array
 - No cleanup function to unsubscribe the channel
@@ -98,7 +103,10 @@ function ChannelDebugger() {
     const interval = setInterval(() => {
       const channels = supabase.getChannels()
       console.log(`Active channels: ${channels.length}`)
-      console.log('Channel topics:', channels.map(c => c.topic))
+      console.log(
+        'Channel topics:',
+        channels.map((c) => c.topic)
+      )
     }, 2000)
 
     return () => clearInterval(interval)
@@ -109,6 +117,7 @@ function ChannelDebugger() {
 ```
 
 If you see the number climbing, you have a leak. Look for:
+
 - Channel count increasing without user action
 - Same channel topics appearing multiple times
 - Count going up when navigating between pages
@@ -157,9 +166,7 @@ function BadExample({ userId }) {
 // ✅ CORRECT - Predictable channel topic
 function GoodExample({ userId }) {
   useEffect(() => {
-    const channel = supabase
-      .channel(`user-${userId}`)
-      .subscribe()
+    const channel = supabase.channel(`user-${userId}`).subscribe()
 
     return () => {
       channel.unsubscribe()
@@ -196,7 +203,7 @@ useEffect(() => {
   }
 }, [])
 ```
-
+{/* supa-mdx-lint-disable Rule003Spelling */}
 **6. Clean up on unmount for dynamic channels**
 
 If you create channels based on props:

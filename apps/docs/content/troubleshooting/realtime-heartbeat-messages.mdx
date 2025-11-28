@@ -53,8 +53,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   realtime: {
     heartbeatCallback: (status) => {
       console.log('Heartbeat status:', status)
-    }
-  }
+    },
+  },
 })
 ```
 
@@ -66,7 +66,7 @@ If you're seeing frequent `timeout` status in your heartbeat callback:
 
 - **Network instability**: Check your network connection quality
 - **Firewall/proxy issues**: Corporate firewalls or proxies might interfere with WebSocket connections
-- **Mobile app suspension**: On mobile, the app being backgrounded can pause heartbeat timers
+- **Mobile app suspension**: On mobile, the app can be suspended which can stop the heartbeat timers
 
 **Connection not reconnecting after timeout**
 
@@ -97,9 +97,7 @@ function ConnectionStatus() {
   return (
     <div>
       <p>Status: {isConnected ? 'Connected' : 'Disconnected'}</p>
-      {!isConnected && (
-        <button onClick={handleReconnect}>Reconnect</button>
-      )}
+      {!isConnected && <button onClick={handleReconnect}>Reconnect</button>}
     </div>
   )
 }
@@ -119,7 +117,7 @@ function App() {
       createClient(SUPABASE_URL, SUPABASE_KEY, {
         realtime: {
           heartbeatIntervalMs: 15000, // Send heartbeat every 15 seconds (default: 25000)
-        }
+        },
       }),
     []
   )
@@ -145,7 +143,7 @@ function App() {
         realtime: {
           worker: true,
           workerUrl: '/worker.js', // Optional: Place in public folder
-        }
+        },
       }),
     []
   )
@@ -155,6 +153,7 @@ function App() {
 ```
 
 If the worker fails to start, check:
+
 - Browser Web Worker support is available
 - Worker script is in the public folder and accessible
 - CORS headers allow loading the worker script
@@ -240,8 +239,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
       } else if (status === 'disconnected') {
         console.error('Disconnected')
       }
-    }
-  }
+    },
+  },
 })
 
 export default supabase

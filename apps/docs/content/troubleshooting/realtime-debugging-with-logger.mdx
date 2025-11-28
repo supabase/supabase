@@ -15,6 +15,7 @@ The Realtime client provides built-in logging to help you debug connection issue
 - **`logLevel`**: Controls which messages the server logs (`info`, `warn`, or `error`)
 
 By default, logging is disabled. When enabled, you can see:
+
 - Messages sent and received
 - Connection events (connect, disconnect, errors)
 - Heartbeat status
@@ -32,8 +33,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   realtime: {
     logger: (kind, msg, data) => {
       console.log(`${kind}: ${msg}`, data)
-    }
-  }
+    },
+  },
 })
 ```
 
@@ -45,8 +46,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
     logLevel: 'info', // 'info' | 'warn' | 'error'
     logger: (kind, msg, data) => {
       console.log(`[${kind}] ${msg}`, data)
-    }
-  }
+    },
+  },
 })
 ```
 
@@ -57,18 +58,21 @@ The logger receives three parameters: `kind`, `msg`, and `data`.
 **Log kinds you'll see:**
 
 **`push`** - Messages sent to the server
+
 ```
 push: realtime:chat heartbeat (42) {}
 push: realtime:chat phx_join (1) { config: {...} }
 ```
 
 **`receive`** - Messages received from server
+
 ```
 receive: ok realtime:chat phx_reply (1) { response: {...} }
 receive: realtime:chat broadcast { event: 'message', payload: {...} }
 ```
 
 **`transport`** - Connection events
+
 ```
 transport: connected to wss://project.supabase.co/realtime/v1
 transport: heartbeat timeout. Attempting to re-establish connection
@@ -77,12 +81,14 @@ transport: leaving duplicate topic "realtime:chat"
 ```
 
 **`error`** - Error events
+
 ```
 error: error in heartbeat callback Error: ...
 error: error waiting for auth on connect Error: ...
 ```
 
 **`worker`** - Web Worker events
+
 ```
 worker: starting default worker
 worker: starting worker for from /worker.js
@@ -100,8 +106,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   realtime: {
     logger: (kind, msg, data) => {
       console.log(`[${kind}] ${msg}`, data)
-    }
-  }
+    },
+  },
 })
 
 const channel = supabase
@@ -128,8 +134,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
       if (kind === 'push' || kind === 'receive') {
         console.log(`[${kind}] ${msg}`, data)
       }
-    }
-  }
+    },
+  },
 })
 
 const channel = supabase.channel('chat', { config: { broadcast: { self: true } } })
@@ -144,7 +150,7 @@ await channel.subscribe()
 await channel.send({
   type: 'broadcast',
   event: 'message',
-  payload: { text: 'Hello' }
+  payload: { text: 'Hello' },
 })
 
 // Check logs:
