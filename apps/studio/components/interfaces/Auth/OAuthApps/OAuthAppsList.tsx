@@ -20,7 +20,6 @@ import {
   Badge,
   Button,
   Card,
-  CardContent,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -33,6 +32,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { CreateOrUpdateOAuthAppSheet } from './CreateOrUpdateOAuthAppSheet'
@@ -136,34 +136,28 @@ export const OAuthAppsList = () => {
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="flex flex-col gap-y-4">
         {newOAuthApp?.client_secret && (
           <NewOAuthAppBanner oauthApp={newOAuthApp} onClose={() => setNewOAuthApp(undefined)} />
         )}
         {!isOAuthServerEnabled && (
-          <div className="space-y-4">
-            <Card>
-              <CardContent className="flex flex-col md:flex-row gap-4 justify-between md:items-center">
-                <div className="flex flex-col gap-2-4">
-                  <h3 className="">OAuth Server is disabled</h3>
-                  <p className="text-foreground-light text-sm">
-                    Enable the OAuth Server to make your project act as an identity provider for
-                    third-party applications.
-                  </p>
-                </div>
-                <Button asChild>
-                  <Link href={`/project/${projectRef}/auth/oauth-server`}>
-                    Go to OAuth Server Settings
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+          <Admonition
+            type="default"
+            layout="horizontal"
+            className="mb-8 [&>div]:!translate-y-0"
+            title="OAuth Server is disabled"
+            description="Enable OAuth Server to make your project act as an identity provider for third-party applications."
+            actions={
+              <Button asChild type="default">
+                <Link href={`/project/${projectRef}/auth/oauth-server`}>OAuth Server Settings</Link>
+              </Button>
+            }
+          />
         )}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
           <div className="flex flex-col lg:flex-row lg:items-center gap-2">
             <Input
-              placeholder="Search oAuth apps"
+              placeholder="Search OAuth apps"
               size="tiny"
               icon={<Search />}
               value={filterString}
