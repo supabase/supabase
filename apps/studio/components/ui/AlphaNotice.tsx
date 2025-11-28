@@ -12,7 +12,7 @@ interface AlphaNoticeProps {
 
 export const AlphaNotice = ({ entity, feedbackUrl }: AlphaNoticeProps) => {
   return (
-    <Admonition showIcon={false} type="tip" className="relative mb-6 overflow-hidden">
+    <Admonition showIcon={false} type="tip" className="relative mb-8 overflow-hidden">
       <div className="absolute -inset-16 z-0 opacity-50">
         <img
           src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
