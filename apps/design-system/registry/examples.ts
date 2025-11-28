@@ -1383,4 +1383,10 @@ export const examples: Registry = [
     registryDependencies: ['mermaid'],
     files: ['example/mermaid-sequence-sync.tsx'],
   },
+  {
+    name: 'mermaid-oauth-flow',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-oauth-flow.tsx'],
+  },
 ]

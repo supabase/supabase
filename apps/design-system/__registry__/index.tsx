@@ -2590,6 +2590,28 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "mermaid-oauth-flow": {
+      name: "mermaid-oauth-flow",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-oauth-flow")),
+      source: "",
+      files: ["registry/default/example/mermaid-oauth-flow.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-styling": {
+      name: "mermaid-styling",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-styling")),
+      source: "",
+      files: ["registry/default/example/mermaid-styling.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "chart-area-axes": {
       name: "chart-area-axes",
       type: "components:block",

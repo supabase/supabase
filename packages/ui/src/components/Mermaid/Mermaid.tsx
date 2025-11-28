@@ -141,8 +141,10 @@ export function Mermaid({ chart, className, zoomable = true }: MermaidProps) {
         const { svg } = await mermaid.render(id, chart.trim())
 
         // Post-process SVG
+        // Fix <br> tags to be self-closing for XML compatibility
+        const fixedSvg = svg.replace(/<br\s*>/gi, '<br/>')
         const parser = new DOMParser()
-        const doc = parser.parseFromString(svg, 'image/svg+xml')
+        const doc = parser.parseFromString(fixedSvg, 'image/svg+xml')
         const svgEl = doc.querySelector('svg')
 
         // Add diagonal line pattern definition
