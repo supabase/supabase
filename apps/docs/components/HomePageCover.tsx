@@ -52,9 +52,9 @@ const HomePageCover = (props) => {
       href: '/guides/getting-started/quickstarts/nextjs',
     },
     {
-      tooltip: 'SvelteKit',
-      icon: '/docs/img/icons/svelte-icon',
-      href: '/guides/getting-started/quickstarts/sveltekit',
+      tooltip: 'TanStack Start',
+      icon: '/docs/img/icons/tanstack-icon',
+      href: '/guides/getting-started/quickstarts/tanstack',
     },
     {
       tooltip: 'Vue',
@@ -90,9 +90,9 @@ const HomePageCover = (props) => {
       enabled: sdkDartEnabled,
     },
     {
-      tooltip: 'SolidJS',
-      icon: '/docs/img/icons/solidjs-icon',
-      href: '/guides/getting-started/quickstarts/solidjs',
+      tooltip: 'Python',
+      icon: '/docs/img/icons/python-icon',
+      href: '/guides/getting-started/quickstarts/flask',
     },
   ]
 
