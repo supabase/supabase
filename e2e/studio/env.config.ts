@@ -23,6 +23,9 @@ export const env = {
   IS_PLATFORM: process.env.IS_PLATFORM || 'false',
   VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO:
     process.env.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO || 'false',
+  ORG_SLUG: process.env.ORG_SLUG || 'default',
+  SUPA_REGION: process.env.SUPA_REGION || 'us-east-1',
+  SUPA_V0_KEY: process.env.SUPA_V0_KEY || 'test',
 }
 
 export const STORAGE_STATE_PATH = path.join(import.meta.dirname, './playwright/.auth/user.json')

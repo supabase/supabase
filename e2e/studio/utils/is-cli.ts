@@ -1,4 +1,4 @@
-import { env } from '../env.config'
+import { env } from '../env.config.js'
 
 /**
  * Returns true if running in CLI/self-hosted mode (locally),

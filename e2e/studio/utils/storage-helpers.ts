@@ -1,6 +1,6 @@
 import { expect, Page } from '@playwright/test'
-import { waitForApiResponse } from './wait-for-response'
-import { toUrl } from './to-url'
+import { waitForApiResponse } from './wait-for-response.js'
+import { toUrl } from './to-url.js'
 
 /**
  * Dismisses any visible toast notifications

@@ -16,8 +16,11 @@ const webServer = !IS_PLATFORM
     }
   : undefined
 
+// 15 minutes for platform, 2 minutes for self-hosted. Takes longer to setup a full project on platform.
+const timeout = IS_PLATFORM ? 15 * 60 * 1000 : 120 * 1000
+
 export default defineConfig({
-  timeout: 120 * 1000,
+  timeout,
   testDir: './features',
   testMatch: /.*\.spec\.ts/,
   forbidOnly: IS_CI,
