@@ -338,7 +338,7 @@ function createStorageExplorerState({
         })
       }
 
-      const newFolder = state.columns[columnIndex].items?.find((x) => x.name === formattedName)
+      const newFolder = state.columns[columnIndex]?.items?.find((x) => x?.name === formattedName)
       if (newFolder) state.openFolder(columnIndex, newFolder)
     },
 

@@ -10,39 +10,38 @@ import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { copyToClipboard, DialogSectionSeparator } from 'ui'
 import { formatClipboardValue } from '../../utils/common'
 
-export type RowContextMenuProps = {
+type RowContextMenuProps = {
   rows: SupaRow[]
 }
+
+type RowContextMenuItemProps = ItemParams<{ rowIdx: number }, string>
 
 export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
 
-  function onDeleteRow(p: ItemParams) {
-    const { props } = p
-    const { rowIdx } = props
+  function onDeleteRow(p: RowContextMenuItemProps) {
+    const rowIdx = p.props?.rowIdx
+    if (!rowIdx) return
+
     const row = rows[rowIdx]
     if (row) tableEditorSnap.onDeleteRows([row])
   }
 
-  function onEditRowClick(p: ItemParams) {
-    const { props } = p
-    const { rowIdx } = props
+  function onEditRowClick(p: RowContextMenuItemProps) {
+    const rowIdx = p.props?.rowIdx
+    if (!rowIdx) return
+
     const row = rows[rowIdx]
     tableEditorSnap.onEditRow(row)
   }
 
   const onCopyCellContent = useCallback(
-    (p: ItemParams) => {
-      const { props } = p
+    (p: RowContextMenuItemProps) => {
+      const rowIdx = p.props?.rowIdx
+      if (!snap.selectedCellPosition || !rowIdx) return
 
-      if (!snap.selectedCellPosition || !props) {
-        return
-      }
-
-      const { rowIdx } = props
       const row = rows[rowIdx]
-
       const columnKey = snap.gridColumns[snap.selectedCellPosition.idx as number].key
 
       const value = row[columnKey]
@@ -55,9 +54,10 @@ export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
   )
 
   const onCopyRowContent = useCallback(
-    (p: ItemParams) => {
-      const { props } = p
-      const { rowIdx } = props
+    (p: RowContextMenuItemProps) => {
+      const rowIdx = p.props?.rowIdx
+      if (!rowIdx) return
+
       const row = rows[rowIdx]
       copyToClipboard(JSON.stringify(row))
       toast.success('Copied row to clipboard')
