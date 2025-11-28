@@ -66,7 +66,9 @@ const DrilldownPane = ({ pane, jsonData, activeKey, onSelectKey = noop }: Drilld
           <p className="font-mono text-xs !text-sky-800 dark:!text-blue-900">{key}:</p>
           <p
             className={`break-all font-mono text-xs ${
-              typeof jsonData[key] !== 'string' ? '!text-purple-900 dark:!text-green-900' : '!text-lime-800 dark:!text-yellow-900'
+              typeof jsonData[key] !== 'string'
+                ? '!text-purple-900 dark:!text-green-900'
+                : '!text-lime-800 dark:!text-yellow-900'
             }`}
           >
             {isNull(jsonData[key])
