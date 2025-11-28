@@ -11,6 +11,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cn, Skeleton } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { ServiceStatus } from './ServiceStatus'
+import { parseMigrationVersion } from 'lib/migration-utils'
 
 export const ActivityStats = () => {
   const { ref } = useParams()
@@ -53,6 +54,17 @@ export const ActivityStats = () => {
       .sort((a, b) => new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf())[0]
   }, [backupsData])
 
+  const [versionLabel, versionTimestamp] = useMemo(() => {
+    const { version } = latestMigration
+
+    const versionDayjs = parseMigrationVersion(version)
+    if (versionDayjs) {
+      return [versionDayjs.fromNow(), versionDayjs.toISOString()]
+    }
+
+    return [version, version]
+  }, [latestMigration])
+
   return (
     <div className="@container">
       <div className="grid grid-cols-1 @md:grid-cols-2 gap-2 @md:gap-6 flex-wrap">
@@ -72,8 +84,8 @@ export const ActivityStats = () => {
             ) : latestMigration ? (
               <TimestampInfo
                 className="text-base"
-                label={dayjs(latestMigration.version, 'YYYYMMDDHHmmss').fromNow()}
-                utcTimestamp={dayjs(latestMigration.version, 'YYYYMMDDHHmmss').toISOString()}
+                label={versionLabel}
+                utcTimestamp={versionTimestamp}
               />
             ) : (
               <p className="text-foreground-lighter">No migrations</p>

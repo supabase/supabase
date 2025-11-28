@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
@@ -22,6 +22,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { MigrationsEmptyState } from './MigrationsEmptyState'
+import { parseMigrationVersion } from 'lib/migration-utils'
 
 const Migrations = () => {
   const [search, setSearch] = useState('')
@@ -106,23 +107,12 @@ const Migrations = () => {
                     <TableBody>
                       {migrations.length > 0 ? (
                         migrations.map((migration) => {
-                          // [Joshen] LEFT OFF HERE
-                          const insertedAt = dayjs(migration.version, 'YYYYMMDDHHmmss').format(
-                            'DD MMM YYYY, HH:mm:ss'
-                          )
+                          const versionDayjs = parseMigrationVersion(migration.version)
+                          const insertedAt =
+                            versionDayjs?.format('DD MMM YYYY, HH:mm:ss') ?? migration.version
 
                           return (
                             <TableRow key={migration.version}>
-                              <TableCell>{migration.version}</TableCell>
-                              <TableCell
-                                className={
-                                  (migration?.name ?? '').length === 0
-                                    ? '!text-foreground-lighter'
-                                    : ''
-                                }
-                              >
-                                {migration?.name ?? 'Name not available'}
-                              </TableCell>
                               <TableCell>{insertedAt}</TableCell>
                               <TableCell align="right">
                                 <Button
