@@ -1,3 +1,6 @@
+import { useRouter } from 'next/router'
+import { useContext, useEffect } from 'react'
+
 import { FeatureFlagContext, useFlag, useParams } from 'common'
 import { OverviewLearnMore } from 'components/interfaces/Auth/Overview/OverviewLearnMore'
 import { OverviewMetrics } from 'components/interfaces/Auth/Overview/OverviewMetrics'
@@ -6,11 +9,9 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
-import { DOCS_URL } from 'lib/constants'
-import { useRouter } from 'next/router'
-import { useContext, useEffect } from 'react'
-import type { NextPageWithLayout } from 'types'
 import { useAuthOverviewQuery } from 'data/auth/auth-overview-query'
+import { DOCS_URL } from 'lib/constants'
+import type { NextPageWithLayout } from 'types'
 
 const AuthOverview: NextPageWithLayout = () => {
   const router = useRouter()

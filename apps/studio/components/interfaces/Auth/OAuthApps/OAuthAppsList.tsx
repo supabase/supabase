@@ -136,7 +136,7 @@ export const OAuthAppsList = () => {
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="flex flex-col gap-y-4">
         {newOAuthApp?.client_secret && (
           <NewOAuthAppBanner oauthApp={newOAuthApp} onClose={() => setNewOAuthApp(undefined)} />
         )}
@@ -144,10 +144,9 @@ export const OAuthAppsList = () => {
           <Admonition
             type="default"
             layout="horizontal"
-            className="mb-12 [&>div]:!translate-y-0"
+            className="mb-8 [&>div]:!translate-y-0"
             title="OAuth Server is disabled"
-            description="Enable OAuth Server to make your project act as an identity provider for
-                    third-party applications."
+            description="Enable OAuth Server to make your project act as an identity provider for third-party applications."
             actions={
               <Button asChild type="default">
                 <Link href={`/project/${projectRef}/auth/oauth-server`}>OAuth Server Settings</Link>

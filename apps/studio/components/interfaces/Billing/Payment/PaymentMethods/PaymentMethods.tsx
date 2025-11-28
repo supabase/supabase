@@ -97,13 +97,13 @@ const PaymentMethods = () => {
                     <Admonition
                       type="note"
                       layout="horizontal"
+                      className="mb-0"
                       title="Payment is currently by invoice"
                       description="You get a monthly invoice and payment link via email. To change your payment
                       method, please contact us via our support form."
                       actions={
-                        <Button key="payment-method-support" asChild type="default">
+                        <Button asChild key="payment-method-support" type="default">
                           <SupportLink
-                            className="ml-3"
                             queryParams={{
                               category: SupportCategories.BILLING,
                               subject: 'Request to change payment method',

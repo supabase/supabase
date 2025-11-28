@@ -1,5 +1,19 @@
 import { useQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import { ChevronRight, ExternalLink, HelpCircle, Telescope } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+
 import { useParams } from 'common'
+import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import {
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import {
   Card,
   CardContent,
@@ -11,35 +25,21 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import Link from 'next/link'
-import { ChevronRight, ExternalLink, HelpCircle, Telescope } from 'lucide-react'
-import { Reports } from 'icons'
 import {
-  ScaffoldSection,
-  ScaffoldSectionTitle,
-  ScaffoldSectionContent,
-} from 'components/layouts/Scaffold'
-import {
-  calculatePercentageChange,
-  getChangeColor,
-  getMetricValues,
-  AuthMetricsResponse,
-  getApiSuccessRates,
-  getAuthSuccessRates,
-} from './OverviewUsage.constants'
-import {
+  AuthErrorCodeRow,
   fetchTopAuthErrorCodes,
   fetchTopResponseErrors,
-  AuthErrorCodeRow,
   ResponseErrorRow,
 } from './OverviewErrors.constants'
 import { OverviewTable } from './OverviewTable'
-import dayjs from 'dayjs'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useRouter } from 'next/router'
-import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
-import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import {
+  AuthMetricsResponse,
+  calculatePercentageChange,
+  getApiSuccessRates,
+  getAuthSuccessRates,
+  getChangeColor,
+  getMetricValues,
+} from './OverviewUsage.constants'
 
 const StatCard = ({
   title,
