@@ -17,7 +17,7 @@ When you self-host, **you are responsible for**:
 - Backups and disaster recovery
 - Monitoring and uptime
 
-Self-hosting is a good fit if you need full control over your data, have compliance requirements that prevent using managed services, or want to run Supabase in an air-gapped environment.
+Self-hosting is a good fit if you need full control over your data, have compliance requirements that prevent using managed services, or want to run Supabase in an isolated environment.
 
 ## Officially supported
 
@@ -29,16 +29,17 @@ Self-hosting is a good fit if you need full control over your data, have complia
       Deploy Supabase within your own infrastructure using Docker Compose.
       </GlassPanel>
     </Link>
+
   </div>
 </div>
 
 ## Community supported
 
-There are several community-driven projects to help you deploy Supabase. These projects may be outdated and are seeking active maintainers. If you're interested in maintaining one of these projects, please [reach out to join SupaSquad](https://supabase.com/open-source/contributing/supasquad).
+There are several community-driven projects to help you deploy Supabase. These projects may be outdated and are seeking active maintainers. If you're interested in maintaining one of these projects, [reach out](/open-source/contributing/supasquad).
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
   {community.map((x) => (
-     <div className="md:col-span-6 xl:col-span-3" key={x.href}>
+    <div className="md:col-span-6 xl:col-span-3" key={x.href}>
       <Link href={x.href} passHref>
         <GlassPanel
           title={
