@@ -5,45 +5,25 @@ export default function MermaidDemo() {
     <Mermaid
       chart={`
 flowchart TB
-    subgraph Client
-        App[Your Application]
-    end
+    Client[Your Application]
+    
+    
+    Gateway[API Gateway]
+    Auth[Auth]
+    API[PostgREST]
+    Realtime[Realtime]
+    PgBouncer[PgBouncer]
+    Postgres[(PostgreSQL)]
 
-    subgraph Gateway
-        Kong[Kong API Gateway]
-    end
-
-    subgraph Services
-        Auth[GoTrue<br/>Auth]
-        API[PostgREST<br/>REST API]
-        Realtime[Realtime<br/>WebSockets]
-        Storage[Storage API<br/>S3-compatible]
-        Meta[postgres-meta<br/>DB Management]
-        Functions[Deno<br/>Edge Functions]
-        GraphQL[pg_graphql<br/>GraphQL]
-    end
-
-    subgraph Data
-        Postgres[(PostgreSQL)]
-        Supavisor[Supavisor<br/>Connection Pooler]
-    end
-
-    App --> Kong
-    Kong --> Auth
-    Kong --> API
-    Kong --> Realtime
-    Kong --> Storage
-    Kong --> Meta
-    Kong --> Functions
-    Kong --> GraphQL
-
-    Auth --> Supavisor
-    API --> Supavisor
-    Realtime --> Supavisor
-    Storage --> Supavisor
-    Meta --> Supavisor
-    GraphQL --> Supavisor
-    Supavisor --> Postgres
+    Client --> Gateway
+    Client --> PgBouncer
+    Client <--> Realtime
+    Gateway --> Auth
+    Gateway --> API
+    Auth --> Postgres
+    API --> Postgres
+    Realtime <--> Postgres
+    PgBouncer --> Postgres
 `}
     />
   )

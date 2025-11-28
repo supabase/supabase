@@ -1,0 +1,13 @@
+@tailwind utilities;
+
+@layer utilities {
+  [data-rmiz-modal-overlay='visible'] {
+    @apply !bg-white;
+  }
+
+  .dark [data-rmiz-modal-overlay='visible'],
+  [data-theme*='dark'] [data-rmiz-modal-overlay='visible'] {
+    @apply !bg-[#171717];
+  }
+}
+

@@ -1,6 +1,7 @@
 'use client'
 
 import 'react-medium-image-zoom/dist/styles.css'
+import './mermaid-zoom.css'
 
 import { useEffect, useRef, useState } from 'react'
 import mermaid from 'mermaid'
@@ -42,7 +43,6 @@ const darkThemeVariables = {
   clusterBorder: '#404040',
   defaultLinkColor: '#3ecf8e',
   edgeLabelBackground: '#171717',
-  // ER diagram specific
   attributeBackgroundColorOdd: '#262626',
   attributeBackgroundColorEven: '#171717',
   rowOdd: '#262626',
@@ -85,7 +85,6 @@ const lightThemeVariables = {
   clusterBorder: '#e5e5e5',
   defaultLinkColor: '#3ecf8e',
   edgeLabelBackground: '#ffffff',
-  // ER diagram specific
   attributeBackgroundColorOdd: '#f5f5f5',
   attributeBackgroundColorEven: '#ffffff',
   rowOdd: '#f5f5f5',
@@ -129,6 +128,7 @@ export function Mermaid({ chart, className, zoomable = true }: MermaidProps) {
       },
       flowchart: {
         useMaxWidth: false,
+        curve: 'linear',
       },
       er: {
         useMaxWidth: false,
@@ -197,36 +197,6 @@ export function Mermaid({ chart, className, zoomable = true }: MermaidProps) {
           rect.setAttribute('stroke', isPostgres ? '#336791' : isDark ? '#525252' : '#d4d4d4')
         })
 
-        // Add pill backgrounds to message text (skip notes - they already have backgrounds)
-        const messageTexts = doc.querySelectorAll('.messageText')
-        messageTexts.forEach((text) => {
-          // Skip if there's already a sibling rect (notes have background rects)
-          const parent = text.parentElement
-          if (parent?.querySelector('rect')) return
-
-          const x = parseFloat(text.getAttribute('x') || '0')
-          const y = parseFloat(text.getAttribute('y') || '0')
-          const dy = text.getAttribute('dy')
-          // Parse dy (e.g., "1em" -> 16px)
-          const dyOffset = dy ? parseFloat(dy) * 16 : 0
-
-          const textContent = text.textContent || ''
-          const estimatedWidth = textContent.length * 9
-          const height = 28
-          const paddingX = 16
-
-          const rect = doc.createElementNS('http://www.w3.org/2000/svg', 'rect')
-          rect.setAttribute('x', String(x - estimatedWidth / 2 - paddingX))
-          rect.setAttribute('y', String(y + dyOffset - height / 2))
-          rect.setAttribute('width', String(estimatedWidth + paddingX * 2))
-          rect.setAttribute('height', String(height))
-          rect.setAttribute('rx', '14')
-          rect.setAttribute('fill', isDark ? '#262626' : '#f5f5f5')
-          rect.setAttribute('class', 'messageTextBg')
-
-          text.parentNode?.insertBefore(rect, text)
-        })
-
         const serializer = new XMLSerializer()
         const processedSvg = serializer.serializeToString(doc)
         setSvg(processedSvg)
@@ -258,23 +228,29 @@ export function Mermaid({ chart, className, zoomable = true }: MermaidProps) {
     )
   }
 
-  const content = (
-    <div
-      ref={containerRef}
-      className={cn(
-        'my-6 flex justify-center rounded-lg border p-6 pb-8',
-        isDark ? 'bg-[#171717] border-[#333]' : 'bg-white border-[#e5e5e5]',
-        '[&_svg]:h-auto [&_svg]:max-w-full',
-        zoomable && 'cursor-zoom-in',
-        className
-      )}
-      dangerouslySetInnerHTML={{ __html: svg }}
-    />
+  const containerClassName = cn(
+    'my-6 flex justify-center rounded-lg border p-6 pb-8',
+    isDark ? 'bg-[#171717] border-[#333]' : 'bg-white border-[#e5e5e5]',
+    className
   )
 
   if (zoomable) {
-    return <Zoom zoomMargin={40}>{content}</Zoom>
+    // Convert SVG to data URL for react-medium-image-zoom compatibility
+    const svgDataUrl = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`
+    return (
+      <div ref={containerRef} className={containerClassName}>
+        <Zoom zoomMargin={40}>
+          <img src={svgDataUrl} alt="Mermaid diagram" className="h-auto max-w-full" />
+        </Zoom>
+      </div>
+    )
   }
 
-  return content
+  return (
+    <div
+      ref={containerRef}
+      className={cn(containerClassName, '[&_svg]:h-auto [&_svg]:max-w-full')}
+      dangerouslySetInnerHTML={{ __html: svg }}
+    />
+  )
 }

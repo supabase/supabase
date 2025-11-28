@@ -1389,4 +1389,28 @@ export const examples: Registry = [
     registryDependencies: ['mermaid'],
     files: ['example/mermaid-oauth-flow.tsx'],
   },
+  {
+    name: 'mermaid-flowchart-subgraph',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-flowchart-subgraph.tsx'],
+  },
+  {
+    name: 'mermaid-sequence-api',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-sequence-api.tsx'],
+  },
+  {
+    name: 'mermaid-er-simple',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-er-simple.tsx'],
+  },
+  {
+    name: 'mermaid-basic',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-basic.tsx'],
+  },
 ]
