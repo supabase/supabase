@@ -4,7 +4,7 @@ import assert from 'assert'
 import fs from 'fs'
 import { faker } from '@faker-js/faker'
 
-import { getCurrentAmiVersion, waitForProjectStatus } from './common/helpers.js'
+import { waitForProjectStatus } from './common/helpers.js'
 import { waitForHealthyServices } from './wait-healthy-services.js'
 import { platformClientV0 } from './common/platform.js'
 

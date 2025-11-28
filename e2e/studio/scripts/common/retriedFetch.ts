@@ -22,15 +22,3 @@ export default async function retriedFetch(
   }
   return await timeoutFetch(input, init, timeout)
 }
-
-export const muchMoreRetriedFetch = (retries = 5, delayBase = 500, timeout = 10000) => {
-  return (input: RequestInfo, init?: RequestInit) => {
-    return retriedFetch(input, init, timeout, retries, delayBase)
-  }
-}
-
-export const longerRetriedFetch = (longerTimeout = 30000) => {
-  return (input: RequestInfo, init?: RequestInit) => {
-    return retriedFetch(input, init, longerTimeout)
-  }
-}
