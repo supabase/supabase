@@ -79,6 +79,7 @@ To start API locally, run:
     const ref = await createProject(platformClient, env.ORG_SLUG, env.SUPA_REGION)
 
     console.log(`\n ✅ Project created: ${ref}, settings as environment variables`)
+    env.PROJECT_REF = ref
     process.env.PROJECT_REF = ref
   }
 

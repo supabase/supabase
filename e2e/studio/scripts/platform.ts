@@ -9,7 +9,7 @@ export async function createProject(
   platformClient: PlatformClient,
   orgSlug: string,
   supaRegion: string
-) {
+): Promise<string> {
   const dbPass = faker.internet.password()
 
   const createResp = await platformClient.send(
