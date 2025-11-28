@@ -48,7 +48,7 @@
     "@mjackson/multipart-parser": "^0.10.1",
     "@modelcontextprotocol/sdk": "^1.18.0",
     "@monaco-editor/react": "^4.6.0",
-    "@next/bundle-analyzer": "15.3.1",
+    "@next/bundle-analyzer": "^16.0.3",
     "@number-flow/react": "^0.3.2",
     "@radix-ui/react-slider": "^1.1.2",
     "@radix-ui/react-slot": "^1.2.0",
