@@ -96,8 +96,85 @@ To start API locally, run:
     }
   }
 
-  const signInUrl = `${studioUrl}/dashboard/sign-in`
+  const signInUrl = `${studioUrl}/sign-in`
   console.log(`\n 🔑 Navigating to sign in page: ${signInUrl}`)
+
+  // Inject HCaptcha mock directly into the page BEFORE navigation
+  // This ensures the mock exists as soon as the page loads
+  // Using HCaptcha's official test response token
+  // Test Site Key: 10000000-ffff-ffff-ffff-000000000001
+  // Test Response Token: 10000000-aaaa-bbbb-cccc-000000000001
+  // This should work if backend is configured with test secret: 0x0000000000000000000000000000000000000000
+  await page.addInitScript(() => {
+    ;(window as any).hcaptcha = {
+      execute: async (options?: any) => {
+        console.log('HCaptcha execute called (init script)', options)
+        // Return HCaptcha's official test token
+        return { response: '10000000-aaaa-bbbb-cccc-000000000001', key: 'mock' }
+      },
+      render: (container: any, options: any) => {
+        console.log('HCaptcha render called (init script)', container, options)
+        return 'mock-widget-id'
+      },
+      reset: (widgetId?: any) => {
+        console.log('HCaptcha reset called (init script)', widgetId)
+      },
+      remove: (widgetId?: any) => {
+        console.log('HCaptcha remove called (init script)', widgetId)
+      },
+      getResponse: (widgetId?: any) => {
+        console.log('HCaptcha getResponse called (init script)', widgetId)
+        return '10000000-aaaa-bbbb-cccc-000000000001'
+      },
+    }
+  })
+
+  // Mock HCaptcha to bypass captcha verification in automated tests
+  // HCaptcha detects automated browsers and will block Playwright
+  // Also fixes CORS issues with custom Vercel headers being sent to hcaptcha.com
+  await page.route('**/*hcaptcha.com/**', async (route) => {
+    const url = route.request().url()
+    console.log(`\n 🔒 Intercepting HCaptcha request: ${url}`)
+
+    // Mock the main hcaptcha script with a stub that auto-resolves
+    if (url.includes('api.js') || url.includes('hcaptcha.js')) {
+      console.log(`\n ✅ Mocking HCaptcha script`)
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/javascript',
+        body: `
+          console.log('HCaptcha mock loaded from route');
+          window.hcaptcha = window.hcaptcha || {
+            execute: async (options) => {
+              console.log('HCaptcha execute called', options);
+              return { response: '10000000-aaaa-bbbb-cccc-000000000001', key: 'mock' };
+            },
+            render: (container, options) => {
+              console.log('HCaptcha render called', container, options);
+              return 'mock-widget-id';
+            },
+            reset: (widgetId) => {
+              console.log('HCaptcha reset called', widgetId);
+            },
+            remove: (widgetId) => {
+              console.log('HCaptcha remove called', widgetId);
+            },
+            getResponse: (widgetId) => {
+              console.log('HCaptcha getResponse called', widgetId);
+              return '10000000-aaaa-bbbb-cccc-000000000001';
+            }
+          };
+        `,
+      })
+    } else {
+      // For other hcaptcha requests, return success
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true }),
+      })
+    }
+  })
 
   await page.goto(signInUrl, { waitUntil: 'networkidle' })
   await page.waitForLoadState('domcontentloaded')
@@ -162,17 +239,63 @@ To start API locally, run:
   await passwordInput.waitFor({ state: 'visible', timeout: 15000 })
   await signInButton.waitFor({ state: 'visible', timeout: 15000 })
 
+  // Listen for console messages to debug issues
+  page.on('console', (msg) => {
+    const type = msg.type()
+    if (type === 'error' || type === 'warning') {
+      console.log(`\n 🔍 Browser ${type}: ${msg.text()}`)
+    }
+  })
+
+  // Track network requests to see what's happening
+  const authRequests: string[] = []
+  page.on('request', (request) => {
+    const url = request.url()
+    if (url.includes('auth') || url.includes('sign-in') || url.includes('password')) {
+      authRequests.push(`${request.method()} ${url}`)
+      console.log(`\n 📡 Auth request: ${request.method()} ${url}`)
+    }
+  })
+
+  page.on('response', async (response) => {
+    const url = response.url()
+    if (url.includes('auth') || url.includes('sign-in') || url.includes('password')) {
+      const status = response.status()
+      console.log(`\n 📨 Auth response: ${status} ${url}`)
+      if (status >= 400) {
+        try {
+          const body = await response.text()
+          console.log(`\n ❌ Error response body: ${body}`)
+        } catch (e) {
+          // ignore
+        }
+      }
+    }
+  })
+
   await emailInput.fill(auth.email ?? '')
   await passwordInput.fill(auth.password ?? '')
+
+  console.log(`\n 🔐 Submitting sign-in form...`)
   await signInButton.click()
 
   // Wait for successful sign-in by checking we've navigated away from sign-in page
   // Could redirect to /organizations, /org/[slug], /new, or /project/default depending on configuration
-  await page.waitForURL((url) => !url.pathname.includes('/sign-in'), {
-    timeout: 60_000,
-  })
+  try {
+    await page.waitForURL((url) => !url.pathname.includes('/sign-in'), {
+      timeout: 30_000,
+    })
+    console.log(`\n ✅ Successfully signed in, redirected to: ${page.url()}`)
+  } catch (error) {
+    console.log(`\n ❌ Sign-in timeout. Current URL: ${page.url()}`)
+    console.log(`\n 📡 Auth requests made: ${authRequests.join(', ')}`)
 
-  console.log(`\n ✅ Successfully signed in, redirected to: ${page.url()}`)
+    // Take a screenshot for debugging
+    await page.screenshot({ path: 'test-results/sign-in-failure.png', fullPage: true })
+    console.log(`\n 📸 Screenshot saved to test-results/sign-in-failure.png`)
+
+    throw error
+  }
 
   await page.context().storageState({ path: STORAGE_STATE_PATH })
 })
