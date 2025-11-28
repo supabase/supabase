@@ -34,7 +34,7 @@
     },
     "authentication:third_party_auth": {
       "type": "boolean",
-      "description": "Enable the authentication third-party auth page"
+      "description": "Enable the authentication third party auth page"
     },
     "authentication:rate_limits": {
       "type": "boolean",
