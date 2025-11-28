@@ -59,7 +59,7 @@ export const PolicyTemplates = ({
       <Input
         size="small"
         id="template-search"
-        icon={<Search size={16} className="text-foreground-muted" />}
+        icon={<Search className="text-foreground-muted" />}
         placeholder="Search templates"
         value={search}
         onChange={(event) => setSearch(event.target.value)}
