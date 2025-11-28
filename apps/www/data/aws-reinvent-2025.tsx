@@ -53,8 +53,7 @@ const data = {
     metaTitle: 'Supabase at AWS re:Invent 2025 | December 1-4, Las Vegas',
     metaDescription:
       'Meet Supabase at AWS re:Invent 2025. Visit us at Booth #1857, join our exclusive events, and learn how to build in a weekend and scale to millions.',
-    ogImage:
-      typeof window !== 'undefined' ? window.location.origin + '/images/og/re_invent.png' : '',
+    ogImage: 'https://supabase.com/images/og/re_invent.png',
   },
   heroSection: {
     id: 'hero',
