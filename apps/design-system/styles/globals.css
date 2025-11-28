@@ -68,9 +68,3 @@
     @apply px-4;
   }
 }
-
-/* Zoomable image/diagram overlay */
-[data-rmiz-modal-overlay='visible'] {
-  @apply !bg-background;
-  opacity: 0.8;
-}
