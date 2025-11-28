@@ -57,7 +57,7 @@ export const AddIntegrationDropdown = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type={type} iconRight={<ChevronDown size={14} strokeWidth={1} />}>
+        <Button type={type} iconRight={<ChevronDown />}>
           Add provider
         </Button>
       </DropdownMenuTrigger>

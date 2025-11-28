@@ -3,6 +3,7 @@ import { ChevronDown } from 'lucide-react'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -71,7 +72,7 @@ export const AddHookDropdown = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type={type} iconRight={<ChevronDown size={14} strokeWidth={1} />}>
+        <Button type={type} iconRight={<ChevronDown />}>
           {buttonText}
         </Button>
       </DropdownMenuTrigger>
@@ -91,14 +92,7 @@ export const AddHookDropdown = ({
             <p className="text-foreground-light">Team or Enterprise Plan required</p>
             <p className="text-foreground-lighter text-xs">
               The following hooks are not available on{' '}
-              <a
-                target="_href"
-                href={`/org/${organization?.slug ?? '_'}/billing`}
-                className="underline"
-              >
-                your plan
-              </a>
-              .
+              <InlineLink href={`/org/${organization?.slug ?? '_'}/billing`}>your plan</InlineLink>.
             </p>
           </DropdownMenuLabel>
         )}

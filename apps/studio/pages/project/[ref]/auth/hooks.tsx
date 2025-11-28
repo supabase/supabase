@@ -36,9 +36,7 @@ const Hooks: NextPageWithLayout = () => {
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Auth Hooks</PageHeaderTitle>
-            <PageHeaderDescription>
-            Customize your authentication flow
-            </PageHeaderDescription>
+            <PageHeaderDescription>Customize your authentication flow</PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
             <DocsButton href={`${DOCS_URL}/guides/auth/auth-hooks`} />
