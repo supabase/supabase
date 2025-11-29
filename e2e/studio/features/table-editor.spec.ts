@@ -717,4 +717,66 @@ test.describe('table editor', () => {
 
     await deleteTable(page, ref, tableNameDataActions)
   })
+
+  test('copying cell values from first and second row works', async ({ page, ref }) => {
+    const tableName = 'pw_table_copy_rows'
+    const colName = 'pw_column'
+
+    // Ensure we're on editor
+    if (!page.url().includes('/editor')) {
+      await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+      await waitForTableToLoad(page, ref)
+    }
+
+    // Create table and add two rows
+    await createTable(page, ref, tableName)
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    // Insert first row with value 'first_row_value'
+    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByTestId(`${colName}-input`).fill('first_row_value')
+    await page.getByTestId('action-bar-save-row').click()
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
+
+    // Insert second row with value 'second_row_value'
+    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByTestId(`${colName}-input`).fill('second_row_value')
+    await page.getByTestId('action-bar-save-row').click()
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
+
+    // Wait for grid to be visible
+    await expect(page.getByRole('grid')).toBeVisible()
+
+    // Right-click on the first row's cell to open context menu
+    const firstRowCell = page.getByRole('gridcell', { name: 'first_row_value' })
+    await expect(firstRowCell).toBeVisible()
+    await firstRowCell.click({ button: 'right' })
+
+    // Click "Copy cell" from context menu
+    await page.getByRole('menuitem', { name: 'Copy cell' }).click()
+    await page.waitForTimeout(500)
+
+    // Verify first row value was copied
+    const firstCopiedValue = await page.evaluate(() => navigator.clipboard.readText())
+    expect(firstCopiedValue).toBe('first_row_value')
+
+    // Right-click on the second row's cell to open context menu
+    const secondRowCell = page.getByRole('gridcell', { name: 'second_row_value' })
+    await expect(secondRowCell).toBeVisible()
+    await secondRowCell.click({ button: 'right' })
+
+    // Click "Copy cell" from context menu
+    await page.getByRole('menuitem', { name: 'Copy cell' }).click()
+    await page.waitForTimeout(500)
+
+    // Verify second row value was copied
+    const secondCopiedValue = await page.evaluate(() => navigator.clipboard.readText())
+    expect(secondCopiedValue).toBe('second_row_value')
+
+    // Cleanup
+    await deleteTable(page, ref, tableName)
+  })
 })
