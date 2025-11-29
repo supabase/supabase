@@ -72,6 +72,8 @@ To start API locally, run:
    * If running on platform, create a project and set the project ref as an environment variable
    */
   if (IS_PLATFORM && !env.PROJECT_REF) {
+    console.log(`\n 🔑 Creating project since none are found`)
+
     const platformClient = new PlatformClient({
       url: env.API_URL,
       accessToken: env.SUPA_V0_KEY,
