@@ -211,4 +211,3 @@ const SecretField = ({ form }: SecretFieldProps): ReactNode => {
     />
   )
 }
-

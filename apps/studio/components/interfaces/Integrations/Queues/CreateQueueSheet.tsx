@@ -118,9 +118,9 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
         configuration:
           values.type === 'partitioned'
             ? {
-              partitionInterval: values.partitionInterval,
-              retentionInterval: values.retentionInterval,
-            }
+                partitionInterval: values.partitionInterval,
+                retentionInterval: values.retentionInterval,
+              }
             : undefined,
       },
       {

@@ -69,7 +69,7 @@ export const WrapperOverviewTab = () => {
   const CreateWrapperSheetComponent = wrapperMeta.customComponent
     ? wrapperMeta.name === 'iceberg_wrapper'
       ? CreateIcebergWrapperSheet
-      : ({ }) => null
+      : ({}) => null
     : CreateWrapperSheet
 
   return (

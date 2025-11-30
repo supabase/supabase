@@ -330,8 +330,8 @@ export const TriggerSheet = ({
                                       return checked
                                         ? field.onChange([...field.value, event.value])
                                         : field.onChange(
-                                          field.value?.filter((value) => value !== event.value)
-                                        )
+                                            field.value?.filter((value) => value !== event.value)
+                                          )
                                     }}
                                   />
                                 </FormControl_Shadcn_>

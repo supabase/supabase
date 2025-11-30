@@ -282,7 +282,7 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
           )
         }
         className="hooks-sidepanel mr-0 transform transition-all duration-300 ease-in-out"
-        onConfirm={() => { }}
+        onConfirm={() => {}}
         onCancel={confirmOnClose}
         customFooter={
           <div className="flex w-full justify-end space-x-3 border-t border-default px-3 py-4">

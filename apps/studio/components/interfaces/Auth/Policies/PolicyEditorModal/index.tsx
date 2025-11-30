@@ -233,5 +233,4 @@ const PolicyEditorModal = ({
   )
 }
 
-
 export default PolicyEditorModal

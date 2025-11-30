@@ -149,16 +149,16 @@ export const CronJobPage = () => {
     </Button>,
     ...(isValidEdgeFunction
       ? [
-        <Button key="view-edge-logs" asChild type="outline">
-          <Link
-            target="_blank"
-            rel="noopener noreferrer"
-            href={`/project/${project?.ref}/functions/${edgeFunctionSlug}/logs`}
-          >
-            View Edge Function logs
-          </Link>
-        </Button>,
-      ]
+          <Button key="view-edge-logs" asChild type="outline">
+            <Link
+              target="_blank"
+              rel="noopener noreferrer"
+              href={`/project/${project?.ref}/functions/${edgeFunctionSlug}/logs`}
+            >
+              View Edge Function logs
+            </Link>
+          </Button>,
+        ]
       : []),
   ]
 
