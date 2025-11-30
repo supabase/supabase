@@ -1,8 +1,8 @@
 {
   "rules": {
-    "react-hooks/exhaustive-deps": 230,
+    "react-hooks/exhaustive-deps": 225,
     "import/no-anonymous-default-export": 62,
-    "@tanstack/query/exhaustive-deps": 19,
+    "@tanstack/query/exhaustive-deps": 18,
     "@tanstack/query/no-deprecated-options": 0
   },
   "ruleFiles": {
@@ -22,9 +22,7 @@
       "components/interfaces/Auth/AuditLogsForm.tsx": 1,
       "components/interfaces/Auth/AuthProvidersForm/FormField.tsx": 2,
       "components/interfaces/Auth/BasicAuthSettingsForm.tsx": 1,
-      "components/interfaces/Auth/Hooks/CreateHookSheet.tsx": 1,
       "components/interfaces/Auth/MfaAuthSettingsForm/MfaAuthSettingsForm.tsx": 1,
-      "components/interfaces/Auth/OAuthApps/CreateOAuthAppSheet.tsx": 1,
       "components/interfaces/Auth/OAuthApps/OAuthServerSettingsForm.tsx": 1,
       "components/interfaces/Auth/Policies/PolicyEditor/PolicyDefinition.tsx": 1,
       "components/interfaces/Auth/Policies/PolicyEditorPanel/PolicyDetailsV2.tsx": 1,
@@ -101,14 +99,12 @@
       "components/interfaces/Storage/AnalyticsBuckets/AnalyticsBucketDetails/CopyEnvButton.tsx": 1,
       "components/interfaces/Storage/StorageExplorer/FileExplorerRowEditing.tsx": 1,
       "components/interfaces/Storage/StorageSettings/StorageSettings.tsx": 1,
-      "components/interfaces/Storage/VectorBuckets/CreateVectorBucketDialog.tsx": 1,
       "components/interfaces/Storage/VectorBuckets/CreateVectorTableSheet.tsx": 1,
       "components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.tsx": 1,
       "components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.tsx": 2,
       "components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/JsonEditor/index.tsx": 2,
       "components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.tsx": 1,
       "components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/TextEditor.tsx": 2,
-      "components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.tsx": 1,
       "components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableQuickstart/QuickstartAIWidget.tsx": 1,
       "components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableQuickstart/useAITableGeneration.ts": 2,
       "components/interfaces/TableGridEditor/TableDefinition.tsx": 1,
@@ -168,14 +164,13 @@
       "pages/project/[ref]/editor/index.tsx": 1,
       "pages/project/[ref]/integrations/[id]/[pageId]/index.tsx": 1,
       "pages/project/[ref]/logs/explorer/index.tsx": 1,
-      "pages/project/[ref]/settings/jwt/index.tsx": 1,
+      "pages/project/[ref]/settings/jwt/legacy.tsx": 1,
       "pages/project/[ref]/sql/quickstarts.tsx": 1,
       "pages/project/[ref]/sql/templates.tsx": 1,
       "pages/sign-in-fly-tos.tsx": 1,
       "pages/sign-in-mfa.tsx": 1,
       "state/role-impersonation-state.tsx": 1,
       "state/sidebar-manager-state.tsx": 1,
-      "state/storage-explorer.tsx": 1,
       "state/table-editor-table.tsx": 1
     },
     "import/no-anonymous-default-export": {
@@ -245,7 +240,7 @@
     "@tanstack/query/exhaustive-deps": {
       "components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants.ts": 1,
       "components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.tsx": 1,
-      "components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.utils.tsx": 3,
+      "components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.utils.tsx": 2,
       "data/branches/branch-diff-query.ts": 1,
       "data/database/foreign-key-constraints-query.ts": 1,
       "data/database/schemas-query.ts": 1,
