@@ -2,14 +2,14 @@ import { AlertCircle, ArrowRight, ChevronDown, ChevronRight } from 'lucide-react
 import { useEffect, useState } from 'react'
 
 import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Badge,
   Button,
   cn,
   Collapsible,
   SidePanel,
-  Alert_Shadcn_,
-  AlertTitle_Shadcn_,
-  AlertDescription_Shadcn_,
   WarningIcon,
 } from 'ui'
 import type { SpreadsheetData } from './SpreadsheetImport.types'
@@ -195,7 +195,7 @@ export const SpreadsheetImportPreview = ({
                                   <ul className="ml-2 list-disc">
                                     {errorData.__parsed_extra.map((value: string, i: number) => (
                                       <li key={i}>
-                                        <code className="text-xs">{value}</code>
+                                        <code className="text-code-inline">{value}</code>
                                       </li>
                                     ))}
                                   </ul>

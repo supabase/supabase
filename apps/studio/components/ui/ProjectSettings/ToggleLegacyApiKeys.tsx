@@ -142,7 +142,7 @@ const ToggleApiKeysModal = ({
   const { ref: projectRef } = useParams()
   const { enabled: isLegacyKeysEnabled } = legacyAPIKeysStatusData || {}
 
-  const { mutate: toggleLegacyAPIKey, isLoading: isTogglingLegacyAPIKey } =
+  const { mutate: toggleLegacyAPIKey, isPending: isTogglingLegacyAPIKey } =
     useToggleLegacyAPIKeysMutation()
 
   const onToggleLegacyAPIKeysEnabled = () => {

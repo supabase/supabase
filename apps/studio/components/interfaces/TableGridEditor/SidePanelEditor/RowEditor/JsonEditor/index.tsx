@@ -12,7 +12,7 @@ import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { minifyJSON, prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
 import { Button, SidePanel, cn } from 'ui'
-import ActionBar from '../../ActionBar'
+import { ActionBar } from '../../ActionBar'
 import { isValueTruncated } from '../RowEditor.utils'
 import { DrilldownViewer } from './DrilldownViewer/DrilldownViewer'
 import { JsonCodeEditor } from './JsonCodeEditor'
@@ -55,7 +55,7 @@ export const JsonEditor = ({
   const jsonString = typeof value === 'object' ? JSON.stringify(value) : (value as string)
   const isTruncated = isValueTruncated(jsonString)
 
-  const { mutate: getCellValue, isLoading, isSuccess, reset } = useGetCellValueMutation()
+  const { mutate: getCellValue, isPending, isSuccess, reset } = useGetCellValueMutation()
 
   const validateJSON = async (resolve: () => void) => {
     try {
@@ -194,7 +194,7 @@ export const JsonEditor = ({
                 performance issues
               </p>
             </div>
-            <Button type="default" loading={isLoading} onClick={loadFullValue}>
+            <Button type="default" loading={isPending} onClick={loadFullValue}>
               Load full JSON data
             </Button>
           </div>

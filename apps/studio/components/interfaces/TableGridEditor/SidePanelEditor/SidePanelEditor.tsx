@@ -25,20 +25,21 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { useUrlState } from 'hooks/ui/useUrlState'
+import { useTrack } from 'lib/telemetry/track'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import type { Dictionary } from 'types'
 import { SonnerProgress } from 'ui'
 import CloseConfirmationModal from 'ui-patterns/Dialogs/CloseConfirmationModal'
-import ColumnEditor from './ColumnEditor/ColumnEditor'
+import { ColumnEditor } from './ColumnEditor/ColumnEditor'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
-import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
+import { ForeignRowSelector } from './RowEditor/ForeignRowSelector/ForeignRowSelector'
 import { JsonEditor } from './RowEditor/JsonEditor'
-import RowEditor from './RowEditor/RowEditor'
+import { RowEditor } from './RowEditor/RowEditor'
 import { convertByteaToHex } from './RowEditor/RowEditor.utils'
 import { TextEditor } from './RowEditor/TextEditor'
-import SchemaEditor from './SchemaEditor'
+import { SchemaEditor } from './SchemaEditor'
 import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import {
   createColumn,
@@ -132,6 +133,7 @@ export const SidePanelEditor = ({
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
 
@@ -165,7 +167,7 @@ export const SidePanelEditor = ({
   })
   const { mutateAsync: createPublication } = useDatabasePublicationCreateMutation()
   const { mutateAsync: updatePublication } = useDatabasePublicationUpdateMutation({
-    onError: () => {},
+    onError: () => { },
   })
 
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
@@ -254,7 +256,7 @@ export const SidePanelEditor = ({
 
     if (payload !== undefined && configuration !== undefined) {
       try {
-        await saveRow(payload, isNewRecord, configuration, () => {})
+        await saveRow(payload, isNewRecord, configuration, () => { })
       } catch (error) {
         // [Joshen] No error handler required as error is handled within saveRow
       } finally {
@@ -279,8 +281,8 @@ export const SidePanelEditor = ({
       const isNewRecord = false
       const configuration = { identifiers, rowIdx: row.idx }
 
-      saveRow(value, isNewRecord, configuration, () => {})
-    } catch (error) {}
+      saveRow(value, isNewRecord, configuration, () => { })
+    } catch (error) { }
   }
 
   const saveColumn = async (
@@ -303,23 +305,23 @@ export const SidePanelEditor = ({
 
     const response = isNewRecord
       ? await createColumn({
-          projectRef: project?.ref!,
-          connectionString: project?.connectionString,
-          payload: payload as CreateColumnPayload,
-          selectedTable,
-          primaryKey,
-          foreignKeyRelations,
-        })
+        projectRef: project?.ref!,
+        connectionString: project?.connectionString,
+        payload: payload as CreateColumnPayload,
+        selectedTable,
+        primaryKey,
+        foreignKeyRelations,
+      })
       : await updateColumn({
-          projectRef: project?.ref!,
-          connectionString: project?.connectionString,
-          originalColumn: selectedColumnToEdit as PostgresColumn,
-          payload: payload as UpdateColumnPayload,
-          selectedTable,
-          primaryKey,
-          foreignKeyRelations,
-          existingForeignKeyRelations,
-        })
+        projectRef: project?.ref!,
+        connectionString: project?.connectionString,
+        originalColumn: selectedColumnToEdit as PostgresColumn,
+        payload: payload as UpdateColumnPayload,
+        selectedTable,
+        primaryKey,
+        foreignKeyRelations,
+        existingForeignKeyRelations,
+      })
 
     if (response?.error) {
       toast.error(response.error.message)
@@ -397,6 +399,12 @@ export const SidePanelEditor = ({
           publish_delete: true,
           tables: realtimeTables,
         })
+
+        track(enabled ? 'table_realtime_enabled' : 'table_realtime_disabled', {
+          method: 'ui',
+          schema_name: table.schema,
+          table_name: table.name,
+        })
         return
       }
       if (realtimePublication.tables === null) {
@@ -425,20 +433,26 @@ export const SidePanelEditor = ({
           connectionString: project.connectionString,
           tables: realtimeTables,
         })
+
+        track(enabled ? 'table_realtime_enabled' : 'table_realtime_disabled', {
+          method: 'ui',
+          schema_name: table.schema,
+          table_name: table.name,
+        })
         return
       }
       const isAlreadyEnabled = realtimePublication.tables.some((x) => x.id == table.id)
       const realtimeTables =
         isAlreadyEnabled && !enabled
           ? // Toggle realtime off
-            realtimePublication.tables
-              .filter((t) => t.id !== table.id)
-              .map((t) => `${t.schema}.${t.name}`)
+          realtimePublication.tables
+            .filter((t) => t.id !== table.id)
+            .map((t) => `${t.schema}.${t.name}`)
           : !isAlreadyEnabled && enabled
             ? // Toggle realtime on
-              realtimePublication.tables
-                .map((t) => `${t.schema}.${t.name}`)
-                .concat([`${table.schema}.${table.name}`])
+            realtimePublication.tables
+              .map((t) => `${t.schema}.${t.name}`)
+              .concat([`${table.schema}.${table.name}`])
             : null
       if (realtimeTables === null) return
       await updatePublication({
@@ -446,6 +460,12 @@ export const SidePanelEditor = ({
         projectRef: project.ref,
         connectionString: project.connectionString,
         tables: realtimeTables,
+      })
+
+      track(enabled ? 'table_realtime_enabled' : 'table_realtime_disabled', {
+        method: 'ui',
+        schema_name: table.schema,
+        table_name: table.name,
       })
     } catch (error: any) {
       toast.error(`Failed to update realtime for ${table.name}: ${error.message}`)
@@ -616,9 +636,8 @@ export const SidePanelEditor = ({
           toast.loading(
             <SonnerProgress
               progress={progress}
-              message={`Adding ${importContent.rows.length.toLocaleString()} rows to ${
-                selectedTable.name
-              }`}
+              message={`Adding ${importContent.rows.length.toLocaleString()} rows to ${selectedTable.name
+                }`}
             />,
             { id: toastId }
           )
@@ -672,7 +691,7 @@ export const SidePanelEditor = ({
       <TableEditor
         table={
           snap.sidePanel?.type === 'table' &&
-          (snap.sidePanel.mode === 'edit' || snap.sidePanel.mode === 'duplicate')
+            (snap.sidePanel.mode === 'edit' || snap.sidePanel.mode === 'duplicate')
             ? selectedTable
             : undefined
         }
@@ -680,11 +699,11 @@ export const SidePanelEditor = ({
         templateData={
           snap.sidePanel?.type === 'table' && snap.sidePanel.templateData
             ? {
-                ...snap.sidePanel.templateData,
-                columns: snap.sidePanel.templateData.columns
-                  ? [...snap.sidePanel.templateData.columns]
-                  : undefined,
-              }
+              ...snap.sidePanel.templateData,
+              columns: snap.sidePanel.templateData.columns
+                ? [...snap.sidePanel.templateData.columns]
+                : undefined,
+            }
             : undefined
         }
         visible={snap.sidePanel?.type === 'table'}

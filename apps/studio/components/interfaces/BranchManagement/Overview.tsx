@@ -38,6 +38,7 @@ import { EditBranchModal } from './EditBranchModal'
 import { PreviewBranchesEmptyState } from './EmptyStates'
 
 interface OverviewProps {
+  isGithubConnected: boolean
   isLoading: boolean
   isSuccess: boolean
   repo: string
@@ -49,6 +50,7 @@ interface OverviewProps {
 }
 
 export const Overview = ({
+  isGithubConnected,
   isLoading,
   isSuccess,
   repo,
@@ -71,6 +73,7 @@ export const Overview = ({
         {isSuccess && mainBranch !== undefined && (
           <BranchRow
             branch={mainBranch}
+            isGithubConnected={isGithubConnected}
             label={
               <div className="flex items-center gap-x-2">
                 <Shield size={14} strokeWidth={1.5} className="text-warning" />
@@ -109,6 +112,7 @@ export const Overview = ({
           persistentBranches.map((branch) => {
             return (
               <BranchRow
+                isGithubConnected={isGithubConnected}
                 key={branch.id}
                 repo={repo}
                 branch={branch}
@@ -135,6 +139,7 @@ export const Overview = ({
           ephemeralBranches.map((branch) => {
             return (
               <BranchRow
+                isGithubConnected={isGithubConnected}
                 key={branch.id}
                 repo={repo}
                 branch={branch}
@@ -190,14 +195,14 @@ const PreviewBranchActions = ({
   ] = useState(false)
   const [showEditBranchModal, setShowEditBranchModal] = useState(false)
 
-  const { mutate: resetBranch, isLoading: isResetting } = useBranchResetMutation({
+  const { mutate: resetBranch, isPending: isResetting } = useBranchResetMutation({
     onSuccess() {
       toast.success('Success! Please allow a few seconds for the branch to reset.')
       setShowConfirmResetModal(false)
     },
   })
 
-  const { mutate: updateBranch, isLoading: isUpdatingBranch } = useBranchUpdateMutation({
+  const { mutate: updateBranch, isPending: isUpdatingBranch } = useBranchUpdateMutation({
     onSuccess() {
       toast.success('Successfully updated branch')
       setShowBranchModeSwitch(false)

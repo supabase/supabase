@@ -79,7 +79,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
     connectionString: project?.connectionString,
   })
 
-  const { mutate: createQueue, isLoading } = useDatabaseQueueCreateMutation()
+  const { mutate: createQueue, isPending } = useDatabaseQueueCreateMutation()
 
   const form = useForm<CreateQueueForm>({
     resolver: zodResolver(FormSchema),
@@ -313,18 +313,11 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
               type="default"
               htmlType="button"
               onClick={confirmOnClose}
-              disabled={isLoading}
+              disabled={isPending}
             >
               Cancel
             </Button>
-            <Button
-              size="tiny"
-              type="primary"
-              form={FORM_ID}
-              htmlType="submit"
-              disabled={isLoading}
-              loading={isLoading}
-            >
+            <Button size="tiny" type="primary" form={FORM_ID} htmlType="submit" loading={isPending}>
               Create queue
             </Button>
           </SheetFooter>

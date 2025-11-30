@@ -103,7 +103,7 @@ export const CronJobPage = () => {
       with command{' '}
       <Tooltip>
         <TooltipTrigger asChild>
-          <code className="text-xs font-mono bg-surface-200 px-1 py-0.5 rounded max-w-[200px] inline-block truncate align-bottom cursor-pointer">
+          <code className="text-code-inline max-w-[200px] inline-block truncate align-bottom cursor-pointer">
             {job.command}
           </code>
         </TooltipTrigger>
