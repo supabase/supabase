@@ -13,9 +13,7 @@ import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEdi
 import { generatePolicyUpdateSQL } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
@@ -34,6 +32,16 @@ import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 /**
  * Filter tables by table name and policy name
@@ -182,7 +190,6 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
   const handleSelectEditPolicy = useCallback(
     (policy: PostgresPolicy) => {
-      setSelectedPolicyIdToEdit(policy.id.toString())
       setSelectedTable(undefined)
 
       if (isInlineEditorEnabled) {
@@ -213,106 +220,112 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   }
 
   return (
-    <ScaffoldContainer size="large">
-      <ScaffoldSection isFullWidth>
-        <div className="mb-4 flex flex-row gap-x-2">
-          <SchemaSelector
-            className="w-full lg:w-[180px]"
-            size="tiny"
-            align="end"
-            showError={false}
-            selectedSchemaName={schema}
-            onSelectSchema={(schemaName) => {
-              setSchema(schemaName)
-              setSearchString('')
-            }}
-          />
-          <Input
-            size="tiny"
-            placeholder="Filter tables and policies"
-            className="w-full lg:w-52"
-            value={searchString || ''}
-            onChange={(e) => {
-              const str = e.target.value
-              setSearchString(str)
-            }}
-            icon={<Search />}
-            actions={
-              searchString ? (
-                <Button
-                  size="tiny"
-                  type="text"
-                  className="p-0 h-5 w-5"
-                  icon={<X />}
-                  onClick={() => setSearchString('')}
+    <>
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Policies</PageHeaderTitle>
+            <PageHeaderDescription>
+              Manage Row Level Security policies for your tables
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-row-level-security`} />
+          </PageHeaderAside>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="large">
+        <PageSection>
+          <PageSectionContent>
+            <div className="mb-4 flex flex-row gap-x-2">
+              <SchemaSelector
+                className="w-full lg:w-[180px]"
+                size="tiny"
+                align="end"
+                showError={false}
+                selectedSchemaName={schema}
+                onSelectSchema={(schemaName) => {
+                  setSchema(schemaName)
+                  setSearchString('')
+                }}
+              />
+              <Input
+                size="tiny"
+                placeholder="Filter tables and policies"
+                className="block w-full lg:w-52"
+                containerClassName="[&>div>svg]:-mt-0.5"
+                value={searchString || ''}
+                onChange={(e) => {
+                  const str = e.target.value
+                  setSearchString(str)
+                }}
+                icon={<Search size={14} />}
+                actions={
+                  searchString ? (
+                    <Button
+                      size="tiny"
+                      type="text"
+                      className="p-0 h-5 w-5"
+                      icon={<X />}
+                      onClick={() => setSearchString('')}
+                    />
+                  ) : null
+                }
+              />
+            </div>
+
+            {isLoading && <GenericSkeletonLoader />}
+
+            {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
+
+            {isSuccess && (
+              <PoliciesDataProvider
+                policies={policies ?? []}
+                isPoliciesLoading={isLoadingPolicies}
+                isPoliciesError={isPoliciesError}
+                policiesError={policiesError ?? undefined}
+                exposedSchemas={exposedSchemas}
+              >
+                <Policies
+                  search={deferredSearchString}
+                  schema={schema}
+                  tables={tablesWithVisibility}
+                  hasTables={(tables ?? []).length > 0}
+                  isLocked={isSchemaLocked}
+                  visibleTableIds={visibleTableIds}
+                  onSelectCreatePolicy={handleSelectCreatePolicy}
+                  onSelectEditPolicy={handleSelectEditPolicy}
+                  onResetSearch={handleResetSearch}
                 />
-              ) : null
-            }
-          />
-        </div>
+              </PoliciesDataProvider>
+            )}
 
-        {isLoading && <GenericSkeletonLoader />}
-
-        {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
-
-        {isSuccess && (
-          <PoliciesDataProvider
-            policies={policies ?? []}
-            isPoliciesLoading={isLoadingPolicies}
-            isPoliciesError={isPoliciesError}
-            policiesError={policiesError ?? undefined}
-            exposedSchemas={exposedSchemas}
-          >
-            <Policies
-              search={deferredSearchString}
+            <PolicyEditorPanel
+              visible={showCreatePolicy || isUpdatingPolicy}
               schema={schema}
-              tables={tablesWithVisibility}
-              hasTables={(tables ?? []).length > 0}
-              isLocked={isSchemaLocked}
-              visibleTableIds={visibleTableIds}
-              onSelectCreatePolicy={handleSelectCreatePolicy}
-              onSelectEditPolicy={handleSelectEditPolicy}
-              onResetSearch={handleResetSearch}
+              searchString={searchString}
+              selectedTable={isUpdatingPolicy ? undefined : selectedTable}
+              selectedPolicy={isUpdatingPolicy ? selectedPolicyIdToEdit : undefined}
+              onSelectCancel={() => {
+                setSelectedTable(undefined)
+                if (isUpdatingPolicy) {
+                  setSelectedPolicyIdToEdit(null)
+                } else {
+                  setShowCreatePolicy(false)
+                }
+              }}
+              authContext="database"
             />
-          </PoliciesDataProvider>
-        )}
-
-        {/* Create or Edit Policy */}
-        <PolicyEditorPanel
-          visible={showCreatePolicy || isUpdatingPolicy}
-          schema={schema}
-          searchString={searchString}
-          selectedTable={isUpdatingPolicy ? undefined : selectedTable}
-          selectedPolicy={isUpdatingPolicy ? selectedPolicyIdToEdit : undefined}
-          onSelectCancel={() => {
-            setSelectedTable(undefined)
-            if (isUpdatingPolicy) {
-              setSelectedPolicyIdToEdit(null)
-            } else {
-              setShowCreatePolicy(false)
-            }
-          }}
-          authContext="database"
-        />
-      </ScaffoldSection>
-    </ScaffoldContainer>
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    </>
   )
 }
 
 AuthPoliciesPage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>
-      <PageLayout
-        title="Policies"
-        subtitle="Manage Row Level Security policies for your tables"
-        secondaryActions={
-          <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-row-level-security`} />
-        }
-        size="large"
-      >
-        {page}
-      </PageLayout>
-    </AuthLayout>
+    <AuthLayout>{page}</AuthLayout>
   </DefaultLayout>
 )
 
