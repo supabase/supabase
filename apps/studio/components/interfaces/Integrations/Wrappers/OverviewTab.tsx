@@ -7,7 +7,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -18,7 +18,7 @@ import {
   SheetContent,
   WarningIcon,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import CloseConfirmationModal from 'ui-patterns/Dialogs/CloseConfirmationModal'
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
@@ -69,7 +69,7 @@ export const WrapperOverviewTab = () => {
   const CreateWrapperSheetComponent = wrapperMeta.customComponent
     ? wrapperMeta.name === 'iceberg_wrapper'
       ? CreateIcebergWrapperSheet
-      : ({}) => null
+      : ({ }) => null
     : CreateWrapperSheet
 
   return (
@@ -153,18 +153,3 @@ export const WrapperOverviewTab = () => {
     </IntegrationOverviewTab>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)

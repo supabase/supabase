@@ -8,7 +8,7 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useDatabaseQueueCreateMutation } from 'data/database-queues/database-queues-create-mutation'
 import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import {
@@ -31,7 +31,7 @@ import {
   SheetTitle,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import CloseConfirmationModal from 'ui-patterns/Dialogs/CloseConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { QUEUE_TYPES } from './Queues.constants'
 import { QueryNameSchema } from './Queues.utils'
@@ -118,9 +118,9 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
         configuration:
           values.type === 'partitioned'
             ? {
-                partitionInterval: values.partitionInterval,
-                retentionInterval: values.retentionInterval,
-              }
+              partitionInterval: values.partitionInterval,
+              retentionInterval: values.retentionInterval,
+            }
             : undefined,
       },
       {
@@ -334,18 +334,3 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
     </Sheet>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)

@@ -286,6 +286,10 @@
       "import": "./src/Dialogs/ConfirmationModal.tsx",
       "types": "./src/Dialogs/ConfirmationModal.tsx"
     },
+    "./Dialogs/CloseConfirmationModal": {
+      "import": "./src/Dialogs/CloseConfirmationModal.tsx",
+      "types": "./src/Dialogs/CloseConfirmationModal.tsx"
+    },
     "./Dialogs/TextConfirmModal": {
       "import": "./src/Dialogs/TextConfirmModal.tsx",
       "types": "./src/Dialogs/TextConfirmModal.tsx"

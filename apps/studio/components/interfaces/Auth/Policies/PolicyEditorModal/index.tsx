@@ -4,9 +4,9 @@ import { toast } from 'sonner'
 
 import { useFeaturePreviewModal } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import useLatest from 'hooks/misc/useLatest'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { Modal } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import CloseConfirmationModal from 'ui-patterns/Dialogs/CloseConfirmationModal'
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
 import {
   PolicyFormField,
@@ -233,19 +233,5 @@ const PolicyEditorModal = ({
   )
 }
 
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the editor? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)
 
 export default PolicyEditorModal

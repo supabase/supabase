@@ -7,7 +7,7 @@ import z from 'zod'
 import { useParams } from 'common'
 import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
 import { ProjectSecret } from 'data/secrets/secrets-query'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { Eye, EyeOff, X } from 'lucide-react'
 import { useLatest } from 'react-use'
 import {
@@ -27,7 +27,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import CloseConfirmationModal from 'ui-patterns/Dialogs/CloseConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const FORM_ID = 'edit-secret-sidepanel'
@@ -212,23 +212,3 @@ const SecretField = ({ form }: SecretFieldProps): ReactNode => {
   )
 }
 
-const CloseConfirmationModal = ({
-  visible,
-  onClose,
-  onCancel,
-}: ConfirmOnCloseModalProps): ReactNode => {
-  return (
-    <ConfirmationModal
-      visible={visible}
-      title="Discard changes"
-      confirmLabel="Discard"
-      onCancel={onCancel}
-      onConfirm={onClose}
-    >
-      <p className="text-sm text-foreground-light">
-        There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-        lost.
-      </p>
-    </ConfirmationModal>
-  )
-}

@@ -9,7 +9,7 @@ import { NavigationItem, PageLayout } from 'components/layouts/PageLayout/PageLa
 import { useCronJobQuery } from 'data/database-cron-jobs/database-cron-job-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import {
   Button,
   cn,
@@ -20,7 +20,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import CloseConfirmationModal from 'ui-patterns/Dialogs/CloseConfirmationModal'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { CreateCronJobSheet } from './CreateCronJobSheet/CreateCronJobSheet'
 import { isSecondsFormat, parseCronJobCommand } from './CronJobs.utils'
@@ -149,16 +149,16 @@ export const CronJobPage = () => {
     </Button>,
     ...(isValidEdgeFunction
       ? [
-          <Button key="view-edge-logs" asChild type="outline">
-            <Link
-              target="_blank"
-              rel="noopener noreferrer"
-              href={`/project/${project?.ref}/functions/${edgeFunctionSlug}/logs`}
-            >
-              View Edge Function logs
-            </Link>
-          </Button>,
-        ]
+        <Button key="view-edge-logs" asChild type="outline">
+          <Link
+            target="_blank"
+            rel="noopener noreferrer"
+            href={`/project/${project?.ref}/functions/${edgeFunctionSlug}/logs`}
+          >
+            View Edge Function logs
+          </Link>
+        </Button>,
+      ]
       : []),
   ]
 
@@ -198,18 +198,3 @@ export const CronJobPage = () => {
     </>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)
