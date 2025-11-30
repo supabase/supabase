@@ -42,7 +42,7 @@ const CustomDomainSidePanel = () => {
   const visible = panel === 'customDomain'
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
-  const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
+  const { mutate: updateAddon, isPending: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully enabled custom domain`)
       closePanel()
@@ -51,7 +51,7 @@ const CustomDomainSidePanel = () => {
       toast.error(`Unable to enable custom domain: ${error.message}`)
     },
   })
-  const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
+  const { mutate: removeAddon, isPending: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled custom domain`)
       closePanel()

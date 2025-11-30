@@ -1,6 +1,6 @@
 ---
-title: 'Build a User Management App with refine'
-description: 'Learn how to use Supabase in your refine App.'
+title: 'Build a User Management App with Refine'
+description: 'Learn how to use Supabase in your Refine App.'
 ---
 
 <$Partial path="quickstart_intro.mdx" />
@@ -13,11 +13,11 @@ If you get stuck while working through this guide, refer to the [full example on
 
 </Admonition>
 
-## About refine
+## About Refine
 
-[refine](https://github.com/refinedev/refine) is a React-based framework used to rapidly build data-heavy applications like admin panels, dashboards, storefronts and any type of CRUD apps. It separates app concerns into individual layers, each backed by a React context and respective provider object. For example, the auth layer represents a context served by a specific set of [`authProvider`](https://refine.dev/docs/tutorial/understanding-authprovider/index/) methods that carry out authentication and authorization actions such as logging in, logging out, getting roles data, etc. Similarly, the data layer offers another level of abstraction that is equipped with [`dataProvider`](https://refine.dev/docs/tutorial/understanding-dataprovider/index/) methods to handle CRUD operations at appropriate backend API endpoints.
+[Refine](https://github.com/refinedev/refine) is a React-based framework used to rapidly build data-heavy applications like admin panels, dashboards, storefronts and any type of CRUD apps. It separates app concerns into individual layers, each backed by a React context and respective provider object. For example, the auth layer represents a context served by a specific set of [`authProvider`](https://refine.dev/docs/tutorial/understanding-authprovider/index/) methods that carry out authentication and authorization actions such as logging in, logging out, getting roles data, etc. Similarly, the data layer offers another level of abstraction that is equipped with [`dataProvider`](https://refine.dev/docs/tutorial/understanding-dataprovider/index/) methods to handle CRUD operations at appropriate backend API endpoints.
 
-refine provides hassle-free integration with Supabase backend with its supplementary [`@refinedev/supabase`](https://github.com/refinedev/refine/tree/master/packages/supabase) package. It generates `authProvider` and `dataProvider` methods at project initialization, so we don't need to expend much effort to define them ourselves. We just need to choose Supabase as our backend service while creating the app with `create refine-app`.
+Refine provides hassle-free integration with Supabase backend with its supplementary [`@refinedev/supabase`](https://github.com/refinedev/refine/tree/main/packages/supabase) package. It generates `authProvider` and `dataProvider` methods at project initialization, so we don't need to expend much effort to define them ourselves. We just need to choose Supabase as our backend service while creating the app with `create refine-app`.
 
 <Admonition type="note">
 
@@ -29,9 +29,9 @@ It is possible to customize the `authProvider` for Supabase and as we'll see bel
 
 ## Building the app
 
-Let's start building the refine app from scratch.
+Let's start building the Refine app from scratch.
 
-### Initialize a refine app
+### Initialize a Refine app
 
 We can use [create refine-app](https://refine.dev/docs/tutorial/getting-started/headless/create-project/#launch-the-refine-cli-setup) command to initialize
 an app. Run the following in the terminal:
@@ -44,13 +44,13 @@ In the above command, we are using the `refine-supabase` preset which chooses th
 
 The `refine-supabase` preset installs the `@refinedev/supabase` package which out-of-the-box includes the Supabase dependency: [supabase-js](https://github.com/supabase/supabase-js).
 
-We also need to install `@refinedev/react-hook-form` and `react-hook-form` packages that allow us to use [React Hook Form](https://react-hook-form.com) inside refine apps. Run:
+We also need to install `@refinedev/react-hook-form` and `react-hook-form` packages that allow us to use [React Hook Form](https://react-hook-form.com) inside Refine apps. Run:
 
 ```bash
 npm install @refinedev/react-hook-form react-hook-form
 ```
 
-With the app initialized and packages installed, at this point before we begin discussing refine concepts, let's try running the app:
+With the app initialized and packages installed, at this point before we begin discussing Refine concepts, let's try running the app:
 
 ```bash
 cd app-name
@@ -110,13 +110,12 @@ The `App.tsx` file initially looks like this:
 ```tsx name=src/App.tsx
 import { Refine, WelcomePage } from '@refinedev/core'
 import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar'
-import routerBindings, {
+import routerProvider, {
   DocumentTitleHandler,
   UnsavedChangesNotifier,
-} from '@refinedev/react-router-v6'
+} from '@refinedev/react-router'
 import { dataProvider, liveProvider } from '@refinedev/supabase'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-
+import { BrowserRouter, Route, Routes } from 'react-router'
 import './App.css'
 import authProvider from './authProvider'
 import { supabaseClient } from './utility'
@@ -129,7 +128,7 @@ function App() {
           dataProvider={dataProvider(supabaseClient)}
           liveProvider={liveProvider(supabaseClient)}
           authProvider={authProvider}
-          routerProvider={routerBindings}
+          routerProvider={routerProvider}
           options={{
             syncWithLocation: true,
             warnWhenUnsavedChanges: true,
@@ -188,11 +187,11 @@ We also want to remove `register`, `updatePassword`, `forgotPassword` and `getPe
 <$CodeTabs>
 
 ```ts name=src/authProvider.ts
-import { AuthBindings } from '@refinedev/core'
+import { AuthProvider } from '@refinedev/core'
 
 import { supabaseClient } from './utility'
 
-const authProvider: AuthBindings = {
+const authProvider: AuthProvider = {
   login: async ({ email }) => {
     try {
       const { error } = await supabaseClient.auth.signInWithOtp({ email })
@@ -285,7 +284,7 @@ export default authProvider
 
 ### Set up a login component
 
-We have chosen to use the headless refine core package that comes with no supported UI framework. So, let's set up a plain React component to manage logins and sign ups.
+We have chosen to use the headless Refine core package that comes with no supported UI framework. So, let's set up a plain React component to manage logins and sign ups.
 
 Create and edit `src/components/auth.tsx`:
 
@@ -297,7 +296,7 @@ import { useLogin } from '@refinedev/core'
 
 export default function Auth() {
   const [email, setEmail] = useState('')
-  const { isLoading, mutate: login } = useLogin()
+  const { isPending, mutate: login } = useLogin()
 
   const handleLogin = async (event: { preventDefault: () => void }) => {
     event.preventDefault()
@@ -307,7 +306,7 @@ export default function Auth() {
   return (
     <div className="row flex flex-center container">
       <div className="col-6 form-widget">
-        <h1 className="header">Supabase + refine</h1>
+        <h1 className="header">Supabase + Refine</h1>
         <p className="description">Sign in via magic link with your email below</p>
         <form className="form-widget" onSubmit={handleLogin}>
           <div>
@@ -321,8 +320,8 @@ export default function Auth() {
             />
           </div>
           <div>
-            <button className={'button block'} disabled={isLoading}>
-              {isLoading ? <span>Loading</span> : <span>Send magic link</span>}
+            <button className={'button block'} disabled={isPending}>
+              {isPending ? <span>Loading</span> : <span>Send magic link</span>}
             </button>
           </div>
         </form>
@@ -334,7 +333,7 @@ export default function Auth() {
 
 </$CodeTabs>
 
-Notice we are using the [`useLogin()`](https://refine.dev/docs/api-reference/core/hooks/authentication/useLogin/) refine auth hook to grab the `mutate: login` method to use inside `handleLogin()` function and `isLoading` state for our form submission. The `useLogin()` hook conveniently offers us access to `authProvider.login` method for authenticating the user with OTP.
+Notice we are using the [`useLogin()`](https://refine.dev/docs/api-reference/core/hooks/authentication/useLogin/) Refine auth hook to grab the `mutate: login` method to use inside `handleLogin()` function and `isLoading` state for our form submission. The `useLogin()` hook conveniently offers us access to `authProvider.login` method for authenticating the user with OTP.
 
 ### Account page
 
@@ -367,7 +366,7 @@ export default function Account() {
   const { mutate: logOut } = useLogout()
 
   const {
-    refineCore: { formLoading, queryResult, onFinish },
+    refineCore: { formLoading, query, onFinish },
     register,
     control,
     handleSubmit,
@@ -416,7 +415,7 @@ export default function Account() {
 
 </$CodeTabs>
 
-Notice above that, we are using three refine hooks, namely the [`useGetIdentity()`](https://refine.dev/docs/api-reference/core/hooks/authentication/useGetIdentity/), [`useLogOut()`](https://refine.dev/docs/api-reference/core/hooks/authentication/useLogout/) and [`useForm()`](https://refine.dev/docs/packages/documentation/react-hook-form/useForm/) hooks.
+Notice above that, we are using three Refine hooks, namely the [`useGetIdentity()`](https://refine.dev/docs/api-reference/core/hooks/authentication/useGetIdentity/), [`useLogOut()`](https://refine.dev/docs/api-reference/core/hooks/authentication/useLogout/) and [`useForm()`](https://refine.dev/docs/packages/documentation/react-hook-form/useForm/) hooks.
 
 `useGetIdentity()` is a auth hook that gets the identity of the authenticated user. It grabs the current user by invoking the `authProvider.getIdentity` method under the hood.
 
@@ -437,13 +436,13 @@ Add the routes for `/login` with the `<Auth />` component and the routes for `in
 ```tsx name=src/App.tsx
 import { Authenticated, Refine } from '@refinedev/core'
 import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar'
-import routerBindings, {
+import routerProvider, {
   CatchAllNavigate,
   DocumentTitleHandler,
   UnsavedChangesNotifier,
-} from '@refinedev/react-router-v6'
+} from '@refinedev/react-router'
 import { dataProvider, liveProvider } from '@refinedev/supabase'
-import { BrowserRouter, Outlet, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Outlet, Route, Routes } from 'react-router'
 
 import './App.css'
 import authProvider from './authProvider'
@@ -459,7 +458,7 @@ function App() {
           dataProvider={dataProvider(supabaseClient)}
           liveProvider={liveProvider(supabaseClient)}
           authProvider={authProvider}
-          routerProvider={routerBindings}
+          routerProvider={routerProvider}
           options={{
             syncWithLocation: true,
             warnWhenUnsavedChanges: true,
@@ -468,14 +467,17 @@ function App() {
           <Routes>
             <Route
               element={
-                <Authenticated fallback={<CatchAllNavigate to="/login" />}>
+                <Authenticated
+                  key="authenticated-routes"
+                  fallback={<CatchAllNavigate to="/login" />}
+                >
                   <Outlet />
                 </Authenticated>
               }
             >
               <Route index element={<Account />} />
             </Route>
-            <Route element={<Authenticated fallback={<Outlet />} />}>
+            <Route element={<Authenticated key="auth-pages" fallback={<Outlet />} />}>
               <Route path="/login" element={<Auth />} />
             </Route>
           </Routes>
@@ -501,7 +503,7 @@ npm run dev
 
 And then open the browser to [localhost:5173](http://localhost:5173) and you should see the completed app.
 
-![Supabase refine](/docs/img/supabase-refine-demo.png)
+![Supabase Refine](/docs/img/supabase-refine-demo.png)
 
 ## Bonus: Profile photos
 
@@ -636,7 +638,7 @@ return (
               size={150}
               onUpload={(filePath) => {
                 onFinish({
-                  ...queryResult?.data?.data,
+                  ...query?.data?.data,
                   avatar_url: filePath,
                   onMutationError: (data: { message: string }) => alert(data?.message),
                 })

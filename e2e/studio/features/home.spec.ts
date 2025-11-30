@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test'
-import { test } from '../utils/test'
-import { toUrl } from '../utils/to-url'
+import { test } from '../utils/test.js'
+import { toUrl } from '../utils/to-url.js'
 
 test.describe('Project', async () => {
   test('Can navigate to project home page', async ({ page, ref }) => {

@@ -90,7 +90,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
   const [showFreeProjectLimitWarning, setShowFreeProjectLimitWarning] = useState(false)
 
-  const { mutate: restoreProject, isLoading: isRestoring } = useProjectRestoreMutation({
+  const { mutate: restoreProject, isPending: isRestoring } = useProjectRestoreMutation({
     onSuccess: (_, variables) => {
       setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.RESTORING })
       toast.success('Restoring project')

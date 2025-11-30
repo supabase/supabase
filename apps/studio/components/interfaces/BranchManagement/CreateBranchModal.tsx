@@ -177,12 +177,12 @@ export const CreateBranchModal = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { mutateAsync: checkGithubBranchValidity, isLoading: isCheckingGHBranchValidity } =
+  const { mutateAsync: checkGithubBranchValidity, isPending: isCheckingGHBranchValidity } =
     useCheckGithubBranchValidity({
       onError: () => {},
     })
 
-  const { mutate: createBranch, isLoading: isCreatingBranch } = useBranchCreateMutation({
+  const { mutate: createBranch, isPending: isCreatingBranch } = useBranchCreateMutation({
     onSuccess: async (data) => {
       toast.success(`Successfully created preview branch "${data.name}"`)
       if (projectRef) {
@@ -564,7 +564,7 @@ export const CreateBranchModal = () => {
                   <p className="text-sm text-foreground-light">
                     {withData ? (
                       <>
-                        <code className="text-xs font-mono">{branchComputeSize.label}</code> compute
+                        <code className="text-code-inline">{branchComputeSize.label}</code> compute
                         size is automatically selected to match your production branch. You may
                         downgrade after creation or pause the branch when not in use to save cost.
                       </>

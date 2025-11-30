@@ -81,7 +81,7 @@ export const S3Connection = () => {
     { enabled: canReadS3Credentials }
   )
 
-  const { mutate: updateStorageConfig, isLoading: isUpdating } =
+  const { mutate: updateStorageConfig, isPending: isUpdating } =
     useProjectStorageConfigUpdateUpdateMutation({
       onSuccess: (_, vars) => {
         if (vars.features) form.reset({ s3ConnectionEnabled: vars.features.s3Protocol.enabled })

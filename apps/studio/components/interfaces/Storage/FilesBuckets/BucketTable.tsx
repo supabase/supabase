@@ -5,7 +5,8 @@ import {
   VirtualizedTableRow,
 } from 'components/ui/VirtualizedTable'
 import { Bucket } from 'data/storage/buckets-query'
-import { Bucket as BucketIcon } from 'icons'
+import { FilesBucket as FilesBucketIcon } from 'icons'
+import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -93,7 +94,7 @@ export const BucketTableRow = ({
   ) => {
     const url = `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucketId)}`
     if (event.metaKey || event.ctrlKey) {
-      window.open(url, '_blank')
+      window.open(`${BASE_PATH}${url}`, '_blank')
     } else {
       router.push(url)
     }
@@ -102,6 +103,7 @@ export const BucketTableRow = ({
   return (
     <BucketTableRow
       key={bucket.id}
+      data-bucket-id={bucket.id}
       className="relative cursor-pointer h-16 group inset-focus"
       onClick={(event) => handleBucketNavigation(bucket.id, event)}
       onKeyDown={(event) => {
@@ -113,7 +115,7 @@ export const BucketTableRow = ({
       tabIndex={0}
     >
       <BucketTableCell className="w-2 pr-1">
-        <BucketIcon aria-label="bucket icon" size={16} className="text-foreground-muted" />
+        <FilesBucketIcon aria-label="bucket icon" size={16} className="text-foreground-muted" />
       </BucketTableCell>
       <BucketTableCell className="flex-1">
         <div className="flex items-center gap-2.5">

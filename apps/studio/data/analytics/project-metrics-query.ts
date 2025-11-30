@@ -1,9 +1,10 @@
-import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { fetchGet } from 'data/fetchers'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { analyticsKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export type ProjectMetricsVariables = {
   projectRef?: string
@@ -100,7 +101,7 @@ export const useProjectMetricsQuery = <TData = ProjectMetricsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectMetricsData, ProjectMetricsError, TData> = {}
+  }: UseCustomQueryOptions<ProjectMetricsData, ProjectMetricsError, TData> = {}
 ) => {
   const { projectRef, interval } = vars
 

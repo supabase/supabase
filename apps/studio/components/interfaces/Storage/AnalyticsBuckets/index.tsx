@@ -1,18 +1,16 @@
-import { ChevronRight, ExternalLink, Search } from 'lucide-react'
-import Link from 'next/link'
+import { ChevronRight, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { useParams } from 'common'
 import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { AlphaNotice } from 'components/ui/AlphaNotice'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
-import { Bucket as BucketIcon } from 'icons'
+import { AnalyticsBucket as AnalyticsBucketIcon } from 'icons'
 import { BASE_PATH } from 'lib/constants'
 import {
-  Badge,
-  Button,
   Card,
   Table,
   TableBody,
@@ -24,7 +22,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition, TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateAnalyticsBucketModal } from './CreateAnalyticsBucketModal'
@@ -46,7 +44,9 @@ export const AnalyticsBuckets = () => {
   })
 
   const analyticsBuckets = buckets.filter((bucket) =>
-    filterString.length === 0 ? true : bucket.id.toLowerCase().includes(filterString.toLowerCase())
+    filterString.length === 0
+      ? true
+      : bucket.name.toLowerCase().includes(filterString.toLowerCase())
   )
   const hasNoBuckets = buckets.length === 0
 
@@ -64,46 +64,10 @@ export const AnalyticsBuckets = () => {
 
   return (
     <ScaffoldSection isFullWidth>
-      <Admonition showIcon={false} type="tip" className="relative mb-6 overflow-hidden">
-        <div className="absolute -inset-16 z-0 opacity-50">
-          <img
-            src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
-            alt="Supabase Grafana"
-            className="w-full h-full object-cover object-right hidden dark:block"
-          />
-          <img
-            src={`${BASE_PATH}/img/reports/bg-grafana-light.svg`}
-            alt="Supabase Grafana"
-            className="w-full h-full object-cover object-right dark:hidden"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-background-alternative to-transparent" />
-        </div>
-
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-8 justify-between px-2 py-1">
-          <div className="flex flex-col gap-y-0.5">
-            <div className="flex flex-col gap-y-2 items-start">
-              <Badge variant="success" className="-ml-0.5 uppercase">
-                New
-              </Badge>
-              <p className="text-sm font-medium">Introducing analytics buckets</p>
-            </div>
-            <p className="text-sm text-foreground-lighter text-balance">
-              Analytics buckets are now in private alpha. Expect rapid changes, limited features,
-              and possible breaking updates. Please share feedback as we refine the experience and
-              expand access.
-            </p>
-          </div>
-          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />} className="mt-2">
-            <Link
-              href="https://github.com/orgs/supabase/discussions/40116"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Share feedback
-            </Link>
-          </Button>
-        </div>
-      </Admonition>
+      <AlphaNotice
+        entity="Analytics buckets"
+        feedbackUrl="https://github.com/orgs/supabase/discussions/40116"
+      />
 
       {isLoadingBuckets && <GenericSkeletonLoader />}
 
@@ -141,7 +105,7 @@ export const AnalyticsBuckets = () => {
                   placeholder="Search for a bucket"
                   value={filterString}
                   onChange={(e) => setFilterString(e.target.value)}
-                  icon={<Search size={12} />}
+                  icon={<Search />}
                 />
                 <CreateAnalyticsBucketModal buttonType="primary" buttonClassName="w-fit" />
               </div>
@@ -178,22 +142,24 @@ export const AnalyticsBuckets = () => {
                       )}
                       {analyticsBuckets.map((bucket) => (
                         <TableRow
-                          key={bucket.id}
+                          key={bucket.name}
                           className="relative cursor-pointer h-16 inset-focus"
-                          onClick={(event) => handleBucketNavigation(bucket.id, event)}
+                          onClick={(event) => handleBucketNavigation(bucket.name, event)}
                           onKeyDown={(event) => {
                             if (event.key === 'Enter' || event.key === ' ') {
                               event.preventDefault()
-                              handleBucketNavigation(bucket.id, event)
+                              handleBucketNavigation(bucket.name, event)
                             }
                           }}
                           tabIndex={0}
                         >
                           <TableCell className="w-2 pr-1">
-                            <BucketIcon size={16} className="text-foreground-muted" />
+                            <AnalyticsBucketIcon size={16} className="text-foreground-muted" />
                           </TableCell>
                           <TableCell>
-                            <p className="whitespace-nowrap max-w-[512px] truncate">{bucket.id}</p>
+                            <p className="whitespace-nowrap max-w-[512px] truncate">
+                              {bucket.name}
+                            </p>
                           </TableCell>
 
                           <TableCell>
