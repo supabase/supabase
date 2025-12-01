@@ -1842,6 +1842,28 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "form-patterns-pagelayout": {
+      name: "form-patterns-pagelayout",
+      type: "components:example",
+      registryDependencies: ["form","card","input","button","select","switch","checkbox","textarea","radio-group","calendar","popover","multi-select"],
+      component: React.lazy(() => import("@/registry/default/example/form-patterns-pagelayout")),
+      source: "",
+      files: ["registry/default/example/form-patterns-pagelayout.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "form-patterns-sidepanel": {
+      name: "form-patterns-sidepanel",
+      type: "components:example",
+      registryDependencies: ["form","sheet","input","button","select","switch","checkbox","textarea","radio-group","calendar","popover","multi-select"],
+      component: React.lazy(() => import("@/registry/default/example/form-patterns-sidepanel")),
+      source: "",
+      files: ["registry/default/example/form-patterns-sidepanel.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "form-item-layout-with-select": {
       name: "form-item-layout-with-select",
       type: "components:example",
