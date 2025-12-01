@@ -62,7 +62,7 @@ export const ActivityStats = () => {
       return [versionDayjs.fromNow(), versionDayjs.toISOString()]
     }
 
-    return [version, version]
+    return [undefined, undefined]
   }, [latestMigration])
 
   return (
