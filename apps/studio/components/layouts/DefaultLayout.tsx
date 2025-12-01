@@ -8,6 +8,7 @@ import { Sidebar } from 'components/interfaces/Sidebar'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useCheckLatestDeploy } from 'hooks/use-check-latest-deploy'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { ResizablePanel, ResizablePanelGroup, SidebarProvider } from 'ui'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader/LayoutHeader'
 import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
@@ -30,7 +31,7 @@ export interface DefaultLayoutProps {
  * - Mobile navigation bar
  * - First level side navigation bar (e.g For navigating to Table Editor, SQL Editor, Database page, etc)
  */
-const DefaultLayout = ({
+export const DefaultLayout = ({
   children,
   headerTitle,
   hideMobileMenu,
@@ -38,6 +39,8 @@ const DefaultLayout = ({
   const { ref } = useParams()
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
+  const { activeSidebar } = useSidebarManagerSnapshot()
+  const showSidebar = !activeSidebar?.component
   const showProductMenu = !!ref && router.pathname !== '/project/[ref]'
 
   const [lastVisitedOrganization] = useLocalStorageQuery(
@@ -53,6 +56,9 @@ const DefaultLayout = ({
         : '/organizations'
 
   useCheckLatestDeploy()
+
+  const contentMinSizePercentage = 50
+  const contentMaxSizePercentage = 70
 
   return (
     <SidebarProvider defaultOpen={false}>
@@ -85,14 +91,19 @@ const DefaultLayout = ({
                   <ResizablePanel
                     id="panel-content"
                     order={1}
-                    minSize={50}
-                    maxSize={70}
-                    defaultSize={70}
                     className="w-full"
+                    minSize={contentMinSizePercentage}
+                    maxSize={contentMaxSizePercentage}
+                    defaultSize={contentMaxSizePercentage}
                   >
                     <div className="h-full overflow-y-auto">{children}</div>
                   </ResizablePanel>
-                  <LayoutSidebar />
+                  <LayoutSidebar
+                    order={2}
+                    minSize={100 - contentMaxSizePercentage}
+                    maxSize={100 - contentMinSizePercentage}
+                    defaultSize={100 - contentMaxSizePercentage}
+                  />
                 </ResizablePanelGroup>
               </div>
             </div>
