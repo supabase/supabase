@@ -79,7 +79,7 @@ export const CreateBranchModal = () => {
   )
 
   const { hasAccess: hasAccessToBranching, isLoading: isLoadingEntitlement } =
-    useCheckEntitlements('branching')
+    useCheckEntitlements('branching_limit')
   const promptPlanUpgrade = IS_PLATFORM && !hasAccessToBranching
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
