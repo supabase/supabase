@@ -22,8 +22,6 @@ describe('geo utils', () => {
     expect(counts).toEqual({ US: 3, SG: 3 })
   })
 
-  // name normalization no longer needed with ISO2-based map dataset
-
   test('getFillColor returns muted color when max=0 or value=0', () => {
     const theme = MAP_CHART_THEME.dark
     expect(getFillColor(0, 0, theme)).toBe(theme.zeroFill)
