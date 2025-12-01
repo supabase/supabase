@@ -69,8 +69,9 @@ export const ActivityStats = () => {
   }, [latestMigration])
 
   const hasValidVersion = versionLabel && versionTimestamp
+
   const versionLabelText =
-    !isLoadingMigrations && hasValidVersion ? 'Unknown version' : 'No migrations'
+    migrationsData && migrationsData.length > 0 ? 'Unknown version' : 'No migrations'
 
   return (
     <div className="@container">
