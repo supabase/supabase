@@ -32,7 +32,7 @@ import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
 
 export const Usage = () => {
-  const { slug, projectRef } = useParams()
+  const { slug } = useParams()
 
   const [dateRange, setDateRange] = useState<any>()
 
@@ -106,7 +106,7 @@ export const Usage = () => {
     isError: isErrorOrgDailyStats,
   } = useOrgDailyStatsQuery({
     orgSlug: slug,
-    projectRef,
+    projectRef: selectedProjectRef ?? undefined,
     startDate,
     endDate,
   })
@@ -299,6 +299,8 @@ export const Usage = () => {
         currentBillingCycleSelected={currentBillingCycleSelected}
         orgDailyStats={orgDailyStats}
         isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+        startDate={startDate}
+        endDate={endDate}
       />
 
       <SizeAndCounts
@@ -308,6 +310,8 @@ export const Usage = () => {
         currentBillingCycleSelected={currentBillingCycleSelected}
         orgDailyStats={orgDailyStats}
         isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+        startDate={startDate}
+        endDate={endDate}
       />
 
       <Activity
