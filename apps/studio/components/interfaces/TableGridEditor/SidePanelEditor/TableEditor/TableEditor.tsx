@@ -217,20 +217,6 @@ export const TableEditor = ({
       const isRlsEnabledChanged = tableFields.isRLSEnabled !== (table?.rls_enabled ?? false)
 
       if (isEmpty(errors)) {
-        const payload: any = {
-          name: tableFields.name.trim(),
-          comment: tableFields.comment?.trim(),
-        }
-
-        if (isNewRecord) {
-          payload.schema = selectedSchema
-        } else if (!isDuplicating) {
-          // Update mode: only include changed fields
-          if (!isNameChanged) delete payload.name
-          if (!isCommentChanged) delete payload.comment
-          if (isRlsEnabledChanged) payload.rls_enabled = tableFields.isRLSEnabled
-        }
-
         const configuration = {
           tableId: table?.id,
           importContent,
@@ -240,23 +226,55 @@ export const TableEditor = ({
           existingForeignKeyRelations: foreignKeys,
           primaryKey,
         }
-
-        const columns = tableFields.columns.map((column) => ({
-          ...column,
-          name: column.name.trim(),
-        }))
-
-        const action = isNewRecord ? 'create' : isDuplicating ? 'duplicate' : 'update'
-
-        saveChanges({
-          action: action as any,
-          payload,
-          configuration,
-          columns,
-          foreignKeyRelations: fkRelations,
-          resolve,
-          generatedPolicies: isNewRecord ? generatedPolicies : [],
+        const columns = tableFields.columns.map((column) => {
+          return { ...column, name: column.name.trim() }
         })
+
+        if (isNewRecord) {
+          const payload: SaveTablePayloadFor<'create'> = {
+            name: tableFields.name.trim(),
+            schema: selectedSchema,
+            comment: tableFields.comment?.trim(),
+          }
+          saveChanges({
+            action: 'create',
+            payload,
+            configuration,
+            columns,
+            foreignKeyRelations: fkRelations,
+            resolve,
+            generatedPolicies,
+          })
+        } else if (isDuplicating) {
+          const payload: SaveTablePayloadFor<'duplicate'> = {
+            name: tableFields.name.trim(),
+            comment: tableFields.comment?.trim(),
+          }
+          saveChanges({
+            action: 'duplicate',
+            payload,
+            configuration,
+            columns,
+            foreignKeyRelations: fkRelations,
+            resolve,
+            generatedPolicies: [],
+          })
+        } else {
+          const payload: SaveTablePayloadFor<'update'> = {
+            ...(isNameChanged && { name: tableFields.name.trim() }),
+            ...(isCommentChanged && { comment: tableFields.comment?.trim() ?? '' }),
+            ...(isRlsEnabledChanged && { rls_enabled: tableFields.isRLSEnabled }),
+          }
+          saveChanges({
+            action: 'update',
+            payload,
+            configuration,
+            columns,
+            foreignKeyRelations: fkRelations,
+            resolve,
+            generatedPolicies: [],
+          })
+        }
       } else {
         resolve()
       }
