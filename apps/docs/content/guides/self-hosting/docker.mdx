@@ -33,7 +33,8 @@ You need the following installed on your system:
 
 - [Git](https://git-scm.com/downloads)
 - [Docker](https://docs.docker.com/manuals/):
-  - **Linux servers/VPS**: Install [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/)
+  - **Linux server/VPS**: Install [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/)
+  - **Linux desktop**: Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/linux/)
   - **macOS**: Install [Docker Desktop](https://docs.docker.com/desktop/install/mac-install/)
   - **Windows**: Install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/)
 
@@ -267,7 +268,7 @@ When using `psql` with command-line parameters instead of a connection string to
 
 If for some reason you need to configure Postgres to be directly accessible from the Internet, read [Exposing your Postgres database](#exposing-your-postgres-database) below.
 
-### Accessing your Edge Functions
+### Accessing Edge Functions
 
 Edge Functions are stored in `volumes/functions`. The default setup has a `hello` function that you can invoke on `http://<your-domain>:8000/functions/v1/hello`.
 
