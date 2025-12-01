@@ -2,7 +2,6 @@ import { ArrowDownNarrowWide, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import { ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -23,6 +22,8 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { CreateBucketModal } from '../CreateBucketModal'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { STORAGE_BUCKET_SORT } from '../Storage.constants'
@@ -69,76 +70,82 @@ export const FilesBuckets = () => {
   )
 
   return (
-    <ScaffoldSection isFullWidth className="h-full gap-y-4">
-      {isLoading && <GenericSkeletonLoader />}
-      {isErrorBuckets && (
-        <>
-          {hasNoApiKeys ? (
-            <Admonition type="warning" title="Project has no active API keys enabled">
-              <p className="!leading-normal text-sm">
-                The Dashboard relies on having active API keys on the project to function. If you'd
-                like to use Storage through the Dashboard, create a set of API keys{' '}
-                <InlineLink href={`/project/${ref}/settings/api-keys/new`}>here</InlineLink>.
-              </p>
-            </Admonition>
-          ) : (
-            <AlertError error={bucketsError} subject="Failed to retrieve buckets" />
-          )}
-        </>
-      )}
-      {isSuccessBuckets && (
-        <>
-          {hasNoBuckets ? (
-            <EmptyBucketState bucketType="files" />
-          ) : (
+    <PageContainer>
+      <PageSection>
+        <PageSectionContent className="h-full gap-y-4">
+          {isLoading && <GenericSkeletonLoader />}
+          {isErrorBuckets && (
             <>
-              <div className="flex flex-grow justify-between gap-x-2 items-center">
-                <div className="flex items-center gap-x-2">
-                  <Input
-                    size="tiny"
-                    className="flex-grow lg:flex-grow-0 w-52"
-                    placeholder="Search for a bucket"
-                    value={filterString}
-                    onChange={(e) => setFilterString(e.target.value)}
-                    icon={<Search />}
-                  />
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button type="default" icon={<ArrowDownNarrowWide />}>
-                        Sorted by {snap.sortBucket === 'alphabetical' ? 'name' : 'created at'}
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-40">
-                      <DropdownMenuRadioGroup
-                        value={snap.sortBucket}
-                        onValueChange={(value) => snap.setSortBucket(value as STORAGE_BUCKET_SORT)}
-                      >
-                        <DropdownMenuRadioItem value="alphabetical">
-                          Sort by name
-                        </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="created_at">
-                          Sort by created at
-                        </DropdownMenuRadioItem>
-                      </DropdownMenuRadioGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-                <CreateBucketModal buttonType="primary" buttonClassName="w-fit" />
-              </div>
-
-              <Card>
-                <BucketsTable
-                  buckets={sortedFilesBuckets}
-                  projectRef={ref ?? '_'}
-                  filterString={filterString}
-                  formattedGlobalUploadLimit={formattedGlobalUploadLimit}
-                  getPolicyCount={getPolicyCount}
-                />
-              </Card>
+              {hasNoApiKeys ? (
+                <Admonition type="warning" title="Project has no active API keys enabled">
+                  <p className="!leading-normal text-sm">
+                    The Dashboard relies on having active API keys on the project to function. If
+                    you'd like to use Storage through the Dashboard, create a set of API keys{' '}
+                    <InlineLink href={`/project/${ref}/settings/api-keys/new`}>here</InlineLink>.
+                  </p>
+                </Admonition>
+              ) : (
+                <AlertError error={bucketsError} subject="Failed to retrieve buckets" />
+              )}
             </>
           )}
-        </>
-      )}
-    </ScaffoldSection>
+          {isSuccessBuckets && !isLoading && (
+            <>
+              {hasNoBuckets ? (
+                <EmptyBucketState bucketType="files" />
+              ) : (
+                <>
+                  <div className="flex flex-grow justify-between gap-x-2 items-center mb-4">
+                    <div className="flex items-center gap-x-2">
+                      <Input
+                        size="tiny"
+                        className="flex-grow lg:flex-grow-0 w-52"
+                        placeholder="Search for a bucket"
+                        value={filterString}
+                        onChange={(e) => setFilterString(e.target.value)}
+                        icon={<Search />}
+                      />
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button type="default" icon={<ArrowDownNarrowWide />}>
+                            Sorted by {snap.sortBucket === 'alphabetical' ? 'name' : 'created at'}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-40">
+                          <DropdownMenuRadioGroup
+                            value={snap.sortBucket}
+                            onValueChange={(value) =>
+                              snap.setSortBucket(value as STORAGE_BUCKET_SORT)
+                            }
+                          >
+                            <DropdownMenuRadioItem value="alphabetical">
+                              Sort by name
+                            </DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="created_at">
+                              Sort by created at
+                            </DropdownMenuRadioItem>
+                          </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                    <CreateBucketModal buttonType="primary" buttonClassName="w-fit" />
+                  </div>
+
+                  <Card>
+                    <BucketsTable
+                      buckets={sortedFilesBuckets}
+                      projectRef={ref ?? '_'}
+                      filterString={filterString}
+                      formattedGlobalUploadLimit={formattedGlobalUploadLimit}
+                      getPolicyCount={getPolicyCount}
+                    />
+                  </Card>
+                </>
+              )}
+            </>
+          )}
+        </PageSectionContent>
+      </PageSection>
+    </PageContainer>
   )
 }
