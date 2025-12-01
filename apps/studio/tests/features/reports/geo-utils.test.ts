@@ -2,9 +2,6 @@ import { describe, expect, test } from 'vitest'
 
 import {
   buildCountsByIso2,
-  buildBaseIso2ToName,
-  normalizeIso2ToName,
-  buildTopoNameToCount,
   getFillColor,
   isMicroCountry,
   isKnownCountryCode,
@@ -25,23 +22,7 @@ describe('geo utils', () => {
     expect(counts).toEqual({ US: 3, SG: 3 })
   })
 
-  test('normalizeIso2ToName applies expected overrides', () => {
-    const base = buildBaseIso2ToName()
-    const norm = normalizeIso2ToName(base)
-    expect(norm['US']).toBe('United States of America')
-    expect(norm['RU']).toBe('Russia')
-    expect(norm['CI']).toBe("Côte d'Ivoire")
-    expect(norm['KR']).toBe('South Korea')
-  })
-
-  test('buildTopoNameToCount maps iso2 counts to normalized names', () => {
-    const counts = { US: 5, KR: 3, RU: 2 }
-    const norm = normalizeIso2ToName(buildBaseIso2ToName())
-    const map = buildTopoNameToCount(counts, norm)
-    expect(map.get('United States of America')).toBe(5)
-    expect(map.get('South Korea')).toBe(3)
-    expect(map.get('Russia')).toBe(2)
-  })
+  // name normalization no longer needed with ISO2-based map dataset
 
   test('getFillColor returns muted color when max=0 or value=0', () => {
     const theme = MAP_CHART_THEME.dark

@@ -33,14 +33,12 @@ import { geoCentroid } from 'd3-geo'
 import { useTheme } from 'next-themes'
 import {
   buildCountsByIso2,
-  buildBaseIso2ToName,
-  normalizeIso2ToName,
-  buildTopoNameToCount,
   getFillColor,
   isMicroCountry,
   isKnownCountryCode,
   computeMarkerRadius,
   MAP_CHART_THEME,
+  extractIso2FromFeatureProps,
 } from 'components/interfaces/Reports/utils/geo'
 
 export const NetworkTrafficRenderer = (
@@ -402,7 +400,6 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
     </CollapsibleContent_Shadcn_>
   </Collapsible_Shadcn_>
 )
-
 export const RequestsByCountryMapRenderer = (
   props: ReportWidgetProps<{
     country: string | null
@@ -418,14 +415,19 @@ export const RequestsByCountryMapRenderer = (
     subtitle: string
     visible: boolean
   }>({ x: 0, y: 0, title: '', subtitle: '', visible: false })
-  // Build core lookups
+
   const countsByIso2 = buildCountsByIso2(props.data)
   const max = Object.values(countsByIso2).reduce((m, v) => (v > m ? v : m), 0)
-  const baseIso2ToName = buildBaseIso2ToName()
-  const iso2ToName = normalizeIso2ToName(baseIso2ToName)
-  const topoNameToCount = buildTopoNameToCount(countsByIso2, iso2ToName)
-  const { resolvedTheme } = useTheme()
-  const theme = resolvedTheme === 'dark' ? MAP_CHART_THEME.dark : MAP_CHART_THEME.light
+  const prefersDark =
+    typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+  const theme = prefersDark ? MAP_CHART_THEME.dark : MAP_CHART_THEME.light
+
+  if (!!props.error) {
+    const error = (
+      typeof props.error === 'string' ? { message: props.error } : props.error
+    ) as ResponseError
+    return <AlertError subject="Failed to retrieve requests by country" error={error} />
+  }
 
   return (
     <div ref={containerRef} className="w-full h-[560px] relative border-t">
@@ -444,7 +446,10 @@ export const RequestsByCountryMapRenderer = (
                     (geo.properties?.name as string) ||
                     (geo.properties?.NAME as string) ||
                     'Unknown'
-                  const value = topoNameToCount.get(title) || 0
+                  const iso2 = extractIso2FromFeatureProps(
+                    (geo.properties || undefined) as Record<string, unknown> | undefined
+                  )
+                  const value = iso2 ? countsByIso2[iso2] || 0 : 0
                   const tooltipTitle = title
                   const tooltipSubtitle = `${value.toLocaleString()} requests`
                   return (
@@ -513,7 +518,10 @@ export const RequestsByCountryMapRenderer = (
                     (geo.properties?.NAME as string) ||
                     'Unknown'
                   if (!isMicroCountry(title)) return null
-                  const value = topoNameToCount.get(title) || 0
+                  const iso2 = extractIso2FromFeatureProps(
+                    (geo.properties || undefined) as Record<string, unknown> | undefined
+                  )
+                  const value = iso2 ? countsByIso2[iso2] || 0 : 0
                   if (value <= 0) return null
                   const [lon, lat] = geoCentroid(geo)
                   const r = computeMarkerRadius(value, max)
@@ -557,21 +565,21 @@ export const RequestsByCountryMapRenderer = (
                 {(() => {
                   const present = new Set<string>()
                   for (const g of geographies) {
-                    const n =
-                      (g.properties?.name as string) || (g.properties?.NAME as string) || undefined
-                    if (n) present.add(n)
+                    const code = extractIso2FromFeatureProps(
+                      (g.properties || undefined) as Record<string, unknown> | undefined
+                    )
+                    if (code) present.add(code)
                   }
 
                   const markers: JSX.Element[] = []
                   for (const iso2 in countsByIso2) {
                     const count = countsByIso2[iso2]
                     if (count <= 0) continue
-                    const countryName = iso2ToName[iso2] || iso2
-                    if (present.has(countryName)) continue
+                    if (present.has(iso2)) continue
                     if (!isKnownCountryCode(iso2)) continue
                     const ll = COUNTRY_LAT_LON[iso2]
                     const r = computeMarkerRadius(count, max)
-                    const tooltipTitle = countryName
+                    const tooltipTitle = iso2
                     const tooltipSubtitle = `${count.toLocaleString()} requests`
                     markers.push(
                       <Marker

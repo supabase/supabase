@@ -55,52 +55,6 @@ export const buildCountsByIso2 = (rows: CountryCountRow[]): Record<string, numbe
   return counts
 }
 
-export const buildBaseIso2ToName = (): Record<string, string> => {
-  const map: Record<string, string> = {}
-  for (const c of COUNTRIES) {
-    map[c.code] = c.name
-  }
-  return map
-}
-
-export const normalizeIso2ToName = (base: Record<string, string>): Record<string, string> => {
-  const map = { ...base }
-  map['US'] = 'United States of America'
-  map['RU'] = 'Russia'
-  map['CD'] = 'Democratic Republic of the Congo'
-  map['CG'] = 'Republic of the Congo'
-  map['CI'] = "Côte d'Ivoire"
-  map['BO'] = 'Bolivia'
-  map['BN'] = 'Brunei'
-  map['IR'] = 'Iran'
-  map['LA'] = 'Laos'
-  map['KR'] = 'South Korea'
-  map['KP'] = 'North Korea'
-  map['SY'] = 'Syria'
-  map['TZ'] = 'Tanzania'
-  map['VE'] = 'Venezuela'
-  map['VN'] = 'Vietnam'
-  // Common alternative endonyms that might appear in topo datasets
-  if (map['CZ'] === 'Czech Republic') map['CZ'] = 'Czechia'
-  if (map['SZ'] === 'Eswatini') map['SZ'] = 'Eswatini'
-  if (map['MM'] === 'Myanmar') map['MM'] = 'Myanmar'
-  if (map['MK'] === 'North Macedonia') map['MK'] = 'North Macedonia'
-  return map
-}
-
-export const buildTopoNameToCount = (
-  countsByIso2: Record<string, number>,
-  iso2ToName: Record<string, string>
-): Map<string, number> => {
-  const map = new Map<string, number>()
-  for (const iso2 in countsByIso2) {
-    const name = iso2ToName[iso2] || iso2
-    const current = map.get(name) || 0
-    map.set(name, current + countsByIso2[iso2])
-  }
-  return map
-}
-
 export const getFillColor = (
   value: number,
   max: number,
@@ -142,4 +96,14 @@ export const isKnownCountryCode = (code: string): code is keyof typeof COUNTRY_L
 export const computeMarkerRadius = (value: number, max: number): number => {
   if (max <= 0) return 2
   return Math.max(1.5, Math.min(4, (value / max) * 4))
+}
+
+export const extractIso2FromFeatureProps = (
+  props: Record<string, unknown> | null | undefined
+): string | undefined => {
+  if (!props) return undefined
+  const raw = (props['ISO_A2_EH'] ?? props['ISO_A2']) as unknown
+  if (typeof raw !== 'string') return undefined
+  const code = raw.trim().toUpperCase()
+  return /^[A-Z]{2}$/.test(code) ? code : undefined
 }
