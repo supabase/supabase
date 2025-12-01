@@ -1,7 +1,7 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { AnimatePresence, motion } from 'framer-motion'
 import { toPng } from 'html-to-image'
-import { Camera, CircleCheck, Image as ImageIcon, Upload, X } from 'lucide-react'
+import { Camera, CircleCheck, HelpCircle, Image as ImageIcon, Upload, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -14,7 +14,6 @@ import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
 import { timeout } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import {
@@ -158,15 +157,15 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
     <ThanksMessage onClose={onClose} />
   ) : (
     <>
-      <div>
+      <>
         <div className="px-5 pb-4">
           <TextArea_Shadcn_
-            placeholder="It would be great if..."
-            rows={5}
+            placeholder="My idea for improving Supabase is..."
+            rows={6}
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
             onPaste={handlePasteEvent}
-            className="text-sm mt-4 mb-1"
+            className="text-sm mt-4 mb-1 resize-none"
           />
         </div>
 
@@ -181,7 +180,7 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
             >
               <Admonition
                 type="caution"
-                title="This looks like an issue that's better handled by support"
+                title="This looks like an issue that’s better handled by support"
                 className="rounded-none border-x-0 border-b-0 mb-0 [&>h5]:text-xs [&>h5]:mb-0.5"
               >
                 <p className="text-xs text-foreground-light !leading-tight">
@@ -201,29 +200,11 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </>
 
       <PopoverSeparator_Shadcn_ />
 
-      <div className="px-5 flex flex-row justify-between items-start mt-4">
-        <div>
-          <p className="text-xs text-foreground">Have a technical issue?</p>
-          <p className="text-xs text-foreground-light">
-            Contact{' '}
-            <SupportLink>
-              <span className="cursor-pointer text-brand-link transition-colors hover:text-brand-600">
-                support
-              </span>
-            </SupportLink>{' '}
-            or{' '}
-            <a href={`${DOCS_URL}`} target="_blank" rel="noreferrer">
-              <span className="cursor-pointer text-brand-link transition-colors hover:text-brand-600">
-                see docs
-              </span>
-            </a>
-            .
-          </p>
-        </div>
+      <div className="px-5 flex flex-row justify-end items-start mt-4">
         <div className="flex items-center gap-2 flex-row">
           {!!screenshot ? (
             <div
@@ -312,24 +293,19 @@ const ThanksMessage = ({ onClose }: { onClose: () => void }) => {
   return (
     <div className="px-0 pt-3 pb-0">
       <div className="grid gap-3">
-        <div className="px-6 grid gap-3 py-2 text-center text-foreground-light">
+        <div className="px-6 grid gap-4 py-3 text-center text-foreground-light">
           <CircleCheck className="mx-auto text-brand-500" size={24} />
-          <p className="text-foreground text-base">Your feedback has been sent. Thanks!</p>
-          <p className="text-sm ">
-            We do not always respond to feedback. If you require assistance, please contact support
-            instead.
-          </p>
+          <div className="text-center flex flex-col">
+            <p className="text-foreground text-base">Your feedback has been sent. Thanks!</p>
+            <p className="text-sm text-balance">
+              We don’t always respond to feedback. If you require assistance, please contact support
+              via the <HelpCircle className="inline-block" size={12} aria-label="Help" /> menu
+              instead.
+            </p>
+          </div>
         </div>
         <PopoverSeparator_Shadcn_ />
-        <div className="flex items-center justify-between px-4">
-          <p className="text-xs text-foreground-light">
-            <SupportLink>
-              <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
-                Create a Support Ticket
-              </span>
-            </SupportLink>
-          </p>
-
+        <div className="flex items-center justify-end px-4">
           <Button type="default" onClick={onClose}>
             Close
           </Button>
