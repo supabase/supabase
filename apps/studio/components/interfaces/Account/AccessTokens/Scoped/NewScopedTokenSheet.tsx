@@ -26,7 +26,12 @@ import { Admonition } from 'ui-patterns'
 import { BasicInfo } from './Form/BasicInfo'
 import { Permissions } from './Form/Permissions'
 import { ResourceAccess } from './Form/ResourceAccess'
-import { mapPermissionToFGA, ExpiresAtOptions } from '../AccessToken.constants'
+import {
+  mapPermissionToFGA,
+  ExpiresAtOptions,
+  getFGARelationName,
+  type ScopedAccessTokenPermission,
+} from '../AccessToken.constants'
 
 const PermissionRowSchema = z.object({
   resource: z.string().min(1, 'Please select a resource'),
@@ -146,9 +151,9 @@ export const NewScopedTokenSheet = ({
     const permissions = permissionRows
       .flatMap((row) => {
         const { resource, action } = row
-        return mapPermissionToFGA(resource, action)
+        return mapPermissionToFGA(resource, action).map(getFGARelationName)
       })
-      .filter(Boolean) as any
+      .filter(Boolean) as ScopedAccessTokenPermission[]
 
     if (!permissions || permissions.length === 0) {
       toast.error('Please configure at least one valid permission.')

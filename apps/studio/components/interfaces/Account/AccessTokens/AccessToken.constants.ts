@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { components } from 'api-types'
 
-type ScopedAccessTokenPermission =
+export type ScopedAccessTokenPermission =
   components['schemas']['CreateScopedAccessTokenBody']['permissions'][number]
 
 export const NON_EXPIRING_TOKEN_VALUE = 'never'
@@ -208,10 +208,10 @@ const RESOURCE_CONFIGS: Record<string, ResourceConfig> = {
     basePermission: 'edge_functions_secrets',
     actions: ['read', 'write'],
   },
-  'project:infra:add-ons': {
+  'project:infra:add_ons': {
     scope: 'project',
     title: 'Manage project infrastructure add-ons',
-    basePermission: 'infra_add-ons',
+    basePermission: 'infra_add_ons',
     actions: ['read', 'write'],
   },
   'project:infra:read_replicas': {
@@ -349,13 +349,16 @@ export const PERMISSIONS_UI = [
 ]
 
 export const ACCESS_TOKEN_PERMISSIONS = PERMISSIONS_UI
+
 export const PERMISSION_TO_FGA_RELATION_MAP: Record<string, string> = {
-  'infra_add-ons_read': 'infra_addons_read',
-  'infra_add-ons_write': 'infra_addons_write',
+  infra_add_ons_read: 'infra_add-ons_read',
+  infra_add_ons_write: 'infra_add-ons_write',
 }
 
-export const getFGARelationName = (permission: ScopedAccessTokenPermission): string => {
-  return PERMISSION_TO_FGA_RELATION_MAP[permission] || permission
+export const getFGARelationName = (
+  permission: ScopedAccessTokenPermission
+): ScopedAccessTokenPermission => {
+  return (PERMISSION_TO_FGA_RELATION_MAP[permission] || permission) as ScopedAccessTokenPermission
 }
 
 export const mapPermissionToFGA = (
