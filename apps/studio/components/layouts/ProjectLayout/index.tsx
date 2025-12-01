@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
 
 import { useFlag, useParams } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
@@ -83,7 +83,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     ref
   ) => {
     const router = useRouter()
-    const [isClient, setIsClient] = useState(false)
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
     const { mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
@@ -110,10 +109,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
     const showPausedState = isPaused && !ignorePausedState
 
-    useEffect(() => {
-      setIsClient(true)
-    }, [])
-
     return (
       <>
         <Head>
@@ -131,12 +126,14 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
           <meta name="description" content="Supabase Studio" />
         </Head>
         <div className="flex flex-row h-full w-full">
-          <ResizablePanelGroup direction="horizontal" autoSaveId="project-layout">
+          {/* autoSaveId="project-layout" */}
+          <ResizablePanelGroup direction="horizontal">
             {showProductMenu && productMenu && (
               <ResizablePanel
                 order={1}
+                minSize={20}
                 maxSize={33}
-                defaultSize={1}
+                defaultSize={20}
                 id="panel-left"
                 className={cn(
                   'hidden md:block',
@@ -179,8 +176,10 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
               />
             )}
             <ResizablePanel
-              defaultSize={1}
               order={2}
+              minSize={67}
+              maxSize={80}
+              defaultSize={80}
               id="panel-project-content"
               className={cn('h-full flex flex-col w-full xl:min-w-[600px] bg-dash-sidebar')}
             >
