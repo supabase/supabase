@@ -31,6 +31,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
+  TableHeadSort,
   TableRow,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -47,8 +48,6 @@ import {
 const OAUTH_APPS_SORT_VALUES = [
   'name:asc',
   'name:desc',
-  'client_id:asc',
-  'client_id:desc',
   'client_type:asc',
   'client_type:desc',
   'registration_type:asc',
@@ -293,45 +292,38 @@ export const OAuthAppsList = () => {
             <Table containerProps={{ stickyLastColumn: true }}>
               <TableHeader>
                 <TableRow>
-                  <TableHead
-                    sortable
-                    column="name"
-                    currentSort={sort}
-                    onSortChange={handleSortChange}
-                  >
-                    Name
+                  <TableHead>
+                    <TableHeadSort column="name" currentSort={sort} onSortChange={handleSortChange}>
+                      Name
+                    </TableHeadSort>
                   </TableHead>
-                  <TableHead
-                    sortable
-                    column="client_id"
-                    currentSort={sort}
-                    onSortChange={handleSortChange}
-                  >
-                    Client ID
+                  <TableHead>Client ID</TableHead>
+                  <TableHead>
+                    <TableHeadSort
+                      column="client_type"
+                      currentSort={sort}
+                      onSortChange={handleSortChange}
+                    >
+                      Client Type
+                    </TableHeadSort>
                   </TableHead>
-                  <TableHead
-                    sortable
-                    column="client_type"
-                    currentSort={sort}
-                    onSortChange={handleSortChange}
-                  >
-                    Client Type
+                  <TableHead>
+                    <TableHeadSort
+                      column="registration_type"
+                      currentSort={sort}
+                      onSortChange={handleSortChange}
+                    >
+                      Registration Type
+                    </TableHeadSort>
                   </TableHead>
-                  <TableHead
-                    sortable
-                    column="registration_type"
-                    currentSort={sort}
-                    onSortChange={handleSortChange}
-                  >
-                    Registration Type
-                  </TableHead>
-                  <TableHead
-                    sortable
-                    column="created_at"
-                    currentSort={sort}
-                    onSortChange={handleSortChange}
-                  >
-                    Created
+                  <TableHead>
+                    <TableHeadSort
+                      column="created_at"
+                      currentSort={sort}
+                      onSortChange={handleSortChange}
+                    >
+                      Created
+                    </TableHeadSort>
                   </TableHead>
                   <TableHead className="w-8 px-0">
                     <div className="!bg-200 px-4 w-full h-full flex items-center border-l @[944px]:border-l-0" />

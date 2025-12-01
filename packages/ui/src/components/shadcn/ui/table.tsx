@@ -54,64 +54,47 @@ TableFooter.displayName = 'TableFooter'
 
 const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTMLTableRowElement>>(
   ({ className, ...props }, ref) => (
-    <tr
-      ref={ref}
-      className={cn(
-        'border-b [&>td]:hover:bg-surface-200 data-[state=selected]:bg-muted',
-        className
-      )}
-      {...props}
-    />
+    <tr ref={ref} className={cn('border-b data-[state=selected]:bg-muted', className)} {...props} />
   )
 )
 TableRow.displayName = 'TableRow'
 
-interface TableHeadSortableProps<TColumn extends string = string> {
-  sortable: true
+const TableHead = React.forwardRef<
+  HTMLTableCellElement,
+  React.ThHTMLAttributes<HTMLTableCellElement>
+>(({ className, ...props }, ref) => (
+  <th
+    ref={ref}
+    className={cn(
+      'h-10 px-4 text-left align-middle heading-meta whitespace-nowrap text-foreground-lighter [&:has([role=checkbox])]:pr-0',
+      className
+    )}
+    {...props}
+  />
+))
+TableHead.displayName = 'TableHead'
+
+interface TableHeadSortProps<TColumn extends string = string> {
   column: TColumn
   currentSort: string
   onSortChange: (column: TColumn) => void
+  children: React.ReactNode
+  className?: string
 }
 
-interface TableHeadNonSortableProps {
-  sortable?: false
-  column?: never
-  currentSort?: never
-  onSortChange?: never
-}
+function TableHeadSort<TColumn extends string = string>({
+  column,
+  currentSort,
+  onSortChange,
+  children,
+  className,
+}: TableHeadSortProps<TColumn>) {
+  const [currentCol, currentOrder] = currentSort.split(':')
+  const isActive = currentCol === column
+  const isAsc = isActive && currentOrder === 'asc'
+  const isDesc = isActive && currentOrder === 'desc'
 
-type TableHeadProps<TColumn extends string = string> =
-  React.ThHTMLAttributes<HTMLTableCellElement> &
-    (TableHeadSortableProps<TColumn> | TableHeadNonSortableProps)
-
-const TableHead = React.forwardRef(TableHeadInner) as (<TColumn extends string = string>(
-  props: TableHeadProps<TColumn> & { ref?: React.Ref<HTMLTableCellElement> }
-) => React.ReactElement) & { displayName?: string }
-
-TableHead.displayName = 'TableHead'
-
-function TableHeadInner<TColumn extends string = string>(
-  {
-    className,
-    sortable,
-    column,
-    currentSort,
-    onSortChange,
-    children,
-    onClick,
-    onMouseEnter,
-    onMouseLeave,
-    ...props
-  }: TableHeadProps<TColumn>,
-  ref: React.Ref<HTMLTableCellElement>
-) {
   const getSortIcon = () => {
-    if (!sortable || !column || !currentSort) return null
-
-    const [currentCol, currentOrder] = currentSort.split(':')
-    const isActive = currentCol === column
-    const isAsc = isActive && currentOrder === 'asc'
-    const isDesc = isActive && currentOrder === 'desc'
     const baseIconClass = 'w-3 h-3 absolute inset-0'
 
     return (
@@ -134,42 +117,28 @@ function TableHeadInner<TColumn extends string = string>(
           className={cn(
             baseIconClass,
             'transition-opacity opacity-80 md:opacity-0',
-            !isActive && 'group-hover/table:opacity-40 group-hover/table-head:opacity-80'
+            !isActive && 'group-hover/table:opacity-40 group-hover/table-head-sort:opacity-80'
           )}
         />
       </>
     )
   }
 
-  const handleClick = (e: React.MouseEvent<HTMLTableCellElement>) => {
-    if (sortable && column && onSortChange) {
-      onSortChange(column)
-    } else if (onClick) {
-      onClick(e)
-    }
-  }
-
-  const thClassName = cn(
-    'h-10 px-4 text-left align-middle heading-meta whitespace-nowrap text-foreground-lighter [&:has([role=checkbox])]:pr-0',
-    sortable && 'cursor-pointer select-none',
-    className
-  )
-
-  const content = sortable ? (
-    <div className="group/table-head flex items-center gap-1 !bg-transparent">
+  return (
+    <button
+      type="button"
+      className={cn(
+        'group/table-head-sort flex items-center gap-1 cursor-pointer select-none !bg-transparent border-none p-0 w-full text-left',
+        className
+      )}
+      onClick={() => onSortChange(column)}
+    >
       {children}
       <div className="w-3 h-3 relative overflow-hidden">{getSortIcon()}</div>
-    </div>
-  ) : (
-    children
-  )
-
-  return (
-    <th ref={ref} className={thClassName} onClick={handleClick} {...props}>
-      {content}
-    </th>
+    </button>
   )
 }
+TableHeadSort.displayName = 'TableHeadSort'
 
 const TableCell = React.forwardRef<
   HTMLTableCellElement,
@@ -191,4 +160,14 @@ const TableCaption = React.forwardRef<
 ))
 TableCaption.displayName = 'TableCaption'
 
-export { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow }
+export {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableHeadSort,
+  TableRow,
+}

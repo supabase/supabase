@@ -48,20 +48,22 @@ import {
 </Table>
 ```
 
-## Sortable TableHead
+## Sortable Columns
 
-`TableHead` supports sorting by passing `sortable`, `column`, `currentSort`, and `onSortChange` optional props.
+Use `TableHeadSort` inside `TableHead` to enable column sorting.
 
 | Prop           | Type                       | Description                                                        |
 | -------------- | -------------------------- | ------------------------------------------------------------------ |
-| `sortable`     | `boolean`                  | Enables sorting functionality for the column.                      |
 | `column`       | `string`                   | Unique identifier for the column                                   |
 | `currentSort`  | `string`                   | Current sort state in format `"column:order"` (e.g., `"name:asc"`) |
 | `onSortChange` | `(column: string) => void` | Callback fired when column header is clicked                       |
+| `children`     | `React.ReactNode`          | Column header content                                              |
 
 ```tsx
-<TableHead sortable column="name" currentSort={sort} onSortChange={handleSortChange}>
-  Name
+<TableHead>
+  <TableHeadSort column="name" currentSort={sort} onSortChange={handleSortChange}>
+    Name
+  </TableHeadSort>
 </TableHead>
 ```
 
