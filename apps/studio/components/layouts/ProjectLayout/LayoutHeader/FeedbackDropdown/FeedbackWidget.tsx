@@ -34,6 +34,81 @@ interface FeedbackWidgetProps {
   onClose: () => void
 }
 
+/**
+ * Client-side heuristic to quickly detect obvious support requests
+ * This provides immediate feedback before the AI classification completes
+ */
+function isLikelySupportRequest(text: string): boolean {
+  if (!text || text.trim().length === 0) return false
+
+  const lowerText = text.toLowerCase()
+
+  // Common support request patterns
+  const supportPatterns = [
+    // Help requests
+    /i need help with/i,
+    /i'm having trouble/i,
+    /i'm having issues/i,
+    /i'm having problems/i,
+    /can you help/i,
+    /could you help/i,
+    /please help/i,
+    /need help/i,
+    /how do i/i,
+    /how can i/i,
+    /how to/i,
+    /why isn't/i,
+    /why doesn't/i,
+    /why won't/i,
+    /why can't/i,
+
+    // Problem indicators
+    /it's not working/i,
+    /it doesn't work/i,
+    /it won't work/i,
+    /it can't work/i,
+    /isn't working/i,
+    /doesn't work/i,
+    /won't work/i,
+    /can't work/i,
+    /i can't/i,
+    /i cannot/i,
+    /i'm unable to/i,
+    /unable to/i,
+
+    // Bug/error indicators
+    /\bbug\b/i,
+    /\bbroken\b/i,
+    /\berror\b/i,
+    /\berrors\b/i,
+    /\bfailed\b/i,
+    /\bfailure\b/i,
+    /\bfailing\b/i,
+    /\bcrash\b/i,
+    /\bcrashed\b/i,
+    /\bcrashing\b/i,
+
+    // Issue/problem keywords
+    /\bissue\b/i,
+    /\bissues\b/i,
+    /\bproblem\b/i,
+    /\bproblems\b/i,
+    /\btrouble\b/i,
+    /\bdifficulty\b/i,
+    /\bdifficulties\b/i,
+
+    // Support-specific phrases
+    /support ticket/i,
+    /contact support/i,
+    /get help/i,
+    /need assistance/i,
+    /require assistance/i,
+    /technical support/i,
+  ]
+
+  return supportPatterns.some((pattern) => pattern.test(lowerText))
+}
+
 export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
   const router = useRouter()
   const { profile } = useProfile()
@@ -58,6 +133,10 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
   )
 
   const { data: category } = useFeedbackCategoryQuery({ prompt: debouncedFeedback })
+
+  // Use client-side heuristic for immediate feedback, AI result takes precedence when available
+  const isLikelySupport = isLikelySupportRequest(feedback)
+  const effectiveCategory = category ?? (isLikelySupport ? 'support' : null)
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: submitFeedback } = useSendFeedbackMutation({
@@ -170,20 +249,20 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
         </div>
 
         <AnimatePresence>
-          {category === 'support' && (
+          {effectiveCategory === 'support' && (
             <motion.div
               key="support-alert"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 16 }}
-              transition={{ duration: 0.25 }}
+              transition={{ duration: 0.2 }}
             >
               <Admonition
                 type="caution"
                 title="This looks like an issue that’s better handled by support"
-                className="rounded-none border-x-0 border-b-0 mb-0 [&>h5]:text-xs [&>h5]:mb-0.5"
+                className="rounded-none border-x-0 border-b-0 mb-0 [&>h5]:text-xs [&>h5]:mb-0.5 text-balance"
               >
-                <p className="text-xs text-foreground-light !leading-tight">
+                <p className="text-xs text-foreground-light !leading-normal">
                   Please{' '}
                   <SupportLink
                     className={cn(
