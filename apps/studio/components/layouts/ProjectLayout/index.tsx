@@ -126,8 +126,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
           <meta name="description" content="Supabase Studio" />
         </Head>
         <div className="flex flex-row h-full w-full">
-          {/* autoSaveId="project-layout" */}
-          <ResizablePanelGroup direction="horizontal">
+          <ResizablePanelGroup direction="horizontal" autoSaveId="project-layout">
             {showProductMenu && productMenu && (
               <ResizablePanel
                 order={1}

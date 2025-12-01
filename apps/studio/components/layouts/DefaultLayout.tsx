@@ -10,10 +10,10 @@ import { useCheckLatestDeploy } from 'hooks/use-check-latest-deploy'
 import { useAppStateSnapshot } from 'state/app-state'
 import { ResizablePanel, ResizablePanelGroup, SidebarProvider } from 'ui'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader/LayoutHeader'
-import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
-import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
 import { LayoutSidebarProvider } from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
+import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 
 export interface DefaultLayoutProps {
   headerTitle?: string
@@ -82,7 +82,14 @@ const DefaultLayout = ({
                   className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
                   autoSaveId="default-layout-content"
                 >
-                  <ResizablePanel id="panel-content" defaultSize={1} className="w-full">
+                  <ResizablePanel
+                    id="panel-content"
+                    order={1}
+                    minSize={50}
+                    maxSize={70}
+                    defaultSize={70}
+                    className="w-full"
+                  >
                     <div className="h-full overflow-y-auto">{children}</div>
                   </ResizablePanel>
                   <LayoutSidebar />
