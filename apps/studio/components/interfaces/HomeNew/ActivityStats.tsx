@@ -81,7 +81,7 @@ export const ActivityStats = () => {
           value={
             isLoadingMigrations ? (
               <Skeleton className="h-6 w-24" />
-            ) : latestMigration ? (
+            ) : versionLabel && versionTimestamp ? (
               <TimestampInfo
                 className="text-base"
                 label={versionLabel}
