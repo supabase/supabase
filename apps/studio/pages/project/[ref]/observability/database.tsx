@@ -37,7 +37,7 @@ import { getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
@@ -140,38 +140,45 @@ const DatabaseUsage = () => {
     },
   })
 
-  const onRefreshReport = async () => {
-    if (!selectedDateRange) return
+  const onRefreshReport = useRefreshHandler(
+    datePickerValue,
+    datePickerHelpers,
+    handleDatePickerChange,
+    async () => {
+      if (!selectedDateRange) return
 
-    setIsRefreshing(true)
-    refresh()
-    const { period_start, period_end, interval } = selectedDateRange
-    REPORT_ATTRIBUTES.forEach((chart: any) => {
-      chart.attributes.forEach((attr: any) => {
+      setIsRefreshing(true)
+      refresh()
+      const { period_start, period_end, interval } = selectedDateRange
+
+      REPORT_ATTRIBUTES.flatMap((chart) => chart.attributes || [])
+        .filter((attr): attr is MultiAttribute => attr !== false)
+        .forEach((attr) => {
+          queryClient.invalidateQueries({
+            queryKey: analyticsKeys.infraMonitoring(ref, {
+              attribute: attr.attribute,
+              startDate: period_start.date,
+              endDate: period_end.date,
+              interval,
+              databaseIdentifier: state.selectedDatabaseId,
+            }),
+          })
+        })
+
+      if (isReplicaSelected) {
         queryClient.invalidateQueries({
           queryKey: analyticsKeys.infraMonitoring(ref, {
-            attribute: attr.attribute,
+            attribute: 'physical_replication_lag_physical_replica_lag_seconds',
             startDate: period_start.date,
             endDate: period_end.date,
             interval,
             databaseIdentifier: state.selectedDatabaseId,
           }),
         })
-      })
-    })
-    if (isReplicaSelected) {
-      queryClient.invalidateQueries({
-        queryKey: analyticsKeys.infraMonitoring(ref, {
-          attribute: 'physical_replication_lag_physical_replica_lag_seconds',
-          startDate: period_start.date,
-          endDate: period_end.date,
-          interval,
-          databaseIdentifier: state.selectedDatabaseId,
-        }),
-      })
+      }
+      setTimeout(() => setIsRefreshing(false), 1000)
     }
-    setTimeout(() => setIsRefreshing(false), 1000)
-  }
+  )
 
   const stateSyncedFromUrlRef = useRef(false)
   useEffect(() => {

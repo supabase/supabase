@@ -142,7 +142,7 @@ Sentry.init({
       },
     }),
 
-    // or @sentry/WinterCGFetch for Next.js Middleware & Edge Functions
+    // or @sentry/WinterCGFetch for Next.js Proxy & Edge Functions
     Sentry.winterCGFetchIntegration({
       breadcrumbs: true,
       shouldCreateSpanForRequest: (url) => {
@@ -223,7 +223,7 @@ Sentry.init({
 
 </TabPanel>
 
-<TabPanel id="edge" label="Middleware & Edge">
+<TabPanel id="edge" label="Proxy & Edge">
 
 ```js sentry.edge.config.ts
 import * as Sentry from '@sentry/nextjs'
