@@ -4,8 +4,9 @@ import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCr
 export type CountryCountRow = { country: string | null; count: number | string }
 
 export interface MapChartTheme {
-  zeroFill: string // the background color of the map when there are no requests
-  scale: [string, string, string, string, string] // low -> high
+  zeroFill: string // fill for countries with zero (or when max=0)
+  brandFill: string // base fill color (same for all, vary by opacity)
+  opacityScale: [number, number, number, number, number] // low -> high opacities
   boundaryStroke: string
   boundaryStrokeHover: string
   markerFill: string
@@ -15,30 +16,20 @@ export interface MapChartTheme {
 export const MAP_CHART_THEME: { light: MapChartTheme; dark: MapChartTheme } = {
   light: {
     zeroFill: 'hsl(var(--background-surface-400))',
-    scale: [
-      'hsl(var(--brand-200))',
-      'hsl(var(--brand-300))',
-      'hsl(var(--brand-400))',
-      'hsl(var(--brand-500))',
-      'hsl(var(--brand-600))',
-    ],
+    brandFill: 'hsl(var(--brand-default))',
+    opacityScale: [0.18, 0.32, 0.5, 0.68, 0.86],
     boundaryStroke: 'hsla(var(--brand-300), 0.6)',
     boundaryStrokeHover: 'hsl(var(--brand-500))',
-    markerFill: 'hsl(var(--brand-500))',
+    markerFill: 'hsl(var(--brand-default))',
     oceanFill: 'transparent',
   },
   dark: {
     zeroFill: 'hsl(var(--background-selection))',
-    scale: [
-      'hsl(var(--brand-200))',
-      'hsl(var(--brand-300))',
-      'hsl(var(--brand-400))',
-      'hsl(var(--brand-500))',
-      'hsl(var(--brand-600))',
-    ],
+    brandFill: 'hsl(var(--brand-default))',
+    opacityScale: [0.18, 0.32, 0.5, 0.68, 0.86],
     boundaryStroke: 'hsla(var(--brand-300), 0.6)',
     boundaryStrokeHover: 'hsl(var(--brand-500))',
-    markerFill: 'hsl(var(--brand-500))',
+    markerFill: 'hsl(var(--brand-default))',
     oceanFill: 'transparent',
   },
 }
@@ -61,12 +52,21 @@ export const getFillColor = (
   theme: MapChartTheme = MAP_CHART_THEME.dark
 ): string => {
   if (max <= 0 || !value) return theme.zeroFill
+  return theme.brandFill
+}
+
+export const getFillOpacity = (
+  value: number,
+  max: number,
+  theme: MapChartTheme = MAP_CHART_THEME.dark
+): number => {
+  if (max <= 0 || !value) return 1
   const ratio = value / max
-  if (ratio > 0.8) return theme.scale[4]
-  if (ratio > 0.6) return theme.scale[3]
-  if (ratio > 0.4) return theme.scale[2]
-  if (ratio > 0.2) return theme.scale[1]
-  return theme.scale[0]
+  if (ratio > 0.8) return theme.opacityScale[4]
+  if (ratio > 0.6) return theme.opacityScale[3]
+  if (ratio > 0.4) return theme.opacityScale[2]
+  if (ratio > 0.2) return theme.opacityScale[1]
+  return theme.opacityScale[0]
 }
 
 const MICRO_COUNTRIES = new Set([
@@ -98,12 +98,28 @@ export const computeMarkerRadius = (value: number, max: number): number => {
   return Math.max(1.5, Math.min(4, (value / max) * 4))
 }
 
+// Best-effort extraction of ISO2 code from feature properties, with name fallback
 export const extractIso2FromFeatureProps = (
-  props: Record<string, unknown> | null | undefined
+  props?: Record<string, unknown>
 ): string | undefined => {
   if (!props) return undefined
-  const raw = (props['ISO_A2_EH'] ?? props['ISO_A2']) as unknown
-  if (typeof raw !== 'string') return undefined
-  const code = raw.trim().toUpperCase()
-  return /^[A-Z]{2}$/.test(code) ? code : undefined
+  const candidates = [
+    'ISO_A2',
+    'iso_a2',
+    'ADMIN_ISO_A2',
+    'WB_A2',
+    'ADM0_A3_IS',
+    'ADM0_A3',
+    'ISO_N3',
+    'id',
+  ]
+  for (const key of candidates) {
+    const v = props[key] as unknown
+    if (typeof v === 'string' && v.length === 2) return v.toUpperCase()
+  }
+  const name =
+    (props['name'] as string | undefined) || (props['NAME'] as string | undefined) || undefined
+  if (!name) return undefined
+  const entry = COUNTRIES.find((c) => c.name === name)
+  return entry?.code
 }

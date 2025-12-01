@@ -34,6 +34,7 @@ import { useTheme } from 'next-themes'
 import {
   buildCountsByIso2,
   getFillColor,
+  getFillOpacity,
   isMicroCountry,
   isKnownCountryCode,
   computeMarkerRadius,
@@ -450,6 +451,7 @@ export const RequestsByCountryMapRenderer = (
                     (geo.properties || undefined) as Record<string, unknown> | undefined
                   )
                   const value = iso2 ? countsByIso2[iso2] || 0 : 0
+                  const baseOpacity = getFillOpacity(value, max, theme)
                   const tooltipTitle = title
                   const tooltipSubtitle = `${value.toLocaleString()} requests`
                   return (
@@ -486,7 +488,7 @@ export const RequestsByCountryMapRenderer = (
                           fill: getFillColor(value, max, theme),
                           stroke: theme.boundaryStroke,
                           strokeWidth: 0.4,
-                          opacity: 1,
+                          opacity: baseOpacity,
                           outline: 'none',
                           cursor: 'default',
                         },
@@ -494,7 +496,7 @@ export const RequestsByCountryMapRenderer = (
                           fill: getFillColor(value, max, theme),
                           stroke: 'transparent',
                           strokeWidth: 0,
-                          opacity: 0.7,
+                          opacity: Math.max(0, baseOpacity * 0.8),
                           outline: 'none',
                           cursor: 'default',
                         },
@@ -502,7 +504,7 @@ export const RequestsByCountryMapRenderer = (
                           fill: getFillColor(value, max, theme),
                           stroke: 'transparent',
                           strokeWidth: 0,
-                          opacity: 0.7,
+                          opacity: Math.max(0, baseOpacity * 0.8),
                           outline: 'none',
                           cursor: 'default',
                         },
