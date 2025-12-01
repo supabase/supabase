@@ -6,7 +6,7 @@ import { useParams } from 'common'
 import { SingleStat } from 'components/ui/SingleStat'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useBackupsQuery } from 'data/database/backups-query'
-import { useMigrationsQuery } from 'data/database/migrations-query'
+import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cn, Skeleton } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
@@ -41,7 +41,10 @@ export const ActivityStats = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const latestMigration = useMemo(() => (migrationsData ?? [])[0], [migrationsData])
+  const latestMigration = useMemo<DatabaseMigration | undefined>(
+    () => (migrationsData ?? [])[0],
+    [migrationsData]
+  )
 
   const { data: backupsData, isLoading: isLoadingBackups } = useBackupsQuery({
     projectRef: project?.ref,
@@ -55,7 +58,7 @@ export const ActivityStats = () => {
   }, [backupsData])
 
   const [versionLabel, versionTimestamp] = useMemo(() => {
-    const { version } = latestMigration
+    const version = latestMigration?.version
 
     const versionDayjs = parseMigrationVersion(version)
     if (versionDayjs) {
