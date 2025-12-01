@@ -17,9 +17,8 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { useApiReport } from 'data/reports/api-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import type { NextPageWithLayout } from 'types'
-import { cn } from 'lib/utils'
 
 export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()
