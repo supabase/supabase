@@ -13,7 +13,11 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(
   ({ className, containerProps, ...props }, ref) => {
     return (
       <ShadowScrollArea {...containerProps}>
-        <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
+        <table
+          ref={ref}
+          className={cn('group/table w-full caption-bottom text-sm', className)}
+          {...props}
+        />
       </ShadowScrollArea>
     )
   }
@@ -80,6 +84,12 @@ type TableHeadProps<TColumn extends string = string> =
   React.ThHTMLAttributes<HTMLTableCellElement> &
     (TableHeadSortableProps<TColumn> | TableHeadNonSortableProps)
 
+const TableHead = React.forwardRef(TableHeadInner) as (<TColumn extends string = string>(
+  props: TableHeadProps<TColumn> & { ref?: React.Ref<HTMLTableCellElement> }
+) => React.ReactElement) & { displayName?: string }
+
+TableHead.displayName = 'TableHead'
+
 function TableHeadInner<TColumn extends string = string>(
   {
     className,
@@ -95,8 +105,6 @@ function TableHeadInner<TColumn extends string = string>(
   }: TableHeadProps<TColumn>,
   ref: React.Ref<HTMLTableCellElement>
 ) {
-  const [isHovered, setIsHovered] = React.useState(false)
-
   const getSortIcon = () => {
     if (!sortable || !column || !currentSort) return null
 
@@ -126,7 +134,8 @@ function TableHeadInner<TColumn extends string = string>(
           className={cn(
             baseIconClass,
             'transition-opacity',
-            !isActive && isHovered ? 'opacity-80' : 'opacity-0'
+            !isDesc && !isAsc && 'group-hover/table:opacity-40',
+            !isActive ? 'group-hover/table-head:opacity-80' : 'opacity-0'
           )}
         />
       </>
@@ -141,24 +150,6 @@ function TableHeadInner<TColumn extends string = string>(
     }
   }
 
-  const handleMouseEnter = (e: React.MouseEvent<HTMLTableCellElement>) => {
-    if (sortable) {
-      setIsHovered(true)
-    }
-    if (onMouseEnter) {
-      onMouseEnter(e)
-    }
-  }
-
-  const handleMouseLeave = (e: React.MouseEvent<HTMLTableCellElement>) => {
-    if (sortable) {
-      setIsHovered(false)
-    }
-    if (onMouseLeave) {
-      onMouseLeave(e)
-    }
-  }
-
   const thClassName = cn(
     'h-10 px-4 text-left align-middle heading-meta whitespace-nowrap text-foreground-lighter [&:has([role=checkbox])]:pr-0',
     sortable && 'cursor-pointer select-none',
@@ -166,7 +157,7 @@ function TableHeadInner<TColumn extends string = string>(
   )
 
   const content = sortable ? (
-    <div className="flex items-center gap-1 !bg-transparent">
+    <div className="group/table-head flex items-center gap-1 !bg-transparent">
       {children}
       <div className="w-3 h-3 relative overflow-hidden">{getSortIcon()}</div>
     </div>
@@ -175,24 +166,11 @@ function TableHeadInner<TColumn extends string = string>(
   )
 
   return (
-    <th
-      ref={ref}
-      className={thClassName}
-      onClick={handleClick}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      {...props}
-    >
+    <th ref={ref} className={thClassName} onClick={handleClick} {...props}>
       {content}
     </th>
   )
 }
-
-const TableHead = React.forwardRef(TableHeadInner) as (<TColumn extends string = string>(
-  props: TableHeadProps<TColumn> & { ref?: React.Ref<HTMLTableCellElement> }
-) => React.ReactElement) & { displayName?: string }
-
-TableHead.displayName = 'TableHead'
 
 const TableCell = React.forwardRef<
   HTMLTableCellElement,
