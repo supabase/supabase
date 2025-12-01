@@ -37,8 +37,8 @@ import {
   PageHeader,
   PageHeaderAside,
   PageHeaderBreadcrumb,
-  PageHeaderFooter,
   PageHeaderMeta,
+  PageHeaderNavigationTabs,
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
@@ -269,7 +269,7 @@ const EdgeFunctionDetailsLayout = ({
           </PageHeaderMeta>
 
           {navigationItems.length > 0 && (
-            <PageHeaderFooter>
+            <PageHeaderNavigationTabs>
               <NavMenu>
                 {navigationItems.map((item) => {
                   const isActive = router.asPath.split('?')[0] === item.href
@@ -280,7 +280,7 @@ const EdgeFunctionDetailsLayout = ({
                   )
                 })}
               </NavMenu>
-            </PageHeaderFooter>
+            </PageHeaderNavigationTabs>
           )}
         </PageHeader>
 

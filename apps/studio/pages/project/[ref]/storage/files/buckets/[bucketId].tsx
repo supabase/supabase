@@ -12,11 +12,10 @@ import { EmptyBucketModal } from 'components/interfaces/Storage/EmptyBucketModal
 import { useSelectedBucket } from 'components/interfaces/Storage/FilesBuckets/useSelectedBucket'
 import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
 import { StorageExplorer } from 'components/interfaces/Storage/StorageExplorer/StorageExplorer'
+import { useBucketPolicyCount } from 'components/interfaces/Storage/useBucketPolicyCount'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-import { Bucket } from 'data/storage/buckets-query'
-import { useStoragePolicyCounts } from 'hooks/storage/useStoragePolicyCounts'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
@@ -46,7 +45,7 @@ const BucketPage: NextPageWithLayout = () => {
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const { getPolicyCount } = useStoragePolicyCounts(bucket ? [bucket as Bucket] : [])
+  const { getPolicyCount } = useBucketPolicyCount()
   const policyCount = bucket ? getPolicyCount(bucket.id) : 0
 
   useEffect(() => {

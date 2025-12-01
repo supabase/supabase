@@ -7,11 +7,6 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import PolicyEditorModal from 'components/interfaces/Auth/Policies/PolicyEditorModal'
-import {
-  ScaffoldSection,
-  ScaffoldSectionDescription,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
@@ -23,6 +18,15 @@ import { Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { formatPoliciesForStorage } from '../Storage.utils'
 import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
 import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
@@ -224,103 +228,119 @@ export const StoragePolicies = () => {
 
   return (
     <>
-      {isLoading ? (
-        <ScaffoldSection isFullWidth>
-          <GenericSkeletonLoader />
-        </ScaffoldSection>
-      ) : (
-        <div>
-          <ScaffoldSection isFullWidth>
-            <ScaffoldSectionTitle>Buckets</ScaffoldSectionTitle>
-            <ScaffoldSectionDescription className="mb-6">
-              Write policies for each bucket to control access to the bucket and its contents
-            </ScaffoldSectionDescription>
-            {buckets.length === 0 && <StoragePoliciesPlaceholder />}
+      <PageContainer>
+        {isLoading ? (
+          <PageSection>
+            <PageSectionContent>
+              <GenericSkeletonLoader />
+            </PageSectionContent>
+          </PageSection>
+        ) : (
+          <div>
+            <PageSection>
+              <PageSectionMeta>
+                <PageSectionSummary>
+                  <PageSectionTitle>Buckets</PageSectionTitle>
+                  <PageSectionDescription>
+                    Write policies for each bucket to control access to the bucket and its contents
+                  </PageSectionDescription>
+                </PageSectionSummary>
+              </PageSectionMeta>
+              <PageSectionContent>
+                {buckets.length === 0 && <StoragePoliciesPlaceholder />}
 
-            {buckets.length > 0 && (
-              <div className="mb-4">
-                <Input
-                  size="tiny"
-                  placeholder="Filter buckets"
-                  className="block"
-                  containerClassName="w-full lg:w-52"
-                  value={searchString || ''}
-                  onChange={(e) => {
-                    const str = e.target.value
-                    setSearchString(str)
-                  }}
-                  icon={<Search />}
-                  actions={
-                    searchString ? (
-                      <Button
-                        size="tiny"
-                        type="text"
-                        className="p-0 h-5 w-5"
-                        icon={<X />}
-                        onClick={() => setSearchString('')}
+                {buckets.length > 0 && (
+                  <div className="mb-4">
+                    <Input
+                      size="tiny"
+                      placeholder="Filter buckets"
+                      className="block"
+                      containerClassName="w-full lg:w-52"
+                      value={searchString || ''}
+                      onChange={(e) => {
+                        const str = e.target.value
+                        setSearchString(str)
+                      }}
+                      icon={<Search />}
+                      actions={
+                        searchString ? (
+                          <Button
+                            size="tiny"
+                            type="text"
+                            className="p-0 h-5 w-5"
+                            icon={<X />}
+                            onClick={() => setSearchString('')}
+                          />
+                        ) : null
+                      }
+                    />
+                  </div>
+                )}
+
+                {searchString.length > 0 && filteredBucketsWithPolicies.length === 0 && (
+                  <NoSearchResults
+                    searchString={searchString}
+                    onResetFilter={() => setSearchString('')}
+                  />
+                )}
+
+                {/* Sections for policies grouped by buckets */}
+                <div className="flex flex-col gap-y-4">
+                  {filteredBucketsWithPolicies.map(({ bucket, policies }) => {
+                    return (
+                      <StoragePoliciesBucketRow
+                        key={bucket.name}
+                        table="objects"
+                        label={bucket.name}
+                        bucket={bucket}
+                        policies={policies}
+                        onSelectPolicyAdd={onSelectPolicyAdd}
+                        onSelectPolicyEdit={onSelectPolicyEdit}
+                        onSelectPolicyDelete={onSelectPolicyDelete}
                       />
-                    ) : null
-                  }
-                />
-              </div>
-            )}
+                    )
+                  })}
+                </div>
+              </PageSectionContent>
+            </PageSection>
 
-            {searchString.length > 0 && filteredBucketsWithPolicies.length === 0 && (
-              <NoSearchResults
-                searchString={searchString}
-                onResetFilter={() => setSearchString('')}
-              />
-            )}
-
-            {/* Sections for policies grouped by buckets */}
-            <div className="flex flex-col gap-y-4">
-              {filteredBucketsWithPolicies.map(({ bucket, policies }) => {
-                return (
+            <PageSection>
+              <PageSectionMeta>
+                <PageSectionSummary>
+                  <PageSectionTitle>Schema</PageSectionTitle>
+                  <PageSectionDescription>
+                    Write policies for the tables under the storage schema directly for greater
+                    control
+                  </PageSectionDescription>
+                </PageSectionSummary>
+              </PageSectionMeta>
+              <PageSectionContent>
+                <div className="flex flex-col gap-y-4">
+                  {/* Section for policies under storage.objects that are not tied to any buckets */}
                   <StoragePoliciesBucketRow
-                    key={bucket.name}
                     table="objects"
-                    label={bucket.name}
-                    bucket={bucket}
-                    policies={policies}
+                    label="Other policies under storage.objects"
+                    policies={ungroupedPolicies}
                     onSelectPolicyAdd={onSelectPolicyAdd}
                     onSelectPolicyEdit={onSelectPolicyEdit}
                     onSelectPolicyDelete={onSelectPolicyDelete}
                   />
-                )
-              })}
-            </div>
-          </ScaffoldSection>
 
-          <ScaffoldSection isFullWidth>
-            <ScaffoldSectionTitle>Schema</ScaffoldSectionTitle>
-            <ScaffoldSectionDescription className="mb-6">
-              Write policies for the tables under the storage schema directly for greater control
-            </ScaffoldSectionDescription>
-
-            <div className="flex flex-col gap-y-4">
-              {/* Section for policies under storage.objects that are not tied to any buckets */}
-              <StoragePoliciesBucketRow
-                table="objects"
-                label="Other policies under storage.objects"
-                policies={ungroupedPolicies}
-                onSelectPolicyAdd={onSelectPolicyAdd}
-                onSelectPolicyEdit={onSelectPolicyEdit}
-                onSelectPolicyDelete={onSelectPolicyDelete}
-              />
-
-              {/* Section for policies under storage.buckets */}
-              <StoragePoliciesBucketRow
-                table="buckets"
-                label="Policies under storage.buckets"
-                policies={storageBucketPolicies}
-                onSelectPolicyAdd={onSelectPolicyAdd}
-                onSelectPolicyEdit={onSelectPolicyEdit}
-                onSelectPolicyDelete={onSelectPolicyDelete}
-              />
-            </div>
-          </ScaffoldSection>
-        </div>
-      )}
+                  {/* Section for policies under storage.buckets */}
+                  <StoragePoliciesBucketRow
+                    table="buckets"
+                    label="Policies under storage.buckets"
+                    policies={storageBucketPolicies}
+                    onSelectPolicyAdd={onSelectPolicyAdd}
+                    onSelectPolicyEdit={onSelectPolicyEdit}
+                    onSelectPolicyDelete={onSelectPolicyDelete}
+                  />
+                </div>
+              </PageSectionContent>
+            </PageSection>
+          </div>
+        )}
+      </PageContainer>
 
       {/* Only used for adding policies to buckets */}
       <StoragePoliciesEditPolicyModal
