@@ -779,4 +779,223 @@ test.describe('table editor', () => {
     // Cleanup
     await deleteTable(page, ref, tableName)
   })
+
+  test('boolean fields can be edited correctly', async ({ page, ref }) => {
+    const tableName = 'pw_table_boolean_edits'
+    const boolColName = 'is_active'
+
+    if (!page.url().includes('/editor')) {
+      await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+      await waitForTableToLoad(page, ref)
+    }
+
+    await dismissToastsIfAny(page)
+
+    // Create a simple table with a boolean column
+    await page.getByRole('button', { name: 'New table', exact: true }).click()
+    await page.getByTestId('table-name-input').fill(tableName)
+    await page.getByTestId('created_at-extra-options').click()
+    await page.getByRole('checkbox', { name: 'Is Nullable' }).click()
+    await page.getByTestId('created_at-extra-options').click({ force: true })
+
+    // Add boolean column
+    await page.getByRole('button', { name: 'Add column' }).click()
+    await page.getByRole('textbox', { name: 'column_name' }).fill(boolColName)
+    await page.getByText('Choose a column type...').click()
+    await page.getByPlaceholder('Search types...').fill('bool')
+    await page.getByRole('option', { name: 'bool' }).first().click()
+
+    await page.getByRole('button', { name: 'Save' }).click()
+    await expect(
+      page.getByText(`Table ${tableName} is good to go!`),
+      'Success toast should be visible after table creation'
+    ).toBeVisible({ timeout: 50000 })
+
+    await expect(
+      page.getByRole('button', { name: `View ${tableName}`, exact: true }),
+      'Table should be visible after creation'
+    ).toBeVisible()
+
+    // Navigate to the table
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    // Insert a row with TRUE value via side panel
+    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('combobox').click()
+    await page.getByRole('option', { name: 'TRUE' }).click()
+    await page.getByTestId('action-bar-save-row').click()
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
+
+    await expect(
+      page.getByRole('gridcell', { name: 'TRUE' }),
+      'TRUE value should be displayed'
+    ).toBeVisible()
+
+    // Insert a row with FALSE value via side panel
+    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('combobox').click()
+    await page.getByRole('option', { name: 'FALSE' }).click()
+    await page.getByTestId('action-bar-save-row').click()
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
+
+    // Verify FALSE value is preserved
+    await expect(
+      page.getByRole('gridcell', { name: 'FALSE' }),
+      'FALSE value should be displayed and preserved'
+    ).toBeVisible()
+
+    // Edit the FALSE value to TRUE using inline editor
+    const falseCell = page.getByRole('gridcell', { name: 'FALSE' }).first()
+    await falseCell.dblclick()
+
+    // Wait for boolean editor dropdown to appear
+    const booleanEditor = page.locator('#boolean-editor')
+    await expect(booleanEditor, 'Boolean editor should be visible').toBeVisible()
+
+    // Change from false to true
+    await booleanEditor.selectOption('true')
+    const updateTrueResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
+    await page.getByRole('columnheader', { name: 'id' }).click()
+    await updateTrueResponse
+
+    // Verify the value changed to TRUE (now there should be 2 TRUE values in the table)
+    await expect(
+      page.getByRole('gridcell', { name: 'TRUE' }),
+      'Value should change to TRUE after inline edit'
+    ).toHaveCount(2)
+
+    // Edit TRUE value back to FALSE using inline editor
+    // Use the second TRUE cell (the one we just edited from FALSE to TRUE)
+    const trueCell = page.getByRole('gridcell', { name: 'TRUE' }).nth(1)
+    await trueCell.dblclick()
+
+    await expect(booleanEditor, 'Boolean editor should be visible for second edit').toBeVisible()
+    await booleanEditor.selectOption('false')
+    const updateFalseResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
+    await page.getByRole('columnheader', { name: 'id' }).click()
+    await updateFalseResponse
+
+    // Verify FALSE value is preserved and not converted to NULL (this is the critical regression test)
+    const falseCells = page.getByRole('gridcell', { name: 'FALSE' })
+    await expect(
+      falseCells.first(),
+      'FALSE value should be preserved and not become NULL after inline edit'
+    ).toBeVisible()
+
+    // Cleanup
+    await deleteTable(page, ref, tableName)
+  })
+
+  test('nullable boolean fields support NULL values', async ({ page, ref }) => {
+    const tableName = 'pw_table_boolean_nullable'
+    const boolColName = 'is_enabled'
+
+    if (!page.url().includes('/editor')) {
+      await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+      await waitForTableToLoad(page, ref)
+    }
+
+    await dismissToastsIfAny(page)
+
+    // Create a table with a nullable boolean column
+    await page.getByRole('button', { name: 'New table', exact: true }).click()
+    await page.getByTestId('table-name-input').fill(tableName)
+    await page.getByTestId('created_at-extra-options').click()
+    await page.getByRole('checkbox', { name: 'Is Nullable' }).click()
+    await page.getByTestId('created_at-extra-options').click({ force: true })
+
+    // Add nullable boolean column
+    await page.getByRole('button', { name: 'Add column' }).click()
+    await page.getByRole('textbox', { name: 'column_name' }).fill(boolColName)
+    await page.getByText('Choose a column type...').click()
+    await page.getByPlaceholder('Search types...').fill('bool')
+    await page.getByRole('option', { name: 'bool' }).first().click()
+
+    await page.getByRole('button', { name: 'Save' }).click()
+    await expect(
+      page.getByText(`Table ${tableName} is good to go!`),
+      'Success toast should be visible after table creation'
+    ).toBeVisible({ timeout: 50000 })
+
+    await expect(
+      page.getByRole('button', { name: `View ${tableName}`, exact: true }),
+      'Table should be visible after creation'
+    ).toBeVisible()
+
+    // Navigate to the table
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    // Insert a row with TRUE value
+    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('combobox').click()
+    await page.getByRole('option', { name: 'TRUE' }).click()
+    await page.getByTestId('action-bar-save-row').click()
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
+
+    await expect(
+      page.getByRole('gridcell', { name: 'TRUE' }),
+      'TRUE value should be displayed'
+    ).toBeVisible()
+
+    // Insert a row with FALSE value
+    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('combobox').click()
+    await page.getByRole('option', { name: 'FALSE' }).click()
+    await page.getByTestId('action-bar-save-row').click()
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
+
+    await expect(
+      page.getByRole('gridcell', { name: 'FALSE' }),
+      'FALSE value should be displayed'
+    ).toBeVisible()
+
+    // Edit FALSE to NULL using inline editor
+    const falseCellToNull = page.getByRole('gridcell', { name: 'FALSE' })
+    await falseCellToNull.dblclick()
+
+    const booleanEditor = page.locator('#boolean-editor')
+    await expect(booleanEditor, 'Boolean editor should be visible').toBeVisible()
+
+    await booleanEditor.selectOption('null')
+
+    const updateNullResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
+    await page.getByRole('columnheader', { name: 'id' }).click()
+    await updateNullResponse
+
+    // Verify value changed to NULL on the second row
+    const nullCells = page.getByRole('gridcell', { name: 'NULL' })
+    await expect(nullCells, 'FALSE should change to NULL after inline edit').toBeVisible()
+
+    // Edit NULL to FALSE using inline editor
+    const nullCellToFalse = page.getByRole('gridcell', { name: 'NULL' })
+    await nullCellToFalse.dblclick()
+
+    await booleanEditor.selectOption('false')
+
+    const updateFalseResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
+    await page.getByRole('columnheader', { name: 'id' }).click()
+    await updateFalseResponse
+
+    await expect(
+      page.getByRole('gridcell', { name: 'FALSE' }),
+      'NULL should change to FALSE after inline edit'
+    ).toBeVisible()
+
+    // Cleanup
+    await deleteTable(page, ref, tableName)
+  })
 })
