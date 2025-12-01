@@ -10,7 +10,7 @@
   <guid>https://supabase.com/blog/vector-buckets</guid>
   <title>Introducing Vector Buckets</title>
   <link>https://supabase.com/blog/vector-buckets</link>
-  <description>Large-scale similarity search for Supabase apps</description>
+  <description>Introducing vector storage in Supabase: a durable storage layer with similarity search built-in.</description>
   <pubDate>Mon, 01 Dec 2025 00:00:00 -0700</pubDate>
 </item>
 <item>
