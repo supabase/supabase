@@ -30,7 +30,7 @@ export interface DefaultLayoutProps {
  * - Mobile navigation bar
  * - First level side navigation bar (e.g For navigating to Table Editor, SQL Editor, Database page, etc)
  */
-export const DefaultLayout = ({
+const DefaultLayout = ({
   children,
   headerTitle,
   hideMobileMenu,
@@ -53,9 +53,6 @@ export const DefaultLayout = ({
         : '/organizations'
 
   useCheckLatestDeploy()
-
-  const contentMinSizePercentage = 50
-  const contentMaxSizePercentage = 70
 
   return (
     <SidebarProvider defaultOpen={false}>
@@ -85,22 +82,10 @@ export const DefaultLayout = ({
                   className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
                   autoSaveId="default-layout-content"
                 >
-                  <ResizablePanel
-                    id="panel-content"
-                    order={1}
-                    className="w-full"
-                    minSize={contentMinSizePercentage}
-                    maxSize={contentMaxSizePercentage}
-                    defaultSize={contentMaxSizePercentage}
-                  >
+                  <ResizablePanel id="panel-content" defaultSize={1} className="w-full">
                     <div className="h-full overflow-y-auto">{children}</div>
                   </ResizablePanel>
-                  <LayoutSidebar
-                    order={2}
-                    minSize={100 - contentMaxSizePercentage}
-                    maxSize={100 - contentMinSizePercentage}
-                    defaultSize={100 - contentMaxSizePercentage}
-                  />
+                  <LayoutSidebar />
                 </ResizablePanelGroup>
               </div>
             </div>
