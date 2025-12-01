@@ -133,9 +133,8 @@ function TableHeadInner<TColumn extends string = string>(
         <ChevronsUpDown
           className={cn(
             baseIconClass,
-            'transition-opacity',
-            !isDesc && !isAsc && 'group-hover/table:opacity-40',
-            !isActive ? 'group-hover/table-head:opacity-80' : 'opacity-0'
+            'transition-opacity opacity-80 md:opacity-0',
+            !isActive && 'group-hover/table:opacity-40 group-hover/table-head:opacity-80'
           )}
         />
       </>
