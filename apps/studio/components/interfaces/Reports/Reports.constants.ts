@@ -312,6 +312,9 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(metadata) as m
           cross join unnest(m.request) as request
           cross join unnest(request.cf) as cf
+        where
+          cf.country is not null
+        ${generateRegexpWhere(filters, false)}
         group by
           cf.country
         `,

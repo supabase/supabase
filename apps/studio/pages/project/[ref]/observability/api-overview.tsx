@@ -91,6 +91,8 @@ export const ApiReport: NextPageWithLayout = () => {
           tooltip="Number of API Gateway requests per country"
           data={data.requestsByCountry || []}
           renderer={RequestsByCountryMapRenderer}
+          contentClassName="p-0 overflow-hidden"
+          headerClassName="px-4 pt-4"
         />
         <ReportWidget
           isLoading={isLoading}

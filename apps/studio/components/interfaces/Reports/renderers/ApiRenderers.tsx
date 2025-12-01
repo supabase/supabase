@@ -27,10 +27,20 @@ import { queryParamsToObject } from '../Reports.utils'
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps'
 import { ZoomableGroup } from 'react-simple-maps'
-import { COUNTRIES } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/BillingAddress.constants'
 import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { BASE_PATH } from 'lib/constants'
 import { geoCentroid } from 'd3-geo'
+import {
+  buildCountsByIso2,
+  buildBaseIso2ToName,
+  normalizeIso2ToName,
+  buildTopoNameToCount,
+  getFillColor,
+  isMicroCountry,
+  isKnownCountryCode,
+  computeMarkerRadius,
+  MAP_CHART_THEME,
+} from 'components/interfaces/Reports/utils/geo'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
@@ -407,74 +417,23 @@ export const RequestsByCountryMapRenderer = (
     subtitle: string
     visible: boolean
   }>({ x: 0, y: 0, title: '', subtitle: '', visible: false })
-  // Build a quick lookup: ISO alpha-2 -> count
-  const countsByIso2: Record<string, number> = {}
-  let max = 0
-  for (const row of props.data) {
-    if (!row.country) continue
-    const code = row.country.toUpperCase()
-    countsByIso2[code] = (countsByIso2[code] || 0) + Number(row.count || 0)
-    if (countsByIso2[code] > max) max = countsByIso2[code]
-  }
-
-  // Build ISO2 -> Country Name map from existing constants
-  const iso2ToName: Record<string, string> = {}
-  for (const c of COUNTRIES) {
-    iso2ToName[c.code] = c.name
-  }
-  // Some common name normalizations between our map data and billing list
-  iso2ToName['US'] = 'United States of America'
-  iso2ToName['RU'] = 'Russia' // MapData uses "Russia"
-  iso2ToName['CD'] = 'Democratic Republic of the Congo'
-  iso2ToName['CG'] = 'Republic of the Congo'
-  iso2ToName['CI'] = "Côte d'Ivoire"
-  iso2ToName['BO'] = 'Bolivia'
-  iso2ToName['BN'] = 'Brunei'
-  iso2ToName['IR'] = 'Iran'
-  iso2ToName['LA'] = 'Laos'
-  iso2ToName['KR'] = 'South Korea'
-  iso2ToName['KP'] = 'North Korea'
-  iso2ToName['SY'] = 'Syria'
-  iso2ToName['TZ'] = 'Tanzania'
-  iso2ToName['VE'] = 'Venezuela'
-  iso2ToName['VN'] = 'Vietnam'
-
-  const getFill = (val: number) => {
-    if (max <= 0 || !val) return 'hsla(var(--brand-200), 0.15)' // muted brand tint
-    const ratio = val / max
-    // 5-step scale using Supabase brand tokens
-    if (ratio > 0.8) return 'hsl(var(--brand-600))'
-    if (ratio > 0.6) return 'hsl(var(--brand-500))'
-    if (ratio > 0.4) return 'hsl(var(--brand-400))'
-    if (ratio > 0.2) return 'hsl(var(--brand-300))'
-    return 'hsl(var(--brand-200))'
-  }
-
-  // Micro/city-states that are visually tiny on world maps - render markers for visibility
-  const MICRO_COUNTRIES = new Set([
-    'Singapore',
-    'Monaco',
-    'Andorra',
-    'Liechtenstein',
-    'San Marino',
-    'Vatican',
-    'Vatican City',
-    'Luxembourg',
-    'Malta',
-    'Bahrain',
-    'Brunei',
-    'Qatar',
-    'Kuwait',
-    'Hong Kong',
-    'Macau',
-  ])
+  // Build core lookups
+  const countsByIso2 = buildCountsByIso2(props.data)
+  const max = Object.values(countsByIso2).reduce((m, v) => (v > m ? v : m), 0)
+  const baseIso2ToName = buildBaseIso2ToName()
+  const iso2ToName = normalizeIso2ToName(baseIso2ToName)
+  const topoNameToCount = buildTopoNameToCount(countsByIso2, iso2ToName)
+  const prefersDark =
+    typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+  const theme = prefersDark ? MAP_CHART_THEME.dark : MAP_CHART_THEME.light
 
   return (
-    <div ref={containerRef} className="w-full h-[560px] relative border border-border-muted">
+    <div ref={containerRef} className="w-full h-[560px] relative border-t">
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{ scale: 155 }}
         className="w-full h-full"
+        style={{ backgroundColor: theme.oceanFill }}
       >
         <ZoomableGroup minZoom={1} maxZoom={5} zoom={1.3}>
           <Geographies geography={WORLD_TOPO_URL}>
@@ -485,21 +444,7 @@ export const RequestsByCountryMapRenderer = (
                     (geo.properties?.name as string) ||
                     (geo.properties?.NAME as string) ||
                     'Unknown'
-                  // Lookup by country name resolved from ISO2 code counts
-                  // Find any ISO2 that maps to this topo country name
-                  // Precompute direct lookup for performance
-                  let value = 0
-                  // Direct match by name
-                  // Try common path: find code whose mapped name equals this title
-                  // Avoid O(n^2) by building a reverse map on first run
-                  // For simplicity here, do a small linear scan of keys; dataset is small (<= 250)
-                  for (const code in countsByIso2) {
-                    const name = iso2ToName[code] || code
-                    if (name === title) {
-                      value = countsByIso2[code]
-                      break
-                    }
-                  }
+                  const value = topoNameToCount.get(title) || 0
                   const tooltipTitle = title
                   const tooltipSubtitle = `${value.toLocaleString()} requests`
                   return (
@@ -533,23 +478,26 @@ export const RequestsByCountryMapRenderer = (
                       onMouseLeave={() => setHoverInfo((prev) => ({ ...prev, visible: false }))}
                       style={{
                         default: {
-                          fill: getFill(value),
-                          stroke: 'hsla(var(--brand-300), 0.6)',
+                          fill: getFillColor(value, max, theme),
+                          stroke: theme.boundaryStroke,
                           strokeWidth: 0.4,
+                          opacity: 1,
                           outline: 'none',
                           cursor: 'default',
                         },
                         hover: {
-                          fill: getFill(value),
-                          stroke: 'hsl(var(--brand-500))',
+                          fill: getFillColor(value, max, theme),
+                          stroke: theme.boundaryStrokeHover,
                           strokeWidth: 0.6,
+                          opacity: 0.7,
                           outline: 'none',
                           cursor: 'default',
                         },
                         pressed: {
-                          fill: getFill(value),
-                          stroke: 'hsl(var(--brand-500))',
+                          fill: getFillColor(value, max, theme),
+                          stroke: theme.boundaryStrokeHover,
                           strokeWidth: 0.6,
+                          opacity: 0.7,
                           outline: 'none',
                           cursor: 'default',
                         },
@@ -564,18 +512,11 @@ export const RequestsByCountryMapRenderer = (
                     (geo.properties?.name as string) ||
                     (geo.properties?.NAME as string) ||
                     'Unknown'
-                  if (!MICRO_COUNTRIES.has(title)) return null
-                  let value = 0
-                  for (const code in countsByIso2) {
-                    const name = iso2ToName[code] || code
-                    if (name === title) {
-                      value = countsByIso2[code]
-                      break
-                    }
-                  }
+                  if (!isMicroCountry(title)) return null
+                  const value = topoNameToCount.get(title) || 0
                   if (value <= 0) return null
                   const [lon, lat] = geoCentroid(geo)
-                  const r = max > 0 ? Math.max(1.5, Math.min(4, (value / max) * 4)) : 2
+                  const r = computeMarkerRadius(value, max)
                   const tooltipTitle = title
                   const tooltipSubtitle = `${value.toLocaleString()} requests`
                   return (
@@ -608,7 +549,7 @@ export const RequestsByCountryMapRenderer = (
                       }}
                       onMouseLeave={() => setHoverInfo((prev) => ({ ...prev, visible: false }))}
                     >
-                      <circle r={r} fill="hsl(var(--brand-500))" />
+                      <circle r={r} fill={theme.markerFill} />
                     </Marker>
                   )
                 })}
@@ -627,15 +568,15 @@ export const RequestsByCountryMapRenderer = (
                     if (count <= 0) continue
                     const countryName = iso2ToName[iso2] || iso2
                     if (present.has(countryName)) continue
-                    const ll = COUNTRY_LAT_LON[iso2 as keyof typeof COUNTRY_LAT_LON]
-                    if (!ll) continue
-                    const r = max > 0 ? Math.max(1.5, Math.min(4, (count / max) * 4)) : 2
+                    if (!isKnownCountryCode(iso2)) continue
+                    const ll = COUNTRY_LAT_LON[iso2]
+                    const r = computeMarkerRadius(count, max)
                     const tooltipTitle = countryName
                     const tooltipSubtitle = `${count.toLocaleString()} requests`
                     markers.push(
                       <Marker
                         key={`fallback-${iso2}`}
-                        coordinates={[ll.lon as number, ll.lat as number]}
+                        coordinates={[ll.lon, ll.lat]}
                         onMouseMove={(e) => {
                           const rect = containerRef.current?.getBoundingClientRect()
                           const x = (rect ? e.clientX - rect.left : e.clientX) + 12
@@ -662,7 +603,7 @@ export const RequestsByCountryMapRenderer = (
                         }}
                         onMouseLeave={() => setHoverInfo((prev) => ({ ...prev, visible: false }))}
                       >
-                        <circle r={r} fill="hsl(var(--brand-500))" />
+                        <circle r={r} fill={theme.markerFill} />
                       </Marker>
                     )
                   }
