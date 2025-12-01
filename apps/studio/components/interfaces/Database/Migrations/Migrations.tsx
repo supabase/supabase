@@ -108,8 +108,9 @@ const Migrations = () => {
                       {migrations.length > 0 ? (
                         migrations.map((migration) => {
                           const versionDayjs = parseMigrationVersion(migration.version)
-                          const insertedAt =
-                            versionDayjs?.format('DD MMM YYYY, HH:mm:ss') ?? migration.version
+                          const insertedAt = versionDayjs
+                            ? versionDayjs.format('DD MMM YYYY, HH:mm:ss')
+                            : 'Unknown'
 
                           return (
                             <TableRow key={migration.version}>
