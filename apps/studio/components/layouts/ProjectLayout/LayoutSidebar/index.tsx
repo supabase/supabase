@@ -27,9 +27,9 @@ export const LayoutSidebar = ({
         id="panel-side"
         key={activeSidebar?.id ?? 'default'}
         order={order}
-        defaultSize={!!activeSidebar?.component ? defaultSize : 0}
-        minSize={!!activeSidebar?.component ? minSize : 0}
-        maxSize={!!activeSidebar?.component ? maxSize : 0}
+        defaultSize={defaultSize}
+        minSize={minSize}
+        maxSize={maxSize}
         className={cn(
           'border-l bg fixed z-40 right-0 top-0 bottom-0',
           'h-[100dvh]',
