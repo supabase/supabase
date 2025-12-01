@@ -5,6 +5,7 @@ const prettierConfig = require('eslint-config-prettier/flat')
 const { default: turboConfig } = require('eslint-config-turbo/flat')
 const { fixupPluginRules } = require('@eslint/compat')
 const tanstackQuery = require('@tanstack/eslint-plugin-query')
+const typescriptConfig = require('eslint-config-next/typescript')
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
@@ -31,6 +32,7 @@ module.exports = defineConfig([
   turboConfig,
   prettierConfig,
   tanstackQueryConfig,
+  typescriptConfig,
   {
     extends: compat.extends('next/core-web-vitals'),
     linterOptions: {
