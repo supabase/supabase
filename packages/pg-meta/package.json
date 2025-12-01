@@ -16,7 +16,8 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "common": "workspace:*"
   },
   "devDependencies": {
     "@types/pg": "^8.11.11",

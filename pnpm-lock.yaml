@@ -2155,6 +2155,9 @@ importers:
 
   packages/pg-meta:
     dependencies:
+      common:
+        specifier: workspace:*
+        version: link:../common
       zod:
         specifier: 'catalog:'
         version: 3.25.76

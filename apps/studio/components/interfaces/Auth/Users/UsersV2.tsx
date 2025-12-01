@@ -1,12 +1,12 @@
 import { useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import { RefreshCw, Trash, Users, X } from 'lucide-react'
+import { RefreshCw, Trash, Users, WandSparklesIcon, X } from 'lucide-react'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 
 import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag, useParams, USER_SEARCH_INDEXES } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AlertError from 'components/ui/AlertError'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
@@ -57,8 +57,22 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useUserIndexStatusesQuery } from 'data/auth/user-search-indexes-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useIndexWorkerStatusQuery } from 'data/auth/index-worker-status-query'
+import { InlineLink } from 'components/ui/InlineLink'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
+const IMPROVED_SEARCH_COUNT_THRESHOLD = 10_000
+
+const INDEX_WORKER_LOGS_SEARCH_STRING = `select id, auth_logs.timestamp, metadata.level, event_message, metadata.msg as msg, metadata.error
+from auth_logs
+cross join unnest(metadata) as metadata
+where metadata.worker_type = 'apiworker_index_worker'
+  and auth_logs.timestamp >= timestamp_sub(current_timestamp(), interval 3 hour)
+order by timestamp desc
+limit 100`
 
 export const UsersV2 = () => {
   const queryClient = useQueryClient()
@@ -149,6 +163,7 @@ export const UsersV2 = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeletingUsers, setIsDeletingUsers] = useState(false)
   const [showFreeformWarning, setShowFreeformWarning] = useState(false)
+  const [showCreateIndexesModal, setShowCreateIndexesModal] = useState(false)
 
   const { data: totalUsersCountData, isSuccess: isCountLoaded } = useUsersCountQuery(
     {
@@ -325,6 +340,74 @@ export const UsersV2 = () => {
     }
   }
 
+  const isImprovedUserSearchEnabled = useFlag('improvedUserSearch')
+  const { data: authConfig } = useAuthConfigQuery({ projectRef })
+  const {
+    data: userSearchIndexes,
+    isError: isUserSearchIndexesError,
+    isLoading: isUserSearchIndexesLoading,
+  } = useUserIndexStatusesQuery({ projectRef, connectionString: project?.connectionString })
+  const { data: indexWorkerStatus } = useIndexWorkerStatusQuery({
+    projectRef,
+    connectionString: project?.connectionString,
+  })
+  const { mutate: updateAuthConfig, isPending: isUpdatingAuthConfig } = useAuthConfigUpdateMutation(
+    {
+      onSuccess: () => {
+        toast.success('Initiated creation of user search indexes')
+      },
+      onError: (error) => {
+        toast.error(`Failed to initiate creation of user search indexes: ${error?.message}`)
+      },
+    }
+  )
+
+  const handleEnableUserSearchIndexes = () => {
+    if (!projectRef) return console.error('Project ref is required')
+    updateAuthConfig({
+      projectRef: projectRef,
+      config: { INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST: true },
+    })
+  }
+
+  const userSearchIndexesAreValidAndReady =
+    !isUserSearchIndexesError &&
+    !isUserSearchIndexesLoading &&
+    userSearchIndexes?.length === USER_SEARCH_INDEXES.length &&
+    userSearchIndexes?.every((index) => index.is_valid && index.is_ready)
+
+  /**
+   * We want to show the improved search when:
+   * 1. The feature flag is enabled for them
+   * 2. The user has opted in (authConfig.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST is true)
+   * 3. The required indexes are valid and ready
+   */
+  const _showImprovedSearch =
+    isImprovedUserSearchEnabled &&
+    authConfig?.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST === true &&
+    userSearchIndexesAreValidAndReady
+
+  /**
+   * We want to show users the improved search opt-in only if:
+   * 1. The feature flag is enabled for them
+   * 2. They have not opted in yet (authConfig.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST is false)
+   * 3. They have < threshold number of users
+   */
+  const isCountWithinThresholdForOptIn = totalUsers <= IMPROVED_SEARCH_COUNT_THRESHOLD
+  const showImprovedSearchOptIn =
+    isImprovedUserSearchEnabled &&
+    authConfig?.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST === false &&
+    isCountWithinThresholdForOptIn
+
+  /**
+   * We want to show an "in progress" state when:
+   * 1. The user has opted in (authConfig.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST is true)
+   * 2. The index worker is currently in progress
+   */
+  const indexWorkerInProgress =
+    authConfig?.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST === true &&
+    indexWorkerStatus?.is_in_progress === true
+
   useEffect(() => {
     if (
       !isRefetching &&
@@ -377,7 +460,26 @@ export const UsersV2 = () => {
   return (
     <>
       <div className="h-full flex flex-col">
-        <FormHeader className="py-4 px-6 !mb-0" title="Users" />
+        <div className="flex items-center">
+          <FormHeader className="py-4 px-6 !mb-0" title="Users" />
+
+          {showImprovedSearchOptIn && (
+            <Button
+              icon={<WandSparklesIcon />}
+              className="mr-6"
+              onClick={() => setShowCreateIndexesModal(true)}
+              loading={isUpdatingAuthConfig}
+            >
+              Create indexes
+            </Button>
+          )}
+
+          {indexWorkerInProgress && (
+            <Button className="mr-6" loading={indexWorkerInProgress}>
+              Creating indexes
+            </Button>
+          )}
+        </div>
         <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-start justify-between gap-2 border-t">
           {selectedUsers.size > 0 ? (
             <div className="flex items-center gap-x-2">
@@ -751,6 +853,47 @@ export const UsersV2 = () => {
           through a single input field. You will also be able to filter users by provider and sort
           on users across different columns.
         </p>
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        size="medium"
+        visible={showCreateIndexesModal}
+        confirmLabel="Create indexes"
+        title="Create user search indexes"
+        onConfirm={() => {
+          handleEnableUserSearchIndexes()
+          setShowCreateIndexesModal(false)
+        }}
+        onCancel={() => setShowCreateIndexesModal(false)}
+        alert={{
+          title: 'Create user search indexes',
+          description:
+            'This process will create indexes on the auth.users table to improve search performance and enable better sorting and filtering capabilities.',
+        }}
+      >
+        <ul className="text-sm list-disc pl-4 my-3 flex flex-col gap-2">
+          <li className="marker:text-foreground-light">
+            Creating these indexes may temporarily impact database performance.
+          </li>
+          <li className="marker:text-foreground-light">
+            Depending on the size of your `auth.users` table, this operation may take some time to
+            complete.
+          </li>
+          <li className="marker:text-foreground-light">
+            You may continue to use the Auth Users page while the indexes are being created, but
+            search performance improvements will only take effect once the process is complete.
+          </li>
+          <li className="marker:text-foreground-light">
+            You can monitor the progress in the{' '}
+            <InlineLink
+              href={`/project/${projectRef}/logs/explorer?q=${encodeURI(INDEX_WORKER_LOGS_SEARCH_STRING)}`}
+              target="_blank"
+            >
+              project logs
+            </InlineLink>
+            . If you encounter any issues, please contact Supabase support for assistance.
+          </li>
+        </ul>
       </ConfirmationModal>
 
       {/* [Joshen] For deleting via context menu, the dialog above is dependent on the selectedUsers state */}
