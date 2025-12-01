@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { test } from 'vitest'
 
-import { StorageReport } from 'pages/project/[ref]/reports/storage'
+import { StorageReport } from 'pages/project/[ref]/observability/storage'
 import { render } from 'tests/helpers'
 
 // [Joshen] Mock data for ApiReport is in __mocks__/hooks/useStorageReport

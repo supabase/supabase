@@ -57,7 +57,7 @@ const DiskSizeConfigurationModal = ({
           timeTillNextAvailableDatabaseResize % 60
         } minute(s)`
 
-  const { mutate: updateProjectUsage, isLoading: isUpdatingDiskSize } =
+  const { mutate: updateProjectUsage, isPending: isUpdatingDiskSize } =
     useProjectDiskResizeMutation({
       onSuccess: (res, variables) => {
         toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)

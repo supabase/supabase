@@ -7,7 +7,7 @@ run: download transform generate format
 ###############################################################################
 # Download all the specs
 ###############################################################################
-# commment out download.auth.v1 temporarily, we're manually creating the file
+# comment out download.auth.v1 temporarily, we're manually creating the file
 # download: download.api.v1 download.auth.v1 download.storage.v1 download.tsdoc.v2
 download: download.api.v1 download.storage.v1 download.tsdoc.v2
 

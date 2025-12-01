@@ -67,7 +67,7 @@ export const LOCAL_STORAGE_KEYS = {
   // Notice banner keys
   FLY_POSTGRES_DEPRECATION_WARNING: 'fly-postgres-deprecation-warning-dismissed',
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
-  MIDDLEWARE_OUTAGE_BANNER: 'middleware-outage-banner-2025-05-16',
+  MAINTENANCE_WINDOW_BANNER: 'maintenance-window-banner-2025-11-21',
   REPORT_DATERANGE: 'supabase-report-daterange',
 
   // api keys view switcher for new and legacy api keys
@@ -83,6 +83,9 @@ export const LOCAL_STORAGE_KEYS = {
 
   // Project sidebar hotkeys
   HOTKEY_SIDEBAR: (sidebarId: string) => `supabase-dashboard-hotkey-sidebar-${sidebarId}`,
+
+  // Index Advisor notice dismissed
+  INDEX_ADVISOR_NOTICE_DISMISSED: (ref: string) => `index-advisor-notice-dismissed-${ref}`,
 
   /**
    * COMMON
