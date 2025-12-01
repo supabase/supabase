@@ -8,7 +8,6 @@ type BucketsTableProps = {
   projectRef: string
   filterString: string
   formattedGlobalUploadLimit: string
-  getPolicyCount: (bucketName: string) => number
 }
 
 export const BucketsTable = (props: BucketsTableProps) => {
@@ -25,7 +24,6 @@ const BucketsTableUnvirtualized = ({
   projectRef,
   filterString,
   formattedGlobalUploadLimit,
-  getPolicyCount,
 }: BucketsTableProps) => {
   const showSearchEmptyState = buckets.length === 0 && filterString.length > 0
 
@@ -45,7 +43,6 @@ const BucketsTableUnvirtualized = ({
               bucket={bucket}
               projectRef={projectRef}
               formattedGlobalUploadLimit={formattedGlobalUploadLimit}
-              getPolicyCount={getPolicyCount}
             />
           ))
         )}
@@ -59,7 +56,6 @@ const BucketsTableVirtualized = ({
   projectRef,
   filterString,
   formattedGlobalUploadLimit,
-  getPolicyCount,
 }: BucketsTableProps) => {
   const showSearchEmptyState = buckets.length === 0 && filterString.length > 0
 
@@ -81,7 +77,6 @@ const BucketsTableVirtualized = ({
             bucket={bucket}
             projectRef={projectRef}
             formattedGlobalUploadLimit={formattedGlobalUploadLimit}
-            getPolicyCount={getPolicyCount}
           />
         )}
       </VirtualizedTableBody>

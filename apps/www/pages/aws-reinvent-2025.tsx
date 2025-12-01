@@ -21,7 +21,14 @@ const AWSReInvent2025: NextPage = () => {
         openGraph={{
           title: data.metadata.metaTitle,
           description: data.metadata.metaDescription,
-          url: `https://supabase.com/aws-reinvent-2025`,
+          images: [
+            {
+              url: data.metadata.ogImage,
+              width: 1280,
+              height: 685,
+              alt: 'Supabase AWS Re:Invent 2025',
+            },
+          ],
         }}
       />
       <Layout className="overflow-visible">

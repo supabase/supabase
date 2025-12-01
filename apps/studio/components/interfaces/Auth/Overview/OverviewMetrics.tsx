@@ -1,13 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import { ChevronRight, ExternalLink, HelpCircle, Telescope } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+
 import { useParams } from 'common'
 import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
-import dayjs from 'dayjs'
-import { ChevronRight, ExternalLink, HelpCircle, Telescope } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import {
   Card,
   CardContent,

@@ -17,7 +17,7 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { useRefreshHandler, useReportDateRange } from 'hooks/misc/useReportDateRange'
 
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
 import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
@@ -86,16 +86,22 @@ const RealtimeUsage = () => {
     })
   }, [ref, selectedDateRange, state.selectedDatabaseId])
 
-  const onRefreshReport = async () => {
-    if (!selectedDateRange) return
+  const onRefreshReport = useRefreshHandler(
+    datePickerValue,
+    datePickerHelpers,
+    handleDatePickerChange,
+    async () => {
+      if (!selectedDateRange) return
 
-    setIsRefreshing(true)
-    queryClient.invalidateQueries({
-      queryKey: ['projects', ref, 'report-v2', { queryGroup: 'realtime' }],
-    })
-    refetch()
-    setTimeout(() => setIsRefreshing(false), 1000)
-  }
+      setIsRefreshing(true)
+
+      queryClient.invalidateQueries({
+        queryKey: ['projects', ref, 'report-v2', { queryGroup: 'realtime' }],
+      })
+      refetch()
+      setTimeout(() => setIsRefreshing(false), 1000)
+    }
+  )
 
   const urlStateHasSyncedRef = useRef(false)
   useEffect(() => {

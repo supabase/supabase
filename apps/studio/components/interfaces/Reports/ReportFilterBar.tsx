@@ -171,6 +171,13 @@ const ReportFilterBar = ({
 
   const [selectedRange, setSelectedRange] = useState<DatePickerValue>(getInitialDatePickerValue())
 
+  // Sync selectedRange when initialDatePickerValue changes
+  useEffect(() => {
+    if (initialDatePickerValue) {
+      setSelectedRange(initialDatePickerValue)
+    }
+  }, [initialDatePickerValue])
+
   return (
     <div className={cn('flex items-center justify-between', className)}>
       <div className="flex flex-row justify-start items-center flex-wrap gap-2">
