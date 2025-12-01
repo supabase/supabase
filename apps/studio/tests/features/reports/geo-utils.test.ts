@@ -50,5 +50,3 @@ describe('geo utils', () => {
     expect(rHigh).toBeGreaterThan(rLow)
   })
 })
-
-
