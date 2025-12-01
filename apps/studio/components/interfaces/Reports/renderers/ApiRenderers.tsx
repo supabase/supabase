@@ -420,9 +420,8 @@ export const RequestsByCountryMapRenderer = (
 
   const countsByIso2 = buildCountsByIso2(props.data)
   const max = Object.values(countsByIso2).reduce((m, v) => (v > m ? v : m), 0)
-  const prefersDark =
-    typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
-  const theme = prefersDark ? MAP_CHART_THEME.dark : MAP_CHART_THEME.light
+  const { resolvedTheme } = useTheme()
+  const theme = resolvedTheme === 'dark' ? MAP_CHART_THEME.dark : MAP_CHART_THEME.light
 
   if (!!props.error) {
     const error = (
