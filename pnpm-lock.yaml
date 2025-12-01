@@ -2100,12 +2100,6 @@ importers:
       '@tanstack/eslint-plugin-query':
         specifier: ^4.0.0
         version: 4.39.1(eslint@9.37.0(jiti@2.5.1)(supports-color@8.1.1))
-      '@typescript-eslint/eslint-plugin':
-        specifier: ^8.34.1
-        version: 8.34.1(@typescript-eslint/parser@8.47.0(eslint@9.37.0(jiti@2.5.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.2))(eslint@9.37.0(jiti@2.5.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.2)
-      '@typescript-eslint/parser':
-        specifier: ^8.34.1
-        version: 8.47.0(eslint@9.37.0(jiti@2.5.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.2)
       eslint-config-next:
         specifier: ^15.5.0
         version: 15.5.4(eslint@9.37.0(jiti@2.5.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.2)
