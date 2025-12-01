@@ -3518,7 +3518,7 @@ export interface components {
         upstreamTarget: 'main' | 'canary'
       }
       features: {
-        icebergCatalog?: {
+        icebergCatalog: {
           enabled: boolean
           maxCatalogs: number
           maxNamespaces: number
@@ -3530,7 +3530,7 @@ export interface components {
         s3Protocol: {
           enabled: boolean
         }
-        vectorBuckets?: {
+        vectorBuckets: {
           enabled: boolean
           maxBuckets: number
           maxIndexes: number
@@ -4044,10 +4044,10 @@ export interface components {
           maxNamespaces: number
           maxTables: number
         }
-        imageTransformation: {
+        imageTransformation?: {
           enabled: boolean
         }
-        s3Protocol: {
+        s3Protocol?: {
           enabled: boolean
         }
         vectorBuckets?: {

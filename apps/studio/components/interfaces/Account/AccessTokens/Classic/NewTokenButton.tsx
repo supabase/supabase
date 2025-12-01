@@ -8,13 +8,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { NewAccessTokenDialog } from './NewAccessTokenDialog'
+import { NewTokenDialog } from './NewTokenDialog'
 
 export interface NewAccessTokenButtonProps {
   onCreateToken: (token: any) => void
 }
 
-export const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
+export const NewTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
   const [visible, setVisible] = useState(false)
   const [tokenScope, setTokenScope] = useState<'V0' | undefined>(undefined)
 
@@ -55,7 +55,7 @@ export const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProp
         </DropdownMenu>
       </div>
 
-      <NewAccessTokenDialog
+      <NewTokenDialog
         open={visible}
         onOpenChange={setVisible}
         tokenScope={tokenScope}
