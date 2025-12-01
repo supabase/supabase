@@ -68,6 +68,10 @@ export const ActivityStats = () => {
     return [undefined, undefined]
   }, [latestMigration])
 
+  const hasValidVersion = versionLabel && versionTimestamp
+  const versionLabelText =
+    !isLoadingMigrations && hasValidVersion ? 'Unknown version' : 'No migrations'
+
   return (
     <div className="@container">
       <div className="grid grid-cols-1 @md:grid-cols-2 gap-2 @md:gap-6 flex-wrap">
@@ -84,14 +88,14 @@ export const ActivityStats = () => {
           value={
             isLoadingMigrations ? (
               <Skeleton className="h-6 w-24" />
-            ) : versionLabel && versionTimestamp ? (
+            ) : hasValidVersion ? (
               <TimestampInfo
                 className="text-base"
                 label={versionLabel}
                 utcTimestamp={versionTimestamp}
               />
             ) : (
-              <p className="text-foreground-lighter">No migrations</p>
+              <p className="text-foreground-lighter">{versionLabelText}</p>
             )
           }
         />
