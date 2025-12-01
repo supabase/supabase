@@ -18,7 +18,9 @@ export const BooleanEditor = <TRow, TSummaryRow = unknown>({
   const value = row[column.key as keyof TRow] as boolean | null
 
   const onChange = (newValue: boolean | null) => {
-    onRowChange({ ...row, [column.key]: newValue }, true)
+    if (newValue !== value) {
+      onRowChange({ ...row, [column.key]: newValue }, true)
+    }
   }
 
   return (
