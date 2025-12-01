@@ -10,9 +10,11 @@ date: '2025-12-01'
 toc_depth: 2
 ---
 
+Today, we're introducing [Vector Buckets](/docs/guides/storage/vector/introduction), a new storage option that gives you the durability and cost efficiency of Amazon S3 with built-in similarity search.
+
 Vector search is becoming a core primitive for modern apps: semantic search, recommendations, RAG, image and audio similarity, and more.
 
-Supabase already gives you powerful tools for vectors, such as `pgvector` in Postgres. Today, we're introducing [Vector Buckets](/docs/guides/storage/vector/introduction), a new storage option that gives you the durability and cost efficiency of Amazon S3 with built-in similarity search.
+Supabase already gives you powerful tools for vectors, such as `pgvector` in Postgres. With Vector Buckets, you now have more options for how you store vectors:
 
 - Use pgvector for smaller, latency-sensitive datasets that belong tightly in your database.
 - Use Vector Buckets when you need to store a large amount of vectors—up to tens of millions—on a durable storage layer with similarity search built in.
