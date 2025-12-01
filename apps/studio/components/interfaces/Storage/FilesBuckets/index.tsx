@@ -7,7 +7,6 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketsQuery } from 'data/storage/buckets-query'
-import { useStoragePolicyCounts } from 'hooks/storage/useStoragePolicyCounts'
 import { IS_PLATFORM } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
@@ -42,11 +41,9 @@ export const FilesBuckets = () => {
     isLoading: isLoadingBuckets,
     isSuccess: isSuccessBuckets,
   } = useBucketsQuery({ projectRef: ref })
-  const { getPolicyCount, isLoading: isLoadingPolicies } = useStoragePolicyCounts(buckets)
 
   const formattedGlobalUploadLimit = formatBytes(data?.fileSizeLimit ?? 0)
 
-  const isLoading = isLoadingBuckets || isLoadingPolicies
   const filesBuckets = buckets
     .filter((bucket) => !('type' in bucket) || bucket.type === 'STANDARD')
     .filter((bucket) =>
@@ -73,7 +70,7 @@ export const FilesBuckets = () => {
     <PageContainer>
       <PageSection>
         <PageSectionContent className="h-full gap-y-4">
-          {isLoading && <GenericSkeletonLoader />}
+          {isLoadingBuckets && <GenericSkeletonLoader />}
           {isErrorBuckets && (
             <>
               {hasNoApiKeys ? (
@@ -89,7 +86,7 @@ export const FilesBuckets = () => {
               )}
             </>
           )}
-          {isSuccessBuckets && !isLoading && (
+          {isSuccessBuckets && (
             <>
               {hasNoBuckets ? (
                 <EmptyBucketState bucketType="files" />
@@ -137,7 +134,6 @@ export const FilesBuckets = () => {
                       projectRef={ref ?? '_'}
                       filterString={filterString}
                       formattedGlobalUploadLimit={formattedGlobalUploadLimit}
-                      getPolicyCount={getPolicyCount}
                     />
                   </Card>
                 </>
