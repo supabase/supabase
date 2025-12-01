@@ -10,6 +10,25 @@ Let's explore how to implement Realtime Presence to track state between multiple
 
 You can use the Supabase client libraries to track Presence state between users.
 
+### How Presence works
+
+Presence lets each connected client publish a small piece of state—called a “presence payload”—to a shared channel. Supabase stores each client’s payload under a unique presence key and keeps a merged view of all connected clients.
+
+When any client subscribes, disconnects, or updates their presence payload, Supabase triggers one of three events:
+
+- **`sync`** — the full presence state has been updated
+- **`join`** — a new client has started tracking presence
+- **`leave`** — a client has stopped tracking presence
+
+The complete presence state returned by `presenceState()` looks like this:
+
+```json
+{
+  "client_key_1": [{ "userId": 1, "typing": false }],
+  "client_key_2": [{ "userId": 2, "typing": true }]
+}
+```
+
 ### Initialize the client
 
 Go to your Supabase project's [API Settings](/dashboard/project/_/settings/api) and grab the `URL` and `anon` public API key.
