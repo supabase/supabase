@@ -11,8 +11,8 @@ import {
   PageHeader,
   PageHeaderAside,
   PageHeaderDescription,
-  PageHeaderFooter,
   PageHeaderMeta,
+  PageHeaderNavigationTabs,
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
@@ -64,7 +64,7 @@ export const StorageBucketsLayout = ({
         </PageHeaderMeta>
 
         {navigationItems.length > 0 && (
-          <PageHeaderFooter>
+          <PageHeaderNavigationTabs>
             <NavMenu>
               {navigationItems.map((item) => (
                 <NavMenuItem key={item.label} active={pathname === item.href}>
@@ -72,7 +72,7 @@ export const StorageBucketsLayout = ({
                 </NavMenuItem>
               ))}
             </NavMenu>
-          </PageHeaderFooter>
+          </PageHeaderNavigationTabs>
         )}
       </PageHeader>
       {children}

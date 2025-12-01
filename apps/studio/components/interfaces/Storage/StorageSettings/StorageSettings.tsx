@@ -236,234 +236,232 @@ export const StorageSettings = () => {
                     subject="Failed to retrieve project's storage configuration"
                   />
                 )}
-                {isSuccess && showMigrationCallout && (
-                  <>
-                    {isListV2UpgradeAvailable && <StorageListV2MigrationCallout />}
-                    {isListV2Upgrading && <StorageListV2MigratingCallout />}
-                  </>
-                )}
                 {isSuccess && (
-                  <form id={formId} className="" onSubmit={form.handleSubmit(onSubmit)}>
-                    <Card>
-                      <CardContent className="pt-6">
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="imageTransformationEnabled"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              layout="flex-row-reverse"
-                              label="Enable image transformation"
-                              description={
-                                <>
-                                  Optimize and resize images on the fly.{' '}
-                                  <InlineLink
-                                    href={`${DOCS_URL}/guides/storage/serving/image-transformations`}
-                                  >
-                                    Learn more
-                                  </InlineLink>
-                                  .
-                                </>
-                              }
-                            >
-                              <FormControl_Shadcn_>
-                                <Switch
-                                  size="large"
-                                  disabled={isFreeTier}
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                />
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
-                      </CardContent>
-
-                      <CardContent>
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="fileSizeLimit"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              hideMessage
-                              layout="flex-row-reverse"
-                              label="Global file size limit"
-                              description={
-                                <>
-                                  Restrict the size of files uploaded across all buckets.{' '}
-                                  {isLoadingBuckets && (
-                                    <span className="text-foreground-light">
-                                      {' '}
-                                      Loading bucket information...
-                                    </span>
-                                  )}{' '}
-                                  <InlineLink
-                                    href={`${DOCS_URL}/guides/storage/uploads/file-limits`}
-                                  >
-                                    Learn more
-                                  </InlineLink>
-                                  .
-                                </>
-                              }
-                            >
-                              <FormControl_Shadcn_>
-                                <div className="flex items-center gap-2">
-                                  <Input_Shadcn_
-                                    type="number"
-                                    {...field}
-                                    className="w-full"
-                                    disabled={isFreeTier || !canUpdateStorageSettings}
+                  <>
+                    {showMigrationCallout && (
+                      <>
+                        {isListV2UpgradeAvailable && <StorageListV2MigrationCallout />}
+                        {isListV2Upgrading && <StorageListV2MigratingCallout />}
+                      </>
+                    )}
+                    <form id={formId} className="" onSubmit={form.handleSubmit(onSubmit)}>
+                      <Card>
+                        <CardContent className="pt-6">
+                          <FormField_Shadcn_
+                            control={form.control}
+                            name="imageTransformationEnabled"
+                            render={({ field }) => (
+                              <FormItemLayout
+                                layout="flex-row-reverse"
+                                label="Enable image transformation"
+                                description={
+                                  <>
+                                    Optimize and resize images on the fly.{' '}
+                                    <InlineLink
+                                      href={`${DOCS_URL}/guides/storage/serving/image-transformations`}
+                                    >
+                                      Learn more
+                                    </InlineLink>
+                                    .
+                                  </>
+                                }
+                              >
+                                <FormControl_Shadcn_>
+                                  <Switch
+                                    size="large"
+                                    disabled={isFreeTier}
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
                                   />
-                                  <FormField_Shadcn_
-                                    control={form.control}
-                                    name="unit"
-                                    render={({ field: unitField }) => (
-                                      <Select_Shadcn_
-                                        value={unitField.value}
-                                        onValueChange={unitField.onChange}
-                                        disabled={isFreeTier || !canUpdateStorageSettings}
-                                      >
-                                        <SelectTrigger_Shadcn_ className="w-[180px]">
-                                          <SelectValue_Shadcn_ placeholder="Choose a prefix">
-                                            {storageUnit}
-                                          </SelectValue_Shadcn_>
-                                        </SelectTrigger_Shadcn_>
-                                        <SelectContent_Shadcn_>
-                                          {Object.values(StorageSizeUnits).map((unit: string) => (
-                                            <SelectItem_Shadcn_
-                                              key={unit}
-                                              disabled={isFreeTier}
-                                              value={unit}
-                                            >
-                                              {unit}
-                                            </SelectItem_Shadcn_>
-                                          ))}
-                                        </SelectContent_Shadcn_>
-                                      </Select_Shadcn_>
-                                    )}
-                                  />
-                                </div>
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
-                        {fileSizeLimitError && (
-                          <FormMessage_Shadcn_ className="ml-auto mt-2 text-right w-1/2">
-                            {isBucketLimitError ? (
-                              <>
-                                <p>Global limit must be greater than that of individual buckets.</p>
-                                <p>
-                                  Remove or decrease the limit on{' '}
-                                  <InlineLink
-                                    href={`/project/${projectRef}/storage/buckets/${affectedBuckets[0]}`}
-                                    className="text-destructive decoration-destructive-500 hover:decoration-destructive"
-                                  >
-                                    {affectedBuckets[0]}
-                                  </InlineLink>{' '}
-                                  ({firstAffectBucketLimit.value}
-                                  {firstAffectBucketLimit.unit})
-                                  {affectedBuckets.length > 1 && (
-                                    <>
-                                      {' '}
-                                      and{' '}
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <span className="underline underline-offset-2 decoration-dotted decoration-destructive-500 hover:decoration-destructive cursor-default">
-                                            +{affectedBuckets.length - 1} other bucket
-                                            {affectedBuckets.length > 2 ? 's' : ''}
-                                          </span>
-                                        </TooltipTrigger>
-                                        <TooltipContent side="bottom">
-                                          <ul>
-                                            {affectedBuckets.slice(1).map((name) => {
-                                              const bucket = buckets.find((x) => x.name === name)
-                                              const formattedLimit = convertFromBytes(
-                                                bucket?.file_size_limit ?? 0
-                                              )
-                                              return (
-                                                <li
-                                                  key={name}
-                                                  className="hover:underline underline-offset-2"
-                                                >
-                                                  <Link
-                                                    href={`/project/${projectRef}/storage/buckets/${name}`}
-                                                  >
-                                                    {bucket?.name} ({formattedLimit.value}
-                                                    {formattedLimit.unit})
-                                                  </Link>
-                                                </li>
-                                              )
-                                            })}
-                                          </ul>
-                                        </TooltipContent>
-                                      </Tooltip>{' '}
-                                      first
-                                    </>
-                                  )}
-                                  .
-                                </p>
-                              </>
-                            ) : (
-                              fileSizeLimitError.message
+                                </FormControl_Shadcn_>
+                              </FormItemLayout>
                             )}
-                          </FormMessage_Shadcn_>
-                        )}
-                      </CardContent>
-                      {isFreeTier && (
-                        <UpgradeToPro
-                          fullWidth
-                          primaryText="Free Plan has a fixed upload file size limit of 50 MB."
-                          secondaryText={`Upgrade to Pro Plan for a configurable upload file size limit of ${formatBytes(
-                            STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
-                          )} and unlock image transformations.`}
-                          source="storageSizeLimit"
-                        />
-                      )}
-                      {isSpendCapOn && (
-                        <UpgradeToPro
-                          fullWidth
-                          buttonText="Disable Spend Cap"
-                          primaryText="Reduced max upload file size limit due to Spend Cap"
-                          secondaryText={`Disable your Spend Cap to allow file uploads of up to ${formatBytes(
-                            STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
-                          )}.`}
-                          source="storageSizeLimit"
-                        />
-                      )}
-
-                      {!canUpdateStorageSettings && (
-                        <CardContent>
-                          <p className="text-sm text-foreground-light">
-                            You need additional permissions to update storage settings
-                          </p>
+                          />
                         </CardContent>
-                      )}
 
-                      <CardFooter className="justify-end space-x-2">
-                        {form.formState.isDirty && (
+                        <CardContent>
+                          <FormField_Shadcn_
+                            control={form.control}
+                            name="fileSizeLimit"
+                            render={({ field }) => (
+                              <FormItemLayout
+                                hideMessage
+                                layout="flex-row-reverse"
+                                label="Global file size limit"
+                                description={
+                                  <>
+                                    Restrict the size of files uploaded across all buckets.{' '}
+                                    <InlineLink
+                                      href={`${DOCS_URL}/guides/storage/uploads/file-limits`}
+                                    >
+                                      Learn more
+                                    </InlineLink>
+                                    .
+                                  </>
+                                }
+                              >
+                                <FormControl_Shadcn_>
+                                  <div className="flex items-center gap-2">
+                                    <Input_Shadcn_
+                                      type="number"
+                                      {...field}
+                                      className="w-full"
+                                      disabled={isFreeTier || !canUpdateStorageSettings}
+                                    />
+                                    <FormField_Shadcn_
+                                      control={form.control}
+                                      name="unit"
+                                      render={({ field: unitField }) => (
+                                        <Select_Shadcn_
+                                          value={unitField.value}
+                                          onValueChange={unitField.onChange}
+                                          disabled={isFreeTier || !canUpdateStorageSettings}
+                                        >
+                                          <SelectTrigger_Shadcn_ className="w-[180px]">
+                                            <SelectValue_Shadcn_ placeholder="Choose a prefix">
+                                              {storageUnit}
+                                            </SelectValue_Shadcn_>
+                                          </SelectTrigger_Shadcn_>
+                                          <SelectContent_Shadcn_>
+                                            {Object.values(StorageSizeUnits).map((unit: string) => (
+                                              <SelectItem_Shadcn_
+                                                key={unit}
+                                                disabled={isFreeTier}
+                                                value={unit}
+                                              >
+                                                {unit}
+                                              </SelectItem_Shadcn_>
+                                            ))}
+                                          </SelectContent_Shadcn_>
+                                        </Select_Shadcn_>
+                                      )}
+                                    />
+                                  </div>
+                                </FormControl_Shadcn_>
+                              </FormItemLayout>
+                            )}
+                          />
+                          {fileSizeLimitError && (
+                            <FormMessage_Shadcn_ className="ml-auto mt-2 text-right w-1/2">
+                              {isBucketLimitError ? (
+                                <>
+                                  <p>
+                                    Global limit must be greater than that of individual buckets.
+                                  </p>
+                                  <p>
+                                    Remove or decrease the limit on{' '}
+                                    <InlineLink
+                                      href={`/project/${projectRef}/storage/buckets/${affectedBuckets[0]}`}
+                                      className="text-destructive decoration-destructive-500 hover:decoration-destructive"
+                                    >
+                                      {affectedBuckets[0]}
+                                    </InlineLink>{' '}
+                                    ({firstAffectBucketLimit.value}
+                                    {firstAffectBucketLimit.unit})
+                                    {affectedBuckets.length > 1 && (
+                                      <>
+                                        {' '}
+                                        and{' '}
+                                        <Tooltip>
+                                          <TooltipTrigger asChild>
+                                            <span className="underline underline-offset-2 decoration-dotted decoration-destructive-500 hover:decoration-destructive cursor-default">
+                                              +{affectedBuckets.length - 1} other bucket
+                                              {affectedBuckets.length > 2 ? 's' : ''}
+                                            </span>
+                                          </TooltipTrigger>
+                                          <TooltipContent side="bottom">
+                                            <ul>
+                                              {affectedBuckets.slice(1).map((name) => {
+                                                const bucket = buckets.find((x) => x.name === name)
+                                                const formattedLimit = convertFromBytes(
+                                                  bucket?.file_size_limit ?? 0
+                                                )
+                                                return (
+                                                  <li
+                                                    key={name}
+                                                    className="hover:underline underline-offset-2"
+                                                  >
+                                                    <Link
+                                                      href={`/project/${projectRef}/storage/buckets/${name}`}
+                                                    >
+                                                      {bucket?.name} ({formattedLimit.value}
+                                                      {formattedLimit.unit})
+                                                    </Link>
+                                                  </li>
+                                                )
+                                              })}
+                                            </ul>
+                                          </TooltipContent>
+                                        </Tooltip>{' '}
+                                        first
+                                      </>
+                                    )}
+                                    .
+                                  </p>
+                                </>
+                              ) : (
+                                fileSizeLimitError.message
+                              )}
+                            </FormMessage_Shadcn_>
+                          )}
+                        </CardContent>
+                        {isFreeTier && (
+                          <UpgradeToPro
+                            fullWidth
+                            primaryText="Free Plan has a fixed upload file size limit of 50 MB."
+                            secondaryText={`Upgrade to Pro Plan for a configurable upload file size limit of ${formatBytes(
+                              STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
+                            )} and unlock image transformations.`}
+                            source="storageSizeLimit"
+                          />
+                        )}
+                        {isSpendCapOn && (
+                          <UpgradeToPro
+                            fullWidth
+                            buttonText="Disable Spend Cap"
+                            primaryText="Reduced max upload file size limit due to Spend Cap"
+                            secondaryText={`Disable your Spend Cap to allow file uploads of up to ${formatBytes(
+                              STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
+                            )}.`}
+                            source="storageSizeLimit"
+                          />
+                        )}
+
+                        {!canUpdateStorageSettings && (
+                          <CardContent>
+                            <p className="text-sm text-foreground-light">
+                              You need additional permissions to update storage settings
+                            </p>
+                          </CardContent>
+                        )}
+
+                        <CardFooter className="justify-end space-x-2">
+                          {form.formState.isDirty && (
+                            <Button
+                              type="default"
+                              htmlType="reset"
+                              onClick={() => form.reset()}
+                              disabled={
+                                !form.formState.isDirty || !canUpdateStorageSettings || isUpdating
+                              }
+                            >
+                              Cancel
+                            </Button>
+                          )}
                           <Button
-                            type="default"
-                            htmlType="reset"
-                            onClick={() => form.reset()}
+                            type="primary"
+                            htmlType="submit"
+                            loading={isUpdating}
                             disabled={
-                              !form.formState.isDirty || !canUpdateStorageSettings || isUpdating
+                              !canUpdateStorageSettings || isUpdating || !form.formState.isDirty
                             }
                           >
-                            Cancel
+                            Save
                           </Button>
-                        )}
-                        <Button
-                          type="primary"
-                          htmlType="submit"
-                          loading={isUpdating}
-                          disabled={
-                            !canUpdateStorageSettings || isUpdating || !form.formState.isDirty
-                          }
-                        >
-                          Save
-                        </Button>
-                      </CardFooter>
-                    </Card>
-                  </form>
+                        </CardFooter>
+                      </Card>
+                    </form>
+                  </>
                 )}
               </>
             )}
