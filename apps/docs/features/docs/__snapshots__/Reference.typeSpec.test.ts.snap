@@ -84221,6 +84221,63 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           ]
         }
       },
+      "@supabase/storage-js.packages/StorageAnalyticsClient.default.from": {
+        "name": "@supabase/storage-js.packages/StorageAnalyticsClient.default.from",
+        "params": [
+          {
+            "name": "bucketName",
+            "type": {
+              "type": "intrinsic",
+              "name": "string"
+            },
+            "comment": {
+              "shortText": "The name of the analytics bucket (warehouse) to connect to"
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "nameOnly",
+            "name": "IcebergRestCatalog"
+          }
+        },
+        "comment": {
+          "shortText": "Get an Iceberg REST Catalog client configured for a specific analytics bucket\\nUse this to perform advanced table and namespace operations within the bucket\\nThe returned client provides full access to the Apache Iceberg REST Catalog API\\n\\n**Public alpha:** This API is part of a public alpha release and may not be available to your account type.",
+          "tags": [
+            {
+              "tag": "alpha",
+              "text": ""
+            }
+          ],
+          "examples": [
+            {
+              "id": "get-catalog-and-create-table",
+              "name": "Get catalog and create table",
+              "code": "\`\`\`js\\n// First, create an analytics bucket\\nconst { data: bucket, error: bucketError } = await supabase\\n  .storage\\n  .analytics\\n  .createBucket('analytics-data')\\n\\n// Get the Iceberg catalog for that bucket\\nconst catalog = supabase.storage.analytics.from('analytics-data')\\n\\n// Create a namespace\\nawait catalog.createNamespace({ namespace: ['default'] })\\n\\n// Create a table with schema\\nawait catalog.createTable(\\n  { namespace: ['default'] },\\n  {\\n    name: 'events',\\n    schema: {\\n      type: 'struct',\\n      fields: [\\n        { id: 1, name: 'id', type: 'long', required: true },\\n        { id: 2, name: 'timestamp', type: 'timestamp', required: true },\\n        { id: 3, name: 'user_id', type: 'string', required: false }\\n      ],\\n      'schema-id': 0,\\n      'identifier-field-ids': [1]\\n    },\\n    'partition-spec': {\\n      'spec-id': 0,\\n      fields: []\\n    },\\n    'write-order': {\\n      'order-id': 0,\\n      fields: []\\n    },\\n    properties: {\\n      'write.format.default': 'parquet'\\n    }\\n  }\\n)\\n\`\`\`"
+            },
+            {
+              "id": "list-tables-in-namespace",
+              "name": "List tables in namespace",
+              "code": "\`\`\`js\\nconst catalog = supabase.storage.analytics.from('analytics-data')\\n\\n// List all tables in the default namespace\\nconst tables = await catalog.listTables({ namespace: ['default'] })\\nconsole.log(tables) // [{ namespace: ['default'], name: 'events' }]\\n\`\`\`"
+            },
+            {
+              "id": "working-with-namespaces",
+              "name": "Working with namespaces",
+              "code": "\`\`\`js\\nconst catalog = supabase.storage.analytics.from('analytics-data')\\n\\n// List all namespaces\\nconst namespaces = await catalog.listNamespaces()\\n\\n// Create namespace with properties\\nawait catalog.createNamespace(\\n  { namespace: ['production'] },\\n  { properties: { owner: 'data-team', env: 'prod' } }\\n)\\n\`\`\`"
+            },
+            {
+              "id": "cleanup-operations",
+              "name": "Cleanup operations",
+              "code": "\`\`\`js\\nconst catalog = supabase.storage.analytics.from('analytics-data')\\n\\n// Drop table with purge option (removes all data)\\nawait catalog.dropTable(\\n  { namespace: ['default'], name: 'events' },\\n  { purge: true }\\n)\\n\\n// Drop namespace (must be empty)\\nawait catalog.dropNamespace({ namespace: ['default'] })\\n\`\`\`"
+            },
+            {
+              "id": "error-handling-with-catalog-operations",
+              "name": "Error handling with catalog operations",
+              "code": "\`\`\`js\\nimport { IcebergError } from 'iceberg-js'\\n\\nconst catalog = supabase.storage.analytics.from('analytics-data')\\n\\ntry {\\n  await catalog.dropTable({ namespace: ['default'], name: 'events' }, { purge: true })\\n} catch (error) {\\n  // Handle 404 errors (resource not found)\\n  const is404 =\\n    (error instanceof IcebergError && error.status === 404) ||\\n    error?.status === 404 ||\\n    error?.details?.error?.code === 404\\n\\n  if (is404) {\\n    console.log('Table does not exist')\\n  } else {\\n    throw error // Re-throw other errors\\n  }\\n}\\n\`\`\`"
+            }
+          ]
+        }
+      },
       "@supabase/storage-js.packages/StorageAnalyticsClient.default.listBuckets": {
         "name": "@supabase/storage-js.packages/StorageAnalyticsClient.default.listBuckets",
         "params": [

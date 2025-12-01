@@ -8,8 +8,6 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { FEATURE_PREVIEWS } from 'components/interfaces/App/FeaturePreview/FeaturePreview.constants'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -33,6 +31,13 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
 import { EmailRateLimitsAlert } from '../EmailRateLimitsAlert'
 import { slugifyTitle } from './EmailTemplates.utils'
@@ -52,10 +57,6 @@ const NotificationsFormSchema = z.object({
     {} as Record<string, z.ZodBoolean>
   ),
 })
-
-const SECURITY_NOTIFICATIONS_DISCUSSIONS_URL = FEATURE_PREVIEWS.find(
-  (f) => f.key === LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS
-)?.discussionsUrl
 
 export const EmailTemplates = () => {
   const { ref: projectRef } = useParams()
@@ -117,18 +118,26 @@ export const EmailTemplates = () => {
   }, [authConfig])
 
   return (
-    <ScaffoldSection isFullWidth className="!pt-0">
+    <>
       {isError && (
-        <AlertError
-          className="mt-12"
-          error={authConfigError}
-          subject="Failed to retrieve auth configuration"
-        />
+        <PageSection className="!pt-0">
+          <PageSectionContent>
+            <AlertError
+              className="mt-12"
+              error={authConfigError}
+              subject="Failed to retrieve auth configuration"
+            />
+          </PageSectionContent>
+        </PageSection>
       )}
       {isLoading && (
-        <div className="w-[854px] mt-12">
-          <GenericSkeletonLoader />
-        </div>
+        <PageSection className="!pt-0">
+          <PageSectionContent>
+            <div className="w-[854px] mt-12">
+              <GenericSkeletonLoader />
+            </div>
+          </PageSectionContent>
+        </PageSection>
       )}
       {isSuccess && (
         <>
@@ -137,10 +146,13 @@ export const EmailTemplates = () => {
               <EmailRateLimitsAlert />
             </div>
           )}
-
-          <div className="mt-12 space-y-12">
-            <div>
-              <ScaffoldSectionTitle className="mb-4">Authentication</ScaffoldSectionTitle>
+          <PageSection className="!pt-0">
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Authentication</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
+            <PageSectionContent>
               <Card>
                 {TEMPLATES_SCHEMAS.filter(
                   (t) => t.misc?.emailTemplateType === 'authentication'
@@ -168,10 +180,16 @@ export const EmailTemplates = () => {
                   )
                 })}
               </Card>
-            </div>
+            </PageSectionContent>
+          </PageSection>
 
-            <div>
-              <ScaffoldSectionTitle className="mb-4">Security</ScaffoldSectionTitle>
+          <PageSection>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Security</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
+            <PageSectionContent>
               {!acknowledged && (
                 <Admonition showIcon={false} type="tip" className="relative mb-6">
                   <Tooltip>
@@ -195,21 +213,12 @@ export const EmailTemplates = () => {
                       </div>
                       <p className="text-sm text-foreground-lighter text-balance">
                         We’ve expanded our email templates to handle security-sensitive actions. The
-                        list of templates will continue to grow as our feature-set changes
-                        {SECURITY_NOTIFICATIONS_DISCUSSIONS_URL && (
-                          <>
-                            {' '}
-                            and as we{' '}
-                            <InlineLink
-                              href={SECURITY_NOTIFICATIONS_DISCUSSIONS_URL}
-                              target="_blank"
-                            >
-                              gather feedback
-                            </InlineLink>{' '}
-                            from our community
-                          </>
-                        )}
-                        .
+                        list of templates will continue to grow as our feature-set changes, and as
+                        we{' '}
+                        <InlineLink href="https://github.com/orgs/supabase/discussions/40349">
+                          gather feedback
+                        </InlineLink>{' '}
+                        from our community .
                       </p>
                     </div>
                     <Button
@@ -300,10 +309,10 @@ export const EmailTemplates = () => {
                   </Card>
                 </form>
               </Form_Shadcn_>
-            </div>
-          </div>
+            </PageSectionContent>
+          </PageSection>
         </>
       )}
-    </ScaffoldSection>
+    </>
   )
 }

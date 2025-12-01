@@ -1,4 +1,6 @@
 import { AlertCircle } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
 
 import { useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
@@ -20,6 +22,8 @@ export const ServiceList = () => {
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
+  const [querySource, setQuerySource] = useQueryState('source', parseAsString)
+
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
   const {
     data: databases,
@@ -27,6 +31,12 @@ export const ServiceList = () => {
     isLoading: isLoadingDatabases,
   } = useReadReplicasQuery({ projectRef })
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef })
+
+  useEffect(() => {
+    if (querySource && querySource !== state.selectedDatabaseId) {
+      state.setSelectedDatabaseId(querySource)
+    }
+  }, [querySource, state, projectRef])
 
   // Get the API service
   const isCustomDomainActive = customDomainData?.customDomain?.status === 'active'
@@ -61,6 +71,9 @@ export const ServiceList = () => {
                     ? [{ id: 'load-balancer', name: 'API Load Balancer' }]
                     : []
                 }
+                onSelectId={() => {
+                  setQuerySource(null)
+                }}
               />
             </CardHeader>
             <CardContent>

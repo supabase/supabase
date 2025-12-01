@@ -16,6 +16,12 @@ cd e2e/studio
 pnpm exec playwright install
 ```
 
+### Environment Variables
+
+Some tests require specific environment variables to be set. If these are not set, the tests will be automatically skipped:
+
+- **`OPENAI_API_KEY`**: Required for the AI Assistant test (`assistant.spec.ts`). Without this variable, the assistant test will be skipped.
+
 ---
 
 ## Running the tests

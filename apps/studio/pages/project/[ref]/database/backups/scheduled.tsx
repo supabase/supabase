@@ -20,8 +20,8 @@ import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
-  PageHeaderFooter,
   PageHeaderMeta,
+  PageHeaderNavigationTabs,
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
@@ -48,9 +48,9 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
             <PageHeaderTitle>Database Backups</PageHeaderTitle>
           </PageHeaderSummary>
         </PageHeaderMeta>
-        <PageHeaderFooter>
+        <PageHeaderNavigationTabs>
           <DatabaseBackupsNav active="scheduled" />
-        </PageHeaderFooter>
+        </PageHeaderNavigationTabs>
       </PageHeader>
       <PageContainer>
         <PageSection>

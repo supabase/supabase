@@ -3,14 +3,19 @@ import { EmptyStatePresentational } from 'ui-patterns'
 import { CreateAnalyticsBucketModal } from './AnalyticsBuckets/CreateAnalyticsBucketModal'
 import { CreateBucketModal } from './CreateBucketModal'
 import { BUCKET_TYPES } from './Storage.constants'
-import { CreateVectorBucketDialog } from './VectorBuckets/CreateVectorBucketDialog'
+import { CreateVectorBucketButton } from './VectorBuckets/CreateVectorBucketDialog'
 
 interface EmptyBucketStateProps {
   bucketType: keyof typeof BUCKET_TYPES
   className?: string
+  onCreateBucket?: () => void
 }
 
-export const EmptyBucketState = ({ bucketType, className }: EmptyBucketStateProps) => {
+export const EmptyBucketState = ({
+  bucketType,
+  className,
+  onCreateBucket,
+}: EmptyBucketStateProps) => {
   const config = BUCKET_TYPES[bucketType]
 
   return (
@@ -30,7 +35,7 @@ export const EmptyBucketState = ({ bucketType, className }: EmptyBucketStateProp
           buttonClassName="w-fit"
         />
       )}
-      {bucketType === 'vectors' && <CreateVectorBucketDialog />}
+      {bucketType === 'vectors' && <CreateVectorBucketButton onClick={onCreateBucket} />}
     </EmptyStatePresentational>
   )
 }
