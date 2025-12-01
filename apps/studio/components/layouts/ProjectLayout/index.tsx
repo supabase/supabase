@@ -181,9 +181,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
             )}
             <ResizablePanel
               order={2}
-              minSize={100 - sidebarMaxSizePercentage}
-              maxSize={100 - sidebarMinSizePercentage}
-              defaultSize={100 - sidebarDefaultSizePercentage}
+              defaultSize={1}
               id="panel-project-content"
               className={cn('h-full flex flex-col w-full xl:min-w-[600px] bg-dash-sidebar')}
             >
@@ -312,7 +310,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   useEffect(() => {
     if (ref) state.setSelectedDatabaseId(ref)
-  }, [ref])
+  }, [ref, state])
 
   if (isBlocking && (isLoading || (requiresProjectDetails && selectedProject === undefined))) {
     return router.pathname.endsWith('[ref]') ? <LoadingState /> : <LogoLoader />
