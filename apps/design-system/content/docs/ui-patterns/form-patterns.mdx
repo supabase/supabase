@@ -3,25 +3,9 @@ title: Form patterns
 description: Common form patterns used in Studio settings pages and side panels.
 ---
 
-Forms in Supabase Studio follow consistent patterns to ensure a cohesive user experience across settings pages and side panels. This guide covers the most common form patterns and field types.
+Forms in Supabase Studio should follow consistent patterns to ensure a cohesive user experience across settings pages and side panels. This guide covers the most common form patterns and field types.
 
-## Overview
-
-Forms in Supabase Studio follow these key principles:
-
-- **Page structure**: Every page has a title and optional subtitle
-- **Sub navigation**: Pages can have sub navigation via tabs
-- **Sections**: Settings pages are broken down into sections
-- **Section structure**: Each section can have a title and a subtitle
-- **Card containers**: Forms or actions within a section are contained within a Card
-- **Field alignment**: Fields within a form are generally horizontally aligned
-- **Save actions**: Long settings pages with multiple sections can have a save action per section
-- **Action positioning**: Save actions are positioned at the bottom of form cards and stick to the bottom
-- **Section actions**: Section actions are also horizontally aligned
-
-## Form Layout Patterns
-
-### PageLayout Pattern
+## Page Layout
 
 Forms in page layouts typically use `PageSection` components with `Card` containers. Fields use `FormItemLayout` with `layout="flex-row-reverse"` for horizontal alignment.
 
@@ -32,9 +16,9 @@ Forms in page layouts typically use `PageSection` components with `Card` contain
   wide
 />
 
-### SidePanel/Sheet Pattern
+## Side Panel
 
-Forms in side panels (Sheets) use `FormItemLayout` with `layout="horizontal"` or `layout="vertical"` depending on available width. The form is typically wrapped in a `Sheet` component.
+Forms in side panels (Sheets) use `FormItemLayout` with `layout="horizontal"` on wider panels and `layout="vertical"` on panels with a size of `sm` or below. The form is typically wrapped in a `Sheet` component.
 
 <ComponentPreview
   name="form-patterns-sidepanel"

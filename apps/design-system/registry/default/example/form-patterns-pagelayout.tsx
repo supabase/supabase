@@ -93,8 +93,8 @@ export default function FormPatternsPageLayout() {
   }
 
   return (
-    <div className="w-full max-w-4xl">
-      <PageSection>
+    <div className="w-full">
+      <PageSection className="py-0">
         <PageSectionMeta>
           <PageSectionSummary>
             <PageSectionTitle>Form Settings</PageSectionTitle>
