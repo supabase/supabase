@@ -29,7 +29,6 @@ import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 're
 import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { BASE_PATH } from 'lib/constants'
 import { geoCentroid } from 'd3-geo'
-import { useTheme } from 'next-themes'
 import {
   buildCountsByIso2,
   getFillColor,
