@@ -16,23 +16,18 @@ Presence lets each connected client publish a small piece of state—called a �
 
 When any client subscribes, disconnects, or updates their presence payload, Supabase triggers one of three events:
 
-- **`sync`** — the full presence state has been updated  
-- **`join`** — a new client has started tracking presence  
-- **`leave`** — a client has stopped tracking presence  
+- **`sync`** — the full presence state has been updated
+- **`join`** — a new client has started tracking presence
+- **`leave`** — a client has stopped tracking presence
 
 The complete presence state returned by `presenceState()` looks like this:
 
 ```json
 {
-  "client_key_1": [
-    { "userId": 1, "typing": false }
-  ],
-  "client_key_2": [
-    { "userId": 2, "typing": true }
-  ]
+  "client_key_1": [{ "userId": 1, "typing": false }],
+  "client_key_2": [{ "userId": 2, "typing": true }]
 }
 ```
-
 
 ### Initialize the client
 
