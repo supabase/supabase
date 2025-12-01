@@ -109,8 +109,8 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
     const showPausedState = isPaused && !ignorePausedState
 
-    const sidebarMinSizePercentage = 10
-    const sidebarDefaultSizePercentage = 20
+    const sidebarMinSizePercentage = 1
+    const sidebarDefaultSizePercentage = 15
     const sidebarMaxSizePercentage = 33
 
     return (
@@ -130,7 +130,8 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
           <meta name="description" content="Supabase Studio" />
         </Head>
         <div className="flex flex-row h-full w-full">
-          <ResizablePanelGroup direction="horizontal" autoSaveId="project-layout">
+          {/*  autoSaveId="project-layout" */}
+          <ResizablePanelGroup direction="horizontal">
             {showProductMenu && productMenu && (
               <ResizablePanel
                 order={1}
