@@ -104,6 +104,7 @@ export const extractIso2FromFeatureProps = (
 ): string | undefined => {
   if (!props) return undefined
   const candidates = [
+    'ISO_A2_EH',
     'ISO_A2',
     'iso_a2',
     'ADMIN_ISO_A2',
@@ -122,4 +123,10 @@ export const extractIso2FromFeatureProps = (
   if (!name) return undefined
   const entry = COUNTRIES.find((c) => c.name === name)
   return entry?.code
+}
+
+export const iso2ToCountryName = (iso2: string): string => {
+  const code = iso2.toUpperCase()
+  const entry = COUNTRIES.find((c) => c.code === code)
+  return entry?.name ?? code
 }

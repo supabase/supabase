@@ -40,6 +40,7 @@ import {
   computeMarkerRadius,
   MAP_CHART_THEME,
   extractIso2FromFeatureProps,
+  iso2ToCountryName,
 } from 'components/interfaces/Reports/utils/geo'
 
 export const NetworkTrafficRenderer = (
@@ -581,7 +582,7 @@ export const RequestsByCountryMapRenderer = (
                     if (!isKnownCountryCode(iso2)) continue
                     const ll = COUNTRY_LAT_LON[iso2]
                     const r = computeMarkerRadius(count, max)
-                    const tooltipTitle = iso2
+                    const tooltipTitle = iso2ToCountryName(iso2)
                     const tooltipSubtitle = `${count.toLocaleString()} requests`
                     markers.push(
                       <Marker
