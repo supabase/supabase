@@ -2,8 +2,8 @@
 title: 'Introducing Vector Buckets'
 description: 'Introducing vector storage in Supabase: a durable storage layer with similarity search built-in.'
 author: fabrizio
-image: 2025-12-01-vector-buckets/og.png
-thumb: 2025-12-01-vector-buckets/og.png
+image: 2025-12-01-vector-buckets/og.png?v=3
+thumb: 2025-12-01-vector-buckets/thumb.png?v=3
 categories:
   - product
 date: '2025-12-01'
@@ -114,8 +114,8 @@ Vector Buckets and `pgvector` are complementary. They serve different roles and 
 - You’re dealing with a **large amount of vectors** (up to tens of millions) that you don’t want sitting in Postgres
 - You’re building **AI-heavy Supabase apps** (semantic search, recommendations, RAG, media similarity) and want a managed vector storage tier
 - You prefer a clear split between:
-    - **Hot vectors** in `pgvector` for the highest-traffic / most latency-sensitive queries
-    - **Warm or cold vectors** in Vector Buckets for everything else
+  - **Hot vectors** in `pgvector` for the highest-traffic / most latency-sensitive queries
+  - **Warm or cold vectors** in Vector Buckets for everything else
 
 In practice, many apps will use both:
 
@@ -127,9 +127,8 @@ In practice, many apps will use both:
 At a high level, here’s what happens under the hood:
 
 **1. Vector Bucket in Supabase Storage**
-    
+
     You create a bucket of type Vector Bucket in the Dashboard or via API.
-    
 
 ```jsx
 import { createClient } from '@supabase/supabase-js'
@@ -137,23 +136,18 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('https://your-project.supabase.co', 'your-service-key')
 
 await supabase.storage.vectors.createBucket('embeddings')
-
 ```
 
 **2. Create Vector indexes inside the bucket**
-    
+
     Inside the Vector Bucket, you create one or more indexes.
-    
 
 ```jsx
 // Create an index in that bucket
-await supabase.storage.vectors
-  .from('embeddings')
-  .createIndex('documents-openai', {
-    dimension: 1536,
-    distanceMetric: 'cosine',
-  })
-
+await supabase.storage.vectors.from('embeddings').createIndex('documents-openai', {
+  dimension: 1536,
+  distanceMetric: 'cosine',
+})
 ```
 
 **3. Store vectors**
@@ -266,9 +260,9 @@ A few concrete ways to put Vector Buckets to work:
 
 - Store embeddings for images, audio or video frames in a Vector Bucket.
 - Use similarity search to:
-    - Find visually similar assets for content discovery or recommendations
-    - Detect possible copyright issues by finding near-duplicate content
-    - Clean up your library by removing duplicate or near-duplicate media
+  - Find visually similar assets for content discovery or recommendations
+  - Detect possible copyright issues by finding near-duplicate content
+  - Clean up your library by removing duplicate or near-duplicate media
 
 ## Availability
 
@@ -286,32 +280,31 @@ More regions will be added in the near future.
 
 We’re using this phase to refine the APIs, scaling behaviour, and search experience based on real workloads. Limits may evolve as we learn from how you use the feature in production.
 
-Vector Buckets are **free to use (fair use policy applies)** during Public Alpha. Egress costs still apply. 
+Vector Buckets are **free to use (fair use policy applies)** during Public Alpha. Egress costs still apply.
 
 ## Get started
 
 You can try Vector Buckets in your project today:
 
 1. **Create a Vector Bucket**
-    
-    Dashboard → **Storage → Create bucket → Vector Bucket**.
-    
+
+   Dashboard → **Storage → Create bucket → Vector Bucket**.
+
 2. **Create an index**
-    
-    Pick a dimension that matches your embedding model and choose a distance metric.
-    
+
+   Pick a dimension that matches your embedding model and choose a distance metric.
+
 3. **Store vectors**
-    
-    Use Supabase clients to upsert vectors with metadata.
-    
+
+   Use Supabase clients to upsert vectors with metadata.
+
 4. **Query vectors**
-    
-    Build endpoints for semantic search, recommendations, or retrieval-augmented generation.
-    
+
+   Build endpoints for semantic search, recommendations, or retrieval-augmented generation.
+
 5. **Layer with `pgvector`**
-    
-    Keep your hottest, most latency-sensitive vectors in `pgvector`, and store large archives and media-heavy datasets in Vector Buckets.
-    
+
+   Keep your hottest, most latency-sensitive vectors in `pgvector`, and store large archives and media-heavy datasets in Vector Buckets.
 
 We’re excited to see what you build with this new vector storage tier.
 
