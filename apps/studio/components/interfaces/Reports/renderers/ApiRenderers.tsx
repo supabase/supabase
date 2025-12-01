@@ -30,6 +30,7 @@ import { ZoomableGroup } from 'react-simple-maps'
 import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { BASE_PATH } from 'lib/constants'
 import { geoCentroid } from 'd3-geo'
+import { useTheme } from 'next-themes'
 import {
   buildCountsByIso2,
   buildBaseIso2ToName,
@@ -423,9 +424,8 @@ export const RequestsByCountryMapRenderer = (
   const baseIso2ToName = buildBaseIso2ToName()
   const iso2ToName = normalizeIso2ToName(baseIso2ToName)
   const topoNameToCount = buildTopoNameToCount(countsByIso2, iso2ToName)
-  const prefersDark =
-    typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
-  const theme = prefersDark ? MAP_CHART_THEME.dark : MAP_CHART_THEME.light
+  const { resolvedTheme } = useTheme()
+  const theme = resolvedTheme === 'dark' ? MAP_CHART_THEME.dark : MAP_CHART_THEME.light
 
   return (
     <div ref={containerRef} className="w-full h-[560px] relative border-t">
