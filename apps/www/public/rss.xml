@@ -4,9 +4,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Mon, 01 Dec 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Tue, 02 Dec 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/open-warehouse-architecture</guid>
+  <title>The Open Warehouse Architecture</title>
+  <link>https://supabase.com/blog/open-warehouse-architecture</link>
+  <description>Introducing Supabase ETL, Analytics Buckets, and Postgres FDW for Iceberg—three features that make Postgres an interface for analytics.</description>
+  <pubDate>Tue, 02 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/vector-buckets</guid>
   <title>Introducing Vector Buckets</title>
   <link>https://supabase.com/blog/vector-buckets</link>

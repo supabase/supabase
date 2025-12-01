@@ -26,15 +26,16 @@ const getAuthors = (post: PostTypes | CMSPostTypes) => {
     return authors
   }
 
-  const authorArray = post.author?.split(',') || []
+  const authorArray = post.author?.split(',').map((a) => a.trim()) || []
   const authors = []
 
   for (let i = 0; i < authorArray.length; i++) {
-    authors.push(
-      blogAuthors.find((authors: any) => {
-        return authors.author_id === authorArray[i]
-      })
-    )
+    const foundAuthor = blogAuthors.find((authors: any) => {
+      return authors.author_id === authorArray[i]
+    })
+    if (foundAuthor) {
+      authors.push(foundAuthor)
+    }
   }
   return authors
 }
@@ -55,6 +56,7 @@ const BlogListItem = ({ post }: Props) => {
       <div className="lg:col-span-2 xl:col-span-4 flex justify-start items-center lg:grid grid-cols-2 xl:grid-cols-3 gap-2 text-sm">
         <div className="hidden lg:flex items-center -space-x-2">
           {authors.map((author: any, i: number) => {
+            if (!author) return null
             return (
               <div className="relative ring-background w-6 h-6 rounded-full ring-2" key={i}>
                 {author.author_image_url && (

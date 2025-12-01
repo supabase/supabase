@@ -1,0 +1,106 @@
+---
+title: 'The Open Warehouse Architecture'
+description: 'Introducing Supabase ETL, Analytics Buckets, and Postgres FDW for Iceberg—three features that make Postgres an interface for analytics.'
+author: paul_copplestone
+image: 2025-12-02-open-warehouse-architecture/og.png
+thumb: 2025-12-02-open-warehouse-architecture/thumb.png
+categories:
+  - product
+date: '2025-12-02:12:00'
+toc_depth: 2
+---
+
+Today, we are announcing three features that lead our Open Warehouse Architecture: [Supabase ETL](/blog/introducing-supabase-etl), [Supabase Analytics Buckets](/blog/introducing-analytics-buckets), and a Postgres Foreign Data Wrapper for Apache Iceberg.
+
+The most critical technical decision any business can make when getting started is choosing a database. Companies that choose the wrong database face a daunting exercise later: migrating to a new one. The problem gets worse because this always happens at the worst possible time, when they are scaling fast.
+
+Choosing a database is not just about what you need today. It is a forward-thinking decision. You have to think about what you might need two, three, five years down the line.
+
+A lot of startups recognize how high-stakes this decision is, and they turn to Supabase to help them get it right. Five million developers count on Supabase. Supabase has launched over 10 million databases. 60% of each Y Combinator batch starts their business on Supabase. They all choose Supabase because it is the most developer-friendly way to get a production-grade Postgres database, running on AWS.
+
+## What we're announcing today
+
+Supabase is launching new products that change how developers think about data:
+
+- **[Supabase ETL](/blog/introducing-supabase-etl)**. A change-data-capture pipeline that continuously replicates data from Supabase Postgres to analytics destinations. With one click, every new row in a Postgres database is mirrored in near real-time into an Iceberg table. No pipelines to maintain. No learning curve. Available now in private alpha.
+
+- **[Supabase Analytics Buckets](/blog/introducing-analytics-buckets)**. Specialized storage buckets built on Apache Iceberg and Amazon S3 Tables that provide columnar storage for analytical workloads while maintaining compatibility with the Postgres interface. Customers have documented 30-90 percent cost savings on storage by moving historical data to Analytics Buckets. Available now in public alpha.
+
+- **Postgres Foreign Data Wrapper for Iceberg**. An open-source Postgres FDW that exposes Iceberg tables as regular Postgres tables, allowing developers to query S3-based analytics data using standard SQL from within Postgres.
+
+Together, these products enable Postgres to become an interface for analytics. Developers can keep hot data in Postgres for fast transactions while streaming history to low-cost object storage for analytics, all accessible through SQL.
+
+They represent a new approach to data infrastructure. We call it the Open Warehouse Architecture.
+
+## The convenience trap
+
+Postgres is the world's most popular database. It's versatile and robust.
+
+But that versatility has a downside. Developers fall into what we call the convenience trap. They start storing analytical data in Postgres because it's the database they already use. Logs, metrics, telemetry. It all goes into Postgres.
+
+This works great for a while. But Postgres isn't designed for analytics. Analytical data grows fast. Eventually, the most critical database in the stack starts to slow down.
+
+![Postgres slowing down with analytical data](/images/blog/2025-12-02-open-warehouse-architecture/1.jpeg)
+
+So teams introduce an analytics engine. Typically ClickHouse.
+
+Now they have two of everything. Two schemas. Two libraries. Two sets of expertise. The data is fragmented between two systems. Getting business insights becomes a hassle.
+
+So they introduce a third database: a data warehouse.
+
+Then the data piles up across three systems and they face the final problem: costs. Every service stores data in a different format. There's redundancy everywhere. They're paying for the same data three times.
+
+What does everyone do at this point? They introduce S3 for long-term storage.
+
+Now they have four systems, each with its own format, its own tooling, its own expertise requirements.
+
+We don't like complexity at Supabase. Our goal is to deliver powerful enterprise-grade platforms and tools without all the "enterprise" complexity.
+
+![Complexity of multiple systems](/images/blog/2025-12-02-open-warehouse-architecture/2.jpeg)
+
+## The Open Warehouse Architecture
+
+The solution is to disaggregate the query engine and unify the storage layer.
+
+Data is stored in an open format (and is also in the main database in the Postgres data format.) Teams don't need different storage formats. They need different query engines for different workloads. Transactional queries need low latency. Analytical queries need fast scans. But the underlying data can be the same.
+
+For applications, teams still need Postgres. It delivers millisecond response times. It powers some of the world's largest apps.
+
+For analytics and warehousing, data gets stored in Apache Iceberg. Iceberg is an [open table format](https://supabase.com/blog/open-data-standards-postgres-otel-iceberg) that has become the industry standard. It's the universal language for data warehouses and analytics engines. Previously, each analytics engine spoke its own language. Snowflake talked Snowflake. Databricks talked Databricks. ClickHouse talked ClickHouse.
+
+Now, Iceberg becomes the lingua franca. Data gets stored in one format, and all the engines agree to speak it. Snowflake can read it. BigQuery can read it. ClickHouse, Trino, Spark, DuckDB can all read it.
+
+AWS recently launched Amazon S3 Tables, which brings Iceberg support to S3. This is significant because S3 has become the standard storage layer for data. Adding Iceberg support means every analytics system in the world can now speak the same language.
+
+Iceberg on S3 becomes the universal resting place for data.
+
+This changes everything. Instead of moving data from system to system, teams store it once. Instead of being locked into one vendor, they can query from any engine. Instead of siloed data, teams have synced data.
+
+Supabase ETL keeps these layers perfectly in sync. When you create a table in Postgres, it's automatically created in Iceberg. When you insert data in Postgres, it appears in Iceberg. When you no longer need data in Postgres, you detach the table from ETL and delete it, and then your data will remain in S3 (at a fraction of the cost.) The experience feels almost magical. Developers switch a connection string and queries feel the same. Postgres for transactions. Iceberg for analytics. Same SQL.
+
+![Open Warehouse Architecture diagram](/images/blog/2025-12-02-open-warehouse-architecture/3.jpeg)
+
+## Business benefits of the Open Warehouse Architecture
+
+Technical leaders also love the Open Warehouse Architecture. 
+
+First, they gain freedom of choice. Developers and data engineers can use any analytics tool they want. Snowflake, BigQuery, ClickHouse, Trino, Spark, DuckDB. They all speak Iceberg. Requirements change. New tools emerge. With an open format, teams aren't locked in.
+
+Second, they often see significant cost reduction. There's no more data redundancy. Data is stored once in S3. Engines connect to it and run queries on top. No duplication. No paying for the same data three times.
+
+Combine the freedom of choice and cost reduction with Supabase's focus on the developer experience, and you get a powerful architecture on which to build your data future.
+
+## The future of data is open
+
+When looking to the future of data, it is clear that it is going to be an open world.
+
+Postgres has eaten the world for transactional workloads. Most new businesses are being built on Postgres. Iceberg is on track to eat the world as the lingua franca for data warehousing.
+
+It took Supabase five years to become the most popular developer platform for Postgres. Supabase launched over 10 million databases and became the platform of choice for startups, AI builders, and innovation labs.
+
+Today, Supabase is starting the same journey with Iceberg. The company is bringing the same developer-friendly approach to this new open format.
+
+Supabase is building primitives that blur the lines between Postgres and S3. These are not just upgrades. They are part of a new foundation for building the next generation of data infrastructure.
+
+The future of data is not siloed systems and proprietary formats. It is open standards, unified storage, and SQL all the way down.
+
