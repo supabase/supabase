@@ -32,9 +32,10 @@ export interface ConfirmationModalProps {
     title?: string
     description?: string | React.ReactNode
   }
+  className?: string
 }
 
-const ConfirmationModal = forwardRef<
+export const ConfirmationModal = forwardRef<
   React.ElementRef<typeof DialogContent>,
   React.ComponentPropsWithoutRef<typeof Dialog> & ConfirmationModalProps
 >(
@@ -54,6 +55,7 @@ const ConfirmationModal = forwardRef<
       children,
       variant = 'default',
       disabled,
+      className,
       ...props
     },
     ref
@@ -105,7 +107,9 @@ const ConfirmationModal = forwardRef<
           )}
           {children && (
             <>
-              <DialogSection padding={'small'}>{children}</DialogSection>
+              <DialogSection padding="small" className={className}>
+                {children}
+              </DialogSection>
               <DialogSectionSeparator />
             </>
           )}

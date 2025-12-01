@@ -59,7 +59,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
   const selectedRuleMeta = data.exceptions.find((x) => x.id === selectedRuleToDelete)
   const selectedMemberForRule = members.find((x) => x.gotrue_id === selectedRuleMeta?.assigned_to)
 
-  const { mutate: deleteRule, isLoading: isDeleting } = useLintRuleDeleteMutation({
+  const { mutate: deleteRule, isPending: isDeleting } = useLintRuleDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted rule')
       setSelectedRuleToDelete(undefined)

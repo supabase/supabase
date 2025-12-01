@@ -1319,9 +1319,19 @@ export const examples: Registry = [
     files: ['example/empty-state-zero-items-table.tsx'],
   },
   {
-    name: 'empty-state-initial-state-presentational',
+    name: 'empty-state-presentational-demo',
     type: 'components:example',
-    files: ['example/empty-state-initial-state-presentational.tsx'],
+    files: ['example/empty-state-presentational-demo.tsx'],
+  },
+  {
+    name: 'empty-state-presentational-buttons',
+    type: 'components:example',
+    files: ['example/empty-state-presentational-buttons.tsx'],
+  },
+  {
+    name: 'empty-state-presentational-icon',
+    type: 'components:example',
+    files: ['example/empty-state-presentational-icon.tsx'],
   },
   {
     name: 'empty-state-initial-state-informational',
@@ -1332,5 +1342,25 @@ export const examples: Registry = [
     name: 'empty-state-zero-items-data-grid',
     type: 'components:example',
     files: ['example/empty-state-zero-items-data-grid.tsx'],
+  },
+  {
+    name: 'metric-card',
+    type: 'components:example',
+    files: ['example/metric-card.tsx'],
+  },
+  {
+    name: 'metric-card-minimal',
+    type: 'components:example',
+    files: ['example/metric-card-minimal.tsx'],
+  },
+  {
+    name: 'metric-card-minimal-horizontal',
+    type: 'components:example',
+    files: ['example/metric-card-minimal-horizontal.tsx'],
+  },
+  {
+    name: 'metric-card-with-icon-link-tooltip',
+    type: 'components:example',
+    files: ['example/metric-card-with-icon-link-tooltip.tsx'],
   },
 ]
