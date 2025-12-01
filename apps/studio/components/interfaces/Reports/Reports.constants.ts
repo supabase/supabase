@@ -310,7 +310,9 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           count(t.id) as count
         from edge_logs t
           cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
           cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
           cross join unnest(request.cf) as cf
         where
           cf.country is not null
