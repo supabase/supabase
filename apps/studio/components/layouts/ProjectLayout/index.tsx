@@ -109,7 +109,8 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
     const showPausedState = isPaused && !ignorePausedState
 
-    const sidebarMinSizePercentage = 20
+    const sidebarMinSizePercentage = 10
+    const sidebarDefaultSizePercentage = 20
     const sidebarMaxSizePercentage = 33
 
     return (
@@ -135,7 +136,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                 order={1}
                 minSize={sidebarMinSizePercentage}
                 maxSize={sidebarMaxSizePercentage}
-                defaultSize={sidebarMinSizePercentage}
+                defaultSize={sidebarDefaultSizePercentage}
                 id="panel-left"
                 className={cn(
                   'hidden md:block',
@@ -181,7 +182,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
               order={2}
               minSize={100 - sidebarMaxSizePercentage}
               maxSize={100 - sidebarMinSizePercentage}
-              defaultSize={100 - sidebarMinSizePercentage}
+              defaultSize={100 - sidebarDefaultSizePercentage}
               id="panel-project-content"
               className={cn('h-full flex flex-col w-full xl:min-w-[600px] bg-dash-sidebar')}
             >
