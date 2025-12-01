@@ -8,7 +8,6 @@ import { Sidebar } from 'components/interfaces/Sidebar'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useCheckLatestDeploy } from 'hooks/use-check-latest-deploy'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { ResizablePanel, ResizablePanelGroup, SidebarProvider } from 'ui'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader/LayoutHeader'
 import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
@@ -39,8 +38,6 @@ export const DefaultLayout = ({
   const { ref } = useParams()
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
-  const { activeSidebar } = useSidebarManagerSnapshot()
-  const showSidebar = !activeSidebar?.component
   const showProductMenu = !!ref && router.pathname !== '/project/[ref]'
 
   const [lastVisitedOrganization] = useLocalStorageQuery(
