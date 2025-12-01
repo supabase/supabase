@@ -113,6 +113,16 @@ const Migrations = () => {
 
                           return (
                             <TableRow key={migration.version}>
+                              <TableCell>{migration.version}</TableCell>
+                              <TableCell
+                                className={
+                                  (migration?.name ?? '').length === 0
+                                    ? '!text-foreground-lighter'
+                                    : ''
+                                }
+                              >
+                                {migration?.name ?? 'Name not available'}
+                              </TableCell>
                               <TableCell>{insertedAt}</TableCell>
                               <TableCell align="right">
                                 <Button
