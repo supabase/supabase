@@ -18,6 +18,8 @@ export const LayoutSidebar = ({
 }: LayoutSidebarProps) => {
   const { activeSidebar } = useSidebarManagerSnapshot()
 
+  if (!activeSidebar?.component) return null
+
   return (
     <>
       <ResizableHandle withHandle />
@@ -30,8 +32,9 @@ export const LayoutSidebar = ({
         maxSize={!!activeSidebar?.component ? maxSize : 0}
         className={cn(
           'border-l bg fixed z-40 right-0 top-0 bottom-0',
-          'w-screen h-[100dvh]',
-          'md:absolute md:h-auto md:w-3/4',
+          'h-[100dvh]',
+          'md:absolute md:h-auto md:w-1/2',
+          'lg:w-2/5',
           'xl:relative xl:border-l-0'
         )}
       >
