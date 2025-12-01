@@ -97,10 +97,7 @@ You can use the Supabase Dashboard to define columns and set data types, includi
 ```jsx
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  'https://your-project.supabase.co',
-  'your-service-key'
-)
+const supabase = createClient('https://your-project.supabase.co', 'your-service-key')
 
 await supabase.storage.createBucket('my-analytics-bucket', {
   type: 'ANALYTICS',
@@ -220,4 +217,3 @@ We are excited to see what you build.
     allowfullscreen
   />
 </div>
-
