@@ -54,7 +54,14 @@ TableFooter.displayName = 'TableFooter'
 
 const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTMLTableRowElement>>(
   ({ className, ...props }, ref) => (
-    <tr ref={ref} className={cn('border-b data-[state=selected]:bg-muted', className)} {...props} />
+    <tr
+      ref={ref}
+      className={cn(
+        'border-b [&>td]:hover:bg-surface-200 data-[state=selected]:bg-muted',
+        className
+      )}
+      {...props}
+    />
   )
 )
 TableRow.displayName = 'TableRow'
@@ -116,8 +123,8 @@ function TableHeadSort<TColumn extends string = string>({
         <ChevronsUpDown
           className={cn(
             baseIconClass,
-            'transition-opacity opacity-80 md:opacity-0',
-            !isActive && 'group-hover/table:opacity-40 group-hover/table-head-sort:opacity-80'
+            'transition-opacity opacity-80 md:opacity-40',
+            !isActive ? 'group-hover/table-head-sort:opacity-80' : '!opacity-0'
           )}
         />
       </>
@@ -128,7 +135,7 @@ function TableHeadSort<TColumn extends string = string>({
     <button
       type="button"
       className={cn(
-        'group/table-head-sort flex items-center gap-1 cursor-pointer select-none !bg-transparent border-none p-0 w-full text-left',
+        'group/table-head-sort heading-meta whitespace-nowrap flex items-center gap-1 cursor-pointer select-none !bg-transparent border-none p-0 w-full text-left',
         className
       )}
       onClick={() => onSortChange(column)}
