@@ -1,48 +1,101 @@
-import { BookOpen } from 'lucide-react'
+import { BookOpen, X } from 'lucide-react'
 import Link from 'next/link'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { Button, cn } from 'ui'
+import { Button, cn, Card, CardContent } from 'ui'
 import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
-import { Admonition } from 'ui-patterns'
 
-export const ObservabilityBanner = () => (
-  <Admonition showIcon={false} type="tip" className="relative overflow-hidden">
-    <div className="absolute -inset-16 z-0 opacity-50">
-      <img
-        src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
-        alt="Background pattern"
-        className="w-full h-full object-cover object-right hidden dark:block"
-      />
-      <img
-        src={`${BASE_PATH}/img/reports/bg-grafana-light.svg`}
-        alt="Background pattern"
-        className="w-full h-full object-cover object-right dark:hidden"
-      />
-      <div className="absolute inset-0 bg-gradient-to-r from-background-alternative to-transparent" />
-    </div>
-    <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-8 justify-between px-2 py-1">
-      <div className="flex flex-col gap-y-0.5">
-        <div className="flex flex-col gap-y-2 items-start">
-          <div className="flex items-center gap-4 mb-2">
-            {LOG_DRAIN_TYPES.map((type) =>
-              React.cloneElement(type.icon, { height: 20, width: 20 })
-            )}
-          </div>
-          <p className="text-sm font-medium">Advanced observability</p>
-        </div>
-        <p className="text-sm text-foreground-lighter text-balance">
-          Visualize over 200 database performance and health metrics with our Metrics API.
-        </p>
-      </div>
-      <ObservabilityBannerActions />
-    </div>
-  </Admonition>
-)
+export const ObservabilityBanner = () => {
+  const { ref } = useParams()
+  const [isDismissed, setIsDismissed] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.OBSERVABILITY_BANNER_DISMISSED(ref ?? ''),
+    false
+  )
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsMounted(true)
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  return (
+    <AnimatePresence>
+      {!isDismissed && (
+        <motion.div
+          initial={{ opacity: 0, y: 20, scale: 0.98 }}
+          animate={isMounted ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.98 }}
+          exit={{ opacity: 0, y: 20, scale: 0.98 }}
+          transition={{
+            duration: 0.3,
+            ease: 'easeOut',
+            delay: 0,
+          }}
+          className="fixed bottom-4 right-4 z-50 w-full max-w-72"
+        >
+          <Card className="relative overflow-hidden shadow-lg">
+            <div className="absolute -inset-16 z-0 opacity-50 pointer-events-none">
+              <img
+                src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
+                alt="Background pattern"
+                className="w-full h-full object-cover object-right hidden dark:block"
+              />
+              <img
+                src={`${BASE_PATH}/img/reports/bg-grafana-light.svg`}
+                alt="Background pattern"
+                className="w-full h-full object-cover object-right dark:hidden"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-background-alternative to-transparent" />
+            </div>
+
+            <CardContent className="relative z-10 p-6">
+              <div className="absolute top-4 right-4 z-20">
+                <Button
+                  type="text"
+                  size="tiny"
+                  htmlType="button"
+                  icon={<X size={16} strokeWidth={1.5} />}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setIsDismissed(true)
+                  }}
+                  className="opacity-75 hover:opacity-100 px-1"
+                  aria-label="Close banner"
+                />
+              </div>
+
+              <div className="flex flex-col gap-y-4">
+                <div className="flex items-center gap-4">
+                  {LOG_DRAIN_TYPES.map((type) => (
+                    <React.Fragment key={type.value}>
+                      {React.cloneElement(type.icon, { height: 20, width: 20 })}
+                    </React.Fragment>
+                  ))}
+                </div>
+                <div className="flex flex-col gap-y-1">
+                  <p className="text-base font-medium">Advanced observability</p>
+                  <p className="text-sm text-foreground-lighter text-balance">
+                    Visualize over 200 database performance and health metrics with our Metrics API.
+                  </p>
+                </div>
+                <ObservabilityBannerActions />
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
 
 const ObservabilityBannerActions = ({ className }: { className?: string }) => {
   const { ref } = useParams()
@@ -65,20 +118,6 @@ const ObservabilityBannerActions = ({ className }: { className?: string }) => {
           Docs
         </Link>
       </Button>
-      {/* <Button type="default" size="tiny" asChild>
-        <Link
-          href="https://github.com/supabase/supabase-grafana"
-          target="_blank"
-          onClick={() =>
-            sendEvent({
-              action: 'reports_database_grafana_banner_clicked',
-              groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-            })
-          }
-        >
-          Configure Grafana
-        </Link>
-      </Button> */}
     </div>
   )
 }
