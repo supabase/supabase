@@ -256,6 +256,7 @@ export function DiskManagementForm() {
     // [Joshen] Skip disk configuration related stuff for AWS Nimbus
     try {
       if (
+        !isAwsK8s &&
         !isAwsNimbus &&
         (payload.storageType !== form.formState.defaultValues?.storageType ||
           payload.provisionedIOPS !== form.formState.defaultValues?.provisionedIOPS ||
@@ -274,6 +275,7 @@ export function DiskManagementForm() {
       }
 
       if (
+        !isAwsK8s &&
         !isAwsNimbus &&
         (payload.growthPercent !== form.formState.defaultValues?.growthPercent ||
           payload.minIncrementGb !== form.formState.defaultValues?.minIncrementGb ||
