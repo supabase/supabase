@@ -165,7 +165,11 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                     name="schema"
                     value={defaultSchema}
                     label="Select a schema to enable the extension for"
-                    descriptionText={`Extension must be installed in ${defaultSchema}.`}
+                    descriptionText={
+                      extension.name === 'wrappers'
+                        ? 'Recommended schema is “extensions”.'
+                        : `Extension must be installed in “${defaultSchema}”.`
+                    }
                   />
                 ) : (
                   <Listbox
