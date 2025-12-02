@@ -42,7 +42,7 @@ export const ObservabilityBanner = () => {
             ease: 'easeOut',
             delay: 0,
           }}
-          className="fixed bottom-4 right-4 z-50 w-full max-w-80"
+          className="fixed bottom-4 right-4 z-50 w-full max-w-72"
         >
           <Card className="relative overflow-hidden shadow-lg rounded-2xl">
             <div className="absolute -inset-16 z-0 opacity-50 pointer-events-none">
@@ -96,8 +96,8 @@ export const ObservabilityBanner = () => {
                   </div>
                 </div>
                 <div className="flex flex-col gap-y-1 mb-2">
-                  <p className="text-base font-medium">Export Metrics to your dashboards</p>
-                  <p className="text-sm text-foreground-lighter text-balance">
+                  <p className="text-sm font-medium">Export Metrics to your dashboards</p>
+                  <p className="text-xs text-foreground-lighter text-balance">
                     Visualize over 200 database performance and health metrics with our Metrics API.
                   </p>
                 </div>
