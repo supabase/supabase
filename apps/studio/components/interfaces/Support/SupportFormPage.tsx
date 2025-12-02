@@ -16,6 +16,7 @@ import { useStateTransition } from 'hooks/misc/useStateTransition'
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { AIAssistantOption } from './AIAssistantOption'
+import { DiscordCTACard } from './DiscordCTACard'
 import { HighlightProjectRefProvider, useHighlightProjectRefContext } from './HighlightContext'
 import { Success } from './Success'
 import type { ExtendedSupportCategories } from './Support.constants'
@@ -89,6 +90,7 @@ function SupportFormPageContent() {
     <SupportFormWrapper>
       <SupportFormHeader />
       <AIAssistantOption projectRef={projectRef} organizationSlug={orgSlug} />
+      <DiscordCTACard organizationSlug={orgSlug} />
       <SupportFormBody
         form={form}
         state={state}
