@@ -6,7 +6,7 @@ import { sleep } from './helpers.js'
 const checkHealth = async (platformClient: PlatformClient, ref: string) => {
   // get health of services
   const healthResp = await platformClient.send(
-    `/projects/${ref}/health?services=db,pooler,auth,realtime,rest,storage`
+    `/v1/projects/${ref}/health?services=db,pooler,auth,realtime,rest,storage`
   )
 
   assert(
