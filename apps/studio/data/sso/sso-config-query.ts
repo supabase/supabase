@@ -44,7 +44,7 @@ export const useOrgSSOConfigQuery = <TData = OrgSSOConfigData>(
 ) => {
   const { data: organization } = useSelectedOrganizationQuery()
   const plan = organization?.plan.id
-  const canSetupSSOConfig = ['team', 'enterprise'].includes(plan ?? '')
+  const canSetupSSOConfig = ['team', 'enterprise', 'platform'].includes(plan ?? '')
 
   return useQuery<OrgSSOConfigData, OrgSSOConfigError, TData>({
     queryKey: orgSSOKeys.orgSSOConfig(orgSlug),

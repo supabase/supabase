@@ -3113,9 +3113,9 @@ export interface components {
           name: string
         }[]
         /** @enum {string} */
-        source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise'
+        source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
         /** @enum {string|null} */
-        target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | null
+        target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform' | null
         valid: boolean
         warnings: {
           key: string
@@ -4352,7 +4352,7 @@ export interface components {
         | 'AI_LOG_GENERATOR_OPT_IN'
       )[]
       /** @enum {string} */
-      plan?: 'free' | 'pro' | 'team' | 'enterprise'
+      plan?: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
     }
     V1PatchMigrationBody: {
       name?: string
