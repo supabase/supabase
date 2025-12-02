@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import type { CreatePolicyBody } from 'data/database-policies/database-policy-create-mutation'
 import { fetchPost } from 'data/fetchers'
+import { BASE_PATH } from 'lib/constants'
 import type { ResponseError } from 'types'
 
 export type SqlPolicyGenerateVariables = {
@@ -34,7 +35,7 @@ export async function generateSqlPolicy({
   orgSlug,
   message,
 }: SqlPolicyGenerateVariables): Promise<SqlPolicyGenerateResponse> {
-  const result = await fetchPost<SqlPolicyGenerateResponse>('/api/ai/sql/policy', {
+  const result = await fetchPost<SqlPolicyGenerateResponse>(`${BASE_PATH}/api/ai/sql/policy`, {
     tableName,
     schema,
     columns,
