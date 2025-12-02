@@ -1,9 +1,10 @@
 import { Check, ChevronsUpDown, Database, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
+import { ActionBar } from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   cn,
@@ -27,7 +28,6 @@ import {
 import WrapperDynamicColumns from './WrapperDynamicColumns'
 import type { Table, TableOption } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 export type WrapperTableEditorProps = {
   visible: boolean

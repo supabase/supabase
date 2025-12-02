@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import { Badge, Button, Checkbox, Modal } from 'ui'
+import { Button, Checkbox, cn, Modal } from 'ui'
 
 import { PolicyName } from 'components/interfaces/Auth/Policies/PolicyEditor/PolicyName'
 import { PolicyRoles } from 'components/interfaces/Auth/Policies/PolicyEditor/PolicyRoles'
@@ -47,7 +47,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
           .
         </p>
       </div>
-      <div className="md:w-2/3">
+      <div className="md:w-2/3 flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
           <Checkbox
             label="SELECT"
@@ -72,11 +72,18 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
         </div>
         <div className="flex w-5/6 flex-wrap">
           {Object.keys(STORAGE_CLIENT_LIBRARY_MAPPINGS).map((method) => (
-            <div key={method} className="mr-2 mt-2 font-mono">
-              <Badge variant={allowedClientLibraryMethods.includes(method) ? 'brand' : 'default'}>
+            <ul key={method} className="mr-2 mt-2 list-none">
+              <li
+                className={cn(
+                  'text-xs font-mono leading-[1.1] px-2 py-1 rounded-full border font-normal whitespace-nowrap transition-colors duration-200',
+                  allowedClientLibraryMethods.includes(method)
+                    ? 'bg-brand bg-opacity-10 text-brand-600 border-brand-500'
+                    : 'bg-surface-75 text-foreground-lighter border-muted'
+                )}
+              >
                 {method}
-              </Badge>
-            </div>
+              </li>
+            </ul>
           ))}
         </div>
       </div>

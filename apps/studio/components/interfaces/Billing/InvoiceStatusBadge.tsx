@@ -1,4 +1,5 @@
 import { InlineLink } from 'components/ui/InlineLink'
+import { DOCS_URL } from 'lib/constants'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { InvoiceStatus } from './Invoices.types'
 
@@ -14,7 +15,7 @@ const invoiceStatusMapping: Record<
 > = {
   [InvoiceStatus.PAID]: {
     label: 'Paid',
-    badgeVariant: 'brand',
+    badgeVariant: 'success',
   },
   [InvoiceStatus.VOID]: {
     label: 'Forgiven',
@@ -52,11 +53,7 @@ const InvoiceStatusBadge = ({
   return (
     <Tooltip>
       <TooltipTrigger>
-        <Badge
-          size="small"
-          className="capitalize"
-          variant={statusMapping?.badgeVariant || 'default'}
-        >
+        <Badge variant={statusMapping?.badgeVariant || 'default'}>
           {statusMapping?.label || status}
         </Badge>
       </TooltipTrigger>
@@ -72,7 +69,7 @@ const InvoiceStatusBadge = ({
 
               <p className="text-xs text-foreground">
                 If you run into this, we recommend{' '}
-                <InlineLink href="https://supabase.com/docs/guides/platform/credits#credit-top-ups">
+                <InlineLink href={`${DOCS_URL}/guides/platform/credits#credit-top-ups`}>
                   topping up your credits
                 </InlineLink>{' '}
                 in advance to avoid running into this in the future.

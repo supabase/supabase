@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
 
 import { useFlag, useParams } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
@@ -83,7 +83,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     ref
   ) => {
     const router = useRouter()
-    const [isClient, setIsClient] = useState(false)
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
     const { mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
@@ -110,9 +109,9 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
     const showPausedState = isPaused && !ignorePausedState
 
-    useEffect(() => {
-      setIsClient(true)
-    }, [])
+    const sidebarMinSizePercentage = 1
+    const sidebarDefaultSizePercentage = 15
+    const sidebarMaxSizePercentage = 33
 
     return (
       <>
@@ -131,12 +130,14 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
           <meta name="description" content="Supabase Studio" />
         </Head>
         <div className="flex flex-row h-full w-full">
-          <ResizablePanelGroup direction="horizontal" autoSaveId="project-layout">
+          {/*  autoSaveId="project-layout" */}
+          <ResizablePanelGroup direction="horizontal">
             {showProductMenu && productMenu && (
               <ResizablePanel
                 order={1}
-                maxSize={33}
-                defaultSize={1}
+                minSize={sidebarMinSizePercentage}
+                maxSize={sidebarMaxSizePercentage}
+                defaultSize={sidebarDefaultSizePercentage}
                 id="panel-left"
                 className={cn(
                   'hidden md:block',
@@ -179,8 +180,10 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
               />
             )}
             <ResizablePanel
-              defaultSize={1}
               order={2}
+              minSize={100 - sidebarMaxSizePercentage}
+              maxSize={100 - sidebarMinSizePercentage}
+              defaultSize={100 - sidebarDefaultSizePercentage}
               id="panel-project-content"
               className={cn('h-full flex flex-col w-full xl:min-w-[600px] bg-dash-sidebar')}
             >
@@ -289,9 +292,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const isProjectBuilding =
     selectedProject?.status === PROJECT_STATUS.COMING_UP ||
     selectedProject?.status === PROJECT_STATUS.UNKNOWN
-  const isProjectPausing =
-    selectedProject?.status === PROJECT_STATUS.GOING_DOWN ||
-    selectedProject?.status === PROJECT_STATUS.PAUSING
+  const isProjectPausing = selectedProject?.status === PROJECT_STATUS.PAUSING
   const isProjectPauseFailed = selectedProject?.status === PROJECT_STATUS.PAUSE_FAILED
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
 

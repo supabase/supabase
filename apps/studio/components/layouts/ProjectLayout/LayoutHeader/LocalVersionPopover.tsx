@@ -51,7 +51,7 @@ export const LocalVersionPopover = () => {
   return (
     <Popover>
       <PopoverTrigger className="flex items-center">
-        <Badge variant={isBeta ? 'warning' : hasUpdate ? 'brand' : 'default'}>
+        <Badge variant={isBeta ? 'warning' : hasUpdate ? 'success' : 'default'}>
           {isBeta ? 'Beta' : hasUpdate ? 'Update available' : 'Latest'}
         </Badge>
       </PopoverTrigger>

@@ -280,7 +280,7 @@ export const TableList = ({
             placeholder="Search for a table"
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}
-            icon={<Search size={12} />}
+            icon={<Search />}
           />
 
           {!isSchemaLocked && (

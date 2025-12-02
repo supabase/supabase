@@ -360,11 +360,7 @@ export const CreateBranchModal = () => {
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
                           <Label>Sync with a GitHub branch</Label>
-                          {!gitlessBranching && (
-                            <Badge variant="warning" size="small">
-                              Required
-                            </Badge>
-                          )}
+                          {!gitlessBranching && <Badge variant="warning">Required</Badge>}
                         </div>
                         <p className="text-sm text-foreground-lighter">
                           Keep this preview branch in sync with a chosen GitHub branch
@@ -386,11 +382,7 @@ export const CreateBranchModal = () => {
                       label={
                         <>
                           <Label className="mr-2">Include data</Label>
-                          {!hasPitrEnabled && (
-                            <Badge variant="warning" size="small">
-                              Requires PITR
-                            </Badge>
-                          )}
+                          {!hasPitrEnabled && <Badge variant="warning">Requires PITR</Badge>}
                         </>
                       }
                       layout="flex-row-reverse"

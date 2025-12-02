@@ -69,7 +69,7 @@ export const Extensions = () => {
           value={filterString}
           onChange={(e) => setFilterString(e.target.value)}
           className="w-52"
-          icon={<Search size={14} />}
+          icon={<Search />}
         />
       </div>
 
