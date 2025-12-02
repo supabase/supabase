@@ -7,12 +7,10 @@ import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance
 
 export const BannerIndexAdvisor = () => {
   const { ref } = useParams()
-  const [isDismissed, setIsDismissed] = useLocalStorageQuery(
+  const [, setIsDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.INDEX_ADVISOR_NOTICE_DISMISSED(ref ?? ''),
     false
   )
-
-  if (isDismissed) return null
 
   return (
     <BannerCard onDismiss={() => setIsDismissed(true)}>

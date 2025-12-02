@@ -62,10 +62,10 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         content: <BannerIndexAdvisor />,
         priority: 1,
       })
-    }
 
-    return () => {
-      dismissBanner('index-advisor-banner')
+      return () => {
+        dismissBanner('index-advisor-banner')
+      }
     }
   }, [
     ref,

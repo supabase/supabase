@@ -22,7 +22,7 @@ const ObservabilityLayoutContent = ({
   children,
 }: PropsWithChildren<ObservabilityLayoutProps>) => {
   const { ref } = useParams()
-  const { addBanner } = useBannerStack()
+  const { addBanner, dismissBanner } = useBannerStack()
 
   const [isMetricsBannerDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.OBSERVABILITY_BANNER_DISMISSED(ref ?? ''),
@@ -37,8 +37,12 @@ const ObservabilityLayoutContent = ({
         content: <BannerMetricsAPI />,
         priority: 0,
       })
+
+      return () => {
+        dismissBanner('metrics-api-banner')
+      }
     }
-  }, [ref, isMetricsBannerDismissed, addBanner])
+  }, [ref, isMetricsBannerDismissed, addBanner, dismissBanner])
 
   const { reportsAll } = useIsFeatureEnabled(['reports:all'])
 
