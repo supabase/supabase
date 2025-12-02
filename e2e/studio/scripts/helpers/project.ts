@@ -71,7 +71,7 @@ export async function getProjectRef({
   orgSlug,
   supaRegion,
   projectName,
-}: GetProjectRefParams): Promise<string> {
+}: GetProjectRefParams): Promise<string | undefined> {
   const getResp = await platformClient.send(`/v1/projects`, { method: 'GET' }, 60000)
 
   if (getResp.status != 200) {
@@ -86,11 +86,5 @@ export async function getProjectRef({
     (p: any) => p.organization_slug === orgSlug && p.region === supaRegion && p.name === projectName
   )
 
-  if (!project) {
-    throw new Error(
-      `Project not found with name: ${projectName}, org: ${orgSlug}, region: ${supaRegion}`
-    )
-  }
-
-  return project.ref
+  return project?.ref
 }
