@@ -10,9 +10,9 @@ date: '2025-12-02:11:00'
 toc_depth: 2
 ---
 
-Today we're introducing Supabase ETL: a change-data-capture pipeline that replicates your Postgres tables to analytical destinations in near real time.
+Today we're introducing **Supabase ETL**: a change-data-capture pipeline that replicates your Postgres tables to analytical destinations in near real time.
 
-Supabase ETL reads changes from your Postgres database and writes them to external destinations. It uses logical replication to capture inserts, updates, deletes and truncates as they happen. Setup takes minutes in the Supabase Dashboard.
+Supabase ETL reads changes from your Postgres database and writes them to external destinations. It uses logical replication to capture inserts, updates, deletes and truncates as they happen. **Setup takes minutes in the Supabase Dashboard.**
 
 The first supported destinations are [Analytics Buckets](/blog/introducing-analytics-buckets) (powered by Iceberg) and BigQuery.
 
@@ -22,9 +22,9 @@ Supabase ETL is open source. You can find the code on GitHub at [github.com/supa
 
 Postgres is excellent for transactional workloads like reading a single user record or inserting an order. But when you need to scan millions of rows for analytics, Postgres slows down.
 
-Column-oriented systems like BigQuery and Apache Iceberg are built for this. They can aggregate massive datasets orders of magnitude faster, compress data more efficiently, and handle complex analytical queries that would choke a transactional database.
+Column-oriented systems like BigQuery, or those built on open formats like Apache Iceberg, are designed for this. They can aggregate massive datasets **orders of magnitude faster**, compress data more efficiently, and handle complex analytical queries that would choke a transactional database.
 
-Supabase ETL gives you the best of both worlds: keep your app fast on Postgres while unlocking powerful analytics on purpose-built systems.
+**Supabase ETL gives you the best of both worlds**: keep your app fast on Postgres while unlocking powerful analytics on purpose-built systems.
 
 ## How it works
 
@@ -42,11 +42,11 @@ Here's how:
 
 5. Your data is available for querying in the destination
 
-The pipeline starts with an initial copy of your selected tables, then switches to streaming mode. Your analytics stay fresh with latency measured in milliseconds to seconds.
+The pipeline starts with an initial copy of your selected tables, then switches to streaming mode. **Your analytics stay fresh with latency measured in milliseconds to seconds.**
 
 ## Setting up ETL
 
-You configure ETL entirely through the Supabase Dashboard. No code required.
+You configure ETL entirely through the Supabase Dashboard. **No code required.**
 
 ### Step 1: Create a publication
 
@@ -68,7 +68,9 @@ Navigate to `Database` in your Supabase Dashboard. Select the `Replication` tab 
 
 ### Step 3: Add a destination
 
-Click `Add Destination` and choose your destination type. _For Analytics Buckets, you will need to create an analytics bucket first in the Storage section._
+Click `Add Destination` and choose your destination type.
+
+**Note:** For Analytics Buckets, you will need to create an analytics bucket first in the Storage section.
 
 Configure the destination with your bucket credentials and select your publication. Click Create and `Start` to begin replication.
 
@@ -84,7 +86,7 @@ Our goal with Supabase ETL is to let you connect your existing data systems to S
 
 [Analytics Buckets](https://supabase.com/docs/guides/storage/analytics/introduction) are specialized storage buckets built on Apache Iceberg, an open table format designed for large analytical datasets. Your data is stored in Parquet files on S3.
 
-When you replicate to Analytics Buckets, your tables are created with a changelog structure. Each row includes a `cdc_operation` column indicating whether the change was an `INSERT`, `UPDATE`, or `DELETE`. This append-only format preserves the complete history of all changes.
+When you replicate to Analytics Buckets, your tables are created with a changelog structure. Each row includes a `cdc_operation` column indicating whether the change was an `INSERT`, `UPDATE`, or `DELETE`. **This append-only format preserves the complete history of all changes.**
 
 You can query Analytics Buckets from PyIceberg, Apache Spark, DuckDB, Amazon Athena, or any tool that supports the Iceberg REST Catalog API.
 
@@ -112,7 +114,9 @@ To remove a table:
 alter publication analytics_pub drop table orders;
 ```
 
-After changing your publication, restart the pipeline from the Dashboard actions menu for the changes to take effect. Note that ETL does not remove data from your destination when you remove a table from a publication, this is by design.
+After changing your publication, restart the pipeline from the Dashboard actions menu for the changes to take effect.
+
+**Note:** ETL does not remove data from your destination when you remove a table from a publication. This is by design to prevent accidental data loss.
 
 ## When to use ETL vs read replicas
 
@@ -120,7 +124,7 @@ Read replicas and ETL solve different problems.
 
 Read replicas help when you need to scale concurrent queries, but they're still Postgres. They don't make analytics faster.
 
-ETL moves your data to systems built for analytics. You get faster queries on large datasets, lower storage costs through compression, and complete separation between your production workload and analytics.
+ETL moves your data to systems built for analytics. You get **faster queries on large datasets**, **lower storage costs** through compression, and **complete separation** between your production workload and analytics.
 
 You can use both: read replicas for application read scaling, ETL for analytics.
 
@@ -141,14 +145,12 @@ We're working on schema change support and additional destinations, and evaluati
 
 Supabase ETL is usage-based:
 
-- $25 per connector per month
-- $15 per GB of change data processed after the initial sync
-- Initial copy is free
+- **$25 per connector per month**
+- **$15 per GB** of change data processed after the initial sync
+- **Initial copy is free**
 
 ## Get started
 
-Supabase ETL is in private alpha. To request access, contact your account manager or fill out the form in the Dashboard.
+**Supabase ETL is in private alpha.** To request access, contact your account manager or fill out the form in the Dashboard.
 
-If you want to dive into the code, the ETL framework is open source and written in Rust. Check out the repository at [github.com/supabase/etl](http://github.com/supabase/etl).
-
-We're excited to see what you build.
+If you want to dive into the code, **the ETL framework is open source** and written in Rust. Check out the repository at [github.com/supabase/etl](http://github.com/supabase/etl).
