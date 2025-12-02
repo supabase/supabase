@@ -76,7 +76,7 @@ const BlogListItem = ({ post }: Props) => {
             {post.categories.map(
               (category, i) =>
                 i === 0 && (
-                  <Badge key={category} className="group-hover:border-foreground-muted capitalize">
+                  <Badge key={category} className="group-hover:border-foreground-muted">
                     {sanitizeCategory(category)}
                   </Badge>
                 )
