@@ -5186,7 +5186,13 @@ export interface components {
         value: string
       }
       /** @enum {string} */
-      tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | 'tier_enterprise'
+      tier:
+        | 'tier_free'
+        | 'tier_pro'
+        | 'tier_payg'
+        | 'tier_team'
+        | 'tier_enterprise'
+        | 'tier_platform'
     }
     CreateOrganizationResponse:
       | {
@@ -5204,7 +5210,7 @@ export interface components {
           organization_requires_mfa: boolean
           plan: {
             /** @enum {string} */
-            id: 'free' | 'pro' | 'team' | 'enterprise'
+            id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
             name: string
           }
           restriction_data: {
@@ -6510,7 +6516,7 @@ export interface components {
       payment_method_type: string
       plan: {
         /** @enum {string} */
-        id: 'free' | 'pro' | 'team' | 'enterprise'
+        id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
         name: string
       }
       project_addons: {
@@ -6571,7 +6577,7 @@ export interface components {
         /** Format: date-time */
         at: string
         /** @enum {string} */
-        target_plan: 'free' | 'pro' | 'team' | 'enterprise'
+        target_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
         usage_billing_enabled: boolean
       } | null
       usage_billing_enabled: boolean
@@ -7471,7 +7477,7 @@ export interface components {
       organization_requires_mfa: boolean
       plan: {
         /** @enum {string} */
-        id: 'free' | 'pro' | 'team' | 'enterprise'
+        id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
         name: string
       }
       restriction_data: {
@@ -7532,7 +7538,7 @@ export interface components {
       opt_in_tags: string[]
       plan: {
         /** @enum {string} */
-        id: 'free' | 'pro' | 'team' | 'enterprise'
+        id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
         name: string
       }
       restriction_data: {
@@ -7602,6 +7608,10 @@ export interface components {
           | 'PITR_28'
           | 'IPV4'
           | 'LOG_DRAIN'
+          | 'LOG_INGESTION'
+          | 'LOG_QUERYING'
+          | 'LOG_STORAGE'
+          | 'ACTIVE_COMPUTE_HOURS'
         usage: number
         usage_original: number
       }[]
@@ -7662,6 +7672,10 @@ export interface components {
           | 'PITR_28'
           | 'IPV4'
           | 'LOG_DRAIN'
+          | 'LOG_INGESTION'
+          | 'LOG_QUERYING'
+          | 'LOG_STORAGE'
+          | 'ACTIVE_COMPUTE_HOURS'
         pricing_free_units?: number
         pricing_package_price?: number
         pricing_package_size?: number
@@ -7740,7 +7754,7 @@ export interface components {
         /** @enum {string} */
         effective_at?: 'now' | 'end_of_billing_period' | 'none'
         /** @enum {string} */
-        id: 'free' | 'pro' | 'team' | 'enterprise'
+        id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
         is_current: boolean
         name: string
         price: number
@@ -8006,9 +8020,9 @@ export interface components {
         name: string
       }[]
       /** @enum {string} */
-      source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise'
+      source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
       /** @enum {string|null} */
-      target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | null
+      target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform' | null
       valid: boolean
       warnings: {
         key: string
@@ -9577,6 +9591,10 @@ export interface components {
           | 'PITR_28'
           | 'IPV4'
           | 'LOG_DRAIN'
+          | 'LOG_INGESTION'
+          | 'LOG_QUERYING'
+          | 'LOG_STORAGE'
+          | 'ACTIVE_COMPUTE_HOURS'
         usage_original?: number
       }[]
       subscription_id: string
@@ -10502,7 +10520,13 @@ export interface components {
         value: string
       }
       /** @enum {string} */
-      tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | 'tier_enterprise'
+      tier:
+        | 'tier_free'
+        | 'tier_pro'
+        | 'tier_payg'
+        | 'tier_team'
+        | 'tier_enterprise'
+        | 'tier_platform'
     }
     UpdateSubscriptionResponse: {
       pending_payment_intent_secret: string | null
