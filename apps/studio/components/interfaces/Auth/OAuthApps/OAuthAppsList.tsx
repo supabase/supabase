@@ -144,9 +144,6 @@ export const OAuthAppsList = () => {
       if (sortCol === 'name') {
         return a.client_name.localeCompare(b.client_name) * orderMultiplier
       }
-      if (sortCol === 'client_id') {
-        return a.client_id.localeCompare(b.client_id) * orderMultiplier
-      }
       if (sortCol === 'client_type') {
         return a.client_type.localeCompare(b.client_type) * orderMultiplier
       }
