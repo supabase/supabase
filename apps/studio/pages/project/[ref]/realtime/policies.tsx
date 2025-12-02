@@ -1,9 +1,9 @@
+import { RealtimePolicies } from 'components/interfaces/Realtime/Policies'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import RealtimeLayout from 'components/layouts/RealtimeLayout/RealtimeLayout'
 import { DocsButton } from 'components/ui/DocsButton'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
-import { RealtimePolicies } from 'components/interfaces/Realtime/Policies'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -22,9 +22,7 @@ const RealtimePoliciesPage: NextPageWithLayout = () => {
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Policies</PageHeaderTitle>
-            <PageHeaderDescription>
-              Control access to your realtime channels
-            </PageHeaderDescription>
+            <PageHeaderDescription>Control access to your realtime channels</PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
             <DocsButton href={`${DOCS_URL}/guides/realtime/authorization`} />
