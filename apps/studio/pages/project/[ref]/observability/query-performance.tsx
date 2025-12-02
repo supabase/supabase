@@ -64,7 +64,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         id: 'index-advisor-banner',
         isDismissed: false,
         content: <BannerIndexAdvisor />,
-        priority: 0,
+        priority: 1,
       })
     }
 
