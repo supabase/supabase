@@ -23,6 +23,7 @@ import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/S
 import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
 import { realtimeReports } from 'data/reports/v2/realtime.config'
 import type { NextPageWithLayout } from 'types'
+import { ObservabilityBanner } from 'components/ui/ObservabilityBanner'
 
 const RealtimeReport: NextPageWithLayout = () => {
   return (
@@ -131,6 +132,7 @@ const RealtimeUsage = () => {
   return (
     <>
       <ReportHeader showDatabaseSelector={false} title="Realtime" />
+      <ObservabilityBanner />
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-3">

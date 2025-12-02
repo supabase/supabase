@@ -34,6 +34,7 @@ import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import { BASE_PATH } from 'lib/constants'
 import { parseAsJson, useQueryState } from 'nuqs'
 import type { NextPageWithLayout } from 'types'
+import { ObservabilityBanner } from 'components/ui/ObservabilityBanner'
 
 const EdgeFunctionsReportV2: NextPageWithLayout = () => {
   return (
@@ -133,6 +134,7 @@ const EdgeFunctionsUsage = () => {
   return (
     <>
       <ReportHeader title="Edge Functions" showDatabaseSelector={false} />
+      <ObservabilityBanner />
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2">

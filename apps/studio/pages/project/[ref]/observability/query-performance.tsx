@@ -20,6 +20,7 @@ import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import { ObservabilityBanner } from 'components/ui/ObservabilityBanner'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -84,6 +85,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
           )}
         </div>
       </div>
+      <ObservabilityBanner />
       <QueryPerformance
         queryHitRate={queryHitRate}
         queryPerformanceQuery={queryPerformanceQuery}

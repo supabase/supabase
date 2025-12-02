@@ -19,6 +19,7 @@ import { useApiReport } from 'data/reports/api-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useCallback } from 'react'
 import type { NextPageWithLayout } from 'types'
+import { ObservabilityBanner } from 'components/ui/ObservabilityBanner'
 
 export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()
@@ -92,6 +93,7 @@ export const ApiReport: NextPageWithLayout = () => {
   return (
     <ReportPadding>
       <ReportHeader title="API Gateway" showDatabaseSelector={false} />
+      <ObservabilityBanner />
       <ReportStickyNav
         content={
           <div className="flex items-center gap-3">

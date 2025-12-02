@@ -1083,6 +1083,18 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
 }
 
 /**
+ * User clicks on Metrics API banner in studio Reports pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/*
+ */
+export interface ObservabilityBannerClickedEvent {
+  action: 'observability_metrics_api_banner_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the deploy button for an Edge Function.
  *
  * @group Events
@@ -2431,6 +2443,7 @@ export type TelemetryEvent =
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
+  | ObservabilityBannerClickedEvent
   | EdgeFunctionDeployButtonClickedEvent
   | EdgeFunctionDeployUpdatesConfirmClickedEvent
   | EdgeFunctionAiAssistantButtonClickedEvent

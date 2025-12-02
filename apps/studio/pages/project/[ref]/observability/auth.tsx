@@ -38,6 +38,7 @@ import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateR
 import { useRouter } from 'next/router'
 import { parseAsJson, useQueryState } from 'nuqs'
 import type { NextPageWithLayout } from 'types'
+import { ObservabilityBanner } from 'components/ui/ObservabilityBanner'
 
 const AuthReport: NextPageWithLayout = () => {
   return (
@@ -201,6 +202,7 @@ const AuthUsage = () => {
   return (
     <>
       <ReportHeader title="Auth" showDatabaseSelector={false} />
+      <ObservabilityBanner />
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2">

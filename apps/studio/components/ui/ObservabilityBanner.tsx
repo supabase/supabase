@@ -1,4 +1,4 @@
-import { BookOpen, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -9,7 +9,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { Button, cn, Card, CardContent } from 'ui'
+import { Button, Badge, cn, Card, CardContent } from 'ui'
 import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
 
 export const ObservabilityBanner = () => {
@@ -23,7 +23,7 @@ export const ObservabilityBanner = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsMounted(true)
-    }, 1000)
+    }, 500)
 
     return () => clearTimeout(timer)
   }, [])
@@ -32,17 +32,17 @@ export const ObservabilityBanner = () => {
     <AnimatePresence>
       {!isDismissed && (
         <motion.div
-          initial={{ opacity: 0, y: 20, scale: 0.98 }}
-          animate={isMounted ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.98 }}
-          exit={{ opacity: 0, y: 20, scale: 0.98 }}
+          initial={{ opacity: 0, y: 6, scale: 0.98 }}
+          animate={isMounted ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 6, scale: 0.99 }}
+          exit={{ opacity: 0, y: 6, scale: 0.99 }}
           transition={{
             duration: 0.3,
             ease: 'easeOut',
             delay: 0,
           }}
-          className="fixed bottom-4 right-4 z-50 w-full max-w-72"
+          className="fixed bottom-4 right-4 z-50 w-full max-w-80"
         >
-          <Card className="relative overflow-hidden shadow-lg">
+          <Card className="relative overflow-hidden shadow-lg rounded-2xl">
             <div className="absolute -inset-16 z-0 opacity-50 pointer-events-none">
               <img
                 src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
@@ -74,15 +74,23 @@ export const ObservabilityBanner = () => {
               </div>
 
               <div className="flex flex-col gap-y-4">
-                <div className="flex items-center gap-4">
-                  {LOG_DRAIN_TYPES.map((type) => (
-                    <React.Fragment key={type.value}>
-                      {React.cloneElement(type.icon, { height: 20, width: 20 })}
-                    </React.Fragment>
-                  ))}
+                <div className="flex flex-col gap-y-2 items-start">
+                  <Badge
+                    variant="success"
+                    className="-ml-0.5 uppercase inline-flex items-center mb-2"
+                  >
+                    Beta
+                  </Badge>
+                  <div className="flex items-center gap-4">
+                    {LOG_DRAIN_TYPES.filter((type) => type.value !== 'sentry').map((type) => (
+                      <React.Fragment key={type.value}>
+                        {React.cloneElement(type.icon, { height: 20, width: 20 })}
+                      </React.Fragment>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex flex-col gap-y-1">
-                  <p className="text-base font-medium">Advanced observability</p>
+                <div className="flex flex-col gap-y-1 mb-2">
+                  <p className="text-base font-medium">Export Metrics to your dashboards</p>
                   <p className="text-sm text-foreground-lighter text-balance">
                     Visualize over 200 database performance and health metrics with our Metrics API.
                   </p>
@@ -104,18 +112,18 @@ const ObservabilityBannerActions = ({ className }: { className?: string }) => {
 
   return (
     <div className={cn('flex gap-2', className)}>
-      <Button type="default" size="tiny" icon={<BookOpen />} asChild>
+      <Button type="default" size="tiny" asChild>
         <Link
           href={`${DOCS_URL}/guides/telemetry/metrics`}
           target="_blank"
           onClick={() =>
             sendEvent({
-              action: 'reports_database_grafana_banner_clicked',
+              action: 'observability_metrics_api_banner_clicked',
               groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
             })
           }
         >
-          Docs
+          Get started for Free
         </Link>
       </Button>
     </div>

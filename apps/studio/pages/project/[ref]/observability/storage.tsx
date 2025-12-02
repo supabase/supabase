@@ -30,6 +30,7 @@ import { useStorageReport } from 'data/reports/storage-report-query'
 import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import { ObservabilityBanner } from 'components/ui/ObservabilityBanner'
 
 export const StorageReport: NextPageWithLayout = () => {
   const report = useStorageReport()
@@ -75,6 +76,7 @@ export const StorageReport: NextPageWithLayout = () => {
   return (
     <ReportPadding>
       <ReportHeader title="Storage" showDatabaseSelector={false} />
+      <ObservabilityBanner />
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2">

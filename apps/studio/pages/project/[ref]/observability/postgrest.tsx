@@ -22,6 +22,7 @@ import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
 import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
 import type { NextPageWithLayout } from 'types'
+import { ObservabilityBanner } from 'components/ui/ObservabilityBanner'
 
 const PostgRESTReport: NextPageWithLayout = () => {
   return (
@@ -105,6 +106,7 @@ const PostgrestReport = () => {
   return (
     <>
       <ReportHeader showDatabaseSelector={false} title="Data API" />
+      <ObservabilityBanner />
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2">
