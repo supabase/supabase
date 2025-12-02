@@ -9,6 +9,7 @@ import 'reactflow/dist/style.css'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -19,6 +20,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { tablesToSQL } from 'lib/helpers'
@@ -92,7 +94,14 @@ export const SchemaGraph = () => {
     {}
   )
 
+  const { can: canUpdateTables } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
+
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
+
+  const canAddTables = canUpdateTables && !isSchemaLocked
 
   const resetLayout = () => {
     const nodes = reactFlowInstance.getNodes()
@@ -294,7 +303,7 @@ export const SchemaGraph = () => {
                 title="No tables in schema"
                 description={`The “${selectedSchema}” schema doesn’t have any tables.`}
               >
-                {!isSchemaLocked ? (
+                {canAddTables ? (
                   <Button asChild className="mt-2" type="default" icon={<Plus />}>
                     <Link href={`/project/${ref}/editor?create=table`}>New table</Link>
                   </Button>
@@ -309,12 +318,14 @@ export const SchemaGraph = () => {
                       content: {
                         side: 'bottom',
                         className: 'w-[280px]',
-                        text: (
+                        text: isSchemaLocked ? (
                           <ProtectedSchemaWarning
                             size="sm"
                             schema={selectedSchema}
                             entity="table"
                           />
+                        ) : (
+                          'You need additional permissions to create tables'
                         ),
                       },
                     }}
