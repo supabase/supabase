@@ -64,10 +64,10 @@ async function getClient() {
   }
 }
 
-export async function getFlags(userEmail: string = '', _customAttributes?: Record<string, string>) {
+export async function getFlags(userEmail: string = '', customAttributes?: Record<string, string>) {
   const client = await getClient()
-  const customAttributes = {
-    ..._customAttributes,
+  const _customAttributes = {
+    ...customAttributes,
     is_staff: !!userEmail ? userEmail.includes('@supabase.').toString() : 'false',
   }
 
@@ -75,11 +75,11 @@ export async function getFlags(userEmail: string = '', _customAttributes?: Recor
     return []
   } else if (userEmail) {
     return client.getAllValuesAsync(
-      new configcat.User(userEmail, undefined, undefined, customAttributes)
+      new configcat.User(userEmail, undefined, undefined, _customAttributes)
     )
   } else {
     return client.getAllValuesAsync(
-      new configcat.User('anonymous', undefined, undefined, customAttributes)
+      new configcat.User('anonymous', undefined, undefined, _customAttributes)
     )
   }
 }
