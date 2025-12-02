@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
-import { CalendarIcon, Plus, Trash2 } from 'lucide-react'
+import { CalendarIcon, ExternalLink, Plus, Trash2, Upload } from 'lucide-react'
+import { useRef, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import * as z from 'zod'
 
@@ -26,10 +27,12 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Separator,
   Switch,
   Textarea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -60,9 +63,17 @@ const formSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
   duration: z.number().min(5).max(30),
   redirectUris: z.array(z.object({ value: z.string().url('Must be a valid URL') })),
+  apiKey: z.string().optional(),
 })
 
 export default function FormPatternsPageLayout() {
+  const uploadButtonRef = useRef<HTMLInputElement>(null)
+  const fileUploadRef = useRef<HTMLInputElement>(null)
+  const [logoFile, setLogoFile] = useState<File>()
+  const [logoUrl, setLogoUrl] = useState<string>()
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
+  const [isDragging, setIsDragging] = useState(false)
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -80,6 +91,7 @@ export default function FormPatternsPageLayout() {
       password: '',
       duration: 10,
       redirectUris: [{ value: '' }],
+      apiKey: 'sk_live_51H3x4mpl3_4nd_53cur3_k3y_1234567890',
     },
   })
 
@@ -123,6 +135,8 @@ export default function FormPatternsPageLayout() {
                     )}
                   />
 
+                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
+
                   {/* Password Input */}
                   <FormField_Shadcn_
                     control={form.control}
@@ -141,48 +155,33 @@ export default function FormPatternsPageLayout() {
                     )}
                   />
 
-                  {/* Input with Units */}
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="duration"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="flex-row-reverse"
-                        label="Input with Units"
-                        description="Input with additional unit label"
-                        className="[&>div]:md:w-1/2"
-                      >
-                        <FormControl_Shadcn_>
-                          <PrePostTab postTab="MB" className="w-full">
-                            <Input_Shadcn_ {...field} type="number" min={5} max={30} />
-                          </PrePostTab>
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
-                  />
+                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
 
-                  {/* Textarea */}
+                  {/* Copyable Input */}
                   <FormField_Shadcn_
                     control={form.control}
-                    name="description"
-                    render={({ field }) => (
+                    name="apiKey"
+                    render={() => (
                       <FormItemLayout
                         layout="flex-row-reverse"
-                        label="Textarea"
-                        description="Multi-line text input for longer content"
-                        className="[&>div]:md:w-1/2"
+                        label="Copyable Input"
+                        description="Read-only input with copy-to-clipboard functionality"
+                        className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
                       >
                         <FormControl_Shadcn_>
-                          <Textarea
-                            {...field}
-                            rows={4}
-                            placeholder="Enter multi-line text"
-                            className="resize-none"
+                          <Input
+                            copy
+                            readOnly
+                            value={form.getValues('apiKey') || ''}
+                            onChange={() => {}}
+                            onCopy={() => console.log('Copied to clipboard')}
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
+
+                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
 
                   {/* Number Input */}
                   <FormField_Shadcn_
@@ -208,6 +207,216 @@ export default function FormPatternsPageLayout() {
                     )}
                   />
 
+                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
+
+                  {/* Input with Units */}
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="duration"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Input with Units"
+                        description="Input with additional unit label"
+                        className="[&>div]:md:w-1/2"
+                      >
+                        <FormControl_Shadcn_>
+                          <PrePostTab postTab="MB" className="w-full">
+                            <Input_Shadcn_ {...field} type="number" min={5} max={30} />
+                          </PrePostTab>
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+
+                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
+
+                  {/* Textarea */}
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Textarea"
+                        description="Multi-line text input for longer content"
+                        className="[&>div]:md:w-1/2"
+                      >
+                        <FormControl_Shadcn_>
+                          <Textarea
+                            {...field}
+                            rows={4}
+                            placeholder="Enter multi-line text"
+                            className="resize-none"
+                          />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+
+                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
+
+                  {/* Icon Upload */}
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="description"
+                    render={() => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Icon upload"
+                        description="For icons, avatars, or small images with preview"
+                        className="[&>div]:md:w-1/2"
+                      >
+                        <FormControl_Shadcn_>
+                          <div className="flex gap-4 items-center">
+                            <button
+                              type="button"
+                              onClick={() => uploadButtonRef.current?.click()}
+                              className="flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong"
+                              style={{
+                                backgroundImage: logoUrl ? `url("${logoUrl}")` : 'none',
+                              }}
+                            >
+                              {!logoUrl && <Upload size={14} />}
+                            </button>
+                            <div className="flex gap-2 items-center">
+                              <Button
+                                type="default"
+                                size="tiny"
+                                icon={<Upload size={14} />}
+                                onClick={() => uploadButtonRef.current?.click()}
+                              >
+                                Upload
+                              </Button>
+                              {logoUrl && (
+                                <Button
+                                  type="default"
+                                  size="tiny"
+                                  icon={<Trash2 size={12} />}
+                                  onClick={() => {
+                                    setLogoFile(undefined)
+                                    setLogoUrl(undefined)
+                                  }}
+                                />
+                              )}
+                            </div>
+                            <input
+                              type="file"
+                              ref={uploadButtonRef}
+                              className="hidden"
+                              accept="image/png, image/jpeg"
+                              onChange={(e) => {
+                                const files = e.target.files
+                                if (files && files.length > 0) {
+                                  const file = files[0]
+                                  setLogoFile(file)
+                                  setLogoUrl(URL.createObjectURL(file))
+                                  e.target.value = ''
+                                }
+                              }}
+                            />
+                          </div>
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+
+                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
+
+                  {/* File Upload */}
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="description"
+                    render={() => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="File Upload"
+                        description="Drag-and-drop or select files for upload"
+                        className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
+                      >
+                        <FormControl_Shadcn_>
+                          <div
+                            className={`border-2 rounded-lg p-6 text-center bg-muted transition-colors duration-300 ${
+                              isDragging
+                                ? 'border-strong border-dashed bg-muted'
+                                : 'border-border border-dashed'
+                            }`}
+                            onDragOver={(e) => {
+                              e.preventDefault()
+                              setIsDragging(true)
+                            }}
+                            onDragLeave={() => setIsDragging(false)}
+                            onDrop={(e) => {
+                              e.preventDefault()
+                              setIsDragging(false)
+                              const files = Array.from(e.dataTransfer.files)
+                              setUploadedFiles((prev) => [...prev, ...files])
+                            }}
+                          >
+                            <input
+                              type="file"
+                              ref={fileUploadRef}
+                              className="hidden"
+                              multiple
+                              onChange={(e) => {
+                                const files = e.target.files
+                                if (files) {
+                                  setUploadedFiles((prev) => [...prev, ...Array.from(files)])
+                                }
+                                e.target.value = ''
+                              }}
+                            />
+                            <div className="flex flex-col items-center gap-y-2">
+                              <Upload size={20} className="text-foreground-lighter" />
+                              <p className="text-sm text-foreground-light">
+                                {uploadedFiles.length > 0
+                                  ? `${uploadedFiles.length} file${uploadedFiles.length > 1 ? 's' : ''} selected`
+                                  : 'Upload files'}
+                              </p>
+                              <p className="text-xs text-foreground-lighter">
+                                Drag and drop or{' '}
+                                <button
+                                  type="button"
+                                  onClick={() => fileUploadRef.current?.click()}
+                                  className="underline cursor-pointer hover:text-foreground-light"
+                                >
+                                  select files
+                                </button>{' '}
+                                to upload
+                              </p>
+                              {uploadedFiles.length > 0 && (
+                                <div className="mt-4 w-full space-y-2">
+                                  {uploadedFiles.map((file, idx) => (
+                                    <div
+                                      key={`${file.name}-${idx}`}
+                                      className="flex items-center justify-between gap-2 p-2 bg rounded border"
+                                    >
+                                      <span className="text-sm text-foreground-light truncate flex-1">
+                                        {file.name}
+                                      </span>
+                                      <Button
+                                        type="default"
+                                        size="tiny"
+                                        icon={<Trash2 size={12} />}
+                                        onClick={() => {
+                                          setUploadedFiles((prev) =>
+                                            prev.filter((_, i) => i !== idx)
+                                          )
+                                        }}
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+
+                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
+
                   {/* Switch */}
                   <FormField_Shadcn_
                     control={form.control}
@@ -224,6 +433,8 @@ export default function FormPatternsPageLayout() {
                       </FormItemLayout>
                     )}
                   />
+
+                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
 
                   {/* Checkbox */}
                   <FormItemLayout
@@ -299,6 +510,8 @@ export default function FormPatternsPageLayout() {
                     </div>
                   </FormItemLayout>
 
+                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
+
                   {/* Select */}
                   <FormField_Shadcn_
                     control={form.control}
@@ -331,6 +544,8 @@ export default function FormPatternsPageLayout() {
                       </FormItemLayout>
                     )}
                   />
+
+                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
 
                   {/* Multi-Select */}
                   <FormField_Shadcn_
@@ -368,6 +583,8 @@ export default function FormPatternsPageLayout() {
                     )}
                   />
 
+                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
+
                   {/* Radio Group */}
                   <FormField_Shadcn_
                     control={form.control}
@@ -396,6 +613,8 @@ export default function FormPatternsPageLayout() {
                       </FormItemLayout>
                     )}
                   />
+
+                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
 
                   {/* Date Picker */}
                   <FormField_Shadcn_
@@ -432,6 +651,8 @@ export default function FormPatternsPageLayout() {
                       </FormItemLayout>
                     )}
                   />
+
+                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
 
                   {/* Field Array */}
                   <FormField_Shadcn_
@@ -481,6 +702,29 @@ export default function FormPatternsPageLayout() {
                       </FormItemLayout>
                     )}
                   />
+
+                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
+
+                  {/* Action Field */}
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label="Action Field"
+                    description="Button or link for navigation or performable actions"
+                    className="[&>div]:md:w-1/2"
+                  >
+                    <div className="flex gap-2 items-center">
+                      <Button
+                        type="default"
+                        icon={<ExternalLink size={14} />}
+                        onClick={() => console.log('Action performed')}
+                      >
+                        View documentation
+                      </Button>
+                      <Button type="default" onClick={() => console.log('Reset action')}>
+                        Reset API key
+                      </Button>
+                    </div>
+                  </FormItemLayout>
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
                   {form.formState.isDirty && (
