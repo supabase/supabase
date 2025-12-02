@@ -78,7 +78,7 @@ Configure the destination with your bucket credentials and select your publicati
 
 The Dashboard shows pipeline status and lag. You can start, stop, restart, or delete pipelines from the actions menu.
 
-## Available Destinations
+## Available destinations
 
 Our goal with Supabase ETL is to let you connect your existing data systems to Supabase. We're actively expanding the list of supported destinations. Right now, the official destinations are Analytics Buckets and BigQuery.
 
@@ -94,9 +94,7 @@ You can query Analytics Buckets from PyIceberg, Apache Spark, DuckDB, Amazon Ath
 
 BigQuery is Google's serverless data warehouse, built for large-scale analytics. It handles petabytes of data and integrates well with existing BI tools and data pipelines.
 
-When you replicate to BigQuery, Supabase ETL creates a view for each table. Behind the scenes, the view points to a versioned copy of your data. When a `TRUNCATE` happens, ETL creates a fresh version and swaps the view to point to it. Old versions are cleaned up automatically.
-
-For example, a source table `public.users` maps to a BigQuery view called `public_users`. Behind the scenes, this view points to a versioned table (`public_users_[version]`), but you don't need to think about that, just query the view, and ETL handles version management for you.
+When you replicate to BigQuery, Supabase ETL creates a view for each table and uses an underlying versioned table to support all operations efficiently. You query the view, and ETL handles the rest.
 
 ## Adding and removing tables
 
