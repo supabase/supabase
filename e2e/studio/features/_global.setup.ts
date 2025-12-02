@@ -14,7 +14,7 @@ dotenv.config({
 })
 
 const IS_PLATFORM = process.env.IS_PLATFORM
-const doAuthentication = Boolean(env.EMAIL && env.PASSWORD && env.PROJECT_REF)
+const doAuthentication = env.AUTHENTICATION
 
 setup('Global Setup', async ({ page }) => {
   console.log(`\n 🧪 Setting up test environment.

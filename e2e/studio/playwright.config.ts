@@ -35,7 +35,8 @@ export default defineConfig({
     trace: 'retain-on-failure',
     permissions: ['clipboard-read', 'clipboard-write'],
     extraHTTPHeaders: {
-      'x-vercel-protection-bypass': process.env.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO,
+      'x-vercel-protection-bypass':
+        process.env.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO || 'false',
       'x-vercel-set-bypass-cookie': 'true',
     },
   },
@@ -52,6 +53,7 @@ export default defineConfig({
       use: {
         browserName: 'chromium',
         screenshot: 'off',
+
         // Only use storage state if authentication is enabled. When AUTHENTICATION=false
         // we should not require a pre-generated storage state file.
         storageState: env.AUTHENTICATION ? STORAGE_STATE_PATH : undefined,

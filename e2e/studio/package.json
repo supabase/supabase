@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "e2e": "playwright test",
-    "e2e:ui": "playwright test --ui"
+    "e2e:ui": "playwright test --ui",
+    "e2e:setup:platform": "tsx scripts/setup-platform-tests.ts"
   },
   "keywords": [],
   "author": "",

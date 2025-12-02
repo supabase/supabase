@@ -29,6 +29,8 @@ export const env = {
   SUPA_PAT: process.env.SUPA_PAT || 'test',
 
   BRANCH_NAME: process.env.BRANCH_NAME || `e2e-test-${Date.now()}`,
+
+  AUTHENTICATION: Boolean(process.env.EMAIL && process.env.PASSWORD && process.env.PROJECT_REF),
 }
 
 export const STORAGE_STATE_PATH = path.join(import.meta.dirname, './playwright/.auth/user.json')
