@@ -73,6 +73,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     }
   }, [
     ref,
+    isIndexAdvisorAvailable,
     isIndexAdvisorBannerDismissed,
     isIndexAdvisorEnabled,
     addBanner,
