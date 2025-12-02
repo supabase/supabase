@@ -59,7 +59,7 @@ export const RLSManagement = ({
   const { includeSchemaMetadata } = useOrgAiOptInLevel()
   const track = useTrack()
   const isExistingTable = !!table && !isNewRecord && !isDuplicating
-  const rlsEnabled = isRlsEnabled ?? true
+  const rlsEnabled = isRlsEnabled ?? false
 
   const { data: policies } = useDatabasePoliciesQuery(
     {
