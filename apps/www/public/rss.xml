@@ -4,9 +4,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 16 Oct 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Mon, 01 Dec 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/vector-buckets</guid>
+  <title>Introducing Vector Buckets</title>
+  <link>https://supabase.com/blog/vector-buckets</link>
+  <description>Introducing vector storage in Supabase: a durable storage layer with similarity search built-in.</description>
+  <pubDate>Mon, 01 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/snap-launches-snap-cloud</guid>
   <title>Snap, Inc. Launches Snap Cloud, Powered by Supabase</title>
   <link>https://supabase.com/blog/snap-launches-snap-cloud</link>
