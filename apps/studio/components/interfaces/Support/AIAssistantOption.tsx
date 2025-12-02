@@ -65,7 +65,7 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
             </div>
           </div>
           {/* Decorative background */}
-          <div className="hidden md:block absolute z-[1] scale-75 -right-24 top-0">
+          <div className="absolute z-[1] scale-75 -right-40 md:-right-24 -top-6 md:top-0">
             <div className="relative grow flex flex-col gap-3 w-[400px]">
               <div className="flex items-start gap-3 pl-12">
                 <div className="w-8 h-8 rounded-full bg-background-surface-300 flex items-center justify-center">

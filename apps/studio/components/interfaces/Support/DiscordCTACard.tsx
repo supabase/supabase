@@ -1,8 +1,9 @@
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { AnimatePresence, motion } from 'framer-motion'
-import { MessageCircle } from 'lucide-react'
 import Link from 'next/link'
+import router from 'next/router'
 import { useEffect, useState } from 'react'
+import SVG from 'react-inlinesvg'
 import { Button } from 'ui'
 import { NO_ORG_MARKER } from './SupportForm.utils'
 
@@ -33,23 +34,43 @@ export const DiscordCTACard = ({ organizationSlug }: DiscordCTACardProps) => {
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
-          className="w-full overflow-hidden border rounded-md relative bg-200 flex flex-col p-6"
+          className="w-full overflow-hidden border border-transparent rounded-md relative flex flex-col p-6"
+          style={{
+            background: '#404EED',
+            borderColor: 'color-mix(in srgb, #404EED 95%, #000000)',
+          }}
         >
-          <div className="">
+          {/* Decorative background */}
+          <div
+            className="absolute inset-0 opacity-20 md:opacity-30"
+            style={{
+              backgroundImage: `url(${router.basePath}/img/support/discord-bg-small.jpg)`,
+              backgroundSize: '75%',
+              backgroundPosition: '112% 50%',
+              backgroundRepeat: 'no-repeat',
+              maskImage: 'linear-gradient(to left, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 100%)',
+              WebkitMaskImage: 'linear-gradient(to left, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 100%)',
+            }}
+          />
+          <div className="relative z-10">
             <div className="flex flex-col gap-3">
               <div>
-                <p className="text-sm text-foreground">Ask the Discord community</p>
-                <p className="text-sm text-foreground-lighter">
+                <h5 className="text-sm font-medium text-white">Ask the Discord community</h5>
+                <p className="text-sm text-white/75">
                   Many code-related questions are answered within minutes.
                 </p>
               </div>
-              <div>
-                <Button asChild size="tiny" type="default" icon={<MessageCircle size={14} />}>
-                  <Link href="https://discord.supabase.com" target="_blank" rel="noreferrer">
-                    Ask on Discord
-                  </Link>
+
+              <Link href="https://discord.supabase.com" target="_blank" rel="noreferrer">
+                <Button
+                  size="tiny"
+                  type="secondary"
+                  icon={<SVG src={`${router.basePath}/img/discord-icon.svg`} className="h-4 w-4" />}
+                  className="bg-white hover:bg-white/90" // Force white button on all color schemes
+                >
+                  <span style={{ color: '#404EED' }}>Ask on Discord</span>
                 </Button>
-              </div>
+              </Link>
             </div>
           </div>
         </motion.div>
