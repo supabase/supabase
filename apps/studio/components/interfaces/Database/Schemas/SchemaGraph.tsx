@@ -303,38 +303,32 @@ export const SchemaGraph = () => {
                 title="No tables in schema"
                 description={`The “${selectedSchema}” schema doesn’t have any tables.`}
               >
-                {canAddTables ? (
-                  <Button asChild className="mt-2" type="default" icon={<Plus />}>
-                    <Link href={`/project/${ref}/editor?create=table`}>New table</Link>
-                  </Button>
-                ) : (
-                  <ButtonTooltip
-                    asChild
-                    type="default"
-                    className="group"
-                    icon={<Plus />}
-                    disabled
-                    tooltip={{
-                      content: {
-                        side: 'bottom',
-                        className: 'w-[280px]',
-                        text: isSchemaLocked ? (
-                          <ProtectedSchemaWarning
-                            size="sm"
-                            schema={selectedSchema}
-                            entity="table"
-                          />
-                        ) : (
-                          'You need additional permissions to create tables'
-                        ),
-                      },
-                    }}
-                  >
-                    <Link passHref href={`/project/${ref}/editor?create=table`}>
-                      New table
-                    </Link>
-                  </ButtonTooltip>
-                )}
+                <ButtonTooltip
+                  asChild
+                  type="default"
+                  className="group"
+                  icon={<Plus />}
+                  disabled={!canAddTables}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      className: 'w-[280px]',
+                      text: isSchemaLocked ? (
+                        <ProtectedSchemaWarning
+                          size="sm"
+                          schema={selectedSchema}
+                          entity="table"
+                        />
+                      ) : !canUpdateTables ? (
+                        'You need additional permissions to create tables'
+                      ) : undefined,
+                    },
+                  }}
+                >
+                  <Link passHref href={`/project/${ref}/editor?create=table`}>
+                    New table
+                  </Link>
+                </ButtonTooltip>
               </Admonition>
             </div>
           ) : (
