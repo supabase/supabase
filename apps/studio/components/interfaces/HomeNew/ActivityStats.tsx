@@ -8,10 +8,10 @@ import { useBranchesQuery } from 'data/branches/branches-query'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { parseMigrationVersion } from 'lib/migration-utils'
 import { cn, Skeleton } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { ServiceStatus } from './ServiceStatus'
-import { parseMigrationVersion } from 'lib/migration-utils'
 
 export const ActivityStats = () => {
   const { ref } = useParams()
@@ -70,8 +70,7 @@ export const ActivityStats = () => {
 
   const hasValidVersion = versionLabel && versionTimestamp
 
-  const versionLabelText =
-    migrationsData && migrationsData.length > 0 ? 'Unknown version' : 'No migrations'
+  const versionLabelText = migrationsData && migrationsData.length > 0 ? 'Unknown' : 'No migrations'
 
   return (
     <div className="@container">
