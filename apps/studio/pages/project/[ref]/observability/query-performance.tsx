@@ -20,8 +20,6 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { useBannerStack } from 'components/ui/BannerStack/BannerStackProvider'
@@ -30,10 +28,8 @@ import { BannerIndexAdvisor } from 'components/ui/BannerStack/Banners/BannerInde
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
   const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
   const { sort: sortConfig } = useQueryPerformanceSort()
-  const { mutate: sendEvent } = useSendEventMutation()
   const { addBanner, dismissBanner } = useBannerStack()
 
   const {
@@ -78,8 +74,6 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     isIndexAdvisorEnabled,
     addBanner,
     dismissBanner,
-    sendEvent,
-    org?.slug,
   ])
 
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
