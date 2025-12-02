@@ -11,16 +11,11 @@ import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
 interface AIAssistantOptionProps {
   projectRef?: string | null
   organizationSlug?: string | null
-  isCondensed?: boolean
 }
 
-export const AIAssistantOption = ({
-  projectRef,
-  organizationSlug,
-  isCondensed = false,
-}: AIAssistantOptionProps) => {
+export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantOptionProps) => {
   const { mutate: sendEvent } = useSendEventMutation()
-  const [isVisible, setIsVisible] = useState(isCondensed)
+  const [isVisible, setIsVisible] = useState(true)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 800)
@@ -48,55 +43,52 @@ export const AIAssistantOption = ({
   return (
     <AnimatePresence initial={false}>
       {isVisible && (
-        <motion.div
+        <motion.aside
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
-          className="w-full overflow-hidden border rounded-md relative"
+          className="w-full overflow-hidden border rounded-md relative bg-200 flex flex-col xl:flex-row p-6"
         >
-          <div className={`flex flex-col xl:flex-row ${isCondensed ? 'py-4 px-5' : 'py-8 px-10'}`}>
-            <div className="flex flex-col gap-3 z-[2] flex-shrink-0 w-full">
-              <div>
-                <p className="text-sm text-foreground">Try the AI Assistant</p>
-                <p className="text-sm text-foreground-lighter">
-                  Ask the AI assistant to help you with your support issue
-                </p>
+          <div className="flex flex-col gap-3 z-[2] flex-shrink-0 w-full">
+            <div>
+              <p className="text-sm text-foreground">Try the AI Assistant</p>
+              <p className="text-sm text-foreground-lighter">
+                Ask the AI Assistant to help you with your support issue.
+              </p>
+            </div>
+            <div>
+              <Link href={aiLink} onClick={onAiAssistantClicked}>
+                <Button size="tiny" type="default">
+                  Ask AI assistant
+                </Button>
+              </Link>
+            </div>
+          </div>
+          {/* Decorative background */}
+          <div className="hidden md:block absolute z-[1] scale-75 -right-24 top-0">
+            <div className="relative grow flex flex-col gap-3 w-[400px]">
+              <div className="flex items-start gap-3 pl-12">
+                <div className="w-8 h-8 rounded-full bg-background-surface-300 flex items-center justify-center">
+                  <MessageSquare size={16} className="text-foreground-lighter" />
+                </div>
+                <div className="flex-1 bg-background-surface-200 rounded-lg p-4 max-w-[280px]">
+                  <p className="text-sm text-foreground-lighter">
+                    Hi! I'm your AI assistant. How can I help you today?
+                  </p>
+                </div>
               </div>
-              <div>
-                <Link href={aiLink} onClick={onAiAssistantClicked}>
-                  <Button size="tiny" type="default">
-                    Ask AI assistant
-                  </Button>
-                </Link>
+              <div className="flex items-start justify-end gap-3 pr-10">
+                <div className="bg-background-surface-200 rounded-lg p-4 max-w-[280px]">
+                  <p className="text-sm text-foreground-lighter">
+                    I can help you with database queries, API endpoints, or any other technical
+                    questions you might have.
+                  </p>
+                </div>
               </div>
             </div>
-            {!isCondensed && (
-              <div className="absolute z-[1] scale-75 -right-24 top-0">
-                <div className="relative grow flex flex-col gap-3 w-[400px]">
-                  <div className="flex items-start gap-3 pl-12">
-                    <div className="w-8 h-8 rounded-full bg-background-surface-300 flex items-center justify-center">
-                      <MessageSquare size={16} className="text-foreground-lighter" />
-                    </div>
-                    <div className="flex-1 bg-background-surface-200 rounded-lg p-4 max-w-[280px]">
-                      <p className="text-sm text-foreground-lighter">
-                        Hi! I'm your AI assistant. How can I help you today?
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start justify-end gap-3 pr-10">
-                    <div className="bg-background-surface-200 rounded-lg p-4 max-w-[280px]">
-                      <p className="text-sm text-foreground-lighter">
-                        I can help you with database queries, API endpoints, or any other technical
-                        questions you might have.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="absolute -inset-2 bg-gradient-to-l from-transparent via-background-200 via-[95%] to-background-200 to-[100%] z-[1]" />
-              </div>
-            )}
+            <div className="absolute -inset-2 bg-gradient-to-l from-transparent via-background-200 via-[90%] to-background-200 to-[100%] z-[1]" />
           </div>
-        </motion.div>
+        </motion.aside>
       )}
     </AnimatePresence>
   )
