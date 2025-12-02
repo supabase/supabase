@@ -1,4 +1,4 @@
-import { Calendar, SquarePlus } from 'lucide-react'
+import { Calendar, HardHat } from 'lucide-react'
 import {
   IconBriefcase2,
   IconChangelog,
@@ -96,6 +96,11 @@ export const data = {
           text: 'Events & Webinars',
           url: '/events',
           icon: Calendar,
+        },
+        {
+          text: 'Contribute',
+          url: '/contribute',
+          icon: HardHat,
         },
       ],
     },
