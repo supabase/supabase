@@ -75,7 +75,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
         </div>
         {hasUpdateOrDelete && (
           <p className="text-sm text-foreground-lighter mt-3">
-            SELECT has been auto selected as UPDATE and DELETE require it
+            <code>SELECT</code> has been auto selected as <code>UPDATE</code> and <code>DELETE</code> require it
           </p>
         )}
         <div className="flex w-5/6 flex-wrap">
