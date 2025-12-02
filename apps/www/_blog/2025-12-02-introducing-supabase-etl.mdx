@@ -20,17 +20,17 @@ Supabase ETL is open source. You can find the code on GitHub at [github.com/supa
 
 ## Why separate OLTP and OLAP?
 
-Postgres stores data by rows. This design is fast for transactional workloads like reading a single user record or inserting an order. It's slow for analytical workloads that scan millions of rows to calculate aggregates.
+Postgres is excellent for transactional workloads like reading a single user record or inserting an order. But when you need to scan millions of rows for analytics, Postgres slows down.
 
-Column-oriented systems like BigQuery, ClickHouse, and Apache Iceberg store data differently. They read only the columns a query needs, making them orders of magnitude faster for scans, aggregations, and time-series analysis.
+Column-oriented systems like BigQuery and Apache Iceberg are built for this. They can aggregate massive datasets orders of magnitude faster, compress data more efficiently, and handle complex analytical queries that would choke a transactional database.
 
-Supabase ETL lets you keep your app on Postgres while offloading analytics to the right tool.
+Supabase ETL gives you the best of both worlds: keep your app fast on Postgres while unlocking powerful analytics on purpose-built systems.
 
 ## How it works
 
-Supabase ETL connects to your database using a Postgres publication and logical replication slot. It captures changes in near real time and batches them for delivery to your destination.
+Supabase ETL captures every change in your Postgres database and delivers it to your analytics destination in near real time.
 
-Here is a simplified view of the architecture:
+Here's how:
 
 1. You create a Postgres publication that defines which tables to replicate
 
@@ -42,7 +42,7 @@ Here is a simplified view of the architecture:
 
 5. Your data is available for querying in the destination
 
-The pipeline performs an initial copy of all selected tables, then switches to streaming mode and captures changes as they happen. Latency is typically milliseconds to seconds.
+The pipeline starts with an initial copy of your selected tables, then switches to streaming mode. Your analytics stay fresh with latency measured in milliseconds to seconds.
 
 ## Setting up ETL
 
@@ -118,24 +118,22 @@ After changing your publication, restart the pipeline from the Dashboard actions
 
 Read replicas and ETL solve different problems.
 
-Read replicas distribute query load across multiple Postgres instances. They help when concurrent connections compete for resources, but they're still Postgres, not optimized for analytical workloads like aggregations over large datasets.
+Read replicas help when you need to scale concurrent queries, but they're still Postgres. They don't make analytics faster.
 
-ETL moves data to systems designed for analytics. Columnar storage enables fast scans over millions of rows, compresses well for lower storage costs, and outputs open formats that any tool can query. It also separates your analytical workload from your transactional database entirely.
+ETL moves your data to systems built for analytics. You get faster queries on large datasets, lower storage costs through compression, and complete separation between your production workload and analytics.
 
 You can use both: read replicas for application read scaling, ETL for analytics.
 
 ## Limitations
 
-Replication has a few constraints to be aware of:
+Replication with Supabase ETL has a few constraints to be aware of:
 
 - Tables must have primary keys (this is a Postgres logical replication requirement)
 - Generated columns are not supported
 - Custom data types are replicated as strings
 - Schema changes are not automatically propagated to destinations
-
 - Data is replicated as-is, without transformation
-
-- Initial table copy is a blocking operation; streaming begins after the copy completes
+- During the initial copy phase, changes accumulate in the WAL and are replayed once streaming begins
 
 We're working on schema change support and additional destinations, and evaluating different streaming techniques to improve flexibility and performance.
 
@@ -144,9 +142,7 @@ We're working on schema change support and additional destinations, and evaluati
 Supabase ETL is usage-based:
 
 - $25 per connector per month
-
 - $15 per GB of change data processed after the initial sync
-
 - Initial copy is free
 
 ## Get started
