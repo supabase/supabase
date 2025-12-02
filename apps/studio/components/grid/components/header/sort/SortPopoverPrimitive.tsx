@@ -309,7 +309,7 @@ export const SortPopoverPrimitive = ({
           base: { variant: 'warning' },
           title: 'Be careful with sorting on unindexed columns',
           description:
-            'This may adversely impact your database, in particular if your table has a large number of rows - use with caution. Sorting will not be persisted across browser sessions as a safeguard.',
+            'This may adversely impact your database, in particular if your table has a large number of rows - use with caution.',
         }}
       >
         <p className="text-foreground-light text-sm">
