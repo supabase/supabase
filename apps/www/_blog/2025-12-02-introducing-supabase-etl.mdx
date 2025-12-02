@@ -50,7 +50,7 @@ You configure ETL entirely through the Supabase Dashboard. No code required.
 
 ### Step 1: Create a publication
 
-A publication defines which tables to replicate. You create it with SQL:
+A publication defines which tables to replicate. You create it with SQL or via the UI:
 
 ```sql
 -- Replicate specific tables
@@ -94,7 +94,7 @@ BigQuery is Google's serverless data warehouse, built for large-scale analytics.
 
 When you replicate to BigQuery, Supabase ETL creates a view for each table. Behind the scenes, the view points to a versioned copy of your data. When a `TRUNCATE` happens, ETL creates a fresh version and swaps the view to point to it. Old versions are cleaned up automatically.
 
-For example, a table `public.users` appears in BigQuery as a view called `public_users`. You query the view like any other table, and ETL handles the versioning for you.
+For example, a source table `public.users` maps to a BigQuery view called `public_users`. Behind the scenes, this view points to a versioned table (`public_users_[version]`), but you don't need to think about that, just query the view, and ETL handles version management for you.
 
 ## Adding and removing tables
 
@@ -112,15 +112,15 @@ To remove a table:
 alter publication analytics_pub drop table orders;
 ```
 
-After changing your publication, restart the pipeline from the Dashboard actions menu. By design, ETL does not remove data from your destination when you remove a table from a publication.
+After changing your publication, restart the pipeline from the Dashboard actions menu for the changes to take effect. Note that ETL does not remove data from your destination when you remove a table from a publication, this is by design.
 
 ## When to use ETL vs read replicas
 
 Read replicas and ETL solve different problems.
 
-Read replicas spread query load across multiple Postgres instances. They help when you have many concurrent reads competing for resources. But replicas are still row-based. They don't make analytical queries faster.
+Read replicas distribute query load across multiple Postgres instances. They help when concurrent connections compete for resources, but they're still Postgres, not optimized for analytical workloads like aggregations over large datasets.
 
-ETL moves data to systems designed for analytics. Use it when you need faster scans on large tables, lower storage costs for historical data, separation between transactional and analytical workloads, or data in open formats that any tool can query.
+ETL moves data to systems designed for analytics. Columnar storage enables fast scans over millions of rows, compresses well for lower storage costs, and outputs open formats that any tool can query. It also separates your analytical workload from your transactional database entirely.
 
 You can use both: read replicas for application read scaling, ETL for analytics.
 
@@ -129,9 +129,8 @@ You can use both: read replicas for application read scaling, ETL for analytics.
 Replication has a few constraints to be aware of:
 
 - Tables must have primary keys (this is a Postgres logical replication requirement)
-
-- Custom and generated data types are not supported
-
+- Generated columns are not supported
+- Custom data types are replicated as strings
 - Schema changes are not automatically propagated to destinations
 
 - Data is replicated as-is, without transformation
