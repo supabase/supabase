@@ -47,6 +47,8 @@ async function main() {
     console.log(`\n ✅ Project found: ${existingProjectRef}, settings as environment variables`)
     appendToEnvFile('PROJECT_REF', existingProjectRef)
     return
+  } else {
+    console.log(`\n 🔑 Project not found, creating new project...`)
   }
 
   const ref = await createProject({

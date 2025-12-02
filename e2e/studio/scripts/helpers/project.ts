@@ -39,23 +39,23 @@ export async function createProject({
   )
 
   if (createResp.status != 201) {
-    console.error('could not create project')
+    console.error('❌ Could not create project')
     console.error(await createResp.text())
   }
   assert(createResp.status == 201, createResp.statusText)
   const project = await createResp.json()
   const ref = project.ref
-  console.log(`created ${ref} ...`)
-  console.log('waiting for healthy project ...')
+  console.log(`✨ Created project ${ref}`)
+  console.log('⏳ Waiting for healthy project...')
 
   // wait for project to be ready
   await waitForProjectStatus({ platformClient, ref, expectedStatus: 'ACTIVE_HEALTHY' })
 
   // wait for all services to be healthy
-  console.log('waiting for healthy services ...')
+  console.log('⏳ Waiting for healthy services...')
   await waitForHealthyServices(platformClient, ref)
 
-  console.log(`project created: ${ref}`)
+  console.log(`🎉 Project created successfully: ${ref}`)
   return ref
 }
 
@@ -75,7 +75,7 @@ export async function getProjectRef({
   const getResp = await platformClient.send(`/v1/projects`, { method: 'GET' }, 60000)
 
   if (getResp.status != 200) {
-    console.error('could not fetch projects')
+    console.error('❌ Could not fetch projects')
     console.error(await getResp.text())
   }
   assert(getResp.status == 200, getResp.statusText)

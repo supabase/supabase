@@ -28,7 +28,7 @@ export const env = {
   SUPA_REGION: process.env.SUPA_REGION || 'us-east-1',
   SUPA_PAT: process.env.SUPA_PAT || 'test',
 
-  BRANCH_NAME: process.env.BRANCH_NAME || `e2e-test-${Date.now()}`,
+  BRANCH_NAME: process.env.BRANCH_NAME || `e2e-test-local`,
 
   AUTHENTICATION: Boolean(process.env.EMAIL && process.env.PASSWORD && process.env.PROJECT_REF),
 }
