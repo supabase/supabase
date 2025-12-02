@@ -1083,7 +1083,7 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
 }
 
 /**
- * User clicks on Metrics API banner in studio Reports pages.
+ * User clicks on Metrics API banner in studio Observability pages.
  *
  * @group Events
  * @source studio
@@ -1091,6 +1091,18 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
  */
 export interface ObservabilityBannerClickedEvent {
   action: 'observability_metrics_api_banner_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicks on dismiss button on Metrics API banner in studio Observability pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/*
+ */
+export interface ObservabilityBannerDismissedEvent {
+  action: 'observability_metrics_api_banner_dismissed'
   groups: TelemetryGroups
 }
 
@@ -2444,6 +2456,7 @@ export type TelemetryEvent =
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
   | ObservabilityBannerClickedEvent
+  | ObservabilityBannerDismissedEvent
   | EdgeFunctionDeployButtonClickedEvent
   | EdgeFunctionDeployUpdatesConfirmClickedEvent
   | EdgeFunctionAiAssistantButtonClickedEvent

@@ -14,6 +14,8 @@ import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.const
 
 export const ObservabilityBanner = () => {
   const { ref } = useParams()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
   const [isDismissed, setIsDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.OBSERVABILITY_BANNER_DISMISSED(ref ?? ''),
     false
@@ -67,6 +69,10 @@ export const ObservabilityBanner = () => {
                   onClick={(e) => {
                     e.preventDefault()
                     setIsDismissed(true)
+                    sendEvent({
+                      action: 'observability_metrics_api_banner_dismissed',
+                      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+                    })
                   }}
                   className="opacity-75 hover:opacity-100 px-1"
                   aria-label="Close banner"
@@ -95,37 +101,25 @@ export const ObservabilityBanner = () => {
                     Visualize over 200 database performance and health metrics with our Metrics API.
                   </p>
                 </div>
-                <ObservabilityBannerActions />
+                <Button type="default" size="tiny" asChild>
+                  <Link
+                    href={`${DOCS_URL}/guides/telemetry/metrics`}
+                    target="_blank"
+                    onClick={() =>
+                      sendEvent({
+                        action: 'observability_metrics_api_banner_clicked',
+                        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+                      })
+                    }
+                  >
+                    Get started for Free
+                  </Link>
+                </Button>
               </div>
             </CardContent>
           </Card>
         </motion.div>
       )}
     </AnimatePresence>
-  )
-}
-
-const ObservabilityBannerActions = ({ className }: { className?: string }) => {
-  const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
-
-  return (
-    <div className={cn('flex gap-2', className)}>
-      <Button type="default" size="tiny" asChild>
-        <Link
-          href={`${DOCS_URL}/guides/telemetry/metrics`}
-          target="_blank"
-          onClick={() =>
-            sendEvent({
-              action: 'observability_metrics_api_banner_clicked',
-              groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-            })
-          }
-        >
-          Get started for Free
-        </Link>
-      </Button>
-    </div>
   )
 }
