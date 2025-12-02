@@ -30,7 +30,7 @@ export const AlphaNotice = ({ entity, feedbackUrl }: AlphaNoticeProps) => {
       <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-8 justify-between px-2 py-1">
         <div className="flex flex-col gap-y-0.5">
           <div className="flex flex-col gap-y-2 items-start">
-            <Badge variant="success" className="-ml-0.5 uppercase">
+            <Badge variant="success" className="-ml-0.5">
               New
             </Badge>
             <p className="text-sm font-medium">Introducing {entity.toLocaleLowerCase()}</p>

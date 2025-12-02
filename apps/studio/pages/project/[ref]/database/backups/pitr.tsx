@@ -23,8 +23,8 @@ import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
-  PageHeaderFooter,
   PageHeaderMeta,
+  PageHeaderNavigationTabs,
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
@@ -39,9 +39,9 @@ const DatabasePhysicalBackups: NextPageWithLayout = () => {
             <PageHeaderTitle>Database Backups</PageHeaderTitle>
           </PageHeaderSummary>
         </PageHeaderMeta>
-        <PageHeaderFooter>
+        <PageHeaderNavigationTabs>
           <DatabaseBackupsNav active="pitr" />
-        </PageHeaderFooter>
+        </PageHeaderNavigationTabs>
       </PageHeader>
       <PageContainer>
         <PageSection>

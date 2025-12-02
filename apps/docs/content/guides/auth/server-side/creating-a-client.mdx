@@ -164,9 +164,9 @@ To access Supabase from a Next.js app, you need 2 types of Supabase clients:
 1. **Client Component client** - To access Supabase from Client Components, which run in the browser.
 2. **Server Component client** - To access Supabase from Server Components, Server Actions, and Route Handlers, which run only on the server.
 
-Since Next.js Server Components can't write cookies, you need middleware to refresh expired Auth tokens and store them.
+Since Next.js Server Components can't write cookies, you need a [Proxy](https://nextjs.org/docs/app/getting-started/proxy) to refresh expired Auth tokens and store them.
 
-The middleware is responsible for:
+The Proxy is responsible for:
 
 1. Refreshing the Auth token by calling `supabase.auth.getClaims()`.
 2. Passing the refreshed Auth token to Server Components, so they don't attempt to refresh the same token themselves. This is accomplished with `request.cookies.set`.
@@ -181,7 +181,7 @@ The middleware is responsible for:
 
     The cookies object lets the Supabase client know how to access the cookies, so it can read and write the user session data. To make `@supabase/ssr` framework-agnostic, the cookies methods aren't hard-coded. These utility functions adapt `@supabase/ssr`'s cookie handling for Next.js.
 
-    The `set` and `remove` methods for the server client need error handlers, because Next.js throws an error if cookies are set from Server Components. You can safely ignore this error because you'll set up middleware in the next step to write refreshed cookies to storage.
+    The `set` and `remove` methods for the server client need error handlers, because Next.js throws an error if cookies are set from Server Components. You can safely ignore this error because you'll set up Proxy in the next step to write refreshed cookies to storage.
 
     The cookie is named `sb-<project_ref>-auth-token` by default.
 
@@ -201,26 +201,26 @@ The middleware is responsible for:
 
 </Accordion>
 
-Create a `utils/supabase` folder at the root of your project, or inside the `./src` folder if you are using one, with a file for each type of client. Then copy the utility functions for each client type.
+Create a `lib/supabase` folder at the root of your project, or inside the `./src` folder if you are using one, with a file for each type of client. Then copy the lib utility functions for each client type.
 
 <div className="mt-12">
   <$CodeTabs>
     <$CodeSample
-      path="/auth/nextjs/utils/supabase/client.ts"
-      meta="name=utils/supabase/client.ts"
+      path="/auth/nextjs/lib/supabase/client.ts"
+      meta="name=lib/supabase/client.ts"
       language="typescript"
     />
     <$CodeSample
-      path="/auth/nextjs/utils/supabase/server.ts"
-      meta="name=utils/supabase/server.ts"
+      path="/auth/nextjs/lib/supabase/server.ts"
+      meta="name=lib/supabase/server.ts"
       language="typescript"
     />
   </$CodeTabs>
 </div>
 
-### Hook up middleware
+### Hook up proxy
 
-The code adds a [matcher](https://nextjs.org/docs/app/building-your-application/routing/middleware#matching-paths) so the middleware doesn't run on routes that don't access Supabase.
+The code adds a [matcher](https://nextjs.org/docs/app/api-reference/file-conventions/proxy#matcher) so the Proxy doesn't run on routes that don't access Supabase.
 
 <Admonition type="danger">
 
@@ -228,7 +228,7 @@ Be careful when protecting pages. The server gets the user session from the cook
 
 Always use `supabase.auth.getClaims()` to protect pages and user data.
 
-_Never_ trust `supabase.auth.getSession()` inside server code such as middleware. It isn't guaranteed to revalidate the Auth token.
+_Never_ trust `supabase.auth.getSession()` inside server code such as Proxy. It isn't guaranteed to revalidate the Auth token.
 
 It's safe to trust `getClaims()` because it validates the JWT signature against the project's published public keys every time.
 
@@ -236,14 +236,10 @@ It's safe to trust `getClaims()` because it validates the JWT signature against 
 
 <div className="mt-12">
   <$CodeTabs>
+    <$CodeSample path="/auth/nextjs/proxy.ts" meta="name=proxy.ts" language="typescript" />
     <$CodeSample
-      path="/auth/nextjs/middleware.ts"
-      meta="name=middleware.ts"
-      language="typescript"
-    />
-    <$CodeSample
-      path="/auth/nextjs/utils/supabase/middleware.ts"
-      meta="name=utils/supabase/middleware.ts"
+      path="/auth/nextjs/lib/supabase/proxy.ts"
+      meta="name=lib/supabase/proxy.ts"
       language="typescript"
     />
   </$CodeTabs>
@@ -256,7 +252,7 @@ You're done! To recap, you've successfully:
 - Called Supabase from a Server Action.
 - Called Supabase from a Server Component.
 - Set up a Supabase client utility to call Supabase from a Client Component. You can use this if you need to call Supabase from a Client Component, for example to set up a realtime subscription.
-- Set up middleware to automatically refresh the Supabase Auth session.
+- Set up Proxy to automatically refresh the Supabase Auth session.
 
 You can now use any Supabase features from your client or server code!
 

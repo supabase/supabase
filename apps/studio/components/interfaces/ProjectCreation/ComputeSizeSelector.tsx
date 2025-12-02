@@ -7,7 +7,6 @@ import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { DOCS_URL } from 'lib/constants'
 import { CloudProvider } from 'shared-data'
 import {
-  Badge,
   FormField_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -16,6 +15,7 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
+import { ComputeBadge } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { sizes } from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
@@ -75,15 +75,11 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
                     .map((option) => {
                       return (
                         <SelectItem_Shadcn_ key={option} value={option}>
-                          <div className="flex flex-row gap-2">
-                            <div className="text-center w-[80px]">
-                              <Badge
-                                variant={option === 'micro' ? 'default' : 'brand'}
-                                className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
-                              >
-                                {instanceSizeSpecs[option].label}
-                              </Badge>
+                          <div className="flex flex-row gap-4 items-center">
+                            <div className="w-14 flex items-center">
+                              <ComputeBadge infraComputeSize={option} />
                             </div>
+
                             <div className="text-sm">
                               <span className="text-foreground">
                                 {instanceSizeSpecs[option].ram} RAM /{' '}

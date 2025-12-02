@@ -95,7 +95,7 @@ export const generateAuthMenu = (
                       name: 'OAuth Server',
                       key: 'oauth-server',
                       url: `/project/${ref}/auth/oauth-server`,
-                      label: 'BETA',
+                      label: 'Beta',
                     },
                   ]
                 : []),
@@ -157,7 +157,7 @@ export const generateAuthMenu = (
                 key: 'hooks',
                 url: `/project/${ref}/auth/hooks`,
                 items: [],
-                label: 'BETA',
+                label: 'Beta',
               },
               {
                 name: 'Audit Logs',

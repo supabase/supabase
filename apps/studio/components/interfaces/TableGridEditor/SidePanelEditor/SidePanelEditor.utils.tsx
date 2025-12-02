@@ -61,7 +61,7 @@ const getAddPrimaryKeySQL = ({
   table: string
   columns: string[]
 }) => {
-  const primaryKeyColumns = columns.join('","')
+  const primaryKeyColumns = columns.map((col) => `"${col}"`).join(', ')
   return `ALTER TABLE "${schema}"."${table}" ADD PRIMARY KEY (${primaryKeyColumns})`
 }
 
