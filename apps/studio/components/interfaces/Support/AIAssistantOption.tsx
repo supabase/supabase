@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 // End of third-party imports
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { Button } from 'ui'
+import { AiIconAnimation, Button } from 'ui'
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
 
 interface AIAssistantOptionProps {
@@ -47,19 +47,19 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
-          className="w-full overflow-hidden border rounded-md relative bg-200 flex flex-col xl:flex-row p-6"
+          className="w-full overflow-hidden border rounded-md relative bg-200 flex flex-col p-6"
         >
           <div className="flex flex-col gap-3 z-[2] flex-shrink-0 w-full">
             <div>
-              <p className="text-sm text-foreground">Try the AI Assistant</p>
+              <h5 className="text-sm font-medium text-foreground">Try Supabase Assistant</h5>
               <p className="text-sm text-foreground-lighter">
-                Ask the AI Assistant to help you with your support issue.
+                Ask our AI assistant to help you with your support issue.
               </p>
             </div>
             <div>
               <Link href={aiLink} onClick={onAiAssistantClicked}>
-                <Button size="tiny" type="default">
-                  Ask AI assistant
+                <Button size="tiny" type="default" icon={<AiIconAnimation size={14} />}>
+                  Ask the Assistant
                 </Button>
               </Link>
             </div>
