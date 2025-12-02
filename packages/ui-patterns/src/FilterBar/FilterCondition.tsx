@@ -193,7 +193,7 @@ export function FilterCondition({
       className="flex items-center rounded px-2 h-6 bg-muted border group shrink-0"
     >
       <span
-        className="text-xs font-medium mr-1 cursor-pointer shrink-0 whitespace-nowrap"
+        className="text-xs mr-1 cursor-pointer shrink-0 whitespace-nowrap text-foreground-light"
         onClick={() => handleLabelClick(path)}
       >
         {property.label}
