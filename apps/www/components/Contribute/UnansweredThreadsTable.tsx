@@ -3,8 +3,27 @@
 import { useState, useMemo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Clock, User, ExternalLink, MessageCircle, Github, Search, X } from 'lucide-react'
-import { Badge, Button, TabsContent_Shadcn_, Input_Shadcn_ } from 'ui'
+import {
+  Clock,
+  User,
+  ExternalLink,
+  MessageCircle,
+  Github,
+  Search,
+  X,
+  Filter,
+  Check,
+} from 'lucide-react'
+import {
+  Badge,
+  Button,
+  TabsContent_Shadcn_,
+  Input_Shadcn_,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  cn,
+} from 'ui'
 import { Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 
 import type { Thread } from '~/data/contribute'
@@ -20,7 +39,14 @@ function ThreadRow({
 
   const handleProductAreaClick = (area: string) => {
     const params = new URLSearchParams(searchParams?.toString() || '')
-    params.set('product_area', area)
+    const currentArea = params.get('product_area')
+    if (currentArea === area) {
+      // If already active, remove the filter
+      params.delete('product_area')
+    } else {
+      // If inactive, set it as active
+      params.set('product_area', area)
+    }
     router.push(`/contribute?${params.toString()}`, { scroll: false })
   }
 
@@ -135,7 +161,13 @@ function ThreadsTable({
   )
 }
 
-export function UnansweredThreadsTable({ threads }: { threads: Thread[] }) {
+export function UnansweredThreadsTable({
+  threads,
+  allProductAreas,
+}: {
+  threads: Thread[]
+  allProductAreas: string[]
+}) {
   const [search, setSearch] = useState('')
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -177,6 +209,16 @@ export function UnansweredThreadsTable({ threads }: { threads: Thread[] }) {
 
   const hasActiveFilters = searchParams?.get('product_area') || search.trim()
 
+  const handleProductAreaFilter = (area: string) => {
+    const params = new URLSearchParams(searchParams?.toString() || '')
+    if (params.get('product_area') === area) {
+      params.delete('product_area')
+    } else {
+      params.set('product_area', area)
+    }
+    router.push(`/contribute?${params.toString()}`, { scroll: false })
+  }
+
   return (
     <section className="w-full max-w-7xl mx-auto px-4 py-16 relative">
       {/* Header */}
@@ -191,52 +233,112 @@ export function UnansweredThreadsTable({ threads }: { threads: Thread[] }) {
         </div>
       </div>
 
-      {/* Search Input */}
-      <div className="mb-6">
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input_Shadcn_
-            type="text"
-            placeholder="Search threads by title, author, or summary..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-      </div>
-
       {/* Tabs */}
-      <Tabs_Shadcn_ value={currentTab} onValueChange={handleTabChange} className="w-full relative">
-        <TabsList_Shadcn_ className="mb-6 gap-6">
-          <TabsTrigger_Shadcn_ value="discord" className="gap-2">
-            <MessageCircle className="h-4 w-4" />
-            Discord {discordThreads.length}
-          </TabsTrigger_Shadcn_>
-          <TabsTrigger_Shadcn_ value="reddit" className="gap-2">
-            <MessageCircle className="h-4 w-4" />
-            Reddit {redditThreads.length}
-          </TabsTrigger_Shadcn_>
-          <TabsTrigger_Shadcn_ value="github" className="gap-2">
-            <Github className="h-4 w-4" />
-            GitHub Issues {githubThreads.length}
-          </TabsTrigger_Shadcn_>
-          {hasActiveFilters && (
-            <div className="absolute top-0  right-0">
-              <Button
-                className="font-medium"
-                icon={<X className="h-4 w-4 mr-2" />}
-                onClick={() => {
-                  const params = new URLSearchParams(searchParams?.toString() || '')
-                  params.delete('product_area')
-                  router.push(`/contribute?${params.toString()}`, { scroll: false })
-                  setSearch('')
-                }}
-              >
-                Clear Filters
-              </Button>
+      <Tabs_Shadcn_ value={currentTab} onValueChange={handleTabChange} className="w-full">
+        <div className="flex items-center justify-between gap-4 mb-6">
+          <TabsList_Shadcn_ className="gap-6 bg-surface-200 rounded-md">
+            <TabsTrigger_Shadcn_
+              value="discord"
+              className="gap-2 px-4 data-[state=active]:bg-surface-300 border-none"
+            >
+              <MessageCircle className="h-4 w-4" />
+              Discord {discordThreads.length}
+            </TabsTrigger_Shadcn_>
+            <TabsTrigger_Shadcn_
+              value="reddit"
+              className="gap-2 px-4 data-[state=active]:bg-surface-300 border-none"
+            >
+              <MessageCircle className="h-4 w-4" />
+              Reddit {redditThreads.length}
+            </TabsTrigger_Shadcn_>
+            <TabsTrigger_Shadcn_
+              value="github"
+              className="gap-2 px-4 data-[state=active]:bg- border-none"
+            >
+              <Github className="h-4 w-4" />
+              GitHub Issues {githubThreads.length}
+            </TabsTrigger_Shadcn_>
+          </TabsList_Shadcn_>
+
+          <div className="flex items-center gap-2 flex-1 justify-end">
+            {/* Search Input */}
+            <div className="relative max-w-md w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input_Shadcn_
+                type="text"
+                placeholder="Search threads by title, author, or summary..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10"
+              />
             </div>
-          )}
-        </TabsList_Shadcn_>
+
+            {/* Filter Button */}
+            <Popover_Shadcn_>
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button
+                  type="default"
+                  icon={<Filter className="h-4 w-4" />}
+                  className={cn('h-8', searchParams?.get('product_area') ? 'bg-surface-200' : '')}
+                >
+                  Filters
+                </Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_ className="w-64 p-0" align="end">
+                <div className="p-4">
+                  <h4 className="text-sm font-semibold mb-3">Product Areas</h4>
+                  <div className="relative">
+                    <div className="grid gap-2 max-h-72 overflow-y-auto">
+                      {allProductAreas.length > 0 ? (
+                        allProductAreas.map((area) => {
+                          const isActive = searchParams?.get('product_area') === area
+                          return (
+                            <button
+                              key={area}
+                              type="button"
+                              onClick={() => handleProductAreaFilter(area)}
+                              className="flex items-center gap-2 text-left px-3 py-2 rounded-md text-sm transition-colors hover:bg-muted"
+                            >
+                              <Check
+                                className={cn(
+                                  'h-4 w-4 shrink-0',
+                                  isActive ? 'opacity-100' : 'opacity-0'
+                                )}
+                              />
+                              {area}
+                            </button>
+                          )
+                        })
+                      ) : (
+                        <p className="text-sm text-muted-foreground py-2">
+                          No product areas available
+                        </p>
+                      )}
+                    </div>
+                    {/* Shadow overlay to indicate scrollable content */}
+                    <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-7 bg-gradient-to-t from-background to-transparent" />
+                  </div>
+                  {hasActiveFilters && (
+                    <div className="mt-3">
+                      <Button
+                        type="outline"
+                        icon={<X className="h-4 w-4" />}
+                        onClick={() => {
+                          const params = new URLSearchParams(searchParams?.toString() || '')
+                          params.delete('product_area')
+                          router.push(`/contribute?${params.toString()}`, { scroll: false })
+                          setSearch('')
+                        }}
+                      >
+                        Clear Filters
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
+          </div>
+        </div>
 
         <TabsContent_Shadcn_ value="discord">
           <ThreadsTable threads={discordThreads} searchParams={searchParams} />

@@ -100,3 +100,26 @@ export async function getUnansweredThreads(product_area?: string): Promise<Threa
   const threads = (data ?? []) as ThreadRow[]
   return threads.map(mapThreadRowToThread)
 }
+
+export async function getAllProductAreas(): Promise<string[]> {
+  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+  const { data, error } = await supabase
+    .from('contribute_threads')
+    .select('product_areas')
+    .in('status', ['unanswered', 'unresolved'])
+
+  if (error) {
+    console.error('Error fetching product areas:', error)
+    return []
+  }
+
+  const areas = new Set<string>()
+  data?.forEach((row: { product_areas: string[] | null }) => {
+    if (row.product_areas && Array.isArray(row.product_areas)) {
+      row.product_areas.forEach((area: string) => areas.add(area))
+    }
+  })
+
+  return Array.from(areas).sort()
+}

@@ -1,4 +1,4 @@
-import { getUnansweredThreads } from '~/data/contribute'
+import { getUnansweredThreads, getAllProductAreas } from '~/data/contribute'
 import { UnansweredThreadsTable } from './UnansweredThreadsTable'
 
 export interface Thread {
@@ -18,8 +18,11 @@ export interface Thread {
 
 export async function UnansweredThreads({ product_area }: { product_area?: string }) {
   try {
-    const threads = await getUnansweredThreads(product_area)
-    return <UnansweredThreadsTable threads={threads} />
+    const [threads, allProductAreas] = await Promise.all([
+      getUnansweredThreads(product_area),
+      getAllProductAreas(),
+    ])
+    return <UnansweredThreadsTable threads={threads} allProductAreas={allProductAreas} />
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return (
