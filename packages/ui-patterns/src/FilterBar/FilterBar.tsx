@@ -1,10 +1,11 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import { Search } from 'lucide-react'
 import { cn } from 'ui'
 import { FilterBarRoot, useFilterBar } from './FilterBarContext'
 import { FilterGroup } from './FilterGroup'
-import { FilterGroup as FilterGroupType, FilterProperty } from './types'
+import { FilterBarAction, FilterGroup as FilterGroupType, FilterProperty } from './types'
 
 export type FilterBarProps = {
   filterProperties: FilterProperty[]
@@ -12,13 +13,14 @@ export type FilterBarProps = {
   freeformText: string
   onFreeformTextChange: (freeformText: string) => void
   filters: FilterGroupType
-  aiApiUrl?: string
+  actions?: FilterBarAction[]
+  isLoading?: boolean
   className?: string
   supportsOperators?: boolean
 }
 
 function FilterBarContent({ className }: { className?: string }) {
-  const { filters, error, optionsError } = useFilterBar()
+  const { filters, error, optionsError, isLoading } = useFilterBar()
 
   return (
     <div className="w-full space-y-2 relative">
@@ -29,9 +31,18 @@ function FilterBarContent({ className }: { className?: string }) {
         )}
       >
         <Search className="text-foreground-muted w-4 h-4 sticky left-0 shrink-0" />
-        <div className="flex-1 flex flex-wrap items-center gap-1 h-full">
+        <motion.div
+          className="flex-1 flex flex-wrap items-center gap-1 h-full"
+          animate={{ opacity: isLoading ? 0.5 : 1 }}
+          transition={{
+            duration: 1,
+            repeat: isLoading ? Infinity : 0,
+            repeatType: 'reverse',
+            ease: 'easeInOut',
+          }}
+        >
           <FilterGroup group={filters} path={[]} />
-        </div>
+        </motion.div>
       </div>
       {(error || optionsError) && (
         <div className="text-red-500 text-xs mt-1">{error || optionsError}</div>
@@ -73,7 +84,8 @@ export function FilterBar({
   onFilterChange,
   freeformText,
   onFreeformTextChange,
-  aiApiUrl,
+  actions,
+  isLoading,
   className,
   supportsOperators = false,
 }: FilterBarProps) {
@@ -84,7 +96,8 @@ export function FilterBar({
       onFilterChange={onFilterChange}
       freeformText={freeformText}
       onFreeformTextChange={onFreeformTextChange}
-      aiApiUrl={aiApiUrl}
+      actions={actions}
+      isLoading={isLoading}
       supportsOperators={supportsOperators}
     >
       <FilterBarContent className={className} />

@@ -338,10 +338,6 @@
       "import": "./src/FilterBar/types.ts",
       "types": "./src/FilterBar/types.ts"
     },
-    "./FilterBar/useAIFilter": {
-      "import": "./src/FilterBar/useAIFilter.ts",
-      "types": "./src/FilterBar/useAIFilter.ts"
-    },
     "./FilterBar/useCommandHandling": {
       "import": "./src/FilterBar/useCommandHandling.ts",
       "types": "./src/FilterBar/useCommandHandling.ts"

@@ -1,7 +1,5 @@
-import { Sparkles } from 'lucide-react'
-import * as React from 'react'
 import { ActiveInput } from './hooks'
-import { FilterGroup, FilterProperty } from './types'
+import { FilterBarAction, FilterGroup, FilterProperty } from './types'
 import { findConditionByPath, isCustomOptionObject, isFilterOptionObject } from './utils'
 
 export type MenuItem = {
@@ -10,6 +8,9 @@ export type MenuItem = {
   icon?: React.ReactNode
   isCustom?: boolean
   customOption?: (props: any) => React.ReactElement
+  isAction?: boolean
+  action?: FilterBarAction
+  actionInputValue?: string
 }
 
 export function buildOperatorItems(
@@ -35,10 +36,10 @@ export function buildOperatorItems(
 export function buildPropertyItems(params: {
   filterProperties: FilterProperty[]
   inputValue: string
-  aiApiUrl?: string
   supportsOperators?: boolean
+  actions?: FilterBarAction[]
 }): MenuItem[] {
-  const { filterProperties, inputValue, aiApiUrl, supportsOperators } = params
+  const { filterProperties, inputValue, supportsOperators, actions } = params
   const items: MenuItem[] = []
 
   items.push(
@@ -51,11 +52,17 @@ export function buildPropertyItems(params: {
     items.push({ value: 'group', label: 'New Group' })
   }
 
-  if (inputValue.trim().length > 0 && aiApiUrl) {
-    items.push({
-      value: 'ai-filter',
-      label: 'Filter by AI',
-      icon: React.createElement(Sparkles, { className: 'mr-2 h-4 w-4', strokeWidth: 1.25 }),
+  const trimmedInput = inputValue.trim()
+  if (actions && trimmedInput.length > 0) {
+    actions.forEach((action) => {
+      items.push({
+        value: action.value,
+        label: action.label,
+        icon: action.icon,
+        isAction: true,
+        action,
+        actionInputValue: trimmedInput,
+      })
     })
   }
 

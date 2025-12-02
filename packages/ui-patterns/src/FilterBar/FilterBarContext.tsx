@@ -1,10 +1,9 @@
 'use client'
 
 import React, { createContext, useContext, useRef, useCallback } from 'react'
-import { FilterProperty, FilterGroup } from './types'
+import { FilterBarAction, FilterProperty, FilterGroup } from './types'
 import { ActiveInput, useFilterBarState, useOptionsCache } from './hooks'
 import { useKeyboardNavigation } from './useKeyboardNavigation'
-import { useAIFilter } from './useAIFilter'
 import { useCommandHandling } from './useCommandHandling'
 import { MenuItem } from './menuItems'
 import {
@@ -50,7 +49,7 @@ export type FilterBarContextValue = {
 
   // Config
   supportsOperators: boolean
-  aiApiUrl?: string
+  actions?: FilterBarAction[]
 
   // Refs
   rootRef: React.RefObject<HTMLDivElement>
@@ -73,7 +72,8 @@ export type FilterBarRootProps = {
   onFilterChange: (filters: FilterGroup) => void
   freeformText: string
   onFreeformTextChange: (text: string) => void
-  aiApiUrl?: string
+  actions?: FilterBarAction[]
+  isLoading?: boolean
   supportsOperators?: boolean
 }
 
@@ -84,16 +84,15 @@ export function FilterBarRoot({
   onFilterChange,
   freeformText,
   onFreeformTextChange,
-  aiApiUrl,
+  actions,
+  isLoading: externalLoading,
   supportsOperators = false,
 }: FilterBarRootProps) {
   const rootRef = useRef<HTMLDivElement>(null)
 
   const {
     isLoading,
-    setIsLoading,
     error,
-    setError,
     hideTimeoutRef,
     activeInput,
     setActiveInput,
@@ -107,19 +106,6 @@ export function FilterBarRoot({
     loadPropertyOptions,
     optionsError,
   } = useOptionsCache()
-
-  const { handleAIFilter } = useAIFilter({
-    activeInput,
-    aiApiUrl,
-    freeformText,
-    filterProperties,
-    activeFilters: filters,
-    onFilterChange,
-    onFreeformTextChange,
-    setIsLoading,
-    setError,
-    setIsCommandMenuVisible,
-  })
 
   const handleInputChange = useCallback(
     (path: number[], value: string) => {
@@ -161,7 +147,7 @@ export function FilterBarRoot({
     handleInputChange,
     handleOperatorChange,
     newPathRef,
-    handleAIFilter,
+    setIsCommandMenuVisible,
   })
 
   const { handleKeyDown } = useKeyboardNavigation({
@@ -262,13 +248,15 @@ export function FilterBarRoot({
     [filters, onFilterChange, setActiveInput]
   )
 
+  const loading = externalLoading ?? isLoading
+
   const contextValue: FilterBarContextValue = {
     // Core state
     filters,
     filterProperties,
     activeInput,
     freeformText,
-    isLoading,
+    isLoading: loading,
     error,
 
     // Handlers
@@ -296,7 +284,7 @@ export function FilterBarRoot({
 
     // Config
     supportsOperators,
-    aiApiUrl,
+    actions,
 
     // Refs
     rootRef,
@@ -310,4 +298,3 @@ export function FilterBarRoot({
     </FilterBarContext.Provider>
   )
 }
-

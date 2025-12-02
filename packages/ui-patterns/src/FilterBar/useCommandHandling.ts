@@ -15,11 +15,12 @@ export function useCommandHandling({
   activeFilters,
   onFilterChange,
   filterProperties,
+  freeformText,
   onFreeformTextChange,
   handleInputChange,
   handleOperatorChange,
   newPathRef,
-  handleAIFilter,
+  setIsCommandMenuVisible,
 }: {
   activeInput: ActiveInput
   setActiveInput: (input: ActiveInput) => void
@@ -31,7 +32,7 @@ export function useCommandHandling({
   handleInputChange: (path: number[], value: string) => void
   handleOperatorChange: (path: number[], value: string) => void
   newPathRef: React.MutableRefObject<number[]>
-  handleAIFilter: () => void
+  setIsCommandMenuVisible: (visible: boolean) => void
 }) {
   const handleGroupCommand = useCallback(() => {
     if (activeInput && activeInput.type === 'group') {
@@ -137,8 +138,19 @@ export function useCommandHandling({
   const handleItemSelect = useCallback(
     (item: MenuItem) => {
       const selectedValue = item.value
-      if (item.value === 'ai-filter') {
-        handleAIFilter()
+      if (item.isAction && item.action) {
+        const path = activeInput?.type === 'group' ? activeInput.path : []
+        Promise.resolve(
+          item.action.onSelect(item.actionInputValue ?? freeformText ?? '', {
+            path,
+            activeFilters,
+          })
+        )
+          .catch((error) => console.error('FilterBar action failed', error))
+          .finally(() => {
+            setIsCommandMenuVisible(false)
+            setActiveInput(null)
+          })
         return
       }
 
@@ -157,11 +169,13 @@ export function useCommandHandling({
     },
     [
       activeInput,
-      handleAIFilter,
+      activeFilters,
+      freeformText,
       handleGroupCommand,
       handleValueCommand,
       handleOperatorCommand,
       handleGroupPropertyCommand,
+      setIsCommandMenuVisible,
     ]
   )
 

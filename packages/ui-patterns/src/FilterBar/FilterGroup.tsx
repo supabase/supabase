@@ -22,7 +22,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     freeformText,
     isLoading,
     supportsOperators,
-    aiApiUrl,
+    actions,
     handleInputBlur,
     handleGroupFreeformFocus,
     handleGroupFreeformChange,
@@ -80,10 +80,17 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
       buildPropertyItems({
         filterProperties,
         inputValue: (isActive ? freeformText : localFreeformValue) || '',
-        aiApiUrl,
+        actions,
         supportsOperators,
       }),
-    [filterProperties, isActive, freeformText, localFreeformValue, aiApiUrl, supportsOperators]
+    [
+      filterProperties,
+      isActive,
+      freeformText,
+      localFreeformValue,
+      actions,
+      supportsOperators,
+    ]
   )
 
   // Only the root group should expand to fill available space

@@ -43,3 +43,23 @@ export type FilterGroup = {
 export function isGroup(condition: FilterCondition | FilterGroup): condition is FilterGroup {
   return 'logicalOperator' in condition
 }
+
+export type FilterBarAction = {
+  value: string
+  label: string
+  icon?: React.ReactNode
+  onSelect: (
+    inputValue: string,
+    context: { path: number[]; activeFilters: FilterGroup }
+  ) => void | Promise<void>
+}
+
+export type SerializableFilterProperty = Pick<FilterProperty, 'label' | 'name' | 'type' | 'operators'> & {
+  options?: string[]
+}
+
+export type AIFilterRequestPayload = {
+  prompt: string
+  filterProperties: SerializableFilterProperty[]
+  currentPath: number[]
+}
