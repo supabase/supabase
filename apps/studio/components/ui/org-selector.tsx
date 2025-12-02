@@ -89,7 +89,7 @@ export function OrganizationSelector({ onSelect, maxOrgsToShow = 5 }: ProjectCla
   const router = useRouter()
   const {
     data: organizations = [],
-    isLoading: isLoadingOrgs,
+    isPending: isLoadingOrgs,
     isSuccess: isSuccessOrgs,
     isError: isErrorOrgs,
   } = useOrganizationsQuery()

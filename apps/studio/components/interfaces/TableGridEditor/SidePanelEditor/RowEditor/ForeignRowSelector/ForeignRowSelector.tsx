@@ -100,7 +100,13 @@ export const ForeignRowSelector = ({
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
-  const { data, isLoading, isSuccess, isError, isRefetching } = useTableRowsQuery(
+  const {
+    data,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    isRefetching,
+  } = useTableRowsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,

@@ -55,7 +55,14 @@ export const SupabaseGrid = ({
     : { warning: null }
   const tableQueriesEnabled = msSqlWarning.warning === null
 
-  const { data, error, isSuccess, isError, isLoading, isRefetching } = useTableRowsQuery(
+  const {
+    data,
+    error,
+    isSuccess,
+    isError,
+    isPending: isLoading,
+    isRefetching,
+  } = useTableRowsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,

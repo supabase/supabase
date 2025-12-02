@@ -31,7 +31,13 @@ export const EdgeFunctionSecrets = () => {
   )
   const { can: canUpdateSecrets } = useAsyncCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
 
-  const { data, error, isLoading, isSuccess, isError } = useSecretsQuery(
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+  } = useSecretsQuery(
     {
       projectRef: projectRef,
     },

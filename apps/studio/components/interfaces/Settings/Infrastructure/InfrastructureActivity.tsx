@@ -52,7 +52,7 @@ export const InfrastructureActivity = () => {
   const state = useDatabaseSelectorStateSnapshot()
   const [dateRange, setDateRange] = useState<any>()
 
-  const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
+  const { data: subscription, isPending: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: organization?.slug,
   })
   const isFreePlan = organization?.plan?.id === 'free'
@@ -143,7 +143,7 @@ export const InfrastructureActivity = () => {
     }
   }
 
-  const { data: cpuUsageData, isLoading: isLoadingCpuUsageData } = useInfraMonitoringQuery({
+  const { data: cpuUsageData, isPending: isLoadingCpuUsageData } = useInfraMonitoringQuery({
     projectRef,
     attribute: 'max_cpu_usage',
     interval,
@@ -153,7 +153,7 @@ export const InfrastructureActivity = () => {
     databaseIdentifier: state.selectedDatabaseId,
   })
 
-  const { data: memoryUsageData, isLoading: isLoadingMemoryUsageData } = useInfraMonitoringQuery({
+  const { data: memoryUsageData, isPending: isLoadingMemoryUsageData } = useInfraMonitoringQuery({
     projectRef,
     attribute: 'ram_usage',
     interval,
@@ -163,7 +163,7 @@ export const InfrastructureActivity = () => {
     databaseIdentifier: state.selectedDatabaseId,
   })
 
-  const { data: ioBudgetData, isLoading: isLoadingIoBudgetData } = useInfraMonitoringQuery({
+  const { data: ioBudgetData, isPending: isLoadingIoBudgetData } = useInfraMonitoringQuery({
     projectRef,
     attribute: 'disk_io_consumption',
     interval,

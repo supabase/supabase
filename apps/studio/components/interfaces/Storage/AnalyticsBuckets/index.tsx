@@ -45,7 +45,7 @@ export const AnalyticsBuckets = () => {
     data: buckets = [],
     error: bucketsError,
     isError: isErrorBuckets,
-    isLoading: isLoadingBuckets,
+    isPending: isLoadingBuckets,
     isSuccess: isSuccessBuckets,
   } = useAnalyticsBucketsQuery({
     projectRef: ref,

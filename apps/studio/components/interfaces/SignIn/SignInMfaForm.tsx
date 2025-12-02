@@ -45,7 +45,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
     error: factorsError,
     isError: isErrorFactors,
     isSuccess: isSuccessFactors,
-    isLoading: isLoadingFactors,
+    isPending: isLoadingFactors,
   } = useMfaListFactorsQuery()
   const {
     mutate: mfaChallengeAndVerify,

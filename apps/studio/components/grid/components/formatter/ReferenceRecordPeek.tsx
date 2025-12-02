@@ -26,7 +26,13 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { data, error, isSuccess, isError, isLoading } = useTableRowsQuery(
+  const {
+    data,
+    error,
+    isSuccess,
+    isError,
+    isPending: isLoading,
+  } = useTableRowsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,

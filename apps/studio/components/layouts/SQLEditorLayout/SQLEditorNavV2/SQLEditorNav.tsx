@@ -172,7 +172,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   // =================
   const {
     data: favoriteSqlSnippetsData,
-    isLoading: isLoadingFavoriteSqlSnippets,
+    isPending: isLoadingFavoriteSqlSnippets,
     hasNextPage: hasMoreFavoriteSqlSnippets,
     fetchNextPage: fetchNextFavoriteSqlSnippets,
     isFetchingNextPage: isFetchingMoreFavoriteSqlSnippets,

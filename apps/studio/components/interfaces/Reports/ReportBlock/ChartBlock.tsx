@@ -69,7 +69,7 @@ export const ChartBlock = ({
   const {
     data: dailyStatsData,
     isFetching: isFetchingDailyStats,
-    isLoading: isLoadingDailyStats,
+    isPending: isLoadingDailyStats,
   } = useProjectDailyStatsQuery(
     {
       projectRef: ref as string,
@@ -83,7 +83,7 @@ export const ChartBlock = ({
   const {
     data: infraMonitoringData,
     isFetching: isFetchingInfraMonitoring,
-    isLoading: isLoadingInfraMonitoring,
+    isPending: isLoadingInfraMonitoring,
   } = useInfraMonitoringQuery(
     {
       projectRef: ref as string,

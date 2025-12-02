@@ -58,7 +58,7 @@ const ObservabilityMenu = () => {
     return queryString ? `?${queryString}` : ''
   }, [router.query])
 
-  const { data: content, isLoading } = useContentQuery({
+  const { data: content, isPending: isLoading } = useContentQuery({
     projectRef: ref,
     type: 'report',
   })

@@ -16,14 +16,14 @@ const CurrentPaymentMethod = () => {
 
   const {
     data: subscription,
-    isLoading: isLoadingSubscription,
+    isPending: isLoadingSubscription,
     isError: isErrorSubscription,
   } = useOrgSubscriptionQuery({
     orgSlug: slug,
   })
   const {
     data: paymentMethods,
-    isLoading: isLoadingOrganizationPaymentMethods,
+    isPending: isLoadingOrganizationPaymentMethods,
     isError: isErrorOrganizationPaymentMethods,
   } = useOrganizationPaymentMethodsQuery({ slug })
 

@@ -32,18 +32,23 @@ export const SearchList = ({ search }: SearchListProps) => {
   const [selectedSnippetToRename, setSelectedSnippetToRename] = useState<Snippet>()
   const [selectedSnippetToDelete, setSelectedSnippetToDelete] = useState<Snippet>()
 
-  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useContentInfiniteQuery(
-      {
-        projectRef,
-        type: 'sql',
-        limit: SNIPPET_PAGE_LIMIT,
-        name: search.length === 0 ? undefined : search,
-      },
-      { placeholderData: keepPreviousData }
-    )
+  const {
+    data,
+    isPending: isLoading,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useContentInfiniteQuery(
+    {
+      projectRef,
+      type: 'sql',
+      limit: SNIPPET_PAGE_LIMIT,
+      name: search.length === 0 ? undefined : search,
+    },
+    { placeholderData: keepPreviousData }
+  )
 
-  const { data: count, isLoading: isLoadingCount } = useContentCountQuery(
+  const { data: count, isPending: isLoadingCount } = useContentCountQuery(
     {
       projectRef,
       type: 'sql',

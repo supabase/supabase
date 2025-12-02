@@ -83,7 +83,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
     useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
 
   const {
-    isLoading: _isLoadingPermissions,
+    isPending: _isLoadingPermissions,
     isError: isErrorPermissions,
     error: permissionsError,
   } = usePermissionsQuery()

@@ -60,7 +60,7 @@ export const AuditLogsForm = () => {
     data: authConfig,
     error: authConfigError,
     isError,
-    isLoading,
+    isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
 
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({

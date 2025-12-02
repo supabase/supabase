@@ -92,7 +92,7 @@ export const CronjobsTab = () => {
       handleErrorOnDelete(deletingCronJobIdRef, selectedId, `Cron job not found`),
   })
 
-  const { data: count, isLoading: isLoadingCount } = useCronJobsCountQuery({
+  const { data: count, isPending: isLoadingCount } = useCronJobsCountQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

@@ -50,7 +50,7 @@ type DialogType = 'legacy' | 'create' | 'rotate' | 'key-details' | 'revoke' | 'd
 
 export const JWTSecretKeysTable = () => {
   const { ref: projectRef } = useParams()
-  const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
+  const { data: project, isPending: isProjectLoading } = useSelectedProjectQuery()
 
   const newJwtSecrets = useFlag('newJwtSecrets')
 
@@ -59,19 +59,19 @@ export const JWTSecretKeysTable = () => {
   const [shownDialog, setShownDialog] = useState<DialogType>()
 
   const { canReadAPIKeys, isLoading: isLoadingCanReadAPIKeys } = useApiKeysVisibility()
-  const { data: signingKeys, isLoading: isLoadingSigningKeys } = useJWTSigningKeysQuery(
+  const { data: signingKeys, isPending: isLoadingSigningKeys } = useJWTSigningKeysQuery(
     {
       projectRef,
     },
     { enabled: canReadAPIKeys }
   )
-  const { data: legacyKey, isLoading: isLoadingLegacyKey } = useLegacyJWTSigningKeyQuery(
+  const { data: legacyKey, isPending: isLoadingLegacyKey } = useLegacyJWTSigningKeyQuery(
     {
       projectRef,
     },
     { enabled: canReadAPIKeys }
   )
-  const { data: legacyAPIKeysStatus, isLoading: isLoadingLegacyAPIKeysStatus } =
+  const { data: legacyAPIKeysStatus, isPending: isLoadingLegacyAPIKeysStatus } =
     useLegacyAPIKeysStatusQuery({ projectRef }, { enabled: canReadAPIKeys })
 
   const { mutate: migrateJWTSecret, isPending: isMigrating } = useLegacyJWTSigningKeyCreateMutation(

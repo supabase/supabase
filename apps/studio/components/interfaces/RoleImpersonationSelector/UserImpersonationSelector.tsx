@@ -53,17 +53,24 @@ const UserImpersonationSelector = () => {
 
   const { data: project } = useSelectedProjectQuery()
 
-  const { data, isSuccess, isLoading, isError, error, isFetching, isPlaceholderData } =
-    useUsersInfiniteQuery(
-      {
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        keywords: debouncedSearchText.trim().toLocaleLowerCase(),
-      },
-      {
-        placeholderData: keepPreviousData,
-      }
-    )
+  const {
+    data,
+    isSuccess,
+    isPending: isLoading,
+    isError,
+    error,
+    isFetching,
+    isPlaceholderData,
+  } = useUsersInfiniteQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      keywords: debouncedSearchText.trim().toLocaleLowerCase(),
+    },
+    {
+      placeholderData: keepPreviousData,
+    }
+  )
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
   const isSearching = isPlaceholderData && isFetching
   const impersonatingUser =

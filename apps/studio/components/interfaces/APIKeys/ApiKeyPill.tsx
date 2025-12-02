@@ -38,7 +38,7 @@ export function ApiKeyPill({
   const {
     data,
     error,
-    isLoading,
+    isPending: isLoading,
     refetch: refetchApiKey,
   } = useAPIKeyIdQuery(
     {

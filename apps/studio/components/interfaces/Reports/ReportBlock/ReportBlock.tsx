@@ -55,7 +55,7 @@ export const ReportBlock = ({
   const {
     data,
     error: contentError,
-    isLoading: isLoadingContent,
+    isPending: isLoadingContent,
   } = useContentIdQuery(
     { projectRef, id: item.id },
     {
@@ -82,7 +82,7 @@ export const ReportBlock = ({
   const {
     data: queryResult,
     error: executeSqlError,
-    isLoading: executeSqlLoading,
+    isPending: executeSqlLoading,
     refetch,
   } = useQuery({
     queryKey: sqlKeys.query(projectRef, [

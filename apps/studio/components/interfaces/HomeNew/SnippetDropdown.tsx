@@ -49,16 +49,21 @@ export const SnippetDropdown = ({
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 500)
 
-  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useContentInfiniteQuery(
-      {
-        projectRef,
-        type: 'sql',
-        limit: SNIPPET_PAGE_LIMIT,
-        name: search.length === 0 ? search : debouncedSearch,
-      },
-      { placeholderData: keepPreviousData }
-    )
+  const {
+    data,
+    isPending: isLoading,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useContentInfiniteQuery(
+    {
+      projectRef,
+      type: 'sql',
+      limit: SNIPPET_PAGE_LIMIT,
+      name: search.length === 0 ? search : debouncedSearch,
+    },
+    { placeholderData: keepPreviousData }
+  )
 
   const snippets = useMemo(() => {
     const items = data?.pages.flatMap((page) => page.content) ?? []

@@ -13,11 +13,11 @@ import {
   ProjectDailyStatsAttribute,
   useProjectDailyStatsQuery,
 } from 'data/analytics/project-daily-stats-query'
+import dayjs from 'dayjs'
 import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { WarningIcon } from 'ui'
 import type { ChartData } from './Charts.types'
-import dayjs from 'dayjs'
 
 interface ChartHandlerProps {
   id?: string
@@ -72,7 +72,7 @@ const ChartHandler = ({
 
   const databaseIdentifier = state.selectedDatabaseId
 
-  const { data: dailyStatsData, isLoading: isFetchingDailyStats } = useProjectDailyStatsQuery(
+  const { data: dailyStatsData, isPending: isFetchingDailyStats } = useProjectDailyStatsQuery(
     {
       projectRef: ref as string,
       attribute: attribute as ProjectDailyStatsAttribute,
@@ -82,7 +82,7 @@ const ChartHandler = ({
     { enabled: provider === 'daily-stats' && data === undefined }
   )
 
-  const { data: infraMonitoringData, isLoading: isFetchingInfraMonitoring } =
+  const { data: infraMonitoringData, isPending: isFetchingInfraMonitoring } =
     useInfraMonitoringQuery(
       {
         projectRef: ref as string,

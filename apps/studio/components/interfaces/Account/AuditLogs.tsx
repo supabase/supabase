@@ -50,16 +50,23 @@ export const AuditLogs = () => {
     useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 
   const { data: organizations } = useOrganizationsQuery()
-  const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
-    useProfileAuditLogsQuery(
-      {
-        iso_timestamp_start: dateRange.from,
-        iso_timestamp_end: dateRange.to,
-      },
-      {
-        retry: false,
-      }
-    )
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    isRefetching,
+    refetch,
+  } = useProfileAuditLogsQuery(
+    {
+      iso_timestamp_start: dateRange.from,
+      iso_timestamp_end: dateRange.to,
+    },
+    {
+      retry: false,
+    }
+  )
 
   const logs = data?.result ?? []
   const sortedLogs = logs

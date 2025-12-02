@@ -33,7 +33,7 @@ export const UsersFooter = ({
 
   const {
     data: countData,
-    isLoading: isLoadingCount,
+    isPending: isLoadingCount,
     isFetching: isFetchingCount,
     isSuccess: isSuccessCount,
   } = useUsersCountQuery(

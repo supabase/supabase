@@ -116,7 +116,7 @@ export const AnalyticBucketDetails = () => {
 
   const {
     data: namespacesData = [],
-    isLoading: isLoadingNamespaces,
+    isPending: isLoadingNamespaces,
     isSuccess: isSuccessNamespaces,
   } = useIcebergNamespacesQuery(
     {

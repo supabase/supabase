@@ -17,7 +17,7 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: boolean }) => {
   const { ref: projectRef } = useParams()
-  const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery(
+  const { data: lints, isPending: isLoadingLints } = useProjectLintsQuery(
     {
       projectRef,
     },

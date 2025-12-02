@@ -80,7 +80,14 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
   const [isConfirmPreviousModalOpen, setIsConfirmPreviousModalOpen] = useState(false)
   const [isConfirmFetchExactCountModalOpen, setIsConfirmFetchExactCountModalOpen] = useState(false)
 
-  const { data, isLoading, isSuccess, isError, isFetching, error } = useTableRowsCountQuery(
+  const {
+    data,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    isFetching,
+    error,
+  } = useTableRowsCountQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -101,7 +108,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
 
   // [Joshen] This is only applicable for foreign tables, as we use the number of rows on the page to determine
   // if we've reached the last page (and hence disable the next button)
-  const { data: rowsData, isLoading: isLoadingRows } = useTableRowsQuery(
+  const { data: rowsData, isPending: isLoadingRows } = useTableRowsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,

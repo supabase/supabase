@@ -52,7 +52,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   const {
     data: upcomingInvoice,
     error: error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useOrgUpcomingInvoiceQuery({ orgSlug: slug })

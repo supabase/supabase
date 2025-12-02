@@ -93,7 +93,7 @@ export const ServiceStatus = () => {
   const isBranch = project?.parentRef !== project?.ref
 
   // Get branches data when on a branch
-  const { data: branches, isLoading: isBranchesLoading } = useBranchesQuery(
+  const { data: branches, isPending: isBranchesLoading } = useBranchesQuery(
     { projectRef: isBranch ? project?.parentRef : undefined },
     {
       enabled: isBranch,
@@ -117,7 +117,7 @@ export const ServiceStatus = () => {
   // [Joshen] Need pooler service check eventually
   const {
     data: status,
-    isLoading,
+    isPending: isLoading,
     refetch: refetchServiceStatus,
   } = useProjectServiceStatusQuery(
     {

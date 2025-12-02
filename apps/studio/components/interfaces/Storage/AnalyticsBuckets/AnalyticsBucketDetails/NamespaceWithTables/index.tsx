@@ -74,7 +74,7 @@ export const NamespaceWithTables = ({
 
   const {
     data: tablesData = [],
-    isLoading: isLoadingNamespaceTables,
+    isPending: isLoadingNamespaceTables,
     isSuccess: isSuccessNamespaceTables,
   } = useIcebergNamespaceTablesQuery(
     {

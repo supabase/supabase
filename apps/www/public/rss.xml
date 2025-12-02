@@ -7,6 +7,13 @@
       <lastBuildDate>Wed, 03 Dec 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/introducing-seven-new-email-templates-for-auth</guid>
+  <title>Introducing Seven New Email Templates for Supabase Auth</title>
+  <link>https://supabase.com/blog/introducing-seven-new-email-templates-for-auth</link>
+  <description>Notify users when security-sensitive actions are taken on their account.</description>
+  <pubDate>Wed, 03 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-power-for-kiro</guid>
   <title>The new Supabase power for Kiro</title>
   <link>https://supabase.com/blog/supabase-power-for-kiro</link>
