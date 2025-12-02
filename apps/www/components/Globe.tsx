@@ -12,9 +12,7 @@ const Globe = () => {
   const supportsWebGL = () => {
     try {
       const canvas = document.createElement('canvas')
-      const gl =
-        canvas.getContext('webgl') ||
-        canvas.getContext('experimental-webgl' as 'webgl')
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl' as 'webgl')
       return !!gl
     } catch {
       return false
