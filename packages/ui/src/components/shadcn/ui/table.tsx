@@ -1,5 +1,6 @@
 import type { ComponentProps } from 'react'
 import * as React from 'react'
+import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react'
 
 import { cn } from '../../../lib/utils/cn'
 import { ShadowScrollArea } from '../../ShadowScrollArea'
@@ -12,7 +13,11 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(
   ({ className, containerProps, ...props }, ref) => {
     return (
       <ShadowScrollArea {...containerProps}>
-        <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
+        <table
+          ref={ref}
+          className={cn('group/table w-full caption-bottom text-sm', className)}
+          {...props}
+        />
       </ShadowScrollArea>
     )
   }
@@ -76,6 +81,72 @@ const TableHead = React.forwardRef<
 ))
 TableHead.displayName = 'TableHead'
 
+interface TableHeadSortProps<TColumn extends string = string> {
+  column: TColumn
+  currentSort: string
+  onSortChange: (column: TColumn) => void
+  children: React.ReactNode
+  className?: string
+}
+
+function TableHeadSort<TColumn extends string = string>({
+  column,
+  currentSort,
+  onSortChange,
+  children,
+  className,
+}: TableHeadSortProps<TColumn>) {
+  const [currentCol, currentOrder] = currentSort.split(':')
+  const isActive = currentCol === column
+  const isAsc = isActive && currentOrder === 'asc'
+  const isDesc = isActive && currentOrder === 'desc'
+
+  const getSortIcon = () => {
+    const baseIconClass = 'w-3 h-3 absolute inset-0'
+
+    return (
+      <>
+        <ArrowUp
+          className={cn(
+            baseIconClass,
+            'transition-transform',
+            isAsc ? 'translate-y-0' : 'translate-y-full'
+          )}
+        />
+        <ArrowDown
+          className={cn(
+            baseIconClass,
+            'transition-transform',
+            isDesc ? 'translate-y-0' : '-translate-y-full'
+          )}
+        />
+        <ChevronsUpDown
+          className={cn(
+            baseIconClass,
+            'transition-opacity opacity-80 md:opacity-40',
+            !isActive ? 'group-hover/table-head-sort:opacity-80' : '!opacity-0'
+          )}
+        />
+      </>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      className={cn(
+        'group/table-head-sort heading-meta whitespace-nowrap flex items-center gap-1 cursor-pointer select-none !bg-transparent border-none p-0 w-full text-left',
+        className
+      )}
+      onClick={() => onSortChange(column)}
+    >
+      {children}
+      <div className="w-3 h-3 relative overflow-hidden">{getSortIcon()}</div>
+    </button>
+  )
+}
+TableHeadSort.displayName = 'TableHeadSort'
+
 const TableCell = React.forwardRef<
   HTMLTableCellElement,
   React.TdHTMLAttributes<HTMLTableCellElement>
@@ -96,4 +167,14 @@ const TableCaption = React.forwardRef<
 ))
 TableCaption.displayName = 'TableCaption'
 
-export { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow }
+export {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableHeadSort,
+  TableRow,
+}

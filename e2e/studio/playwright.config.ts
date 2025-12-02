@@ -1,11 +1,9 @@
 import { defineConfig } from '@playwright/test'
-import { env, STORAGE_STATE_PATH } from './env.config'
 import dotenv from 'dotenv'
 import path from 'path'
+import { env, STORAGE_STATE_PATH } from './env.config.js'
 
-dotenv.config({
-  path: path.resolve(__dirname, '.env.local'),
-})
+dotenv.config({ path: path.resolve(import.meta.dirname, '.env.local') })
 
 const IS_CI = !!process.env.CI
 
@@ -60,5 +58,6 @@ export default defineConfig({
     command: 'pnpm --workspace-root run e2e:setup',
     port: WEB_SERVER_PORT,
     timeout: WEB_SERVER_TIMEOUT,
+    reuseExistingServer: true,
   },
 })

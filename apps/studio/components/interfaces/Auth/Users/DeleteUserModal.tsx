@@ -20,7 +20,7 @@ export const DeleteUserModal = ({
 }: DeleteUserModalProps) => {
   const { ref: projectRef } = useParams()
 
-  const { mutate: deleteUser, isLoading: isDeleting } = useUserDeleteMutation({
+  const { mutate: deleteUser, isPending: isDeleting } = useUserDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted ${selectedUser?.email}`)
       onDeleteSuccess?.()

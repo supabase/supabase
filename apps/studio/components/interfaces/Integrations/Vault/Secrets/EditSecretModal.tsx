@@ -1,10 +1,15 @@
-import { useState } from 'react'
-import { EyeOff, Eye } from 'lucide-react'
-import { type SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
+import { Eye, EyeOff } from 'lucide-react'
+import { useState } from 'react'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { z } from 'zod'
 
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
+import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import type { VaultSecret } from 'types'
 import {
   Button,
   Dialog,
@@ -20,11 +25,6 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
-import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import type { VaultSecret } from 'types'
 
 interface EditSecretModalProps {
   visible: boolean
@@ -62,7 +62,7 @@ const EditSecretModal = ({ visible, secret, onClose }: EditSecretModalProps) => 
     values,
   })
 
-  const { mutate: updateSecret, isLoading: isSubmitting } = useVaultSecretUpdateMutation()
+  const { mutate: updateSecret, isPending: isSubmitting } = useVaultSecretUpdateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof SecretSchema>> = async (values) => {
     if (!project) return console.error('Project is required')

@@ -613,9 +613,9 @@ export default ProtectedRoute
 </TabPanel>
 </Tabs>
 
-## Auth with Next.js middleware
+## Auth with Next.js proxy
 
-As an alternative to protecting individual pages you can use a [Next.js Middleware](https://nextjs.org/docs/middleware) to protect the entire directory or those that match the config object. In the following example, all requests to `/middleware-protected/*` will check whether a user is signed in, if successful the request will be forwarded to the destination route, otherwise the user will be redirected:
+As an alternative to protecting individual pages you can use a [Next.js Proxy](https://nextjs.org/docs/app/getting-started/proxy) to protect the entire directory or those that match the config object. In the following example, all requests to `/middleware-protected/*` will check whether a user is signed in, if successful the request will be forwarded to the destination route, otherwise the user will be redirected:
 
 ```ts middleware.ts
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'

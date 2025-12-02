@@ -18,10 +18,9 @@ export type ResponseData =
   paths['/platform/projects/{ref}/run-lints']['get']['responses']['200']['content']['application/json']
 
 export const enrichLintsQuery = (query: string, exposedSchemas?: string) => {
-  const literalSchemas = exposedSchemas ? `'${exposedSchemas}'` : ''
   return `
 set pg_stat_statements.track = none;
-set local pgrst.db_schemas = ${literalSchemas};
+${!!exposedSchemas ? `set local pgrst.db_schemas = '${exposedSchemas}';` : ''}
 -- source: dashboard
 -- user: ${'self host'}
 -- date: ${new Date().toISOString()}

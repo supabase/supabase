@@ -39,7 +39,7 @@ export default function MultiSelectDemo() {
               </a>
             </h2>
             <p>
-              Before diving deep into cloud services, it's important to understand the basic
+              Before diving deep into cloud services, it&apos;s important to understand the basic
               building blocks that make cloud computing possible.
             </p>
 

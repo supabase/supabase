@@ -161,7 +161,7 @@ export const TextConfirmModal = forwardRef<
                 name="confirmValue"
                 render={({ field }) => (
                   <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                    <FormLabel_Shadcn_ {...label}>
+                    <FormLabel_Shadcn_ {...label} enableSelection>
                       Type{' '}
                       <span className="text-foreground break-all whitespace-pre">
                         {confirmString}

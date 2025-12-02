@@ -741,6 +741,14 @@
     "author_image_url": "/images/avatars/seth-kramer.jpeg"
   },
   {
+    "author_id": "riccardo_busetti",
+    "author": "Riccardo Busetti",
+    "username": "iambriccardo",
+    "position": "Engineering",
+    "author_url": "https://github.com/iambriccardo",
+    "author_image_url": "https://github.com/iambriccardo.png"
+  },
+  {
     "author_id": "fady",
     "author": "Fady Abdelmalik",
     "position": "Engineering",

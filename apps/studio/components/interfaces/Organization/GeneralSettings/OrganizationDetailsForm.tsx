@@ -40,7 +40,7 @@ export const OrganizationDetailsForm = () => {
     'organizations'
   )
 
-  const { mutate: updateOrganization, isLoading: isUpdatingDetails } =
+  const { mutate: updateOrganization, isPending: isUpdatingDetails } =
     useOrganizationUpdateMutation()
 
   const orgDetailsForm = useForm<z.infer<typeof OrgDetailsSchema>>({

@@ -16,6 +16,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "EmptyStatePresentational": {
+      name: "EmptyStatePresentational",
+      type: "components:fragment",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/../../packages/ui-patterns/src/EmptyStatePresentational")),
+      source: "",
+      files: ["registry/default//EmptyStatePresentational/index.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "TextConfirmModal": {
       name: "TextConfirmModal",
       type: "components:fragment",
@@ -181,24 +192,13 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "badge-destructive": {
-      name: "badge-destructive",
+    "badge-state": {
+      name: "badge-state",
       type: "components:example",
       registryDependencies: ["badge"],
-      component: React.lazy(() => import("@/registry/default/example/badge-destructive")),
+      component: React.lazy(() => import("@/registry/default/example/badge-state")),
       source: "",
-      files: ["registry/default/example/badge-destructive.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "badge-outline": {
-      name: "badge-outline",
-      type: "components:example",
-      registryDependencies: ["badge"],
-      component: React.lazy(() => import("@/registry/default/example/badge-outline")),
-      source: "",
-      files: ["registry/default/example/badge-outline.tsx"],
+      files: ["registry/default/example/badge-state.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -2447,13 +2447,35 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "empty-state-initial-state-presentational": {
-      name: "empty-state-initial-state-presentational",
+    "empty-state-presentational-demo": {
+      name: "empty-state-presentational-demo",
       type: "components:example",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/empty-state-initial-state-presentational")),
+      component: React.lazy(() => import("@/registry/default/example/empty-state-presentational-demo")),
       source: "",
-      files: ["registry/default/example/empty-state-initial-state-presentational.tsx"],
+      files: ["registry/default/example/empty-state-presentational-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "empty-state-presentational-buttons": {
+      name: "empty-state-presentational-buttons",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/empty-state-presentational-buttons")),
+      source: "",
+      files: ["registry/default/example/empty-state-presentational-buttons.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "empty-state-presentational-icon": {
+      name: "empty-state-presentational-icon",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/empty-state-presentational-icon")),
+      source: "",
+      files: ["registry/default/example/empty-state-presentational-icon.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
