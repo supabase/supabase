@@ -15,7 +15,7 @@ export const BannerMetricsAPI = () => {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
-  const [isDismissed, setIsDismissed] = useLocalStorageQuery(
+  const [, setIsDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.OBSERVABILITY_BANNER_DISMISSED(ref ?? ''),
     false
   )
