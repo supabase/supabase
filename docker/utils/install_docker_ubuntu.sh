@@ -1,10 +1,24 @@
 #!/bin/sh
-
 #
-# Based on the DigitalOcean's guide here:
+# Based on the DigitalOcean's guide:
 # https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-22-04
 #
+
 set -e
+
+if command -v docker >/dev/null 2>&1; then
+    echo "Docker is already installed."
+    printf "Re-install? (y/N) "
+    read -r REPLY
+    case "$REPLY" in
+        [Yy])
+            ;;
+        *)
+            echo "Script canceled."
+            exit 1
+            ;;
+    esac
+fi
 
 echo "===> Installing prerequisite packages which let apt use packages over HTTPS..."
 sudo apt install apt-transport-https ca-certificates curl software-properties-common
