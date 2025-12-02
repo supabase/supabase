@@ -20,7 +20,6 @@ jobs:
 
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      TURBOPACK_CACHE_KEY: ${{ github.event_name == 'pull_request' && format('{0}-pr-{1}-turbopack-cache', github.repository, github.event.pull_request.number) || format('{0}-branch-{1}-turbopack-cache', github.repository, github.ref_name) }}
       TURBOREPO_CACHE_KEY: ${{ github.event_name == 'pull_request' && format('{0}-pr-{1}-turborepo-cache', github.repository, github.event.pull_request.number) || format('{0}-branch-{1}-turborepo-cache', github.repository, github.ref_name) }}
 
     steps:
@@ -38,15 +37,6 @@ jobs:
               - 'e2e/studio/**'
               - 'pnpm-lock.yaml'
               - '.github/workflows/studio-e2e-test.yml'
-
-      # ⬇️ Mount Turbopack cache on a Sticky Disk (per PR)
-      - name: Mount Turbopack cache (Sticky Disk)
-        if: steps.filter.outputs.studio == 'true'
-        uses: useblacksmith/stickydisk@v1
-        with:
-          key: ${{ env.TURBOPACK_CACHE_KEY }}
-          # adjust if your Next app lives elsewhere
-          path: apps/studio/.next/cache
 
       # ⬇️ Mount Turborepo cache on a Sticky Disk (per PR)
       - name: Mount Turborepo cache (Sticky Disk)
