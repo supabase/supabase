@@ -96,7 +96,7 @@ export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-40" side="bottom" align="end">
               <DropdownMenuItem asChild className="gap-x-2">
-                <Link href={`/project/${ref}/settings/api?source=loadbalancer`}>View API URL</Link>
+                <Link href={`/project/${ref}/settings/api?source=load-balancer`}>View API URL</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -295,7 +295,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               ) : status === REPLICA_STATUS.RESIZING ? (
                 <Badge>Resizing</Badge>
               ) : status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
-                <Badge variant="brand">Healthy</Badge>
+                <Badge variant="success">Healthy</Badge>
               ) : (
                 <Badge variant="warning">Unhealthy</Badge>
               )}

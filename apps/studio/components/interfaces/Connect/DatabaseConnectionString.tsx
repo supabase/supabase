@@ -1,4 +1,5 @@
 import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
 import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
 
@@ -493,11 +494,9 @@ export const DatabaseConnectionString = () => {
                             }
                             className="text-foreground !bg-dash-sidebar justify-between"
                           >
-                            <div className="text-xs flex items-center py-2 px-1">
+                            <div className="text-xs flex items-center gap-x-2 py-2 px-1">
                               <span>Using the Shared Pooler</span>
-                              <Badge variant={'brand'} size={'small'} className="ml-2">
-                                IPv4 compatible
-                              </Badge>
+                              <Badge variant="success">IPv4 compatible</Badge>
                             </div>
                           </Button>
                         </CollapsibleTrigger_Shadcn_>
