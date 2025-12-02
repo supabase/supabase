@@ -126,7 +126,6 @@ export default function FilterBarDemo() {
         onFreeformTextChange={setFreeformText}
         filters={filters}
         onFilterChange={setFilters}
-        supportsOperators={true}
       />
     </div>
   )
