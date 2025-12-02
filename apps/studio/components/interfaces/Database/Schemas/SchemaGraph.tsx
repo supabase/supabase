@@ -15,7 +15,6 @@ import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
@@ -301,34 +300,20 @@ export const SchemaGraph = () => {
                 type="default"
                 className="max-w-md"
                 title="No tables in schema"
-                description={`The “${selectedSchema}” schema doesn’t have any tables.`}
+                description={
+                  isSchemaLocked
+                    ? `The “${selectedSchema}” schema is managed by Supabase and is read-only through
+                    the dashboard.`
+                    : !canUpdateTables
+                      ? 'You need additional permissions to create tables'
+                      : `The “${selectedSchema}” schema doesn’t have any tables.`
+                }
               >
-                <ButtonTooltip
-                  asChild
-                  type="default"
-                  className="group"
-                  icon={<Plus />}
-                  disabled={!canAddTables}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      className: 'w-[280px]',
-                      text: isSchemaLocked ? (
-                        <ProtectedSchemaWarning
-                          size="sm"
-                          schema={selectedSchema}
-                          entity="table"
-                        />
-                      ) : !canUpdateTables ? (
-                        'You need additional permissions to create tables'
-                      ) : undefined,
-                    },
-                  }}
-                >
-                  <Link passHref href={`/project/${ref}/editor?create=table`}>
-                    New table
-                  </Link>
-                </ButtonTooltip>
+                {canAddTables && (
+                  <Button asChild className="mt-2" type="default" icon={<Plus />}>
+                    <Link href={`/project/${ref}/editor?create=table`}>New table</Link>
+                  </Button>
+                )}
               </Admonition>
             </div>
           ) : (
