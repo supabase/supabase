@@ -9,7 +9,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { Button, Badge, cn, Card, CardContent } from 'ui'
+import { Button, Badge, Card, CardContent } from 'ui'
 import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
 
 export const ObservabilityBanner = () => {
