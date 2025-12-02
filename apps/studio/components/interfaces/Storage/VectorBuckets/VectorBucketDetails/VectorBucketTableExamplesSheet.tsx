@@ -154,8 +154,8 @@ values
 
   const jsCode = `import { createClient } from '@supabase/supabase-js'
 
-// Adding vector data needs a secret or service role key. 
-// This code SHOULD NOT be run on the client side, you'll be vulnerable to a data leak.
+// Adding vector data requires a secret or service role key 
+// This code SHOULD NOT be run on the client side as you will be vulnerable to a data leak
 const client = createClient(
   process.env.SUPABASE_URL,
   process.env.${secretKey ? 'SUPABASE_SECRET_KEY' : 'SUPABASE_SERVICE_ROLE_KEY'},
@@ -236,7 +236,7 @@ const result = await index.putVectors({
             <Link
               target="_blank"
               rel="noreferrer"
-              href={`${DOCS_URL}/reference/javascript/vectorindex-putvectors`}
+              href={`${DOCS_URL}/guides/storage/vector/storing-vectors?queryGroups=language&language=${language}#basic-vector-insertion`}
             >
               Docs
             </Link>

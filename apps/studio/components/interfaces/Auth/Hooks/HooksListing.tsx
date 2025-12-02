@@ -10,7 +10,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cn } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { EmptyStatePresentational, GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   PageSection,
@@ -109,7 +109,7 @@ export const HooksListing = () => {
     <PageSection>
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>All hooks</PageSectionTitle>
+          <PageSectionTitle>Hooks</PageSectionTitle>
         </PageSectionSummary>
         <PageSectionAside>
           <AddHookDropdown
@@ -122,14 +122,12 @@ export const HooksListing = () => {
       </PageSectionMeta>
       <PageSectionContent>
         {hooks.filter((h) => isValidHook(h)).length === 0 && (
-          <div
-            className={[
-              'border rounded border-default px-20 py-16',
-              'flex flex-col items-center justify-center space-y-4',
-            ].join(' ')}
+          <EmptyStatePresentational
+            title="Create an auth hook"
+            description="Use Postgres functions or HTTP endpoints to customize your authentication flow."
           >
-            <p className="text-sm text-foreground-light">No hooks configured yet</p>
             <AddHookDropdown
+              type="default"
               align="center"
               buttonText="Add a new hook"
               onSelectHook={(title) => {
@@ -137,7 +135,7 @@ export const HooksListing = () => {
                 if (hook) setSelectedHook(hook.id)
               }}
             />
-          </div>
+          </EmptyStatePresentational>
         )}
 
         <div className="-space-y-px">

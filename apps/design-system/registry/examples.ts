@@ -62,16 +62,10 @@ export const examples: Registry = [
     files: ['example/badge-demo.tsx'],
   },
   {
-    name: 'badge-destructive',
+    name: 'badge-state',
     type: 'components:example',
     registryDependencies: ['badge'],
-    files: ['example/badge-destructive.tsx'],
-  },
-  {
-    name: 'badge-outline',
-    type: 'components:example',
-    registryDependencies: ['badge'],
-    files: ['example/badge-outline.tsx'],
+    files: ['example/badge-state.tsx'],
   },
   {
     name: 'badge-secondary',
@@ -1319,9 +1313,19 @@ export const examples: Registry = [
     files: ['example/empty-state-zero-items-table.tsx'],
   },
   {
-    name: 'empty-state-initial-state-presentational',
+    name: 'empty-state-presentational-demo',
     type: 'components:example',
-    files: ['example/empty-state-initial-state-presentational.tsx'],
+    files: ['example/empty-state-presentational-demo.tsx'],
+  },
+  {
+    name: 'empty-state-presentational-buttons',
+    type: 'components:example',
+    files: ['example/empty-state-presentational-buttons.tsx'],
+  },
+  {
+    name: 'empty-state-presentational-icon',
+    type: 'components:example',
+    files: ['example/empty-state-presentational-icon.tsx'],
   },
   {
     name: 'empty-state-initial-state-informational',
