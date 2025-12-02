@@ -35,11 +35,7 @@ export const PolicyListItem = ({ policy, className, onRemove }: PolicyListItemPr
 
           <div className="flex items-center gap-2">
             {policy.command && <Badge variant="default">{policy.command}</Badge>}
-            {policy.isNew && (
-              <Badge variant="success" size="tiny">
-                New
-              </Badge>
-            )}
+            {policy.isNew && <Badge variant="success">New</Badge>}
             {onRemove && policy.isNew && (
               <button
                 type="button"
