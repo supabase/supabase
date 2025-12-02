@@ -70,16 +70,16 @@ export function isLikelySupportRequest(text: string): boolean {
   // Common support request patterns
   const supportPatterns = [
     // Help requests
-    /i need help with/i,
-    /i'm having trouble/i,
-    /i'm having issues/i,
-    /i'm having problems/i,
+    /need help/i,
+    /having trouble/i,
+    /having issues/i,
+    /having problems/i,
     /can you help/i,
     /could you help/i,
     /please help/i,
     /need help/i,
-    /how do i/i,
-    /how can i/i,
+    /how do/i,
+    /how can/i,
     /how to/i,
     /why isn't/i,
     /why doesn't/i,
@@ -95,10 +95,12 @@ export function isLikelySupportRequest(text: string): boolean {
     /doesn't work/i,
     /won't work/i,
     /can't work/i,
+    /not work/i,
     /i can't/i,
     /i cannot/i,
-    /i'm unable to/i,
     /unable to/i,
+    /wrong/i,
+    /bad/i,
 
     // Bug/error indicators
     /\bbug\b/i,
