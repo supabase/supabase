@@ -57,6 +57,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
     isSuccess,
   } = useOrgUpcomingInvoiceQuery({ orgSlug: slug })
 
+  // For non-platform customers, compute is broken down per project and contains a breakdown array
   const computeItems =
     upcomingInvoice?.lines?.filter(
       (item) =>
@@ -81,7 +82,8 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   const otherItems =
     upcomingInvoice?.lines?.filter(
       (item) =>
-        !item.description?.toLowerCase().includes('compute') &&
+        // In case we have no per-project breakdown for compute, we treat it as a regular item for display purposes
+        (!item.usage_metric?.toString()?.startsWith('COMPUTE_HOURS') || !item.breakdown?.length) &&
         !item.description?.toLowerCase().includes('plan')
     ) || []
 

@@ -15,6 +15,8 @@ export interface SizeAndCountsProps {
   currentBillingCycleSelected: boolean
   orgDailyStats: OrgDailyUsageResponse | undefined
   isLoadingOrgDailyStats: boolean
+  startDate: string | undefined
+  endDate: string | undefined
 }
 
 const SizeAndCounts = ({
@@ -24,6 +26,8 @@ const SizeAndCounts = ({
   currentBillingCycleSelected,
   orgDailyStats,
   isLoadingOrgDailyStats,
+  startDate,
+  endDate,
 }: SizeAndCountsProps) => {
   const chartMeta: {
     [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
@@ -46,6 +50,8 @@ const SizeAndCounts = ({
       chartMeta={chartMeta}
       subscription={subscription}
       currentBillingCycleSelected={currentBillingCycleSelected}
+      startDate={startDate}
+      endDate={endDate}
     />
   )
 }
