@@ -57,3 +57,78 @@ export const uploadAttachment = async ({ image, userId }: UploadAttachmentArgs) 
   })
   return signedUrls[0]
 }
+
+/**
+ * Client-side heuristic to quickly detect obvious support requests
+ * This provides immediate feedback before the AI classification completes
+ */
+export function isLikelySupportRequest(text: string): boolean {
+  if (!text || text.trim().length === 0) return false
+
+  const lowerText = text.toLowerCase()
+
+  // Common support request patterns
+  const supportPatterns = [
+    // Help requests
+    /i need help with/i,
+    /i'm having trouble/i,
+    /i'm having issues/i,
+    /i'm having problems/i,
+    /can you help/i,
+    /could you help/i,
+    /please help/i,
+    /need help/i,
+    /how do i/i,
+    /how can i/i,
+    /how to/i,
+    /why isn't/i,
+    /why doesn't/i,
+    /why won't/i,
+    /why can't/i,
+
+    // Problem indicators
+    /it's not working/i,
+    /it doesn't work/i,
+    /it won't work/i,
+    /it can't work/i,
+    /isn't working/i,
+    /doesn't work/i,
+    /won't work/i,
+    /can't work/i,
+    /i can't/i,
+    /i cannot/i,
+    /i'm unable to/i,
+    /unable to/i,
+
+    // Bug/error indicators
+    /\bbug\b/i,
+    /\bbroken\b/i,
+    /\berror\b/i,
+    /\berrors\b/i,
+    /\bfailed\b/i,
+    /\bfailure\b/i,
+    /\bfailing\b/i,
+    /\bcrash\b/i,
+    /\bcrashed\b/i,
+    /\bcrashing\b/i,
+
+    // Issue/problem keywords
+    /\bissue\b/i,
+    /\bissues\b/i,
+    /\bproblem\b/i,
+    /\bproblems\b/i,
+    /\btrouble\b/i,
+    /\bdifficulty\b/i,
+    /\bdifficulties\b/i,
+
+    // Support-specific phrases
+    /support ticket/i,
+    /contact support/i,
+    /get help/i,
+    /need assistance/i,
+    /require assistance/i,
+    /technical support/i,
+  ]
+
+  return supportPatterns.some((pattern) => pattern.test(lowerText))
+}

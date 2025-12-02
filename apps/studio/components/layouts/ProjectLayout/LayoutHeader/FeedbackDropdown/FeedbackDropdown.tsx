@@ -29,7 +29,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
       <PopoverContent_Shadcn_
         side="bottom"
         align="end"
-        className="px-0 flex flex-col pt-1 pb-3 w-96"
+        className="p-0 flex flex-col w-[22rem]"
         id="feedback-widget"
       >
         <FeedbackWidget onClose={() => setIsOpen(false)} />
@@ -37,5 +37,3 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
     </Popover_Shadcn_>
   )
 }
-
-export default FeedbackDropdown

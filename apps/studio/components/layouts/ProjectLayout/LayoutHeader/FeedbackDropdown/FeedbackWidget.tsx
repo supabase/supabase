@@ -28,85 +28,14 @@ import {
   TextArea_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
+import {
+  convertB64toBlob,
+  isLikelySupportRequest,
+  uploadAttachment,
+} from './FeedbackDropdown.utils'
 
 interface FeedbackWidgetProps {
   onClose: () => void
-}
-
-/**
- * Client-side heuristic to quickly detect obvious support requests
- * This provides immediate feedback before the AI classification completes
- */
-function isLikelySupportRequest(text: string): boolean {
-  if (!text || text.trim().length === 0) return false
-
-  const lowerText = text.toLowerCase()
-
-  // Common support request patterns
-  const supportPatterns = [
-    // Help requests
-    /i need help with/i,
-    /i'm having trouble/i,
-    /i'm having issues/i,
-    /i'm having problems/i,
-    /can you help/i,
-    /could you help/i,
-    /please help/i,
-    /need help/i,
-    /how do i/i,
-    /how can i/i,
-    /how to/i,
-    /why isn't/i,
-    /why doesn't/i,
-    /why won't/i,
-    /why can't/i,
-
-    // Problem indicators
-    /it's not working/i,
-    /it doesn't work/i,
-    /it won't work/i,
-    /it can't work/i,
-    /isn't working/i,
-    /doesn't work/i,
-    /won't work/i,
-    /can't work/i,
-    /i can't/i,
-    /i cannot/i,
-    /i'm unable to/i,
-    /unable to/i,
-
-    // Bug/error indicators
-    /\bbug\b/i,
-    /\bbroken\b/i,
-    /\berror\b/i,
-    /\berrors\b/i,
-    /\bfailed\b/i,
-    /\bfailure\b/i,
-    /\bfailing\b/i,
-    /\bcrash\b/i,
-    /\bcrashed\b/i,
-    /\bcrashing\b/i,
-
-    // Issue/problem keywords
-    /\bissue\b/i,
-    /\bissues\b/i,
-    /\bproblem\b/i,
-    /\bproblems\b/i,
-    /\btrouble\b/i,
-    /\bdifficulty\b/i,
-    /\bdifficulties\b/i,
-
-    // Support-specific phrases
-    /support ticket/i,
-    /contact support/i,
-    /get help/i,
-    /need assistance/i,
-    /require assistance/i,
-    /technical support/i,
-  ]
-
-  return supportPatterns.some((pattern) => pattern.test(lowerText))
 }
 
 export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
@@ -236,54 +165,49 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
     <ThanksMessage onClose={onClose} />
   ) : (
     <>
-      <>
-        <div className="px-5 pb-4">
-          <TextArea_Shadcn_
-            placeholder="My idea for improving Supabase is..."
-            rows={6}
-            value={feedback}
-            onChange={(e) => setFeedback(e.target.value)}
-            onPaste={handlePasteEvent}
-            className="text-sm mt-4 mb-1 resize-none"
-          />
-        </div>
+      <div className="p-4">
+        <TextArea_Shadcn_
+          placeholder="My idea for improving Supabase is..."
+          rows={6}
+          value={feedback}
+          onChange={(e) => setFeedback(e.target.value)}
+          onPaste={handlePasteEvent}
+          className="text-sm mb-1 resize-none"
+        />
+      </div>
 
-        <AnimatePresence>
-          {effectiveCategory === 'support' && (
-            <motion.div
-              key="support-alert"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 16 }}
-              transition={{ duration: 0.2 }}
+      <AnimatePresence>
+        {effectiveCategory === 'support' && (
+          <motion.div
+            key="support-alert"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 16 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Admonition
+              type="caution"
+              title="This looks like an issue that’s better handled by support"
+              className="rounded-none border-x-0 border-b-0 mb-0"
             >
-              <Admonition
-                type="caution"
-                title="This looks like an issue that’s better handled by support"
-                className="rounded-none border-x-0 border-b-0 mb-0 [&>h5]:text-xs [&>h5]:mb-0.5 text-balance"
-              >
-                <p className="text-xs text-foreground-light !leading-normal">
-                  Please{' '}
-                  <SupportLink
-                    className={cn(
-                      InlineLinkClassName,
-                      'text-foreground-light hover:text-foreground'
-                    )}
-                    queryParams={{ projectRef: slug, message: feedback }}
-                  >
-                    open a support ticket
-                  </SupportLink>{' '}
-                  to get help with this issue, as we do not reply to all product feedback.
-                </p>
-              </Admonition>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </>
+              <p className="text-xs text-foreground-light !leading-normal !mb-0">
+                Please{' '}
+                <SupportLink
+                  className={cn(InlineLinkClassName)}
+                  queryParams={{ projectRef: slug, message: feedback }}
+                >
+                  open a support ticket
+                </SupportLink>{' '}
+                to get help with this issue, as we do not reply to all product feedback.
+              </p>
+            </Admonition>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <PopoverSeparator_Shadcn_ />
 
-      <div className="px-5 flex flex-row justify-end items-start mt-4">
+      <div className="p-4 flex flex-row justify-end items-start">
         <div className="flex items-center gap-2 flex-row">
           {!!screenshot ? (
             <div
