@@ -35,7 +35,7 @@ const ObservabilityLayoutContent = ({
         id: 'metrics-api-banner',
         isDismissed: false,
         content: <BannerMetricsAPI />,
-        priority: 0,
+        priority: 1,
       })
 
       return () => {
