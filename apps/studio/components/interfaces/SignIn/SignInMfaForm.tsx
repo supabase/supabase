@@ -49,7 +49,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
   } = useMfaListFactorsQuery()
   const {
     mutate: mfaChallengeAndVerify,
-    isLoading: isVerifying,
+    isPending: isVerifying,
     isSuccess,
   } = useMfaChallengeAndVerifyMutation({
     onSuccess: async () => {

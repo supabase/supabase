@@ -120,7 +120,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const results = logData
   const isLoading = logsLoading
 
-  const { mutate: upsertContent, isLoading: isUpsertingContent } = useContentUpsertMutation({
+  const { mutate: upsertContent, isPending: isUpsertingContent } = useContentUpsertMutation({
     onError: (e) => {
       const error = e as { message: string }
       console.error(error)

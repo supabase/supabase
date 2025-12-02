@@ -22,10 +22,10 @@ export const DeleteAnalyticsBucketModal = ({
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { mutateAsync: deleteAnalyticsBucketCleanUp, isLoading: isCleaningUpAnalyticsBucket } =
+  const { mutateAsync: deleteAnalyticsBucketCleanUp, isPending: isCleaningUpAnalyticsBucket } =
     useAnalyticsBucketDeleteCleanUp({ projectRef, bucketId })
 
-  const { mutate: deleteAnalyticsBucket, isLoading: isDeletingAnalyticsBucket } =
+  const { mutate: deleteAnalyticsBucket, isPending: isDeletingAnalyticsBucket } =
     useAnalyticsBucketDeleteMutation({
       onSuccess: async () => {
         if (project?.connectionString) await deleteAnalyticsBucketCleanUp()

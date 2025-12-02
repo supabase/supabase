@@ -177,12 +177,12 @@ export const CreateBranchModal = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { mutateAsync: checkGithubBranchValidity, isLoading: isCheckingGHBranchValidity } =
+  const { mutateAsync: checkGithubBranchValidity, isPending: isCheckingGHBranchValidity } =
     useCheckGithubBranchValidity({
       onError: () => {},
     })
 
-  const { mutate: createBranch, isLoading: isCreatingBranch } = useBranchCreateMutation({
+  const { mutate: createBranch, isPending: isCreatingBranch } = useBranchCreateMutation({
     onSuccess: async (data) => {
       toast.success(`Successfully created preview branch "${data.name}"`)
       if (projectRef) {
@@ -360,11 +360,7 @@ export const CreateBranchModal = () => {
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
                           <Label>Sync with a GitHub branch</Label>
-                          {!gitlessBranching && (
-                            <Badge variant="warning" size="small">
-                              Required
-                            </Badge>
-                          )}
+                          {!gitlessBranching && <Badge variant="warning">Required</Badge>}
                         </div>
                         <p className="text-sm text-foreground-lighter">
                           Keep this preview branch in sync with a chosen GitHub branch
@@ -386,11 +382,7 @@ export const CreateBranchModal = () => {
                       label={
                         <>
                           <Label className="mr-2">Include data</Label>
-                          {!hasPitrEnabled && (
-                            <Badge variant="warning" size="small">
-                              Requires PITR
-                            </Badge>
-                          )}
+                          {!hasPitrEnabled && <Badge variant="warning">Requires PITR</Badge>}
                         </>
                       }
                       layout="flex-row-reverse"
@@ -564,7 +556,7 @@ export const CreateBranchModal = () => {
                   <p className="text-sm text-foreground-light">
                     {withData ? (
                       <>
-                        <code className="text-xs font-mono">{branchComputeSize.label}</code> compute
+                        <code className="text-code-inline">{branchComputeSize.label}</code> compute
                         size is automatically selected to match your production branch. You may
                         downgrade after creation or pause the branch when not in use to save cost.
                       </>

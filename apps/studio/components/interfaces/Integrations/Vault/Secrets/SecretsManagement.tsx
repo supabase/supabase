@@ -110,7 +110,7 @@ export const SecretsManagement = () => {
                 size="tiny"
                 className="w-52"
                 placeholder="Search by name or key ID"
-                icon={<Search size={14} />}
+                icon={<Search />}
                 value={searchValue ?? ''}
                 onChange={(e) => setSearchValue(e.target.value)}
                 actions={[

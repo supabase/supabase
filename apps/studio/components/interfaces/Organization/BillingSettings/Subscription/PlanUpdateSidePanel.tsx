@@ -204,13 +204,13 @@ export const PlanUpdateSidePanel = () => {
                 >
                   <div className="w-full">
                     <div className="flex items-center space-x-2">
-                      <p className="text-brand text-sm uppercase">{plan.name}</p>
+                      <p className="text-brand-link text-sm uppercase">{plan.name}</p>
                       {isCurrentPlan ? (
                         <div className="text-xs bg-surface-300 text-foreground-light rounded px-2 py-0.5">
                           Current plan
                         </div>
                       ) : plan.nameBadge ? (
-                        <div className="text-xs bg-brand-400 text-brand-600 rounded px-2 py-0.5">
+                        <div className="text-xs bg-brand-300 dark:bg-brand-400 text-brand-600 rounded px-2 py-0.5">
                           {plan.nameBadge}
                         </div>
                       ) : null}
@@ -238,6 +238,7 @@ export const PlanUpdateSidePanel = () => {
                         type={isDowngradeOption ? 'default' : 'primary'}
                         disabled={
                           subscription?.plan?.id === 'enterprise' ||
+                          subscription?.plan?.id === 'platform' ||
                           // Downgrades to free are still allowed through the dashboard given we have much better control about showing customers the impact + any possible issues with downgrading to free
                           (selectedOrganization?.managed_by !== MANAGED_BY.SUPABASE &&
                             plan.id !== 'tier_free') ||
@@ -262,8 +263,9 @@ export const PlanUpdateSidePanel = () => {
                             side: 'bottom',
                             className: hasOrioleProjects ? 'w-96 text-center' : '',
                             text:
-                              subscription?.plan?.id === 'enterprise'
-                                ? 'Reach out to us via support to update your plan from Enterprise'
+                              subscription?.plan?.id === 'enterprise' ||
+                              subscription?.plan?.id === 'platform'
+                                ? 'Reach out to us via support to update your plan'
                                 : hasOrioleProjects
                                   ? 'Your organization has projects that are using the OrioleDB extension which is only available on the Free plan. Remove all OrioleDB projects before changing your plan.'
                                   : !canUpdateSubscription

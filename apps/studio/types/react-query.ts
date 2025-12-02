@@ -10,7 +10,7 @@ export type UseCustomQueryOptions<
   TError = unknown,
   TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
-> = UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>
+> = Omit<UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>, 'queryKey'>
 
 export type UseCustomMutationOptions<
   TData = unknown,
