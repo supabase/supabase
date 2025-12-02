@@ -18,7 +18,8 @@ const metricsStackOptions: MetricsStackOption[] = [
     title: 'Grafana Cloud (SaaS)',
     description: (
       <>
-        Use Grafana Cloud’s managed Prometheus and import the Supabase dashboard without running any infrastructure.
+        Use Grafana Cloud’s managed Prometheus (works on Free + Pro tiers) and import the Supabase dashboard without
+        running any infrastructure.
       </>
     ),
     href: '/guides/telemetry/metrics/grafana-cloud',
