@@ -51,6 +51,21 @@ export function FilterCondition({
   const wrapperRef = useRef<HTMLDivElement>(null)
   const property = filterProperties.find((p) => p.name === condition.propertyName)
   const [showValueCustom, setShowValueCustom] = useState(false)
+  const [hasTypedOperator, setHasTypedOperator] = useState(false)
+  const [hasTypedValue, setHasTypedValue] = useState(false)
+
+  // Reset "has typed" state when focus changes
+  useEffect(() => {
+    if (!isOperatorActive) {
+      setHasTypedOperator(false)
+    }
+  }, [isOperatorActive])
+
+  useEffect(() => {
+    if (!isActive) {
+      setHasTypedValue(false)
+    }
+  }, [isActive])
 
   useEffect(() => {
     if (isActive && valueRef.current) {
@@ -70,8 +85,14 @@ export function FilterCondition({
   )
 
   const operatorItems = useMemo(
-    () => buildOperatorItems({ type: 'operator', path }, rootFilters, filterProperties),
-    [path, rootFilters, filterProperties]
+    () =>
+      buildOperatorItems(
+        { type: 'operator', path },
+        rootFilters,
+        filterProperties,
+        hasTypedOperator
+      ),
+    [path, rootFilters, filterProperties, hasTypedOperator]
   )
 
   const valueItems = useMemo(
@@ -82,9 +103,18 @@ export function FilterCondition({
         filterProperties,
         propertyOptionsCache,
         loadingOptions,
-        (condition.value ?? '').toString()
+        (condition.value ?? '').toString(),
+        hasTypedValue
       ),
-    [path, rootFilters, filterProperties, propertyOptionsCache, loadingOptions, condition.value]
+    [
+      path,
+      rootFilters,
+      filterProperties,
+      propertyOptionsCache,
+      loadingOptions,
+      condition.value,
+      hasTypedValue,
+    ]
   )
 
   const customValueItem = useMemo(
@@ -137,6 +167,7 @@ export function FilterCondition({
 
   const onOperatorChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
+      setHasTypedOperator(true)
       handleOperatorChange(path, e.target.value)
     },
     [handleOperatorChange, path]
@@ -144,6 +175,7 @@ export function FilterCondition({
 
   const onValueChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
+      setHasTypedValue(true)
       handleInputChange(path, e.target.value)
     },
     [handleInputChange, path]
