@@ -24,6 +24,7 @@ import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIRepor
 import { realtimeReports } from 'data/reports/v2/realtime.config'
 import type { NextPageWithLayout } from 'types'
 import { ObservabilityBanner } from 'components/ui/ObservabilityBanner'
+import { ObservabilityLink } from 'components/ui/ObservabilityLink'
 
 const RealtimeReport: NextPageWithLayout = () => {
   return (
@@ -216,6 +217,9 @@ const RealtimeUsage = () => {
           />
         </div>
       </ReportStickyNav>
+      <div className="py-8">
+        <ObservabilityLink />
+      </div>
     </>
   )
 }

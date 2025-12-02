@@ -31,6 +31,7 @@ import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateR
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { ObservabilityBanner } from 'components/ui/ObservabilityBanner'
+import { ObservabilityLink } from 'components/ui/ObservabilityLink'
 
 export const StorageReport: NextPageWithLayout = () => {
   const report = useStorageReport()
@@ -188,6 +189,9 @@ export const StorageReport: NextPageWithLayout = () => {
           />
         </div>
       </ReportStickyNav>
+      <div className="py-8">
+        <ObservabilityLink />
+      </div>
     </ReportPadding>
   )
 }

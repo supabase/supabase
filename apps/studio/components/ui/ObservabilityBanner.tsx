@@ -101,20 +101,25 @@ export const ObservabilityBanner = () => {
                     Visualize over 200 database performance and health metrics with our Metrics API.
                   </p>
                 </div>
-                <Button type="default" size="tiny" asChild>
-                  <Link
-                    href={`${DOCS_URL}/guides/telemetry/metrics`}
-                    target="_blank"
-                    onClick={() =>
-                      sendEvent({
-                        action: 'observability_metrics_api_banner_clicked',
-                        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                      })
-                    }
-                  >
-                    Get started for Free
-                  </Link>
-                </Button>
+                <div className="flex gap-2">
+                  <Button type="default" size="tiny" asChild>
+                    <Link
+                      href={`${DOCS_URL}/guides/telemetry/metrics`}
+                      target="_blank"
+                      onClick={() =>
+                        sendEvent({
+                          action: 'observability_metrics_api_banner_clicked',
+                          groups: {
+                            project: ref ?? 'Unknown',
+                            organization: org?.slug ?? 'Unknown',
+                          },
+                        })
+                      }
+                    >
+                      Get started for Free
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
