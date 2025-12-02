@@ -130,11 +130,7 @@ export const ProjectCardStatus = ({
     projectStatus === 'isHealthy'
   ) {
     if (renderMode === 'badge') {
-      return (
-        <Badge variant="success" className="rounded-md">
-          Active
-        </Badge>
-      )
+      return <Badge variant="success">Active</Badge>
     }
     return null
   }

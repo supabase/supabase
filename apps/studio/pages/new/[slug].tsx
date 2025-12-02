@@ -91,7 +91,7 @@ const Wizard: NextPageWithLayout = () => {
   const isHomeNew = useFlag('homeNew')
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
-  const isNotOnTeamOrEnterprisePlan = !['team', 'enterprise'].includes(currentOrg?.plan.id ?? '')
+  const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
 
   // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
   if (slug === 'last-visited-org') {
@@ -162,10 +162,10 @@ const Wizard: NextPageWithLayout = () => {
   const hasOAuthApps = approvedOAuthApps.length > 0
 
   const { data: allOverdueInvoices = [] } = useOverdueInvoicesQuery({
-    enabled: isNotOnTeamOrEnterprisePlan,
+    enabled: isNotOnHigherPlan,
   })
   const overdueInvoices = allOverdueInvoices.filter((x) => x.organization_id === currentOrg?.id)
-  const hasOutstandingInvoices = isNotOnTeamOrEnterprisePlan && overdueInvoices.length > 0
+  const hasOutstandingInvoices = isNotOnHigherPlan && overdueInvoices.length > 0
 
   const { data: orgProjectsFromApi } = useOrgProjectsInfiniteQuery({ slug: currentOrg?.slug })
   const allOrgProjects = useMemo(

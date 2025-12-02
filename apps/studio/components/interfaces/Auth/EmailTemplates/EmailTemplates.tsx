@@ -8,8 +8,6 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { FEATURE_PREVIEWS } from 'components/interfaces/App/FeaturePreview/FeaturePreview.constants'
-import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -28,10 +26,6 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Switch,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -47,7 +41,6 @@ import {
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
 import { EmailRateLimitsAlert } from '../EmailRateLimitsAlert'
 import { slugifyTitle } from './EmailTemplates.utils'
-import { TemplateEditor } from './TemplateEditor'
 
 const notificationEnabledKeys = TEMPLATES_SCHEMAS.filter(
   (t) => t.misc?.emailTemplateType === 'security'
@@ -65,13 +58,8 @@ const NotificationsFormSchema = z.object({
   ),
 })
 
-const SECURITY_NOTIFICATIONS_DISCUSSIONS_URL = FEATURE_PREVIEWS.find(
-  (f) => f.key === LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS
-)?.discussionsUrl
-
 export const EmailTemplates = () => {
   const { ref: projectRef } = useParams()
-  const isSecurityNotificationsEnabled = useIsSecurityNotificationsEnabled()
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
@@ -153,225 +141,176 @@ export const EmailTemplates = () => {
       )}
       {isSuccess && (
         <>
-          {builtInSMTP ? (
+          {builtInSMTP && (
             <div className="mt-12">
               <EmailRateLimitsAlert />
             </div>
-          ) : null}
-          {isSecurityNotificationsEnabled ? (
-            <>
-              <PageSection className="!pt-0">
-                <PageSectionMeta>
-                  <PageSectionSummary>
-                    <PageSectionTitle>Authentication</PageSectionTitle>
-                  </PageSectionSummary>
-                </PageSectionMeta>
-                <PageSectionContent>
-                  <Card>
-                    {TEMPLATES_SCHEMAS.filter(
-                      (t) => t.misc?.emailTemplateType === 'authentication'
-                    ).map((template) => {
-                      const templateSlug = slugifyTitle(template.title)
+          )}
+          <PageSection className="!pt-0">
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Authentication</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
+            <PageSectionContent>
+              <Card>
+                {TEMPLATES_SCHEMAS.filter(
+                  (t) => t.misc?.emailTemplateType === 'authentication'
+                ).map((template) => {
+                  const templateSlug = slugifyTitle(template.title)
 
-                      return (
-                        <CardContent key={`${template.id}`} className="p-0">
-                          <Link
-                            href={`/project/${projectRef}/auth/templates/${templateSlug}`}
-                            className="flex items-center justify-between hover:bg-surface-200 transition-colors py-4 px-6 w-full h-full"
+                  return (
+                    <CardContent key={`${template.id}`} className="p-0">
+                      <Link
+                        href={`/project/${projectRef}/auth/templates/${templateSlug}`}
+                        className="flex items-center justify-between hover:bg-surface-200 transition-colors py-4 px-6 w-full h-full"
+                      >
+                        <div className="flex flex-col">
+                          <h3 className="text-sm text-foreground">{template.title}</h3>
+                          {template.purpose && (
+                            <p className="text-sm text-foreground-lighter">{template.purpose}</p>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                          <ChevronRight size={16} className="text-foreground-muted" />
+                        </div>
+                      </Link>
+                    </CardContent>
+                  )
+                })}
+              </Card>
+            </PageSectionContent>
+          </PageSection>
+
+          <PageSection>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Security</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
+            <PageSectionContent>
+              {!acknowledged && (
+                <Admonition showIcon={false} type="tip" className="relative mb-6">
+                  <Tooltip>
+                    <TooltipTrigger
+                      onClick={() => setAcknowledged(true)}
+                      className="absolute top-3 right-3 opacity-30 hover:opacity-100 transition-opacity"
+                    >
+                      <X size={14} className="text-foreground-light" />
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Dismiss</TooltipContent>
+                  </Tooltip>
+                  <div className="flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-8 justify-between px-2 py-1">
+                    <div className="flex flex-col gap-y-0.5">
+                      <div className="flex flex-col gap-y-2 items-start">
+                        <Badge variant="success" className="-ml-0.5 uppercase">
+                          New
+                        </Badge>
+                        <p className="text-sm font-medium">
+                          Notify users about security-sensitive actions on their accounts
+                        </p>
+                      </div>
+                      <p className="text-sm text-foreground-lighter text-balance">
+                        We’ve expanded our email templates to handle security-sensitive actions. The
+                        list of templates will continue to grow as our feature-set changes, and as
+                        we{' '}
+                        <InlineLink href="https://github.com/orgs/supabase/discussions/40349">
+                          gather feedback
+                        </InlineLink>{' '}
+                        from our community .
+                      </p>
+                    </div>
+                    <Button
+                      asChild
+                      type="default"
+                      icon={<ExternalLink strokeWidth={1.5} />}
+                      className="mt-2"
+                    >
+                      <Link href={`${DOCS_URL}/guides/auth/auth-email-templates`} target="_blank">
+                        Docs
+                      </Link>
+                    </Button>
+                  </div>
+                </Admonition>
+              )}
+
+              <Form_Shadcn_ {...notificationsForm}>
+                <form onSubmit={notificationsForm.handleSubmit(onSubmit)} className="space-y-4">
+                  <Card>
+                    {TEMPLATES_SCHEMAS.filter((t) => t.misc?.emailTemplateType === 'security').map(
+                      (template) => {
+                        const templateSlug = slugifyTitle(template.title)
+                        const templateEnabledKey =
+                          `MAILER_NOTIFICATIONS_${template.id?.replace('_NOTIFICATION', '')}_ENABLED` as keyof typeof authConfig
+
+                        return (
+                          <CardContent
+                            key={`${template.id}`}
+                            className="p-0 flex items-center justify-between hover:bg-surface-200 transition-colors w-full h-full"
                           >
-                            <div className="flex flex-col">
+                            <Link
+                              href={`/project/${projectRef}/auth/templates/${templateSlug}`}
+                              className="flex flex-col flex-1 py-4 px-6"
+                            >
                               <h3 className="text-sm text-foreground">{template.title}</h3>
                               {template.purpose && (
                                 <p className="text-sm text-foreground-lighter">
                                   {template.purpose}
                                 </p>
                               )}
-                            </div>
+                            </Link>
 
-                            <div className="flex items-center gap-4">
-                              <ChevronRight size={16} className="text-foreground-muted" />
-                            </div>
-                          </Link>
-                        </CardContent>
-                      )
-                    })}
-                  </Card>
-                </PageSectionContent>
-              </PageSection>
+                            <div className="flex items-center gap-4 h-full pl-2 relative">
+                              <FormField_Shadcn_
+                                control={notificationsForm.control}
+                                name={templateEnabledKey}
+                                render={({ field }) => (
+                                  <FormControl_Shadcn_>
+                                    <Switch
+                                      checked={field.value}
+                                      onCheckedChange={field.onChange}
+                                      disabled={!canUpdateConfig}
+                                    />
+                                  </FormControl_Shadcn_>
+                                )}
+                              />
 
-              <PageSection>
-                <PageSectionMeta>
-                  <PageSectionSummary>
-                    <PageSectionTitle>Security</PageSectionTitle>
-                  </PageSectionSummary>
-                </PageSectionMeta>
-                <PageSectionContent>
-                  {!acknowledged && (
-                    <Admonition showIcon={false} type="tip" className="relative mb-6">
-                      <Tooltip>
-                        <TooltipTrigger
-                          onClick={() => setAcknowledged(true)}
-                          className="absolute top-3 right-3 opacity-30 hover:opacity-100 transition-opacity"
-                        >
-                          <X size={14} className="text-foreground-light" />
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom">Dismiss</TooltipContent>
-                      </Tooltip>
-                      <div className="flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-8 justify-between px-2 py-1">
-                        <div className="flex flex-col gap-y-0.5">
-                          <div className="flex flex-col gap-y-2 items-start">
-                            <Badge variant="success" className="-ml-0.5 uppercase">
-                              New
-                            </Badge>
-                            <p className="text-sm font-medium">
-                              Notify users about security-sensitive actions on their accounts
-                            </p>
-                          </div>
-                          <p className="text-sm text-foreground-lighter text-balance">
-                            We’ve expanded our email templates to handle security-sensitive actions.
-                            The list of templates will continue to grow as our feature-set changes
-                            {SECURITY_NOTIFICATIONS_DISCUSSIONS_URL && (
-                              <>
-                                {' '}
-                                and as we{' '}
-                                <InlineLink
-                                  href={SECURITY_NOTIFICATIONS_DISCUSSIONS_URL}
-                                  target="_blank"
-                                >
-                                  gather feedback
-                                </InlineLink>{' '}
-                                from our community
-                              </>
-                            )}
-                            .
-                          </p>
-                        </div>
-                        <Button
-                          asChild
-                          type="default"
-                          icon={<ExternalLink strokeWidth={1.5} />}
-                          className="mt-2"
-                        >
-                          <Link
-                            href={`${DOCS_URL}/guides/auth/auth-email-templates`}
-                            target="_blank"
-                          >
-                            Docs
-                          </Link>
-                        </Button>
-                      </div>
-                    </Admonition>
-                  )}
-
-                  <Form_Shadcn_ {...notificationsForm}>
-                    <form onSubmit={notificationsForm.handleSubmit(onSubmit)} className="space-y-4">
-                      <Card>
-                        {TEMPLATES_SCHEMAS.filter(
-                          (t) => t.misc?.emailTemplateType === 'security'
-                        ).map((template) => {
-                          const templateSlug = slugifyTitle(template.title)
-                          const templateEnabledKey =
-                            `MAILER_NOTIFICATIONS_${template.id?.replace('_NOTIFICATION', '')}_ENABLED` as keyof typeof authConfig
-
-                          return (
-                            <CardContent
-                              key={`${template.id}`}
-                              className="p-0 flex items-center justify-between hover:bg-surface-200 transition-colors w-full h-full"
-                            >
                               <Link
                                 href={`/project/${projectRef}/auth/templates/${templateSlug}`}
-                                className="flex flex-col flex-1 py-4 px-6"
+                                className="py-6 pr-6"
                               >
-                                <h3 className="text-sm text-foreground">{template.title}</h3>
-                                {template.purpose && (
-                                  <p className="text-sm text-foreground-lighter">
-                                    {template.purpose}
-                                  </p>
-                                )}
+                                <ChevronRight size={16} className="text-foreground-muted" />
                               </Link>
-
-                              <div className="flex items-center gap-4 h-full pl-2 relative">
-                                <FormField_Shadcn_
-                                  control={notificationsForm.control}
-                                  name={templateEnabledKey}
-                                  render={({ field }) => (
-                                    <FormControl_Shadcn_>
-                                      <Switch
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                        disabled={!canUpdateConfig}
-                                      />
-                                    </FormControl_Shadcn_>
-                                  )}
-                                />
-
-                                <Link
-                                  href={`/project/${projectRef}/auth/templates/${templateSlug}`}
-                                  className="py-6 pr-6"
-                                >
-                                  <ChevronRight size={16} className="text-foreground-muted" />
-                                </Link>
-                              </div>
-                            </CardContent>
-                          )
-                        })}
-                        <CardFooter className="justify-end space-x-2">
-                          {notificationsForm.formState.isDirty && (
-                            <Button type="default" onClick={() => notificationsForm.reset()}>
-                              Cancel
-                            </Button>
-                          )}
-                          <Button
-                            type="primary"
-                            htmlType="submit"
-                            disabled={
-                              !canUpdateConfig ||
-                              isUpdatingConfig ||
-                              !notificationsForm.formState.isDirty
-                            }
-                            loading={isUpdatingConfig}
-                          >
-                            Save changes
-                          </Button>
-                        </CardFooter>
-                      </Card>
-                    </form>
-                  </Form_Shadcn_>
-                </PageSectionContent>
-              </PageSection>
-            </>
-          ) : (
-            <PageSection className="!pt-0">
-              <PageSectionContent>
-                <Card className="mt-12">
-                  <Tabs_Shadcn_ defaultValue={slugifyTitle(TEMPLATES_SCHEMAS[0].title)}>
-                    <TabsList_Shadcn_ className="pt-2 px-6 gap-5 mb-0 overflow-x-scroll no-scrollbar mb-4">
-                      {TEMPLATES_SCHEMAS.filter(
-                        (t) => t.misc?.emailTemplateType === 'authentication'
-                      ).map((template) => (
-                        <TabsTrigger_Shadcn_
-                          key={`${template.id}`}
-                          value={slugifyTitle(template.title)}
-                        >
-                          {template.title}
-                        </TabsTrigger_Shadcn_>
-                      ))}
-                    </TabsList_Shadcn_>
-                    {TEMPLATES_SCHEMAS.filter(
-                      (t) => t.misc?.emailTemplateType === 'authentication'
-                    ).map((template) => {
-                      const panelId = slugifyTitle(template.title)
-                      return (
-                        <TabsContent_Shadcn_ key={panelId} value={panelId} className="mt-0">
-                          <TemplateEditor key={template.title} template={template} />
-                        </TabsContent_Shadcn_>
-                      )
-                    })}
-                  </Tabs_Shadcn_>
-                </Card>
-              </PageSectionContent>
-            </PageSection>
-          )}
+                            </div>
+                          </CardContent>
+                        )
+                      }
+                    )}
+                    <CardFooter className="justify-end space-x-2">
+                      {notificationsForm.formState.isDirty && (
+                        <Button type="default" onClick={() => notificationsForm.reset()}>
+                          Cancel
+                        </Button>
+                      )}
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        disabled={
+                          !canUpdateConfig ||
+                          isUpdatingConfig ||
+                          !notificationsForm.formState.isDirty
+                        }
+                        loading={isUpdatingConfig}
+                      >
+                        Save changes
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </form>
+              </Form_Shadcn_>
+            </PageSectionContent>
+          </PageSection>
         </>
       )}
     </>
