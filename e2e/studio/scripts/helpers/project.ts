@@ -21,7 +21,7 @@ export async function createProject({
   const dbPass = faker.internet.password()
 
   const createResp = await platformClient.send(
-    `/projects`,
+    `/v1/projects`,
     {
       method: 'POST',
       body: {
@@ -72,7 +72,7 @@ export async function getProjectRef({
   supaRegion,
   projectName,
 }: GetProjectRefParams): Promise<string> {
-  const getResp = await platformClient.send(`/projects`, { method: 'GET' }, 60000)
+  const getResp = await platformClient.send(`/v1/projects`, { method: 'GET' }, 60000)
 
   if (getResp.status != 200) {
     console.error('could not fetch projects')
