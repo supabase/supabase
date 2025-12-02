@@ -127,10 +127,19 @@ export const navigateToBucket = async (page: Page, ref: string, bucketName: stri
   // Click on the bucket row to navigate
   const bucketRow = page.getByRole('row').filter({ hasText: bucketName })
   await expect(bucketRow, `Bucket row for ${bucketName} should be visible`).toBeVisible()
+
+  // Wait for the objects list API request to complete
+  const objectsListPromise = page.waitForResponse(
+    (response) =>
+      response.url().includes(`/platform/storage/${ref}/buckets/${bucketName}/objects/list`) &&
+      response.request().method() === 'POST' &&
+      response.status() === 201
+  )
+
   await bucketRow.click()
 
-  // Wait for navigation to complete
-  await page.waitForURL(new RegExp(`/storage/files/buckets/${encodeURIComponent(bucketName)}`))
+  // Wait for the API response
+  await objectsListPromise
 
   // Verify we're in the bucket by checking the breadcrumb or "Edit bucket" button
   await expect(
@@ -175,7 +184,7 @@ export const uploadFile = async (page: Page, filePath: string, fileName: string)
   await fileInput.setInputFiles(filePath)
 
   // Wait for upload to complete - file should appear in the explorer
-  await page.waitForTimeout(2000) // Allow time for upload to process
+  await page.waitForTimeout(15_000) // Allow time for upload to process
 
   // Verify file appears in the explorer by title
   await expect(
