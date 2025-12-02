@@ -1304,6 +1304,11 @@ module.exports = [
     destination: '/docs/guides/auth/auth-helpers/auth-ui',
   },
   {
+    permanent: true,
+    source: '/docs/guides/auth/auth-helpers/:path*',
+    destination: '/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
+  },
+  {
     permanent: false,
     source: '/docs/guides/auth/server-side/nextjs',
     destination:
