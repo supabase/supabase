@@ -6,8 +6,9 @@ import { useParams } from 'common'
 import { SingleStat } from 'components/ui/SingleStat'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useBackupsQuery } from 'data/database/backups-query'
-import { useMigrationsQuery } from 'data/database/migrations-query'
+import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { parseMigrationVersion } from 'lib/migration-utils'
 import { cn, Skeleton } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { ServiceStatus } from './ServiceStatus'
@@ -40,7 +41,10 @@ export const ActivityStats = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const latestMigration = useMemo(() => (migrationsData ?? [])[0], [migrationsData])
+  const latestMigration = useMemo<DatabaseMigration | undefined>(
+    () => (migrationsData ?? [])[0],
+    [migrationsData]
+  )
 
   const { data: backupsData, isLoading: isLoadingBackups } = useBackupsQuery({
     projectRef: project?.ref,
@@ -52,6 +56,21 @@ export const ActivityStats = () => {
       .slice()
       .sort((a, b) => new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf())[0]
   }, [backupsData])
+
+  const [versionLabel, versionTimestamp] = useMemo(() => {
+    const version = latestMigration?.version
+
+    const versionDayjs = parseMigrationVersion(version)
+    if (versionDayjs) {
+      return [versionDayjs.fromNow(), versionDayjs.toISOString()]
+    }
+
+    return [undefined, undefined]
+  }, [latestMigration])
+
+  const hasValidVersion = versionLabel && versionTimestamp
+
+  const versionLabelText = migrationsData && migrationsData.length > 0 ? 'Unknown' : 'No migrations'
 
   return (
     <div className="@container">
@@ -69,14 +88,14 @@ export const ActivityStats = () => {
           value={
             isLoadingMigrations ? (
               <Skeleton className="h-6 w-24" />
-            ) : latestMigration ? (
+            ) : hasValidVersion ? (
               <TimestampInfo
                 className="text-base"
-                label={dayjs(latestMigration.version, 'YYYYMMDDHHmmss').fromNow()}
-                utcTimestamp={dayjs(latestMigration.version, 'YYYYMMDDHHmmss').toISOString()}
+                label={versionLabel}
+                utcTimestamp={versionTimestamp}
               />
             ) : (
-              <p className="text-foreground-lighter">No migrations</p>
+              <p className="text-foreground-lighter">{versionLabelText}</p>
             )
           }
         />

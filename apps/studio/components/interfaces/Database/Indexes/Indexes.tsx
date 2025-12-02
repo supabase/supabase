@@ -148,7 +148,7 @@ const Indexes = () => {
               className="w-full lg:w-52"
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search for an index"
-              icon={<Search size={14} />}
+              icon={<Search />}
             />
 
             {!isSchemaLocked && (

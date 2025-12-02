@@ -190,7 +190,6 @@ export const CreateAnalyticsBucketModal = ({
       form.reset()
       toast.success(`Created bucket “${values.name}”`)
       onOpenChange(false)
-      router.push(`/project/${ref}/storage/analytics/buckets/${values.name}`)
     } catch (error: any) {
       toast.error(`Failed to create bucket: ${error.message}`)
     }

@@ -1,8 +1,8 @@
 import type { OAuthClient } from '@supabase/supabase-js'
 import { Edit, MoreVertical, Plus, RotateCw, Search, Trash, X } from 'lucide-react'
 import Link from 'next/link'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useRef, useState } from 'react'
+import { parseAsBoolean, parseAsStringLiteral, useQueryState } from 'nuqs'
+import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -20,7 +20,6 @@ import {
   Badge,
   Button,
   Card,
-  CardContent,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -31,8 +30,10 @@ import {
   TableCell,
   TableHead,
   TableHeader,
+  TableHeadSort,
   TableRow,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { CreateOrUpdateOAuthAppSheet } from './CreateOrUpdateOAuthAppSheet'
@@ -43,6 +44,21 @@ import {
   OAUTH_APP_CLIENT_TYPE_OPTIONS,
   OAUTH_APP_REGISTRATION_TYPE_OPTIONS,
 } from './oauthApps.utils'
+
+const OAUTH_APPS_SORT_VALUES = [
+  'name:asc',
+  'name:desc',
+  'client_type:asc',
+  'client_type:desc',
+  'registration_type:asc',
+  'registration_type:desc',
+  'created_at:asc',
+  'created_at:desc',
+] as const
+
+type OAuthAppsSort = (typeof OAUTH_APPS_SORT_VALUES)[number]
+type OAuthAppsSortColumn = OAuthAppsSort extends `${infer Column}:${string}` ? Column : unknown
+type OAuthAppsSortOrder = OAuthAppsSort extends `${string}:${infer Order}` ? Order : unknown
 
 export const OAuthAppsList = () => {
   const { ref: projectRef } = useParams()
@@ -108,12 +124,40 @@ export const OAuthAppsList = () => {
 
   const [filterString, setFilterString] = useState<string>('')
 
-  const filteredOAuthApps = filterOAuthApps({
-    apps: oAuthApps,
-    searchString: filterString,
-    registrationTypes: filteredRegistrationTypes,
-    clientTypes: filteredClientTypes,
-  })
+  const [sort, setSort] = useQueryState(
+    'sort',
+    parseAsStringLiteral<OAuthAppsSort>(OAUTH_APPS_SORT_VALUES).withDefault('name:asc')
+  )
+
+  const filteredAndSortedOAuthApps = useMemo(() => {
+    const filtered = filterOAuthApps({
+      apps: oAuthApps,
+      searchString: filterString,
+      registrationTypes: filteredRegistrationTypes,
+      clientTypes: filteredClientTypes,
+    })
+
+    const [sortCol, sortOrder] = sort.split(':') as [OAuthAppsSortColumn, OAuthAppsSortOrder]
+    const orderMultiplier = sortOrder === 'asc' ? 1 : -1
+
+    return filtered.sort((a, b) => {
+      if (sortCol === 'name') {
+        return a.client_name.localeCompare(b.client_name) * orderMultiplier
+      }
+      if (sortCol === 'client_type') {
+        return a.client_type.localeCompare(b.client_type) * orderMultiplier
+      }
+      if (sortCol === 'registration_type') {
+        return a.registration_type.localeCompare(b.registration_type) * orderMultiplier
+      }
+      if (sortCol === 'created_at') {
+        return (
+          (new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) * orderMultiplier
+        )
+      }
+      return 0
+    })
+  }, [oAuthApps, filterString, filteredRegistrationTypes, filteredClientTypes, sort])
 
   const hasActiveFilters =
     filterString.length > 0 ||
@@ -126,6 +170,22 @@ export const OAuthAppsList = () => {
     setFilteredClientTypes([])
   }
 
+  const handleSortChange = (column: OAuthAppsSortColumn) => {
+    const [currentCol, currentOrder] = sort.split(':') as [OAuthAppsSortColumn, OAuthAppsSortOrder]
+    if (currentCol === column) {
+      // Cycle through: asc -> desc -> no sort (default)
+      if (currentOrder === 'asc') {
+        setSort(`${column}:desc` as OAuthAppsSort)
+      } else {
+        // Reset to default sort (name:asc)
+        setSort('name:asc')
+      }
+    } else {
+      // New column, start with asc
+      setSort(`${column}:asc` as OAuthAppsSort)
+    }
+  }
+
   if (isAuthConfigLoading || (isOAuthServerEnabled && isLoading)) {
     return <GenericSkeletonLoader />
   }
@@ -136,36 +196,30 @@ export const OAuthAppsList = () => {
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="flex flex-col gap-y-4">
         {newOAuthApp?.client_secret && (
           <NewOAuthAppBanner oauthApp={newOAuthApp} onClose={() => setNewOAuthApp(undefined)} />
         )}
         {!isOAuthServerEnabled && (
-          <div className="space-y-4">
-            <Card>
-              <CardContent className="flex flex-col md:flex-row gap-4 justify-between md:items-center">
-                <div className="flex flex-col gap-2-4">
-                  <h3 className="">OAuth Server is disabled</h3>
-                  <p className="text-foreground-light text-sm">
-                    Enable the OAuth Server to make your project act as an identity provider for
-                    third-party applications.
-                  </p>
-                </div>
-                <Button asChild>
-                  <Link href={`/project/${projectRef}/auth/oauth-server`}>
-                    Go to OAuth Server Settings
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+          <Admonition
+            type="default"
+            layout="horizontal"
+            className="mb-8 [&>div]:!translate-y-0"
+            title="OAuth Server is disabled"
+            description="Enable OAuth Server to make your project act as an identity provider for third-party applications."
+            actions={
+              <Button asChild type="default">
+                <Link href={`/project/${projectRef}/auth/oauth-server`}>OAuth Server Settings</Link>
+              </Button>
+            }
+          />
         )}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
           <div className="flex flex-col lg:flex-row lg:items-center gap-2">
             <Input
-              placeholder="Search oAuth apps"
+              placeholder="Search OAuth apps"
               size="tiny"
-              icon={<Search size="14" />}
+              icon={<Search />}
               value={filterString}
               className="w-full lg:w-52"
               onChange={(e) => setFilterString(e.target.value)}
@@ -229,26 +283,54 @@ export const OAuthAppsList = () => {
             <Table containerProps={{ stickyLastColumn: true }}>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
+                  <TableHead>
+                    <TableHeadSort column="name" currentSort={sort} onSortChange={handleSortChange}>
+                      Name
+                    </TableHeadSort>
+                  </TableHead>
                   <TableHead>Client ID</TableHead>
-                  <TableHead>Client Type</TableHead>
-                  <TableHead>Registration Type</TableHead>
-                  <TableHead>Created</TableHead>
+                  <TableHead>
+                    <TableHeadSort
+                      column="client_type"
+                      currentSort={sort}
+                      onSortChange={handleSortChange}
+                    >
+                      Client Type
+                    </TableHeadSort>
+                  </TableHead>
+                  <TableHead>
+                    <TableHeadSort
+                      column="registration_type"
+                      currentSort={sort}
+                      onSortChange={handleSortChange}
+                    >
+                      Registration Type
+                    </TableHeadSort>
+                  </TableHead>
+                  <TableHead>
+                    <TableHeadSort
+                      column="created_at"
+                      currentSort={sort}
+                      onSortChange={handleSortChange}
+                    >
+                      Created
+                    </TableHeadSort>
+                  </TableHead>
                   <TableHead className="w-8 px-0">
                     <div className="!bg-200 px-4 w-full h-full flex items-center border-l @[944px]:border-l-0" />
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredOAuthApps.length === 0 && (
+                {filteredAndSortedOAuthApps.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={6}>
                       <p className="text-foreground-lighter">No OAuth apps found</p>
                     </TableCell>
                   </TableRow>
                 )}
-                {filteredOAuthApps.length > 0 &&
-                  filteredOAuthApps.map((app) => (
+                {filteredAndSortedOAuthApps.length > 0 &&
+                  filteredAndSortedOAuthApps.map((app) => (
                     <TableRow key={app.client_id} className="w-full">
                       <TableCell className="w-48 max-w-48 flex" title={app.client_name}>
                         <Button

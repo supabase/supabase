@@ -34,7 +34,7 @@ import {
   createLatencyReportConfig,
   createUsageReportConfig,
 } from 'data/reports/v2/auth.config'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
 import { useRouter } from 'next/router'
 import { parseAsJson, useQueryState } from 'nuqs'
 import type { NextPageWithLayout } from 'types'
@@ -155,14 +155,18 @@ const AuthUsage = () => {
     filters: {},
   })
 
-  const onRefreshReport = async () => {
-    if (!selectedDateRange) return
+  const onRefreshReport = useRefreshHandler(
+    datePickerValue,
+    datePickerHelpers,
+    handleDatePickerChange,
+    async () => {
+      if (!selectedDateRange) return
 
-    setIsRefreshing(true)
-
-    refetch()
-    setTimeout(() => setIsRefreshing(false), 1000)
-  }
+      setIsRefreshing(true)
+      refetch()
+      setTimeout(() => setIsRefreshing(false), 1000)
+    }
+  )
 
   const router = useRouter()
 
