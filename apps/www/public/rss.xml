@@ -7,10 +7,17 @@
       <lastBuildDate>Tue, 02 Dec 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
-  <guid>https://supabase.com/blog/open-warehouse-architecture</guid>
-  <title>The Open Warehouse Architecture</title>
-  <link>https://supabase.com/blog/open-warehouse-architecture</link>
-  <description>Introducing Supabase ETL, Analytics Buckets, and Postgres FDW for Iceberg—three features that make Postgres an interface for analytics.</description>
+  <guid>https://supabase.com/blog/introducing-analytics-buckets</guid>
+  <title>Introducing Analytics Buckets</title>
+  <link>https://supabase.com/blog/introducing-analytics-buckets</link>
+  <description>Use Analytics Buckets to store huge datasets in Supabase Storage with Apache Iceberg and columnar Parquet format, optimized for analytical workloads.</description>
+  <pubDate>Tue, 02 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/introducing-supabase-etl</guid>
+  <title>Introducing Supabase ETL</title>
+  <link>https://supabase.com/blog/introducing-supabase-etl</link>
+  <description>A change-data-capture pipeline that replicates your Postgres tables to analytical destinations like Analytics Buckets and BigQuery in near real time.</description>
   <pubDate>Tue, 02 Dec 2025 00:00:00 -0700</pubDate>
 </item>
 <item>
