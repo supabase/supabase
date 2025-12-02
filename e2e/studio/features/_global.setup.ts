@@ -2,8 +2,6 @@ import { expect, test as setup } from '@playwright/test'
 import dotenv from 'dotenv'
 import path from 'path'
 import { env, STORAGE_STATE_PATH } from '../env.config.js'
-import { createProject } from '../scripts/platform.js'
-import { PlatformClient } from '../scripts/common/platform.js'
 
 /**
  * Run any setup tasks for the tests.
@@ -16,14 +14,13 @@ dotenv.config({
 })
 
 const IS_PLATFORM = process.env.IS_PLATFORM
-
-const envHasAuth = env.AUTHENTICATION
+const doAuthentication = Boolean(env.EMAIL && env.PASSWORD && env.PROJECT_REF)
 
 setup('Global Setup', async ({ page }) => {
   console.log(`\n 🧪 Setting up test environment.
     - Studio URL: ${env.STUDIO_URL}
     - API URL: ${env.API_URL}
-    - Auth: ${envHasAuth ? 'enabled' : 'disabled'}
+    - Auth: ${doAuthentication ? 'enabled' : 'disabled'}
     - Is Platform: ${IS_PLATFORM}
     `)
 
@@ -69,33 +66,11 @@ To start API locally, run:
   console.log(`\n ✅ API is running at ${apiUrl}`)
 
   /**
-   * If running on platform, create a project and set the project ref as an environment variable
-   */
-  if (IS_PLATFORM && !env.PROJECT_REF) {
-    console.log(`\n 🔑 Creating project since none are found`)
-
-    const platformClient = new PlatformClient({
-      url: env.API_URL,
-      accessToken: env.SUPA_V0_KEY,
-    })
-    const ref = await createProject(platformClient, env.ORG_SLUG, env.SUPA_REGION)
-
-    console.log(`\n ✅ Project created: ${ref}, settings as environment variables`)
-    env.PROJECT_REF = ref
-    process.env.PROJECT_REF = ref
-  }
-
-  /**
    * Only run authentication if the environment requires it
    */
-  if (!env.AUTHENTICATION) {
+  if (!doAuthentication) {
     console.log(`\n 🔑 Skipping authentication for ${env.STUDIO_URL}`)
     return
-  } else {
-    if (!env.EMAIL || !env.PASSWORD || !env.PROJECT_REF) {
-      console.error(`Missing environment variables. Check README.md for more information.`)
-      throw new Error('Missing environment variables')
-    }
   }
 
   const signInUrl = `${studioUrl}/sign-in`
