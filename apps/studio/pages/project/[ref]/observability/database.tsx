@@ -25,7 +25,6 @@ import ChartHandler from 'components/ui/Charts/ChartHandler'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { LazyComposedChartHandler } from 'components/ui/Charts/ComposedChartHandler'
 import { ReportSettings } from 'components/ui/Charts/ReportSettings'
-import { ObservabilityBanner } from 'components/ui/ObservabilityBanner'
 import { ObservabilityLink } from 'components/ui/ObservabilityLink'
 import Panel from 'components/ui/Panel'
 import { analyticsKeys } from 'data/analytics/keys'
@@ -205,7 +204,6 @@ const DatabaseUsage = () => {
   return (
     <>
       <ReportHeader showDatabaseSelector title="Database" />
-      {/* <ObservabilityBanner /> */}
       <ReportStickyNav
         content={
           <>

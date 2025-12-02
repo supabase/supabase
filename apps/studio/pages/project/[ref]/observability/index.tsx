@@ -12,7 +12,6 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
 import { LogoLoader } from 'ui'
-import { ObservabilityBanner } from 'components/ui/ObservabilityBanner'
 
 export const UserReportPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -51,7 +50,6 @@ export const UserReportPage: NextPageWithLayout = () => {
         <LogoLoader />
       ) : (
         <>
-          {/* <ObservabilityBanner /> */}
           <ProductEmptyState
             title="Observability"
             ctaButtonLabel="New custom report"
