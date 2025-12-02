@@ -23,12 +23,11 @@ Grafana maintains a <a href="https://grafana.com/docs/grafana-cloud/monitor-infr
 ## 1. Create a Grafana Cloud stack
 
 1. Sign in to [Grafana Cloud](https://grafana.com/auth/sign-in).
-2. Create (or select) a stack that has **Prometheus Metrics** enabled.
-3. From the stack home, copy the Prometheus remote-write endpoint as well as the instance ID and API token.
+2. Create (or select) a stack that has **Prometheus Metrics** enabled (Free and Pro tiers both work for this guide).
 
 ## 2. Configure the Supabase integration
 
-1. Navigate to **Integrations & connections → Supabase** inside Grafana Cloud.
+1. Navigate to **Connections → Add new connection → Supabase** inside Grafana Cloud.
 2. Provide:
    - Your Supabase project ref (e.g. `abcd1234`).
    - The Metrics API endpoint: `https://<project-ref>.supabase.co/customer/v1/privileged/metrics`.

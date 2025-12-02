@@ -2756,6 +2756,10 @@ export const telemetry: NavMenuConstant = {
           url: '/guides/telemetry/metrics' as `/${string}`,
           items: [
             {
+              name: 'Overview',
+              url: '/guides/telemetry/metrics' as `/${string}`,
+            },
+            {
               name: 'Grafana Cloud',
               url: '/guides/telemetry/metrics/grafana-cloud' as `/${string}`,
             },

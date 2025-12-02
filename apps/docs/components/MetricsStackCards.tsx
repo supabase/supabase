@@ -83,7 +83,7 @@ export function MetricsStackCards() {
     <div className="grid gap-4 not-prose md:grid-cols-2">
       {metricsStackOptions.map((option) => (
         <Link key={option.href} href={option.href} className="col-span-1 block h-full">
-          <div className="relative flex h-full flex-col gap-4 rounded-2xl border border-foreground/10 bg-surface-75/50 p-5 text-left transition duration-300 ease-out hover:-translate-y-1 hover:border-brand-500 hover:bg-gradient-to-br hover:from-brand-500/15 hover:via-transparent hover:to-transparent">
+          <div className="relative flex h-full flex-col gap-4 rounded-2xl border border-foreground/10 bg-surface-75/50 p-5 text-left transition duration-200 hover:border-foreground/30 hover:bg-surface-100">
             <div className="flex items-center gap-3">
               <span
                 className="flex h-10 w-10 items-center justify-center rounded-full text-base font-semibold"
