@@ -6,13 +6,13 @@ const steps = [
     number: 1,
     icon: Lightbulb,
     title: 'Find a Thread',
-    description: 'Browse unanswered questions below from Discord and Reddit.',
+    description: 'Browse questions below from Discord, Reddit, and GitHub.',
   },
   {
     number: 2,
     icon: MessageCircle,
     title: 'Share Knowledge',
-    description: 'Click through and provide a helpful, detailed response.',
+    description: 'Click through and provide a helpful, detailed solution.',
   },
   {
     number: 3,

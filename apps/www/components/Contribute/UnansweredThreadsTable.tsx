@@ -224,7 +224,7 @@ export function UnansweredThreadsTable({
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-8">
         <div className="flex flex-col gap-2">
-          <h2 className="text-xl text-foreground">Unanswered Threads</h2>
+          <h2 className="text-xl text-foreground">Unresolved Threads</h2>
           <p className="text-foreground-lighter">From the last 24 hours</p>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">

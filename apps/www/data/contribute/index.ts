@@ -3,6 +3,8 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_CONTRIBUTE_URL as string
 const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_CONTRIBUTE_PUBLISHABLE_KEY as string
 
+type ThreadSource = 'discord' | 'reddit' | 'github' | 'unknown'
+
 export interface Thread {
   id: string
   title: string
@@ -11,7 +13,7 @@ export interface Thread {
   tags: string[]
   product_areas: string[]
   posted: string
-  source: 'discord' | 'reddit' | 'github'
+  source: ThreadSource
   external_activity_url: string
   category: string | null
   sub_category: string | null
@@ -20,15 +22,19 @@ export interface Thread {
 
 type ThreadRow = {
   thread_id: string
-  title: string
+  subject: string
+  status: string
   author: string
   external_activity_url: string | null
   created_at: string
   source: string | null
   product_areas: string[] | null
+  stack: string[] | null
   category: string | null
   sub_category: string | null
   summary: string | null
+  first_msg_time: string | null
+  message_count: number | null
 }
 
 function formatTimeAgo(date: Date): string {
@@ -41,26 +47,25 @@ function formatTimeAgo(date: Date): string {
   return `${Math.floor(diffInSeconds / 86400)}d ago`
 }
 
-function normalizeSource(source: string | null): 'discord' | 'reddit' | 'github' {
-  if (!source) return 'discord'
-  const normalized = source.toLowerCase().trim()
-  if (normalized === 'reddit') return 'reddit'
-  if (normalized === 'github') return 'github'
-  return 'discord'
+function normalizeSource(source: string | null): ThreadSource {
+  if (!source) return 'unknown'
+  return source.toLowerCase().trim() as ThreadSource
 }
 
 function mapThreadRowToThread(row: ThreadRow): Thread {
-  const createdAt = new Date(row.created_at)
+  const firstMsgTime = new Date(row.first_msg_time ?? '')
   const source = normalizeSource(row.source)
 
   return {
     id: row.thread_id,
-    title: row.title,
+    title: row.subject,
     user: row.author,
     channel: row.source?.toUpperCase() ?? '',
     tags: row.product_areas ?? [],
     product_areas: row.product_areas ?? [],
-    posted: isNaN(createdAt.getTime()) ? '' : formatTimeAgo(createdAt),
+    posted: isNaN(firstMsgTime.getTime())
+      ? formatTimeAgo(new Date(row.created_at))
+      : formatTimeAgo(firstMsgTime),
     source,
     external_activity_url: row.external_activity_url ?? '#',
     category: row.category,
@@ -79,8 +84,9 @@ export async function getUnansweredThreads(product_area?: string): Promise<Threa
   let query = supabase
     .from('contribute_threads')
     .select(
-      'thread_id, title, author, external_activity_url, created_at, source, product_areas, category, sub_category, summary'
+      'thread_id, subject, status, author, external_activity_url, created_at, source, product_areas, stack, category, sub_category, summary, first_msg_time, message_count'
     )
+    .gte('first_msg_time', since)
     .in('status', ['unanswered', 'unresolved'])
 
   if (product_area) {
@@ -89,7 +95,7 @@ export async function getUnansweredThreads(product_area?: string): Promise<Threa
 
   const { data, error } = await query
     // .gte("created_at", since)
-    .order('created_at', { ascending: false })
+    .order('first_msg_time', { ascending: false })
     .limit(100)
 
   if (error) {

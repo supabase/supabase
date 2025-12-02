@@ -11,7 +11,7 @@ export function Hero() {
         Help Build the Supabase Community
       </h2>
       <p className="text-sm md:text-base text-foreground-lighter max-w-sm sm:max-w-md md:max-w-lg mx-auto">
-        Every question answered helps someone build something amazing. Browse unanswered threads
+        Every question answered helps someone build something amazing. Browse unresolved threads
         from the last 24 hours and share your knowledge with fellow developers.
       </p>
     </header>
