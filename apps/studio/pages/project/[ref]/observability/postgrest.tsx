@@ -107,7 +107,7 @@ const PostgrestReport = () => {
   return (
     <>
       <ReportHeader showDatabaseSelector={false} title="Data API" />
-      <ObservabilityBanner />
+      {/* <ObservabilityBanner /> */}
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2">

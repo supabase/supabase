@@ -77,7 +77,7 @@ export const StorageReport: NextPageWithLayout = () => {
   return (
     <ReportPadding>
       <ReportHeader title="Storage" showDatabaseSelector={false} />
-      <ObservabilityBanner />
+      {/* <ObservabilityBanner /> */}
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2">

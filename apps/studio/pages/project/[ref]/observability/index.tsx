@@ -51,7 +51,7 @@ export const UserReportPage: NextPageWithLayout = () => {
         <LogoLoader />
       ) : (
         <>
-          <ObservabilityBanner />
+          {/* <ObservabilityBanner /> */}
           <ProductEmptyState
             title="Observability"
             ctaButtonLabel="New custom report"

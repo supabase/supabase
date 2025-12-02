@@ -68,7 +68,7 @@ export const WithStatements = ({
 
   return (
     <>
-      <IndexAdvisorNotice />
+      {/* <IndexAdvisorNotice /> */}
       <QueryPerformanceMetrics />
       <QueryPerformanceFilterBar
         showRolesFilter={true}

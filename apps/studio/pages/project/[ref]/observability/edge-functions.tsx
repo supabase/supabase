@@ -135,7 +135,7 @@ const EdgeFunctionsUsage = () => {
   return (
     <>
       <ReportHeader title="Edge Functions" showDatabaseSelector={false} />
-      <ObservabilityBanner />
+      {/* <ObservabilityBanner /> */}
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2">

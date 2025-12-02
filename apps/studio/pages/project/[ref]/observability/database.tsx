@@ -205,7 +205,7 @@ const DatabaseUsage = () => {
   return (
     <>
       <ReportHeader showDatabaseSelector title="Database" />
-      <ObservabilityBanner />
+      {/* <ObservabilityBanner /> */}
       <ReportStickyNav
         content={
           <>

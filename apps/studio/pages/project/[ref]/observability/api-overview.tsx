@@ -94,7 +94,7 @@ export const ApiReport: NextPageWithLayout = () => {
   return (
     <ReportPadding>
       <ReportHeader title="API Gateway" showDatabaseSelector={false} />
-      <ObservabilityBanner />
+      {/* <ObservabilityBanner /> */}
       <ReportStickyNav
         content={
           <div className="flex items-center gap-3">

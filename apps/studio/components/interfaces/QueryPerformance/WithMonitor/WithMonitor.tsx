@@ -82,7 +82,7 @@ export const WithMonitor = ({ dateRange, onDateRangeChange }: WithMonitorProps) 
 
   return (
     <>
-      <IndexAdvisorNotice />
+      {/* <IndexAdvisorNotice /> */}
       <QueryPerformanceChart
         dateRange={dateRange}
         onDateRangeChange={onDateRangeChange}

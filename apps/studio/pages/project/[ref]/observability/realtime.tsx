@@ -133,7 +133,7 @@ const RealtimeUsage = () => {
   return (
     <>
       <ReportHeader showDatabaseSelector={false} title="Realtime" />
-      <ObservabilityBanner />
+      {/* <ObservabilityBanner /> */}
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-3">

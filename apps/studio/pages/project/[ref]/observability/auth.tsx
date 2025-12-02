@@ -203,7 +203,7 @@ const AuthUsage = () => {
   return (
     <>
       <ReportHeader title="Auth" showDatabaseSelector={false} />
-      <ObservabilityBanner />
+      {/* <ObservabilityBanner /> */}
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2">
