@@ -21,6 +21,7 @@ jobs:
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       TURBOPACK_CACHE_KEY: ${{ github.event_name == 'pull_request' && format('{0}-pr-{1}-turbopack-cache', github.repository, github.event.pull_request.number) || format('{0}-branch-{1}-turbopack-cache', github.repository, github.ref_name) }}
+      TURBOREPO_CACHE_KEY: ${{ github.event_name == 'pull_request' && format('{0}-pr-{1}-turborepo-cache', github.repository, github.event.pull_request.number) || format('{0}-branch-{1}-turborepo-cache', github.repository, github.ref_name) }}
 
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
@@ -46,6 +47,14 @@ jobs:
           key: ${{ env.TURBOPACK_CACHE_KEY }}
           # adjust if your Next app lives elsewhere
           path: apps/studio/.next/cache
+
+      # ⬇️ Mount Turborepo cache on a Sticky Disk (per PR)
+      - name: Mount Turborepo cache (Sticky Disk)
+        if: steps.filter.outputs.studio == 'true'
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ env.TURBOREPO_CACHE_KEY }}
+          path: .turbo
 
       - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         if: steps.filter.outputs.studio == 'true'
