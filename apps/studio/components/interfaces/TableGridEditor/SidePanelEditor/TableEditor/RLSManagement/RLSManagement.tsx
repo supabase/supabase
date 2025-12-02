@@ -239,12 +239,12 @@ export const RLSManagement = ({
                 <h4 className="text-sm text-foreground">
                   {generateFailed
                     ? 'We could not generate policies for this table'
-                    : 'No policies yet'}
+                    : 'Generate starting policies'}
                 </h4>
                 <p className="text-sm text-foreground-lighter">
                   {generateFailed
                     ? 'Update your table schema and try again or add policies manually after the table is created.'
-                    : 'Generate starting policies based on your table schema and relationships. Policies will be created after the table is saved.'}
+                    : 'Policies will be generated based on your table schema and relationships and can be customized after the table is created.'}
                 </p>
               </div>
               <Button
