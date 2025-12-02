@@ -5,6 +5,8 @@ const prettierConfig = require('eslint-config-prettier/flat')
 const { default: turboConfig } = require('eslint-config-turbo/flat')
 const { fixupPluginRules } = require('@eslint/compat')
 const tanstackQuery = require('@tanstack/eslint-plugin-query')
+const tseslint = require('@typescript-eslint/eslint-plugin')
+const tsparser = require('@typescript-eslint/parser')
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
@@ -25,12 +27,32 @@ const tanstackQueryConfig = {
   },
 }
 
+// TypeScript ESLint config for TypeScript files
+const typescriptConfig = {
+  name: 'typescript',
+  files: ['**/*.ts', '**/*.tsx'],
+  languageOptions: {
+    parser: tsparser,
+    parserOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+    },
+  },
+  plugins: {
+    '@typescript-eslint': tseslint,
+  },
+  rules: {
+    '@typescript-eslint/no-explicit-any': 'warn',
+  },
+}
+
 module.exports = defineConfig([
   // Global ignore for the .next folder
   { ignores: ['.next', 'public'] },
   turboConfig,
   prettierConfig,
   tanstackQueryConfig,
+  typescriptConfig,
   {
     extends: compat.extends('next/core-web-vitals'),
     linterOptions: {

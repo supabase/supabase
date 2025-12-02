@@ -1,28 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { parseAsBoolean, useQueryState } from 'nuqs'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
-import { useIsAnalyticsBucketsEnabled } from 'data/config/project-storage-config-query'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useAnalyticsBucketCreateMutation } from 'data/storage/analytics-bucket-create-mutation'
 import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import {
   Button,
-  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -30,7 +23,6 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  DialogTrigger,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -122,40 +114,22 @@ const formId = 'create-analytics-storage-bucket-form'
 export type CreateAnalyticsBucketForm = z.infer<typeof FormSchema>
 
 interface CreateAnalyticsBucketModalProps {
-  buttonSize?: 'tiny' | 'small'
-  buttonType?: 'default' | 'primary'
-  buttonClassName?: string
-  disabled?: boolean
-  tooltip?: {
-    content: {
-      side?: 'top' | 'bottom' | 'left' | 'right'
-      text?: string
-    }
-  }
+  open: boolean
+  onOpenChange: (value: boolean) => void
 }
 
 export const CreateAnalyticsBucketModal = ({
-  buttonSize = 'tiny',
-  buttonType = 'default',
-  buttonClassName,
-  disabled = false,
-  tooltip,
+  open,
+  onOpenChange,
 }: CreateAnalyticsBucketModalProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
-  const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
   const { extension: wrappersExtension, state: wrappersExtensionState } =
     useIcebergWrapperExtension()
 
-  const [visible, setVisible] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
-
-  const { data: buckets = [], isLoading } = useAnalyticsBucketsQuery({ projectRef: ref })
-  const icebergCatalogEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
+  const { data: buckets = [] } = useAnalyticsBucketsQuery({ projectRef: ref })
   const wrappersExtenstionNeedsUpgrading = wrappersExtensionState === 'needs-upgrade'
 
   const { mutate: sendEvent } = useSendEventMutation()
@@ -174,8 +148,6 @@ export const CreateAnalyticsBucketModal = ({
 
   const config = BUCKET_TYPES['analytics']
   const isCreating = isEnablingExtension || isCreatingIcebergWrapper || isCreatingAnalyticsBucket
-  const isDisabled =
-    !canCreateBuckets || !icebergCatalogEnabled || isLoading || buckets.length >= 2 || disabled
 
   const form = useForm<CreateAnalyticsBucketForm>({
     resolver: zodResolver(FormSchema),
@@ -217,8 +189,7 @@ export const CreateAnalyticsBucketModal = ({
 
       form.reset()
       toast.success(`Created bucket “${values.name}”`)
-      setVisible(false)
-      router.push(`/project/${ref}/storage/analytics/buckets/${values.name}`)
+      onOpenChange(false)
     } catch (error: any) {
       toast.error(`Failed to create bucket: ${error.message}`)
     }
@@ -226,44 +197,16 @@ export const CreateAnalyticsBucketModal = ({
 
   const handleClose = () => {
     form.reset()
-    setVisible(false)
+    onOpenChange(false)
   }
 
   return (
     <Dialog
-      open={visible}
+      open={open}
       onOpenChange={(open) => {
         if (!open) handleClose()
       }}
     >
-      <DialogTrigger asChild>
-        <ButtonTooltip
-          block
-          size={buttonSize}
-          type={buttonType}
-          className={buttonClassName}
-          icon={<Plus size={14} />}
-          disabled={isDisabled}
-          style={{ justifyContent: 'start' }}
-          onClick={() => setVisible(true)}
-          tooltip={{
-            content: {
-              side: tooltip?.content?.side || 'bottom',
-              className: cn(!icebergCatalogEnabled ? 'w-72 text-center' : ''),
-              text: !icebergCatalogEnabled
-                ? 'Analytics buckets are not enabled for your project. Please contact support to enable it.'
-                : !canCreateBuckets
-                  ? 'You need additional permissions to create buckets'
-                  : buckets.length >= 2
-                    ? 'Bucket limit reached'
-                    : tooltip?.content?.text,
-            },
-          }}
-        >
-          New bucket
-        </ButtonTooltip>
-      </DialogTrigger>
-
       <DialogContent size="large" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Create {config.singularName} bucket</DialogTitle>
@@ -336,7 +279,7 @@ export const CreateAnalyticsBucketModal = ({
         </Form_Shadcn_>
 
         <DialogFooter>
-          <Button type="default" disabled={isCreating} onClick={() => setVisible(false)}>
+          <Button type="default" disabled={isCreating} onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button

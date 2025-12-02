@@ -4,9 +4,23 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Mon, 01 Dec 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Tue, 02 Dec 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/introducing-analytics-buckets</guid>
+  <title>Introducing Analytics Buckets</title>
+  <link>https://supabase.com/blog/introducing-analytics-buckets</link>
+  <description>Use Analytics Buckets to store huge datasets in Supabase Storage with Apache Iceberg and columnar Parquet format, optimized for analytical workloads.</description>
+  <pubDate>Tue, 02 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/introducing-supabase-etl</guid>
+  <title>Introducing Supabase ETL</title>
+  <link>https://supabase.com/blog/introducing-supabase-etl</link>
+  <description>A change-data-capture pipeline that replicates your Postgres tables to analytical destinations like Analytics Buckets and BigQuery in near real time.</description>
+  <pubDate>Tue, 02 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/vector-buckets</guid>
   <title>Introducing Vector Buckets</title>
   <link>https://supabase.com/blog/vector-buckets</link>

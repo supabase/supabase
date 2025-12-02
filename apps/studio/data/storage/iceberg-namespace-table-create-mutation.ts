@@ -1,61 +1,64 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
+import { components } from 'api-types'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageKeys } from './keys'
 
-type DeleteIcebergNamespaceTableVariables = {
+export type NamespaceTableFields = components['schemas']['CreateNamespaceTableBody']['fields']
+
+type CreateIcebergNamespaceTableVariables = {
+  projectRef?: string
   warehouse: string
   namespace: string
-  table: string
-  projectRef?: string
+  name: string
+  fields: NamespaceTableFields
 }
 
-async function deleteIcebergNamespaceTable({
+async function createIcebergNamespaceTable({
   projectRef,
   warehouse,
   namespace,
-  table,
-}: DeleteIcebergNamespaceTableVariables) {
+  name,
+  fields,
+}: CreateIcebergNamespaceTableVariables) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { error } = await del(
-    '/platform/storage/{ref}/analytics-buckets/{id}/namespaces/{namespace}/tables/{table}',
+  const { data, error } = await post(
+    '/platform/storage/{ref}/analytics-buckets/{id}/namespaces/{namespace}/tables',
     {
-      params: {
-        path: { ref: projectRef, id: warehouse, namespace, table },
-        query: { purge: true },
-      },
+      params: { path: { ref: projectRef, id: warehouse, namespace } },
+      body: { name, fields },
     }
   )
 
   if (error) handleError(error)
-  return true
+  return data
 }
 
-type IcebergNamespaceTableDeleteData = Awaited<ReturnType<typeof deleteIcebergNamespaceTable>>
+type IcebergNamespaceTableCreateData = Awaited<ReturnType<typeof createIcebergNamespaceTable>>
 
-export const useIcebergNamespaceTableDeleteMutation = ({
+export const useIcebergNamespaceTableCreateMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
   UseCustomMutationOptions<
-    IcebergNamespaceTableDeleteData,
+    IcebergNamespaceTableCreateData,
     ResponseError,
-    DeleteIcebergNamespaceTableVariables
+    CreateIcebergNamespaceTableVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
   return useMutation<
-    IcebergNamespaceTableDeleteData,
+    IcebergNamespaceTableCreateData,
     ResponseError,
-    DeleteIcebergNamespaceTableVariables
+    CreateIcebergNamespaceTableVariables
   >({
-    mutationFn: (vars) => deleteIcebergNamespaceTable({ ...vars }),
+    mutationFn: (vars) => createIcebergNamespaceTable({ ...vars }),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({
         queryKey: storageKeys.icebergNamespace({
@@ -68,7 +71,7 @@ export const useIcebergNamespaceTableDeleteMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to delete Iceberg namespace table: ${data.message}`)
+        toast.error(`Failed to create Iceberg namespace table: ${data.message}`)
       } else {
         onError(data, variables, context)
       }
