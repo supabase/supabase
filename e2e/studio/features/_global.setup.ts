@@ -2,6 +2,7 @@ import { expect, test as setup } from '@playwright/test'
 import dotenv from 'dotenv'
 import path from 'path'
 import { env, STORAGE_STATE_PATH } from '../env.config.js'
+import { setupProjectForTests } from '../scripts/setup-platform-tests.js'
 
 /**
  * Run any setup tasks for the tests.
@@ -64,6 +65,13 @@ To start API locally, run:
   })
 
   console.log(`\n ✅ API is running at ${apiUrl}`)
+
+  /**
+   * Setup Project for tests
+   */
+  const projectRef = await setupProjectForTests()
+  process.env.PROJECT_REF = projectRef
+  env.PROJECT_REF = projectRef
 
   /**
    * Only run authentication if the environment requires it

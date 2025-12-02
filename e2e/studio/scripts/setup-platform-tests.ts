@@ -4,19 +4,11 @@ import { env } from '../env.config.js'
 import { PlatformClient } from './common/platform.js'
 import { createProject, getProjectRef } from './helpers/project.js'
 
-function appendToEnvFile(key: string, value: string) {
-  const envFile = path.join(import.meta.dirname, '../.env.local')
-  const envFileContent = fs.readFileSync(envFile, 'utf8')
-  const envFileLines = envFileContent.split('\n')
-  envFileLines.push(`${key}=${value}`)
-  fs.writeFileSync(envFile, envFileLines.join('\n'))
-}
-
-async function main() {
+export async function setupProjectForTests() {
   const isPlatform = env.IS_PLATFORM === 'true'
   if (!isPlatform) {
     console.log('Not running on platform, skipping project creation')
-    return
+    return 'default'
   }
 
   // Will default to e2e-test-<timestamp> if not set
@@ -45,8 +37,7 @@ async function main() {
   })
   if (existingProjectRef) {
     console.log(`\n ✅ Project found: ${existingProjectRef}, settings as environment variables`)
-    appendToEnvFile('PROJECT_REF', existingProjectRef)
-    return
+    return existingProjectRef
   } else {
     console.log(`\n 🔑 Project not found, creating new project...`)
   }
@@ -59,7 +50,5 @@ async function main() {
   })
 
   console.log(`\n ✅ Project created: ${ref}, settings as environment variables`)
-  appendToEnvFile('PROJECT_REF', ref)
+  return ref
 }
-
-main()
