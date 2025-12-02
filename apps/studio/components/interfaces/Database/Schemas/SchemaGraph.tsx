@@ -14,11 +14,13 @@ import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
+import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { tablesToSQL } from 'lib/helpers'
 import {
   copyToClipboard,
@@ -89,6 +91,8 @@ export const SchemaGraph = () => {
     LOCAL_STORAGE_KEYS.SCHEMA_VISUALIZER_POSITIONS(ref as string, schema?.id ?? 0),
     {}
   )
+
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   const resetLayout = () => {
     const nodes = reactFlowInstance.getNodes()
@@ -290,9 +294,36 @@ export const SchemaGraph = () => {
                 title="No tables in schema"
                 description={`The “${selectedSchema}” schema doesn’t have any tables.`}
               >
-                <Button asChild className="mt-2" type="default" icon={<Plus />}>
-                  <Link href={`/project/${ref}/editor?create=table`}>New table</Link>
-                </Button>
+                {!isSchemaLocked ? (
+                  <Button asChild className="mt-2" type="default" icon={<Plus />}>
+                    <Link href={`/project/${ref}/editor?create=table`}>New table</Link>
+                  </Button>
+                ) : (
+                  <ButtonTooltip
+                    asChild
+                    type="default"
+                    className="group"
+                    icon={<Plus />}
+                    disabled
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        className: 'w-[280px]',
+                        text: (
+                          <ProtectedSchemaWarning
+                            size="sm"
+                            schema={selectedSchema}
+                            entity="table"
+                          />
+                        ),
+                      },
+                    }}
+                  >
+                    <Link passHref href={`/project/${ref}/editor?create=table`}>
+                      New table
+                    </Link>
+                  </ButtonTooltip>
+                )}
               </Admonition>
             </div>
           ) : (
