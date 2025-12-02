@@ -27,12 +27,6 @@ cd supabase-project
 echo "===> Pulling the latest images..."
 docker compose pull
 
-echo "===> Installing net-tools..."
-sudo apt install net-tools
-
-echo "===> Installing postgresql-client..."
-sudo apt install postgresql-client
-
 echo ""
 echo "*** Make sure to edit .env and replace passwords, keys, and hostnames with your own values!!! ***"
 echo ""
