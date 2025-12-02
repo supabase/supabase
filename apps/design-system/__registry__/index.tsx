@@ -192,24 +192,13 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "badge-destructive": {
-      name: "badge-destructive",
+    "badge-state": {
+      name: "badge-state",
       type: "components:example",
       registryDependencies: ["badge"],
-      component: React.lazy(() => import("@/registry/default/example/badge-destructive")),
+      component: React.lazy(() => import("@/registry/default/example/badge-state")),
       source: "",
-      files: ["registry/default/example/badge-destructive.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "badge-outline": {
-      name: "badge-outline",
-      type: "components:example",
-      registryDependencies: ["badge"],
-      component: React.lazy(() => import("@/registry/default/example/badge-outline")),
-      source: "",
-      files: ["registry/default/example/badge-outline.tsx"],
+      files: ["registry/default/example/badge-state.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
