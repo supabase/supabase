@@ -9,6 +9,10 @@ import {
   isGroup,
 } from './types'
 
+export function pathsEqual(a: number[], b: number[]): boolean {
+  return a.length === b.length && a.every((v, i) => v === b[i])
+}
+
 export function findGroupByPath(group: FilterGroup, path: number[]): FilterGroup | null {
   if (path.length === 0) return group
 

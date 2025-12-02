@@ -1,67 +1,51 @@
-import React, { useRef, useEffect, useMemo, useState, useCallback } from 'react'
-import { ActiveInput } from './hooks'
+'use client'
+
 import { X } from 'lucide-react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   Input_Shadcn_,
   Popover_Shadcn_,
-  PopoverContent_Shadcn_,
   PopoverAnchor_Shadcn_,
+  PopoverContent_Shadcn_,
 } from 'ui'
-import { buildOperatorItems, buildValueItems, MenuItem } from './menuItems'
-import { FilterGroup as FilterGroupType } from './types'
-import { FilterCondition as FilterConditionType, FilterProperty } from './types'
-import { useDeferredBlur, useHighlightNavigation } from './hooks'
 import { DefaultCommandList } from './DefaultCommandList'
+import { useFilterBar } from './FilterBarContext'
+import { useDeferredBlur, useHighlightNavigation } from './hooks'
+import { buildOperatorItems, buildValueItems } from './menuItems'
+import { FilterCondition as FilterConditionType } from './types'
 
-type FilterConditionProps = {
+export type FilterConditionProps = {
   condition: FilterConditionType
-  filterProperties: FilterProperty[]
-  id: string
+  path: number[]
   isActive: boolean
   isOperatorActive: boolean
-  isLoading?: boolean
-  onOperatorChange: (value: string) => void
-  onValueChange: (value: string) => void
-  onOperatorFocus: () => void
-  onValueFocus: () => void
-  onBlur: () => void
-  onLabelClick: () => void
-  onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void
-  onRemove: () => void
-  // Local context
-  rootFilters: FilterGroupType
-  path: number[]
-  propertyOptionsCache: Record<string, { options: any[]; searchValue: string }>
-  loadingOptions: Record<string, boolean>
-  aiApiUrl?: string
-  onSelectMenuItem: (item: MenuItem) => void
-  setActiveInput: (input: ActiveInput) => void
 }
 
 export function FilterCondition({
   condition,
-  filterProperties,
-  id,
+  path,
   isActive,
   isOperatorActive,
-  isLoading,
-  onOperatorChange,
-  onValueChange,
-  onOperatorFocus,
-  onValueFocus,
-  onBlur,
-  onLabelClick,
-  onKeyDown,
-  onRemove,
-  rootFilters,
-  path,
-  propertyOptionsCache,
-  loadingOptions,
-  aiApiUrl,
-  onSelectMenuItem,
-  setActiveInput,
 }: FilterConditionProps) {
+  const {
+    filters: rootFilters,
+    filterProperties,
+    isLoading,
+    propertyOptionsCache,
+    loadingOptions,
+    handleOperatorChange,
+    handleInputChange,
+    handleOperatorFocus,
+    handleInputFocus,
+    handleInputBlur,
+    handleLabelClick,
+    handleKeyDown,
+    handleRemoveCondition,
+    handleSelectMenuItem,
+    setActiveInput,
+  } = useFilterBar()
+
   const operatorRef = useRef<HTMLInputElement>(null)
   const valueRef = useRef<HTMLInputElement>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
@@ -76,20 +60,24 @@ export function FilterCondition({
     }
   }, [isActive, isOperatorActive])
 
-  const handleOperatorBlur = useDeferredBlur(wrapperRef as React.RefObject<HTMLElement>, onBlur)
-  const handleValueBlur = useDeferredBlur(wrapperRef as React.RefObject<HTMLElement>, onBlur)
-
-  if (!property) return null
+  const handleOperatorBlur = useDeferredBlur(
+    wrapperRef as React.RefObject<HTMLElement>,
+    handleInputBlur
+  )
+  const handleValueBlur = useDeferredBlur(
+    wrapperRef as React.RefObject<HTMLElement>,
+    handleInputBlur
+  )
 
   const operatorItems = useMemo(
-    () => buildOperatorItems({ type: 'operator', path } as any, rootFilters, filterProperties),
+    () => buildOperatorItems({ type: 'operator', path }, rootFilters, filterProperties),
     [path, rootFilters, filterProperties]
   )
 
   const valueItems = useMemo(
     () =>
       buildValueItems(
-        { type: 'value', path } as any,
+        { type: 'value', path },
         rootFilters,
         filterProperties,
         propertyOptionsCache,
@@ -118,7 +106,7 @@ export function FilterCondition({
     handleKeyDown: handleOperatorKeyDown,
     reset: resetOpHighlight,
   } = useHighlightNavigation(operatorItems.length, (index) => {
-    if (operatorItems[index]) onSelectMenuItem(operatorItems[index])
+    if (operatorItems[index]) handleSelectMenuItem(operatorItems[index])
   })
 
   const {
@@ -133,18 +121,39 @@ export function FilterCondition({
       if (item.isCustom) {
         setShowValueCustom(true)
       } else {
-        onSelectMenuItem(item)
+        handleSelectMenuItem(item)
       }
     },
-    onKeyDown
+    handleKeyDown
   )
 
   useEffect(() => {
     if (!isOperatorActive) resetOpHighlight()
   }, [isOperatorActive, resetOpHighlight])
+
   useEffect(() => {
     if (!isActive) resetValHighlight()
   }, [isActive, resetValHighlight])
+
+  const onOperatorChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      handleOperatorChange(path, e.target.value)
+    },
+    [handleOperatorChange, path]
+  )
+
+  const onValueChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      handleInputChange(path, e.target.value)
+    },
+    [handleInputChange, path]
+  )
+
+  const onRemove = useCallback(() => {
+    handleRemoveCondition(path)
+  }, [handleRemoveCondition, path])
+
+  if (!property) return null
 
   return (
     <div
@@ -153,28 +162,29 @@ export function FilterCondition({
     >
       <span
         className="text-xs font-medium mr-1 cursor-pointer shrink-0 whitespace-nowrap"
-        onClick={onLabelClick}
+        onClick={() => handleLabelClick(path)}
       >
         {property.label}
       </span>
       <Popover_Shadcn_ open={isOperatorActive && !isLoading && operatorItems.length > 0}>
         <PopoverAnchor_Shadcn_ asChild>
-          <Input_Shadcn_
-            ref={operatorRef}
-            type="text"
-            value={condition.operator}
-            onChange={(e) => onOperatorChange(e.target.value)}
-            onFocus={onOperatorFocus}
-            onBlur={handleOperatorBlur}
-            onKeyDown={handleOperatorKeyDown}
-            className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 h-6 mr-1 text-foreground-light"
-            style={{
-              width: `${Math.max(condition.operator.length, 1)}ch`,
-              minWidth: '1ch',
-            }}
-            disabled={isLoading}
-            aria-label={`Operator for ${property.label}`}
-          />
+          <div className="relative inline-block mr-1">
+            <Input_Shadcn_
+              ref={operatorRef}
+              type="text"
+              value={condition.operator}
+              onChange={onOperatorChange}
+              onFocus={() => handleOperatorFocus(path)}
+              onBlur={handleOperatorBlur}
+              onKeyDown={handleOperatorKeyDown}
+              className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 h-6 text-foreground-light w-full absolute left-0 top-0"
+              disabled={isLoading}
+              aria-label={`Operator for ${property.label}`}
+            />
+            <span className="invisible whitespace-pre text-xs block h-6">
+              {condition.operator || ' '}
+            </span>
+          </div>
         </PopoverAnchor_Shadcn_>
         <PopoverContent_Shadcn_
           className="min-w-[220px] p-0"
@@ -186,55 +196,57 @@ export function FilterCondition({
           onInteractOutside={(e) => {
             const target = e.target as Node
             if (wrapperRef.current && !wrapperRef.current.contains(target)) {
-              onBlur()
+              handleInputBlur()
             }
           }}
         >
           <DefaultCommandList
             items={operatorItems}
             highlightedIndex={opHighlightedIndex}
-            onSelect={onSelectMenuItem}
+            onSelect={handleSelectMenuItem}
             includeIcon={false}
           />
         </PopoverContent_Shadcn_>
       </Popover_Shadcn_>
       <Popover_Shadcn_ open={isActive && !isLoading && (showValueCustom || valueItems.length > 0)}>
         <PopoverAnchor_Shadcn_ asChild>
-          <Input_Shadcn_
-            ref={valueRef}
-            type="text"
-            value={(condition.value ?? '').toString()}
-            onChange={(e) => onValueChange(e.target.value)}
-            onFocus={onValueFocus}
-            onBlur={handleValueBlur}
-            onKeyDown={handleValueKeyDown}
-            className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 h-6 mr-1"
-            style={{
-              width: `${Math.max((condition.value ?? '').toString().length, 1)}ch`,
-              minWidth: '1ch',
-            }}
-            disabled={isLoading}
-            aria-label={`Value for ${property.label}`}
-          />
+          <div className="relative inline-block mr-1 max-w-[150px]">
+            <Input_Shadcn_
+              ref={valueRef}
+              type="text"
+              value={(condition.value ?? '').toString()}
+              onChange={onValueChange}
+              onFocus={() => handleInputFocus(path)}
+              onBlur={handleValueBlur}
+              onKeyDown={handleValueKeyDown}
+              className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 h-6 w-full absolute left-0 top-0"
+              disabled={isLoading}
+              aria-label={`Value for ${property.label}`}
+            />
+            <span className="invisible whitespace-pre text-xs block h-6">
+              {(condition.value ?? '').toString() || ' '}
+            </span>
+          </div>
         </PopoverAnchor_Shadcn_>
         <PopoverContent_Shadcn_
           className="min-w-[220px] w-fit p-0"
           align="start"
+          side="bottom"
+          portal
           onOpenAutoFocus={(e) => e.preventDefault()}
           onCloseAutoFocus={(e) => e.preventDefault()}
           onInteractOutside={(e) => {
             const target = e.target as Node
             if (wrapperRef.current && !wrapperRef.current.contains(target)) {
-              onBlur()
+              handleInputBlur()
             }
           }}
         >
           {showValueCustom && customValueItem && customValueItem.customOption ? (
             customValueItem.customOption({
               onChange: (value: string) => {
-                onValueChange(value)
+                handleInputChange(path, value)
                 setShowValueCustom(false)
-                // Return focus to group's freeform after selection in next tick
                 setTimeout(() => {
                   setActiveInput({ type: 'group', path: path.slice(0, -1) })
                 }, 0)
@@ -250,7 +262,7 @@ export function FilterCondition({
               items={valueItems}
               highlightedIndex={valHighlightedIndex}
               onSelect={(item) =>
-                item.isCustom ? setShowValueCustom(true) : onSelectMenuItem(item)
+                item.isCustom ? setShowValueCustom(true) : handleSelectMenuItem(item)
               }
               includeIcon
             />
