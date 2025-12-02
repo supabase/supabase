@@ -30,7 +30,7 @@ export const DiscordCTACard = ({ organizationSlug }: DiscordCTACardProps) => {
   return (
     <AnimatePresence initial={false}>
       {isVisible && (
-        <motion.div
+        <motion.aside
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
@@ -52,6 +52,7 @@ export const DiscordCTACard = ({ organizationSlug }: DiscordCTACardProps) => {
               WebkitMaskImage: 'linear-gradient(to left, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 100%)',
             }}
           />
+          {/* Content */}
           <div className="relative z-10">
             <div className="flex flex-col gap-3">
               <div>
@@ -73,7 +74,7 @@ export const DiscordCTACard = ({ organizationSlug }: DiscordCTACardProps) => {
               </Link>
             </div>
           </div>
-        </motion.div>
+        </motion.aside>
       )}
     </AnimatePresence>
   )
