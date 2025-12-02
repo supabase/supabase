@@ -2754,6 +2754,24 @@ export const telemetry: NavMenuConstant = {
         {
           name: 'Metrics',
           url: '/guides/telemetry/metrics' as `/${string}`,
+          items: [
+            {
+              name: 'Grafana Cloud',
+              url: '/guides/telemetry/metrics/grafana-cloud' as `/${string}`,
+            },
+            {
+              name: 'Grafana self-hosted',
+              url: '/guides/telemetry/metrics/grafana-self-hosted' as `/${string}`,
+            },
+            {
+              name: 'Datadog',
+              url: '/guides/telemetry/metrics/datadog' as `/${string}`,
+            },
+            {
+              name: 'Vendor-agnostic setup',
+              url: '/guides/telemetry/metrics/vendor-agnostic' as `/${string}`,
+            },
+          ],
         },
         {
           name: 'Sentry integration',
