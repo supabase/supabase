@@ -106,18 +106,16 @@ export const SecurityOptions = ({
                           value="false"
                           // @ts-ignore
                           label={
-                            <>
-                              Use public schema for Data API
-                              <Badge color="scale" className="ml-2">
-                                Default
-                              </Badge>
-                            </>
+                            <div className="flex items-center gap-2">
+                              <span>Use public schema for Data API</span>
+                              <Badge>Default</Badge>
+                            </div>
                           }
                           // @ts-ignore
                           description={
                             <>
                               Query all tables in the{' '}
-                              <code className="text-code-inline">public</code> schema
+                              <code className="text-code-inline !text-[11px]">public</code> schema
                             </>
                           }
                           className="[&>div>div>p]:text-left [&>div>div>p]:text-xs"
@@ -133,7 +131,7 @@ export const SecurityOptions = ({
                           description={
                             <>
                               Query allowlisted tables in a dedicated{' '}
-                              <code className="text-code-inline">api</code> schema
+                              <code className="text-code-inline !text-[11px]">api</code> schema
                             </>
                           }
                           className="[&>div>div>p]:text-left [&>div>div>p]:text-xs"

@@ -101,16 +101,6 @@ export const RestoreToNewProject = () => {
   const isRestoring = previousClones?.some((c) => c.status === 'IN_PROGRESS')
   const restoringClone = previousClones?.find((c) => c.status === 'IN_PROGRESS')
 
-  if (organization?.managed_by === 'vercel-marketplace') {
-    return (
-      <Admonition
-        type="default"
-        title="Restore to new project is not available for Vercel Marketplace organizations"
-        description="Restoring project backups to a new project created via Vercel Marketplace is not supported yet."
-      />
-    )
-  }
-
   if (isFreePlan) {
     return (
       <UpgradeToPro
@@ -170,19 +160,17 @@ export const RestoreToNewProject = () => {
     return (
       <Admonition
         type="default"
-        title="Restore to new project requires physical backups"
+        title="Physical backups are required"
         description={
           <>
-            Physical backups must be enabled to restore your database to a new project.
-            <br /> Find out more about how backups work at supabase{' '}
+            Physical backups must be enabled to restore your database to a new project.{' '}
             <Link
               target="_blank"
               className="underline"
               href={`${DOCS_URL}/guides/platform/backups`}
             >
-              in our docs
+              Learn more
             </Link>
-            .
           </>
         }
       />

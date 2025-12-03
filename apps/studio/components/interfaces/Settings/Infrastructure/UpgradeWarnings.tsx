@@ -90,7 +90,7 @@ export const UnsupportedExtensionsWarning = ({
               <li className="py-3 last:pb-0 flex flex-row justify-between gap-2" key={obj}>
                 <div className="flex flex-row gap-2 items-center flex-1 min-w-0">
                   <p className="overflow-hidden text-ellipsis whitespace-nowrap min-w-0">{obj}</p>
-                  <Badge variant="warning" size="small" className="flex-shrink-0">
+                  <Badge variant="warning" className="flex-shrink-0">
                     Deprecated
                   </Badge>
                 </div>

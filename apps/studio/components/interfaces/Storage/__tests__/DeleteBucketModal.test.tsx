@@ -90,12 +90,18 @@ describe(`DeleteBucketModal`, () => {
         },
       ],
     })
-    // useBucketDeleteMutation
+    // useBucketDeleteMutation - empty bucket
     addAPIMock({
       method: `post`,
       path: `/platform/storage/:ref/buckets/:id/empty`,
     })
-    // useDatabasePolicyDeleteMutation
+    // useBucketDeleteMutation - poll for empty bucket
+    addAPIMock({
+      method: `post`,
+      path: `/platform/storage/:ref/buckets/:id/objects/list`,
+      response: [], // Return empty array to indicate bucket is empty
+    })
+    // useBucketDeleteMutation - delete bucket
     addAPIMock({
       method: `delete`,
       path: `/platform/storage/:ref/buckets/:id`,

@@ -124,13 +124,15 @@ The two special message types have a well defined binary format where the first 
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |  Type (0x03)  | Join Ref Size |   Ref Size    |  Topic Size   |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|User Event Size| Payload Enc.  |  Join Ref (variable length)   |
+|User Event Size| Metadata Size | Payload Enc.  |  Join Ref ... |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                      Ref (variable length)                    |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                     Topic (variable length)                   |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                  User Event (variable length)                 |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                   Metadata (variable length)                  |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                User Payload (variable length)                 |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -143,11 +145,13 @@ The two special message types have a well defined binary format where the first 
 - **Ref Size**: 1 byte, size of reference string (max 255)
 - **Topic Size**: 1 byte, size of topic string (max 255)
 - **User Event Size**: 1 byte, size of user event string (max 255)
+- **Metadata Size**: 1 byte, size of metadata string (max 255)
 - **Payload Encoding**: 1 byte (0 = binary, 1 = JSON)
 - **Join Ref**: Variable length string
 - **Ref**: Variable length string
 - **Topic**: Variable length string
 - **User Event**: Variable length string
+- **Metadata**: Variable length JSON string
 - **User Payload**: Variable length payload data
 
 #### User Broadcast
@@ -386,6 +390,7 @@ Below is the same example from the previous section, showing the binary frame st
 - Topic: `realtime:chat-room`
 - Payload encoding being JSON
 - User Event: `user-event`
+- Metadata is empty
 - User Payload
 
 ```
@@ -394,6 +399,7 @@ Below is the same example from the previous section, showing the binary frame st
 0x01                      // Ref Size
 0x12                      // Topic Size
 0x0A                      // User Event Size
+0x00                      // Metadata Size
 0x01                      // Payload Encoding (1 = JSON)
 10                        // Actual Join Ref
 1                         // Actual Ref

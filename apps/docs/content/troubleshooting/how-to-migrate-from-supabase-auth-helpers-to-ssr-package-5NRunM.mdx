@@ -22,7 +22,7 @@ npm uninstall @supabase/auth-helpers-nextjs @supabase/supabase-js
 npm install @supabase/ssr @supabase/supabase-js
 ```
 
-### 2. Create the utility functions to create Supabase clients.
+### 2. Create the utility functions to create Supabase clients
 
 ```
 // utils/supabase/client.ts
@@ -58,7 +58,7 @@ export function createClient() {
             )
           } catch {
             // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
+            // This can be ignored if you have proxy refreshing
             // user sessions.
           }
         },
@@ -67,7 +67,7 @@ export function createClient() {
   );
 }
 
-// utils/supabase/middleware.ts
+// utils/supabase/proxy.ts
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
@@ -133,15 +133,15 @@ export async function updateSession(request: NextRequest) {
 }
 ```
 
-### 3. Replace your middleware.ts file
+### 3. Replace your proxy.ts file
 
 ```
-// middleware.ts
+// proxy.ts
 
 import { type NextRequest } from 'next/server';
-import { updateSession } from '@/utils/supabase/middleware';
+import { updateSession } from '@/utils/supabase/proxy';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   return await updateSession(request);
 }
 
@@ -159,7 +159,7 @@ export const config = {
 };
 ```
 
-### 4. Create your server actions to handle login and sign up.
+### 4. Create your server actions to handle login and sign up
 
 ```
 // app/login/actions.ts
@@ -212,7 +212,7 @@ export async function signup(formData: FormData) {
 }
 ```
 
-### 5. Utilize the server actions in your login page UI.
+### 5. Utilize the server actions in your login page UI
 
 ```
 // app/login/page.tsx
@@ -245,13 +245,13 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { createClient } from '@/utils/supabase/client';
 
 export default async function Page() {
-	// replace this line
-	const supabase = createClientComponentClient<Database>();
+ // replace this line
+ const supabase = createClientComponentClient<Database>();
 
-	// with
-	const supabase = createClient();
+ // with
+ const supabase = createClient();
 
-	return...
+ return...
 }
 ```
 
@@ -266,16 +266,16 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { createClient } from '@/utils/supabase/server';
 
 export default async function Page() {
-	// replace
-	const cookieStore = cookies();
-	const supabase = createServerComponentClient<Database>({
-		cookies: () => cookieStore
-	});
+ // replace
+ const cookieStore = cookies();
+ const supabase = createServerComponentClient<Database>({
+  cookies: () => cookieStore
+ });
 
-	// with
-	const supabase = createClient();
+ // with
+ const supabase = createClient();
 
-	return...
+ return...
 }
 ```
 
@@ -290,8 +290,8 @@ import { cookies } from 'next/headers';
 import { createClient } from '@/utils/supabase/server';
 
 export async function POST(request: Request) {
-	// replace
-	const supabase = createRouteHandlerClient<Database>({
+ // replace
+ const supabase = createRouteHandlerClient<Database>({
     cookies: () => cookieStore,
   });
 

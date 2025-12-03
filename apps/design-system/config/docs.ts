@@ -65,6 +65,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/ui-patterns/empty-states',
           items: [],
         },
+        {
+          title: 'Forms',
+          href: '/docs/ui-patterns/forms',
+          items: [],
+        },
       ],
     },
     {
@@ -83,6 +88,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Assistant Chat',
           href: '/docs/fragments/assistant-chat',
+          items: [],
+        },
+        {
+          title: 'EmptyStatePresentational',
+          href: '/docs/fragments/empty-state-presentational',
           items: [],
         },
         {
@@ -306,6 +316,12 @@ export const docsConfig: DocsConfig = {
           title: 'Label',
           href: '/docs/components/label',
           items: [],
+        },
+        {
+          title: 'Mermaid',
+          href: '/docs/components/mermaid',
+          items: [],
+          label: 'New',
         },
         {
           title: 'Menubar',

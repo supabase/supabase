@@ -40,6 +40,22 @@ Vector buckets excel at:
 - **RAG (Retrieval-Augmented Generation)** - Find relevant context for LLM queries
 - **Personalization** - Recommend tailored content based on user embeddings
 
+## Comparison to pgvector
+
+Vector buckets share similarities to pgvector and matches the developer experience of using pgvector as much as possible, but Vector buckets and any [Foreign Data Wrappers (FDW)](/docs/guides/database/extensions/wrappers/overview) they use only support one similarity search algorithm, the `<===>` distance operator.
+
+This makes Vector buckets ideal for:
+
+- Large-scale data storage
+- Backend processing workflows
+- Applications where speed is less critical
+
+And pgvector is ideal for:
+
+- Fast prototyping and small data volumes
+- Applications requiring quick response times
+- User-facing features closer to the front end
+
 ## How Vector buckets work
 
 1. **Create a bucket** to organize your vector data

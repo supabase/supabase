@@ -272,3 +272,26 @@ export const useReportDateRange = (
     handleDatePickerChange,
   }
 }
+
+export function useRefreshHandler(
+  datePickerValue: DatePickerValue,
+  datePickerHelpers: ReportsDatetimeHelper[],
+  handleDatePickerChange: (value: DatePickerValue) => boolean | void,
+  refresh: () => void | Promise<void>
+): () => void | Promise<void> {
+  return useCallback(async () => {
+    if (datePickerValue.isHelper && datePickerValue.text) {
+      const selectedHelper = datePickerHelpers.find((h) => h.text === datePickerValue.text)
+      if (selectedHelper) {
+        handleDatePickerChange({
+          from: selectedHelper.calcFrom(),
+          to: selectedHelper.calcTo(),
+          isHelper: true,
+          text: selectedHelper.text,
+        })
+      }
+    }
+
+    await refresh()
+  }, [datePickerValue, datePickerHelpers, handleDatePickerChange, refresh])
+}
