@@ -1,7 +1,7 @@
 import { format } from 'date-fns'
-import { useCallback, useMemo, useState } from 'react'
-import { DateRange } from 'react-day-picker'
+import { useEffect, useMemo, useState } from 'react'
 
+import { useDebounce } from '@uidotdev/usehooks'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import type { Filter, SupaColumn } from 'components/grid/types'
 import {
@@ -64,21 +64,14 @@ function filterGroupToFilters(group: FilterGroup): Filter[] {
 
 // Custom date picker component for the FilterBar
 function DatePickerOption({ onChange, onCancel, search }: CustomOptionProps) {
-  const [date, setDate] = useState<DateRange | undefined>(
-    search
-      ? {
-          from: new Date(search),
-          to: undefined,
-        }
-      : undefined
-  )
+  const [date, setDate] = useState<Date | undefined>(search ? new Date(search) : undefined)
 
   return (
     <div className="w-[300px] space-y-4">
       <Calendar
-        initialFocus
-        mode="range"
-        defaultMonth={date?.from}
+        autoFocus
+        mode="single"
+        defaultMonth={date}
         selected={date}
         onSelect={setDate}
         className="w-full"
@@ -87,18 +80,7 @@ function DatePickerOption({ onChange, onCancel, search }: CustomOptionProps) {
         <Button type="default" onClick={onCancel}>
           Cancel
         </Button>
-        <Button
-          type="primary"
-          onClick={() =>
-            onChange(
-              date?.from
-                ? date.to
-                  ? `${format(date.from, 'yyyy-MM-dd')} - ${format(date.to, 'yyyy-MM-dd')}`
-                  : format(date.from, 'yyyy-MM-dd')
-                : ''
-            )
-          }
-        >
+        <Button type="primary" onClick={() => onChange(date ? format(date, 'yyyy-MM-dd') : '')}>
           Apply
         </Button>
       </div>
@@ -137,14 +119,22 @@ function serializeFilterProperties(
 }
 
 export const FilterPopover = ({ portal = true }: FilterPopoverProps) => {
-  const { filters, onApplyFilters } = useTableFilter()
+  const { filters: urlFilters, onApplyFilters } = useTableFilter()
   const snap = useTableEditorTableStateSnapshot()
+
+  // Local state for immediate UI updates
+  const [localFilters, setLocalFilters] = useState<Filter[]>(urlFilters)
+  const debouncedLocalFilters = useDebounce(localFilters, 500)
+
+  useEffect(() => {
+    onApplyFilters(debouncedLocalFilters)
+  }, [debouncedLocalFilters])
 
   const [freeformText, setFreeformText] = useState('')
   const { mutateAsync: generateFilters, isLoading: isGenerating } = useSqlFilterGenerateMutation()
 
   // Convert filters to FilterGroup for the FilterBar
-  const filterGroup = useMemo(() => filtersToFilterGroup(filters), [filters])
+  const filterGroup = useMemo(() => filtersToFilterGroup(localFilters), [localFilters])
 
   // Create filter properties from table columns
   const filterProperties: FilterProperty[] = useMemo(() => {
@@ -222,13 +212,11 @@ export const FilterPopover = ({ portal = true }: FilterPopoverProps) => {
   )
 
   // Handle filter changes from FilterBar
-  const handleFilterChange = useCallback(
-    (newFilterGroup: FilterGroup) => {
-      const newFilters = filterGroupToFilters(newFilterGroup)
-      onApplyFilters(newFilters)
-    },
-    [onApplyFilters]
-  )
+  const handleFilterChange = (newFilterGroup: FilterGroup) => {
+    const newFilters = filterGroupToFilters(newFilterGroup)
+    // Update local state immediately for responsive UI
+    setLocalFilters(newFilters)
+  }
 
   const actions = useMemo(
     () => [
@@ -254,7 +242,7 @@ export const FilterPopover = ({ portal = true }: FilterPopoverProps) => {
         },
       },
     ],
-    [generateFilters, serializableFilterProperties, handleFilterChange]
+    [generateFilters, serializableFilterProperties]
   )
 
   return (
