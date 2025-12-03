@@ -65,6 +65,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/ui-patterns/empty-states',
           items: [],
         },
+        {
+          title: 'Forms',
+          href: '/docs/ui-patterns/forms',
+          items: [],
+        },
       ],
     },
     {
