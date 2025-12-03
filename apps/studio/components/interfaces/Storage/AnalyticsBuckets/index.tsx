@@ -1,5 +1,6 @@
 import { ChevronRight, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 
 import { useParams } from 'common'
@@ -26,6 +27,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent, PageSectionTitle } from 'ui-patterns/PageSection'
 import { EmptyBucketState } from '../EmptyBucketState'
+import { CreateBucketButton } from '../NewBucketButton'
 import { CreateAnalyticsBucketModal } from './CreateAnalyticsBucketModal'
 
 export const AnalyticsBuckets = () => {
@@ -33,6 +35,11 @@ export const AnalyticsBuckets = () => {
   const router = useRouter()
 
   const [filterString, setFilterString] = useState('')
+
+  const [visible, setVisible] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const {
     data: buckets = [],
@@ -64,133 +71,142 @@ export const AnalyticsBuckets = () => {
   }
 
   return (
-    <PageContainer>
-      <PageSection>
-        <PageSectionContent>
-          <AlphaNotice
-            entity="Analytics buckets"
-            feedbackUrl="https://github.com/orgs/supabase/discussions/40116"
-          />
+    <>
+      <PageContainer>
+        <PageSection>
+          <PageSectionContent>
+            <AlphaNotice
+              entity="Analytics buckets"
+              feedbackUrl="https://github.com/orgs/supabase/discussions/40116"
+            />
 
-          {isLoadingBuckets && <GenericSkeletonLoader />}
+            {isLoadingBuckets && <GenericSkeletonLoader />}
 
-          {isErrorBuckets && (
-            <AlertError error={bucketsError} subject="Failed to retrieve analytics buckets" />
-          )}
+            {isErrorBuckets && (
+              <AlertError error={bucketsError} subject="Failed to retrieve analytics buckets" />
+            )}
 
-          {isSuccessBuckets && (
-            <>
-              {hasNoBuckets ? (
-                <EmptyBucketState bucketType="analytics" />
-              ) : (
-                <div className="flex flex-col gap-y-4">
-                  <div className="flex flex-row items-center gap-x-2">
-                    <PageSectionTitle>Buckets</PageSectionTitle>
-                    {analyticsBuckets.length > 0 && (
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <span className="bg-surface-200 rounded-full px-2 py-1 leading-none text-xs text-foreground-lighter tracking-widest">
-                            {analyticsBuckets.length}
-                            /2
-                          </span>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom" className="w-64 text-center">
-                          Each project can only have up to 2 buckets while analytics buckets are in
-                          alpha{' '}
-                        </TooltipContent>
-                      </Tooltip>
+            {isSuccessBuckets && (
+              <>
+                {hasNoBuckets ? (
+                  <EmptyBucketState
+                    bucketType="analytics"
+                    onCreateBucket={() => setVisible(true)}
+                  />
+                ) : (
+                  <div className="flex flex-col gap-y-4">
+                    <div className="flex flex-row items-center gap-x-2">
+                      <PageSectionTitle>Buckets</PageSectionTitle>
+                      {analyticsBuckets.length > 0 && (
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <span className="bg-surface-200 rounded-full px-2 py-1 leading-none text-xs text-foreground-lighter tracking-widest">
+                              {analyticsBuckets.length}
+                              /2
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" className="w-64 text-center">
+                            Each project can only have up to 2 buckets while analytics buckets are
+                            in alpha{' '}
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
+                    <div className="flex flex-grow justify-between gap-x-2 items-center">
+                      <Input
+                        size="tiny"
+                        className="flex-grow lg:flex-grow-0 w-52"
+                        placeholder="Search for a bucket"
+                        value={filterString}
+                        onChange={(e) => setFilterString(e.target.value)}
+                        icon={<Search />}
+                      />
+                      <CreateBucketButton onClick={() => setVisible(true)} />
+                    </div>
+
+                    {isLoadingBuckets ? (
+                      <GenericSkeletonLoader />
+                    ) : (
+                      <Card>
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              {analyticsBuckets.length > 0 && (
+                                <TableHead className="w-2 pr-1">
+                                  <span className="sr-only">Icon</span>
+                                </TableHead>
+                              )}
+                              <TableHead>Name</TableHead>
+                              <TableHead>Created at</TableHead>
+                              <TableHead>
+                                <span className="sr-only">Actions</span>
+                              </TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {analyticsBuckets.length === 0 && filterString.length > 0 && (
+                              <TableRow className="[&>td]:hover:bg-inherit">
+                                <TableCell colSpan={3}>
+                                  <p className="text-sm text-foreground">No results found</p>
+                                  <p className="text-sm text-foreground-light">
+                                    Your search for "{filterString}" did not return any results
+                                  </p>
+                                </TableCell>
+                              </TableRow>
+                            )}
+                            {analyticsBuckets.map((bucket) => (
+                              <TableRow
+                                key={bucket.name}
+                                className="relative cursor-pointer h-16 inset-focus"
+                                onClick={(event) => handleBucketNavigation(bucket.name, event)}
+                                onKeyDown={(event) => {
+                                  if (event.key === 'Enter' || event.key === ' ') {
+                                    event.preventDefault()
+                                    handleBucketNavigation(bucket.name, event)
+                                  }
+                                }}
+                                tabIndex={0}
+                              >
+                                <TableCell className="w-2 pr-1">
+                                  <AnalyticsBucketIcon
+                                    size={16}
+                                    className="text-foreground-muted"
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <p className="whitespace-nowrap max-w-[512px] truncate">
+                                    {bucket.name}
+                                  </p>
+                                </TableCell>
+
+                                <TableCell>
+                                  <p className="text-foreground-light">
+                                    <TimestampInfo
+                                      utcTimestamp={bucket.created_at}
+                                      className="text-sm text-foreground-light"
+                                    />
+                                  </p>
+                                </TableCell>
+
+                                <TableCell>
+                                  <div className="flex justify-end items-center h-full">
+                                    <ChevronRight size={14} className="text-foreground-muted/60" />
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </Card>
                     )}
                   </div>
-                  <div className="flex flex-grow justify-between gap-x-2 items-center">
-                    <Input
-                      size="tiny"
-                      className="flex-grow lg:flex-grow-0 w-52"
-                      placeholder="Search for a bucket"
-                      value={filterString}
-                      onChange={(e) => setFilterString(e.target.value)}
-                      icon={<Search />}
-                    />
-                    <CreateAnalyticsBucketModal buttonType="primary" buttonClassName="w-fit" />
-                  </div>
-
-                  {isLoadingBuckets ? (
-                    <GenericSkeletonLoader />
-                  ) : (
-                    <Card>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            {analyticsBuckets.length > 0 && (
-                              <TableHead className="w-2 pr-1">
-                                <span className="sr-only">Icon</span>
-                              </TableHead>
-                            )}
-                            <TableHead>Name</TableHead>
-                            <TableHead>Created at</TableHead>
-                            <TableHead>
-                              <span className="sr-only">Actions</span>
-                            </TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {analyticsBuckets.length === 0 && filterString.length > 0 && (
-                            <TableRow className="[&>td]:hover:bg-inherit">
-                              <TableCell colSpan={3}>
-                                <p className="text-sm text-foreground">No results found</p>
-                                <p className="text-sm text-foreground-light">
-                                  Your search for "{filterString}" did not return any results
-                                </p>
-                              </TableCell>
-                            </TableRow>
-                          )}
-                          {analyticsBuckets.map((bucket) => (
-                            <TableRow
-                              key={bucket.name}
-                              className="relative cursor-pointer h-16 inset-focus"
-                              onClick={(event) => handleBucketNavigation(bucket.name, event)}
-                              onKeyDown={(event) => {
-                                if (event.key === 'Enter' || event.key === ' ') {
-                                  event.preventDefault()
-                                  handleBucketNavigation(bucket.name, event)
-                                }
-                              }}
-                              tabIndex={0}
-                            >
-                              <TableCell className="w-2 pr-1">
-                                <AnalyticsBucketIcon size={16} className="text-foreground-muted" />
-                              </TableCell>
-                              <TableCell>
-                                <p className="whitespace-nowrap max-w-[512px] truncate">
-                                  {bucket.name}
-                                </p>
-                              </TableCell>
-
-                              <TableCell>
-                                <p className="text-foreground-light">
-                                  <TimestampInfo
-                                    utcTimestamp={bucket.created_at}
-                                    className="text-sm text-foreground-light"
-                                  />
-                                </p>
-                              </TableCell>
-
-                              <TableCell>
-                                <div className="flex justify-end items-center h-full">
-                                  <ChevronRight size={14} className="text-foreground-muted/60" />
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </Card>
-                  )}
-                </div>
-              )}
-            </>
-          )}
-        </PageSectionContent>
-      </PageSection>
-    </PageContainer>
+                )}
+              </>
+            )}
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+      <CreateAnalyticsBucketModal open={visible} onOpenChange={setVisible} />
+    </>
   )
 }

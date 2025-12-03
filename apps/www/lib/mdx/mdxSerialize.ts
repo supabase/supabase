@@ -81,7 +81,7 @@ export async function mdxSerialize(source: string, options?: { tocDepth?: number
     theme: codeHikeTheme,
     lineNumbers: true,
     showCopyButton: true,
-    skipLanguages: [],
+    skipLanguages: ['mermaid'],
     autoImport: false,
   }
 

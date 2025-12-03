@@ -1,10 +1,9 @@
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 
 import { useParams } from 'common'
 import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
-import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -154,30 +153,19 @@ export const AnalyticsBucketFields = ({
     isError: isErrorBuckets,
   } = useAnalyticsBucketsQuery({ projectRef })
 
-  // Construct catalog URI for iceberg namespaces query
-  const catalogUri = useMemo(() => {
-    if (!project?.ref || !projectSettings) return ''
-    const protocol = projectSettings.app_config?.protocol ?? 'https'
-    const endpoint =
-      projectSettings.app_config?.storage_endpoint || projectSettings.app_config?.endpoint
-    return getCatalogURI(project.ref, protocol, endpoint)
-  }, [project?.ref, projectSettings])
-
   const canSelectNamespace = !!warehouseName && !!serviceApiKey
 
   const {
     data: namespaces = [],
     isLoading: isLoadingNamespaces,
     isError: isErrorNamespaces,
-    refetch: refetchNamespaces,
   } = useIcebergNamespacesQuery(
     {
       projectRef,
-      catalogUri,
-      warehouse: warehouseName || '',
+      warehouse: warehouseName,
     },
     {
-      enabled: type === 'Analytics Bucket' && !!catalogUri && !!warehouseName && !!serviceApiKey,
+      enabled: type === 'Analytics Bucket' && !!serviceApiKey,
     }
   )
 
