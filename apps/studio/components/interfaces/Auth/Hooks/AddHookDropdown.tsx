@@ -38,12 +38,10 @@ export const AddHookDropdown = ({
 
   const { data: authConfig } = useAuthConfigQuery({ projectRef })
   const { can: canUpdateAuthHook } = useAsyncCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
-  const { getEntitlementSetValues: getEntitledHookSet, isLoading: isLoadingEntitlement } =
-    useCheckEntitlements('auth.hooks')
+  const { getEntitlementSetValues: getEntitledHookSet } = useCheckEntitlements('auth.hooks')
+  const entitledHookSet = getEntitledHookSet()
 
   const { availableHooks, nonAvailableHooks } = useMemo(() => {
-    const entitledHookSet = getEntitledHookSet()
-
     const allHooks: Hook[] = HOOKS_DEFINITIONS.map((definition) => ({
       ...definition,
       enabled: authConfig?.[definition.enabledKey] || false,
@@ -62,7 +60,7 @@ export const AddHookDropdown = ({
     )
 
     return { availableHooks, nonAvailableHooks }
-  }, [getEntitledHookSet, isLoadingEntitlement, authConfig])
+  }, [entitledHookSet, authConfig])
 
   if (!canUpdateAuthHook) {
     return (
