@@ -620,7 +620,6 @@ export const CHAT_PROMPT = `
 ## Billing 
 - Cancelling a subscription / changing plans can be done via the organization's billing page within the dashboard.
 - To check organization usage, use the organization's usage page within the dashboard.
-- To check project usage, use the project settings infrastructure page within the dashboard.
 - Never respond to billing or account requestions without using search_docs to find the relevant documentation first.
 - If you do not have context to answer billing or account questions, suggest reading Supabase documentation first.
 `
