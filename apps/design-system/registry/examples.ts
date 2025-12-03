@@ -62,16 +62,10 @@ export const examples: Registry = [
     files: ['example/badge-demo.tsx'],
   },
   {
-    name: 'badge-destructive',
+    name: 'badge-state',
     type: 'components:example',
     registryDependencies: ['badge'],
-    files: ['example/badge-destructive.tsx'],
-  },
-  {
-    name: 'badge-outline',
-    type: 'components:example',
-    registryDependencies: ['badge'],
-    files: ['example/badge-outline.tsx'],
+    files: ['example/badge-state.tsx'],
   },
   {
     name: 'badge-secondary',

@@ -140,7 +140,7 @@ The Realtime engine seems like a great _compliment_ for `pg_crdt`, but before we
 
 These are a few of the _known_ limitations:
 
-- Realtime broadcasts database changes from the Postgres write ahead log (WAL). The WAL includes a complete copy of the the underlying data so small updates cause the entire document to broadcast to all collaborators
+- Realtime broadcasts database changes from the Postgres write ahead log (WAL). The WAL includes a complete copy of the underlying data so small updates cause the entire document to broadcast to all collaborators
 - Frequently updated CRDTs produce a lot of WAL and dead tuples
 - Large CRDT types in Postgres generate significant serialization/deserialization overhead on-update.
 

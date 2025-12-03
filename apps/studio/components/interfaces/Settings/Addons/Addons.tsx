@@ -232,10 +232,7 @@ export const Addons = () => {
                       <ShimmeringLoader className="w-32" />
                     ) : (
                       <div className="flex py-3">
-                        <ComputeBadge
-                          infraComputeSize={selectedProject?.infra_compute_size}
-                          size={'large'}
-                        />
+                        <ComputeBadge infraComputeSize={selectedProject?.infra_compute_size} />
                       </div>
                     )}
 
