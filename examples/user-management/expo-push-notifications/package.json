@@ -20,7 +20,7 @@
     "expo-notifications": "~0.28.3",
     "expo-status-bar": "~1.12.1",
     "react": "18.2.0",
-    "react-native": "0.74.1",
+    "react-native": "0.82.1",
     "react-native-url-polyfill": "^2.0.0"
   },
   "devDependencies": {
