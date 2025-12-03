@@ -1,7 +1,6 @@
 import { useParams } from 'common/hooks'
 import { BannerCard } from '../BannerCard'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useTrack } from 'lib/telemetry/track'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { Badge } from 'ui'
@@ -13,8 +12,7 @@ import { DOCS_URL } from 'lib/constants'
 
 export const BannerMetricsAPI = () => {
   const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const [, setIsDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.OBSERVABILITY_BANNER_DISMISSED(ref ?? ''),
     false
@@ -45,15 +43,7 @@ export const BannerMetricsAPI = () => {
             <Link
               href={`${DOCS_URL}/guides/telemetry/metrics`}
               target="_blank"
-              onClick={() =>
-                sendEvent({
-                  action: 'observability_metrics_api_banner_clicked',
-                  groups: {
-                    project: ref ?? 'Unknown',
-                    organization: org?.slug ?? 'Unknown',
-                  },
-                })
-              }
+              onClick={() => track('observability_banner_cta_button_clicked')}
             >
               Get started for free
             </Link>

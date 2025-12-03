@@ -1089,20 +1089,8 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
  * @source studio
  * @page /observability/*
  */
-export interface ObservabilityBannerClickedEvent {
+export interface ObservabilityBannerCtaButtonClickedEvent {
   action: 'observability_banner_cta_button_clicked'
-  groups: TelemetryGroups
-}
-
-/**
- * User clicks on dismiss button on Metrics API banner in studio Observability pages.
- *
- * @group Events
- * @source studio
- * @page /observability/*
- */
-export interface ObservabilityBannerDismissedEvent {
-  action: 'observability_banner_dismiss_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -2455,8 +2443,7 @@ export type TelemetryEvent =
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
-  | ObservabilityBannerClickedEvent
-  | ObservabilityBannerDismissedEvent
+  | ObservabilityBannerCtaButtonClickedEvent
   | EdgeFunctionDeployButtonClickedEvent
   | EdgeFunctionDeployUpdatesConfirmClickedEvent
   | EdgeFunctionAiAssistantButtonClickedEvent
