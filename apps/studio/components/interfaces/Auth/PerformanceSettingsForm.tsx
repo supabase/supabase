@@ -316,7 +316,10 @@ export const PerformanceSettingsForm = () => {
                             }
                           }}
                         >
-                          <SelectTrigger_Shadcn_ size="small">
+                          <SelectTrigger_Shadcn_
+                            size="small"
+                            disabled={!canUpdateConfig || promptProPlanUpgrade}
+                          >
                             <SelectValue_Shadcn_>
                               {field.value === 'percent' ? 'Percentage' : 'Absolute'}
                             </SelectValue_Shadcn_>

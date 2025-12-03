@@ -37,9 +37,9 @@ const PerformancePage: NextPageWithLayout = () => {
       <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
-            <PageHeaderTitle>Advanced</PageHeaderTitle>
+            <PageHeaderTitle>Performance</PageHeaderTitle>
             <PageHeaderDescription>
-              Configure advanced authentication server settings
+              Tune your Auth server for best performance
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
@@ -52,7 +52,7 @@ const PerformancePage: NextPageWithLayout = () => {
             </PageSectionContent>
           </PageSection>
         ) : (
-        <PerformanceSettingsForm />
+          <PerformanceSettingsForm />
         )}
       </PageContainer>
     </>
