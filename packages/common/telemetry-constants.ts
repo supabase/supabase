@@ -1095,6 +1095,42 @@ export interface ObservabilityBannerCtaButtonClickedEvent {
 }
 
 /**
+ * Index Advisor banner enable button clicked event.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/query-performance
+ */
+export interface IndexAdvisorBannerEnableButtonClickedEvent {
+  action: 'index_advisor_banner_enable_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * Index Advisor banner dimissed event.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/query-performance
+ */
+export interface IndexAdvisorBannerDismissButtonClickedEvent {
+  action: 'index_advisor_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the dismiss button on a banner in studio Observability pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/*
+ */
+export interface ObservabilityBannerDismissButtonClickedEvent {
+  action: 'observability_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the deploy button for an Edge Function.
  *
  * @group Events
@@ -2444,6 +2480,9 @@ export type TelemetryEvent =
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
   | ObservabilityBannerCtaButtonClickedEvent
+  | ObservabilityBannerDismissButtonClickedEvent
+  | IndexAdvisorBannerEnableButtonClickedEvent
+  | IndexAdvisorBannerDismissButtonClickedEvent
   | EdgeFunctionDeployButtonClickedEvent
   | EdgeFunctionDeployUpdatesConfirmClickedEvent
   | EdgeFunctionAiAssistantButtonClickedEvent

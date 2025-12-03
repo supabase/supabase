@@ -18,8 +18,10 @@ import {
   Button,
 } from 'ui'
 import { getIndexAdvisorExtensions } from './index-advisor.utils'
+import { useTrack } from 'lib/telemetry/track'
 
 export const EnableIndexAdvisorButton = () => {
+  const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -98,6 +100,7 @@ export const EnableIndexAdvisorButton = () => {
             onClick={(e) => {
               e.preventDefault()
               onEnableIndexAdvisor()
+              track('index_advisor_banner_enable_button_clicked')
             }}
             disabled={isEnablingExtension}
           >

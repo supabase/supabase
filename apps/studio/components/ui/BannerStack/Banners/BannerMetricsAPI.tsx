@@ -9,16 +9,24 @@ import React from 'react'
 import { Button } from 'ui'
 import Link from 'next/link'
 import { DOCS_URL } from 'lib/constants'
+import { useBannerStack } from '../BannerStackProvider'
 
 export const BannerMetricsAPI = () => {
   const { ref } = useParams()
   const track = useTrack()
+  const { dismissBanner } = useBannerStack()
   const [, setIsDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.OBSERVABILITY_BANNER_DISMISSED(ref ?? ''),
     false
   )
   return (
-    <BannerCard onDismiss={() => setIsDismissed(true)}>
+    <BannerCard
+      onDismiss={() => {
+        setIsDismissed(true)
+        dismissBanner('metrics-api-banner')
+        track('observability_banner_dismiss_button_clicked')
+      }}
+    >
       <div className="flex flex-col gap-y-4">
         <div className="flex flex-col gap-y-2 items-start">
           <Badge variant="success" className="-ml-0.5 uppercase inline-flex items-center mb-2">
