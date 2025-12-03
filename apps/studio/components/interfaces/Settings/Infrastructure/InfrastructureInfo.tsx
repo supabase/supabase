@@ -148,7 +148,7 @@ const InfrastructureInfo = () => {
                           actions={[
                             isVisibleReleaseChannel && (
                               <Tooltip>
-                                <TooltipTrigger>
+                                <TooltipTrigger asChild>
                                   <Badge variant="warning" className="mr-1">
                                     {isVisibleReleaseChannel}
                                   </Badge>
@@ -161,7 +161,7 @@ const InfrastructureInfo = () => {
                             ),
                             isOrioleDb && (
                               <Tooltip>
-                                <TooltipTrigger>
+                                <TooltipTrigger asChild>
                                   <Badge variant="default" className="mr-1">
                                     OrioleDB
                                   </Badge>
@@ -173,7 +173,7 @@ const InfrastructureInfo = () => {
                             ),
                             isOnLatestVersion && (
                               <Tooltip>
-                                <TooltipTrigger>
+                                <TooltipTrigger asChild>
                                   <Badge variant="success" className="mr-1">
                                     Latest
                                   </Badge>
