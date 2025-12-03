@@ -50,19 +50,55 @@ export default function ExposedMaterializedViewDialog({
           </p>
           <p>
             To protect your materialized view from unwanted access to its data, you can pick one of
-            two options:
+            three options:
           </p>
 
           <ul>
             <li>
-              Put a function in front of it and apply a security rule equivalent to RLS in front of
-              the function
+              <p>
+                Revoke <code>select</code> access from API roles <code>anon</code> and{' '}
+                <code>authenticated</code>
+              </p>
+              <div className="border rounded-md">
+                <ScrollArea className="px-4 py-2">
+                  <SimpleCodeBlock>
+                    {`REVOKE SELECT on "${table.schema}"."${table.name}" FROM public, anon, authenticated;`}
+                  </SimpleCodeBlock>
+                </ScrollArea>
+              </div>
             </li>
+
             <li>
-              Put a view in front of the materialized view and apply a rule like
-              <code>where uid = auth.uid()</code> directly in the view
+              <p>
+                Put a function in front of it and apply a security rule equivalent to RLS in front
+                of the function
+              </p>
+              <div className="border rounded-md">
+                <ScrollArea className="px-4 py-2">
+                  <SimpleCodeBlock>
+                    {`CREATE OR REPLACE FUNCTION get_${table.name}_secure() RETURNS SETOF ${table.schema}.${table.name} LANGUAGE sql AS $$ SELECT * FROM ${table.schema}.${table.name} WHERE user_id = auth.uid();$$;`}
+                  </SimpleCodeBlock>
+                </ScrollArea>
+              </div>
+            </li>
+
+            <li>
+              <p>
+                Put a view in front of the materialized view and apply a rule like
+                <code>where uid = auth.uid()</code> directly in the view
+              </p>
+
+              <div className="border rounded-md">
+                <ScrollArea className="px-4 py-2">
+                  <SimpleCodeBlock>
+                    {`CREATE VIEW ${table.schema}.${table.name}_secure AS SELECT * FROM ${table.schema}.${table.name} WHERE user_id = auth.uid();`}
+                  </SimpleCodeBlock>
+                </ScrollArea>
+              </div>
             </li>
           </ul>
+
+          <p>Feel free to adjust the queries according to your project's needs.</p>
         </DialogSection>
 
         <DialogFooter>
