@@ -4141,23 +4141,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/storage/{ref}/buckets/{id}/objects/download': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Downloads a file from a private bucket */
-    post: operations['StorageObjectsController_download']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/storage/{ref}/buckets/{id}/objects/list': {
     parameters: {
       query?: never
@@ -6069,22 +6052,6 @@ export interface components {
     }
     DownloadBackupResponse: {
       fileUrl: string
-    }
-    DownloadObjectBody: {
-      options?: {
-        download?: boolean
-        downloadName?: string
-        transform?: {
-          /** @enum {string} */
-          format?: 'origin'
-          height?: number
-          quality?: number
-          /** @enum {string} */
-          resize?: 'cover' | 'contain' | 'fill'
-          width?: number
-        }
-      }
-      path: string
     }
     DynamicRegisterOAuthAppBody: {
       client_name: string
@@ -9301,7 +9268,7 @@ export interface components {
         upstreamTarget: 'main' | 'canary'
       }
       features: {
-        icebergCatalog?: {
+        icebergCatalog: {
           enabled: boolean
           maxCatalogs: number
           maxNamespaces: number
@@ -9313,7 +9280,7 @@ export interface components {
         s3Protocol: {
           enabled: boolean
         }
-        vectorBuckets?: {
+        vectorBuckets: {
           enabled: boolean
           maxBuckets: number
           maxIndexes: number
@@ -9399,7 +9366,6 @@ export interface components {
         vectorBucketName: string
       }[]
     }
-    StreamableFile: Record<string, never>
     SupavisorConfigResponse: {
       connection_string: string
       /** @description Use connection_string instead */
@@ -10543,10 +10509,10 @@ export interface components {
           maxNamespaces: number
           maxTables: number
         }
-        imageTransformation: {
+        imageTransformation?: {
           enabled: boolean
         }
-        s3Protocol: {
+        s3Protocol?: {
           enabled: boolean
         }
         vectorBuckets?: {
@@ -25540,62 +25506,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to copy object */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StorageObjectsController_download: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Storage bucket id */
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['DownloadObjectBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['StreamableFile']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to download the file */
       500: {
         headers: {
           [name: string]: unknown

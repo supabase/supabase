@@ -3,6 +3,7 @@ TEAM
 Supabase is 100% remote.
 
 Aaron Byrne
+Ada Wong
 Adam Mokan
 Akash Manimaran
 Alaister Young
@@ -15,6 +16,7 @@ Amy Q
 Andrew Valleteau
 Andrey A
 Angelico de los Reyes
+Anna Weihl
 Ant Wilson
 Ariuna K
 Artur Zakirov
@@ -62,6 +64,7 @@ Etienne Stalmans
 Fabrizio Cataldo
 Fabrizio Fenoglio
 Fady A
+Fatuma Abdullahi
 Felipe Stival
 Francesco Sansalvadore
 Greg Kress
@@ -119,10 +122,12 @@ Mark Burggraf
 Matthew Hambright
 Matt Johnston
 Matt Rossman
+Miles Thomas
 Monica Khoury
 Mykhailo Mischa Lieibenson
 Nick B
 Nick Littman
+Nick Nowlan
 Nyannyacha
 Oli R
 Pamela Chia

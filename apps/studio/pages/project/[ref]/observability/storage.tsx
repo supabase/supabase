@@ -27,7 +27,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useStorageReport } from 'data/reports/storage-report-query'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
@@ -58,13 +58,19 @@ export const StorageReport: NextPageWithLayout = () => {
   const handleDatepickerChange = (vals: DatePickerValue) => {
     const promptShown = handleDatePickerChangeFromHook(vals)
     if (!promptShown) {
-      // Update query params for the report
       mergeParams({
-        iso_timestamp_start: vals.from || '',
-        iso_timestamp_end: vals.to || '',
+        iso_timestamp_start: vals.from ?? '',
+        iso_timestamp_end: vals.to ?? '',
       })
     }
   }
+
+  const onRefreshReport = useRefreshHandler(
+    datePickerValue,
+    datePickerHelpers,
+    handleDatepickerChange,
+    refresh
+  )
 
   return (
     <ReportPadding>
@@ -79,7 +85,7 @@ export const StorageReport: NextPageWithLayout = () => {
                 icon={<RefreshCw className={report.isLoading ? 'animate-spin' : ''} />}
                 className="w-7"
                 tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-                onClick={() => report.refresh()}
+                onClick={onRefreshReport}
               />
               <LogsDatePicker
                 onSubmit={handleDatepickerChange}

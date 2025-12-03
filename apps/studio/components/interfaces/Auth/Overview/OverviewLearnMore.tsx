@@ -22,7 +22,7 @@ export const OverviewLearnMore = () => {
   const { ref } = useParams()
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
-  const { theme, resolvedTheme } = useTheme()
+  const { resolvedTheme } = useTheme()
 
   useEffect(() => {
     setIsMounted(true)

@@ -7,7 +7,6 @@ import * as z from 'zod'
 
 import { useFlag, useParams } from 'common'
 import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
-import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPrimaryKeysExists } from 'data/database/primary-keys-exists-query'
@@ -221,19 +220,10 @@ export const DestinationPanel = ({
   // Helper function to handle namespace creation if needed
   const resolveNamespace = async (data: z.infer<typeof FormSchema>) => {
     if (data.namespace === CREATE_NEW_NAMESPACE) {
-      if (!data.newNamespaceName) {
-        throw new Error('New namespace name is required')
-      }
-
-      // Construct catalog URI for namespace creation
-      const protocol = projectSettings?.app_config?.protocol ?? 'https'
-      const endpoint =
-        projectSettings?.app_config?.storage_endpoint || projectSettings?.app_config?.endpoint
-      const catalogUri = getCatalogURI(project?.ref ?? '', protocol, endpoint)
+      if (!data.newNamespaceName) throw new Error('New namespace name is required')
 
       await createNamespace({
         projectRef,
-        catalogUri,
         warehouse: data.warehouseName!,
         namespace: data.newNamespaceName,
       })

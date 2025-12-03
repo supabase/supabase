@@ -8,7 +8,7 @@ import { Label } from '@ui/components/shadcn/ui/label'
 import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { TimeSplitInput } from 'components/ui/DatePicker/TimeSplitInput'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import {
   Button,
   ButtonProps,
@@ -21,7 +21,6 @@ import {
 } from 'ui'
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
 import type { DatetimeHelper } from './Logs.types'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 export type DatePickerValue = {
   to: string
@@ -290,15 +289,7 @@ export const LogsDatePicker = ({
                 aria-disabled={helper.disabled}
               ></RadioGroupItem>
               {helper.text}
-              {showHelperBadge(helper) ? (
-                <Badge
-                  size="small"
-                  variant="outline"
-                  className="h-5 text-[10px] text-foreground-light capitalize"
-                >
-                  {helper.availableIn?.[0] || ''}
-                </Badge>
-              ) : null}
+              {showHelperBadge(helper) ? <Badge>{helper.availableIn?.[0] || ''}</Badge> : null}
             </Label>
           ))}
         </RadioGroup>
