@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.62.10
+  version: 2.65.2
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -78,7 +78,7 @@ flags:
     name: --workdir <string>
     description: path to a Supabase project directory
     default_value: ''
-  - id: 'yes'
+  - id: "yes"
     name: --yes
     description: answer yes to all prompts
     default_value: 'false'
@@ -2963,6 +2963,8 @@ commands:
       Pulls schema changes from a remote database. A new migration file will be created under `supabase/migrations` directory.
 
       Requires your local project to be linked to a remote database by running `supabase link`. For self-hosted databases, you can pass in the connection parameters using `--db-url` flag.
+
+      > Note this command requires Docker Desktop (or a running Docker daemon), as it starts a local Postgres container to diff your remote schema.
 
       Optionally, a new row can be inserted into the migration history table to reflect the current state of the remote database.
 
