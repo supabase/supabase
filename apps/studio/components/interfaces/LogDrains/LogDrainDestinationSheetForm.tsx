@@ -141,12 +141,7 @@ function LogDrainFormItem({
       name={value}
       control={formControl}
       render={({ field }) => (
-        <FormItemLayout
-          layout="horizontal"
-          label={label}
-          description={description || ''}
-          hideMessage
-        >
+        <FormItemLayout layout="horizontal" label={label} description={description || ''}>
           <FormControl_Shadcn_>
             <Input_Shadcn_ type={type || 'text'} placeholder={placeholder} {...field} />
           </FormControl_Shadcn_>
@@ -324,7 +319,6 @@ export function LogDrainDestinationSheetForm({
                     layout="horizontal"
                     label="Type"
                     description={LOG_DRAIN_TYPES.find((t) => t.value === type)?.description || ''}
-                    hideMessage
                   >
                     <Select_Shadcn_
                       defaultValue={defaultType}
@@ -371,7 +365,7 @@ export function LogDrainDestinationSheetForm({
                         control={form.control}
                         name="http"
                         render={({ field }) => (
-                          <FormItemLayout layout="horizontal" label="HTTP Version" hideMessage>
+                          <FormItemLayout layout="horizontal" label="HTTP Version">
                             <FormControl_Shadcn_>
                               <RadioGroupCard
                                 className="flex gap-2"
@@ -442,7 +436,6 @@ export function LogDrainDestinationSheetForm({
                         <FormItemLayout
                           layout="horizontal"
                           label={'Region'}
-                          hideMessage
                           description={
                             <p>
                               The Datadog region to send logs to. Read more about Datadog regions{' '}
