@@ -39,6 +39,7 @@ const FormSchema = z.object({
 })
 
 interface RequestUpgradeToBillingOwnersProps {
+  block?: boolean
   plan?: PlanRequest
   addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
   /** Used in the default message template, e.g: "Upgrade to ..." */
@@ -46,6 +47,7 @@ interface RequestUpgradeToBillingOwnersProps {
 }
 
 export const RequestUpgradeToBillingOwners = ({
+  block = false,
   plan = 'Pro',
   addon,
   featureProposition,
@@ -104,7 +106,7 @@ export const RequestUpgradeToBillingOwners = ({
       ? addon === 'spendCap'
         ? `We'd like to ${isFreePlan ? 'upgrade to Pro and ' : ''}${action} ${target} so that we can ${featureProposition}`
         : `We'd like to ${isFreePlan ? 'upgrade to Pro and ' : ''}${action} ${target} so that we can ${featureProposition}`
-      : `We'd like to upgrade to the ${plan} plan to ${featureProposition ?? 'use a feature'} ${target}`,
+      : `We'd like to upgrade to the ${plan} plan ${!!featureProposition ? ` to ${featureProposition} ` : ''}${target}`,
   }
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -130,7 +132,9 @@ export const RequestUpgradeToBillingOwners = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button type="primary">{buttonText}</Button>
+        <Button block={block} type="primary">
+          {buttonText}
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <Form_Shadcn_ {...form}>
