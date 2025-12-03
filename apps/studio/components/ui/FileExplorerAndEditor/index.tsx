@@ -115,6 +115,11 @@ export const FileExplorerAndEditor = ({
 
   const handleFileNameChange = (id: number, newName: string) => {
     if (!newName.trim()) return // Don't allow empty names
+
+    // Check if the new name already exists in other files
+    const isDuplicate = files.some((file) => file.id !== id && file.name === newName)
+    if (isDuplicate) return
+
     const updatedFiles = files.map((file) =>
       file.id === id
         ? {
