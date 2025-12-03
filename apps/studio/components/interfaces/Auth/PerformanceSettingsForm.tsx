@@ -118,7 +118,7 @@ export const PerformanceSettingsForm = () => {
       if (!isUpdatingDatabaseForm) {
         databaseForm.reset({
           DB_MAX_POOL_SIZE:
-            authConfig?.DB_MAX_POOL_SIZE !== null ? (authConfig?.DB_MAX_POOL_SIZE ?? 10) : 10,
+            authConfig?.DB_MAX_POOL_SIZE !== null ? authConfig?.DB_MAX_POOL_SIZE ?? 10 : 10,
           DB_MAX_POOL_SIZE_UNIT:
             authConfig?.DB_MAX_POOL_SIZE_UNIT !== null
               ? authConfig?.DB_MAX_POOL_SIZE_UNIT
