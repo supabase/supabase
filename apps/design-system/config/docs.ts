@@ -66,8 +66,8 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Form Patterns',
-          href: '/docs/ui-patterns/form-patterns',
+          title: 'Forms',
+          href: '/docs/ui-patterns/forms',
           items: [],
         },
       ],
