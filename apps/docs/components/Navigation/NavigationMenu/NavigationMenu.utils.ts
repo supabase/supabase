@@ -150,6 +150,8 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.Storage
     case pathname.startsWith('/contributing'):
       return MenuId.Contributing
+    case pathname.startsWith('ui'):
+      return MenuId.Ui
     default:
       return MenuId.GettingStarted
   }

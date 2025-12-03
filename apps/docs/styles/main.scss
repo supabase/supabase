@@ -96,19 +96,24 @@ pre[class*='language-'] {
 
 .method-list-item {
   @apply border-t border-gray-400;
+
   .method-list-item-label {
     @apply flex items-center gap-1;
   }
+
   .method-list-item-label-name {
     @apply font-mono font-bold text-sm py-2;
   }
+
   .method-list-item-label-badge {
     @apply font-mono text-xs px-1;
     overflow-wrap: anywhere;
   }
+
   .method-list-item-validation {
     @apply flex flex-wrap gap-2 items-center;
   }
+
   .method-list-item-description {
     @apply text-sm space-y-2;
   }
@@ -116,6 +121,7 @@ pre[class*='language-'] {
 
 .method-list-title-isChild {
   font-family: var(--custom-font-size-xs);
+
   & h5 {
     font-weight: 200;
   }
@@ -143,16 +149,19 @@ pre[class*='language-'] {
   padding: 12px;
   border-bottom: none;
 }
+
 .method-list-title {
   margin: 0;
   padding: 6px 12px;
 }
+
 .method-list-group .method-list-group li div,
 .method-list-group .method-list-group li h4,
 .method-list-group .method-list-group li p {
   padding: 0;
   margin: 0;
 }
+
 .method-list-group .method-list-group li h4 {
   margin-bottom: 4px;
 }
@@ -185,7 +194,7 @@ pre[class*='language-'] {
   }
 }
 
-.admonition-content > p {
+.admonition-content>p {
   @apply m-0;
 }
 
@@ -200,6 +209,7 @@ h4 code {
   &:before {
     display: none;
   }
+
   &::after {
     display: none;
   }
@@ -224,6 +234,7 @@ a:has(code) {
 // fix code line wrapping
 // need to set this to happen from medium onwards, otherwise the would cause horizontal scroll
 article p code {
+
   &::before,
   &::after {
     display: none !important;
@@ -232,6 +243,7 @@ article p code {
 
 .short-inline-codeblock {
   word-wrap: break-word;
+
   @media screen and (min-width: 769px) {
     white-space: pre !important;
   }
@@ -257,9 +269,11 @@ article p code {
   width: 100%;
   grid-column: 1 / -1;
 }
-.next-image--dynamic-fill > span {
+
+.next-image--dynamic-fill>span {
   position: relative !important;
 }
+
 .next-image--dynamic-fill img {
   object-fit: contain;
   width: 100% !important;
@@ -302,10 +316,12 @@ th code {
 [data-rmiz-modal-img] {
   transition-timing-function: cubic-bezier(0.24, 0.25, 0.05, 1) !important;
 }
+
 [data-rmiz-modal-overlay='visible'] {
   background-color: hsl(var(--background-default)) !important;
   opacity: 0.8;
 }
+
 [data-rmiz-modal-img] {
   image-rendering: high-quality;
 }
@@ -314,23 +330,19 @@ th code {
 
 .shimmering-loader {
   animation: shimmer 2s infinite linear;
-  background: linear-gradient(
-    to right,
-    hsl(var(--border-default)) 4%,
-    hsl(var(--background-surface-200)) 25%,
-    hsl(var(--border-default)) 36%
-  );
+  background: linear-gradient(to right,
+      hsl(var(--border-default)) 4%,
+      hsl(var(--background-surface-200)) 25%,
+      hsl(var(--border-default)) 36%);
   background-size: 1000px 100%;
 }
 
 .dark .shimmering-loader {
   animation: shimmer 2s infinite linear;
-  background: linear-gradient(
-    to right,
-    hsl(var(--border-default)) 4%,
-    hsl(var(--border-control)) 25%,
-    hsl(var(--border-default)) 36%
-  );
+  background: linear-gradient(to right,
+      hsl(var(--border-default)) 4%,
+      hsl(var(--border-control)) 25%,
+      hsl(var(--border-default)) 36%);
   background-size: 1000px 100%;
 }
 
@@ -338,6 +350,7 @@ th code {
   0% {
     background-position: -1000px 0;
   }
+
   100% {
     background-position: 1000px 0;
   }
@@ -346,6 +359,7 @@ th code {
 .skip-link {
   @apply sr-only;
 }
+
 .skip-link:focus {
   @apply not-sr-only;
 }
@@ -374,6 +388,7 @@ th code {
   --code-token-property: #3ecf8e;
   --code-highlight-color: #232323;
 }
+
 [data-theme='light'],
 .light {
   --code-token-keyword: #6b35dc;
@@ -389,4 +404,76 @@ th code {
   --code-token-number: hsl(var(--foreground-light) / 1);
   --code-token-property: #15593b;
   --code-highlight-color: #1c1c1c;
+}
+
+.preview {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 14.5%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 14.5%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 14.5%;
+  --primary: 0 0% 20.5%;
+  --primary-foreground: 0 0% 98.5%;
+  --secondary: 0 0% 97%;
+  --secondary-foreground: 0 0% 20.5%;
+  --muted: 0 0% 97%;
+  --muted-foreground: 0 0% 55.6%;
+  --accent: 0 0% 97%;
+  --accent-foreground: 0 0% 20.5%;
+  --destructive: 27.3 24.5% 57.7%;
+  --destructive-foreground: 27.3 24.5% 57.7%;
+  --border: 0 0% 92.2%;
+  --input: 0 0% 92.2%;
+  --ring: 0 0% 70.8%;
+  --chart-1: 41.1 22.2% 64.6%;
+  --chart-2: 184.7 11.8% 60%;
+  --chart-3: 227.4 7% 39.8%;
+  --chart-4: 84.4 18.9% 82.8%;
+  --chart-5: 70.1 18.8% 76.9%;
+  --radius: 0.625rem;
+  --sidebar: 0 0% 98.5%;
+  --sidebar-foreground: 0 0% 14.5%;
+  --sidebar-primary: 0 0% 20.5%;
+  --sidebar-primary-foreground: 0 0% 98.5%;
+  --sidebar-accent: 0 0% 97%;
+  --sidebar-accent-foreground: 0 0% 20.5%;
+  --sidebar-border: 0 0% 92.2%;
+  --sidebar-ring: 0 0% 70.8%;
+}
+
+[data-theme='dark'] .preview,
+[data-theme='classic-dark'] .preview {
+  --background: 0 0% 14.5%;
+  --foreground: 0 0% 98.5%;
+  --card: 0 0% 0%;
+  --card-foreground: 0 0% 98.5%;
+  --popover: 0 0% 14.5%;
+  --popover-foreground: 0 0% 98.5%;
+  --primary: 0 0% 98.5%;
+  --primary-foreground: 0 0% 20.5%;
+  --secondary: 0 0% 26.9%;
+  --secondary-foreground: 0 0% 98.5%;
+  --muted: 0 0% 26.9%;
+  --muted-foreground: 0 0% 70.8%;
+  --accent: 0 0% 26.9%;
+  --accent-foreground: 0 0% 98.5%;
+  --destructive: 25.7 14.1% 39.6%;
+  --destructive-foreground: 25.3 23.7% 63.7%;
+  --border: 0 0% 26.9%;
+  --input: 0 0% 26.9%;
+  --ring: 0 0% 55.6%;
+  --chart-1: 264.4 24.3% 48.8%;
+  --chart-2: 162.5 17% 69.6%;
+  --chart-3: 70.1 18.8% 76.9%;
+  --chart-4: 303.9 26.5% 62.7%;
+  --chart-5: 16.4 24.6% 64.5%;
+  --sidebar: 0 0% 20.5%;
+  --sidebar-foreground: 0 0% 98.5%;
+  --sidebar-primary: 264.4 24.3% 48.8%;
+  --sidebar-primary-foreground: 0 0% 98.5%;
+  --sidebar-accent: 0 0% 26.9%;
+  --sidebar-accent-foreground: 0 0% 98.5%;
+  --sidebar-border: 0 0% 26.9%;
+  --sidebar-ring: 0 0% 43.9%;
 }

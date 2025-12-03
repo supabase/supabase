@@ -9,6 +9,10 @@ interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {
   isPair?: boolean
 }
 
+const REGISTRY_BASE_URL = process.env.NEXT_PUBLIC_UI_LIBRARY_REGISTRY_URL
+  || process.env.NEXT_PUBLIC_BASE_PATH
+  || '';
+
 export function BlockPreview({ name, wide = false, isPair = false }: ComponentPreviewProps) {
   const BlockPreview = React.useMemo(() => {
     return (
@@ -19,7 +23,7 @@ export function BlockPreview({ name, wide = false, isPair = false }: ComponentPr
           }
         >
           <iframe
-            src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/example/${name}`}
+            src={`${REGISTRY_BASE_URL}/example/${name}`}
             style={{
               border: 'none',
               width: '100%',

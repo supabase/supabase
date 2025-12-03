@@ -1,6 +1,6 @@
 // 'use client'
 
-import { AvatarStack } from '@/registry/default/blocks/realtime-avatar-stack/components/avatar-stack'
+import { AvatarStack } from '../blocks/realtime-avatar-stack/components/avatar-stack'
 import { users } from './utils'
 
 const avatars = users.filter(
