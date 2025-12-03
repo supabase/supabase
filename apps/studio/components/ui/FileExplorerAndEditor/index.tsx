@@ -3,6 +3,7 @@ import { Edit, File, Plus, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import AIEditor from 'components/ui/AIEditor'
+import { toast } from 'sonner'
 import {
   Button,
   ContextMenu_Shadcn_,
@@ -145,11 +146,19 @@ export const FileExplorerAndEditor = ({
 
   const handleFileNameChange = (id: number, newName: string) => {
     // Don't allow empty names
-    if (!newName.trim()) return exitEditMode()
+    if (!newName.trim()) {
+      toast.error('File name cannot be empty')
+      return exitEditMode()
+    }
 
     // Check if the new name already exists in other files
     const isDuplicate = files.some((file) => file.id !== id && file.name === newName)
-    if (isDuplicate) return exitEditMode()
+    if (isDuplicate) {
+      toast.error(
+        `The name ${newName} already exists in the current directory. Please use a different name.`
+      )
+      return exitEditMode()
+    }
 
     const updatedFiles = files.map((file) =>
       file.id === id
