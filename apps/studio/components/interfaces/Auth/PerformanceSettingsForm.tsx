@@ -195,7 +195,6 @@ export const PerformanceSettingsForm = () => {
       <ScaffoldSection isFullWidth>
         {promptProPlanUpgrade && (
           <UpgradeToPro
-            className="mb-4"
             primaryText="Configuring Auth server performance is only available on the Pro plan and above"
             secondaryText="Upgrade to the Pro plan to configure settings for your Auth server"
           />

@@ -30,7 +30,6 @@ const UpgradeToPro = ({
   source = 'upgrade',
   disabled = false,
   fullWidth = false,
-  className,
 }: UpgradeToProProps) => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
@@ -46,8 +45,7 @@ const UpgradeToPro = ({
     <div
       className={cn(
         'block w-full py-4 px-6 bg-surface-200',
-        fullWidth ? 'border-b' : 'border rounded',
-        className
+        fullWidth ? 'border-b' : 'border rounded'
       )}
     >
       <div className="flex gap-x-3">
