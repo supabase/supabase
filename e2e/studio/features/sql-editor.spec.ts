@@ -6,6 +6,7 @@ import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { waitForApiResponseWithTimeout } from '../utils/wait-for-response-with-timeout.js'
 import { waitForApiResponse } from '../utils/wait-for-response.js'
+import { env } from '../env.config.js'
 
 const sqlSnippetName = 'pw_sql_snippet'
 const sqlSnippetNameDuplicate = 'pw_sql_snippet (Duplicate)'
@@ -50,6 +51,11 @@ const deleteFolder = async (page: Page, ref: string, folderName: string) => {
 }
 
 test.describe('SQL Editor', () => {
+  test.skip(
+    env.IS_PLATFORM === 'true',
+    'This test does not work in hosted environments. Self hosted mode is supported.'
+  )
+
   let page: Page
 
   test.beforeAll(async ({ browser, ref }) => {
