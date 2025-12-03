@@ -271,7 +271,12 @@ function isFilterSql(filter: Filter) {
 }
 
 function castColumnToText(filter: Filter) {
-  return `${ident(filter.column)}::text ${filter.operator} ${filterLiteral(filter.value)}`
+  // For LIKE/ILIKE operators, wrap the value with wildcards if not already present
+  let value = filter.value
+  if (typeof value === 'string' && !value.includes('%') && !value.includes('_')) {
+    value = `%${value}%`
+  }
+  return `${ident(filter.column)}::text ${filter.operator} ${filterLiteral(value)}`
 }
 
 function filterLiteral(value: any) {
