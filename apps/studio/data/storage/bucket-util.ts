@@ -31,5 +31,5 @@ export async function pollUntilBucketEmpty({
     await new Promise((resolve) => setTimeout(resolve, intervalMs))
   }
 
-  throw new Error('Timeout waiting for bucket to empty')
+  throw new Error('Failed to empty bucket. Please try again in a few minutes.')
 }
