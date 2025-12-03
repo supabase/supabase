@@ -2263,7 +2263,7 @@ export interface LogDrainSaveButtonClickedEvent {
     /**
      * Type of the destination saved
      */
-    destination: 'webhook' | 'datadog' | 'loki' | 'sentry'
+    destination: string
   }
   groups: TelemetryGroups
 }
