@@ -89,7 +89,9 @@ export const S3Connection = () => {
   const { mutate: updateStorageConfig, isPending: isUpdating } =
     useProjectStorageConfigUpdateUpdateMutation({
       onSuccess: (_, vars) => {
-        if (vars.features) form.reset({ s3ConnectionEnabled: vars.features.s3Protocol.enabled })
+        if (vars.features?.s3Protocol) {
+          form.reset({ s3ConnectionEnabled: vars.features.s3Protocol.enabled })
+        }
         toast.success('Successfully updated storage settings')
       },
     })
