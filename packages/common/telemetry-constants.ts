@@ -1083,14 +1083,14 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
 }
 
 /**
- * User clicks on Metrics API banner in studio Observability pages.
+ * User clicks on Metrics API banner CTA button in studio Observability pages.
  *
  * @group Events
  * @source studio
  * @page /observability/*
  */
 export interface ObservabilityBannerClickedEvent {
-  action: 'observability_metrics_api_banner_clicked'
+  action: 'observability_banner_cta_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -1102,7 +1102,7 @@ export interface ObservabilityBannerClickedEvent {
  * @page /observability/*
  */
 export interface ObservabilityBannerDismissedEvent {
-  action: 'observability_metrics_api_banner_dismissed'
+  action: 'observability_banner_dismiss_button_clicked'
   groups: TelemetryGroups
 }
 
