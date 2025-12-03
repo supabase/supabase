@@ -36,7 +36,7 @@ sequenceDiagram
     autonumber
     participant P as Postgres
     participant R as Remote Source
-    P->>R: Execute Query
+    P->>R: Execute query
     R->>P: Wait (blocking)
     Note over R,P: Fetch all rows (or fixed batch)
     P-->P: Buffer all rows in memory
@@ -70,7 +70,7 @@ sequenceDiagram
     autonumber
     participant P as Postgres
     participant R as Remote Source
-    P->>R: Execute Query
+    P->>R: Execute query
     P->>P: Spawn async task (non-blocking)
     par Async Task
         R->>P:
