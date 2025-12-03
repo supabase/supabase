@@ -1,3 +1,4 @@
+import { Eye, EyeOff } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
@@ -13,7 +14,6 @@ import {
 } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
-import { Eye, EyeOff } from 'lucide-react'
 import {
   Accordion_Shadcn_,
   AccordionContent_Shadcn_,

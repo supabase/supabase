@@ -1171,6 +1171,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/upgrade-request': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Request organization upgrade - notifies billing owners */
+    post: operations['UpgradeRequestController_requestUpgrade']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/cloud-marketplace/link': {
     parameters: {
       query?: never
@@ -3948,6 +3965,76 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/storage/{ref}/analytics-buckets/{id}/namespaces': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets list of namespaces from a bucket */
+    get: operations['StorageAnalyticsBucketNamespacesController_getBuckets']
+    put?: never
+    /** Create a namespace within a bucket */
+    post: operations['StorageAnalyticsBucketNamespacesController_createBucket']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/storage/{ref}/analytics-buckets/{id}/namespaces/{namespace}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Drop a namespace within an analytics bucket */
+    delete: operations['StorageAnalyticsBucketNamespaceController_deleteBucket']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/storage/{ref}/analytics-buckets/{id}/namespaces/{namespace}/tables': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets list of tables from a namespace */
+    get: operations['StorageAnalyticsBucketNamespaceTablesController_getBuckets']
+    put?: never
+    /** Create a table within a namespace */
+    post: operations['StorageAnalyticsBucketNamespaceTablesController_createTable']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/storage/{ref}/analytics-buckets/{id}/namespaces/{namespace}/tables/{table}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Drop a table within a namespace */
+    delete: operations['StorageAnalyticsBucketNamespaceTableController_dropTable']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/storage/{ref}/archive': {
     parameters: {
       query?: never
@@ -4048,23 +4135,6 @@ export interface paths {
     put?: never
     /** Copys object */
     post: operations['StorageObjectsController_copyObject']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/storage/{ref}/buckets/{id}/objects/download': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Downloads a file from a private bucket */
-    post: operations['StorageObjectsController_download']
     delete?: never
     options?: never
     head?: never
@@ -4953,6 +5023,33 @@ export interface components {
       email: string
       role_id: number
       role_scoped_projects?: string[]
+    }
+    CreateNamespaceBody: {
+      namespace: string
+    }
+    CreateNamespaceTableBody: {
+      fields: {
+        id: number
+        name: string
+        required: boolean
+        type:
+          | (
+              | 'boolean'
+              | 'int'
+              | 'long'
+              | 'float'
+              | 'double'
+              | 'string'
+              | 'timestamp'
+              | 'date'
+              | 'time'
+              | 'timestamptz'
+              | 'uuid'
+              | 'binary'
+            )
+          | string
+      }[]
+      name: string
     }
     CreateNotificationExceptionsBody: {
       exceptions: {
@@ -5955,22 +6052,6 @@ export interface components {
     }
     DownloadBackupResponse: {
       fileUrl: string
-    }
-    DownloadObjectBody: {
-      options?: {
-        download?: boolean
-        downloadName?: string
-        transform?: {
-          /** @enum {string} */
-          format?: 'origin'
-          height?: number
-          quality?: number
-          /** @enum {string} */
-          resize?: 'cover' | 'contain' | 'fill'
-          width?: number
-        }
-      }
-      path: string
     }
     DynamicRegisterOAuthAppBody: {
       client_name: string
@@ -7203,6 +7284,41 @@ export interface components {
     MoveObjectBody: {
       from: string
       to: string
+    }
+    NamespacesResponse: {
+      data: {
+        namespace: string[]
+      }[]
+    }
+    NamespaceTableResponse: {
+      'current-schema-id': number
+      'current-snapshot-id'?: number
+      'default-sort-order-id'?: number
+      'default-spec-id'?: number
+      'format-version'?: number
+      'last-column-id'?: number
+      'last-partition-id'?: number
+      'last-sequence-number'?: number
+      'last-updated-ms'?: number
+      location: string
+      'metadata-location'?: string
+      'metadata-log'?: unknown[]
+      name?: string
+      'partition-specs': unknown[]
+      properties: {
+        [key: string]: string
+      }
+      refs?: {
+        [key: string]: unknown
+      }
+      schemas: {
+        fields: unknown[]
+        type: string
+      }[]
+      'snapshot-log'?: unknown[]
+      snapshots?: unknown[]
+      'sort-orders': unknown[]
+      'table-uuid'?: string
     }
     NotificationResponse: {
       /** @description Any JSON-serializable value */
@@ -8853,6 +8969,14 @@ export interface components {
         schema: string
       }[]
     }
+    RequestUpgradeBody: {
+      note?: string
+      /** @enum {string} */
+      requested_plan: 'Pro' | 'Team' | 'Enterprise'
+    }
+    RequestUpgradeResponse: {
+      message: string
+    }
     ResetPasswordBody: {
       /** Format: email */
       email: string
@@ -9103,6 +9227,12 @@ export interface components {
     StorageAnalyticsBucketDeleteResponse: {
       message: string
     }
+    StorageAnalyticsBucketNamespaceTablesResponse: {
+      data: {
+        name: string
+        namespace: string[]
+      }[]
+    }
     StorageAnalyticsBucketResponse: {
       created_at: string
       name: string
@@ -9138,7 +9268,7 @@ export interface components {
         upstreamTarget: 'main' | 'canary'
       }
       features: {
-        icebergCatalog?: {
+        icebergCatalog: {
           enabled: boolean
           maxCatalogs: number
           maxNamespaces: number
@@ -9150,7 +9280,7 @@ export interface components {
         s3Protocol: {
           enabled: boolean
         }
-        vectorBuckets?: {
+        vectorBuckets: {
           enabled: boolean
           maxBuckets: number
           maxIndexes: number
@@ -9236,7 +9366,6 @@ export interface components {
         vectorBucketName: string
       }[]
     }
-    StreamableFile: Record<string, never>
     SupavisorConfigResponse: {
       connection_string: string
       /** @description Use connection_string instead */
@@ -10380,10 +10509,10 @@ export interface components {
           maxNamespaces: number
           maxTables: number
         }
-        imageTransformation: {
+        imageTransformation?: {
           enabled: boolean
         }
-        s3Protocol: {
+        s3Protocol?: {
           enabled: boolean
         }
         vectorBuckets?: {
@@ -13924,6 +14053,61 @@ export interface operations {
         content?: never
       }
       /** @description Failed to preview subscription changes */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  UpgradeRequestController_requestUpgrade: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RequestUpgradeBody']
+      }
+    }
+    responses: {
+      /** @description Upgrade request has been sent to billing owners */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RequestUpgradeResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to send upgrade request */
       500: {
         headers: {
           [name: string]: unknown
@@ -24329,7 +24513,7 @@ export interface operations {
         /** @description Search buckets by name */
         search?: string
         /** @description Sort column for buckets */
-        sortColumn?: 'id' | 'name' | 'created_at' | 'updated_at'
+        sortColumn?: 'name' | 'created_at' | 'updated_at'
         /** @description Sort order for buckets */
         sortOrder?: 'asc' | 'desc'
       }
@@ -24478,6 +24662,328 @@ export interface operations {
         content?: never
       }
       /** @description Failed to delete analytics bucket */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageAnalyticsBucketNamespacesController_getBuckets: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Analytics Bucket ID */
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['NamespacesResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get list of namespaces */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageAnalyticsBucketNamespacesController_createBucket: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Analytics Bucket ID */
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateNamespaceBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to create namespace */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageAnalyticsBucketNamespaceController_deleteBucket: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Analytics Bucket ID */
+        id: string
+        namespace: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to drop namespace */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageAnalyticsBucketNamespaceTablesController_getBuckets: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Analytics Bucket ID */
+        id: string
+        namespace: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['StorageAnalyticsBucketNamespaceTablesResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get list of tables buckets */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageAnalyticsBucketNamespaceTablesController_createTable: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Analytics Bucket ID */
+        id: string
+        namespace: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateNamespaceTableBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['NamespaceTableResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to create table */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageAnalyticsBucketNamespaceTableController_dropTable: {
+    parameters: {
+      query?: {
+        /** @description Boolean string, true or false */
+        purge?: boolean
+      }
+      header?: never
+      path: {
+        /** @description Analytics Bucket ID */
+        id: string
+        namespace: string
+        /** @description Project ref */
+        ref: string
+        table: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to drop table */
       500: {
         headers: {
           [name: string]: unknown
@@ -25000,62 +25506,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to copy object */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StorageObjectsController_download: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Storage bucket id */
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['DownloadObjectBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['StreamableFile']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to download the file */
       500: {
         headers: {
           [name: string]: unknown
