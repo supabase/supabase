@@ -1171,6 +1171,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/upgrade-request': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Request organization upgrade - notifies billing owners */
+    post: operations['UpgradeRequestController_requestUpgrade']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/cloud-marketplace/link': {
     parameters: {
       query?: never
@@ -4124,23 +4141,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/storage/{ref}/buckets/{id}/objects/download': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Downloads a file from a private bucket */
-    post: operations['StorageObjectsController_download']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/storage/{ref}/buckets/{id}/objects/list': {
     parameters: {
       query?: never
@@ -5186,13 +5186,7 @@ export interface components {
         value: string
       }
       /** @enum {string} */
-      tier:
-        | 'tier_free'
-        | 'tier_pro'
-        | 'tier_payg'
-        | 'tier_team'
-        | 'tier_enterprise'
-        | 'tier_platform'
+      tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | 'tier_enterprise'
     }
     CreateOrganizationResponse:
       | {
@@ -5210,7 +5204,7 @@ export interface components {
           organization_requires_mfa: boolean
           plan: {
             /** @enum {string} */
-            id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
+            id: 'free' | 'pro' | 'team' | 'enterprise'
             name: string
           }
           restriction_data: {
@@ -6059,22 +6053,6 @@ export interface components {
     DownloadBackupResponse: {
       fileUrl: string
     }
-    DownloadObjectBody: {
-      options?: {
-        download?: boolean
-        downloadName?: string
-        transform?: {
-          /** @enum {string} */
-          format?: 'origin'
-          height?: number
-          quality?: number
-          /** @enum {string} */
-          resize?: 'cover' | 'contain' | 'fill'
-          width?: number
-        }
-      }
-      path: string
-    }
     DynamicRegisterOAuthAppBody: {
       client_name: string
       /** Format: uri */
@@ -6532,7 +6510,7 @@ export interface components {
       payment_method_type: string
       plan: {
         /** @enum {string} */
-        id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
+        id: 'free' | 'pro' | 'team' | 'enterprise'
         name: string
       }
       project_addons: {
@@ -6593,7 +6571,7 @@ export interface components {
         /** Format: date-time */
         at: string
         /** @enum {string} */
-        target_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
+        target_plan: 'free' | 'pro' | 'team' | 'enterprise'
         usage_billing_enabled: boolean
       } | null
       usage_billing_enabled: boolean
@@ -7493,7 +7471,7 @@ export interface components {
       organization_requires_mfa: boolean
       plan: {
         /** @enum {string} */
-        id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
+        id: 'free' | 'pro' | 'team' | 'enterprise'
         name: string
       }
       restriction_data: {
@@ -7554,7 +7532,7 @@ export interface components {
       opt_in_tags: string[]
       plan: {
         /** @enum {string} */
-        id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
+        id: 'free' | 'pro' | 'team' | 'enterprise'
         name: string
       }
       projects: {
@@ -7663,10 +7641,6 @@ export interface components {
           | 'PITR_28'
           | 'IPV4'
           | 'LOG_DRAIN'
-          | 'LOG_INGESTION'
-          | 'LOG_QUERYING'
-          | 'LOG_STORAGE'
-          | 'ACTIVE_COMPUTE_HOURS'
         usage: number
         usage_original: number
       }[]
@@ -7727,10 +7701,6 @@ export interface components {
           | 'PITR_28'
           | 'IPV4'
           | 'LOG_DRAIN'
-          | 'LOG_INGESTION'
-          | 'LOG_QUERYING'
-          | 'LOG_STORAGE'
-          | 'ACTIVE_COMPUTE_HOURS'
         pricing_free_units?: number
         pricing_package_price?: number
         pricing_package_size?: number
@@ -7809,7 +7779,7 @@ export interface components {
         /** @enum {string} */
         effective_at?: 'now' | 'end_of_billing_period' | 'none'
         /** @enum {string} */
-        id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
+        id: 'free' | 'pro' | 'team' | 'enterprise'
         is_current: boolean
         name: string
         price: number
@@ -8075,9 +8045,9 @@ export interface components {
         name: string
       }[]
       /** @enum {string} */
-      source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
+      source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise'
       /** @enum {string|null} */
-      target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform' | null
+      target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | null
       valid: boolean
       warnings: {
         key: string
@@ -8999,6 +8969,14 @@ export interface components {
         schema: string
       }[]
     }
+    RequestUpgradeBody: {
+      note?: string
+      /** @enum {string} */
+      requested_plan: 'Pro' | 'Team' | 'Enterprise'
+    }
+    RequestUpgradeResponse: {
+      message: string
+    }
     ResetPasswordBody: {
       /** Format: email */
       email: string
@@ -9290,7 +9268,7 @@ export interface components {
         upstreamTarget: 'main' | 'canary'
       }
       features: {
-        icebergCatalog?: {
+        icebergCatalog: {
           enabled: boolean
           maxCatalogs: number
           maxNamespaces: number
@@ -9302,7 +9280,7 @@ export interface components {
         s3Protocol: {
           enabled: boolean
         }
-        vectorBuckets?: {
+        vectorBuckets: {
           enabled: boolean
           maxBuckets: number
           maxIndexes: number
@@ -9388,7 +9366,6 @@ export interface components {
         vectorBucketName: string
       }[]
     }
-    StreamableFile: Record<string, never>
     SupavisorConfigResponse: {
       connection_string: string
       /** @description Use connection_string instead */
@@ -9639,10 +9616,6 @@ export interface components {
           | 'PITR_28'
           | 'IPV4'
           | 'LOG_DRAIN'
-          | 'LOG_INGESTION'
-          | 'LOG_QUERYING'
-          | 'LOG_STORAGE'
-          | 'ACTIVE_COMPUTE_HOURS'
         usage_original?: number
       }[]
       subscription_id: string
@@ -10536,10 +10509,10 @@ export interface components {
           maxNamespaces: number
           maxTables: number
         }
-        imageTransformation: {
+        imageTransformation?: {
           enabled: boolean
         }
-        s3Protocol: {
+        s3Protocol?: {
           enabled: boolean
         }
         vectorBuckets?: {
@@ -10568,13 +10541,7 @@ export interface components {
         value: string
       }
       /** @enum {string} */
-      tier:
-        | 'tier_free'
-        | 'tier_pro'
-        | 'tier_payg'
-        | 'tier_team'
-        | 'tier_enterprise'
-        | 'tier_platform'
+      tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | 'tier_enterprise'
     }
     UpdateSubscriptionResponse: {
       pending_payment_intent_secret: string | null
@@ -14086,6 +14053,61 @@ export interface operations {
         content?: never
       }
       /** @description Failed to preview subscription changes */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  UpgradeRequestController_requestUpgrade: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RequestUpgradeBody']
+      }
+    }
+    responses: {
+      /** @description Upgrade request has been sent to billing owners */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RequestUpgradeResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to send upgrade request */
       500: {
         headers: {
           [name: string]: unknown
@@ -25484,62 +25506,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to copy object */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StorageObjectsController_download: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Storage bucket id */
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['DownloadObjectBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['StreamableFile']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to download the file */
       500: {
         headers: {
           [name: string]: unknown
