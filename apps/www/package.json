@@ -32,7 +32,7 @@
     "@octokit/rest": "^21.0.0",
     "@payloadcms/live-preview-react": "^3.0.0",
     "@radix-ui/react-dialog": "^1.0.5",
-    "@sentry/nextjs": "^10",
+    "@sentry/nextjs": "catalog:",
     "@supabase/supabase-js": "catalog:",
     "@vercel/og": "^0.6.2",
     "ai-commands": "workspace:*",
