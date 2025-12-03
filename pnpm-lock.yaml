@@ -4842,9 +4842,6 @@ packages:
   '@next/bundle-analyzer@16.0.4':
     resolution: {integrity: sha512-6IajJ23QrXW5RTJj2lRHcBM8mxcEl+vgd7XXVODQG/BcJyjgIP1k5OefdRl+P80btPvHeHoV4fIgC1so25pXcg==}
 
-  '@next/env@15.3.3':
-    resolution: {integrity: sha512-OdiMrzCl2Xi0VTjiQQUK0Xh7bJHnOuET2s+3V+Y40WJBAXrJeGA3f+I8MZJ/YQ3mVGi5XGR1L66oFlgqXhQ4Vw==}
-
   '@next/env@15.5.6':
     resolution: {integrity: sha512-3qBGRW+sCGzgbpc5TS1a0p7eNxnOarGVQhZxfvTdnV0gFI61lX7QNtQ4V1TSREctXzYn5NetbUsLvyqwLFJM6Q==}
 
@@ -23051,8 +23048,6 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@next/env@15.3.3': {}
-
   '@next/env@15.5.6': {}
 
   '@next/env@16.0.4': {}
@@ -36794,7 +36789,7 @@ snapshots:
 
   payload@3.52.0(graphql@16.11.0)(typescript@5.9.2):
     dependencies:
-      '@next/env': 15.3.3
+      '@next/env': 15.5.6
       '@payloadcms/translations': 3.52.0
       '@types/busboy': 1.5.4
       ajv: 8.17.1
