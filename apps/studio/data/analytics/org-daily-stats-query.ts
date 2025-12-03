@@ -42,10 +42,6 @@ export enum PricingMetric {
   LOG_DRAIN_EVENTS = 'LOG_DRAIN_EVENTS',
   AUTH_MFA_PHONE = 'AUTH_MFA_PHONE',
   AUTH_MFA_WEB_AUTHN = 'AUTH_MFA_WEB_AUTHN',
-  ACTIVE_COMPUTE_HOURS = 'ACTIVE_COMPUTE_HOURS',
-  LOG_INGESTION = 'LOG_INGESTION',
-  LOG_QUERYING = 'LOG_QUERYING',
-  LOG_STORAGE = 'LOG_STORAGE',
 }
 
 export enum ComputeUsageMetric {
@@ -137,7 +133,7 @@ export async function getOrgDailyStats(
       query: {
         start: startDate,
         end: endDate,
-        projectRef,
+        project_ref: projectRef,
       },
     },
     signal,

@@ -73,7 +73,7 @@ export const Header = ({ customHeader, isRefetching, tableQueriesEnabled = true 
         ) : snap.selectedRows.size > 0 ? (
           <RowHeader tableQueriesEnabled={tableQueriesEnabled} />
         ) : (
-          <DefaultHeader />
+          <DefaultHeader tableQueriesEnabled={tableQueriesEnabled} />
         )}
         <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
       </div>
@@ -81,7 +81,9 @@ export const Header = ({ customHeader, isRefetching, tableQueriesEnabled = true 
   )
 }
 
-const DefaultHeader = () => {
+const DefaultHeader = ({
+  tableQueriesEnabled = true,
+}: Pick<HeaderProps, 'tableQueriesEnabled'>) => {
   const { ref: projectRef } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
 
@@ -104,7 +106,7 @@ const DefaultHeader = () => {
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
         <FilterPopover />
-        <SortPopover />
+        <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
       </div>
       {canAddNew && (
         <>
@@ -231,7 +233,6 @@ type RowHeaderProps = {
 }
 
 const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
-  debugger
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
