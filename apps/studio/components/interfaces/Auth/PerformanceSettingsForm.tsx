@@ -32,7 +32,7 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const FormSchema = z.object({
@@ -72,7 +72,6 @@ export const PerformanceSettingsForm = () => {
   })
   const maxConnectionLimit = maxConnData?.maxConnections ?? 60
 
-  const isLoading = isLoadingAuthConfig || isLoadingMaxConns
   const isProPlan = organization?.plan.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlan
 
@@ -182,7 +181,7 @@ export const PerformanceSettingsForm = () => {
     )
   }
 
-  if (isLoading) {
+  if (isLoadingAuthConfig) {
     return (
       <ScaffoldSection isFullWidth>
         <GenericSkeletonLoader />
@@ -299,11 +298,10 @@ export const PerformanceSettingsForm = () => {
                           value={field.value}
                           onValueChange={(value) => {
                             const values = databaseForm.getValues()
-
                             field.onChange(value)
 
                             if (values.DB_MAX_POOL_SIZE_UNIT !== value) {
-                              let currentValue = values.DB_MAX_POOL_SIZE!
+                              const currentValue = values.DB_MAX_POOL_SIZE!
 
                               let preservedPoolSize: number
                               if (value === 'percent') {
@@ -383,16 +381,20 @@ export const PerformanceSettingsForm = () => {
                               />
                             </PrePostTab>
                           </div>
-                          <div className="px-2 text-xs text-muted w-full text-end">
-                            <span className="text-brand">
-                              {chosenUnit === 'percent'
-                                ? Math.floor(
-                                    maxConnectionLimit * (Math.min(100, field.value!) / 100)
-                                  ).toString()
-                                : Math.min(maxConnectionLimit, field.value!)}
-                            </span>{' '}
-                            / {maxConnectionLimit} max
-                          </div>
+                          {isLoadingMaxConns ? (
+                            <ShimmeringLoader className="py-2 w-16 ml-auto" />
+                          ) : (
+                            <div className="text-xs text-muted w-full text-end">
+                              <span className="text-brand">
+                                {chosenUnit === 'percent'
+                                  ? Math.floor(
+                                      maxConnectionLimit * (Math.min(100, field.value!) / 100)
+                                    ).toString()
+                                  : Math.min(maxConnectionLimit, field.value!)}
+                              </span>{' '}
+                              / {maxConnectionLimit} max
+                            </div>
+                          )}
                         </div>
                       </FormControl_Shadcn_>
                     </FormItemLayout>
