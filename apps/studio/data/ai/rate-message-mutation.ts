@@ -1,10 +1,10 @@
 import { UIMessage } from '@ai-sdk/react'
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 
 import type { RateMessageResponse } from 'components/ui/AIAssistantPanel/Message.utils'
 import { constructHeaders, fetchHandler } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
-import { ResponseError } from 'types'
+import { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type RateMessageVariables = {
   rating: 'positive' | 'negative'
@@ -52,7 +52,7 @@ export const useRateMessageMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<RateMessageData, ResponseError, RateMessageVariables>,
+  UseCustomMutationOptions<RateMessageData, ResponseError, RateMessageVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<RateMessageData, ResponseError, RateMessageVariables>({

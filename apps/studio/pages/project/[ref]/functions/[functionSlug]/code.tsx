@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { DeployEdgeFunctionWarningModal } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
+import { EdgeFunctionFile } from 'components/interfaces/EdgeFunctions/EdgeFunction.types'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -58,16 +59,18 @@ const CodePage = () => {
       refetchIntervalInBackground: false,
     }
   )
-  const [files, setFiles] = useState<
-    { id: number; name: string; content: string; selected?: boolean }[]
-  >([])
+  const [files, setFiles] = useState<EdgeFunctionFile[]>([])
 
-  const { mutate: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
+  const { mutate: deployFunction, isPending: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
       toast.success('Successfully updated edge function')
       setShowDeployWarning(false)
     },
   })
+
+  const fileExists = (filePath: string | undefined): boolean => {
+    return filePath ? files.some((file) => file.name === filePath) : false
+  }
 
   const onUpdate = async () => {
     if (isDeploying || !ref || !functionSlug || !selectedFunction || files.length === 0) return
@@ -76,30 +79,8 @@ const CodePage = () => {
       const newEntrypointPath = selectedFunction.entrypoint_path?.split('/').pop()
       const newImportMapPath = selectedFunction.import_map_path?.split('/').pop()
 
-      const fallbackEntrypointPath = () => {
-        // when there's no matching entrypoint path is set,
-        // we use few heuristics to find an entrypoint file
-        // 1. If the function has only a single TS / JS file, if so set it as entrypoint
-        const jsFiles = files.filter(({ name }) => name.endsWith('.js') || name.endsWith('.ts'))
-        if (jsFiles.length === 1) {
-          return jsFiles[0].name
-        } else if (jsFiles.length) {
-          // 2. If function has a `index` or `main` file use it as the entrypoint
-          const regex = /^.*?(index|main).*$/i
-          const matchingFile = jsFiles.find(({ name }) => regex.test(name))
-          // 3. if no valid index / main file found, we set the entrypoint expliclty to first JS file
-          return matchingFile ? matchingFile.name : jsFiles[0].name
-        } else {
-          // no potential entrypoint files found, this will most likely result in an error on deploy
-          return 'index.ts'
-        }
-      }
-
-      const fallbackImportMapPath = () => {
-        // try to find a deno.json or import_map.json file
-        const regex = /^.*?(deno|import_map).json*$/i
-        return files.find(({ name }) => regex.test(name))?.name
-      }
+      const entrypointExists = fileExists(newEntrypointPath)
+      const importMapExists = fileExists(newImportMapPath)
 
       deployFunction({
         projectRef: ref,
@@ -107,15 +88,8 @@ const CodePage = () => {
         metadata: {
           name: selectedFunction.name,
           verify_jwt: selectedFunction.verify_jwt,
-          entrypoint_path: files.some(({ name }) => name === newEntrypointPath)
-            ? (newEntrypointPath as string)
-            : fallbackEntrypointPath(),
-          import_map_path: files.some(({ name }) => name === newImportMapPath)
-            ? newImportMapPath
-            : fallbackImportMapPath(),
-          static_patterns: files
-            .filter(({ name }) => !name.match(/\.(js|ts|jsx|tsx|json|wasm)$/i))
-            .map(({ name }) => name),
+          ...(entrypointExists && { entrypoint_path: newEntrypointPath }),
+          ...(importMapExists && { import_map_path: newImportMapPath }),
         },
         files: files.map(({ name, content }) => ({ name, content })),
       })

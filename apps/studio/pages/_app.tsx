@@ -1,8 +1,8 @@
 import 'react-data-grid/lib/styles.css'
 import 'styles/code.scss'
 import 'styles/contextMenu.scss'
-import 'styles/date-picker.scss'
 import 'styles/editor.scss'
+import 'styles/focus.scss'
 import 'styles/graphiql-base.scss'
 import 'styles/grid.scss'
 import 'styles/main.scss'
@@ -52,7 +52,6 @@ import { GlobalErrorBoundaryState } from 'components/ui/ErrorBoundary/GlobalErro
 import { useRootQueryClient } from 'data/query-client'
 import { customFont, sourceCodePro } from 'fonts'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { LegacyInlineEditorHotkeyMigration } from 'hooks/misc/useLegacyInlineEditorHotkeyMigration'
 import { AuthProvider } from 'lib/auth'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
@@ -141,7 +140,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       }}
                     />
                   </Head>
-                  <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
+                  <MetaFaviconsPagesRouter applicationName="Supabase Studio" includeManifest />
                   <TooltipProvider delayDuration={0}>
                     <RouteValidationWrapper>
                       <ThemeProvider
@@ -164,8 +163,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       </ThemeProvider>
                     </RouteValidationWrapper>
                   </TooltipProvider>
-                  {/* Temporary migration, to be removed by 2025-11-28 */}
-                  <LegacyInlineEditorHotkeyMigration />
                   <Telemetry />
                   {!isTestEnv && (
                     <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />

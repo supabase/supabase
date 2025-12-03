@@ -1,6 +1,6 @@
-import { QueryClient, useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useInfiniteQuery } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlVariables } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { ENTITY_TYPE } from './entity-type-constants'
 import { entityTypeKeys } from './keys'
 
@@ -130,7 +130,7 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<EntityTypesData, EntityTypesError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<EntityTypesData, EntityTypesError, TData> = {}
 ) => {
   return useInfiniteQuery<EntityTypesData, EntityTypesError, TData>({
     queryKey: entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),

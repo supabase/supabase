@@ -1,5 +1,6 @@
 import { Query } from '@supabase/pg-meta/src/query'
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { UseCustomQueryOptions } from 'types'
 import { executeSql } from '../sql/execute-sql-query'
 import { vaultSecretsKeys } from './keys'
 
@@ -55,7 +56,7 @@ export const useVaultSecretDecryptedValueQuery = <TData = string>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<getDecryptedValueResult, VaultSecretsDecryptedValueError, TData> = {}
+  }: UseCustomQueryOptions<getDecryptedValueResult, VaultSecretsDecryptedValueError, TData> = {}
 ) =>
   useQuery<getDecryptedValueResult, VaultSecretsDecryptedValueError, TData>({
     queryKey: vaultSecretsKeys.getDecryptedValue(projectRef, id),
@@ -63,7 +64,7 @@ export const useVaultSecretDecryptedValueQuery = <TData = string>(
     select(data) {
       return (data[0]?.decrypted_secret ?? '') as TData
     },
-    enabled: enabled && typeof projectRef !== 'undefined',
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
     ...options,
   })
 

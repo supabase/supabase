@@ -1,8 +1,8 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { replicationKeys } from './keys'
 
 type ReplicationPublicationsParams = { projectRef?: string; sourceId?: number }
@@ -39,7 +39,7 @@ export const useReplicationPublicationsQuery = <TData = ReplicationPublicationsD
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ReplicationPublicationsData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<ReplicationPublicationsData, ResponseError, TData> = {}
 ) =>
   useQuery<ReplicationPublicationsData, ResponseError, TData>({
     queryKey: replicationKeys.publications(projectRef, sourceId),

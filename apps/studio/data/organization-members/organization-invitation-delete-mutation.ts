@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { organizationKeys as organizationKeysV1 } from '../organizations/keys'
 import { organizationKeys } from './keys'
 
@@ -31,7 +31,7 @@ export const useOrganizationDeleteInvitationMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     OrganizationDeleteInvitationData,
     ResponseError,
     OrganizationDeleteInvitationVariables

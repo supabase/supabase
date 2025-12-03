@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, put } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { sslEnforcementKeys } from './keys'
 
 export type SSLEnforcementUpdateVariables = {
@@ -38,7 +38,7 @@ export const useSSLEnforcementUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<SSLEnforcementUpdateData, ResponseError, SSLEnforcementUpdateVariables>,
+  UseCustomMutationOptions<SSLEnforcementUpdateData, ResponseError, SSLEnforcementUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

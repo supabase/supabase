@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { replicationKeys } from './keys'
 
 export type BigQueryDestinationConfig = {
@@ -125,7 +125,11 @@ export const useUpdateDestinationPipelineMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<UpdateDestinationPipelineData, ResponseError, UpdateDestinationPipelineParams>,
+  UseCustomMutationOptions<
+    UpdateDestinationPipelineData,
+    ResponseError,
+    UpdateDestinationPipelineParams
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

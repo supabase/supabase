@@ -1,24 +1,26 @@
-import { CreateOAuthClientParams, SupabaseClient } from '@supabase/supabase-js'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { CreateOAuthClientParams } from '@supabase/supabase-js'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { createProjectSupabaseClient } from 'lib/project-supabase-client'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { oauthServerAppKeys } from './keys'
 
 export type OAuthServerAppCreateVariables = CreateOAuthClientParams & {
-  projectRef?: string
-  supabaseClient?: SupabaseClient<any>
+  projectRef: string | undefined
+  clientEndpoint: string | undefined
 }
 
 export async function createOAuthServerApp({
   projectRef,
-  supabaseClient,
+  clientEndpoint,
   ...params
 }: OAuthServerAppCreateVariables) {
   if (!projectRef) throw new Error('Project reference is required')
-  if (!supabaseClient) throw new Error('Supabase client is required')
+  if (!clientEndpoint) throw new Error('Client endpoint is required')
 
+  const supabaseClient = await createProjectSupabaseClient(projectRef, clientEndpoint)
   const { data, error } = await supabaseClient.auth.admin.oauth.createClient(params)
 
   if (error) return handleError(error)
@@ -32,7 +34,7 @@ export const useOAuthServerAppCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<OAuthAppCreateData, ResponseError, OAuthServerAppCreateVariables>,
+  UseCustomMutationOptions<OAuthAppCreateData, ResponseError, OAuthServerAppCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -40,9 +42,9 @@ export const useOAuthServerAppCreateMutation = ({
   return useMutation<OAuthAppCreateData, ResponseError, OAuthServerAppCreateVariables>({
     mutationFn: (vars) => createOAuthServerApp(vars),
     onSuccess: async (data, variables, context) => {
-      const { projectRef } = variables
+      const { projectRef, clientEndpoint } = variables
       await queryClient.invalidateQueries({
-        queryKey: oauthServerAppKeys.list(projectRef),
+        queryKey: oauthServerAppKeys.list(projectRef, clientEndpoint),
       })
       await onSuccess?.(data, variables, context)
     },

@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { usageKeys } from '../usage/keys'
 
 export type ProjectDiskResizeVariables = {
@@ -35,7 +35,7 @@ export const useProjectDiskResizeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ProjectDiskResizeData, ResponseError, ProjectDiskResizeVariables>,
+  UseCustomMutationOptions<ProjectDiskResizeData, ResponseError, ProjectDiskResizeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

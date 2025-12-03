@@ -3,7 +3,7 @@ import { partition } from 'lodash'
 import { ChevronDown, Globe2, Loader2, Network } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, { Background, Edge, ReactFlowProvider, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
 
@@ -54,8 +54,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
   const isOrioleDb = useIsOrioleDb()
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
-  const numTransition = useRef<number>()
-  const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
+  const { isLoading: isLoadingProject } = useSelectedProjectQuery()
 
   const isAws = useIsAwsCloudProvider()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
@@ -63,7 +62,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
   const [view, setView] = useState<'flow' | 'map'>('flow')
   const [showDeleteAllModal, setShowDeleteAllModal] = useState(false)
   const { showNewReplicaPanel, setShowNewReplicaPanel } = useShowNewReplicaPanel()
-  const [refetchInterval, setRefetchInterval] = useState<number | boolean>(10000)
+  const [refetchInterval, setRefetchInterval] = useState<number | false>(10000)
   const [newReplicaRegion, setNewReplicaRegion] = useState<AWS_REGIONS_KEYS>()
   const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<Database>()
   const [selectedReplicaToRestart, setSelectedReplicaToRestart] = useState<Database>()
@@ -74,9 +73,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
     data: loadBalancers,
     refetch: refetchLoadBalancers,
     isSuccess: isSuccessLoadBalancers,
-  } = useLoadBalancersQuery({
-    projectRef,
-  })
+  } = useLoadBalancersQuery({ projectRef })
   const {
     data,
     error,
@@ -84,50 +81,57 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
     isLoading,
     isError,
     isSuccess: isSuccessReplicas,
-  } = useReadReplicasQuery({
-    projectRef,
-  })
+  } = useReadReplicasQuery({ projectRef })
   const [[primary], replicas] = useMemo(
     () => partition(data ?? [], (db) => db.identifier === projectRef),
     [data, projectRef]
   )
 
-  useReadReplicasStatusesQuery(
-    { projectRef },
-    {
-      refetchInterval: refetchInterval as any,
-      refetchOnWindowFocus: false,
-      onSuccess: async (res) => {
-        const fixedStatues = [
-          REPLICA_STATUS.ACTIVE_HEALTHY,
-          REPLICA_STATUS.ACTIVE_UNHEALTHY,
-          REPLICA_STATUS.INIT_READ_REPLICA_FAILED,
-        ]
-        const replicasInTransition = res.filter((db) => {
-          const { status } = db.replicaInitializationStatus || {}
-          return (
-            !fixedStatues.includes(db.status) || status === ReplicaInitializationStatus.InProgress
-          )
-        })
-        const hasTransientStatus = replicasInTransition.length > 0
+  const { data: replicasStatuses, isSuccess: isSuccessReplicasStatuses } =
+    useReadReplicasStatusesQuery(
+      { projectRef },
+      {
+        refetchInterval: refetchInterval,
+        refetchOnWindowFocus: false,
+      }
+    )
 
-        // If any replica's status has changed, refetch databases
-        if (
-          numTransition.current !== replicasInTransition.length ||
-          res.length !== (data ?? []).length
-        ) {
-          numTransition.current = replicasInTransition.length
-          await refetchReplicas()
-          setTimeout(() => refetchLoadBalancers(), 2000)
-        }
+  const numReplicas = useMemo(() => data?.length ?? 0, [data])
+  useEffect(() => {
+    if (!isSuccessReplicasStatuses) return
+    const refetch = async () => {
+      const fixedStatues = [
+        REPLICA_STATUS.ACTIVE_HEALTHY,
+        REPLICA_STATUS.ACTIVE_UNHEALTHY,
+        REPLICA_STATUS.INIT_READ_REPLICA_FAILED,
+      ]
+      const replicasInTransition = replicasStatuses.filter((db) => {
+        const { status } = db.replicaInitializationStatus || {}
+        return (
+          !fixedStatues.includes(db.status) || status === ReplicaInitializationStatus.InProgress
+        )
+      })
+      const hasTransientStatus = replicasInTransition.length > 0
 
-        // If all replicas are active healthy, stop fetching statuses
-        if (!hasTransientStatus) {
-          setRefetchInterval(false)
-        }
-      },
+      // If any replica's status has changed, refetch databases
+      if (replicasStatuses.length !== numReplicas) {
+        await refetchReplicas()
+        setTimeout(() => refetchLoadBalancers(), 2000)
+      }
+
+      // If all replicas are active healthy, stop fetching statuses
+      if (!hasTransientStatus) {
+        setRefetchInterval(false)
+      }
     }
-  )
+    refetch()
+  }, [
+    numReplicas,
+    isSuccessReplicasStatuses,
+    refetchLoadBalancers,
+    refetchReplicas,
+    replicasStatuses,
+  ])
 
   const backgroundPatternColor =
     resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'

@@ -1,16 +1,7 @@
-import {
-  BarChart3,
-  Code,
-  Database,
-  GitBranch,
-  Shield,
-  Table,
-  Upload,
-  User,
-  UserPlus,
-} from 'lucide-react'
+import { BarChart3, Code, Database, GitBranch, Shield, Table, Upload, UserPlus } from 'lucide-react'
 
 import { FRAMEWORKS } from 'components/interfaces/Connect/Connect.constants'
+import { DOCS_URL } from 'lib/constants'
 import { AiIconAnimation, CodeBlock } from 'ui'
 import type { GettingStartedAction, GettingStartedStep } from './GettingStarted.types'
 import type { GettingStartedStatuses } from './useGettingStartedProgress'
@@ -74,7 +65,7 @@ export const getCodeWorkflowSteps = ({
       actions: [
         {
           label: 'Create schema file',
-          href: 'https://supabase.com/docs/guides/local-development/declarative-database-schemas',
+          href: `${DOCS_URL}/guides/local-development/declarative-database-schemas`,
           variant: 'default',
         },
         {
@@ -99,7 +90,7 @@ export const getCodeWorkflowSteps = ({
       actions: [
         {
           label: 'Create a seed file',
-          href: 'https://supabase.com/docs/guides/local-development/seeding-your-database',
+          href: `${DOCS_URL}/guides/local-development/seeding-your-database`,
           variant: 'default',
         },
         {
@@ -158,7 +149,7 @@ export const getCodeWorkflowSteps = ({
       actions: [
         {
           label: 'Read docs',
-          href: 'https://supabase.com/docs/guides/auth',
+          href: `${DOCS_URL}/guides/auth`,
           variant: 'default',
         },
       ],
@@ -173,12 +164,12 @@ export const getCodeWorkflowSteps = ({
       actions: [
         {
           label: 'Create a bucket via SQL',
-          href: 'https://supabase.com/docs/guides/storage/buckets/creating-buckets?queryGroups=language&language=sql',
+          href: `${DOCS_URL}/guides/storage/buckets/creating-buckets?queryGroups=language&language=sql`,
           variant: 'default',
         },
         {
           label: 'Upload a file',
-          href: 'https://supabase.com/docs/guides/storage/uploads/standard-uploads',
+          href: `${DOCS_URL}/guides/storage/uploads/standard-uploads`,
           variant: 'default',
         },
       ],
@@ -193,7 +184,7 @@ export const getCodeWorkflowSteps = ({
       actions: [
         {
           label: 'Create and deploy via CLI',
-          href: `https://supabase.com/docs/guides/functions/quickstart`,
+          href: `${DOCS_URL}/guides/functions/quickstart`,
           variant: 'default',
         },
         { label: 'View functions', href: `/project/${ref}/functions`, variant: 'default' },
@@ -331,7 +322,7 @@ export const getNoCodeWorkflowSteps = ({
       actions: [
         {
           label: 'Read docs',
-          href: 'https://supabase.com/docs/guides/auth',
+          href: `${DOCS_URL}/guides/auth`,
           variant: 'default',
         },
       ],

@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { organizationKeys } from './keys'
+import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
+import { organizationKeys } from './keys'
 
 type OrganizationProjectClaimVariables = {
   slug: string
@@ -67,7 +67,7 @@ export const useOrganizationProjectClaimQuery = <TData = OrganizationProjectClai
   { slug, token }: OrganizationProjectClaimVariables,
   {
     ...options
-  }: UseQueryOptions<OrganizationProjectClaimData, OrganizationProjectClaimError, TData> = {}
+  }: UseCustomQueryOptions<OrganizationProjectClaimData, OrganizationProjectClaimError, TData> = {}
 ) =>
   useQuery<OrganizationProjectClaimData, OrganizationProjectClaimError, TData>({
     queryKey: organizationKeys.projectClaim(slug, token),

@@ -16,15 +16,11 @@ cd e2e/studio
 pnpm exec playwright install
 ```
 
-### Run a local Supabase instance
+### Environment Variables
 
-Make sure you have Supabase CLI installed
+Some tests require specific environment variables to be set. If these are not set, the tests will be automatically skipped:
 
-```bash
-cd e2e/studio
-
-supabase start
-```
+- **`OPENAI_API_KEY`**: Required for the AI Assistant test (`assistant.spec.ts`). Without this variable, the assistant test will be skipped.
 
 ---
 

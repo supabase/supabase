@@ -24,6 +24,7 @@ import {
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
@@ -64,6 +65,9 @@ export const AuditLogs = () => {
     'notifications'
   )
 
+  const { hasAccess: hasAccessToAuditLogs, isLoading: isLoadingEntitlements } =
+    useCheckEntitlements('security.audit_logs_days')
+
   const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
     useOrganizationAuditLogsQuery(
       {
@@ -79,7 +83,8 @@ export const AuditLogs = () => {
         },
       }
     )
-  const isLogsNotAvailableBasedOnPlan = isError && error.message.endsWith(logsUpgradeError)
+
+  const isLogsNotAvailableBasedOnPlan = isError && !hasAccessToAuditLogs
   const isRangeExceededError = isError && error.message.includes('range exceeded')
   const showFilters = !isLoading && !isLogsNotAvailableBasedOnPlan
 
@@ -127,10 +132,10 @@ export const AuditLogs = () => {
       }
     })
 
-  // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
-  // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
+  // This feature depends on the subscription tier of the user.
+  // The API limits the logs to maximum of 62 days and 5 minutes so when the page is
   // viewed for more than 5 minutes, the call parameters needs to be updated. This also works with
-  // higher tiers (7 days of logs).The user will see a loading shimmer.
+  // higher tiers.The user will see a loading shimmer.
   useEffect(() => {
     const duration = dayjs(dateRange.from).diff(dayjs(dateRange.to))
     const interval = setInterval(() => {
@@ -160,7 +165,7 @@ export const AuditLogs = () => {
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
                   <p>
-                    Upgrade to Team or Enterprise to view up to 28 days of Audit Logs for your
+                    Upgrade to Team or Enterprise to view up to 62 days of Audit Logs for your
                     organization.
                   </p>
                 </AlertDescription_Shadcn_>
@@ -261,7 +266,7 @@ export const AuditLogs = () => {
               </div>
             )}
 
-            {isLoading || isLoadingPermissions ? (
+            {isLoading || isLoadingPermissions || isLoadingEntitlements ? (
               <div className="space-y-2">
                 <ShimmeringLoader />
                 <ShimmeringLoader className="w-3/4" />
@@ -343,12 +348,12 @@ export const AuditLogs = () => {
                           (member) => member.gotrue_id === log.actor.id
                         )
                         const role = roles.find((role) => user?.role_ids?.[0] === role.id)
-                        const project = projects?.find(
-                          (project) => project.ref === log.target.metadata.project_ref
-                        )
-                        const organization = organizations?.find(
-                          (org) => org.slug === log.target.metadata.org_slug
-                        )
+                        const logProjectRef =
+                          log.target.metadata.project_ref ?? log.target.metadata.ref
+                        const logOrgSlug = log.target.metadata.org_slug ?? log.target.metadata.slug
+
+                        const project = projects?.find((project) => project.ref === logProjectRef)
+                        const organization = organizations?.find((org) => logOrgSlug)
 
                         const hasStatusCode = log.action.metadata[0]?.status !== undefined
                         const userIcon =
@@ -415,16 +420,10 @@ export const AuditLogs = () => {
                               </p>
                               <p
                                 className="text-foreground-light text-xs mt-0.5 truncate"
-                                title={
-                                  log.target.metadata.project_ref ?? log.target.metadata.org_slug
-                                }
+                                title={logProjectRef ?? logOrgSlug ?? ''}
                               >
-                                {log.target.metadata.project_ref
-                                  ? 'Ref: '
-                                  : log.target.metadata.org_slug
-                                    ? 'Slug: '
-                                    : null}
-                                {log.target.metadata.project_ref ?? log.target.metadata.org_slug}
+                                {logProjectRef ? 'Ref: ' : logOrgSlug ? 'Slug: ' : null}
+                                {logProjectRef ?? logOrgSlug}
                               </p>
                             </Table.td>
                             <Table.td>

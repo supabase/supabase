@@ -1,8 +1,8 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback } from 'react'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { resourceKeys } from './keys'
 
 export type ResourcesVariables = {
@@ -26,7 +26,7 @@ export type ResourcesError = ResponseError
 
 export const useResourcesQuery = <TData = ResourcesData>(
   { projectRef }: ResourcesVariables,
-  { enabled = true, ...options }: UseQueryOptions<ResourcesData, ResourcesError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<ResourcesData, ResourcesError, TData> = {}
 ) =>
   useQuery<ResourcesData, ResourcesError, TData>({
     queryKey: resourceKeys.list(projectRef),

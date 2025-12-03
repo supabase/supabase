@@ -1,6 +1,6 @@
 import pgMeta from '@supabase/pg-meta'
 import { PGColumn } from '@supabase/pg-meta/src/pg-meta-columns'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseKeys } from 'data/database/keys'
@@ -9,7 +9,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import { tableRowKeys } from 'data/table-rows/keys'
 import { viewKeys } from 'data/views/keys'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type DatabaseColumnDeleteVariables = {
   projectRef: string
@@ -43,7 +43,7 @@ export const useDatabaseColumnDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseColumnDeleteData, ResponseError, DatabaseColumnDeleteVariables>,
+  UseCustomMutationOptions<DatabaseColumnDeleteData, ResponseError, DatabaseColumnDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

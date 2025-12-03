@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import type { CustomerAddress, CustomerTaxId } from './types'
 
 export type OrganizationCreditTopUpVariables = {
@@ -64,7 +64,11 @@ export const useOrganizationCreditTopUpMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<OrganizationTaxIdUpdateData, ResponseError, OrganizationCreditTopUpVariables>,
+  UseCustomMutationOptions<
+    OrganizationTaxIdUpdateData,
+    ResponseError,
+    OrganizationCreditTopUpVariables
+  >,
   'mutationFn'
 > = {}) => {
   return useMutation<OrganizationTaxIdUpdateData, ResponseError, OrganizationCreditTopUpVariables>({

@@ -55,6 +55,11 @@ module.exports = [
     destination: '/storage',
   },
   {
+    permanent: true,
+    source: '/docs/guides/reports/:match*',
+    destination: '/docs/guides/observability/:match*',
+  },
+  {
     permanent: false,
     source: '/blog/2021/03/08/toad-a-link-shorterner-with-simple-apis-for-low-coders',
     destination: '/blog/2021/03/08/toad-a-link-shortener-with-simple-apis-for-low-coders',
@@ -1297,6 +1302,18 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/auth/auth-helpers/auth-ui-overview',
     destination: '/docs/guides/auth/auth-helpers/auth-ui',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/auth/server-side/nextjs',
+    destination:
+      '/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=nextjs',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/auth/server-side/sveltekit',
+    destination:
+      '/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=sveltekit',
   },
   {
     permanent: true,

@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { sqlKeys } from './keys'
 
 export type QueryAbortVariables = {
@@ -24,7 +24,7 @@ export const useQueryAbortMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<QueryAbortData, ResponseError, QueryAbortVariables>,
+  UseCustomMutationOptions<QueryAbortData, ResponseError, QueryAbortVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

@@ -1,7 +1,7 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { contentKeys } from './keys'
 import { SNIPPET_PAGE_LIMIT } from './sql-folders-query'
 
@@ -51,7 +51,7 @@ export const useSQLSnippetFolderContentsQuery = <TData = SQLSnippetFolderContent
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<
+  }: UseCustomInfiniteQueryOptions<
     SQLSnippetFolderContentsData,
     SQLSnippetFolderContentsError,
     TData

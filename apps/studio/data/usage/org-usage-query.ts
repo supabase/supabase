@@ -1,9 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { usageKeys } from './keys'
 
 export type OrgUsageVariables = {
@@ -41,7 +41,7 @@ export type OrgUsageError = ResponseError
 
 export const useOrgUsageQuery = <TData = OrgUsageData>(
   { orgSlug, projectRef, start, end }: OrgUsageVariables,
-  { enabled = true, ...options }: UseQueryOptions<OrgUsageData, OrgUsageError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<OrgUsageData, OrgUsageError, TData> = {}
 ) =>
   useQuery<OrgUsageData, OrgUsageError, TData>({
     queryKey: usageKeys.orgUsage(

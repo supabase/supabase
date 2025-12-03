@@ -1,10 +1,10 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { ResponseData } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionDetails.types'
 import { constructHeaders, fetchHandler } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type EdgeFunctionTestResponse = {
   title: string
@@ -49,7 +49,7 @@ export const useEdgeFunctionTestMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<EdgeFunctionTestData, ResponseError, EdgeFunctionTestVariables>,
+  UseCustomMutationOptions<EdgeFunctionTestData, ResponseError, EdgeFunctionTestVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<EdgeFunctionTestData, ResponseError, EdgeFunctionTestVariables>({

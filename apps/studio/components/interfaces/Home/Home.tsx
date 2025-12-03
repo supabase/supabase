@@ -213,7 +213,7 @@ export const Home = () => {
 
       <>
         <div className="py-16 border-b border-muted">
-          <div className="mx-auto max-w-7xl space-y-16">
+          <div className="mx-auto max-w-7xl space-y-16 @container">
             {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && (
               <>{isNewProject ? <NewProjectPanel /> : <ProjectUsageSection />}</>
             )}
@@ -222,7 +222,7 @@ export const Home = () => {
         </div>
 
         <div className="bg-surface-100/5 py-16">
-          <div className="mx-auto max-w-7xl space-y-16">
+          <div className="mx-auto max-w-7xl space-y-16 @container">
             {project?.status !== PROJECT_STATUS.INACTIVE && (
               <>
                 <div className="space-y-8">

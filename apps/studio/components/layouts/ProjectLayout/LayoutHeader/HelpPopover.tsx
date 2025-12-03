@@ -5,7 +5,9 @@ import { useState } from 'react'
 import SVG from 'react-inlinesvg'
 
 import { IS_PLATFORM } from 'common'
+import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportForm.utils'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -20,11 +22,10 @@ import {
   ButtonGroupItem,
   cn,
   Popover,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
 } from 'ui'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 
 export const HelpPopover = () => {
   const router = useRouter()
@@ -36,6 +37,12 @@ export const HelpPopover = () => {
   const [isOpen, setIsOpen] = useState(false)
 
   const projectRef = project?.parent_project_ref ?? (router.query.ref as string | undefined)
+  let supportLinkQueryParams: Partial<SupportFormUrlKeys> | undefined = undefined
+  if (projectRef) {
+    supportLinkQueryParams = { projectRef }
+  } else if (org?.slug) {
+    supportLinkQueryParams = { orgSlug: org.slug }
+  }
 
   return (
     <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen}>
@@ -137,7 +144,7 @@ export const HelpPopover = () => {
                   </ButtonGroupItem>
 
                   <ButtonGroupItem size="tiny" icon={<Mail strokeWidth={1.5} size={14} />}>
-                    <SupportLink queryParams={{ projectRef }}>Contact support</SupportLink>
+                    <SupportLink queryParams={supportLinkQueryParams}>Contact support</SupportLink>
                   </ButtonGroupItem>
                 </>
               )}

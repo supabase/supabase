@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
 import { subscriptionKeys } from 'data/subscriptions/keys'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { customDomainKeys } from './keys'
 
 export type CustomDomainDeleteVariables = {
@@ -28,7 +28,7 @@ export const useCustomDomainDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<CustomDomainDeleteData, ResponseError, CustomDomainDeleteVariables>,
+  UseCustomMutationOptions<CustomDomainDeleteData, ResponseError, CustomDomainDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

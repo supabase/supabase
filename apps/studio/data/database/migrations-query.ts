@@ -1,4 +1,5 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { UseCustomQueryOptions } from 'types'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseKeys } from './keys'
 
@@ -55,7 +56,7 @@ export type MigrationsError = ExecuteSqlError
 
 export const useMigrationsQuery = <TData = MigrationsData>(
   { projectRef, connectionString }: MigrationsVariables,
-  { enabled = true, ...options }: UseQueryOptions<MigrationsData, MigrationsError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<MigrationsData, MigrationsError, TData> = {}
 ) =>
   useQuery<MigrationsData, MigrationsError, TData>({
     queryKey: databaseKeys.migrations(projectRef),

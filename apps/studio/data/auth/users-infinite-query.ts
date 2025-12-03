@@ -1,10 +1,12 @@
 import { getPaginatedUsersSQL } from '@supabase/pg-meta/src/sql/studio/get-users-paginated'
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 
+import { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 import type { components } from 'data/api'
 import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
+import { UseCustomInfiniteQueryOptions } from 'types'
 import { authKeys } from './keys'
 
 const USERS_PAGE_LIMIT = 50
@@ -19,8 +21,8 @@ type UsersVariables = {
   providers?: string[]
   sort?: 'id' | 'created_at' | 'email' | 'phone' | 'last_sign_in_at'
   order?: 'asc' | 'desc'
-
-  column?: 'id' | 'email' | 'phone'
+  /** If set, uses optimized prefix search for the specified column */
+  column?: OptimizedSearchColumns
   startAt?: string
 }
 
@@ -38,20 +40,27 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
     order,
     column,
   }: UsersVariables,
-  { enabled = true, ...options }: UseInfiniteQueryOptions<UsersData, UsersError, TData> = {}
+  { enabled = true, ...options }: UseCustomInfiniteQueryOptions<UsersData, UsersError, TData> = {}
 ) => {
   const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   return useInfiniteQuery<UsersData, UsersError, TData>({
-    queryKey: authKeys.usersInfinite(projectRef, { keywords, filter, providers, sort, order }),
+    queryKey: authKeys.usersInfinite(projectRef, {
+      keywords,
+      filter,
+      providers,
+      sort,
+      order,
+      column,
+    }),
     queryFn: ({ signal, pageParam }) => {
       return executeSql(
         {
           projectRef,
           connectionString,
           sql: getPaginatedUsersSQL({
-            page: column ? undefined : pageParam,
+            page: column ? undefined : (pageParam as number),
             verified: filter,
             keywords,
             providers,
@@ -59,9 +68,8 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
             order: order ?? 'asc',
             limit: USERS_PAGE_LIMIT,
             column,
-            startAt: column ? pageParam : undefined,
+            startAt: column ? (pageParam as string) : undefined,
           }),
-          queryKey: authKeys.usersInfinite(projectRef),
         },
         signal
       )

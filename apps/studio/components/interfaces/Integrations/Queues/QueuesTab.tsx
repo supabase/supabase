@@ -1,6 +1,6 @@
 import { RefreshCw, Search, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
 
@@ -9,7 +9,7 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useQueuesQuery } from 'data/database-queues/database-queues-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, cn, LoadingLine, Sheet, SheetContent } from 'ui'
+import { Button, cn, LoadingLine } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { CreateQueueSheet } from './CreateQueueSheet'
 import { formatQueueColumns, prepareQueuesForDataGrid } from './Queues.utils'
@@ -22,9 +22,10 @@ export const QueuesTab = () => {
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
   const [search, setSearch] = useState(searchQuery)
 
-  // used for confirmation prompt in the Create Queue Sheet
-  const [isClosingCreateQueueSheet, setIsClosingCreateQueueSheet] = useState(false)
-  const [createQueueSheetShown, setCreateQueueSheetShown] = useState(false)
+  const [createQueueSheetShown, setCreateQueueSheetShown] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const {
     data: queues,
@@ -62,7 +63,7 @@ export const QueuesTab = () => {
               size="tiny"
               className="w-52"
               placeholder="Search for a queue"
-              icon={<Search size={14} />}
+              icon={<Search />}
               value={search ?? ''}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
@@ -162,18 +163,12 @@ export const QueuesTab = () => {
         </div>
       </div>
 
-      <Sheet open={createQueueSheetShown} onOpenChange={() => setIsClosingCreateQueueSheet(true)}>
-        <SheetContent size="default" className="w-[35%]" tabIndex={undefined}>
-          <CreateQueueSheet
-            onClose={() => {
-              setIsClosingCreateQueueSheet(false)
-              setCreateQueueSheetShown(false)
-            }}
-            isClosing={isClosingCreateQueueSheet}
-            setIsClosing={setIsClosingCreateQueueSheet}
-          />
-        </SheetContent>
-      </Sheet>
+      <CreateQueueSheet
+        visible={createQueueSheetShown}
+        onClose={() => {
+          setCreateQueueSheetShown(false)
+        }}
+      />
     </>
   )
 }

@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { integrationKeys } from './keys'
 
 export type VercelIntegrationCreateVariables = {
@@ -37,7 +37,7 @@ export async function createVercelIntegration({
 
   if (error) handleError(error)
   // [Joshen] API isn't typed on this endpoint
-  // https://github.com/supabase/infrastructure/blob/develop/api/src/routes/platform/integrations/vercel/vercel-integration.controller.ts#L50
+  // https://github.com/supabase/platform/blob/develop/api/src/routes/platform/integrations/vercel/vercel-integration.controller.ts#L50
   return data as { id: string }
 }
 
@@ -48,7 +48,11 @@ export const useVercelIntegrationCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<VercelIntegrationCreateData, ResponseError, VercelIntegrationCreateVariables>,
+  UseCustomMutationOptions<
+    VercelIntegrationCreateData,
+    ResponseError,
+    VercelIntegrationCreateVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

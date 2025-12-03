@@ -1,6 +1,6 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { apiKeysKeys } from './../keys'
 
 export interface APIKeyVariables {
@@ -35,7 +35,7 @@ export type APIKeyIdData = Awaited<ReturnType<typeof getAPIKeysById>>
 
 export const useAPIKeyIdQuery = <TData = APIKeyIdData>(
   { projectRef, id, reveal }: APIKeyVariables,
-  { enabled = true, ...options }: UseQueryOptions<APIKeyIdData, ResponseError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<APIKeyIdData, ResponseError, TData> = {}
 ) =>
   useQuery<APIKeyIdData, ResponseError, TData>({
     queryKey: apiKeysKeys.single(projectRef, id),

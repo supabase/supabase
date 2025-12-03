@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { operations } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { contentKeys } from './keys'
 
 type GetContentCountVariables =
@@ -37,7 +37,7 @@ export type ContentIdError = ResponseError
 
 export const useContentCountQuery = <TData = ContentIdData>(
   { projectRef, type, name }: GetContentCountVariables,
-  { enabled = true, ...options }: UseQueryOptions<ContentIdData, ContentIdError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<ContentIdData, ContentIdError, TData> = {}
 ) =>
   useQuery<ContentIdData, ContentIdError, TData>({
     queryKey: contentKeys.count(projectRef, type, {

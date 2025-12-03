@@ -34,23 +34,29 @@ function isHCaptchaRelatedError(event: Sentry.Event): boolean {
 // and has a specific pre_context comment that we can use for filtering.
 // Copied from docs app instrumentation-client.ts
 function isThirdPartyError(frames: Sentry.StackFrame[] | undefined) {
-  if (!frames) return false
+  if (!frames || frames.length === 0) return false
 
   function isSentryFrame(frame: Sentry.StackFrame, index: number) {
-    return index === 0 && frame.pre_context?.[0]?.includes('sentry.javascript')
+    return index === 0 && frame.pre_context?.some((line) => line.includes('sentry.javascript'))
   }
 
-  return !frames.some((frame, index) => {
-    // Check both abs_path and filename for paths starting with app:///_next.
+  // Check if any frame is from our app (excluding Sentry's own frame)
+  const hasAppFrame = frames.some((frame, index) => {
     const path = frame.abs_path || frame.filename
     return path?.startsWith('app:///_next') && !isSentryFrame(frame, index)
   })
+
+  // If no app frames found, it's a third-party error
+  return !hasAppFrame
 }
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
+  // [Ali] Filter out browser extensions and user scripts (FE-2094)
+  // Using denyUrls to block known third-party script patterns
+  denyUrls: [/userscript/i],
   beforeBreadcrumb(breadcrumb, _hint) {
     const cleanedBreadcrumb = { ...breadcrumb }
 
@@ -95,7 +101,6 @@ Sentry.init({
     }
 
     const frames = event.exception?.values?.[0].stacktrace?.frames || []
-
     if (isThirdPartyError(frames)) {
       return null
     }

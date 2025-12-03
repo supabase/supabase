@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { upsertMigration } from '../database/migration-upsert-mutation'
 import { getBranchDiff } from './branch-diff-query'
 import { branchKeys } from './keys'
@@ -59,7 +59,7 @@ export const useBranchMergeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BranchMergeData, ResponseError, BranchMergeVariables>,
+  UseCustomMutationOptions<BranchMergeData, ResponseError, BranchMergeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

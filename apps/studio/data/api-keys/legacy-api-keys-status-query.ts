@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { apiKeysKeys } from './keys'
 
 interface LegacyAPIKeysStatusVariables {
@@ -31,7 +31,7 @@ export const useLegacyAPIKeysStatusQuery = <TData = LegacyAPIKeysStatusData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<LegacyAPIKeysStatusData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<LegacyAPIKeysStatusData, ResponseError, TData> = {}
 ) =>
   useQuery<LegacyAPIKeysStatusData, ResponseError, TData>({
     queryKey: apiKeysKeys.status(projectRef),

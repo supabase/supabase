@@ -1,14 +1,13 @@
-import { QueryClient, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback } from 'react'
 
 import type { components } from 'data/api'
 import { get, handleError, isValidConnString } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { projectKeys } from './keys'
 import { OrgProjectsResponse } from './org-projects-infinite-query'
 
 type ProjectDetailVariables = { ref?: string }
-type PaginatedProjectsResponse = components['schemas']['ListProjectsPaginatedResponse']
-
 export type ProjectDetail = components['schemas']['ProjectDetailResponse']
 export interface Project extends Omit<ProjectDetail, 'status'> {
   /**
@@ -42,7 +41,10 @@ export type ProjectDetailError = ResponseError
 
 export const useProjectDetailQuery = <TData = ProjectDetailData>(
   { ref }: ProjectDetailVariables,
-  { enabled = true, ...options }: UseQueryOptions<ProjectDetailData, ProjectDetailError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<ProjectDetailData, ProjectDetailError, TData> = {}
 ) =>
   useQuery<ProjectDetailData, ProjectDetailError, TData>({
     queryKey: projectKeys.detail(ref),
@@ -73,9 +75,12 @@ export function prefetchProjectDetail(client: QueryClient, { ref }: ProjectDetai
 export const useInvalidateProjectDetailsQuery = () => {
   const queryClient = useQueryClient()
 
-  const invalidateProjectDetailsQuery = (ref: string) => {
-    return queryClient.invalidateQueries({ queryKey: projectKeys.detail(ref) })
-  }
+  const invalidateProjectDetailsQuery = useCallback(
+    (ref: string) => {
+      return queryClient.invalidateQueries({ queryKey: projectKeys.detail(ref) })
+    },
+    [queryClient]
+  )
 
   return { invalidateProjectDetailsQuery }
 }
@@ -157,26 +162,6 @@ export const useSetProjectStatus = () => {
       (old) => {
         if (!old) return old
         return { ...old, status }
-      },
-      { updatedAt: Date.now() }
-    )
-
-    // [Joshen] Temporarily for completeness while we still have UIs depending on the old endpoint (Org teams)
-    // Can be removed once we completely deprecate projects-query (Old unpaginated endpoint)
-    queryClient.setQueriesData<PaginatedProjectsResponse | undefined>(
-      { queryKey: projectKeys.list() },
-      (old) => {
-        if (!old) return old
-
-        return {
-          ...old,
-          projects: old.projects.map((project) => {
-            if (project.ref === ref) {
-              return { ...project, status }
-            }
-            return project
-          }),
-        }
       },
       { updatedAt: Date.now() }
     )
