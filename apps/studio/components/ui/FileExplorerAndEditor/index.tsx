@@ -114,11 +114,32 @@ export const FileExplorerAndEditor = ({
   }
 
   const handleFileNameChange = (id: number, newName: string) => {
-    if (!newName.trim()) return // Don't allow empty names
+    const exitEditMode = () => {
+      setTreeData({
+        name: '',
+        children: files.map((file) => ({
+          id: file.id.toString(),
+          name: file.name,
+          metadata: {
+            isEditing: false,
+            originalId: file.id,
+          },
+        })),
+      })
+    }
+
+    // Don't allow empty names
+    if (!newName.trim()) {
+      exitEditMode()
+      return
+    }
 
     // Check if the new name already exists in other files
     const isDuplicate = files.some((file) => file.id !== id && file.name === newName)
-    if (isDuplicate) return
+    if (isDuplicate) {
+      exitEditMode()
+      return
+    }
 
     const updatedFiles = files.map((file) =>
       file.id === id
@@ -276,7 +297,9 @@ export const FileExplorerAndEditor = ({
                           }
                         }}
                         onClick={() => {
-                          if (originalId !== null) handleFileSelect(originalId)
+                          if (originalId !== null && !element.metadata?.isEditing) {
+                            handleFileSelect(originalId)
+                          }
                         }}
                         onDoubleClick={() => {
                           if (originalId !== null) {
