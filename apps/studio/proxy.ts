@@ -25,7 +25,7 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/generate-attachment-url',
 ]
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   if (
     IS_PLATFORM &&
     !HOSTED_SUPPORTED_API_URLS.some((url) => request.nextUrl.pathname.endsWith(url))
