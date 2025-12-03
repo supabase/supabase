@@ -115,6 +115,7 @@ export default function BlogClient({ initialBlogs, totalPosts }: BlogClientProps
     totalItems: currentTotal,
     pageSize: POSTS_PER_PAGE,
     fetchMore: fetchMorePosts,
+    rootMargin: '1000px',
   })
 
   // Handle filter changes - fetch filtered results from API

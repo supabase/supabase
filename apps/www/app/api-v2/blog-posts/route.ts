@@ -4,13 +4,6 @@ import { getAllCMSPosts } from 'lib/get-cms-posts'
 
 export const revalidate = 30
 
-export async function OPTIONS() {
-  return new Response(null, {
-    status: 200,
-    headers: corsHeaders,
-  })
-}
-
 // Cache for combined posts to avoid re-fetching on every request
 let cachedPosts: any[] | null = null
 let cacheTimestamp = 0
