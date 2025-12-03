@@ -77,7 +77,7 @@ allow_list = [
     "[Ii]dempotency",
     "[KMG]bps",
     "[KMG]iB",
-    "[Kk]ubernetes"
+    "[Kk]ubernetes",
     "[Ll]iveness",
     "LogEvent",
     "[Mm]atryoshka",
