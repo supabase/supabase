@@ -130,7 +130,8 @@ while let Some(row) = receiver.blocking_recv() {
 ```
 
 <Admonition>
-  This is simplified pseudocode. The actual implementation uses Wrappers’ internal async runtime and error handling.
+  This is simplified pseudocode. The actual implementation uses Wrappers’ internal async runtime and
+  error handling.
 </Admonition>
 
 The FDW spawns an async task that pulls rows from the remote source as they become available and sends them through a **size-limited channel**. The main Postgres backend then reads from this channel **synchronously but incrementally**, ensuring memory usage stays bounded and the first results arrive quickly—even for massive scans.
