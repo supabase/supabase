@@ -1,5 +1,4 @@
 import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
-import { useEffect } from 'react'
 
 import { useParams } from 'common'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
@@ -19,18 +18,14 @@ import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
-import { useBannerStack } from 'components/ui/BannerStack/BannerStackProvider'
-import { BannerIndexAdvisor } from 'components/ui/BannerStack/Banners/BannerIndexAdvisor'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
+  const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
   const { sort: sortConfig } = useQueryPerformanceSort()
-  const { addBanner, dismissBanner } = useBannerStack()
 
   const {
     selectedDateRange,
@@ -48,33 +43,6 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     minCalls: parseAsInteger,
     indexAdvisor: parseAsString.withDefault('false'),
   })
-
-  const [isIndexAdvisorBannerDismissed, setIsIndexAdvisorBannerDismissed] = useLocalStorageQuery(
-    `${ref}-index-advisor-banner-dismissed`,
-    false
-  )
-
-  useEffect(() => {
-    if (isIndexAdvisorAvailable && !isIndexAdvisorEnabled && !isIndexAdvisorBannerDismissed) {
-      addBanner({
-        id: 'index-advisor-banner',
-        isDismissed: false,
-        content: <BannerIndexAdvisor />,
-        priority: 3,
-      })
-
-      return () => {
-        dismissBanner('index-advisor-banner')
-      }
-    }
-  }, [
-    ref,
-    isIndexAdvisorAvailable,
-    isIndexAdvisorBannerDismissed,
-    isIndexAdvisorEnabled,
-    addBanner,
-    dismissBanner,
-  ])
 
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const hooks = queriesFactory(config.queries, ref ?? 'default')

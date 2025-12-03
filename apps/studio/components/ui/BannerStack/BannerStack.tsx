@@ -1,4 +1,3 @@
-// apps/studio/components/ui/BannerStack/BannerStack.tsx
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useBannerStack } from './BannerStackProvider'
@@ -53,6 +52,7 @@ export const BannerStack = () => {
                   type: 'spring',
                   stiffness: 300,
                   damping: 30,
+                  delay: 0.25,
                 }}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
