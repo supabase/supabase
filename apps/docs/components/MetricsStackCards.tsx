@@ -18,8 +18,8 @@ const metricsStackOptions: MetricsStackOption[] = [
     title: 'Grafana Cloud (SaaS)',
     description: (
       <>
-        Use Grafana Cloud’s managed Prometheus (works on Free + Pro tiers) and import the Supabase dashboard without
-        running any infrastructure.
+        Use Grafana Cloud’s managed Prometheus (works on Free + Pro tiers) and import the Supabase
+        dashboard without running any infrastructure.
       </>
     ),
     href: '/guides/telemetry/metrics/grafana-cloud',
@@ -35,8 +35,8 @@ const metricsStackOptions: MetricsStackOption[] = [
     title: 'Grafana + self-hosted Prometheus',
     description: (
       <>
-        Run Prometheus yourself following the official installation guidance and pair it with Grafana plus our dashboard
-        JSON and alert pack.
+        Run Prometheus yourself following the official installation guidance and pair it with
+        Grafana plus our dashboard JSON and alert pack.
       </>
     ),
     href: '/guides/telemetry/metrics/grafana-self-hosted',
@@ -49,8 +49,8 @@ const metricsStackOptions: MetricsStackOption[] = [
     title: 'Datadog',
     description: (
       <>
-        Scrape the Metrics API with the Datadog Agent or Prometheus remote write and monitor Supabase alongside your app
-        telemetry.
+        Scrape the Metrics API with the Datadog Agent or Prometheus remote write and monitor
+        Supabase alongside your app telemetry.
       </>
     ),
     href: '/guides/telemetry/metrics/datadog',
@@ -66,8 +66,8 @@ const metricsStackOptions: MetricsStackOption[] = [
     title: 'Vendor-agnostic / BYO Prometheus',
     description: (
       <>
-        Connect AWS AMP, Grafana Mimir, VictoriaMetrics, or any Prometheus-compatible SaaS with the same scrape job
-        pattern.
+        Connect AWS AMP, Grafana Mimir, VictoriaMetrics, or any Prometheus-compatible SaaS with the
+        same scrape job pattern.
       </>
     ),
     href: '/guides/telemetry/metrics/vendor-agnostic',
@@ -114,4 +114,3 @@ export function MetricsStackCards() {
     </div>
   )
 }
-

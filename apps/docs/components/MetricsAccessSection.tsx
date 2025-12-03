@@ -22,8 +22,10 @@ export function MetricsAccessSection({ defaultOpen = true }: MetricsAccessSectio
         <div className="space-y-4 pt-4 text-sm text-foreground-light">
           <p>
             Every Supabase project exposes a metrics feed at{' '}
-            <code>https://&lt;project-ref&gt;.supabase.co/customer/v1/privileged/metrics</code>. Replace
-            <code>&lt;project-ref&gt;</code> with the identifier from your project URL or from the dashboard sidebar.
+            <code>https://&lt;project-ref&gt;.supabase.co/customer/v1/privileged/metrics</code>.
+            Replace
+            <code>&lt;project-ref&gt;</code> with the identifier from your project URL or from the
+            dashboard sidebar.
           </p>
 
           <ol className="list-decimal space-y-2 pl-5">
@@ -32,22 +34,28 @@ export function MetricsAccessSection({ defaultOpen = true }: MetricsAccessSectio
               <ProjectConfigVariables variable="url" />
             </li>
             <li>
-              Configure your collector to scrape once per minute. The endpoint already emits the full set of metrics
-              on each request.
+              Configure your collector to scrape once per minute. The endpoint already emits the
+              full set of metrics on each request.
             </li>
             <li>
               Authenticate with HTTP Basic Auth:
               <ul className="mt-2 list-disc space-y-1 pl-6">
                 <li>
-                  <span className="font-medium text-foreground">Username:</span> <code>service_role</code>
+                  <span className="font-medium text-foreground">Username:</span>{' '}
+                  <code>service_role</code>
                 </li>
                 <li>
-                  <span className="font-medium text-foreground">Password:</span> a service role secret (JWT) from{' '}
+                  <span className="font-medium text-foreground">Password:</span> a service role
+                  secret (JWT) from{' '}
                   <Link href={JWT_SETTINGS_URL} target="_blank" rel="noreferrer">
                     Project Settings → JWT (opens in a new tab)
                   </Link>{' '}
                   or any other Secret API key from{' '}
-                  <Link href="/dashboard/project/_/settings/api-keys" target="_blank" rel="noreferrer">
+                  <Link
+                    href="/dashboard/project/_/settings/api-keys"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     Project Settings → API keys (opens in a new tab)
                   </Link>
                   .
@@ -61,7 +69,7 @@ export function MetricsAccessSection({ defaultOpen = true }: MetricsAccessSectio
           </p>
 
           <pre className="overflow-x-auto rounded border border-foreground/10 bg-muted p-4 text-xs leading-relaxed text-foreground">
-{`curl <project-url>/customer/v1/privileged/metrics \\
+            {`curl <project-url>/customer/v1/privileged/metrics \\
   --user 'service_role:sb_secret_...'`}
           </pre>
 
@@ -76,8 +84,8 @@ export function MetricsAccessSection({ defaultOpen = true }: MetricsAccessSectio
                 and reuse it wherever you configure observability tooling.
               </li>
               <li>
-                <span className="font-medium text-foreground">Optional:</span> programmatically exchange an access token
-                for project API keys via the{' '}
+                <span className="font-medium text-foreground">Optional:</span> programmatically
+                exchange an access token for project API keys via the{' '}
                 <Link href={MANAGEMENT_API_DOC} target="_blank" rel="noreferrer">
                   Management API (opens in a new tab)
                 </Link>
@@ -87,7 +95,7 @@ export function MetricsAccessSection({ defaultOpen = true }: MetricsAccessSectio
           </div>
 
           <pre className="overflow-x-auto rounded border border-foreground/10 bg-muted p-4 text-xs leading-relaxed text-foreground">
-{`# (Optional) Exchange an account access token for project API keys
+            {`# (Optional) Exchange an account access token for project API keys
 export SUPABASE_ACCESS_TOKEN="your-access-token"
 export PROJECT_REF="your-project-ref"
 
@@ -99,4 +107,3 @@ curl -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \\
     </section>
   )
 }
-

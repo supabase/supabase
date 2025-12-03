@@ -31,10 +31,10 @@ instances:
   - openmetrics_endpoint: https://<project-ref>.supabase.co/customer/v1/privileged/metrics
     namespace: supabase
     metrics:
-      - "supabase_*"
+      - 'supabase_*'
     auth_type: basic
     username: service_role
-    password: {{ env "SUPABASE_SERVICE_ROLE_KEY" }}
+    password: { { env "SUPABASE_SERVICE_ROLE_KEY" } }
     ssl_verify: true
     prometheus_timeout: 30
     labels_mapper:
@@ -81,4 +81,3 @@ remote_write:
 - **High cardinality warnings:** filter out labels such as `datname` or `application_name` if you only need aggregate views.
 
 [← Back to the Metrics API landing](/guides/telemetry/metrics)
-
