@@ -9,11 +9,9 @@ import {
   InfraMonitoringMultiData,
   InfraMonitoringError,
   useInfraMonitoringAttributesQuery,
-  useInfraMonitoringQuery,
 } from './infra-monitoring-query'
 
 const DEFAULT_DATE_FORMAT = 'HH:mm DD MMM'
-const DEFAULT_ATTRIBUTE: InfraMonitoringAttribute = 'max_cpu_usage'
 
 type InfraQueryResult = Pick<
   UseQueryResult<AnalyticsData, InfraMonitoringError>,
@@ -32,22 +30,8 @@ export function useInfraMonitoringQueries(
 ) {
   const shouldFetch = data === undefined && isVisible
   const hasAttributes = attributes.length > 0
-  const isSingleAttribute = attributes.length === 1
-  const primaryAttribute = attributes[0] ?? DEFAULT_ATTRIBUTE
 
-  const singleAttributeQuery = useInfraMonitoringQuery(
-    {
-      projectRef: ref as string,
-      attribute: primaryAttribute,
-      startDate,
-      endDate,
-      interval,
-      databaseIdentifier,
-    },
-    { enabled: shouldFetch && isSingleAttribute && hasAttributes }
-  )
-
-  const multiQuery = useInfraMonitoringAttributesQuery(
+  const query = useInfraMonitoringAttributesQuery(
     {
       projectRef: ref as string,
       attributes,
@@ -56,29 +40,25 @@ export function useInfraMonitoringQueries(
       interval,
       databaseIdentifier,
     },
-    { enabled: shouldFetch && attributes.length > 1 }
+    { enabled: shouldFetch && hasAttributes }
   )
 
   const seriesByAttribute = useMemo(() => {
-    if (!multiQuery.data) return undefined
-    return mapMultiResponseToAnalyticsData(multiQuery.data, attributes)
-  }, [multiQuery.data, attributes])
+    if (!query.data) return undefined
+    return mapMultiResponseToAnalyticsData(query.data, attributes)
+  }, [query.data, attributes])
 
   if (!hasAttributes) {
     return []
   }
 
-  if (isSingleAttribute) {
-    return [singleAttributeQuery]
-  }
-
   return attributes.map<InfraQueryResult>((attribute) => ({
     data: seriesByAttribute?.[attribute],
-    error: multiQuery.error,
-    isError: multiQuery.isError,
-    isFetching: multiQuery.isFetching,
-    isLoading: multiQuery.isLoading,
-    status: multiQuery.status,
+    error: query.error,
+    isError: query.isError,
+    isFetching: query.isFetching,
+    isLoading: query.isLoading,
+    status: query.status,
   }))
 }
 

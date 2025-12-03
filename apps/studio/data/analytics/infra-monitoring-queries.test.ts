@@ -69,4 +69,14 @@ describe('mapMultiResponseToAnalyticsData', () => {
 
     expect(result.max_cpu_usage?.data[0].periodStartFormatted).toBe('2024/01/02')
   })
+
+  it('handles single attribute the same as multiple attributes', () => {
+    const singleResult = mapMultiResponseToAnalyticsData(mockResponse, ['max_cpu_usage'])
+    const multiResult = mapMultiResponseToAnalyticsData(mockResponse, [
+      'max_cpu_usage',
+      'ram_usage',
+    ])
+
+    expect(singleResult.max_cpu_usage).toStrictEqual(multiResult.max_cpu_usage)
+  })
 })

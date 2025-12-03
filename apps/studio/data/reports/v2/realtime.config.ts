@@ -1,5 +1,8 @@
 import type { AnalyticsData, AnalyticsInterval } from 'data/analytics/constants'
-import { getInfraMonitoring, InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
+import {
+  getInfraMonitoringAttributes,
+  InfraMonitoringAttribute,
+} from 'data/analytics/infra-monitoring-query'
 import { ReportConfig } from './reports.types'
 
 async function runInfraMonitoringQuery(
@@ -10,16 +13,32 @@ async function runInfraMonitoringQuery(
   interval: AnalyticsInterval,
   databaseIdentifier?: string
 ): Promise<AnalyticsData> {
-  const data = await getInfraMonitoring({
+  const response = await getInfraMonitoringAttributes({
     projectRef,
-    attribute,
+    attributes: [attribute],
     startDate,
     endDate,
     interval,
     databaseIdentifier,
   })
 
-  return data
+  // TODO(raulb): This is inefficient. Each report makes a separate API call for one attribute.
+  // Could be optimized by batching multiple attributes into fewer requests like InfrastructureActivity.tsx does.
+  // This transforms multi-attribute response to single-attribute format.
+  const data = response.data.map((item) => ({
+    period_start: item.period_start,
+    [attribute]: item.values[attribute],
+  }))
+
+  const seriesMetadata = response.series[attribute]
+
+  return {
+    data,
+    format: seriesMetadata?.format,
+    yAxisLimit: seriesMetadata?.yAxisLimit,
+    total: seriesMetadata?.total,
+    totalGrouped: { [attribute]: seriesMetadata?.total },
+  } as AnalyticsData
 }
 
 export const realtimeReports = ({
