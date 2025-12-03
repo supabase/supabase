@@ -329,7 +329,7 @@ export function DiskManagementForm() {
         <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
           <NoticeBar
             type="default"
-            visible={isEntitlementsLoaded && !hasAccess}
+            visible={isEntitlementsLoaded && isPlanUpgradeRequired}
             title="Compute and Disk configuration is not available on the Free Plan"
             actions={<UpgradePlanButton source="diskManagementConfigure" plan="Pro" />}
             description="You will need to upgrade to at least the Pro Plan to configure compute and disk"
