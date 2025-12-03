@@ -7,6 +7,13 @@
       <lastBuildDate>Tue, 02 Dec 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/adding-async-streaming-to-pg-fdw</guid>
+  <title>Adding Async Streaming to Postgres Foreign Data Wrappers</title>
+  <link>https://supabase.com/blog/adding-async-streaming-to-pg-fdw</link>
+  <description>Supabase Wrappers introduces asynchronous streaming to Postgres Foreign Data Wrappers, enabling efficient, memory-safe queries for massive analytical workloads.</description>
+  <pubDate>Tue, 04 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/introducing-analytics-buckets</guid>
   <title>Introducing Analytics Buckets</title>
   <link>https://supabase.com/blog/introducing-analytics-buckets</link>
