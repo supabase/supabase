@@ -40,6 +40,7 @@ import {
   extractIso2FromFeatureProps,
   iso2ToCountryName,
 } from 'components/interfaces/Reports/utils/geo'
+import { useTheme } from 'next-themes'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
