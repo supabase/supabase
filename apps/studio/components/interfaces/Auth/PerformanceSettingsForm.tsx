@@ -203,7 +203,7 @@ export const PerformanceSettingsForm = () => {
         <div className="my-4">
           <UpgradeToPro
             primaryText="Upgrade to Pro"
-            secondaryText="Adjusting low-level Auth settings is only available on the Pro plan or higher."
+            secondaryText="Auth server performance tuning is not available on the free plan"
             buttonText="Upgrade to Pro"
           />
         </div>
