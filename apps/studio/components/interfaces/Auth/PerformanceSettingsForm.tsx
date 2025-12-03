@@ -78,7 +78,7 @@ export const PerformanceSettingsForm = () => {
 
   const isLoading = isLoadingAuthConfig || isLoadingMaxConns
 
-  const isProPlan = organization?.plan.id !== 'free' && organization?.plan.id !== 'pro'
+  const isProPlan = organization?.plan.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlan
 
   const requestDurationForm = useForm({
