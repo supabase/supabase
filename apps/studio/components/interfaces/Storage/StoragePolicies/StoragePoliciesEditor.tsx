@@ -28,6 +28,9 @@ const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {}
 
 const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = () => {} }: any) => {
   const allowedClientLibraryMethods = deriveAllowedClientLibraryMethods(allowedOperations)
+  const hasUpdateOrDelete =
+    allowedOperations.includes('UPDATE') || allowedOperations.includes('DELETE')
+
   return (
     <div className="flex flex-col md:flex-row justify-between gap-4 md:gap-12">
       <div className="flex md:w-1/3 flex-col space-y-2">
@@ -70,6 +73,12 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
             checked={allowedOperations.includes('DELETE')}
           />
         </div>
+        {hasUpdateOrDelete && (
+          <p className="text-sm text-foreground-light mt-3 prose [&>code]:text-xs">
+            <code>SELECT</code> has been auto selected as <code>UPDATE</code> and{' '}
+            <code>DELETE</code> require it
+          </p>
+        )}
         <div className="flex w-5/6 flex-wrap">
           {Object.keys(STORAGE_CLIENT_LIBRARY_MAPPINGS).map((method) => (
             <ul key={method} className="mr-2 mt-2 list-none">
