@@ -20,10 +20,9 @@ base64_url_encode() {
 }
 
 gen_token() {
-    payload=$(
-        echo "$1" | jq --arg jq_iat "$iat" --arg jq_exp "$exp" '.iat=($jq_iat | tonumber) | .exp=($jq_exp | tonumber)'
-    )
+    payload=$1
     payload_base64=$(printf %s "$payload" | base64_url_encode)
+    header_base64=$(printf %s "$header" | base64_url_encode)
     signed_content="${header_base64}.${payload_base64}"
     signature=$(printf %s "$signed_content" | openssl dgst -binary -sha256 -hmac "$jwt_secret" | base64_url_encode)
     printf '%s' "${signed_content}.${signature}"
@@ -36,13 +35,17 @@ fi
 
 jwt_secret="$(gen_base64 30)"
 
-header='{"typ": "JWT","alg": "HS256"}'
-header_base64=$(printf %s "$header" | base64_url_encode)
+# Used in get_token()
+header='{"alg":"HS256","typ":"JWT"}'
 iat=$(date +%s)
 exp=$((iat + 5 * 3600 * 24 * 365)) # 5 years
 
-anon_payload='{"role": "anon", "iss": "supabase"}'
-service_role_payload='{"role": "service_role", "iss": "supabase"}'
+# Normalizes JSON formatting so that the token matches https://www.jwt.io/ results
+anon_payload="{\"role\":\"anon\",\"iss\":\"supabase\",\"iat\":$iat,\"exp\":$exp}"
+service_role_payload="{\"role\":\"service_role\",\"iss\":\"supabase\",\"iat\":$iat,\"exp\":$exp}"
+
+#echo "anon_payload=$anon_payload"
+#echo "service_role_payload=$service_role_payload"
 
 anon_key=$(gen_token "$anon_payload")
 service_role_key=$(gen_token "$service_role_payload")
@@ -53,14 +56,20 @@ pg_meta_crypto_key=$(gen_hex 16)
 s3_protocol_access_key_id=$(gen_hex 16)
 s3_protocol_access_key_secret=$(gen_hex 32)
 
+echo ""
 echo "JWT_SECRET=${jwt_secret}"
+echo ""
+#echo "Issued at: $iat"
+#echo "Expire: $exp"
 echo "ANON_KEY=${anon_key}"
 echo "SERVICE_ROLE_KEY=${service_role_key}"
+echo ""
 echo "SECRET_KEY_BASE=${secret_key_base}"
 echo "VAULT_ENC_KEY=${vault_enc_key}"
 echo "PG_META_CRYPTO_KEY=${pg_meta_crypto_key}"
 echo "S3_PROTOCOL_ACCESS_KEY_ID=${s3_protocol_access_key_id}"
 echo "S3_PROTOCOL_ACCESS_KEY_SECRET=${s3_protocol_access_key_secret}"
+echo ""
 
 printf "Update .env file? (y/N) "
 read -r REPLY
