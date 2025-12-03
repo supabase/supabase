@@ -1,13 +1,15 @@
 import { useSynchronizedAnimation } from 'hooks/misc/useSynchronizedAnimation'
 import { cn } from 'ui'
 
+// [Joshen] Deprecate this file - this is declared in ui-patterns
+
 export interface ShimmeringLoader {
   className?: string
   delayIndex?: number
   animationDelay?: number
 }
 
-const ShimmeringLoader = ({
+export const ShimmeringLoader = ({
   className,
   delayIndex = 0,
   animationDelay = 150,
@@ -26,13 +28,11 @@ const ShimmeringLoader = ({
   )
 }
 
-const GenericSkeletonLoader = () => (
+export const GenericSkeletonLoader = () => (
   <div className="space-y-2">
     <ShimmeringLoader />
     <ShimmeringLoader className="w-3/4" delayIndex={1} />
     <ShimmeringLoader className="w-1/2" delayIndex={2} />
   </div>
 )
-
-export { GenericSkeletonLoader }
 export default ShimmeringLoader

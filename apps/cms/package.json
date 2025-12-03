@@ -55,7 +55,7 @@
     "react-dom": "catalog:",
     "sharp": "~0.34.0",
     "tailwind-merge": "^1.13.2",
-    "tsx": "^4.19.3",
+    "tsx": "catalog:",
     "typescript": "catalog:"
   },
   "externals": {

@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { constructHeaders, fetchHandler } from 'data/fetchers'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { ResponseError } from 'types'
+import { ResponseError, UseCustomQueryOptions } from 'types'
 import { aiKeys } from './keys'
 
 // check to see if the OPENAI_API_KEY env var is set in self-hosted
@@ -33,9 +33,10 @@ export type ResourceError = { errorEventId: string; message: string }
 export const useCheckOpenAIKeyQuery = <TData = ResourceData>({
   enabled = true,
   ...options
-}: UseQueryOptions<ResourceData, ResourceError, TData> = {}) =>
-  useQuery<ResourceData, ResourceError, TData>(
-    aiKeys.apiKey(),
-    ({ signal }) => checkOpenAIKey(signal),
-    { enabled: !IS_PLATFORM && enabled, ...options }
-  )
+}: UseCustomQueryOptions<ResourceData, ResourceError, TData> = {}) =>
+  useQuery<ResourceData, ResourceError, TData>({
+    queryKey: aiKeys.apiKey(),
+    queryFn: ({ signal }) => checkOpenAIKey(signal),
+    enabled: !IS_PLATFORM && enabled,
+    ...options,
+  })

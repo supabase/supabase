@@ -141,12 +141,37 @@ const nextConfig = {
       },
       {
         source: '/project/:ref/storage',
-        destination: '/project/:ref/storage/buckets',
+        destination: '/project/:ref/storage/files',
         permanent: true,
       },
       {
+        source: '/project/:ref/storage/buckets',
+        destination: '/project/:ref/storage/files',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage/policies',
+        destination: '/project/:ref/storage/files/policies',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage/buckets/:bucketId',
+        destination: '/project/:ref/storage/files/buckets/:bucketId',
+        permanent: true,
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/api-keys/new',
+        destination: '/project/:ref/settings/api-keys',
+      },
+      {
         source: '/project/:ref/settings/storage',
-        destination: '/project/:ref/storage/settings',
+        destination: '/project/:ref/storage/files/settings',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage/settings',
+        destination: '/project/:ref/storage/files/settings',
         permanent: true,
       },
       {
@@ -216,6 +241,11 @@ const nextConfig = {
         source: '/project/:ref/settings/billing/subscription',
         destination: '/org/_/billing',
         permanent: true,
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/jwt/signing-keys',
+        destination: '/project/:ref/settings/jwt',
       },
       {
         source: '/project/:ref/database/api-logs',
@@ -304,18 +334,28 @@ const nextConfig = {
       },
       {
         permanent: true,
+        source: '/project/:ref/reports',
+        destination: '/project/:ref/observability',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/reports/:path*',
+        destination: '/project/:ref/observability/:path*',
+      },
+      {
+        permanent: true,
         source: '/project/:ref/query-performance',
-        destination: '/project/:ref/reports/query-performance',
+        destination: '/project/:ref/observability/query-performance',
       },
       {
         permanent: true,
         source: '/project/:ref/advisors/query-performance',
-        destination: '/project/:ref/reports/query-performance',
+        destination: '/project/:ref/observability/query-performance',
       },
       {
         permanent: true,
         source: '/project/:ref/database/query-performance',
-        destination: '/project/:ref/reports/query-performance',
+        destination: '/project/:ref/observability/query-performance',
       },
       {
         permanent: true,
@@ -408,6 +448,22 @@ const nextConfig = {
             },
           ]
         : []),
+
+      ...(process.env.MAINTENANCE_MODE === 'true'
+        ? [
+            {
+              source: '/((?!maintenance|img).*)', // Redirect all paths except /maintenance and /img
+              destination: '/maintenance',
+              permanent: false,
+            },
+          ]
+        : [
+            {
+              source: '/maintenance',
+              destination: '/',
+              permanent: false,
+            },
+          ]),
     ]
   },
   async headers() {

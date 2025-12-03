@@ -19,7 +19,7 @@ export const ConnectionIcon = ({ icon, iconFolder, supportsDarkMode }: Connectio
 
   const shouldUseDarkMode =
     supportsDarkMode ||
-    ['expo', 'nextjs', 'prisma', 'drizzle', 'astro', 'remix'].includes(icon.toLowerCase())
+    ['expo', 'nextjs', 'prisma', 'drizzle', 'astro', 'remix', 'refine'].includes(icon.toLowerCase())
 
   const iconImgSrc = icon.startsWith('http')
     ? icon

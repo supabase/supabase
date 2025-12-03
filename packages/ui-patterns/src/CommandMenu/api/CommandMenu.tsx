@@ -1,5 +1,5 @@
 'use client'
-
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { AlertTriangle, ArrowLeft, Command, Search } from 'lucide-react'
 import type { HTMLAttributes, MouseEvent, PropsWithChildren, ReactElement, ReactNode } from 'react'
 import { Children, cloneElement, forwardRef, isValidElement, useEffect, useMemo } from 'react'
@@ -7,14 +7,22 @@ import { ErrorBoundary } from 'react-error-boundary'
 
 import { useBreakpoint } from 'common'
 import useDragToClose from 'common/hooks/useDragToClose'
-import { Button, Command_Shadcn_, Dialog, DialogContent, cn } from 'ui'
+import {
+  Button,
+  Command_Shadcn_,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  cn,
+} from 'ui'
 
 import { useCurrentPage, usePageComponent, usePopPage } from './hooks/pagesHooks'
 import { useQuery, useSetQuery } from './hooks/queryHooks'
 import { useCommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
 import {
-  useCommandMenuSize,
   useCommandMenuOpen,
+  useCommandMenuSize,
   useSetCommandMenuOpen,
   useSetupCommandMenuTouchEvents,
 } from './hooks/viewHooks'
@@ -149,7 +157,7 @@ function CommandMenuTrigger({ children }: PropsWithChildren) {
       'inline-flex items-center justify-center',
       'whitespace-nowrap',
       'rounded-md border border-input bg-background',
-      'text-sm font-medium',
+      'text-sm',
       'hover:bg-accent hover:text-accent-foreground',
       'ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
       'disabled:pointer-events-none disabled:opacity-50',
@@ -163,9 +171,11 @@ function CommandMenuTrigger({ children }: PropsWithChildren) {
 function CommandMenuTriggerInput({
   className,
   placeholder = 'Search...',
+  showShortcut = true,
 }: {
   className?: string
   placeholder?: string | React.ReactNode
+  showShortcut?: boolean
 }) {
   return (
     <CommandMenuTrigger>
@@ -177,25 +187,31 @@ function CommandMenuTriggerInput({
           'pl-1.5 md:pl-2 pr-1',
           'flex items-center justify-between',
           'bg-surface-100/75 text-foreground-lighter border',
-          'hover:bg-opacity-100 hover:border-strong',
-          'focus-visible:!outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600',
+          'hover:bg-opacity-100 hover:border-stronger',
+          'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-border-strong focus-visible:ring-offset-1 focus-visible:ring-offset-background',
           'transition',
           className
         )}
       >
-        <div className="flex items-center space-x-2 text-foreground-muted">
-          <Search size={18} strokeWidth={2} />
-          <p className="flex text-sm pr-2">{placeholder}</p>
+        <div className="flex items-center space-x-1.5 text-foreground-lighter">
+          <Search
+            size={16}
+            strokeWidth={1.5}
+            className="group-hover:text-foreground-light transition-colors"
+          />
+          <p className="flex text-sm pr-2 text-foreground-muted">{placeholder}</p>
         </div>
-        <div className="command-shortcut hidden md:flex items-center space-x-1">
-          <div
-            aria-hidden="true"
-            className="md:flex items-center justify-center h-full px-1 border rounded bg-surface-300 gap-0.5"
-          >
-            <Command size={12} strokeWidth={1.5} />
-            <span className="text-[12px]">K</span>
+        {showShortcut && (
+          <div className="command-shortcut hidden md:flex items-center space-x-1">
+            <div
+              aria-hidden="true"
+              className="md:flex items-center justify-center h-full px-1 border rounded bg-surface-300 gap-0.5"
+            >
+              <Command size={12} strokeWidth={1.5} />
+              <span className="text-[12px]">K</span>
+            </div>
           </div>
-        </div>
+        )}
       </button>
     </CommandMenuTrigger>
   )
@@ -252,6 +268,10 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
           className: cn('overflow-hidden flex data-closed:delay-100'),
         }}
       >
+        <VisuallyHidden>
+          <DialogTitle>Command menu</DialogTitle>
+          <DialogDescription>Type a command or search</DialogDescription>
+        </VisuallyHidden>
         <ErrorBoundary FallbackComponent={CommandError}>
           <PageSwitch>{children}</PageSwitch>
         </ErrorBoundary>

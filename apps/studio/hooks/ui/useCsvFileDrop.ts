@@ -11,6 +11,7 @@ interface UseCsvFileDropOptions {
 
 interface UseCsvFileDropReturn {
   isDraggedOver: boolean
+  isValidFile: boolean
   onDragOver: (event: DragEvent<HTMLDivElement>) => void
   onFileDrop: (event: DragEvent<HTMLDivElement>) => void
 }
@@ -21,20 +22,28 @@ export function useCsvFileDrop({
   onTelemetryEvent,
 }: UseCsvFileDropOptions): UseCsvFileDropReturn {
   const [isDraggedOver, setIsDraggedOver] = useState(false)
+  const [isValidFile, setIsValidFile] = useState(false)
 
   const onDragOver = useCallback(
     (event: DragEvent<HTMLDivElement>) => {
       if (!enabled) return
 
+      const [item] = event.dataTransfer.items
+
+      // ignore non files drop, like column headers
+      if (item && item.kind !== 'file') return
+
       if (event.type === 'dragover' && !isDraggedOver) {
         setIsDraggedOver(true)
+        setIsValidFile(item.type === 'text/csv')
       } else if (event.type === 'dragleave' || event.type === 'drop') {
         setIsDraggedOver(false)
+        setIsValidFile(false)
       }
       event.stopPropagation()
       event.preventDefault()
     },
-    [enabled, isDraggedOver]
+    [enabled, isDraggedOver, isValidFile]
   )
 
   const onFileDrop = useCallback(
@@ -44,6 +53,11 @@ export function useCsvFileDrop({
       onDragOver(event)
 
       const [file] = event.dataTransfer.files
+      const [item] = event.dataTransfer.items
+
+      // ignore non files drop, like column headers
+      if (item && item.kind !== 'file') return
+
       if (flagInvalidFileImport(file)) return
 
       onFileDropped(file)
@@ -54,6 +68,7 @@ export function useCsvFileDrop({
   )
 
   return {
+    isValidFile: isValidFile && isDraggedOver,
     isDraggedOver,
     onDragOver,
     onFileDrop,

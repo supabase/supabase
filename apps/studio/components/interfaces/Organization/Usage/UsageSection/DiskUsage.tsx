@@ -23,7 +23,7 @@ import { CategoryAttribute } from '../Usage.constants'
 
 export interface DiskUsageProps {
   slug: string
-  projectRef?: string
+  projectRef?: string | null
   attribute: CategoryAttribute
   subscription?: OrgSubscription
   usage?: OrgUsageResponse

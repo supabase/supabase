@@ -17,7 +17,7 @@ import { BackupItem } from './BackupItem'
 import { BackupsEmpty } from './BackupsEmpty'
 import { BackupsStorageAlert } from './BackupsStorageAlert'
 
-const BackupsList = () => {
+export const BackupsList = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const [selectedBackup, setSelectedBackup] = useState<DatabaseBackup>()
@@ -29,7 +29,7 @@ const BackupsList = () => {
   const { data: backups } = useBackupsQuery({ projectRef })
   const {
     mutate: restoreFromBackup,
-    isLoading: isRestoring,
+    isPending: isRestoring,
     isSuccess: isSuccessBackup,
   } = useBackupRestoreMutation({
     onSuccess: () => {
@@ -120,5 +120,3 @@ const BackupsList = () => {
     </>
   )
 }
-
-export default BackupsList

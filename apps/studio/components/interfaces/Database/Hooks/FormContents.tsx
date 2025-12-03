@@ -3,6 +3,7 @@ import Image from 'next/legacy/image'
 import { MutableRefObject, useEffect } from 'react'
 
 import { useParams } from 'common'
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
@@ -50,7 +51,11 @@ export const FormContents = ({
   const restUrl = project?.restUrl
   const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
-  const { data: keys = [] } = useAPIKeysQuery({ projectRef: ref, reveal: true })
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: keys = [] } = useAPIKeysQuery(
+    { projectRef: ref, reveal: true },
+    { enabled: canReadAPIKeys }
+  )
   const { data: functions = [], isSuccess: isSuccessEdgeFunctions } = useEdgeFunctionsQuery({
     projectRef: ref,
   })
@@ -90,23 +95,23 @@ export const FormContents = ({
     if (values.http_url && isEdgeFunctionSelected) {
       const fnSlug = values.http_url.split('/').at(-1)
       const fn = functions.find((x) => x.slug === fnSlug)
+      const authorizationHeader = httpHeaders.find((x) => x.name === 'Authorization')
+      const edgeFunctionAuthHeaderVal = `Bearer ${legacyServiceRole}`
 
-      if (fn?.verify_jwt) {
-        if (!httpHeaders.some((x) => x.name === 'Authorization')) {
-          const authorizationHeader = {
-            id: uuidv4(),
-            name: 'Authorization',
-            value: `Bearer ${legacyServiceRole}`,
-          }
-          setHttpHeaders([...httpHeaders, authorizationHeader])
+      if (fn?.verify_jwt && authorizationHeader == null) {
+        const authorizationHeader = {
+          id: uuidv4(),
+          name: 'Authorization',
+          value: edgeFunctionAuthHeaderVal,
         }
-      } else {
-        const updatedHttpHeaders = httpHeaders.filter((x) => x.name !== 'Authorization')
+        setHttpHeaders([...httpHeaders, authorizationHeader])
+      } else if (fn?.verify_jwt && authorizationHeader?.value !== edgeFunctionAuthHeaderVal) {
+        const updatedHttpHeaders = httpHeaders.map((x) => {
+          if (x.name === 'Authorization') return { ...x, value: edgeFunctionAuthHeaderVal }
+          else return x
+        })
         setHttpHeaders(updatedHttpHeaders)
       }
-    } else {
-      const updatedHttpHeaders = httpHeaders.filter((x) => x.name !== 'Authorization')
-      setHttpHeaders(updatedHttpHeaders)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [values.http_url, isSuccessEdgeFunctions])

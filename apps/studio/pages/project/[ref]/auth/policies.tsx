@@ -1,9 +1,11 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Search } from 'lucide-react'
+import { Search, X } from 'lucide-react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useCallback, useDeferredValue, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
-import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
 import { Policies } from 'components/interfaces/Auth/Policies/Policies'
 import { PoliciesDataProvider } from 'components/interfaces/Auth/Policies/PoliciesDataContext'
 import { getGeneralPolicyTemplates } from 'components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
@@ -11,24 +13,35 @@ import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEdi
 import { generatePolicyUpdateSQL } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
-import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import NoPermission from 'components/ui/NoPermission'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
-import { parseAsString, useQueryState } from 'nuqs'
+import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import type { NextPageWithLayout } from 'types'
+import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 /**
  * Filter tables by table name and policy name
@@ -87,13 +100,18 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
+  const { openSidebar } = useSidebarManagerSnapshot()
+  const {
+    setValue: setEditorPanelValue,
+    setTemplates: setEditorPanelTemplates,
+    setInitialPrompt: setEditorPanelInitialPrompt,
+  } = useEditorPanelStateSnapshot()
 
   const [selectedTable, setSelectedTable] = useState<string>()
-  const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
-  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()
-
-  // Local editor panel state
-  const [editorPanelOpen, setEditorPanelOpen] = useState(false)
+  const [showCreatePolicy, setShowCreatePolicy] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: schema, excludedSchemas: ['realtime'] })
 
@@ -106,6 +124,15 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const { setValue: setSelectedPolicyIdToEdit, value: selectedPolicyIdToEdit } =
+    useQueryStateWithSelect({
+      urlKey: 'edit',
+      select: (id: string) =>
+        id ? policies?.find((policy) => policy.id.toString() === id) : undefined,
+      enabled: !!policies,
+      onError: () => toast.error(`Policy not found`),
+    })
 
   const {
     data: tables,
@@ -138,169 +165,167 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const handleSelectCreatePolicy = useCallback(
     (table: string) => {
       setSelectedTable(table)
-      setSelectedPolicyToEdit(undefined)
+      setSelectedPolicyIdToEdit(null)
+      setShowCreatePolicy(true)
+
       if (isInlineEditorEnabled) {
-        setEditorPanelOpen(true)
+        const defaultSql = `create policy "replace_with_policy_name"
+  on ${schema}.${table}
+  for select
+  to authenticated
+  using (
+    true  -- Write your policy condition here
+);`
+
+        setEditorPanelInitialPrompt('Create a new RLS policy that...')
+        setEditorPanelValue(defaultSql)
+        setEditorPanelTemplates([])
+        openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
       } else {
-        setShowPolicyAiEditor(true)
+        setShowCreatePolicy(true)
       }
     },
-    [isInlineEditorEnabled]
+    [isInlineEditorEnabled, openSidebar, schema]
   )
 
   const handleSelectEditPolicy = useCallback(
     (policy: PostgresPolicy) => {
-      setSelectedPolicyToEdit(policy)
       setSelectedTable(undefined)
+
       if (isInlineEditorEnabled) {
-        setEditorPanelOpen(true)
+        setEditorPanelInitialPrompt(`Update the RLS policy with name "${policy.name}" that...`)
+        setEditorPanelValue(generatePolicyUpdateSQL(policy))
+        const templates = getGeneralPolicyTemplates(policy.schema, policy.table).map(
+          (template) => ({
+            name: template.templateName,
+            description: template.description,
+            content: template.statement,
+          })
+        )
+        setEditorPanelTemplates(templates)
+        openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
       } else {
-        setShowPolicyAiEditor(true)
+        setSelectedPolicyIdToEdit(policy.id.toString())
       }
     },
-    [isInlineEditorEnabled]
+    [isInlineEditorEnabled, openSidebar]
   )
 
   const handleResetSearch = useCallback(() => setSearchString(''), [setSearchString])
+
+  const isUpdatingPolicy = !!selectedPolicyIdToEdit
 
   if (isPermissionsLoaded && !canReadPolicies) {
     return <NoPermission isFullPage resourceText="view this project's RLS policies" />
   }
 
   return (
-    <ScaffoldContainer size="large">
-      <ScaffoldSection isFullWidth>
-        <div className="mb-4 flex flex-row gap-2 justify-between">
-          <Input
-            size="tiny"
-            placeholder="Filter tables and policies"
-            className="block w-full lg:w-52"
-            containerClassName="[&>div>svg]:-mt-0.5"
-            value={searchString || ''}
-            onChange={(e) => {
-              const str = e.target.value
-              setSearchString(str)
-            }}
-            icon={<Search size={14} />}
-          />
-          <SchemaSelector
-            className="w-full lg:w-[180px]"
-            size="tiny"
-            align="end"
-            showError={false}
-            selectedSchemaName={schema}
-            onSelectSchema={(schemaName) => {
-              setSchema(schemaName)
-              setSearchString('')
-            }}
-          />
-        </div>
+    <>
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Policies</PageHeaderTitle>
+            <PageHeaderDescription>
+              Manage Row Level Security policies for your tables
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-row-level-security`} />
+          </PageHeaderAside>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="large">
+        <PageSection>
+          <PageSectionContent>
+            <div className="mb-4 flex flex-row gap-x-2">
+              <SchemaSelector
+                className="w-full lg:w-[180px]"
+                size="tiny"
+                align="end"
+                showError={false}
+                selectedSchemaName={schema}
+                onSelectSchema={(schemaName) => {
+                  setSchema(schemaName)
+                  setSearchString('')
+                }}
+              />
+              <Input
+                size="tiny"
+                placeholder="Filter tables and policies"
+                className="block w-full lg:w-52"
+                containerClassName="[&>div>svg]:-mt-0.5"
+                value={searchString || ''}
+                onChange={(e) => {
+                  const str = e.target.value
+                  setSearchString(str)
+                }}
+                icon={<Search size={14} />}
+                actions={
+                  searchString ? (
+                    <Button
+                      size="tiny"
+                      type="text"
+                      className="p-0 h-5 w-5"
+                      icon={<X />}
+                      onClick={() => setSearchString('')}
+                    />
+                  ) : null
+                }
+              />
+            </div>
 
-        {isLoading && <GenericSkeletonLoader />}
+            {isLoading && <GenericSkeletonLoader />}
 
-        {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
+            {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
 
-        {isSuccess && (
-          <PoliciesDataProvider
-            policies={policies ?? []}
-            isPoliciesLoading={isLoadingPolicies}
-            isPoliciesError={isPoliciesError}
-            policiesError={policiesError ?? undefined}
-            exposedSchemas={exposedSchemas}
-          >
-            <Policies
-              search={deferredSearchString}
+            {isSuccess && (
+              <PoliciesDataProvider
+                policies={policies ?? []}
+                isPoliciesLoading={isLoadingPolicies}
+                isPoliciesError={isPoliciesError}
+                policiesError={policiesError ?? undefined}
+                exposedSchemas={exposedSchemas}
+              >
+                <Policies
+                  search={deferredSearchString}
+                  schema={schema}
+                  tables={tablesWithVisibility}
+                  hasTables={(tables ?? []).length > 0}
+                  isLocked={isSchemaLocked}
+                  visibleTableIds={visibleTableIds}
+                  onSelectCreatePolicy={handleSelectCreatePolicy}
+                  onSelectEditPolicy={handleSelectEditPolicy}
+                  onResetSearch={handleResetSearch}
+                />
+              </PoliciesDataProvider>
+            )}
+
+            <PolicyEditorPanel
+              visible={showCreatePolicy || isUpdatingPolicy}
               schema={schema}
-              tables={tablesWithVisibility}
-              hasTables={(tables ?? []).length > 0}
-              isLocked={isSchemaLocked}
-              visibleTableIds={visibleTableIds}
-              onSelectCreatePolicy={handleSelectCreatePolicy}
-              onSelectEditPolicy={handleSelectEditPolicy}
-              onResetSearch={handleResetSearch}
+              searchString={searchString}
+              selectedTable={isUpdatingPolicy ? undefined : selectedTable}
+              selectedPolicy={isUpdatingPolicy ? selectedPolicyIdToEdit : undefined}
+              onSelectCancel={() => {
+                setSelectedTable(undefined)
+                if (isUpdatingPolicy) {
+                  setSelectedPolicyIdToEdit(null)
+                } else {
+                  setShowCreatePolicy(false)
+                }
+              }}
+              authContext="database"
             />
-          </PoliciesDataProvider>
-        )}
-
-        <PolicyEditorPanel
-          visible={showPolicyAiEditor}
-          schema={schema}
-          searchString={searchString}
-          selectedTable={selectedTable}
-          selectedPolicy={selectedPolicyToEdit}
-          onSelectCancel={() => {
-            setSelectedTable(undefined)
-            setShowPolicyAiEditor(false)
-            setSelectedPolicyToEdit(undefined)
-          }}
-          authContext="database"
-        />
-
-        <EditorPanel
-          open={editorPanelOpen}
-          onClose={() => {
-            setEditorPanelOpen(false)
-            setSelectedPolicyToEdit(undefined)
-            setSelectedTable(undefined)
-          }}
-          onRunSuccess={() => {
-            setEditorPanelOpen(false)
-            setSelectedPolicyToEdit(undefined)
-            setSelectedTable(undefined)
-          }}
-          initialValue={
-            selectedPolicyToEdit
-              ? generatePolicyUpdateSQL(selectedPolicyToEdit)
-              : selectedTable
-                ? `create policy "replace_with_policy_name"\n  on ${schema}.${selectedTable}\n  for select\n  to authenticated\n  using (\n    true  -- Write your policy condition here\n);`
-                : ''
-          }
-          label={
-            selectedPolicyToEdit
-              ? 'RLS policies are just SQL statements that you can alter'
-              : selectedTable
-                ? `Create new RLS policy on "${selectedTable}"`
-                : ''
-          }
-          initialPrompt={
-            selectedPolicyToEdit
-              ? `Update the policy with name "${selectedPolicyToEdit.name}" in the ${selectedPolicyToEdit.schema} schema on the ${selectedPolicyToEdit.table} table. It should...`
-              : selectedTable
-                ? `Create and name a entirely new RLS policy for the "${selectedTable}" table in the ${schema} schema. The policy should...`
-                : ''
-          }
-          templates={
-            selectedPolicyToEdit
-              ? getGeneralPolicyTemplates(
-                  selectedPolicyToEdit.schema,
-                  selectedPolicyToEdit.table
-                ).map((template) => ({
-                  name: template.templateName,
-                  description: template.description,
-                  content: template.statement,
-                }))
-              : []
-          }
-        />
-      </ScaffoldSection>
-    </ScaffoldContainer>
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    </>
   )
 }
 
 AuthPoliciesPage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>
-      <PageLayout
-        title="Policies"
-        subtitle="Manage Row Level Security policies for your tables"
-        secondaryActions={
-          <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-row-level-security`} />
-        }
-        size="large"
-      >
-        {page}
-      </PageLayout>
-    </AuthLayout>
+    <AuthLayout>{page}</AuthLayout>
   </DefaultLayout>
 )
 

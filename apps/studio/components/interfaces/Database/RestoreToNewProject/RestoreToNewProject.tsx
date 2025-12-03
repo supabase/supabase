@@ -1,9 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import { PITRForm } from 'components/interfaces/Database/Backups/PITR/pitr-form'
+import { PITRForm } from 'components/interfaces/Database/Backups/PITR/PITRForm'
 import { BackupsList } from 'components/interfaces/Database/Backups/RestoreToNewProject/BackupsList'
 import { ConfirmRestoreDialog } from 'components/interfaces/Database/Backups/RestoreToNewProject/ConfirmRestoreDialog'
 import { CreateNewProjectDialog } from 'components/interfaces/Database/Backups/RestoreToNewProject/CreateNewProjectDialog'
@@ -28,7 +28,7 @@ import {
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import { getDatabaseMajorVersion } from 'lib/helpers'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { PreviousRestoreItem } from './PreviousRestoreItem'
 
 export const RestoreToNewProject = () => {
@@ -75,6 +75,7 @@ export const RestoreToNewProject = () => {
     data: cloneStatus,
     refetch: refetchCloneStatus,
     isLoading: cloneStatusLoading,
+    isSuccess: isCloneStatusSuccess,
   } = useCloneStatusQuery(
     {
       projectRef: project?.ref,
@@ -82,29 +83,23 @@ export const RestoreToNewProject = () => {
     {
       refetchInterval,
       refetchOnWindowFocus: false,
-      onSuccess: (data) => {
-        const hasTransientState = data?.clones.some((c) => c.status === 'IN_PROGRESS')
-        if (!hasTransientState) setRefetchInterval(false)
-      },
       enabled: PHYSICAL_BACKUPS_ENABLED || PITR_ENABLED,
     }
   )
   const IS_CLONED_PROJECT = cloneStatus?.cloned_from?.source_project?.ref ? true : false
   const isLoading = !isPermissionsLoaded || cloneBackupsLoading || cloneStatusLoading
 
+  useEffect(() => {
+    if (!isCloneStatusSuccess) return
+    const hasTransientState = cloneStatus.clones.some((c) => c.status === 'IN_PROGRESS')
+    if (!hasTransientState) {
+      setRefetchInterval(false)
+    }
+  }, [cloneStatus?.clones, isCloneStatusSuccess])
+
   const previousClones = cloneStatus?.clones
   const isRestoring = previousClones?.some((c) => c.status === 'IN_PROGRESS')
   const restoringClone = previousClones?.find((c) => c.status === 'IN_PROGRESS')
-
-  if (organization?.managed_by === 'vercel-marketplace') {
-    return (
-      <Admonition
-        type="default"
-        title="Restore to new project is not available for Vercel Marketplace organizations"
-        description="Restoring project backups to a new project created via Vercel Marketplace is not supported yet."
-      />
-    )
-  }
 
   if (isFreePlan) {
     return (
@@ -165,19 +160,17 @@ export const RestoreToNewProject = () => {
     return (
       <Admonition
         type="default"
-        title="Restore to new project requires physical backups"
+        title="Physical backups are required"
         description={
           <>
-            Physical backups must be enabled to restore your database to a new project.
-            <br /> Find out more about how backups work at supabase{' '}
+            Physical backups must be enabled to restore your database to a new project.{' '}
             <Link
               target="_blank"
               className="underline"
               href={`${DOCS_URL}/guides/platform/backups`}
             >
-              in our docs
+              Learn more
             </Link>
-            .
           </>
         }
       />

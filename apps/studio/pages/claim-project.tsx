@@ -13,7 +13,7 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { withAuth } from 'hooks/misc/withAuth'
 import type { NextPageWithLayout } from 'types'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 const ClaimProjectPageLayout = ({ children }: PropsWithChildren) => {
   const { appTitle } = useCustomContent(['app:title'])
@@ -92,8 +92,8 @@ const ClaimProjectPage: NextPageWithLayout = () => {
   if (step === 'choose-org' || !selectedOrganization) {
     return (
       <ProjectClaimChooseOrg
-        onChoose={(org) => {
-          setSelectedOrgSlug(org.slug)
+        onChoose={(orgSlug) => {
+          setSelectedOrgSlug(orgSlug)
           setStep('benefits')
         }}
       />

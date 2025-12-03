@@ -2,7 +2,7 @@ import { AlignLeft, Check, Heart, Keyboard, MoreVertical } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
+import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from 'lib/constants'

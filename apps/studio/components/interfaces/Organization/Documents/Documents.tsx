@@ -10,7 +10,7 @@ import { SecurityQuestionnaire } from './SecurityQuestionnaire'
 import { SOC2 } from './SOC2'
 import { TIA } from './TIA'
 
-const Documents = () => {
+export const Documents = () => {
   const { organizationLegalDocuments } = useCustomContent(['organization:legal_documents'])
 
   if (Array.isArray(organizationLegalDocuments)) {
@@ -67,5 +67,3 @@ const Documents = () => {
     </>
   )
 }
-
-export default Documents

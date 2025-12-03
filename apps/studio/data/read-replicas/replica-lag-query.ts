@@ -1,6 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { replicaKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export const replicationLagSql = () => {
   const sql = /* SQL */ `
@@ -43,13 +44,11 @@ export const useReplicationLagQuery = <TData = ReplicationLagData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ReplicationLagData, ReplicationLagError, TData> = {}
+  }: UseCustomQueryOptions<ReplicationLagData, ReplicationLagError, TData> = {}
 ) =>
-  useQuery<ReplicationLagData, ReplicationLagError, TData>(
-    replicaKeys.replicaLag(projectRef, id),
-    ({ signal }) => getReplicationLag({ projectRef, connectionString, id }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ReplicationLagData, ReplicationLagError, TData>({
+    queryKey: replicaKeys.replicaLag(projectRef, id),
+    queryFn: ({ signal }) => getReplicationLag({ projectRef, connectionString, id }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
+    ...options,
+  })

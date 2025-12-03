@@ -1,22 +1,23 @@
+import { range } from 'lib/helpers'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { cn } from 'ui'
 import { TweetCard } from 'ui-patterns/TweetCard'
-import { range } from 'lib/helpers'
 
-import tweets from 'shared-data/tweets'
 import { useBreakpoint } from 'common'
 import React from 'react'
+import { topTweets } from 'shared-data/tweets'
 
 interface Props {
   className?: string
 }
 
+const tweetsData = topTweets
+
 const TwitterSocialProof: React.FC<Props> = ({ className }) => {
   const { basePath } = useRouter()
   const isSm = useBreakpoint()
   const isMd = useBreakpoint(1024)
-  const tweetsData = tweets.slice(0, 18)
 
   return (
     <>

@@ -70,9 +70,9 @@ const useLogsQuery = (
     isLoading,
     isRefetching,
     refetch,
-  } = useQuery(
-    ['projects', projectRef, 'logs', params],
-    async ({ signal }) => {
+  } = useQuery({
+    queryKey: ['projects', projectRef, 'logs', params],
+    queryFn: async ({ signal }) => {
       const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
         params: {
           path: { ref: projectRef },
@@ -86,11 +86,9 @@ const useLogsQuery = (
 
       return data as unknown as Logs
     },
-    {
-      enabled: _enabled,
-      refetchOnWindowFocus: false,
-    }
-  )
+    enabled: _enabled,
+    refetchOnWindowFocus: false,
+  })
 
   let error: null | string | object = rqError ? (rqError as any).message : null
 

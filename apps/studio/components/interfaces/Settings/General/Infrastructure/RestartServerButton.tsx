@@ -46,7 +46,7 @@ const RestartServerButton = () => {
     'reboot'
   )
 
-  const { mutate: restartProject, isLoading: isRestartingProject } = useProjectRestartMutation({
+  const { mutate: restartProject, isPending: isRestartingProject } = useProjectRestartMutation({
     onSuccess: () => {
       onRestartSuccess()
     },
@@ -54,7 +54,7 @@ const RestartServerButton = () => {
       onRestartFailed(error, 'project')
     },
   })
-  const { mutate: restartProjectServices, isLoading: isRestartingServices } =
+  const { mutate: restartProjectServices, isPending: isRestartingServices } =
     useProjectRestartServicesMutation({
       onSuccess: () => {
         onRestartSuccess()

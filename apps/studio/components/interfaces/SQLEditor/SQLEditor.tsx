@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import ResizableAIWidget from 'components/ui/AIEditor/ResizableAIWidget'
 import { GridFooter } from 'components/ui/GridFooter'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
@@ -32,6 +33,7 @@ import {
   isRoleImpersonationEnabled,
   useGetImpersonatedRoleState,
 } from 'state/role-impersonation-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
@@ -86,6 +88,7 @@ export const SQLEditor = () => {
   const queryClient = useQueryClient()
   const tabs = useTabsStateSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
@@ -154,7 +157,7 @@ export const SQLEditor = () => {
   /* React query mutations */
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
+  const { mutate: execute, isPending: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
       if (id) snapV2.addResult(id, data.result, vars.autoLimit)
 
@@ -162,7 +165,7 @@ export const SQLEditor = () => {
       refetchEntityDefinitions()
 
       // revalidate lint query
-      queryClient.invalidateQueries(lintKeys.lint(ref))
+      queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
     },
     onError(error: any, vars) {
       if (id) {
@@ -380,9 +383,9 @@ export const SQLEditor = () => {
     try {
       const snippet = snapV2.snippets[id]
       const result = snapV2.results[id]?.[0]
+      openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
       aiSnap.newChat({
         name: 'Debug SQL snippet',
-        open: true,
         sqlSnippets: [
           (snippet.snippet.content?.sql ?? '').replace(sqlAiDisclaimerComment, '').trim(),
         ],

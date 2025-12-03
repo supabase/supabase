@@ -62,9 +62,9 @@ export default function DatePickerForm() {
                         'w-[240px] pl-3 text-left font-normal',
                         !field.value && 'text-muted-foreground'
                       )}
+                      icon={<CalendarIcon className="h-4 w-4 opacity-50" />}
                     >
                       {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
                   </FormControl_Shadcn_>
                 </PopoverTrigger_Shadcn_>

@@ -67,7 +67,7 @@ export const SignUpForm = () => {
     token: parseAsString.withDefault(''),
   })
 
-  const { mutate: signup, isLoading: isSigningUp } = useSignUpMutation({
+  const { mutate: signup, isPending: isSigningUp } = useSignUpMutation({
     onSuccess: () => {
       toast.success(`Signed up successfully!`)
       setIsSubmitted(true)

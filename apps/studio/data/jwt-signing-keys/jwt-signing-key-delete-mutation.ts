@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { jwtSigningKeysKeys } from './keys'
 
 interface JWTSigningKeyDeleteVariables {
@@ -30,29 +30,27 @@ export const useJWTSigningKeyDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<JWTSigningKeyDeleteData, ResponseError, JWTSigningKeyDeleteVariables>,
+  UseCustomMutationOptions<JWTSigningKeyDeleteData, ResponseError, JWTSigningKeyDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<JWTSigningKeyDeleteData, ResponseError, JWTSigningKeyDeleteVariables>(
-    (vars) => deleteJWTSigningKey(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<JWTSigningKeyDeleteData, ResponseError, JWTSigningKeyDeleteVariables>({
+    mutationFn: (vars) => deleteJWTSigningKey(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await queryClient.invalidateQueries(jwtSigningKeysKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: jwtSigningKeysKeys.list(projectRef) })
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete JWT signing key: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete JWT signing key: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

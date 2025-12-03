@@ -2,8 +2,7 @@
 
 import { LOCAL_STORAGE_KEYS, useBreakpoint } from 'common'
 import { startCase } from 'lib/helpers'
-import { useSearchParams } from 'next/navigation'
-import { useRouter } from 'next/compat/router'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import type { BlogView } from 'app/blog/BlogClient'
 import type PostTypes from 'types/post'
@@ -75,14 +74,13 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
 
   const handleReplaceRouter = () => {
     if (!searchTerm && category !== 'all' && router) {
-      router.query.category = category
-      router?.replace(router, undefined, { shallow: true, scroll: false })
+      router?.replace(`/blog?category=${category}`, { scroll: false })
     }
   }
 
   const handlePosts = () => {
     // construct an array of blog posts
-    // not inluding the first blog post
+    // not including the first blog post
     const shiftedBlogs = [...allPosts]
     shiftedBlogs.shift()
 
@@ -113,19 +111,19 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
   }, [isMobile])
 
   useEffect(() => {
-    if (router?.isReady && q) {
+    if (q) {
       setSearchTerm(q)
     }
-    if (router?.isReady && activeCategory && activeCategory !== 'all') {
+    if (activeCategory && activeCategory !== 'all') {
       setCategory(activeCategory)
     }
-  }, [activeCategory, router?.isReady, q])
+  }, [activeCategory, q])
 
   function handleSearchByText(text: string) {
     setSearchTerm(text)
-    searchParams?.has('q') && router?.replace('/blog', undefined, { shallow: true, scroll: false })
-    router?.replace(`/blog?q=${text}`, undefined, { shallow: true, scroll: false })
-    if (text.length < 1) router?.replace('/blog', undefined, { shallow: true, scroll: false })
+    searchParams?.has('q') && router?.replace('/blog', { scroll: false })
+    router?.replace(`/blog?q=${text}`, { scroll: false })
+    if (text.length < 1) router?.replace('/blog', { scroll: false })
 
     const matches = allPosts.filter((post: any) => {
       const found =
@@ -143,9 +141,8 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
     searchTerm && setSearchTerm('')
     setCategory(category)
     category === 'all'
-      ? router?.replace('/blog', undefined, { shallow: true, scroll: false })
-      : router?.replace(`/blog?category=${category}`, undefined, {
-          shallow: true,
+      ? router?.replace('/blog', { scroll: false })
+      : router?.replace(`/blog?category=${category}`, {
           scroll: false,
         })
   }

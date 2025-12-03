@@ -1,41 +1,55 @@
-import { useParams } from 'common'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 
-import { AnalyticBucketDetails } from 'components/interfaces/Storage/AnalyticBucketDetails'
-import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
-import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer/useSelectedBucket'
+import { useParams } from 'common'
+import { AnalyticBucketDetails } from 'components/interfaces/Storage/AnalyticsBuckets/AnalyticsBucketDetails'
+import { useSelectedAnalyticsBucket } from 'components/interfaces/Storage/AnalyticsBuckets/useSelectedAnalyticsBucket'
+import { BUCKET_TYPES } from 'components/interfaces/Storage/Storage.constants'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import { AnalyticsBucket as AnalyticsBucketIcon } from 'icons'
 import type { NextPageWithLayout } from 'types'
 
 const AnalyticsBucketPage: NextPageWithLayout = () => {
-  const { bucketId } = useParams()
+  const config = BUCKET_TYPES.analytics
+  const router = useRouter()
+  const { ref, bucketId } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { projectRef } = useStorageExplorerStateSnapshot()
-  const { bucket, error, isSuccess, isError } = useSelectedBucket()
+  const { data: bucket, isSuccess } = useSelectedAnalyticsBucket()
 
-  // [Joshen] Checking against projectRef from storage explorer to check if the store has initialized
-  if (!project || !projectRef) return null
+  useEffect(() => {
+    if (isSuccess && !bucket) {
+      toast.info(`Bucket "${bucketId}" does not exist in your project`)
+      router.push(`/project/${ref}/storage/analytics`)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess])
 
   return (
-    <div className="storage-container flex flex-grow p-4">
-      {isError && <StorageBucketsError error={error as any} />}
-
-      {isSuccess ? (
-        !bucket ? (
-          <div className="flex h-full w-full items-center justify-center">
-            <p className="text-sm text-foreground-light">Bucket {bucketId} cannot be found</p>
-          </div>
-        ) : bucket.type === 'ANALYTICS' ? (
-          <AnalyticBucketDetails bucket={bucket} />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <p className="text-sm text-foreground-light">This bucket is not an analytics bucket</p>
-          </div>
-        )
-      ) : null}
-    </div>
+    <PageLayout
+      title={bucketId}
+      icon={
+        <div className="shrink-0 w-10 h-10 relative bg-surface-100 border rounded-md flex items-center justify-center">
+          <AnalyticsBucketIcon size={20} className="text-foreground-light" />
+        </div>
+      }
+      breadcrumbs={[
+        {
+          label: 'Analytics',
+          href: `/project/${project?.ref}/storage/analytics`,
+        },
+        {
+          label: 'Buckets',
+        },
+      ]}
+      secondaryActions={config?.docsUrl ? [<DocsButton key="docs" href={config.docsUrl} />] : []}
+    >
+      <AnalyticBucketDetails />
+    </PageLayout>
   )
 }
 

@@ -4,7 +4,7 @@ import { partition } from 'lodash'
 import { Table2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -20,23 +20,28 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { usePHFlag } from 'hooks/ui/useFlag'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { useAiAssistantStateSnapshot, AssistantMessageType } from 'state/ai-assistant-state'
+import { useTrack } from 'lib/telemetry/track'
+import { AssistantMessageType, useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   AiIconAnimation,
   Button,
-  cn,
   SQL_ICON,
-  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
+  cn,
 } from 'ui'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { ActionCard } from './ActionCard'
 import { RecentItems } from './RecentItems'
+import { SIDEBAR_KEYS } from '../ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 
 const NEW_PROJECT_THRESHOLD_DAYS = 7
 const TABLE_QUICKSTART_FLAG = 'tableQuickstart'
@@ -54,17 +59,21 @@ export function NewTab() {
   const { profile } = useProfile()
   const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
+  const { selectedSchema } = useQuerySchemaState()
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   const snap = useTableEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabs = useTabsStateSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
-
+  const { openSidebar } = useSidebarManagerSnapshot()
   const [isCreatingChat, setIsCreatingChat] = useState(false)
   const [templates] = partition(SQL_TEMPLATES, { type: 'template' })
   const [quickstarts] = partition(SQL_TEMPLATES, { type: 'quickstart' })
+  const hasTrackedExposure = useRef(false)
 
   const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'user_content',
@@ -76,7 +85,7 @@ export function NewTab() {
 
   /**
    * Returns:
-   * - `QuickstartVariant`: user variation (if bucketed into AI, Templates, or future variants)
+   * - `QuickstartVariant`: user variation (`control`, `ai`, `templates`, `assistant`)
    * - `false`: user not yet bucketed or not targeted for experiment
    * - `undefined`: PostHog still loading
    */
@@ -97,18 +106,36 @@ export function NewTab() {
       ? tableQuickstartVariant
       : null
 
+  const shouldTrackExposure =
+    editor !== 'sql' &&
+    isNewProject &&
+    tableQuickstartVariant !== false &&
+    tableQuickstartVariant !== undefined
+
+  useEffect(() => {
+    if (shouldTrackExposure && !hasTrackedExposure.current) {
+      hasTrackedExposure.current = true
+      track('table_quickstart_opened', {
+        variant: tableQuickstartVariant,
+      })
+    }
+  }, [shouldTrackExposure, tableQuickstartVariant, track])
+
   const handleOpenAssistant = () => {
     if (isCreatingChat) return
 
     setIsCreatingChat(true)
 
     try {
+      openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
       const chatId = aiSnap.newChat({
         name: 'Create a database table',
-        open: true,
       })
 
       if (!chatId) {
+        track('table_quickstart_assistant_opened', {
+          chatCreated: false,
+        })
         throw new Error('Failed to create chat')
       }
 
@@ -125,6 +152,10 @@ export function NewTab() {
       }
 
       aiSnap.saveMessage([userMessage, assistantMessage])
+
+      track('table_quickstart_assistant_opened', {
+        chatCreated: true,
+      })
     } catch (error) {
       console.error('Failed to open AI assistant:', error)
       const message = error instanceof Error ? error.message : 'Unknown error'
@@ -134,16 +165,18 @@ export function NewTab() {
     }
   }
 
-  const tableEditorActions = [
-    {
-      icon: <Table2 className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
-      title: 'Create a table',
-      description: 'Design and create a new database table',
-      bgColor: 'bg-blue-500',
-      isBeta: false,
-      onClick: () => snap.onAddTable(),
-    },
-  ]
+  const tableEditorActions = isSchemaLocked
+    ? []
+    : [
+        {
+          icon: <Table2 className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
+          title: 'Create a table',
+          description: 'Design and create a new database table',
+          bgColor: 'bg-blue-500',
+          isBeta: false,
+          onClick: () => snap.onAddTable(),
+        },
+      ]
 
   const sqlEditorActions = [
     {

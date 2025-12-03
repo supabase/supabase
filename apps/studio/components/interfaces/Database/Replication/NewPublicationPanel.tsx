@@ -1,10 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
-import { useCreatePublicationMutation } from 'data/replication/create-publication-mutation'
-import { useReplicationTablesQuery } from 'data/replication/tables-query'
 import { X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { z } from 'zod'
+
+import { useParams } from 'common'
+import { useCreatePublicationMutation } from 'data/replication/publication-create-mutation'
+import { useReplicationTablesQuery } from 'data/replication/tables-query'
 import {
   Button,
   cn,
@@ -23,7 +25,6 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
-import { z } from 'zod'
 
 interface NewPublicationPanelProps {
   visible: boolean
@@ -33,7 +34,7 @@ interface NewPublicationPanelProps {
 
 export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanelProps) => {
   const { ref: projectRef } = useParams()
-  const { mutateAsync: createPublication, isLoading: creatingPublication } =
+  const { mutateAsync: createPublication, isPending: creatingPublication } =
     useCreatePublicationMutation()
   const { data: tables } = useReplicationTablesQuery({
     projectRef,
@@ -86,7 +87,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
                 <div>
                   <SheetTitle>New Publication</SheetTitle>
                   <SheetDescription>
-                    Create a new publication to share table changes for replication
+                    Create a new publication to replicate table changes to destinations
                   </SheetDescription>
                 </div>
                 <SheetClose
@@ -125,7 +126,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
                     render={({ field }) => (
                       <FormItemLayout
                         label="Tables"
-                        description="Which tables to make available for replication"
+                        description="Which tables to replicate to destinations"
                       >
                         <FormControl_Shadcn_>
                           <MultiSelector
@@ -138,7 +139,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
                             </MultiSelector.Trigger>
                             <MultiSelector.Content>
                               <MultiSelector.List>
-                                {tables?.tables.map((table) => (
+                                {tables?.map((table) => (
                                   <MultiSelector.Item
                                     key={`${table.schema}.${table.name}`}
                                     value={`${table.schema}.${table.name}`}

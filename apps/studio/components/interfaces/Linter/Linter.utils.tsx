@@ -312,7 +312,7 @@ export const LintCTA = ({
 
   return (
     <Button asChild type="default">
-      <Link href={link} target="_blank" rel="noreferrer" className="no-underline">
+      <Link href={link} rel="noreferrer" className="no-underline">
         {linkText}
       </Link>
     </Button>
@@ -343,7 +343,7 @@ export const LintEntity = ({ metadata }: { metadata: Lint['metadata'] }) => {
 
 export const LintCategoryBadge = ({ category }: { category: string }) => {
   return (
-    <Badge variant={category === 'SECURITY' ? 'destructive' : 'warning'} className="capitalize">
+    <Badge variant={category === 'SECURITY' ? 'destructive' : 'warning'}>
       {category.toLowerCase()}
     </Badge>
   )
