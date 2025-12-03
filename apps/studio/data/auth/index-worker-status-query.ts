@@ -1,4 +1,4 @@
-import { getIndexWorkerStatusSQL } from '@supabase/pg-meta/src/sql/studio/get-index-worker-status'
+import pgMeta from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { executeSql, type ExecuteSqlError } from 'data/sql/execute-sql-query'
@@ -18,7 +18,7 @@ export async function getIndexWorkerStatus(
   { projectRef, connectionString }: IndexWorkerStatusVariables,
   signal?: AbortSignal
 ): Promise<IndexWorkerStatusData> {
-  const sql = getIndexWorkerStatusSQL()
+  const sql = pgMeta.getIndexWorkerStatusSQL()
 
   const { result } = await executeSql<IndexWorkerStatusData[]>(
     {

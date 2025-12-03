@@ -1,12 +1,21 @@
 import { useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import { RefreshCw, Trash, Users, WandSparklesIcon, X } from 'lucide-react'
+import {
+  ExternalLinkIcon,
+  InfoIcon,
+  RefreshCw,
+  Trash,
+  Users,
+  WandSparklesIcon,
+  X,
+} from 'lucide-react'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
+import pgMeta from '@supabase/pg-meta'
 
 import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
-import { LOCAL_STORAGE_KEYS, useFlag, useParams, USER_SEARCH_INDEXES } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AlertError from 'components/ui/AlertError'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
@@ -26,6 +35,9 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Button,
   cn,
   LoadingLine,
@@ -62,6 +74,7 @@ import { useUserIndexStatusesQuery } from 'data/auth/user-search-indexes-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useIndexWorkerStatusQuery } from 'data/auth/index-worker-status-query'
 import { InlineLink } from 'components/ui/InlineLink'
+import Link from 'next/link'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 const IMPROVED_SEARCH_COUNT_THRESHOLD = 10_000
@@ -373,7 +386,7 @@ export const UsersV2 = () => {
   const userSearchIndexesAreValidAndReady =
     !isUserSearchIndexesError &&
     !isUserSearchIndexesLoading &&
-    userSearchIndexes?.length === USER_SEARCH_INDEXES.length &&
+    userSearchIndexes?.length === pgMeta.USER_SEARCH_INDEXES.length &&
     userSearchIndexes?.every((index) => index.is_valid && index.is_ready)
 
   /**
@@ -460,26 +473,50 @@ export const UsersV2 = () => {
   return (
     <>
       <div className="h-full flex flex-col">
-        <div className="flex items-center">
-          <FormHeader className="py-4 px-6 !mb-0" title="Users" />
+        <FormHeader className="py-4 px-6 !mb-0" title="Users" />
 
-          {showImprovedSearchOptIn && (
-            <Button
-              icon={<WandSparklesIcon />}
-              className="mr-6"
-              onClick={() => setShowCreateIndexesModal(true)}
-              loading={isUpdatingAuthConfig}
-            >
-              Create indexes
-            </Button>
-          )}
+        {showImprovedSearchOptIn && (
+          <Alert_Shadcn_ className="rounded-none mb-0 border-0 border-t">
+            <InfoIcon className="size-4" />
+            <AlertTitle_Shadcn_>Opt-in to an improved search experience</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_ className="flex justify-between items-center">
+              <div>
+                Creating the necessary indexes will provide a safer and more performant search
+                experience.
+              </div>
+              <Button
+                icon={<WandSparklesIcon />}
+                onClick={() => setShowCreateIndexesModal(true)}
+                loading={isUpdatingAuthConfig}
+              >
+                Create indexes
+              </Button>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        )}
 
-          {indexWorkerInProgress && (
-            <Button className="mr-6" loading={indexWorkerInProgress}>
-              Creating indexes
-            </Button>
-          )}
-        </div>
+        {indexWorkerInProgress && (
+          <Alert_Shadcn_ className="rounded-none mb-0 border-0 border-t">
+            <InfoIcon className="size-4" />
+            <AlertTitle_Shadcn_>Index creation is in progress</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_ className="flex justify-between items-center">
+              <div>
+                The indexes are currently being created. This process may take some time depending
+                on the number of users in your project.
+              </div>
+
+              <Button type="link" iconRight={<ExternalLinkIcon />} asChild>
+                <Link
+                  href={`/project/${projectRef}/logs/explorer?q=${encodeURI(INDEX_WORKER_LOGS_SEARCH_STRING)}`}
+                  target="_blank"
+                >
+                  View logs
+                </Link>
+              </Button>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        )}
+
         <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-start justify-between gap-2 border-t">
           {selectedUsers.size > 0 ? (
             <div className="flex items-center gap-x-2">
