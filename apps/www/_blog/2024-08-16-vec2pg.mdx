@@ -26,7 +26,7 @@ toc_depth: 3
 
 ## Objective
 
-Our goal with https://github.com/supabase-community/vec2pg is to create an easy on-ramp to efficiently copy your data from various vector databases into Postgres with associated ids and metadata. The data loads into a new schema with a table name that matches the source e.g. `vec2pg.<collection_name>` . That output table uses https://github.com/pgvector/pgvector's `vector` type for the embedding/vector and the builtin `json` type for additional metadata.
+Our goal with https://github.com/supabase-community/vec2pg is to create an easy on-ramp to efficiently copy your data from various vector databases into Postgres with associated ids and metadata. The data loads into a new schema with a table name that matches the source e.g. `vec2pg.<collection_name>` . That output table uses [pgvector's](https://github.com/pgvector/pgvector) `vector` type for the embedding/vector and the builtin `json` type for additional metadata.
 
 <div>
   <Img alt="vec2pg qudrant 1" src="/images/blog/lw12/day-5/vec2pg_qdrant_2.png" />

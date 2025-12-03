@@ -1,11 +1,11 @@
 import { expect, Page } from '@playwright/test'
 import fs from 'fs'
-import { isCLI } from '../utils/is-cli'
-import { test } from '../utils/test'
-import { toUrl } from '../utils/to-url'
-import { waitForApiResponse } from '../utils/wait-for-response'
-import { waitForApiResponseWithTimeout } from '../utils/wait-for-response-with-timeout'
-import { resetLocalStorage } from '../utils/reset-local-storage'
+import { isCLI } from '../utils/is-cli.js'
+import { resetLocalStorage } from '../utils/reset-local-storage.js'
+import { test } from '../utils/test.js'
+import { toUrl } from '../utils/to-url.js'
+import { waitForApiResponseWithTimeout } from '../utils/wait-for-response-with-timeout.js'
+import { waitForApiResponse } from '../utils/wait-for-response.js'
 
 const sqlSnippetName = 'pw_sql_snippet'
 const sqlSnippetNameDuplicate = 'pw_sql_snippet (Duplicate)'
@@ -122,10 +122,14 @@ test.describe('SQL Editor', () => {
     await page.locator('.view-lines').click()
     await page.keyboard.press('ControlOrMeta+KeyA')
     await page.keyboard.type(`select 'hello world';`)
+
+    const sqlMutationPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
     await page.getByTestId('sql-run-button').click()
+    await sqlMutationPromise
 
     // verify the result
-    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
     await expect(page.getByRole('gridcell', { name: 'hello world' })).toBeVisible()
 
     // SQL written in the editor should not be the previous query.
@@ -353,7 +357,11 @@ hello world`)
     await sharedSnippet.getByText(sqlSnippetNameShare).click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Unshare query with team' }).click()
     await expect(page.getByRole('heading', { name: 'Confirm to unshare query:' })).toBeVisible()
+
+    const unsharePromise = waitForApiResponse(page, 'projects', ref, 'content', { method: 'PUT' })
     await page.getByRole('button', { name: 'Unshare query', exact: true }).click()
+    await unsharePromise
+    await expect(page.getByTestId('confirm-unshare-snippet-modal')).not.toBeVisible()
     await expect(sharedSnippet.getByText(sqlSnippetNameShare, { exact: true })).not.toBeVisible()
 
     // clear SQL snippet

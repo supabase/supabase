@@ -20,6 +20,7 @@ import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
@@ -143,7 +144,6 @@ export const UsersV2 = () => {
 
   const [columns, setColumns] = useState<Column<any>[]>([])
   const [search, setSearch] = useState(filterKeywords)
-  const [selectedUser, setSelectedUser] = useState<string>()
   const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<User>()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -205,6 +205,14 @@ export const UsersV2 = () => {
   const { mutateAsync: deleteUser } = useUserDeleteMutation()
 
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
+
+  const { setValue: setSelectedUser, value: selectedUser } = useQueryStateWithSelect({
+    urlKey: 'show',
+    select: (id: string) => (id ? users?.find((u) => u.id === id)?.id : undefined),
+    enabled: !!users && !isLoading,
+    onError: () => toast.error(`User not found`),
+  })
+
   // [Joshen] Only relevant for when selecting one user only
   const selectedUserFromCheckbox = users.find((u) => u.id === [...selectedUsers][0])
 
@@ -309,7 +317,7 @@ export const UsersV2 = () => {
       setShowDeleteModal(false)
       setSelectedUsers(new Set([]))
 
-      if (userIds.includes(selectedUser)) setSelectedUser(undefined)
+      if (userIds.includes(selectedUser)) setSelectedUser(null)
     } catch (error: any) {
       toast.error(`Failed to delete selected users: ${error.message}`)
     } finally {
@@ -357,7 +365,7 @@ export const UsersV2 = () => {
       isCountLoaded &&
       isCountWithinThresholdForSortBy
     ) {
-      if (specificFilterColumn === 'id' && localStorageFilter !== 'id') {
+      if (specificFilterColumn === 'email' && localStorageFilter !== 'email') {
         setSpecificFilterColumn(localStorageFilter)
       }
       if (sortByValue === 'id:asc' && localStorageSortByValue !== 'id:asc') {
@@ -394,7 +402,7 @@ export const UsersV2 = () => {
                   setSearch={setSearch}
                   setFilterKeywords={(s) => {
                     setFilterKeywords(s)
-                    setSelectedUser(undefined)
+                    setSelectedUser(null)
                     sendEvent({
                       action: 'auth_users_search_submitted',
                       properties: {
@@ -680,7 +688,7 @@ export const UsersV2 = () => {
           {selectedUser !== undefined && (
             <UserPanel
               selectedUser={users.find((u) => u.id === selectedUser)}
-              onClose={() => setSelectedUser(undefined)}
+              onClose={() => setSelectedUser(null)}
             />
           )}
         </ResizablePanelGroup>
@@ -754,7 +762,7 @@ export const UsersV2 = () => {
           cleanPointerEventsNoneOnBody()
         }}
         onDeleteSuccess={() => {
-          if (selectedUserToDelete?.id === selectedUser) setSelectedUser(undefined)
+          if (selectedUserToDelete?.id === selectedUser) setSelectedUser(null)
           setSelectedUserToDelete(undefined)
           cleanPointerEventsNoneOnBody(500)
         }}

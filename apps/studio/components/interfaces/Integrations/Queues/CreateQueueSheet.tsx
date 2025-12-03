@@ -79,7 +79,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
     connectionString: project?.connectionString,
   })
 
-  const { mutate: createQueue, isLoading } = useDatabaseQueueCreateMutation()
+  const { mutate: createQueue, isPending } = useDatabaseQueueCreateMutation()
 
   const form = useForm<CreateQueueForm>({
     resolver: zodResolver(FormSchema),
@@ -208,7 +208,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
                                         {definition.label}
                                       </p>
                                       {definition.value === 'partitioned' && (
-                                        <Badge variant="warning">Coming soon</Badge>
+                                        <Badge>Coming soon</Badge>
                                       )}
                                     </div>
                                     <p className="text-foreground-lighter text-left">
@@ -270,7 +270,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
                         label={
                           <div className="flex items-center gap-x-2">
                             <p>Enable Row Level Security (RLS)</p>
-                            <Badge color="scale">Recommended</Badge>
+                            <Badge variant="success">Recommended</Badge>
                           </div>
                         }
                         description="Restrict access to your queue by enabling RLS and writing Postgres policies to control access for each role."
@@ -313,18 +313,11 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
               type="default"
               htmlType="button"
               onClick={confirmOnClose}
-              disabled={isLoading}
+              disabled={isPending}
             >
               Cancel
             </Button>
-            <Button
-              size="tiny"
-              type="primary"
-              form={FORM_ID}
-              htmlType="submit"
-              disabled={isLoading}
-              loading={isLoading}
-            >
+            <Button size="tiny" type="primary" form={FORM_ID} htmlType="submit" loading={isPending}>
               Create queue
             </Button>
           </SheetFooter>

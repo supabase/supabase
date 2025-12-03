@@ -10,7 +10,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import NoSearchResults from 'components/ui/NoSearchResults'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { withAuth } from 'hooks/misc/withAuth'
@@ -75,8 +75,8 @@ const OrganizationsPage: NextPageWithLayout = () => {
             <Input
               size="tiny"
               placeholder="Search for an organization"
-              icon={<Search size={16} />}
-              className="w-full flex-1 md:w-64 [&>div>div>div>input]:!pl-7 [&>div>div>div>div]:!pl-2"
+              icon={<Search />}
+              className="w-full flex-1 md:w-64"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />

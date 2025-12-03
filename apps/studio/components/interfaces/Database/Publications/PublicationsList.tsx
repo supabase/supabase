@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import InformationBox from 'components/ui/InformationBox'
-import NoSearchResults from 'components/ui/NoSearchResults'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -100,8 +100,8 @@ export const PublicationsList = () => {
           <div className="flex items-center">
             <Input
               size="tiny"
-              icon={<Search size={12} />}
-              className="w-48 pl-8"
+              icon={<Search />}
+              className="w-48"
               placeholder="Search for a publication"
               value={filterString}
               onChange={(e) => setFilterString(e.target.value)}
