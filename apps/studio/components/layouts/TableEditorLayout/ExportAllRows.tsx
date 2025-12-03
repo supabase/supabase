@@ -95,18 +95,20 @@ const fetchAllRows = async ({
   }
 
   const type = table.entity_type
-  if (
-    (type === ENTITY_TYPE.VIEW || type === ENTITY_TYPE.MATERIALIZED_VIEW) &&
-    !bypassConfirmation
-  ) {
+  if (type === ENTITY_TYPE.VIEW && !bypassConfirmation) {
     return {
       status: 'require_confirmation',
-      reason: `Exporting a view may cause performance issues on very large views. If possible, we recommend exporting the underlying table instead.`,
+      reason: `Exporting a view may cause consistency issues or performance issues on very large views. If possible, we recommend exporting the underlying table instead.`,
+    }
+  } else if (type === ENTITY_TYPE.MATERIALIZED_VIEW && !bypassConfirmation) {
+    return {
+      status: 'require_confirmation',
+      reason: `Exporting a materialized view may cause performance issues on very large views. If possible, we recommend exporting the underlying table instead.`,
     }
   } else if (type === ENTITY_TYPE.FOREIGN_TABLE && !bypassConfirmation) {
     return {
       status: 'require_confirmation',
-      reason: `Exporting a foreign table, which may cause performance issues on very large tables.`,
+      reason: `Exporting a foreign table may cause consistency issues or performance issues on very large tables.`,
     }
   }
 

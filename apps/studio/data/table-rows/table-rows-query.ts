@@ -5,6 +5,7 @@ import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-quer
 import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
 import {
@@ -113,6 +114,11 @@ export async function executeWithRetry<T>(
   throw new Error('Max retries reached without success')
 }
 
+const checkIfCtidAvailable = (table: SupaTable): boolean =>
+  table.type === ENTITY_TYPE.TABLE ||
+  table.type === ENTITY_TYPE.PARTITIONED_TABLE ||
+  table.type === ENTITY_TYPE.MATERIALIZED_VIEW
+
 export const getAllTableRowsSql = ({
   table,
   filters = [],
@@ -145,6 +151,8 @@ export const getAllTableRowsSql = ({
   const { cursorPaginationEligible, cursorPaginationNonEligible } =
     getPreferredOrderByColumns(table)
 
+  const hasCtid = checkIfCtidAvailable(table)
+
   if (sorts.length === 0) {
     if (cursorPaginationEligible.length > 0) {
       cursorColumns = cursorPaginationEligible[0]
@@ -155,9 +163,13 @@ export const getAllTableRowsSql = ({
       // guarantee uniqueness
     } else if (cursorPaginationNonEligible.length > 0) {
       queryChains = queryChains.order(table.name, cursorPaginationNonEligible[0])
-      queryChains = queryChains.order(table.name, 'ctid')
+      if (hasCtid) {
+        queryChains = queryChains.order(table.name, 'ctid')
+      }
     } else {
-      queryChains = queryChains.order(table.name, 'ctid')
+      if (hasCtid) {
+        queryChains = queryChains.order(table.name, 'ctid')
+      }
     }
   } else {
     sorts.forEach((sort) => {
@@ -176,7 +188,9 @@ export const getAllTableRowsSql = ({
           queryChains = queryChains.order(table.name, col)
         })
     } else {
-      queryChains = queryChains.order(table.name, 'ctid')
+      if (hasCtid) {
+        queryChains = queryChains.order(table.name, 'ctid')
+      }
     }
   }
 
