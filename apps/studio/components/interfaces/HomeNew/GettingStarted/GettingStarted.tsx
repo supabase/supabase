@@ -113,7 +113,7 @@ export function GettingStarted({ steps, onStepClick, onDismiss }: GettingStarted
                         )}
                       >
                         {isComplete ? (
-                          <Check size={16} strokeWidth={1.5} className="text-brand" />
+                          <Check size={16} strokeWidth={1.5} className="text-brand-link" />
                         ) : (
                           index + 1
                         )}
@@ -144,8 +144,8 @@ export function GettingStarted({ steps, onStepClick, onDismiss }: GettingStarted
           {showCongratulations ? (
             <div className="relative w-full flex-1 min-h-[100px] shrink-0 overflow-hidden bg-200 flex flex-col justify-end">
               <div className="p-10">
-                <div className="w-8 h-8 rounded-md bg-brand/10 flex items-center justify-center shrink-0 mb-4 -ml-0.5">
-                  <Check size={16} strokeWidth={1.5} className="text-brand" />
+                <div className="w-8 h-8 rounded-md bg-brand/15 flex items-center justify-center shrink-0 mb-4">
+                  <Check size={16} strokeWidth={1.5} className="text-brand-link" />
                 </div>
                 <div className="flex flex-row items-center gap-4 mb-1">
                   <h3>All steps complete</h3>
