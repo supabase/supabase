@@ -1,19 +1,17 @@
-import { Check, Code, Table2, X } from 'lucide-react'
+import { Code, Table2 } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { FRAMEWORKS } from 'components/interfaces/Connect/Connect.constants'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
-import Link from 'next/link'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { Button, Card, CardContent, IconDiscord, ToggleGroup, ToggleGroupItem } from 'ui'
+import { Button, Card, CardContent, ToggleGroup, ToggleGroupItem } from 'ui'
 import { FrameworkSelector } from './FrameworkSelector'
 import { GettingStarted } from './GettingStarted'
 import {
@@ -142,17 +140,6 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
   )
 
   const steps = workflow === 'code' ? codeSteps : workflow === 'no-code' ? noCodeSteps : []
-
-  // const allStepsComplete = steps.length > 0 && steps.every((step) => step.status === 'complete')
-  const allStepsComplete = true
-  const [isCongratulationsDismissed, setIsCongratulationsDismissed] = useState(false)
-
-  // Reset congratulations dismissed state when workflow changes
-  useEffect(() => {
-    setIsCongratulationsDismissed(false)
-  }, [workflow])
-
-  const showCongratulations = allStepsComplete && !isCongratulationsDismissed
 
   return (
     <section className="w-full">
@@ -317,65 +304,27 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
           </CardContent>
         </Card>
       ) : (
-        <div className="relative">
-          {showCongratulations && (
-            <div className="rounded-lg border border-muted overflow-hidden @container absolute inset-0 z-50 bg-200 flex items-center justify-center p-10">
-              <ButtonTooltip
-                type="outline"
-                size="tiny"
-                className="absolute top-4 right-4 w-6 h-6"
-                icon={<X size={16} strokeWidth={1.5} />}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: 'Return to steps',
-                  },
-                }}
-                onClick={() => setIsCongratulationsDismissed(true)}
-              />
-
-              <CardContent className="p-8 text-center max-w-md flex flex-col items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-brand/10 flex items-center justify-center">
-                  <Check size={32} strokeWidth={2} className="text-brand" />
-                </div>
-                <div className="flex flex-col items-center gap-6">
-                  <div className="flex flex-col items-center">
-                    <h3 className="text-lg">All steps complete</h3>
-                    <p className="text-foreground-light">
-                      Share your progress with the Supabase community.
-                    </p>
-                  </div>
-                  <Button asChild type="default" size="tiny" icon={<IconDiscord size={14} />}>
-                    <Link href={'https://discord.supabase.com/'} target="_blank">
-                      Join us on Discord
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </div>
-          )}
-          <GettingStarted
-            steps={steps}
-            onStepClick={({ stepIndex, stepTitle, actionType, wasCompleted }) => {
-              if (workflow) {
-                sendEvent({
-                  action: 'home_getting_started_step_clicked',
-                  properties: {
-                    workflow: workflow === 'no-code' ? 'no_code' : 'code',
-                    step_number: stepIndex + 1,
-                    step_title: stepTitle,
-                    action_type: actionType,
-                    was_completed: wasCompleted,
-                  },
-                  groups: {
-                    project: project?.ref || '',
-                    organization: organization?.slug || '',
-                  },
-                })
-              }
-            }}
-          />
-        </div>
+        <GettingStarted
+          steps={steps}
+          onStepClick={({ stepIndex, stepTitle, actionType, wasCompleted }) => {
+            if (workflow) {
+              sendEvent({
+                action: 'home_getting_started_step_clicked',
+                properties: {
+                  workflow: workflow === 'no-code' ? 'no_code' : 'code',
+                  step_number: stepIndex + 1,
+                  step_title: stepTitle,
+                  action_type: actionType,
+                  was_completed: wasCompleted,
+                },
+                groups: {
+                  project: project?.ref || '',
+                  organization: organization?.slug || '',
+                },
+              })
+            }
+          }}
+        />
       )}
     </section>
   )
