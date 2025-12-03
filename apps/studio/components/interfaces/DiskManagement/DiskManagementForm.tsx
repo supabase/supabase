@@ -72,6 +72,9 @@ export function DiskManagementForm() {
   const { data: org } = useSelectedOrganizationQuery()
   const { setProjectStatus } = useSetProjectStatus()
 
+  const isSpendCapEnabled =
+    org?.plan.id !== 'free' && !org?.usage_billing_enabled && project?.cloud_provider !== 'FLY'
+
   const { data: resourceWarnings } = useResourceWarningsQuery({ ref: projectRef })
   // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
@@ -208,7 +211,7 @@ export function DiskManagementForm() {
   const usedPercentage = (usedSize / totalSize) * 100
 
   const disableIopsThroughputConfig =
-    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) && !hasAccess
+    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)
 
   const isBranch = project?.parent_project_ref !== undefined
 
@@ -216,6 +219,7 @@ export function DiskManagementForm() {
     isRequestingChanges ||
     isPlanUpgradeRequired ||
     isWithinCooldownWindow ||
+    isSpendCapEnabled ||
     !canUpdateDiskConfiguration ||
     !isAws
 
@@ -325,154 +329,160 @@ export function DiskManagementForm() {
         <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
           <NoticeBar
             type="default"
-            visible={isEntitlementsLoaded && !hasAccess}
+            visible={isEntitlementsLoaded && isPlanUpgradeRequired}
             title="Compute and Disk configuration is not available on the Free Plan"
             actions={<UpgradePlanButton source="diskManagementConfigure" plan="Pro" />}
             description="You will need to upgrade to at least the Pro Plan to configure compute and disk"
           />
 
-          {isProjectResizing || isProjectRequestingDiskChanges || noPermissions ? (
-            <div className="relative flex flex-col gap-10">
-              <DiskMangementRestartRequiredSection
-                visible={isProjectResizing}
-                title="Your project will now automatically restart."
-                description="Your project will be unavailable for up to 2 mins."
-              />
-              <NoticeBar
-                type="default"
-                visible={isProjectRequestingDiskChanges}
-                title="Disk configuration changes have been requested"
-                description="The requested changes will be applied to your disk shortly"
-              />
-              <NoticeBar
-                type="default"
-                visible={noPermissions}
-                title="You do not have permission to update disk configuration"
-                description="Please contact your organization administrator to update your disk configuration"
-              />
-            </div>
-          ) : null}
+          {isProjectResizing ||
+            isProjectRequestingDiskChanges ||
+            (noPermissions && (
+              <div className="relative flex flex-col gap-10">
+                <DiskMangementRestartRequiredSection
+                  visible={isProjectResizing}
+                  title="Your project will now automatically restart."
+                  description="Your project will be unavailable for up to 2 mins."
+                />
+                <NoticeBar
+                  type="default"
+                  visible={isProjectRequestingDiskChanges}
+                  title="Disk configuration changes have been requested"
+                  description="The requested changes will be applied to your disk shortly"
+                />
+                <NoticeBar
+                  type="default"
+                  visible={noPermissions}
+                  title="You do not have permission to update disk configuration"
+                  description="Please contact your organization administrator to update your disk configuration"
+                />
+              </div>
+            ))}
+
           <Separator />
 
           <ComputeSizeField form={form} disabled={disableComputeInputs} />
 
           {!(isAws || isAwsNimbus) && <Separator />}
 
-          <SpendCapDisabledSection />
+          <div className="flex flex-col gap-y-2">
+            <SpendCapDisabledSection />
 
-          <NoticeBar
-            type="default"
-            visible={!(isAws || isAwsNimbus)}
-            title="Disk configuration is only available for projects in the AWS cloud provider"
-            description={
-              isAwsK8s
-                ? 'Configuring your disk for AWS (Revamped) projects is unavailable for now.'
-                : isBranch
-                  ? 'Delete and recreate your Preview Branch to configure disk size. It was deployed on an older branching infrastructure.'
-                  : 'The Fly Postgres offering is deprecated - please migrate your instance to the AWS cloud prov to configure your disk.'
-            }
-          />
-          {isAws && (
-            <>
-              <div className="flex flex-col gap-y-3">
-                <DiskCountdownRadial />
-                {!isReadOnlyMode && usedPercentage >= 90 && isWithinCooldownWindow && (
-                  <Admonition
-                    type="destructive"
-                    title="Database size is currently over 90% of disk size"
-                    description="Your project will enter read-only mode once you reach 95% of the disk space to prevent your database from exceeding the disk limitations"
-                  >
-                    <DocsButton
-                      abbrev={false}
-                      className="mt-2"
-                      href={`${DOCS_URL}/guides/platform/database-size#read-only-mode`}
-                    />
-                  </Admonition>
-                )}
-                {isReadOnlyMode && (
-                  <Admonition
-                    type="destructive"
-                    title="Project is currently in read-only mode"
-                    description="You will need to manually override read-only mode and reduce the database size to below 95% of the disk size"
-                  >
-                    <DocsButton
-                      abbrev={false}
-                      className="mt-2"
-                      href={`${DOCS_URL}/guides/platform/database-size#disabling-read-only-mode`}
-                    />
-                  </Admonition>
-                )}
-              </div>
-              <DiskSizeField
-                form={form}
-                disableInput={disableDiskInputs}
-                setAdvancedSettingsOpenState={setAdvancedSettingsOpenState}
-              />
-              <Separator />
-              <Collapsible_Shadcn_
-                // TO DO: wrap component into pattern
-                className="-space-y-px"
-                open={advancedSettingsOpen}
-                onOpenChange={() => setAdvancedSettingsOpenState((prev) => !prev)}
-              >
-                <CollapsibleTrigger_Shadcn_ className="px-8 py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">
-                  <div className="flex flex-col items-start">
-                    <span className="text-sm text-foreground">Advanced disk settings</span>
-                    <span className="text-sm text-foreground-light text-left">
-                      Specify additional settings for your disk, including autoscaling
-                      configuration, IOPS, throughput, and disk type.
-                    </span>
-                  </div>
-                  <ChevronRight
-                    size={16}
-                    className="text-foreground-light transition-all group-data-[state=open]:rotate-90"
-                    strokeWidth={1}
-                  />
-                </CollapsibleTrigger_Shadcn_>
-                <CollapsibleContent_Shadcn_
-                  className={cn(
-                    'flex flex-col gap-8 py-8 transition-all',
-                    'data-[state=open]:border data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
+            <NoticeBar
+              type="default"
+              visible={!(isAws || isAwsNimbus)}
+              title="Disk configuration is only available for projects in the AWS cloud provider"
+              description={
+                isAwsK8s
+                  ? 'Configuring your disk for AWS (Revamped) projects is unavailable for now.'
+                  : isBranch
+                    ? 'Delete and recreate your Preview Branch to configure disk size. It was deployed on an older branching infrastructure.'
+                    : 'The Fly Postgres offering is deprecated - please migrate your instance to the AWS cloud prov to configure your disk.'
+              }
+            />
+
+            {isAws && (
+              <>
+                <div className="flex flex-col gap-y-3">
+                  <DiskCountdownRadial />
+                  {!isReadOnlyMode && usedPercentage >= 90 && isWithinCooldownWindow && (
+                    <Admonition
+                      type="destructive"
+                      title="Database size is currently over 90% of disk size"
+                      description="Your project will enter read-only mode once you reach 95% of the disk space to prevent your database from exceeding the disk limitations"
+                    >
+                      <DocsButton
+                        abbrev={false}
+                        className="mt-2"
+                        href={`${DOCS_URL}/guides/platform/database-size#read-only-mode`}
+                      />
+                    </Admonition>
                   )}
+                  {isReadOnlyMode && (
+                    <Admonition
+                      type="destructive"
+                      title="Project is currently in read-only mode"
+                      description="You will need to manually override read-only mode and reduce the database size to below 95% of the disk size"
+                    >
+                      <DocsButton
+                        abbrev={false}
+                        className="mt-2"
+                        href={`${DOCS_URL}/guides/platform/database-size#disabling-read-only-mode`}
+                      />
+                    </Admonition>
+                  )}
+                </div>
+                <DiskSizeField
+                  form={form}
+                  disableInput={disableDiskInputs}
+                  setAdvancedSettingsOpenState={setAdvancedSettingsOpenState}
+                />
+                <Separator />
+                <Collapsible_Shadcn_
+                  // TO DO: wrap component into pattern
+                  className="-space-y-px"
+                  open={advancedSettingsOpen}
+                  onOpenChange={() => setAdvancedSettingsOpenState((prev) => !prev)}
                 >
-                  <div className="px-8 flex flex-col gap-y-8">
-                    <AutoScaleFields form={form} />
-                  </div>
-                  <Separator />
-                  <div className="px-8 flex flex-col gap-y-8">
-                    <NoticeBar
-                      type="default"
-                      visible={disableIopsThroughputConfig}
-                      title="Adjusting disk configuration requires LARGE Compute size or above"
-                      description={`Increase your compute size to adjust your disk's storage type, ${form.getValues('storageType') === 'gp3' ? 'IOPS, ' : ''} and throughput`}
-                      actions={
-                        <Button
-                          type="default"
-                          onClick={() => {
-                            form.setValue('computeSize', 'ci_large')
-                          }}
-                        >
-                          Change to LARGE Compute
-                        </Button>
-                      }
+                  <CollapsibleTrigger_Shadcn_ className="px-8 py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">
+                    <div className="flex flex-col items-start">
+                      <span className="text-sm text-foreground">Advanced disk settings</span>
+                      <span className="text-sm text-foreground-light text-left">
+                        Specify additional settings for your disk, including autoscaling
+                        configuration, IOPS, throughput, and disk type.
+                      </span>
+                    </div>
+                    <ChevronRight
+                      size={16}
+                      className="text-foreground-light transition-all group-data-[state=open]:rotate-90"
+                      strokeWidth={1}
                     />
-                    <StorageTypeField
-                      form={form}
-                      disableInput={disableIopsThroughputConfig || disableDiskInputs}
-                    />
-                    <IOPSField
-                      form={form}
-                      disableInput={disableIopsThroughputConfig || disableDiskInputs}
-                    />
-                    <ThroughputField
-                      form={form}
-                      disableInput={disableIopsThroughputConfig || disableDiskInputs}
-                    />
-                  </div>
-                </CollapsibleContent_Shadcn_>
-              </Collapsible_Shadcn_>
-            </>
-          )}
+                  </CollapsibleTrigger_Shadcn_>
+                  <CollapsibleContent_Shadcn_
+                    className={cn(
+                      'flex flex-col gap-8 py-8 transition-all',
+                      'data-[state=open]:border data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
+                    )}
+                  >
+                    <div className="px-8 flex flex-col gap-y-8">
+                      <AutoScaleFields form={form} />
+                    </div>
+                    <Separator />
+                    <div className="px-8 flex flex-col gap-y-8">
+                      <NoticeBar
+                        type="default"
+                        visible={disableIopsThroughputConfig}
+                        title="Adjusting disk configuration requires LARGE Compute size or above"
+                        description={`Increase your compute size to adjust your disk's storage type, ${form.getValues('storageType') === 'gp3' ? 'IOPS, ' : ''} and throughput`}
+                        actions={
+                          <Button
+                            type="default"
+                            onClick={() => {
+                              form.setValue('computeSize', 'ci_large')
+                            }}
+                          >
+                            Change to LARGE Compute
+                          </Button>
+                        }
+                      />
+                      <StorageTypeField
+                        form={form}
+                        disableInput={disableIopsThroughputConfig || disableDiskInputs}
+                      />
+                      <IOPSField
+                        form={form}
+                        disableInput={disableIopsThroughputConfig || disableDiskInputs}
+                      />
+                      <ThroughputField
+                        form={form}
+                        disableInput={disableIopsThroughputConfig || disableDiskInputs}
+                      />
+                    </div>
+                  </CollapsibleContent_Shadcn_>
+                </Collapsible_Shadcn_>
+              </>
+            )}
+          </div>
         </ScaffoldContainer>
         <AnimatePresence>
           {isDirty ? (
