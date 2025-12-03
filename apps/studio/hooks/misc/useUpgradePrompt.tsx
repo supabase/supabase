@@ -1,12 +1,13 @@
-import { maybeShowUpgradePrompt } from 'components/interfaces/Settings/Logs/Logs.utils'
+import { maybeShowUpgradePromptIfNotEntitled } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { useEffect, useState } from 'react'
-import { useSelectedOrganizationQuery } from './useSelectedOrganization'
+import { useCheckEntitlements } from './useCheckEntitlements'
 
 export const useUpgradePrompt = (from: string) => {
-  const { data: organization } = useSelectedOrganizationQuery()
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
+  const entitledToAuditLogDays = getEntitlementNumericValue()
 
-  const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, organization?.plan?.id)
+  const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(from, entitledToAuditLogDays)
 
   useEffect(() => {
     if (shouldShowUpgradePrompt) {

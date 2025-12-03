@@ -180,6 +180,7 @@ export const POSTGRESQL_RESERVED_WORDS = new Set([
   'SYMMETRIC',
   'SYSDATE',
   'SYSTEM',
+  'SYSTEM_USER',
   'TABLE',
   'TAG',
   'TDES',

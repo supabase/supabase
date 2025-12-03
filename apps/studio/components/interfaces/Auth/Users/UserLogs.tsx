@@ -1,5 +1,6 @@
 import { ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
+import { useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 
 import { useParams } from 'common'
@@ -21,6 +22,7 @@ interface UserLogsProps {
 export const UserLogs = ({ user }: UserLogsProps) => {
   const { ref } = useParams()
   const { filters, setFilters } = useLogsUrlState()
+  const [_, setFiltersValue] = useQueryState('f')
 
   const {
     logData: authLogs,
@@ -36,6 +38,10 @@ export const UserLogs = ({ user }: UserLogsProps) => {
 
   useEffect(() => {
     if (user.id) setFilters({ ...filters, search_query: user.id })
+
+    return () => {
+      setFiltersValue(null)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.id])
 

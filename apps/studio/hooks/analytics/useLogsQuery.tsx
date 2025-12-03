@@ -16,6 +16,8 @@ import {
   checkForWithClause,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { get } from 'data/fetchers'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from 'lib/constants'
 
 export interface LogsQueryHook {
   params: LogsEndpointParams
@@ -45,6 +47,8 @@ const useLogsQuery = (
       : defaultHelper.calcTo(),
   })
 
+  const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
+
   useEffect(() => {
     setParams((prev) => ({
       ...prev,
@@ -66,9 +70,9 @@ const useLogsQuery = (
     isLoading,
     isRefetching,
     refetch,
-  } = useQuery(
-    ['projects', projectRef, 'logs', params],
-    async ({ signal }) => {
+  } = useQuery({
+    queryKey: ['projects', projectRef, 'logs', params],
+    queryFn: async ({ signal }) => {
       const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
         params: {
           path: { ref: projectRef },
@@ -82,11 +86,9 @@ const useLogsQuery = (
 
       return data as unknown as Logs
     },
-    {
-      enabled: _enabled,
-      refetchOnWindowFocus: false,
-    }
-  )
+    enabled: _enabled,
+    refetchOnWindowFocus: false,
+  })
 
   let error: null | string | object = rqError ? (rqError as any).message : null
 
@@ -98,13 +100,13 @@ const useLogsQuery = (
     if (usesWith) {
       error = {
         message: 'The parser does not yet support WITH and subquery statements.',
-        docs: 'https://supabase.com/docs/guides/platform/advanced-log-filtering#the-with-keyword-and-subqueries-are-not-supported',
+        docs: `${DOCS_URL}/guides/platform/advanced-log-filtering#the-with-keyword-and-subqueries-are-not-supported`,
       }
     }
     if (usesILIKE) {
       error = {
         message: 'BigQuery does not support ILIKE. Use REGEXP_CONTAINS instead.',
-        docs: 'https://supabase.com/docs/guides/platform/advanced-log-filtering#the-ilike-and-similar-to-keywords-are-not-supported',
+        docs: `${DOCS_URL}/guides/platform/advanced-log-filtering#the-ilike-and-similar-to-keywords-are-not-supported`,
       }
     }
   }
@@ -112,10 +114,19 @@ const useLogsQuery = (
     setParams((prev) => ({ ...prev, sql: newQuery }))
   }
 
+  const logData = (data?.result ?? []).map((x) => {
+    if (logsMetadata) {
+      return x
+    } else {
+      const { metadata, ...log } = x
+      return log
+    }
+  })
+
   return {
     params,
     isLoading: (_enabled && isLoading) || isRefetching,
-    logData: data?.result ?? [],
+    logData: logData,
     error,
     changeQuery,
     runQuery: () => refetch(),

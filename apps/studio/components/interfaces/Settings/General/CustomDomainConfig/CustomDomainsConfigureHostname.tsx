@@ -11,6 +11,7 @@ import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mut
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { Form, Input } from 'ui'
 
 const schema = yup.object({
@@ -21,8 +22,8 @@ const CustomDomainsConfigureHostname = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { mutate: checkCNAMERecord, isLoading: isCheckingRecord } = useCheckCNAMERecordMutation()
-  const { mutate: createCustomDomain, isLoading: isCreating } = useCustomDomainCreateMutation()
+  const { mutate: checkCNAMERecord, isPending: isCheckingRecord } = useCheckCNAMERecordMutation()
+  const { mutate: createCustomDomain, isPending: isCreating } = useCustomDomainCreateMutation()
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
 
   const FORM_ID = 'custom-domains-form'
@@ -77,7 +78,7 @@ const CustomDomainsConfigureHostname = () => {
                       !canConfigureCustomDomain ? (
                         "You need additional permissions to update your project's custom domain settings"
                       ) : (
-                        <DocsButton href="https://supabase.com/docs/guides/platform/custom-domains" />
+                        <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
                       )
                     }
                   />
@@ -100,13 +101,13 @@ const CustomDomainsConfigureHostname = () => {
                 <p className="col-span-12 text-sm lg:col-span-7 leading-6">
                   Set up a CNAME record for{' '}
                   {values.domain ? (
-                    <code className="text-xs">{values.domain}</code>
+                    <code className="text-code-inline">{values.domain}</code>
                   ) : (
                     'your custom domain'
                   )}{' '}
                   resolving to{' '}
                   {endpoint ? (
-                    <code className="text-xs">{endpoint}</code>
+                    <code className="text-code-inline">{endpoint}</code>
                   ) : (
                     "your project's API URL"
                   )}{' '}

@@ -1,7 +1,7 @@
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { analyticsKeys } from './keys'
 
 export type ProjectLogRequestsCountVariables = {
@@ -38,22 +38,21 @@ export const useProjectLogRequestsCountQuery = <TData = ProjectLogRequestsCountD
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectLogRequestsCountData, ProjectLogRequestsCountError, TData> = {}
+  }: UseCustomQueryOptions<ProjectLogRequestsCountData, ProjectLogRequestsCountError, TData> = {}
 ) =>
-  useQuery<ProjectLogRequestsCountData, ProjectLogRequestsCountError, TData>(
-    analyticsKeys.usageApiRequestsCount(projectRef),
-    ({ signal }) => getProjectLogRequestsCountStats({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectLogRequestsCountData, ProjectLogRequestsCountError, TData>({
+    queryKey: analyticsKeys.usageApiRequestsCount(projectRef),
+    queryFn: ({ signal }) => getProjectLogRequestsCountStats({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 
 export function prefetchProjectLogRequestsCount(
   client: QueryClient,
   { projectRef }: ProjectLogRequestsCountVariables
 ) {
-  return client.fetchQuery(analyticsKeys.usageApiRequestsCount(projectRef), ({ signal }) =>
-    getProjectLogRequestsCountStats({ projectRef }, signal)
-  )
+  return client.fetchQuery({
+    queryKey: analyticsKeys.usageApiRequestsCount(projectRef),
+    queryFn: ({ signal }) => getProjectLogRequestsCountStats({ projectRef }, signal),
+  })
 }

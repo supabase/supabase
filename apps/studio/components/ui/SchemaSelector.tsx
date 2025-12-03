@@ -124,7 +124,7 @@ const SchemaSelector = ({
                 </div>
               ) : (
                 <div className="w-full flex gap-1">
-                  <p className="text-foreground-lighter">Choose a schema…</p>
+                  <p className="text-foreground-lighter">Choose a schema...</p>
                 </div>
               )}
             </Button>

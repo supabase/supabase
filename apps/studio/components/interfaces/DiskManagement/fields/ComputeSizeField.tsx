@@ -2,15 +2,17 @@ import { CpuIcon, Lock, Microchip } from 'lucide-react'
 import { useMemo } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { InstanceSpecs } from 'lib/constants'
-import Link from 'next/link'
+import { DOCS_URL, InstanceSpecs } from 'lib/constants'
 import {
   cn,
   FormField_Shadcn_,
@@ -33,7 +35,7 @@ import {
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
 import { NoticeBar } from '../ui/NoticeBar'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 /**
  * to do: this could be a type from api-types
@@ -56,6 +58,9 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const { data: org } = useSelectedOrganizationQuery()
   const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
 
+  const { hasAccess: entitledUpdateCompute, isLoading: isEntitlementLoading } =
+    useCheckEntitlements('instances.compute_update_available_sizes')
+
   const showComputePrice = useIsFeatureEnabled('project_addons:show_compute_price')
 
   const { computeSize, storageType } = form.watch()
@@ -66,7 +71,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
     error: addonsError,
   } = useProjectAddonsQuery({ projectRef: ref })
 
-  const isLoading = isProjectLoading || isAddonsLoading
+  const isLoading = isProjectLoading || isAddonsLoading || isEntitlementLoading
 
   const { control, formState, setValue, trigger } = form
 
@@ -91,10 +96,8 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
     plan: org?.plan.id ?? 'free',
   })
 
-  const showUpgradeBadge = showMicroUpgrade(
-    org?.plan.id ?? 'free',
-    project?.infra_compute_size ?? 'nano'
-  )
+  const projectComputeSize = project?.infra_compute_size ?? 'nano'
+  const showUpgradeBadge = entitledUpdateCompute && projectComputeSize === 'nano'
 
   return (
     <FormField_Shadcn_
@@ -139,7 +142,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                 <div className="mt-3">
                   <DocsButton
                     abbrev={false}
-                    href="https://supabase.com/docs/guides/platform/compute-and-disk"
+                    href={`${DOCS_URL}/guides/platform/compute-and-disk`}
                   />
                 </div>
 
@@ -302,8 +305,12 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                       'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group] w-full h-[110px]'
                     )}
                     label={
-                      <Link
-                        href={`/support/new?projectRef=${ref}&category=sales&subject=Enquiry%20about%20larger%20instance%20sizes`}
+                      <SupportLink
+                        queryParams={{
+                          projectRef: ref,
+                          category: SupportCategories.SALES_ENQUIRY,
+                          subject: 'Enquiry about larger instance sizes',
+                        }}
                       >
                         <div className="w-full flex flex-col gap-3 justify-between">
                           <div className="relative px-3 flex justify-between">
@@ -334,7 +341,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                             </div>
                           </div>
                         </div>
-                      </Link>
+                      </SupportLink>
                     }
                   />
                 </>

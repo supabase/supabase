@@ -3,7 +3,7 @@ import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   Header,
   LoadingCardView,
@@ -33,14 +33,13 @@ import {
 
 const GenericProjectPage: NextPage = () => {
   const router = useRouter()
+  const { slug } = useParams()
   const { routeSlug, ...queryParams } = router.query
 
   const [lastVisitedOrgSlug] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''
   )
-
-  const [selectedSlug, setSlug] = useState(lastVisitedOrgSlug)
 
   const {
     data: organizations = [],
@@ -50,6 +49,10 @@ const GenericProjectPage: NextPage = () => {
   } = useOrganizationsQuery({
     enabled: IS_PLATFORM,
   })
+
+  const [selectedSlug, setSlug] = useState<string>(
+    slug || lastVisitedOrgSlug || organizations[0]?.slug
+  )
   const selectedOrganization = organizations.find((x) => x.slug === selectedSlug)
 
   const query = Object.keys(queryParams).length

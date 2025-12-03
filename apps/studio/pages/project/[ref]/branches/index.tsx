@@ -22,6 +22,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
@@ -76,7 +77,9 @@ const BranchesPage: NextPageWithLayout = () => {
   const isLoading = isLoadingConnections || isLoadingBranches
   const isSuccess = isSuccessConnections && isSuccessBranches
 
-  const { mutate: deleteBranch, isLoading: isDeleting } = useBranchDeleteMutation({
+  const isGithubConnected = githubConnection !== undefined
+
+  const { mutate: deleteBranch, isPending: isDeleting } = useBranchDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted branch')
       setSelectedBranchToDelete(undefined)
@@ -144,6 +147,7 @@ const BranchesPage: NextPageWithLayout = () => {
 
                   {!isError && (
                     <Overview
+                      isGithubConnected={isGithubConnected}
                       isLoading={isLoading}
                       isSuccess={isSuccess}
                       repo={repo}
@@ -223,7 +227,7 @@ BranchesPage.getLayout = (page) => {
             Branching Feedback
           </a>
         </Button>
-        <DocsButton href="https://supabase.com/docs/guides/platform/branching" />
+        <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
       </div>
     )
 

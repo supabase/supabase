@@ -1,11 +1,11 @@
 'use client'
 
 import dayjs from 'dayjs'
+import { formatBytes } from 'lib/helpers'
 import { useState } from 'react'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
 import { numberFormatter } from './Charts.utils'
-import { formatBytes } from 'lib/helpers'
 
 export interface ReportAttributes {
   id?: string
@@ -129,7 +129,7 @@ export const calculateTotalChartAggregate = (
     ?.filter((p) => !ignoreAttributes?.includes(p.dataKey))
     .reduce((acc, curr) => acc + curr.value, 0)
 
-const CustomTooltip = ({
+export const CustomTooltip = ({
   active,
   payload,
   label,
@@ -173,6 +173,8 @@ const CustomTooltip = ({
       ...(maxValueAttribute?.attribute ? [maxValueAttribute.attribute] : []),
     ]
 
+    const localTimeZone = dayjs.tz.guess()
+
     const total = showTotal && calculateTotalChartAggregate(payload, attributesToIgnoreFromTotal)
 
     const getIcon = (color: string, isMax: boolean) =>
@@ -212,14 +214,12 @@ const CustomTooltip = ({
           !isActiveHoveredChart && 'opacity-0'
         )}
       >
+        <p className="text-foreground-light text-xs">{localTimeZone}</p>
         <p className="font-medium">{dayjs(timestamp).format(DateTimeFormats.FULL_SECONDS)}</p>
         <div className="grid gap-0">
-          {payload
-            .reverse()
-            .filter((entry: any) => entry.value !== 0)
-            .map((entry: any, index: number) => (
-              <LabelItem key={`${entry.name}-${index}`} entry={entry} />
-            ))}
+          {payload.reverse().map((entry: any, index: number) => (
+            <LabelItem key={`${entry.name}-${index}`} entry={entry} />
+          ))}
           {active && showTotal && (
             <div className="flex md:flex-col gap-1 md:gap-0 text-foreground mt-1">
               <span className="flex-grow text-foreground-lighter">Total</span>
@@ -259,7 +259,7 @@ interface CustomLabelProps {
   hiddenAttributes?: Set<string>
 }
 
-const CustomLabel = ({
+export const CustomLabel = ({
   payload,
   attributes,
   showMaxValue,
@@ -293,12 +293,12 @@ const CustomLabel = ({
   const LabelItem = ({ entry }: { entry: any }) => {
     const attribute = attributes?.find((a) => a.attribute === entry.name)
     const isMax = entry.name === maxValueAttribute?.attribute
-    const isHovered = hoveredLabel === entry.name
     const isHidden = hiddenAttributes?.has(entry.name)
+    const color = isHidden ? 'gray' : entry.color
 
     const Label = () => (
       <div className="flex items-center gap-1">
-        {getIcon(entry.name, entry.color)}
+        {getIcon(entry.name, color)}
         <span className={cn('text-nowrap text-foreground-lighter', isHidden && 'opacity-50')}>
           {attribute?.label || entry.name}
         </span>
@@ -310,17 +310,17 @@ const CustomLabel = ({
     return (
       <button
         key={entry.name}
-        className="flex md:flex-col gap-1 md:gap-0 w-fit text-foreground rounded-lg p-1.5 hover:bg-background-overlay-hover"
+        className="flex md:flex-col gap-1 md:gap-0 w-fit text-foreground rounded-lg  hover:bg-background-overlay-hover"
         onMouseOver={() => handleMouseEnter(entry.name)}
         onMouseOutCapture={handleMouseLeave}
         onClick={(e) => onToggleAttribute?.(entry.name, { exclusive: e.metaKey || e.ctrlKey })}
       >
         {!!attribute?.tooltip ? (
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger className="p-1.5">
               <Label />
             </TooltipTrigger>
-            <TooltipContent side="bottom" align="center" className="max-w-[250px]">
+            <TooltipContent sideOffset={6} side="bottom" align="center" className="max-w-[250px]">
               {attribute.tooltip}
             </TooltipContent>
           </Tooltip>
@@ -334,10 +334,10 @@ const CustomLabel = ({
   return (
     <div className="relative z-10 mx-auto flex flex-col items-center gap-1 text-xs w-full">
       <div className="flex flex-wrap items-center justify-center gap-2">
-        {items?.map((entry, index) => <LabelItem key={`${entry.name}-${index}`} entry={entry} />)}
+        <TooltipProvider delayDuration={800}>
+          {items?.map((entry, index) => <LabelItem key={`${entry.name}-${index}`} entry={entry} />)}
+        </TooltipProvider>
       </div>
     </div>
   )
 }
-
-export { CustomLabel, CustomTooltip }

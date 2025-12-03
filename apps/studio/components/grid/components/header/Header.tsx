@@ -17,6 +17,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import {
   useRoleImpersonationStateSnapshot,
@@ -45,9 +46,10 @@ import { SortPopover } from './sort/SortPopover'
 export const MAX_EXPORT_ROW_COUNT = 500000
 export const MAX_EXPORT_ROW_COUNT_MESSAGE = (
   <>
-    Sorry! We're unable to support exporting row counts larger than $
-    {MAX_EXPORT_ROW_COUNT.toLocaleString()} at the moment. Alternatively, you may consider using
-    <Link href="https://supabase.com/docs/reference/cli/supabase-db-dump" target="_blank">
+    Sorry! We're unable to support exporting row counts larger than{' '}
+    {MAX_EXPORT_ROW_COUNT.toLocaleString('en-US')} at the moment. Alternatively, you may consider
+    using{' '}
+    <Link href={`${DOCS_URL}/reference/cli/supabase-db-dump`} target="_blank">
       pg_dump
     </Link>{' '}
     via our CLI instead.
@@ -57,9 +59,10 @@ export const MAX_EXPORT_ROW_COUNT_MESSAGE = (
 export type HeaderProps = {
   customHeader: ReactNode
   isRefetching: boolean
+  tableQueriesEnabled?: boolean
 }
 
-export const Header = ({ customHeader, isRefetching }: HeaderProps) => {
+export const Header = ({ customHeader, isRefetching, tableQueriesEnabled = true }: HeaderProps) => {
   const snap = useTableEditorTableStateSnapshot()
 
   return (
@@ -68,9 +71,9 @@ export const Header = ({ customHeader, isRefetching }: HeaderProps) => {
         {customHeader ? (
           customHeader
         ) : snap.selectedRows.size > 0 ? (
-          <RowHeader />
+          <RowHeader tableQueriesEnabled={tableQueriesEnabled} />
         ) : (
-          <DefaultHeader />
+          <DefaultHeader tableQueriesEnabled={tableQueriesEnabled} />
         )}
         <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
       </div>
@@ -78,7 +81,9 @@ export const Header = ({ customHeader, isRefetching }: HeaderProps) => {
   )
 }
 
-const DefaultHeader = () => {
+const DefaultHeader = ({
+  tableQueriesEnabled = true,
+}: Pick<HeaderProps, 'tableQueriesEnabled'>) => {
   const { ref: projectRef } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
 
@@ -101,7 +106,7 @@ const DefaultHeader = () => {
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
         <FilterPopover />
-        <SortPopover />
+        <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
       </div>
       {canAddNew && (
         <>
@@ -223,7 +228,11 @@ const DefaultHeader = () => {
   )
 }
 
-const RowHeader = () => {
+type RowHeaderProps = {
+  tableQueriesEnabled?: boolean
+}
+
+const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
@@ -237,16 +246,19 @@ const RowHeader = () => {
   const [isExporting, setIsExporting] = useState(false)
   const [showExportModal, setShowExportModal] = useState(false)
 
-  const { data } = useTableRowsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    tableId: snap.table.id,
-    sorts,
-    filters,
-    page: snap.page,
-    limit: tableEditorSnap.rowsPerPage,
-    roleImpersonationState: roleImpersonationState as RoleImpersonationState,
-  })
+  const { data } = useTableRowsQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      tableId: snap.table.id,
+      sorts,
+      filters,
+      page: snap.page,
+      limit: tableEditorSnap.rowsPerPage,
+      roleImpersonationState: roleImpersonationState as RoleImpersonationState,
+    },
+    { enabled: tableQueriesEnabled }
+  )
 
   const { data: countData } = useTableRowsCountQuery(
     {
@@ -257,7 +269,7 @@ const RowHeader = () => {
       enforceExactCount: snap.enforceExactCount,
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
-    { keepPreviousData: true }
+    { keepPreviousData: true, enabled: tableQueriesEnabled }
   )
 
   const allRows = data?.rows ?? []

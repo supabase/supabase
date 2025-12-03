@@ -6,8 +6,9 @@ import { useParams } from 'common'
 import { SingleStat } from 'components/ui/SingleStat'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useBackupsQuery } from 'data/database/backups-query'
-import { useMigrationsQuery } from 'data/database/migrations-query'
+import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { parseMigrationVersion } from 'lib/migration-utils'
 import { cn, Skeleton } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { ServiceStatus } from './ServiceStatus'
@@ -40,7 +41,10 @@ export const ActivityStats = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const latestMigration = useMemo(() => (migrationsData ?? [])[0], [migrationsData])
+  const latestMigration = useMemo<DatabaseMigration | undefined>(
+    () => (migrationsData ?? [])[0],
+    [migrationsData]
+  )
 
   const { data: backupsData, isLoading: isLoadingBackups } = useBackupsQuery({
     projectRef: project?.ref,
@@ -53,26 +57,45 @@ export const ActivityStats = () => {
       .sort((a, b) => new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf())[0]
   }, [backupsData])
 
+  const [versionLabel, versionTimestamp] = useMemo(() => {
+    const version = latestMigration?.version
+
+    const versionDayjs = parseMigrationVersion(version)
+    if (versionDayjs) {
+      return [versionDayjs.fromNow(), versionDayjs.toISOString()]
+    }
+
+    return [undefined, undefined]
+  }, [latestMigration])
+
+  const hasValidVersion = versionLabel && versionTimestamp
+
+  const versionLabelText = migrationsData && migrationsData.length > 0 ? 'Unknown' : 'No migrations'
+
   return (
     <div className="@container">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-6 flex-wrap">
+      <div className="grid grid-cols-1 @md:grid-cols-2 gap-2 @md:gap-6 flex-wrap">
         <ServiceStatus />
 
         <SingleStat
           href={`/project/${ref}/database/migrations`}
           icon={<Database size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>Last migration</span>}
+          trackingProperties={{
+            stat_type: 'migrations',
+            stat_value: migrationsData?.length ?? 0,
+          }}
           value={
             isLoadingMigrations ? (
               <Skeleton className="h-6 w-24" />
-            ) : latestMigration ? (
+            ) : hasValidVersion ? (
               <TimestampInfo
                 className="text-base"
-                label={dayjs(latestMigration.version, 'YYYYMMDDHHmmss').fromNow()}
-                utcTimestamp={dayjs(latestMigration.version, 'YYYYMMDDHHmmss').toISOString()}
+                label={versionLabel}
+                utcTimestamp={versionTimestamp}
               />
             ) : (
-              <p className="text-foreground-lighter">No migrations</p>
+              <p className="text-foreground-lighter">{versionLabelText}</p>
             )
           }
         />
@@ -81,6 +104,10 @@ export const ActivityStats = () => {
           href={`/project/${ref}/database/backups/scheduled`}
           icon={<Archive size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>Last backup</span>}
+          trackingProperties={{
+            stat_type: 'backups',
+            stat_value: backupsData?.backups?.length ?? 0,
+          }}
           value={
             isLoadingBackups ? (
               <Skeleton className="h-6 w-24" />
@@ -103,6 +130,10 @@ export const ActivityStats = () => {
           href={`/project/${ref}/branches`}
           icon={<GitBranch size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>{isDefaultProject ? 'Recent branch' : 'Branch Created'}</span>}
+          trackingProperties={{
+            stat_type: 'branches',
+            stat_value: branchesData?.length ?? 0,
+          }}
           value={
             isLoadingBranches ? (
               <Skeleton className="h-6 w-24" />

@@ -34,6 +34,29 @@ describe('Table Row Query', () => {
       })
       expect(result).toEqual([])
     })
+
+    test('should exclude specified columns when determining default sort', () => {
+      const table = {
+        primary_keys: [{ name: 'id' }],
+        columns: [
+          {
+            name: 'id',
+            data_type: 'integer',
+            format: 'int4',
+            ordinal_position: 1,
+          },
+          {
+            name: 'name',
+            data_type: 'text',
+            format: 'text',
+            ordinal_position: 2,
+          },
+        ],
+      } as any
+
+      const result = getDefaultOrderByColumns(table, { excludedColumns: ['id'] })
+      expect(result).toEqual(['name'])
+    })
   })
 
   describe('getTableRowsSql', () => {

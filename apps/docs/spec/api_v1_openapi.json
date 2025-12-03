@@ -38,7 +38,9 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Get database branch config",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
+        "x-oauth-scope": "environment:read"
       },
       "patch": {
         "description": "Updates the configuration of the specified database branch",
@@ -80,10 +82,12 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Update database branch config",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-oauth-scope": "environment:write"
       },
       "delete": {
-        "description": "Deletes the specified database branch",
+        "description": "Deletes the specified database branch. By default, deletes immediately. Use force=false to schedule deletion with 1-hour grace period (only when soft deletion is enabled).",
         "operationId": "v1-delete-a-branch",
         "parameters": [
           {
@@ -103,6 +107,13 @@
                 { "type": "string", "format": "uuid", "deprecated": true }
               ]
             }
+          },
+          {
+            "name": "force",
+            "required": false,
+            "in": "query",
+            "description": "If set to false, schedule deletion with 1-hour grace period (only when soft deletion is enabled).",
+            "schema": { "default": "true", "type": "boolean" }
           }
         ],
         "responses": {
@@ -118,7 +129,9 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Delete a database branch",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-oauth-scope": "environment:write"
       }
     },
     "/v1/branches/{branch_id_or_ref}/push": {
@@ -164,7 +177,9 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Pushes a database branch",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-oauth-scope": "environment:write"
       }
     },
     "/v1/branches/{branch_id_or_ref}/merge": {
@@ -210,7 +225,9 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Merges a database branch",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-oauth-scope": "environment:write"
       }
     },
     "/v1/branches/{branch_id_or_ref}/reset": {
@@ -256,7 +273,51 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Resets a database branch",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-oauth-scope": "environment:write"
+      }
+    },
+    "/v1/branches/{branch_id_or_ref}/restore": {
+      "post": {
+        "description": "Cancels scheduled deletion and restores the branch to active state",
+        "operationId": "v1-restore-a-branch",
+        "parameters": [
+          {
+            "name": "branch_id_or_ref",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "minLength": 20,
+                  "maxLength": 20,
+                  "pattern": "^[a-z]+$",
+                  "description": "Project ref"
+                },
+                { "type": "string", "format": "uuid", "deprecated": true }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BranchRestoreResponse" }
+              }
+            }
+          },
+          "500": { "description": "Failed to restore database branch" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Restore a scheduled branch deletion",
+        "tags": ["Environments"],
+        "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-oauth-scope": "environment:write"
       }
     },
     "/v1/branches/{branch_id_or_ref}/diff": {
@@ -298,7 +359,9 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Diffs a database branch",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-oauth-scope": "environment:write"
       }
     },
     "/v1/projects": {
@@ -321,7 +384,9 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "List all projects",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-oauth-scope": "projects:read"
       },
       "post": {
         "operationId": "v1-create-a-project",
@@ -342,6 +407,76 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Create a project",
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-oauth-scope": "projects:write"
+      }
+    },
+    "/v1/projects/available-regions": {
+      "get": {
+        "operationId": "v1-get-available-regions",
+        "parameters": [
+          {
+            "name": "organization_slug",
+            "required": true,
+            "in": "query",
+            "description": "Slug of your organization",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "continent",
+            "required": false,
+            "in": "query",
+            "description": "Continent code to determine regional recommendations: NA (North America), SA (South America), EU (Europe), AF (Africa), AS (Asia), OC (Oceania), AN (Antarctica)",
+            "schema": {
+              "example": "NA",
+              "type": "string",
+              "enum": ["NA", "SA", "EU", "AF", "AS", "OC", "AN"]
+            }
+          },
+          {
+            "name": "desired_instance_size",
+            "required": false,
+            "in": "query",
+            "description": "Desired instance size",
+            "schema": {
+              "example": "nano",
+              "type": "string",
+              "enum": [
+                "pico",
+                "nano",
+                "micro",
+                "small",
+                "medium",
+                "large",
+                "xlarge",
+                "2xlarge",
+                "4xlarge",
+                "8xlarge",
+                "12xlarge",
+                "16xlarge",
+                "24xlarge",
+                "24xlarge_optimized_memory",
+                "24xlarge_optimized_cpu",
+                "24xlarge_high_memory",
+                "48xlarge",
+                "48xlarge_optimized_memory",
+                "48xlarge_optimized_cpu",
+                "48xlarge_high_memory"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/RegionsInfo" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "[Beta] Gets the list of available regions that can be used for a new project",
         "tags": ["Projects"]
       }
     },
@@ -366,7 +501,9 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "List all organizations",
-        "tags": ["Organizations"]
+        "tags": ["Organizations"],
+        "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
+        "x-oauth-scope": "organizations:read"
       },
       "post": {
         "operationId": "v1-create-an-organization",
@@ -449,10 +586,7 @@
             "required": false,
             "in": "query",
             "description": "Resource indicator for MCP (Model Context Protocol) clients",
-            "schema": {
-              "type": "string",
-              "enum": ["https://api.supabase.com/mcp", "https://mcp.supabase.com/mcp"]
-            }
+            "schema": { "format": "uri", "type": "string" }
           }
         ],
         "responses": { "204": { "description": "" } },
@@ -559,8 +693,7 @@
         "responses": { "204": { "description": "" } },
         "security": [{ "bearer": [] }],
         "summary": "Authorize user through oauth and claim a project",
-        "tags": ["OAuth"],
-        "x-internal": true
+        "tags": ["OAuth"]
       }
     },
     "/v1/snippets": {
@@ -605,7 +738,9 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Lists SQL snippets for the logged in user",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/snippets/{id}": {
@@ -630,7 +765,211 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets a specific SQL snippet",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-oauth-scope": "database:read"
+      }
+    },
+    "/v1/projects/{ref}/actions": {
+      "get": {
+        "description": "Returns a paginated list of action runs of the specified project.",
+        "operationId": "v1-list-action-runs",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "schema": { "minimum": 0, "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": { "minimum": 10, "type": "number" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ListActionRunResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to list action runs" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "List all action runs",
+        "tags": ["Environments"],
+        "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
+        "x-oauth-scope": "environment:read"
+      },
+      "head": {
+        "description": "Returns the total number of action runs of the specified project.",
+        "operationId": "v1-count-action-runs",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "headers": {
+              "X-Total-Count": {
+                "schema": { "type": "integer", "format": "int64", "minimum": 0 },
+                "description": "total count value"
+              }
+            },
+            "description": ""
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to count action runs" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Count the number of action runs",
+        "tags": ["Environments"],
+        "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
+        "x-oauth-scope": "environment:read"
+      }
+    },
+    "/v1/projects/{ref}/actions/{run_id}": {
+      "get": {
+        "description": "Returns the current status of the specified action run.",
+        "operationId": "v1-get-action-run",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          },
+          {
+            "name": "run_id",
+            "required": true,
+            "in": "path",
+            "description": "Action Run ID",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ActionRunResponse" } }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to get action run status" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get the status of an action run",
+        "tags": ["Environments"],
+        "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
+        "x-oauth-scope": "environment:read"
+      }
+    },
+    "/v1/projects/{ref}/actions/{run_id}/status": {
+      "patch": {
+        "description": "Updates the status of an ongoing action run.",
+        "operationId": "v1-update-action-run-status",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          },
+          {
+            "name": "run_id",
+            "required": true,
+            "in": "path",
+            "description": "Action Run ID",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/UpdateRunStatusBody" } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UpdateRunStatusResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to update action run status" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Update the status of an action run",
+        "tags": ["Environments"],
+        "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-oauth-scope": "environment:write"
+      }
+    },
+    "/v1/projects/{ref}/actions/{run_id}/logs": {
+      "get": {
+        "description": "Returns the logs from the specified action run.",
+        "operationId": "v1-get-action-run-logs",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          },
+          {
+            "name": "run_id",
+            "required": true,
+            "in": "path",
+            "description": "Action Run ID",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": { "text/plain": { "schema": { "type": "string" } } },
+            "description": ""
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to get action run logs" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get the logs of an action run",
+        "tags": ["Environments"],
+        "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
+        "x-oauth-scope": "environment:read"
       }
     },
     "/v1/projects/{ref}/api-keys": {
@@ -664,11 +1003,15 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Get project api keys",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
+        "x-oauth-scope": "secrets:read"
       },
       "post": {
         "operationId": "v1-create-project-api-key",
@@ -701,11 +1044,15 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/ApiKeyResponse" } }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Creates a new API key for the project",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-oauth-scope": "secrets:write"
       }
     },
     "/v1/projects/{ref}/api-keys/legacy": {
@@ -729,11 +1076,15 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Check whether JWT based legacy (anon, service_role) API keys are enabled. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
+        "x-oauth-scope": "secrets:read"
       },
       "put": {
         "operationId": "v1-update-project-legacy-api-keys",
@@ -762,11 +1113,15 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Disable or re-enable JWT based legacy (anon, service_role) API keys. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-oauth-scope": "secrets:write"
       }
     },
     "/v1/projects/{ref}/api-keys/{id}": {
@@ -807,11 +1162,15 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/ApiKeyResponse" } }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Updates an API key for the project",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-oauth-scope": "secrets:write"
       },
       "get": {
         "operationId": "v1-get-project-api-key",
@@ -844,11 +1203,15 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/ApiKeyResponse" } }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Get API key",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
+        "x-oauth-scope": "secrets:read"
       },
       "delete": {
         "operationId": "v1-delete-project-api-key",
@@ -889,11 +1252,15 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/ApiKeyResponse" } }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Deletes an API key for the project",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-oauth-scope": "secrets:write"
       }
     },
     "/v1/projects/{ref}/branches": {
@@ -921,12 +1288,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve database branches" }
         },
         "security": [{ "bearer": [] }],
         "summary": "List all database branches",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
+        "x-oauth-scope": "environment:read"
       },
       "post": {
         "description": "Creates a database branch from the specified project.",
@@ -953,12 +1324,16 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/BranchResponse" } }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to create database branch" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Create a database branch",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-oauth-scope": "environment:write"
       },
       "delete": {
         "description": "Disables preview branching for the specified project",
@@ -974,12 +1349,16 @@
         ],
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to disable preview branching" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Disables preview branching",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [{ "name": "OAuth scope: environment:write", "position": "after" }],
+        "x-oauth-scope": "environment:write"
       }
     },
     "/v1/projects/{ref}/branches/{name}": {
@@ -1003,12 +1382,16 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/BranchResponse" } }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to fetch database branch" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Get a database branch",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [{ "name": "OAuth scope: environment:read", "position": "after" }],
+        "x-oauth-scope": "environment:read"
       }
     },
     "/v1/projects/{ref}/custom-hostname": {
@@ -1032,12 +1415,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's custom hostname config" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Gets project's custom hostname config",
-        "tags": ["Domains"]
+        "tags": ["Domains"],
+        "x-badges": [{ "name": "OAuth scope: domains:read", "position": "after" }],
+        "x-oauth-scope": "domains:read"
       },
       "delete": {
         "operationId": "v1-Delete hostname config",
@@ -1052,12 +1439,16 @@
         ],
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to delete project custom hostname configuration" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Deletes a project's custom hostname configuration",
-        "tags": ["Domains"]
+        "tags": ["Domains"],
+        "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
+        "x-oauth-scope": "domains:write"
       }
     },
     "/v1/projects/{ref}/custom-hostname/initialize": {
@@ -1089,12 +1480,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project custom hostname configuration" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Updates project's custom hostname configuration",
-        "tags": ["Domains"]
+        "tags": ["Domains"],
+        "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
+        "x-oauth-scope": "domains:write"
       }
     },
     "/v1/projects/{ref}/custom-hostname/reverify": {
@@ -1118,12 +1513,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to verify project custom hostname configuration" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Attempts to verify the DNS configuration for project's custom hostname configuration",
-        "tags": ["Domains"]
+        "tags": ["Domains"],
+        "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
+        "x-oauth-scope": "domains:write"
       }
     },
     "/v1/projects/{ref}/custom-hostname/activate": {
@@ -1147,12 +1546,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to activate project custom hostname configuration" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Activates a custom hostname for a project.",
-        "tags": ["Domains"]
+        "tags": ["Domains"],
+        "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
+        "x-oauth-scope": "domains:write"
       }
     },
     "/v1/projects/{ref}/network-bans/retrieve": {
@@ -1176,12 +1579,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's network bans" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Gets project's network bans",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-oauth-scope": "projects:read"
       }
     },
     "/v1/projects/{ref}/network-bans/retrieve/enriched": {
@@ -1205,12 +1612,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's enriched network bans" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Gets project's network bans with additional information about which databases they affect",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-oauth-scope": "projects:read"
       }
     },
     "/v1/projects/{ref}/network-bans": {
@@ -1235,12 +1646,16 @@
         },
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to remove network bans." }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Remove network bans.",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-oauth-scope": "projects:write"
       }
     },
     "/v1/projects/{ref}/network-restrictions": {
@@ -1264,12 +1679,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's network restrictions" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Gets project's network restrictions",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-oauth-scope": "projects:read"
       },
       "patch": {
         "operationId": "v1-patch-network-restrictions",
@@ -1299,12 +1718,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project network restrictions" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Alpha] Updates project's network restrictions by adding or removing CIDRs",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-oauth-scope": "projects:write"
       }
     },
     "/v1/projects/{ref}/network-restrictions/apply": {
@@ -1336,12 +1759,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project network restrictions" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Updates project's network restrictions",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-oauth-scope": "projects:write"
       }
     },
     "/v1/projects/{ref}/pgsodium": {
@@ -1365,12 +1792,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's pgsodium config" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Gets project's pgsodium config",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
+        "x-oauth-scope": "secrets:read"
       },
       "put": {
         "operationId": "v1-update-pgsodium-config",
@@ -1400,12 +1831,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project's pgsodium config" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-oauth-scope": "secrets:write"
       }
     },
     "/v1/projects/{ref}/postgrest": {
@@ -1429,12 +1864,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's postgrest config" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets project's postgrest config",
-        "tags": ["Rest"]
+        "tags": ["Rest"],
+        "x-badges": [{ "name": "OAuth scope: rest:read", "position": "after" }],
+        "x-oauth-scope": "rest:read"
       },
       "patch": {
         "operationId": "v1-update-postgrest-service-config",
@@ -1464,12 +1903,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project's postgrest config" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Updates project's postgrest config",
-        "tags": ["Rest"]
+        "tags": ["Rest"],
+        "x-badges": [{ "name": "OAuth scope: rest:write", "position": "after" }],
+        "x-oauth-scope": "rest:write"
       }
     },
     "/v1/projects/{ref}": {
@@ -1493,12 +1936,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets a specific project that belongs to the authenticated user",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-oauth-scope": "projects:read"
       },
       "delete": {
         "operationId": "v1-delete-a-project",
@@ -1520,11 +1967,52 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Deletes the given project",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-oauth-scope": "projects:write"
+      },
+      "patch": {
+        "operationId": "v1-update-a-project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/V1UpdateProjectBody" } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V1ProjectRefResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to update project" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Updates the given project",
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-oauth-scope": "projects:write"
       }
     },
     "/v1/projects/{ref}/secrets": {
@@ -1552,12 +2040,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's secrets" }
         },
         "security": [{ "bearer": [] }],
         "summary": "List all secrets",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
+        "x-oauth-scope": "secrets:read"
       },
       "post": {
         "description": "Creates multiple secrets and adds them to the specified project.",
@@ -1579,12 +2071,16 @@
         },
         "responses": {
           "201": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to create project's secrets" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Bulk create secrets",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-oauth-scope": "secrets:write"
       },
       "delete": {
         "description": "Deletes all secrets with the given names from the specified project",
@@ -1601,17 +2097,21 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": { "schema": { "type": "array", "items": { "type": "string" } } }
+            "application/json": { "schema": { "$ref": "#/components/schemas/DeleteSecretsBody" } }
           }
         },
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to delete secrets with given names" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Bulk delete secrets",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-oauth-scope": "secrets:write"
       }
     },
     "/v1/projects/{ref}/ssl-enforcement": {
@@ -1635,12 +2135,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's SSL enforcement config" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Get project's SSL enforcement configuration.",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-oauth-scope": "database:read"
       },
       "put": {
         "operationId": "v1-update-ssl-enforcement-config",
@@ -1670,12 +2174,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project's SSL enforcement configuration." }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Update project's SSL enforcement configuration.",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/types/typescript": {
@@ -1706,12 +2214,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to generate TypeScript types" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Generate TypeScript types",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/vanity-subdomain": {
@@ -1735,12 +2247,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get project vanity subdomain configuration" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Gets current vanity subdomain config",
-        "tags": ["Domains"]
+        "tags": ["Domains"],
+        "x-badges": [{ "name": "OAuth scope: domains:read", "position": "after" }],
+        "x-oauth-scope": "domains:read"
       },
       "delete": {
         "operationId": "v1-deactivate-vanity-subdomain-config",
@@ -1755,12 +2271,16 @@
         ],
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to delete project vanity subdomain configuration" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Deletes a project's vanity subdomain configuration",
-        "tags": ["Domains"]
+        "tags": ["Domains"],
+        "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
+        "x-oauth-scope": "domains:write"
       }
     },
     "/v1/projects/{ref}/vanity-subdomain/check-availability": {
@@ -1790,12 +2310,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to check project vanity subdomain configuration" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Checks vanity subdomain availability",
-        "tags": ["Domains"]
+        "tags": ["Domains"],
+        "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
+        "x-oauth-scope": "domains:write"
       }
     },
     "/v1/projects/{ref}/vanity-subdomain/activate": {
@@ -1825,12 +2349,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to activate project vanity subdomain configuration" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Activates a vanity subdomain for a project.",
-        "tags": ["Domains"]
+        "tags": ["Domains"],
+        "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
+        "x-oauth-scope": "domains:write"
       }
     },
     "/v1/projects/{ref}/upgrade": {
@@ -1860,12 +2388,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to initiate project upgrade" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Upgrades the project's Postgres version",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-oauth-scope": "projects:write"
       }
     },
     "/v1/projects/{ref}/upgrade/eligibility": {
@@ -1889,12 +2421,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to determine project upgrade eligibility" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Returns the project's eligibility for upgrades",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-oauth-scope": "projects:read"
       }
     },
     "/v1/projects/{ref}/upgrade/status": {
@@ -1924,12 +2460,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project upgrade status" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Gets the latest status of the project's upgrade",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-oauth-scope": "projects:read"
       }
     },
     "/v1/projects/{ref}/readonly": {
@@ -1953,12 +2493,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get project readonly mode status" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Returns project's readonly mode status",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/readonly/temporary-disable": {
@@ -1975,12 +2519,16 @@
         ],
         "responses": {
           "201": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to disable project's readonly mode" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Disables project's readonly mode for the next 15 minutes",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/read-replicas/setup": {
@@ -2005,7 +2553,9 @@
         },
         "responses": {
           "201": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to set up read replica" }
         },
         "security": [{ "bearer": [] }],
@@ -2035,7 +2585,9 @@
         },
         "responses": {
           "201": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to remove read replica" }
         },
         "security": [{ "bearer": [] }],
@@ -2094,12 +2646,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's service health status" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets project's service health status",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-oauth-scope": "projects:read"
       }
     },
     "/v1/projects/{ref}/config/auth/signing-keys/legacy": {
@@ -2123,11 +2679,15 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Set up the project's existing JWT secret as an in_use JWT signing key. This endpoint will be removed in the future always check for HTTP 404 Not Found.",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-oauth-scope": "secrets:write"
       },
       "get": {
         "operationId": "v1-get-legacy-signing-key",
@@ -2149,11 +2709,15 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Get the signing key information for the JWT secret imported as signing key for this project. This endpoint will be removed in the future, check for HTTP 404 Not Found.",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
+        "x-oauth-scope": "secrets:read"
       }
     },
     "/v1/projects/{ref}/config/auth/signing-keys": {
@@ -2185,11 +2749,15 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Create a new signing key for the project in standby status",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-oauth-scope": "secrets:write"
       },
       "get": {
         "operationId": "v1-get-project-signing-keys",
@@ -2211,11 +2779,15 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "List all signing keys for the project",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
+        "x-oauth-scope": "secrets:read"
       }
     },
     "/v1/projects/{ref}/config/auth/signing-keys/{id}": {
@@ -2245,7 +2817,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Get information about a signing key",
@@ -2277,11 +2851,15 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Remove a signing key from a project. Only possible if the key has been in revoked status for a while.",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-oauth-scope": "secrets:write"
       },
       "patch": {
         "operationId": "v1-update-project-signing-key",
@@ -2317,11 +2895,15 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Update a signing key, mainly its status",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
+        "x-oauth-scope": "secrets:write"
       }
     },
     "/v1/projects/{ref}/config/storage": {
@@ -2345,7 +2927,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's storage config" }
         },
         "security": [{ "bearer": [] }],
@@ -2373,7 +2957,9 @@
         },
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project's storage config" }
         },
         "security": [{ "bearer": [] }],
@@ -2402,12 +2988,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's Postgres config" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets project's Postgres config",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-oauth-scope": "database:read"
       },
       "put": {
         "operationId": "v1-update-postgres-config",
@@ -2437,12 +3027,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project's Postgres config" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Updates project's Postgres config",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/config/database/pgbouncer": {
@@ -2466,11 +3060,15 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's pgbouncer config" }
         },
         "summary": "Get project's pgbouncer config",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/config/database/pooler": {
@@ -2497,12 +3095,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's supavisor config" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets project's supavisor config",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-oauth-scope": "database:read"
       },
       "patch": {
         "operationId": "v1-update-pooler-config",
@@ -2532,12 +3134,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project's supavisor config" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Updates project's supavisor config",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/config/auth": {
@@ -2561,12 +3167,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's auth config" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets project's auth config",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [{ "name": "OAuth scope: auth:read", "position": "after" }],
+        "x-oauth-scope": "auth:read"
       },
       "patch": {
         "operationId": "v1-update-auth-service-config",
@@ -2596,12 +3206,75 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update project's auth config" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Updates a project's auth config",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [{ "name": "OAuth scope: auth:write", "position": "after" }],
+        "x-oauth-scope": "auth:write"
+      }
+    },
+    "/v1/projects/{ref}/config/realtime": {
+      "get": {
+        "operationId": "v1-get-realtime-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gets project's realtime configuration",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RealtimeConfigResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Gets realtime configuration",
+        "tags": ["Realtime Config"]
+      },
+      "patch": {
+        "operationId": "v1-update-realtime-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateRealtimeConfigBody" }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Updates realtime configuration",
+        "tags": ["Realtime Config"]
       }
     },
     "/v1/projects/{ref}/config/auth/third-party-auth": {
@@ -2631,11 +3304,15 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/ThirdPartyAuth" } }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Creates a new third-party auth integration",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [{ "name": "OAuth scope: auth:write", "position": "after" }],
+        "x-oauth-scope": "auth:write"
       },
       "get": {
         "operationId": "v1-list-project-tpa-integrations",
@@ -2660,11 +3337,15 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Lists all third-party auth integrations",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [{ "name": "OAuth scope: auth:read", "position": "after" }],
+        "x-oauth-scope": "auth:read"
       }
     },
     "/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}": {
@@ -2692,11 +3373,15 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/ThirdPartyAuth" } }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Removes a third-party auth integration",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [{ "name": "OAuth scope: auth:write", "position": "after" }],
+        "x-oauth-scope": "auth:write"
       },
       "get": {
         "operationId": "v1-get-project-tpa-integration",
@@ -2722,11 +3407,15 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/ThirdPartyAuth" } }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Get a third-party integration",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [{ "name": "OAuth scope: auth:read", "position": "after" }],
+        "x-oauth-scope": "auth:read"
       }
     },
     "/v1/projects/{ref}/pause": {
@@ -2741,10 +3430,17 @@
             "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
-        "responses": { "200": { "description": "" }, "403": { "description": "" } },
+        "responses": {
+          "200": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "security": [{ "bearer": [] }],
         "summary": "Pauses the given project",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-oauth-scope": "projects:write"
       }
     },
     "/v1/projects/{ref}/restore": {
@@ -2770,11 +3466,15 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Lists available restore versions for the given project",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-oauth-scope": "projects:read"
       },
       "post": {
         "operationId": "v1-restore-a-project",
@@ -2787,10 +3487,17 @@
             "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
-        "responses": { "200": { "description": "" }, "403": { "description": "" } },
+        "responses": {
+          "200": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "security": [{ "bearer": [] }],
         "summary": "Restores the given project",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-oauth-scope": "projects:write"
       }
     },
     "/v1/projects/{ref}/restore/cancel": {
@@ -2805,14 +3512,22 @@
             "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
-        "responses": { "200": { "description": "" }, "403": { "description": "" } },
+        "responses": {
+          "200": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "security": [{ "bearer": [] }],
         "summary": "Cancels the given project restoration",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
+        "x-oauth-scope": "projects:write"
       }
     },
     "/v1/projects/{ref}/billing/addons": {
       "get": {
+        "description": "Returns the billing addons that are currently applied, including the active compute instance size, and lists every addon option that can be provisioned with pricing metadata.",
         "operationId": "v1-list-project-addons",
         "parameters": [
           {
@@ -2832,14 +3547,17 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to list project addons" }
         },
         "security": [{ "bearer": [] }],
-        "summary": "Lists project addons",
+        "summary": "List billing addons and compute instance selections",
         "tags": ["Billing"]
       },
       "patch": {
+        "description": "Selects an addon variant, for example scaling the project’s compute instance up or down, and applies it to the project.",
         "operationId": "v1-apply-project-addon",
         "parameters": [
           {
@@ -2860,16 +3578,19 @@
         },
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to apply project addon" }
         },
         "security": [{ "bearer": [] }],
-        "summary": "Applies project addon",
+        "summary": "Apply or update billing addons, including compute instance size",
         "tags": ["Billing"]
       }
     },
     "/v1/projects/{ref}/billing/addons/{addon_variant}": {
       "delete": {
+        "description": "Disables the selected addon variant, including rolling the compute instance back to its previous size.",
         "operationId": "v1-remove-project-addon",
         "parameters": [
           {
@@ -2917,11 +3638,13 @@
         ],
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to remove project addon" }
         },
         "security": [{ "bearer": [] }],
-        "summary": "Removes project addon",
+        "summary": "Remove billing addons or revert compute instance sizing",
         "tags": ["Billing"]
       }
     },
@@ -2946,7 +3669,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets project claim token",
@@ -2973,7 +3698,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Creates project claim token",
@@ -2991,7 +3718,12 @@
             "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
-        "responses": { "204": { "description": "" }, "403": { "description": "" } },
+        "responses": {
+          "204": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "security": [{ "bearer": [] }],
         "summary": "Revokes project claim token",
         "tags": ["Projects"],
@@ -3021,11 +3753,15 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets project performance advisors.",
-        "tags": ["Advisors"]
+        "tags": ["Advisors"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/advisors/security": {
@@ -3057,16 +3793,20 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets project security advisors.",
-        "tags": ["Advisors"]
+        "tags": ["Advisors"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/analytics/endpoints/logs.all": {
       "get": {
-        "description": "Executes a SQL query on the project's logs.\n\nEither the 'iso_timestamp_start' and 'iso_timestamp_end' parameters must be provided.\nIf both are not provided, only the last 1 minute of logs will be queried.\nThe timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.\n",
+        "description": "Executes a SQL query on the project's logs.\n\nEither the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.\nIf both are not provided, only the last 1 minute of logs will be queried.\nThe timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.\n\nNote: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer:~:text=logs%20from%20the-,Sources,-drop%2Ddown%3A) for all available sources. \n",
         "operationId": "v1-get-project-logs",
         "parameters": [
           {
@@ -3076,7 +3816,13 @@
             "description": "Project ref",
             "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
-          { "name": "sql", "required": false, "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "sql",
+            "required": false,
+            "in": "query",
+            "description": "Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details.",
+            "schema": { "type": "string" }
+          },
           {
             "name": "iso_timestamp_start",
             "required": false,
@@ -3097,11 +3843,15 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets project's logs",
-        "tags": ["Analytics"]
+        "tags": ["Analytics"],
+        "x-badges": [{ "name": "OAuth scope: analytics:read", "position": "after" }],
+        "x-oauth-scope": "analytics:read"
       }
     },
     "/v1/projects/{ref}/analytics/endpoints/usage.api-counts": {
@@ -3134,7 +3884,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get project's usage api counts" }
         },
         "security": [{ "bearer": [] }],
@@ -3163,7 +3915,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get project's usage api requests count" }
         },
         "security": [{ "bearer": [] }],
@@ -3197,7 +3951,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get project's function combined statistics" }
         },
         "security": [{ "bearer": [] }],
@@ -3232,12 +3988,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to create login role" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Create a login role for CLI with temporary password",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-oauth-scope": "database:write"
       },
       "delete": {
         "operationId": "v1-delete-login-roles",
@@ -3259,12 +4019,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to delete login roles" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Delete existing login roles used by CLI",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/database/migrations": {
@@ -3289,12 +4053,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to list database migrations" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] List applied migration versions",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-oauth-scope": "database:read"
       },
       "post": {
         "description": "Only available to selected partner OAuth apps",
@@ -3325,12 +4093,16 @@
         },
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to apply database migration" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Apply a database migration",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-oauth-scope": "database:write"
       },
       "put": {
         "description": "Only available to selected partner OAuth apps",
@@ -3361,12 +4133,127 @@
         },
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to upsert database migration" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Upsert a database migration without applying",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-oauth-scope": "database:write"
+      },
+      "delete": {
+        "description": "Only available to selected partner OAuth apps",
+        "operationId": "v1-rollback-migrations",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          },
+          {
+            "name": "gte",
+            "required": true,
+            "in": "query",
+            "description": "Rollback migrations greater or equal to this version",
+            "schema": { "pattern": "^\\d+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to rollback database migration" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "[Beta] Rollback database migrations and remove them from history table",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-oauth-scope": "database:write"
+      }
+    },
+    "/v1/projects/{ref}/database/migrations/{version}": {
+      "get": {
+        "description": "Only available to selected partner OAuth apps",
+        "operationId": "v1-get-a-migration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          },
+          {
+            "name": "version",
+            "required": true,
+            "in": "path",
+            "schema": { "pattern": "^\\d+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V1GetMigrationResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to get database migration" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "[Beta] Fetch an existing entry from migration history",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-oauth-scope": "database:read"
+      },
+      "patch": {
+        "description": "Only available to selected partner OAuth apps",
+        "operationId": "v1-patch-a-migration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          },
+          {
+            "name": "version",
+            "required": true,
+            "in": "path",
+            "schema": { "pattern": "^\\d+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/V1PatchMigrationBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to patch database migration" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "[Beta] Patch an existing entry in migration history",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/database/query": {
@@ -3389,12 +4276,49 @@
         },
         "responses": {
           "201": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to run sql query" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Run sql query",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-oauth-scope": "database:write"
+      }
+    },
+    "/v1/projects/{ref}/database/query/read-only": {
+      "post": {
+        "description": "All entity references must be schema qualified.",
+        "operationId": "v1-read-only-query",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/V1ReadOnlyQueryBody" } }
+          }
+        },
+        "responses": {
+          "201": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to run read-only sql query" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "[Beta] Run a sql query as supabase_read_only_user",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/database/webhooks/enable": {
@@ -3411,12 +4335,16 @@
         ],
         "responses": {
           "201": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to enable Database Webhooks on the project" }
         },
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Enables Database Webhooks on the project",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/database/context": {
@@ -3442,11 +4370,56 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets database metadata for the given project.",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-oauth-scope": "projects:read"
+      }
+    },
+    "/v1/projects/{ref}/database/password": {
+      "patch": {
+        "operationId": "v1-update-database-password",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/V1UpdatePasswordBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V1UpdatePasswordResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to update database password" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Updates the database password",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/database/jit": {
@@ -3469,12 +4442,16 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/JitAccessResponse" } }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to list database jit access" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Get user-id to role mappings for JIT access",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-oauth-scope": "database:read"
       },
       "post": {
         "description": "Authorizes the request to assume a role in the project database",
@@ -3505,12 +4482,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to authorize database jit access" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Authorize user-id to role mappings for JIT access",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-oauth-scope": "database:read"
       },
       "put": {
         "description": "Modifies the roles that can be assumed and for how long",
@@ -3537,7 +4518,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/JitAccessResponse" } }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to upsert database migration" }
         },
         "security": [{ "bearer": [] }],
@@ -3567,7 +4550,9 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to list database jit access" }
         },
         "security": [{ "bearer": [] }],
@@ -3596,7 +4581,9 @@
         ],
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to remove JIT access" }
         },
         "security": [{ "bearer": [] }],
@@ -3629,12 +4616,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve project's functions" }
         },
         "security": [{ "bearer": [] }],
         "summary": "List all functions",
-        "tags": ["Edge Functions"]
+        "tags": ["Edge Functions"],
+        "x-badges": [{ "name": "OAuth scope: edge_functions:read", "position": "after" }],
+        "x-oauth-scope": "edge_functions:read"
       },
       "post": {
         "deprecated": true,
@@ -3706,13 +4697,17 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/FunctionResponse" } }
             }
           },
+          "401": { "description": "Unauthorized" },
           "402": { "description": "Maximum number of functions reached for Plan" },
-          "403": { "description": "" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to create project's function" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Create a function",
-        "tags": ["Edge Functions"]
+        "tags": ["Edge Functions"],
+        "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
+        "x-oauth-scope": "edge_functions:write"
       },
       "put": {
         "description": "Bulk update functions. It will create a new function or replace existing. The operation is idempotent. NOTE: You will need to manually bump the version.",
@@ -3743,13 +4738,17 @@
               }
             }
           },
+          "401": { "description": "Unauthorized" },
           "402": { "description": "Maximum number of functions reached for Plan" },
-          "403": { "description": "" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update functions" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Bulk update functions",
-        "tags": ["Edge Functions"]
+        "tags": ["Edge Functions"],
+        "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
+        "x-oauth-scope": "edge_functions:write"
       }
     },
     "/v1/projects/{ref}/functions/deploy": {
@@ -3795,13 +4794,17 @@
               }
             }
           },
+          "401": { "description": "Unauthorized" },
           "402": { "description": "Maximum number of functions reached for Plan" },
-          "403": { "description": "" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to deploy function" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Deploy a function",
-        "tags": ["Edge Functions"]
+        "tags": ["Edge Functions"],
+        "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
+        "x-oauth-scope": "edge_functions:write"
       }
     },
     "/v1/projects/{ref}/functions/{function_slug}": {
@@ -3833,12 +4836,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve function with given slug" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Retrieve a function",
-        "tags": ["Edge Functions"]
+        "tags": ["Edge Functions"],
+        "x-badges": [{ "name": "OAuth scope: edge_functions:read", "position": "after" }],
+        "x-oauth-scope": "edge_functions:read"
       },
       "patch": {
         "description": "Updates a function with the specified slug and project.",
@@ -3916,12 +4923,16 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/FunctionResponse" } }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update function with given slug" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Update a function",
-        "tags": ["Edge Functions"]
+        "tags": ["Edge Functions"],
+        "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
+        "x-oauth-scope": "edge_functions:write"
       },
       "delete": {
         "description": "Deletes a function with the specified slug from the specified project.",
@@ -3944,12 +4955,16 @@
         ],
         "responses": {
           "200": { "description": "" },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to delete function with given slug" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Delete a function",
-        "tags": ["Edge Functions"]
+        "tags": ["Edge Functions"],
+        "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
+        "x-oauth-scope": "edge_functions:write"
       }
     },
     "/v1/projects/{ref}/functions/{function_slug}/body": {
@@ -3979,12 +4994,16 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/StreamableFile" } }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve function body with given slug" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Retrieve a function body",
-        "tags": ["Edge Functions"]
+        "tags": ["Edge Functions"],
+        "x-badges": [{ "name": "OAuth scope: edge_functions:read", "position": "after" }],
+        "x-oauth-scope": "edge_functions:read"
       }
     },
     "/v1/projects/{ref}/storage/buckets": {
@@ -4011,12 +5030,16 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get list of buckets" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Lists all buckets",
-        "tags": ["Storage"]
+        "tags": ["Storage"],
+        "x-badges": [{ "name": "OAuth scope: storage:read", "position": "after" }],
+        "x-oauth-scope": "storage:read"
       }
     },
     "/v1/projects/{ref}/config/auth/sso/providers": {
@@ -4046,12 +5069,16 @@
               }
             }
           },
-          "403": { "description": "" },
-          "404": { "description": "SAML 2.0 support is not enabled for this project" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "404": { "description": "SAML 2.0 support is not enabled for this project" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Creates a new SSO provider",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [{ "name": "OAuth scope: auth:write", "position": "after" }],
+        "x-oauth-scope": "auth:write"
       },
       "get": {
         "operationId": "v1-list-all-sso-provider",
@@ -4073,12 +5100,16 @@
               }
             }
           },
-          "403": { "description": "" },
-          "404": { "description": "SAML 2.0 support is not enabled for this project" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "404": { "description": "SAML 2.0 support is not enabled for this project" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Lists all SSO providers",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [{ "name": "OAuth scope: auth:read", "position": "after" }],
+        "x-oauth-scope": "auth:read"
       }
     },
     "/v1/projects/{ref}/config/auth/sso/providers/{provider_id}": {
@@ -4108,14 +5139,18 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
           "404": {
             "description": "Either SAML 2.0 was not enabled for this project, or the provider does not exist"
-          }
+          },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets a SSO provider by its UUID",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [{ "name": "OAuth scope: auth:read", "position": "after" }],
+        "x-oauth-scope": "auth:read"
       },
       "put": {
         "operationId": "v1-update-a-sso-provider",
@@ -4149,14 +5184,18 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
           "404": {
             "description": "Either SAML 2.0 was not enabled for this project, or the provider does not exist"
-          }
+          },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Updates a SSO provider by its UUID",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [{ "name": "OAuth scope: auth:write", "position": "after" }],
+        "x-oauth-scope": "auth:write"
       },
       "delete": {
         "operationId": "v1-delete-a-sso-provider",
@@ -4184,14 +5223,18 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
           "404": {
             "description": "Either SAML 2.0 was not enabled for this project, or the provider does not exist"
-          }
+          },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Removes a SSO provider by its UUID",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [{ "name": "OAuth scope: auth:write", "position": "after" }],
+        "x-oauth-scope": "auth:write"
       }
     },
     "/v1/projects/{ref}/database/backups": {
@@ -4213,12 +5256,16 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/V1BackupsResponse" } }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get backups" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Lists all backups",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/database/backups/restore-pitr": {
@@ -4239,10 +5286,17 @@
             "application/json": { "schema": { "$ref": "#/components/schemas/V1RestorePitrBody" } }
           }
         },
-        "responses": { "201": { "description": "" }, "403": { "description": "" } },
+        "responses": {
+          "201": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "security": [{ "bearer": [] }],
         "summary": "Restores a PITR backup for a database",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/database/backups/restore-point": {
@@ -4274,12 +5328,16 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Initiates a creation of a restore point for a database",
         "tags": ["Database"],
-        "x-internal": true
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-internal": true,
+        "x-oauth-scope": "database:write"
       },
       "get": {
         "operationId": "v1-get-restore-point",
@@ -4307,13 +5365,17 @@
               }
             }
           },
-          "403": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to get requested restore points" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Get restore points for project",
         "tags": ["Database"],
-        "x-internal": true
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-internal": true,
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/database/backups/undo": {
@@ -4334,11 +5396,18 @@
             "application/json": { "schema": { "$ref": "#/components/schemas/V1UndoBody" } }
           }
         },
-        "responses": { "201": { "description": "" }, "403": { "description": "" } },
+        "responses": {
+          "201": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "security": [{ "bearer": [] }],
         "summary": "Initiates an undo to a given restore point",
         "tags": ["Database"],
-        "x-internal": true
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-internal": true,
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/organizations/{slug}/members": {
@@ -4365,11 +5434,15 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "List members of an organization",
-        "tags": ["Organizations"]
+        "tags": ["Organizations"],
+        "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
+        "x-oauth-scope": "organizations:read"
       }
     },
     "/v1/organizations/{slug}": {
@@ -4393,11 +5466,15 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets information about the organization",
-        "tags": ["Organizations"]
+        "tags": ["Organizations"],
+        "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
+        "x-oauth-scope": "organizations:read"
       }
     },
     "/v1/organizations/{slug}/project-claim/{token}": {
@@ -4422,7 +5499,9 @@
               }
             }
           },
-          "403": { "description": "" }
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets project details for the specified organization and claim token",
@@ -4441,11 +5520,84 @@
           },
           { "name": "token", "required": true, "in": "path", "schema": { "type": "string" } }
         ],
-        "responses": { "204": { "description": "" }, "403": { "description": "" } },
+        "responses": {
+          "204": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "security": [{ "bearer": [] }],
         "summary": "Claims project for the specified organization",
         "tags": ["Organizations"],
         "x-internal": true
+      }
+    },
+    "/v1/organizations/{slug}/projects": {
+      "get": {
+        "description": "Returns a paginated list of projects for the specified organization.\n\n    This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.",
+        "operationId": "v1-get-all-projects-for-organization",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "description": "Organization slug",
+            "schema": { "pattern": "^[\\w-]+$", "type": "string" }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "description": "Number of projects to skip",
+            "schema": { "minimum": 0, "default": 0, "type": "integer" }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of projects to return per page",
+            "schema": { "minimum": 1, "maximum": 100, "default": 100, "type": "integer" }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search projects by name",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "Sort order for projects",
+            "schema": {
+              "default": "name_asc",
+              "type": "string",
+              "enum": ["name_asc", "name_desc", "created_asc", "created_desc"]
+            }
+          },
+          {
+            "name": "statuses",
+            "required": false,
+            "in": "query",
+            "description": "A comma-separated list of project statuses to filter by.\n\nThe following values are supported: `ACTIVE_HEALTHY`, `INACTIVE`.",
+            "schema": { "example": "?statuses=ACTIVE_HEALTHY,INACTIVE", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/OrganizationProjectsResponse" }
+              }
+            }
+          },
+          "500": { "description": "Failed to retrieve projects" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Gets all projects for the given organization",
+        "tags": ["Projects"]
       }
     }
   },
@@ -4469,7 +5621,10 @@
     { "name": "Projects", "description": "Projects related endpoints" },
     { "name": "Rest", "description": "Rest related endpoints" },
     { "name": "Secrets", "description": "Secrets related endpoints" },
-    { "name": "Storage", "description": "Storage related endpoints" }
+    {
+      "name": "Storage",
+      "description": "Visit [https://supabase.github.io/storage/](https://supabase.github.io/storage/) for complete documentation."
+    }
   ],
   "servers": [],
   "components": {
@@ -4540,7 +5695,12 @@
               "FUNCTIONS_FAILED"
             ]
           },
-          "request_review": { "type": "boolean" }
+          "request_review": { "type": "boolean" },
+          "notify_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "HTTP endpoint to receive branch status updates."
+          }
         }
       },
       "BranchResponse": {
@@ -4573,7 +5733,29 @@
           "created_at": { "type": "string", "format": "date-time" },
           "updated_at": { "type": "string", "format": "date-time" },
           "review_requested_at": { "type": "string", "format": "date-time" },
-          "with_data": { "type": "boolean" }
+          "with_data": { "type": "boolean" },
+          "notify_url": { "type": "string", "format": "uri" },
+          "deletion_scheduled_at": { "type": "string", "format": "date-time" },
+          "preview_project_status": {
+            "type": "string",
+            "enum": [
+              "INACTIVE",
+              "ACTIVE_HEALTHY",
+              "ACTIVE_UNHEALTHY",
+              "COMING_UP",
+              "UNKNOWN",
+              "GOING_DOWN",
+              "INIT_FAILED",
+              "REMOVED",
+              "RESTORING",
+              "UPGRADING",
+              "PAUSING",
+              "RESTORE_FAILED",
+              "RESTARTING",
+              "PAUSE_FAILED",
+              "RESIZING"
+            ]
+          }
         },
         "required": [
           "id",
@@ -4605,11 +5787,122 @@
         },
         "required": ["workflow_run_id", "message"]
       },
+      "BranchRestoreResponse": {
+        "type": "object",
+        "properties": { "message": { "type": "string", "enum": ["Branch restoration initiated"] } },
+        "required": ["message"]
+      },
+      "V1ListProjectsPaginatedResponse": {
+        "type": "object",
+        "properties": {
+          "projects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "number" },
+                "cloud_provider": { "type": "string" },
+                "inserted_at": { "type": "string", "nullable": true },
+                "name": { "type": "string" },
+                "organization_id": { "type": "number" },
+                "organization_slug": { "type": "string" },
+                "ref": { "type": "string" },
+                "region": { "type": "string" },
+                "status": { "type": "string" },
+                "subscription_id": { "type": "string", "nullable": true },
+                "is_branch_enabled": { "type": "boolean" },
+                "is_physical_backups_enabled": { "type": "boolean", "nullable": true },
+                "preview_branch_refs": { "type": "array", "items": { "type": "string" } },
+                "disk_volume_size_gb": { "type": "number" },
+                "infra_compute_size": {
+                  "type": "string",
+                  "enum": [
+                    "pico",
+                    "nano",
+                    "micro",
+                    "small",
+                    "medium",
+                    "large",
+                    "xlarge",
+                    "2xlarge",
+                    "4xlarge",
+                    "8xlarge",
+                    "12xlarge",
+                    "16xlarge",
+                    "24xlarge",
+                    "24xlarge_optimized_memory",
+                    "24xlarge_optimized_cpu",
+                    "24xlarge_high_memory",
+                    "48xlarge",
+                    "48xlarge_optimized_memory",
+                    "48xlarge_optimized_cpu",
+                    "48xlarge_high_memory"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "cloud_provider",
+                "inserted_at",
+                "name",
+                "organization_id",
+                "organization_slug",
+                "ref",
+                "region",
+                "status",
+                "subscription_id",
+                "is_branch_enabled",
+                "is_physical_backups_enabled",
+                "preview_branch_refs"
+              ]
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "type": "number",
+                "description": "Total number of projects. Use this to calculate the total number of pages."
+              },
+              "limit": {
+                "type": "number",
+                "description": "Maximum number of projects per page (actual number may be less)"
+              },
+              "offset": {
+                "type": "number",
+                "description": "Number of projects skipped in this response"
+              }
+            },
+            "required": ["count", "limit", "offset"]
+          }
+        },
+        "required": ["projects", "pagination"]
+      },
       "V1ProjectWithDatabaseResponse": {
         "type": "object",
         "properties": {
-          "id": { "type": "string", "description": "Id of your project" },
-          "organization_id": { "type": "string", "description": "Slug of your organization" },
+          "id": {
+            "type": "string",
+            "deprecated": true,
+            "description": "Deprecated: Use `ref` instead."
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 20,
+            "pattern": "^[a-z]+$",
+            "description": "Project ref"
+          },
+          "organization_id": {
+            "type": "string",
+            "description": "Deprecated: Use `organization_slug` instead.",
+            "deprecated": true
+          },
+          "organization_slug": {
+            "type": "string",
+            "pattern": "^[\\w-]+$",
+            "description": "Organization slug"
+          },
           "name": { "type": "string", "description": "Name of your project" },
           "region": {
             "type": "string",
@@ -4652,14 +5945,33 @@
             "required": ["host", "version", "postgres_engine", "release_channel"]
           }
         },
-        "required": ["id", "organization_id", "name", "region", "created_at", "status", "database"]
+        "required": [
+          "id",
+          "ref",
+          "organization_id",
+          "organization_slug",
+          "name",
+          "region",
+          "created_at",
+          "status",
+          "database"
+        ]
       },
       "V1CreateProjectBody": {
         "type": "object",
         "properties": {
           "db_pass": { "type": "string", "description": "Database password" },
           "name": { "type": "string", "maxLength": 256, "description": "Name of your project" },
-          "organization_id": { "type": "string", "description": "Slug of your organization" },
+          "organization_id": {
+            "type": "string",
+            "description": "Deprecated: Use `organization_slug` instead.",
+            "deprecated": true
+          },
+          "organization_slug": {
+            "type": "string",
+            "pattern": "^[\\w-]+$",
+            "description": "Organization slug"
+          },
           "plan": {
             "type": "string",
             "enum": ["free", "pro"],
@@ -4668,7 +5980,8 @@
           },
           "region": {
             "type": "string",
-            "description": "Region you want your server to reside in",
+            "description": "Region you want your server to reside in. Use region_selection instead.",
+            "deprecated": true,
             "enum": [
               "us-east-1",
               "us-east-2",
@@ -4689,6 +6002,58 @@
               "ap-south-1",
               "sa-east-1"
             ]
+          },
+          "region_selection": {
+            "discriminator": { "propertyName": "type" },
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "type": { "type": "string", "enum": ["specific"] },
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Specific region code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.",
+                    "enum": [
+                      "us-east-1",
+                      "us-east-2",
+                      "us-west-1",
+                      "us-west-2",
+                      "ap-east-1",
+                      "ap-southeast-1",
+                      "ap-northeast-1",
+                      "ap-northeast-2",
+                      "ap-southeast-2",
+                      "eu-west-1",
+                      "eu-west-2",
+                      "eu-west-3",
+                      "eu-north-1",
+                      "eu-central-1",
+                      "eu-central-2",
+                      "ca-central-1",
+                      "ap-south-1",
+                      "sa-east-1"
+                    ]
+                  }
+                },
+                "required": ["type", "code"]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": { "type": "string", "enum": ["smartGroup"] },
+                  "code": {
+                    "type": "string",
+                    "enum": ["americas", "emea", "apac"],
+                    "description": "The Smart Region Group's code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.",
+                    "example": "apac"
+                  }
+                },
+                "required": ["type", "code"]
+              }
+            ],
+            "description": "Region selection. Only one of region or region_selection can be specified.",
+            "example": "{ type: 'smartGroup', code: 'americas' }"
           },
           "kps_enabled": {
             "type": "boolean",
@@ -4725,17 +6090,49 @@
             "format": "uri",
             "description": "Template URL used to create the project from the CLI.",
             "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
+          },
+          "release_channel": {
+            "type": "string",
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
+            "description": "Release channel. If not provided, GA will be used.",
+            "deprecated": true
+          },
+          "postgres_engine": {
+            "type": "string",
+            "enum": ["15", "17", "17-oriole"],
+            "description": "Postgres engine version. If not provided, the latest version will be used.",
+            "deprecated": true
           }
         },
-        "required": ["db_pass", "name", "organization_id", "region"],
+        "required": ["db_pass", "name", "organization_slug"],
         "additionalProperties": false,
         "hideDefinitions": ["release_channel", "postgres_engine"]
       },
       "V1ProjectResponse": {
         "type": "object",
         "properties": {
-          "id": { "type": "string", "description": "Id of your project" },
-          "organization_id": { "type": "string", "description": "Slug of your organization" },
+          "id": {
+            "type": "string",
+            "deprecated": true,
+            "description": "Deprecated: Use `ref` instead."
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 20,
+            "pattern": "^[a-z]+$",
+            "description": "Project ref"
+          },
+          "organization_id": {
+            "type": "string",
+            "description": "Deprecated: Use `organization_slug` instead.",
+            "deprecated": true
+          },
+          "organization_slug": {
+            "type": "string",
+            "pattern": "^[\\w-]+$",
+            "description": "Organization slug"
+          },
           "name": { "type": "string", "description": "Name of your project" },
           "region": {
             "type": "string",
@@ -4768,12 +6165,102 @@
             ]
           }
         },
-        "required": ["id", "organization_id", "name", "region", "created_at", "status"]
+        "required": [
+          "id",
+          "ref",
+          "organization_id",
+          "organization_slug",
+          "name",
+          "region",
+          "created_at",
+          "status"
+        ]
+      },
+      "RegionsInfo": {
+        "type": "object",
+        "properties": {
+          "recommendations": {
+            "type": "object",
+            "properties": {
+              "smartGroup": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "code": { "type": "string", "enum": ["americas", "emea", "apac"] },
+                  "type": { "type": "string", "enum": ["smartGroup"] }
+                },
+                "required": ["name", "code", "type"]
+              },
+              "specific": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "code": { "type": "string" },
+                    "type": { "type": "string", "enum": ["specific"] },
+                    "provider": {
+                      "type": "string",
+                      "enum": ["AWS", "FLY", "AWS_K8S", "AWS_NIMBUS"]
+                    },
+                    "status": { "type": "string", "enum": ["capacity", "other"] }
+                  },
+                  "required": ["name", "code", "type", "provider"]
+                }
+              }
+            },
+            "required": ["smartGroup", "specific"]
+          },
+          "all": {
+            "type": "object",
+            "properties": {
+              "smartGroup": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "code": { "type": "string", "enum": ["americas", "emea", "apac"] },
+                    "type": { "type": "string", "enum": ["smartGroup"] }
+                  },
+                  "required": ["name", "code", "type"]
+                }
+              },
+              "specific": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "code": { "type": "string" },
+                    "type": { "type": "string", "enum": ["specific"] },
+                    "provider": {
+                      "type": "string",
+                      "enum": ["AWS", "FLY", "AWS_K8S", "AWS_NIMBUS"]
+                    },
+                    "status": { "type": "string", "enum": ["capacity", "other"] }
+                  },
+                  "required": ["name", "code", "type", "provider"]
+                }
+              }
+            },
+            "required": ["smartGroup", "specific"]
+          }
+        },
+        "required": ["recommendations", "all"]
       },
       "OrganizationResponseV1": {
         "type": "object",
-        "properties": { "id": { "type": "string" }, "name": { "type": "string" } },
-        "required": ["id", "name"]
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Deprecated: Use `slug` instead.",
+            "deprecated": true
+          },
+          "slug": { "type": "string", "pattern": "^[\\w-]+$", "description": "Organization slug" },
+          "name": { "type": "string" }
+        },
+        "required": ["id", "slug", "name"]
       },
       "CreateOrganizationV1": {
         "type": "object",
@@ -4793,9 +6280,10 @@
           "refresh_token": { "type": "string" },
           "resource": {
             "type": "string",
-            "enum": ["https://api.supabase.com/mcp", "https://mcp.supabase.com/mcp"],
+            "format": "uri",
             "description": "Resource indicator for MCP (Model Context Protocol) clients"
-          }
+          },
+          "scope": { "type": "string" }
         },
         "additionalProperties": false
       },
@@ -4926,6 +6414,143 @@
           "content"
         ]
       },
+      "ListActionRunResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string" },
+            "branch_id": { "type": "string" },
+            "run_steps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "enum": ["clone", "pull", "health", "configure", "migrate", "seed", "deploy"]
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "CREATED",
+                      "DEAD",
+                      "EXITED",
+                      "PAUSED",
+                      "REMOVING",
+                      "RESTARTING",
+                      "RUNNING"
+                    ]
+                  },
+                  "created_at": { "type": "string" },
+                  "updated_at": { "type": "string" }
+                },
+                "required": ["name", "status", "created_at", "updated_at"]
+              }
+            },
+            "git_config": { "nullable": true },
+            "workdir": { "type": "string", "nullable": true },
+            "check_run_id": { "type": "number", "nullable": true },
+            "created_at": { "type": "string" },
+            "updated_at": { "type": "string" }
+          },
+          "required": [
+            "id",
+            "branch_id",
+            "run_steps",
+            "workdir",
+            "check_run_id",
+            "created_at",
+            "updated_at"
+          ]
+        }
+      },
+      "ActionRunResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "branch_id": { "type": "string" },
+          "run_steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "enum": ["clone", "pull", "health", "configure", "migrate", "seed", "deploy"]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "CREATED",
+                    "DEAD",
+                    "EXITED",
+                    "PAUSED",
+                    "REMOVING",
+                    "RESTARTING",
+                    "RUNNING"
+                  ]
+                },
+                "created_at": { "type": "string" },
+                "updated_at": { "type": "string" }
+              },
+              "required": ["name", "status", "created_at", "updated_at"]
+            }
+          },
+          "git_config": { "nullable": true },
+          "workdir": { "type": "string", "nullable": true },
+          "check_run_id": { "type": "number", "nullable": true },
+          "created_at": { "type": "string" },
+          "updated_at": { "type": "string" }
+        },
+        "required": [
+          "id",
+          "branch_id",
+          "run_steps",
+          "workdir",
+          "check_run_id",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "UpdateRunStatusBody": {
+        "type": "object",
+        "properties": {
+          "clone": {
+            "type": "string",
+            "enum": ["CREATED", "DEAD", "EXITED", "PAUSED", "REMOVING", "RESTARTING", "RUNNING"]
+          },
+          "pull": {
+            "type": "string",
+            "enum": ["CREATED", "DEAD", "EXITED", "PAUSED", "REMOVING", "RESTARTING", "RUNNING"]
+          },
+          "health": {
+            "type": "string",
+            "enum": ["CREATED", "DEAD", "EXITED", "PAUSED", "REMOVING", "RESTARTING", "RUNNING"]
+          },
+          "configure": {
+            "type": "string",
+            "enum": ["CREATED", "DEAD", "EXITED", "PAUSED", "REMOVING", "RESTARTING", "RUNNING"]
+          },
+          "migrate": {
+            "type": "string",
+            "enum": ["CREATED", "DEAD", "EXITED", "PAUSED", "REMOVING", "RESTARTING", "RUNNING"]
+          },
+          "seed": {
+            "type": "string",
+            "enum": ["CREATED", "DEAD", "EXITED", "PAUSED", "REMOVING", "RESTARTING", "RUNNING"]
+          },
+          "deploy": {
+            "type": "string",
+            "enum": ["CREATED", "DEAD", "EXITED", "PAUSED", "REMOVING", "RESTARTING", "RUNNING"]
+          }
+        }
+      },
+      "UpdateRunStatusResponse": {
+        "type": "object",
+        "properties": { "message": { "type": "string", "enum": ["ok"] } },
+        "required": ["message"]
+      },
       "ApiKeyResponse": {
         "type": "object",
         "properties": {
@@ -5023,7 +6648,12 @@
             "description": "Postgres engine version. If not provided, the latest version will be used."
           },
           "secrets": { "type": "object", "additionalProperties": { "type": "string" } },
-          "with_data": { "type": "boolean" }
+          "with_data": { "type": "boolean" },
+          "notify_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "HTTP endpoint to receive branch status updates."
+          }
         },
         "required": ["branch_name"]
       },
@@ -5312,6 +6942,11 @@
         },
         "required": ["id", "ref", "name"]
       },
+      "V1UpdateProjectBody": {
+        "type": "object",
+        "properties": { "name": { "type": "string", "minLength": 1, "maxLength": 256 } },
+        "required": ["name"]
+      },
       "SecretResponse": {
         "type": "object",
         "properties": {
@@ -5338,6 +6973,7 @@
           "required": ["name", "value"]
         }
       },
+      "DeleteSecretsBody": { "type": "array", "items": { "type": "string" } },
       "SslEnforcementResponse": {
         "type": "object",
         "properties": {
@@ -5584,6 +7220,11 @@
                   "connected_cluster": { "type": "integer" }
                 },
                 "required": ["healthy", "db_connected", "connected_cluster"]
+              },
+              {
+                "type": "object",
+                "properties": { "db_schema": { "type": "string" } },
+                "required": ["db_schema"]
               }
             ]
           },
@@ -5765,8 +7406,22 @@
               },
               "icebergCatalog": {
                 "type": "object",
-                "properties": { "enabled": { "type": "boolean" } },
-                "required": ["enabled"]
+                "properties": {
+                  "enabled": { "type": "boolean" },
+                  "maxNamespaces": { "type": "integer", "minimum": 0 },
+                  "maxTables": { "type": "integer", "minimum": 0 },
+                  "maxCatalogs": { "type": "integer", "minimum": 0 }
+                },
+                "required": ["enabled", "maxNamespaces", "maxTables", "maxCatalogs"]
+              },
+              "vectorBuckets": {
+                "type": "object",
+                "properties": {
+                  "enabled": { "type": "boolean" },
+                  "maxBuckets": { "type": "integer", "minimum": 0 },
+                  "maxIndexes": { "type": "integer", "minimum": 0 }
+                },
+                "required": ["enabled", "maxBuckets", "maxIndexes"]
               }
             },
             "required": ["imageTransformation", "s3Protocol"]
@@ -5783,9 +7438,18 @@
             "type": "object",
             "properties": { "upstreamTarget": { "type": "string", "enum": ["main", "canary"] } },
             "required": ["upstreamTarget"]
-          }
+          },
+          "migrationVersion": { "type": "string" },
+          "databasePoolMode": { "type": "string" }
         },
-        "required": ["fileSizeLimit", "features", "capabilities", "external"]
+        "required": [
+          "fileSizeLimit",
+          "features",
+          "capabilities",
+          "external",
+          "migrationVersion",
+          "databasePoolMode"
+        ]
       },
       "UpdateStorageConfigBody": {
         "type": "object",
@@ -5811,8 +7475,22 @@
               },
               "icebergCatalog": {
                 "type": "object",
-                "properties": { "enabled": { "type": "boolean" } },
-                "required": ["enabled"]
+                "properties": {
+                  "enabled": { "type": "boolean" },
+                  "maxNamespaces": { "type": "integer", "minimum": 0 },
+                  "maxTables": { "type": "integer", "minimum": 0 },
+                  "maxCatalogs": { "type": "integer", "minimum": 0 }
+                },
+                "required": ["enabled", "maxNamespaces", "maxTables", "maxCatalogs"]
+              },
+              "vectorBuckets": {
+                "type": "object",
+                "properties": {
+                  "enabled": { "type": "boolean" },
+                  "maxBuckets": { "type": "integer", "minimum": 0 },
+                  "maxIndexes": { "type": "integer", "minimum": 0 }
+                },
+                "required": ["enabled", "maxBuckets", "maxIndexes"]
               }
             },
             "required": ["imageTransformation", "s3Protocol"]
@@ -5846,11 +7524,25 @@
           "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
           "session_replication_role": { "type": "string", "enum": ["origin", "replica", "local"] },
           "shared_buffers": { "type": "string" },
-          "statement_timeout": { "type": "string" },
+          "statement_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
           "track_commit_timestamp": { "type": "boolean" },
           "wal_keep_size": { "type": "string" },
-          "wal_sender_timeout": { "type": "string" },
-          "work_mem": { "type": "string" }
+          "wal_sender_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
+          "work_mem": { "type": "string" },
+          "checkpoint_timeout": {
+            "type": "string",
+            "description": "Default unit: s",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
+          "hot_standby_feedback": { "type": "boolean" }
         }
       },
       "UpdatePostgresConfigBody": {
@@ -5874,11 +7566,25 @@
           "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
           "session_replication_role": { "type": "string", "enum": ["origin", "replica", "local"] },
           "shared_buffers": { "type": "string" },
-          "statement_timeout": { "type": "string" },
+          "statement_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
           "track_commit_timestamp": { "type": "boolean" },
           "wal_keep_size": { "type": "string" },
-          "wal_sender_timeout": { "type": "string" },
+          "wal_sender_timeout": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
           "work_mem": { "type": "string" },
+          "checkpoint_timeout": {
+            "type": "string",
+            "description": "Default unit: s",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
+          "hot_standby_feedback": { "type": "boolean" },
           "restart_database": { "type": "boolean" }
         },
         "additionalProperties": false
@@ -5957,68 +7663,91 @@
         "properties": {
           "api_max_request_duration": { "type": "integer", "nullable": true },
           "db_max_pool_size": { "type": "integer", "nullable": true },
+          "db_max_pool_size_unit": {
+            "type": "string",
+            "enum": ["connections", "percent"],
+            "nullable": true
+          },
           "disable_signup": { "type": "boolean", "nullable": true },
           "external_anonymous_users_enabled": { "type": "boolean", "nullable": true },
           "external_apple_additional_client_ids": { "type": "string", "nullable": true },
           "external_apple_client_id": { "type": "string", "nullable": true },
+          "external_apple_email_optional": { "type": "boolean", "nullable": true },
           "external_apple_enabled": { "type": "boolean", "nullable": true },
           "external_apple_secret": { "type": "string", "nullable": true },
           "external_azure_client_id": { "type": "string", "nullable": true },
+          "external_azure_email_optional": { "type": "boolean", "nullable": true },
           "external_azure_enabled": { "type": "boolean", "nullable": true },
           "external_azure_secret": { "type": "string", "nullable": true },
           "external_azure_url": { "type": "string", "nullable": true },
           "external_bitbucket_client_id": { "type": "string", "nullable": true },
+          "external_bitbucket_email_optional": { "type": "boolean", "nullable": true },
           "external_bitbucket_enabled": { "type": "boolean", "nullable": true },
           "external_bitbucket_secret": { "type": "string", "nullable": true },
           "external_discord_client_id": { "type": "string", "nullable": true },
+          "external_discord_email_optional": { "type": "boolean", "nullable": true },
           "external_discord_enabled": { "type": "boolean", "nullable": true },
           "external_discord_secret": { "type": "string", "nullable": true },
           "external_email_enabled": { "type": "boolean", "nullable": true },
           "external_facebook_client_id": { "type": "string", "nullable": true },
+          "external_facebook_email_optional": { "type": "boolean", "nullable": true },
           "external_facebook_enabled": { "type": "boolean", "nullable": true },
           "external_facebook_secret": { "type": "string", "nullable": true },
           "external_figma_client_id": { "type": "string", "nullable": true },
+          "external_figma_email_optional": { "type": "boolean", "nullable": true },
           "external_figma_enabled": { "type": "boolean", "nullable": true },
           "external_figma_secret": { "type": "string", "nullable": true },
           "external_github_client_id": { "type": "string", "nullable": true },
+          "external_github_email_optional": { "type": "boolean", "nullable": true },
           "external_github_enabled": { "type": "boolean", "nullable": true },
           "external_github_secret": { "type": "string", "nullable": true },
           "external_gitlab_client_id": { "type": "string", "nullable": true },
+          "external_gitlab_email_optional": { "type": "boolean", "nullable": true },
           "external_gitlab_enabled": { "type": "boolean", "nullable": true },
           "external_gitlab_secret": { "type": "string", "nullable": true },
           "external_gitlab_url": { "type": "string", "nullable": true },
           "external_google_additional_client_ids": { "type": "string", "nullable": true },
           "external_google_client_id": { "type": "string", "nullable": true },
+          "external_google_email_optional": { "type": "boolean", "nullable": true },
           "external_google_enabled": { "type": "boolean", "nullable": true },
           "external_google_secret": { "type": "string", "nullable": true },
           "external_google_skip_nonce_check": { "type": "boolean", "nullable": true },
           "external_kakao_client_id": { "type": "string", "nullable": true },
+          "external_kakao_email_optional": { "type": "boolean", "nullable": true },
           "external_kakao_enabled": { "type": "boolean", "nullable": true },
           "external_kakao_secret": { "type": "string", "nullable": true },
           "external_keycloak_client_id": { "type": "string", "nullable": true },
+          "external_keycloak_email_optional": { "type": "boolean", "nullable": true },
           "external_keycloak_enabled": { "type": "boolean", "nullable": true },
           "external_keycloak_secret": { "type": "string", "nullable": true },
           "external_keycloak_url": { "type": "string", "nullable": true },
           "external_linkedin_oidc_client_id": { "type": "string", "nullable": true },
+          "external_linkedin_oidc_email_optional": { "type": "boolean", "nullable": true },
           "external_linkedin_oidc_enabled": { "type": "boolean", "nullable": true },
           "external_linkedin_oidc_secret": { "type": "string", "nullable": true },
           "external_slack_oidc_client_id": { "type": "string", "nullable": true },
+          "external_slack_oidc_email_optional": { "type": "boolean", "nullable": true },
           "external_slack_oidc_enabled": { "type": "boolean", "nullable": true },
           "external_slack_oidc_secret": { "type": "string", "nullable": true },
           "external_notion_client_id": { "type": "string", "nullable": true },
+          "external_notion_email_optional": { "type": "boolean", "nullable": true },
           "external_notion_enabled": { "type": "boolean", "nullable": true },
           "external_notion_secret": { "type": "string", "nullable": true },
           "external_phone_enabled": { "type": "boolean", "nullable": true },
           "external_slack_client_id": { "type": "string", "nullable": true },
+          "external_slack_email_optional": { "type": "boolean", "nullable": true },
           "external_slack_enabled": { "type": "boolean", "nullable": true },
           "external_slack_secret": { "type": "string", "nullable": true },
           "external_spotify_client_id": { "type": "string", "nullable": true },
+          "external_spotify_email_optional": { "type": "boolean", "nullable": true },
           "external_spotify_enabled": { "type": "boolean", "nullable": true },
           "external_spotify_secret": { "type": "string", "nullable": true },
           "external_twitch_client_id": { "type": "string", "nullable": true },
+          "external_twitch_email_optional": { "type": "boolean", "nullable": true },
           "external_twitch_enabled": { "type": "boolean", "nullable": true },
           "external_twitch_secret": { "type": "string", "nullable": true },
           "external_twitter_client_id": { "type": "string", "nullable": true },
+          "external_twitter_email_optional": { "type": "boolean", "nullable": true },
           "external_twitter_enabled": { "type": "boolean", "nullable": true },
           "external_twitter_secret": { "type": "string", "nullable": true },
           "external_workos_client_id": { "type": "string", "nullable": true },
@@ -6028,6 +7757,7 @@
           "external_web3_solana_enabled": { "type": "boolean", "nullable": true },
           "external_web3_ethereum_enabled": { "type": "boolean", "nullable": true },
           "external_zoom_client_id": { "type": "string", "nullable": true },
+          "external_zoom_email_optional": { "type": "boolean", "nullable": true },
           "external_zoom_enabled": { "type": "boolean", "nullable": true },
           "external_zoom_secret": { "type": "string", "nullable": true },
           "hook_custom_access_token_enabled": { "type": "boolean", "nullable": true },
@@ -6048,6 +7778,9 @@
           "hook_before_user_created_enabled": { "type": "boolean", "nullable": true },
           "hook_before_user_created_uri": { "type": "string", "nullable": true },
           "hook_before_user_created_secrets": { "type": "string", "nullable": true },
+          "hook_after_user_created_enabled": { "type": "boolean", "nullable": true },
+          "hook_after_user_created_uri": { "type": "string", "nullable": true },
+          "hook_after_user_created_secrets": { "type": "string", "nullable": true },
           "jwt_exp": { "type": "integer", "nullable": true },
           "mailer_allow_unverified_email_sign_ins": { "type": "boolean", "nullable": true },
           "mailer_autoconfirm": { "type": "boolean", "nullable": true },
@@ -6060,12 +7793,66 @@
           "mailer_subjects_magic_link": { "type": "string", "nullable": true },
           "mailer_subjects_reauthentication": { "type": "string", "nullable": true },
           "mailer_subjects_recovery": { "type": "string", "nullable": true },
+          "mailer_subjects_password_changed_notification": { "type": "string", "nullable": true },
+          "mailer_subjects_email_changed_notification": { "type": "string", "nullable": true },
+          "mailer_subjects_phone_changed_notification": { "type": "string", "nullable": true },
+          "mailer_subjects_mfa_factor_enrolled_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_mfa_factor_unenrolled_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_identity_linked_notification": { "type": "string", "nullable": true },
+          "mailer_subjects_identity_unlinked_notification": { "type": "string", "nullable": true },
           "mailer_templates_confirmation_content": { "type": "string", "nullable": true },
           "mailer_templates_email_change_content": { "type": "string", "nullable": true },
           "mailer_templates_invite_content": { "type": "string", "nullable": true },
           "mailer_templates_magic_link_content": { "type": "string", "nullable": true },
           "mailer_templates_reauthentication_content": { "type": "string", "nullable": true },
           "mailer_templates_recovery_content": { "type": "string", "nullable": true },
+          "mailer_templates_password_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_email_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_phone_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_mfa_factor_enrolled_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_mfa_factor_unenrolled_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_identity_linked_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_identity_unlinked_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_notifications_password_changed_enabled": { "type": "boolean", "nullable": true },
+          "mailer_notifications_email_changed_enabled": { "type": "boolean", "nullable": true },
+          "mailer_notifications_phone_changed_enabled": { "type": "boolean", "nullable": true },
+          "mailer_notifications_mfa_factor_enrolled_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_mfa_factor_unenrolled_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_identity_linked_enabled": { "type": "boolean", "nullable": true },
+          "mailer_notifications_identity_unlinked_enabled": { "type": "boolean", "nullable": true },
           "mfa_max_enrolled_factors": { "type": "integer", "nullable": true },
           "mfa_totp_enroll_enabled": { "type": "boolean", "nullable": true },
           "mfa_totp_verify_enabled": { "type": "boolean", "nullable": true },
@@ -6077,6 +7864,7 @@
           "mfa_phone_template": { "type": "string", "nullable": true },
           "mfa_phone_max_frequency": { "type": "integer", "nullable": true },
           "nimbus_oauth_client_id": { "type": "string", "nullable": true },
+          "nimbus_oauth_email_optional": { "type": "boolean", "nullable": true },
           "nimbus_oauth_client_secret": { "type": "string", "nullable": true },
           "password_hibp_enabled": { "type": "boolean", "nullable": true },
           "password_min_length": { "type": "integer", "nullable": true },
@@ -6157,68 +7945,87 @@
         "required": [
           "api_max_request_duration",
           "db_max_pool_size",
+          "db_max_pool_size_unit",
           "disable_signup",
           "external_anonymous_users_enabled",
           "external_apple_additional_client_ids",
           "external_apple_client_id",
+          "external_apple_email_optional",
           "external_apple_enabled",
           "external_apple_secret",
           "external_azure_client_id",
+          "external_azure_email_optional",
           "external_azure_enabled",
           "external_azure_secret",
           "external_azure_url",
           "external_bitbucket_client_id",
+          "external_bitbucket_email_optional",
           "external_bitbucket_enabled",
           "external_bitbucket_secret",
           "external_discord_client_id",
+          "external_discord_email_optional",
           "external_discord_enabled",
           "external_discord_secret",
           "external_email_enabled",
           "external_facebook_client_id",
+          "external_facebook_email_optional",
           "external_facebook_enabled",
           "external_facebook_secret",
           "external_figma_client_id",
+          "external_figma_email_optional",
           "external_figma_enabled",
           "external_figma_secret",
           "external_github_client_id",
+          "external_github_email_optional",
           "external_github_enabled",
           "external_github_secret",
           "external_gitlab_client_id",
+          "external_gitlab_email_optional",
           "external_gitlab_enabled",
           "external_gitlab_secret",
           "external_gitlab_url",
           "external_google_additional_client_ids",
           "external_google_client_id",
+          "external_google_email_optional",
           "external_google_enabled",
           "external_google_secret",
           "external_google_skip_nonce_check",
           "external_kakao_client_id",
+          "external_kakao_email_optional",
           "external_kakao_enabled",
           "external_kakao_secret",
           "external_keycloak_client_id",
+          "external_keycloak_email_optional",
           "external_keycloak_enabled",
           "external_keycloak_secret",
           "external_keycloak_url",
           "external_linkedin_oidc_client_id",
+          "external_linkedin_oidc_email_optional",
           "external_linkedin_oidc_enabled",
           "external_linkedin_oidc_secret",
           "external_slack_oidc_client_id",
+          "external_slack_oidc_email_optional",
           "external_slack_oidc_enabled",
           "external_slack_oidc_secret",
           "external_notion_client_id",
+          "external_notion_email_optional",
           "external_notion_enabled",
           "external_notion_secret",
           "external_phone_enabled",
           "external_slack_client_id",
+          "external_slack_email_optional",
           "external_slack_enabled",
           "external_slack_secret",
           "external_spotify_client_id",
+          "external_spotify_email_optional",
           "external_spotify_enabled",
           "external_spotify_secret",
           "external_twitch_client_id",
+          "external_twitch_email_optional",
           "external_twitch_enabled",
           "external_twitch_secret",
           "external_twitter_client_id",
+          "external_twitter_email_optional",
           "external_twitter_enabled",
           "external_twitter_secret",
           "external_workos_client_id",
@@ -6228,6 +8035,7 @@
           "external_web3_solana_enabled",
           "external_web3_ethereum_enabled",
           "external_zoom_client_id",
+          "external_zoom_email_optional",
           "external_zoom_enabled",
           "external_zoom_secret",
           "hook_custom_access_token_enabled",
@@ -6248,6 +8056,9 @@
           "hook_before_user_created_enabled",
           "hook_before_user_created_uri",
           "hook_before_user_created_secrets",
+          "hook_after_user_created_enabled",
+          "hook_after_user_created_uri",
+          "hook_after_user_created_secrets",
           "jwt_exp",
           "mailer_allow_unverified_email_sign_ins",
           "mailer_autoconfirm",
@@ -6260,12 +8071,33 @@
           "mailer_subjects_magic_link",
           "mailer_subjects_reauthentication",
           "mailer_subjects_recovery",
+          "mailer_subjects_password_changed_notification",
+          "mailer_subjects_email_changed_notification",
+          "mailer_subjects_phone_changed_notification",
+          "mailer_subjects_mfa_factor_enrolled_notification",
+          "mailer_subjects_mfa_factor_unenrolled_notification",
+          "mailer_subjects_identity_linked_notification",
+          "mailer_subjects_identity_unlinked_notification",
           "mailer_templates_confirmation_content",
           "mailer_templates_email_change_content",
           "mailer_templates_invite_content",
           "mailer_templates_magic_link_content",
           "mailer_templates_reauthentication_content",
           "mailer_templates_recovery_content",
+          "mailer_templates_password_changed_notification_content",
+          "mailer_templates_email_changed_notification_content",
+          "mailer_templates_phone_changed_notification_content",
+          "mailer_templates_mfa_factor_enrolled_notification_content",
+          "mailer_templates_mfa_factor_unenrolled_notification_content",
+          "mailer_templates_identity_linked_notification_content",
+          "mailer_templates_identity_unlinked_notification_content",
+          "mailer_notifications_password_changed_enabled",
+          "mailer_notifications_email_changed_enabled",
+          "mailer_notifications_phone_changed_enabled",
+          "mailer_notifications_mfa_factor_enrolled_enabled",
+          "mailer_notifications_mfa_factor_unenrolled_enabled",
+          "mailer_notifications_identity_linked_enabled",
+          "mailer_notifications_identity_unlinked_enabled",
           "mfa_max_enrolled_factors",
           "mfa_totp_enroll_enabled",
           "mfa_totp_verify_enabled",
@@ -6277,6 +8109,7 @@
           "mfa_phone_template",
           "mfa_phone_max_frequency",
           "nimbus_oauth_client_id",
+          "nimbus_oauth_email_optional",
           "nimbus_oauth_client_secret",
           "password_hibp_enabled",
           "password_min_length",
@@ -6361,12 +8194,66 @@
           "mailer_subjects_email_change": { "type": "string", "nullable": true },
           "mailer_subjects_magic_link": { "type": "string", "nullable": true },
           "mailer_subjects_reauthentication": { "type": "string", "nullable": true },
+          "mailer_subjects_password_changed_notification": { "type": "string", "nullable": true },
+          "mailer_subjects_email_changed_notification": { "type": "string", "nullable": true },
+          "mailer_subjects_phone_changed_notification": { "type": "string", "nullable": true },
+          "mailer_subjects_mfa_factor_enrolled_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_mfa_factor_unenrolled_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_identity_linked_notification": { "type": "string", "nullable": true },
+          "mailer_subjects_identity_unlinked_notification": { "type": "string", "nullable": true },
           "mailer_templates_invite_content": { "type": "string", "nullable": true },
           "mailer_templates_confirmation_content": { "type": "string", "nullable": true },
           "mailer_templates_recovery_content": { "type": "string", "nullable": true },
           "mailer_templates_email_change_content": { "type": "string", "nullable": true },
           "mailer_templates_magic_link_content": { "type": "string", "nullable": true },
           "mailer_templates_reauthentication_content": { "type": "string", "nullable": true },
+          "mailer_templates_password_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_email_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_phone_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_mfa_factor_enrolled_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_mfa_factor_unenrolled_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_identity_linked_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_identity_unlinked_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_notifications_password_changed_enabled": { "type": "boolean", "nullable": true },
+          "mailer_notifications_email_changed_enabled": { "type": "boolean", "nullable": true },
+          "mailer_notifications_phone_changed_enabled": { "type": "boolean", "nullable": true },
+          "mailer_notifications_mfa_factor_enrolled_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_mfa_factor_unenrolled_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_identity_linked_enabled": { "type": "boolean", "nullable": true },
+          "mailer_notifications_identity_unlinked_enabled": { "type": "boolean", "nullable": true },
           "mfa_max_enrolled_factors": {
             "type": "integer",
             "minimum": 0,
@@ -6526,65 +8413,86 @@
           "hook_before_user_created_enabled": { "type": "boolean", "nullable": true },
           "hook_before_user_created_uri": { "type": "string", "nullable": true },
           "hook_before_user_created_secrets": { "type": "string", "nullable": true },
+          "hook_after_user_created_enabled": { "type": "boolean", "nullable": true },
+          "hook_after_user_created_uri": { "type": "string", "nullable": true },
+          "hook_after_user_created_secrets": { "type": "string", "nullable": true },
           "external_apple_enabled": { "type": "boolean", "nullable": true },
           "external_apple_client_id": { "type": "string", "nullable": true },
+          "external_apple_email_optional": { "type": "boolean", "nullable": true },
           "external_apple_secret": { "type": "string", "nullable": true },
           "external_apple_additional_client_ids": { "type": "string", "nullable": true },
           "external_azure_enabled": { "type": "boolean", "nullable": true },
           "external_azure_client_id": { "type": "string", "nullable": true },
+          "external_azure_email_optional": { "type": "boolean", "nullable": true },
           "external_azure_secret": { "type": "string", "nullable": true },
           "external_azure_url": { "type": "string", "nullable": true },
           "external_bitbucket_enabled": { "type": "boolean", "nullable": true },
           "external_bitbucket_client_id": { "type": "string", "nullable": true },
+          "external_bitbucket_email_optional": { "type": "boolean", "nullable": true },
           "external_bitbucket_secret": { "type": "string", "nullable": true },
           "external_discord_enabled": { "type": "boolean", "nullable": true },
           "external_discord_client_id": { "type": "string", "nullable": true },
+          "external_discord_email_optional": { "type": "boolean", "nullable": true },
           "external_discord_secret": { "type": "string", "nullable": true },
           "external_facebook_enabled": { "type": "boolean", "nullable": true },
           "external_facebook_client_id": { "type": "string", "nullable": true },
+          "external_facebook_email_optional": { "type": "boolean", "nullable": true },
           "external_facebook_secret": { "type": "string", "nullable": true },
           "external_figma_enabled": { "type": "boolean", "nullable": true },
           "external_figma_client_id": { "type": "string", "nullable": true },
+          "external_figma_email_optional": { "type": "boolean", "nullable": true },
           "external_figma_secret": { "type": "string", "nullable": true },
           "external_github_enabled": { "type": "boolean", "nullable": true },
           "external_github_client_id": { "type": "string", "nullable": true },
+          "external_github_email_optional": { "type": "boolean", "nullable": true },
           "external_github_secret": { "type": "string", "nullable": true },
           "external_gitlab_enabled": { "type": "boolean", "nullable": true },
           "external_gitlab_client_id": { "type": "string", "nullable": true },
+          "external_gitlab_email_optional": { "type": "boolean", "nullable": true },
           "external_gitlab_secret": { "type": "string", "nullable": true },
           "external_gitlab_url": { "type": "string", "nullable": true },
           "external_google_enabled": { "type": "boolean", "nullable": true },
           "external_google_client_id": { "type": "string", "nullable": true },
+          "external_google_email_optional": { "type": "boolean", "nullable": true },
           "external_google_secret": { "type": "string", "nullable": true },
           "external_google_additional_client_ids": { "type": "string", "nullable": true },
           "external_google_skip_nonce_check": { "type": "boolean", "nullable": true },
           "external_kakao_enabled": { "type": "boolean", "nullable": true },
           "external_kakao_client_id": { "type": "string", "nullable": true },
+          "external_kakao_email_optional": { "type": "boolean", "nullable": true },
           "external_kakao_secret": { "type": "string", "nullable": true },
           "external_keycloak_enabled": { "type": "boolean", "nullable": true },
           "external_keycloak_client_id": { "type": "string", "nullable": true },
+          "external_keycloak_email_optional": { "type": "boolean", "nullable": true },
           "external_keycloak_secret": { "type": "string", "nullable": true },
           "external_keycloak_url": { "type": "string", "nullable": true },
           "external_linkedin_oidc_enabled": { "type": "boolean", "nullable": true },
           "external_linkedin_oidc_client_id": { "type": "string", "nullable": true },
+          "external_linkedin_oidc_email_optional": { "type": "boolean", "nullable": true },
           "external_linkedin_oidc_secret": { "type": "string", "nullable": true },
           "external_slack_oidc_enabled": { "type": "boolean", "nullable": true },
           "external_slack_oidc_client_id": { "type": "string", "nullable": true },
+          "external_slack_oidc_email_optional": { "type": "boolean", "nullable": true },
           "external_slack_oidc_secret": { "type": "string", "nullable": true },
           "external_notion_enabled": { "type": "boolean", "nullable": true },
           "external_notion_client_id": { "type": "string", "nullable": true },
+          "external_notion_email_optional": { "type": "boolean", "nullable": true },
           "external_notion_secret": { "type": "string", "nullable": true },
           "external_slack_enabled": { "type": "boolean", "nullable": true },
           "external_slack_client_id": { "type": "string", "nullable": true },
+          "external_slack_email_optional": { "type": "boolean", "nullable": true },
           "external_slack_secret": { "type": "string", "nullable": true },
           "external_spotify_enabled": { "type": "boolean", "nullable": true },
           "external_spotify_client_id": { "type": "string", "nullable": true },
+          "external_spotify_email_optional": { "type": "boolean", "nullable": true },
           "external_spotify_secret": { "type": "string", "nullable": true },
           "external_twitch_enabled": { "type": "boolean", "nullable": true },
           "external_twitch_client_id": { "type": "string", "nullable": true },
+          "external_twitch_email_optional": { "type": "boolean", "nullable": true },
           "external_twitch_secret": { "type": "string", "nullable": true },
           "external_twitter_enabled": { "type": "boolean", "nullable": true },
           "external_twitter_client_id": { "type": "string", "nullable": true },
+          "external_twitter_email_optional": { "type": "boolean", "nullable": true },
           "external_twitter_secret": { "type": "string", "nullable": true },
           "external_workos_enabled": { "type": "boolean", "nullable": true },
           "external_workos_client_id": { "type": "string", "nullable": true },
@@ -6594,8 +8502,14 @@
           "external_web3_ethereum_enabled": { "type": "boolean", "nullable": true },
           "external_zoom_enabled": { "type": "boolean", "nullable": true },
           "external_zoom_client_id": { "type": "string", "nullable": true },
+          "external_zoom_email_optional": { "type": "boolean", "nullable": true },
           "external_zoom_secret": { "type": "string", "nullable": true },
           "db_max_pool_size": { "type": "integer", "nullable": true },
+          "db_max_pool_size_unit": {
+            "type": "string",
+            "enum": ["connections", "percent"],
+            "nullable": true
+          },
           "api_max_request_duration": { "type": "integer", "nullable": true },
           "mfa_totp_enroll_enabled": { "type": "boolean", "nullable": true },
           "mfa_totp_verify_enabled": { "type": "boolean", "nullable": true },
@@ -6619,6 +8533,148 @@
           "nimbus_oauth_client_id": { "type": "string", "nullable": true },
           "nimbus_oauth_client_secret": { "type": "string", "nullable": true }
         }
+      },
+      "RealtimeConfigResponse": {
+        "type": "object",
+        "properties": {
+          "private_only": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Whether to only allow private channels"
+          },
+          "connection_pool": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "nullable": true,
+            "description": "Sets connection pool size for Realtime Authorization"
+          },
+          "max_concurrent_users": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "nullable": true,
+            "description": "Sets maximum number of concurrent users rate limit"
+          },
+          "max_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "nullable": true,
+            "description": "Sets maximum number of events per second rate per channel limit"
+          },
+          "max_bytes_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000,
+            "nullable": true,
+            "description": "Sets maximum number of bytes per second rate per channel limit"
+          },
+          "max_channels_per_client": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "nullable": true,
+            "description": "Sets maximum number of channels per client rate limit"
+          },
+          "max_joins_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "nullable": true,
+            "description": "Sets maximum number of joins per second rate limit"
+          },
+          "max_presence_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "nullable": true,
+            "description": "Sets maximum number of presence events per second rate limit"
+          },
+          "max_payload_size_in_kb": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "nullable": true,
+            "description": "Sets maximum number of payload size in KB rate limit"
+          },
+          "suspend": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Whether to suspend realtime"
+          }
+        },
+        "required": [
+          "private_only",
+          "connection_pool",
+          "max_concurrent_users",
+          "max_events_per_second",
+          "max_bytes_per_second",
+          "max_channels_per_client",
+          "max_joins_per_second",
+          "max_presence_events_per_second",
+          "max_payload_size_in_kb",
+          "suspend"
+        ]
+      },
+      "UpdateRealtimeConfigBody": {
+        "type": "object",
+        "properties": {
+          "private_only": {
+            "type": "boolean",
+            "description": "Whether to only allow private channels"
+          },
+          "connection_pool": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Sets connection pool size for Realtime Authorization"
+          },
+          "max_concurrent_users": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "description": "Sets maximum number of concurrent users rate limit"
+          },
+          "max_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50000,
+            "description": "Sets maximum number of events per second rate per channel limit"
+          },
+          "max_bytes_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000,
+            "description": "Sets maximum number of bytes per second rate per channel limit"
+          },
+          "max_channels_per_client": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "description": "Sets maximum number of channels per client rate limit"
+          },
+          "max_joins_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "description": "Sets maximum number of joins per second rate limit"
+          },
+          "max_presence_events_per_second": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "description": "Sets maximum number of presence events per second rate limit"
+          },
+          "max_payload_size_in_kb": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "description": "Sets maximum number of payload size in KB rate limit"
+          },
+          "suspend": { "type": "boolean", "description": "Whether to suspend realtime" }
+        },
+        "additionalProperties": false
       },
       "CreateThirdPartyAuthBody": {
         "type": "object",
@@ -7136,7 +9192,8 @@
         "type": "object",
         "properties": {
           "query": { "type": "string", "minLength": 1 },
-          "name": { "type": "string" }
+          "name": { "type": "string" },
+          "rollback": { "type": "string" }
         },
         "required": ["query"]
       },
@@ -7144,15 +9201,41 @@
         "type": "object",
         "properties": {
           "query": { "type": "string", "minLength": 1 },
-          "name": { "type": "string" }
+          "name": { "type": "string" },
+          "rollback": { "type": "string" }
         },
         "required": ["query"]
+      },
+      "V1GetMigrationResponse": {
+        "type": "object",
+        "properties": {
+          "version": { "type": "string", "minLength": 1 },
+          "name": { "type": "string" },
+          "statements": { "type": "array", "items": { "type": "string" } },
+          "rollback": { "type": "array", "items": { "type": "string" } },
+          "created_by": { "type": "string" },
+          "idempotency_key": { "type": "string" }
+        },
+        "required": ["version"]
+      },
+      "V1PatchMigrationBody": {
+        "type": "object",
+        "properties": { "name": { "type": "string" }, "rollback": { "type": "string" } }
       },
       "V1RunQueryBody": {
         "type": "object",
         "properties": {
           "query": { "type": "string", "minLength": 1 },
+          "parameters": { "type": "array", "items": {} },
           "read_only": { "type": "boolean" }
+        },
+        "required": ["query"]
+      },
+      "V1ReadOnlyQueryBody": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string", "minLength": 1 },
+          "parameters": { "type": "array", "items": {} }
         },
         "required": ["query"]
       },
@@ -7181,6 +9264,16 @@
           }
         },
         "required": ["databases"]
+      },
+      "V1UpdatePasswordBody": {
+        "type": "object",
+        "properties": { "password": { "type": "string", "minLength": 4 } },
+        "required": ["password"]
+      },
+      "V1UpdatePasswordResponse": {
+        "type": "object",
+        "properties": { "message": { "type": "string" } },
+        "required": ["message"]
       },
       "JitAccessResponse": {
         "type": "object",
@@ -7978,7 +10071,7 @@
         "type": "object",
         "properties": {
           "name": { "type": "string" },
-          "status": { "type": "string", "enum": ["AVAILABLE", "PENDING", "REMOVED"] }
+          "status": { "type": "string", "enum": ["AVAILABLE", "PENDING", "REMOVED", "FAILED"] }
         },
         "required": ["name", "status"]
       },
@@ -8069,8 +10162,6 @@
                   "required": ["name", "limit"]
                 }
               },
-              "target_organization_eligible": { "type": "boolean", "nullable": true },
-              "target_organization_has_free_project_slots": { "type": "boolean", "nullable": true },
               "source_subscription_plan": {
                 "type": "string",
                 "enum": ["free", "pro", "team", "enterprise"]
@@ -8087,8 +10178,6 @@
               "errors",
               "info",
               "members_exceeding_free_project_limit",
-              "target_organization_eligible",
-              "target_organization_has_free_project_slots",
               "source_subscription_plan",
               "target_subscription_plan"
             ]
@@ -8098,6 +10187,130 @@
           "created_by": { "type": "string", "format": "uuid" }
         },
         "required": ["project", "preview", "expires_at", "created_at", "created_by"]
+      },
+      "OrganizationProjectsResponse": {
+        "type": "object",
+        "properties": {
+          "projects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ref": { "type": "string" },
+                "name": { "type": "string" },
+                "cloud_provider": { "type": "string" },
+                "region": { "type": "string" },
+                "is_branch": { "type": "boolean" },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "INACTIVE",
+                    "ACTIVE_HEALTHY",
+                    "ACTIVE_UNHEALTHY",
+                    "COMING_UP",
+                    "UNKNOWN",
+                    "GOING_DOWN",
+                    "INIT_FAILED",
+                    "REMOVED",
+                    "RESTORING",
+                    "UPGRADING",
+                    "PAUSING",
+                    "RESTORE_FAILED",
+                    "RESTARTING",
+                    "PAUSE_FAILED",
+                    "RESIZING"
+                  ]
+                },
+                "inserted_at": { "type": "string" },
+                "databases": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "infra_compute_size": {
+                        "type": "string",
+                        "enum": [
+                          "pico",
+                          "nano",
+                          "micro",
+                          "small",
+                          "medium",
+                          "large",
+                          "xlarge",
+                          "2xlarge",
+                          "4xlarge",
+                          "8xlarge",
+                          "12xlarge",
+                          "16xlarge",
+                          "24xlarge",
+                          "24xlarge_optimized_memory",
+                          "24xlarge_optimized_cpu",
+                          "24xlarge_high_memory",
+                          "48xlarge",
+                          "48xlarge_optimized_memory",
+                          "48xlarge_optimized_cpu",
+                          "48xlarge_high_memory"
+                        ]
+                      },
+                      "region": { "type": "string" },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "ACTIVE_HEALTHY",
+                          "ACTIVE_UNHEALTHY",
+                          "COMING_UP",
+                          "GOING_DOWN",
+                          "INIT_FAILED",
+                          "REMOVED",
+                          "RESTORING",
+                          "UNKNOWN",
+                          "INIT_READ_REPLICA",
+                          "INIT_READ_REPLICA_FAILED",
+                          "RESTARTING",
+                          "RESIZING"
+                        ]
+                      },
+                      "cloud_provider": { "type": "string" },
+                      "identifier": { "type": "string" },
+                      "type": { "type": "string", "enum": ["PRIMARY", "READ_REPLICA"] },
+                      "disk_volume_size_gb": { "type": "number" },
+                      "disk_type": { "type": "string", "enum": ["gp3", "io2"] },
+                      "disk_throughput_mbps": { "type": "number" },
+                      "disk_last_modified_at": { "type": "string" }
+                    },
+                    "required": ["region", "status", "cloud_provider", "identifier", "type"]
+                  }
+                }
+              },
+              "required": [
+                "ref",
+                "name",
+                "cloud_provider",
+                "region",
+                "is_branch",
+                "status",
+                "inserted_at",
+                "databases"
+              ]
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "type": "number",
+                "description": "Total number of projects. Use this to calculate the total number of pages."
+              },
+              "limit": { "type": "number", "description": "Maximum number of projects per page" },
+              "offset": {
+                "type": "number",
+                "description": "Number of projects skipped in this response"
+              }
+            },
+            "required": ["count", "limit", "offset"]
+          }
+        },
+        "required": ["projects", "pagination"]
       }
     }
   }

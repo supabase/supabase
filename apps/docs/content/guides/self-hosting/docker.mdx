@@ -168,7 +168,7 @@ By default, the database is not accessible from outside the local machine but th
 You may also want to connect to your Postgres database via an ORM or another direct method other than `psql`.
 
 For this you can use the standard Postgres connection string.
-You can find the the environment values mentioned below in the `.env` file which will be covered in the next section.
+You can find the environment values mentioned below in the `.env` file which will be covered in the next section.
 
 ```
 postgres://postgres:[POSTGRES_PASSWORD]@[your-server-ip]:5432/[POSTGRES_DB]
@@ -220,6 +220,8 @@ Update the `./docker/.env` file with your own secrets. In particular, these are 
 - `SITE_URL`: the base URL of your site.
 - `SMTP_*`: mail server credentials. You can use any SMTP server.
 - `POOLER_TENANT_ID`: the tenant-id that will be used by Supavisor pooler for your connection string
+- `PG_META_CRYPTO_KEY`: encryption key for securing connection strings between Studio and postgres-meta
+- `SECRET_KEY_BASE`: encryption key for securing Realtime and Supavisor communications. (Must be at least 64 characters; generate with `openssl rand -base64 48`)
 
 You will need to [restart](#restarting-all-services) the services for the changes to take effect.
 

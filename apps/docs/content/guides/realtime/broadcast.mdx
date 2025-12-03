@@ -6,6 +6,27 @@ description: 'Send low-latency messages using the client libs, REST, or your Dat
 
 You can use Realtime Broadcast to send low-latency messages between users. Messages can be sent using the client libraries, REST APIs, or directly from your database.
 
+## How Broadcast works
+
+The way Broadcast works changes based on the channel you are using:
+
+- From REST API will receive an HTTP request which then will be sent via WebSocket to connected clients
+- From Client libraries we have an established WebSocket connection and we use that to send a message to the server which then will be sent via WebSocket to connected clients
+- From Database we add a new entry to `realtime.messages` where we have logical replication set to listen for changes which then will be sent via WebSocket to connected clients
+
+<Admonition type="note">
+
+The public flag (the last argument in `realtime.send(payload, event, topic, is_private))` only affects who can subscribe to the topic not who can read messages from the database.
+
+- Public (false) → Anyone can subscribe to that topic without authentication
+- Private (true) → Only authenticated clients can subscribe to that topic
+
+However, regardless of whether it's public or private, the Realtime service connects to your database as the authenticated Supabase Admin role.
+
+</Admonition>
+
+For Authorization we do insert a message and try to read it and then we it back as way to verify that the RLS policies set by the user are being respected by the user joining the channel but this messages won't be sent to the user. You can read more about it in the [Authorization](/docs/guides/realtime/authorization) docs
+
 ## Subscribe to messages
 
 You can use the Supabase client libraries to receive Broadcast messages.
@@ -384,6 +405,7 @@ You can use the Supabase client libraries to send Broadcast messages.
   </$Show>
 </Tabs>
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
 ### Broadcast from the Database
 
 <Admonition type="caution">
@@ -410,6 +432,14 @@ select
     false -- Public / Private flag
   );
 ```
+
+<Admonition type="note">
+
+The realtime.send function in the database includes a flag that determines whether the broadcast is private or public, and client channels also have the same configuration. For broadcasts to work correctly, these settings must match a public broadcast will only reach public channels, and a private broadcast will only reach private ones.
+
+By default, all database broadcasts are private, meaning clients must authenticate to receive them. If the database sends a public message but the client subscribes to a private channel, the message won't be delivered since private channels only accept signed, authenticated messages.
+
+</Admonition>
 
 It's a common use case to broadcast messages when a record is created, updated, or deleted. We provide a helper function specific to this use case, `realtime.broadcast_changes()`. For more details, check out the [Subscribing to Database Changes](/docs/guides/realtime/subscribing-to-database-changes) guide.
 
@@ -836,12 +866,6 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
 
 ## Trigger broadcast messages from your database
 
-<Admonition type="caution">
-
-This feature is currently in Public Alpha. If you have any issues [submit a support ticket](https://supabase.help).
-
-</Admonition>
-
 ### How it works
 
 Broadcast Changes allows you to trigger messages from your database. To achieve it Realtime is directly reading your WAL (Write Append Log) file using a publication against the `realtime.messages` table so whenever a new insert happens a message is sent to connected users.
@@ -948,3 +972,194 @@ const changes = supabase
   .on('broadcast', { event: 'DELETE' }, (payload) => console.log(payload))
   .subscribe()
 ```
+
+## Broadcast replay
+
+<Admonition type="caution">
+
+This feature is currently in Public Alpha. If you have any issues [submit a support ticket](https://supabase.help).
+
+</Admonition>
+
+### How it works
+
+Broadcast Replay enables **private** channels to access messages that were sent earlier. Only messages published via [Broadcast From the Database](#broadcast-from-the-database) are available for replay.
+
+You can configure replay with the following options:
+
+- **`since`** (Required): The epoch timestamp in milliseconds (e.g., `1697472000000`), specifying the earliest point from which messages should be retrieved.
+- **`limit`** (Optional): The number of messages to return. This must be a positive integer, with a maximum value of 25.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+  <TabPanel id="js" label="JavaScript">
+    <Admonition type="note">
+
+      This is currently available only in the Supabase JavaScript client version 2.74.0 and later.
+
+    </Admonition>
+
+    ```js
+    const config = {
+      private: true,
+      broadcast: {
+        replay: {
+          since: 1697472000000, // Unix timestamp in milliseconds
+          limit: 10
+        }
+      }
+    }
+    const channel = supabase.channel('main:room', { config })
+
+    // Broadcast callback receives meta field
+    channel.on('broadcast', { event: 'position' }, (payload) => {
+      if (payload?.meta?.replayed) {
+        console.log('Replayed message: ', payload)
+      } else {
+        console.log('This is a new message', payload)
+      }
+      // ...
+    })
+    .subscribe()
+    ```
+
+  </TabPanel>
+
+<$Show if="sdk:dart">
+
+  <TabPanel id="dart" label="Dart">
+    <Admonition type="note">
+
+      This is currently available only in the Supabase Dart client version 2.10.0 and later.
+
+    </Admonition>
+    ```dart
+    // Configure broadcast with replay
+    final channel = supabase.channel(
+      'my-channel',
+      RealtimeChannelConfig(
+        self: true,
+        ack: true,
+        private: true,
+        replay: ReplayOption(
+          since: 1697472000000, // Unix timestamp in milliseconds
+          limit: 25,
+        ),
+      ),
+    );
+
+    // Broadcast callback receives meta field
+    channel.onBroadcast(
+      event: 'position',
+      callback: (payload) {
+        final meta = payload['meta'] as Map<String, dynamic>?;
+        if (meta?['replayed'] == true) {
+          print('Replayed message: ${meta?['id']}');
+        }
+      },
+    ).subscribe();
+    ```
+
+  </TabPanel>
+  </$Show>
+
+<$Show if="sdk:swift">
+
+  <TabPanel id="swift" label="Swift">
+    <Admonition type="note">
+
+      This is currently available only in the Supabase Swift client version 2.34.0 and later.
+
+    </Admonition>
+    ```swift
+    // Configure broadcast with replay
+    let channel = supabase.realtimeV2.channel("my-channel") {
+      $0.isPrivate = true
+      $0.broadcast.acknowledgeBroadcasts = true
+      $0.broadcast.receiveOwnBroadcasts = true
+      $0.broadcast.replay = ReplayOption(
+        since: 1697472000000, // Unix timestamp in milliseconds
+        limit: 25
+      )
+    }
+
+    var subscriptions = Set<RealtimeSubscription>()
+
+    // Broadcast callback receives meta field
+    channel.onBroadcast(event: "position") { message in
+      if let meta = message["payload"]?.objectValue?["meta"]?.objectValue,
+         let replayed = meta["replayed"]?.boolValue,
+         replayed {
+        print("Replayed message: \(meta["id"]?.stringValue ?? "")")
+      }
+    }
+    .store(in: &subscriptions)
+
+    await channel.subscribe()
+    ```
+
+  </TabPanel>
+  </$Show>
+
+<$Show if="sdk:kotlin">
+
+  <TabPanel id="kotlin" label="Kotlin">
+    <Admonition type="note">
+
+      Unsupported in Kotlin for now.
+
+    </Admonition>
+
+  </TabPanel>
+  </$Show>
+
+<$Show if="sdk:python">
+
+  <TabPanel id="python" label="Python">
+    <Admonition type="note">
+
+      This is currently available only in the Supabase Python client version 2.22.0 and later.
+
+    </Admonition>
+    ```python
+    # Configure broadcast with replay
+    channel = client.channel('my-channel', {
+        'config': {
+            "private": True,
+            'broadcast': {
+                'self': True,
+                'ack': True,
+                'replay': {
+                    'since': 1697472000000,
+                    'limit': 100
+                }
+            }
+        }
+    })
+
+    # Broadcast callback receives meta field
+    def on_broadcast(payload):
+        if payload.get('meta', {}).get('replayed'):
+            print(f"Replayed message: {payload['meta']['id']}")
+
+    await channel.on_broadcast('position', on_broadcast)
+    await channel.subscribe()
+    ```
+
+  </TabPanel>
+  </$Show>
+</Tabs>
+
+#### When to use Broadcast replay
+
+A few common use cases for Broadcast Replay include:
+
+- Displaying the most recent messages from a chat room
+- Loading the last events that happened during a sports event
+- Ensuring users always see the latest events after a page reload or network interruption
+- Highlighting the most recent sections that changed in a web page

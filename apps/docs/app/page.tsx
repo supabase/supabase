@@ -187,6 +187,19 @@ const additionalResources = [
     icon: 'integrations',
     href: '/guides/integrations',
   },
+  {
+    title: 'Supabase UI',
+    description: 'A collection of pre-built Supabase components to speed up your project.',
+    icon: 'ui',
+    href: 'https://supabase.com/ui',
+    external: true,
+  },
+  {
+    title: 'Troubleshooting',
+    description: 'Our troubleshooting guide for solutions to common Supabase issues.',
+    icon: 'troubleshooting',
+    href: '/guides/troubleshooting',
+  },
 ]
 
 const HomePage = () => (
@@ -303,6 +316,7 @@ const HomePage = () => (
                   href={resource.href}
                   className="col-span-12 md:col-span-6 lg:col-span-3"
                   passHref
+                  target={resource.external ? '_blank' : undefined}
                 >
                   <GlassPanelWithIconPicker {...resource} background={false}>
                     {resource.description}

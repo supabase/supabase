@@ -1,12 +1,13 @@
 import Link from 'next/link'
 
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import type { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { formatCurrency } from 'lib/helpers'
 import { ChevronRight } from 'lucide-react'
 import { useMemo } from 'react'
-import { Button, cn, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
+import { cn, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 import { billingMetricUnit, formatUsage } from '../helpers'
 import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
 
@@ -156,13 +157,9 @@ export const BillingMetric = ({
             </div>
           ) : (
             <div>
-              <Button type="default" asChild>
-                <Link
-                  href={`/org/${slug}/billing?panel=subscriptionPlan&source=billingBreakdownUsage${metric.anchor}`}
-                >
-                  Upgrade
-                </Link>
-              </Button>
+              <UpgradePlanButton source={`billingBreakdownUsage${metric.anchor}`}>
+                Upgrade
+              </UpgradePlanButton>
             </div>
           )}
         </div>

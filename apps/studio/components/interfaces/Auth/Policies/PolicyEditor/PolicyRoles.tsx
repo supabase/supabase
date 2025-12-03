@@ -13,7 +13,7 @@ interface PolicyRolesProps {
 }
 type SystemRole = (typeof SYSTEM_ROLES)[number]
 
-const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps) => {
+export const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps) => {
   const { data: project } = useSelectedProjectQuery()
   const { data, error, isLoading, isError, isSuccess } = useDatabaseRolesQuery({
     projectRef: project?.ref,
@@ -57,5 +57,3 @@ const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps)
     </div>
   )
 }
-
-export default PolicyRoles

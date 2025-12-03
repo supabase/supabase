@@ -5,7 +5,7 @@ description: 'Use a custom domain instead of the default Supabase domain for you
 tocVideo: '6rcGnW_Mh-0'
 ---
 
-Custom domains allow you to present a branded experience to your users. These are available as an [add-on for projects on a paid plan](/dashboard/project/_/settings/addons?panel=customDomain).
+Custom domains allow you to present a branded experience to your users. These are available as a [paid add-on for projects on a paid plan](/dashboard/project/_/settings/addons?panel=customDomain).
 
 There are two types of domains supported by Supabase:
 
@@ -23,6 +23,12 @@ Custom domains change the way your project's URLs appear to your users. This is 
 - You are storing URLs in a database or encoding them in QR codes.
 
 Custom domains help you keep your APIs portable for the long term. By using a custom domain you can migrate from one Supabase project to another, or make it easier to version APIs in the future.
+
+### Limitations
+
+- Custom domains are not intended to enable hosting of frontend applications through [Edge Functions](/docs/guides/functions).
+- You can only attach a single custom domain to any given Supabase project. It is not possible to break out your project's resources into multiple custom domains.
+- Custom domains can only be powered by CNAME records.
 
 ### Configure a custom domain using the Supabase dashboard
 

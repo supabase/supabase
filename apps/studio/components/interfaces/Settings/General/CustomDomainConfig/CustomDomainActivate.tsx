@@ -9,6 +9,7 @@ import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mut
 import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-domains-activate-mutation'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
+import { DOCS_URL } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -21,8 +22,8 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
   const [isActivateConfirmModalVisible, setIsActivateConfirmModalVisible] = useState(false)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const { mutate: checkCNAMERecord, isLoading: isCheckingRecord } = useCheckCNAMERecordMutation()
-  const { mutate: activateCustomDomain, isLoading: isActivating } = useCustomDomainActivateMutation(
+  const { mutate: checkCNAMERecord, isPending: isCheckingRecord } = useCheckCNAMERecordMutation()
+  const { mutate: activateCustomDomain, isPending: isActivating } = useCustomDomainActivateMutation(
     {
       onSuccess: () => {
         toast.success(`Successfully activated custom domain`)
@@ -30,7 +31,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
       },
     }
   )
-  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation({
+  const { mutate: deleteCustomDomain, isPending: isDeleting } = useCustomDomainDeleteMutation({
     onSuccess: () => {
       toast.success(
         'Custom domain setup cancelled successfully. It may take a few seconds before your custom domain is fully removed, so you may need to refresh your browser.'
@@ -77,8 +78,8 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
               <AlertDescription_Shadcn_>
                 <p className="col-span-12 text-sm lg:col-span-7 leading-6">
                   Your custom domain CNAME record for{' '}
-                  <code className="text-xs">{customDomain.hostname}</code>
-                  should resolve to{' '}
+                  <code className="text-code-inline">{customDomain.hostname}</code> should resolve
+                  to{' '}
                   {endpoint ? (
                     <code className="text-xs">{endpoint}</code>
                   ) : (
@@ -95,7 +96,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
 
         <Panel.Content className="w-full">
           <div className="flex items-center justify-between">
-            <DocsButton href="https://supabase.com/docs/guides/platform/custom-domains" />
+            <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
             <div className="flex items-center space-x-2">
               <Button
                 type="default"

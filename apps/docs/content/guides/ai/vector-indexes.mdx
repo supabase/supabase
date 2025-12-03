@@ -26,7 +26,15 @@ Indexes can be used to improve performance of nearest neighbor search using vari
 | `<#>`    | negative inner product | `vector_ip_ops`                                                                      |
 | `<=>`    | cosine distance        | `vector_cosine_ops`                                                                  |
 
-Currently vectors with up to 2,000 dimensions can be indexed.
+For pgvector versions 0.7.0 and above, it's possible to create indexes on vectors with the following maximum dimensions:
+
+- vector: up to 2,000 dimensions
+- halfvec: up to 4,000 dimensions
+- bit: up to 64,000 dimensions
+
+You can check your current pgvector version by running: `SELECT * FROM pg_extension WHERE extname = 'vector';` or by navigating to the [Extensions](/dashboard/project/_/database/extensions) tab in your Supabase project dashboard.
+
+If you are on an earlier version of pgvector, you should [upgrade your project here](/dashboard/project/_/settings/infrastructure).
 
 ## Resources
 

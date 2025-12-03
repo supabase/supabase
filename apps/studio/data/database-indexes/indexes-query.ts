@@ -1,6 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseIndexesKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 type GetIndexesArgs = {
   schema?: string
@@ -55,13 +56,11 @@ export type IndexesError = ExecuteSqlError
 
 export const useIndexesQuery = <TData = IndexesData>(
   { projectRef, connectionString, schema }: IndexesVariables,
-  { enabled = true, ...options }: UseQueryOptions<IndexesData, IndexesError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<IndexesData, IndexesError, TData> = {}
 ) =>
-  useQuery<IndexesData, IndexesError, TData>(
-    databaseIndexesKeys.list(projectRef, schema),
-    ({ signal }) => getIndexes({ projectRef, connectionString, schema }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof schema !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<IndexesData, IndexesError, TData>({
+    queryKey: databaseIndexesKeys.list(projectRef, schema),
+    queryFn: ({ signal }) => getIndexes({ projectRef, connectionString, schema }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof schema !== 'undefined',
+    ...options,
+  })

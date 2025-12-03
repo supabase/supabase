@@ -1,16 +1,15 @@
-import { Lightbulb, ChevronsUpDown, Expand } from 'lucide-react'
+import { Lightbulb, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-import dayjs from 'dayjs'
 
 import { formatSql } from 'lib/formatSql'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
 import {
   QUERY_PERFORMANCE_COLUMNS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
+import { formatDuration } from './QueryPerformance.utils'
 
 interface QueryDetailProps {
   reportType: QUERY_PERFORMANCE_REPORT_TYPES
@@ -40,22 +39,6 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
   }, [selectedRow])
 
   const [isExpanded, setIsExpanded] = useState(false)
-
-  const formatDuration = (seconds: number) => {
-    const dur = dayjs.duration(seconds, 'seconds')
-
-    const minutes = Math.floor(dur.asMinutes())
-    const remainingSeconds = dur.seconds() + dur.milliseconds() / 1000
-
-    const parts = []
-    if (minutes > 0) parts.push(`${minutes}m`)
-    if (remainingSeconds > 0) {
-      const formattedSeconds = remainingSeconds.toFixed(2)
-      parts.push(`${formattedSeconds}s`)
-    }
-
-    return parts.join(' ')
-  }
 
   return (
     <QueryPanelContainer>
@@ -146,10 +129,10 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
                         <span
                           className={cn(
                             'tabular-nums',
-                            formatDuration(rawValue / 1000) === '0.00s' && 'text-foreground-lighter'
+                            formatDuration(totalTime) === '0.00s' && 'text-foreground-lighter'
                           )}
                         >
-                          {formatDuration(totalTime / 1000)}
+                          {formatDuration(totalTime)}
                         </span>
                       </p>
                     ) : (
@@ -185,7 +168,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
                 return (
                   <li key={x.id} className="flex justify-between pt-3 text-sm">
                     <p className="text-foreground-light">{x.name}</p>
-                    {typeof rawValue === 'string' ? (
+                    {typeof rawValue === 'string' || typeof rawValue === 'number' ? (
                       <p
                         className={cn(
                           cacheHitRateToNumber(rawValue).toFixed(2) === '0.00' &&

@@ -55,7 +55,9 @@ const CreditBalance = () => {
         {isPermissionsLoaded && !canReadSubscriptions ? (
           <NoPermission resourceText="view this organization's credits" />
         ) : (
-          <FormPanel footer={<CreditTopUp slug={slug} />}>
+          <FormPanel
+            footer={subscription?.billing_via_partner ? undefined : <CreditTopUp slug={slug} />}
+          >
             <FormSection>
               <FormSectionContent fullWidth loading={isLoading}>
                 {isError && (
