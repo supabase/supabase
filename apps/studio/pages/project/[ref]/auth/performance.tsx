@@ -22,11 +22,16 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const PerformancePage: NextPageWithLayout = () => {
   const { ref } = useParams()
+  const showPerformance = useIsFeatureEnabled('authentication:performance')
 
   const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'custom_config_gotrue'
   )
+
+  if (!showPerformance) {
+    return <UnknownInterface urlBack={`/project/${ref}/auth/providers`} />
+  }
 
   if (isPermissionsLoaded && !canReadAuthSettings) {
     return <NoPermission isFullPage resourceText="access your project's authentication settings" />
@@ -39,7 +44,7 @@ const PerformancePage: NextPageWithLayout = () => {
           <PageHeaderSummary>
             <PageHeaderTitle>Performance</PageHeaderTitle>
             <PageHeaderDescription>
-              Tune your Auth server for best performance
+              Configure settings to optimize your Auth server's performance
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>

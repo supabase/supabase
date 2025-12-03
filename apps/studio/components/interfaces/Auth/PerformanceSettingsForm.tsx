@@ -7,13 +7,11 @@ import * as z from 'zod'
 
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { StringNumberOrNull } from 'components/ui/Forms/Form.constants'
 import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
-
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -23,9 +21,9 @@ import {
   Card,
   CardContent,
   CardFooter,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   PrePostTab,
   Select_Shadcn_,
@@ -68,8 +66,6 @@ export const PerformanceSettingsForm = () => {
     isLoading: isLoadingAuthConfig,
   } = useAuthConfigQuery({ projectRef: project?.ref })
 
-  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
-
   const { data: maxConnData, isLoading: isLoadingMaxConns } = useMaxConnectionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -77,19 +73,16 @@ export const PerformanceSettingsForm = () => {
   const maxConnectionLimit = maxConnData?.maxConnections ?? 60
 
   const isLoading = isLoadingAuthConfig || isLoadingMaxConns
-
   const isProPlan = organization?.plan.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlan
 
+  const { mutate: updateAuthConfig, isPending: isSaving } = useAuthConfigUpdateMutation()
+
   const requestDurationForm = useForm({
     resolver: zodResolver(
-      z.object({
-        API_MAX_REQUEST_DURATION: FormSchema.shape.API_MAX_REQUEST_DURATION,
-      })
+      z.object({ API_MAX_REQUEST_DURATION: FormSchema.shape.API_MAX_REQUEST_DURATION })
     ),
-    defaultValues: {
-      API_MAX_REQUEST_DURATION: 10,
-    },
+    defaultValues: { API_MAX_REQUEST_DURATION: 10 },
   })
 
   const databaseForm = useForm({
@@ -106,27 +99,6 @@ export const PerformanceSettingsForm = () => {
   })
 
   const chosenUnit = databaseForm.watch('DB_MAX_POOL_SIZE_UNIT')
-
-  useEffect(() => {
-    if (authConfig) {
-      if (!isUpdatingRequestDurationForm) {
-        requestDurationForm.reset({
-          API_MAX_REQUEST_DURATION: authConfig?.API_MAX_REQUEST_DURATION ?? 10,
-        })
-      }
-
-      if (!isUpdatingDatabaseForm) {
-        databaseForm.reset({
-          DB_MAX_POOL_SIZE:
-            authConfig?.DB_MAX_POOL_SIZE !== null ? authConfig?.DB_MAX_POOL_SIZE ?? 10 : 10,
-          DB_MAX_POOL_SIZE_UNIT:
-            authConfig?.DB_MAX_POOL_SIZE_UNIT !== null
-              ? authConfig?.DB_MAX_POOL_SIZE_UNIT
-              : 'connections',
-        })
-      }
-    }
-  }, [authConfig, isUpdatingRequestDurationForm, isUpdatingDatabaseForm])
 
   const onSubmitRequestDurationForm = (values: any) => {
     if (!project?.ref) return console.error('Project ref is required')
@@ -166,12 +138,33 @@ export const PerformanceSettingsForm = () => {
           setIsUpdatingDatabaseForm(false)
         },
         onSuccess: () => {
-          toast.success('Successfully updated database connection settings')
+          toast.success('Successfully updated connection settings')
           setIsUpdatingDatabaseForm(false)
         },
       }
     )
   }
+
+  useEffect(() => {
+    if (authConfig) {
+      if (!isUpdatingRequestDurationForm) {
+        requestDurationForm.reset({
+          API_MAX_REQUEST_DURATION: authConfig?.API_MAX_REQUEST_DURATION ?? 10,
+        })
+      }
+
+      if (!isUpdatingDatabaseForm) {
+        databaseForm.reset({
+          DB_MAX_POOL_SIZE:
+            authConfig?.DB_MAX_POOL_SIZE !== null ? authConfig?.DB_MAX_POOL_SIZE ?? 10 : 10,
+          DB_MAX_POOL_SIZE_UNIT:
+            authConfig?.DB_MAX_POOL_SIZE_UNIT !== null
+              ? authConfig?.DB_MAX_POOL_SIZE_UNIT
+              : 'connections',
+        })
+      }
+    }
+  }, [authConfig, isUpdatingRequestDurationForm, isUpdatingDatabaseForm])
 
   if (isError) {
     return (
@@ -199,23 +192,21 @@ export const PerformanceSettingsForm = () => {
 
   return (
     <>
-      {promptProPlanUpgrade && (
-        <div className="my-4">
+      <ScaffoldSection isFullWidth>
+        {promptProPlanUpgrade && (
           <UpgradeToPro
-            primaryText="Upgrade to Pro"
-            secondaryText="Auth server performance tuning is not available on the free plan"
-            buttonText="Upgrade to Pro"
+            className="mb-4"
+            primaryText="Configuring Auth server performance is only available on the Pro plan and above"
+            secondaryText="Upgrade to the Pro plan to configure settings for your Auth server"
           />
-        </div>
-      )}
+        )}
+      </ScaffoldSection>
+
       <ScaffoldSection isFullWidth>
         <ScaffoldSectionTitle className="mb-4">Request Duration</ScaffoldSectionTitle>
 
         <Form_Shadcn_ {...requestDurationForm}>
-          <form
-            onSubmit={requestDurationForm.handleSubmit(onSubmitRequestDurationForm)}
-            className="space-y-4"
-          >
+          <form onSubmit={requestDurationForm.handleSubmit(onSubmitRequestDurationForm)}>
             <Card>
               <CardContent className="pt-6">
                 <FormField_Shadcn_
@@ -224,8 +215,16 @@ export const PerformanceSettingsForm = () => {
                   render={({ field }) => (
                     <FormItemLayout
                       layout="flex-row-reverse"
-                      label="Terminate long-running requests"
-                      description="Requests that have not completed within this timeframe will be terminated. Adjust this value to control load-shedding. Recommended: not less than 10 seconds."
+                      label="Maximum allowed duration for an Auth request"
+                      description={
+                        <>
+                          <p>
+                            Requests that exceed this time limit will be terminated. Used to manage
+                            server load.
+                          </p>
+                          <p>We recommend a minimum of 10 seconds.</p>
+                        </>
+                      }
                     >
                       <FormControl_Shadcn_>
                         <div className="relative">
@@ -284,7 +283,17 @@ export const PerformanceSettingsForm = () => {
                     <FormItemLayout
                       layout="flex-row-reverse"
                       label="Allocation strategy"
-                      description="Choose to allocate a percentage or an absolute number of connections to the Auth server. Prefer a percentage strategy as it grows with your instance size."
+                      description={
+                        <>
+                          <p>
+                            Choose to allocate a percentage or an absolute number of connections to
+                            the Auth server.
+                          </p>
+                          <p>
+                            We recommend a percentage strategy as it grows with your instance size.
+                          </p>
+                        </>
+                      }
                     >
                       <FormControl_Shadcn_>
                         <Select_Shadcn_
@@ -324,7 +333,7 @@ export const PerformanceSettingsForm = () => {
                               {field.value === 'percent' ? 'Percentage' : 'Absolute'}
                             </SelectValue_Shadcn_>
                           </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
+                          <SelectContent_Shadcn_ align="end">
                             <SelectItem_Shadcn_ value="connections" className="text-xs">
                               Absolute number of connections
                             </SelectItem_Shadcn_>
@@ -346,10 +355,14 @@ export const PerformanceSettingsForm = () => {
                       label="Maximum connections"
                       description={
                         <>
-                          Limit the maximum number of connections that the Auth server will take up
-                          under highest load.{' '}
-                          <em className="text-brand !not-italic">Connections are not reserved</em>{' '}
-                          and returned to Postgres a few minutes after being idle.
+                          <p>
+                            Maximum number of connections that the Auth server will take up under
+                            highest load.
+                          </p>
+                          <p>
+                            <em className="text-brand !not-italic">Connections are not reserved</em>{' '}
+                            and returned to Postgres a few minutes after being idle.
+                          </p>
                         </>
                       }
                     >
