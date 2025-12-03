@@ -1,6 +1,7 @@
 import sumBy from 'lodash/sumBy'
 import { ChevronRight } from 'lucide-react'
 import { Fragment, useRef, useState } from 'react'
+import * as z from 'zod'
 
 import { useParams } from 'common'
 import {
@@ -423,10 +424,13 @@ export const RequestsByCountryMapRenderer = (
   const theme = resolvedTheme === 'dark' ? MAP_CHART_THEME.dark : MAP_CHART_THEME.light
 
   if (!!props.error) {
-    const error = (
-      typeof props.error === 'string' ? { message: props.error } : props.error
-    ) as ResponseError
-    return <AlertError subject="Failed to retrieve requests by geography" error={error} />
+    const AlertErrorSchema = z.object({ message: z.string() })
+    const parsed =
+      typeof props.error === 'string'
+        ? { success: true, data: { message: props.error } }
+        : AlertErrorSchema.safeParse(props.error)
+    const alertError = parsed.success ? parsed.data : null
+    return <AlertError subject="Failed to retrieve requests by geography" error={alertError} />
   }
 
   return (
