@@ -4,6 +4,7 @@ import { type CSSProperties } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
@@ -13,9 +14,14 @@ import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-types-infinite-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
+import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { formatSql } from 'lib/formatSql'
+import {
+  useRoleImpersonationStateSnapshot,
+  type RoleImpersonationState,
+} from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
@@ -74,6 +80,23 @@ const EntityListItem = ({
   const isActive = Number(id) === entity.id
   const canEdit = isActive && !isLocked
 
+  const { filters } = useTableFilter()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
+  const { data: countData } = useTableRowsCountQuery(
+    {
+      projectRef,
+      connectionString: project?.connectionString,
+      tableId: entity.id,
+      filters,
+      enforceExactCount: false,
+      roleImpersonationState: roleImpersonationState as RoleImpersonationState,
+    },
+    {
+      enabled: isTableLikeEntityListItem(entity) && isActive,
+    }
+  )
+  const rowCount = countData?.count
+
   const { data: lints = [] } = useProjectLintsQuery({
     projectRef: project?.ref,
   })
@@ -127,6 +150,7 @@ const EntityListItem = ({
     connectionString: project?.connectionString ?? null,
     entity,
     type: 'fetch_all',
+    totalRows: rowCount,
   })
 
   const { exportSql, confirmationModal: exportSqlConfirmationModal } = useExportAllRowsAsSql({
@@ -135,6 +159,7 @@ const EntityListItem = ({
     connectionString: project?.connectionString ?? null,
     entity,
     type: 'fetch_all',
+    totalRows: rowCount,
   })
 
   return (
