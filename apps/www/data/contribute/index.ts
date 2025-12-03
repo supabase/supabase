@@ -3,13 +3,12 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_CONTRIBUTE_URL as string
 const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_CONTRIBUTE_PUBLISHABLE_KEY as string
 
-type ThreadSource = 'discord' | 'reddit' | 'github' | 'unknown'
-
+type ThreadSource = 'discord' | 'reddit' | 'github'
 export interface Thread {
   id: string
   title: string
   user: string
-  channel: string
+  channel: ThreadSource
   tags: string[]
   product_areas: string[]
   posted: string
@@ -48,7 +47,7 @@ function formatTimeAgo(date: Date): string {
 }
 
 function normalizeSource(source: string | null): ThreadSource {
-  if (!source) return 'unknown'
+  if (!source) return 'discord'
   return source.toLowerCase().trim() as ThreadSource
 }
 
@@ -60,7 +59,7 @@ function mapThreadRowToThread(row: ThreadRow): Thread {
     id: row.thread_id,
     title: row.subject,
     user: row.author,
-    channel: row.source?.toUpperCase() ?? '',
+    channel: source,
     tags: row.product_areas ?? [],
     product_areas: row.product_areas ?? [],
     posted: isNaN(firstMsgTime.getTime())
