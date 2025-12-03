@@ -36,9 +36,10 @@ export interface GettingStartedProps {
     actionType: 'primary' | 'ai_assist' | 'external_link'
     wasCompleted: boolean
   }) => void
+  onDismiss?: () => void
 }
 
-export function GettingStarted({ steps, onStepClick }: GettingStartedProps) {
+export function GettingStarted({ steps, onStepClick, onDismiss }: GettingStartedProps) {
   const allStepsComplete = steps.length > 0 && steps.every((step) => step.status === 'complete')
   const [activeStepKey, setActiveStepKey] = useState<string | null>(null)
   const hasInitializedRef = useRef(false)
@@ -162,7 +163,7 @@ export function GettingStarted({ steps, onStepClick }: GettingStartedProps) {
                         Join us on Discord
                       </Link>
                     </Button>
-                    <Button type="text" size="tiny">
+                    <Button type="text" size="tiny" onClick={onDismiss}>
                       Dismiss section
                     </Button>
                   </div>

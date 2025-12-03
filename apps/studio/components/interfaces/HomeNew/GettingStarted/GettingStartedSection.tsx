@@ -324,6 +324,27 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
               })
             }
           }}
+          onDismiss={() => {
+            onChange('hidden')
+            if (workflow) {
+              const completedSteps = (workflow === 'code' ? codeSteps : noCodeSteps).filter(
+                (step) => step.status === 'complete'
+              ).length
+              const totalSteps = (workflow === 'code' ? codeSteps : noCodeSteps).length
+              sendEvent({
+                action: 'home_getting_started_closed',
+                properties: {
+                  workflow: workflow === 'no-code' ? 'no_code' : 'code',
+                  steps_completed: completedSteps,
+                  total_steps: totalSteps,
+                },
+                groups: {
+                  project: project?.ref || '',
+                  organization: organization?.slug || '',
+                },
+              })
+            }
+          }}
         />
       )}
     </section>
