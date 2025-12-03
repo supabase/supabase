@@ -141,28 +141,6 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
 
   const steps = workflow === 'code' ? codeSteps : workflow === 'no-code' ? noCodeSteps : []
 
-  const handleDismiss = useCallback(() => {
-    onChange('hidden')
-    if (workflow) {
-      const completedSteps = (workflow === 'code' ? codeSteps : noCodeSteps).filter(
-        (step) => step.status === 'complete'
-      ).length
-      const totalSteps = (workflow === 'code' ? codeSteps : noCodeSteps).length
-      sendEvent({
-        action: 'home_getting_started_closed',
-        properties: {
-          workflow: workflow === 'no-code' ? 'no_code' : 'code',
-          steps_completed: completedSteps,
-          total_steps: totalSteps,
-        },
-        groups: {
-          project: project?.ref || '',
-          organization: organization?.slug || '',
-        },
-      })
-    }
-  }, [workflow, codeSteps, noCodeSteps, onChange, sendEvent, project?.ref, organization?.slug])
-
   return (
     <section className="w-full">
       <div className="flex justify-between items-center mb-6">
@@ -209,7 +187,31 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
               Code
             </ToggleGroupItem>
           </ToggleGroup>
-          <Button size="tiny" type="outline" onClick={handleDismiss}>
+          <Button
+            size="tiny"
+            type="outline"
+            onClick={() => {
+              onChange('hidden')
+              if (workflow) {
+                const completedSteps = (workflow === 'code' ? codeSteps : noCodeSteps).filter(
+                  (step) => step.status === 'complete'
+                ).length
+                const totalSteps = (workflow === 'code' ? codeSteps : noCodeSteps).length
+                sendEvent({
+                  action: 'home_getting_started_closed',
+                  properties: {
+                    workflow: workflow === 'no-code' ? 'no_code' : 'code',
+                    steps_completed: completedSteps,
+                    total_steps: totalSteps,
+                  },
+                  groups: {
+                    project: project?.ref || '',
+                    organization: organization?.slug || '',
+                  },
+                })
+              }
+            }}
+          >
             Dismiss
           </Button>
         </div>
@@ -322,7 +324,6 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
               })
             }
           }}
-          onDismiss={handleDismiss}
         />
       )}
     </section>

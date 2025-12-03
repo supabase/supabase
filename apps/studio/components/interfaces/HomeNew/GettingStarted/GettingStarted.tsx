@@ -36,10 +36,9 @@ export interface GettingStartedProps {
     actionType: 'primary' | 'ai_assist' | 'external_link'
     wasCompleted: boolean
   }) => void
-  onDismiss?: () => void
 }
 
-export function GettingStarted({ steps, onStepClick, onDismiss }: GettingStartedProps) {
+export function GettingStarted({ steps, onStepClick }: GettingStartedProps) {
   const allStepsComplete = steps.length > 0 && steps.every((step) => step.status === 'complete')
   const [activeStepKey, setActiveStepKey] = useState<string | null>(null)
 
@@ -152,25 +151,17 @@ export function GettingStarted({ steps, onStepClick, onDismiss }: GettingStarted
                   Drop into our Discord community to share your progress and learn from fellow
                   developers.
                 </p>
-                <div className="mt-auto flex flex-wrap gap-2 pt-2">
-                  <Button
-                    asChild
-                    type="default"
-                    icon={<IconDiscord size={14} />}
-                    className="text-foreground-light hover:text-foreground"
-                  >
-                    <Link href={'https://discord.supabase.com/'} target="_blank">
-                      Join our Discord
-                    </Link>
-                  </Button>
-                  <Button
-                    type="text"
-                    onClick={onDismiss}
-                    className="text-foreground-light hover:text-foreground"
-                  >
-                    Dismiss section
-                  </Button>
-                </div>
+
+                <Button
+                  asChild
+                  type="default"
+                  icon={<IconDiscord size={14} />}
+                  className="text-foreground-light hover:text-foreground"
+                >
+                  <Link href={'https://discord.supabase.com/'} target="_blank">
+                    Join our Discord
+                  </Link>
+                </Button>
               </div>
             </div>
           ) : (
