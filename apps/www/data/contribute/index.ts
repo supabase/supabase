@@ -1,40 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
+import type { Thread, ThreadRow, ThreadSource } from '~/types/contribute'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_CONTRIBUTE_URL as string
 const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_CONTRIBUTE_PUBLISHABLE_KEY as string
-
-type ThreadSource = 'discord' | 'reddit' | 'github'
-export interface Thread {
-  id: string
-  title: string
-  user: string
-  channel: ThreadSource
-  tags: string[]
-  product_areas: string[]
-  posted: string
-  source: ThreadSource
-  external_activity_url: string
-  category: string | null
-  sub_category: string | null
-  summary: string | null
-}
-
-type ThreadRow = {
-  thread_id: string
-  subject: string
-  status: string
-  author: string
-  external_activity_url: string | null
-  created_at: string
-  source: string | null
-  product_areas: string[] | null
-  stack: string[] | null
-  category: string | null
-  sub_category: string | null
-  summary: string | null
-  first_msg_time: string | null
-  message_count: number | null
-}
 
 function formatTimeAgo(date: Date): string {
   const now = new Date()
@@ -51,20 +19,24 @@ function normalizeSource(source: string | null): ThreadSource {
   return source.toLowerCase().trim() as ThreadSource
 }
 
-function mapThreadRowToThread(row: ThreadRow): Thread {
-  const firstMsgTime = new Date(row.first_msg_time ?? '')
+function mapThreadRowToThread(row: Thread): ThreadRow {
+  const firstMsgTime = row.first_msg_time ? new Date(row.first_msg_time) : null
   const source = normalizeSource(row.source)
 
   return {
     id: row.thread_id,
-    title: row.subject,
+    title: row.subject ?? row.title ?? '',
     user: row.author,
     channel: source,
     tags: row.product_areas ?? [],
     product_areas: row.product_areas ?? [],
-    posted: isNaN(firstMsgTime.getTime())
-      ? formatTimeAgo(new Date(row.created_at))
-      : formatTimeAgo(firstMsgTime),
+    stack: row.stack ?? [],
+    posted:
+      firstMsgTime && !isNaN(firstMsgTime.getTime())
+        ? formatTimeAgo(firstMsgTime)
+        : row.created_at
+          ? formatTimeAgo(new Date(row.created_at))
+          : '',
     source,
     external_activity_url: row.external_activity_url ?? '#',
     category: row.category,
@@ -76,7 +48,7 @@ function mapThreadRowToThread(row: ThreadRow): Thread {
 export async function getUnansweredThreads(
   product_area?: string,
   channel?: string
-): Promise<Thread[]> {
+): Promise<ThreadRow[]> {
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
   const twentyFourHoursAgo = new Date()
@@ -110,7 +82,7 @@ export async function getUnansweredThreads(
     throw error
   }
 
-  const threads = (data ?? []) as ThreadRow[]
+  const threads = (data ?? []) as Thread[]
   return threads.map(mapThreadRowToThread)
 }
 

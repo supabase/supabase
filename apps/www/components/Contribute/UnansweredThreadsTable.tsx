@@ -24,14 +24,14 @@ import {
 } from 'ui'
 import { Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 
-import type { Thread } from '~/data/contribute'
+import type { ThreadRow } from '~/data/contribute'
 import { ChannelBadge } from './ChannelBadge'
 
 function ThreadRow({
   thread,
   searchParams,
 }: {
-  thread: Thread
+  thread: ThreadRow
   searchParams: URLSearchParams | null
 }) {
   const router = useRouter()
@@ -51,13 +51,13 @@ function ThreadRow({
 
   return (
     <tr className="border-b border-border hover:bg-muted/50 transition-colors">
-      <td className="py-4 px-6">
-        <div className="flex flex-col gap-1">
+      <td className="py-4 px-6 w-[45%] min-w-[350px]">
+        <div className="flex flex-col gap-1 overflow-hidden">
           <a
             href={thread.external_activity_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-foreground transition-colors"
+            className="font-medium text-foreground transition-colors truncate"
           >
             {thread.title}
           </a>
@@ -66,8 +66,8 @@ function ThreadRow({
           </div>
         </div>
       </td>
-      <td className="py-4 px-6">
-        <div className="flex flex-wrap gap-2">
+      <td className="py-4 px-6 w-[20%] min-w-[150px]">
+        <div className="flex flex-wrap gap-2 overflow-hidden">
           {thread.product_areas.length > 0 ? (
             thread.product_areas.map((area) => {
               const isActive = searchParams?.get('product_area') === area
@@ -89,8 +89,21 @@ function ThreadRow({
           )}
         </div>
       </td>
-      <td className="py-4 px-6">
-        <span className="text-sm text-muted-foreground">{thread.posted}</span>
+      <td className="py-4 px-6 w-[20%] min-w-[150px]">
+        <div className="flex flex-wrap gap-2 overflow-hidden">
+          {thread.stack.length > 0 ? (
+            thread.stack.map((tech) => (
+              <Badge key={tech} variant="outline" className="text-xs">
+                {tech}
+              </Badge>
+            ))
+          ) : (
+            <span className="text-xs text-muted-foreground">—</span>
+          )}
+        </div>
+      </td>
+      <td className="py-4 px-6 w-[15%] min-w-[100px]">
+        <span className="text-sm text-muted-foreground whitespace-nowrap">{thread.posted}</span>
       </td>
     </tr>
   )
@@ -107,7 +120,7 @@ function ThreadsTable({
   threads,
   searchParams,
 }: {
-  threads: Thread[]
+  threads: ThreadRow[]
   searchParams: URLSearchParams | null
 }) {
   if (threads.length === 0) {
@@ -120,12 +133,21 @@ function ThreadsTable({
 
   return (
     <div className=" overflow-hidden">
-      <table className="w-full">
+      <table className="w-full table-fixed">
         <thead className="border-b border-border">
           <tr>
-            <th className="text-left py-3 px-6 text-sm text-foreground">Thread</th>
-            <th className="text-left py-3 px-6 text-sm text-foreground">Area</th>
-            <th className="text-left py-3 px-6 text-sm text-foreground">Posted</th>
+            <th className="text-left py-3 px-6 text-sm text-foreground min-w-[350px] w-[45%]">
+              Thread
+            </th>
+            <th className="text-left py-3 px-6 text-sm text-foreground min-w-[150px] w-[20%]">
+              Area
+            </th>
+            <th className="text-left py-3 px-6 text-sm text-foreground min-w-[150px] w-[20%]">
+              Stack
+            </th>
+            <th className="text-left py-3 px-6 text-sm text-foreground min-w-[100px] w-[15%]">
+              Posted
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -142,7 +164,7 @@ export function UnansweredThreadsTable({
   threads,
   allProductAreas,
 }: {
-  threads: Thread[]
+  threads: ThreadRow[]
   allProductAreas: string[]
 }) {
   const [search, setSearch] = useState('')
