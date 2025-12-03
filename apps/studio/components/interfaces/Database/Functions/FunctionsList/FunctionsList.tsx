@@ -1,20 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Search } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { parseAsBoolean, parseAsJson, useQueryState } from 'nuqs'
-import { useRef } from 'react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+
+import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
-import {
-  ReportsSelectFilter,
-  selectFilterSchema,
-} from 'components/interfaces/Reports/v2/ReportsSelectFilter'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseFunctionDeleteMutation } from 'data/database-functions/database-functions-delete-mutation'
 import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
@@ -22,21 +15,12 @@ import { useDatabaseFunctionsQuery } from 'data/database-functions/database-func
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import {
-  AiIconAnimation,
-  Card,
-  Input,
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui'
+import { AiIconAnimation, Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
+import { FilterBar, FilterGroup, FilterProperty, isGroup } from 'ui-patterns'
 import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
 
@@ -54,13 +38,21 @@ begin
 end;
 $$;`
 
+const initialFilters: FilterGroup = {
+  logicalOperator: 'AND',
+  conditions: [
+    {
+      propertyName: 'schema',
+      operator: '=',
+      value: 'public',
+    },
+  ],
+}
+
 const FunctionsList = () => {
-  const router = useRouter()
-  const { search } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
-  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
   const {
     setValue: setEditorPanelValue,
@@ -68,8 +60,90 @@ const FunctionsList = () => {
     setInitialPrompt: setEditorPanelInitialPrompt,
   } = useEditorPanelStateSnapshot()
 
+  // FilterBar state
+  const [filters, setFilters] = useState<FilterGroup>(initialFilters)
+  const [freeformText, setFreeformText] = useState('')
+
   // Track the ID being deleted to exclude it from error checking
   const deletingFunctionIdRef = useRef<string | null>(null)
+
+  const { can: canCreateFunctions } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'functions'
+  )
+
+  const { data: schemas } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const {
+    data: functions,
+    error,
+    isLoading,
+    isError,
+  } = useDatabaseFunctionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  // Extract filter values from FilterGroup
+  const extractFilterValues = (group: FilterGroup, propertyName: string): string[] => {
+    const values: string[] = []
+    for (const condition of group.conditions) {
+      if (isGroup(condition)) {
+        values.push(...extractFilterValues(condition, propertyName))
+      } else if (condition.propertyName === propertyName && condition.value !== null) {
+        values.push(String(condition.value))
+      }
+    }
+    return values
+  }
+
+  const selectedSchema = extractFilterValues(filters, 'schema')[0] ?? 'public'
+  const returnTypeFilter = extractFilterValues(filters, 'return_type')
+  const securityFilter = extractFilterValues(filters, 'security')
+
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
+
+  // Get unique return types from all functions for filter options
+  const uniqueReturnTypes = useMemo(() => {
+    return Array.from(new Set((functions ?? []).map((fn) => fn.return_type))).sort()
+  }, [functions])
+
+  // Filter properties for FilterBar
+  const filterProperties: FilterProperty[] = useMemo(
+    () => [
+      {
+        label: 'Schema',
+        name: 'schema',
+        type: 'string' as const,
+        options: (schemas ?? [])
+          .map((s) => s.name)
+          .sort()
+          .map((name) => ({ label: name, value: name })),
+        operators: ['='],
+      },
+      {
+        label: 'Return Type',
+        name: 'return_type',
+        type: 'string' as const,
+        options: uniqueReturnTypes.map((type) => ({ label: type, value: type })),
+        operators: ['=', '!='],
+      },
+      {
+        label: 'Security',
+        name: 'security',
+        type: 'string' as const,
+        options: [
+          { label: 'Definer', value: 'definer' },
+          { label: 'Invoker', value: 'invoker' },
+        ],
+        operators: ['='],
+      },
+    ],
+    [schemas, uniqueReturnTypes]
+  )
 
   const createFunction = () => {
     setSelectedFunctionIdToDuplicate(null)
@@ -112,63 +186,6 @@ const FunctionsList = () => {
   const deleteFunction = (fn: DatabaseFunction) => {
     setSelectedFunctionToDelete(fn.id.toString())
   }
-
-  const filterString = search ?? ''
-
-  // Filters
-  const [returnTypeFilter, setReturnTypeFilter] = useQueryState(
-    'return_type',
-    parseAsJson(selectFilterSchema.parse)
-  )
-  const [securityFilter, setSecurityFilter] = useQueryState(
-    'security',
-    parseAsJson(selectFilterSchema.parse)
-  )
-
-  const setFilterString = (str: string) => {
-    const url = new URL(document.URL)
-    if (str === '') {
-      url.searchParams.delete('search')
-    } else {
-      url.searchParams.set('search', str)
-    }
-    router.push(url)
-  }
-
-  const { can: canCreateFunctions } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'functions'
-  )
-
-  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
-
-  // [Joshen] This is to preload the data for the Schema Selector
-  useSchemasQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
-  const {
-    data: functions,
-    error,
-    isLoading,
-    isError,
-  } = useDatabaseFunctionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
-  // Get unique return types from functions in the selected schema
-  const schemaFunctions = (functions ?? []).filter((fn) => fn.schema === selectedSchema)
-  const uniqueReturnTypes = Array.from(new Set(schemaFunctions.map((fn) => fn.return_type))).sort()
-
-  // Get security options based on what exists in the selected schema
-  const hasDefiner = schemaFunctions.some((fn) => fn.security_definer)
-  const hasInvoker = schemaFunctions.some((fn) => !fn.security_definer)
-  const securityOptions = [
-    ...(hasDefiner ? [{ label: 'Definer', value: 'definer' }] : []),
-    ...(hasInvoker ? [{ label: 'Invoker', value: 'invoker' }] : []),
-  ]
 
   const [showCreateFunctionForm, setShowCreateFunctionForm] = useQueryState(
     'new',
@@ -240,53 +257,24 @@ const FunctionsList = () => {
       ) : (
         <div className="w-full space-y-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
-            <div className="flex flex-col lg:flex-row lg:items-center gap-2">
-              <SchemaSelector
-                className="w-full lg:w-[180px]"
-                size="tiny"
-                showError={false}
-                selectedSchemaName={selectedSchema}
-                onSelectSchema={(schema) => {
-                  setFilterString('')
-                  // Wait for the filter to be cleared from the URL
-                  setTimeout(() => {
-                    setSelectedSchema(schema)
-                  }, 50)
-                }}
-              />
-              <Input
-                placeholder="Search for a function"
-                size="tiny"
-                icon={<Search />}
-                value={filterString}
-                className="w-full lg:w-52"
-                onChange={(e) => setFilterString(e.target.value)}
-              />
-              <ReportsSelectFilter
-                label="Return Type"
-                options={uniqueReturnTypes.map((type) => ({
-                  label: type,
-                  value: type,
-                }))}
-                value={returnTypeFilter ?? []}
-                onChange={setReturnTypeFilter}
-                showSearch
-              />
-              <ReportsSelectFilter
-                label="Security"
-                options={securityOptions}
-                value={securityFilter ?? []}
-                onChange={setSecurityFilter}
+            <div className="flex-1 min-w-0">
+              <FilterBar
+                filterProperties={filterProperties}
+                filters={filters}
+                onFilterChange={setFilters}
+                freeformText={freeformText}
+                onFreeformTextChange={setFreeformText}
               />
             </div>
 
-            <div className="flex items-center gap-x-2">
+            <div className="flex items-center gap-x-2 shrink-0">
               {!isSchemaLocked && (
                 <>
                   <ButtonTooltip
                     disabled={!canCreateFunctions}
                     onClick={() => createFunction()}
                     className="flex-grow"
+                    size="small"
                     tooltip={{
                       content: {
                         side: 'bottom',
@@ -300,6 +288,7 @@ const FunctionsList = () => {
                   </ButtonTooltip>
                   <ButtonTooltip
                     type="default"
+                    size="small"
                     disabled={!canCreateFunctions}
                     className="px-1 pointer-events-auto"
                     icon={<AiIconAnimation size={16} />}
@@ -345,10 +334,10 @@ const FunctionsList = () => {
               <TableBody>
                 <FunctionList
                   schema={selectedSchema}
-                  filterString={filterString}
+                  filterString={freeformText}
                   isLocked={isSchemaLocked}
-                  returnTypeFilter={returnTypeFilter ?? []}
-                  securityFilter={securityFilter ?? []}
+                  returnTypeFilter={returnTypeFilter}
+                  securityFilter={securityFilter}
                   duplicateFunction={duplicateFunction}
                   editFunction={editFunction}
                   deleteFunction={deleteFunction}

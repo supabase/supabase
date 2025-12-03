@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
+import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
@@ -21,7 +21,6 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
-import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
 
 interface FunctionListProps {
   schema: string
@@ -71,7 +70,10 @@ const FunctionList = ({
     'functions'
   )
 
-  if (_functions.length === 0 && filterString.length === 0) {
+  const hasFiltersApplied =
+    filterString.length > 0 || returnTypeFilter.length > 0 || securityFilter.length > 0
+
+  if (_functions.length === 0 && !hasFiltersApplied) {
     return (
       <TableRow key={schema}>
         <TableCell colSpan={5}>
@@ -84,14 +86,12 @@ const FunctionList = ({
     )
   }
 
-  if (_functions.length === 0 && filterString.length > 0) {
+  if (_functions.length === 0 && hasFiltersApplied) {
     return (
       <TableRow key={schema}>
         <TableCell colSpan={5}>
           <p className="text-sm text-foreground">No results found</p>
-          <p className="text-sm text-foreground-light">
-            Your search for "{filterString}" did not return any results
-          </p>
+          <p className="text-sm text-foreground-light">No functions match your current filters</p>
         </TableCell>
       </TableRow>
     )
