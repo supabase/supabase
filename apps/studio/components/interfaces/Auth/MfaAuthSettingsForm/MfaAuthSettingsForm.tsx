@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { boolean, number, object, string } from 'yup'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
@@ -12,7 +11,6 @@ import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import {
   AlertTitle_Shadcn_,
@@ -118,7 +116,8 @@ export const MfaAuthSettingsForm = () => {
     'custom_config_gotrue'
   )
 
-  const { hasAccess: hasAccessToMFA, isLoading: isLoadingEntitlement } = useCheckEntitlements('auth_mfa_phone')
+  const { hasAccess: hasAccessToMFA, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('auth_mfa_phone')
   const promptProPlanUpgrade = IS_PLATFORM && !hasAccessToMFA
 
   // For now, we support Twilio and Vonage. Twilio Verify is not supported and the remaining providers are community maintained.
