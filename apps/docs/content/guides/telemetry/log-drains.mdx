@@ -12,12 +12,12 @@ You can read about the initial announcement [here](/blog/log-drains) and vote fo
 
 The following table lists the supported destinations and the required setup configuration:
 
-| Destination           | Transport Method | Configuration                                                                 |
-| --------------------- | ---------------- | ----------------------------------------------------------------------------- |
-| Generic HTTP endpoint | HTTP             | URL <br /> HTTP Version <br/> Gzip <br /> Headers                             |
-| DataDog               | HTTP             | API Key <br /> Region                                                         |
-| Loki                  | HTTP             | URL <br /> Headers                                                            |
-| Sentry                | HTTP             | DSN                                                                           |
+| Destination           | Transport Method | Configuration                                                                          |
+| --------------------- | ---------------- | -------------------------------------------------------------------------------------- |
+| Generic HTTP endpoint | HTTP             | URL <br /> HTTP Version <br/> Gzip <br /> Headers                                      |
+| DataDog               | HTTP             | API Key <br /> Region                                                                  |
+| Loki                  | HTTP             | URL <br /> Headers                                                                     |
+| Sentry                | HTTP             | DSN                                                                                    |
 | Amazon S3             | AWS SDK          | S3 Bucket <br/> Region <br/> Access Key ID <br/> Secret Access Key <br/> Batch Timeout |
 
 HTTP requests are batched with a max of 250 logs or 1 second intervals, whichever happens first. Logs are compressed via Gzip if the destination supports it.
