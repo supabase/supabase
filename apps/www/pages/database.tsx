@@ -11,11 +11,11 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { Badge, Button, Image, Tabs } from 'ui'
 
 // data
-import MainProducts from '~/data/MainProducts'
 import ApiExamplesData from 'data/products/database/api-examples'
 import ExtensionsExamplesData from 'data/products/database/extensions-examples'
 import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
 import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
+import MainProducts from '~/data/MainProducts'
 import HighlightsCards from '~/data/products/database/highlight-cards'
 
 import { ArrowUpRight, X } from 'lucide-react'
@@ -268,9 +268,9 @@ function Database() {
             ]}
             footer={[
               <div className="grid grid-cols-12" key={0}>
-                <div className="col-span-12 mt-0 flex flex-col 2xl:flex-row lg:col-span-6 xl:col-span-12 xl:mb-8 gap-1">
+                <div className="col-span-12 mt-0 flex flex-col 2xl:flex-row lg:col-span-6 xl:col-span-12 xl:mb-8 gap-1 xl:gap-2 xl:items-center">
                   <p className="text-foreground-light m-0">Available libraries:</p>
-                  <div className="flex gap-1">
+                  <div className="flex gap-1 xl:mb-0.5">
                     <Link href="/docs/reference/javascript/introduction" target="_blank">
                       <Badge>Javascript</Badge>
                     </Link>

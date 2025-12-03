@@ -8,7 +8,6 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { useParams } from 'common'
-import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { TEMPLATES_SCHEMAS } from 'components/interfaces/Auth/AuthTemplatesValidation'
 import { slugifyTitle } from 'components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
 import { TemplateEditor } from 'components/interfaces/Auth/EmailTemplates/TemplateEditor'
@@ -66,7 +65,6 @@ const RedirectToTemplates = () => {
   const router = useRouter()
   const { templateId, ref } = router.query
   const { ref: projectRef } = useParams()
-  const isSecurityNotificationsEnabled = useIsSecurityNotificationsEnabled()
 
   const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.READ,
@@ -135,12 +133,6 @@ const RedirectToTemplates = () => {
   }
 
   useEffect(() => {
-    if (isPermissionsLoaded && !isSecurityNotificationsEnabled) {
-      router.replace(`/project/${ref}/auth/templates/`)
-    }
-  }, [isPermissionsLoaded, isSecurityNotificationsEnabled, ref, router])
-
-  useEffect(() => {
     if (authConfig && templateEnabledKey) {
       templateForm.reset({
         [templateEnabledKey]: Boolean(authConfig[templateEnabledKey as keyof typeof authConfig]),
@@ -153,7 +145,7 @@ const RedirectToTemplates = () => {
     return <NoPermission isFullPage resourceText="access your project's email settings" />
   }
 
-  if (!isSecurityNotificationsEnabled || !templateId) {
+  if (!templateId) {
     return null
   }
 

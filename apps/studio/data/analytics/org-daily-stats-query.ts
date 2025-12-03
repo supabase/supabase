@@ -133,7 +133,7 @@ export async function getOrgDailyStats(
       query: {
         start: startDate,
         end: endDate,
-        projectRef,
+        project_ref: projectRef,
       },
     },
     signal,

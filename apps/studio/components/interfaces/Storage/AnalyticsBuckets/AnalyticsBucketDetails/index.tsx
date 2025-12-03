@@ -38,7 +38,7 @@ import { useSelectedAnalyticsBucket } from '../useSelectedAnalyticsBucket'
 import { HIDE_REPLICATION_USER_FLOW } from './AnalyticsBucketDetails.constants'
 import { BucketHeader } from './BucketHeader'
 import { ConnectTablesDialog } from './ConnectTablesDialog'
-import { CreateTableInstructions } from './CreateTableInstructions'
+import { CreateTableInstructions } from './CreateTable/CreateTableInstructions'
 import { NamespaceWithTables } from './NamespaceWithTables'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useAnalyticsBucketAssociatedEntities } from './useAnalyticsBucketAssociatedEntities'
@@ -120,7 +120,6 @@ export const AnalyticBucketDetails = () => {
   } = useIcebergNamespacesQuery(
     {
       projectRef,
-      catalogUri: wrapperValues.catalog_uri,
       warehouse: wrapperValues.warehouse,
     },
     {
