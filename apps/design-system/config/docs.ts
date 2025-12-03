@@ -318,6 +318,12 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Mermaid',
+          href: '/docs/components/mermaid',
+          items: [],
+          label: 'New',
+        },
+        {
           title: 'Menubar',
           href: '/docs/components/menubar',
           items: [],

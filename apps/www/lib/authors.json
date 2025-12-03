@@ -749,6 +749,20 @@
     "author_image_url": "https://github.com/iambriccardo.png"
   },
   {
+    "author_id": "fady",
+    "author": "Fady Abdelmalik",
+    "position": "Engineering",
+    "author_url": "https://github.com/issuedat",
+    "author_image_url": "https://github.com/issuedat.png"
+  },
+  {
+    "author_id": "danny",
+    "author": "Danny White",
+    "position": "Product Design",
+    "author_url": "https://github.com/dnywh",
+    "author_image_url": "https://github.com/dnywh.png"
+  },
+  {
     "author_id": "matt_rossman",
     "author": "Matt Rossman",
     "username": "mattrossman",

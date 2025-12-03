@@ -2568,6 +2568,116 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "mermaid-demo": {
+      name: "mermaid-demo",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-demo")),
+      source: "",
+      files: ["registry/default/example/mermaid-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-flowchart": {
+      name: "mermaid-flowchart",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-flowchart")),
+      source: "",
+      files: ["registry/default/example/mermaid-flowchart.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-er-diagram": {
+      name: "mermaid-er-diagram",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-er-diagram")),
+      source: "",
+      files: ["registry/default/example/mermaid-er-diagram.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-sequence-async": {
+      name: "mermaid-sequence-async",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-sequence-async")),
+      source: "",
+      files: ["registry/default/example/mermaid-sequence-async.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-sequence-sync": {
+      name: "mermaid-sequence-sync",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-sequence-sync")),
+      source: "",
+      files: ["registry/default/example/mermaid-sequence-sync.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-oauth-flow": {
+      name: "mermaid-oauth-flow",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-oauth-flow")),
+      source: "",
+      files: ["registry/default/example/mermaid-oauth-flow.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-flowchart-subgraph": {
+      name: "mermaid-flowchart-subgraph",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-flowchart-subgraph")),
+      source: "",
+      files: ["registry/default/example/mermaid-flowchart-subgraph.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-sequence-api": {
+      name: "mermaid-sequence-api",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-sequence-api")),
+      source: "",
+      files: ["registry/default/example/mermaid-sequence-api.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-er-simple": {
+      name: "mermaid-er-simple",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-er-simple")),
+      source: "",
+      files: ["registry/default/example/mermaid-er-simple.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-basic": {
+      name: "mermaid-basic",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-basic")),
+      source: "",
+      files: ["registry/default/example/mermaid-basic.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "chart-area-axes": {
       name: "chart-area-axes",
       type: "components:block",
