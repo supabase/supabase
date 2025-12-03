@@ -45,7 +45,7 @@ import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector/RoleImpersonationPopover'
 import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
-import MaterializedViewEntityAutofixSecurityModal from './MaterializedViewEntityAutofixSecurityModal'
+import ExposedMaterializedViewDialog from './ExposedMaterializedViewDialog'
 
 export interface GridHeaderActionsProps {
   table: Entity
@@ -86,8 +86,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
   const [isAutofixViewSecurityModalOpen, setIsAutofixViewSecurityModalOpen] = useState(false)
   const [
-    isAutofixMaterializedViewSecurityModalOpen,
-    setIsAutofixMaterializedViewSecurityModalOpen,
+    isExposedMaterializedViewDialogOpen,
+    setIsExposedMaterializedViewDialogOpen,
   ] = useState(false)
 
   const snap = useTableEditorTableStateSnapshot()
@@ -471,14 +471,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   </p>
 
                   <div className="mt-2 flex items-center gap-2">
-                    <Button
-                      type="secondary"
-                      onClick={() => {
-                        setIsAutofixMaterializedViewSecurityModalOpen(true)
-                      }}
-                    >
-                      Autofix
-                    </Button>
+                    <ExposedMaterializedViewDialog table={table} isExposedMaterializedViewDialogOpen={isExposedMaterializedViewDialogOpen} setIsExposedMaterializedViewDialogOpen={setIsExposedMaterializedViewDialogOpen} />
+
                     <Button type="default" asChild>
                       <Link
                         target="_blank"
@@ -570,14 +564,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
         table={table}
         isAutofixViewSecurityModalOpen={isAutofixViewSecurityModalOpen}
         setIsAutofixViewSecurityModalOpen={setIsAutofixViewSecurityModalOpen}
-      />
-
-      <MaterializedViewEntityAutofixSecurityModal
-        table={table}
-        isAutofixMaterializedViewSecurityModalOpen={isAutofixMaterializedViewSecurityModalOpen}
-        setIsAutofixMaterializedViewSecurityModalOpen={
-          setIsAutofixMaterializedViewSecurityModalOpen
-        }
       />
 
       {isTable && (
