@@ -777,7 +777,6 @@ export const TIER_QUERY_LIMITS: {
   PAYG: { text: '7 days', value: 7, unit: 'day', promptUpgrade: true },
   TEAM: { text: '28 days', value: 28, unit: 'day', promptUpgrade: true },
   ENTERPRISE: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
-  PLATFORM: { text: '1 day', value: 1, unit: 'day', promptUpgrade: false },
 }
 
 export const LOG_ROUTES_WITH_REPLICA_SUPPORT = [
