@@ -1,7 +1,7 @@
 import { sortBy } from 'lodash'
 import { AlertCircle, Search, Trash } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useEffect, useRef, useState } from 'react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -12,14 +12,13 @@ import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/Shimmerin
 import { useDatabaseIndexDeleteMutation } from 'data/database-indexes/index-delete-mutation'
 import { useIndexesQuery, type DatabaseIndex } from 'data/database-indexes/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
   Card,
-  Input,
   SidePanel,
   Table,
   TableBody,
@@ -28,7 +27,8 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import CreateIndexSidePanel from './CreateIndexSidePanel'
 
@@ -36,7 +36,7 @@ const Indexes = () => {
   const { data: project } = useSelectedProjectQuery()
   const { schema: urlSchema, table } = useParams()
 
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const deletingIndexNameRef = useRef<string | null>(null)
 
@@ -184,7 +184,7 @@ const Indexes = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {sortedIndexes.length === 0 && search.length === 0 && (
+                    {indexes.length === 0 && search.length === 0 && (
                       <TableRow>
                         <TableCell colSpan={4}>
                           <p className="text-sm text-foreground">No indexes created yet</p>
@@ -194,7 +194,7 @@ const Indexes = () => {
                         </TableCell>
                       </TableRow>
                     )}
-                    {sortedIndexes.length === 0 && search.length > 0 && (
+                    {indexes.length === 0 && search.length > 0 && (
                       <TableRow>
                         <TableCell colSpan={4}>
                           <p className="text-sm text-foreground">No results found</p>
