@@ -16,6 +16,8 @@ export const metadata: Metadata = {
   },
 }
 
+const INITIAL_POSTS_LIMIT = 25
+
 export default async function BlogPage() {
   // Get static blog posts
   const staticPostsData = getSortedPosts({ directory: '_blog', runner: '** BLOG PAGE **' })
@@ -30,5 +32,9 @@ export default async function BlogPage() {
     return dateB - dateA
   })
 
-  return <BlogClient blogs={allPosts} />
+  // Only send initial posts to client, rest will be loaded via API
+  const initialPosts = allPosts.slice(0, INITIAL_POSTS_LIMIT)
+  const totalPosts = allPosts.length
+
+  return <BlogClient initialBlogs={initialPosts} totalPosts={totalPosts} />
 }

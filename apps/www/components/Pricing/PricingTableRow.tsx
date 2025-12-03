@@ -63,6 +63,7 @@ export const pricingTooltips: PricingTooltips = {
   'auth.thirdPartyMAUs': {
     main: 'Users who use the Supabase platform through a third-party authentication provider (Firebase Auth, Auth0 or Cognito).\nBilling is based on the sum of distinct third-party users requesting your API through the billing period. Resets every billing cycle.',
   },
+
   'storage.size': {
     main: "The sum of all objects' size in your storage buckets.\nBilling is prorated down to the hour and will be displayed as GB-Hrs on your invoice.",
   },
@@ -107,6 +108,35 @@ export const pricingTooltips: PricingTooltips = {
 
   'security.customDomains': {
     enterprise: 'Volume discounts available.',
+  },
+
+  'auth.auditLogs': {
+    main: (
+      <span className="prose text-xs">
+        Auth Audit Logs provide comprehensive tracking of authentication events. Audit logs are
+        automatically captured for all authentication events and help you monitor user
+        authentication activities, detect suspicious behavior, and maintain compliance with security
+        requirements. Read more in our{' '}
+        <Link href="/docs/guides/auth/audit-logs" target="_blank">
+          docs
+        </Link>
+        .
+      </span>
+    ),
+  },
+
+  'security.platformAuditLogs': {
+    main: (
+      <span className="prose text-xs">
+        Any Platform API/Dashboard actions performed by organization members are logged
+        automatically for auditing and security purposes. Includes actions such as creating a new
+        project, inviting members or changing project settings. Read more in our{' '}
+        <Link href="/docs/guides/security/platform-audit-logs" target="_blank">
+          docs
+        </Link>
+        .
+      </span>
+    ),
   },
 }
 

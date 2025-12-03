@@ -64,7 +64,7 @@ const Security: NextPageWithLayout = () => {
               </div>
 
               {data ? (
-                <Badge variant={data.totp.length === 0 ? 'default' : 'brand'}>
+                <Badge variant={data.totp.length === 0 ? 'default' : 'success'}>
                   {data.totp.length} app{data.totp.length === 1 ? '' : 's'} configured
                 </Badge>
               ) : null}

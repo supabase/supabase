@@ -21,18 +21,31 @@ About to push some code? At a minimum, check your work against this list:
 
 ## Focus management
 
-All interactive page elements should be reachable by keyboard. They should also provide visual feedback upon selection via a `focus-visible` state. We use consistent focus styles such as `inset-focus` so users recognize this state instantly.
+All interactive page elements should be reachable by keyboard. Given the below inconsistency between devices and browsers, add `tabIndex={0}` to all buttons, links, and non-text inputs, ideally at the component level. Consider tying the state of `tabIndex` to the `disabled` state of a component, if applicable.
 
-```jsx
-<TableCell>
-  <p>{name}</p>
-  <button
-    className={cn('absolute inset-0', 'inset-focus')}
-    onClick={(event) => handleBucketNavigation(name, event)}
-  >
-    <span className="sr-only">Go to bucket details</span>
-  </button>
-</TableCell>
+Chromium-based browsers and Firefox handle this automatically via the Tab key. Safari, by default, requires the Option key to also be held down. Enabling _Keyboard navigation_ on macOS Settings [removes this requirement](https://mayank.co/blog/safari-focus/#keyboard-navigation) but makes links non-tabbable as a result.
+
+Interactive page elements should also provide visual feedback upon selection via a `focus-visible` state. We use consistent focus styles such as `inset-focus` so users recognize this state instantly.
+
+[Button](../components/button) has all of the above built-in. Bespoke interactive elements however, such as the below clickable [TableRow](../components/table), require these props to be added manually:
+
+```tsx showLineNumbers {3, 5-11}
+<TableRow
+  key={id}
+  className="relative cursor-pointer h-16 inset-focus"
+  onClick={(event) => handleBucketNavigation(name, event)}
+  onKeyDown={(event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleBucketNavigation(name, event)
+    }
+  }}
+  tabIndex={0}
+>
+  <TableCell>
+    <p>{name}</p>
+  </TableCell>
+</TableRow>
 ```
 
 Consider also affordances like `ctrl` and `meta` key support for opening in a new tab. Anything that you can do with a mouse input should be replicable by keyboard.
@@ -51,13 +64,45 @@ Some keyboard-navigable content may be contain hundreds or thousands of items. H
 - Pagination or virtualization
 - “Jump to” shortcuts to skip ahead
 
-## Screen reader support
+## Screen readers
 
-Textual elements are supported out-of-the-box by screen readers. Imagery of course should be described by `alt` tags.
+Textual elements are supported out-of-the-box by screen readers.
 
-Less obvious however are scaffolding elements that only makes sense visually, when paired with other content. For example: a table column for actions may not have a visual _Actions_ label because its purpose is obvious to a sighted person. For everyone else’s sake, this column should be titled with `sr-only` text:
+### Imagery
 
-```jsx
+Images should have their contents described with an `alt` attribute. Write an objective description of the content rather than its context. For example:
+
+```tsx showLineNumbers {2}
+// Correct: painting a picture with words
+<img src="beagle.png" alt="A tricolor beagle galloping through a grassy field, ears in the air" />
+
+// Incorrect: Unhelpful context
+<img src="beagle.png" alt="Our logo" />
+```
+
+Icons and other visual elements that aren’t strictly images should use the `aria-label` attribute. For example:
+
+```tsx showLineNumbers {2}
+<BucketTableCell>
+  <BucketIcon aria-label="bucket icon" size={16} />
+</BucketTableCell>
+```
+
+Visual elements that are _purely_ visual aids may be removed from the accessibility tree via the `aria-hidden` attribute. For example:
+
+```tsx showLineNumbers {2}
+<BucketTableCell>
+  <ChevronRight aria-hidden={true} size={14} />
+</BucketTableCell>
+```
+
+Never use `aria-hidden={true}` on focusable elements, since these are critical pieces of functionality.
+
+### Scaffolding
+
+Some scaffolding elements only make sense visually, in the context of surrounding visual content. For example: a table column for actions may not have a visual _Actions_ label because its purpose is obvious (by nearby contents) to a sighted person. For everyone else’s sake, this column should be titled with `sr-only` text:
+
+```tsx showLineNumbers {2}
 <TableHead>
   <span className="sr-only">Actions</span>
 </TableHead>
