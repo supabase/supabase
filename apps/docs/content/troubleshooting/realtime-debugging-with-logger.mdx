@@ -143,14 +143,17 @@ const channel = supabase.channel('chat', { config: { broadcast: { self: true } }
 channel.on('broadcast', { event: 'message' }, (payload) => {
   console.log('Message received:', payload)
 })
-
-await channel.subscribe()
-
-// Send a message
-await channel.send({
-  type: 'broadcast',
-  event: 'message',
-  payload: { text: 'Hello' },
+// Send message after subscribing
+channel.subscribe((status, err) => {
+  if (status == 'SUBSCRIBED') {
+    channel.send({
+      type: 'broadcast',
+      event: 'message',
+      payload: { text: 'Hello' },
+    })
+  } else {
+    console.error({status, err})
+  }
 })
 
 // Check logs:
