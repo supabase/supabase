@@ -3113,9 +3113,9 @@ export interface components {
           name: string
         }[]
         /** @enum {string} */
-        source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
+        source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise'
         /** @enum {string|null} */
-        target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform' | null
+        target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | null
         valid: boolean
         warnings: {
           key: string
@@ -3518,7 +3518,7 @@ export interface components {
         upstreamTarget: 'main' | 'canary'
       }
       features: {
-        icebergCatalog?: {
+        icebergCatalog: {
           enabled: boolean
           maxCatalogs: number
           maxNamespaces: number
@@ -3530,7 +3530,7 @@ export interface components {
         s3Protocol: {
           enabled: boolean
         }
-        vectorBuckets?: {
+        vectorBuckets: {
           enabled: boolean
           maxBuckets: number
           maxIndexes: number
@@ -4044,10 +4044,10 @@ export interface components {
           maxNamespaces: number
           maxTables: number
         }
-        imageTransformation: {
+        imageTransformation?: {
           enabled: boolean
         }
-        s3Protocol: {
+        s3Protocol?: {
           enabled: boolean
         }
         vectorBuckets?: {
@@ -4352,7 +4352,7 @@ export interface components {
         | 'AI_LOG_GENERATOR_OPT_IN'
       )[]
       /** @enum {string} */
-      plan?: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
+      plan?: 'free' | 'pro' | 'team' | 'enterprise'
     }
     V1PatchMigrationBody: {
       name?: string

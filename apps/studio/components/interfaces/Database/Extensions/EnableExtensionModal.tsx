@@ -26,6 +26,11 @@ import { Admonition } from 'ui-patterns'
 
 const orioleExtCallOuts = ['vector', 'postgis']
 
+// Extensions that have recommended schemas (rather than required schemas)
+const extensionsWithRecommendedSchemas: Record<string, string> = {
+  wrappers: 'extensions',
+}
+
 interface EnableExtensionModalProps {
   visible: boolean
   extension: PostgresExtension
@@ -88,6 +93,20 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
       cancel = true
     }
   }, [visible, extension.name])
+
+  const getSchemaDescriptionText = (extensionName: string, schema: string | null | undefined) => {
+    // Prioritize defaultSchema (required/forced) over recommended schema
+    if (schema) {
+      return `Extension must be installed in the “${schema}” schema.`
+    }
+
+    const recommendedSchema = extensionsWithRecommendedSchemas[extensionName]
+    if (recommendedSchema) {
+      return `Use the “${recommendedSchema}” schema for full compatibility with related features.`
+    }
+
+    return undefined
+  }
 
   const validate = (values: any) => {
     const errors: any = {}
@@ -165,13 +184,14 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                     name="schema"
                     value={defaultSchema}
                     label="Select a schema to enable the extension for"
-                    descriptionText={`Extension must be installed in ${defaultSchema}.`}
+                    descriptionText={getSchemaDescriptionText(extension.name, defaultSchema)}
                   />
                 ) : (
                   <Listbox
                     size="small"
                     name="schema"
                     label="Select a schema to enable the extension for"
+                    descriptionText={getSchemaDescriptionText(extension.name, null)}
                   >
                     <Listbox.Option
                       key="custom"

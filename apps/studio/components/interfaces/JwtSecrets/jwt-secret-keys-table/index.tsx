@@ -236,6 +236,7 @@ export const JWTSecretKeysTable = () => {
                       <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                         Type
                       </TableHead>
+                      <TableHead />
                       <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                         Actions
                       </TableHead>
