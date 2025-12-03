@@ -6,7 +6,6 @@ export type SubscriptionTier =
   | 'tier_payg'
   | 'tier_team'
   | 'tier_enterprise'
-  | 'tier_platform'
 
 export type AddonVariantId = components['schemas']['UpdateAddonBody']['addon_variant']
 
