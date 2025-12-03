@@ -426,7 +426,7 @@ export const RequestsByCountryMapRenderer = (
     const error = (
       typeof props.error === 'string' ? { message: props.error } : props.error
     ) as ResponseError
-    return <AlertError subject="Failed to retrieve requests by country" error={error} />
+    return <AlertError subject="Failed to retrieve requests by geography" error={error} />
   }
 
   return (

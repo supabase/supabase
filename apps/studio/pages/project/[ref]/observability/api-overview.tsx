@@ -87,7 +87,7 @@ export const ApiReport: NextPageWithLayout = () => {
           isLoading={isLoading}
           params={params.requestsByCountry}
           error={error.requestsByCountry}
-          title="Requests by Country"
+          title="Requests by Geography"
           tooltip="Number of API Gateway requests per country"
           data={data.requestsByCountry || []}
           renderer={RequestsByCountryMapRenderer}
