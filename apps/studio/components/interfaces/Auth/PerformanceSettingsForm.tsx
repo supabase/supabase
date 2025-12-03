@@ -294,7 +294,6 @@ export const PerformanceSettingsForm = () => {
 
                             field.onChange(value)
 
-
                             if (values.DB_MAX_POOL_SIZE_UNIT !== value) {
                               let currentValue = values.DB_MAX_POOL_SIZE!
 
@@ -309,8 +308,7 @@ export const PerformanceSettingsForm = () => {
                               } else {
                                 // convert from percentage to roughly the same connection number
                                 preservedPoolSize = Math.floor(
-                                  maxConnectionLimit *
-                                    (Math.min(100, currentValue) / 100)
+                                  maxConnectionLimit * (Math.min(100, currentValue) / 100)
                                 )
                               }
 
