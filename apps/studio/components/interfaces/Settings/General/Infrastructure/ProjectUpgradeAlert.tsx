@@ -1,10 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, AlertTriangle } from 'lucide-react'
+import { AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { z } from 'zod'
 
 import { useFlag, useParams } from 'common'
@@ -25,7 +27,6 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Badge,
-  Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
@@ -40,7 +41,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const formatValue = ({ postgres_version, release_channel }: ProjectUpgradeTargetVersion) => {
@@ -115,55 +115,62 @@ export const ProjectUpgradeAlert = () => {
 
   return (
     <>
-      <Alert_Shadcn_ title="Your project can be upgraded to the latest version of Postgres">
-        <AlertTitle_Shadcn_>
-          Your project can be upgraded to the latest version of Postgres
-        </AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>
-          <p className="mb-3">
-            The latest version of Postgres ({latestPgVersion}) is available for your project.
-          </p>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="tiny"
-                type="primary"
-                onClick={() => setShowUpgradeModal(true)}
-                disabled={projectUpgradeDisabled}
-              >
-                Upgrade project
-              </Button>
-            </TooltipTrigger>
-            {projectUpgradeDisabled && (
-              <TooltipContent side="bottom" align="center">
-                Project upgrade is currently disabled
-              </TooltipContent>
-            )}
-          </Tooltip>
-        </AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+      <Admonition
+        type="default"
+        layout="vertical"
+        title="Your project can be upgraded to the latest version of Postgres"
+        description={`Postgres version ${latestPgVersion} is now available for your project.`}
+        actions={
+          <div className="self-start mt-3 flex items-center gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="tiny"
+                  type="default"
+                  onClick={() => setShowUpgradeModal(true)}
+                  disabled={projectUpgradeDisabled}
+                >
+                  Upgrade
+                </Button>
+              </TooltipTrigger>
+              {projectUpgradeDisabled && (
+                <TooltipContent side="bottom" align="center">
+                  Postgres upgrade is currently disabled
+                </TooltipContent>
+              )}
+            </Tooltip>
+            <Button size="tiny" type="text" asChild>
+              <Link href={`${DOCS_URL}/guides/platform/upgrading`} target="_blank" rel="noreferrer">
+                Learn more
+              </Link>
+            </Button>
+          </div>
+        }
+      />
 
       <Modal
         hideFooter
         size="small"
         visible={showUpgradeModal}
         onCancel={() => setShowUpgradeModal(false)}
-        header="Confirm to upgrade Postgres version"
+        header="Upgrade Postgres"
       >
         <Form_Shadcn_ {...form}>
           <form onSubmit={form.handleSubmit(onConfirmUpgrade)}>
-            <Admonition
+            {/* <Admonition
               type="warning"
               className="border-x-0 border-t-0 rounded-none"
               title={`Your project will be offline for up to ${durationEstimateHours} hour${durationEstimateHours === 1 ? '' : 's'}`}
               description="It is advised to upgrade at a time when there will be minimal impact for your application."
-            />
+            /> */}
             <Modal.Content>
               <div className="space-y-4">
                 <p className="text-sm">
-                  All services will be offline and you will not be able to downgrade back to
-                  Postgres {currentPgVersion}.
+                  Your project will be offline during the upgrade, which may take up to{' '}
+                  {durationEstimateHours} hour{durationEstimateHours === 1 ? '' : 's'}. Choose a
+                  time when the impact will be minimal.
                 </p>
+                <p className="text-sm">This upgrade is permanent and cannot be reversed.</p>
                 {isDiskSizeUpdated && (
                   <Markdown
                     extLinks
@@ -174,28 +181,25 @@ export const ProjectUpgradeAlert = () => {
                 )}
                 {/* @ts-ignore */}
                 {(data?.potential_breaking_changes ?? []).length > 0 && (
-                  <Alert_Shadcn_ variant="destructive" title="Breaking changes">
-                    <AlertCircle className="h-4 w-4" strokeWidth={2} />
-                    <AlertTitle_Shadcn_>Breaking changes</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                      <p>
-                        Your project will be upgraded across major versions of Postgres. This may
-                        involve breaking changes.
-                      </p>
-
-                      <div>
+                  <Admonition
+                    type="destructive"
+                    title="Breaking changes"
+                    description="Your project will be upgraded across major versions of Postgres. This may
+                        involve breaking changes."
+                    actions={
+                      <div className="self-start mt-3">
                         <Button size="tiny" type="default" asChild>
                           <Link
                             href={`${DOCS_URL}/guides/platform/migrating-and-upgrading-projects#caveats`}
                             target="_blank"
                             rel="noreferrer"
                           >
-                            View docs
+                            Learn more
                           </Link>
                         </Button>
                       </div>
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
+                    }
+                  />
                 )}
                 {legacyAuthCustomRoles.length > 0 && (
                   <Alert_Shadcn_
@@ -239,11 +243,12 @@ export const ProjectUpgradeAlert = () => {
                     </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
                 )}
+                <Modal.Separator />
                 <FormField_Shadcn_
                   control={form.control}
                   name="postgresVersionSelection"
                   render={({ field }) => (
-                    <FormItemLayout label="Select the version of Postgres to upgrade to">
+                    <FormItemLayout label="Postgres version">
                       <FormControl_Shadcn_>
                         <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger_Shadcn_>
@@ -286,8 +291,8 @@ export const ProjectUpgradeAlert = () => {
               >
                 Cancel
               </Button>
-              <Button htmlType="submit" disabled={isUpgrading} loading={isUpgrading}>
-                Confirm upgrade
+              <Button type="warning" htmlType="submit" disabled={isUpgrading} loading={isUpgrading}>
+                Upgrade
               </Button>
             </Modal.Content>
           </form>
