@@ -314,7 +314,7 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
   }
 
   const exportParams = snap.allRowsSelected
-    ? ({ type: 'fetch_all' } as const)
+    ? ({ type: 'fetch_all', filters, sorts } as const)
     : ({
         type: 'provided_rows',
         table: snap.table,
