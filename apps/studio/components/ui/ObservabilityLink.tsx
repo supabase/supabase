@@ -11,7 +11,7 @@ export const ObservabilityLink = () => {
           className="text-foreground underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground transition-all"
           target="_blank"
         >
-          Get started for Free
+          Get started for free!
         </Link>
       </p>
     </div>
