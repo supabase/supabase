@@ -49,6 +49,7 @@ type FetchAllRowsParams = {
   filters?: Filter[]
   sorts?: Sort[]
   roleImpersonationState?: RoleImpersonationState
+  startCallback?: () => void
   progressCallback?: (progress: number) => void
 } & OutputCallbacks
 
@@ -66,6 +67,7 @@ const fetchAllRows = async ({
   filters,
   sorts,
   roleImpersonationState,
+  startCallback,
   progressCallback,
   convertToOutputFormat,
   convertToBlob,
@@ -124,6 +126,8 @@ const fetchAllRows = async ({
       reason: `This table does not have a primary key defined, which may cause performance issues when exporting very large tables.`,
     }
   }
+
+  startCallback?.()
 
   let rows: Record<string, unknown>[]
   try {
@@ -261,12 +265,6 @@ export const useExportAllRowsGeneric = (
 
       const { projectRef, connectionString, entity, totalRows } = params
 
-      startProgressTracker({
-        id: entity.id,
-        name: entity.name,
-        trackPercentage: totalRows !== undefined,
-      })
-
       const exportResult =
         params.type === 'provided_rows'
           ? convertAndDownload(formatRowsForExport(params.rows, params.table), params.table, {
@@ -283,6 +281,13 @@ export const useExportAllRowsGeneric = (
               filters: params.filters,
               sorts: params.sorts,
               roleImpersonationState: params.roleImpersonationState,
+              startCallback: () => {
+                startProgressTracker({
+                  id: entity.id,
+                  name: entity.name,
+                  trackPercentage: totalRows !== undefined,
+                })
+              },
               progressCallback: totalRows
                 ? (value: number) =>
                     trackPercentageProgress({
