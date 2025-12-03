@@ -78,13 +78,10 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     console.error('[blog-posts] Error:', error)
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500, headers: corsHeaders }
-    )
+    return NextResponse.json({
+      success: false,
+      error: 'Internal server error',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    })
   }
 }
