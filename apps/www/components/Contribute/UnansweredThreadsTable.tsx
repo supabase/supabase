@@ -1,52 +1,24 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
-import {
-  Clock,
-  MessageCircle,
-  Github,
-  Search,
-  X,
-  Filter,
-  Check,
-  List,
-  BotMessageSquare,
-} from 'lucide-react'
-import {
-  Badge,
-  Button,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  cn,
-} from 'ui'
+import { useQueryState, parseAsString } from 'nuqs'
+import { Clock, MessageCircle, Github, Search, Filter, List, BotMessageSquare } from 'lucide-react'
+import { Badge, Button, Input_Shadcn_, cn } from 'ui'
 import { Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 
-import type { ThreadRow } from '~/data/contribute'
+import type { ThreadRow } from '~/types/contribute'
 import { ChannelBadge } from './ChannelBadge'
+import { FilterPopover } from './FilterDialog'
 
-function ThreadRow({
-  thread,
-  searchParams,
-}: {
-  thread: ThreadRow
-  searchParams: URLSearchParams | null
-}) {
-  const router = useRouter()
+function ThreadRow({ thread, productArea }: { thread: ThreadRow; productArea: string | null }) {
+  const [currentProductArea, setProductArea] = useQueryState('product_area', parseAsString)
 
-  const handleProductAreaClick = (area: string) => {
-    const params = new URLSearchParams(searchParams?.toString() || '')
-    const currentArea = params.get('product_area')
-    if (currentArea === area) {
-      // If already active, remove the filter
-      params.delete('product_area')
+  function handleProductAreaClick(area: string) {
+    if (currentProductArea === area) {
+      setProductArea(null)
     } else {
-      // If inactive, set it as active
-      params.set('product_area', area)
+      setProductArea(area)
     }
-    router.push(`/contribute?${params.toString()}`, { scroll: false })
   }
 
   return (
@@ -69,8 +41,8 @@ function ThreadRow({
       <td className="py-4 px-6 w-[20%] min-w-[150px]">
         <div className="flex flex-wrap gap-2 overflow-hidden">
           {thread.product_areas.length > 0 ? (
-            thread.product_areas.map((area) => {
-              const isActive = searchParams?.get('product_area') === area
+            thread.product_areas.map((area: string) => {
+              const isActive = productArea === area
               return (
                 <button key={area} onClick={() => handleProductAreaClick(area)} type="button">
                   <Badge
@@ -92,7 +64,7 @@ function ThreadRow({
       <td className="py-4 px-6 w-[20%] min-w-[150px]">
         <div className="flex flex-wrap gap-2 overflow-hidden">
           {thread.stack.length > 0 ? (
-            thread.stack.map((tech) => (
+            thread.stack.map((tech: string) => (
               <Badge key={tech} variant="outline" className="text-xs">
                 {tech}
               </Badge>
@@ -109,30 +81,23 @@ function ThreadRow({
   )
 }
 
-function getTabName(channel: string | null): string {
-  if (channel === 'all') return 'All'
-  if (channel === 'reddit') return 'Reddit'
-  if (channel === 'github') return 'GitHub'
-  return 'Discord'
-}
-
 function ThreadsTable({
   threads,
-  searchParams,
+  productArea,
 }: {
   threads: ThreadRow[]
-  searchParams: URLSearchParams | null
+  productArea: string | null
 }) {
   if (threads.length === 0) {
     return (
       <div className="border border-border rounded-lg p-8 text-center text-muted-foreground">
-        No {getTabName(searchParams?.get('channel') || null)} threads found
+        No threads found
       </div>
     )
   }
 
   return (
-    <div className=" overflow-hidden">
+    <div className="overflow-hidden">
       <table className="w-full table-fixed">
         <thead className="border-b border-border">
           <tr>
@@ -152,7 +117,7 @@ function ThreadsTable({
         </thead>
         <tbody>
           {threads.map((thread) => (
-            <ThreadRow key={thread.id} thread={thread} searchParams={searchParams} />
+            <ThreadRow key={thread.id} thread={thread} productArea={productArea} />
           ))}
         </tbody>
       </table>
@@ -163,28 +128,28 @@ function ThreadsTable({
 export function UnansweredThreadsTable({
   threads,
   allProductAreas,
+  allStacks,
 }: {
   threads: ThreadRow[]
   allProductAreas: string[]
+  allStacks: string[]
 }) {
   const [search, setSearch] = useState('')
-  const searchParams = useSearchParams()
-  const router = useRouter()
+  const [channel, setChannel] = useQueryState('channel', parseAsString.withDefault('all'))
+  const [productArea] = useQueryState('product_area', parseAsString)
+  const [stack] = useQueryState('stack', parseAsString)
 
   const validTabs = ['all', 'discord', 'reddit', 'github'] as const
-  const tabFromUrl = searchParams?.get('channel')
   const currentTab = (
-    validTabs.includes(tabFromUrl as any) ? tabFromUrl : 'all'
+    validTabs.includes(channel as any) ? channel : 'all'
   ) as (typeof validTabs)[number]
 
-  const handleTabChange = (value: string) => {
-    const params = new URLSearchParams(searchParams?.toString() || '')
+  function handleTabChange(value: string) {
     if (value === 'all') {
-      params.delete('channel')
+      setChannel(null)
     } else {
-      params.set('channel', value)
+      setChannel(value)
     }
-    router.push(`/contribute?${params.toString()}`, { scroll: false })
   }
 
   const filteredThreads = useMemo(() => {
@@ -202,17 +167,7 @@ export function UnansweredThreadsTable({
     })
   }, [threads, search])
 
-  const hasActiveFilters = searchParams?.get('product_area') || search.trim()
-
-  const handleProductAreaFilter = (area: string) => {
-    const params = new URLSearchParams(searchParams?.toString() || '')
-    if (params.get('product_area') === area) {
-      params.delete('product_area')
-    } else {
-      params.set('product_area', area)
-    }
-    router.push(`/contribute?${params.toString()}`, { scroll: false })
-  }
+  const activeFilterCount = [productArea, stack].filter(Boolean).length
 
   return (
     <section className="w-full max-w-7xl mx-auto px-4 py-16 relative">
@@ -255,7 +210,7 @@ export function UnansweredThreadsTable({
             </TabsTrigger_Shadcn_>
             <TabsTrigger_Shadcn_
               value="github"
-              className="gap-2 px-4 data-[state=active]:bg- border-none"
+              className="gap-2 px-4 data-[state=active]:bg-surface-300 border-none"
             >
               <Github className="h-4 w-4" />
               GitHub
@@ -276,73 +231,30 @@ export function UnansweredThreadsTable({
             </div>
 
             {/* Filter Button */}
-            <Popover_Shadcn_>
-              <PopoverTrigger_Shadcn_ asChild>
+            <FilterPopover
+              allProductAreas={allProductAreas}
+              allStacks={allStacks}
+              trigger={
                 <Button
                   type="default"
                   icon={<Filter className="h-4 w-4" />}
-                  className={cn('h-8', searchParams?.get('product_area') ? 'bg-surface-200' : '')}
+                  className={cn('h-8', activeFilterCount > 0 ? 'bg-surface-200' : '')}
                 >
-                  Filters
+                  <span className="flex items-center gap-2">
+                    Filters
+                    {activeFilterCount > 0 && (
+                      <Badge className="bg-brand-200 text-brand-foreground">
+                        {activeFilterCount}
+                      </Badge>
+                    )}
+                  </span>
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="w-64 p-0" align="end">
-                <div className="p-4">
-                  <h4 className="text-sm font-semibold mb-3">Area</h4>
-                  <div className="relative">
-                    <div className="grid gap-2 max-h-72 overflow-y-auto">
-                      {allProductAreas.length > 0 ? (
-                        allProductAreas.map((area) => {
-                          const isActive = searchParams?.get('product_area') === area
-                          return (
-                            <button
-                              key={area}
-                              type="button"
-                              onClick={() => handleProductAreaFilter(area)}
-                              className="flex items-center gap-2 text-left px-3 py-2 rounded-md text-sm transition-colors hover:bg-muted"
-                            >
-                              <Check
-                                className={cn(
-                                  'h-4 w-4 shrink-0',
-                                  isActive ? 'opacity-100' : 'opacity-0'
-                                )}
-                              />
-                              {area}
-                            </button>
-                          )
-                        })
-                      ) : (
-                        <p className="text-sm text-muted-foreground py-2">
-                          No product areas available
-                        </p>
-                      )}
-                    </div>
-                    {/* Shadow overlay to indicate scrollable content */}
-                    <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-7 bg-gradient-to-t from-background to-transparent" />
-                  </div>
-                  {hasActiveFilters && (
-                    <div className="mt-3">
-                      <Button
-                        type="outline"
-                        icon={<X className="h-4 w-4" />}
-                        onClick={() => {
-                          const params = new URLSearchParams(searchParams?.toString() || '')
-                          params.delete('product_area')
-                          router.push(`/contribute?${params.toString()}`, { scroll: false })
-                          setSearch('')
-                        }}
-                      >
-                        Clear Filters
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              }
+            />
           </div>
         </div>
 
-        <ThreadsTable threads={filteredThreads} searchParams={searchParams} />
+        <ThreadsTable threads={filteredThreads} productArea={productArea} />
       </Tabs_Shadcn_>
     </section>
   )

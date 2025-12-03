@@ -6,11 +6,12 @@ import DefaultLayout from '~/components/Layouts/Default'
 export default async function ContributePage({
   searchParams,
 }: {
-  searchParams: Promise<{ product_area?: string, channel?: string }>
+  searchParams: Promise<{ product_area?: string; channel?: string; stack?: string }>
 }) {
   const params = await searchParams
   const product_area = params.product_area
   const channel = params.channel
+  const stack = params.stack
 
   return (
     <DefaultLayout>
@@ -21,7 +22,7 @@ export default async function ContributePage({
               <Hero />
               <GetStarted />
             </div>
-            <UnansweredThreads product_area={product_area} channel={channel} />
+            <UnansweredThreads product_area={product_area} channel={channel} stack={stack} />
           </div>
         </div>
       </main>

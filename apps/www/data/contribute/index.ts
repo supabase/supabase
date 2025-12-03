@@ -47,7 +47,8 @@ function mapThreadRowToThread(row: Thread): ThreadRow {
 
 export async function getUnansweredThreads(
   product_area?: string,
-  channel?: string
+  channel?: string,
+  stack?: string
 ): Promise<ThreadRow[]> {
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
@@ -65,6 +66,10 @@ export async function getUnansweredThreads(
 
   if (product_area) {
     query = query.contains('product_areas', [product_area])
+  }
+
+  if (stack) {
+    query = query.contains('stack', [stack])
   }
 
   if (channel) {
@@ -107,4 +112,27 @@ export async function getAllProductAreas(): Promise<string[]> {
   })
 
   return Array.from(areas).sort()
+}
+
+export async function getAllStacks(): Promise<string[]> {
+  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+  const { data, error } = await supabase
+    .from('contribute_threads')
+    .select('stack')
+    .in('status', ['unanswered', 'unresolved'])
+
+  if (error) {
+    console.error('Error fetching stacks:', error)
+    return []
+  }
+
+  const stacks = new Set<string>()
+  data?.forEach((row: { stack: string[] | null }) => {
+    if (row.stack && Array.isArray(row.stack)) {
+      row.stack.forEach((stack: string) => stacks.add(stack))
+    }
+  })
+
+  return Array.from(stacks).sort()
 }
