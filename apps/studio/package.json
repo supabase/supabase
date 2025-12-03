@@ -8,7 +8,7 @@
     "build": "next build && if [ \"$SKIP_ASSET_UPLOAD\" != \"1\" ]; then ./../../scripts/upload-static-assets.sh; fi",
     "start": "next start",
     "lint": "eslint .",
-    "lint:ratchet": "tsx scripts/ratchet-eslint-rules.ts --rule react-hooks/exhaustive-deps --rule import/no-anonymous-default-export --rule @tanstack/query/exhaustive-deps --rule @tanstack/query/no-deprecated-options",
+    "lint:ratchet": "tsx scripts/ratchet-eslint-rules.ts --rule react-hooks/exhaustive-deps --rule import/no-anonymous-default-export --rule @tanstack/query/exhaustive-deps --rule @tanstack/query/no-deprecated-options --rule @typescript-eslint/no-explicit-any",
     "clean": "rimraf node_modules tsconfig.tsbuildinfo .next .turbo",
     "test": "vitest --run --coverage",
     "test:watch": "vitest watch",
