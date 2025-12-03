@@ -34,7 +34,7 @@ const ObservabilityLayoutContent = ({
   )
 
   const [isIndexAdvisorBannerDismissed] = useLocalStorageQuery(
-    `${ref}-index-advisor-banner-dismissed`,
+    LOCAL_STORAGE_KEYS.INDEX_ADVISOR_NOTICE_DISMISSED(ref ?? ''),
     false
   )
 
@@ -46,6 +46,8 @@ const ObservabilityLayoutContent = ({
         content: <BannerMetricsAPI />,
         priority: 1,
       })
+    } else {
+      dismissBanner('metrics-api-banner')
     }
   }, [isMetricsBannerDismissed, addBanner, dismissBanner])
 
@@ -67,9 +69,7 @@ const ObservabilityLayoutContent = ({
         content: <BannerIndexAdvisor />,
         priority: 3,
       })
-    }
-
-    if (wasQueryPerformancePage && !isQueryPerformancePage) {
+    } else if (isIndexAdvisorBannerDismissed || !isQueryPerformancePage) {
       dismissBanner('index-advisor-banner')
     }
 
