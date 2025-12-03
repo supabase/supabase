@@ -117,7 +117,7 @@ export const MfaAuthSettingsForm = () => {
   )
 
   const { hasAccess: hasAccessToMFA, isLoading: isLoadingEntitlement } =
-    useCheckEntitlements('auth_mfa_phone')
+    useCheckEntitlements('auth.mfa_phone')
   const promptProPlanUpgrade = IS_PLATFORM && !hasAccessToMFA
 
   // For now, we support Twilio and Vonage. Twilio Verify is not supported and the remaining providers are community maintained.
