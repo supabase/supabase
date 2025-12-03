@@ -4,9 +4,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 02 Dec 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Wed, 03 Dec 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-power-for-kiro</guid>
+  <title>The new Supabase power for Kiro</title>
+  <link>https://supabase.com/blog/supabase-power-for-kiro</link>
+  <description>Build full-stack applications faster with the Kiro IDE using deep knowledge of your Supabase project, best practices for database migrations, edge functions, and security policies.</description>
+  <pubDate>Wed, 03 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/introducing-analytics-buckets</guid>
   <title>Introducing Analytics Buckets</title>
   <link>https://supabase.com/blog/introducing-analytics-buckets</link>
