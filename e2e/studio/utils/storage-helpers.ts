@@ -135,7 +135,7 @@ export const navigateToBucket = async (page: Page, ref: string, bucketName: stri
     (response) =>
       response.url().includes(`/platform/storage/${ref}/buckets/${bucketName}/objects/list`) &&
       response.request().method() === 'POST' &&
-      response.status() === 201
+      (response.status() === 200 || response.status() === 201)
   )
 
   await bucketRow.click()
