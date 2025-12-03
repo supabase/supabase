@@ -142,33 +142,40 @@ export function GettingStarted({ steps, onStepClick, onDismiss }: GettingStarted
 
         <CardContent className="flex flex-1 flex-col gap-0 p-0 overflow-y-auto border-b-0">
           {showCongratulations ? (
-            <div className="flex flex-1 items-center justify-center p-10 bg-200">
-              <CardContent className="p-8 text-center max-w-md flex flex-col items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-brand/10 flex items-center justify-center">
-                  <Check size={32} strokeWidth={2} className="text-brand" />
+            <div className="relative w-full flex-1 min-h-[100px] shrink-0 overflow-hidden bg-200 flex flex-col">
+              <div className="flex-1" />
+              <div className="p-10">
+                {/* <div className="flex flex-row items-center gap-4 mb-1"></div> */}
+                <div className="w-8 h-8 rounded-md bg-brand/10 flex items-center justify-center shrink-0 mb-4 -ml-0.5">
+                  <Check size={16} strokeWidth={1.5} className="text-brand" />
                 </div>
-                <div className="flex flex-col items-center gap-6">
-                  <div className="flex flex-col items-center">
-                    <h3 className="text-lg">All steps complete</h3>
-                    <p className="text-foreground-light">
-                      Drop into our Discord community to share your progress and learn from fellow
-                      developers.
-                    </p>
-                  </div>
-
-                  {/* Buttons */}
-                  <div className="flex items-center gap-2">
-                    <Button asChild type="default" size="tiny" icon={<IconDiscord size={14} />}>
-                      <Link href={'https://discord.supabase.com/'} target="_blank">
-                        Join us on Discord
-                      </Link>
-                    </Button>
-                    <Button type="text" size="tiny" onClick={onDismiss}>
-                      Dismiss section
-                    </Button>
-                  </div>
+                <div className="flex flex-row items-center gap-4 mb-1">
+                  <h3>All steps complete</h3>
                 </div>
-              </CardContent>
+                <p className="text-foreground-light max-w-prose mb-4 text-balance">
+                  Drop into our Discord community to share your progress and learn from fellow
+                  developers.
+                </p>
+                <div className="mt-auto flex flex-wrap gap-2 pt-2">
+                  <Button
+                    asChild
+                    type="default"
+                    icon={<IconDiscord size={14} />}
+                    className="text-foreground-light hover:text-foreground"
+                  >
+                    <Link href={'https://discord.supabase.com/'} target="_blank">
+                      Join our Discord
+                    </Link>
+                  </Button>
+                  <Button
+                    type="text"
+                    onClick={onDismiss}
+                    className="text-foreground-light hover:text-foreground"
+                  >
+                    Dismiss section
+                  </Button>
+                </div>
+              </div>
             </div>
           ) : (
             <>
@@ -235,7 +242,7 @@ export function GettingStarted({ steps, onStepClick, onDismiss }: GettingStarted
                         {activeStep.status}
                       </Badge>
                     </div>
-                    <p className="text-foreground-light max-w-prose mb-4">
+                    <p className="text-foreground-light max-w-prose mb-4 text-balance">
                       {activeStep.description}
                     </p>
                     <div className="mt-auto flex flex-wrap gap-2 pt-2">
