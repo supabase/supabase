@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -23,9 +22,6 @@ import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutatio
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Badge,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -157,12 +153,6 @@ export const ProjectUpgradeAlert = () => {
       >
         <Form_Shadcn_ {...form}>
           <form onSubmit={form.handleSubmit(onConfirmUpgrade)}>
-            {/* <Admonition
-              type="warning"
-              className="border-x-0 border-t-0 rounded-none"
-              title={`Your project will be offline for up to ${durationEstimateHours} hour${durationEstimateHours === 1 ? '' : 's'}`}
-              description="It is advised to upgrade at a time when there will be minimal impact for your application."
-            /> */}
             <Modal.Content>
               <div className="space-y-4">
                 <p className="text-sm">
@@ -202,46 +192,47 @@ export const ProjectUpgradeAlert = () => {
                   />
                 )}
                 {legacyAuthCustomRoles.length > 0 && (
-                  <Alert_Shadcn_
-                    variant="warning"
-                    title="Custom Postgres roles using md5 authentication have been detected"
-                  >
-                    <AlertTriangle className="h-4 w-4" strokeWidth={2} />
-                    <AlertTitle_Shadcn_>
-                      Custom Postgres roles will not work automatically after upgrade
-                    </AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                      <p>You must run a series of commands after upgrading.</p>
-                      <p>
-                        This is because new Postgres versions use scram-sha-256 authentication by
-                        default and do not support md5, as it has been deprecated.
-                      </p>
-                      <div>
-                        <p className="mb-1">Run the following commands after the upgrade:</p>
+                  <Admonition
+                    type="warning"
+                    title="Custom Postgres roles will not automatically work after upgrade"
+                    description={
+                      <>
+                        <p className="mb-1">
+                          New Postgres versions use{' '}
+                          <code className="text-code-inline">scram-sha-256</code> authentication by
+                          default and do not support <code className="text-code-inline">md5</code>,
+                          as it has been deprecated.
+                        </p>
+
+                        <p className="mb-1">
+                          Note the following following commands and run them after upgrading:
+                        </p>
                         <div className="flex items-baseline gap-2">
                           <code className="text-xs">
                             {legacyAuthCustomRoles.map((role) => (
                               <div key={role} className="pb-1">
-                                ALTER ROLE <span className="text-brand">{role}</span> WITH PASSWORD
-                                '<span className="text-brand">newpassword</span>';
+                                ALTER ROLE <span className="text-brand-link">{role}</span> WITH
+                                PASSWORD '<span className="text-brand-link">newpassword</span>';
                               </div>
                             ))}
                           </code>
                         </div>
-                      </div>
-                      <div>
+                      </>
+                    }
+                    actions={
+                      <div className="self-start mt-3">
                         <Button size="tiny" type="default" asChild>
                           <Link
                             href={`${DOCS_URL}/guides/platform/migrating-and-upgrading-projects#caveats`}
                             target="_blank"
                             rel="noreferrer"
                           >
-                            View docs
+                            Learn more
                           </Link>
                         </Button>
                       </div>
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
+                    }
+                  />
                 )}
                 <Modal.Separator />
                 <FormField_Shadcn_
