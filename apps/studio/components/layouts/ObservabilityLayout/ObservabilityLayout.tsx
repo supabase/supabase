@@ -1,6 +1,6 @@
 import { PropsWithChildren, useEffect } from 'react'
 import { useParams } from 'common'
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, IS_PLATFORM } from 'common'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { withAuth } from 'hooks/misc/withAuth'
@@ -39,7 +39,7 @@ const ObservabilityLayoutContent = ({
   )
 
   useEffect(() => {
-    if (!isMetricsBannerDismissed) {
+    if (!isMetricsBannerDismissed && IS_PLATFORM) {
       addBanner({
         id: 'metrics-api-banner',
         isDismissed: false,
