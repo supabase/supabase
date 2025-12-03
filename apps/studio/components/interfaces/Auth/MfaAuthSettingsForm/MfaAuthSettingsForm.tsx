@@ -44,6 +44,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 function determineMFAStatus(verifyEnabled: boolean, enrollEnabled: boolean) {
   return verifyEnabled ? (enrollEnabled ? 'Enabled' : 'Verify Enabled') : 'Disabled'
@@ -117,9 +118,8 @@ export const MfaAuthSettingsForm = () => {
     'custom_config_gotrue'
   )
 
-  const { data: organization } = useSelectedOrganizationQuery()
-  const isProPlanAndUp = organization?.plan?.id !== 'free'
-  const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
+  const { hasAccess: hasAccessToMFA, isLoading: isLoadingEntitlement } = useCheckEntitlements('auth_mfa_phone')
+  const promptProPlanUpgrade = IS_PLATFORM && !hasAccessToMFA
 
   // For now, we support Twilio and Vonage. Twilio Verify is not supported and the remaining providers are community maintained.
   const sendSMSHookIsEnabled =
@@ -235,7 +235,7 @@ export const MfaAuthSettingsForm = () => {
   const onSubmitPhoneForm = (values: any) => {
     let payload = { ...values }
 
-    if (isProPlanAndUp) {
+    if (hasAccessToMFA) {
       const { verifyEnabled: MFA_PHONE_VERIFY_ENABLED, enrollEnabled: MFA_PHONE_ENROLL_ENABLED } =
         MfaStatusToState(values.MFA_PHONE)
       payload = {
@@ -283,7 +283,7 @@ export const MfaAuthSettingsForm = () => {
     )
   }
 
-  if (isLoading) {
+  if (isLoading || isLoadingEntitlement) {
     return (
       <PageSection>
         <PageSectionContent>
@@ -437,7 +437,7 @@ export const MfaAuthSettingsForm = () => {
                           <Select_Shadcn_
                             value={field.value}
                             onValueChange={field.onChange}
-                            disabled={!canUpdateConfig || !isProPlanAndUp}
+                            disabled={!canUpdateConfig || !hasAccessToMFA}
                           >
                             <SelectTrigger_Shadcn_>
                               <SelectValue_Shadcn_ placeholder="Select status" />
@@ -481,7 +481,7 @@ export const MfaAuthSettingsForm = () => {
                             min={6}
                             max={30}
                             {...field}
-                            disabled={!canUpdateConfig || !isProPlanAndUp}
+                            disabled={!canUpdateConfig || !hasAccessToMFA}
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>
@@ -503,7 +503,7 @@ export const MfaAuthSettingsForm = () => {
                           <Input_Shadcn_
                             type="text"
                             {...field}
-                            disabled={!canUpdateConfig || !isProPlanAndUp}
+                            disabled={!canUpdateConfig || !hasAccessToMFA}
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>
@@ -524,7 +524,7 @@ export const MfaAuthSettingsForm = () => {
                       !canUpdateConfig ||
                       isUpdatingPhoneForm ||
                       !phoneForm.formState.isDirty ||
-                      !isProPlanAndUp
+                      !hasAccessToMFA
                     }
                     loading={isUpdatingPhoneForm}
                   >
