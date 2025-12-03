@@ -1,3 +1,4 @@
+import { useBucketPolicyCount } from 'components/interfaces/Storage/useBucketPolicyCount'
 import {
   VirtualizedTableCell,
   VirtualizedTableHead,
@@ -73,7 +74,6 @@ type BucketTableRowProps = {
   bucket: Bucket
   projectRef: string
   formattedGlobalUploadLimit: string
-  getPolicyCount: (bucketName: string) => number
 }
 
 export const BucketTableRow = ({
@@ -81,12 +81,12 @@ export const BucketTableRow = ({
   bucket,
   projectRef,
   formattedGlobalUploadLimit,
-  getPolicyCount,
 }: BucketTableRowProps) => {
+  const router = useRouter()
+  const { getPolicyCount } = useBucketPolicyCount()
+
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
-
-  const router = useRouter()
 
   const handleBucketNavigation = (
     bucketId: string,

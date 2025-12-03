@@ -1,5 +1,5 @@
 import { Monaco } from '@monaco-editor/react'
-import { IDisposable } from 'monaco-editor'
+import type { IDisposable } from 'monaco-editor'
 import { useEffect, useRef } from 'react'
 
 import { LOCAL_STORAGE_KEYS } from 'common'

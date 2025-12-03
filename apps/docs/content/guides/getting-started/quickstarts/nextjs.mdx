@@ -62,58 +62,7 @@ hideToc: true
 
   </StepHikeCompact.Step>
 
-<StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Create Supabase client">
-
-    Create a new file at `utils/supabase/server.ts` and populate with the following.
-
-    This creates a Supabase client, using the credentials from the `env.local` file.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-    <$CodeTabs>
-
-      ```ts name=utils/supabase/server.ts
-      import { createServerClient } from '@supabase/ssr'
-      import { cookies } from 'next/headers'
-
-      export async function createClient() {
-        const cookieStore = await cookies()
-
-        return createServerClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-          {
-            cookies: {
-              getAll() {
-                return cookieStore.getAll()
-              },
-              setAll(cookiesToSet) {
-                try {
-                  cookiesToSet.forEach(({ name, value, options }) =>
-                    cookieStore.set(name, value, options)
-                  )
-                } catch {
-                  // The `setAll` method was called from a Server Component.
-                  // This can be ignored if you have middleware refreshing
-                  // user sessions.
-                }
-              },
-            },
-          }
-        )
-      }
-      ```
-
-    </$CodeTabs>
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={5}>
+  <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Query Supabase data from Next.js">
 
     Create a new file at `app/instruments/page.tsx` and populate with the following.
@@ -127,13 +76,22 @@ hideToc: true
     <$CodeTabs>
 
       ```ts name=app/instruments/page.tsx
-      import { createClient } from '@/utils/supabase/server';
+      import { createClient } from "@/lib/supabase/server";
+      import { Suspense } from "react";
 
-      export default async function Instruments() {
+      async function InstrumentsData() {
         const supabase = await createClient();
         const { data: instruments } = await supabase.from("instruments").select();
 
-        return <pre>{JSON.stringify(instruments, null, 2)}</pre>
+        return <pre>{JSON.stringify(instruments, null, 2)}</pre>;
+      }
+
+      export default function Instruments() {
+        return (
+          <Suspense fallback={<div>Loading instruments...</div>}>
+            <InstrumentsData />
+          </Suspense>
+        );
       }
       ```
 
@@ -143,7 +101,7 @@ hideToc: true
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={6}>
+  <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Start the app">
 
     Run the development server, go to http://localhost:3000/instruments in a browser and you should see the list of instruments.

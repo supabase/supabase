@@ -1,10 +1,10 @@
+import { BASE_PATH } from 'lib/constants'
 import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { cn, Button, Card, CardContent, Badge } from 'ui'
-import { GettingStartedStep, GettingStartedAction } from './GettingStarted.types'
-import { BASE_PATH } from 'lib/constants'
+import { Badge, Button, Card, CardContent, cn } from 'ui'
+import { GettingStartedAction, GettingStartedStep } from './GettingStarted.types'
 
 // Determine action type for tracking
 const getActionType = (action: GettingStartedAction): 'primary' | 'ai_assist' | 'external_link' => {
@@ -186,7 +186,7 @@ export function GettingStarted({ steps, onStepClick }: GettingStartedProps) {
               <h3>{activeStep.title}</h3>
               <Badge
                 variant={activeStep.status === 'complete' ? 'success' : 'default'}
-                className="capitalize hidden @2xl:inline-flex"
+                className="hidden @2xl:inline-flex"
               >
                 {activeStep.status}
               </Badge>

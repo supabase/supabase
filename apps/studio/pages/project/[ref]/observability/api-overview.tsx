@@ -17,6 +17,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { useApiReport } from 'data/reports/api-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { useCallback } from 'react'
 import type { NextPageWithLayout } from 'types'
 
 export const ApiReport: NextPageWithLayout = () => {
@@ -42,15 +43,51 @@ export const ApiReport: NextPageWithLayout = () => {
     setShowUpgradePrompt,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
-  const handleDatepickerChange = (vals: DatePickerValue) => {
-    const promptShown = handleDatePickerChangeFromHook(vals)
-    if (!promptShown) {
+  const handleDatepickerChange = useCallback(
+    (vals: DatePickerValue) => {
+      const promptShown = handleDatePickerChangeFromHook(vals)
+      if (!promptShown) {
+        mergeParams({
+          iso_timestamp_start: vals.from ?? '',
+          iso_timestamp_end: vals.to ?? '',
+        })
+      }
+    },
+    [handleDatePickerChangeFromHook, mergeParams]
+  )
+
+  const handleDatepickerChangeForRefresh = useCallback(
+    (vals: DatePickerValue) => {
+      handleDatePickerChangeFromHook(vals)
       mergeParams({
-        iso_timestamp_start: vals.from || '',
-        iso_timestamp_end: vals.to || '',
+        iso_timestamp_start: vals.from ?? '',
+        iso_timestamp_end: vals.to ?? '',
       })
+      handleDatepickerChange(vals)
+    },
+    [handleDatePickerChangeFromHook, mergeParams, handleDatepickerChange]
+  )
+
+  const refreshWithParams = useCallback(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    refresh()
+  }, [refresh])
+
+  const onRefreshReport = useCallback(async () => {
+    if (datePickerValue.isHelper && datePickerValue.text) {
+      const selectedHelper = datePickerHelpers.find((h) => h.text === datePickerValue.text)
+      if (selectedHelper) {
+        handleDatepickerChangeForRefresh({
+          from: selectedHelper.calcFrom(),
+          to: selectedHelper.calcTo(),
+          isHelper: true,
+          text: selectedHelper.text,
+        })
+      }
     }
-  }
+
+    await refreshWithParams()
+  }, [datePickerValue, datePickerHelpers, handleDatepickerChangeForRefresh, refreshWithParams])
 
   return (
     <ReportPadding>
@@ -64,7 +101,7 @@ export const ApiReport: NextPageWithLayout = () => {
               datepickerFrom={params.totalRequests.iso_timestamp_start}
               datepickerTo={params.totalRequests.iso_timestamp_end}
               onAddFilter={addFilter}
-              onRefresh={refresh}
+              onRefresh={onRefreshReport}
               isLoading={isLoading}
               filters={filters}
               datepickerHelpers={datePickerHelpers}
