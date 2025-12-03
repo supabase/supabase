@@ -45,27 +45,28 @@ export function GettingStarted({ steps, onStepClick, onDismiss }: GettingStarted
   const hasInitializedRef = useRef(false)
 
   useEffect(() => {
-    if (hasInitializedRef.current) {
-      // After initial setup, only handle step selection if user hasn't selected one
-      return
-    }
-
     if (steps.length === 0) {
       setActiveStepKey(null)
       hasInitializedRef.current = true
       return
     }
 
-    // On initial load: if all steps are complete, don't select any step
-    // Otherwise, select the first step
-    if (allStepsComplete) {
-      setActiveStepKey(null)
-    } else {
-      setActiveStepKey(steps[0]?.key ?? null)
-    }
+    // Check if the current active step key is still valid in the new steps array
+    const isActiveStepValid = activeStepKey && steps.some((step) => step.key === activeStepKey)
 
-    hasInitializedRef.current = true
-  }, [steps, allStepsComplete])
+    // If we haven't initialized yet, or the active step is no longer valid (e.g., after tab switch)
+    if (!hasInitializedRef.current || !isActiveStepValid) {
+      // If all steps are complete, don't select any step
+      if (allStepsComplete) {
+        setActiveStepKey(null)
+      } else {
+        // Select the first incomplete step, or the first step if all are complete
+        const firstIncompleteStep = steps.find((step) => step.status !== 'complete')
+        setActiveStepKey(firstIncompleteStep?.key ?? steps[0]?.key ?? null)
+      }
+      hasInitializedRef.current = true
+    }
+  }, [steps, allStepsComplete, activeStepKey])
 
   const activeStep = activeStepKey ? steps.find((step) => step.key === activeStepKey) : null
   const activeStepIndex = activeStep ? steps.findIndex((step) => step.key === activeStep.key) : -1
