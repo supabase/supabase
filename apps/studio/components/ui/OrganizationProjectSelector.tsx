@@ -41,6 +41,7 @@ interface OrganizationProjectSelectorSelectorProps {
   renderActions?: (setOpen: (value: boolean) => void) => ReactNode
   onSelect?: (project: OrgProject) => void
   onInitialLoad?: (projects: OrgProject[]) => void
+  isOptionDisabled?: (project: OrgProject) => boolean
   fetchOnMount?: boolean
 }
 
@@ -57,6 +58,7 @@ export const OrganizationProjectSelector = ({
   renderActions,
   onSelect,
   onInitialLoad,
+  isOptionDisabled,
   fetchOnMount = false,
 }: OrganizationProjectSelectorSelectorProps) => {
   const { data: organization } = useSelectedOrganizationQuery()
@@ -145,6 +147,7 @@ export const OrganizationProjectSelector = ({
         )}
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_
+        portal
         sameWidthAsTrigger={sameWidthAsTrigger}
         className="p-0"
         side="bottom"
@@ -197,6 +200,7 @@ export const OrganizationProjectSelector = ({
                           setOpen(false)
                         }}
                         onClick={() => setOpen(false)}
+                        disabled={!!isOptionDisabled ? isOptionDisabled(project) : false}
                       >
                         {!!renderRow ? (
                           renderRow(project)

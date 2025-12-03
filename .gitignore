@@ -117,7 +117,7 @@ next-env.d.ts
 .vercel
 
 # AI assistant local files
-.serena/
+.claude/
 CLAUDE.md
 
 #include template .env file for docker-compose

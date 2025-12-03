@@ -1,52 +1,28 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { storageKeys } from './keys'
 
 type GetNamespacesVariables = {
-  catalogUri: string
-  warehouse: string
-  token: string
+  warehouse?: string
+  projectRef?: string
 }
 
-// [Joshen] Investigate if we can use the temp API keys here
-async function getNamespaces({ catalogUri, warehouse, token }: GetNamespacesVariables) {
-  let headers = new Headers()
-  // handle both secret key and service role key
-  if (token.startsWith('sb_secret_')) {
-    headers = await constructHeaders({
-      'Content-Type': 'application/json',
-      apikey: `${token}`,
-    })
-    headers.delete('Authorization')
-  } else {
-    headers = await constructHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    })
-  }
+async function getNamespaces(
+  { projectRef, warehouse }: GetNamespacesVariables,
+  signal?: AbortSignal
+) {
+  if (!projectRef) throw new Error('projectRef is required')
+  if (!warehouse) throw new Error('warehouse is required')
 
-  const url = `${catalogUri}/v1/${warehouse}/namespaces`.replaceAll(/(?<!:)\/\//g, '/')
+  const { data, error } = await get('/platform/storage/{ref}/analytics-buckets/{id}/namespaces', {
+    params: { path: { ref: projectRef, id: warehouse } },
+    signal,
+  })
 
-  try {
-    const response = await fetchHandler(url, {
-      headers,
-      method: 'GET',
-    })
-
-    const result = await response.json()
-    if (result.error) {
-      if (result.error.message) {
-        throw new Error(result.error.message)
-      }
-      throw new Error('Failed to get iceberg namespaces')
-    }
-    const r = result as { namespaces: string[][] }
-    return r.namespaces.flat()
-  } catch (error) {
-    handleError(error)
-  }
+  if (error) handleError(error)
+  return data.data.map((x) => x.namespace).flat()
 }
 
 type IcebergNamespacesData = Awaited<ReturnType<typeof getNamespaces>>
@@ -55,11 +31,24 @@ export type IcebergNamespacesError = ResponseError
 
 export const useIcebergNamespacesQuery = <TData = IcebergNamespacesData>(
   params: GetNamespacesVariables,
-  { ...options }: UseCustomQueryOptions<IcebergNamespacesData, IcebergNamespacesError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<IcebergNamespacesData, IcebergNamespacesError, TData> = {}
 ) => {
+  const { projectRef, warehouse } = params
+
   return useQuery<IcebergNamespacesData, IcebergNamespacesError, TData>({
-    queryKey: storageKeys.icebergNamespaces(params.catalogUri, params.warehouse),
-    queryFn: () => getNamespaces(params),
+    queryKey: storageKeys.icebergNamespaces({
+      projectRef,
+      warehouse,
+    }),
+    queryFn: ({ signal }) => getNamespaces({ projectRef, warehouse }, signal),
+    enabled:
+      options &&
+      typeof projectRef !== 'undefined' &&
+      typeof warehouse !== 'undefined' &&
+      warehouse.length > 0,
     ...options,
   })
 }

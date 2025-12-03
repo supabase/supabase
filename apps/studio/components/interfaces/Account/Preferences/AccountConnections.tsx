@@ -15,7 +15,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -34,7 +33,7 @@ export const AccountConnections = () => {
 
   const isConnected = gitHubAuthorization !== null
 
-  const { mutate: removeAuthorization, isLoading: isRemoving } =
+  const { mutate: removeAuthorization, isPending: isRemoving } =
     useGitHubAuthorizationDeleteMutation({
       onSuccess: () => {
         toast.success('GitHub authorization removed successfully')

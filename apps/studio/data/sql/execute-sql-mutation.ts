@@ -16,7 +16,6 @@ export type QueryResponseError = {
   code: string
   message: string
   error: string
-  formattedError: string
   file: string
   length: number
   line: string

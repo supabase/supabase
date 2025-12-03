@@ -52,7 +52,6 @@ import { GlobalErrorBoundaryState } from 'components/ui/ErrorBoundary/GlobalErro
 import { useRootQueryClient } from 'data/query-client'
 import { customFont, sourceCodePro } from 'fonts'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { LegacyInlineEditorHotkeyMigration } from 'hooks/misc/useLegacyInlineEditorHotkeyMigration'
 import { AuthProvider } from 'lib/auth'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
@@ -164,8 +163,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       </ThemeProvider>
                     </RouteValidationWrapper>
                   </TooltipProvider>
-                  {/* Temporary migration, to be removed by 2025-11-28 */}
-                  <LegacyInlineEditorHotkeyMigration />
                   <Telemetry />
                   {!isTestEnv && (
                     <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
