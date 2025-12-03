@@ -55,7 +55,7 @@ export const BannerMetricsAPI = () => {
                 })
               }
             >
-              Get started for Free
+              Get started for free
             </Link>
           </Button>
         </div>
