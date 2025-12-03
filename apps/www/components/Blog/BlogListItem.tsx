@@ -48,6 +48,7 @@ const BlogListItem = ({ post }: Props) => {
   return (
     <Link
       href={post.path}
+      prefetch={false}
       className="group flex flex-col lg:grid lg:grid-cols-10 xl:grid-cols-12 w-full py-2 sm:py-4 h-full border-b"
     >
       <div className="flex w-full lg:col-span-8 xl:col-span-8">
