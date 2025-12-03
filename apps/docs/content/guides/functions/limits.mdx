@@ -26,6 +26,13 @@ subtitle: "Limits applied Edge Functions in Supabase's hosted platform."
 - Maximum log message length: 10,000 characters
 - Log event threshold: 100 events per 10 seconds
 
+### Secrets
+
+- Maximum number of secrets per project: **100**
+- Secret name length: up to **256** characters
+- Maximum secret size: **48 KiB** (**24,576** characters)
+- Names must NOT start with the prefix `SUPABASE_` (this prefix is reserved).
+
 ## Other limits & restrictions
 
 - Outgoing connections to ports `25` and `587` are not allowed.
