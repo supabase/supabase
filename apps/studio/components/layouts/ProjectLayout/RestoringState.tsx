@@ -1,5 +1,5 @@
 import { CheckCircle, Download, Loader } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
@@ -26,24 +26,28 @@ const RestoringState = () => {
 
   const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
-  useProjectStatusQuery(
+  const { data: projectStatusData, isSuccess: isProjectStatusSuccess } = useProjectStatusQuery(
     { projectRef: ref },
     {
       enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
-      refetchInterval: (res) => {
-        return res?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
-      },
-      onSuccess: async (res) => {
-        if (res.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
-          setIsCompleted(true)
-        } else {
-          if (ref) invalidateProjectDetailsQuery(ref)
-        }
+      refetchInterval: (data) => {
+        return data?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
       },
     }
   )
 
-  const { mutate: downloadBackup, isLoading: isDownloading } = useBackupDownloadMutation({
+  useEffect(() => {
+    if (!isProjectStatusSuccess) return
+    if (projectStatusData.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
+      setIsCompleted(true)
+    } else {
+      if (ref) {
+        invalidateProjectDetailsQuery(ref)
+      }
+    }
+  }, [isProjectStatusSuccess, projectStatusData, ref, invalidateProjectDetailsQuery])
+
+  const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
     onSuccess: (res) => {
       const { fileUrl } = res
 

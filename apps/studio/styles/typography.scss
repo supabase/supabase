@@ -79,6 +79,7 @@
     @apply truncate cursor-pointer underline underline-offset-4 decoration-foreground-muted/50 hover:decoration-foreground-lighter/80 transition-colors duration-100;
   }
 
+  // Pair with `code` elements for semantic consistency, e.g. <code className="text-code-inline">
   .text-code-inline {
     @apply break-all text-xs tracking-tight bg-surface-200 border border-muted rounded-md px-1 py-0.5 text-foreground font-medium;
   }

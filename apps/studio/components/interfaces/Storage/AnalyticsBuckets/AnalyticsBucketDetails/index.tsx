@@ -2,6 +2,7 @@ import { uniq } from 'lodash'
 import { Loader2, SquarePlus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
@@ -22,23 +23,25 @@ import {
   DatabaseExtension,
   useDatabaseExtensionsQuery,
 } from 'data/database-extensions/database-extensions-query'
-import { useReplicationPipelineStatusQuery } from 'data/etl/pipeline-status-query'
-import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
+import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
+import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { Button, Card, CardContent } from 'ui'
+import { EmptyStatePresentational } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
 import { useSelectedAnalyticsBucket } from '../useSelectedAnalyticsBucket'
+import { HIDE_REPLICATION_USER_FLOW } from './AnalyticsBucketDetails.constants'
 import { BucketHeader } from './BucketHeader'
 import { ConnectTablesDialog } from './ConnectTablesDialog'
+import { CreateTableInstructions } from './CreateTable/CreateTableInstructions'
 import { NamespaceWithTables } from './NamespaceWithTables'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useAnalyticsBucketAssociatedEntities } from './useAnalyticsBucketAssociatedEntities'
-import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperInstance'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
 export const AnalyticBucketDetails = () => {
@@ -53,7 +56,10 @@ export const AnalyticBucketDetails = () => {
     isError: isErrorBucket,
   } = useSelectedAnalyticsBucket()
 
-  const [modal, setModal] = useState<'delete' | null>(null)
+  const [showDeleteModal, setShowDeleteModal] = useQueryState(
+    'delete',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   // [Joshen] Namespaces are now created asynchronously when the pipeline is started, so long poll after
   // updating connected tables until namespaces are updated
   // Namespace would just be the schema (Which is currently limited to public)
@@ -61,14 +67,16 @@ export const AnalyticBucketDetails = () => {
   const [pollIntervalNamespaces, setPollIntervalNamespaces] = useState(0)
   const [pollIntervalNamespaceTables, setPollIntervalNamespaceTables] = useState(0)
 
-  const { mutateAsync: startPipeline, isLoading: isStartingPipeline } = useStartPipelineMutation()
+  const { mutateAsync: startPipeline, isPending: isStartingPipeline } = useStartPipelineMutation()
 
-  /** The wrapper instance is the wrapper that is installed for this Analytics bucket. */
-  const { data: wrapperInstance, isLoading: isLoadingWrapperInstance } =
-    useAnalyticsBucketWrapperInstance({ bucketId: bucket?.id })
-  const { publication, pipeline } = useAnalyticsBucketAssociatedEntities({
+  const {
+    publication,
+    pipeline,
+    icebergWrapper: wrapperInstance,
+    isLoadingWrapperInstance,
+  } = useAnalyticsBucketAssociatedEntities({
     projectRef,
-    bucketId: bucket?.id,
+    bucketId: bucket?.name,
   })
   const { data, isSuccess: isSuccessPipelineStatus } = useReplicationPipelineStatusQuery(
     { projectRef, pipelineId: pipeline?.id },
@@ -107,18 +115,16 @@ export const AnalyticBucketDetails = () => {
 
   const {
     data: namespacesData = [],
-    error: namespacesError,
     isLoading: isLoadingNamespaces,
     isSuccess: isSuccessNamespaces,
-    isError: isErrorNamespaces,
   } = useIcebergNamespacesQuery(
     {
       projectRef,
-      catalogUri: wrapperValues.catalog_uri,
       warehouse: wrapperValues.warehouse,
     },
     {
-      refetchInterval: (data = []) => {
+      refetchInterval: (_data) => {
+        const data = _data ?? []
         if (pollIntervalNamespaces === 0) return false
 
         const publicationTableSchemas = publication?.tables.map((x) => x.schema) ?? []
@@ -174,24 +180,24 @@ export const AnalyticBucketDetails = () => {
           {state === 'loading' ? (
             <ScaffoldSection isFullWidth>
               <BucketHeader showActions={false} />
-              <GenericTableLoader headers={['Name']} />
+              <GenericTableLoader />
             </ScaffoldSection>
           ) : state === 'not-installed' ? (
             <ExtensionNotInstalled
-              bucketName={bucket?.id}
+              bucketName={bucket?.name}
               projectRef={project?.ref!}
               wrapperMeta={wrapperMeta}
               wrappersExtension={wrappersExtension!}
             />
           ) : state === 'needs-upgrade' ? (
             <ExtensionNeedsUpgrade
-              bucketName={bucket?.id}
+              bucketName={bucket?.name}
               projectRef={project?.ref!}
               wrapperMeta={wrapperMeta}
               wrappersExtension={wrappersExtension!}
             />
           ) : state === 'missing' ? (
-            <WrapperMissing bucketName={bucket?.id} />
+            <WrapperMissing bucketName={bucket?.name} />
           ) : state === 'added' && wrapperInstance ? (
             <>
               <ScaffoldSection isFullWidth>
@@ -205,40 +211,35 @@ export const AnalyticBucketDetails = () => {
 
                 {isLoadingNamespaces || isLoadingWrapperInstance ? (
                   <GenericTableLoader headers={['Name']} />
-                ) : isErrorNamespaces ? (
-                  <AlertError subject="Failed to retrieve namespaces" error={namespacesError} />
                 ) : namespaces.length === 0 ? (
                   <>
-                    {isPollingForData ? (
-                      <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-3 items-center text-center gap-1 text-balance">
-                        <Loader2
-                          size={24}
-                          strokeWidth={1.5}
-                          className="animate-spin text-foreground-muted"
-                        />
-                        <div className="flex flex-col items-center text-center">
-                          <h3>Connecting table(s) to bucket</h3>
-                          <p className="text-foreground-light text-sm">
-                            Tables will be shown here once the connection is complete
-                          </p>
-                        </div>
-                      </aside>
+                    {HIDE_REPLICATION_USER_FLOW ? (
+                      <CreateTableInstructions />
+                    ) : isPollingForData ? (
+                      <EmptyStatePresentational
+                        icon={
+                          <Loader2
+                            size={24}
+                            strokeWidth={1.5}
+                            className="animate-spin text-foreground-muted"
+                          />
+                        }
+                        title="Connecting table(s) to bucket"
+                        description="Tables will be shown here once the connection is complete"
+                      />
                     ) : (
-                      <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-3 items-center text-center gap-1 text-balance">
-                        <SquarePlus size={24} strokeWidth={1.5} className="text-foreground-muted" />
-                        <div className="flex flex-col items-center text-center">
-                          <h3>Connect database tables</h3>
-                          <p className="text-foreground-light text-sm">
-                            Stream table data for continuous backups and analysis
-                          </p>
-                        </div>
+                      <EmptyStatePresentational
+                        icon={SquarePlus}
+                        title="Connect database tables"
+                        description="Stream table data for continuous backups and analysis"
+                      >
                         <ConnectTablesDialog
                           onSuccessConnectTables={() => {
                             setPollIntervalNamespaces(4000)
                             setPollIntervalNamespaceTables(4000)
                           }}
                         />
-                      </aside>
+                      </EmptyStatePresentational>
                     )}
                   </>
                 ) : (
@@ -264,7 +265,7 @@ export const AnalyticBucketDetails = () => {
                           <div className="flex items-center gap-x-2">
                             <Button asChild type="default">
                               <Link
-                                href={`/project/${projectRef}/database/etl/${pipeline.replicator_id}`}
+                                href={`/project/${projectRef}/database/replication/${pipeline.replicator_id}`}
                               >
                                 View replication
                               </Link>
@@ -294,14 +295,11 @@ export const AnalyticBucketDetails = () => {
                       {namespaces.map(({ namespace, schema, tables }) => (
                         <NamespaceWithTables
                           key={namespace}
-                          bucketName={bucket?.id}
                           namespace={namespace}
                           sourceType="direct"
                           schema={schema}
                           tables={tables as any}
-                          wrapperInstance={wrapperInstance}
                           wrapperValues={wrapperValues}
-                          wrapperMeta={wrapperMeta}
                           pollIntervalNamespaceTables={pollIntervalNamespaceTables}
                           setPollIntervalNamespaceTables={setPollIntervalNamespaceTables}
                         />
@@ -311,7 +309,7 @@ export const AnalyticBucketDetails = () => {
                 )}
               </ScaffoldSection>
 
-              <SimpleConfigurationDetails bucketName={bucket?.id} />
+              <SimpleConfigurationDetails bucketName={bucket?.name} />
             </>
           ) : null}
 
@@ -330,8 +328,8 @@ export const AnalyticBucketDetails = () => {
                 </div>
                 <Button
                   type="danger"
-                  disabled={!bucket?.id || !isSuccessBucket}
-                  onClick={() => setModal('delete')}
+                  disabled={!bucket?.name || !isSuccessBucket}
+                  onClick={() => setShowDeleteModal(true)}
                 >
                   Delete bucket
                 </Button>
@@ -342,9 +340,9 @@ export const AnalyticBucketDetails = () => {
       )}
 
       <DeleteAnalyticsBucketModal
-        visible={modal === `delete`}
-        bucketId={bucket?.id}
-        onClose={() => setModal(null)}
+        visible={showDeleteModal}
+        bucketId={bucket?.name}
+        onClose={() => setShowDeleteModal(false)}
         onSuccess={() => router.push(`/project/${projectRef}/storage/analytics`)}
       />
     </>
@@ -450,7 +448,7 @@ const ExtensionNeedsUpgrade = ({
 }
 
 const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
-  const { mutateAsync: createIcebergWrapper, isLoading: isCreatingIcebergWrapper } =
+  const { mutateAsync: createIcebergWrapper, isPending: isCreatingIcebergWrapper } =
     useIcebergWrapperCreateMutation()
 
   const onSetupWrapper = async () => {

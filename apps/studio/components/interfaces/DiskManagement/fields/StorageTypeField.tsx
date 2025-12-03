@@ -110,16 +110,11 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
                           className={cn(disableIo2 && '!pointer-events-auto')}
                         >
                           <div className="flex flex-col gap-0 items-start">
-                            <div className="flex gap-3 items-center">
+                            <div className="flex gap-2 items-center">
                               <span className="text-sm text-foreground">{item.name}</span>{' '}
-                              <div>
-                                <Badge
-                                  variant={'outline'}
-                                  className="font-mono bg-alternative bg-opacity-100"
-                                >
-                                  {item.type}
-                                </Badge>
-                              </div>
+                              <Badge variant="default" className="font-mono">
+                                {item.type}
+                              </Badge>
                             </div>
                             <p className="text-foreground-light">{item.description}</p>
                           </div>

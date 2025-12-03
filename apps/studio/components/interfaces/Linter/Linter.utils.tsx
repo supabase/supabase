@@ -343,7 +343,7 @@ export const LintEntity = ({ metadata }: { metadata: Lint['metadata'] }) => {
 
 export const LintCategoryBadge = ({ category }: { category: string }) => {
   return (
-    <Badge variant={category === 'SECURITY' ? 'destructive' : 'warning'} className="capitalize">
+    <Badge variant={category === 'SECURITY' ? 'destructive' : 'warning'}>
       {category.toLowerCase()}
     </Badge>
   )

@@ -26,6 +26,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Typography',
+          href: '/docs/typography',
+          items: [],
+        },
+        {
           title: 'Theming',
           href: '/docs/theming',
           items: [],
@@ -36,9 +41,9 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          items: [],
-          href: '/docs/ui-patterns/accessibility',
           title: 'Accessibility',
+          href: '/docs/accessibility',
+          items: [],
         },
       ],
     },
@@ -78,6 +83,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Assistant Chat',
           href: '/docs/fragments/assistant-chat',
+          items: [],
+        },
+        {
+          title: 'EmptyStatePresentational',
+          href: '/docs/fragments/empty-state-presentational',
           items: [],
         },
         {
