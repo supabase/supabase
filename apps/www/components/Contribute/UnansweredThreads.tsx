@@ -16,10 +16,16 @@ export interface Thread {
   summary: string | null
 }
 
-export async function UnansweredThreads({ product_area }: { product_area?: string }) {
+export async function UnansweredThreads({
+  product_area,
+  channel,
+}: {
+  product_area?: string
+  channel?: string
+}) {
   try {
     const [threads, allProductAreas] = await Promise.all([
-      getUnansweredThreads(product_area),
+      getUnansweredThreads(product_area, channel),
       getAllProductAreas(),
     ])
     return <UnansweredThreadsTable threads={threads} allProductAreas={allProductAreas} />

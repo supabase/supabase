@@ -2,22 +2,20 @@
 
 import { useState, useMemo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import Link from 'next/link'
 import {
   Clock,
-  User,
-  ExternalLink,
   MessageCircle,
   Github,
   Search,
   X,
   Filter,
   Check,
+  List,
+  BotMessageSquare,
 } from 'lucide-react'
 import {
   Badge,
   Button,
-  TabsContent_Shadcn_,
   Input_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
@@ -27,6 +25,7 @@ import {
 import { Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 
 import type { Thread } from '~/data/contribute'
+import { ChannelBadge } from './ChannelBadge'
 
 function ThreadRow({
   thread,
@@ -52,11 +51,6 @@ function ThreadRow({
 
   return (
     <tr className="border-b border-border hover:bg-muted/50 transition-colors">
-      {/* <td className="py-4 px-6">
-        <span className="text-xs font-mono text-muted-foreground select-all">
-          {thread.id}
-        </span>
-      </td> */}
       <td className="py-4 px-6">
         <div className="flex flex-col gap-1">
           <a
@@ -67,16 +61,10 @@ function ThreadRow({
           >
             {thread.title}
           </a>
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <User className="h-3.5 w-3.5" />
-            <span>{thread.user}</span>
+          <div className="flex items-center gap-1.5">
+            <ChannelBadge channel={thread.channel} />
           </div>
         </div>
-      </td>
-      <td className="py-4 px-6">
-        <Badge className="text-xs" variant="secondary">
-          {thread.channel}
-        </Badge>
       </td>
       <td className="py-4 px-6">
         <div className="flex flex-wrap gap-2">
@@ -104,20 +92,14 @@ function ThreadRow({
       <td className="py-4 px-6">
         <span className="text-sm text-muted-foreground">{thread.posted}</span>
       </td>
-      <td className="py-4 px-6">
-        <Button type="text" icon={<ExternalLink className="h-3.5 w-3.5 ml-1" />} asChild>
-          <a href={thread.external_activity_url} target="_blank" rel="noopener noreferrer">
-            Reply
-          </a>
-        </Button>
-      </td>
     </tr>
   )
 }
 
-function getTabName(tab: string | null): string {
-  if (tab === 'reddit') return 'Reddit'
-  if (tab === 'github') return 'GitHub'
+function getTabName(channel: string | null): string {
+  if (channel === 'all') return 'All'
+  if (channel === 'reddit') return 'Reddit'
+  if (channel === 'github') return 'GitHub'
   return 'Discord'
 }
 
@@ -131,7 +113,7 @@ function ThreadsTable({
   if (threads.length === 0) {
     return (
       <div className="border border-border rounded-lg p-8 text-center text-muted-foreground">
-        No {getTabName(searchParams?.get('tab') || null)} threads found
+        No {getTabName(searchParams?.get('channel') || null)} threads found
       </div>
     )
   }
@@ -141,14 +123,9 @@ function ThreadsTable({
       <table className="w-full">
         <thead className="border-b border-border">
           <tr>
-            {/* <th className="text-left py-3 px-6 text-sm font-semibold text-foreground">
-              ID
-            </th> */}
             <th className="text-left py-3 px-6 text-sm text-foreground">Thread</th>
-            <th className="text-left py-3 px-6 text-sm text-foreground">Channel</th>
-            <th className="text-left py-3 px-6 text-sm text-foreground">Product Areas</th>
+            <th className="text-left py-3 px-6 text-sm text-foreground">Area</th>
             <th className="text-left py-3 px-6 text-sm text-foreground">Posted</th>
-            <th className="text-left py-3 px-6 text-sm text-foreground"></th>
           </tr>
         </thead>
         <tbody>
@@ -172,18 +149,18 @@ export function UnansweredThreadsTable({
   const searchParams = useSearchParams()
   const router = useRouter()
 
-  const validTabs = ['discord', 'reddit', 'github'] as const
-  const tabFromUrl = searchParams?.get('tab')
+  const validTabs = ['all', 'discord', 'reddit', 'github'] as const
+  const tabFromUrl = searchParams?.get('channel')
   const currentTab = (
-    validTabs.includes(tabFromUrl as any) ? tabFromUrl : 'discord'
+    validTabs.includes(tabFromUrl as any) ? tabFromUrl : 'all'
   ) as (typeof validTabs)[number]
 
   const handleTabChange = (value: string) => {
     const params = new URLSearchParams(searchParams?.toString() || '')
-    if (value === 'discord') {
-      params.delete('tab')
+    if (value === 'all') {
+      params.delete('channel')
     } else {
-      params.set('tab', value)
+      params.set('channel', value)
     }
     router.push(`/contribute?${params.toString()}`, { scroll: false })
   }
@@ -202,10 +179,6 @@ export function UnansweredThreadsTable({
       )
     })
   }, [threads, search])
-
-  const discordThreads = filteredThreads.filter((t) => t.source === 'discord')
-  const redditThreads = filteredThreads.filter((t) => t.source === 'reddit')
-  const githubThreads = filteredThreads.filter((t) => t.source === 'github')
 
   const hasActiveFilters = searchParams?.get('product_area') || search.trim()
 
@@ -238,25 +211,32 @@ export function UnansweredThreadsTable({
         <div className="flex items-center justify-between gap-4 mb-6">
           <TabsList_Shadcn_ className="gap-6 bg-surface-200 rounded-md">
             <TabsTrigger_Shadcn_
+              value="all"
+              className="gap-2 px-4 data-[state=active]:bg-surface-300 border-none"
+            >
+              <List className="h-4 w-4" />
+              All
+            </TabsTrigger_Shadcn_>
+            <TabsTrigger_Shadcn_
               value="discord"
               className="gap-2 px-4 data-[state=active]:bg-surface-300 border-none"
             >
-              <MessageCircle className="h-4 w-4" />
-              Discord {discordThreads.length}
+              <BotMessageSquare className="h-4 w-4" />
+              Discord
             </TabsTrigger_Shadcn_>
             <TabsTrigger_Shadcn_
               value="reddit"
               className="gap-2 px-4 data-[state=active]:bg-surface-300 border-none"
             >
               <MessageCircle className="h-4 w-4" />
-              Reddit {redditThreads.length}
+              Reddit
             </TabsTrigger_Shadcn_>
             <TabsTrigger_Shadcn_
               value="github"
               className="gap-2 px-4 data-[state=active]:bg- border-none"
             >
               <Github className="h-4 w-4" />
-              GitHub Issues {githubThreads.length}
+              GitHub
             </TabsTrigger_Shadcn_>
           </TabsList_Shadcn_>
 
@@ -286,7 +266,7 @@ export function UnansweredThreadsTable({
               </PopoverTrigger_Shadcn_>
               <PopoverContent_Shadcn_ className="w-64 p-0" align="end">
                 <div className="p-4">
-                  <h4 className="text-sm font-semibold mb-3">Product Areas</h4>
+                  <h4 className="text-sm font-semibold mb-3">Area</h4>
                   <div className="relative">
                     <div className="grid gap-2 max-h-72 overflow-y-auto">
                       {allProductAreas.length > 0 ? (
@@ -340,17 +320,7 @@ export function UnansweredThreadsTable({
           </div>
         </div>
 
-        <TabsContent_Shadcn_ value="discord">
-          <ThreadsTable threads={discordThreads} searchParams={searchParams} />
-        </TabsContent_Shadcn_>
-
-        <TabsContent_Shadcn_ value="reddit">
-          <ThreadsTable threads={redditThreads} searchParams={searchParams} />
-        </TabsContent_Shadcn_>
-
-        <TabsContent_Shadcn_ value="github">
-          <ThreadsTable threads={githubThreads} searchParams={searchParams} />
-        </TabsContent_Shadcn_>
+        <ThreadsTable threads={filteredThreads} searchParams={searchParams} />
       </Tabs_Shadcn_>
     </section>
   )

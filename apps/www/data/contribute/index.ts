@@ -74,7 +74,10 @@ function mapThreadRowToThread(row: ThreadRow): Thread {
   }
 }
 
-export async function getUnansweredThreads(product_area?: string): Promise<Thread[]> {
+export async function getUnansweredThreads(
+  product_area?: string,
+  channel?: string
+): Promise<Thread[]> {
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
   const twentyFourHoursAgo = new Date()
@@ -91,6 +94,11 @@ export async function getUnansweredThreads(product_area?: string): Promise<Threa
 
   if (product_area) {
     query = query.contains('product_areas', [product_area])
+  }
+
+  if (channel) {
+    console.log('channel', channel)
+    query = query.eq('source', channel.toLowerCase())
   }
 
   const { data, error } = await query
