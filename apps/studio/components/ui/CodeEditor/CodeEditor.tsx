@@ -1,6 +1,6 @@
 import Editor, { EditorProps, Monaco, OnChange, OnMount, useMonaco } from '@monaco-editor/react'
 import { merge, noop } from 'lodash'
-import { editor } from 'monaco-editor'
+import type { editor } from 'monaco-editor'
 import { MutableRefObject, useEffect, useRef, useState } from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
