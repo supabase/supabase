@@ -2281,7 +2281,7 @@ export interface LogDrainConfirmButtonSubmittedEvent {
     /**
      * Type of the destination confirmed
      */
-    destination: 'webhook' | 'datadog' | 'loki' | 'sentry'
+    destination: string
   }
   groups: TelemetryGroups
 }

@@ -199,10 +199,7 @@ export function LogDrains({
               if (selectedLogDrain && ref) {
                 deleteLogDrain({ token: selectedLogDrain.token, projectRef: ref })
                 track('log_drain_confirm_button_submitted', {
-                  destination: selectedLogDrain.type as Exclude<
-                    LogDrainType,
-                    'elastic' | 'postgres' | 'bigquery' | 'clickhouse' | 'axiom'
-                  >,
+                  destination: selectedLogDrain.type,
                 })
               }
             }}
