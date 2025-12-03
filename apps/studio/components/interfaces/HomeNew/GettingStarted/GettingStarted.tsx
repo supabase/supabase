@@ -142,10 +142,8 @@ export function GettingStarted({ steps, onStepClick, onDismiss }: GettingStarted
 
         <CardContent className="flex flex-1 flex-col gap-0 p-0 overflow-y-auto border-b-0">
           {showCongratulations ? (
-            <div className="relative w-full flex-1 min-h-[100px] shrink-0 overflow-hidden bg-200 flex flex-col">
-              <div className="flex-1" />
+            <div className="relative w-full flex-1 min-h-[100px] shrink-0 overflow-hidden bg-200 flex flex-col justify-end">
               <div className="p-10">
-                {/* <div className="flex flex-row items-center gap-4 mb-1"></div> */}
                 <div className="w-8 h-8 rounded-md bg-brand/10 flex items-center justify-center shrink-0 mb-4 -ml-0.5">
                   <Check size={16} strokeWidth={1.5} className="text-brand" />
                 </div>
