@@ -38,6 +38,8 @@ const FormSchema = z.object({
   note: z.string().optional(),
 })
 
+const formId = 'request-upgrade-form'
+
 interface RequestUpgradeToBillingOwnersProps {
   block?: boolean
   plan?: PlanRequest
@@ -138,7 +140,7 @@ export const RequestUpgradeToBillingOwners = ({
       </DialogTrigger>
       <DialogContent>
         <Form_Shadcn_ {...form}>
-          <form id="request-upgrade-form" onSubmit={form.handleSubmit(onSubmit)}>
+          <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
               <DialogTitle>{titleText}</DialogTitle>
               <DialogDescription>
@@ -209,7 +211,7 @@ export const RequestUpgradeToBillingOwners = ({
               <Button type="default" disabled={isSubmitting} onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button htmlType="submit" loading={isSubmitting}>
+              <Button htmlType="submit" form={formId} loading={isSubmitting}>
                 Submit request
               </Button>
             </DialogFooter>
