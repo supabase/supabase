@@ -85,10 +85,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const [showEnableRealtime, setShowEnableRealtime] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
   const [isAutofixViewSecurityModalOpen, setIsAutofixViewSecurityModalOpen] = useState(false)
-  const [
-    isExposedMaterializedViewDialogOpen,
-    setIsExposedMaterializedViewDialogOpen,
-  ] = useState(false)
+  const [isExposedMaterializedViewDialogOpen, setIsExposedMaterializedViewDialogOpen] =
+    useState(false)
 
   const snap = useTableEditorTableStateSnapshot()
   const showHeaderActions = snap.selectedRows.size === 0
@@ -471,7 +469,13 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   </p>
 
                   <div className="mt-2 flex items-center gap-2">
-                    <ExposedMaterializedViewDialog table={table} isExposedMaterializedViewDialogOpen={isExposedMaterializedViewDialogOpen} setIsExposedMaterializedViewDialogOpen={setIsExposedMaterializedViewDialogOpen} />
+                    <ExposedMaterializedViewDialog
+                      table={table}
+                      isExposedMaterializedViewDialogOpen={isExposedMaterializedViewDialogOpen}
+                      setIsExposedMaterializedViewDialogOpen={
+                        setIsExposedMaterializedViewDialogOpen
+                      }
+                    />
 
                     <Button type="default" asChild>
                       <Link

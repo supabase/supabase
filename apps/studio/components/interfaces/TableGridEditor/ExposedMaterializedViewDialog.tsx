@@ -1,5 +1,17 @@
 import { Entity } from 'data/table-editor/table-editor-types'
-import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogSection, DialogSectionSeparator, DialogTitle, DialogTrigger, ScrollArea, SimpleCodeBlock } from 'ui'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  DialogTrigger,
+  ScrollArea,
+  SimpleCodeBlock,
+} from 'ui'
 
 interface ExposedMaterializedViewDialogProps {
   table: Entity
@@ -13,9 +25,16 @@ export default function ExposedMaterializedViewDialog({
   setIsExposedMaterializedViewDialogOpen,
 }: ExposedMaterializedViewDialogProps) {
   return (
-    <Dialog open={isExposedMaterializedViewDialogOpen} onOpenChange={setIsExposedMaterializedViewDialogOpen}>
+    <Dialog
+      open={isExposedMaterializedViewDialogOpen}
+      onOpenChange={setIsExposedMaterializedViewDialogOpen}
+    >
       <DialogTrigger asChild>
-        <Button type="secondary" size="tiny" onClick={() => setIsExposedMaterializedViewDialogOpen(true)}>
+        <Button
+          type="secondary"
+          size="tiny"
+          onClick={() => setIsExposedMaterializedViewDialogOpen(true)}
+        >
           Check possible options
         </Button>
       </DialogTrigger>
@@ -30,10 +49,10 @@ export default function ExposedMaterializedViewDialog({
             <code>authenticated</code> mitigates the risk of exposing sensitive data to all users.
           </p>
           <p>
-            To protect your materialized view from unwanted access to its data, you can pick one of two
-            options:
+            To protect your materialized view from unwanted access to its data, you can pick one of
+            two options:
           </p>
-          
+
           <ul>
             <li>
               Put a function in front of it and apply a security rule equivalent to RLS in front of
