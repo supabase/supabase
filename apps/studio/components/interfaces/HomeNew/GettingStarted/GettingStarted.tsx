@@ -2,7 +2,7 @@ import { BASE_PATH } from 'lib/constants'
 import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Badge, Button, Card, CardContent, cn, IconDiscord } from 'ui'
 import { GettingStartedAction, GettingStartedStep } from './GettingStarted.types'
 
@@ -42,20 +42,18 @@ export interface GettingStartedProps {
 export function GettingStarted({ steps, onStepClick, onDismiss }: GettingStartedProps) {
   const allStepsComplete = steps.length > 0 && steps.every((step) => step.status === 'complete')
   const [activeStepKey, setActiveStepKey] = useState<string | null>(null)
-  const hasInitializedRef = useRef(false)
 
   useEffect(() => {
     if (steps.length === 0) {
       setActiveStepKey(null)
-      hasInitializedRef.current = true
       return
     }
 
     // Check if the current active step key is still valid in the new steps array
     const isActiveStepValid = activeStepKey && steps.some((step) => step.key === activeStepKey)
 
-    // If we haven't initialized yet, or the active step is no longer valid (e.g., after tab switch)
-    if (!hasInitializedRef.current || !isActiveStepValid) {
+    // If no step is selected or the active step is no longer valid (e.g., after tab switch)
+    if (!isActiveStepValid) {
       // If all steps are complete, don't select any step
       if (allStepsComplete) {
         setActiveStepKey(null)
@@ -64,7 +62,6 @@ export function GettingStarted({ steps, onStepClick, onDismiss }: GettingStarted
         const firstIncompleteStep = steps.find((step) => step.status !== 'complete')
         setActiveStepKey(firstIncompleteStep?.key ?? steps[0]?.key ?? null)
       }
-      hasInitializedRef.current = true
     }
   }, [steps, allStepsComplete, activeStepKey])
 
