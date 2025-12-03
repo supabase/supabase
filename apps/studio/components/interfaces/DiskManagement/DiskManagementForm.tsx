@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { MAX_WIDTH_CLASSES, PADDING_CLASSES, ScaffoldContainer } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
+import { RequestUpgradeToBillingOwners } from 'components/ui/RequestUpgradeToBillingOwners'
 import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import {
   useDiskAttributesQuery,
@@ -462,14 +463,21 @@ export function DiskManagementForm() {
                         title="Adjusting disk configuration requires LARGE Compute size or above"
                         description={`Increase your compute size to adjust your disk's storage type, ${form.getValues('storageType') === 'gp3' ? 'IOPS, ' : ''} and throughput`}
                         actions={
-                          <Button
-                            type="default"
-                            onClick={() => {
-                              form.setValue('computeSize', 'ci_large')
-                            }}
-                          >
-                            Change to LARGE Compute
-                          </Button>
+                          canUpdateDiskConfiguration ? (
+                            <Button
+                              type="default"
+                              onClick={() => {
+                                form.setValue('computeSize', 'ci_large')
+                              }}
+                            >
+                              Change to LARGE Compute
+                            </Button>
+                          ) : (
+                            <RequestUpgradeToBillingOwners
+                              addon="computeSize"
+                              featureProposition="adjust disk configuration"
+                            />
+                          )
                         }
                       />
                       <StorageTypeField
