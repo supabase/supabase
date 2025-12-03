@@ -11,6 +11,7 @@ import {
   Badge,
   cn,
 } from 'ui'
+import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 
 interface FilterPopoverProps {
   allProductAreas: string[]
@@ -20,8 +21,18 @@ interface FilterPopoverProps {
 
 export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPopoverProps) {
   const [open, setOpen] = useState(false)
-  const [productArea, setProductArea] = useQueryState('product_area', parseAsString)
-  const [stack, setStack] = useQueryState('stack', parseAsString)
+  const [productArea, setProductArea] = useQueryState(
+    'product_area',
+    parseAsString.withOptions({
+      shallow: false,
+    })
+  )
+  const [stack, setStack] = useQueryState(
+    'stack',
+    parseAsString.withOptions({
+      shallow: false,
+    })
+  )
 
   function handleProductAreaClick(area: string) {
     if (productArea === area) {
@@ -51,32 +62,25 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
         <div className="p-4">
           {/* Header */}
           <div className="flex flex-row items-center justify-between pb-4">
-            <h3 className="text-sm font-semibold text-foreground">Filter Threads</h3>
+            <h3 className="text-sm text-foreground">Filter Threads</h3>
             <div className="flex items-center gap-2">
               {(productArea || stack) && (
-                <button
-                  type="button"
+                <Button
+                  type="outline"
                   onClick={handleClearAll}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  iconRight={<X className="h-4 w-4" />}
                 >
                   Clear all
-                </button>
+                </Button>
               )}
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="Close"
-              >
-                <X className="h-4 w-4" />
-              </button>
             </div>
           </div>
+          <PopoverSeparator />
 
-          <div className="grid gap-8 pb-4">
+          <div className="grid gap-8 pb-4 mt-4">
             {/* Product Area Section */}
             <div className="grid gap-3">
-              <h3 className="text-sm font-semibold text-muted-foreground">Product Area</h3>
+              <h3 className="text-sm  text-muted-foreground">Product Area</h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                 {allProductAreas.map((area) => {
                   const isSelected = productArea === area
@@ -86,14 +90,17 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
                       type="button"
                       onClick={() => handleProductAreaClick(area)}
                       className={cn(
-                        'flex items-center gap-2 px-3 py-2 rounded-sm text-sm text-foreground transition-colors',
+                        'flex items-center gap-1.5 px-2 py-1 rounded-md text-sm text-foreground transition-colors',
                         isSelected
                           ? 'bg-brand-200 text-brand-foreground border border-brand-300'
                           : 'bg-surface-200 hover:bg-surface-300'
                       )}
                     >
                       <Check
-                        className={cn('h-4 w-4 shrink-0', isSelected ? 'opacity-100' : 'opacity-0')}
+                        className={cn(
+                          'h-3.5 w-3.5 shrink-0',
+                          isSelected ? 'opacity-100' : 'opacity-0'
+                        )}
                       />
                       <span className="text-left">{area}</span>
                     </button>
@@ -104,7 +111,7 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
 
             {/* Tech Stack Section */}
             <div className="grid gap-3">
-              <h3 className="text-sm font-semibold text-muted-foreground">Tech Stack</h3>
+              <h3 className="text-sm  text-muted-foreground">Tech Stack</h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                 {allStacks.map((tech) => {
                   const isSelected = stack === tech
@@ -114,14 +121,17 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
                       type="button"
                       onClick={() => handleStackClick(tech)}
                       className={cn(
-                        'flex items-center gap-2 px-3 py-2 rounded-sm text-sm text-foreground transition-colors',
+                        'flex items-center gap-1.5 px-2 py-1 rounded-md text-sm text-foreground transition-colors',
                         isSelected
                           ? 'bg-brand-200 text-brand-foreground border border-brand-300'
                           : 'bg-surface-200 hover:bg-surface-300'
                       )}
                     >
                       <Check
-                        className={cn('h-4 w-4 shrink-0', isSelected ? 'opacity-100' : 'opacity-0')}
+                        className={cn(
+                          'h-3.5 w-3.5 shrink-0',
+                          isSelected ? 'opacity-100' : 'opacity-0'
+                        )}
                       />
                       <span className="text-left">{tech}</span>
                     </button>

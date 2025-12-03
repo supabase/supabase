@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useQueryState, parseAsString } from 'nuqs'
+import { useRouter } from 'next/navigation'
 import { Clock, MessageCircle, Github, Search, Filter, List, BotMessageSquare } from 'lucide-react'
 import { Badge, Button, Input_Shadcn_, cn } from 'ui'
 import { Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
@@ -135,7 +136,13 @@ export function UnansweredThreadsTable({
   allStacks: string[]
 }) {
   const [search, setSearch] = useState('')
-  const [channel, setChannel] = useQueryState('channel', parseAsString.withDefault('all'))
+
+  const [channel, setChannel] = useQueryState(
+    'channel',
+    parseAsString.withDefault('all').withOptions({
+      shallow: false, // notify server, re-render RSC tree
+    })
+  )
   const [productArea] = useQueryState('product_area', parseAsString)
   const [stack] = useQueryState('stack', parseAsString)
 
@@ -144,12 +151,14 @@ export function UnansweredThreadsTable({
     validTabs.includes(channel as any) ? channel : 'all'
   ) as (typeof validTabs)[number]
 
-  function handleTabChange(value: string) {
+  async function handleTabChange(value: string) {
     if (value === 'all') {
-      setChannel(null)
+      await setChannel(null)
     } else {
-      setChannel(value)
+      await setChannel(value)
     }
+    // Trigger server re-fetch by refreshing the router
+    //router.refresh()
   }
 
   const filteredThreads = useMemo(() => {
