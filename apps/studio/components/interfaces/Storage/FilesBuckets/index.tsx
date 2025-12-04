@@ -1,12 +1,13 @@
+import { useDebounce } from '@uidotdev/usehooks'
 import { ArrowDownNarrowWide, Search } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { useBucketsQuery } from 'data/storage/buckets-query'
+import { usePaginatedBucketsQuery } from 'data/storage/buckets-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { parseAsBoolean, useQueryState } from 'nuqs'
@@ -33,7 +34,13 @@ import { BucketsTable } from './BucketsTable'
 export const FilesBuckets = () => {
   const { ref } = useParams()
   const snap = useStorageExplorerStateSnapshot()
+
   const [filterString, setFilterString] = useState('')
+  const debouncedFilterString = useDebounce(filterString, 250)
+  const normalizedSearch = debouncedFilterString.trim()
+
+  const sortColumn = snap.sortBucket === STORAGE_BUCKET_SORT.ALPHABETICAL ? 'name' : 'created_at'
+  const sortOrder = snap.sortBucket === STORAGE_BUCKET_SORT.ALPHABETICAL ? 'asc' : 'desc'
 
   const [visible, setVisible] = useQueryState(
     'new',
@@ -42,36 +49,34 @@ export const FilesBuckets = () => {
 
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const {
-    data: buckets = [],
+    data: bucketsData,
     error: bucketsError,
     isError: isErrorBuckets,
     isLoading: isLoadingBuckets,
     isSuccess: isSuccessBuckets,
-  } = useBucketsQuery({ projectRef: ref })
+    isFetching: isFetchingBuckets,
+    fetchNextPage,
+    hasNextPage,
+  } = usePaginatedBucketsQuery({
+    projectRef: ref,
+    search: normalizedSearch.length > 0 ? normalizedSearch : undefined,
+    sortColumn,
+    sortOrder,
+  })
+  const buckets = useMemo(() => bucketsData?.pages.flatMap((page) => page) ?? [], [bucketsData])
+  const fileBuckets = buckets.filter((bucket) => !('type' in bucket) || bucket.type === 'STANDARD')
+  const hasNoBuckets = fileBuckets.length === 0 && normalizedSearch.length === 0
 
   const formattedGlobalUploadLimit = formatBytes(data?.fileSizeLimit ?? 0)
 
-  const filesBuckets = buckets
-    .filter((bucket) => !('type' in bucket) || bucket.type === 'STANDARD')
-    .filter((bucket) =>
-      filterString.length === 0
-        ? true
-        : bucket.id.toLowerCase().includes(filterString.toLowerCase())
-    )
-  const hasNoBuckets =
-    buckets.filter((bucket) => !('type' in bucket) || bucket.type === 'STANDARD').length === 0
   const hasNoApiKeys =
     isErrorBuckets && bucketsError.message.includes('Project has no active API keys')
 
-  const sortedFilesBuckets = useMemo(
-    () =>
-      snap.sortBucket === 'alphabetical'
-        ? filesBuckets.sort((a, b) =>
-            a.id.toLowerCase().trim().localeCompare(b.id.toLowerCase().trim())
-          )
-        : filesBuckets.sort((a, b) => (new Date(b.created_at) > new Date(a.created_at) ? 1 : -1)),
-    [filesBuckets, snap.sortBucket]
-  )
+  const handleLoadMoreBuckets = useCallback(() => {
+    if (hasNextPage && !isFetchingBuckets) {
+      fetchNextPage()
+    }
+  }, [hasNextPage, isFetchingBuckets, fetchNextPage])
 
   return (
     <>
@@ -138,10 +143,15 @@ export const FilesBuckets = () => {
 
                     <Card>
                       <BucketsTable
-                        buckets={sortedFilesBuckets}
+                        buckets={fileBuckets}
                         projectRef={ref ?? '_'}
                         filterString={filterString}
                         formattedGlobalUploadLimit={formattedGlobalUploadLimit}
+                        pagination={{
+                          hasMore: hasNextPage,
+                          isLoadingMore: isFetchingBuckets,
+                          onLoadMore: handleLoadMoreBuckets,
+                        }}
                       />
                     </Card>
                   </>
