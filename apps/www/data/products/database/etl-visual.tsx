@@ -1,3 +1,5 @@
+import { ComponentProps } from 'react'
+
 export const ETLVisual = (props: ComponentProps<'svg'>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
