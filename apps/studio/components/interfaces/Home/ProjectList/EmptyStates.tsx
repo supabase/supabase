@@ -131,7 +131,7 @@ export const NoProjectsState = ({ slug }: { slug: string }) => {
     <EmptyStatePresentational
       icon={BoxPlus}
       title="Create a project"
-      description="Launch a complete backend platform built on Postgres."
+      description="Launch a complete backend built on Postgres."
     >
       {projectCreationEnabled && (
         <Button size="tiny" type="default" asChild icon={<Plus />}>
@@ -142,20 +142,19 @@ export const NoProjectsState = ({ slug }: { slug: string }) => {
   )
 }
 
-export const NoOrganizationsState = () => {
+export const NoOrganizationsState = ({
+  buttonType = 'primary',
+}: {
+  buttonType?: 'primary' | 'default'
+}) => {
   return (
-    <div className="col-span-4 space-y-4 rounded-lg border border-dashed border-muted p-6 text-center">
-      <div className="space-y-1">
-        <p>You are not part of any organizations yet</p>
-        <p className="text-sm text-foreground-light">
-          Create your first organization to get started with Supabase
-        </p>
-      </div>
-      <div>
-        <Button asChild icon={<Plus />}>
-          <Link href="/new">New organization</Link>
-        </Button>
-      </div>
-    </div>
+    <EmptyStatePresentational
+      title="Create an organization"
+      description="Manage your team and projects in one place."
+    >
+      <Button size="tiny" type={buttonType} asChild icon={<Plus />}>
+        <Link href="/new">New organization</Link>
+      </Button>
+    </EmptyStatePresentational>
   )
 }
