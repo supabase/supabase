@@ -182,6 +182,8 @@
     "@vitest/coverage-v8": "^3.2.0",
     "@vitest/ui": "^3.2.0",
     "api-types": "workspace:*",
+    "autoevals": "^0.0.131",
+    "braintrust": "^0.4.10",
     "common": "workspace:*",
     "config": "workspace:*",
     "date-fns": "^2.30.0",
