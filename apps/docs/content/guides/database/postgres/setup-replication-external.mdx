@@ -23,7 +23,7 @@ CREATE PUBLICATION example_pub;
 select pg_create_logical_replication_slot('example_slot', 'pgoutput');
 ```
 
-3. Now we will connect to our **external database** and subscribe to our `publication`
+3. Now connect to your **external database** and subscribe to the `publication`
 
 <Admonition type="caution">
 
