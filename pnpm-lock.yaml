@@ -6,24 +6,6 @@ settings:
 
 catalogs:
   default:
-    '@sentry/nextjs':
-      specifier: ^10.26.0
-      version: 10.27.0
-    '@supabase/auth-js':
-      specifier: 2.86.0
-      version: 2.86.0
-    '@supabase/postgrest-js':
-      specifier: 2.86.0
-      version: 2.86.0
-    '@supabase/realtime-js':
-      specifier: 2.86.0
-      version: 2.86.0
-    '@supabase/supabase-js':
-      specifier: 2.86.0
-      version: 2.86.0
-    '@types/node':
-      specifier: ^22.0.0
-      version: 22.13.14
     '@types/react':
       specifier: ^18.3.0
       version: 18.3.3
@@ -51,15 +33,6 @@ catalogs:
     typescript:
       specifier: ~5.9.0
       version: 5.9.2
-    valtio:
-      specifier: ^1.12.0
-      version: 1.12.0
-    vite:
-      specifier: ^7.1.11
-      version: 7.1.11
-    vitest:
-      specifier: ^3.2.0
-      version: 3.2.4
     zod:
       specifier: ^3.25.76
       version: 3.25.76
@@ -239,7 +212,7 @@ importers:
         version: 3.3.1(react-hook-form@7.47.0(react@18.3.1))
       contentlayer2:
         specifier: 0.4.6
-        version: 0.4.6(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1)
+        version: 0.4.6(esbuild@0.25.2)(markdown-wasm@1.2.0)
       date-fns:
         specifier: ^2.30.0
         version: 2.30.0
@@ -263,10 +236,10 @@ importers:
         version: 1.2.0
       next:
         specifier: 'catalog:'
-        version: 15.5.7(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
+        version: 15.5.7(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
       next-contentlayer2:
         specifier: 0.4.6
-        version: 0.4.6(contentlayer2@0.4.6(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.25.2)(markdown-wasm@1.2.0)(next@15.5.7(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@8.1.1)
+        version: 0.4.6(contentlayer2@0.4.6(esbuild@0.25.2)(markdown-wasm@1.2.0))(esbuild@0.25.2)(markdown-wasm@1.2.0)(next@15.5.7(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-themes:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -281,7 +254,7 @@ importers:
         version: 9.11.1(react@18.3.1)
       react-docgen:
         specifier: ^7.0.3
-        version: 7.0.3(supports-color@8.1.1)
+        version: 7.0.3
       react-dom:
         specifier: 'catalog:'
         version: 18.3.1(react@18.3.1)
@@ -308,13 +281,13 @@ importers:
         version: 6.0.0
       remark:
         specifier: ^14.0.3
-        version: 14.0.3(supports-color@8.1.1)
+        version: 14.0.3
       remark-code-import:
         specifier: ^1.2.0
         version: 1.2.0
       remark-gfm:
         specifier: ^4.0.0
-        version: 4.0.0(supports-color@8.1.1)
+        version: 4.0.0
       sonner:
         specifier: ^1.5.0
         version: 1.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -420,7 +393,7 @@ importers:
         version: 1.0.3(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@sentry/nextjs':
         specifier: 'catalog:'
-        version: 10.27.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.7(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
+        version: 10.27.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.86.0
@@ -1605,7 +1578,7 @@ importers:
         version: 1.0.5(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@sentry/nextjs':
         specifier: 'catalog:'
-        version: 10.27.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.7(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
+        version: 10.27.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.86.0
@@ -2449,6 +2422,9 @@ importers:
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.52.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-slot':
+        specifier: ^1.2.4
+        version: 1.2.4(@types/react@18.3.3)(react@18.3.1)
       '@radix-ui/react-visually-hidden':
         specifier: ^1.1.3
         version: 1.2.3(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2508,7 +2484,7 @@ importers:
         version: 0.52.2
       next:
         specifier: 'catalog:'
-        version: 15.5.7(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
+        version: 16.0.7(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
       next-themes:
         specifier: '*'
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2620,7 +2596,7 @@ importers:
         version: link:../api-types
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)
+        version: 0.9.13(next@16.0.7(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)
       tsx:
         specifier: 'catalog:'
         version: 4.20.3
@@ -7332,6 +7308,15 @@ packages:
 
   '@radix-ui/react-slot@1.2.3':
     resolution: {integrity: sha512-aeNmHnBxbi2St0au6VBVC7JXFlhLlOnvIIlePNniyUNAClzmtAUEY8/pBiK3iHjufOlwA+c20/8jngo7xcrg8A==}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
+  '@radix-ui/react-slot@1.2.4':
+    resolution: {integrity: sha512-Jl+bCv8HxKnlTLVrcDE8zTMJ09R9/ukw4qBs/oZClOfoQk/cOTbDn+NceXfV7j09YPVQUryJPHurafcSg6EVKA==}
     peerDependencies:
       '@types/react': '*'
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
@@ -20492,6 +20477,26 @@ snapshots:
 
   '@babel/compat-data@7.28.4': {}
 
+  '@babel/core@7.28.4':
+    dependencies:
+      '@babel/code-frame': 7.27.1
+      '@babel/generator': 7.28.3
+      '@babel/helper-compilation-targets': 7.27.2
+      '@babel/helper-module-transforms': 7.28.3(@babel/core@7.28.4)
+      '@babel/helpers': 7.28.4
+      '@babel/parser': 7.28.4
+      '@babel/template': 7.27.2
+      '@babel/traverse': 7.28.4
+      '@babel/types': 7.28.4
+      '@jridgewell/remapping': 2.3.5
+      convert-source-map: 2.0.0
+      debug: 4.4.3
+      gensync: 1.0.0-beta.2
+      json5: 2.2.3
+      semver: 6.3.1
+    transitivePeerDependencies:
+      - supports-color
+
   '@babel/core@7.28.4(supports-color@8.1.1)':
     dependencies:
       '@babel/code-frame': 7.27.1
@@ -20575,6 +20580,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@babel/helper-module-imports@7.27.1':
+    dependencies:
+      '@babel/traverse': 7.28.4
+      '@babel/types': 7.28.4
+    transitivePeerDependencies:
+      - supports-color
+
   '@babel/helper-module-imports@7.27.1(supports-color@8.1.1)':
     dependencies:
       '@babel/traverse': 7.28.4(supports-color@8.1.1)
@@ -20588,6 +20600,15 @@ snapshots:
       '@babel/helper-module-imports': 7.27.1(supports-color@8.1.1)
       '@babel/helper-validator-identifier': 7.27.1
       '@babel/traverse': 7.28.4(supports-color@8.1.1)
+    transitivePeerDependencies:
+      - supports-color
+
+  '@babel/helper-module-transforms@7.28.3(@babel/core@7.28.4)':
+    dependencies:
+      '@babel/core': 7.28.4
+      '@babel/helper-module-imports': 7.27.1
+      '@babel/helper-validator-identifier': 7.27.1
+      '@babel/traverse': 7.28.4
     transitivePeerDependencies:
       - supports-color
 
@@ -20745,6 +20766,21 @@ snapshots:
       '@babel/parser': 7.28.4
       '@babel/types': 7.28.4
 
+  '@babel/traverse@7.24.7':
+    dependencies:
+      '@babel/code-frame': 7.27.1
+      '@babel/generator': 7.28.3
+      '@babel/helper-environment-visitor': 7.24.7
+      '@babel/helper-function-name': 7.24.7
+      '@babel/helper-hoist-variables': 7.24.7
+      '@babel/helper-split-export-declaration': 7.24.7
+      '@babel/parser': 7.28.4
+      '@babel/types': 7.28.4
+      debug: 4.4.3
+      globals: 11.12.0
+    transitivePeerDependencies:
+      - supports-color
+
   '@babel/traverse@7.24.7(supports-color@8.1.1)':
     dependencies:
       '@babel/code-frame': 7.27.1
@@ -20769,6 +20805,18 @@ snapshots:
       '@babel/types': 7.28.4
       debug: 4.4.3(supports-color@8.1.1)
       globals: 11.12.0
+    transitivePeerDependencies:
+      - supports-color
+
+  '@babel/traverse@7.28.4':
+    dependencies:
+      '@babel/code-frame': 7.27.1
+      '@babel/generator': 7.28.3
+      '@babel/helper-globals': 7.28.0
+      '@babel/parser': 7.28.4
+      '@babel/template': 7.27.2
+      '@babel/types': 7.28.4
+      debug: 4.4.3
     transitivePeerDependencies:
       - supports-color
 
@@ -20950,12 +20998,33 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       react-is: 17.0.2
 
+  '@contentlayer2/cli@0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)':
+    dependencies:
+      '@contentlayer2/core': 0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)
+      '@contentlayer2/utils': 0.4.3
+      clipanion: 3.2.1(typanion@3.14.0)
+      typanion: 3.14.0
+    transitivePeerDependencies:
+      - '@effect-ts/otel-node'
+      - esbuild
+      - markdown-wasm
+      - supports-color
+
   '@contentlayer2/cli@0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1)':
     dependencies:
       '@contentlayer2/core': 0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1)
       '@contentlayer2/utils': 0.4.3
       clipanion: 3.2.1(typanion@3.14.0)
       typanion: 3.14.0
+    transitivePeerDependencies:
+      - '@effect-ts/otel-node'
+      - esbuild
+      - markdown-wasm
+      - supports-color
+
+  '@contentlayer2/client@0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)':
+    dependencies:
+      '@contentlayer2/core': 0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)
     transitivePeerDependencies:
       - '@effect-ts/otel-node'
       - esbuild
@@ -20969,6 +21038,27 @@ snapshots:
       - '@effect-ts/otel-node'
       - esbuild
       - markdown-wasm
+      - supports-color
+
+  '@contentlayer2/core@0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)':
+    dependencies:
+      '@contentlayer2/utils': 0.4.3
+      camel-case: 4.1.2
+      comment-json: 4.2.3
+      gray-matter: 4.0.3
+      mdx-bundler: 10.0.2(esbuild@0.25.2)
+      rehype-stringify: 10.0.0
+      remark-frontmatter: 5.0.0
+      remark-parse: 11.0.0
+      remark-rehype: 11.1.1
+      source-map-support: 0.5.21
+      type-fest: 4.30.0
+      unified: 11.0.5
+    optionalDependencies:
+      esbuild: 0.25.2
+      markdown-wasm: 1.2.0
+    transitivePeerDependencies:
+      - '@effect-ts/otel-node'
       - supports-color
 
   '@contentlayer2/core@0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1)':
@@ -20992,6 +21082,25 @@ snapshots:
       - '@effect-ts/otel-node'
       - supports-color
 
+  '@contentlayer2/source-files@0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)':
+    dependencies:
+      '@contentlayer2/core': 0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)
+      '@contentlayer2/utils': 0.4.3
+      chokidar: 3.6.0
+      fast-glob: 3.3.3
+      gray-matter: 4.0.3
+      imagescript: 1.3.0
+      micromatch: 4.0.8
+      ts-pattern: 5.1.1
+      unified: 11.0.5
+      yaml: 2.8.1
+      zod: 3.25.76
+    transitivePeerDependencies:
+      - '@effect-ts/otel-node'
+      - esbuild
+      - markdown-wasm
+      - supports-color
+
   '@contentlayer2/source-files@0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1)':
     dependencies:
       '@contentlayer2/core': 0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1)
@@ -21005,6 +21114,17 @@ snapshots:
       unified: 11.0.5
       yaml: 2.8.1
       zod: 3.25.76
+    transitivePeerDependencies:
+      - '@effect-ts/otel-node'
+      - esbuild
+      - markdown-wasm
+      - supports-color
+
+  '@contentlayer2/source-remote-files@0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)':
+    dependencies:
+      '@contentlayer2/core': 0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)
+      '@contentlayer2/source-files': 0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)
+      '@contentlayer2/utils': 0.4.3
     transitivePeerDependencies:
       - '@effect-ts/otel-node'
       - esbuild
@@ -21291,6 +21411,16 @@ snapshots:
     dependencies:
       '@esbuild-kit/core-utils': 3.3.2
       get-tsconfig: 4.10.0
+
+  '@esbuild-plugins/node-resolve@0.2.2(esbuild@0.25.2)':
+    dependencies:
+      '@types/resolve': 1.20.6
+      debug: 4.4.3
+      esbuild: 0.25.2
+      escape-string-regexp: 4.0.0
+      resolve: 1.22.10
+    transitivePeerDependencies:
+      - supports-color
 
   '@esbuild-plugins/node-resolve@0.2.2(esbuild@0.25.2)(supports-color@8.1.1)':
     dependencies:
@@ -22739,6 +22869,16 @@ snapshots:
 
   '@marijn/find-cluster-break@1.0.2': {}
 
+  '@mdx-js/esbuild@3.0.1(esbuild@0.25.2)':
+    dependencies:
+      '@mdx-js/mdx': 3.0.1
+      '@types/unist': 3.0.3
+      esbuild: 0.25.2
+      vfile: 6.0.3
+      vfile-message: 4.0.2
+    transitivePeerDependencies:
+      - supports-color
+
   '@mdx-js/esbuild@3.0.1(esbuild@0.25.2)(supports-color@8.1.1)':
     dependencies:
       '@mdx-js/mdx': 3.0.1(supports-color@8.1.1)
@@ -22776,6 +22916,34 @@ snapshots:
       unist-util-stringify-position: 3.0.3
       unist-util-visit: 4.1.2
       vfile: 5.3.7
+    transitivePeerDependencies:
+      - supports-color
+
+  '@mdx-js/mdx@3.0.1':
+    dependencies:
+      '@types/estree': 1.0.5
+      '@types/estree-jsx': 1.0.1
+      '@types/hast': 3.0.4
+      '@types/mdx': 2.0.10
+      collapse-white-space: 2.1.0
+      devlop: 1.1.0
+      estree-util-build-jsx: 3.0.1
+      estree-util-is-identifier-name: 3.0.0
+      estree-util-to-js: 2.0.0
+      estree-walker: 3.0.3
+      hast-util-to-estree: 3.1.3
+      hast-util-to-jsx-runtime: 2.3.6
+      markdown-extensions: 2.0.0
+      periscopic: 3.1.0
+      remark-mdx: 3.0.1
+      remark-parse: 11.0.0
+      remark-rehype: 11.1.1
+      source-map: 0.7.6
+      unified: 11.0.5
+      unist-util-position-from-estree: 2.0.0
+      unist-util-stringify-position: 4.0.0
+      unist-util-visit: 5.0.0
+      vfile: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
@@ -25856,6 +26024,13 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.3
 
+  '@radix-ui/react-slot@1.2.4(@types/react@18.3.3)(react@18.3.1)':
+    dependencies:
+      '@radix-ui/react-compose-refs': 1.1.2(@types/react@18.3.3)(react@18.3.1)
+      react: 18.3.1
+    optionalDependencies:
+      '@types/react': 18.3.3
+
   '@radix-ui/react-switch@1.0.3(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.26.10
@@ -26783,7 +26958,7 @@ snapshots:
 
   '@sentry/core@10.27.0': {}
 
-  '@sentry/nextjs@10.27.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.7(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)':
+  '@sentry/nextjs@10.27.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.38.0
@@ -30389,6 +30564,20 @@ snapshots:
 
   content-type@1.0.5: {}
 
+  contentlayer2@0.4.6(esbuild@0.25.2)(markdown-wasm@1.2.0):
+    dependencies:
+      '@contentlayer2/cli': 0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)
+      '@contentlayer2/client': 0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)
+      '@contentlayer2/core': 0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)
+      '@contentlayer2/source-files': 0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)
+      '@contentlayer2/source-remote-files': 0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)
+      '@contentlayer2/utils': 0.4.3
+    transitivePeerDependencies:
+      - '@effect-ts/otel-node'
+      - esbuild
+      - markdown-wasm
+      - supports-color
+
   contentlayer2@0.4.6(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1):
     dependencies:
       '@contentlayer2/cli': 0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1)
@@ -30932,6 +31121,10 @@ snapshots:
       ms: 2.1.3
     optionalDependencies:
       supports-color: 8.1.1
+
+  debug@4.4.3:
+    dependencies:
+      ms: 2.1.3
 
   debug@4.4.3(supports-color@8.1.1):
     dependencies:
@@ -32866,6 +33059,27 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  hast-util-to-estree@3.1.3:
+    dependencies:
+      '@types/estree': 1.0.5
+      '@types/estree-jsx': 1.0.1
+      '@types/hast': 3.0.4
+      comma-separated-tokens: 2.0.3
+      devlop: 1.1.0
+      estree-util-attach-comments: 3.0.0
+      estree-util-is-identifier-name: 3.0.0
+      hast-util-whitespace: 3.0.0
+      mdast-util-mdx-expression: 2.0.0
+      mdast-util-mdx-jsx: 3.1.3
+      mdast-util-mdxjs-esm: 2.0.1
+      property-information: 7.0.0
+      space-separated-tokens: 2.0.2
+      style-to-js: 1.1.16
+      unist-util-position: 5.0.0
+      zwitch: 2.0.4
+    transitivePeerDependencies:
+      - supports-color
+
   hast-util-to-estree@3.1.3(supports-color@8.1.1):
     dependencies:
       '@types/estree': 1.0.5
@@ -32931,6 +33145,26 @@ snapshots:
       property-information: 6.3.0
       space-separated-tokens: 2.0.2
       style-to-object: 1.0.6
+      unist-util-position: 5.0.0
+      vfile-message: 4.0.2
+    transitivePeerDependencies:
+      - supports-color
+
+  hast-util-to-jsx-runtime@2.3.6:
+    dependencies:
+      '@types/estree': 1.0.5
+      '@types/hast': 3.0.4
+      '@types/unist': 3.0.3
+      comma-separated-tokens: 2.0.3
+      devlop: 1.1.0
+      estree-util-is-identifier-name: 3.0.0
+      hast-util-whitespace: 3.0.0
+      mdast-util-mdx-expression: 2.0.0
+      mdast-util-mdx-jsx: 3.1.3
+      mdast-util-mdxjs-esm: 2.0.1
+      property-information: 7.0.0
+      space-separated-tokens: 2.0.2
+      style-to-js: 1.1.16
       unist-util-position: 5.0.0
       vfile-message: 4.0.2
     transitivePeerDependencies:
@@ -34324,6 +34558,23 @@ snapshots:
       unist-util-is: 6.0.0
       unist-util-visit-parents: 6.0.1
 
+  mdast-util-from-markdown@1.3.1:
+    dependencies:
+      '@types/mdast': 3.0.15
+      '@types/unist': 2.0.8
+      decode-named-character-reference: 1.0.2
+      mdast-util-to-string: 3.2.0
+      micromark: 3.2.0
+      micromark-util-decode-numeric-character-reference: 1.1.0
+      micromark-util-decode-string: 1.1.0
+      micromark-util-normalize-identifier: 1.1.0
+      micromark-util-symbol: 1.1.0
+      micromark-util-types: 1.1.0
+      unist-util-stringify-position: 3.0.3
+      uvu: 0.5.6
+    transitivePeerDependencies:
+      - supports-color
+
   mdast-util-from-markdown@1.3.1(supports-color@8.1.1):
     dependencies:
       '@types/mdast': 3.0.15
@@ -34358,6 +34609,23 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  mdast-util-from-markdown@2.0.2:
+    dependencies:
+      '@types/mdast': 4.0.4
+      '@types/unist': 3.0.3
+      decode-named-character-reference: 1.0.2
+      devlop: 1.1.0
+      mdast-util-to-string: 4.0.0
+      micromark: 4.0.0
+      micromark-util-decode-numeric-character-reference: 2.0.1
+      micromark-util-decode-string: 2.0.0
+      micromark-util-normalize-identifier: 2.0.0
+      micromark-util-symbol: 2.0.1
+      micromark-util-types: 2.0.0
+      unist-util-stringify-position: 4.0.0
+    transitivePeerDependencies:
+      - supports-color
+
   mdast-util-from-markdown@2.0.2(supports-color@8.1.1):
     dependencies:
       '@types/mdast': 4.0.4
@@ -34372,6 +34640,17 @@ snapshots:
       micromark-util-symbol: 2.0.1
       micromark-util-types: 2.0.0
       unist-util-stringify-position: 4.0.0
+    transitivePeerDependencies:
+      - supports-color
+
+  mdast-util-frontmatter@2.0.1:
+    dependencies:
+      '@types/mdast': 4.0.4
+      devlop: 1.1.0
+      escape-string-regexp: 5.0.0
+      mdast-util-from-markdown: 2.0.2
+      mdast-util-to-markdown: 2.1.0
+      micromark-extension-frontmatter: 2.0.0
     transitivePeerDependencies:
       - supports-color
 
@@ -34407,6 +34686,16 @@ snapshots:
       mdast-util-to-markdown: 1.5.0
       micromark-util-normalize-identifier: 1.1.0
 
+  mdast-util-gfm-footnote@2.0.0:
+    dependencies:
+      '@types/mdast': 4.0.4
+      devlop: 1.1.0
+      mdast-util-from-markdown: 2.0.2
+      mdast-util-to-markdown: 2.1.0
+      micromark-util-normalize-identifier: 2.0.0
+    transitivePeerDependencies:
+      - supports-color
+
   mdast-util-gfm-footnote@2.0.0(supports-color@8.1.1):
     dependencies:
       '@types/mdast': 4.0.4
@@ -34421,6 +34710,14 @@ snapshots:
     dependencies:
       '@types/mdast': 3.0.15
       mdast-util-to-markdown: 1.5.0
+
+  mdast-util-gfm-strikethrough@2.0.0:
+    dependencies:
+      '@types/mdast': 4.0.4
+      mdast-util-from-markdown: 2.0.2
+      mdast-util-to-markdown: 2.1.0
+    transitivePeerDependencies:
+      - supports-color
 
   mdast-util-gfm-strikethrough@2.0.0(supports-color@8.1.1):
     dependencies:
@@ -34439,6 +34736,16 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  mdast-util-gfm-table@2.0.0:
+    dependencies:
+      '@types/mdast': 4.0.4
+      devlop: 1.1.0
+      markdown-table: 3.0.3
+      mdast-util-from-markdown: 2.0.2
+      mdast-util-to-markdown: 2.1.0
+    transitivePeerDependencies:
+      - supports-color
+
   mdast-util-gfm-table@2.0.0(supports-color@8.1.1):
     dependencies:
       '@types/mdast': 4.0.4
@@ -34453,6 +34760,15 @@ snapshots:
     dependencies:
       '@types/mdast': 3.0.15
       mdast-util-to-markdown: 1.5.0
+
+  mdast-util-gfm-task-list-item@2.0.0:
+    dependencies:
+      '@types/mdast': 4.0.4
+      devlop: 1.1.0
+      mdast-util-from-markdown: 2.0.2
+      mdast-util-to-markdown: 2.1.0
+    transitivePeerDependencies:
+      - supports-color
 
   mdast-util-gfm-task-list-item@2.0.0(supports-color@8.1.1):
     dependencies:
@@ -34472,6 +34788,18 @@ snapshots:
       mdast-util-gfm-table: 1.0.7(supports-color@8.1.1)
       mdast-util-gfm-task-list-item: 1.0.2
       mdast-util-to-markdown: 1.5.0
+    transitivePeerDependencies:
+      - supports-color
+
+  mdast-util-gfm@3.0.0:
+    dependencies:
+      mdast-util-from-markdown: 2.0.2
+      mdast-util-gfm-autolink-literal: 2.0.0
+      mdast-util-gfm-footnote: 2.0.0
+      mdast-util-gfm-strikethrough: 2.0.0
+      mdast-util-gfm-table: 2.0.0
+      mdast-util-gfm-task-list-item: 2.0.0
+      mdast-util-to-markdown: 2.1.0
     transitivePeerDependencies:
       - supports-color
 
@@ -34509,6 +34837,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  mdast-util-mdx-expression@2.0.0:
+    dependencies:
+      '@types/estree-jsx': 1.0.1
+      '@types/hast': 3.0.4
+      '@types/mdast': 4.0.4
+      devlop: 1.1.0
+      mdast-util-from-markdown: 2.0.2
+      mdast-util-to-markdown: 2.1.0
+    transitivePeerDependencies:
+      - supports-color
+
   mdast-util-mdx-expression@2.0.0(supports-color@8.1.1):
     dependencies:
       '@types/estree-jsx': 1.0.1
@@ -34534,6 +34873,23 @@ snapshots:
       unist-util-remove-position: 4.0.2
       unist-util-stringify-position: 3.0.3
       vfile-message: 3.1.4
+    transitivePeerDependencies:
+      - supports-color
+
+  mdast-util-mdx-jsx@3.1.3:
+    dependencies:
+      '@types/estree-jsx': 1.0.1
+      '@types/hast': 3.0.4
+      '@types/mdast': 4.0.4
+      '@types/unist': 3.0.3
+      ccount: 2.0.1
+      devlop: 1.1.0
+      mdast-util-from-markdown: 2.0.2
+      mdast-util-to-markdown: 2.1.0
+      parse-entities: 4.0.1
+      stringify-entities: 4.0.3
+      unist-util-stringify-position: 4.0.0
+      vfile-message: 4.0.2
     transitivePeerDependencies:
       - supports-color
 
@@ -34564,6 +34920,16 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  mdast-util-mdx@3.0.0:
+    dependencies:
+      mdast-util-from-markdown: 2.0.2
+      mdast-util-mdx-expression: 2.0.0
+      mdast-util-mdx-jsx: 3.1.3
+      mdast-util-mdxjs-esm: 2.0.1
+      mdast-util-to-markdown: 2.1.0
+    transitivePeerDependencies:
+      - supports-color
+
   mdast-util-mdx@3.0.0(supports-color@8.1.1):
     dependencies:
       mdast-util-from-markdown: 2.0.2(supports-color@8.1.1)
@@ -34581,6 +34947,17 @@ snapshots:
       '@types/mdast': 3.0.15
       mdast-util-from-markdown: 1.3.1(supports-color@8.1.1)
       mdast-util-to-markdown: 1.5.0
+    transitivePeerDependencies:
+      - supports-color
+
+  mdast-util-mdxjs-esm@2.0.1:
+    dependencies:
+      '@types/estree-jsx': 1.0.1
+      '@types/hast': 3.0.4
+      '@types/mdast': 4.0.4
+      devlop: 1.1.0
+      mdast-util-from-markdown: 2.0.2
+      mdast-util-to-markdown: 2.1.0
     transitivePeerDependencies:
       - supports-color
 
@@ -34679,6 +35056,21 @@ snapshots:
   mdurl@1.0.1: {}
 
   mdurl@2.0.0: {}
+
+  mdx-bundler@10.0.2(esbuild@0.25.2):
+    dependencies:
+      '@babel/runtime': 7.26.10
+      '@esbuild-plugins/node-resolve': 0.2.2(esbuild@0.25.2)
+      '@fal-works/esbuild-plugin-global-externals': 2.1.2
+      '@mdx-js/esbuild': 3.0.1(esbuild@0.25.2)
+      esbuild: 0.25.2
+      gray-matter: 4.0.3
+      remark-frontmatter: 5.0.0
+      remark-mdx-frontmatter: 4.0.0
+      uuid: 9.0.1
+      vfile: 6.0.3
+    transitivePeerDependencies:
+      - supports-color
 
   mdx-bundler@10.0.2(esbuild@0.25.2)(supports-color@8.1.1):
     dependencies:
@@ -35282,6 +35674,28 @@ snapshots:
 
   micromark-util-types@2.0.0: {}
 
+  micromark@3.2.0:
+    dependencies:
+      '@types/debug': 4.1.9
+      debug: 4.4.3
+      decode-named-character-reference: 1.0.2
+      micromark-core-commonmark: 1.1.0
+      micromark-factory-space: 1.1.0
+      micromark-util-character: 1.2.0
+      micromark-util-chunked: 1.1.0
+      micromark-util-combine-extensions: 1.1.0
+      micromark-util-decode-numeric-character-reference: 1.1.0
+      micromark-util-encode: 1.1.0
+      micromark-util-normalize-identifier: 1.1.0
+      micromark-util-resolve-all: 1.1.0
+      micromark-util-sanitize-uri: 1.2.0
+      micromark-util-subtokenize: 1.1.0
+      micromark-util-symbol: 1.1.0
+      micromark-util-types: 1.1.0
+      uvu: 0.5.6
+    transitivePeerDependencies:
+      - supports-color
+
   micromark@3.2.0(supports-color@8.1.1):
     dependencies:
       '@types/debug': 4.1.9
@@ -35301,6 +35715,28 @@ snapshots:
       micromark-util-symbol: 1.1.0
       micromark-util-types: 1.1.0
       uvu: 0.5.6
+    transitivePeerDependencies:
+      - supports-color
+
+  micromark@4.0.0:
+    dependencies:
+      '@types/debug': 4.1.9
+      debug: 4.4.3
+      decode-named-character-reference: 1.0.2
+      devlop: 1.1.0
+      micromark-core-commonmark: 2.0.1
+      micromark-factory-space: 2.0.0
+      micromark-util-character: 2.0.1
+      micromark-util-chunked: 2.0.0
+      micromark-util-combine-extensions: 2.0.0
+      micromark-util-decode-numeric-character-reference: 2.0.1
+      micromark-util-encode: 2.0.1
+      micromark-util-normalize-identifier: 2.0.0
+      micromark-util-resolve-all: 2.0.0
+      micromark-util-sanitize-uri: 2.0.1
+      micromark-util-subtokenize: 2.0.1
+      micromark-util-symbol: 2.0.1
+      micromark-util-types: 2.0.0
     transitivePeerDependencies:
       - supports-color
 
@@ -35595,6 +36031,20 @@ snapshots:
       - markdown-wasm
       - supports-color
 
+  next-contentlayer2@0.4.6(contentlayer2@0.4.6(esbuild@0.25.2)(markdown-wasm@1.2.0))(esbuild@0.25.2)(markdown-wasm@1.2.0)(next@15.5.7(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      '@contentlayer2/core': 0.4.3(esbuild@0.25.2)(markdown-wasm@1.2.0)
+      '@contentlayer2/utils': 0.4.3
+      contentlayer2: 0.4.6(esbuild@0.25.2)(markdown-wasm@1.2.0)
+      next: 15.5.7(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+    transitivePeerDependencies:
+      - '@effect-ts/otel-node'
+      - esbuild
+      - markdown-wasm
+      - supports-color
+
   next-mdx-remote@4.4.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@8.1.1):
     dependencies:
       '@mdx-js/mdx': 2.3.0(supports-color@8.1.1)
@@ -35609,11 +36059,6 @@ snapshots:
   next-plugin-yaml@1.0.1:
     dependencies:
       js-yaml-loader: 1.2.2
-
-  next-router-mock@0.9.13(next@15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1):
-    dependencies:
-      next: 15.5.7(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
-      react: 18.3.1
 
   next-router-mock@0.9.13(next@16.0.7(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1):
     dependencies:
@@ -35642,6 +36087,24 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       styled-jsx: 5.1.6(@babel/core@7.28.4(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(react@18.3.1)
+    optionalDependencies:
+      '@opentelemetry/api': 1.9.0
+      '@playwright/test': 1.56.1
+      sass: 1.77.4
+      sharp: 0.34.5
+    transitivePeerDependencies:
+      - '@babel/core'
+      - babel-plugin-macros
+
+  next@15.5.7(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4):
+    dependencies:
+      '@next/env': 15.5.7
+      '@swc/helpers': 0.5.15
+      caniuse-lite: 1.0.30001743
+      postcss: 8.4.31
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      styled-jsx: 5.1.6(@babel/core@7.28.4)(react@18.3.1)
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
       '@playwright/test': 1.56.1
@@ -37435,6 +37898,21 @@ snapshots:
       '@types/node': 22.13.14
       '@types/react': 18.3.3
 
+  react-docgen@7.0.3:
+    dependencies:
+      '@babel/core': 7.28.4
+      '@babel/traverse': 7.24.7
+      '@babel/types': 7.24.7
+      '@types/babel__core': 7.20.2
+      '@types/babel__traverse': 7.20.2
+      '@types/doctrine': 0.0.9
+      '@types/resolve': 1.20.6
+      doctrine: 3.0.0
+      resolve: 1.22.8
+      strip-indent: 4.0.0
+    transitivePeerDependencies:
+      - supports-color
+
   react-docgen@7.0.3(supports-color@8.1.1):
     dependencies:
       '@babel/core': 7.28.4(supports-color@8.1.1)
@@ -38052,6 +38530,15 @@ snapshots:
       mdast-util-find-and-replace: 2.2.2
       node-emoji: 1.11.0
 
+  remark-frontmatter@5.0.0:
+    dependencies:
+      '@types/mdast': 4.0.4
+      mdast-util-frontmatter: 2.0.1
+      micromark-extension-frontmatter: 2.0.0
+      unified: 11.0.5
+    transitivePeerDependencies:
+      - supports-color
+
   remark-frontmatter@5.0.0(supports-color@8.1.1):
     dependencies:
       '@types/mdast': 4.0.4
@@ -38067,6 +38554,17 @@ snapshots:
       mdast-util-gfm: 2.0.2(supports-color@8.1.1)
       micromark-extension-gfm: 2.0.3
       unified: 10.1.2
+    transitivePeerDependencies:
+      - supports-color
+
+  remark-gfm@4.0.0:
+    dependencies:
+      '@types/mdast': 4.0.4
+      mdast-util-gfm: 3.0.0
+      micromark-extension-gfm: 3.0.0
+      remark-parse: 11.0.0
+      remark-stringify: 11.0.0
+      unified: 11.0.5
     transitivePeerDependencies:
       - supports-color
 
@@ -38125,10 +38623,25 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  remark-mdx@3.0.1:
+    dependencies:
+      mdast-util-mdx: 3.0.0
+      micromark-extension-mdxjs: 3.0.0
+    transitivePeerDependencies:
+      - supports-color
+
   remark-mdx@3.0.1(supports-color@8.1.1):
     dependencies:
       mdast-util-mdx: 3.0.0(supports-color@8.1.1)
       micromark-extension-mdxjs: 3.0.0
+    transitivePeerDependencies:
+      - supports-color
+
+  remark-parse@10.0.2:
+    dependencies:
+      '@types/mdast': 3.0.15
+      mdast-util-from-markdown: 1.3.1
+      unified: 10.1.2
     transitivePeerDependencies:
       - supports-color
 
@@ -38137,6 +38650,15 @@ snapshots:
       '@types/mdast': 3.0.15
       mdast-util-from-markdown: 1.3.1(supports-color@8.1.1)
       unified: 10.1.2
+    transitivePeerDependencies:
+      - supports-color
+
+  remark-parse@11.0.0:
+    dependencies:
+      '@types/mdast': 4.0.4
+      mdast-util-from-markdown: 2.0.2
+      micromark-util-types: 2.0.0
+      unified: 11.0.5
     transitivePeerDependencies:
       - supports-color
 
@@ -38175,6 +38697,15 @@ snapshots:
       '@types/mdast': 4.0.4
       mdast-util-to-markdown: 2.1.0
       unified: 11.0.5
+
+  remark@14.0.3:
+    dependencies:
+      '@types/mdast': 3.0.15
+      remark-parse: 10.0.2
+      remark-stringify: 10.0.3
+      unified: 10.1.2
+    transitivePeerDependencies:
+      - supports-color
 
   remark@14.0.3(supports-color@8.1.1):
     dependencies:
@@ -39320,6 +39851,13 @@ snapshots:
     optionalDependencies:
       '@babel/core': 7.28.4(supports-color@8.1.1)
       babel-plugin-macros: 3.1.0
+
+  styled-jsx@5.1.6(@babel/core@7.28.4)(react@18.3.1):
+    dependencies:
+      client-only: 0.0.1
+      react: 18.3.1
+    optionalDependencies:
+      '@babel/core': 7.28.4
 
   stylehacks@7.0.6(postcss@8.5.6):
     dependencies:

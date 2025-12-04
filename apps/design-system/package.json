@@ -19,8 +19,8 @@
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
     "contentlayer2": "0.4.6",
-    "dayjs": "1.11.13",
     "date-fns": "^2.30.0",
+    "dayjs": "1.11.13",
     "eslint-config-supabase": "workspace:*",
     "icons": "workspace:*",
     "jotai": "^2.8.0",
