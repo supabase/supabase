@@ -31,6 +31,9 @@ export const env = {
   BRANCH_NAME: process.env.BRANCH_NAME || `e2e-test-local`,
 
   AUTHENTICATION: Boolean(process.env.EMAIL && process.env.PASSWORD),
+
+  IS_APP_RUNNING_ON_LOCALHOST:
+    process.env.STUDIO_URL?.includes('localhost') || process.env.STUDIO_URL?.includes('127.0.0.1'),
 }
 
 export const STORAGE_STATE_PATH = path.join(import.meta.dirname, './playwright/.auth/user.json')

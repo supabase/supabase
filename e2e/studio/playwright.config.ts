@@ -2,22 +2,35 @@ import { defineConfig } from '@playwright/test'
 import { env, STORAGE_STATE_PATH } from './env.config.js'
 
 const IS_CI = !!process.env.CI
-const IS_PLATFORM = env.IS_PLATFORM
 
 const WEB_SERVER_TIMEOUT = Number(process.env.WEB_SERVER_TIMEOUT) || 10 * 60 * 1000
 const WEB_SERVER_PORT = Number(process.env.WEB_SERVER_PORT) || 8082
 
-const webServer = !IS_PLATFORM
-  ? {
-      command: 'pnpm --workspace-root run e2e:setup:selfhosted',
+// 15 minutes for platform, 2 minutes for self-hosted. Takes longer to setup a full project on platform.
+const setupTimeout = env.IS_PLATFORM ? 15 * 60 * 1000 : 120 * 1000
+
+const createWebServerConfig = () => {
+  if (env.IS_PLATFORM && env.IS_APP_RUNNING_ON_LOCALHOST) {
+    return {
+      command: 'pnpm --workspace-root run e2e:setup:platform',
       port: WEB_SERVER_PORT,
       timeout: WEB_SERVER_TIMEOUT,
       reuseExistingServer: true,
     }
-  : undefined
+  }
 
-// 15 minutes for platform, 2 minutes for self-hosted. Takes longer to setup a full project on platform.
-const setupTimeout = IS_PLATFORM ? 15 * 60 * 1000 : 120 * 1000
+  // Apps running on runner using the vercel staging environment
+  if (env.IS_PLATFORM && !env.IS_APP_RUNNING_ON_LOCALHOST) {
+    return undefined
+  }
+
+  return {
+    command: 'pnpm --workspace-root run e2e:setup:selfhosted',
+    port: WEB_SERVER_PORT,
+    timeout: WEB_SERVER_TIMEOUT,
+    reuseExistingServer: true,
+  }
+}
 
 export default defineConfig({
   timeout: 120 * 1000,
@@ -66,5 +79,5 @@ export default defineConfig({
     ['html', { open: 'never' }],
     ['json', { outputFile: 'test-results/test-results.json' }],
   ],
-  webServer,
+  webServer: createWebServerConfig(),
 })
