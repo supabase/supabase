@@ -15,7 +15,7 @@ const toBoolean = (value?: string) => {
 
 export const env = {
   STUDIO_URL: process.env.STUDIO_URL || 'http://localhost:8082',
-  API_URL: process.env.API_URL || 'https://api.supabase.green',
+  API_URL: process.env.API_URL || 'https://localhost:8080',
 
   IS_PLATFORM: toBoolean(process.env.IS_PLATFORM || 'false'),
   EMAIL: process.env.EMAIL,
