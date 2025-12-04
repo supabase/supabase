@@ -127,6 +127,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/project/:ref/auth/advanced',
+        destination: '/project/:ref/auth/performance',
+        permanent: true,
+      },
+      {
         source: '/project/:ref/database',
         destination: '/project/:ref/database/tables',
         permanent: true,

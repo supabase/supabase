@@ -6,7 +6,7 @@ subtitle: 'Set up replication with Airbyte, Estuary, Fivetran, and other tools.'
 sidebar_label: 'Setting up'
 ---
 
-This guide covers setting up **manual replication** using external tools. If you prefer a simpler, managed solution, see [Replication](/docs/guides/database/replication/replication-setup) instead.
+This guide covers setting up **manual logical replication** using external tools. If you prefer a simpler, managed solution, read [the Replication setup docs](/docs/guides/database/replication/replication-setup) instead.
 
 <Admonition type="note">
 
@@ -89,6 +89,21 @@ You can follow those steps with the following modifications:
 
 1. Use the `postgres` user for replication
 2. Skip step 3
+
+</TabPanel>
+
+<TabPanel id="dms" label="AWS DMS">
+
+AWS DMS has the following [documentation](https://docs.aws.amazon.com/dms/latest/userguide/Welcome.html) on configuring Postgres as a source.
+
+DMS is notably useful if you have infrastructure running in AWS and/or you have custom networking. An additional benefit is that DMS is able to replicate schema changes.
+
+You can follow those steps with the following modifications:
+
+1. Use the `postgres` user for replication (or create a new user with replication permissions: `ALTER USER <user> WITH REPLICATION;`)
+2. Set `pluginname` to `test-decoding`
+3. Depending on your databases the pre-assessment may fail. It is not required.
+4. Increase `wal_sender_timeout` and other settings (`max_wal_size`) using the [Supabase CLI](/docs/guides/platform/custom-postgres-config)
 
 </TabPanel>
 

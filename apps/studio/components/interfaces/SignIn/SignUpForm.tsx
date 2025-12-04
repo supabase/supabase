@@ -222,7 +222,7 @@ export const SignUpForm = () => {
               disabled={password.length === 0 || isSubmitting}
               loading={isSubmitting}
             >
-              Sign Up
+              Sign up
             </Button>
           </form>
         </Form_Shadcn_>

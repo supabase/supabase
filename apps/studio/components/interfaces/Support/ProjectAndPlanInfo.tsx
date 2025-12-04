@@ -62,6 +62,7 @@ export function ProjectAndPlanInfo({
       {showPlanExpectationInfo &&
         orgSlug &&
         subscriptionPlanId !== 'enterprise' &&
+        subscriptionPlanId !== 'platform' &&
         category !== 'Login_issues' && (
           <PlanExpectationInfoBox orgSlug={orgSlug} planId={subscriptionPlanId} />
         )}
