@@ -415,15 +415,6 @@ export const MfaAuthSettingsForm = () => {
             >
               <Card>
                 <CardContent className="pt-6">
-                  {promptProPlanUpgrade && (
-                    <div className="mb-4">
-                      <UpgradeToPro
-                        primaryText="Upgrade to Pro"
-                        secondaryText="Advanced MFA requires the Pro Plan"
-                      />
-                    </div>
-                  )}
-
                   <FormField_Shadcn_
                     control={phoneForm.control}
                     name="MFA_PHONE"
@@ -510,6 +501,14 @@ export const MfaAuthSettingsForm = () => {
                     )}
                   />
                 </CardContent>
+
+                {promptProPlanUpgrade && (
+                  <UpgradeToPro
+                    fullWidth
+                    primaryText="Configuring Advanced MFA is only available on the Pro plan and above"
+                    secondaryText="Upgrade to the Pro plan to configure Advanced MFA settings"
+                  />
+                )}
 
                 <CardFooter className="justify-end space-x-2">
                   {phoneForm.formState.isDirty && (

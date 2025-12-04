@@ -197,7 +197,8 @@
         "NOTION_SUPASQUAD_APPLICATIONS_DB_ID",
         "CUSTOMERIO_SITE_ID",
         "CUSTOMERIO_API_KEY",
-        "CUSTOMERIO_APP_API_KEY"
+        "CUSTOMERIO_APP_API_KEY",
+        "NEXT_RUNTIME"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
@@ -220,7 +221,9 @@
         "NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID",
         "NEXT_PUBLIC_GOTRUE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-        "NEXT_PUBLIC_USERCENTRICS_RULESET_ID"
+        "NEXT_PUBLIC_USERCENTRICS_RULESET_ID",
+        "SUPABASE_MANAGEMENT_API_TOKEN",
+        "OPENAI_API_KEY"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },

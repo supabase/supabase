@@ -54,7 +54,7 @@ where h.x_real_ip is not null
     for: ['api'],
   },
   {
-    label: 'Requests by Country',
+    label: 'Requests by Geography',
     description: 'List all ISO 3166-1 alpha-2 country codes that used the Supabase API',
     mode: 'custom',
     searchString: `select
