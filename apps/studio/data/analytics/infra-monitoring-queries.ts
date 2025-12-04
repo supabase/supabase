@@ -4,12 +4,27 @@ import type { UseQueryResult } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 
 import type { AnalyticsData, AnalyticsInterval } from './constants'
-import type { InfraMonitoringAttribute } from './infra-monitoring-query'
+import type {
+  InfraMonitoringAttribute,
+  InfraMonitoringMultiResponse,
+  InfraMonitoringSingleResponse,
+} from './infra-monitoring-query'
 import {
   InfraMonitoringMultiData,
   InfraMonitoringError,
   useInfraMonitoringAttributesQuery,
 } from './infra-monitoring-query'
+
+// TODO(raulb): Remove isMultiResponse type guard once API always returns multi-attribute format.
+/**
+ * Type guard to check if response is the multi-attribute format.
+ * Multi-format has `series` property, single-format has metadata directly on response.
+ */
+function isMultiResponse(
+  response: InfraMonitoringMultiData
+): response is InfraMonitoringMultiResponse {
+  return 'series' in response
+}
 
 const DEFAULT_DATE_FORMAT = 'HH:mm DD MMM'
 
@@ -45,7 +60,7 @@ export function useInfraMonitoringQueries(
 
   const seriesByAttribute = useMemo(() => {
     if (!query.data) return undefined
-    return mapMultiResponseToAnalyticsData(query.data, attributes)
+    return mapResponseToAnalyticsData(query.data, attributes)
   }, [query.data, attributes])
 
   if (!hasAttributes) {
@@ -62,31 +77,62 @@ export function useInfraMonitoringQueries(
   }))
 }
 
-export function mapMultiResponseToAnalyticsData(
+export function mapResponseToAnalyticsData(
   response: InfraMonitoringMultiData,
   attributes: InfraMonitoringAttribute[],
   dateFormat: string = DEFAULT_DATE_FORMAT
-) {
-  return attributes.reduce<Record<string, AnalyticsData>>((acc, attribute) => {
-    const metadata = response.series?.[attribute]
-    if (!metadata) return acc
+): Record<string, AnalyticsData> {
+  // Handle multi-attribute response format
+  if (isMultiResponse(response)) {
+    return attributes.reduce<Record<string, AnalyticsData>>((acc, attribute) => {
+      const metadata = response.series?.[attribute]
+      if (!metadata) return acc
 
-    const dataPoints = response.data.map((point) => {
-      const value = point.values?.[attribute]
-      return {
-        period_start: point.period_start,
-        periodStartFormatted: dayjs(point.period_start).format(dateFormat),
-        [attribute]: value === undefined ? 0 : Number(value),
+      const dataPoints = response.data.map((point) => {
+        const value = point.values?.[attribute]
+        return {
+          period_start: point.period_start,
+          periodStartFormatted: dayjs(point.period_start).format(dateFormat),
+          [attribute]: value === undefined ? 0 : Number(value),
+        }
+      })
+
+      acc[attribute] = {
+        data: dataPoints,
+        format: metadata.format,
+        total: metadata.total,
+        yAxisLimit: metadata.yAxisLimit,
       }
-    })
 
-    acc[attribute] = {
-      data: dataPoints,
-      format: metadata.format,
-      total: metadata.total,
-      yAxisLimit: metadata.yAxisLimit,
+      return acc
+    }, {})
+  }
+
+  // TODO(raulb): Remove single-attribute response handling once API always returns multi-attribute format.
+  // Handle single-attribute response format
+  // API returns this format when only 1 attribute is requested
+  const singleResponse = response as InfraMonitoringSingleResponse
+  const attribute = attributes[0]
+  if (!attribute) return {}
+
+  const dataPoints = singleResponse.data.map((point) => {
+    const value = point[attribute]
+    return {
+      period_start: point.period_start,
+      periodStartFormatted: dayjs(point.period_start).format(dateFormat),
+      [attribute]: value === undefined ? 0 : Number(value),
     }
+  })
 
-    return acc
-  }, {})
+  return {
+    [attribute]: {
+      data: dataPoints,
+      format: singleResponse.format,
+      total: singleResponse.total,
+      yAxisLimit: singleResponse.yAxisLimit,
+    },
+  }
 }
+
+/** @deprecated Use mapResponseToAnalyticsData instead */
+export const mapMultiResponseToAnalyticsData = mapResponseToAnalyticsData

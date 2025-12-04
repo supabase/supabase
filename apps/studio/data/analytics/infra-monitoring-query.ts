@@ -31,6 +31,16 @@ export type InfraMonitoringSeriesMetadata = {
   totalAverage: number
 }
 
+// TODO(raulb): Remove InfraMonitoringSingleResponse once API always returns multi-attribute format.
+// Single-attribute response shape (when API receives 1 attribute)
+export type InfraMonitoringSingleResponse = InfraMonitoringSeriesMetadata & {
+  data: {
+    period_start: string
+    [attribute: string]: string | undefined
+  }[]
+}
+
+// Multi-attribute response shape (when API receives 2+ attributes)
 export type InfraMonitoringMultiResponse = {
   data: {
     period_start: string
@@ -38,6 +48,10 @@ export type InfraMonitoringMultiResponse = {
   }[]
   series: Record<string, InfraMonitoringSeriesMetadata>
 }
+
+// TODO(raulb): Simplify to just InfraMonitoringMultiResponse once API always returns multi-attribute format.
+// API returns different shapes based on attribute count
+export type InfraMonitoringResponse = InfraMonitoringSingleResponse | InfraMonitoringMultiResponse
 
 export type InfraMonitoringMultiVariables = {
   projectRef?: string
@@ -80,7 +94,7 @@ export async function getInfraMonitoringAttributes(
   })
 
   if (error) handleError(error)
-  return data as unknown as InfraMonitoringMultiResponse
+  return data as unknown as InfraMonitoringResponse
 }
 
 export type InfraMonitoringError = unknown

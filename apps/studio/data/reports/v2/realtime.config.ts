@@ -1,4 +1,5 @@
 import type { AnalyticsData, AnalyticsInterval } from 'data/analytics/constants'
+import { mapResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
 import {
   getInfraMonitoringAttributes,
   InfraMonitoringAttribute,
@@ -22,22 +23,16 @@ async function runInfraMonitoringQuery(
     databaseIdentifier,
   })
 
-  // TODO(raulb): This is inefficient. Each report makes a separate API call for one attribute.
-  // Could be optimized by batching multiple attributes into fewer requests like InfrastructureActivity.tsx does.
-  // This transforms multi-attribute response to single-attribute format.
-  const data = response.data.map((item) => ({
-    period_start: item.period_start,
-    [attribute]: item.values[attribute],
-  }))
-
-  const seriesMetadata = response.series[attribute]
+  // Use shared mapping function that handles both single and multi-attribute response formats
+  const mapped = mapResponseToAnalyticsData(response, [attribute])
+  const analyticsData = mapped[attribute]
 
   return {
-    data,
-    format: seriesMetadata?.format,
-    yAxisLimit: seriesMetadata?.yAxisLimit,
-    total: seriesMetadata?.total,
-    totalGrouped: { [attribute]: seriesMetadata?.total },
+    data: analyticsData?.data ?? [],
+    format: analyticsData?.format,
+    yAxisLimit: analyticsData?.yAxisLimit,
+    total: analyticsData?.total,
+    totalGrouped: { [attribute]: analyticsData?.total },
   } as AnalyticsData
 }
 

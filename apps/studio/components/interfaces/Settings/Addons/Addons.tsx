@@ -25,6 +25,7 @@ import {
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { mapResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
 import { useInfraMonitoringAttributesQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
@@ -90,9 +91,12 @@ export const Addons = () => {
     endDate,
   })
   const mostRecentRemainingIOBudget = useMemo(() => {
-    if (!ioBudgetData?.data?.length) return undefined
-    const lastPoint = ioBudgetData.data[ioBudgetData.data.length - 1]
-    return { disk_io_budget: lastPoint.values?.disk_io_budget }
+    if (!ioBudgetData) return undefined
+    const mapped = mapResponseToAnalyticsData(ioBudgetData, ['disk_io_budget'])
+    const data = mapped['disk_io_budget']?.data
+    if (!data?.length) return undefined
+    const lastPoint = data[data.length - 1]
+    return { disk_io_budget: lastPoint?.disk_io_budget }
   }, [ioBudgetData])
 
   const {
