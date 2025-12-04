@@ -50,7 +50,7 @@ instances:
 - Use `labels_mapper` to rename high-cardinality labels into shorter Datadog tag keys.
 - If you monitor multiple projects, duplicate the instance block with a unique `namespace` and tag each project (`tags: ["supabase_project:<ref>"]`).
 
-## Option B: Prometheus remote write into Datadog
+## Option B: Prometheus remote write into datadog
 
 If you already run [Prometheus](https://prometheus.io/docs/prometheus/latest/installation/) (self-hosted or managed), push scraped metrics into Datadog using the [Prometheus Remote Write integration](https://docs.datadoghq.com/integrations/guide/prometheus_remote_write/):
 
