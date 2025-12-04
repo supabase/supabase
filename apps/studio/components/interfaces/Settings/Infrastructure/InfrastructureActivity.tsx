@@ -23,7 +23,11 @@ import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DataPoint } from 'data/analytics/constants'
-import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
+import {
+  InfraMonitoringAttribute,
+  useInfraMonitoringAttributesQuery,
+} from 'data/analytics/infra-monitoring-query'
+import { mapMultiResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
@@ -43,6 +47,12 @@ const NON_DEDICATED_IO_RESOURCES = [
   'ci_large',
   'ci_xlarge',
   'ci_2xlarge',
+]
+
+const INFRA_ATTRIBUTES: InfraMonitoringAttribute[] = [
+  'max_cpu_usage',
+  'ram_usage',
+  'disk_io_consumption',
 ]
 
 export const InfrastructureActivity = () => {
@@ -143,35 +153,24 @@ export const InfrastructureActivity = () => {
     }
   }
 
-  const { data: cpuUsageData, isLoading: isLoadingCpuUsageData } = useInfraMonitoringQuery({
-    projectRef,
-    attribute: 'max_cpu_usage',
-    interval,
-    startDate,
-    endDate,
-    dateFormat,
-    databaseIdentifier: state.selectedDatabaseId,
-  })
+  const { data: infraMonitoringData, isLoading: isLoadingInfraData } =
+    useInfraMonitoringAttributesQuery({
+      projectRef,
+      attributes: INFRA_ATTRIBUTES,
+      interval,
+      startDate,
+      endDate,
+      databaseIdentifier: state.selectedDatabaseId,
+    })
 
-  const { data: memoryUsageData, isLoading: isLoadingMemoryUsageData } = useInfraMonitoringQuery({
-    projectRef,
-    attribute: 'ram_usage',
-    interval,
-    startDate,
-    endDate,
-    dateFormat,
-    databaseIdentifier: state.selectedDatabaseId,
-  })
+  const transformedData = useMemo(() => {
+    if (!infraMonitoringData) return undefined
+    return mapMultiResponseToAnalyticsData(infraMonitoringData, INFRA_ATTRIBUTES, dateFormat)
+  }, [infraMonitoringData, dateFormat])
 
-  const { data: ioBudgetData, isLoading: isLoadingIoBudgetData } = useInfraMonitoringQuery({
-    projectRef,
-    attribute: 'disk_io_consumption',
-    interval,
-    startDate,
-    endDate,
-    dateFormat,
-    databaseIdentifier: state.selectedDatabaseId,
-  })
+  const cpuUsageData = transformedData?.max_cpu_usage
+  const memoryUsageData = transformedData?.ram_usage
+  const ioBudgetData = transformedData?.disk_io_consumption
 
   const hasLatest = dayjs(endDate!).isAfter(dayjs().startOf('day'))
 
@@ -186,15 +185,15 @@ export const InfrastructureActivity = () => {
 
   const chartMeta: { [key: string]: { data: DataPoint[]; isLoading: boolean } } = {
     max_cpu_usage: {
-      isLoading: isLoadingCpuUsageData,
+      isLoading: isLoadingInfraData,
       data: cpuUsageData?.data ?? [],
     },
     ram_usage: {
-      isLoading: isLoadingMemoryUsageData,
+      isLoading: isLoadingInfraData,
       data: memoryUsageData?.data ?? [],
     },
     disk_io_consumption: {
-      isLoading: isLoadingIoBudgetData,
+      isLoading: isLoadingInfraData,
       data: ioBudgetData?.data ?? [],
     },
   }

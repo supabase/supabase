@@ -17,7 +17,7 @@ import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
@@ -27,6 +27,7 @@ import { projectKeys } from 'data/projects/keys'
 import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -60,7 +61,6 @@ import {
   estimateDiskCost,
   estimateRestoreTime,
 } from './BranchManagement.utils'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 export const CreateBranchModal = () => {
   const { ref } = useParams()
@@ -268,14 +268,14 @@ export const CreateBranchModal = () => {
         <Form_Shadcn_ {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
             {promptPlanUpgrade && (
-              <>
-                <UpgradeToPro
-                  primaryText="Upgrade to unlock branching"
-                  secondaryText="Create and test schema changes, functions, and more in a separate, temporary instance without affecting production"
-                  source="create-branch"
-                />
-                <DialogSectionSeparator />
-              </>
+              <UpgradeToPro
+                fullWidth
+                layout="vertical"
+                source="create-branch"
+                featureProposition="enable branching"
+                primaryText="Upgrade to unlock branching"
+                secondaryText="Create and test schema changes, functions, and more in a separate, temporary instance without affecting production"
+              />
             )}
 
             <DialogSection

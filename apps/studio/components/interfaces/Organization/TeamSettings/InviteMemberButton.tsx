@@ -311,7 +311,11 @@ export const InviteMemberButton = () => {
                         </Link>
                       </Button>
                       {(currentPlan?.id === 'free' || currentPlan?.id === 'pro') && (
-                        <UpgradePlanButton source="inviteMemberSSO" plan="Team" />
+                        <UpgradePlanButton
+                          plan="Team"
+                          source="inviteMemberSSO"
+                          featureProposition="enable Single Sign-on (SSO)"
+                        />
                       )}
                     </div>
                   </div>
