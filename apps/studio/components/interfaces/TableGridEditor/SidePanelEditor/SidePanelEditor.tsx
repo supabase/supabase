@@ -23,8 +23,7 @@ import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-muta
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { tableKeys } from 'data/tables/keys'
 import { RetrieveTableResult } from 'data/tables/table-retrieve-query'
-import { getTables, useTablesQuery } from 'data/tables/tables-query'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { getTables } from 'data/tables/tables-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
@@ -134,14 +133,19 @@ export const SidePanelEditor = ({
   const snap = useTableEditorStateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
-  const { selectedSchema } = useQuerySchemaState()
 
+  const track = useTrack()
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
-  const track = useTrack()
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
+
+  const { data: publications } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
     checkIsDirty: () => isEdited,
@@ -167,15 +171,6 @@ export const SidePanelEditor = ({
       toast.success('Successfully updated row')
     },
   })
-  const { data: publications } = useDatabasePublicationsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const { data: allTables } = useTablesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    includeColumns: true,
-  })
   const { mutateAsync: createPublication } = useDatabasePublicationCreateMutation()
   const { mutateAsync: updatePublication } = useDatabasePublicationUpdateMutation({
     onError: () => {},
@@ -183,8 +178,6 @@ export const SidePanelEditor = ({
   const { mutateAsync: createPolicy } = useDatabasePolicyCreateMutation({
     onError: () => {}, // Errors handled inline
   })
-
-  const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const isDuplicating = snap.sidePanel?.type === 'table' && snap.sidePanel.mode === 'duplicate'
 
@@ -486,13 +479,18 @@ export const SidePanelEditor = ({
     }
   }
 
-  const saveTable = async (params: SaveTableParams) => {
-    // action and payload are not destructured here to preserve type
-    // narrowing later on
-    const { configuration, columns, foreignKeyRelations, resolve, generatedPolicies = [] } = params
-
+  const saveTable = async ({
+    action,
+    payload,
+    configuration,
+    columns,
+    foreignKeyRelations,
+    generatedPolicies = [],
+    resolve,
+  }: SaveTableParams) => {
     let toastId
     let saveTableError = false
+
     const {
       importContent,
       isRLSEnabled,
@@ -503,52 +501,24 @@ export const SidePanelEditor = ({
     } = configuration
 
     try {
-      if (params.action === 'create') {
-        toastId = toast.loading(`Creating new table: ${params.payload.name}...`)
+      if (action === 'create') {
+        toastId = toast.loading(`Creating new table: ${payload.name}...`)
 
         const table = await createTable({
           projectRef: project?.ref!,
           connectionString: project?.connectionString,
           toastId,
-          payload: params.payload,
+          payload,
           columns,
           foreignKeyRelations,
           isRLSEnabled,
           importContent,
           organizationSlug: org?.slug,
-          hasGeneratedPolicies: generatedPolicies.length > 0 && isRLSEnabled,
+          generatedPolicies,
+          onCreatePoliciesSuccess: () => track('rls_generated_policies_created'),
         })
+
         if (isRealtimeEnabled) await updateTableRealtime(table, true)
-
-        // Create generated policies after table creation
-        if (generatedPolicies.length > 0 && isRLSEnabled && project?.ref) {
-          await Promise.all(
-            generatedPolicies.map(async (policy) => {
-              try {
-                await createPolicy({
-                  projectRef: project.ref,
-                  connectionString: project.connectionString,
-                  payload: {
-                    name: policy.name,
-                    table: policy.table,
-                    schema: policy.schema,
-                    definition: policy.definition,
-                    check: policy.check,
-                    action: policy.action,
-                    command: policy.command,
-                    roles: policy.roles,
-                  },
-                })
-              } catch (error: any) {
-                // Continue to show table creation success even if policy creation fails
-                console.error(`Failed to create policy "${policy.name}":`, error)
-              }
-            })
-          )
-
-          // Track successful policy creation
-          track('rls_generated_policies_created')
-        }
 
         // Invalidate queries for table creation
         await Promise.all([
@@ -563,21 +533,16 @@ export const SidePanelEditor = ({
         toast.success(`Table ${table.name} is good to go!`, { id: toastId })
 
         onTableCreated(table)
-      } else if (params.action === 'duplicate' && !!selectedTable) {
+      } else if (action === 'duplicate' && !!selectedTable) {
         const tableToDuplicate = selectedTable
         toastId = toast.loading(`Duplicating table: ${tableToDuplicate.name}...`)
 
-        const table = await duplicateTable(
-          project?.ref!,
-          project?.connectionString,
-          params.payload,
-          {
-            isRLSEnabled,
-            isDuplicateRows,
-            duplicateTable: tableToDuplicate,
-            foreignKeyRelations,
-          }
-        )
+        const table = await duplicateTable(project?.ref!, project?.connectionString, payload, {
+          isRLSEnabled,
+          isDuplicateRows,
+          duplicateTable: tableToDuplicate,
+          foreignKeyRelations,
+        })
         if (isRealtimeEnabled) await updateTableRealtime(table, isRealtimeEnabled)
 
         await Promise.all([
@@ -592,7 +557,7 @@ export const SidePanelEditor = ({
           { id: toastId }
         )
         onTableCreated(table)
-      } else if (params.action === 'update' && selectedTable) {
+      } else if (action === 'update' && selectedTable) {
         toastId = toast.loading(`Updating table: ${selectedTable.name}...`)
 
         const { table, hasError } = await updateTable({
@@ -600,7 +565,7 @@ export const SidePanelEditor = ({
           connectionString: project?.connectionString,
           toastId,
           table: selectedTable,
-          payload: params.payload,
+          payload,
           columns,
           foreignKeyRelations,
           existingForeignKeyRelations,
@@ -620,10 +585,10 @@ export const SidePanelEditor = ({
             `Table ${table.name} has been updated but there were some errors. Please check these errors separately.`
           )
         } else {
-          if (ref && params.payload.name) {
+          if (ref && payload.name) {
             // [Joshen] Only table entities can be updated via the dashboard
             const tabId = createTabId(ENTITY_TYPE.TABLE, { id: selectedTable.id })
-            tabsSnap.updateTab(tabId, { label: params.payload.name })
+            tabsSnap.updateTab(tabId, { label: payload.name })
           }
           toast.success(`Successfully updated ${table.name}!`, { id: toastId })
         }

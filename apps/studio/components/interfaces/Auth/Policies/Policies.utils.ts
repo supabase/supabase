@@ -77,7 +77,7 @@ const createSQLStatementForCreatePolicy = (policyFormFields: PolicyFormField): P
   return { description, statement }
 }
 
-export const createSQLStatementForUpdatePolicy = (
+const createSQLStatementForUpdatePolicy = (
   policyFormFields: PolicyFormField,
   fieldsToUpdate: Partial<PolicyFormField>
 ): PolicyForReview => {
@@ -183,13 +183,17 @@ type Relationship = {
  * Gets relationships for a specific table from FK constraints.
  * Returns relationships where the table is the source.
  */
-const getRelationshipsForTable = (
-  schema: string,
-  tableName: string,
-  allForeignKeyConstraints: ForeignKeyConstraint[]
-): Relationship[] => {
-  return allForeignKeyConstraints
-    .filter((fk) => fk.source_schema === schema && fk.source_table === tableName)
+const getRelationshipsForTable = ({
+  schema,
+  table,
+  fkConstraints,
+}: {
+  schema: string
+  table: string
+  fkConstraints: ForeignKeyConstraint[]
+}): Relationship[] => {
+  return fkConstraints
+    .filter((fk) => fk.source_schema === schema && fk.source_table === table)
     .flatMap((fk) =>
       fk.source_columns.map((sourceCol, i) => ({
         source_schema: fk.source_schema,
@@ -211,11 +215,11 @@ const findPathToAuthUsers = (
   allForeignKeyConstraints: ForeignKeyConstraint[],
   maxDepth = 3
 ): Relationship[] | null => {
-  const startRelationships = getRelationshipsForTable(
-    startTable.schema,
-    startTable.name,
-    allForeignKeyConstraints
-  )
+  const startRelationships = getRelationshipsForTable({
+    schema: startTable.schema,
+    table: startTable.name,
+    fkConstraints: allForeignKeyConstraints,
+  })
 
   const queue: { table: { schema: string; name: string }; path: Relationship[] }[] = [
     { table: startTable, path: [] },
@@ -224,16 +228,20 @@ const findPathToAuthUsers = (
   visited.add(`${startTable.schema}.${startTable.name}`)
 
   while (queue.length > 0) {
-    const { table, path } = queue.shift()!
+    const queueItem = queue.shift()
+    if (!queueItem) continue
 
-    if (path.length >= maxDepth) {
-      continue
-    }
+    const { table, path } = queueItem
+    if (path.length >= maxDepth) continue
 
     const relationships =
       path.length === 0
         ? startRelationships
-        : getRelationshipsForTable(table.schema, table.name, allForeignKeyConstraints)
+        : getRelationshipsForTable({
+            schema: table.schema,
+            table: table.name,
+            fkConstraints: allForeignKeyConstraints,
+          })
 
     for (const rel of relationships) {
       // Found path to auth.users
@@ -246,9 +254,7 @@ const findPathToAuthUsers = (
       }
 
       const targetId = `${rel.target_table_schema}.${rel.target_table_name}`
-      if (visited.has(targetId)) {
-        continue
-      }
+      if (visited.has(targetId)) continue
 
       // Add target table to queue for further exploration
       queue.push({

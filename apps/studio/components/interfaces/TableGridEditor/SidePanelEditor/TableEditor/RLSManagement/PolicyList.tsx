@@ -1,6 +1,9 @@
 import { X } from 'lucide-react'
+
 import {
   Badge,
+  Card,
+  cn,
   HoverCard_Shadcn_,
   HoverCardContent_Shadcn_,
   HoverCardTrigger_Shadcn_,
@@ -16,7 +19,6 @@ export interface PolicyListItemData {
 
 interface PolicyListItemProps {
   policy: PolicyListItemData
-  className?: string
   onRemove?: () => void
 }
 
@@ -24,19 +26,22 @@ interface PolicyListItemProps {
  * A shared component for displaying policy items with hover preview
  * Used in RLSManagement and policy creation toast notifications
  */
-export const PolicyListItem = ({ policy, className, onRemove }: PolicyListItemProps) => {
+export const PolicyListItem = ({ policy, onRemove }: PolicyListItemProps) => {
   return (
     <HoverCard_Shadcn_ openDelay={200} closeDelay={100}>
       <HoverCardTrigger_Shadcn_ asChild>
         <div
-          className={`flex items-center justify-between text-sm text-foreground py-2 px-3 hover:bg-surface-100 transition-colors ${className ?? ''}`}
+          className={cn(
+            'flex items-center justify-between text-sm text-foreground py-2 px-3 hover:bg-surface-100 transition-colors',
+            'border-b border-default last:border-b-0'
+          )}
         >
-          <p className="font-mono text-xs truncate flex-1">{policy.name}</p>
+          <code className="text-xs truncate flex-1">{policy.name}</code>
 
           <div className="flex items-center gap-2">
             {policy.command && <Badge variant="default">{policy.command}</Badge>}
             {policy.isNew && <Badge variant="success">New</Badge>}
-            {onRemove && policy.isNew && (
+            {!!onRemove && policy.isNew && (
               <button
                 type="button"
                 onClick={(e) => {
@@ -66,6 +71,7 @@ export const PolicyListItem = ({ policy, className, onRemove }: PolicyListItemPr
 }
 
 interface PolicyListProps {
+  disabled?: boolean
   policies: PolicyListItemData[]
   className?: string
   onRemove?: (index: number) => void
@@ -75,19 +81,25 @@ interface PolicyListProps {
  * A list of policies with hover previews
  * Used in RLSManagement and toast notifications
  */
-export const PolicyList = ({ policies, className, onRemove }: PolicyListProps) => {
+export const PolicyList = ({
+  disabled = false,
+  policies,
+  className,
+  onRemove,
+}: PolicyListProps) => {
   return (
-    <div
-      className={`rounded border border-default overflow-hidden bg-surface-100 ${className ?? ''}`}
-    >
-      {policies.map((policy, idx) => (
-        <PolicyListItem
-          key={`${policy.name}-${idx}`}
-          policy={policy}
-          className={idx < policies.length - 1 ? 'border-b border-default' : ''}
-          onRemove={onRemove ? () => onRemove(idx) : undefined}
-        />
-      ))}
-    </div>
+    <Card aria-disabled={disabled} className={cn(disabled && 'opacity-50 pointer-events-none')}>
+      <div
+        className={`rounded border border-default overflow-hidden bg-surface-100 ${className ?? ''}`}
+      >
+        {policies.map((policy, idx) => (
+          <PolicyListItem
+            key={`${policy.name}-${idx}`}
+            policy={policy}
+            onRemove={onRemove ? () => onRemove(idx) : undefined}
+          />
+        ))}
+      </div>
+    </Card>
   )
 }

@@ -44,7 +44,8 @@ export async function generateSqlPolicy({
     orgSlug,
     message,
   })
-  if ('error' in result) throw result
+
+  if ('error' in result) throw result.error
   return result as SqlPolicyGenerateResponse
 }
 
@@ -59,10 +60,10 @@ export const useSqlPolicyGenerateMutation = ({
   return useMutation<SqlPolicyGenerateResponse, ResponseError, SqlPolicyGenerateVariables>(
     (vars) => generateSqlPolicy(vars),
     {
-      async onSuccess(data, variables, context) {
+      async onSuccess(data, variables) {
         await onSuccess?.(data, variables)
       },
-      async onError(data, variables, context) {
+      async onError(data, variables) {
         if (onError === undefined) {
           toast.error(`Failed to generate policy: ${data.message}`)
         } else {

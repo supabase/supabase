@@ -1,67 +1,54 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { useEffect, useMemo, useState } from 'react'
-
-import { AIOptInModal } from 'components/ui/AIAssistantPanel/AIOptInModal'
-import { ToggleRlsButton } from 'components/ui/ToggleRlsButton'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { toast } from 'sonner'
-import type { ResponseError } from 'types'
-import { Button, Card, CardContent, cn } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
-
-import {
-  generateStartingPoliciesForTable,
-  type GeneratedPolicy,
-} from 'components/interfaces/Auth/Policies/Policies.utils'
-import { generatePolicyUpdateSQL } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
-import {
-  useForeignKeyConstraintsQuery,
-  type ForeignKeyConstraint,
-} from 'data/database/foreign-key-constraints-query'
-import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { useTrack } from 'lib/telemetry/track'
-import { ExternalLink, InfoIcon } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
+import { useMemo } from 'react'
+
+import { type GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
+import { generatePolicyUpdateSQL } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { DocsButton } from 'components/ui/DocsButton'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
+import { Button, cn } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
-import type { ColumnField } from '../../SidePanelEditor.types'
+import { TableField } from '../TableEditor.types'
 import { PolicyList, type PolicyListItemData } from './PolicyList'
+import { PolicyListEmptyState } from './PolicyListEmptyState'
+import { ToggleRLSButton } from './ToggleRLSButton'
 
 interface RLSManagementProps {
-  schema: string
   table?: PostgresTable
-  tableName?: string // For new tables
-  columns?: ColumnField[] // For new tables
+  tableFields: TableField // Fields within the form
   foreignKeyRelations?: ForeignKey[] // For new tables
-  isRlsEnabled: boolean
-  onChangeRlsEnabled?: (isEnabled: boolean) => void
   isNewRecord: boolean
   isDuplicating: boolean
   generatedPolicies?: GeneratedPolicy[]
+  onRLSUpdate?: (isEnabled: boolean) => void
   onGeneratedPoliciesChange?: (policies: GeneratedPolicy[]) => void
 }
 
 export const RLSManagement = ({
-  schema,
   table,
-  tableName,
-  columns = [],
+  tableFields,
   foreignKeyRelations = [],
-  isRlsEnabled,
-  onChangeRlsEnabled,
   isNewRecord,
   isDuplicating,
   generatedPolicies = [],
+  onRLSUpdate,
   onGeneratedPoliciesChange,
 }: RLSManagementProps) => {
-  const { data: project } = useSelectedProjectQuery()
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [generateFailed, setGenerateFailed] = useState(false)
-  const [isOptInModalOpen, setIsOptInModalOpen] = useState(false)
-  const { includeSchemaMetadata } = useOrgAiOptInLevel()
   const track = useTrack()
+  const { data: project } = useSelectedProjectQuery()
+  const { selectedSchema } = useQuerySchemaState()
+
+  const { name: tableName, columns, isRLSEnabled } = tableFields
+  const schema = table?.schema ?? selectedSchema
+
   const isExistingTable = !!table && !isNewRecord && !isDuplicating
-  const rlsEnabled = isRlsEnabled ?? false
+  const disablePoliciesList = isExistingTable && !isRLSEnabled
 
   const { data: policies } = useDatabasePoliciesQuery(
     {
@@ -70,18 +57,6 @@ export const RLSManagement = ({
     },
     {
       enabled: !isNewRecord && !isDuplicating,
-    }
-  )
-
-  // Fetch foreign key constraints for policy generation BFS traversal
-  const { data: schemaForeignKeys } = useForeignKeyConstraintsQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      schema: schema,
-    },
-    {
-      enabled: isNewRecord && !isDuplicating && !!schema,
     }
   )
 
@@ -117,285 +92,76 @@ export const RLSManagement = ({
     [existingPoliciesList, generatedPoliciesList]
   )
 
-  useEffect(() => {
-    if (includeSchemaMetadata) {
-      setGenerateFailed(false)
-    }
-  }, [includeSchemaMetadata])
-
   const hasPolicies = allPoliciesList.length > 0
 
-  const convertForeignKeysToConstraints = (fks: ForeignKey[]): ForeignKeyConstraint[] => {
-    if (!tableName || !schema) {
-      return []
+  const handleRemoveGeneratedPolicy = (index: number) => {
+    // Find the index in generatedPoliciesList that corresponds to the allPoliciesList index
+    const generatedIndex = index - existingPoliciesList.length
+    if (generatedIndex >= 0 && generatedIndex < generatedPolicies.length) {
+      const updatedPolicies = generatedPolicies.filter((_, i) => i !== generatedIndex)
+      onGeneratedPoliciesChange?.(updatedPolicies)
+
+      // Track policy removal
+      if (project?.ref) track('rls_generated_policy_removed')
     }
-
-    return fks
-      .filter((fk) => fk.columns && fk.columns.length > 0) // Only include FKs with columns
-      .map((fk) => ({
-        id: typeof fk.id === 'number' ? fk.id : 0,
-        constraint_name: fk.name || '',
-        source_id: typeof fk.tableId === 'number' ? fk.tableId : 0,
-        source_schema: schema.trim(),
-        source_table: tableName.trim(),
-        source_columns: fk.columns.map((col: { source: string; target: string }) =>
-          col.source.trim()
-        ),
-        target_id: 0,
-        target_schema: fk.schema.trim(),
-        target_table: fk.table.trim(),
-        target_columns: fk.columns.map((col: { source: string; target: string }) =>
-          col.target.trim()
-        ),
-        deletion_action: fk.deletionAction || 'NO ACTION',
-        update_action: fk.updateAction || 'NO ACTION',
-      }))
-  }
-
-  const handleGeneratePolicies = async () => {
-    if (!project?.ref || !tableName || columns.length === 0) {
-      toast.error('Unable to generate policies. Please ensure table name and columns are set.')
-      return
-    }
-
-    track('rls_generate_policies_clicked')
-
-    setIsGenerating(true)
-    try {
-      const trimmedTableName = tableName.trim()
-      const trimmedSchema = schema.trim()
-
-      const newTableForeignKeys = convertForeignKeysToConstraints(foreignKeyRelations)
-
-      const allForeignKeys = [
-        ...newTableForeignKeys,
-        ...(schemaForeignKeys ?? []).filter(
-          (existingFk) =>
-            !(
-              existingFk.source_schema === trimmedSchema &&
-              existingFk.source_table === trimmedTableName
-            )
-        ),
-      ]
-
-      const tableColumns = columns.map((col) => ({ name: col.name.trim() }))
-
-      const policies = await generateStartingPoliciesForTable({
-        table: { name: trimmedTableName, schema: trimmedSchema },
-        foreignKeyConstraints: allForeignKeys,
-        columns: tableColumns,
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        enableAi: includeSchemaMetadata,
-      })
-
-      if (policies.length === 0) {
-        setGenerateFailed(true)
-      } else {
-        setGenerateFailed(false)
-        onGeneratedPoliciesChange?.(policies)
-      }
-    } catch (error: any) {
-      console.error('Failed to generate policies:', error)
-      toast.error(error.message || 'Failed to generate policies')
-    } finally {
-      setIsGenerating(false)
-    }
-  }
-
-  const handleRlsToggleSuccess = (nextIsEnabled: boolean) => {
-    onChangeRlsEnabled?.(nextIsEnabled)
-    toast.success(
-      nextIsEnabled
-        ? 'Row Level Security has been enabled for this table.'
-        : 'Row Level Security has been disabled for this table.'
-    )
-  }
-
-  const handleRlsToggleError = (error: ResponseError) => {
-    toast.error(error.message ?? 'Unable to update Row Level Security for this table.')
-  }
-
-  const renderEnableRlsButton = () => {
-    if (!project || !table || !isExistingTable) return null
-    return (
-      <ToggleRlsButton
-        tableId={table.id}
-        type="default"
-        size="tiny"
-        schema={table.schema ?? schema}
-        tableName={table.name}
-        isRlsEnabled={rlsEnabled}
-        projectRef={project.ref}
-        connectionString={project.connectionString ?? null}
-        onSuccess={handleRlsToggleSuccess}
-        onError={handleRlsToggleError}
-        className="w-fit mt-4"
-      />
-    )
-  }
-
-  const disablePoliciesList = isExistingTable && !rlsEnabled
-
-  const renderPolicies = () => {
-    if (!hasPolicies) {
-      if (isNewRecord && !isDuplicating) {
-        const getFailureMessage = () => {
-          if (!generateFailed) {
-            return {
-              title: 'Generate starting policies',
-              description:
-                'Starter policies are generated from your table relationships to auth.users—or, if none exist, using AI.',
-            }
-          }
-
-          if (!includeSchemaMetadata) {
-            return {
-              title: 'Unable to generate policies',
-              description:
-                "We couldn't detect any relationships to auth.users to suggest policies. Enable schema metadata sharing to use our AI-assisted policy generator.",
-            }
-          }
-
-          return {
-            title: 'We could not generate policies for this table',
-            description:
-              "Automatic policy generation wasn't possible for this table. Update the schema and try again, or add policies manually after creating the table.",
-          }
-        }
-
-        const { title, description } = getFailureMessage()
-        const showPermissionButton = generateFailed && !includeSchemaMetadata
-
-        return (
-          <CardContent className="flex flex-col items-center justify-center py-8">
-            <div className="flex flex-col items-center gap-4 text-center max-w-md">
-              <div className="flex flex-col gap-1">
-                <h4 className="text-sm text-foreground">{title}</h4>
-                <p className="text-sm text-foreground-lighter">{description}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  type="default"
-                  size="tiny"
-                  onClick={handleGeneratePolicies}
-                  loading={isGenerating}
-                  disabled={isGenerating || !isRlsEnabled}
-                >
-                  {isGenerating
-                    ? 'Generating policies...'
-                    : generateFailed
-                      ? 'Try generating again'
-                      : 'Generate policies'}
-                </Button>
-                {showPermissionButton && (
-                  <Button
-                    type="default"
-                    size="tiny"
-                    onClick={() => setIsOptInModalOpen(true)}
-                    disabled={isGenerating}
-                  >
-                    Permission settings
-                  </Button>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        )
-      }
-      return (
-        <CardContent>
-          <p className="text-sm text-foreground-lighter">No policies exist for this table</p>
-        </CardContent>
-      )
-    }
-
-    const handleRemoveGeneratedPolicy = (index: number) => {
-      // Find the index in generatedPoliciesList that corresponds to the allPoliciesList index
-      const generatedIndex = index - existingPoliciesList.length
-      if (generatedIndex >= 0 && generatedIndex < generatedPolicies.length) {
-        const updatedPolicies = generatedPolicies.filter((_, i) => i !== generatedIndex)
-        onGeneratedPoliciesChange?.(updatedPolicies)
-
-        // Track policy removal
-        if (project?.ref) {
-          track('rls_generated_policy_removed')
-        }
-      }
-    }
-
-    return (
-      <PolicyList
-        policies={allPoliciesList}
-        className="border-0 rounded-none"
-        onRemove={isNewRecord && !isDuplicating ? handleRemoveGeneratedPolicy : undefined}
-      />
-    )
-  }
-
-  if (!project) return null
-
-  if (isNewRecord && !isDuplicating) {
-    return (
-      <div>
-        <div className="flex items-center mb-4 gap-2">
-          <div className="flex-1">
-            <h3>Policies</h3>
-            <p className="text-sm text-foreground-lighter">
-              Set rules around who can read and write data to this table
-            </p>
-          </div>
-        </div>
-
-        <Card>{renderPolicies()}</Card>
-        {generatedPolicies?.length > 0 && (
-          <p className="text-xs text-foreground-lighter mt-4 flex items-center gap-2">
-            <InfoIcon size={16} strokeWidth={1.5} />
-            Review the policies generated before creating your table
-          </p>
-        )}
-        <AIOptInModal visible={isOptInModalOpen} onCancel={() => setIsOptInModalOpen(false)} />
-      </div>
-    )
   }
 
   return (
-    <div>
-      <div className="flex items-center mb-4 gap-2">
-        <div className="flex-1">
-          <h3>Policies</h3>
+    <div className="flex flex-col gap-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h5>Policies</h5>
           <p className="text-sm text-foreground-lighter">
             Set rules around who can read and write data to this table
           </p>
         </div>
-        <Button
-          asChild
-          type="default"
-          size="tiny"
-          icon={<ExternalLink size={16} strokeWidth={1.5} />}
-        >
-          <Link href={`/project/${project.ref}/auth/policies`} target="_blank">
-            Manage policies
-          </Link>
-        </Button>
+        {!isNewRecord && (
+          <Button asChild type="default" icon={<ExternalLink />}>
+            <Link
+              target="_blank"
+              rel="noopener noreferrer"
+              href={`/project/${project?.ref}/auth/policies`}
+            >
+              Manage policies
+            </Link>
+          </Button>
+        )}
       </div>
 
-      {isExistingTable && !rlsEnabled && (
-        <Admonition
-          className="mb-4"
-          type="warning"
-          title="Row Level Security is disabled"
-          description="Your table is currently accessible by anyone on the internet. We recommend enabling RLS to restrict access."
-          actions={renderEnableRlsButton()}
+      <Admonition
+        // [Joshen] Using CSS to determine visibility here as the onSuccess within ToggleRLSButton doesn't get triggered
+        // if we dynamically render this component, since this admonition gets unmounted from the DOM once RLS is updated
+        className={cn('mb-0', !isNewRecord && !isRLSEnabled ? 'block' : 'hidden')}
+        type="warning"
+        title="Row Level Security is currently disabled"
+        description="Your table is currently accessible by anyone on the internet. We recommend enabling RLS to restrict access."
+        actions={
+          <div className="flex items-center gap-x-2 mt-3">
+            <ToggleRLSButton table={table} isRLSEnabled={isRLSEnabled} onSuccess={onRLSUpdate} />
+            <DocsButton href={`${DOCS_URL}/guides/database/postgres/row-level-security`} />
+          </div>
+        }
+      />
+
+      {!hasPolicies ? (
+        <PolicyListEmptyState
+          schema={schema}
+          tableName={tableName}
+          columns={columns}
+          foreignKeyRelations={foreignKeyRelations}
+          isNewRecord={isNewRecord}
+          isDuplicating={isDuplicating}
+          isRLSEnabled={isRLSEnabled}
+          onGeneratedPoliciesChange={onGeneratedPoliciesChange}
+        />
+      ) : (
+        <PolicyList
+          policies={allPoliciesList}
+          disabled={disablePoliciesList}
+          className="border-0 rounded-none"
+          onRemove={isNewRecord && !isDuplicating ? handleRemoveGeneratedPolicy : undefined}
         />
       )}
-
-      <Card
-        aria-disabled={disablePoliciesList}
-        className={cn(disablePoliciesList && 'opacity-50 pointer-events-none')}
-      >
-        {renderPolicies()}
-      </Card>
     </div>
   )
 }

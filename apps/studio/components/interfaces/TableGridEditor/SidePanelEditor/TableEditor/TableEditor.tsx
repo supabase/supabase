@@ -1,5 +1,5 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { isEmpty, isUndefined, noop } from 'lodash'
+import { isEmpty, noop } from 'lodash'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -34,7 +34,7 @@ import { SpreadsheetImport } from '../SpreadsheetImport/SpreadsheetImport'
 import ColumnManagement from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
 import { HeaderTitle } from './HeaderTitle'
-import RLSDisableModalContent from './RLSDisableModal'
+import { RLSDisableModalContent } from './RLSDisableModal'
 import { RLSManagement } from './RLSManagement/RLSManagement'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import type { ImportContent, TableField } from './TableEditor.types'
@@ -72,29 +72,34 @@ export const TableEditor = ({
   saveChanges = noop,
   updateEditorDirty = noop,
 }: TableEditorProps) => {
-  const tableEditorApi = useContext(TableEditorStateContext)
+  const track = useTrack()
   const snap = useTableEditorStateSnapshot()
+  const tableEditorApi = useContext(TableEditorStateContext)
+  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
+  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
 
+  const [params, setParams] = useUrlState()
   const { data: project } = useSelectedProjectQuery()
   const { selectedSchema } = useQuerySchemaState()
-  const isNewRecord = isUndefined(table)
-  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
-  const track = useTrack()
 
-  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
+  const isNewRecord = table === undefined
+  const visibleChanged = useChanged(visible)
+
+  const [errors, setErrors] = useState<PlainObject>({})
+  const [tableFields, setTableFields] = useState<TableField>()
+  const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
+
+  const [isDuplicateRows, setIsDuplicateRows] = useState<boolean>(false)
+  const [importContent, setImportContent] = useState<ImportContent>()
+  const [isImportingSpreadsheet, setIsImportingSpreadsheet] = useState<boolean>(false)
+  const [rlsConfirmVisible, setRlsConfirmVisible] = useState<boolean>(false)
+
+  const [generatedPolicies, setGeneratedPolicies] = useState<GeneratedPolicy[]>([])
 
   const { enabled: generatePoliciesEnabled } = useTableCreateGeneratePolicies({
     isNewRecord,
     projectInsertedAt: project?.inserted_at,
   })
-
-  const [params, setParams] = useUrlState()
-  useEffect(() => {
-    if (params.create === 'table' && snap.ui.open === 'none') {
-      tableEditorApi.onAddTable()
-      setParams({ ...params, create: undefined })
-    }
-  }, [tableEditorApi, setParams, snap.ui.open, params])
 
   const { data: types } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
@@ -122,17 +127,6 @@ export const TableEditor = ({
     isTable: !isNewRecord,
     isRealtimeEnabled,
   })
-
-  const [errors, setErrors] = useState<PlainObject>({})
-  const [tableFields, setTableFields] = useState<TableField>()
-  const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
-
-  const [isDuplicateRows, setIsDuplicateRows] = useState<boolean>(false)
-  const [importContent, setImportContent] = useState<ImportContent>()
-  const [isImportingSpreadsheet, setIsImportingSpreadsheet] = useState<boolean>(false)
-  const [rlsConfirmVisible, setRlsConfirmVisible] = useState<boolean>(false)
-
-  const [generatedPolicies, setGeneratedPolicies] = useState<GeneratedPolicy[]>([])
 
   const { data: constraints } = useTableConstraintsQuery({
     projectRef: project?.ref,
@@ -204,12 +198,8 @@ export const TableEditor = ({
   const onSaveChanges = async (resolve: () => void) => {
     if (tableFields) {
       const errors = validateFields(tableFields)
-      if (errors.name) {
-        toast.error(errors.name)
-      }
-      if (errors.columns) {
-        toast.error(errors.columns)
-      }
+      if (errors.name) toast.error(errors.name)
+      if (errors.columns) toast.error(errors.columns)
       setErrors(errors)
 
       const isNameChanged = tableFields.name.trim() !== table?.name
@@ -281,7 +271,13 @@ export const TableEditor = ({
     }
   }
 
-  const visibleChanged = useChanged(visible)
+  useEffect(() => {
+    if (params.create === 'table' && snap.ui.open === 'none') {
+      tableEditorApi.onAddTable()
+      setParams({ ...params, create: undefined })
+    }
+  }, [tableEditorApi, setParams, snap.ui.open, params])
+
   useEffect(() => {
     if (visibleChanged && visible) {
       setErrors({})
@@ -381,7 +377,9 @@ export const TableEditor = ({
           onChange={(event: any) => onUpdateField({ comment: event.target.value })}
         />
       </SidePanel.Content>
+
       <SidePanel.Separator />
+
       {!generatePoliciesEnabled && (
         <>
           <SidePanel.Content className="space-y-10 py-6">
@@ -547,20 +545,16 @@ export const TableEditor = ({
       {generatePoliciesEnabled && (
         <>
           <SidePanel.Separator />
-
           <SidePanel.Content className="space-y-10 py-6">
             <RLSManagement
-              schema={table?.schema ?? selectedSchema ?? ''}
               table={table}
-              tableName={isNewRecord ? tableFields.name : undefined}
-              columns={isNewRecord ? tableFields.columns : undefined}
+              tableFields={tableFields}
               foreignKeyRelations={isNewRecord ? fkRelations : undefined}
-              isRlsEnabled={tableFields.isRLSEnabled}
-              onChangeRlsEnabled={(value) => onUpdateField({ isRLSEnabled: value })}
               isNewRecord={isNewRecord}
               isDuplicating={isDuplicating}
               generatedPolicies={generatedPolicies}
               onGeneratedPoliciesChange={setGeneratedPolicies}
+              onRLSUpdate={(value) => onUpdateField({ isRLSEnabled: value })}
             />
           </SidePanel.Content>
         </>
