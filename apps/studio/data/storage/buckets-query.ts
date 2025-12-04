@@ -1,4 +1,10 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import {
+  useInfiniteQuery,
+  useQuery,
+  useQueryClient,
+  type UseInfiniteQueryResult,
+} from '@tanstack/react-query'
+import { useMemo } from 'react'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
@@ -134,6 +140,43 @@ export const usePaginatedBucketsQuery = <TData = BucketsWithPaginationData>(
     keepPreviousData: resolvedKeepPreviousData,
     retry: shouldRetryBucketsQuery,
   })
+}
+
+/**
+ * Tries to get the bucket info from the cache first. If not found, fetches
+ * from remote by name.
+ */
+export const useBucketInfoQueryPreferCached = (bucketName?: string, projectRef?: string) => {
+  const queryClient = useQueryClient()
+
+  const cachedBucketInfo = useMemo(() => {
+    if (!bucketName) return undefined
+
+    const bucketsPages = queryClient.getQueryData(storageKeys.bucketsList(projectRef)) as
+      | UseInfiniteQueryResult<Bucket[]>['data']
+      | undefined
+    const buckets = bucketsPages?.pages.flatMap((page) => page) ?? []
+    return buckets.find((b) => b.name === bucketName)
+  }, [bucketName, projectRef, queryClient])
+
+  const shouldFetchBucketInfo = !!bucketName && !cachedBucketInfo
+  const { data: remoteBucketsPages } = usePaginatedBucketsQuery(
+    {
+      projectRef,
+      search: bucketName,
+      // Sort by name so exact matches appear first
+      sortColumn: 'name',
+    },
+    {
+      enabled: shouldFetchBucketInfo,
+    }
+  )
+
+  if (!bucketName) return undefined
+  if (cachedBucketInfo) return cachedBucketInfo
+
+  const remoteBuckets = remoteBucketsPages?.pages.flatMap((page) => page) ?? []
+  return remoteBuckets.find((b) => b.name === bucketName)
 }
 
 const shouldRetryBucketsQuery = (failureCount: number, error: unknown) => {
