@@ -1,5 +1,9 @@
 import type { AnalyticsData, AnalyticsInterval } from 'data/analytics/constants'
-import { getInfraMonitoring, InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
+import { mapResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
+import {
+  getInfraMonitoringAttributes,
+  InfraMonitoringAttribute,
+} from 'data/analytics/infra-monitoring-query'
 import { ReportConfig } from './reports.types'
 
 async function runInfraMonitoringQuery(
@@ -10,16 +14,26 @@ async function runInfraMonitoringQuery(
   interval: AnalyticsInterval,
   databaseIdentifier?: string
 ): Promise<AnalyticsData> {
-  const data = await getInfraMonitoring({
+  const response = await getInfraMonitoringAttributes({
     projectRef,
-    attribute,
+    attributes: [attribute],
     startDate,
     endDate,
     interval,
     databaseIdentifier,
   })
 
-  return data
+  // Use shared mapping function that handles both single and multi-attribute response formats
+  const mapped = mapResponseToAnalyticsData(response, [attribute])
+  const analyticsData = mapped[attribute]
+
+  return {
+    data: analyticsData?.data ?? [],
+    format: analyticsData?.format,
+    yAxisLimit: analyticsData?.yAxisLimit,
+    total: analyticsData?.total,
+    totalGrouped: { [attribute]: analyticsData?.total },
+  } as AnalyticsData
 }
 
 export const realtimeReports = ({
