@@ -1878,9 +1878,28 @@ importers:
       '@playwright/test':
         specifier: ^1.52.0
         version: 1.56.1
+      '@supabase/supabase-js':
+        specifier: 'catalog:'
+        version: 2.86.0
+      cross-fetch:
+        specifier: ^4.1.0
+        version: 4.1.0(encoding@0.1.13)
       dotenv:
         specifier: ^16.5.0
         version: 16.5.0
+    devDependencies:
+      '@dotenvx/dotenvx':
+        specifier: ^1.51.1
+        version: 1.51.1
+      '@faker-js/faker':
+        specifier: ^9.9.0
+        version: 9.9.0
+      api-types:
+        specifier: workspace:*
+        version: link:../../packages/api-types
+      tsx:
+        specifier: 'catalog:'
+        version: 4.20.3
 
   packages/ai-commands:
     dependencies:
@@ -3425,6 +3444,10 @@ packages:
 
   '@dotenvx/dotenvx@1.51.0':
     resolution: {integrity: sha512-CbMGzyOYSyFF7d4uaeYwO9gpSBzLTnMmSmTVpCZjvpJFV69qYbjYPpzNnCz1mb2wIvEhjWjRwQWuBzTO0jITww==}
+    hasBin: true
+
+  '@dotenvx/dotenvx@1.51.1':
+    resolution: {integrity: sha512-fqcQxcxC4LOaUlW8IkyWw8x0yirlLUkbxohz9OnWvVWjf73J5yyw7jxWnkOJaUKXZotcGEScDox9MU6rSkcDgg==}
     hasBin: true
 
   '@drizzle-team/brocli@0.10.2':
@@ -10850,6 +10873,9 @@ packages:
 
   cross-fetch@3.2.0:
     resolution: {integrity: sha512-Q+xVJLoGOeIMXZmbUK4HYk+69cQH6LudR0Vu/pRm2YlU/hDV9CiS0gKUMaWY5f2NeUH9C1nV3bsTlCo0FsTV1Q==}
+
+  cross-fetch@4.1.0:
+    resolution: {integrity: sha512-uKm5PU+MHTootlWEY+mZ4vvXoCn4fLQxT9dSc1sXVMSFkINTJVN8cAQROpwcKm8bJ/c7rgZVIBWzH5T78sNZZw==}
 
   cross-inspect@1.0.1:
     resolution: {integrity: sha512-Pcw1JTvZLSJH83iiGWt6fRcT+BjZlCDRVwYLbUcHzv/CRpB7r0MlSrGbIyQvVSNyGnbt7G4AXuyCiDR3POvZ1A==}
@@ -21078,6 +21104,18 @@ snapshots:
       picomatch: 4.0.3
       which: 4.0.0
 
+  '@dotenvx/dotenvx@1.51.1':
+    dependencies:
+      commander: 11.1.0
+      dotenv: 17.2.2
+      eciesjs: 0.4.15
+      execa: 5.1.1
+      fdir: 6.5.0(picomatch@4.0.3)
+      ignore: 5.3.2
+      object-treeify: 1.1.33
+      picomatch: 4.0.3
+      which: 4.0.0
+
   '@drizzle-team/brocli@0.10.2': {}
 
   '@ecies/ciphers@0.2.4(@noble/ciphers@1.3.0)':
@@ -30419,6 +30457,12 @@ snapshots:
       cross-spawn: 7.0.6
 
   cross-fetch@3.2.0(encoding@0.1.13):
+    dependencies:
+      node-fetch: 2.7.0(encoding@0.1.13)
+    transitivePeerDependencies:
+      - encoding
+
+  cross-fetch@4.1.0(encoding@0.1.13):
     dependencies:
       node-fetch: 2.7.0(encoding@0.1.13)
     transitivePeerDependencies:
