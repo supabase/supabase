@@ -6,30 +6,29 @@ topics = [ "realtime" ]
 keywords = [ "channels", "useEffect", "react", "memory leak", "quota", "TooManyChannels", "ChannelRateLimitReached", "unsubscribe", "cleanup" ]
 database_id = ""
 ---
+
 {/* supa-mdx-lint-disable Rule003Spelling */}
 **What is the TooManyChannels error?**
-{/* supa-mdx-lint-enable Rule003Spelling */}
 
 The TooManyChannels error occurs when your application tries to create more than the allowed number of Realtime channels. When you exceed this limit, you'll see an error with the code `ChannelRateLimitReached`.
 
 This limit exists to protect both your application and Supabase servers from resource exhaustion.
 
 **What causes TooManyChannels errors?**
-
+{/* supa-mdx-lint-enable Rule003Spelling */}
 The most common cause is accidentally creating channels without cleaning them up, especially in React applications. This happens when:
 
 {/* supa-mdx-lint-disable Rule003Spelling */}
+
 - Components create channels on every render without unsubscribing
 - `useEffect` runs multiple times due to missing or incorrect dependencies
 - Components unmount without cleaning up their channels
 - Development mode in React (StrictMode) causes effects to run twice
-{/* supa-mdx-lint-enable Rule003Spelling */}
+  {/* supa-mdx-lint-enable Rule003Spelling */}
 
 Each time you call `supabase.channel('topic').subscribe()`, a new channel is created unless you properly clean it up.
-
-**Common culprits: React useEffect and component re-renders**
 {/* supa-mdx-lint-disable Rule003Spelling */}
-Here's the most common mistake that causes TooManyChannels errors:
+Here's the most common mistake that might lead to TooManyChannels errors:
 {/* supa-mdx-lint-enable Rule003Spelling */}
 
 ```tsx
@@ -188,8 +187,9 @@ console.log(channel1 === channel2) // true
 ```
 
 **5. Handle strict mode in development**
-
+{/* supa-mdx-lint-disable Rule003Spelling */}
 React StrictMode intentionally runs effects twice in development. Your cleanup function will handle this:
+{/* supa-mdx-lint-enable Rule003Spelling */}
 
 ```tsx
 // This works correctly even in StrictMode
@@ -203,6 +203,7 @@ useEffect(() => {
   }
 }, [])
 ```
+
 {/* supa-mdx-lint-disable Rule003Spelling */}
 **6. Clean up on unmount for dynamic channels**
 
