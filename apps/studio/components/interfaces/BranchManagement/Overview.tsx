@@ -18,6 +18,7 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { TextConfirmModal } from 'components/ui/TextConfirmationModalWrapper'
 import { useBranchQuery } from 'data/branches/branch-query'
 import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
@@ -31,8 +32,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { EditBranchModal } from './EditBranchModal'
 import { PreviewBranchesEmptyState } from './EmptyStates'

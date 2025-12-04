@@ -1,7 +1,8 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ReactNode, forwardRef, useEffect } from 'react'
+import { Check, Copy } from 'lucide-react'
+import { ReactNode, forwardRef, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Alert_Shadcn_,
@@ -20,6 +21,7 @@ import {
   Form_Shadcn_,
   Input_Shadcn_,
   cn,
+  copyToClipboard,
 } from 'ui'
 import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 import { z } from 'zod'
@@ -49,6 +51,7 @@ export interface TextConfirmModalProps {
   description?: React.ComponentProps<typeof FormDescription_Shadcn_>
   blockDeleteButton?: boolean
   errorMessage?: string
+  enableCopy?: boolean
 }
 
 export const TextConfirmModal = forwardRef<
@@ -77,10 +80,13 @@ export const TextConfirmModal = forwardRef<
       blockDeleteButton = true,
       variant = 'default',
       errorMessage = 'Value entered does not match',
+      enableCopy = false,
       ...props
     },
     ref
   ) => {
+    const [showCopied, setShowCopied] = useState(false)
+
     const formSchema = z.object({
       confirmValue: z.preprocess(
         (val) => (typeof val === 'string' ? val.trim() : val),
@@ -111,6 +117,12 @@ export const TextConfirmModal = forwardRef<
     useEffect(() => {
       if (confirmString) form.reset()
     }, [confirmString])
+
+    useEffect(() => {
+      if (!showCopied) return
+      const timer = setTimeout(() => setShowCopied(false), 2000)
+      return () => clearTimeout(timer)
+    }, [showCopied])
 
     return (
       <Dialog
@@ -161,11 +173,27 @@ export const TextConfirmModal = forwardRef<
                 name="confirmValue"
                 render={({ field }) => (
                   <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                    <FormLabel_Shadcn_ {...label} enableSelection>
+                    <FormLabel_Shadcn_ {...label} enableSelection={!enableCopy}>
                       Type{' '}
-                      <span className="text-foreground break-all whitespace-pre">
-                        {confirmString}
-                      </span>{' '}
+                      {enableCopy ? (
+                        <Button
+                          type="default"
+                          className="h-[23px] px-1.5 py-0 border-muted text-sm whitespace-pre break-all"
+                          iconRight={
+                            showCopied ? <Check strokeWidth={2} className="text-brand" /> : <Copy />
+                          }
+                          onClick={() => {
+                            setShowCopied(true)
+                            copyToClipboard(confirmString)
+                          }}
+                        >
+                          {confirmString}
+                        </Button>
+                      ) : (
+                        <span className="text-foreground break-all whitespace-pre">
+                          {confirmString}
+                        </span>
+                      )}{' '}
                       to confirm.
                     </FormLabel_Shadcn_>
                     <FormControl_Shadcn_>
