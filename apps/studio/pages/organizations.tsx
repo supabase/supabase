@@ -51,8 +51,13 @@ const OrganizationsPage: NextPageWithLayout = () => {
           <Admonition
             type="destructive"
             title="Organization not found"
-            description={`The organization “${orgSlug}” does not exist or you do not have access to it. If you
-              think this is an error, please reach out to the organization owner for access.`}
+            description={
+              <>
+                The organization <code className="text-code-inline">{orgSlug}</code> does not exist
+                or you do not have access to it. Please reach out to its owner if you believe this
+                is an error.
+              </>
+            }
           />
         )}
 
