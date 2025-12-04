@@ -9,7 +9,7 @@ import {
   MAX_EXPORT_ROW_COUNT,
   MAX_EXPORT_ROW_COUNT_MESSAGE,
 } from 'components/grid/components/header/Header'
-import { LOAD_TAB_FROM_CACHE_PARAM, parseSupaTable } from 'components/grid/SupabaseGrid.utils'
+import { buildTableEditorUrl, parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import {
   formatTableRowsToSQL,
   getEntityLintDetails,
@@ -244,7 +244,7 @@ const EntityListItem = ({
       title={entity.name}
       style={style}
       id={String(entity.id)}
-      href={`/project/${projectRef}/editor/${entity.id}?schema=${entity.schema}&${LOAD_TAB_FROM_CACHE_PARAM}=true`}
+      href={buildTableEditorUrl(projectRef, entity.name, entity.id, entity.schema)}
       role="button"
       aria-label={`View ${entity.name}`}
       className={cn(

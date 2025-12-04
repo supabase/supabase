@@ -13,8 +13,6 @@ import { formatClipboardValue } from './utils/common'
 import { parseAsNativeArrayOf, parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
 import { useSearchParams } from 'next/navigation'
 
-export const LOAD_TAB_FROM_CACHE_PARAM = 'loadFromCache'
-
 export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] {
   if (Array.isArray(sort)) {
     return compact(
@@ -29,7 +27,7 @@ export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] 
   return []
 }
 
-export function sortsToUrlParams(sorts: Sort[]) {
+export function sortsToUrlParams(sorts: { column: string; ascending?: boolean }[]) {
   return sorts.map((sort) => `${sort.column}:${sort.ascending ? 'asc' : 'desc'}`)
 }
 
@@ -54,7 +52,9 @@ export function formatFilterURLParams(filter?: string[]): Filter[] {
   ) as Filter[]
 }
 
-export function filtersToUrlParams(filters: Filter[]) {
+export function filtersToUrlParams(
+  filters: { column: string | Array<string>; operator: string; value: string }[]
+) {
   return filters.map((filter) => {
     const selectedOperator = FilterOperatorOptions.find(
       (option) => option.value === filter.operator
@@ -139,6 +139,24 @@ export function loadTableEditorStateFromLocalStorage(
   return json[tableKey]
 }
 
+export function buildTableEditorUrl(
+  projectRef: string,
+  tableName: string,
+  tableId: number,
+  schema?: string | null
+) {
+  const url = new URL(`/project/${projectRef}/editor/${tableId}`)
+
+  const savedState = loadTableEditorStateFromLocalStorage(projectRef, tableName, schema)
+  if (savedState?.sorts) {
+    url.searchParams.set('sort', savedState.sorts.join(','))
+  }
+  if (savedState?.filters) {
+    url.searchParams.set('filter', savedState.filters.join(':'))
+  }
+  return url.toString()
+}
+
 export function saveTableEditorStateToLocalStorage({
   projectRef,
   tableName,
@@ -186,8 +204,7 @@ function getLatestParams() {
   const queryParams = new URLSearchParams(window.location.search)
   const sort = queryParams.getAll('sort')
   const filter = queryParams.getAll('filter')
-  const loadFromCache = !!queryParams.get(LOAD_TAB_FROM_CACHE_PARAM)
-  return { sort, filter, loadFromCache }
+  return { sort, filter }
 }
 
 export function useSyncTableEditorStateFromLocalStorageWithUrl({
@@ -202,7 +219,6 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
     {
       sort: parseAsNativeArrayOf(parseAsString),
       filter: parseAsNativeArrayOf(parseAsString),
-      [LOAD_TAB_FROM_CACHE_PARAM]: parseAsBoolean.withDefault(false),
     },
     {
       history: 'replace',
@@ -213,8 +229,7 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
   const urlParams = useMemo(() => {
     const sort = searchParams.getAll('sort')
     const filter = searchParams.getAll('filter')
-    const loadFromCache = !!searchParams.get(LOAD_TAB_FROM_CACHE_PARAM)
-    return { sort, filter, loadFromCache }
+    return { sort, filter }
   }, [searchParams])
 
   useEffect(() => {
@@ -225,25 +240,13 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
     // `urlParams` from `useQueryStates` can be stale so always get the latest from the URL
     const latestUrlParams = getLatestParams()
 
-    if (latestUrlParams.loadFromCache) {
-      const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.name, table.schema)
-      updateUrlParams(
-        {
-          sort: savedState?.sorts ?? [],
-          filter: savedState?.filters ?? [],
-          loadFromCache: false,
-        },
-        { clearOnDefault: true }
-      )
-    } else {
-      saveTableEditorStateToLocalStorage({
-        projectRef,
-        tableName: table.name,
-        schema: table.schema,
-        sorts: latestUrlParams.sort,
-        filters: latestUrlParams.filter,
-      })
-    }
+    saveTableEditorStateToLocalStorage({
+      projectRef,
+      tableName: table.name,
+      schema: table.schema,
+      sorts: latestUrlParams.sort,
+      filters: latestUrlParams.filter,
+    })
   }, [urlParams, table, projectRef])
 }
 
