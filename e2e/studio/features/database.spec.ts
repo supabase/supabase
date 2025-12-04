@@ -54,8 +54,8 @@ const createTable = async (page: Page, tableName: string, newColumnName: string)
 }
 
 const deleteTable = async (page: Page, tableName: string) => {
-  await page.getByLabel(`View ${tableName}`).nth(0).click()
-  await page.getByLabel(`View ${tableName}`).getByRole('button').nth(1).click()
+  await page.getByLabel(`View ${tableName}`, { exact: true }).nth(0).click()
+  await page.getByLabel(`View ${tableName}`, { exact: true }).getByRole('button').nth(1).click()
   await page.getByText('Delete table').click()
   await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).click()
   await page.getByRole('button', { name: 'Delete' }).click()
