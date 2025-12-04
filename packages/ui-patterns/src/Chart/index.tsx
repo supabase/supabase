@@ -73,7 +73,7 @@ const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
 )
 ChartCard.displayName = 'ChartCard'
 
-/* Chart Header */
+/* Chart Header Components */
 interface ChartHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
 }
@@ -186,5 +186,21 @@ const ChartActions = React.forwardRef<HTMLDivElement, ChartActionsProps>(
 )
 ChartActions.displayName = 'ChartActions'
 
+/* Chart Content */
+interface ChartContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode
+}
+
+const ChartContent = React.forwardRef<HTMLDivElement, ChartContentProps>(
+  ({ children, className, ...props }, ref) => {
+    return (
+      <div ref={ref} className={cn('px-6 py-4', className)} {...props}>
+        {children}
+      </div>
+    )
+  }
+)
+ChartContent.displayName = 'ChartContent'
+
 /* Exports */
-export { Chart, ChartCard, ChartHeader, ChartTitle, ChartActions }
+export { Chart, ChartCard, ChartHeader, ChartTitle, ChartActions, ChartContent }

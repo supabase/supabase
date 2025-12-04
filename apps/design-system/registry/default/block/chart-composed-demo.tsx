@@ -1,6 +1,13 @@
 'use client'
 
-import { Chart, ChartActions, ChartCard, ChartHeader, ChartTitle } from 'ui-patterns/Chart'
+import {
+  Chart,
+  ChartActions,
+  ChartCard,
+  ChartContent,
+  ChartHeader,
+  ChartTitle,
+} from 'ui-patterns/Chart'
 import { ExternalLink } from 'lucide-react'
 
 export default function ComposedChartDemo() {
@@ -8,7 +15,7 @@ export default function ComposedChartDemo() {
     {
       label: 'Open in Logs Explorer',
       onClick: () => {
-        alert('Tada! You clicked me!')
+        alert('Ta da! You clicked me! 🎉')
       },
       icon: <ExternalLink size={12} />,
     },
@@ -21,6 +28,7 @@ export default function ComposedChartDemo() {
           <ChartTitle tooltip="This is a tooltip">My Chart Title</ChartTitle>
           <ChartActions actions={actions} />
         </ChartHeader>
+        <ChartContent>Chart here</ChartContent>
       </ChartCard>
     </Chart>
   )
