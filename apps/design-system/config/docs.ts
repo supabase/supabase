@@ -51,13 +51,8 @@ export const docsConfig: DocsConfig = {
       title: 'UI Patterns',
       items: [
         {
-          title: 'Navigation',
-          href: '/docs/ui-patterns/navigation',
-          items: [],
-        },
-        {
-          title: 'Layout',
-          href: '/docs/ui-patterns/layout',
+          title: 'Charts',
+          href: '/docs/ui-patterns/charts',
           items: [],
         },
         {
@@ -71,8 +66,13 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Charts',
-          href: '/docs/ui-patterns/charts',
+          title: 'Layout',
+          href: '/docs/ui-patterns/layout',
+          items: [],
+        },
+        {
+          title: 'Navigation',
+          href: '/docs/ui-patterns/navigation',
           items: [],
         },
       ],
