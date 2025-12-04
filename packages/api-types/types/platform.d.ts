@@ -5974,11 +5974,11 @@ export interface components {
     }
     DiskAutoscaleConfig: {
       /** @description Growth percentage for disk autoscaling */
-      growth_percent?: number | null
+      growth_percent: number | null
       /** @description Maximum limit the disk size will grow to in GB */
-      max_size_gb?: number | null
+      max_size_gb: number | null
       /** @description Minimum increment size for disk autoscaling in GB */
-      min_increment_gb?: number | null
+      min_increment_gb: number | null
     }
     DiskRequestBody: {
       attributes:
@@ -7535,45 +7535,6 @@ export interface components {
         id: 'free' | 'pro' | 'team' | 'enterprise'
         name: string
       }
-      projects: {
-        cloud_provider: string
-        disk_volume_size_gb?: number
-        engine?: string
-        id: number
-        /** @enum {string} */
-        infra_compute_size?:
-          | 'pico'
-          | 'nano'
-          | 'micro'
-          | 'small'
-          | 'medium'
-          | 'large'
-          | 'xlarge'
-          | '2xlarge'
-          | '4xlarge'
-          | '8xlarge'
-          | '12xlarge'
-          | '16xlarge'
-          | '24xlarge'
-          | '24xlarge_optimized_memory'
-          | '24xlarge_optimized_cpu'
-          | '24xlarge_high_memory'
-          | '48xlarge'
-          | '48xlarge_optimized_memory'
-          | '48xlarge_optimized_cpu'
-          | '48xlarge_high_memory'
-        inserted_at: string | null
-        is_branch_enabled: boolean
-        is_physical_backups_enabled: boolean | null
-        name: string
-        organization_id: number
-        organization_slug: string
-        preview_branch_refs: string[]
-        ref: string
-        region: string
-        status: string
-        subscription_id: string | null
-      }[]
       restriction_data: {
         [key: string]: unknown
       } | null
