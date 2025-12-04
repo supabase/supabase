@@ -7424,7 +7424,7 @@
                 "required": ["enabled", "maxBuckets", "maxIndexes"]
               }
             },
-            "required": ["imageTransformation", "s3Protocol"]
+            "required": ["imageTransformation", "s3Protocol", "icebergCatalog", "vectorBuckets"]
           },
           "capabilities": {
             "type": "object",
@@ -7492,8 +7492,7 @@
                 },
                 "required": ["enabled", "maxBuckets", "maxIndexes"]
               }
-            },
-            "required": ["imageTransformation", "s3Protocol"]
+            }
           },
           "external": {
             "type": "object",
