@@ -102,12 +102,12 @@ scrape_configs:
 
 **For Grafana Cloud users** instead of manually configuring `prometheus.yaml`, use a `Metrics Endpoint` instead:
 
-- In the left-hand menu, select `Connections` and click `Add new connection`.
-- Search for `Metrics Endpoint` and select it.
-- Click `Add new scrape job`.
+- In the left-hand menu, select **Connections** and click **Add new connection**.
+- Search for **Metrics Endpoint** and select it.
+- Click **Add new scrape job**.
 - Enter the details specified in [Accessing the metrics endpoint](/docs/guides/telemetry/metrics#accessing-the-metrics-endpoint).
-- Set the **scraping interval** to `60s`.
-- Test the connection. Once it has passed, click `Save Scrape Job`.
+- Set the **scraping interval** to "60s".
+- Test the connection. Once it has passed, click **Save Scrape Job**.
 
 ### Setting up a dashboard
 
@@ -139,8 +139,8 @@ Under **Interval behavior**, set the **scraping interval** to 60s and test the d
 - Under `Grafana Cloud stack` click `Details`.
 - Search for `Prometheus` and click `Details`.
 - The `Grafana Data Source settings` section will contain the necessary connection details
-  - `URL` (will be of the format `https://UNIQUE_IDENTIFIER.grafana.net/api/prom`)
-  - `User` / `Password`
+  - "URL" (the format "https://UNIQUE_IDENTIFIER.grafana.net/api/prom")
+  - "User" / "Password"
 
 ### Adding the Supabase dashboard
 
@@ -148,10 +148,10 @@ In the left-hand menu, select `Dashboards` and click `New`. From the drop-down, 
 
 Copy the raw file from our [supabase-grafana](https://raw.githubusercontent.com/supabase/supabase-grafana/refs/heads/main/grafana/dashboard.json) repository.
 
-- If your Prometheus data source is named `prometheus`, paste the contents of the file (or upload the file).
-- If your Prometheus data source is **not named `prometheus`**, find all occurrences of `"uid": "prometheus"` and replace `prometheus` with your custom data source name.
+- If your Prometheus data source is named "prometheus", paste the contents of the file (or upload the file).
+- If your Prometheus data source is **not named "prometheus"**, find all occurrences of `"uid": "prometheus"` and replace `prometheus` with your custom data source name.
 
-Click `Load` and the dashboard will load from the project specified in your Prometheus job.
+Click "Load" and the dashboard loads from the project specified in your Prometheus job.
 
 ### Monitoring your project
 
