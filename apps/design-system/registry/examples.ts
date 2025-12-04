@@ -32,6 +32,18 @@ export const examples: Registry = [
     files: ['example/admonition-destructive.tsx'],
   },
   {
+    name: 'alert-demo',
+    type: 'components:example',
+    registryDependencies: ['alert'],
+    files: ['example/alert-demo.tsx'],
+  },
+  {
+    name: 'alert-destructive',
+    type: 'components:example',
+    registryDependencies: ['alert'],
+    files: ['example/alert-destructive.tsx'],
+  },
+  {
     name: 'alert-dialog-demo',
     type: 'components:example',
     registryDependencies: ['alert-dialog', 'button'],
