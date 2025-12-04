@@ -212,7 +212,7 @@ export function DiskManagementForm() {
   const usedPercentage = (usedSize / totalSize) * 100
 
   const disableIopsThroughputConfig =
-    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)
+    !isSpendCapEnabled && RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)
 
   const isBranch = project?.parent_project_ref !== undefined
 
