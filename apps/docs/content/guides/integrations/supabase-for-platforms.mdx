@@ -53,16 +53,16 @@ Pico instance is our newest compute instance and the only one that scales to zer
 
 If you want access to Pico instances contact us.
 
-### New API keys
+### Recommended API keys
 
 Management API endpoints:
 
-- Get the new API keys: [`GET /v1/projects/{ref}/api-keys`](https://api.supabase.com/api/v1#tag/secrets/get/v1/projects/{ref}/api-keys)
-- Enable the new API keys: [`POST /v1/projects/{ref}/api-keys`](https://api.supabase.com/api/v1#tag/secrets/post/v1/projects/{ref}/api-keys)
+- Get the API keys: [`GET /v1/projects/{ref}/api-keys`](https://api.supabase.com/api/v1#tag/secrets/get/v1/projects/{ref}/api-keys)
+- Enable the API keys: [`POST /v1/projects/{ref}/api-keys`](https://api.supabase.com/api/v1#tag/secrets/post/v1/projects/{ref}/api-keys)
 
-We are in the process of migrating away from our legacy API keys `anon` and `service_role` and towards the new API keys `publishable` and `secret`. You can learn more by navigating to [Upcoming changes to Supabase API Keys #29260](https://github.com/orgs/supabase/discussions/29260).
+We are in the process of migrating away from our legacy API keys `anon` and `service_role` and towards API keys `publishable` and `secret`. You can learn more by navigating to [Upcoming changes to Supabase API Keys #29260](https://github.com/orgs/supabase/discussions/29260).
 
-Get the new API keys by making a [`GET /v1/projects/{ref}/api-keys`](https://api.supabase.com/api/v1#tag/secrets/get/v1/projects/{ref}/api-keys) request.
+Get the API keys by making a [`GET /v1/projects/{ref}/api-keys`](https://api.supabase.com/api/v1#tag/secrets/get/v1/projects/{ref}/api-keys) request.
 
 ```sh
 curl 'https://api.supabase.com/v1/projects/{ref}/api-keys?reveal=true' \
@@ -71,7 +71,7 @@ curl 'https://api.supabase.com/v1/projects/{ref}/api-keys?reveal=true' \
 
 If the response includes `"publishable"` and `"secret"` keys then you're all set and you should only use those from now on.
 
-Otherwise, enable the new API keys by making two [`POST /v1/projects/{ref}/api-keys`](https://api.supabase.com/api/v1#tag/secrets/post/v1/projects/{ref}/api-keys) requests, one for `publishable` and another for `secret`.
+Otherwise, enable the API keys by making two [`POST /v1/projects/{ref}/api-keys`](https://api.supabase.com/api/v1#tag/secrets/post/v1/projects/{ref}/api-keys) requests, one for `publishable` and another for `secret`.
 
 ```sh
 curl 'https://api.supabase.com/v1/projects/{ref}/api-keys' \
