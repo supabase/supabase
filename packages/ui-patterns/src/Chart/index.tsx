@@ -4,7 +4,7 @@ import * as React from 'react'
 import { useContext } from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { Button, Card, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
-import { HelpCircle } from 'lucide-react'
+import { HelpCircle, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 
 /* Chart Config */
@@ -192,13 +192,16 @@ interface ChartContentProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string
   isEmpty?: boolean
   emptyState?: React.ReactNode
+  loadingState?: React.ReactNode
 }
 
 const ChartContent = React.forwardRef<HTMLDivElement, ChartContentProps>(
-  ({ children, className, isEmpty = false, emptyState, ...props }, ref) => {
+  ({ children, className, isEmpty = false, emptyState, loadingState, ...props }, ref) => {
+    const { isLoading } = useChart()
+
     return (
-      <div ref={ref} className={cn('px-6 py-4', className)} {...props}>
-        {isEmpty ? emptyState : children}
+      <div ref={ref} className={cn('px-6 pt-4 pb-6', className)} {...props}>
+        {isLoading ? loadingState : isEmpty ? emptyState : children}
       </div>
     )
   }
@@ -219,23 +222,42 @@ const ChartEmptyState = React.forwardRef<HTMLDivElement, ChartEmptyStateProps>(
       <div
         ref={ref}
         className={cn(
-          'px-6 py-12 border border-dashed items-center justify-center flex flex-col',
+          'h-40 border border-dashed border-control items-center justify-center flex flex-col',
           className
         )}
         {...props}
       >
         {icon && (
-          <div className="flex items-center justify-center w-7 h-7 text-foreground-lighter">
+          <div className="flex items-center justify-center w-6 h-6 text-foreground-lighter mb-1">
             {icon}
           </div>
         )}
-        <h3 className="text-xs font-medium text-foreground-light">{title}</h3>
-        <p className="text-xs text-foreground-lighter">{description}</p>
+        <h3 className="text-sm font-medium text-foreground-light">{title}</h3>
+        <p className="text-sm text-foreground-lighter">{description}</p>
       </div>
     )
   }
 )
 ChartEmptyState.displayName = 'ChartEmptyState'
 
+/* Chart Loading State */
+const ChartLoadingState = () => {
+  return (
+    <div className="h-40 border border-dashed border-control items-center justify-center flex flex-col">
+      <Loader2 size={20} className="animate-spin text-foreground-muted" />
+    </div>
+  )
+}
+ChartLoadingState.displayName = 'ChartLoadingState'
+
 /* Exports */
-export { Chart, ChartCard, ChartHeader, ChartTitle, ChartActions, ChartContent, ChartEmptyState }
+export {
+  Chart,
+  ChartCard,
+  ChartHeader,
+  ChartTitle,
+  ChartActions,
+  ChartContent,
+  ChartEmptyState,
+  ChartLoadingState,
+}

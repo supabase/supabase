@@ -8,6 +8,7 @@ import {
   ChartHeader,
   ChartTitle,
   ChartEmptyState,
+  ChartLoadingState,
 } from 'ui-patterns/Chart'
 import { BarChart2, ExternalLink } from 'lucide-react'
 
@@ -39,6 +40,7 @@ export default function ComposedChartDemo() {
                 description="It may take up to 24 hours for data to refresh"
               />
             }
+            loadingState={<ChartLoadingState />}
           >
             Chart here
           </ChartContent>
