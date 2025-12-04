@@ -251,9 +251,9 @@ export function LogsSidebarMenuV2() {
       {unifiedLogsFlagEnabled && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"
-          title="New Logs Interface"
-          description="Unified view across all services with improved filtering and real-time updates"
-          illustration={<Badge variant="brand">Feature Preview</Badge>}
+          title="Introducing unified logs"
+          description="A unified view across all services with improved filtering and real-time updates."
+          illustration={<Badge variant="success">New</Badge>}
           actions={
             <>
               <Button

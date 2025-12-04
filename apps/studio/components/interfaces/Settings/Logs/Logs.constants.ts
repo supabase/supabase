@@ -54,7 +54,7 @@ where h.x_real_ip is not null
     for: ['api'],
   },
   {
-    label: 'Requests by Country',
+    label: 'Requests by Geography',
     description: 'List all ISO 3166-1 alpha-2 country codes that used the Supabase API',
     mode: 'custom',
     searchString: `select
@@ -777,6 +777,7 @@ export const TIER_QUERY_LIMITS: {
   PAYG: { text: '7 days', value: 7, unit: 'day', promptUpgrade: true },
   TEAM: { text: '28 days', value: 28, unit: 'day', promptUpgrade: true },
   ENTERPRISE: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
+  PLATFORM: { text: '1 day', value: 1, unit: 'day', promptUpgrade: false },
 }
 
 export const LOG_ROUTES_WITH_REPLICA_SUPPORT = [

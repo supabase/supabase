@@ -299,11 +299,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
                       <Label>Sync with a GitHub branch</Label>
-                      {!gitlessBranching && (
-                        <Badge variant="warning" size="small">
-                          Required
-                        </Badge>
-                      )}
+                      {!gitlessBranching && <Badge variant="warning">Required</Badge>}
                     </div>
                     <p className="text-sm text-foreground-light">
                       {gitlessBranching

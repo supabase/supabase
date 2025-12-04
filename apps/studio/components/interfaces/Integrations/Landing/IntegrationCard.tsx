@@ -72,14 +72,8 @@ export const IntegrationCard = ({
               <h3>{name}</h3>
               <p className="text-foreground-light text-sm">{description}</p>
               <div className="flex items-center gap-x-1 mt-4">
-                {status && (
-                  <Badge variant="warning" className="capitalize">
-                    {status}
-                  </Badge>
-                )}
-                <Badge>
-                  <span>Official</span>
-                </Badge>
+                {status && <Badge variant="warning">{status}</Badge>}
+                <Badge>Official</Badge>
               </div>
             </div>
           </CardContent>
@@ -98,8 +92,8 @@ export const IntegrationCard = ({
             </div>
             {isInstalled && (
               <div className="flex items-center gap-x-1">
-                <BadgeCheck size={14} className="text-brand" />
-                <span className=" text-brand text-xs">Installed</span>
+                <BadgeCheck size={14} className="text-brand-link" />
+                <span className="text-brand-link text-xs">Installed</span>
               </div>
             )}
           </div>
@@ -108,14 +102,8 @@ export const IntegrationCard = ({
 
             <p className="text-foreground-light text-xs flex-1">{description}</p>
             <div className="flex items-center gap-x-1 mt-4">
-              {status && (
-                <Badge variant="warning" className="capitalize">
-                  {status}
-                </Badge>
-              )}
-              <Badge>
-                <span>Official</span>
-              </Badge>
+              {status && <Badge variant="warning">{status}</Badge>}
+              <Badge>Official</Badge>
             </div>
           </div>
         </CardContent>

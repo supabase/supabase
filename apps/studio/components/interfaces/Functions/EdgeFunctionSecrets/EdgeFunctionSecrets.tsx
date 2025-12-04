@@ -76,10 +76,7 @@ export const EdgeFunctionSecrets = () => {
   const headers = [
     <TableHead key="secret-name">Name</TableHead>,
     <TableHead key="secret-value" className="flex items-center gap-x-2">
-      Digest{' '}
-      <Badge color="scale" className="font-mono">
-        SHA256
-      </Badge>
+      Digest <Badge variant="default">SHA256</Badge>
     </TableHead>,
     <TableHead key="secret-updated-at">Updated at</TableHead>,
     <TableHead key="actions" />,
@@ -117,7 +114,7 @@ export const EdgeFunctionSecrets = () => {
                       placeholder="Search for a secret"
                       value={searchString}
                       onChange={(e: any) => setSearchString(e.target.value)}
-                      icon={<Search size={14} />}
+                      icon={<Search />}
                     />
                   </div>
 

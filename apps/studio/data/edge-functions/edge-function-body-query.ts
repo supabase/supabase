@@ -33,7 +33,10 @@ export async function getEdgeFunctionBody(
 
   if (!data || !boundary) return { files: [] }
 
-  for await (let part of parseMultipartStream(data, { boundary })) {
+  for await (let part of parseMultipartStream(data, {
+    boundary,
+    maxFileSize: 20 * 1024 * 1024,
+  })) {
     if (part.isFile) {
       files.push({
         name: part.filename,
