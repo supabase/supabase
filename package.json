@@ -59,9 +59,9 @@
     "url": "git+https://github.com/supabase/supabase.git"
   },
   "engines": {
-    "pnpm": "10.18",
+    "pnpm": "10.24",
     "node": ">=22"
   },
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
-  "packageManager": "pnpm@10.18.0"
+  "packageManager": "pnpm@10.24.0"
 }

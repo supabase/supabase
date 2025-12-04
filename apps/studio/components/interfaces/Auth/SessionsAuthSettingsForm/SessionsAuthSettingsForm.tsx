@@ -8,7 +8,7 @@ import * as z from 'zod'
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -368,6 +368,8 @@ export const SessionsAuthSettingsForm = () => {
                 {promptProPlanUpgrade && (
                   <UpgradeToPro
                     fullWidth
+                    source="authSessions"
+                    featureProposition="configure user sessions"
                     primaryText="Configuring user sessions is only available on the Pro Plan and above"
                     secondaryText="Upgrade to the Pro plan to configure settings for user sessions"
                   />

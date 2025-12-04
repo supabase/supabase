@@ -8,13 +8,14 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -22,7 +23,6 @@ import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
 import {
-  Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -32,7 +32,6 @@ import {
   SidePanel,
   cn,
 } from 'ui'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -272,32 +271,21 @@ const PITRSidePanel = () => {
           {selectedCategory === 'on' && (
             <div className="!mt-8 pb-4">
               {!hasAccessToPitrVariants ? (
-                <Alert
-                  withIcon
-                  variant="info"
+                <UpgradeToPro
                   className="mb-4"
-                  title="Changing your Point-In-Time-Recovery is only available on the Pro Plan"
-                  actions={<UpgradePlanButton source="pitrSidePanel" plan="Pro" />}
-                >
-                  Upgrade your plan to change PITR for your project
-                </Alert>
+                  addon="pitr"
+                  primaryText="Changing your Point-In-Time-Recovery is only available on the Pro Plan"
+                  secondaryText="Upgrade your plan to change PITR for your project"
+                  featureProposition="enable PITR"
+                />
               ) : !hasSufficientCompute ? (
-                <Alert
-                  withIcon
-                  variant="warning"
+                <UpgradeToPro
                   className="mb-4"
-                  title="Your project is required to minimally be on a Small compute size to enable PITR"
-                  actions={[
-                    <Button asChild key="change-compute" type="default">
-                      <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
-                        Change compute size
-                      </Link>
-                    </Button>,
-                  ]}
-                >
-                  This is to ensure that your project has enough resources to execute PITR
-                  successfully
-                </Alert>
+                  addon="computeSize"
+                  primaryText="Project needs to be at least on a Small compute size to enable PITR"
+                  secondaryText="This ensures enough resources to execute PITR successfully"
+                  featureProposition="enable PITR"
+                />
               ) : null}
 
               <Radio.Group
