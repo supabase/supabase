@@ -84,12 +84,6 @@ To start API locally, run:
   const signInUrl = `${studioUrl}/sign-in`
   console.log(`\n 🔑 Navigating to sign in page: ${signInUrl}`)
 
-  // Inject HCaptcha mock directly into the page BEFORE navigation
-  // This ensures the mock exists as soon as the page loads
-  // Using HCaptcha's official test response token
-  // Test Site Key: 10000000-ffff-ffff-ffff-000000000001
-  // Test Response Token: 10000000-aaaa-bbbb-cccc-000000000001
-  // This should work if backend is configured with test secret: 0x0000000000000000000000000000000000000000
   await page.addInitScript(() => {
     ;(window as any).hcaptcha = {
       execute: async (options?: any) => {
