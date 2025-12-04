@@ -142,17 +142,13 @@ export const NoProjectsState = ({ slug }: { slug: string }) => {
   )
 }
 
-export const NoOrganizationsState = ({
-  buttonType = 'primary',
-}: {
-  buttonType?: 'primary' | 'default'
-}) => {
+export const NoOrganizationsState = ({}) => {
   return (
     <EmptyStatePresentational
       title="Create an organization"
       description="Manage your team and projects in one place."
     >
-      <Button size="tiny" type={buttonType} asChild icon={<Plus />}>
+      <Button size="tiny" type="primary" asChild icon={<Plus />}>
         <Link href="/new">New organization</Link>
       </Button>
     </EmptyStatePresentational>
