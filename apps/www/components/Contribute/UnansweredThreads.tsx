@@ -5,14 +5,16 @@ export async function UnansweredThreads({
   product_area,
   channel,
   stack,
+  search,
 }: {
   product_area?: string
   channel?: string
   stack?: string
+  search?: string
 }) {
   try {
     const [threads, allProductAreas, allStacks] = await Promise.all([
-      getUnansweredThreads(product_area, channel, stack),
+      getUnansweredThreads(product_area, channel, stack, search),
       getAllProductAreas(),
       getAllStacks(),
     ])

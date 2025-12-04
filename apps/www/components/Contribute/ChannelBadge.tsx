@@ -49,14 +49,11 @@ interface ChannelBadgeProps {
   iconClassName?: string
 }
 
-/**
- * A badge component that displays a channel name with its corresponding icon
- */
 export function ChannelBadge({ channel, className, iconClassName }: ChannelBadgeProps) {
   const Icon = getChannelIcon(channel)
 
   return (
-    <Badge className={cn('text-xs', className)}>
+    <Badge className={cn(className)}>
       <Icon className={cn('w-3 h-3', iconClassName)} />
       <span className="ml-1">{getChannelLabel(channel)}</span>
     </Badge>

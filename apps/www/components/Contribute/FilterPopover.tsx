@@ -3,14 +3,7 @@
 import { useState } from 'react'
 import { X, Check } from 'lucide-react'
 import { useQueryState, parseAsString } from 'nuqs'
-import {
-  Button,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Badge,
-  cn,
-} from 'ui'
+import { Button, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, cn } from 'ui'
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 
 interface FilterPopoverProps {

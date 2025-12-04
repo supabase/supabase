@@ -48,7 +48,8 @@ function mapThreadRowToThread(row: Thread): ThreadRow {
 export async function getUnansweredThreads(
   product_area?: string,
   channel?: string,
-  stack?: string
+  stack?: string,
+  search?: string
 ): Promise<ThreadRow[]> {
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
@@ -61,8 +62,12 @@ export async function getUnansweredThreads(
     .select(
       'thread_id, subject, status, author, external_activity_url, created_at, source, product_areas, stack, category, sub_category, summary, first_msg_time, message_count'
     )
-    .gte('first_msg_time', since)
-    .in('status', ['unanswered', 'unresolved'])
+
+  // When searching, don't apply time/status filters to allow finding any matching threads
+  if (!search || !search.trim()) {
+    query = query.gte('first_msg_time', since).in('status', ['unanswered', 'unresolved'])
+  }
+  // When searching, skip status filter to find threads regardless of status
 
   if (product_area) {
     query = query.contains('product_areas', [product_area])
@@ -77,6 +82,18 @@ export async function getUnansweredThreads(
     query = query.eq('source', channel.toLowerCase())
   }
 
+  if (search && search.trim()) {
+    const trimmedSearch = search.trim()
+    const searchTerm = `%${trimmedSearch}%`
+    console.log('Applying search filter:', {
+      originalSearch: search,
+      trimmedSearch,
+      searchTerm,
+      column: 'subject',
+    })
+    query = query.ilike('subject', searchTerm)
+  }
+
   const { data, error } = await query
     // .gte("created_at", since)
     .order('first_msg_time', { ascending: false })
@@ -84,8 +101,16 @@ export async function getUnansweredThreads(
 
   if (error) {
     console.error('Error fetching threads:', error)
+    console.error('Query details:', { search, product_area, channel, stack })
     throw error
   }
+
+  console.log('Query results:', {
+    count: data?.length,
+    search,
+    hasSearch: !!search,
+    sampleSubjects: data?.slice(0, 3).map((t: any) => t.subject),
+  })
 
   const threads = (data ?? []) as Thread[]
   return threads.map(mapThreadRowToThread)

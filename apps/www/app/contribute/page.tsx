@@ -3,15 +3,22 @@ import { Hero } from '~/components/Contribute/Hero'
 import { UnansweredThreads } from '~/components/Contribute/UnansweredThreads'
 import DefaultLayout from '~/components/Layouts/Default'
 
+// eslint-disable-next-line no-restricted-exports
 export default async function ContributePage({
   searchParams,
 }: {
-  searchParams: Promise<{ product_area?: string; channel?: string; stack?: string }>
+  searchParams: Promise<{
+    product_area?: string
+    channel?: string
+    stack?: string
+    search?: string
+  }>
 }) {
   const params = await searchParams
   const product_area = params.product_area
   const channel = params.channel
   const stack = params.stack
+  const search = params.search
 
   return (
     <DefaultLayout>
@@ -22,7 +29,12 @@ export default async function ContributePage({
               <Hero />
               <GetStarted />
             </div>
-            <UnansweredThreads product_area={product_area} channel={channel} stack={stack} />
+            <UnansweredThreads
+              product_area={product_area}
+              channel={channel}
+              stack={stack}
+              search={search}
+            />
           </div>
         </div>
       </main>
