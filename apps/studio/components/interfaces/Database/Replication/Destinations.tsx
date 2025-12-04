@@ -147,10 +147,9 @@ export const Destinations = () => {
               {isPaidPlan ? (
                 <EnableReplicationModal />
               ) : (
-                <UpgradePlanButton type="primary" plan="Pro" />
+                <UpgradePlanButton source="replication" featureProposition="use replication" />
               )}
-              {/* [Joshen] Placeholder for when we have documentation */}
-              <DocsButton href={`${DOCS_URL}`} />
+              <DocsButton href={`${DOCS_URL}/guides/database/replication#replication`} />
             </div>
           </div>
         ) : hasDestinations ? (

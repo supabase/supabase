@@ -7,7 +7,7 @@ import { boolean, number, object, string } from 'yup'
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -414,15 +414,6 @@ export const MfaAuthSettingsForm = () => {
             >
               <Card>
                 <CardContent className="pt-6">
-                  {promptProPlanUpgrade && (
-                    <div className="mb-4">
-                      <UpgradeToPro
-                        primaryText="Upgrade to Pro"
-                        secondaryText="Advanced MFA requires the Pro Plan"
-                      />
-                    </div>
-                  )}
-
                   <FormField_Shadcn_
                     control={phoneForm.control}
                     name="MFA_PHONE"
@@ -509,6 +500,16 @@ export const MfaAuthSettingsForm = () => {
                     )}
                   />
                 </CardContent>
+
+                {promptProPlanUpgrade && (
+                  <UpgradeToPro
+                    fullWidth
+                    source="authSmsMfa"
+                    featureProposition="configure settings for SMS MFA"
+                    primaryText="SMS MFA is only available on the Pro Plan and above"
+                    secondaryText="Upgrade to the Pro plan to configure settings for SMS MFA"
+                  />
+                )}
 
                 <CardFooter className="justify-end space-x-2">
                   {phoneForm.formState.isDirty && (

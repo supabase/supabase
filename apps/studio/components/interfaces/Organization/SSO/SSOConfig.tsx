@@ -7,16 +7,13 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useSSOConfigCreateMutation } from 'data/sso/sso-config-create-mutation'
 import { useOrgSSOConfigQuery } from 'data/sso/sso-config-query'
 import { useSSOConfigUpdateMutation } from 'data/sso/sso-config-update-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Card,
   CardContent,
@@ -25,7 +22,6 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Switch,
-  WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { AttributeMapping } from './AttributeMapping'
@@ -69,7 +65,7 @@ export const SSOConfig = () => {
 
   const { data: organization } = useSelectedOrganizationQuery()
   const plan = organization?.plan.id
-  const canSetupSSOConfig = ['team', 'enterprise'].includes(plan ?? '')
+  const canSetupSSOConfig = ['team', 'enterprise', 'platform'].includes(plan ?? '')
 
   const {
     data: ssoConfig,
@@ -159,30 +155,13 @@ export const SSOConfig = () => {
     <ScaffoldContainer>
       <ScaffoldSection isFullWidth>
         {!!plan && !canSetupSSOConfig ? (
-          <Alert_Shadcn_
-            variant="default"
-            title="Organization MFA enforcement is not available on Free plan"
-          >
-            <WarningIcon />
-            <div className="flex flex-col md:flex-row pt-1 gap-4">
-              <div className="grow">
-                <AlertTitle_Shadcn_>
-                  Organization Single Sign-on (SSO) is available from Team plan and above
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
-                  <p className="max-w-3xl">
-                    SSO as a login option provides additional acccount security for your team by
-                    enforcing the use of an identity provider when logging into Supabase. Upgrade to
-                    Team or above to set up SSO for your organization.
-                  </p>
-                </AlertDescription_Shadcn_>
-              </div>
-
-              <div className="flex items-center">
-                <UpgradePlanButton type="primary" source="sso" plan="Team" />
-              </div>
-            </div>
-          </Alert_Shadcn_>
+          <UpgradeToPro
+            plan="Team"
+            source="organizationSso"
+            primaryText="Organization Single Sign-on (SSO) is available from Team plan and above"
+            secondaryText="SSO as a login option provides additional acccount security for your team by enforcing the use of an identity provider when logging into Supabase. Upgrade to Team or above to set up SSO for your organization."
+            featureProposition="enable Single Sign-on (SSO)"
+          />
         ) : (
           <>
             {isLoadingSSOConfig && (
