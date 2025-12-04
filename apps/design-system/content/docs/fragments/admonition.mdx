@@ -4,7 +4,7 @@ description: Displays a callout for user attention.
 fragment: true
 ---
 
-Replaces the Alert component. Also known as a banner or callout.
+Admonition is an opinionated [Alert](https://ui.shadcn.com/docs/components/alert), used for scenarios that require a callout or distinct notice.
 
 <ComponentPreview
   name="admonition-demo"
@@ -26,6 +26,17 @@ import { Admonition } from 'ui-patterns/admonition'
   description="Yes. It adheres to the WAI-ARIA design pattern."
 />
 ```
+
+### Buttons
+
+Style the color of the button based upon the _context_ of the Admonition, not its inherited `type`. For example, the below `warning` Admonition has an encouraged action, so its button has `type="default"`. The `destructive` Admonition has a button that is destructive, so the button has `type="danger"`.
+
+<ComponentPreview
+  name="admonition-button"
+  className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
+/>
+
+Only ever use the `primary` (green) button `type` on a `default` Admonition. Even then—given that Admonition is an isolated callout—the `primary` button `type` should rarely be used.
 
 ## Examples
 
