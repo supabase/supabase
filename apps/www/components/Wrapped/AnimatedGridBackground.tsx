@@ -1,0 +1,192 @@
+'use client'
+
+import { motion } from 'framer-motion'
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import { Dots, Stripes } from './Visuals'
+
+const STAGGER_DELAY = 0.05
+const MOVE_INTERVAL = 2000 // Time between moves in ms
+const MOVE_DURATION = 0.5 // Animation duration in seconds
+
+type TileType = 'dots' | 'stripes'
+
+type TileConfig = {
+  id: number
+  type: TileType
+  initialCell: number
+}
+
+type AnimatedGridBackgroundProps = {
+  cols: number
+  rows: number
+  tiles: Array<{ cell: number; type: TileType }>
+  initialDelay?: number
+}
+
+export function AnimatedGridBackground({
+  cols,
+  rows,
+  tiles,
+  initialDelay = 0,
+}: AnimatedGridBackgroundProps) {
+  const totalCells = cols * rows
+
+  // Convert tiles config to internal format with IDs
+  const tileConfigs: TileConfig[] = useMemo(
+    () =>
+      tiles.map((tile, index) => ({
+        id: index,
+        type: tile.type,
+        initialCell: tile.cell,
+      })),
+    [tiles]
+  )
+
+  // Track current positions of all tiles
+  const [tilePositions, setTilePositions] = useState<Map<number, number>>(() => {
+    const initial = new Map<number, number>()
+    tileConfigs.forEach((tile) => {
+      initial.set(tile.id, tile.initialCell)
+    })
+    return initial
+  })
+
+  // Get adjacent cells (up, down, left, right) that are within bounds
+  const getAdjacentCells = useCallback(
+    (cell: number): number[] => {
+      const row = Math.floor(cell / cols)
+      const col = cell % cols
+      const adjacent: number[] = []
+
+      // Up
+      if (row > 0) adjacent.push(cell - cols)
+      // Down
+      if (row < rows - 1) adjacent.push(cell + cols)
+      // Left
+      if (col > 0) adjacent.push(cell - 1)
+      // Right
+      if (col < cols - 1) adjacent.push(cell + 1)
+
+      return adjacent
+    },
+    [cols, rows]
+  )
+
+  // Get occupied cells
+  const getOccupiedCells = useCallback((): Set<number> => {
+    return new Set(tilePositions.values())
+  }, [tilePositions])
+
+  // Move a random tile to an adjacent empty cell
+  const moveRandomTile = useCallback(() => {
+    const occupiedCells = getOccupiedCells()
+    const tileIds = Array.from(tilePositions.keys())
+
+    // Shuffle tile IDs to pick randomly
+    const shuffledIds = [...tileIds].sort(() => Math.random() - 0.5)
+
+    for (const tileId of shuffledIds) {
+      const currentCell = tilePositions.get(tileId)!
+      const adjacentCells = getAdjacentCells(currentCell)
+
+      // Find empty adjacent cells
+      const emptyAdjacent = adjacentCells.filter((cell) => !occupiedCells.has(cell))
+
+      if (emptyAdjacent.length > 0) {
+        // Pick a random empty adjacent cell
+        const targetCell = emptyAdjacent[Math.floor(Math.random() * emptyAdjacent.length)]
+
+        setTilePositions((prev) => {
+          const next = new Map(prev)
+          next.set(tileId, targetCell)
+          return next
+        })
+
+        return // Only move one tile per interval
+      }
+    }
+  }, [tilePositions, getAdjacentCells, getOccupiedCells])
+
+  // Set up the movement interval
+  useEffect(() => {
+    const interval = setInterval(moveRandomTile, MOVE_INTERVAL)
+    return () => clearInterval(interval)
+  }, [moveRandomTile])
+
+  // Calculate position offset for animation
+  const getCellPosition = (cell: number) => {
+    const row = Math.floor(cell / cols)
+    const col = cell % cols
+    return { row, col }
+  }
+
+  // Calculate the CSS transform for a tile based on its current cell vs initial cell
+  const getTileTransform = (tileId: number, initialCell: number) => {
+    const currentCell = tilePositions.get(tileId) ?? initialCell
+    const initial = getCellPosition(initialCell)
+    const current = getCellPosition(currentCell)
+
+    const xOffset = (current.col - initial.col) * 100
+    const yOffset = (current.row - initial.row) * 100
+
+    return { x: `${xOffset}%`, y: `${yOffset}%` }
+  }
+
+  return (
+    <div
+      className={`absolute inset-0 grid h-full [&>*]:border-muted [&>*]:border-r [&>*]:border-b`}
+      style={{
+        gridTemplateColumns: `repeat(${cols}, 1fr)`,
+        gridTemplateRows: `repeat(${rows}, 1fr)`,
+      }}
+    >
+      {Array.from({ length: totalCells }).map((_, cellIndex) => {
+        const row = Math.floor(cellIndex / cols)
+        const col = cellIndex % cols
+        const diagonalIndex = row + col
+
+        // Check if this cell is the initial position of any tile
+        const tile = tileConfigs.find((t) => t.initialCell === cellIndex)
+
+        // Remove right border on last column
+        const isLastCol = col === cols - 1
+        // Remove bottom border on last row
+        const isLastRow = row === rows - 1
+
+        return (
+          <div
+            key={cellIndex}
+            className={`relative ${isLastCol ? '!border-r-0' : ''} ${isLastRow ? '!border-b-0' : ''}`}
+          >
+            {tile && (
+              <motion.div
+                className="absolute inset-0"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                  x: getTileTransform(tile.id, tile.initialCell).x,
+                  y: getTileTransform(tile.id, tile.initialCell).y,
+                }}
+                transition={{
+                  opacity: {
+                    delay: initialDelay + diagonalIndex * STAGGER_DELAY,
+                    duration: 0.3,
+                  },
+                  scale: {
+                    delay: initialDelay + diagonalIndex * STAGGER_DELAY,
+                    duration: 0.3,
+                  },
+                  x: { type: 'spring', stiffness: 200, damping: 20 },
+                  y: { type: 'spring', stiffness: 200, damping: 20 },
+                }}
+              >
+                {tile.type === 'dots' ? <Dots /> : <Stripes />}
+              </motion.div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
