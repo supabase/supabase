@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import Link from 'next/link'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -20,7 +21,6 @@ import {
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import Link from 'next/link'
 import {
   Button,
   Card,
@@ -399,7 +399,11 @@ export const RealtimeSettings = () => {
                                   </div>
                                   <div className="flex-grow flex items-center justify-end">
                                     {isFreePlan ? (
-                                      <UpgradePlanButton source="realtimeSettings" plan="Pro" />
+                                      <UpgradePlanButton
+                                        source="realtimeSettings"
+                                        addon="spendCap"
+                                        featureProposition="configure the max events per second parameter of realtime settings"
+                                      />
                                     ) : (
                                       <ToggleSpendCapButton />
                                     )}
@@ -457,7 +461,11 @@ export const RealtimeSettings = () => {
                                   </div>
                                   <div className="flex-grow flex items-center justify-end">
                                     {isFreePlan ? (
-                                      <UpgradePlanButton source="realtimeSettings" plan="Pro" />
+                                      <UpgradePlanButton
+                                        source="realtimeSettings"
+                                        addon="spendCap"
+                                        featureProposition="configure the max presence events per second parameter of realtime settings"
+                                      />
                                     ) : (
                                       <ToggleSpendCapButton />
                                     )}
@@ -515,7 +523,11 @@ export const RealtimeSettings = () => {
                                   </div>
                                   <div className="flex-grow flex items-center justify-end">
                                     {isFreePlan ? (
-                                      <UpgradePlanButton source="realtimeSettings" plan="Pro" />
+                                      <UpgradePlanButton
+                                        addon="spendCap"
+                                        source="realtimeSettings"
+                                        featureProposition="configure the max payload size parameter of realtime settings"
+                                      />
                                     ) : (
                                       <ToggleSpendCapButton />
                                     )}
