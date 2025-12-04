@@ -52,7 +52,7 @@ const deleteFolder = async (page: Page, ref: string, folderName: string) => {
 
 test.describe('SQL Editor', () => {
   test.skip(
-    env.IS_PLATFORM === 'true',
+    env.IS_PLATFORM,
     'This test does not work in hosted environments. Self hosted mode is supported.'
   )
 

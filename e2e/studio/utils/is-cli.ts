@@ -7,5 +7,5 @@ import { env } from '../env.config.js'
 export function isCLI(): boolean {
   // IS_PLATFORM=true = hosted mode
   // IS_PLATFORM=false = CLI/self-hosted mode
-  return env.IS_PLATFORM === 'false'
+  return !env.IS_PLATFORM
 }

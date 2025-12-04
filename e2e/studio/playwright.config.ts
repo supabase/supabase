@@ -2,7 +2,7 @@ import { defineConfig } from '@playwright/test'
 import { env, STORAGE_STATE_PATH } from './env.config.js'
 
 const IS_CI = !!process.env.CI
-const IS_PLATFORM = env.IS_PLATFORM === 'true'
+const IS_PLATFORM = env.IS_PLATFORM
 
 const WEB_SERVER_TIMEOUT = Number(process.env.WEB_SERVER_TIMEOUT) || 10 * 60 * 1000
 const WEB_SERVER_PORT = Number(process.env.WEB_SERVER_PORT) || 8082

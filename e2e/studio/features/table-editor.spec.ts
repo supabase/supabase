@@ -109,7 +109,7 @@ const deleteEnumIfExist = async (page: Page, ref: string, enumName: string) => {
 }
 
 // Due to rate API rate limits run this test in serial mode on platform.
-const testRunner = env.IS_PLATFORM === 'true' ? test.describe.serial : test.describe
+const testRunner = env.IS_PLATFORM ? test.describe.serial : test.describe
 testRunner('table editor', () => {
   test.beforeAll(async ({ browser, ref }) => {
     await withFileOnceSetup(import.meta.url, async () => {

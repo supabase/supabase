@@ -1,12 +1,9 @@
-import path from 'path'
-import fs from 'fs'
 import { env } from '../env.config.js'
 import { PlatformClient } from './common/platform.js'
 import { createProject, getProjectRef } from './helpers/project.js'
 
 export async function setupProjectForTests() {
-  const isPlatform = env.IS_PLATFORM === 'true'
-  if (!isPlatform) {
+  if (!env.IS_PLATFORM) {
     console.log('Not running on platform, skipping project creation')
     return 'default'
   }
