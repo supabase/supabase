@@ -18,15 +18,11 @@ export type ChartConfig = {
 
 /* Chart Context */
 interface ChartContextValue {
-  config?: ChartConfig
-  data?: any[] /* TODO: proper type */
   isLoading?: boolean
   isDisabled?: boolean
 }
 
 const ChartContext = React.createContext<ChartContextValue>({
-  config: {},
-  data: [],
   isLoading: false,
   isDisabled: false,
 })
@@ -37,21 +33,16 @@ export const useChart = () => {
 
 /* Chart Base */
 interface ChartProps extends React.HTMLAttributes<HTMLDivElement> {
-  config?: ChartConfig
   children: React.ReactNode
-  data: any[] /* TODO: proper type */
   isLoading?: boolean
   isDisabled?: boolean
   className?: string
 }
 
 const Chart = React.forwardRef<HTMLDivElement, ChartProps>(
-  (
-    { config = {}, children, data, isLoading = false, isDisabled = false, className, ...props },
-    ref
-  ) => {
+  ({ children, isLoading = false, isDisabled = false, className, ...props }, ref) => {
     return (
-      <ChartContext.Provider value={{ config, data, isLoading, isDisabled }}>
+      <ChartContext.Provider value={{ isLoading, isDisabled }}>
         <div ref={ref} className={cn('relative w-full', className)} {...props}>
           {children}
         </div>
@@ -70,7 +61,7 @@ interface ChartCardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
   ({ children, className, asChild, ...props }, ref) => {
-    const Comp = asChild ? Slot : 'div'
+    const Comp = asChild ? Slot : Card
     return (
       <Comp ref={ref} className={cn('relative w-full', className)} {...props}>
         {children}
@@ -80,5 +71,28 @@ const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
 )
 ChartCard.displayName = 'ChartCard'
 
+/* Chart Header */
+interface ChartHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode
+}
+
+const ChartHeader = React.forwardRef<HTMLDivElement, ChartHeaderProps>(
+  ({ children, className, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          'py-4 px-6 flex flex-row items-center justify-between gap-2 space-y-0 pb-0 border-b-0 relative',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    )
+  }
+)
+ChartHeader.displayName = 'ChartHeader'
+
 /* Exports */
-export { Chart, ChartCard }
+export { Chart, ChartCard, ChartHeader }

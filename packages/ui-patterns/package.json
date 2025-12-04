@@ -605,6 +605,10 @@
     "./MetricCard": {
       "import": "./src/MetricCard/index.tsx",
       "types": "./src/MetricCard/index.tsx"
+    },
+    "./Chart": {
+      "import": "./src/Chart/index.tsx",
+      "types": "./src/Chart/index.tsx"
     }
   },
   "dependencies": {

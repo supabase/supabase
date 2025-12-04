@@ -9,4 +9,12 @@ export const charts: Registry = [
     category: 'Charts',
     subcategory: 'Bar',
   },
+  {
+    name: 'chart-composed-demo',
+    type: 'components:block',
+    registryDependencies: ['chart'],
+    files: ['block/chart-composed-demo.tsx'],
+    category: 'Charts',
+    subcategory: 'Composed',
+  },
 ]
