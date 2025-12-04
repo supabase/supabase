@@ -1107,6 +1107,18 @@ export interface IndexAdvisorBannerEnableButtonClickedEvent {
 }
 
 /**
+ * Index Advisor dialog enable button clicked event.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/query-performance
+ */
+export interface IndexAdvisorDialogEnableButtonClickedEvent {
+  action: 'index_advisor_dialog_enable_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * Index Advisor banner dimissed event.
  *
  * @group Events
@@ -2483,6 +2495,7 @@ export type TelemetryEvent =
   | ObservabilityBannerDismissButtonClickedEvent
   | IndexAdvisorBannerEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
+  | IndexAdvisorDialogEnableButtonClickedEvent
   | EdgeFunctionDeployButtonClickedEvent
   | EdgeFunctionDeployUpdatesConfirmClickedEvent
   | EdgeFunctionAiAssistantButtonClickedEvent

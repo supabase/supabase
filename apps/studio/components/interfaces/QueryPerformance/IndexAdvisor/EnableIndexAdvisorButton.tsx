@@ -70,7 +70,9 @@ export const EnableIndexAdvisorButton = () => {
   return (
     <AlertDialog open={isDialogOpen} onOpenChange={() => setIsDialogOpen(!isDialogOpen)}>
       <AlertDialogTrigger asChild>
-        <Button type="primary">Enable</Button>
+        <Button type="primary" onClick={() => track('index_advisor_banner_enable_button_clicked')}>
+          Enable
+        </Button>
       </AlertDialogTrigger>
 
       <AlertDialogContent>
@@ -100,7 +102,7 @@ export const EnableIndexAdvisorButton = () => {
             onClick={(e) => {
               e.preventDefault()
               onEnableIndexAdvisor()
-              track('index_advisor_banner_enable_button_clicked')
+              track('index_advisor_dialog_enable_button_clicked')
             }}
             disabled={isEnablingExtension}
           >
