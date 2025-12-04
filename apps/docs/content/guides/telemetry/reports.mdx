@@ -282,13 +282,18 @@ The Storage report provides visibility into how your Supabase Storage is being u
 
 The Realtime report tracks WebSocket connections, channel activity, and real-time event patterns in your Supabase project.
 
-| Chart                 | Description                                                   | Key Insights                                      |
-| --------------------- | ------------------------------------------------------------- | ------------------------------------------------- |
-| Realtime Connections  | Active WebSocket connections over time                        | Concurrent user activity and connection stability |
-| Channel Events        | Breakdown of broadcast, Postgres changes, and presence events | Real-time feature usage patterns                  |
-| Rate of Channel Joins | Frequency of new channel subscriptions                        | User engagement with real-time features           |
-| Total Requests        | HTTP requests to Realtime endpoints                           | API usage alongside WebSocket activity            |
-| Response Speed        | Performance of Realtime API endpoints                         | Infrastructure optimization opportunities         |
+| Chart                                                      | Description                                                                             | Key Insights                                      |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| Realtime Connections                                       | Active WebSocket connections over time                                                  | Concurrent user activity and connection stability |
+| Broadcast Events                                           | Broadcast events over time                                                              | Real-time feature usage patterns                  |
+| Presence Events                                            | Presence events over time                                                               | Real-time feature usage patterns                  |
+| Postgres Changes Events                                    | Postgres Changes events over time                                                       | Real-time feature usage patterns                  |
+| Rate of Channel Joins                                      | Frequency of new channel subscriptions                                                  | User engagement with real-time features           |
+| Message Payload Size                                       | Median size of message payloads sent                                                    | Payload size that is being transmitted            |
+| Broadcast From Database Replication Lag                    | Median latency between database commit and broadcast when using broadcast from database | Latency to Broadcast from the database            |
+| Read/Write Private Channel Subscription RLS Execution Time | Median time to authorize private channels                                               | `realtime.messages` RLS policies performance      |
+| Total Requests                                             | HTTP requests to Realtime endpoints                                                     | API usage alongside WebSocket activity            |
+| Response Speed                                             | Performance of Realtime API endpoints                                                   | Infrastructure optimization opportunities         |
 
 ## Edge Functions
 
