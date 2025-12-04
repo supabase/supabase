@@ -1,9 +1,9 @@
 import { Plus, Search } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useParams } from 'common'
+import { NoOrganizationsState } from 'components/interfaces/Home/ProjectList/EmptyStates'
 import { OrganizationCard } from 'components/interfaces/Organization/OrganizationCard'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -26,7 +26,6 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 const OrganizationsPage: NextPageWithLayout = () => {
-  const router = useRouter()
   const [search, setSearch] = useState('')
   const { error: orgNotFoundError, org: orgSlug } = useParams()
   const orgNotFound = orgNotFoundError === 'org_not_found'
@@ -40,14 +39,6 @@ const OrganizationsPage: NextPageWithLayout = () => {
       : organizations?.filter(
           (x) => x.name.toLowerCase().includes(search) || x.slug.toLowerCase().includes(search)
         )
-
-  useEffect(() => {
-    // If there are no organizations, force the user to create one
-    // unless the user is on the not found page
-    if (isSuccess && organizations.length <= 0 && !orgNotFound) {
-      router.push('/new')
-    }
-  }, [isSuccess, organizations])
 
   return (
     <ScaffoldContainer>
@@ -70,43 +61,49 @@ const OrganizationsPage: NextPageWithLayout = () => {
           <p className="-mt-4">You don't have any organizations yet. Create one to get started.</p>
         )}
 
-        <div className="flex items-center justify-between gap-x-2 md:gap-x-3">
-          {organizations.length > 0 && (
-            <Input
-              size="tiny"
-              placeholder="Search for an organization"
-              icon={<Search />}
-              className="w-full flex-1 md:w-64"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-            />
-          )}
+        {isLoading ? (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <Skeleton className="h-[70px] rounded-md" />
+            <Skeleton className="h-[70px] rounded-md" />
+            <Skeleton className="h-[70px] rounded-md" />
+          </div>
+        ) : isError ? (
+          <AlertError error={error} subject="Failed to load organizations" />
+        ) : isSuccess && organizations.length === 0 && !orgNotFound ? (
+          <NoOrganizationsState />
+        ) : (
+          <>
+            <div className="flex items-center justify-between gap-x-2 md:gap-x-3">
+              {organizations.length > 0 && (
+                <Input
+                  size="tiny"
+                  placeholder="Search for an organization"
+                  icon={<Search />}
+                  className="w-full flex-1 md:w-64"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                />
+              )}
 
-          {organizationCreationEnabled && (
-            <Button asChild icon={<Plus />} type="primary" className="w-min">
-              <Link href={`/new`}>New organization</Link>
-            </Button>
-          )}
-        </div>
+              {organizationCreationEnabled && organizations.length > 0 && (
+                <Button asChild icon={<Plus />} type="primary" className="w-min">
+                  <Link href={`/new`}>New organization</Link>
+                </Button>
+              )}
+            </div>
 
-        {search.length > 0 && filteredOrganizations.length === 0 && (
-          <NoSearchResults searchString={search} />
+            {search.length > 0 && filteredOrganizations.length === 0 && (
+              <NoSearchResults searchString={search} />
+            )}
+
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {isSuccess &&
+                filteredOrganizations.map((org) => (
+                  <OrganizationCard key={org.id} organization={org} />
+                ))}
+            </div>
+          </>
         )}
-
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {isLoading && (
-            <>
-              <Skeleton className="h-[70px] rounded-md" />
-              <Skeleton className="h-[70px] rounded-md" />
-              <Skeleton className="h-[70px] rounded-md" />
-            </>
-          )}
-          {isError && <AlertError error={error} subject="Failed to load organizations" />}
-          {isSuccess &&
-            filteredOrganizations.map((org) => (
-              <OrganizationCard key={org.id} organization={org} />
-            ))}
-        </div>
       </ScaffoldSection>
     </ScaffoldContainer>
   )
