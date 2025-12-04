@@ -57,9 +57,7 @@ const OrganizationsPage: NextPageWithLayout = () => {
           </Alert_Shadcn_>
         )}
 
-        {organizations.length === 0 && orgNotFound && (
-          <p className="-mt-4">You don't have any organizations yet. Create one to get started.</p>
-        )}
+        {organizations.length === 0 && orgNotFound && <NoOrganizationsState />}
 
         {isLoading ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
