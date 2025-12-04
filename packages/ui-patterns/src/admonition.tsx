@@ -78,16 +78,6 @@ const admonitionSVG = cva('', {
   },
 })
 
-const admonitionBase = cva('', {
-  variants: {
-    type: {
-      default: `bg-surface-200/25 border border-default`,
-      warning: `bg-warning-200 border border-warning-400`,
-      destructive: `bg-destructive-200 border border-destructive-400`,
-    },
-  },
-})
-
 export const Admonition = forwardRef<
   React.ElementRef<typeof Alert_Shadcn_>,
   React.ComponentPropsWithoutRef<typeof Alert_Shadcn_> & AdmonitionProps
@@ -115,12 +105,7 @@ export const Admonition = forwardRef<
         ref={ref}
         variant={typeMapped}
         {...props}
-        className={cn(
-          'mb-2',
-          admonitionSVG({ type: typeMapped }),
-          admonitionBase({ type: typeMapped }),
-          props.className
-        )}
+        className={cn('mb-2', admonitionSVG({ type: typeMapped }), props.className)}
       >
         {(showIcon && typeMapped === 'warning') || typeMapped === 'destructive' ? (
           <WarningIcon />
