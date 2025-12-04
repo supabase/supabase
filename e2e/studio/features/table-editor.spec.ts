@@ -12,6 +12,7 @@ import {
   waitForGridDataToLoad,
   waitForTableToLoad,
 } from '../utils/wait-for-response.js'
+import { env } from '../env.config.js'
 
 const tableNamePrefix = 'pw_table'
 const columnName = 'pw_column'
@@ -107,7 +108,9 @@ const deleteEnumIfExist = async (page: Page, ref: string, enumName: string) => {
   await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
 }
 
-test.describe.serial('table editor', () => {
+// Due to rate API rate limits run this test in serial mode on platform.
+const testRunner = env.IS_PLATFORM === 'true' ? test.describe.serial : test.describe
+testRunner('table editor', () => {
   test.beforeAll(async ({ browser, ref }) => {
     await withFileOnceSetup(import.meta.url, async () => {
       const ctx = await browser.newContext()
