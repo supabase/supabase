@@ -55,11 +55,11 @@ curl <project-url>/customer/v1/privileged/metrics \
 
 ## Supabase Grafana
 
-The pre-configured Supabase Grafana Dashboard is an advanced version of the [Dashboard's Database Reports](/dashboard/project/_/observability/database). It visualizes over 200 database performance and health metrics.
+The pre-configured [Supabase Grafana Dashboard](https://github.com/supabase/supabase-grafana/) is an advanced version of the [Dashboard's Database Reports](/dashboard/project/_/observability/database). It visualizes over 200 database performance and health metrics.
 
 ![Supabase Grafana](/docs/img/guides/platform/supabase-grafana-prometheus.png)
 
-Instructions are included in the README for deploying the repository using docker.
+Instructions are included in the [README](https://github.com/supabase/supabase-grafana/blob/main/README.md) for deploying the repository using docker.
 
 ## Using the metrics endpoint in production
 
@@ -100,6 +100,15 @@ scrape_configs:
           group: "MyGroupLabel"
 ```
 
+**For Grafana Cloud users** instead of manually configuring `prometheus.yaml`, use a "Metrics Endpoint" instead:
+
+- In the left-hand menu, select **Connections** and click **Add new connection**.
+- Search for **Metrics Endpoint** and select it.
+- Click **Add new scrape job**.
+- Enter the details specified in [Accessing the metrics endpoint](/docs/guides/telemetry/metrics#accessing-the-metrics-endpoint).
+- Set the **scraping interval** to "60s".
+- Test the connection. Once it has passed, click **Save Scrape Job**.
+
 ### Setting up a dashboard
 
 For this guide, we will be using [Grafana](https://grafana.com/docs/grafana/latest/introduction/).
@@ -108,7 +117,7 @@ You can [self-host](https://grafana.com/docs/grafana/latest/setup-grafana/instal
 
 - [DigitalOcean](https://marketplace.digitalocean.com/apps/grafana)
 - [AWS](https://aws.amazon.com/grafana/)
-- [Grafana Cloud](https://grafana.com/grafana/)
+- [Grafana Cloud](https://grafana.com/products/cloud/metrics/)
 
 Follow the guides of the provider you choose to get Grafana up and running.
 
@@ -118,15 +127,31 @@ In the left-hand menu, select `Data sources` and click `Add new data source`.
 
 Select `Prometheus` and enter the connection details for the Prometheus instance you have set up.
 
+**Grafana Cloud users** refer to [Grafana Cloud Prometheus connection details](/docs/guides/telemetry/metrics#grafana-cloud-prometheus).
+
+Name the datasource "prometheus" (if you use a different name, you need to modify the `dashboard.json` file when adding the dashboard).
+
 Under **Interval behavior**, set the **scraping interval** to 60s and test the data source. Once it has passed, save it.
+
+#### Grafana cloud Prometheus connection details [#grafana-cloud-prometheus]
+
+- Log into your [Grafana Cloud Portal](https://grafana.com/auth/sign-in/).
+- Under **Grafana Cloud stack** click **Details**.
+- Search for **Prometheus** and click **Details**.
+- The **Grafana Data Source settings** section contains the necessary connection details
+  - "URL" (the format "https://UNIQUE_IDENTIFIER.grafana.net/api/prom")
+  - "User" / "Password"
 
 ### Adding the Supabase dashboard
 
 In the left-hand menu, select `Dashboards` and click `New`. From the drop-down, select `Import`.
 
-Copy the raw file from our [supabase-grafana](https://raw.githubusercontent.com/supabase/supabase-grafana/refs/heads/main/grafana/dashboard.json) repository and paste it (or upload the file).
+Copy the raw file from our [supabase-grafana](https://raw.githubusercontent.com/supabase/supabase-grafana/refs/heads/main/grafana/dashboard.json) repository.
 
-Click `Load` and the dashboard will load from the project specified in your Prometheus job.
+- If your Prometheus data source is named "prometheus", paste the contents of the file (or upload the file).
+- If your Prometheus data source is **not named "prometheus"**, find all occurrences of `"uid": "prometheus"` and replace `prometheus` with your custom data source name.
+
+Click "Load" and the dashboard loads from the project specified in your Prometheus job.
 
 ### Monitoring your project
 
@@ -134,7 +159,6 @@ You can configure alerts from Prometheus or Grafana. The `supabase-grafana` repo
 
 <Admonition type="caution">
 
-Grafana Cloud has an unofficial integration for scraping Supabase metrics. See their [docs](https://grafana.com/docs/grafana-cloud/monitor-infrastructure/integrations/integration-reference/integration-supabase/) for instructions on how to configure it but note that it is not full-featured nor is it supported
-by Supabase.
+Grafana Cloud has an unofficial integration for scraping Supabase metrics. See their [docs](https://grafana.com/docs/grafana-cloud/monitor-infrastructure/integrations/integration-reference/integration-supabase/) for instructions on how to configure it but note that it is not full-featured nor is it supported by Supabase.
 
 </Admonition>
