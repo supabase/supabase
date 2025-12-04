@@ -27,6 +27,7 @@ import { projectKeys } from 'data/projects/keys'
 import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -77,8 +78,9 @@ export const CreateBranchModal = () => {
     'preview_branches'
   )
 
-  const isProPlanAndUp = selectedOrg?.plan?.id !== 'free'
-  const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
+  const { hasAccess: hasAccessToBranching, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('branching_limit')
+  const promptPlanUpgrade = IS_PLATFORM && !hasAccessToBranching
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const projectRef =
@@ -219,7 +221,8 @@ export const CreateBranchModal = () => {
     !canCreateBranch ||
     !isSuccessAddons ||
     !isSuccessConnections ||
-    promptProPlanUpgrade ||
+    isLoadingEntitlement ||
+    !hasAccessToBranching ||
     (!gitlessBranching && !githubConnection) ||
     isCreatingBranch ||
     isCheckingGHBranchValidity
@@ -253,7 +256,7 @@ export const CreateBranchModal = () => {
         size="large"
         hideClose
         onOpenAutoFocus={(e) => {
-          if (promptProPlanUpgrade) e.preventDefault()
+          if (promptPlanUpgrade) e.preventDefault()
         }}
         aria-describedby={undefined}
       >
@@ -264,7 +267,7 @@ export const CreateBranchModal = () => {
 
         <Form_Shadcn_ {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            {promptProPlanUpgrade && (
+            {promptPlanUpgrade && (
               <UpgradeToPro
                 fullWidth
                 layout="vertical"
@@ -277,7 +280,7 @@ export const CreateBranchModal = () => {
 
             <DialogSection
               padding="medium"
-              className={cn('space-y-4', promptProPlanUpgrade && 'opacity-25 pointer-events-none')}
+              className={cn('space-y-4', promptPlanUpgrade && 'opacity-25 pointer-events-none')}
             >
               <FormField_Shadcn_
                 control={form.control}
@@ -408,7 +411,7 @@ export const CreateBranchModal = () => {
               padding="medium"
               className={cn(
                 'flex flex-col gap-4',
-                promptProPlanUpgrade && 'opacity-25 pointer-events-none'
+                promptPlanUpgrade && 'opacity-25 pointer-events-none'
               )}
             >
               {withData && (

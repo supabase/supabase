@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useParams } from 'common'
-import { AdvancedAuthSettingsForm } from 'components/interfaces/Auth/AdvancedAuthSettingsForm'
+import { PerformanceSettingsForm } from 'components/interfaces/Auth/PerformanceSettingsForm'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import NoPermission from 'components/ui/NoPermission'
@@ -20,17 +20,17 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
-const AdvancedPage: NextPageWithLayout = () => {
+const PerformancePage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const showAdvanced = useIsFeatureEnabled('authentication:advanced')
+  const showPerformance = useIsFeatureEnabled('authentication:performance')
 
   const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'custom_config_gotrue'
   )
 
-  if (!showAdvanced) {
-    return <UnknownInterface urlBack={`/project/${ref}/auth/users`} />
+  if (!showPerformance) {
+    return <UnknownInterface urlBack={`/project/${ref}/auth/providers`} />
   }
 
   if (isPermissionsLoaded && !canReadAuthSettings) {
@@ -42,9 +42,9 @@ const AdvancedPage: NextPageWithLayout = () => {
       <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
-            <PageHeaderTitle>Advanced</PageHeaderTitle>
+            <PageHeaderTitle>Performance</PageHeaderTitle>
             <PageHeaderDescription>
-              Configure advanced authentication server settings
+              Configure settings to optimize your Auth server's performance
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
@@ -57,17 +57,17 @@ const AdvancedPage: NextPageWithLayout = () => {
             </PageSectionContent>
           </PageSection>
         ) : (
-          <AdvancedAuthSettingsForm />
+          <PerformanceSettingsForm />
         )}
       </PageContainer>
     </>
   )
 }
 
-AdvancedPage.getLayout = (page) => (
+PerformancePage.getLayout = (page) => (
   <DefaultLayout>
     <AuthLayout>{page}</AuthLayout>
   </DefaultLayout>
 )
 
-export default AdvancedPage
+export default PerformancePage

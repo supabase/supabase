@@ -503,15 +503,13 @@ export const MfaAuthSettingsForm = () => {
                 </CardContent>
 
                 {promptProPlanUpgrade && (
-                  <div className="mb-4">
-                    <UpgradeToPro
-                      fullWidth
-                      source="authSmsMfa"
-                      featureProposition="configure settings for SMS MFA"
-                      primaryText="SMS MFA is only available on the Pro Plan and above"
-                      secondaryText="Upgrade to the Pro plan to configure settings for SMS MFA"
-                    />
-                  </div>
+                  <UpgradeToPro
+                    fullWidth
+                    source="authSmsMfa"
+                    featureProposition="configure settings for SMS MFA"
+                    primaryText="SMS MFA is only available on the Pro Plan and above"
+                    secondaryText="Upgrade to the Pro plan to configure settings for SMS MFA"
+                  />
                 )}
 
                 <CardFooter className="justify-end space-x-2">

@@ -46,7 +46,7 @@ export const UpgradeToPro = ({
       className={cn(
         'bg-surface-100 mb-0',
         fullWidth &&
-          'border-0 rounded-none border-b px-6 [&>svg]:left-6 [&>div>button]:w-min [&>div>button]:mt-3',
+          'border-0 rounded-none border-b px-6 [&>svg]:left-6 [&>div>button]:w-min [&>div>button]:mt-3 [&>div>a]:w-min [&>div>a]:mt-3',
         className
       )}
       actions={

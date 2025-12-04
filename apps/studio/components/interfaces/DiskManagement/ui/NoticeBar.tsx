@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { type ComponentProps, type ReactNode } from 'react'
+import { cn } from 'ui'
 
 import { Admonition } from 'ui-patterns'
 
@@ -20,7 +21,7 @@ export function NoticeBar({ visible, description, actions, ...props }: NoticeBar
           exit={{ opacity: 0, height: 0, y: 4 }}
           transition={{ duration: 0.15 }}
         >
-          <Admonition {...props}>
+          <Admonition {...props} className={cn(props.className, 'mb-0')}>
             {description}
             <div className="flex flex-col gap-2">
               {actions && <div className="mt-2">{actions}</div>}
