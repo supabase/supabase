@@ -2,6 +2,9 @@ import fs from 'fs'
 import path from 'path'
 
 const BASE_URL = 'https://supabase.com/ui/docs'
+const DOCS_DIR = path.join(process.cwd(), 'content/docs')
+const OUTPUT_DIR = path.join(process.cwd(), 'public')
+const OUTPUT_FILE = path.join(OUTPUT_DIR, 'llms.txt')
 
 interface DocMeta {
   title: string
@@ -11,26 +14,36 @@ interface DocMeta {
 
 console.log('🤖 Building llms.txt')
 
-// Function to extract frontmatter from MDX files
+// Parse frontmatter safely
 function extractFrontmatter(content: string): { title?: string; description?: string } {
-  const frontmatterRegex = /---\n([\s\S]*?)\n---/
-  const match = content.match(frontmatterRegex)
+  const fmRegex = /^---\n([\s\S]*?)\n---/m
+  const match = content.match(fmRegex)
   if (!match) return {}
 
-  const frontmatter = match[1]
-  const titleMatch = frontmatter.match(/title:\s*(.*)/)
-  const descriptionMatch = frontmatter.match(/description:\s*(.*)/)
+  const lines = match[1]
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
 
-  return {
-    title: titleMatch?.[1],
-    description: descriptionMatch?.[1],
+  const result: { title?: string; description?: string } = {}
+
+  for (const line of lines) {
+    if (line.startsWith('title:')) {
+      result.title = line.replace('title:', '').trim()
+    } else if (line.startsWith('description:')) {
+      result.description = line.replace('description:', '').trim()
+    }
   }
+
+  return result
 }
 
-// Function to recursively get all MDX files
+// Recursively collect MDX files
 function getMdxFiles(dir: string): string[] {
-  const files: string[] = []
+  if (!fs.existsSync(dir)) return []
+
   const entries = fs.readdirSync(dir, { withFileTypes: true })
+  const files: string[] = []
 
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name)
@@ -44,39 +57,32 @@ function getMdxFiles(dir: string): string[] {
   return files
 }
 
-// Function to get all MDX files and their metadata
+// Build metadata list
 function getDocFiles(): DocMeta[] {
-  const docsDir = path.join(process.cwd(), 'content/docs')
-  const mdxFiles = getMdxFiles(docsDir).sort((a, b) => a.localeCompare(b))
+  const mdxFiles = getMdxFiles(DOCS_DIR).sort()
 
   const docs: DocMeta[] = []
-
-  for (const fullPath of mdxFiles) {
-    console.log(fullPath)
-    const content = fs.readFileSync(fullPath, 'utf-8')
+  for (const file of mdxFiles) {
+    const content = fs.readFileSync(file, 'utf-8')
     const { title, description } = extractFrontmatter(content)
 
-    if (title) {
-      // Get relative path and convert to URL path
-      const relativePath = path.relative(docsDir, fullPath)
-      const urlPath = relativePath
-        .replace(/\.mdx$/, '')
-        .replace(/\/index$/, '')
-        .replace(/\\/g, '/')
+    if (!title) continue
 
-      docs.push({
-        title,
-        description,
-        path: urlPath,
-      })
-    }
+    const relativePath = path.relative(DOCS_DIR, file)
+    const urlPath = relativePath
+      .replace(/\.mdx$/, '')
+      .replace(/\/index$/, '')
+      .replace(/\\/g, '/')
+
+    docs.push({ title, description, path: urlPath })
   }
 
   return docs
 }
 
-// Generate the llms.txt content
+// Build llms.txt
 const docs = getDocFiles()
+
 let content = `# Supabase UI Library
 Last updated: ${new Date().toISOString()}
 
@@ -86,21 +92,18 @@ Library of components for your project. The components integrate with Supabase a
 ## Docs
 `
 
-// Add documentation links
 for (const doc of docs) {
   const url = `${BASE_URL}/${doc.path}`
-  content += `- [${doc.title}](${url})`
+  content += `- [${doc.title}](${url})\n`
   if (doc.description) {
-    content += `\n    - ${doc.description}`
+    content += `  - ${doc.description}\n`
   }
-  content += '\n'
 }
 
-// Write the file
-const publicDir = path.join(process.cwd(), 'public')
-if (!fs.existsSync(publicDir)) {
-  fs.mkdirSync(publicDir, { recursive: true })
+// Ensure directory exists
+if (!fs.existsSync(OUTPUT_DIR)) {
+  fs.mkdirSync(OUTPUT_DIR, { recursive: true })
 }
 
-fs.writeFileSync(path.join(publicDir, 'llms.txt'), content)
-console.log('✅ Generated llms.txt in public directory')
+fs.writeFileSync(OUTPUT_FILE, content)
+console.log('✅ Generated llms.txt in public/')
