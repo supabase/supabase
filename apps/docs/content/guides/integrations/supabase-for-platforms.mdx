@@ -1,13 +1,13 @@
 ---
-id: 'platform-as-a-service'
-title: 'Supabase as a Service'
-description: 'Use Supabase as a Platform for your own business and tools.'
-subtitle: 'Use Supabase as a Platform for your own business and tools.'
+id: 'supabase-for-platform'
+title: 'Supabase for Platforms'
+description: 'Use Supabase as a platform for your own business and tools.'
+subtitle: 'Use Supabase as a platform for your own business and tools.'
 ---
 
 Supabase is a [Platform as a Service](https://en.wikipedia.org/wiki/Platform_as_a_service) (PaaS) that can be managed programmatically. You can use it to offer the key primitives to your own users, such as [Database](/docs/guides/database/overview), [Auth](/docs/guides/auth), [Edge Functions](/docs/guides/functions), [Storage](/docs/guides/storage), and [Realtime](/docs/guides/realtime). Supabase is commonly used as a platform by AI Builders and frameworks needing a backend.
 
-This document will guide you on best practices when using Supabase as a PaaS and assumes that Supabase projects are in a Supabase organization that you own. If you want to instead interact with projects through OAuth integration, navigate to [Supabase OAuth Integration](/docs/guides/integrations/build-a-supabase-oauth-integration) for more details.
+This document will guide you on best practices when using Supabase for your own platform and assumes that Supabase projects are in a Supabase organization that you own. If you want to instead interact with projects that your users own, navigate to [OAuth integration](/docs/guides/integrations/build-a-supabase-oauth-integration) for more details.
 
 ![Platform as a Service](/docs/img/integrations/paas-intro.png)
 
@@ -19,16 +19,16 @@ All features of Supabase can be managed through the [Management API](/docs/refer
 
 Management API endpoints:
 
-- Create project: [`POST /v1/projects`](https://api.supabase.com/api/v1#tag/projects/post/v1projects)
-- Get smart region selection codes: [`GET /v1/projects/available-regions`](https://api.supabase.com/api/v1#tag/projects/get/v1projectsavailable-regions)
-- Check service health: [`GET /v1/projects/{ref}/health`](https://api.supabase.com/api/v1#tag/projects/get/v1projectsrefhealth)
+- Create project: [`POST /v1/projects`](https://api.supabase.com/api/v1#tag/projects/post/v1/projects)
+- Get smart region selection codes: [`GET /v1/projects/available-regions`](https://api.supabase.com/api/v1#tag/projects/get/v1/projects/available-regions)
+- Check service health: [`GET /v1/projects/{ref}/health`](https://api.supabase.com/api/v1#tag/projects/get/v1/projects/{ref}/health)
 
 We recommend:
 
 - **a _very_ secure password for each database**. Do not reuse the same password across databases.
 - **storing the encrypted version of the password**. Once you set the password during project creation, there is no way to programmatically change the password but you can do so manually in the Supabase Dashboard.
-- **using smart region selection to ensure there's enough capacity**. The available smart region codes are `americas`, `emea`, and `apac` and you can make a request to [`GET /v1/projects/available-regions`](https://api.supabase.com/api/v1#tag/projects/get/v1projectsavailable-regions) for region details.
-- **make sure that the services are `ACTIVE_HEALTHY` after project creation**. After creating project, confirm the service that you want to make a request to has a status of `ACTIVE_HEALTHY` by polling [`GET /v1/projects/{ref}/health`](https://api.supabase.com/api/v1#tag/projects/get/v1projectsrefhealth). For example, before making a request to set an Auth configuration confirm that the Auth service has a status of `ACTIVE_HEALTHY`.
+- **using smart region selection to ensure there's enough capacity**. The available smart region codes are `americas`, `emea`, and `apac` and you can make a request to [`GET /v1/projects/available-regions`](https://api.supabase.com/api/v1#tag/projects/get/v1/projects/available-regions) for region details.
+- **make sure that the services are `ACTIVE_HEALTHY` after project creation**. After creating project, confirm the service that you want to make a request to has a status of `ACTIVE_HEALTHY` by polling [`GET /v1/projects/{ref}/health`](https://api.supabase.com/api/v1#tag/projects/get/v1/projects/{ref}/health). For example, before making a request to set an Auth configuration confirm that the Auth service has a status of `ACTIVE_HEALTHY`.
 
 ```sh
 curl https://api.supabase.com/v1/projects \
@@ -57,12 +57,12 @@ If you want access to Pico instances contact us.
 
 Management API endpoints:
 
-- Get the new API keys: [`GET /v1/projects/{ref}/api-keys`](https://api.supabase.com/api/v1#tag/secrets/get/v1projectsrefapi-keys)
-- Enable the new API keys: [`POST /v1/projects/{ref}/api-keys`](https://api.supabase.com/api/v1#tag/secrets/post/v1projectsrefapi-keys)
+- Get the new API keys: [`GET /v1/projects/{ref}/api-keys`](https://api.supabase.com/api/v1#tag/secrets/get/v1/projects/{ref}/api-keys)
+- Enable the new API keys: [`POST /v1/projects/{ref}/api-keys`](https://api.supabase.com/api/v1#tag/secrets/post/v1/projects/{ref}/api-keys)
 
 We are in the process of migrating away from our legacy API keys `anon` and `service_role` and towards the new API keys `publishable` and `secret`. You can learn more by navigating to [Upcoming changes to Supabase API Keys #29260](https://github.com/orgs/supabase/discussions/29260).
 
-Get the new API keys by making a [`GET /v1/projects/{ref}/api-keys`](https://api.supabase.com/api/v1#tag/secrets/get/v1projectsrefapi-keys) request.
+Get the new API keys by making a [`GET /v1/projects/{ref}/api-keys`](https://api.supabase.com/api/v1#tag/secrets/get/v1/projects/{ref}/api-keys) request.
 
 ```sh
 curl 'https://api.supabase.com/v1/projects/{ref}/api-keys?reveal=true' \
@@ -71,7 +71,7 @@ curl 'https://api.supabase.com/v1/projects/{ref}/api-keys?reveal=true' \
 
 If the response includes `"publishable"` and `"secret"` keys then you're all set and you should only use those from now on.
 
-Otherwise, enable the new API keys by making two [`POST /v1/projects/{ref}/api-keys`](https://api.supabase.com/api/v1#tag/secrets/post/v1projectsrefapi-keys) requests, one for `publishable` and another for `secret`.
+Otherwise, enable the new API keys by making two [`POST /v1/projects/{ref}/api-keys`](https://api.supabase.com/api/v1#tag/secrets/post/v1/projects/{ref}/api-keys) requests, one for `publishable` and another for `secret`.
 
 ```sh
 curl 'https://api.supabase.com/v1/projects/{ref}/api-keys' \
@@ -100,9 +100,9 @@ curl 'https://api.supabase.com/v1/projects/{ref}/api-keys?reveal=true' \
 
 ## Changing compute sizes
 
-Management API endpoint: [`PATCH /v1/projects/{ref}/billing/addons`](https://api.supabase.com/api/v1#tag/billing/patch/v1projectsrefbillingaddons)
+Management API endpoint: [`PATCH /v1/projects/{ref}/billing/addons`](https://api.supabase.com/api/v1#tag/billing/patch/v1/projects/{ref}/billing/addons)
 
-You can upgrade and downgrade compute sizes by making requests to [`PATCH /v1/projects/{ref}/billing/addons`](https://api.supabase.com/api/v1#tag/billing/patch/v1projectsrefbillingaddons).
+You can upgrade and downgrade compute sizes by making requests to [`PATCH /v1/projects/{ref}/billing/addons`](https://api.supabase.com/api/v1#tag/billing/patch/v1/projects/{ref}/billing/addons).
 
 ```sh
 curl 'https://api.supabase.com/v1/projects/{ref}/billing/addons' \
@@ -121,12 +121,12 @@ Once you have access to [Pico instances](#pico-compute-instance), you will no lo
 
 Management API endpoints:
 
-- Auth: [`PATCH /v1/projects/{ref}/config/auth`](https://api.supabase.com/api/v1#tag/auth/patch/v1projectsrefconfigauth)
-- Data API (PostgREST): [`PATCH /v1/projects/{ref}/postgrest`](https://api.supabase.com/api/v1#tag/rest/patch/v1projectsrefpostgrest)
+- Auth: [`PATCH /v1/projects/{ref}/config/auth`](https://api.supabase.com/api/v1#tag/auth/patch/v1/projects/{ref}/config/auth)
+- Data API (PostgREST): [`PATCH /v1/projects/{ref}/postgrest`](https://api.supabase.com/api/v1#tag/rest/patch/v1/projects/{ref}/postgrest)
 - Edge Functions:
-  - [`PATCH /v1/projects/{ref}/functions/{function_slug}`](https://api.supabase.com/api/v1#tag/edge-functions/patch/v1projectsreffunctionsfunction_slug)
-  - [`PUT /v1/projects/{ref}/functions`](https://api.supabase.com/api/v1#tag/edge-functions/put/v1projectsreffunctions)
-- Storage: [`PATCH /v1/projects/{ref}/config/storage`](https://api.supabase.com/api/v1#tag/storage/patch/v1projectsrefconfigstorage)
+  - [`PATCH /v1/projects/{ref}/functions/{function_slug}`](https://api.supabase.com/api/v1#tag/edge-functions/patch/v1/projects/{ref}/functions/{function_slug})
+  - [`PUT /v1/projects/{ref}/functions`](https://api.supabase.com/api/v1#tag/edge-functions/put/v1/projects/{ref}/functions)
+- Storage: [`PATCH /v1/projects/{ref}/config/storage`](https://api.supabase.com/api/v1#tag/storage/patch/v1/projects/{ref}/config/storage)
 - Realtime: [`PATCH /v1/projects/{ref}/config/realtime`](https://api.supabase.com/api/v1#tag/realtime-config/patch/v1/projects/{ref}/config/realtime)
 
 You can manage the configuration of all services using the Management API.
@@ -141,7 +141,7 @@ Because of this, it's important that you adopt a development workflow on behalf 
 
 ### Creating a `DEV` branch
 
-Management API endpoint: [`POST /v1/projects/{ref}/branches`](https://api.supabase.com/api/v1#tag/environments/post/v1projectsrefbranches)
+Management API endpoint: [`POST /v1/projects/{ref}/branches`](https://api.supabase.com/api/v1#tag/environments/post/v1/projects/{ref}/branches)
 
 After launching a project, it's important that all changes happen on a development branch. Branches can be treated like ephemeral servers: if anything goes wrong you can either revert the changes or destroy the branch and create a new one based off of production.
 
@@ -161,9 +161,9 @@ curl 'https://api.supabase.com/v1/projects/{ref}/branches' \
 
 ### Make database changes
 
-Management API endpoint: [`POST /v1/projects/{ref}/database/migrations`](https://api.supabase.com/api/v1#tag/database/post/v1projectsrefdatabasemigrations)
+Management API endpoint: [`POST /v1/projects/{ref}/database/migrations`](https://api.supabase.com/api/v1#tag/database/post/v1/projects/{ref}/database/migrations)
 
-For this example we will create a todos table using the [`POST /v1/projects/{ref}/database/migrations`](https://api.supabase.com/api/v1#tag/database/post/v1projectsrefdatabasemigrations) endpoint.
+For this example we will create a todos table using the [`POST /v1/projects/{ref}/database/migrations`](https://api.supabase.com/api/v1#tag/database/post/v1/projects/{ref}/database/migrations) endpoint.
 
 ```sql
 create table public.todos (
@@ -295,7 +295,7 @@ curl https://api.supabase.com/v1/projects/functions/deploy \
 
 ### Merge all changes
 
-Management API endpoint: [`POST /v1/branches/{branch_id_or_ref}/merge`](https://api.supabase.com/api/v1#tag/environments/post/v1branchesbranch_id_or_refmerge)
+Management API endpoint: [`POST /v1/branches/{branch_id_or_ref}/merge`](https://api.supabase.com/api/v1#tag/environments/post/v1/branches/{branch_id_or_ref}/merge)
 
 Once the changes have been made, you can merge the changes into the production project:
 
@@ -314,7 +314,7 @@ Merging changes will automatically merge only the following:
 
 ## Security checks for production
 
-Management API endpoint: [`GET /v1/projects/{ref}/advisors/security`](https://api.supabase.com/api/v1#tag/advisors/get/v1projectsrefadvisorssecurity)
+Management API endpoint: [`GET /v1/projects/{ref}/advisors/security`](https://api.supabase.com/api/v1#tag/advisors/get/v1/projects/{ref}/advisors/security)
 
 Prior to deploying to production we strongly recommend running the security advisor on the project to make sure the latest changes are secure.
 
@@ -327,7 +327,7 @@ curl https://api.supabase.com/v1/projects/{ref}/advisors/security \
 
 ## Disaster recovery for production
 
-Management API endpoint: [`POST /v1/projects/{ref}/database/backups/restore-pitr`](https://api.supabase.com/api/v1#tag/database/post/v1projectsrefdatabasebackupsrestore-pitr)
+Management API endpoint: [`POST /v1/projects/{ref}/database/backups/restore-pitr`](https://api.supabase.com/api/v1#tag/database/post/v1/projects/{ref}/database/backups/restore-pitr)
 
 ![Rollback](/docs/img/integrations/rollback.png)
 
@@ -346,7 +346,7 @@ curl https://api.supabase.com/v1/projects/database/backups/restore-pitr \
 
 ## Claim flow
 
-Management API endpoint: [`GET /v1/oauth/authorize/project-claim`](https://api.supabase.com/api/v1#tag/oauth/get/v1oauthauthorizeproject-claim)
+Management API endpoint: [`GET /v1/oauth/authorize/project-claim`](https://api.supabase.com/api/v1#tag/oauth/get/v1/oauth/authorize/project-claim)
 
 Your users may want to claim the project that currently lives in your org so that they can have more control over it.
 
