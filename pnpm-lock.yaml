@@ -1645,6 +1645,9 @@ importers:
       next-themes:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      nuqs:
+        specifier: ^2.8.1
+        version: 2.8.1(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(next@15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       openai:
         specifier: ^4.75.1
         version: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76)
@@ -15219,6 +15222,27 @@ packages:
       react: '>=18.2.0 || ^19.0.0-0'
       react-router: ^6 || ^7
       react-router-dom: ^6 || ^7
+    peerDependenciesMeta:
+      '@remix-run/react':
+        optional: true
+      '@tanstack/react-router':
+        optional: true
+      next:
+        optional: true
+      react-router:
+        optional: true
+      react-router-dom:
+        optional: true
+
+  nuqs@2.8.1:
+    resolution: {integrity: sha512-kIw8UW5KXXfVla6B9h0EKzSH/YDpee6lojniQoMyul8wq9brwV0kElE2Jzg4NSCLBo7n2E3wc1J3o7IyPYVlqQ==}
+    peerDependencies:
+      '@remix-run/react': '>=2'
+      '@tanstack/react-router': ^1
+      next: '>=14.2.0'
+      react: '>=18.2.0 || ^19.0.0-0'
+      react-router: ^5 || ^6 || ^7
+      react-router-dom: ^5 || ^6 || ^7
     peerDependenciesMeta:
       '@remix-run/react':
         optional: true
@@ -35871,6 +35895,15 @@ snapshots:
     optionalDependencies:
       '@tanstack/react-router': 1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next: 16.0.7(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
+      react-router: 7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+
+  nuqs@2.8.1(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(next@15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
+    dependencies:
+      '@standard-schema/spec': 1.0.0
+      react: 18.3.1
+    optionalDependencies:
+      '@tanstack/react-router': 1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 15.5.7(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
       react-router: 7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
   nuxt@4.1.2(@electric-sql/pglite@0.2.15)(@parcel/watcher@2.5.1)(@types/node@22.13.14)(@vue/compiler-sfc@3.5.21)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(pg@8.16.3))(encoding@0.1.13)(eslint@9.37.0(jiti@2.5.1)(supports-color@8.1.1))(ioredis@5.7.0(supports-color@8.1.1))(magicast@0.3.5)(rollup@4.50.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.20.3)(typescript@5.9.2)(vite@7.1.11(@types/node@22.13.14)(jiti@2.5.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.1))(yaml@2.8.1):
