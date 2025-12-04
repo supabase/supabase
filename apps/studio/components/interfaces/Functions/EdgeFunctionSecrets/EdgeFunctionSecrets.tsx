@@ -18,22 +18,25 @@ import AddNewSecretForm from './AddNewSecretForm'
 import EdgeFunctionSecret from './EdgeFunctionSecret'
 import { EditSecretSheet } from './EditSecretSheet'
 
-const EdgeFunctionSecrets = () => {
+export const EdgeFunctionSecrets = () => {
   const { ref: projectRef } = useParams()
   const [searchString, setSearchString] = useState('')
 
   // Track the ID being deleted to exclude it from error checking
   const deletingSecretNameRef = useRef<string | null>(null)
 
-  const { can: canReadSecrets, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.SECRETS_READ,
+  const { can: canReadSecrets, isLoading: isLoadingSecretsPermissions } = useAsyncCheckPermissions(
+    PermissionAction.FUNCTIONS_SECRET_READ,
     '*'
   )
   const { can: canUpdateSecrets } = useAsyncCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
 
-  const { data, error, isLoading, isSuccess, isError } = useSecretsQuery({
-    projectRef: projectRef,
-  })
+  const { data, error, isLoading, isSuccess, isError } = useSecretsQuery(
+    {
+      projectRef: projectRef,
+    },
+    { enabled: canReadSecrets }
+  )
 
   const { setValue: setSelectedSecretToEdit, value: selectedSecretToEdit } =
     useQueryStateWithSelect({
@@ -73,19 +76,20 @@ const EdgeFunctionSecrets = () => {
   const headers = [
     <TableHead key="secret-name">Name</TableHead>,
     <TableHead key="secret-value" className="flex items-center gap-x-2">
-      Digest{' '}
-      <Badge color="scale" className="font-mono">
-        SHA256
-      </Badge>
+      Digest <Badge variant="default">SHA256</Badge>
     </TableHead>,
     <TableHead key="secret-updated-at">Updated at</TableHead>,
     <TableHead key="actions" />,
   ]
 
+  const showLoadingState = isLoadingSecretsPermissions || (canReadSecrets && isLoading)
+
   return (
     <>
-      {isLoading || isLoadingPermissions ? (
+      {showLoadingState ? (
         <GenericSkeletonLoader />
+      ) : !canReadSecrets ? (
+        <NoPermission resourceText="view this project's edge function secrets" />
       ) : (
         <>
           {isError && <AlertError error={error} subject="Failed to retrieve project secrets" />}
@@ -110,7 +114,7 @@ const EdgeFunctionSecrets = () => {
                       placeholder="Search for a secret"
                       value={searchString}
                       onChange={(e: any) => setSearchString(e.target.value)}
-                      icon={<Search size={14} />}
+                      icon={<Search />}
                     />
                   </div>
 
@@ -187,5 +191,3 @@ const EdgeFunctionSecrets = () => {
     </>
   )
 }
-
-export default EdgeFunctionSecrets

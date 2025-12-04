@@ -3,6 +3,7 @@ import { ChevronDown } from 'lucide-react'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -21,12 +22,14 @@ import { extractMethod, isValidHook } from './hooks.utils'
 interface AddHookDropdownProps {
   buttonText?: string
   align?: 'end' | 'center'
+  type?: 'primary' | 'default'
   onSelectHook: (hook: HOOK_DEFINITION_TITLE) => void
 }
 
 export const AddHookDropdown = ({
   buttonText = 'Add hook',
   align = 'end',
+  type = 'primary',
   onSelectHook,
 }: AddHookDropdownProps) => {
   const { ref: projectRef } = useParams()
@@ -49,14 +52,16 @@ export const AddHookDropdown = ({
   const nonEnterpriseHookOptions = hooks.filter((h) => !isValidHook(h) && !h.enterprise)
   const enterpriseHookOptions = hooks.filter((h) => !isValidHook(h) && h.enterprise)
 
-  const isTeamsOrEnterprisePlan =
-    organization?.plan.id === 'team' || organization?.plan.id === 'enterprise'
+  const hasAccessToAdvancedHooks =
+    organization?.plan.id === 'team' ||
+    organization?.plan.id === 'enterprise' ||
+    organization?.plan.id === 'platform'
 
   if (!canUpdateAuthHook) {
     return (
       <ButtonTooltip
         disabled
-        type="primary"
+        type={type}
         tooltip={{
           content: { side: 'bottom', text: 'You need additional permissions to add auth hooks' },
         }}
@@ -69,7 +74,7 @@ export const AddHookDropdown = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="primary" iconRight={<ChevronDown className="w-4 h-4" strokeWidth={1} />}>
+        <Button type={type} iconRight={<ChevronDown />}>
           {buttonText}
         </Button>
       </DropdownMenuTrigger>
@@ -84,27 +89,20 @@ export const AddHookDropdown = ({
 
         <DropdownMenuSeparator />
 
-        {!isTeamsOrEnterprisePlan && (
+        {!hasAccessToAdvancedHooks && (
           <DropdownMenuLabel className="grid gap-1 bg-surface-200">
             <p className="text-foreground-light">Team or Enterprise Plan required</p>
             <p className="text-foreground-lighter text-xs">
               The following hooks are not available on{' '}
-              <a
-                target="_href"
-                href={`https://supabase.com/dashboard/org/${organization?.slug ?? '_'}/billing`}
-                className="underline"
-              >
-                your plan
-              </a>
-              .
+              <InlineLink href={`/org/${organization?.slug ?? '_'}/billing`}>your plan</InlineLink>.
             </p>
           </DropdownMenuLabel>
         )}
         {enterpriseHookOptions.map((h) =>
-          isTeamsOrEnterprisePlan ? (
+          hasAccessToAdvancedHooks ? (
             <DropdownMenuItem
               key={h.title}
-              disabled={!isTeamsOrEnterprisePlan}
+              disabled={!hasAccessToAdvancedHooks}
               className=""
               onClick={() => onSelectHook(h.title)}
             >
@@ -113,7 +111,7 @@ export const AddHookDropdown = ({
           ) : (
             <DropdownMenuItem
               key={h.title}
-              disabled={!isTeamsOrEnterprisePlan}
+              disabled={!hasAccessToAdvancedHooks}
               onClick={() => onSelectHook(h.title)}
             >
               {h.title}

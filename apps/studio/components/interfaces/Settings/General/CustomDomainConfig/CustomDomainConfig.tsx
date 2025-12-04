@@ -6,7 +6,7 @@ import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { InlineLinkClassName } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import {
   useCustomDomainsQuery,
   type CustomDomainsData,
@@ -63,7 +63,6 @@ export const CustomDomainConfig = () => {
         </Panel>
       ) : !hasCustomDomainAddon ? (
         <UpgradeToPro
-          icon={<AlertCircle size={18} strokeWidth={1.5} />}
           primaryText={
             customDomainsDisabledDueToQuota
               ? 'New custom domains are temporarily disabled'
@@ -74,10 +73,11 @@ export const CustomDomainConfig = () => {
               ? 'We are working with our upstream DNS provider before we are able to sign up new custom domains. Please check back in a few hours.'
               : plan === 'free'
                 ? 'Paid Plans come with free vanity subdomains or Custom Domains for an additional $10/month per domain.'
-                : 'To configure a custom domain for your project, please enable the add-on. Each Custom Domains costs $10 per month.'
+                : 'To configure a custom domain for your project, please enable the add-on. Each Custom Domain costs $10 per month.'
           }
           addon="customDomain"
           source="customDomain"
+          featureProposition="enable custom domains"
           disabled={customDomainsDisabledDueToQuota}
         />
       ) : isCustomDomainsLoading ? (

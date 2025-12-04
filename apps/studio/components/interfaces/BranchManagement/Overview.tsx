@@ -41,6 +41,7 @@ import { PreviewBranchesEmptyState } from './EmptyStates'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 interface OverviewProps {
+  isGithubConnected: boolean
   isLoading: boolean
   isSuccess: boolean
   repo: string
@@ -52,6 +53,7 @@ interface OverviewProps {
 }
 
 export const Overview = ({
+  isGithubConnected,
   isLoading,
   isSuccess,
   repo,
@@ -78,6 +80,7 @@ export const Overview = ({
         {isSuccess && mainBranch !== undefined && (
           <BranchRow
             branch={mainBranch}
+            isGithubConnected={isGithubConnected}
             label={
               <div className="flex items-center gap-x-2">
                 <Shield size={14} strokeWidth={1.5} className="text-warning" />
@@ -140,6 +143,7 @@ export const Overview = ({
           persistentBranches.map((branch) => {
             return (
               <BranchRow
+                isGithubConnected={isGithubConnected}
                 key={branch.id}
                 repo={repo}
                 branch={branch}
@@ -166,6 +170,7 @@ export const Overview = ({
           ephemeralBranches.map((branch) => {
             return (
               <BranchRow
+                isGithubConnected={isGithubConnected}
                 key={branch.id}
                 repo={repo}
                 branch={branch}
