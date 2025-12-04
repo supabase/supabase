@@ -66,12 +66,8 @@ const OrganizationsPage: NextPageWithLayout = () => {
           </Alert_Shadcn_>
         )}
 
-        {organizations.length === 0 && orgNotFound && (
-          <p className="-mt-4">You don't have any organizations yet. Create one to get started.</p>
-        )}
-
-        <div className="flex items-center justify-between gap-x-2 md:gap-x-3">
-          {organizations.length > 0 && (
+        {organizations.length > 0 && (
+          <div className="flex items-center justify-between gap-x-2 md:gap-x-3">
             <Input
               size="tiny"
               placeholder="Search for an organization"
@@ -80,14 +76,16 @@ const OrganizationsPage: NextPageWithLayout = () => {
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
-          )}
 
-          {organizationCreationEnabled && (
-            <Button asChild icon={<Plus />} type="primary" className="w-min">
-              <Link href={`/new`}>New organization</Link>
-            </Button>
-          )}
-        </div>
+            {organizationCreationEnabled && (
+              <Button asChild icon={<Plus />} type="primary" className="w-min">
+                <Link href={`/new`}>New organization</Link>
+              </Button>
+            )}
+          </div>
+        )}
+
+        {isSuccess && organizations.length === 0 && !isError && <NoOrganizationsState />}
 
         {search.length > 0 && filteredOrganizations.length === 0 && (
           <NoSearchResults searchString={search} />
