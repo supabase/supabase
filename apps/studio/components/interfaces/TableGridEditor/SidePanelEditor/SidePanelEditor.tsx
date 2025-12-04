@@ -270,18 +270,21 @@ export const SidePanelEditor = ({
     const selectedForeignKeyToEdit = snap.sidePanel.foreignKey
 
     try {
-      const { row } = selectedForeignKeyToEdit
+      const { row, column } = selectedForeignKeyToEdit
       const identifiers = {} as Dictionary<any>
-      selectedTable.primary_keys.forEach((column) => {
-        const col = selectedTable.columns?.find((x) => x.name === column.name)
-        identifiers[column.name] =
-          col?.format === 'bytea' ? convertByteaToHex(row![column.name]) : row![column.name]
+      selectedTable.primary_keys.forEach((col) => {
+        const tableCol = selectedTable.columns?.find((x) => x.name === col.name)
+        identifiers[col.name] =
+          tableCol?.format === 'bytea' ? convertByteaToHex(row![col.name]) : row![col.name]
       })
 
       const isNewRecord = false
       const configuration = { identifiers, rowIdx: row.idx }
 
-      saveRow(value, isNewRecord, configuration, () => {})
+      const filteredValue =
+        value && column ? { [column.name]: value[column.name] } : value
+
+      saveRow(filteredValue, isNewRecord, configuration, () => {})
     } catch (error) {}
   }
 
