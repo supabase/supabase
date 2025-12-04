@@ -8,7 +8,7 @@ import { boolean, number, object, string } from 'yup'
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -505,8 +505,10 @@ export const MfaAuthSettingsForm = () => {
                 {promptProPlanUpgrade && (
                   <UpgradeToPro
                     fullWidth
-                    primaryText="Configuring Advanced MFA is only available on the Pro plan and above"
-                    secondaryText="Upgrade to the Pro plan to configure Advanced MFA settings"
+                    source="authSmsMfa"
+                    featureProposition="configure settings for SMS MFA"
+                    primaryText="SMS MFA is only available on the Pro Plan and above"
+                    secondaryText="Upgrade to the Pro plan to configure settings for SMS MFA"
                   />
                 )}
 

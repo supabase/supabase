@@ -8,7 +8,7 @@ import * as z from 'zod'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
@@ -194,6 +194,8 @@ export const PerformanceSettingsForm = () => {
       <ScaffoldSection isFullWidth>
         {promptProPlanUpgrade && (
           <UpgradeToPro
+            source="authPerformance"
+            featureProposition="configure advanced Auth server settings"
             primaryText="Configuring Auth server performance is only available on the Pro plan and above"
             secondaryText="Upgrade to the Pro plan to configure settings for your Auth server"
           />
