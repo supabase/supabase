@@ -7,8 +7,9 @@ import {
   ChartContent,
   ChartHeader,
   ChartTitle,
+  ChartEmptyState,
 } from 'ui-patterns/Chart'
-import { ExternalLink } from 'lucide-react'
+import { BarChart2, ExternalLink } from 'lucide-react'
 
 export default function ComposedChartDemo() {
   const actions = [
@@ -22,14 +23,27 @@ export default function ComposedChartDemo() {
   ]
 
   return (
-    <Chart>
-      <ChartCard>
-        <ChartHeader>
-          <ChartTitle tooltip="This is a tooltip">My Chart Title</ChartTitle>
-          <ChartActions actions={actions} />
-        </ChartHeader>
-        <ChartContent>Chart here</ChartContent>
-      </ChartCard>
-    </Chart>
+    <div className="w-8/12">
+      <Chart>
+        <ChartCard>
+          <ChartHeader>
+            <ChartTitle tooltip="This is a tooltip">My Chart Title</ChartTitle>
+            <ChartActions actions={actions} />
+          </ChartHeader>
+          <ChartContent
+            isEmpty={true}
+            emptyState={
+              <ChartEmptyState
+                icon={<BarChart2 size={16} />}
+                title="No data to show"
+                description="It may take up to 24 hours for data to refresh"
+              />
+            }
+          >
+            Chart here
+          </ChartContent>
+        </ChartCard>
+      </Chart>
+    </div>
   )
 }

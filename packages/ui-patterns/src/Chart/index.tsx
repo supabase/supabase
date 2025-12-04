@@ -189,18 +189,53 @@ ChartActions.displayName = 'ChartActions'
 /* Chart Content */
 interface ChartContentProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
+  className?: string
+  isEmpty?: boolean
+  emptyState?: React.ReactNode
 }
 
 const ChartContent = React.forwardRef<HTMLDivElement, ChartContentProps>(
-  ({ children, className, ...props }, ref) => {
+  ({ children, className, isEmpty = false, emptyState, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn('px-6 py-4 min-h-64', className)} {...props}>
-        {children}
+      <div ref={ref} className={cn('px-6 py-4', className)} {...props}>
+        {isEmpty ? emptyState : children}
       </div>
     )
   }
 )
 ChartContent.displayName = 'ChartContent'
 
+/* Chart Empty State */
+interface ChartEmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
+  className?: string
+  icon?: React.ReactNode
+  title: string
+  description: string
+}
+
+const ChartEmptyState = React.forwardRef<HTMLDivElement, ChartEmptyStateProps>(
+  ({ className, icon, title, description, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          'px-6 py-12 border border-dashed items-center justify-center flex flex-col',
+          className
+        )}
+        {...props}
+      >
+        {icon && (
+          <div className="flex items-center justify-center w-7 h-7 text-foreground-lighter">
+            {icon}
+          </div>
+        )}
+        <h3 className="text-xs font-medium text-foreground-light">{title}</h3>
+        <p className="text-xs text-foreground-lighter">{description}</p>
+      </div>
+    )
+  }
+)
+ChartEmptyState.displayName = 'ChartEmptyState'
+
 /* Exports */
-export { Chart, ChartCard, ChartHeader, ChartTitle, ChartActions, ChartContent }
+export { Chart, ChartCard, ChartHeader, ChartTitle, ChartActions, ChartContent, ChartEmptyState }
