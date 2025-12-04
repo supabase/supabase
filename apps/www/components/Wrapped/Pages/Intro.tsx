@@ -159,11 +159,7 @@ export const Intro = () => {
 
   return (
     <Scrollytelling.Root>
-      <Scrollytelling.Pin
-        childHeight={'100vh'}
-        pinSpacerHeight={`${titles.length * 100}vh`}
-        top={0}
-      >
+      <Scrollytelling.Pin childHeight={'100vh'} pinSpacerHeight={`${titles.length * 60}vh`} top={0}>
         <section className="h-screen border-x border-b max-w-[60rem] mx-auto">
           <div className="h-full grid place-items-center px-4 relative overflow-hidden">
             {/* Floating boxes */}
@@ -198,12 +194,12 @@ export const Intro = () => {
                       : []),
                   ]}
                 >
-                  <h1
+                  <p
                     className="h1 text-center absolute inset-x-8 top-1/2 -translate-y-1/2"
                     style={{ opacity: 0, transform: 'translateY(calc(-50% + 30px))' }}
                   >
                     {title}
-                  </h1>
+                  </p>
                 </Scrollytelling.Animation>
               )
             })}

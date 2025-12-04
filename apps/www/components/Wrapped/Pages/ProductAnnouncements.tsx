@@ -257,7 +257,7 @@ function MonthAccordion({
     <div>
       <button
         onClick={onToggle}
-        className="w-full px-6 py-2.5 md:py-4 flex items-center justify-between hover:bg-surface-75 transition-colors"
+        className="w-full px-6 lg:px-8 py-2.5 md:py-4 flex items-center justify-between hover:bg-surface-75 transition-colors"
       >
         <div className="flex items-center gap-3">
           <span className="text-base font-medium">{month.name}</span>
@@ -284,7 +284,7 @@ function MonthAccordion({
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <ul className="px-6 pb-4 space-y-2">
+            <ul className="px-6 lg:px-8 pb-4 space-y-2">
               {month.announcements.map((announcement) => (
                 <li key={announcement.title}>
                   <Link
@@ -343,15 +343,15 @@ export const ProductAnnouncements = () => {
         />
 
         {/* Content */}
-        <div className="flex flex-col justify-end h-full px-4 py-0 relative">
-          <h1 className="font-bold tracking-tight text-6xl md:text-7xl lg:text-[5.6rem]">
+        <div className="flex flex-col justify-end h-full px-4 lg:px-8 py-0 relative">
+          <h2 className="font-bold tracking-tight text-6xl md:text-7xl lg:text-[5.6rem]">
             Launch <span className="line-through text-foreground-muted">Week</span> Year
-          </h1>
+          </h2>
         </div>
       </section>
 
-      <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 py-12">
-        <h2 className="text-2xl">Product Announcements</h2>
+      <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 lg:px-8 py-12">
+        <h3 className="text-2xl">Product Announcements</h3>
         <p className="text-base text-foreground-lighter mt-4">
           Everything we shipped in 2025. Click on a month to explore.
         </p>

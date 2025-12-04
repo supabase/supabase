@@ -77,7 +77,7 @@ export const CustomerStories = () => {
 
   return (
     <>
-      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x`">
+      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x">
         {/* Grid background */}
         <AnimatedGridBackground
           cols={5}
@@ -92,15 +92,16 @@ export const CustomerStories = () => {
         />
 
         {/* Content */}
-        <div className="flex flex-col justify-end h-full px-4 py-0 relative">
-          <h1 className="font-bold tracking-tight text-6xl md:text-7xl lg:text-[5.6rem]">
+        <div className="flex flex-col justify-end h-full px-4 lg:px-8 py-0 relative">
+          <h2 className="font-bold tracking-tight text-6xl md:text-7xl lg:text-[5.6rem]">
             Customer Stories
-          </h1>
+          </h2>
         </div>
       </section>
 
-      <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 py-12">
-        <h2 className="text-2xl">Customers count on Supabase</h2>
+      {/* NOTE (Alan): extra padding here to optically align subheading wuth header.*/}
+      <div className="relative max-w-[60rem] mx-auto border-x border-b px-6 lg:px-10 py-12">
+        <h3 className="text-2xl">Customers count on Supabase</h3>
       </div>
 
       {/* Testimonials grid */}
