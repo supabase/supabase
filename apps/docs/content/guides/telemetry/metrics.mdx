@@ -129,16 +129,16 @@ Select `Prometheus` and enter the connection details for the Prometheus instance
 
 **Grafana Cloud users** refer to [Grafana Cloud Prometheus connection details](/docs/guides/telemetry/metrics#grafana-cloud-prometheus).
 
-Name the datasource `prometheus` (if you use a different name, you will need to modify the `dashboard.json` file when adding the dashboard).
+Name the datasource "prometheus" (if you use a different name, you need to modify the `dashboard.json` file when adding the dashboard).
 
 Under **Interval behavior**, set the **scraping interval** to 60s and test the data source. Once it has passed, save it.
 
 #### Grafana cloud Prometheus connection details [#grafana-cloud-prometheus]
 
 - Log into your [Grafana Cloud Portal](https://grafana.com/auth/sign-in/).
-- Under `Grafana Cloud stack` click `Details`.
-- Search for `Prometheus` and click `Details`.
-- The `Grafana Data Source settings` section will contain the necessary connection details
+- Under **Grafana Cloud stack** click **Details**.
+- Search for **Prometheus** and click **Details**.
+- The **Grafana Data Source settings** section contains the necessary connection details
   - "URL" (the format "https://UNIQUE_IDENTIFIER.grafana.net/api/prom")
   - "User" / "Password"
 
