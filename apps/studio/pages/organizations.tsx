@@ -61,6 +61,29 @@ const OrganizationsPage: NextPageWithLayout = () => {
           <p className="-mt-4">You don't have any organizations yet. Create one to get started.</p>
         )}
 
+        <div className="flex items-center justify-between gap-x-2 md:gap-x-3">
+          {organizations.length > 0 && (
+            <Input
+              size="tiny"
+              placeholder="Search for an organization"
+              icon={<Search />}
+              className="w-full flex-1 md:w-64"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+          )}
+
+          {organizationCreationEnabled && (
+            <Button asChild icon={<Plus />} type="primary" className="w-min">
+              <Link href={`/new`}>New organization</Link>
+            </Button>
+          )}
+        </div>
+
+        {search.length > 0 && filteredOrganizations.length === 0 && (
+          <NoSearchResults searchString={search} />
+        )}
+
         {isLoading ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Skeleton className="h-[70px] rounded-md" />
@@ -72,37 +95,12 @@ const OrganizationsPage: NextPageWithLayout = () => {
         ) : isSuccess && organizations.length === 0 && !orgNotFound ? (
           <NoOrganizationsState />
         ) : (
-          <>
-            <div className="flex items-center justify-between gap-x-2 md:gap-x-3">
-              {organizations.length > 0 && (
-                <Input
-                  size="tiny"
-                  placeholder="Search for an organization"
-                  icon={<Search />}
-                  className="w-full flex-1 md:w-64"
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                />
-              )}
-
-              {organizationCreationEnabled && organizations.length > 0 && (
-                <Button asChild icon={<Plus />} type="primary" className="w-min">
-                  <Link href={`/new`}>New organization</Link>
-                </Button>
-              )}
-            </div>
-
-            {search.length > 0 && filteredOrganizations.length === 0 && (
-              <NoSearchResults searchString={search} />
-            )}
-
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {isSuccess &&
-                filteredOrganizations.map((org) => (
-                  <OrganizationCard key={org.id} organization={org} />
-                ))}
-            </div>
-          </>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {isSuccess &&
+              filteredOrganizations.map((org) => (
+                <OrganizationCard key={org.id} organization={org} />
+              ))}
+          </div>
         )}
       </ScaffoldSection>
     </ScaffoldContainer>
