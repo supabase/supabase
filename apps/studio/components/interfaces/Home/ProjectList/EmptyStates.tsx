@@ -1,3 +1,4 @@
+import { BoxPlus } from 'icons'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
 
@@ -15,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { EmptyStatePresentational } from 'ui-patterns'
 import { ShimmeringCard } from './ShimmeringCard'
 
 export const Header = () => {
@@ -126,18 +128,17 @@ export const NoProjectsState = ({ slug }: { slug: string }) => {
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
   return (
-    <div className="col-span-4 space-y-4 rounded-lg border border-dashed p-6 text-center">
-      <div className="space-y-1">
-        <p>No projects</p>
-        <p className="text-sm text-foreground-light">Get started by creating a new project.</p>
-      </div>
-
+    <EmptyStatePresentational
+      icon={BoxPlus}
+      title="Create a project"
+      description="Launch a complete backend platform built on Postgres."
+    >
       {projectCreationEnabled && (
-        <Button asChild icon={<Plus />}>
-          <Link href={`/new/${slug}`}>New Project</Link>
+        <Button size="tiny" type="default" asChild icon={<Plus />}>
+          <Link href={`/new/${slug}`}>New project</Link>
         </Button>
       )}
-    </div>
+    </EmptyStatePresentational>
   )
 }
 
