@@ -9,6 +9,7 @@ import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
 import { getPlanChangeType } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
+import { RequestUpgradeToBillingOwners } from 'components/ui/RequestUpgradeToBillingOwners'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
@@ -232,19 +233,21 @@ export const PlanUpdateSidePanel = () => {
                       <Button block disabled type="default">
                         Current plan
                       </Button>
+                    ) : !canUpdateSubscription ? (
+                      <RequestUpgradeToBillingOwners block plan={plan.name as 'Pro' | 'Team'} />
                     ) : (
                       <ButtonTooltip
                         block
                         type={isDowngradeOption ? 'default' : 'primary'}
                         disabled={
                           subscription?.plan?.id === 'enterprise' ||
+                          subscription?.plan?.id === 'platform' ||
                           // Downgrades to free are still allowed through the dashboard given we have much better control about showing customers the impact + any possible issues with downgrading to free
                           (selectedOrganization?.managed_by !== MANAGED_BY.SUPABASE &&
                             plan.id !== 'tier_free') ||
                           // Orgs managed by AWS marketplace are not allowed to change the plan
                           selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE ||
-                          hasOrioleProjects ||
-                          !canUpdateSubscription
+                          hasOrioleProjects
                         }
                         onClick={() => {
                           setSelectedTier(plan.id as any)
@@ -262,16 +265,14 @@ export const PlanUpdateSidePanel = () => {
                             side: 'bottom',
                             className: hasOrioleProjects ? 'w-96 text-center' : '',
                             text:
-                              subscription?.plan?.id === 'enterprise'
-                                ? 'Reach out to us via support to update your plan from Enterprise'
+                              subscription?.plan?.id === 'enterprise' ||
+                              subscription?.plan?.id === 'platform'
+                                ? 'Reach out to us via support to update your plan'
                                 : hasOrioleProjects
                                   ? 'Your organization has projects that are using the OrioleDB extension which is only available on the Free plan. Remove all OrioleDB projects before changing your plan.'
-                                  : !canUpdateSubscription
-                                    ? 'You do not have permission to change the subscription plan'
-                                    : selectedOrganization?.managed_by ===
-                                        MANAGED_BY.AWS_MARKETPLACE
-                                      ? 'You cannot change the plan for an organization managed by AWS Marketplace'
-                                      : undefined,
+                                  : selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE
+                                    ? 'You cannot change the plan for an organization managed by AWS Marketplace'
+                                    : undefined,
                           },
                         }}
                       >
