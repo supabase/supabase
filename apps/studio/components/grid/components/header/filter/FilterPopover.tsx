@@ -139,8 +139,11 @@ export const FilterPopover = ({ portal = true }: FilterPopoverProps) => {
   // Create filter properties from table columns
   const filterProperties: FilterProperty[] = useMemo(() => {
     const columns = snap.table?.columns ?? []
-    const defaultOperators = FilterOperatorOptions.map((op) => op.value)
-    const stringOperators = ['~~*', ...defaultOperators.filter((op) => op !== '~~*')]
+    const defaultOperators = FilterOperatorOptions.map((op) => ({ value: op.value, label: op.label }))
+    const stringOperators = [
+      { value: '~~*', label: 'ilike operator' },
+      ...defaultOperators.filter((op) => op.value !== '~~*'),
+    ]
 
     return columns.map((column) => {
       // For enum columns, use the enum values as options
@@ -150,7 +153,7 @@ export const FilterPopover = ({ portal = true }: FilterPopoverProps) => {
           name: column.name,
           type: 'string' as const,
           options: column.enum.map((value) => ({ label: value, value })),
-          operators: FilterOperatorOptions.map((op) => op.value),
+          operators: defaultOperators,
         }
       }
 
@@ -164,7 +167,10 @@ export const FilterPopover = ({ portal = true }: FilterPopoverProps) => {
             { label: 'true', value: 'true' },
             { label: 'false', value: 'false' },
           ],
-          operators: ['=', '<>'],
+          operators: [
+            { value: '=', label: 'equals' },
+            { value: '<>', label: 'not equal' },
+          ],
         }
       }
 
@@ -176,7 +182,14 @@ export const FilterPopover = ({ portal = true }: FilterPopoverProps) => {
         const lastMonth = new Date(Date.now() - 30 * 86400000)
 
         // Put '>' first so it's the default operator for dates
-        const dateOperators = ['>', '>=', '<', '<=', '=', '<>']
+        const dateOperators = [
+          { value: '>', label: 'greater than' },
+          { value: '>=', label: 'greater than or equal' },
+          { value: '<', label: 'less than' },
+          { value: '<=', label: 'less than or equal' },
+          { value: '=', label: 'equals' },
+          { value: '<>', label: 'not equal' },
+        ]
 
         return {
           label: column.name,

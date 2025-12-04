@@ -1,6 +1,6 @@
 import { ActiveInput } from './hooks'
 import { FilterBarAction, FilterGroup, FilterProperty } from './types'
-import { findConditionByPath, isCustomOptionObject, isFilterOptionObject } from './utils'
+import { findConditionByPath, isCustomOptionObject, isFilterOptionObject, isFilterOperatorObject } from './utils'
 
 export type MenuItem = {
   value: string
@@ -29,8 +29,17 @@ export function buildOperatorItems(
   const shouldFilter = hasTypedSinceFocus && operatorValue.length > 0
 
   return availableOperators
-    .filter((op) => !shouldFilter || op.toUpperCase().includes(operatorValue))
-    .map((op) => ({ value: op, label: op }))
+    .filter((op) => {
+      if (!shouldFilter) return true
+      const searchText = isFilterOperatorObject(op) ? op.value : op
+      return searchText.toUpperCase().includes(operatorValue)
+    })
+    .map((op) => {
+      if (isFilterOperatorObject(op)) {
+        return { value: op.value, label: op.label }
+      }
+      return { value: op, label: op }
+    })
 }
 
 export function buildPropertyItems(params: {

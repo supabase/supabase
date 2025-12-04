@@ -52,7 +52,13 @@ const filterProperties = [
     label: 'Name',
     name: 'name',
     type: 'string' as const,
-    operators: ['=', '!=', 'CONTAINS', 'STARTS WITH', 'ENDS WITH'],
+    operators: [
+      { value: '=', label: 'Equals' },
+      { value: '!=', label: 'Not equals' },
+      { value: 'CONTAINS', label: 'Contains' },
+      { value: 'STARTS WITH', label: 'Starts with' },
+      { value: 'ENDS WITH', label: 'Ends with' },
+    ],
   },
   {
     label: 'Status',

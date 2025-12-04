@@ -21,12 +21,19 @@ export type FilterOption = string | FilterOptionObject | CustomOptionObject
 export type AsyncOptionsFunction = (search?: string) => Promise<(string | FilterOptionObject)[]>
 export type SyncOptionsFunction = (search?: string) => (string | FilterOptionObject)[]
 
+export type FilterOperatorObject = {
+  value: string
+  label: string
+}
+
+export type FilterOperator = string | FilterOperatorObject
+
 export type FilterProperty = {
   label: string
   name: string
   type: 'string' | 'number' | 'date' | 'boolean'
   options?: FilterOption[] | AsyncOptionsFunction | SyncOptionsFunction | CustomOptionObject
-  operators?: string[]
+  operators?: FilterOperator[]
 }
 
 export type FilterCondition = {

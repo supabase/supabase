@@ -4,6 +4,7 @@ import {
   FilterProperty,
   CustomOptionObject,
   FilterOptionObject,
+  FilterOperatorObject,
   AsyncOptionsFunction,
   SyncOptionsFunction,
   isGroup,
@@ -55,6 +56,10 @@ export function isCustomOptionObject(option: any): option is CustomOptionObject 
 
 export function isFilterOptionObject(option: any): option is FilterOptionObject {
   return typeof option === 'object' && option !== null && 'value' in option && 'label' in option
+}
+
+export function isFilterOperatorObject(operator: any): operator is FilterOperatorObject {
+  return typeof operator === 'object' && operator !== null && 'value' in operator && 'label' in operator
 }
 
 export function isAsyncOptionsFunction(
@@ -126,11 +131,14 @@ export function addFilterToGroup(
   property: FilterProperty
 ): FilterGroup {
   if (path.length === 0) {
+    const firstOperator = property.operators?.[0] || '='
+    const operatorValue = isFilterOperatorObject(firstOperator) ? firstOperator.value : firstOperator
+
     return {
       ...group,
       conditions: [
         ...group.conditions,
-        { propertyName: property.name, value: '', operator: property.operators?.[0] || '=' },
+        { propertyName: property.name, value: '', operator: operatorValue },
       ],
     }
   }

@@ -170,18 +170,15 @@ export function useKeyboardNavigation({
           const lastConditionPath = [...activeInput.path, group.conditions.length - 1]
           removeByPath(lastConditionPath)
           setActiveInput({ type: 'group', path: activeInput.path })
-        } else if (group && group.conditions.length === 0) {
+        } else if (group && group.conditions.length === 0 && activeInput.path.length > 0) {
+          // Only remove nested empty groups, not the root group
           removeByPath(activeInput.path)
-
-          if (activeInput.path.length > 0) {
-            setActiveInput({
-              type: 'group',
-              path: activeInput.path.slice(0, -1),
-            })
-          } else {
-            setActiveInput(null)
-          }
+          setActiveInput({
+            type: 'group',
+            path: activeInput.path.slice(0, -1),
+          })
         }
+        // For root group with no conditions, do nothing - keep menu open
       } else if (activeInput?.type === 'value' && isEmpty) {
         const condition = findConditionByPath(activeFilters, activeInput.path)
         if (condition && !condition.value) {
