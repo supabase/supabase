@@ -3,7 +3,9 @@
 import * as React from 'react'
 import { useContext } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { Card, cn } from 'ui'
+import { Button, Card, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import { HelpCircle } from 'lucide-react'
+import Link from 'next/link'
 
 /* Chart Config */
 export type ChartConfig = {
@@ -94,5 +96,95 @@ const ChartHeader = React.forwardRef<HTMLDivElement, ChartHeaderProps>(
 )
 ChartHeader.displayName = 'ChartHeader'
 
+interface ChartTitleProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode
+  tooltip?: string
+}
+
+const ChartTitle = React.forwardRef<HTMLDivElement, ChartTitleProps>(
+  ({ children, className, tooltip, ...props }, ref) => {
+    return (
+      <h3 ref={ref} className={cn('h3 flex items-center gap-2', className)} {...props}>
+        <span>{children}</span>
+        {tooltip && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <HelpCircle size={14} strokeWidth={1.5} className="text-foreground-light" />
+            </TooltipTrigger>
+            <TooltipContent>{tooltip}</TooltipContent>
+          </Tooltip>
+        )}
+      </h3>
+    )
+  }
+)
+ChartTitle.displayName = 'ChartTitle'
+
+export type ChartAction = {
+  label: string
+  icon?: React.ReactNode
+  onClick?: () => void
+  href?: string
+  type?: 'button' | 'link'
+  className?: string
+}
+
+interface ChartActionsProps extends React.HTMLAttributes<HTMLDivElement> {
+  actions?: ChartAction[]
+  children?: React.ReactNode
+}
+
+const ChartActions = React.forwardRef<HTMLDivElement, ChartActionsProps>(
+  ({ actions, children, className, ...props }, ref) => {
+    if (children) {
+      return (
+        <div ref={ref} className={cn('flex items-center gap-2', className)} {...props}>
+          {children}
+        </div>
+      )
+    }
+
+    if (actions && actions.length > 0) {
+      return (
+        <div ref={ref} className={cn('flex items-center gap-2', className)} {...props}>
+          {actions.map((action, index) => {
+            const isLink = !!action.href
+
+            return (
+              <Tooltip key={index}>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="default"
+                    size="tiny"
+                    className={cn('px-1.5 text-foreground-lighter', action.className)}
+                    onClick={action.onClick}
+                    asChild={isLink}
+                  >
+                    {isLink ? (
+                      <Link href={action.href!}>
+                        {action.icon}
+                        <span className="sr-only">{action.label}</span>
+                      </Link>
+                    ) : (
+                      <>
+                        {action.icon}
+                        <span className="sr-only">{action.label}</span>
+                      </>
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">{action.label}</TooltipContent>
+              </Tooltip>
+            )
+          })}
+        </div>
+      )
+    }
+
+    return null
+  }
+)
+ChartActions.displayName = 'ChartActions'
+
 /* Exports */
-export { Chart, ChartCard, ChartHeader }
+export { Chart, ChartCard, ChartHeader, ChartTitle, ChartActions }
