@@ -309,15 +309,26 @@ function MonthAccordion({
 }
 
 export const ProductAnnouncements = () => {
-  const [openMonth, setOpenMonth] = useState<string | null>('December 2025')
+  // All months open by default
+  const [openMonths, setOpenMonths] = useState<Set<string>>(
+    () => new Set(months.map((m) => m.name))
+  )
 
   const handleToggle = (monthName: string) => {
-    setOpenMonth(openMonth === monthName ? null : monthName)
+    setOpenMonths((prev) => {
+      const next = new Set(prev)
+      if (next.has(monthName)) {
+        next.delete(monthName)
+      } else {
+        next.add(monthName)
+      }
+      return next
+    })
   }
 
   return (
     <>
-      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x border-b">
+      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x">
         {/* Grid background */}
         <AnimatedGridBackground
           cols={5}
@@ -346,26 +357,37 @@ export const ProductAnnouncements = () => {
         </p>
       </div>
 
-      {/* Months accordion - 2 columns */}
+      {/* Months accordion - 2 columns, top-to-bottom flow */}
       <div className="relative max-w-[60rem] mx-auto border-x border-b">
         <div className="grid grid-cols-1 lg:grid-cols-2">
-          {months.map((month, index) => (
-            <div
-              key={month.name}
-              className={cn(
-                'border-b border-muted lg:border-r',
-                'lg:[&:nth-child(2n)]:border-r-0',
-                index >= months.length - 2 && 'lg:border-b-0',
-                index === months.length - 1 && 'border-b-0'
-              )}
-            >
-              <MonthAccordion
-                month={month}
-                isOpen={openMonth === month.name}
-                onToggle={() => handleToggle(month.name)}
-              />
-            </div>
-          ))}
+          {(() => {
+            // Reorder for top-to-bottom flow in 2 columns
+            const half = Math.ceil(months.length / 2)
+            const reordered: { month: Month; originalIndex: number }[] = []
+            for (let i = 0; i < half; i++) {
+              reordered.push({ month: months[i], originalIndex: i })
+              if (i + half < months.length) {
+                reordered.push({ month: months[i + half], originalIndex: i + half })
+              }
+            }
+            return reordered.map(({ month, originalIndex }, index) => (
+              <div
+                key={month.name}
+                className={cn(
+                  'border-b border-muted lg:border-r',
+                  'lg:[&:nth-child(2n)]:border-r-0',
+                  index >= reordered.length - 2 && 'lg:border-b-0',
+                  index === reordered.length - 1 && 'border-b-0'
+                )}
+              >
+                <MonthAccordion
+                  month={month}
+                  isOpen={openMonths.has(month.name)}
+                  onToggle={() => handleToggle(month.name)}
+                />
+              </div>
+            ))
+          })()}
         </div>
       </div>
     </>

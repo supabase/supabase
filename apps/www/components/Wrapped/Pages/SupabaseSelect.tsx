@@ -65,7 +65,7 @@ function RotatingImage({
 export const SupabaseSelect = () => {
   return (
     <>
-      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x border-b">
+      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x">
         {/* Grid background */}
         <AnimatedGridBackground
           cols={5}

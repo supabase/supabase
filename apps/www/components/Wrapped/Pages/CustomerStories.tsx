@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { cn } from 'ui'
 import {
   PhoenixEnergyLogo,
   RallyLogo,
@@ -76,7 +77,7 @@ export const CustomerStories = () => {
 
   return (
     <>
-      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x border-b">
+      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x`">
         {/* Grid background */}
         <AnimatedGridBackground
           cols={5}
@@ -103,19 +104,24 @@ export const CustomerStories = () => {
       </div>
 
       {/* Testimonials grid */}
-      <div className="relative max-w-[60rem] mx-auto border-x">
+      <div className="relative max-w-[60rem] mx-auto border-x border-b">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           {(() => {
             const remainder = testimonials.length % cols
             const emptyCells = remainder === 0 ? 0 : cols - remainder
+            const totalItems = testimonials.length + emptyCells
 
             return (
               <>
-                {testimonials.map((testimonial) => (
+                {testimonials.map((testimonial, index) => (
                   <Link
                     key={testimonial.company}
                     href={testimonial.url}
-                    className="group px-6 py-8 border-r border-b border-muted last:border-r-0 lg:[&:nth-child(2n)]:border-r-0 hover:bg-surface-75 transition-colors"
+                    className={cn(
+                      'group px-6 py-8 border-r border-muted lg:[&:nth-child(2n)]:border-r-0 hover:bg-surface-75 transition-colors',
+                      index < totalItems - 2 ? 'border-b' : 'lg:border-b-0',
+                      index < totalItems - 1 ? 'border-b' : 'border-b-0'
+                    )}
                   >
                     <div className="grid grid-rows-[44px_1fr_auto] gap-6 h-full">
                       {/* Logo placeholder */}
@@ -144,7 +150,7 @@ export const CustomerStories = () => {
                 {Array.from({ length: emptyCells }).map((_, i) => (
                   <div
                     key={`empty-${i}`}
-                    className="px-6 py-8 border-r border-b border-muted last:border-r-0"
+                    className="px-6 py-8 border-r border-muted last:border-r-0"
                   />
                 ))}
               </>
