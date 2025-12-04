@@ -49,7 +49,7 @@ export const ForeignKeyRow = ({
             {status !== undefined && (
               <Badge
                 variant={
-                  status === 'ADD' ? 'brand' : status === 'UPDATE' ? 'warning' : 'destructive'
+                  status === 'ADD' ? 'success' : status === 'UPDATE' ? 'warning' : 'destructive'
                 }
               >
                 {status}

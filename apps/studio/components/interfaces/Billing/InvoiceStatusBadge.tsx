@@ -15,7 +15,7 @@ const invoiceStatusMapping: Record<
 > = {
   [InvoiceStatus.PAID]: {
     label: 'Paid',
-    badgeVariant: 'brand',
+    badgeVariant: 'success',
   },
   [InvoiceStatus.VOID]: {
     label: 'Forgiven',
@@ -53,11 +53,7 @@ const InvoiceStatusBadge = ({
   return (
     <Tooltip>
       <TooltipTrigger>
-        <Badge
-          size="small"
-          className="capitalize"
-          variant={statusMapping?.badgeVariant || 'default'}
-        >
+        <Badge variant={statusMapping?.badgeVariant || 'default'}>
           {statusMapping?.label || status}
         </Badge>
       </TooltipTrigger>

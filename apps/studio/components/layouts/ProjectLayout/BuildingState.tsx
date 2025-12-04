@@ -65,7 +65,7 @@ const BuildingState = () => {
         <div className="w-full flex flex-col gap-4">
           <div className="w-full flex flex-col md:flex-row items-start md:items-center gap-3">
             <h1 className="text-3xl">{project?.name}</h1>
-            <Badge variant="default" className="bg-surface-100 bg-opacity-100">
+            <Badge>
               <div className="flex items-center gap-2">
                 <Loader2 className="animate-spin" size={12} />
                 <span>

@@ -12,12 +12,12 @@ import {
 import { getDecryptedParameters } from 'components/interfaces/Storage/ImportForeignSchemaDialog.utils'
 import { DotPing } from 'components/ui/DotPing'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { useFDWDropForeignTableMutation } from 'data/fdw/fdw-drop-foreign-table-mutation'
+import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import { useUpdatePublicationMutation } from 'data/replication/publication-update-mutation'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useReplicationTablesQuery } from 'data/replication/tables-query'
-import { useFDWDropForeignTableMutation } from 'data/fdw/fdw-drop-foreign-table-mutation'
-import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { useIcebergNamespaceTableDeleteMutation } from 'data/storage/iceberg-namespace-table-delete-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { SqlEditor, TableEditor } from 'icons'
@@ -43,6 +43,7 @@ import {
 } from '../AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketAssociatedEntities } from '../useAnalyticsBucketAssociatedEntities'
 import { useAnalyticsBucketWrapperInstance } from '../useAnalyticsBucketWrapperInstance'
+import { InsertDataDialog } from './InsertDataDialog'
 import { inferPostgresTableFromNamespaceTable } from './NamespaceWithTables.utils'
 
 interface TableRowComponentProps {
@@ -78,7 +79,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
 
   const { mutateAsync: updateFDW } = useFDWUpdateMutation()
   const { mutateAsync: dropForeignTable } = useFDWDropForeignTableMutation()
-  const { mutateAsync: deleteNamespaceTable, isLoading: isDeletingNamespaceTable } =
+  const { mutateAsync: deleteNamespaceTable, isPending: isDeletingNamespaceTable } =
     useIcebergNamespaceTableDeleteMutation({ onError: () => {} })
   const { mutateAsync: updatePublication } = useUpdatePublicationMutation()
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
@@ -227,7 +228,6 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
       const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
       await deleteNamespaceTable({
         projectRef,
-        catalogUri: wrapperValues.catalog_uri,
         warehouse: wrapperValues.warehouse,
         namespace: namespace,
         table: table.name,
@@ -257,7 +257,6 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
       const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
       await deleteNamespaceTable({
         projectRef,
-        catalogUri: wrapperValues.catalog_uri,
         warehouse: wrapperValues.warehouse,
         namespace: namespace,
         table: table.name,
@@ -419,7 +418,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
         <TableRow key={x.id}>
           <TableCell className="pl-6">
             <div className="flex items-center gap-x-2 rounded">
-              <div className="w-4 h-4 rounded-bl-lg border-l-2 border-b-2 border-control -translate-y-1.5" />
+              <div className="w-4 h-5 rounded-bl-lg border-l-2 border-b-2 border-control -translate-y-2" />
               <div
                 className={cn(
                   'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
@@ -433,7 +432,8 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
               </p>
             </div>
           </TableCell>
-          <TableCell className="flex flex-row justify-end">
+          <TableCell className="flex flex-row justify-end gap-x-2">
+            <InsertDataDialog table={table.name} fdwTable={x} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button type="default" className="w-7" icon={<MoreVertical />} />

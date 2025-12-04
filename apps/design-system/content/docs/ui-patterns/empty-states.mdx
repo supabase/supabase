@@ -5,36 +5,12 @@ description: Convey the absence of data and provide clear instruction for what t
 
 Empty states convey the fact that there is nothing to list, perform, or display on the current page. **Ideally**, they also provide a clear action for the user to take.
 
-## Missing route
-
-Users may accidentally navigate to a non-existent dynamic route, such as a non-existent bucket in [Storage](https://supabase.com/dashboard/project/_/storage) or a non-existent table in the [Table Editor](https://supabase.com/dashboard/project/_/editor). In these cases, follow the pattern of a centered [Admonition](../fragments/admonition) as shown below.
-
-<ComponentPreview name="empty-state-missing-route" peekCode wide />
-
 ## No data
 
 There are two ways an empty state may be displayed in cases where there is no data:
 
-- **Zero results**: no data after a search or filter
 - **Initial state**: no data to begin with
-
-### Zero results
-
-Data-heavy presentations without results should have an empty state that broadly matches the state when there is data. This makes the transition between the two states more seamless.
-
-#### Table
-
-A [Table](../components/table) instance with zero results should display a single row. Dulling the TableHead text color and removing the TableCell hover state can further reinforce the lack of usable data.
-
-<ComponentPreview name="empty-state-zero-items-table" peekCode wide />
-
-#### DataGrid
-
-[DataGrid](../components/data-table) typically spans the full height and width of a container. A classic example is [Users](https://supabase.com/dashboard/project/_/auth/users), which (as it sounds) displays a list of the project’s registered users. Any instance with zero results should display a more prominent empty with a clear title, description, and supporting illustration.
-
-<ComponentPreview name="empty-state-zero-items-data-grid" peekCode wide />
-
-Other DataGrid instances include [Cron Jobs](https://supabase.com/dashboard/project/_/integrations/cron/jobs) and [Queues](https://supabase.com/dashboard/project/_/integrations/queues).
+- **Zero results**: no data after a search or filter
 
 ### Initial state
 
@@ -55,6 +31,30 @@ Or perhaps the list type is data-heavy or does not benefit from additional infor
 <ComponentPreview name="empty-state-initial-state-informational" peekCode wide />
 
 Keep in mind that empty states will likely appear after a visual loading state. Consider layout shift and button placement during and after the transition.
+
+### Zero results
+
+Data-heavy presentations without results should have an empty state that broadly matches the state when there is data. This makes the transition between the two states more seamless.
+
+#### Table
+
+A [Table](../components/table) instance with zero results should display a single row. Dulling the TableHead text color and removing the TableCell hover state can further reinforce the lack of usable data.
+
+<ComponentPreview name="empty-state-zero-items-table" peekCode wide />
+
+#### DataGrid
+
+[DataGrid](../components/data-table) typically spans the full height and width of a container. A classic example is [Users](https://supabase.com/dashboard/project/_/auth/users), which (as it sounds) displays a list of the project’s registered users. Any instance with zero results should display a more prominent empty with a clear title, description, and supporting illustration.
+
+<ComponentPreview name="empty-state-zero-items-data-grid" peekCode wide />
+
+Other DataGrid instances include [Cron Jobs](https://supabase.com/dashboard/project/_/integrations/cron/jobs) and [Queues](https://supabase.com/dashboard/project/_/integrations/queues).
+
+## Missing route
+
+Users may accidentally navigate to a non-existent dynamic route, such as a non-existent bucket in [Storage](https://supabase.com/dashboard/project/_/storage) or a non-existent table in the [Table Editor](https://supabase.com/dashboard/project/_/editor). In these cases, follow the pattern of a centered [Admonition](../fragments/admonition) as shown below.
+
+<ComponentPreview name="empty-state-missing-route" peekCode wide />
 
 ## Components
 

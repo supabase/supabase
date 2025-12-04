@@ -213,15 +213,13 @@ export const ChartConfig = ({
               <TooltipContent side="bottom">Dismiss</TooltipContent>
             </Tooltip>
             <div className="flex items-center gap-x-2">
-              <Badge variant="success" className="text-xs rounded px-1">
-                NEW
-              </Badge>
+              <Badge variant="success">New</Badge>
               <p className="text-xs">Add this chart to custom reports</p>
             </div>
-            <p className="text-xs text-foreground-light mt-1">
+            <p className="text-xs text-foreground-light !mt-1">
               SQL snippets can now be added and saved to your custom reports. Try it out now!
             </p>
-            <Button asChild size="tiny" type="default" className="mt-2">
+            <Button asChild size="tiny" type="default" className="mt-1">
               <Link href={`/project/${ref}/reports`}>Head to Reports</Link>
             </Button>
           </Admonition>
