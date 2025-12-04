@@ -317,11 +317,9 @@ Resumable uploads also supports using signed upload tokens to created time-limit
 
 ```typescript
 // Create a signed upload URL
-const { data } = await supabase.storage
-  .from('bucket_name')
-  .createSignedUploadUrl('file_path', {
-    upsert: true  // Optional: allow overwriting existing files
-  })
+const { data } = await supabase.storage.from('bucket_name').createSignedUploadUrl('file_path', {
+  upsert: true, // Optional: allow overwriting existing files
+})
 
 // Use the signed URL token in resumable upload headers
 // Include data.token in the x-signature header

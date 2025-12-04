@@ -516,11 +516,8 @@ const supabase = createClient(
 // Create an OAuth client
 const { data, error } = await supabase.auth.admin.oauth.createClient({
   name: 'My Third-Party App',
-  redirect_uris: [
-    'https://my-app.com/auth/callback',
-    'https://my-app.com/auth/silent-callback'
-  ],
-  client_type: 'confidential'
+  redirect_uris: ['https://my-app.com/auth/callback', 'https://my-app.com/auth/silent-callback'],
+  client_type: 'confidential',
 })
 
 if (error) {

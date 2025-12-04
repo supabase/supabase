@@ -184,9 +184,9 @@ async def semantic_search(query, top_k=5):
         model='text-embedding-3-small',
         input=query
     )
-    
+
     query_vector = query_embedding.data[0].embedding
-    
+
     # Search for similar vectors
     results = supabase.storage.vectors() \
         .from_('embeddings') \
@@ -197,7 +197,7 @@ async def semantic_search(query, top_k=5):
             return_distance=True,
             return_metadata=True
         )
-    
+
     return [
         {
             'id': result.key,
@@ -436,16 +436,16 @@ while True:
         return_data=False,  # Don't return embeddings for faster response
         return_metadata=True
     )
-    
+
     if not results:
         break
-    
+
     page_count += 1
     print(f'Page {page_count}: {len(results.vectors)} vectors')
-    
+
     for vector in results.vectors:
         print(f'  - {vector.key}: {vector.metadata.get("title") if vector.metadata else "N/A"}')
-    
+
     next_token = results.nextToken
     if not next_token:
         break
@@ -524,7 +524,7 @@ async function hybridSearch(queryVector, filters) {
 ```python
 def hybrid_search(query_vector, filters):
     index = supabase.storage.vectors().from_('embeddings').index('documents-openai')
-    
+
     # Get similar vectors with filters
     vector_results = index.query(
         query_vector={'float32': query_vector},
@@ -533,12 +533,12 @@ def hybrid_search(query_vector, filters):
         return_distance=True,
         return_metadata=True
     )
-    
+
     # Get additional details from relational database
     doc_ids = [v.metadata.get('doc_id') for v in vector_results.vectors if v.metadata and v.metadata.get('doc_id')]
     details_response = supabase.table('documents').select('*').in_('id', doc_ids).execute()
     details = details_response.data if details_response.data else []
-    
+
     # Merge results
     return [
         {
@@ -648,13 +648,13 @@ from supabase import create_client
 async def retrieve_context_for_llm(user_query):
     supabase = create_client(...)
     openai = OpenAI()
-    
+
     # 1. Embed the user query
     query_embedding = openai.embeddings.create(
         model='text-embedding-3-small',
         input=user_query
     )
-    
+
     # 2. Retrieve relevant documents
     vector_results = supabase.storage.vectors() \
         .from_('embeddings') \
@@ -664,13 +664,13 @@ async def retrieve_context_for_llm(user_query):
             topK=5,
             return_metadata=True
         )
-    
+
     # 3. Use vectors to augment LLM prompt
     context = '\n\n'.join(
         v.metadata.get('content', '') if v.metadata else ''
         for v in vector_results.vectors
     )
-    
+
     response = openai.chat.completions.create(
         model='gpt-4',
         messages=[
@@ -684,7 +684,7 @@ async def retrieve_context_for_llm(user_query):
             }
         ]
     )
-    
+
     return response.choices[0].message.content
 ```
 
@@ -736,7 +736,7 @@ async function recommendProducts(userEmbedding, topK = 5) {
 ```python
 def recommend_products(user_embedding, top_k=5):
     supabase = create_client(...)
-    
+
     # Find similar products
     results = supabase.storage.vectors() \
         .from_('embeddings') \
@@ -747,7 +747,7 @@ def recommend_products(user_embedding, top_k=5):
             filter={'in_stock': True},
             return_metadata=True
         )
-    
+
     return [
         {
             'id': result.metadata.get('product_id') if result.metadata else None,
