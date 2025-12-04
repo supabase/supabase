@@ -1,14 +1,22 @@
+
 [data-theme='classic-dark'],
 .classic-dark {
+  /* System / Helpers */
   --helpers-os-appearance: Dark;
+
+  /* Code Block Colors (HSL) */
   --code-block-5: 13.8deg 89.7% 69.6%;
   --code-block-4: 276.1deg 67.7% 74.5%;
   --code-block-3: 83.8deg 61.7% 63.1%;
   --code-block-2: 33.2deg 90.3% 75.7%;
   --code-block-1: 170.8deg 43.1% 61.4%;
+
+  /* Secondary */
   --secondary-default: 0deg 0% 100%;
   --secondary-400: 0deg 0% 100%;
   --secondary-200: 0deg 0% 100%;
+
+  /* Brand Colors */
   --brand-link: 153.1deg 60.2% 52.7%;
   --brand-default: 153.1deg 60.2% 52.7%;
   --brand-600: 153deg 59.5% 70%;
@@ -16,49 +24,65 @@
   --brand-400: 153.3deg 65.2% 13.5%;
   --brand-300: 153.8deg 69.6% 9%;
   --brand-200: 152.5deg 75% 6.3%;
+
+  /* Warning Colors */
   --warning-default: 38.9deg 100% 57.1%;
   --warning-600: 38.9deg 89.8% 49.8%;
   --warning-500: 34.8deg 90.9% 21.6%;
   --warning-400: 33.2deg 100% 14.5%;
   --warning-300: 32.3deg 100% 10.2%;
   --warning-200: 36.8deg 100% 6.1%;
+
+  /* Destructive Colors */
   --destructive-default: 10.2deg 77.9% 53.9%;
   --destructive-600: 9.7deg 85.2% 62.9%;
   --destructive-500: 7.9deg 71.6% 29%;
   --destructive-400: 6.7deg 60% 20.6%;
   --destructive-300: 7.5deg 51.3% 15.3%;
   --destructive-200: 10.9deg 23.4% 9.2%;
+
+  /* Backgrounds */
   --background-dash-sidebar: 0deg 0% 11%;
   --background-dialog-default: 0deg 0% 11%;
   --background-surface-75: 0deg 0% 12.5%;
   --background-200: 0deg 0% 11%;
   --foreground-contrast: 0deg 0% 11%;
-  --border-button-hover: var(--colors-gray-dark-800);
-  --border-button-default: var(--colors-gray-dark-700);
-  --border-stronger: var(--colors-gray-dark-800);
-  --border-strong: var(--colors-gray-dark-700);
-  --border-alternative: var(--colors-gray-dark-500);
-  --border-control: var(--colors-gray-dark-600);
-  --border-overlay: var(--colors-gray-dark-500);
-  --border-secondary: var(--colors-gray-dark-500);
-  --border-muted: var(--colors-gray-dark-500);
-  --border-default: var(--colors-gray-dark-600);
-  --background-dash-canvas: var(--colors-gray-dark-200);
-  --background-button-default: var(--colors-gray-dark-500);
-  --background-muted: var(--colors-gray-dark-400);
-  --background-overlay-hover: var(--colors-gray-dark-500);
-  --background-overlay-default: var(--colors-gray-dark-300);
-  --background-surface-400: var(--colors-gray-dark-700);
-  --background-surface-300: var(--colors-gray-dark-500);
-  --background-surface-200: var(--colors-gray-dark-400);
-  --background-surface-100: var(--colors-gray-dark-300);
-  --background-control: var(--colors-gray-dark-300);
-  --background-selection: var(--colors-gray-dark-600);
-  --background-alternative-default: var(--colors-gray-dark-100);
-  --background-alternative-200: var(--colors-gray-dark-200);
-  --background-default: var(--colors-gray-dark-200);
-  --foreground-muted: var(--colors-gray-dark-900);
-  --foreground-lighter: var(--colors-gray-dark-1000);
-  --foreground-light: var(--colors-gray-dark-1100);
-  --foreground-default: var(--colors-gray-dark-1200);
+
+  /* Border Colors */
+  --border-button-hover: var(--colors-gray-dark-800, #333);
+  --border-button-default: var(--colors-gray-dark-700, #2b2b2b);
+  --border-stronger: var(--colors-gray-dark-800, #333);
+  --border-strong: var(--colors-gray-dark-700, #2b2b2b);
+  --border-alternative: var(--colors-gray-dark-500, #4d4d4d);
+  --border-control: var(--colors-gray-dark-600, #3a3a3a);
+  --border-overlay: var(--colors-gray-dark-500, #4d4d4d);
+  --border-secondary: var(--colors-gray-dark-500, #4d4d4d);
+  --border-muted: var(--colors-gray-dark-500, #4d4d4d);
+  --border-default: var(--colors-gray-dark-600, #3a3a3a);
+
+  /* Background Surfaces */
+  --background-dash-canvas: var(--colors-gray-dark-200, #202020);
+  --background-button-default: var(--colors-gray-dark-500, #4d4d4d);
+  --background-muted: var(--colors-gray-dark-400, #404040);
+  --background-overlay-hover: var(--colors-gray-dark-500, #4d4d4d);
+  --background-overlay-default: var(--colors-gray-dark-300, #353535);
+  --background-surface-400: var(--colors-gray-dark-700, #2b2b2b);
+  --background-surface-300: var(--colors-gray-dark-500, #4d4d4d);
+  --background-surface-200: var(--colors-gray-dark-400, #404040);
+  --background-surface-100: var(--colors-gray-dark-300, #353535);
+  --background-control: var(--colors-gray-dark-300, #353535);
+  --background-selection: var(--colors-gray-dark-600, #3a3a3a);
+  --background-alternative-default: var(--colors-gray-dark-100, #282828);
+  --background-alternative-200: var(--colors-gray-dark-200, #202020);
+  --background-default: var(--colors-gray-dark-200, #202020);
+
+  /* Foreground / Text Colors */
+  --foreground-muted: var(--colors-gray-dark-900, #b3b3b3);
+  --foreground-lighter: var(--colors-gray-dark-1000, #ccc);
+  --foreground-light: var(--colors-gray-dark-1100, #ddd);
+  --foreground-default: var(--colors-gray-dark-1200, #eee);
+
+    /* Accessibility: Focus & Selection */
+  --focus-ring: 153deg 70% 55%;
+  --focus-ring-width: 2px;
 }
