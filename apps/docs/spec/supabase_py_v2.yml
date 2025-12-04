@@ -8446,11 +8446,11 @@ functions:
       - name: sort_column
         isOptional: true
         type: string
-        description: Column to sort by. Options: `id`, `name`, `created_at`, `updated_at`.
+        description: "Column to sort by. Options: `id`, `name`, `created_at`, `updated_at`."
       - name: sort_order
         isOptional: true
         type: string
-        description: Sort order. Options: `asc`, `desc`.
+        description: "Sort order. Options: `asc`, `desc`."
       - name: search
         isOptional: true
         type: string
@@ -8626,7 +8626,7 @@ functions:
       - name: distance_metric
         isOptional: false
         type: string
-        description: The distance metric to use. Options: `cosine`, `euclidean`.
+        description: "The distance metric to use. Options: `cosine`, `euclidean`."
       - name: data_type
         isOptional: false
         type: string
