@@ -2945,8 +2945,8 @@ export const integrations: NavMenuConstant = {
           ],
         },
         {
-          name: 'Supabase as a Service',
-          url: '/guides/integrations/platform-as-a-service',
+          name: 'Supabase for Platforms',
+          url: '/guides/integrations/supabase-for-platforms',
         },
       ],
     },
