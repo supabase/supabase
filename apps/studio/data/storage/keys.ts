@@ -1,5 +1,26 @@
 export const storageKeys = {
   buckets: (projectRef: string | undefined) => ['projects', projectRef, 'buckets'] as const,
+  bucketsList: (
+    projectRef: string | undefined,
+    params: {
+      limit?: number
+      search?: string
+      sortColumn?: string
+      sortOrder?: string
+    } = {}
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'buckets',
+      'list',
+      {
+        limit: params.limit,
+        search: params.search,
+        sortColumn: params.sortColumn,
+        sortOrder: params.sortOrder,
+      },
+    ] as const,
   analyticsBuckets: (projectRef: string | undefined) =>
     ['projects', projectRef, 'analytics-buckets'] as const,
   vectorBuckets: (projectRef: string | undefined) =>

@@ -243,7 +243,7 @@ export const SubscriptionPlanUpdateDialog = ({
       <DialogContent
         onOpenAutoFocus={(event) => event.preventDefault()}
         size="xlarge"
-        className="p-0 overflow-y-auto max-h-[1000px]"
+        className="p-0"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 h-full items-stretch">
           {/* Left Column */}
