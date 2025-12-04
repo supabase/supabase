@@ -22,9 +22,7 @@ const MigrationsPage: NextPageWithLayout = () => {
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Database Migrations</PageHeaderTitle>
-            <PageHeaderDescription>
-              History of migrations that have been run on your database
-            </PageHeaderDescription>
+            <PageHeaderDescription>Track changes to your database over time</PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
             <DocsButton

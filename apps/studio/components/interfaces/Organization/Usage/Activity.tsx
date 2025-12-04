@@ -19,8 +19,6 @@ const Activity = ({
   orgSlug,
   projectRef,
   subscription,
-  startDate,
-  endDate,
   currentBillingCycleSelected,
   orgDailyStats,
   isLoadingOrgDailyStats,
