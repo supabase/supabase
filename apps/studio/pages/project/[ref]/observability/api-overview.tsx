@@ -9,6 +9,7 @@ import {
   NetworkTrafficRenderer,
   ResponseSpeedChartRenderer,
   TopApiRoutesRenderer,
+  RequestsByCountryMapRenderer,
   TotalRequestsChartRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
 import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
@@ -119,6 +120,17 @@ export const ApiReport: NextPageWithLayout = () => {
           </div>
         }
       >
+        <ReportWidget
+          isLoading={isLoading}
+          params={params.requestsByCountry}
+          error={error.requestsByCountry}
+          title="Requests by Geography"
+          tooltip="Number of API Gateway requests per country"
+          data={data.requestsByCountry || []}
+          renderer={RequestsByCountryMapRenderer}
+          contentClassName="p-0 overflow-hidden"
+          headerClassName="px-4 pt-4"
+        />
         <ReportWidget
           isLoading={isLoading}
           params={params.totalRequests}

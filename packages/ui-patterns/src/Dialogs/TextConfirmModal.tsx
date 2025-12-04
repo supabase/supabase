@@ -1,8 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Check, Copy } from 'lucide-react'
-import { ReactNode, forwardRef, useEffect, useState } from 'react'
+import { ReactNode, forwardRef, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Alert_Shadcn_,
@@ -21,7 +20,6 @@ import {
   Form_Shadcn_,
   Input_Shadcn_,
   cn,
-  copyToClipboard,
 } from 'ui'
 import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 import { z } from 'zod'
@@ -83,8 +81,6 @@ export const TextConfirmModal = forwardRef<
     },
     ref
   ) => {
-    const [showCopied, setShowCopied] = useState(false)
-
     const formSchema = z.object({
       confirmValue: z.preprocess(
         (val) => (typeof val === 'string' ? val.trim() : val),
@@ -115,12 +111,6 @@ export const TextConfirmModal = forwardRef<
     useEffect(() => {
       if (confirmString) form.reset()
     }, [confirmString])
-
-    useEffect(() => {
-      if (!showCopied) return
-      const timer = setTimeout(() => setShowCopied(false), 2000)
-      return () => clearTimeout(timer)
-    }, [showCopied])
 
     return (
       <Dialog
@@ -171,21 +161,11 @@ export const TextConfirmModal = forwardRef<
                 name="confirmValue"
                 render={({ field }) => (
                   <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                    <FormLabel_Shadcn_ {...label}>
+                    <FormLabel_Shadcn_ {...label} enableSelection>
                       Type{' '}
-                      <Button
-                        type="default"
-                        className="h-[23px] px-1.5 py-0 border-muted text-sm whitespace-pre break-all"
-                        iconRight={
-                          showCopied ? <Check strokeWidth={2} className="text-brand" /> : <Copy />
-                        }
-                        onClick={() => {
-                          setShowCopied(true)
-                          copyToClipboard(confirmString)
-                        }}
-                      >
+                      <span className="text-foreground break-all whitespace-pre">
                         {confirmString}
-                      </Button>{' '}
+                      </span>{' '}
                       to confirm.
                     </FormLabel_Shadcn_>
                     <FormControl_Shadcn_>

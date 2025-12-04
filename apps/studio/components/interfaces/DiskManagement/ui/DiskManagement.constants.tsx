@@ -8,7 +8,7 @@ export enum DiskType {
   IO2 = 'io2',
 }
 
-// [Joshen] As per https://github.com/supabase/infrastructure/pull/20478
+// [Joshen] As per https://github.com/supabase/platform/pull/20478
 export const DISK_AUTOSCALE_CONFIG_DEFAULTS = {
   growthPercent: 50,
   minIncrementSize: 4,

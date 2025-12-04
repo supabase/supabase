@@ -7,6 +7,7 @@ interface ShadowScrollAreaProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
   containerClassName?: string
   stickyLastColumn?: boolean
+  outerContainerRef?: React.Ref<HTMLDivElement>
 }
 
 /**
@@ -16,7 +17,10 @@ interface ShadowScrollAreaProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 
 const ShadowScrollArea = React.forwardRef<HTMLDivElement, ShadowScrollAreaProps>(
-  ({ className, containerClassName, children, stickyLastColumn, ...props }, ref) => {
+  (
+    { className, containerClassName, children, stickyLastColumn, outerContainerRef, ...props },
+    ref
+  ) => {
     const containerRef = React.useRef<HTMLDivElement>(null)
     const { hasHorizontalScroll, canScrollLeft, canScrollRight } = useHorizontalScroll(containerRef)
 
@@ -34,7 +38,7 @@ const ShadowScrollArea = React.forwardRef<HTMLDivElement, ShadowScrollAreaProps>
     )
 
     return (
-      <div className={cn(containerClassName, 'relative')}>
+      <div ref={outerContainerRef} className={cn(containerClassName, 'relative')}>
         <div
           className={cn(
             'absolute inset-0 pointer-events-none z-[38]',

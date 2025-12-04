@@ -327,7 +327,9 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
             <SheetSection className="space-y-4">
               <div className="flex items-center justify-between">
                 <label className="text-sm text-foreground">Metadata keys</label>
-                <DocsButton href={`${DOCS_URL}/guides/storage/vector/introduction`} />
+                <DocsButton
+                  href={`${DOCS_URL}/guides/storage/vector/storing-vectors#metadata-best-practices`}
+                />
               </div>
               <div className="space-y-2">
                 {fields.map((field, index) => (
