@@ -14,7 +14,7 @@
   "authentication:emails": true,
   "authentication:multi_factor": true,
   "authentication:attack_protection": true,
-  "authentication:advanced": true,
+  "authentication:performance": true,
 
   "authentication:show_email_phone_columns": true,
   "authentication:show_manual_linking": true,
