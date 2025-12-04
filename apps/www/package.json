@@ -25,6 +25,7 @@
     "@mdx-js/react": "^2.3.0",
     "@next/bundle-analyzer": "15.3.1",
     "@next/mdx": "15.3.1",
+    "@number-flow/react": "^0.3.2",
     "@octokit/auth-app": "^7.0.0",
     "@octokit/core": "^6.0.0",
     "@octokit/graphql": "^8.0.0",

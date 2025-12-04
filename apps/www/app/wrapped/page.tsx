@@ -1,17 +1,57 @@
+'use client'
+
+import { motion, AnimatePresence } from 'framer-motion'
 import DefaultLayout from '~/components/Layouts/Default'
-import { motion } from 'framer-motion'
-import { HighlightedText } from '~/components/Wrapped/HighlightedText'
+import { WrappedProvider, useWrapped } from '~/components/Wrapped/WrappedContext'
+import { Home } from '~/components/Wrapped/Pages/Home'
+import { Intro } from '~/components/Wrapped/Pages/Intro'
+import { YearOfAI } from '~/components/Wrapped/Pages/YearOfAI'
+import { Devs } from '~/components/Wrapped/Pages/Devs'
+import { TableOfContents } from '~/components/Wrapped/TableOfContents'
+
+const pageTransition = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+  transition: { type: 'spring', duration: 0.4, bounce: 0 },
+}
+
+function WrappedContent() {
+  const { currentPage } = useWrapped()
+
+  return (
+    <AnimatePresence mode="wait">
+      {currentPage === 'home' && (
+        <motion.div key="home" {...pageTransition} initial={false}>
+          <Home />
+        </motion.div>
+      )}
+      {currentPage === 'intro' && (
+        <motion.div key="intro" {...pageTransition}>
+          <Intro />
+        </motion.div>
+      )}
+      {currentPage === 'year-of-ai' && (
+        <motion.div key="year-of-ai" {...pageTransition}>
+          <YearOfAI />
+        </motion.div>
+      )}
+      {currentPage === 'devs' && (
+        <motion.div key="devs" {...pageTransition}>
+          <Devs />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
 
 export default function SupabaseWrappedPage() {
   return (
-    <DefaultLayout className="bg-alternative">
-      <section className="max-w-[60rem] aspect-[4/3] mx-auto border-x px-8">
-        <div className="flex flex-col gap-16">
-          <h1 className="font-bold tracking-tight text-[6rem]">
-            Supabase <HighlightedText>Wrapped</HighlightedText>
-          </h1>
-        </div>
-      </section>
-    </DefaultLayout>
+    <WrappedProvider>
+      <DefaultLayout className="bg-alternative relative">
+        {/*<TableOfContents />*/}
+        <WrappedContent />
+      </DefaultLayout>
+    </WrappedProvider>
   )
 }

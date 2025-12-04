@@ -1576,6 +1576,9 @@ importers:
       '@next/mdx':
         specifier: 15.3.1
         version: 15.3.1(@mdx-js/loader@2.3.0(supports-color@8.1.1)(webpack@5.94.0))(@mdx-js/react@2.3.0(react@18.3.1))
+      '@number-flow/react':
+        specifier: ^0.3.2
+        version: 0.3.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@octokit/auth-app':
         specifier: ^7.0.0
         version: 7.1.5
@@ -15173,6 +15176,7 @@ packages:
   next@16.0.4:
     resolution: {integrity: sha512-vICcxKusY8qW7QFOzTvnRL1ejz2ClTqDKtm1AcUjm2mPv/lVAdgpGNsftsPRIDJOXOjRQO68i1dM8Lp8GZnqoA==}
     engines: {node: '>=20.9.0'}
+    deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/CVE-2025-66478 for more details.
     hasBin: true
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
