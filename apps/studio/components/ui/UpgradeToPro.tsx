@@ -18,6 +18,7 @@ interface UpgradeToProProps {
   source?: string
   disabled?: boolean
   fullWidth?: boolean
+  className?: string
 }
 
 const UpgradeToPro = ({
@@ -44,7 +45,7 @@ const UpgradeToPro = ({
     <div
       className={cn(
         'block w-full py-4 px-6 bg-surface-200',
-        fullWidth ? 'border-b' : 'border border-opacity-20 border-overlay rounded'
+        fullWidth ? 'border-b' : 'border rounded'
       )}
     >
       <div className="flex gap-x-3">
