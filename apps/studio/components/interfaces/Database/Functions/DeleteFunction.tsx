@@ -1,4 +1,4 @@
-import { TextConfirmModal } from 'components/ui/TextConfirmationModalWrapper'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 

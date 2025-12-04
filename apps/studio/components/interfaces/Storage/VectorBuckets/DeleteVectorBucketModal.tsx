@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { TextConfirmModal } from 'components/ui/TextConfirmationModalWrapper'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
 import { useVectorBucketDeleteMutation } from 'data/storage/vector-bucket-delete-mutation'
 import { deleteVectorBucketIndex } from 'data/storage/vector-bucket-index-delete-mutation'

@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { TextConfirmModal } from 'components/ui/TextConfirmationModalWrapper'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useBucketDeleteMutation } from 'data/storage/bucket-delete-mutation'

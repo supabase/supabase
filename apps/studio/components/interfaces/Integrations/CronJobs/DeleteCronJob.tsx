@@ -1,7 +1,7 @@
 import { parseAsString, useQueryState } from 'nuqs'
 import { toast } from 'sonner'
 
-import { TextConfirmModal } from 'components/ui/TextConfirmationModalWrapper'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useDatabaseCronJobDeleteMutation } from 'data/database-cron-jobs/database-cron-jobs-delete-mutation'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
