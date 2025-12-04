@@ -194,7 +194,7 @@ interface ChartContentProps extends React.HTMLAttributes<HTMLDivElement> {
 const ChartContent = React.forwardRef<HTMLDivElement, ChartContentProps>(
   ({ children, className, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn('px-6 py-4', className)} {...props}>
+      <div ref={ref} className={cn('px-6 py-4 min-h-64', className)} {...props}>
         {children}
       </div>
     )
