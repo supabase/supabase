@@ -70,6 +70,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/ui-patterns/forms',
           items: [],
         },
+        {
+          title: 'Charts',
+          href: '/docs/ui-patterns/charts',
+          items: [],
+        },
       ],
     },
     {
