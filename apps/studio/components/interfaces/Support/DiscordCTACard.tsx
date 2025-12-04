@@ -15,26 +15,22 @@ export const DiscordCTACard = ({ organizationSlug }: DiscordCTACardProps) => {
   const { data: organizations } = useOrganizationsQuery()
   const [isVisible, setIsVisible] = useState(false)
 
+  const selectedOrg = organizations?.find((org) => org.slug === organizationSlug)
+  const isFreePlan = selectedOrg?.plan.id === 'free'
+
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 800)
     return () => clearTimeout(timer)
   }, [])
 
-  if (!organizationSlug || organizationSlug === NO_ORG_MARKER) return null
-
-  const selectedOrg = organizations?.find((org) => org.slug === organizationSlug)
-  const isFreePlan = selectedOrg?.plan.id === 'free'
-
-  if (!isFreePlan) return null
-
   return (
-    <AnimatePresence initial={false}>
-      {isVisible && (
+    <AnimatePresence>
+      {isVisible && isFreePlan && organizationSlug !== NO_ORG_MARKER && (
         <motion.aside
           initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
+          animate={{ height: '128px', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
-          className="w-full overflow-hidden border border-transparent rounded-md relative flex flex-col p-6"
+          className="w-full overflow-hidden border border-transparent rounded-md relative flex items-center px-6"
           style={{
             background: '#404EED',
             borderColor: 'color-mix(in srgb, #404EED 95%, #000000)',

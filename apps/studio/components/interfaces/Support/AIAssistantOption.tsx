@@ -2,7 +2,6 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
-// End of third-party imports
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { AiIconAnimation, Button } from 'ui'
@@ -15,7 +14,7 @@ interface AIAssistantOptionProps {
 
 export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantOptionProps) => {
   const { mutate: sendEvent } = useSendEventMutation()
-  const [isVisible, setIsVisible] = useState(true)
+  const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 800)
@@ -41,13 +40,13 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
   if (!organizationSlug || organizationSlug === NO_ORG_MARKER) return null
 
   return (
-    <AnimatePresence initial={false}>
+    <AnimatePresence>
       {isVisible && (
         <motion.aside
           initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
+          animate={{ height: '128px', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
-          className="w-full overflow-hidden border rounded-md relative bg-200 flex flex-col p-6"
+          className="w-full overflow-hidden border rounded-md relative bg-200 flex items-center px-6"
         >
           <div className="flex flex-col gap-3 z-[2] flex-shrink-0 w-full">
             <div>
