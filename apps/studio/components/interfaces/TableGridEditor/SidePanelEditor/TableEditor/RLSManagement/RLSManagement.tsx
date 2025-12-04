@@ -1,6 +1,7 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
+import { AIOptInModal } from 'components/ui/AIAssistantPanel/AIOptInModal'
 import { ToggleRlsButton } from 'components/ui/ToggleRlsButton'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -56,6 +57,7 @@ export const RLSManagement = ({
   const { data: project } = useSelectedProjectQuery()
   const [isGenerating, setIsGenerating] = useState(false)
   const [generateFailed, setGenerateFailed] = useState(false)
+  const [isOptInModalOpen, setIsOptInModalOpen] = useState(false)
   const { includeSchemaMetadata } = useOrgAiOptInLevel()
   const track = useTrack()
   const isExistingTable = !!table && !isNewRecord && !isDuplicating
@@ -114,6 +116,12 @@ export const RLSManagement = ({
     () => [...existingPoliciesList, ...generatedPoliciesList],
     [existingPoliciesList, generatedPoliciesList]
   )
+
+  useEffect(() => {
+    if (includeSchemaMetadata) {
+      setGenerateFailed(false)
+    }
+  }, [includeSchemaMetadata])
 
   const hasPolicies = allPoliciesList.length > 0
 
@@ -232,34 +240,65 @@ export const RLSManagement = ({
   const renderPolicies = () => {
     if (!hasPolicies) {
       if (isNewRecord && !isDuplicating) {
+        const getFailureMessage = () => {
+          if (!generateFailed) {
+            return {
+              title: 'Generate starting policies',
+              description:
+                'Starter policies are generated from your table relationships to auth.users—or, if none exist, using AI.',
+            }
+          }
+
+          if (!includeSchemaMetadata) {
+            return {
+              title: 'Unable to generate policies',
+              description:
+                "We couldn't detect any relationships to auth.users to suggest policies. Enable schema metadata sharing to use our AI-assisted policy generator.",
+            }
+          }
+
+          return {
+            title: 'We could not generate policies for this table',
+            description:
+              "Automatic policy generation wasn't possible for this table. Update the schema and try again, or add policies manually after creating the table.",
+          }
+        }
+
+        const { title, description } = getFailureMessage()
+        const showPermissionButton = generateFailed && !includeSchemaMetadata
+
         return (
           <CardContent className="flex flex-col items-center justify-center py-8">
             <div className="flex flex-col items-center gap-4 text-center max-w-md">
               <div className="flex flex-col gap-1">
-                <h4 className="text-sm text-foreground">
-                  {generateFailed
-                    ? 'We could not generate policies for this table'
-                    : 'Generate starting policies'}
-                </h4>
-                <p className="text-sm text-foreground-lighter">
-                  {generateFailed
-                    ? 'Update your table schema and try again or add policies manually after the table is created.'
-                    : 'Policies will be generated based on your table schema and relationships and can be customized after the table is created.'}
-                </p>
+                <h4 className="text-sm text-foreground">{title}</h4>
+                <p className="text-sm text-foreground-lighter">{description}</p>
               </div>
-              <Button
-                type="default"
-                size="tiny"
-                onClick={handleGeneratePolicies}
-                loading={isGenerating}
-                disabled={isGenerating || !isRlsEnabled}
-              >
-                {isGenerating
-                  ? 'Generating policies...'
-                  : generateFailed
-                    ? 'Try generating again'
-                    : 'Generate policies'}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="default"
+                  size="tiny"
+                  onClick={handleGeneratePolicies}
+                  loading={isGenerating}
+                  disabled={isGenerating || !isRlsEnabled}
+                >
+                  {isGenerating
+                    ? 'Generating policies...'
+                    : generateFailed
+                      ? 'Try generating again'
+                      : 'Generate policies'}
+                </Button>
+                {showPermissionButton && (
+                  <Button
+                    type="default"
+                    size="tiny"
+                    onClick={() => setIsOptInModalOpen(true)}
+                    disabled={isGenerating}
+                  >
+                    Permission settings
+                  </Button>
+                )}
+              </div>
             </div>
           </CardContent>
         )
@@ -315,6 +354,7 @@ export const RLSManagement = ({
             Review the policies generated before creating your table
           </p>
         )}
+        <AIOptInModal visible={isOptInModalOpen} onCancel={() => setIsOptInModalOpen(false)} />
       </div>
     )
   }
