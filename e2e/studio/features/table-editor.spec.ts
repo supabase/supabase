@@ -598,13 +598,7 @@ test.describe.serial('table editor', () => {
     // test pagination (page 1 -> page 2)
     await expect(page.getByRole('gridcell', { name: 'value 7', exact: true })).toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'value 101', exact: true })).not.toBeVisible()
-    let footer: Locator
-    if (isCLI()) {
-      footer = page.getByLabel('Table grid footer')
-    } else {
-      footer = page.locator('[data-sentry-component="GridFooter"]')
-    }
-    await footer.getByRole('button').nth(1).click()
+    await page.getByLabel('Table grid footer').getByRole('button').nth(1).click()
     await waitForGridDataToLoad(page, ref) // retrieve next page data
     await expect(page.getByRole('gridcell', { name: 'value 7', exact: true })).not.toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'value 101', exact: true })).toBeVisible()
