@@ -6,63 +6,12 @@ settings:
 
 catalogs:
   default:
-    '@sentry/nextjs':
-      specifier: ^10.26.0
-      version: 10.27.0
-    '@supabase/auth-js':
-      specifier: 2.86.0
-      version: 2.86.0
-    '@supabase/postgrest-js':
-      specifier: 2.86.0
-      version: 2.86.0
-    '@supabase/realtime-js':
-      specifier: 2.86.0
-      version: 2.86.0
     '@supabase/supabase-js':
       specifier: 2.86.0
       version: 2.86.0
-    '@types/node':
-      specifier: ^22.0.0
-      version: 22.13.14
-    '@types/react':
-      specifier: ^18.3.0
-      version: 18.3.3
-    '@types/react-dom':
-      specifier: ^18.3.0
-      version: 18.3.0
-    next:
-      specifier: ^15.5.7
-      version: 15.5.7
-    react:
-      specifier: ^18.3.0
-      version: 18.3.1
-    react-dom:
-      specifier: ^18.3.0
-      version: 18.3.1
-    recharts:
-      specifier: ^2.15.4
-      version: 2.15.4
-    tailwindcss:
-      specifier: 3.4.1
-      version: 3.4.1
     tsx:
       specifier: 4.20.3
       version: 4.20.3
-    typescript:
-      specifier: ~5.9.0
-      version: 5.9.2
-    valtio:
-      specifier: ^1.12.0
-      version: 1.12.0
-    vite:
-      specifier: ^7.1.11
-      version: 7.1.11
-    vitest:
-      specifier: ^3.2.0
-      version: 3.2.4
-    zod:
-      specifier: ^3.25.76
-      version: 3.25.76
 
 overrides:
   '@eslint/eslintrc>js-yaml': ^4.1.1
@@ -1888,9 +1837,6 @@ importers:
         specifier: ^16.5.0
         version: 16.5.0
     devDependencies:
-      '@dotenvx/dotenvx':
-        specifier: ^1.51.1
-        version: 1.51.1
       '@faker-js/faker':
         specifier: ^9.9.0
         version: 9.9.0
@@ -3444,10 +3390,6 @@ packages:
 
   '@dotenvx/dotenvx@1.51.0':
     resolution: {integrity: sha512-CbMGzyOYSyFF7d4uaeYwO9gpSBzLTnMmSmTVpCZjvpJFV69qYbjYPpzNnCz1mb2wIvEhjWjRwQWuBzTO0jITww==}
-    hasBin: true
-
-  '@dotenvx/dotenvx@1.51.1':
-    resolution: {integrity: sha512-fqcQxcxC4LOaUlW8IkyWw8x0yirlLUkbxohz9OnWvVWjf73J5yyw7jxWnkOJaUKXZotcGEScDox9MU6rSkcDgg==}
     hasBin: true
 
   '@drizzle-team/brocli@0.10.2':
@@ -21093,18 +21035,6 @@ snapshots:
       tslib: 2.6.2
 
   '@dotenvx/dotenvx@1.51.0':
-    dependencies:
-      commander: 11.1.0
-      dotenv: 17.2.2
-      eciesjs: 0.4.15
-      execa: 5.1.1
-      fdir: 6.5.0(picomatch@4.0.3)
-      ignore: 5.3.2
-      object-treeify: 1.1.33
-      picomatch: 4.0.3
-      which: 4.0.0
-
-  '@dotenvx/dotenvx@1.51.1':
     dependencies:
       commander: 11.1.0
       dotenv: 17.2.2

@@ -18,7 +18,6 @@
     "dotenv": "^16.5.0"
   },
   "devDependencies": {
-    "@dotenvx/dotenvx": "^1.51.1",
     "@faker-js/faker": "^9.9.0",
     "api-types": "workspace:*",
     "tsx": "catalog:"
