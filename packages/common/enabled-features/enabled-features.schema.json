@@ -52,9 +52,9 @@
       "type": "boolean",
       "description": "Enable the authentication attack protection page"
     },
-    "authentication:advanced": {
+    "authentication:performance": {
       "type": "boolean",
-      "description": "Enable the authentication advanced page"
+      "description": "Enable the authentication performance page"
     },
 
     "authentication:show_providers": {
@@ -434,7 +434,7 @@
     "ai:opt_in_level_schema",
     "ai:opt_in_level_schema_and_log",
     "ai:opt_in_level_schema_and_log_and_data",
-    "authentication:advanced",
+    "authentication:performance",
     "authentication:attack_protection",
     "authentication:emails",
     "authentication:multi_factor",

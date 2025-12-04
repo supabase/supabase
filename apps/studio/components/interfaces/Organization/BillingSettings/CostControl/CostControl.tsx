@@ -51,7 +51,7 @@ const CostControl = ({}: CostControlProps) => {
   const isUsageBillingEnabled = subscription?.usage_billing_enabled ?? false
 
   const canChangeTier =
-    !projectUpdateDisabled && !['team', 'enterprise'].includes(currentPlan?.id || '')
+    !projectUpdateDisabled && !['team', 'enterprise', 'platform'].includes(currentPlan?.id || '')
 
   const costControlDisabled = selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE
 
@@ -122,7 +122,7 @@ const CostControl = ({}: CostControlProps) => {
 
               {isSuccess && !costControlDisabled && (
                 <div className="space-y-6">
-                  {['team', 'enterprise'].includes(currentPlan?.id || '') ? (
+                  {['team', 'enterprise', 'platform'].includes(currentPlan?.id || '') ? (
                     <Alert
                       withIcon
                       variant="info"

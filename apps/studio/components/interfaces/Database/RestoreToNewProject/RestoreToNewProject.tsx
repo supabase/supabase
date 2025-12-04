@@ -14,7 +14,7 @@ import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { useCloneStatusQuery } from 'data/projects/clone-status-query'
@@ -106,6 +106,7 @@ export const RestoreToNewProject = () => {
       <UpgradeToPro
         buttonText="Upgrade"
         source="backupsRestoreToNewProject"
+        featureProposition="enable restoring to new project"
         primaryText="Restore to a new project requires a pro plan or above."
         secondaryText="To restore to a new project, you need to upgrade to a Pro plan and have physical backups enabled."
       />
