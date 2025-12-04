@@ -141,7 +141,11 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                     />
                     {/* Speed up initial API loading times by preconnecting to domain */}
                     {IS_PLATFORM && (
-                      <link rel="preconnect" href={new URL(API_URL).origin} crossOrigin="" />
+                      <link
+                        rel="preconnect"
+                        href={new URL(API_URL).origin}
+                        crossOrigin="anonymous"
+                      />
                     )}
                   </Head>
                   <MetaFaviconsPagesRouter applicationName="Supabase Studio" includeManifest />
