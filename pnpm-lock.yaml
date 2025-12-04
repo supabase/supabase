@@ -1696,6 +1696,9 @@ importers:
       next-themes:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      nuqs:
+        specifier: 2.7.1
+        version: 2.7.1(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(next@15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       openai:
         specifier: ^4.75.1
         version: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76)
@@ -35923,6 +35926,15 @@ snapshots:
     dependencies:
       mitt: 3.0.1
       next: 15.5.7(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
+
+  nuqs@2.7.1(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(next@15.5.7(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
+    dependencies:
+      '@standard-schema/spec': 1.0.0
+      react: 18.3.1
+    optionalDependencies:
+      '@tanstack/react-router': 1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 15.5.7(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
+      react-router: 7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
   nuqs@2.7.1(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(next@16.0.7(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
     dependencies:
