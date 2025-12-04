@@ -54,8 +54,8 @@ const OrganizationsPage: NextPageWithLayout = () => {
             description={
               <>
                 The organization <code className="text-code-inline">{orgSlug}</code> does not exist
-                or you do not have access to it. Please reach out to the owner if you believe this
-                is an error.
+                or you do not have permission to access to it. Contact the the owner if you believe
+                this is a mistake.
               </>
             }
           />
