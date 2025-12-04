@@ -89,10 +89,6 @@ export const YearOfAI = () => {
           ))}
         </div>
       </div>
-
-      <div className="relative max-w-[60rem] mx-auto border-x border-b p-8">
-        <h2 className="text-2xl">Developers love supabase...</h2>
-      </div>
     </>
   )
 }

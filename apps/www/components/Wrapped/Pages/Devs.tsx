@@ -142,7 +142,7 @@ export const Devs = () => {
       ))}
 
       {/* Stats grid */}
-      <div className="relative max-w-[60rem] mx-auto border-x border-b">
+      <div className="relative max-w-[60rem] mx-auto border-x">
         <div className="grid grid-cols-2 lg:grid-cols-4">
           {(() => {
             const cols = 4
