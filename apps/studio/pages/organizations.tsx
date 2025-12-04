@@ -16,14 +16,8 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { withAuth } from 'hooks/misc/withAuth'
 import type { NextPageWithLayout } from 'types'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  CriticalIcon,
-  Skeleton,
-} from 'ui'
+import { Button, Skeleton } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 const OrganizationsPage: NextPageWithLayout = () => {
@@ -54,17 +48,12 @@ const OrganizationsPage: NextPageWithLayout = () => {
     <ScaffoldContainer>
       <ScaffoldSection isFullWidth className="flex flex-col gap-y-4">
         {orgNotFound && (
-          <Alert_Shadcn_ variant="destructive">
-            <CriticalIcon />
-            <AlertTitle_Shadcn_>Organization not found</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              That organization (<code>{orgSlug}</code>) does not exist or you don't have access to
-              it.
-            </AlertDescription_Shadcn_>
-            <AlertDescription_Shadcn_ className="mt-3">
-              If you think this is an error, please reach out to the org owner to get access.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+          <Admonition
+            type="destructive"
+            title="Organization not found"
+            description={`The organization “${orgSlug}” does not exist or you do not have access to it. If you
+              think this is an error, please reach out to the organization owner for access.`}
+          />
         )}
 
         {organizations.length > 0 && (
