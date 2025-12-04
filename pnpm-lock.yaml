@@ -2115,6 +2115,9 @@ importers:
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.48.0
         version: 8.48.0(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^8.48.0
+        version: 8.48.0(eslint@9.39.1(jiti@2.6.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.3)
       eslint-config-next:
         specifier: ^15.5.0
         version: 15.5.6(eslint@9.39.1(jiti@2.6.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.3)
@@ -20100,7 +20103,7 @@ snapshots:
   '@graphql-tools/optimize@2.0.0(graphql@16.12.0)':
     dependencies:
       graphql: 16.12.0
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@graphql-tools/prisma-loader@8.0.17(@types/node@22.19.1)(crossws@0.3.5)(encoding@0.1.13)(graphql@16.12.0)(supports-color@8.1.1)':
     dependencies:
@@ -20136,7 +20139,7 @@ snapshots:
       '@ardatan/relay-compiler': 12.0.3(encoding@0.1.13)(graphql@16.12.0)
       '@graphql-tools/utils': 10.10.3(graphql@16.12.0)
       graphql: 16.12.0
-      tslib: 2.6.3
+      tslib: 2.8.1
     transitivePeerDependencies:
       - encoding
 
@@ -24936,7 +24939,7 @@ snapshots:
 
   '@types/busboy@1.5.4':
     dependencies:
-      '@types/node': 22.19.1
+      '@types/node': 24.10.1
 
   '@types/chai@5.2.3':
     dependencies:
@@ -24959,7 +24962,7 @@ snapshots:
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 22.19.1
+      '@types/node': 24.10.1
 
   '@types/crypto-js@4.2.2': {}
 
@@ -25212,11 +25215,11 @@ snapshots:
 
   '@types/mysql@2.15.27':
     dependencies:
-      '@types/node': 22.19.1
+      '@types/node': 24.10.1
 
   '@types/node-fetch@2.6.13':
     dependencies:
-      '@types/node': 22.19.1
+      '@types/node': 24.10.1
       form-data: 4.0.5
 
   '@types/node@18.19.130':
@@ -25233,7 +25236,7 @@ snapshots:
 
   '@types/papaparse@5.5.0':
     dependencies:
-      '@types/node': 22.19.1
+      '@types/node': 24.10.1
 
   '@types/parse-json@4.0.2': {}
 
@@ -25249,7 +25252,7 @@ snapshots:
 
   '@types/pg@8.10.2':
     dependencies:
-      '@types/node': 22.19.1
+      '@types/node': 24.10.1
       pg-protocol: 1.10.3
       pg-types: 4.1.0
 
@@ -25267,7 +25270,7 @@ snapshots:
 
   '@types/randombytes@2.0.3':
     dependencies:
-      '@types/node': 22.19.1
+      '@types/node': 24.10.1
 
   '@types/react-beautiful-dnd@13.1.8':
     dependencies:
@@ -25341,7 +25344,7 @@ snapshots:
 
   '@types/tedious@4.0.14':
     dependencies:
-      '@types/node': 22.19.1
+      '@types/node': 24.10.1
 
   '@types/tern@0.23.9':
     dependencies:
@@ -25373,7 +25376,7 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 22.19.1
+      '@types/node': 24.10.1
 
   '@types/zxcvbn@4.4.5': {}
 
@@ -29104,7 +29107,7 @@ snapshots:
   graphql-tag@2.12.6(graphql@16.12.0):
     dependencies:
       graphql: 16.12.0
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   graphql-validation-complexity@0.4.2(graphql@16.12.0):
     dependencies:
@@ -29815,7 +29818,7 @@ snapshots:
 
   is-lower-case@2.0.2:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   is-map@2.0.3: {}
 
@@ -29920,7 +29923,7 @@ snapshots:
 
   is-upper-case@2.0.2:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   is-weakmap@2.0.2: {}
 
@@ -30455,11 +30458,11 @@ snapshots:
 
   lower-case-first@2.0.2:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   lower-case@2.0.2:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   lowlight@1.20.0:
     dependencies:
@@ -35240,7 +35243,7 @@ snapshots:
 
   sponge-case@1.0.1:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   sprintf-js@1.0.3: {}
 
@@ -35657,7 +35660,7 @@ snapshots:
 
   swap-case@2.0.2:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   swiper@11.2.10: {}
 
@@ -35869,7 +35872,7 @@ snapshots:
 
   title-case@3.0.3:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   tldts-core@7.0.19: {}
 
@@ -36469,11 +36472,11 @@ snapshots:
 
   upper-case-first@2.0.2:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   upper-case@2.0.2:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   uqr@0.1.2: {}
 
