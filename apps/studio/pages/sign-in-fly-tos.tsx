@@ -112,9 +112,9 @@ const SignInFlyTos = () => {
           )}
         </div>
       )}
-      <div className="sm:text-center">
+      <div className="text-center text-balance">
         <p className="text-xs text-foreground-lighter sm:mx-auto sm:max-w-sm">
-          By continuing, you agree to Supabase's{' '}
+          By continuing, you agree to Supabase’s{' '}
           <Link href="https://supabase.com/terms" className="underline hover:text-foreground-light">
             Terms of Service
           </Link>{' '}
