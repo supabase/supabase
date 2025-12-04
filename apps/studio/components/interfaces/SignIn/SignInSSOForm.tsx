@@ -108,7 +108,7 @@ export const SignInSSOForm = () => {
         </div>
 
         <Button block form={formId} htmlType="submit" size="large" loading={isSubmitting}>
-          Sign In
+          Sign in
         </Button>
       </form>
     </Form_Shadcn_>
