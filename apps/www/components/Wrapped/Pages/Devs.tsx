@@ -1,16 +1,16 @@
 'use client'
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { AnimatedGridBackground } from '../AnimatedGridBackground'
 import { AnimatedCounter } from '../AnimatedCounter'
 =======
 import { motion } from 'framer-motion'
+=======
+>>>>>>> c9e9354b96 (single page)
 import { useEffect, useState } from 'react'
 import NumberFlow from '@number-flow/react'
-import { Dots, Stripes } from '../Visuals'
-
-const GRID_COLS = 5
-const STAGGER_DELAY = 0.05
+import { AnimatedGridBackground } from '../AnimatedGridBackground'
 
 interface AnimatedCounterProps {
   value: number
@@ -50,24 +50,33 @@ const heroStats = [
     number: 14_196_130,
     increment: 1,
 <<<<<<< HEAD
+<<<<<<< HEAD
     intervalMs: 1000,
 =======
     intervalMs: 1000, // +1 every 2 seconds
 >>>>>>> 3525bdad4d (wip)
+=======
+    intervalMs: 1000,
+>>>>>>> c9e9354b96 (single page)
   },
   {
     headline: 'Projects created',
     number: 11_212_051,
     increment: 1,
 <<<<<<< HEAD
+<<<<<<< HEAD
     intervalMs: 500,
 =======
     intervalMs: 500, // +1 every 0.5 seconds
 >>>>>>> 3525bdad4d (wip)
+=======
+    intervalMs: 500,
+>>>>>>> c9e9354b96 (single page)
   },
   {
     headline: 'Realtime messages delivered',
     number: 280_355_288_012,
+<<<<<<< HEAD
 <<<<<<< HEAD
     increment: 1931,
     intervalMs: 200,
@@ -75,6 +84,10 @@ const heroStats = [
     increment: 1931, // ~9657 per second / 5
     intervalMs: 200, // update every 200ms
 >>>>>>> 3525bdad4d (wip)
+=======
+    increment: 1931,
+    intervalMs: 200,
+>>>>>>> c9e9354b96 (single page)
   },
 ]
 
@@ -137,38 +150,19 @@ export const Devs = () => {
 =======
       <section className="relative max-w-[60rem] h-[420px] mx-auto border-x border-b">
         {/* Grid background */}
-        <div className="absolute inset-0 grid grid-cols-5 grid-rows-3 h-full [&>*]:border-muted [&>*]:border-r [&>*]:border-b [&>*:nth-child(5n)]:border-r-0 [&>*:nth-child(n+11)]:border-b-0">
-          {Array.from({ length: 10 }).map((_, i) => {
-            const row = Math.floor(i / GRID_COLS)
-            const col = i % GRID_COLS
-            const diagonalIndex = row + col
-            const hasContent = [0, 2, 3, 4, 5, 7].includes(i)
-
-            return (
-              <div key={i} className="relative">
-                {hasContent && (
-                  <motion.div
-                    className="absolute inset-0"
-                    initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{
-                      delay: 0.35 + diagonalIndex * STAGGER_DELAY,
-                      duration: 0.3,
-                      ease: 'easeOut',
-                    }}
-                  >
-                    {i === 0 && <Dots />}
-                    {i === 2 && <Stripes />}
-                    {i === 3 && <Stripes />}
-                    {i === 4 && <Stripes />}
-                    {i === 5 && <Stripes />}
-                    {i === 7 && <Dots />}
-                  </motion.div>
-                )}
-              </div>
-            )
-          })}
-        </div>
+        <AnimatedGridBackground
+          cols={5}
+          rows={3}
+          tiles={[
+            { cell: 0, type: 'dots' },
+            { cell: 2, type: 'stripes' },
+            { cell: 3, type: 'stripes' },
+            { cell: 4, type: 'stripes' },
+            { cell: 5, type: 'stripes' },
+            { cell: 7, type: 'dots' },
+          ]}
+          initialDelay={0.35}
+        />
 
         {/* Content */}
         <div className="flex flex-col justify-end h-full px-8 py-0 relative">

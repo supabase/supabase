@@ -1,11 +1,20 @@
 'use client'
 
+<<<<<<< HEAD
 import { motion, useInView } from 'framer-motion'
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+=======
+import { motion } from 'framer-motion'
+import { useState, useEffect, useCallback, useMemo } from 'react'
+>>>>>>> c9e9354b96 (single page)
 import { Dots, Stripes } from './Visuals'
 
 const STAGGER_DELAY = 0.05
 const MOVE_INTERVAL = 2000 // Time between moves in ms
+<<<<<<< HEAD
+=======
+const MOVE_DURATION = 0.5 // Animation duration in seconds
+>>>>>>> c9e9354b96 (single page)
 
 type TileType = 'dots' | 'stripes'
 
@@ -15,6 +24,7 @@ type TileConfig = {
   initialCell: number
 }
 
+<<<<<<< HEAD
 type ResponsiveRows = {
   mobile: number
   desktop: number
@@ -23,6 +33,11 @@ type ResponsiveRows = {
 type AnimatedGridBackgroundProps = {
   cols: number
   rows: number | ResponsiveRows
+=======
+type AnimatedGridBackgroundProps = {
+  cols: number
+  rows: number
+>>>>>>> c9e9354b96 (single page)
   tiles: Array<{ cell: number; type: TileType }>
   initialDelay?: number
 }
@@ -33,6 +48,7 @@ export function AnimatedGridBackground({
   tiles,
   initialDelay = 0,
 }: AnimatedGridBackgroundProps) {
+<<<<<<< HEAD
   // Detect if we're on mobile (client-side only)
   const [isMobile, setIsMobile] = useState(false)
 
@@ -65,12 +81,34 @@ export function AnimatedGridBackground({
 
   // Reinitialize tile positions when tileConfigs changes (e.g., on responsive change)
   useEffect(() => {
+=======
+  const totalCells = cols * rows
+
+  // Convert tiles config to internal format with IDs
+  const tileConfigs: TileConfig[] = useMemo(
+    () =>
+      tiles.map((tile, index) => ({
+        id: index,
+        type: tile.type,
+        initialCell: tile.cell,
+      })),
+    [tiles]
+  )
+
+  // Track current positions of all tiles
+  const [tilePositions, setTilePositions] = useState<Map<number, number>>(() => {
+>>>>>>> c9e9354b96 (single page)
     const initial = new Map<number, number>()
     tileConfigs.forEach((tile) => {
       initial.set(tile.id, tile.initialCell)
     })
+<<<<<<< HEAD
     setTilePositions(initial)
   }, [tileConfigs])
+=======
+    return initial
+  })
+>>>>>>> c9e9354b96 (single page)
 
   // Get adjacent cells (up, down, left, right) that are within bounds
   const getAdjacentCells = useCallback(
@@ -82,7 +120,11 @@ export function AnimatedGridBackground({
       // Up
       if (row > 0) adjacent.push(cell - cols)
       // Down
+<<<<<<< HEAD
       if (row < actualRows - 1) adjacent.push(cell + cols)
+=======
+      if (row < rows - 1) adjacent.push(cell + cols)
+>>>>>>> c9e9354b96 (single page)
       // Left
       if (col > 0) adjacent.push(cell - 1)
       // Right
@@ -90,7 +132,11 @@ export function AnimatedGridBackground({
 
       return adjacent
     },
+<<<<<<< HEAD
     [cols, actualRows]
+=======
+    [cols, rows]
+>>>>>>> c9e9354b96 (single page)
   )
 
   // Get occupied cells
@@ -128,6 +174,7 @@ export function AnimatedGridBackground({
     }
   }, [tilePositions, getAdjacentCells, getOccupiedCells])
 
+<<<<<<< HEAD
   // Ref for viewport detection
   const containerRef = useRef<HTMLDivElement>(null)
   const isInView = useInView(containerRef, { once: true, amount: 0.2 })
@@ -138,6 +185,13 @@ export function AnimatedGridBackground({
     const interval = setInterval(moveRandomTile, MOVE_INTERVAL)
     return () => clearInterval(interval)
   }, [moveRandomTile, isInView])
+=======
+  // Set up the movement interval
+  useEffect(() => {
+    const interval = setInterval(moveRandomTile, MOVE_INTERVAL)
+    return () => clearInterval(interval)
+  }, [moveRandomTile])
+>>>>>>> c9e9354b96 (single page)
 
   // Calculate position offset for animation
   const getCellPosition = (cell: number) => {
@@ -152,6 +206,7 @@ export function AnimatedGridBackground({
     const initial = getCellPosition(initialCell)
     const current = getCellPosition(currentCell)
 
+<<<<<<< HEAD
     const colDiff = current.col - initial.col
     const rowDiff = current.row - initial.row
 
@@ -165,15 +220,28 @@ export function AnimatedGridBackground({
       x: `calc(${xOffset}% + ${xBorderOffset}px)`,
       y: `calc(${yOffset}% + ${yBorderOffset}px)`,
     }
+=======
+    const xOffset = (current.col - initial.col) * 100
+    const yOffset = (current.row - initial.row) * 100
+
+    return { x: `${xOffset}%`, y: `${yOffset}%` }
+>>>>>>> c9e9354b96 (single page)
   }
 
   return (
     <div
+<<<<<<< HEAD
       ref={containerRef}
       className={`absolute inset-0 grid h-full [&>*]:border-muted [&>*]:border-r [&>*]:border-b overflow-hidden`}
       style={{
         gridTemplateColumns: `repeat(${cols}, 1fr)`,
         gridTemplateRows: `repeat(${actualRows}, 1fr)`,
+=======
+      className={`absolute inset-0 grid h-full [&>*]:border-muted [&>*]:border-r [&>*]:border-b`}
+      style={{
+        gridTemplateColumns: `repeat(${cols}, 1fr)`,
+        gridTemplateRows: `repeat(${rows}, 1fr)`,
+>>>>>>> c9e9354b96 (single page)
       }}
     >
       {Array.from({ length: totalCells }).map((_, cellIndex) => {
@@ -198,6 +266,7 @@ export function AnimatedGridBackground({
               <motion.div
                 className="absolute inset-0"
                 initial={{ opacity: 0, scale: 0.98 }}
+<<<<<<< HEAD
                 animate={
                   isInView
                     ? {
@@ -208,6 +277,14 @@ export function AnimatedGridBackground({
                       }
                     : { opacity: 0, scale: 0.98 }
                 }
+=======
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                  x: getTileTransform(tile.id, tile.initialCell).x,
+                  y: getTileTransform(tile.id, tile.initialCell).y,
+                }}
+>>>>>>> c9e9354b96 (single page)
                 transition={{
                   opacity: {
                     delay: initialDelay + diagonalIndex * STAGGER_DELAY,
@@ -217,8 +294,13 @@ export function AnimatedGridBackground({
                     delay: initialDelay + diagonalIndex * STAGGER_DELAY,
                     duration: 0.3,
                   },
+<<<<<<< HEAD
                   x: { type: 'spring', duration: 0.69, bounce: 0.12 },
                   y: { type: 'spring', duration: 0.69, bounce: 0.12 },
+=======
+                  x: { type: 'spring', stiffness: 200, damping: 20 },
+                  y: { type: 'spring', stiffness: 200, damping: 20 },
+>>>>>>> c9e9354b96 (single page)
                 }}
               >
                 {tile.type === 'dots' ? <Dots /> : <Stripes />}
