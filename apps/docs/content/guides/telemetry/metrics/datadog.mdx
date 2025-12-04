@@ -52,7 +52,7 @@ instances:
 
 ## Option B: Prometheus remote write into Datadog
 
-If you already run <a href="https://prometheus.io/docs/prometheus/latest/installation/" target="_blank" rel="noreferrer">Prometheus</a> (self-hosted or managed), push scraped metrics into Datadog using the [Prometheus Remote Write integration](https://docs.datadoghq.com/integrations/guide/prometheus_remote_write/):
+If you already run [Prometheus](https://prometheus.io/docs/prometheus/latest/installation/) (self-hosted or managed), push scraped metrics into Datadog using the [Prometheus Remote Write integration](https://docs.datadoghq.com/integrations/guide/prometheus_remote_write/):
 
 1. Configure Prometheus with the Supabase scrape job (see the [self-hosted guide](/guides/telemetry/metrics/grafana-self-hosted#1-deploy-prometheus)).
 2. Add a `remote_write` section to `prometheus.yml` that targets Datadog’s endpoint:
