@@ -6,7 +6,7 @@ description: 'Deploy Prometheus and Grafana yourself to monitor Supabase metrics
 
 Self-hosting [Prometheus](https://prometheus.io/docs/prometheus/latest/installation/) and Grafana gives you full control over retention, alert routing, and dashboards. The Supabase Metrics API slots into any standard Prometheus scrape job, so you can run everything locally, on a VM, or inside Kubernetes.
 
-<MetricsAccessSection />
+<MetricsAccessSection defaultOpen={false} />
 
 <Admonition type="note">
 
@@ -46,6 +46,8 @@ scrape_configs:
 - If you run Prometheus behind a proxy, make sure it can establish outbound HTTPS connections to `*.supabase.co`.
 - Store secrets (service role key) with your secret manager or inject them via environment variables.
 
+</Admonition>
+
 ## 2. Deploy Grafana
 
 Install Grafana (Docker image, Helm chart, or packages) and connect it to Prometheus:
@@ -60,6 +62,12 @@ Install Grafana (Docker image, Helm chart, or packages) and connect it to Promet
 3. Select your Prometheus datasource when prompted.
 
 You now have over 200 production-ready panels covering CPU, IO, WAL, replication, index bloat, and query throughput.
+
+<img
+  src="/docs/img/guides/platform/supabase-grafana-prometheus.png"
+  alt="Supabase Grafana dashboard showcasing database metrics"
+  className="mt-6 rounded-lg border border-foreground/10 shadow-sm"
+/>
 
 ## 4. Configure alerting
 

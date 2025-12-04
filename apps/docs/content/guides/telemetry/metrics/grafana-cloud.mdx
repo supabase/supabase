@@ -18,7 +18,7 @@ Grafana maintains a [Supabase integration guide](https://grafana.com/docs/grafan
 - A Grafana Cloud account with Prometheus metrics enabled (Free or Pro tier).
 - A Grafana API token with the `metrics:write` and `metrics:read` scopes if you plan to push data manually.
 
-<MetricsAccessSection />
+<MetricsAccessSection defaultOpen={false} />
 
 ## 1. Create a Grafana Cloud stack
 
@@ -43,6 +43,12 @@ If you prefer to reuse an existing Grafana Agent deployment, configure an [integ
 3. When prompted for the datasource, choose the Prometheus instance that receives the Supabase metrics.
 
 This dashboard includes 200+ charts grouped by CPU, IO, connections, replication, WAL, and bloat indicators.
+
+<img
+  src="/docs/img/guides/platform/supabase-grafana-prometheus.png"
+  alt="Supabase Grafana dashboard showcasing database metrics"
+  className="mt-6 rounded-lg border border-foreground/10 shadow-sm"
+/>
 
 ## 4. Configure alerts (optional)
 
