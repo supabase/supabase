@@ -13,7 +13,7 @@ type BucketDeleteVariables = {
 
 async function deleteBucket({ projectRef, id }: BucketDeleteVariables) {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!id) throw new Error('Bucket name is requried')
+  if (!id) throw new Error('Bucket name is required')
 
   const { error: emptyBucketError } = await post('/platform/storage/{ref}/buckets/{id}/empty', {
     params: { path: { ref: projectRef, id } },
