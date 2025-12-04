@@ -19,7 +19,7 @@ import {
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
 import { ChartHeader } from './ChartHeader'
-import { ChartHighlightActions, ChartHighlightAction } from './ChartHighlightActions'
+import { ChartHighlightAction, ChartHighlightActions } from './ChartHighlightActions'
 import {
   CHART_COLORS,
   DateTimeFormats,
@@ -62,10 +62,13 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   titleTooltip?: string
   hideYAxis?: boolean
   hideHighlightedValue?: boolean
+  hideHighlightedLabel?: boolean
+  hideHighlightArea?: boolean
   syncId?: string
   docsUrl?: string
   sql?: string
   highlightActions?: ChartHighlightAction[]
+  showNewBadge?: boolean
 }
 
 export function ComposedChart({
@@ -101,11 +104,14 @@ export function ComposedChart({
   updateDateRange,
   hideYAxis,
   hideHighlightedValue,
+  hideHighlightedLabel = false,
+  hideHighlightArea = false,
   syncId,
   docsUrl,
   sql,
   highlightActions,
   titleTooltip,
+  showNewBadge,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
   const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
@@ -299,6 +305,7 @@ export function ComposedChart({
   if (data.length === 0) {
     return (
       <NoDataPlaceholder
+        hideTotalPlaceholder={highlightedValue === undefined}
         message={emptyStateMessage}
         description="It may take up to 24 hours for data to refresh"
         size={size}
@@ -315,7 +322,10 @@ export function ComposedChart({
       <ChartHeader
         hideHighlightedValue={hideHighlightedValue}
         title={title}
+        showNewBadge={showNewBadge}
         format={format}
+        hideHighlightedLabel={hideHighlightedLabel}
+        hideHighlightArea={hideHighlightArea}
         titleTooltip={titleTooltip}
         customDateFormat={customDateFormat}
         highlightedValue={formatHighlightedValue(resolvedHighlightedValue)}
@@ -344,30 +354,34 @@ export function ComposedChart({
           data={data}
           syncId={syncId}
           style={{ cursor: 'crosshair' }}
-          onMouseMove={(e: any) => {
+          onMouseMove={({ activeLabel, activeTooltipIndex, activePayload }) => {
+            if (!activeTooltipIndex) return
+
             setIsActiveHoveredChart(true)
-            if (e.activeTooltipIndex !== focusDataIndex) {
-              setFocusDataIndex(e.activeTooltipIndex)
-              setActivePayload(e.activePayload)
+            if (activeTooltipIndex !== focusDataIndex) {
+              setFocusDataIndex(activeTooltipIndex)
+              setActivePayload(activePayload ?? [])
             }
 
-            setHover(e.activeTooltipIndex)
+            setHover(activeTooltipIndex)
 
-            const activeTimestamp = data[e.activeTooltipIndex]?.timestamp
+            const activeTimestamp = data[activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseMove({
               activeLabel: activeTimestamp?.toString(),
-              coordinates: e.activeLabel,
+              coordinates: activeLabel,
             })
           }}
-          onMouseDown={(e: any) => {
-            const activeTimestamp = data[e.activeTooltipIndex]?.timestamp
+          onMouseDown={({ activeLabel, activeTooltipIndex }) => {
+            if (!activeTooltipIndex) return
+
+            const activeTimestamp = data[activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseDown({
               activeLabel: activeTimestamp?.toString(),
-              coordinates: e.activeLabel,
+              coordinates: activeLabel,
             })
           }}
           onMouseUp={chartHighlight?.handleMouseUp}
-          onMouseLeave={(e) => {
+          onMouseLeave={() => {
             setIsActiveHoveredChart(false)
             setFocusDataIndex(null)
             setActivePayload(null)

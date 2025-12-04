@@ -25,7 +25,7 @@ interface PublicationsComboBoxProps {
   field: ControllerRenderProps<any, 'publicationName'>
 }
 
-const PublicationsComboBox = ({
+export const PublicationsComboBox = ({
   publications,
   isLoadingPublications,
   isLoadingCheck,
@@ -36,19 +36,15 @@ const PublicationsComboBox = ({
   const [selectedPublication, setSelectedPublication] = useState<string>(field?.value || '')
   const [searchTerm, setSearchTerm] = useState('')
 
-  useEffect(() => {
-    setSelectedPublication(field?.value || '')
-  }, [field?.value])
-
-  function handleSearchChange(value: string) {
-    setSearchTerm(value)
-  }
-
   function handlePublicationSelect(pub: string) {
     setSelectedPublication(pub)
     setDropdownOpen(false)
     field.onChange(pub)
   }
+
+  useEffect(() => {
+    setSelectedPublication(field?.value || '')
+  }, [field?.value])
 
   return (
     <Popover_Shadcn_
@@ -87,7 +83,7 @@ const PublicationsComboBox = ({
           <CommandInput_Shadcn_
             placeholder="Find publication..."
             value={searchTerm}
-            onValueChange={handleSearchChange}
+            onValueChange={setSearchTerm}
           />
           <CommandList_Shadcn_>
             <CommandEmpty_Shadcn_>
@@ -100,7 +96,13 @@ const PublicationsComboBox = ({
                 'No publications found'
               )}
             </CommandEmpty_Shadcn_>
+
             <CommandGroup_Shadcn_>
+              {publications.length === 0 && (
+                <p className="text-foreground-lighter text-xs py-3 px-2">
+                  No publications available
+                </p>
+              )}
               <ScrollArea className={publications.length > 7 ? 'h-[210px]' : ''}>
                 {publications.map((pub) => (
                   <CommandItem_Shadcn_
@@ -121,7 +123,9 @@ const PublicationsComboBox = ({
                 ))}
               </ScrollArea>
             </CommandGroup_Shadcn_>
+
             <CommandSeparator_Shadcn_ />
+
             <CommandGroup_Shadcn_>
               <CommandItem_Shadcn_
                 className="cursor-pointer w-full"
@@ -138,5 +142,3 @@ const PublicationsComboBox = ({
     </Popover_Shadcn_>
   )
 }
-
-export default PublicationsComboBox

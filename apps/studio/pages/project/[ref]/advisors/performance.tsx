@@ -35,7 +35,6 @@ const ProjectLints: NextPageWithLayout = () => {
 
   const activeLints = useMemo(() => {
     return [...(data ?? [])]?.filter((x) => x.categories.includes('PERFORMANCE'))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
   const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
     []) as string[]

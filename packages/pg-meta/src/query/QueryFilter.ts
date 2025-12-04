@@ -18,7 +18,7 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
     protected actionOptions?: { returning: boolean; enumArrayColumns?: string[] }
   ) {}
 
-  filter(column: string, operator: FilterOperator, value: any) {
+  filter(column: string | string[], operator: FilterOperator, value: any) {
     this.filters.push({ column, operator, value })
     return this
   }

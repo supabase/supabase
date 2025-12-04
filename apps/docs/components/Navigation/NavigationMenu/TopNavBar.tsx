@@ -7,14 +7,17 @@ import { memo, useState } from 'react'
 // End of third-party imports
 
 import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
+import { isFeatureEnabled } from 'common/enabled-features'
 import { Button, buttonVariants, cn } from 'ui'
-import { AuthenticatedDropdownMenu, CommandMenuTrigger } from 'ui-patterns'
+import { AuthenticatedDropdownMenu, CommandMenuTriggerInput } from 'ui-patterns'
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
 import useDropdownMenu from './useDropdownMenu'
 
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
 const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
+
+const largeLogo = isFeatureEnabled('branding:large_logo')
 
 const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()
@@ -40,37 +43,14 @@ const TopNavBar: FC = () => {
             </div>
 
             <div className="flex gap-2 items-center">
-              <CommandMenuTrigger>
-                <button
-                  className={cn(
-                    'group',
-                    'flex-grow md:w-44 xl:w-56 h-[30px] rounded-md',
-                    'pl-1.5 md:pl-2 pr-1',
-                    'flex items-center justify-between',
-                    'bg-surface-100/75 text-foreground-lighter border',
-                    'hover:bg-opacity-100 hover:border-strong',
-                    'focus-visible:!outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600',
-                    'transition'
-                  )}
-                >
-                  <div className="flex items-center space-x-2 text-foreground-muted">
-                    <Search size={18} strokeWidth={2} />
-                    <p className="flex text-sm pr-2">
-                      Search
-                      <span className="hidden xl:inline ml-1"> docs...</span>
-                    </p>
-                  </div>
-                  <div className="hidden md:flex items-center space-x-1">
-                    <div
-                      aria-hidden="true"
-                      className="md:flex items-center justify-center h-full px-1 border rounded bg-surface-300 gap-0.5"
-                    >
-                      <Command size={12} strokeWidth={1.5} />
-                      <span className="text-[12px]">K</span>
-                    </div>
-                  </div>
-                </button>
-              </CommandMenuTrigger>
+              <CommandMenuTriggerInput
+                placeholder={
+                  <>
+                    Search
+                    <span className="hidden xl:inline ml-1"> docs...</span>
+                  </>
+                }
+              />
               <button
                 title="Menu dropdown button"
                 className={cn(
@@ -121,7 +101,7 @@ const HeaderLogo = memo(() => {
       )}
     >
       <Image
-        className="hidden dark:block !m-0"
+        className={cn('hidden dark:block !m-0', largeLogo && 'h-[36px]')}
         src={navigationLogo?.dark ?? '/docs/supabase-dark.svg'}
         priority={true}
         loading="eager"
@@ -130,7 +110,7 @@ const HeaderLogo = memo(() => {
         alt="Supabase wordmark"
       />
       <Image
-        className="block dark:hidden !m-0"
+        className={cn('block dark:hidden !m-0', largeLogo && 'h-[36px]')}
         src={navigationLogo?.light ?? '/docs/supabase-light.svg'}
         priority={true}
         loading="eager"

@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { customDomainKeys } from './keys'
 
 export type CustomDomainCreateVariables = {
@@ -30,27 +30,25 @@ export const useCustomDomainCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<CustomDomainCreateData, ResponseError, CustomDomainCreateVariables>,
+  UseCustomMutationOptions<CustomDomainCreateData, ResponseError, CustomDomainCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CustomDomainCreateData, ResponseError, CustomDomainCreateVariables>(
-    (vars) => createCustomDomain(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(customDomainKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create custom domain: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<CustomDomainCreateData, ResponseError, CustomDomainCreateVariables>({
+    mutationFn: (vars) => createCustomDomain(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: customDomainKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create custom domain: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

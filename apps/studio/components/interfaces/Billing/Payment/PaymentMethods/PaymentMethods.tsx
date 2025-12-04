@@ -1,11 +1,11 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { CreditCardIcon, Plus } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -23,7 +23,8 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { getURL } from 'lib/helpers'
-import { Alert, Button } from 'ui'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
 import CreditCard from './CreditCard'
 import DeletePaymentMethodModal from './DeletePaymentMethodModal'
@@ -93,26 +94,26 @@ const PaymentMethods = () => {
               {isSuccess && (
                 <>
                   {subscription?.payment_method_type === 'invoice' && (
-                    <Alert
-                      withIcon
-                      variant="info"
+                    <Admonition
+                      type="note"
+                      layout="horizontal"
+                      className="mb-0"
                       title="Payment is currently by invoice"
-                      actions={[
-                        <Button key="payment-method-support" asChild type="default">
-                          <Link
-                            href={`/support/new?category=billing&subject=Request%20to%20change%20payment%20method`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="ml-3"
+                      description="You get a monthly invoice and payment link via email. To change your payment
+                      method, please contact us via our support form."
+                      actions={
+                        <Button asChild key="payment-method-support" type="default">
+                          <SupportLink
+                            queryParams={{
+                              category: SupportCategories.BILLING,
+                              subject: 'Request to change payment method',
+                            }}
                           >
                             Contact support
-                          </Link>
-                        </Button>,
-                      ]}
-                    >
-                      You get a monthly invoice and payment link via email. To change your payment
-                      method, please contact us via our support form.
-                    </Alert>
+                          </SupportLink>
+                        </Button>
+                      }
+                    />
                   )}
                   <FormPanel
                     footer={

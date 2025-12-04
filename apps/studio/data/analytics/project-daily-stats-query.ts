@@ -1,9 +1,10 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { operations } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import type { AnalyticsData } from './constants'
 import { analyticsKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export type ProjectDailyStatsAttribute =
   operations['DailyStatsController_getDailyStats']['parameters']['query']['attribute']
@@ -48,23 +49,22 @@ export const useProjectDailyStatsQuery = <TData = ProjectDailyStatsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectDailyStatsData, ProjectDailyStatsError, TData> = {}
+  }: UseCustomQueryOptions<ProjectDailyStatsData, ProjectDailyStatsError, TData> = {}
 ) =>
-  useQuery<ProjectDailyStatsData, ProjectDailyStatsError, TData>(
-    analyticsKeys.infraMonitoring(projectRef, {
+  useQuery<ProjectDailyStatsData, ProjectDailyStatsError, TData>({
+    queryKey: analyticsKeys.infraMonitoring(projectRef, {
       attribute,
       startDate,
       endDate,
     }),
-    ({ signal }) => getProjectDailyStats({ projectRef, attribute, startDate, endDate }, signal),
-    {
-      enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        typeof attribute !== 'undefined' &&
-        typeof startDate !== 'undefined' &&
-        typeof endDate !== 'undefined',
-      staleTime: 1000 * 60 * 30, // default good for 30m, stats only refresh once a day
-      ...options,
-    }
-  )
+    queryFn: ({ signal }) =>
+      getProjectDailyStats({ projectRef, attribute, startDate, endDate }, signal),
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      typeof attribute !== 'undefined' &&
+      typeof startDate !== 'undefined' &&
+      typeof endDate !== 'undefined',
+    staleTime: 1000 * 60 * 30,
+    ...options,
+  })

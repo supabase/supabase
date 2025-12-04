@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button } from 'ui'
@@ -35,11 +36,19 @@ export const UpgradePlanButton = ({
   const href = billingAll
     ? propsHref ??
       `/org/${slug}/billing?panel=subscriptionPlan${!!source ? `&source=${source}` : ''}`
-    : `/support/new?slug=${slug}&projectRef=no-project&category=Plan_upgrade&subject=${subject}&message=${encodeURIComponent(message)}`
+    : ''
+  const linkChildren = children || `Upgrade to ${plan}`
+  const link = billingAll ? (
+    <Link href={href}>{linkChildren}</Link>
+  ) : (
+    <SupportLink queryParams={{ orgSlug: slug, category: 'Plan_upgrade', subject, message }}>
+      {linkChildren}
+    </SupportLink>
+  )
 
   return (
     <Button asChild type={type} disabled={disabled}>
-      <Link href={href}>{children || `Upgrade to ${plan}`}</Link>
+      {link}
     </Button>
   )
 }

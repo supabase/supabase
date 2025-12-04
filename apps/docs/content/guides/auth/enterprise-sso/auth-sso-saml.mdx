@@ -481,3 +481,13 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 </TabPanel>
 
 </Tabs>
+
+### Why doesn't IdP-initiated SAML flow work with PKCE, and what's the alternative?
+
+Traditional IdP-initiated SAML flows aren't compatible with PKCE (Proof Key for Code Exchange) because PKCE requires a `code_challenge` and `code_verifier` that are generated when your application initiates the authentication flow. In IdP-initiated flows, Supabase receives an unsolicited response without this information, causing the code exchange step to fail.
+
+To achieve the same user experience while maintaining PKCE security, you can implement a "bookmark app" approach:
+
+Create an endpoint in your application (for example, `https://your-app.com/auth/saml-init`) that initiates the SAML flow using `signInWithSSO`. Then create a bookmark or linked application in your IdP that points to this endpoint. When users access the bookmark app, it triggers a secure SP-initiated flow.
+
+This approach supports custom SAML assertions and lets you embed the link anywhere in your application.

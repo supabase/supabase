@@ -149,7 +149,7 @@ const InfrastructureInfo = () => {
                             isVisibleReleaseChannel && (
                               <Tooltip>
                                 <TooltipTrigger>
-                                  <Badge variant="warning" className="mr-1 capitalize">
+                                  <Badge variant="warning" className="mr-1">
                                     {isVisibleReleaseChannel}
                                   </Badge>
                                 </TooltipTrigger>
@@ -174,7 +174,7 @@ const InfrastructureInfo = () => {
                             isOnLatestVersion && (
                               <Tooltip>
                                 <TooltipTrigger>
-                                  <Badge variant="brand" className="mr-1">
+                                  <Badge variant="success" className="mr-1">
                                     Latest
                                   </Badge>
                                 </TooltipTrigger>

@@ -4,7 +4,6 @@ import { UseFormReturn } from 'react-hook-form'
 import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
 import { DOCS_URL } from 'lib/constants'
-import { CreateProjectForm } from 'pages/new/[slug]'
 import {
   Badge,
   cn,
@@ -19,6 +18,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { CreateProjectForm } from './ProjectCreation.schema'
 
 interface AdvancedConfigurationProps {
   form: UseFormReturn<CreateProjectForm>
@@ -58,13 +58,11 @@ export const AdvancedConfiguration = ({
                         label={
                           <>
                             Postgres
-                            <Badge color="scale" className="ml-2">
-                              Default
-                            </Badge>
+                            <Badge>Default</Badge>
                           </>
                         }
                         description="Recommended for production workloads"
-                        className="[&>div>div>p]:text-left [&>div>div>p]:text-xs"
+                        className="[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>label]:flex [&>div>div>label]:items-center [&>div>div>label]:gap-x-2"
                       />
                     </FormControl_Shadcn_>
                   </FormItem_Shadcn_>
@@ -76,14 +74,12 @@ export const AdvancedConfiguration = ({
                         label={
                           <>
                             Postgres with OrioleDB
-                            <Badge color="warning" className="ml-2">
-                              Alpha
-                            </Badge>
+                            <Badge variant="warning">Alpha</Badge>
                           </>
                         }
                         description="Not recommended for production workloads"
                         className={cn(
-                          '[&>div>div>p]:text-left [&>div>div>p]:text-xs',
+                          '[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>label]:flex [&>div>div>label]:items-center [&>div>div>label]:gap-x-2',
                           form.getValues('useOrioleDb') ? '!rounded-b-none' : ''
                         )}
                       />

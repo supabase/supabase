@@ -1,15 +1,17 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { ArrowRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
+import { useEffect } from 'react'
 
 import { useParams } from 'common'
-import ClientLibrary from 'components/interfaces/Home/ClientLibrary'
+import { ClientLibrary } from 'components/interfaces/Home/ClientLibrary'
 import { ExampleProject } from 'components/interfaces/Home/ExampleProject'
 import { EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
-import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
-import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { DisplayApiSettings } from 'components/ui/ProjectSettings/DisplayApiSettings'
+import { DisplayConfigSettings } from 'components/ui/ProjectSettings/DisplayConfigSettings'
+import { useInvalidateProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
+import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
-import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -19,7 +21,9 @@ import { Badge, Button } from 'ui'
 const BuildingState = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const queryClient = useQueryClient()
+
+  const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
+  const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
   const showExamples = useIsFeatureEnabled('project_homepage:show_examples')
 
@@ -27,21 +31,31 @@ const BuildingState = () => {
     'project_homepage:client_libraries',
   ])
 
-  useProjectStatusQuery(
+  const { data: projectStatusData, isSuccess: isProjectStatusSuccess } = useProjectStatusQuery(
     { projectRef: ref },
     {
       enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
-      refetchInterval: (res) => {
-        return res?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
-      },
-      onSuccess: async (res) => {
-        if (res.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
-          if (ref) invalidateProjectDetailsQuery(queryClient, ref)
-          invalidateProjectsQuery(queryClient)
-        }
+      refetchInterval: (data) => {
+        return data?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
       },
     }
   )
+
+  useEffect(() => {
+    if (!isProjectStatusSuccess) return
+    if (projectStatusData?.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
+      if (ref) {
+        invalidateProjectDetailsQuery(ref)
+      }
+      invalidateProjectsQuery()
+    }
+  }, [
+    isProjectStatusSuccess,
+    projectStatusData,
+    ref,
+    invalidateProjectDetailsQuery,
+    invalidateProjectsQuery,
+  ])
 
   if (project === undefined) return null
 
@@ -51,7 +65,7 @@ const BuildingState = () => {
         <div className="w-full flex flex-col gap-4">
           <div className="w-full flex flex-col md:flex-row items-start md:items-center gap-3">
             <h1 className="text-3xl">{project?.name}</h1>
-            <Badge variant="default" className="bg-surface-100 bg-opacity-100">
+            <Badge>
               <div className="flex items-center gap-2">
                 <Loader2 className="animate-spin" size={12} />
                 <span>
@@ -111,7 +125,7 @@ const BuildingState = () => {
                           support ticket.
                         </p>
                         <Button asChild type="default">
-                          <Link href="/support/new">Contact support team</Link>
+                          <SupportLink>Contact support team</SupportLink>
                         </Button>
                       </>
                     }

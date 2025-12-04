@@ -9,12 +9,6 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  ScaffoldSection,
-  ScaffoldSectionDescription,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
-import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
@@ -36,10 +30,26 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
   WarningIcon,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageSection,
+  PageSectionAside,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { CreateCredentialModal } from './CreateCredentialModal'
 import { RevokeCredentialModal } from './RevokeCredentialModal'
@@ -76,10 +86,12 @@ export const S3Connection = () => {
     { enabled: canReadS3Credentials }
   )
 
-  const { mutate: updateStorageConfig, isLoading: isUpdating } =
+  const { mutate: updateStorageConfig, isPending: isUpdating } =
     useProjectStorageConfigUpdateUpdateMutation({
       onSuccess: (_, vars) => {
-        if (vars.features) form.reset({ s3ConnectionEnabled: vars.features.s3Protocol.enabled })
+        if (vars.features?.s3Protocol) {
+          form.reset({ s3ConnectionEnabled: vars.features.s3Protocol.enabled })
+        }
         toast.success('Successfully updated storage settings')
       },
     })
@@ -115,190 +127,210 @@ export const S3Connection = () => {
 
   return (
     <>
-      <ScaffoldSection isFullWidth>
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <ScaffoldSectionTitle>Connection</ScaffoldSectionTitle>
-            <ScaffoldSectionDescription>
-              Connect to your bucket using any S3-compatible service via the S3 protocol.
-            </ScaffoldSectionDescription>
-          </div>
-          <DocsButton href={`${DOCS_URL}/guides/storage/s3/authentication`} />
-        </div>
+      <PageContainer>
+        <PageSection>
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Connection</PageSectionTitle>
+              <PageSectionDescription>
+                Connect to your bucket using any S3-compatible service via the S3 protocol
+              </PageSectionDescription>
+            </PageSectionSummary>
+            <PageSectionAside>
+              <DocsButton href={`${DOCS_URL}/guides/storage/s3/authentication`} />
+            </PageSectionAside>
+          </PageSectionMeta>
 
-        {isErrorStorageConfig && (
-          <AlertError
-            className="mb-4"
-            subject="Failed to retrieve storage configuration"
-            error={configError}
-          />
-        )}
+          <PageSectionContent>
+            {isErrorStorageConfig && (
+              <AlertError
+                className="mb-4"
+                subject="Failed to retrieve storage configuration"
+                error={configError}
+              />
+            )}
 
-        <Form_Shadcn_ {...form}>
-          <form id="s3-connection-form" onSubmit={form.handleSubmit(onSubmit)}>
-            {projectIsLoading ? (
-              <GenericSkeletonLoader />
-            ) : isProjectActive ? (
-              <Card>
-                <CardContent className="pt-6">
-                  <FormField_Shadcn_
-                    name="s3ConnectionEnabled"
-                    control={form.control}
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="horizontal"
-                        className="[&>*>label]:text-foreground"
-                        label="Enable connection via S3 protocol"
-                        description="Allow clients to connect to Supabase Storage via the S3 protocol"
-                      >
-                        <FormControl_Shadcn_>
-                          <Switch
-                            size="large"
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={!isSuccessStorageConfig || field.disabled}
+            <Form_Shadcn_ {...form}>
+              <form id="s3-connection-form" onSubmit={form.handleSubmit(onSubmit)}>
+                {projectIsLoading ? (
+                  <GenericSkeletonLoader />
+                ) : isProjectActive ? (
+                  <Card>
+                    <CardContent className="pt-6">
+                      <FormField_Shadcn_
+                        name="s3ConnectionEnabled"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItemLayout
+                            layout="horizontal"
+                            className="[&>*>label]:text-foreground"
+                            label="S3 protocol connection"
+                            description="Allow clients to connect to Supabase Storage via the S3 protocol"
+                          >
+                            <FormControl_Shadcn_>
+                              <Switch
+                                size="large"
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                disabled={!isSuccessStorageConfig || field.disabled}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+                    </CardContent>
+
+                    <CardContent className="py-6">
+                      <div className="flex flex-col gap-y-4">
+                        <FormItemLayout layout="horizontal" label="Endpoint" isReactForm={false}>
+                          <Input readOnly copy value={s3connectionUrl} />
+                        </FormItemLayout>
+                        <FormItemLayout layout="horizontal" label="Region" isReactForm={false}>
+                          <Input
+                            readOnly
+                            copy
+                            value={project?.region}
+                            data-1p-ignore
+                            data-lpignore="true"
+                            data-form-type="other"
+                            data-bwignore
                           />
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
-                  />
-                </CardContent>
+                        </FormItemLayout>
+                      </div>
+                    </CardContent>
 
-                <CardContent className="py-6">
-                  <div className="flex flex-col gap-y-4">
-                    <FormItemLayout layout="horizontal" label="Endpoint" isReactForm={false}>
-                      <Input readOnly copy disabled value={s3connectionUrl} />
-                    </FormItemLayout>
-                    {!projectIsLoading && (
-                      <FormItemLayout layout="horizontal" label="Region" isReactForm={false}>
-                        <Input className="input-mono" copy disabled value={project?.region} />
-                      </FormItemLayout>
+                    {!isLoadingPermissions && !canUpdateStorageSettings && (
+                      <CardContent>
+                        <p className="text-sm text-foreground-light">
+                          You need additional permissions to update storage settings
+                        </p>
+                      </CardContent>
                     )}
-                  </div>
-                </CardContent>
 
-                {!isLoadingPermissions && !canUpdateStorageSettings && (
-                  <CardContent>
-                    <p className="text-sm text-foreground-light">
-                      You need additional permissions to update storage settings
-                    </p>
-                  </CardContent>
+                    <CardFooter className="justify-end space-x-2">
+                      {form.formState.isDirty && (
+                        <Button
+                          type="default"
+                          htmlType="reset"
+                          onClick={() => form.reset()}
+                          disabled={
+                            !form.formState.isDirty || !canUpdateStorageSettings || isUpdating
+                          }
+                        >
+                          Cancel
+                        </Button>
+                      )}
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={isUpdating}
+                        disabled={
+                          !form.formState.isDirty || !canUpdateStorageSettings || isUpdating
+                        }
+                      >
+                        Save
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ) : (
+                  <Alert_Shadcn_ variant="warning">
+                    <WarningIcon />
+                    <AlertTitle>Project is paused</AlertTitle>
+                    <AlertDescription_Shadcn_>
+                      To connect to your S3 bucket, you need to restore your project.
+                    </AlertDescription_Shadcn_>
+                    <div className="mt-3 flex items-center space-x-2">
+                      <Button asChild type="default">
+                        <Link href={`/project/${projectRef}`}>Restore project</Link>
+                      </Button>
+                    </div>
+                  </Alert_Shadcn_>
                 )}
+              </form>
+            </Form_Shadcn_>
+          </PageSectionContent>
+        </PageSection>
 
-                <CardFooter className="justify-end space-x-2">
-                  {form.formState.isDirty && (
-                    <Button
-                      type="default"
-                      htmlType="reset"
-                      onClick={() => form.reset()}
-                      disabled={!form.formState.isDirty || !canUpdateStorageSettings || isUpdating}
-                    >
-                      Cancel
-                    </Button>
-                  )}
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={isUpdating}
-                    disabled={!form.formState.isDirty || !canUpdateStorageSettings || isUpdating}
-                  >
-                    Save
-                  </Button>
-                </CardFooter>
-              </Card>
-            ) : (
+        <PageSection>
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Access keys</PageSectionTitle>
+              <PageSectionDescription>
+                Manage your access keys for this project
+              </PageSectionDescription>
+            </PageSectionSummary>
+            <PageSectionAside>
+              <CreateCredentialModal visible={openCreateCred} onOpenChange={setOpenCreateCred} />
+            </PageSectionAside>
+          </PageSectionMeta>
+
+          <PageSectionContent>
+            {projectIsLoading || isLoadingPermissions ? (
+              <GenericSkeletonLoader />
+            ) : !canReadS3Credentials ? (
+              <NoPermission resourceText="view this project's S3 access keys" />
+            ) : !isProjectActive ? (
               <Alert_Shadcn_ variant="warning">
                 <WarningIcon />
-                <AlertTitle>Project is paused</AlertTitle>
+                <AlertTitle>Can't fetch S3 access keys</AlertTitle>
                 <AlertDescription_Shadcn_>
-                  To connect to your S3 bucket, you need to restore your project.
+                  To fetch your S3 access keys, you need to restore your project.
                 </AlertDescription_Shadcn_>
-                <div className="mt-3 flex items-center space-x-2">
-                  <Button asChild type="default">
+                <AlertDescription_Shadcn_>
+                  <Button asChild type="default" className="mt-3">
                     <Link href={`/project/${projectRef}`}>Restore project</Link>
                   </Button>
-                </div>
+                </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
-            )}
-          </form>
-        </Form_Shadcn_>
-      </ScaffoldSection>
-
-      <ScaffoldSection isFullWidth>
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <ScaffoldSectionTitle>Access keys</ScaffoldSectionTitle>
-            <ScaffoldSectionDescription>
-              Manage your access keys for this project.
-            </ScaffoldSectionDescription>
-          </div>
-          <CreateCredentialModal visible={openCreateCred} onOpenChange={setOpenCreateCred} />
-        </div>
-
-        {projectIsLoading || isLoadingPermissions ? (
-          <GenericSkeletonLoader />
-        ) : !canReadS3Credentials ? (
-          <NoPermission resourceText="view this project's S3 access keys" />
-        ) : !isProjectActive ? (
-          <Alert_Shadcn_ variant="warning">
-            <WarningIcon />
-            <AlertTitle>Can't fetch S3 access keys</AlertTitle>
-            <AlertDescription_Shadcn_>
-              To fetch your S3 access keys, you need to restore your project.
-            </AlertDescription_Shadcn_>
-            <AlertDescription_Shadcn_>
-              <Button asChild type="default" className="mt-3">
-                <Link href={`/project/${projectRef}`}>Restore project</Link>
-              </Button>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-        ) : (
-          <>
-            {isLoadingStorageCreds ? (
-              <div className="p-4">
-                <GenericSkeletonLoader />
-              </div>
             ) : (
-              <div className="overflow-x-auto">
-                <Table
-                  head={[
-                    <Table.th key="description">Description</Table.th>,
-                    <Table.th key="access-key-id">Access key ID</Table.th>,
-                    <Table.th key="created-at">Created at</Table.th>,
-                    <Table.th key="actions" />,
-                  ]}
-                  body={
-                    hasStorageCreds ? (
-                      storageCreds.data?.map((cred) => (
-                        <StorageCredItem
-                          key={cred.id}
-                          created_at={cred.created_at}
-                          access_key={cred.access_key}
-                          description={cred.description}
-                          id={cred.id}
-                          onDeleteClick={() => {
-                            setDeleteCred(cred)
-                            setOpenDeleteDialog(true)
-                          }}
-                        />
-                      ))
-                    ) : (
-                      <Table.tr>
-                        <Table.td colSpan={4} className="!rounded-b-md overflow-hidden">
-                          <p className="text-sm text-foreground">No access keys created</p>
-                          <p className="text-sm text-foreground-light">
-                            There are no access keys associated with your project yet
-                          </p>
-                        </Table.td>
-                      </Table.tr>
-                    )
-                  }
-                />
-              </div>
+              <>
+                {isLoadingStorageCreds ? (
+                  <GenericSkeletonLoader />
+                ) : (
+                  <Card>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead key="description">Name</TableHead>
+                          <TableHead key="access-key-id">Key ID</TableHead>
+                          <TableHead key="created-at">Created at</TableHead>
+                          <TableHead key="actions" />
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {hasStorageCreds ? (
+                          storageCreds.data?.map((cred) => (
+                            <StorageCredItem
+                              key={cred.id}
+                              created_at={cred.created_at}
+                              access_key={cred.access_key}
+                              description={cred.description}
+                              id={cred.id}
+                              onDeleteClick={() => {
+                                setDeleteCred(cred)
+                                setOpenDeleteDialog(true)
+                              }}
+                            />
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={4} className="!rounded-b-md overflow-hidden">
+                              <p className="text-sm text-foreground">No access keys created</p>
+                              <p className="text-sm text-foreground-light">
+                                There are no access keys associated with your project yet
+                              </p>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </Card>
+                )}
+              </>
             )}
-          </>
-        )}
-      </ScaffoldSection>
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
 
       <RevokeCredentialModal
         visible={openDeleteDialog}

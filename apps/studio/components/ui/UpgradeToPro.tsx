@@ -18,6 +18,7 @@ interface UpgradeToProProps {
   source?: string
   disabled?: boolean
   fullWidth?: boolean
+  className?: string
 }
 
 const UpgradeToPro = ({
@@ -44,12 +45,12 @@ const UpgradeToPro = ({
     <div
       className={cn(
         'block w-full py-4 px-6 bg-surface-200',
-        fullWidth ? 'border-b' : 'border border-opacity-20 border-overlay rounded'
+        fullWidth ? 'border-b' : 'border rounded'
       )}
     >
       <div className="flex gap-x-3">
         {icon && <div className="mt-1">{icon}</div>}
-        <div className="flex flex-col md:flex-row w-full md:items-center justify-between gap-4 md:gap-x-8">
+        <div className="flex flex-col @md:flex-row w-full @md:items-center justify-between gap-4 @md:gap-x-8">
           <div className="space-y-1 flex-1 max-w-2xl">
             <p className="text-sm">{primaryText}</p>
             <div>

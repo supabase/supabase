@@ -28,18 +28,28 @@ function parseMarkdown(markdown: string) {
     }
   })
 
+  return { heading, content: withoutFrontmatter.trim() }
+}
+
+/**
+ * Wraps content in a markdown code block.
+ *
+ * Uses `mdast` to ensure proper escaping of backticks within the content.
+ */
+export function wrapInMarkdownCodeBlock(content: string) {
+  const mdast = fromMarkdown(content)
+
   const codeBlock: Code = {
     type: 'code',
     lang: 'markdown',
-    value: markdown,
+    value: content,
   }
   const root: Root = {
     type: 'root',
     children: [codeBlock],
   }
-  const content = toMarkdown(root)
 
-  return { heading, content }
+  return toMarkdown(root)
 }
 
 async function getAiPromptsImpl() {
@@ -105,4 +115,29 @@ export async function generateAiPromptsStaticParams() {
       slug: prompt.filename,
     }
   })
+}
+
+/**
+ * Generates a deep link URL for Cursor that preloads the given prompt text.
+ *
+ * Cursor deep links have a maximum URL length of 8000 characters.
+ * If the generated URL exceeds this length, `url` will be undefined
+ * and an error will be returned.
+ */
+export function generateCursorPromptDeepLink(promptText: string) {
+  // Temporarily reject prompts that contain ".env" due to a bug in Cursor
+  if (promptText.includes('.env')) {
+    return { error: new Error('Prompt text cannot contain the text .env due to a temporary bug') }
+  }
+
+  const url = new URL('cursor://anysphere.cursor-deeplink/prompt')
+  url.searchParams.set('text', promptText)
+  const urlString = url.toString()
+
+  // Cursor has a max URL length of 8000 characters for deep links
+  if (urlString.length > 8000) {
+    return { error: new Error('Prompt text is too long to generate a Cursor deep link.') }
+  }
+
+  return { url: urlString }
 }

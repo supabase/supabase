@@ -1,6 +1,6 @@
 import { Smartphone } from 'lucide-react'
 
-import { TOTPFactors } from 'components/interfaces/Account'
+import { TOTPFactors } from 'components/interfaces/Account/TOTPFactors'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -64,7 +64,7 @@ const Security: NextPageWithLayout = () => {
               </div>
 
               {data ? (
-                <Badge variant={data.totp.length === 0 ? 'default' : 'brand'}>
+                <Badge variant={data.totp.length === 0 ? 'default' : 'success'}>
                   {data.totp.length} app{data.totp.length === 1 ? '' : 's'} configured
                 </Badge>
               ) : null}
@@ -81,7 +81,7 @@ const Security: NextPageWithLayout = () => {
 
 Security.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout headerTitle="Account">
+    <DefaultLayout hideMobileMenu headerTitle="Account">
       <OrganizationLayout>
         <AccountLayout title="Security">{page}</AccountLayout>
       </OrganizationLayout>

@@ -1,13 +1,13 @@
-import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import { DataPoint } from 'data/analytics/constants'
+import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import SectionHeader from '../SectionHeader'
 import { CategoryMetaKey, USAGE_CATEGORIES } from '../Usage.constants'
 import AttributeUsage from './AttributeUsage'
-import DiskUsage from './DiskUsage'
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import DatabaseSizeUsage from './DatabaseSizeUsage'
+import { DiskUsage } from './DiskUsage'
 
 export interface ChartMeta {
   [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
@@ -15,11 +15,13 @@ export interface ChartMeta {
 
 export interface UsageSectionProps {
   orgSlug: string
-  projectRef?: string
+  projectRef?: string | null
   categoryKey: CategoryMetaKey
   subscription?: OrgSubscription
   chartMeta: ChartMeta
   currentBillingCycleSelected: boolean
+  startDate?: string
+  endDate?: string
 }
 
 const UsageSection = ({
@@ -29,6 +31,8 @@ const UsageSection = ({
   chartMeta,
   subscription,
   currentBillingCycleSelected,
+  startDate,
+  endDate,
 }: UsageSectionProps) => {
   const {
     data: usage,
@@ -36,7 +40,12 @@ const UsageSection = ({
     isLoading: isLoadingUsage,
     isError: isErrorUsage,
     isSuccess: isSuccessUsage,
-  } = useOrgUsageQuery({ orgSlug })
+  } = useOrgUsageQuery({
+    orgSlug,
+    projectRef,
+    start: !currentBillingCycleSelected && startDate ? new Date(startDate) : undefined,
+    end: !currentBillingCycleSelected && endDate ? new Date(endDate) : undefined,
+  })
 
   const categoryMeta = USAGE_CATEGORIES(subscription).find(
     (category) => category.key === categoryKey

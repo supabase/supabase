@@ -4,6 +4,7 @@ import { groupBy } from 'lodash'
 import { DataPoint } from 'data/analytics/constants'
 import type { OrgDailyUsageResponse, PricingMetric } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 
 // [Joshen] This is just for development to generate some test data for chart rendering
 export const generateUsageData = (attribute: string, days: number): DataPoint[] => {
@@ -17,7 +18,16 @@ export const generateUsageData = (attribute: string, days: number): DataPoint[] 
   })
 }
 
-export const getUpgradeUrl = (slug: string, subscription?: OrgSubscription, source?: string) => {
+export function useGetUpgradeUrl(slug: string, subscription?: OrgSubscription, source?: string) {
+  const { billingAll } = useIsFeatureEnabled(['billing:all'])
+
+  if (!billingAll) {
+    const subject = `Enquiry to upgrade plan for organization`
+    const message = `Organization Slug: ${slug}\nRequested plan: <Specify which plan to upgrade to: Pro | Team | Enterprise>`
+
+    return `/support/new?orgSlug=${slug}&projectRef=no-project&category=Plan_upgrade&subject=${subject}&message=${encodeURIComponent(message)}`
+  }
+
   if (!subscription) {
     return `/org/${slug}/billing`
   }

@@ -306,13 +306,22 @@ function createTabsState(projectRef: string) {
       onClearDashboardHistory: () => void
     }) => {
       const tabBeingClosed = store.tabsMap[id]
-      const tabsAfterClosing = Object.values(store.tabsMap).filter((tab) => tab.id !== id)
 
-      const nextTabId = !editor
-        ? undefined
-        : tabsAfterClosing.filter((tab) => {
-            return editorEntityTypes[editor]?.includes(tab.type)
-          })[0]?.id
+      const editorTabIds = (
+        editor
+          ? Object.values(store.tabsMap).filter((tab) =>
+              editorEntityTypes[editor]?.includes(tab.type)
+            )
+          : []
+      ).map((tab) => tab.id)
+      const tabIndexBeingClosed = editorTabIds.indexOf(id)
+      const isLastTabBeingClosed = tabIndexBeingClosed === editorTabIds.length - 1
+      const nextTabId =
+        editorTabIds.length === 1
+          ? undefined
+          : isLastTabBeingClosed
+            ? editorTabIds[tabIndexBeingClosed - 1]
+            : editorTabIds[tabIndexBeingClosed + 1]
 
       const { [id]: value, ...otherTabs } = store.tabsMap
       store.tabsMap = otherTabs

@@ -2,10 +2,10 @@ import { GeneralSettings } from 'components/interfaces/Organization/GeneralSetti
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
-import { Loading } from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from 'types'
+import { LogoLoader } from 'ui'
 
 const OrgGeneralSettings: NextPageWithLayout = () => {
   const { isLoading: isLoadingPermissions } = usePermissionsQuery()
@@ -14,7 +14,7 @@ const OrgGeneralSettings: NextPageWithLayout = () => {
   return (
     <>
       {selectedOrganization === undefined && isLoadingPermissions ? (
-        <Loading />
+        <LogoLoader />
       ) : (
         <GeneralSettings />
       )}

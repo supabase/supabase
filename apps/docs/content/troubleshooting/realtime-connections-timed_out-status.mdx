@@ -1,0 +1,17 @@
+---
+title = "Realtime connections giving `TIMED_OUT` errors"
+topics = [ "realtime" ]
+keywords = []
+---
+
+If your Realtime connections in your application are giving `TIMED_OUT` errors, this often indicates an incompatibility between the version of `realtime-js` being used in your `supabase-js` client library package and your Node.js version. This issue happens when using versions of Node.js older than v22 with more recent versions of `supabase-js`.
+
+**Why This Occurs:**
+This happens due to a fundamental change made to fix various issues. See more details on why this change was made and solutions to fix it: https://github.com/orgs/supabase/discussions/37869
+
+**How to Resolve This:**
+
+There are two primary options to fix this:
+
+1. **Upgrade Node.js**: Upgrade your Node.js version to the latest Long Term Support (LTS) release, such as Node.js v24 as of November 2025.
+2. **Explicitly set the WebSocket transport**: See the linked GitHub discussion above for a detailed guide on doing this.

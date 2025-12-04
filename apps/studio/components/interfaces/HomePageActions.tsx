@@ -1,13 +1,13 @@
+import { useDebounce } from '@uidotdev/usehooks'
 import { Filter, Grid, List, Loader2, Plus, Search, X } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 
-import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { PROJECT_STATUS } from 'lib/constants'
-import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -57,9 +57,9 @@ export const HomePageActions = ({
       <div className="flex items-center gap-2">
         <Input
           placeholder="Search for a project"
-          icon={<Search size={12} />}
+          icon={<Search />}
           size="tiny"
-          className="w-32 md:w-64 pl-8 [&>div>div>div>input]:!pl-7 [&>div>div>div>div]:!pl-2"
+          className="w-32 md:w-64"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           actions={[
@@ -83,7 +83,13 @@ export const HomePageActions = ({
               icon={<Filter />}
             />
           </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
+          <PopoverContent_Shadcn_
+            className="p-0 w-56"
+            side="bottom"
+            align="center"
+            sideOffset={6}
+            portal={true}
+          >
             <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
               <p className="text-xs">Filter projects by status</p>
               <div className="flex flex-col">

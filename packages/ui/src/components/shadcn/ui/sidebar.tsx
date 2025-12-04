@@ -219,8 +219,8 @@ const Sidebar = React.forwardRef<
         {/* This is what handles the sidebar gap on desktop */}
         <div
           className={cn(
-            overflowing ? 'absolute top-0' : 'relative', // sidebar custom changes - to contain the absolute sidebar below
-            'duration-100 h-svh w-[--sidebar-width] bg-transparent transition-[width] ease-linear',
+            overflowing ? 'absolute top-0' : 'relative',
+            'duration-100 h-full w-[--sidebar-width] bg-transparent transition-[width] ease-linear',
             'group-data-[collapsible=offcanvas]:w-0',
             'group-data-[side=right]:rotate-180',
             variant === 'floating' || variant === 'inset'
@@ -553,6 +553,13 @@ const SidebarMenuButton = React.forwardRef<
   ) => {
     const Comp = asChild ? Slot : 'button'
     const { isMobile, state } = useSidebar()
+    const { disabled, tabIndex } = props
+
+    // Set default tabIndex for proper Safari focus handling
+    // - Explicit tabIndex prop takes precedence
+    // - If disabled, default to -1 (unless explicitly set)
+    // - Otherwise, default to 0 for keyboard accessibility
+    const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
 
     const button = (
       <Comp
@@ -561,6 +568,7 @@ const SidebarMenuButton = React.forwardRef<
         data-size={size}
         data-active={isActive}
         data-has-icon={hasIcon}
+        tabIndex={computedTabIndex}
         className={cn(sidebarMenuButtonVariants({ variant, size, hasIcon }), className)}
         {...props}
       />

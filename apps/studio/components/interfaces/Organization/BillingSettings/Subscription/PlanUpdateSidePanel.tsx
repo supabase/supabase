@@ -183,6 +183,11 @@ export const PlanUpdateSidePanel = () => {
               const features = plan.features
               const footer = plan.footer
 
+              const source = Array.isArray(router.query.source)
+                ? router.query.source[0]
+                : router.query.source
+              const shouldHighlight = source === 'log-drains-empty-state' && plan.id === 'tier_team'
+
               if (plan.id === 'tier_enterprise') {
                 return <EnterpriseCard key={plan.id} plan={plan} isCurrentPlan={isCurrentPlan} />
               }
@@ -192,18 +197,20 @@ export const PlanUpdateSidePanel = () => {
                   key={plan.id}
                   className={cn(
                     'px-4 py-4 flex flex-col items-start justify-between',
-                    'border rounded-md col-span-12 md:col-span-4 bg-surface-200'
+                    'border rounded-md col-span-12 md:col-span-4 bg-surface-200',
+                    shouldHighlight &&
+                      'ring-4 ring-brand animate-[pulse_1.5s_ease-in-out_1] shadow-md shadow-brand/40'
                   )}
                 >
                   <div className="w-full">
                     <div className="flex items-center space-x-2">
-                      <p className="text-brand text-sm uppercase">{plan.name}</p>
+                      <p className="text-brand-link text-sm uppercase">{plan.name}</p>
                       {isCurrentPlan ? (
                         <div className="text-xs bg-surface-300 text-foreground-light rounded px-2 py-0.5">
                           Current plan
                         </div>
                       ) : plan.nameBadge ? (
-                        <div className="text-xs bg-brand-400 text-brand-600 rounded px-2 py-0.5">
+                        <div className="text-xs bg-brand-300 dark:bg-brand-400 text-brand-600 rounded px-2 py-0.5">
                           {plan.nameBadge}
                         </div>
                       ) : null}
