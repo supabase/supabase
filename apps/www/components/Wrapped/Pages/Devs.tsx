@@ -89,11 +89,11 @@ const gridStats = [
 export const Devs = () => {
   return (
     <>
-      <section className="relative max-w-[60rem] h-[420px] mx-auto border-x border-b">
+      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x border-b">
         {/* Grid background */}
         <AnimatedGridBackground
           cols={5}
-          rows={3}
+          rows={{ mobile: 2, desktop: 3 }}
           tiles={[
             { cell: 0, type: 'dots' },
             { cell: 2, type: 'stripes' },
@@ -106,16 +106,16 @@ export const Devs = () => {
         />
 
         {/* Content */}
-        <div className="flex flex-col justify-end h-full px-8 py-0 relative">
+        <div className="flex flex-col justify-end h-full px-4 py-0 relative">
           <div className="flex justify-between items-center">
-            <h1 className="font-bold tracking-tight text-[5.6rem]">
+            <h1 className="font-bold tracking-tight text-6xl md:text-7xl lg:text-[5.6rem]">
               Devs <span className="text-brand">💚</span> Supabase
             </h1>
           </div>
         </div>
       </section>
 
-      <div className="relative max-w-[60rem] mx-auto border-x border-b px-8 py-12">
+      <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 py-12">
         <p className="text-xl text-foreground-light max-w-2xl">
           In 2025, developers around the world shipped faster, scaled further, and built things we
           never imagined. Here is what you accomplished on Supabase.

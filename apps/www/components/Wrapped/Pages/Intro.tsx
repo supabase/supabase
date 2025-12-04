@@ -165,7 +165,7 @@ export const Intro = () => {
         top={0}
       >
         <section className="h-screen border-x border-b max-w-[60rem] mx-auto">
-          <div className="h-full grid place-items-center px-8 relative overflow-hidden">
+          <div className="h-full grid place-items-center px-4 relative overflow-hidden">
             {/* Floating boxes */}
             <FloatingBoxes />
 

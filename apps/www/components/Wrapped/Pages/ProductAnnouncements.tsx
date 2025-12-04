@@ -257,7 +257,7 @@ function MonthAccordion({
     <div>
       <button
         onClick={onToggle}
-        className="w-full px-6 py-4 flex items-center justify-between hover:bg-surface-75 transition-colors"
+        className="w-full px-6 py-2.5 md:py-4 flex items-center justify-between hover:bg-surface-75 transition-colors"
       >
         <div className="flex items-center gap-3">
           <span className="text-base font-medium">{month.name}</span>
@@ -317,11 +317,11 @@ export const ProductAnnouncements = () => {
 
   return (
     <>
-      <section className="relative max-w-[60rem] h-[420px] mx-auto border-x border-b">
+      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x border-b">
         {/* Grid background */}
         <AnimatedGridBackground
           cols={5}
-          rows={3}
+          rows={{ mobile: 2, desktop: 3 }}
           tiles={[
             { cell: 1, type: 'stripes' },
             { cell: 4, type: 'dots' },
@@ -332,14 +332,14 @@ export const ProductAnnouncements = () => {
         />
 
         {/* Content */}
-        <div className="flex flex-col justify-end h-full px-8 py-0 relative">
-          <h1 className="font-bold tracking-tight text-[5.6rem]">
+        <div className="flex flex-col justify-end h-full px-4 py-0 relative">
+          <h1 className="font-bold tracking-tight text-6xl md:text-7xl lg:text-[5.6rem]">
             Launch <span className="line-through text-foreground-muted">Week</span> Year
           </h1>
         </div>
       </section>
 
-      <div className="relative max-w-[60rem] mx-auto border-x border-b px-8 py-12">
+      <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 py-12">
         <h2 className="text-2xl">Product Announcements</h2>
         <p className="text-base text-foreground-lighter mt-4">
           Everything we shipped in 2025. Click on a month to explore.

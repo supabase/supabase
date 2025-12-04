@@ -76,11 +76,11 @@ export const CustomerStories = () => {
 
   return (
     <>
-      <section className="relative max-w-[60rem] h-[420px] mx-auto border-x border-b">
+      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x border-b">
         {/* Grid background */}
         <AnimatedGridBackground
           cols={5}
-          rows={3}
+          rows={{ mobile: 2, desktop: 3 }}
           tiles={[
             { cell: 3, type: 'dots' },
             { cell: 4, type: 'dots' },
@@ -91,12 +91,14 @@ export const CustomerStories = () => {
         />
 
         {/* Content */}
-        <div className="flex flex-col justify-end h-full px-8 py-0 relative">
-          <h1 className="font-bold tracking-tight text-[5.6rem]">Customer Stories</h1>
+        <div className="flex flex-col justify-end h-full px-4 py-0 relative">
+          <h1 className="font-bold tracking-tight text-6xl md:text-7xl lg:text-[5.6rem]">
+            Customer Stories
+          </h1>
         </div>
       </section>
 
-      <div className="relative max-w-[60rem] mx-auto border-x border-b px-8 py-12">
+      <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 py-12">
         <h2 className="text-2xl">Customers count on Supabase</h2>
       </div>
 

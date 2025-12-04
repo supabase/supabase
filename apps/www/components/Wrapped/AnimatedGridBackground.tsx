@@ -16,9 +16,14 @@ type TileConfig = {
   initialCell: number
 }
 
+type ResponsiveRows = {
+  mobile: number
+  desktop: number
+}
+
 type AnimatedGridBackgroundProps = {
   cols: number
-  rows: number
+  rows: number | ResponsiveRows
   tiles: Array<{ cell: number; type: TileType }>
   initialDelay?: number
 }
@@ -29,27 +34,44 @@ export function AnimatedGridBackground({
   tiles,
   initialDelay = 0,
 }: AnimatedGridBackgroundProps) {
-  const totalCells = cols * rows
+  // Detect if we're on mobile (client-side only)
+  const [isMobile, setIsMobile] = useState(false)
 
-  // Convert tiles config to internal format with IDs
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  // Get the actual row count based on responsive config
+  const actualRows = typeof rows === 'number' ? rows : isMobile ? rows.mobile : rows.desktop
+  const totalCells = cols * actualRows
+
+  // Convert tiles config to internal format with IDs, filtering out tiles outside bounds
   const tileConfigs: TileConfig[] = useMemo(
     () =>
-      tiles.map((tile, index) => ({
-        id: index,
-        type: tile.type,
-        initialCell: tile.cell,
-      })),
-    [tiles]
+      tiles
+        .filter((tile) => tile.cell < totalCells)
+        .map((tile, index) => ({
+          id: index,
+          type: tile.type,
+          initialCell: tile.cell,
+        })),
+    [tiles, totalCells]
   )
 
   // Track current positions of all tiles
-  const [tilePositions, setTilePositions] = useState<Map<number, number>>(() => {
+  const [tilePositions, setTilePositions] = useState<Map<number, number>>(new Map())
+
+  // Reinitialize tile positions when tileConfigs changes (e.g., on responsive change)
+  useEffect(() => {
     const initial = new Map<number, number>()
     tileConfigs.forEach((tile) => {
       initial.set(tile.id, tile.initialCell)
     })
-    return initial
-  })
+    setTilePositions(initial)
+  }, [tileConfigs])
 
   // Get adjacent cells (up, down, left, right) that are within bounds
   const getAdjacentCells = useCallback(
@@ -61,7 +83,7 @@ export function AnimatedGridBackground({
       // Up
       if (row > 0) adjacent.push(cell - cols)
       // Down
-      if (row < rows - 1) adjacent.push(cell + cols)
+      if (row < actualRows - 1) adjacent.push(cell + cols)
       // Left
       if (col > 0) adjacent.push(cell - 1)
       // Right
@@ -69,7 +91,7 @@ export function AnimatedGridBackground({
 
       return adjacent
     },
-    [cols, rows]
+    [cols, actualRows]
   )
 
   // Get occupied cells
@@ -137,7 +159,7 @@ export function AnimatedGridBackground({
       className={`absolute inset-0 grid h-full [&>*]:border-muted [&>*]:border-r [&>*]:border-b`}
       style={{
         gridTemplateColumns: `repeat(${cols}, 1fr)`,
-        gridTemplateRows: `repeat(${rows}, 1fr)`,
+        gridTemplateRows: `repeat(${actualRows}, 1fr)`,
       }}
     >
       {Array.from({ length: totalCells }).map((_, cellIndex) => {

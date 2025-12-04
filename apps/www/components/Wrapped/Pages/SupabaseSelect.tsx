@@ -24,10 +24,10 @@ const allImages = [
 
 // Gallery layout configuration
 const gallerySlots = [
-  { id: 0, span: 'col-span-2 row-span-2' },
-  { id: 1, span: 'col-span-3 row-span-2' },
-  { id: 2, span: 'col-span-3 row-span-2' },
-  { id: 3, span: 'col-span-2 row-span-2' },
+  { id: 0, span: 'col-span-1 lg:col-span-2 row-span-1 lg:row-span-2' },
+  { id: 1, span: 'col-span-1 lg:col-span-3 row-span-1 lg:row-span-2' },
+  { id: 2, span: 'col-span-1 lg:col-span-3 row-span-1 lg:row-span-2' },
+  { id: 3, span: 'col-span-1 lg:col-span-2 row-span-1 lg:row-span-2' },
 ]
 
 function RotatingImage({
@@ -65,11 +65,11 @@ function RotatingImage({
 export const SupabaseSelect = () => {
   return (
     <>
-      <section className="relative max-w-[60rem] h-[420px] mx-auto border-x border-b">
+      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x border-b">
         {/* Grid background */}
         <AnimatedGridBackground
           cols={5}
-          rows={3}
+          rows={{ mobile: 2, desktop: 3 }}
           tiles={[
             { cell: 0, type: 'stripes' },
             { cell: 2, type: 'dots' },
@@ -80,12 +80,14 @@ export const SupabaseSelect = () => {
         />
 
         {/* Content */}
-        <div className="flex flex-col justify-end h-full px-8 py-0 relative">
-          <h1 className="font-bold tracking-tight text-[5.6rem]">Supabase Select</h1>
+        <div className="flex flex-col justify-end h-full px-4 py-0 relative">
+          <h1 className="font-bold tracking-tight text-6xl md:text-7xl lg:text-[5.6rem]">
+            Supabase Select
+          </h1>
         </div>
       </section>
 
-      <div className="relative max-w-[60rem] mx-auto border-x border-b px-8 py-12">
+      <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 py-12">
         <h2 className="text-2xl">Our first user conference was a blast</h2>
         <p className="text-base text-foreground-lighter mt-4">Thank you for being part of it.</p>
       </div>
@@ -202,7 +204,7 @@ function GalleryGrid() {
 
   return (
     <div ref={ref} className="relative max-w-[60rem] mx-auto border-x border-b p-3">
-      <div className="grid grid-cols-5 gap-2 auto-rows-[200px]">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-2 auto-rows-[200px]">
         {gallerySlots.map((slot, index) => (
           <RotatingImage
             key={slot.id}
