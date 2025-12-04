@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { useContext } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { Button, Card, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import { Button, Card, Tooltip, TooltipContent, TooltipTrigger, Skeleton, cn } from 'ui'
 import { HelpCircle, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -186,6 +186,54 @@ const ChartActions = React.forwardRef<HTMLDivElement, ChartActionsProps>(
 )
 ChartActions.displayName = 'ChartActions'
 
+/* Chart Metric */
+interface ChartMetricProps extends React.HTMLAttributes<HTMLDivElement> {
+  label: string
+  value: string | number | null | undefined
+  status?: 'positive' | 'negative' | 'warning' | 'default'
+  align?: 'start' | 'end'
+  className?: string
+}
+
+const ChartMetric = React.forwardRef<HTMLDivElement, ChartMetricProps>(
+  ({ label, value, className, status, align = 'start', ...props }, ref) => {
+    const { isLoading } = useChart()
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          'flex gap-0.5 flex-col',
+          align === 'start' ? 'items-start' : 'items-end',
+          className
+        )}
+        {...props}
+      >
+        <div className="flex items-center gap-2">
+          {status && (
+            <span
+              className={cn(
+                'flex-shrink-0 w-1.5 h-1.5 rounded-full flex',
+                status === 'positive' && 'bg-brand',
+                status === 'negative' && 'bg-destructive',
+                status === 'warning' && 'bg-warning',
+                status === 'default' && 'bg-foreground-lighter'
+              )}
+            />
+          )}
+          <h3 className="text-xs font-mono uppercase flex items-center gap-2 text-foreground-light my-0">
+            {label}
+          </h3>
+        </div>
+        <span className="text-foreground text-xl tabular-nums">
+          {isLoading ? <Skeleton className="w-12 h-6" /> : value}
+        </span>
+      </div>
+    )
+  }
+)
+ChartMetric.displayName = 'ChartMetric'
+
 /* Chart Content */
 interface ChartContentProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
@@ -250,6 +298,24 @@ const ChartLoadingState = () => {
 }
 ChartLoadingState.displayName = 'ChartLoadingState'
 
+/* Chart Container */
+
+/* Chart Footer */
+interface ChartFooterProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode
+}
+
+const ChartFooter = React.forwardRef<HTMLDivElement, ChartFooterProps>(
+  ({ children, className, ...props }, ref) => {
+    return (
+      <div ref={ref} className={cn('border-t', className)} {...props}>
+        {children}
+      </div>
+    )
+  }
+)
+ChartFooter.displayName = 'ChartFooter'
+
 /* Exports */
 export {
   Chart,
@@ -257,7 +323,9 @@ export {
   ChartHeader,
   ChartTitle,
   ChartActions,
+  ChartMetric,
   ChartContent,
   ChartEmptyState,
   ChartLoadingState,
+  ChartFooter,
 }
