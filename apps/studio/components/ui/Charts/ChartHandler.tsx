@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useState } from 'react'
+import { PropsWithChildren, useMemo, useState } from 'react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import AreaChart from 'components/ui/Charts/AreaChart'
@@ -7,8 +7,9 @@ import BarChart from 'components/ui/Charts/BarChart'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import {
   InfraMonitoringAttribute,
-  useInfraMonitoringQuery,
+  useInfraMonitoringAttributesQuery,
 } from 'data/analytics/infra-monitoring-query'
+import { mapMultiResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
 import {
   ProjectDailyStatsAttribute,
   useProjectDailyStatsQuery,
@@ -83,10 +84,10 @@ const ChartHandler = ({
   )
 
   const { data: infraMonitoringData, isLoading: isFetchingInfraMonitoring } =
-    useInfraMonitoringQuery(
+    useInfraMonitoringAttributesQuery(
       {
         projectRef: ref as string,
-        attribute: attribute as InfraMonitoringAttribute,
+        attributes: [attribute as InfraMonitoringAttribute],
         startDate,
         endDate,
         interval: interval as AnalyticsInterval,
@@ -95,10 +96,18 @@ const ChartHandler = ({
       { enabled: provider === 'infra-monitoring' && data === undefined }
     )
 
+  const transformedInfraData = useMemo(() => {
+    if (!infraMonitoringData) return undefined
+    const mapped = mapMultiResponseToAnalyticsData(infraMonitoringData, [
+      attribute as InfraMonitoringAttribute,
+    ])
+    return mapped[attribute]
+  }, [infraMonitoringData, attribute])
+
   const chartData =
     data ||
     (provider === 'infra-monitoring'
-      ? infraMonitoringData
+      ? transformedInfraData
       : provider === 'daily-stats'
         ? dailyStatsData
         : undefined)
