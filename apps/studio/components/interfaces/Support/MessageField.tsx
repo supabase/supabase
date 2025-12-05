@@ -41,7 +41,7 @@ export function MessageField({ form, originalError }: MessageFieldProps) {
             <Admonition
               showIcon={false}
               type="default"
-              className="mt-2"
+              className="mt-2 max-h-[150px] overflow-y-auto"
               title="The error that you ran into will be included in your message for reference"
               description={`Error: ${originalError}`}
             />

@@ -1,7 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { handleError, patch } from 'data/fetchers'
 import { toast } from 'sonner'
-import { ResponseError } from 'types'
+
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { handleError, patch } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { apiKeysKeys } from '../keys'
 
 export interface UpdateAPIKeybyIdVariables {
@@ -42,29 +43,27 @@ export const useResourceUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ResourceUpdateData, ResponseError, UpdateAPIKeybyIdVariables>,
+  UseCustomMutationOptions<ResourceUpdateData, ResponseError, UpdateAPIKeybyIdVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ResourceUpdateData, ResponseError, UpdateAPIKeybyIdVariables>(
-    (vars) => updateAPIKeysById(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, id } = variables
+  return useMutation<ResourceUpdateData, ResponseError, UpdateAPIKeybyIdVariables>({
+    mutationFn: (vars) => updateAPIKeysById(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, id } = variables
 
-        await queryClient.invalidateQueries(apiKeysKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: apiKeysKeys.list(projectRef) })
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to mutate: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to mutate: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

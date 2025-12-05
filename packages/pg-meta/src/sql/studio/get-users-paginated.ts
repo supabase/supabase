@@ -1,3 +1,6 @@
+import { prefixToUUID, stringRange } from './get-users-common'
+import { OptimizedSearchColumns } from './get-users-types'
+
 interface getPaginatedUsersSQLProps {
   page?: number
   verified?: 'verified' | 'unverified' | 'anonymous'
@@ -8,54 +11,11 @@ interface getPaginatedUsersSQLProps {
   limit?: number
 
   /** If set, uses fast queries but these don't allow any sorting so the above parameters are completely ignored. */
-  column?: 'id' | 'email' | 'phone'
+  column?: OptimizedSearchColumns
   startAt?: string
 }
 
 const DEFAULT_LIMIT = 50
-
-function prefixToUUID(prefix: string, max: boolean) {
-  const mapped = '00000000-0000-0000-0000-000000000000'
-    .split('')
-    .map((c, i) => (c === '-' ? c : prefix[i] ?? c))
-
-  if (prefix.length >= mapped.length) {
-    return mapped.join('')
-  }
-
-  if (prefix.length && prefix.length < 15) {
-    mapped[14] = '4'
-  }
-
-  if (prefix.length && prefix.length < 20) {
-    mapped[19] = max ? 'b' : '8'
-  }
-
-  if (max) {
-    for (let i = prefix.length; i < mapped.length; i += 1) {
-      if (mapped[i] === '0') {
-        mapped[i] = 'f'
-      }
-    }
-  }
-
-  return mapped.join('')
-}
-
-function stringRange(prefix: string) {
-  if (!prefix) {
-    return [prefix, undefined]
-  }
-
-  const lastChar = prefix.charCodeAt(prefix.length - 1)
-
-  if (lastChar >= `~`.charCodeAt(0)) {
-    // not ASCII
-    return [prefix, prefix]
-  }
-
-  return [prefix, prefix.substring(0, prefix.length - 1) + String.fromCharCode(lastChar + 1)]
-}
 
 export const getPaginatedUsersSQL = ({
   page = 0,
@@ -109,7 +69,7 @@ export const getPaginatedUsersSQL = ({
   const sortOn = sort ?? 'created_at'
   const sortOrder = order ?? 'desc'
 
-  let actualQuery = `${conditions.length > 0 ? ` where ${combinedConditions}` : ''}
+  let whereStatement = `${conditions.length > 0 ? ` where ${combinedConditions}` : ''}
     order by
       "${sortOn}" ${sortOrder} nulls last
     limit
@@ -119,22 +79,21 @@ export const getPaginatedUsersSQL = ({
   `
 
   // DON'T TOUCH THESE QUERIES. ONE CHARACTER OFF AND DISASTER.
-  let firstOperator = startAt ? '>' : '>='
+  const firstOperator = startAt ? '>' : '>='
 
   if (column === 'email') {
     const range = stringRange(keywords ?? '')
 
-    actualQuery = `where lower(email) ${firstOperator} '${startAt ? startAt : range[0]}' ${range[1] ? `and lower(email) < '${range[1]}'` : ''} and instance_id = '00000000-0000-0000-0000-000000000000'::uuid order by instance_id, lower(email) asc limit ${limit}`
+    whereStatement = `where lower(email) ${firstOperator} '${startAt ? startAt : range[0]}' ${range[1] ? `and lower(email) < '${range[1]}'` : ''} and instance_id = '00000000-0000-0000-0000-000000000000'::uuid order by instance_id, lower(email) asc limit ${limit}`
   } else if (column === 'phone') {
     const range = stringRange(keywords ?? '')
-
-    actualQuery = `where phone ${firstOperator} '${startAt ? startAt : range[0]}' ${range[1] ? `and phone < '${range[1]}'` : ''} order by phone asc limit ${limit}`
+    whereStatement = `where phone ${firstOperator} '${startAt ? startAt : range[0]}' ${range[1] ? `and phone < '${range[1]}'` : ''} order by phone asc limit ${limit}`
   } else if (column === 'id') {
     const isMatchingUUIDValue = prefixToUUID(keywords ?? '', false) === keywords
     if (isMatchingUUIDValue) {
-      actualQuery = `where id = '${keywords}' order by id asc limit ${limit}`
+      whereStatement = `where id = '${keywords}' order by id asc limit ${limit}`
     } else {
-      actualQuery = `where id ${firstOperator} '${startAt ? startAt : prefixToUUID(keywords ?? '', false)}' and id < '${prefixToUUID(keywords ?? '', true)}' order by id asc limit ${limit}`
+      whereStatement = `where id ${firstOperator} '${startAt ? startAt : prefixToUUID(keywords ?? '', false)}' and id < '${prefixToUUID(keywords ?? '', true)}' order by id asc limit ${limit}`
     }
   }
 
@@ -156,7 +115,7 @@ export const getPaginatedUsersSQL = ({
       auth.users.updated_at
     from
       auth.users
-    ${actualQuery}`
+    ${whereStatement}`
 
   let usersQuery = `
 with

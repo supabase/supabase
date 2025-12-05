@@ -3,13 +3,14 @@ import { isFeatureEnabled } from 'common'
 
 const billingEnabled = isFeatureEnabled('billing:all')
 
-export type ExtendedSupportCategories = SupportCategories | 'Plan_upgrade'
+export type ExtendedSupportCategories = SupportCategories | 'Plan_upgrade' | 'Others'
 
 export const CATEGORY_OPTIONS: {
   value: ExtendedSupportCategories
   label: string
   description: string
   query?: string
+  hidden?: boolean
 }[] = [
   {
     value: SupportCategories.PROBLEM,
@@ -77,6 +78,13 @@ export const CATEGORY_OPTIONS: {
           query: undefined,
         },
       ]),
+  {
+    value: 'Others' as const,
+    label: 'Others',
+    description: 'Issues that are not related to any of the other categories',
+    query: undefined,
+    hidden: true,
+  },
 ]
 
 export const SEVERITY_OPTIONS = [

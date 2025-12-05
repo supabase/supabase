@@ -84,11 +84,6 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
 }
 
-export const useIsInlineEditorEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]
-}
-
 export const useUnifiedLogsPreview = () => {
   const { flags, onUpdateFlag } = useFeaturePreviewContext()
 
@@ -110,18 +105,12 @@ export const useIsAdvisorRulesEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
 }
 
-export const useIsNewStorageUIEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_NEW_STORAGE_UI]
-}
-
 export const useFeaturePreviewModal = () => {
   const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')
 
   const gitlessBranchingEnabled = useFlag('gitlessBranching')
   const advisorRulesEnabled = useFlag('advisorRules')
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
-  const isNewStorageUIAvailable = useFlag('storageAnalyticsVector')
 
   const selectedFeatureKeyFromQuery = featurePreviewModal?.trim() ?? null
   const showFeaturePreviewModal = selectedFeatureKeyFromQuery !== null
@@ -136,8 +125,6 @@ export const useFeaturePreviewModal = () => {
           return advisorRulesEnabled
         case 'supabase-ui-preview-unified-logs':
           return isUnifiedLogsPreviewAvailable
-        case 'new-storage-ui':
-          return isNewStorageUIAvailable
         default:
           return true
       }

@@ -1,0 +1,20 @@
+name: Validate pull request
+
+on:
+  pull_request:
+    types: [opened, labeled, unlabeled, synchronize, ready_for_review]
+
+jobs:
+  validate-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tagged with 'do not merge'
+        if: contains( github.event.pull_request.labels.*.name, 'do-not-merge')
+        run: |
+          echo "PR blocked: [tag: do not merge]"
+          exit 1
+
+      - name: All good
+        if: ${{ success() }}
+        run: |
+          echo "All good"

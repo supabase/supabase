@@ -6,7 +6,7 @@ import { dailyUsageToDataPoints } from './Usage.utils'
 
 export interface ActivityProps {
   orgSlug: string
-  projectRef?: string
+  projectRef?: string | null
   startDate: string | undefined
   endDate: string | undefined
   subscription: OrgSubscription | undefined
@@ -19,8 +19,6 @@ const Activity = ({
   orgSlug,
   projectRef,
   subscription,
-  startDate,
-  endDate,
   currentBillingCycleSelected,
   orgDailyStats,
   isLoadingOrgDailyStats,

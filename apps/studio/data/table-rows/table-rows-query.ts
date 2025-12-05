@@ -1,23 +1,19 @@
 import { Query } from '@supabase/pg-meta/src/query'
 import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
-import {
-  useQuery,
-  useQueryClient,
-  type QueryClient,
-  type UseQueryOptions,
-} from '@tanstack/react-query'
+import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 
-import { THRESHOLD_COUNT } from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
 import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
+import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
 import {
   ROLE_IMPERSONATION_NO_RESULTS,
   RoleImpersonationState,
   wrapWithRoleImpersonation,
 } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
+import { ResponseError, UseCustomQueryOptions } from 'types'
 import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
 import { tableRowKeys } from './keys'
 import { formatFilterValue } from './utils'
@@ -43,6 +39,27 @@ const getDefaultOrderByColumns = (table: SupaTable) => {
   }
 }
 
+function getErrorCode(error: any): number | undefined {
+  // Our custom ResponseError's use 'code' instead of 'status'
+  if (error instanceof ResponseError) {
+    return error.code
+  }
+  return error.status
+}
+
+function getRetryAfter(error: any): number | undefined {
+  if (error instanceof ResponseError) {
+    return error.retryAfter
+  }
+
+  const headerRetry = error.headers?.get('retry-after')
+  if (headerRetry) {
+    return parseInt(headerRetry)
+  }
+
+  return undefined
+}
+
 async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
@@ -50,17 +67,18 @@ async function sleep(ms: number) {
 export async function executeWithRetry<T>(
   fn: () => Promise<T>,
   maxRetries: number = 3,
-  baseDelay: number = 500
+  baseDelay: number = 1000
 ): Promise<T> {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn()
-    } catch (error: any) {
-      // Our custom ResponseError's use 'code' instead of 'status'
-      if ((error?.status ?? error?.code) === 429 && attempt < maxRetries) {
+    } catch (error: unknown) {
+      const errorCode = getErrorCode(error)
+      if (errorCode === 429 && attempt < maxRetries) {
         // Get retry delay from headers or use exponential backoff (1s, then 2s, then 4s)
-        const retryAfter = error.headers?.get('retry-after')
-        const delayMs = retryAfter ? parseInt(retryAfter) * 1000 : baseDelay * Math.pow(2, attempt)
+        const retryAfter = getRetryAfter(error)
+        const delayMs = retryAfter ? retryAfter * 1000 : baseDelay * Math.pow(2, attempt)
+
         await sleep(delayMs)
         continue
       }
@@ -231,8 +249,27 @@ export async function getTableRows(
 
   const table = parseSupaTable(entity)
 
+  const equalityFilterColumns = filters
+    ?.filter((filter) => filter.operator === '=' || filter.operator === 'is')
+    .flatMap((filter) => filter.column)
+
+  // There is an edge case for MS SQL foreign tables, where the Postgres query
+  // planner may drop sorts that are redundant with filters, resulting in
+  // invalid MS SQL syntax. To prevent this, we exclude potentially conflicting
+  // columns from potential default sort columns.
+  const excludedColumns = isMsSqlForeignTable(entity)
+    ? Array.from(new Set(equalityFilterColumns))
+    : undefined
+
   const sql = wrapWithRoleImpersonation(
-    getTableRowsSql({ table: entity, filters, sorts, limit, page }),
+    getTableRowsSql({
+      table: entity,
+      filters,
+      sorts,
+      limit,
+      page,
+      sortExcludedColumns: excludedColumns,
+    }),
     roleImpersonationState
   )
 
@@ -260,33 +297,31 @@ export async function getTableRows(
 
 export const useTableRowsQuery = <TData = TableRowsData>(
   { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>,
-  { enabled = true, ...options }: UseQueryOptions<TableRowsData, TableRowsError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<TableRowsData, TableRowsError, TData> = {}
 ) => {
   const queryClient = useQueryClient()
-  return useQuery<TableRowsData, TableRowsError, TData>(
-    tableRowKeys.tableRows(projectRef, {
+  return useQuery<TableRowsData, TableRowsError, TData>({
+    queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
       ...args,
     }),
-    ({ signal }) =>
+    queryFn: ({ signal }) =>
       getTableRows({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
-      ...options,
-    }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
+    ...options,
+  })
 }
 
 export function prefetchTableRows(
   client: QueryClient,
   { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>
 ) {
-  return client.fetchQuery(
-    tableRowKeys.tableRows(projectRef, {
+  return client.fetchQuery({
+    queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
       ...args,
     }),
-    ({ signal }) =>
-      getTableRows({ queryClient: client, projectRef, connectionString, tableId, ...args }, signal)
-  )
+    queryFn: ({ signal }) =>
+      getTableRows({ queryClient: client, projectRef, connectionString, tableId, ...args }, signal),
+  })
 }

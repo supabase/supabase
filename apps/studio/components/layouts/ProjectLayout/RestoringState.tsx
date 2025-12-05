@@ -1,8 +1,9 @@
 import { CheckCircle, Download, Loader } from 'lucide-react'
-import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import { useDownloadableBackupQuery } from 'data/database/backup-query'
@@ -25,24 +26,28 @@ const RestoringState = () => {
 
   const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
-  useProjectStatusQuery(
+  const { data: projectStatusData, isSuccess: isProjectStatusSuccess } = useProjectStatusQuery(
     { projectRef: ref },
     {
       enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
-      refetchInterval: (res) => {
-        return res?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
-      },
-      onSuccess: async (res) => {
-        if (res.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
-          setIsCompleted(true)
-        } else {
-          if (ref) invalidateProjectDetailsQuery(ref)
-        }
+      refetchInterval: (data) => {
+        return data?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
       },
     }
   )
 
-  const { mutate: downloadBackup, isLoading: isDownloading } = useBackupDownloadMutation({
+  useEffect(() => {
+    if (!isProjectStatusSuccess) return
+    if (projectStatusData.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
+      setIsCompleted(true)
+    } else {
+      if (ref) {
+        invalidateProjectDetailsQuery(ref)
+      }
+    }
+  }, [isProjectStatusSuccess, projectStatusData, ref, invalidateProjectDetailsQuery])
+
+  const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
     onSuccess: (res) => {
       const { fileUrl } = res
 
@@ -110,11 +115,15 @@ const RestoringState = () => {
             </div>
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
               <Button asChild type="default">
-                <Link
-                  href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Ongoing%20restoration%20for%20project`}
+                <SupportLink
+                  queryParams={{
+                    category: SupportCategories.DATABASE_UNRESPONSIVE,
+                    projectRef: project?.ref,
+                    subject: 'Ongoing restoration for project',
+                  }}
                 >
                   Contact support
-                </Link>
+                </SupportLink>
               </Button>
               <ButtonTooltip
                 type="default"

@@ -1,7 +1,8 @@
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery } from '@tanstack/react-query'
 
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 type GetForeignKeyConstraintsVariables = {
   schema?: string
@@ -132,22 +133,23 @@ export const useForeignKeyConstraintsQuery = <TData = ForeignKeyConstraintsData>
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ForeignKeyConstraintsData, ForeignKeyConstraintsError, TData> = {}
+  }: UseCustomQueryOptions<ForeignKeyConstraintsData, ForeignKeyConstraintsError, TData> = {}
 ) =>
-  useQuery<ForeignKeyConstraintsData, ForeignKeyConstraintsError, TData>(
-    databaseKeys.foreignKeyConstraints(projectRef, schema),
-    ({ signal }) => getForeignKeyConstraints({ projectRef, connectionString, schema }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof schema !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ForeignKeyConstraintsData, ForeignKeyConstraintsError, TData>({
+    queryKey: databaseKeys.foreignKeyConstraints(projectRef, schema),
+    queryFn: ({ signal }) =>
+      getForeignKeyConstraints({ projectRef, connectionString, schema }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof schema !== 'undefined',
+    ...options,
+  })
 
 export function prefetchForeignKeyConstraints(
   client: QueryClient,
   { projectRef, connectionString, schema }: ForeignKeyConstraintsVariables
 ) {
-  return client.fetchQuery(databaseKeys.foreignKeyConstraints(projectRef, schema), ({ signal }) =>
-    getForeignKeyConstraints({ projectRef, connectionString, schema }, signal)
-  )
+  return client.fetchQuery({
+    queryKey: databaseKeys.foreignKeyConstraints(projectRef, schema),
+    queryFn: ({ signal }) =>
+      getForeignKeyConstraints({ projectRef, connectionString, schema }, signal),
+  })
 }

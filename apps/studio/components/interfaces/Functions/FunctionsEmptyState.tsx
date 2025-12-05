@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 
 import { useParams } from 'common'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
 import { ResourceItem } from 'components/ui/Resource/ResourceItem'
@@ -13,6 +14,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
@@ -38,6 +40,7 @@ export const FunctionsEmptyState = () => {
   const { ref } = useParams()
   const router = useRouter()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { data: org } = useSelectedOrganizationQuery()
@@ -56,7 +59,7 @@ export const FunctionsEmptyState = () => {
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Create your first edge function</CardTitle>
+          <CardTitle>Deploy your first edge function</CardTitle>
         </CardHeader>
         <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
           {/* Editor Option */}
@@ -95,9 +98,9 @@ export const FunctionsEmptyState = () => {
             <Button
               type="default"
               onClick={() => {
+                openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                 aiSnap.newChat({
                   name: 'Create new edge function',
-                  open: true,
                   initialInput: 'Create a new edge function that ...',
                   suggestions: {
                     title:

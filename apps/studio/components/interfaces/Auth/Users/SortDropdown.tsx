@@ -46,7 +46,7 @@ export const SortDropdown = ({
               <>
                 Sorting cannot be changed when searching on a specific column. If you'd like to sort
                 on other columns, change the search to{' '}
-                <span className="text-warning">all columns</span> from the header.
+                <span className="text-warning">unified search</span> from the search dropdown.
               </>
             ),
           },

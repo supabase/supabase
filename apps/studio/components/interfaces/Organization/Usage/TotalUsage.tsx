@@ -20,7 +20,7 @@ import { SectionContent } from './SectionContent'
 
 export interface ComputeProps {
   orgSlug: string
-  projectRef?: string
+  projectRef?: string | null
   startDate: string | undefined
   endDate: string | undefined
   subscription: OrgSubscription | undefined
@@ -62,6 +62,8 @@ export const TotalUsage = ({
 
   // When the user filters by project ref or selects a custom timeframe, we only display usage+project breakdown, but no costs/limits
   const showRelationToSubscription = currentBillingCycleSelected && !projectRef
+
+  const isOnHigherPlan = ['team', 'enterprise', 'platform'].includes(subscription?.plan.id ?? '')
 
   const hasExceededAnyLimits =
     showRelationToSubscription &&
@@ -148,7 +150,7 @@ export const TotalUsage = ({
 
         {isSuccessUsage && subscription && (
           <div>
-            {showRelationToSubscription && (
+            {showRelationToSubscription && !isOnHigherPlan && (
               <p className="text-sm">
                 {!hasExceededAnyLimits ? (
                   <span>

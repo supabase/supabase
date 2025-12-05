@@ -50,7 +50,7 @@ export function useCheckLatestDeploy() {
       const commitTime =
         commit.commitTime === 'unknown'
           ? 'unknown time'
-          : dayjs(commit.commitTime).format('YYYY-MM-DD HH:mm:ss')
+          : dayjs(commit.commitTime).format('YYYY-MM-DD HH:mm:ss Z')
       console.log(
         `Supabase Studio is running commit ${commit.commitSha} deployed at ${commitTime}.`
       )

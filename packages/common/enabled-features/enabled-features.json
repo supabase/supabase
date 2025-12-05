@@ -14,7 +14,7 @@
   "authentication:emails": true,
   "authentication:multi_factor": true,
   "authentication:attack_protection": true,
-  "authentication:advanced": true,
+  "authentication:performance": true,
 
   "authentication:show_email_phone_columns": true,
   "authentication:show_manual_linking": true,
@@ -28,6 +28,8 @@
   "billing:all": true,
 
   "branding:large_logo": false,
+
+  "cli:disable_custom_profiles": true,
 
   "dashboard_auth:sign_up": true,
   "dashboard_auth:sign_in_with_github": true,
@@ -50,6 +52,7 @@
   "docs:contribution": true,
   "docs:fdw": true,
   "docs:footer": true,
+  "docs:navigation_dropdown_links_home": true,
   "docs:self-hosting": true,
   "docs:framework_quickstarts": true,
   "docs:full_getting_started": true,
@@ -118,6 +121,9 @@
   "sdk:kotlin": true,
   "sdk:python": true,
   "sdk:swift": true,
+
+  "storage:analytics": true,
+  "storage:vectors": true,
 
   "search:fullIndex": true,
 

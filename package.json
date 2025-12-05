@@ -29,15 +29,10 @@
     "test:ui-patterns": "turbo run test --filter=ui-patterns",
     "test:studio": "turbo run test --filter=studio",
     "test:studio:watch": "turbo run test --filter=studio -- watch",
+    "e2e:setup:cli": "supabase stop --all --no-backup ; supabase start --exclude studio && supabase db reset && supabase status --output json > keys.json && node scripts/generateLocalEnv.js",
+    "e2e:setup": "SKIP_ASSET_UPLOAD=1 pnpm e2e:setup:cli && NODE_ENV=test NODE_OPTIONS=\"--max-old-space-size=4096\" pnpm run build:studio && NODE_ENV=test pnpm --prefix ./apps/studio start --port 8082",
     "e2e": "pnpm --prefix e2e/studio run e2e",
-    "e2e:dev-hosted": "pnpm --prefix e2e/studio run e2e:dev-hosted",
-    "e2e:dev-selfhosted": "pnpm --prefix e2e/studio run e2e:dev-selfhosted",
-    "e2e:selfhosted": "pnpm --prefix e2e/studio run e2e:selfhosted",
-    "e2e:staging": "pnpm --prefix e2e/studio run e2e:staging",
-    "e2e:prod": "pnpm --prefix e2e/studio run e2e:prod",
-    "e2e:ci": "pnpm --prefix e2e/studio run e2e:ci",
-    "e2e:supabase:start": "pnpm --prefix e2e/studio run supabase:start",
-    "e2e:supabase:stop": "pnpm --prefix e2e/studio run supabase:stop",
+    "e2e:ui": "pnpm --prefix e2e/studio run e2e:ui",
     "perf:kong": "ab -t 5 -c 20 -T application/json http://localhost:8000/",
     "perf:meta": "ab -t 5 -c 20 -T application/json http://localhost:5555/tables",
     "setup:cli": "supabase start -x studio && supabase status --output json > keys.json && node scripts/generateLocalEnv.js",
@@ -46,15 +41,16 @@
     "knip": "pnpx knip@~5.50.0"
   },
   "devDependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.410.0",
+    "@aws-sdk/client-secrets-manager": "^3.823.0",
     "@types/node": "catalog:",
     "eslint": "^9.0.0",
     "prettier": "3.2.4",
     "prettier-plugin-sql-cst": "^0.11.0",
     "rimraf": "^6.0.0",
     "sass": "^1.72.0",
-    "supabase": "^2.50.3",
+    "supabase": "^2.58.5",
     "supports-color": "^8.0.0",
+    "tailwindcss": "catalog:",
     "turbo": "2.3.3",
     "typescript": "catalog:"
   },
@@ -63,9 +59,9 @@
     "url": "git+https://github.com/supabase/supabase.git"
   },
   "engines": {
-    "pnpm": "10.18",
+    "pnpm": "10.24",
     "node": ">=22"
   },
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
-  "packageManager": "pnpm@10.18.0"
+  "packageManager": "pnpm@10.24.0"
 }

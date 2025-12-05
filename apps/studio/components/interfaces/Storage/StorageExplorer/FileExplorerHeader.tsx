@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { compact, debounce, isEqual, noop } from 'lodash'
+import { compact, isEqual, noop } from 'lodash'
 import {
   Check,
   ChevronLeft,
@@ -14,18 +14,16 @@ import {
   Upload,
   X,
 } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-import {
-  useIsAPIDocsSidePanelEnabled,
-  useIsNewStorageUIEnabled,
-} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -58,23 +56,23 @@ const SORT_ORDER_OPTIONS = [
 const HeaderPathEdit = ({ loading, isSearching, breadcrumbs, togglePathEdit }: any) => {
   return (
     <div
-      className={`group ${!loading ? 'cursor-pointer' : ''}`}
+      className={cn('group', !loading && 'cursor-pointer')}
       onClick={() => (!loading.isLoading ? togglePathEdit() : {})}
     >
       {loading.isLoading ? (
-        <div className="ml-2 flex items-center">
-          <Loader size={16} strokeWidth={2} className="animate-spin" />
-          <p className="ml-3 text-sm">{loading.message}</p>
+        <div className="ml-2 flex items-center gap-x-3">
+          <Loader size={14} strokeWidth={2} className="animate-spin" />
+          <p className="text-sm text-foreground-light">{loading.message}</p>
         </div>
       ) : (
-        <div className="flex cursor-pointer items-center">
-          <p className="ml-3 text-sm truncate">{breadcrumbs[breadcrumbs.length - 1] || ''}</p>
+        <div className="flex cursor-pointer items-center gap-x-3">
+          {breadcrumbs.length > 1 && (
+            <p className="ml-2 text-sm truncate">{breadcrumbs[breadcrumbs.length - 1] || ''}</p>
+          )}
           {!isSearching && (
-            <div className="ml-3 flex items-center space-x-2 opacity-0 transition group-hover:opacity-100">
-              <Button type="text" icon={<Edit2 />}>
-                Navigate
-              </Button>
-            </div>
+            <Button type="text" icon={<Edit2 />} className="transition opacity-0 hover:opacity-100">
+              Navigate
+            </Button>
           )}
         </div>
       )}
@@ -148,13 +146,10 @@ export const FileExplorerHeader = ({
   setItemSearchString = noop,
   onFilesUpload = noop,
 }: FileExplorerHeader) => {
-  const debounceDuration = 300
   const snap = useStorageExplorerStateSnapshot()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
-  const isNewStorageUIEnabled = useIsNewStorageUIEnabled()
 
   const [pathString, setPathString] = useState('')
-  const [searchString, setSearchString] = useState('')
   const [loading, setLoading] = useState({ isLoading: false, message: '' })
 
   const [isEditingPath, setIsEditingPath] = useState(false)
@@ -186,10 +181,6 @@ export const FileExplorerHeader = ({
   const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   useEffect(() => {
-    if (itemSearchString) setSearchString(itemSearchString)
-  }, [])
-
-  useEffect(() => {
     // [Joshen] Somehow toggle search triggers this despite breadcrumbs
     // being unchanged. Manually doing a prop check to fix this
     if (!isEqual(previousBreadcrumbs.current, breadcrumbs)) {
@@ -197,13 +188,6 @@ export const FileExplorerHeader = ({
       previousBreadcrumbs.current = breadcrumbs
     }
   }, [breadcrumbs])
-
-  const searchInputHandler = useCallback(debounce(setItemSearchString, debounceDuration), [])
-  const onSearchInputUpdate = (event: any) => {
-    setSearchString(event.target.value)
-    // @ts-ignore
-    searchInputHandler(event.target.value)
-  }
 
   const onSelectBack = () => {
     popColumn()
@@ -263,7 +247,6 @@ export const FileExplorerHeader = ({
   }
 
   const onCancelSearch = () => {
-    setSearchString('')
     snap.setIsSearching(false)
     setItemSearchString('')
   }
@@ -283,10 +266,11 @@ export const FileExplorerHeader = ({
 
   return (
     <div
-      className="
-    flex h-[40px] pl-2
-    items-center justify-between
-    rounded-t-md border-b border-overlay bg-surface-100"
+      className={cn(
+        'flex h-[40px] pl-2',
+        'items-center justify-between',
+        'rounded-t-md border-b border-overlay bg-surface-100'
+      )}
     >
       {/* Navigation */}
       <div className={`flex items-center ${isEditingPath ? 'w-1/2' : ''}`}>
@@ -334,29 +318,12 @@ export const FileExplorerHeader = ({
             />
           </form>
         ) : snap.view === STORAGE_VIEWS.COLUMNS ? (
-          breadcrumbs.length > 1 ? (
-            <HeaderPathEdit
-              loading={loading}
-              isSearching={snap.isSearching}
-              breadcrumbs={breadcrumbs}
-              togglePathEdit={togglePathEdit}
-            />
-          ) : isNewStorageUIEnabled ? (
-            <div className="flex items-center group">
-              <div className="flex items-center space-x-2 opacity-0 transition group-hover:opacity-100">
-                <Button type="text" icon={<Edit2 />} onClick={togglePathEdit}>
-                  Navigate
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <HeaderPathEdit
-              loading={loading}
-              isSearching={snap.isSearching}
-              breadcrumbs={breadcrumbs}
-              togglePathEdit={togglePathEdit}
-            />
-          )
+          <HeaderPathEdit
+            loading={loading}
+            isSearching={snap.isSearching}
+            breadcrumbs={breadcrumbs}
+            togglePathEdit={togglePathEdit}
+          />
         ) : breadcrumbs.length > 1 ? (
           <HeaderBreadcrumbs
             loading={loading}
@@ -487,24 +454,24 @@ export const FileExplorerHeader = ({
               size="tiny"
               autoFocus
               className="w-52"
-              icon={<Search size={14} strokeWidth={2} />}
+              icon={<Search />}
               actions={[
-                <X
-                  key="close"
-                  className="mx-2 cursor-pointer text-foreground"
-                  size={14}
-                  strokeWidth={2}
+                <Button
+                  size="tiny"
+                  type="text"
+                  icon={<X />}
                   onClick={onCancelSearch}
+                  className="p-0 h-5 w-5"
                 />,
               ]}
               placeholder="Search for a file or folder"
               type="text"
-              value={searchString}
-              onChange={onSearchInputUpdate}
+              value={itemSearchString}
+              onChange={(event) => setItemSearchString(event.target.value)}
             />
           ) : (
             <Button
-              icon={<Search size={16} strokeWidth={2} />}
+              icon={<Search />}
               size="tiny"
               type="text"
               className="px-1"

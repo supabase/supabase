@@ -1,10 +1,10 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { PostgresMaterializedView } from '@supabase/postgres-meta'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { materializedViewKeys } from './keys'
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type MaterializedViewsVariables = {
   projectRef?: string
@@ -49,18 +49,14 @@ export const useMaterializedViewsQuery = <TData = MaterializedViewsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<MaterializedViewsData, MaterializedViewsError, TData> = {}
+  }: UseCustomQueryOptions<MaterializedViewsData, MaterializedViewsError, TData> = {}
 ) =>
-  useQuery<MaterializedViewsData, MaterializedViewsError, TData>(
-    schema
+  useQuery<MaterializedViewsData, MaterializedViewsError, TData>({
+    queryKey: schema
       ? materializedViewKeys.listBySchema(projectRef, schema)
       : materializedViewKeys.list(projectRef),
-    ({ signal }) => getMaterializedViews({ projectRef, connectionString, schema }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      // We're using a staleTime of 0 here because the only way to create a
-      // materialized view is via SQL, which we don't know about
-      staleTime: 0,
-      ...options,
-    }
-  )
+    queryFn: ({ signal }) => getMaterializedViews({ projectRef, connectionString, schema }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    staleTime: 0,
+    ...options,
+  })

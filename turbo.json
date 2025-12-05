@@ -73,6 +73,7 @@
         "SUPABASE_URL",
         "VERCEL",
         "VERCEL_ENV",
+        "MAINTENANCE_MODE",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",
@@ -89,6 +90,8 @@
         "PG_META_CRYPTO_KEY",
         "POSTGRES_PASSWORD",
         "POSTGRES_HOST",
+        "POSTGRES_USER_READ_WRITE",
+        "POSTGRES_USER_READ_ONLY",
         "POSTGRES_DB",
         "POSTGRES_PORT",
         "READ_ONLY_URL",
@@ -100,8 +103,10 @@
         "DEFAULT_ORGANIZATION_NAME",
         "OPENAI_API_KEY",
         "AUTH_JWT_SECRET",
-        "LOGFLARE_URL",
+        "LOGFLARE_API_KEY",
+        "LOGFLARE_PUBLIC_ACCESS_TOKEN",
         "LOGFLARE_PRIVATE_ACCESS_TOKEN",
+        "LOGFLARE_URL",
         "SENTRY_ORG",
         "SENTRY_PROJECT",
         "SENTRY_AUTH_TOKEN",
@@ -118,7 +123,7 @@
         "AI_PRO_MODEL",
         "AI_NORMAL_MODEL",
         "SUPPORT_SUPABASE_SECRET_KEY",
-        "NIMBUS_PROD_PROJECTS_URL"
+        "NEXT_PUBLIC_IS_NIMBUS"
       ],
       "passThroughEnv": ["CURRENT_CLI_VERSION", "VERCEL_GIT_COMMIT_SHA"],
       "outputs": [".next/**", "!.next/cache/**"]
@@ -192,7 +197,8 @@
         "NOTION_SUPASQUAD_APPLICATIONS_DB_ID",
         "CUSTOMERIO_SITE_ID",
         "CUSTOMERIO_API_KEY",
-        "CUSTOMERIO_APP_API_KEY"
+        "CUSTOMERIO_APP_API_KEY",
+        "NEXT_RUNTIME"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
@@ -215,7 +221,9 @@
         "NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID",
         "NEXT_PUBLIC_GOTRUE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-        "NEXT_PUBLIC_USERCENTRICS_RULESET_ID"
+        "NEXT_PUBLIC_USERCENTRICS_RULESET_ID",
+        "SUPABASE_MANAGEMENT_API_TOKEN",
+        "OPENAI_API_KEY"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },

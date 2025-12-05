@@ -1,0 +1,80 @@
+---
+title: Layout
+description: Guidelines to create consistent layouts across Studio pages using a set of page components.
+---
+
+The Page pattern consists of three main components that work together to create consistent page layouts: [PageContainer](../fragments/page-container), [PageHeader](../fragments/page-header), and [PageSection](../fragments/page-section). These components provide a structured approach to building pages with consistent spacing, max-widths, and content organization.
+
+## Layout Types
+
+### Settings
+
+Settings pages are used for configuration and preference management. They follow a single-column layout with default widths to keep content focused and readable. Examples include project settings or auth sessions.
+
+- Use `PageHeader` with `size="default"`
+- Use `PageContainer` with `size="default"`
+- Use `PageSection` for organizing settings into logical groups
+
+<ComponentPreview
+  name="page-layout-settings"
+  description="Settings page layout with default widths"
+  peekCode
+  wide
+/>
+
+### List
+
+List pages display collections of objects like tables, triggers, or functions. These pages use larger widths to accommodate wide content like data tables. Examples include database triggers, database functions or org team members.
+
+- Use `PageHeader` with `size="large"`
+- Use `PageContainer` with `size="large"`
+- Use `PageSection` to wrap list content
+
+**Table and List Actions:**
+
+- **With filters or search:** If the table has filters or search, place table actions aligned with the filters on the right side. Do not use `PageSectionAside` or `PageHeaderAside` for table actions when filters are present.
+- **Without filters:** For simple lists without filters or search, add primary list actions to `PageHeaderAside` or `PageSectionAside` as appropriate.
+
+<ComponentPreview
+  name="page-layout-list"
+  description="List page layout with search and filters - actions aligned with search"
+  peekCode
+  wide
+/>
+
+<ComponentPreview
+  name="page-layout-list-simple"
+  description="Simple list page layout without filters - actions in PageHeaderAside"
+  peekCode
+  wide
+/>
+
+### Data and Full Page Experiences
+
+Full-page experiences like the table editor, cron jobs, and edge functions require maximum screen real-estate and so make use of "full" size containers.
+
+- Use `PageHeader` with `size="full"`
+- Use `PageContainer` with `size="full"`
+- Content spans the full width of the viewport
+
+### Detail Pages
+
+Detail pages display dense or lengthy content split into multiple sections. The horizontal orientation allows for better information hierarchy and context. Examples include organisation billing or project infrastructure.
+
+- Use `PageHeader` with `size="large"`
+- Use `PageContainer` with `size="large"`
+- Use `PageSection` with `orientation="horizontal"` to show summary alongside content
+- Multiple sections can stack vertically with horizontal layouts within each
+
+<ComponentPreview
+  name="page-layout-detail"
+  description="Detail page layout with horizontal sections for dense content"
+  peekCode
+  wide
+/>
+
+## Components
+
+- **[PageContainer](/docs/fragments/page-container)** - Container component providing consistent max-width and padding based on size variants
+- **[PageHeader](/docs/fragments/page-header)** - Compound component for building page headers with breadcrumbs, icons, titles, descriptions, actions, and navigation
+- **[PageSection](/docs/fragments/page-section)** - Compound component for organizing page content into distinct sections with title, description, and action areas
