@@ -7,7 +7,8 @@ import { NoticeBanner } from 'components/layouts/AppLayout/NoticeBanner'
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
 
 export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
-  const ongoingIncident = useFlag('ongoingIncident') || process.env.ONGOING_INCIDENT === 'true'
+  const ongoingIncident =
+    useFlag('ongoingIncident') || process.env.NEXT_PUBLIC_ONGOING_INCIDENT === 'true'
   const showNoticeBanner = useFlag('showNoticeBanner')
   const clockSkewBanner = useFlag('clockSkewBanner')
 
