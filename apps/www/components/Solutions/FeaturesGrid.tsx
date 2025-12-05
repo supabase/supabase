@@ -6,12 +6,11 @@ import SectionContainer from '../Layouts/SectionContainer'
 
 export default function FeaturesGrid(props: any) {
   const hasExtendedCards = props.features.some(
-    (f: any) =>
-      f.id === 'project-claim-flow' || f.id === 'platform-kit' || f.id === 'pico-instances'
+    (f: any) => f.id === 'claim-flow' || f.id === 'platform-kit' || f.id === 'pico-instances'
   )
 
   return (
-    <SectionContainer className="flex flex-col gap-4 xl:pt-20">
+    <SectionContainer id={props.id} className="flex flex-col gap-4 xl:pt-20 scroll-mt-20">
       <div className="flex flex-col gap-2 max-w-xl">
         <h2 className="h2 text-foreground-lighter !m-0">{props.heading}</h2>
         <p className="p !text-foreground-lighter max-w-md">{props.subheading}</p>
@@ -40,7 +39,7 @@ export default function FeaturesGrid(props: any) {
             [&_.next-image--dynamic-fill]:rounded-none"
         />
         <Content card={props.features.find((f: any) => f.id === 'branching')} />
-        <Content card={props.features.find((f: any) => f.id === 'project-claim-flow')} />
+        <Content card={props.features.find((f: any) => f.id === 'claim-flow')} />
         <Content card={props.features.find((f: any) => f.id === 'platform-kit')} />
         <Content
           card={props.features.find((f: any) => f.id === 'pico-instances')}

@@ -2754,6 +2754,28 @@ export const telemetry: NavMenuConstant = {
         {
           name: 'Metrics',
           url: '/guides/telemetry/metrics' as `/${string}`,
+          items: [
+            {
+              name: 'Overview',
+              url: '/guides/telemetry/metrics' as `/${string}`,
+            },
+            {
+              name: 'Grafana Cloud',
+              url: '/guides/telemetry/metrics/grafana-cloud' as `/${string}`,
+            },
+            {
+              name: 'Grafana self-hosted',
+              url: '/guides/telemetry/metrics/grafana-self-hosted' as `/${string}`,
+            },
+            {
+              name: 'Datadog',
+              url: '/guides/telemetry/metrics/datadog' as `/${string}`,
+            },
+            {
+              name: 'Vendor-agnostic setup',
+              url: '/guides/telemetry/metrics/vendor-agnostic' as `/${string}`,
+            },
+          ],
         },
         {
           name: 'Sentry integration',
@@ -2929,21 +2951,24 @@ export const integrations: NavMenuConstant = {
     },
     {
       name: 'Build Your Own',
-      url: undefined,
       items: [
         {
-          name: 'Build a Supabase integration',
-          url: '/guides/integrations/build-a-supabase-integration',
+          name: 'Supabase OAuth Integration',
+          url: '/guides/integrations/build-a-supabase-oauth-integration',
           items: [
             {
               name: 'Overview',
-              url: '/guides/integrations/build-a-supabase-integration' as `/${string}`,
+              url: '/guides/integrations/build-a-supabase-oauth-integration',
             },
             {
               name: 'OAuth scopes',
-              url: '/guides/integrations/build-a-supabase-integration/oauth-scopes' as `/${string}`,
+              url: '/guides/integrations/build-a-supabase-oauth-integration/oauth-scopes',
             },
           ],
+        },
+        {
+          name: 'Supabase for Platforms',
+          url: '/guides/integrations/supabase-for-platforms',
         },
       ],
     },
