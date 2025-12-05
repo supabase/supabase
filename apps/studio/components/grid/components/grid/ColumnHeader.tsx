@@ -1,5 +1,5 @@
 import type { XYCoord } from 'dnd-core'
-import { ArrowRight, Key, Link, ListOrdered, Lock } from 'lucide-react'
+import { ArrowRight, Key, Link, Lock, TextSearch } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 
@@ -148,10 +148,10 @@ export function ColumnHeader<R>({
           {isIndexed && (
             <Tooltip>
               <TooltipTrigger>
-                <ListOrdered size={14} strokeWidth={2} />
+                <TextSearch size={14} strokeWidth={2} />
               </TooltipTrigger>
               <TooltipContent side="bottom" className="font-normal">
-                This column has an index
+                Indexed Column
               </TooltipContent>
             </Tooltip>
           )}
