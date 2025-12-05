@@ -215,6 +215,7 @@ may_uppercase = [
     "Telegram",
     "Third-Party Auth",
     "TimescaleDB",
+    "TooManyChannels",
     "Transformers.js",
     "Twilio",
     "Twitch",
