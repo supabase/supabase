@@ -10,6 +10,7 @@ export interface AlertErrorProps {
   projectRef?: string
   subject?: string
   error?: { message: string } | null
+  layout?: 'vertical' | 'horizontal'
   className?: string
   showIcon?: boolean
   additionalActions?: React.ReactNode
@@ -21,12 +22,38 @@ export interface AlertErrorProps {
 
 // [Joshen] To standardize the language for all error UIs
 
+const ContactSupportButton = ({
+  projectRef,
+  subject,
+  error,
+}: {
+  projectRef: string
+  subject: string
+  error: { message: string } | null
+}) => {
+  return (
+    <Button asChild type="default" className="w-min">
+      <SupportLink
+        queryParams={{
+          category: SupportCategories.DASHBOARD_BUG,
+          projectRef,
+          subject,
+          error: error?.message,
+        }}
+      >
+        Contact support
+      </SupportLink>
+    </Button>
+  )
+}
+
 export const AlertError = ({
   projectRef,
   subject,
   error,
   className,
   showIcon = true,
+  layout = 'horizontal',
   children,
   additionalActions,
 }: PropsWithChildren<AlertErrorProps>) => {
@@ -37,7 +64,8 @@ export const AlertError = ({
   return (
     <Admonition
       type="warning"
-      layout="horizontal"
+      layout={additionalActions ? 'vertical' : layout}
+      // layout="vertical"
       showIcon={showIcon}
       title={subject}
       description={
@@ -51,21 +79,14 @@ export const AlertError = ({
         </>
       }
       actions={
-        <>
-          {additionalActions}
-          <Button asChild type="default" className="w-min">
-            <SupportLink
-              queryParams={{
-                category: SupportCategories.DASHBOARD_BUG,
-                projectRef,
-                subject,
-                error: error?.message,
-              }}
-            >
-              Contact support
-            </SupportLink>
-          </Button>
-        </>
+        additionalActions ? (
+          <div className="flex gap-2 mt-3">
+            {additionalActions}
+            <ContactSupportButton projectRef={projectRef} subject={subject} error={error} />
+          </div>
+        ) : (
+          <ContactSupportButton projectRef={projectRef} subject={subject} error={error} />
+        )
       }
       className={className ? className : undefined}
     />
