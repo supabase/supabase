@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import DefaultLayout from '~/components/Layouts/Default'
-import { ThreadContent } from './ThreadContent'
+import { ThreadContent } from '~/components/Contribute/ThreadContent'
 import PageLoading from './page-loading'
 
 // eslint-disable-next-line no-restricted-exports

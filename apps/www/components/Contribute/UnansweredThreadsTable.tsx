@@ -211,7 +211,7 @@ export function UnansweredThreadsTable({
               <GitHubIcon
                 className={cn(
                   'h-4 w-4',
-                  currentTab === 'github' ? 'text-[#181717]' : 'text-foreground-lighter'
+                  currentTab === 'github' ? 'text-foreground' : 'text-foreground-lighter'
                 )}
               />
               GitHub
@@ -335,7 +335,7 @@ function ThreadRow({
               <GitHubIcon
                 className={cn(
                   'h-4 w-4',
-                  thread.channel === 'github' ? 'text-[#181717]' : 'text-foreground-lighter'
+                  thread.channel === 'github' ? 'text-foreground' : 'text-foreground-lighter'
                 )}
               />
             )}

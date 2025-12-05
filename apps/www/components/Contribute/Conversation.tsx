@@ -1,11 +1,6 @@
 import { getThreadRepliesById } from '~/data/contribute'
 
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
 export async function Conversation({ thread_key }: { thread_key: string | null }) {
-  await sleep(5000)
   const { question, replies } = await getThreadRepliesById(thread_key)
 
   if (!question && replies.length === 0) {

@@ -2,9 +2,9 @@ import { notFound } from 'next/navigation'
 import { Badge, Button } from 'ui'
 import { getThreadById } from '~/data/contribute'
 import { DiscordIcon, GitHubIcon, RedditIcon } from '~/components/Contribute/Icons'
-import { Conversation } from './Conversation'
+import { Conversation } from '~/components/Contribute/Conversation'
 import { Suspense } from 'react'
-import Loading from './loading'
+import Loading from '../../app/contribute/t/[id]/loading'
 
 export async function ThreadContent({ id }: { id: string }) {
   const thread = await getThreadById(id)
@@ -20,7 +20,7 @@ export async function ThreadContent({ id }: { id: string }) {
           <div className="flex items-center gap-3 mb-4">
             {thread.channel === 'discord' && <DiscordIcon className="h-5 w-5 text-[#5865F2]" />}
             {thread.channel === 'reddit' && <RedditIcon className="h-5 w-5 text-[#FF4500]" />}
-            {thread.channel === 'github' && <GitHubIcon className="h-5 w-5 text-[#181717]" />}
+            {thread.channel === 'github' && <GitHubIcon className="h-5 w-5 text-foreground" />}
             <span className="text-sm text-foreground-lighter capitalize">{thread.channel}</span>
             <span className="text-sm text-foreground-lighter">•</span>
             <span className="text-sm text-foreground-lighter">{thread.posted}</span>
