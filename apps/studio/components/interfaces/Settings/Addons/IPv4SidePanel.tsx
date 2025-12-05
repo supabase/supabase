@@ -19,7 +19,6 @@ import { useAddonsPagePanel } from 'state/addons-page'
 import { Button, Radio, SidePanel, cn } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { Feature } from 'data/entitlements/entitlements.constants'
 
 const IPv4SidePanel = () => {
   const isAws = useIsAwsCloudProvider()
@@ -64,9 +63,8 @@ const IPv4SidePanel = () => {
     (addons?.available_addons ?? []).find((addon) => addon.type === 'ipv4')?.variants ?? []
 
   const isFreePlan = organization?.plan?.id === 'free'
-  const { hasAccess: hasAccessToIPv4, isLoading: isLoadingEntitlement } = useCheckEntitlements(
-    Feature.IPV4
-  )
+  const { hasAccess: hasAccessToIPv4, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('ipv4')
   const hasChanges = selectedOption !== (subscriptionIpV4Option?.variant.identifier ?? 'ipv4_none')
   const selectedIPv4 = availableOptions.find((option) => option.identifier === selectedOption)
   const isPgBouncerEnabled = !isFreePlan

@@ -33,7 +33,6 @@ import {
   Button,
   WarningIcon,
 } from 'ui'
-import { Feature } from 'data/entitlements/entitlements.constants'
 
 const logsUpgradeError = 'upgrade to Team or Enterprise Plan to access audit logs.'
 
@@ -67,7 +66,7 @@ export const AuditLogs = () => {
   )
 
   const { hasAccess: hasAccessToAuditLogs, isLoading: isLoadingEntitlements } =
-    useCheckEntitlements(Feature.SECURITY_AUDIT_LOGS_DAYS)
+    useCheckEntitlements('security.audit_logs_days')
 
   const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
     useOrganizationAuditLogsQuery(

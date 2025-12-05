@@ -25,7 +25,6 @@ import {
   cn,
 } from 'ui'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { Feature } from 'data/entitlements/entitlements.constants'
 
 const CustomDomainSidePanel = () => {
   const { ref: projectRef } = useParams()
@@ -70,7 +69,7 @@ const CustomDomainSidePanel = () => {
     (addons?.available_addons ?? []).find((addon) => addon.type === 'custom_domain')?.variants ?? []
 
   const { hasAccess: hasAccessToCustomDomain, isLoading: isLoadingEntitlement } =
-    useCheckEntitlements(Feature.CUSTOM_DOMAIN)
+    useCheckEntitlements('custom_domain')
   const hasChanges = selectedOption !== (subscriptionCDOption?.variant.identifier ?? 'cd_none')
   const selectedCustomDomain = availableOptions.find(
     (option) => option.identifier === selectedOption

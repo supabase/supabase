@@ -12,7 +12,6 @@ import type { DataTableTimerangeFilterField } from '../DataTable.types'
 import { isArrayOfDates } from '../DataTable.utils'
 import { useDataTable } from '../providers/DataTableProvider'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { Feature } from 'data/entitlements/entitlements.constants'
 
 export function DataTableFilterTimerange<TData>({
   value: _value,
@@ -24,7 +23,7 @@ export function DataTableFilterTimerange<TData>({
 
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
 
-  const { getEntitlementNumericValue } = useCheckEntitlements(Feature.LOG_RETENTION_DAYS)
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToAuditLogDays = getEntitlementNumericValue()
 
   const date: DateRange | undefined = useMemo(

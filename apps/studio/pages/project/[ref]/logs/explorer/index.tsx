@@ -52,7 +52,6 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from 'ui'
-import { Feature } from 'data/entitlements/entitlements.constants'
 
 const LOCAL_PLACEHOLDER_QUERY =
   'select\n  timestamp, event_message, metadata\n  from edge_logs limit 5'
@@ -93,7 +92,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     []
   )
 
-  const { getEntitlementNumericValue } = useCheckEntitlements(Feature.LOG_RETENTION_DAYS)
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToAuditLogDays = getEntitlementNumericValue()
 
   const { data: content } = useContentQuery({

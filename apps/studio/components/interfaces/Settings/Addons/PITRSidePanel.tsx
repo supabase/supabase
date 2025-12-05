@@ -32,7 +32,6 @@ import {
   SidePanel,
   cn,
 } from 'ui'
-import { Feature } from 'data/entitlements/entitlements.constants'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -106,9 +105,7 @@ const PITRSidePanel = () => {
   const availableOptions = availableAddons.find((addon) => addon.type === 'pitr')?.variants ?? []
 
   const hasChanges = selectedOption !== (subscriptionPitr?.variant.identifier ?? 'pitr_0')
-  const { hasAccess: hasAccessToPitrVariants } = useCheckEntitlements(
-    Feature.PITR_AVAILABLE_VARIANTS
-  )
+  const { hasAccess: hasAccessToPitrVariants } = useCheckEntitlements('pitr.available_variants')
   const selectedPitr = availableOptions.find((option) => option.identifier === selectedOption)
   const hasSufficientCompute =
     !!subscriptionCompute && subscriptionCompute.variant.identifier !== 'ci_micro'

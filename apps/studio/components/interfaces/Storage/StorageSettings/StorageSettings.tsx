@@ -53,7 +53,6 @@ import {
   StorageSizeUnits,
 } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
-import { Feature } from 'data/entitlements/entitlements.constants'
 
 const formId = 'storage-settings-form'
 
@@ -89,9 +88,8 @@ export const StorageSettings = () => {
     !!config && !config.capabilities.list_v2 && config.external.upstreamTarget === 'canary'
 
   const { data: organization } = useSelectedOrganizationQuery()
-  const { getEntitlementNumericValue, isEntitlementUnlimited } = useCheckEntitlements(
-    Feature.STORAGE_MAX_FILE_SIZE
-  )
+  const { getEntitlementNumericValue, isEntitlementUnlimited } =
+    useCheckEntitlements('storage.max_file_size')
   const isFreeTier = organization?.plan.id === 'free'
   const isSpendCapOn =
     organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false

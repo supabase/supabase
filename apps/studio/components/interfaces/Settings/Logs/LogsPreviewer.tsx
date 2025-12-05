@@ -30,7 +30,6 @@ import { maybeShowUpgradePromptIfNotEntitled } from './Logs.utils'
 import { PreviewFilterPanelWithUniversal } from './PreviewFilterPanelWithUniversal'
 import UpgradePrompt from './UpgradePrompt'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { Feature } from 'data/entitlements/entitlements.constants'
 
 /**
  * Calculates the appropriate time range for bar click filtering based on the current time range duration.
@@ -208,7 +207,7 @@ export const LogsPreviewer = ({
     refresh()
   }
 
-  const { getEntitlementNumericValue } = useCheckEntitlements(Feature.LOG_RETENTION_DAYS)
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToAuditLogDays = getEntitlementNumericValue()
 
   const handleSearch: LogSearchCallback = async (event, { query, to, from }) => {
