@@ -53,19 +53,19 @@ export default function ComposedChartDemo() {
     <div className="w-8/12">
       <Chart isLoading={isLoading}>
         <ChartCard>
-          <ChartHeader>
+          {/* <ChartHeader>
             <ChartTitle tooltip="This is a tooltip">My Chart Title</ChartTitle>
 
             <ChartActions actions={actions} />
-          </ChartHeader>
+          </ChartHeader> */}
 
-          {/* <ChartHeader>
+          <ChartHeader>
             <ChartMetric label="Total Users" value="20000" />
             <div className="flex items-center gap-6">
               <ChartMetric label="Warn" value="12" status="warning" align="end" />
               <ChartMetric label="Err" value="7" status="negative" align="end" />
             </div>
-          </ChartHeader> */}
+          </ChartHeader>
 
           <ChartContent
             isEmpty={data.length === 0}
