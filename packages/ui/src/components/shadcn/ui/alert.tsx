@@ -13,11 +13,11 @@ export const alertVariants = cva(
     variants: {
       variant: {
         default:
-          'text-foreground bg-alternative border [&>svg]:text-background [&>svg]:bg-foreground',
+          'bg-surface-200/25 border-default text-foreground [&>svg]:text-background [&>svg]:bg-foreground',
         destructive:
-          'text border-destructive-400 bg-destructive-200 [&>svg]:text-destructive-200 [&>svg]:bg-destructive-600',
+          'bg-destructive-200 border-destructive-400 [&>svg]:text-destructive-200 [&>svg]:bg-destructive-600',
         warning:
-          'border-warning-400 bg-warning-200 [&>svg]:text-warning-200 [&>svg]:bg-warning-600',
+          'bg-warning-200 border-warning-400 [&>svg]:text-warning-200 [&>svg]:bg-warning-600',
       },
     },
     defaultVariants: {
