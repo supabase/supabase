@@ -28,7 +28,7 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   )
 }
 
-const GitHubSection = () => {
+export const GitHubSection = () => {
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
 
@@ -93,5 +93,3 @@ const GitHubSection = () => {
     </ScaffoldContainer>
   )
 }
-
-export default GitHubSection

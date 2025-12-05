@@ -1,24 +1,25 @@
 import { useState } from 'react'
+
 import {
   ScaffoldContainer,
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { Button, Card, CardContent, cn } from 'ui'
-import AWSPrivateLinkAccountItem from './AWSPrivateLinkAccountItem'
-import AWSPrivateLinkForm from './AWSPrivateLinkForm'
 import { ResourceList } from 'components/ui/Resource/ResourceList'
-import { IntegrationImageHandler } from '../IntegrationsSettings'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useAWSAccountsQuery } from 'data/aws-accounts/aws-accounts-query'
 import { useAWSAccountDeleteMutation } from 'data/aws-accounts/aws-account-delete-mutation'
+import { useAWSAccountsQuery } from 'data/aws-accounts/aws-accounts-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
+import { Button, Card, CardContent, cn } from 'ui'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import { IntegrationImageHandler } from '../IntegrationsSettings'
+import { AWSPrivateLinkAccountItem } from './AWSPrivateLinkAccountItem'
+import { AWSPrivateLinkForm } from './AWSPrivateLinkForm'
 
-const AWSPrivateLinkSection = () => {
+export const AWSPrivateLinkSection = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const { data: accounts } = useAWSAccountsQuery({ projectRef: project?.ref })
@@ -95,7 +96,7 @@ const AWSPrivateLinkSection = () => {
                       <AWSPrivateLinkAccountItem
                         key={account.aws_account_id}
                         {...account}
-                        onClick={() => onEditAccount(account)}
+                        onEdit={() => onEditAccount(account)}
                         onDelete={() => onDeleteAccount(account)}
                       />
                     ))}
@@ -112,7 +113,9 @@ const AWSPrivateLinkSection = () => {
           </ScaffoldSectionContent>
         </ScaffoldSection>
       </ScaffoldContainer>
+
       <AWSPrivateLinkForm account={selectedAccount} open={showForm} onOpenChange={setShowForm} />
+
       <ConfirmationModal
         variant="destructive"
         visible={showDeleteModal}
@@ -129,5 +132,3 @@ const AWSPrivateLinkSection = () => {
     </>
   )
 }
-
-export default AWSPrivateLinkSection

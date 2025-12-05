@@ -1,26 +1,29 @@
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+
+import { InlineLink } from 'components/ui/InlineLink'
+import { useAWSAccountCreateMutation } from 'data/aws-accounts/aws-account-create-mutation'
+import type { AWSAccount } from 'data/aws-accounts/aws-accounts-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
+  Badge,
   Button,
+  Card,
+  CardContent,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
-  SheetDescription,
-  SheetSection,
-  Badge,
   Input_Shadcn_,
-  Card,
-  CardContent,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
 } from 'ui'
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import type { AWSAccount } from 'data/aws-accounts/aws-accounts-query'
-import { useAWSAccountCreateMutation } from 'data/aws-accounts/aws-account-create-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 interface AWSPrivateLinkFormProps {
   account?: AWSAccount
@@ -33,10 +36,10 @@ interface FormValues {
   accountName: string
 }
 
-const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormProps) => {
+export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormProps) => {
   const isNew = !account
   const { data: project } = useSelectedProjectQuery()
-  const { mutate: createAccount, isLoading } = useAWSAccountCreateMutation()
+  const { mutate: createAccount, isPending } = useAWSAccountCreateMutation()
 
   const form = useForm<FormValues>({
     defaultValues: {
@@ -74,14 +77,7 @@ const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormP
           <SheetTitle>{isNew ? 'Add AWS Account' : 'AWS Account Details'}</SheetTitle>
           <SheetDescription>
             Connect to your Supabase project from your AWS VPC using AWS PrivateLink.{' '}
-            <a
-              href="https://supabase.com/docs/guides/platform/privatelink"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              Learn more
-            </a>
+            <InlineLink href={`${DOCS_URL}/guides/platform/privatelink`}>Learn more</InlineLink>
           </SheetDescription>
         </SheetHeader>
         <Form_Shadcn_ {...form}>
@@ -99,14 +95,11 @@ const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormP
                           account owner. Association requests are automatically deleted if not
                           accepted within 12 hours.
                           <br />
-                          <a
-                            href="https://supabase.com/docs/guides/platform/privatelink#step-2-accept-resource-share"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="underline"
+                          <InlineLink
+                            href={`${DOCS_URL}/guides/platform/privatelink#step-2-accept-resource-share`}
                           >
                             Learn how to accept
-                          </a>
+                          </InlineLink>
                         </>
                       ) : account.status === 'CREATING' ? (
                         'This account connection is being created.'
@@ -193,11 +186,11 @@ const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormP
             </SheetSection>
 
             <SheetFooter>
-              <Button type="default" onClick={() => onOpenChange(false)}>
+              <Button type="default" disabled={isPending} onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
               {isNew && (
-                <Button htmlType="submit" disabled={isLoading} loading={isLoading}>
+                <Button htmlType="submit" loading={isPending}>
                   Add Account
                 </Button>
               )}
@@ -208,5 +201,3 @@ const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormP
     </Sheet>
   )
 }
-
-export default AWSPrivateLinkForm

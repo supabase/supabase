@@ -1,5 +1,15 @@
-import { ResourceItem } from 'components/ui/Resource/ResourceItem'
-import { Badge } from 'ui'
+import { Edit, MoreVertical, Trash } from 'lucide-react'
+
+import {
+  Badge,
+  Button,
+  CardContent,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from 'ui'
 
 interface AWSPrivateLinkAccountItemProps {
   aws_account_id: string
@@ -12,15 +22,15 @@ interface AWSPrivateLinkAccountItemProps {
     | 'CREATION_FAILED'
     | 'DELETING'
   shared_at: string | null
-  onClick: () => void
+  onEdit: () => void
   onDelete: () => void
 }
 
-const AWSPrivateLinkAccountItem = ({
+export const AWSPrivateLinkAccountItem = ({
   aws_account_id,
   account_name,
   status,
-  onClick,
+  onEdit,
   onDelete,
 }: AWSPrivateLinkAccountItemProps) => {
   const getStatusBadge = () => {
@@ -43,15 +53,30 @@ const AWSPrivateLinkAccountItem = ({
   }
 
   return (
-    <ResourceItem
-      onClick={onClick}
-      actions={[{ label: 'Delete account', onClick: onDelete }]}
-      meta={getStatusBadge()}
-    >
-      <div>{aws_account_id}</div>
-      <div className="text-sm text-foreground-lighter">{account_name || 'No description'}</div>
-    </ResourceItem>
+    <CardContent className="flex items-center justify-between text-sm gap-4">
+      <div className="flex-1">
+        <div>{aws_account_id}</div>
+        <div className="text-sm text-foreground-lighter">{account_name || 'No description'}</div>
+      </div>
+
+      {getStatusBadge()}
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button type="text" className="px-1" icon={<MoreVertical />} />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-40">
+          <DropdownMenuItem onClick={onEdit} className="gap-x-2">
+            <Edit size={14} />
+            <span>Edit account</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={onDelete} className="gap-x-2">
+            <Trash size={14} />
+            <span>Delete account</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </CardContent>
   )
 }
-
-export default AWSPrivateLinkAccountItem

@@ -22,10 +22,11 @@ export interface ResourceItemProps extends HTMLAttributes<HTMLDivElement> {
   onClick?: () => void
   children?: ReactNode
   actions?: ResourceAction[]
+  dropdownClassName?: string
 }
 
 export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
-  ({ media, meta, onClick, children, className, actions, ...props }, ref) => {
+  ({ media, meta, onClick, children, className, actions, dropdownClassName, ...props }, ref) => {
     return (
       <CardContent
         ref={ref}
@@ -55,7 +56,7 @@ export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
                 }}
               />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className={dropdownClassName}>
               {actions.map((action) => (
                 <DropdownMenuItem
                   key={action.label}
