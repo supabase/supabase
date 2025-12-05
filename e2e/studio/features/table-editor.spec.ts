@@ -12,6 +12,7 @@ import {
   waitForGridDataToLoad,
   waitForTableToLoad,
 } from '../utils/wait-for-response.js'
+import { env } from '../env.config.js'
 
 const tableNamePrefix = 'pw_table'
 const columnName = 'pw_column'
@@ -107,7 +108,9 @@ const deleteEnumIfExist = async (page: Page, ref: string, enumName: string) => {
   await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
 }
 
-test.describe('table editor', () => {
+// Due to rate API rate limits run this test in serial mode on platform.
+const testRunner = env.IS_PLATFORM ? test.describe.serial : test.describe
+testRunner('table editor', () => {
   test.beforeAll(async ({ browser, ref }) => {
     await withFileOnceSetup(import.meta.url, async () => {
       const ctx = await browser.newContext()
@@ -598,13 +601,7 @@ test.describe('table editor', () => {
     // test pagination (page 1 -> page 2)
     await expect(page.getByRole('gridcell', { name: 'value 7', exact: true })).toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'value 101', exact: true })).not.toBeVisible()
-    let footer: Locator
-    if (isCLI()) {
-      footer = page.getByLabel('Table grid footer')
-    } else {
-      footer = page.locator('[data-sentry-component="GridFooter"]')
-    }
-    await footer.getByRole('button').nth(1).click()
+    await page.getByLabel('Table grid footer').getByRole('button').nth(1).click()
     await waitForGridDataToLoad(page, ref) // retrieve next page data
     await expect(page.getByRole('gridcell', { name: 'value 7', exact: true })).not.toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'value 101', exact: true })).toBeVisible()
