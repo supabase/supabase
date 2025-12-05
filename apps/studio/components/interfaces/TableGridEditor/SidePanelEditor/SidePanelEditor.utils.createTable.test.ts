@@ -160,7 +160,7 @@ describe('createTable', () => {
       expect.objectContaining({
         projectRef,
         connectionString,
-        id: mockTableResult.id,
+        id: mockTableResult.table.id,
       })
     )
 
