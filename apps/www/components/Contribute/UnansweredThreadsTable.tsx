@@ -50,6 +50,9 @@ function ThreadsTable({
             <th className="text-left py-3 px-6 text-sm text-foreground min-w-[150px] w-[20%]">
               Stack
             </th>
+            <th className="text-left py-3 px-6 text-sm text-foreground min-w-[100px] w-[10%]">
+              Replies
+            </th>
             <th className="text-left py-3 px-6 text-sm text-foreground min-w-[100px] w-[15%]">
               Posted
             </th>
@@ -338,9 +341,7 @@ function ThreadRow({
             )}
           </div>
           <Link
-            href={thread.external_activity_url}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={`/contribute/t/${thread.id}`}
             className="text-foreground transition-colors truncate"
           >
             {highlightText(thread.title, search)}
@@ -382,6 +383,13 @@ function ThreadRow({
             <span className="text-xs text-muted-foreground">—</span>
           )}
         </div>
+      </td>
+      <td className="py-4 px-6 w-[10%] min-w-[100px]">
+        <span className="text-sm text-muted-foreground whitespace-nowrap">
+          {thread.message_count !== null && thread.message_count !== undefined
+            ? Math.max(0, thread.message_count - 1)
+            : '—'}
+        </span>
       </td>
       <td className="py-4 px-6 w-[15%] min-w-[100px]">
         <span className="text-sm text-muted-foreground whitespace-nowrap">{thread.posted}</span>

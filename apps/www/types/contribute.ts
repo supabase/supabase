@@ -7,6 +7,7 @@ export type ThreadSource = 'discord' | 'reddit' | 'github'
 export interface ThreadRow {
   id: string
   title: string
+  conversation: string
   user: string
   channel: ThreadSource
   tags: string[]
@@ -18,4 +19,6 @@ export interface ThreadRow {
   category: string | null
   sub_category: string | null
   summary: string | null
+  thread_key: string | null
+  message_count: number | null
 }

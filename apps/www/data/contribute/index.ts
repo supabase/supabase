@@ -28,6 +28,7 @@ function mapThreadRowToThread(row: Thread): ThreadRow {
     title: row.subject ?? row.title ?? '',
     user: row.author,
     channel: source,
+    conversation: row.conversation ?? '',
     tags: row.product_areas ?? [],
     product_areas: row.product_areas ?? [],
     stack: row.stack ?? [],
@@ -42,6 +43,8 @@ function mapThreadRowToThread(row: Thread): ThreadRow {
     category: row.category,
     sub_category: row.sub_category,
     summary: row.summary,
+    thread_key: row.thread_key ?? null,
+    message_count: row.message_count ?? null,
   }
 }
 
@@ -107,6 +110,54 @@ export async function getUnansweredThreads(
 
   const threads = (data ?? []) as Thread[]
   return threads.map(mapThreadRowToThread)
+}
+
+export async function getThreadById(id: string): Promise<ThreadRow | null> {
+  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+  const { data, error } = await supabase
+    .from('contribute_threads')
+    .select(
+      'thread_id, subject, status, author, conversation, external_activity_url, created_at, source, product_areas, stack, category, sub_category, summary, first_msg_time, message_count, thread_key'
+    )
+    .eq('thread_id', id)
+    .single()
+
+  if (error) {
+    console.error('Error fetching thread:', error)
+    return null
+  }
+
+  if (!data) {
+    return null
+  }
+
+  return mapThreadRowToThread(data as Thread)
+}
+
+export async function getThreadRepliesById(thread_key: string | null) {
+  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+  if (!thread_key) {
+    return { question: null, replies: [] }
+  }
+
+  const { data, error } = await supabase
+    .from('contribute_posts')
+    .select('id, author, content, ts, external_activity_url, thread_key, kind')
+    .eq('thread_key', thread_key)
+    .in('kind', ['question', 'reply'])
+    .order('ts', { ascending: true })
+
+  if (error) {
+    console.error('Error fetching thread posts:', error)
+    return { question: null, replies: [] }
+  }
+
+  const question = data?.find((post) => post.kind === 'question') || null
+  const replies = data?.filter((post) => post.kind === 'reply') || []
+
+  return { question, replies }
 }
 
 export async function getAllProductAreas(): Promise<string[]> {
