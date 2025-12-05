@@ -150,7 +150,6 @@ First, create an analytics bucket to store your replicated data:
      src="/docs/img/database/replication/replication-iceberg-details.png"
      zoomable
    />
-
    - **Name**: A unique name for your bucket (e.g., `analytics_warehouse`)
    - **Region**: Select the region where your data will be stored
 
@@ -173,13 +172,11 @@ First, create an analytics bucket to store your replicated data:
    />
 
 3. Configure the general settings:
-
    - **Destination name**: A name to identify this destination (e.g., "Analytics Warehouse")
    - **Publication**: The publication to replicate data from (created in [Step 1](#step-1-create-a-postgres-publication))
    - **Destination type**: Select **Analytics Buckets**
 
 4. Configure Analytics Buckets settings:
-
    - **Bucket**: The name of your analytics bucket from Step 1
    - **Namespace**: The schema name where your tables will be replicated (e.g., `public`)
    - **Catalog Token**: Authentication token from Step 1
@@ -187,7 +184,6 @@ First, create an analytics bucket to store your replicated data:
    - **S3 Secret Access Key**: Secret key from Step 1
 
 5. Configure **Advanced Settings** (optional):
-
    - **Batch wait time (milliseconds)**: How long to wait for more changes before sending a batch. Default is recommended for optimal performance.
 
 6. Click **Create and start** to begin replication
@@ -233,21 +229,18 @@ Before configuring BigQuery as a destination, set up the following in Google Clo
 1. **Google Cloud Platform (GCP) account**: [Sign up for GCP](https://cloud.google.com/gcp) if you don't have one
 
 2. **BigQuery dataset**: Create a [BigQuery dataset](https://cloud.google.com/bigquery/docs/datasets-intro) in your GCP project
-
    - Open the BigQuery console in GCP
    - Select your project
    - Click "Create Dataset"
    - Provide a dataset ID (e.g., `supabase_replication`)
 
 3. **GCP service account key**: Create a [service account](https://cloud.google.com/iam/docs/keys-create-delete) with appropriate permissions:
-
    - Go to IAM & Admin → Service Accounts
    - Click "Create Service Account"
    - Grant the **BigQuery Data Editor** role
    - Create and download the JSON key file
 
    Required permissions:
-
    - `bigquery.datasets.get`
    - `bigquery.tables.create`
    - `bigquery.tables.get`
@@ -267,13 +260,11 @@ Before configuring BigQuery as a destination, set up the following in Google Clo
    />
 
 3. Configure the general settings:
-
    - **Destination name**: A name to identify this destination (e.g., "BigQuery Warehouse")
    - **Publication**: The publication to replicate data from (created in [Step 1](#step-1-create-a-postgres-publication))
    - **Destination type**: Select **BigQuery**
 
 4. Configure BigQuery-specific settings:
-
    - **Project ID**: Your BigQuery project identifier (found in the GCP Console)
    - **Dataset ID**: The name of your BigQuery dataset (without the project ID)
 
@@ -286,7 +277,6 @@ Before configuring BigQuery as a destination, set up the following in Google Clo
    - **Service Account Key**: Your GCP service account key in JSON format (from Step 1)
 
 5. Configure **Advanced Settings** (optional):
-
    - **Batch wait time (milliseconds)**: How long to wait for more changes before sending a batch. Default is recommended for optimal performance.
 
 6. Click **Create and start** to begin replication
