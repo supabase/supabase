@@ -1,0 +1,50 @@
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6 [&>div]:space-y-4"
+>
+
+<AccordionItem
+header={<span className="text-foreground">What you can do with the Metrics API</span>}
+id="how-do-i-check-when-a-user-went-through-mfa"
+>
+
+Every Supabase project exposes a metrics feed at `https://<project-ref>.supabase.co/customer/v1/privileged/metrics`. Replace `<project-ref>` with the identifier from your project URL or from the dashboard sidebar.
+
+1. Copy your project reference and confirm the base URL using the helper below.
+
+   <ProjectConfigVariables variable="url" />
+
+2. Configure your collector to scrape once per minute. The endpoint already emits the full set of metrics on each request.
+3. Authenticate with HTTP Basic Auth:
+
+   - **Username**: `service_role`
+   - **Password**: a service role secret (JWT) from [**Project Settings > JWT** (opens in a new tab)](/dashboard/project/_/settings/jwt) or any other Secret API key from [**Project Settings > API keys** (opens in a new tab)](/dashboard/project/_/settings/api-keys)
+
+Testing locally is as simple as running `curl` with your service role secret:
+
+```bash
+curl <project-url>/customer/v1/privileged/metrics \
+    --user 'service_role:sb_secret_...'
+```
+
+You can provision long-lived automation tokens in two ways:
+
+- Create an account access token once at [**Account Settings > Access Tokens (opens in a new tab)**](/dashboard/account/tokens) and reuse it wherever you configure observability tooling.
+- **Optional**: programmatically exchange an access token for project API keys via the [Management API ](/docs/reference/api/management-projects-api-keys-retrieve').
+
+```bash
+# (Optional) Exchange an account access token for project API keys
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+curl -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+    "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys?reveal=true"
+```
+
+</AccordionItem>
+
+</Accordion>

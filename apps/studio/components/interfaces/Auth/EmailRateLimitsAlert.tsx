@@ -10,11 +10,7 @@ export const EmailRateLimitsAlert = () => {
   const { ref } = useParams()
 
   return (
-    <Admonition
-      type="warning"
-      title="Set up custom SMTP"
-      className="bg-warning-200 border-warning-400"
-    >
+    <Admonition type="warning" title="Set up custom SMTP">
       <p>
         You’re using the built-in email service. This service has rate limits and is not meant to be
         used for production apps.{' '}
