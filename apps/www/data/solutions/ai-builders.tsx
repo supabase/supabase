@@ -181,8 +181,12 @@ const data: {
     ],
   },
   features: {
-    id: 'features',
-    heading: <span className="text-foreground">Supabase as a Service</span>,
+    id: 'supabase-for-platforms',
+    heading: (
+      <a href="#supabase-for-platforms" className="text-foreground underline hover:no-underline">
+        Supabase for Platforms
+      </a>
+    ),
     subheading:
       'Build a delightful next-generation tools experience for your customers, backed by a powerful white-label Supabase backend.',
     features: [
