@@ -7,13 +7,13 @@ keywords = [ "heartbeat", "connection", "websocket", "keep-alive", "timeout", "o
 database_id = ""
 ---
 
-**What are heartbeat messages?**
+## What are heartbeat messages?
 
 Heartbeat messages are periodic signals sent between the Realtime client and server to verify that the WebSocket connection is alive and functioning properly. The client sends a heartbeat message on the `phoenix` topic with the event type `heartbeat` at regular intervals (default: 25 seconds), and the server responds with a `phx_reply` message.
 
 These messages serve as a keep-alive mechanism to detect connection issues that might not be immediately apparent, such as silent network failures or intermediary proxy timeouts.
 
-**Why heartbeats matter**
+## Why heartbeats matter
 
 Heartbeat messages are critical for maintaining reliable real-time connections:
 
@@ -24,7 +24,7 @@ Heartbeat messages are critical for maintaining reliable real-time connections:
 
 Without heartbeats, your application might appear connected while being unable to send or receive messages.
 
-**How to handle heartbeat messages**
+## How to handle heartbeat messages
 
 You can monitor heartbeat lifecycle events using the `onHeartbeat` method:
 
@@ -58,9 +58,9 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
 })
 ```
 
-**Troubleshooting heartbeat issues**
+## Troubleshooting heartbeat issues
 
-**Frequent heartbeat timeouts**
+### Frequent heartbeat timeouts
 
 If you're seeing frequent `timeout` status in your heartbeat callback:
 
@@ -103,7 +103,7 @@ function ConnectionStatus() {
 }
 ```
 
-**Customizing heartbeat interval**
+### Customizing heartbeat interval
 
 You can adjust the heartbeat frequency when creating your Supabase client in React:
 
@@ -128,7 +128,7 @@ function App() {
 
 Note: Increasing the interval reduces network traffic but delays detection of connection failures. Decreasing it improves detection speed but increases overhead.
 
-**Heartbeat errors in Web Workers**
+### Heartbeat errors in Web Workers
 
 For React applications with long-running connections, use Web Workers to prevent browser tab throttling:
 
@@ -158,9 +158,9 @@ If the worker fails to start, check:
 - Worker script is in the public folder and accessible
 - CORS headers allow loading the worker script
 
-**Best practices**
+## Best practices
 
-**Show connection status to users**
+### Show connection status to users
 
 Display connection status with a simple indicator:
 
@@ -192,7 +192,7 @@ function ConnectionIndicator() {
 }
 ```
 
-**Reconnect when React Native app comes to foreground**
+### Reconnect when React Native app comes to foreground
 
 Ensure connection is active when user opens your app:
 
@@ -222,7 +222,7 @@ function App() {
 }
 ```
 
-**Monitor connection in your entire app**
+### Monitor connection in your entire app
 
 Set up monitoring when you create your Supabase client:
 
