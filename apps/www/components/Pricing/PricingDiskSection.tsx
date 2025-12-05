@@ -7,7 +7,7 @@ const diskTypes = [
   {
     name: 'General Purpose',
     tagline: 'Balance between price and performance',
-    maxSize: '16 TB',
+    maxSize: '60 TB',
     size: '8 GB included\nthen $0.125 per GB',
     iops: '3,000 IOPS included\nthen $0.024 per IOPS',
     throughput: '125 MB/s included\nthen $0.095 per MB/s',
