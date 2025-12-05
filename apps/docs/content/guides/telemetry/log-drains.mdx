@@ -137,13 +137,13 @@ Deno.serve(async (req) => {
 
 </Accordion>
 
-## DataDog logs
+## Datadog logs
 
-Logs sent to DataDog have the name of the log source set on the `service` field of the event and the source set to `Supabase`. Logs are gzipped before they are sent to DataDog.
+Logs sent to Datadog have the name of the log source set on the `service` field of the event and the source set to `Supabase`. Logs are gzipped before they are sent to Datadog.
 
 The payload message is a JSON string of the raw log event, prefixed with the event timestamp.
 
-To setup DataDog log drain, generate a DataDog API key [here](https://app.datadoghq.com/organization-settings/api-keys) and the location of your DataDog site.
+To setup Datadog log drain, generate a Datadog API key [here](https://app.datadoghq.com/organization-settings/api-keys) and the location of your Datadog site.
 
 <Accordion
   type="default"
