@@ -1,7 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import type { ResponseError } from 'types'
+
 import { del, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { awsAccountKeys } from './keys'
 
 export type AWSAccountDeleteVariables = {
@@ -42,7 +43,7 @@ export const useAWSAccountDeleteMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(awsAccountKeys.list(projectRef))
+        await queryClient.invalidateQueries({ queryKey: awsAccountKeys.list(projectRef) })
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
