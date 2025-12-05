@@ -6,8 +6,7 @@ import SectionContainer from '../Layouts/SectionContainer'
 
 export default function FeaturesGrid(props: any) {
   const hasExtendedCards = props.features.some(
-    (f: any) =>
-      f.id === 'project-claim-flow' || f.id === 'platform-kit' || f.id === 'pico-instances'
+    (f: any) => f.id === 'claim-flow' || f.id === 'platform-kit' || f.id === 'pico-instances'
   )
 
   return (
@@ -40,7 +39,7 @@ export default function FeaturesGrid(props: any) {
             [&_.next-image--dynamic-fill]:rounded-none"
         />
         <Content card={props.features.find((f: any) => f.id === 'branching')} />
-        <Content card={props.features.find((f: any) => f.id === 'project-claim-flow')} />
+        <Content card={props.features.find((f: any) => f.id === 'claim-flow')} />
         <Content card={props.features.find((f: any) => f.id === 'platform-kit')} />
         <Content
           card={props.features.find((f: any) => f.id === 'pico-instances')}

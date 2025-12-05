@@ -43,8 +43,8 @@ const data: {
         type: 'primary' as any,
       },
       {
-        label: 'Connect your app',
-        href: 'https://supabase.com/docs/guides/integrations/build-a-supabase-integration',
+        label: 'Build your integration',
+        href: '/solutions/ai-builders#talk-to-partnership-team',
         type: 'default' as any,
       },
     ],
@@ -182,11 +182,7 @@ const data: {
   },
   features: {
     id: 'supabase-for-platforms',
-    heading: (
-      <a href="#supabase-for-platforms" className="text-foreground underline hover:no-underline">
-        Supabase for Platforms
-      </a>
-    ),
+    heading: <span className="text-foreground">Supabase for Platforms</span>,
     subheading:
       'Build a delightful next-generation tools experience for your customers, backed by a powerful white-label Supabase backend.',
     features: [
@@ -495,17 +491,6 @@ const data: {
             backend.
           </>
         ),
-        img: (
-          <Image
-            src={{
-              dark: '/images/solutions/ai-builders/mgmt-api-permissions-dark.png',
-              light: '/images/solutions/ai-builders/mgmt-api-permissions-light.png',
-            }}
-            alt="Management Api Permissions panel"
-            width={900}
-            height={900}
-          />
-        ),
       },
       {
         id: 'branching',
@@ -553,14 +538,14 @@ const data: {
         ),
         subheading: (
           <>
-            <span className="text-foreground">Offer production and development branches.</span>{' '}
-            Enable your customers to deploy and test changes without affecting their main production
+            <span className="text-foreground">Offer development branches.</span> Enable your
+            customers to deploy and test changes without affecting their main production
             applications.
           </>
         ),
       },
       {
-        id: 'project-claim-flow',
+        id: 'claim-flow',
         icon: Timer,
         heading: (
           <>
@@ -586,7 +571,7 @@ const data: {
                 strokeLinejoin="round"
               />
             </svg>
-            Project claim flow
+            Claim flow
           </>
         ),
         subheading: (
@@ -640,7 +625,7 @@ const data: {
             <span className="text-foreground">
               UI components for the Management API that you can embed directly in your app
             </span>{' '}
-            so they never have to leave it to interact with their project.
+            so your users never have to leave it to interact with their projects.
           </>
         ),
       },
@@ -685,7 +670,7 @@ const data: {
                 strokeLinejoin="round"
               />
             </svg>
-            Compute instance on shared architecture
+            Pico instances
           </>
         ),
         subheading: (
