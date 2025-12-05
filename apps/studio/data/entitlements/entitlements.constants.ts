@@ -1,6 +1,7 @@
 import type { components } from 'api-types'
 
-export type FeatureKey = components['schemas']['ListEntitlementsResponse']['features'][number]
+export type FeatureKey =
+  components['schemas']['ListEntitlementsResponse']['entitlements'][number]['feature']['key']
 
 export const Feature = {
   INSTANCES_COMPUTE_AVAILABLE_SIZES: 'instances.compute_update_available_sizes',
