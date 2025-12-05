@@ -456,3 +456,5 @@ export {
   ChartDisabledState,
   ChartFooter,
 }
+export { ChartBar, type ChartBarTick, type ChartBarProps } from './charts/chart-bar'
+export { ChartLine, type ChartLineTick, type ChartLineProps } from './charts/chart-line'
