@@ -1,3 +1,4 @@
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import type { APIKeysData } from 'data/api-keys/api-keys-query'
 import { motion } from 'framer-motion'
 import { MoreVertical } from 'lucide-react'
@@ -9,7 +10,6 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { APIKeyDeleteDialog } from './APIKeyDeleteDialog'
 import { ApiKeyPill } from './ApiKeyPill'
 
