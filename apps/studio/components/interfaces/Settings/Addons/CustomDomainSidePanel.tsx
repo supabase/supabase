@@ -69,7 +69,7 @@ const CustomDomainSidePanel = () => {
     (addons?.available_addons ?? []).find((addon) => addon.type === 'custom_domain')?.variants ?? []
 
   const { hasAccess: hasAccessToCustomDomain, isLoading: isLoadingEntitlement } =
-    useCheckEntitlements('custom_domain')
+    useCheckEntitlements(Feature.CUSTOM_DOMAIN)
   const hasChanges = selectedOption !== (subscriptionCDOption?.variant.identifier ?? 'cd_none')
   const selectedCustomDomain = availableOptions.find(
     (option) => option.identifier === selectedOption

@@ -61,6 +61,7 @@ import {
   estimateDiskCost,
   estimateRestoreTime,
 } from './BranchManagement.utils'
+import { Feature } from 'data/entitlements/entitlements.constants'
 
 export const CreateBranchModal = () => {
   const { ref } = useParams()
@@ -78,8 +79,9 @@ export const CreateBranchModal = () => {
     'preview_branches'
   )
 
-  const { hasAccess: hasAccessToBranching, isLoading: isLoadingEntitlement } =
-    useCheckEntitlements('branching_limit')
+  const { hasAccess: hasAccessToBranching, isLoading: isLoadingEntitlement } = useCheckEntitlements(
+    Feature.BRANCHING_LIMIT
+  )
   const promptPlanUpgrade = IS_PLATFORM && !hasAccessToBranching
 
   const isBranch = projectDetails?.parent_project_ref !== undefined

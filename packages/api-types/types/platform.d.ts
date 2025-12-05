@@ -7128,6 +7128,20 @@ export interface components {
         /** @enum {string} */
         type: 'boolean' | 'numeric' | 'set'
       }[]
+      features: (
+        | 'instances.compute_update_available_sizes'
+        | 'storage.max_file_size'
+        | 'security.audit_logs_days'
+        | 'log.retention_days'
+        | 'custom_domain'
+        | 'ipv4'
+        | 'pitr.available_variants'
+        | 'log_drains'
+        | 'branching_limit'
+        | 'branching_persistent'
+        | 'auth.mfa_phone'
+        | 'auth.hooks'
+      )[]
     }
     ListGitHubConnectionsResponse: {
       connections: {

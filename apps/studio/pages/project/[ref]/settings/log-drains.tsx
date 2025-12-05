@@ -34,6 +34,7 @@ import { ChevronDown } from 'lucide-react'
 import { cloneElement } from 'react'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { Feature } from 'data/entitlements/entitlements.constants'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
   const { can: canManageLogDrains, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -49,8 +50,9 @@ const LogDrainsSettings: NextPageWithLayout = () => {
     useState<LogDrainCreateVariables | null>(null)
   const [mode, setMode] = useState<'create' | 'update'>('create')
 
-  const { hasAccess: hasAccessToLogDrains, isLoading: isLoadingEntitlement } =
-    useCheckEntitlements('log_drains')
+  const { hasAccess: hasAccessToLogDrains, isLoading: isLoadingEntitlement } = useCheckEntitlements(
+    Feature.LOG_DRAINS
+  )
 
   const { data: logDrains } = useLogDrainsQuery(
     { ref },

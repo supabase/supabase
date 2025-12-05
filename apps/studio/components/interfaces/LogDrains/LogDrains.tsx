@@ -30,6 +30,7 @@ import { LogDrainsCard } from './LogDrainsCard'
 import { LogDrainsEmpty } from './LogDrainsEmpty'
 import { VoteLink } from './VoteLink'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { Feature } from 'data/entitlements/entitlements.constants'
 
 export function LogDrains({
   onNewDrainClick,
@@ -38,8 +39,9 @@ export function LogDrains({
   onNewDrainClick: (src: LogDrainType) => void
   onUpdateDrainClick: (drain: LogDrainData) => void
 }) {
-  const { hasAccess: hasAccessToLogDrains, isLoading: isLoadingEntitlement } =
-    useCheckEntitlements('log_drains')
+  const { hasAccess: hasAccessToLogDrains, isLoading: isLoadingEntitlement } = useCheckEntitlements(
+    Feature.LOG_DRAINS
+  )
   const track = useTrack()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedLogDrain, setSelectedLogDrain] = useState<LogDrainData | null>(null)

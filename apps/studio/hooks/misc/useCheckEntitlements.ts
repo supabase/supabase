@@ -7,6 +7,7 @@ import type {
   EntitlementType,
 } from 'data/entitlements/entitlements-query'
 import { IS_PLATFORM } from 'lib/constants'
+import { type FeatureKey } from 'data/entitlements/entitlements.constants'
 
 function isNumericConfig(
   config: EntitlementConfig,
@@ -55,7 +56,7 @@ function getEntitlementSetValues(entitlement: Entitlement | null): string[] {
 }
 
 export function useCheckEntitlements(
-  featureKey: string,
+  featureKey: FeatureKey,
   organizationSlug?: string,
   options?: {
     enabled?: boolean

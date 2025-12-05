@@ -43,6 +43,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { Feature } from 'data/entitlements/entitlements.constants'
 
 function determineMFAStatus(verifyEnabled: boolean, enrollEnabled: boolean) {
   return verifyEnabled ? (enrollEnabled ? 'Enabled' : 'Verify Enabled') : 'Disabled'
@@ -116,8 +117,9 @@ export const MfaAuthSettingsForm = () => {
     'custom_config_gotrue'
   )
 
-  const { hasAccess: hasAccessToMFA, isLoading: isLoadingEntitlement } =
-    useCheckEntitlements('auth.mfa_phone')
+  const { hasAccess: hasAccessToMFA, isLoading: isLoadingEntitlement } = useCheckEntitlements(
+    Feature.AUTH_MFA_PHONE
+  )
   const promptProPlanUpgrade = IS_PLATFORM && !hasAccessToMFA
 
   // For now, we support Twilio and Vonage. Twilio Verify is not supported and the remaining providers are community maintained.

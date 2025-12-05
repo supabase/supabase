@@ -21,6 +21,7 @@ import {
 } from 'ui'
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
 import type { DatetimeHelper } from './Logs.types'
+import { Feature } from 'data/entitlements/entitlements.constants'
 
 export type DatePickerValue = {
   to: string
@@ -237,7 +238,7 @@ export const LogsDatePicker = ({
     Math.abs(dayjs(startDate).diff(dayjs(endDate), 'days')) >
     LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD - 1
 
-  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
+  const { getEntitlementNumericValue } = useCheckEntitlements(Feature.LOG_RETENTION_DAYS)
   const entitledToAuditLogDays = getEntitlementNumericValue()
 
   const showHelperBadge = (helper?: DatetimeHelper) => {

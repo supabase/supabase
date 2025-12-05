@@ -39,6 +39,7 @@ import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { EditBranchModal } from './EditBranchModal'
 import { PreviewBranchesEmptyState } from './EmptyStates'
+import { Feature } from 'data/entitlements/entitlements.constants'
 
 interface OverviewProps {
   isGithubConnected: boolean
@@ -71,7 +72,7 @@ export const Overview = ({
   const { data: selectedOrg } = useSelectedOrganizationQuery()
 
   const { hasAccess: hasAccessToPersistentBranching, isLoading: isLoadingEntitlement } =
-    useCheckEntitlements('branching_persistent')
+    useCheckEntitlements(Feature.BRANCHING_PERSISTENT)
 
   return (
     <>
@@ -219,7 +220,7 @@ const PreviewBranchActions = ({
   const isPersistentBranch = branch.persistent
 
   const { hasAccess: hasAccessToPersistentBranching, isLoading: isLoadingEntitlement } =
-    useCheckEntitlements('branching_persistent')
+    useCheckEntitlements(Feature.BRANCHING_PERSISTENT)
 
   const [showConfirmResetModal, setShowConfirmResetModal] = useState(false)
   const [showBranchModeSwitch, setShowBranchModeSwitch] = useState(false)

@@ -36,6 +36,7 @@ import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
 import { NoticeBar } from '../ui/NoticeBar'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { Feature } from 'data/entitlements/entitlements.constants'
 
 /**
  * to do: this could be a type from api-types
@@ -59,7 +60,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
 
   const { hasAccess: entitledUpdateCompute, isLoading: isEntitlementLoading } =
-    useCheckEntitlements('instances.compute_update_available_sizes')
+    useCheckEntitlements(Feature.COMPUTE_UPDATE_AVAILABLE_SIZES)
 
   const showComputePrice = useIsFeatureEnabled('project_addons:show_compute_price')
 
