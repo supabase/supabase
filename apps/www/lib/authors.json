@@ -741,6 +741,14 @@
     "author_image_url": "/images/avatars/seth-kramer.jpeg"
   },
   {
+    "author_id": "cemal_kilic",
+    "author": "Cemal Kılıç",
+    "username": "cemalkilic",
+    "position": "Engineering",
+    "author_url": "https://github.com/cemalkilic",
+    "author_image_url": "https://github.com/cemalkilic.png"
+  },
+  {
     "author_id": "riccardo_busetti",
     "author": "Riccardo Busetti",
     "username": "iambriccardo",
