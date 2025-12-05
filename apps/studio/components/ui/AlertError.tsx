@@ -16,10 +16,6 @@ export interface AlertErrorProps {
   additionalActions?: React.ReactNode
 }
 
-/**
- * @deprecated Use `import { Admonition } from "ui-patterns/admonition"` instead
- */
-
 // [Joshen] To standardize the language for all error UIs
 
 const ContactSupportButton = ({
@@ -27,9 +23,9 @@ const ContactSupportButton = ({
   subject,
   error,
 }: {
-  projectRef: string
-  subject: string
-  error: { message: string } | null
+  projectRef?: string
+  subject?: string
+  error?: { message: string } | null
 }) => {
   return (
     <Button asChild type="default" className="w-min">
@@ -46,6 +42,10 @@ const ContactSupportButton = ({
     </Button>
   )
 }
+
+/**
+ * @deprecated Use `import { Admonition } from "ui-patterns/admonition"` instead
+ */
 
 export const AlertError = ({
   projectRef,
@@ -65,7 +65,6 @@ export const AlertError = ({
     <Admonition
       type="warning"
       layout={additionalActions ? 'vertical' : layout}
-      // layout="vertical"
       showIcon={showIcon}
       title={subject}
       description={
