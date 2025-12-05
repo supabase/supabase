@@ -17,7 +17,23 @@ Our charts use a combination of our own presentational components and [Recharts]
 
 ## Best Practices
 
-1. **Use provided chart types first**: Always try to use the default provided charts first, otherwise passing Recharts compoennts to `<ChartContent>` is possible but not recommended. 
+1. **Use provided chart types first**: Always try to use the default provided charts first, otherwise passing Recharts compoennts to `<ChartContent>` is possible but not recommended to avoid complexity.
+
+2. **Use the `useChart` context to show loading and disabled states**: The `useChart` context provides boolean flags for child components to show `isLoading` and `isDisabled` states.
+
+3. **Keep it simple**: Try to avoid abstracting the chart content too much. These components should cover most of your presentational needs.
+
+
+## Examples
+
+### Basic Chart
+
+<ComponentPreview name="chart-composed-basic" peekCode wide />
+
+### Chart States
+
+<ComponentPreview name="chart-composed-states" peekCode wide />
+
 
 ## API
 
@@ -28,8 +44,8 @@ The root container component that provides chart context to all child components
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | `React.ReactNode` | - | Chart child components |
-| `isLoading` | `boolean` | `false` | Shows loading state in child components |
-| `isDisabled` | `boolean` | `false` | Disables chart interactions |
+| `isLoading` | `boolean` | `false` | Shows loading state in child components via the `useChart` context |
+| `isDisabled` | `boolean` | `false` | Disables chart interactions via the `useChart` context |
 | `className` | `string` | - | Additional CSS classes |
 | `...props` | `React.HTMLAttributes<HTMLDivElement>` | - | All standard div props |
 
@@ -40,7 +56,7 @@ A card wrapper for the chart. Can be used as a Card component or as a slot.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | `React.ReactNode` | - | Chart content |
-| `asChild` | `boolean` | - | Render as child component (uses Slot) |
+| `asChild` | `boolean` | - | Render as child component (uses Slot) - ideal for removing the `Card` wrapper |
 | `className` | `string` | - | Additional CSS classes |
 | `...props` | `React.HTMLAttributes<HTMLDivElement>` | - | All standard div props |
 

@@ -13,9 +13,7 @@ import {
   ChartFooter,
 } from 'ui-patterns/Chart'
 import { BarChart2, ExternalLink } from 'lucide-react'
-
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
-
 import { useState, useEffect } from 'react'
 
 export default function ComposedChartDemo() {
@@ -31,7 +29,7 @@ export default function ComposedChartDemo() {
     },
   ]
 
-  const data = Array.from({ length: 100 }, (_, i) => {
+  const data = Array.from({ length: 60 }, (_, i) => {
     const date = new Date()
     date.setMinutes(date.getMinutes() - i * 5) // Each point 5 minutes apart
 
@@ -42,6 +40,8 @@ export default function ComposedChartDemo() {
       warning_count: Math.floor(Math.random() * 50), // Random value 0-50
     }
   }).reverse()
+
+  const totalUsersValue = 4663
 
   useEffect(() => {
     setTimeout(() => {
@@ -60,10 +60,14 @@ export default function ComposedChartDemo() {
           </ChartHeader> */}
 
           <ChartHeader>
-            <ChartMetric label="Total Users" value="20000" />
+            <ChartMetric
+              label="Total Users"
+              value={totalUsersValue.toLocaleString('en-US')}
+              tooltip="This is a tooltip"
+            />
             <div className="flex items-center gap-6">
-              <ChartMetric label="Warn" value="12" status="warning" align="end" />
-              <ChartMetric label="Err" value="7" status="negative" align="end" />
+              <ChartMetric label="Warn" value="1.2k" status="warning" align="end" />
+              <ChartMetric label="Err" value="736" status="negative" align="end" />
             </div>
           </ChartHeader>
 

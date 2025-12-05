@@ -2711,5 +2711,27 @@ export const Index: Record<string, any> = {
       subcategory: "Composed",
       chunks: []
     },
+    "chart-composed-basic": {
+      name: "chart-composed-basic",
+      type: "components:block",
+      registryDependencies: ["chart"],
+      component: React.lazy(() => import("@/registry/default/block/chart-composed-basic")),
+      source: "__registry__/default/block/chart-composed-basic.tsx",
+      files: ["registry/default/block/chart-composed-basic.tsx"],
+      category: "Charts",
+      subcategory: "Composed",
+      chunks: []
+    },
+    "chart-composed-states": {
+      name: "chart-composed-states",
+      type: "components:block",
+      registryDependencies: ["chart"],
+      component: React.lazy(() => import("@/registry/default/block/chart-composed-states")),
+      source: "__registry__/default/block/chart-composed-states.tsx",
+      files: ["registry/default/block/chart-composed-states.tsx"],
+      category: "Charts",
+      subcategory: "Composed",
+      chunks: []
+    },
   },
 }
