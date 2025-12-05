@@ -36,21 +36,9 @@ export default function ChartComposedStates() {
         <ChartCard>
           <ChartHeader>
             <ChartTitle tooltip="This is a tooltip">Response Errors</ChartTitle>
-
             <ChartActions actions={actions} />
           </ChartHeader>
-          <ChartContent
-            isEmpty={false}
-            emptyState={
-              <ChartEmptyState
-                title="No data to show"
-                description="It may take up to 24 hours for data to refresh"
-              />
-            }
-            loadingState={<ChartLoadingState />}
-          >
-            My chart here...
-          </ChartContent>
+          <ChartContent loadingState={<ChartLoadingState />}>My chart here...</ChartContent>
         </ChartCard>
       </Chart>
 
@@ -58,7 +46,6 @@ export default function ChartComposedStates() {
         <ChartCard>
           <ChartHeader>
             <ChartTitle tooltip="This is a tooltip">Response Errors</ChartTitle>
-
             <ChartActions actions={actions} />
           </ChartHeader>
           <ChartContent
@@ -81,7 +68,6 @@ export default function ChartComposedStates() {
         <ChartCard>
           <ChartHeader>
             <ChartTitle tooltip="This is a tooltip">Response Errors</ChartTitle>
-
             <ChartActions actions={actions} />
           </ChartHeader>
           <ChartContent loadingState={<ChartLoadingState />} disabledActions={disabledActions}>
