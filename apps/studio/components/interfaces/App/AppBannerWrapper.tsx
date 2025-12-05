@@ -7,14 +7,14 @@ import { NoticeBanner } from 'components/layouts/AppLayout/NoticeBanner'
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
 
 export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
-  const ongoingIncident = useFlag('ongoingIncident')
+  const ongoingIncident = useFlag('ongoingIncident') || process.env.ONGOING_INCIDENT === 'true'
   const showNoticeBanner = useFlag('showNoticeBanner')
   const clockSkewBanner = useFlag('clockSkewBanner')
 
   return (
     <div className="flex flex-col">
       <div className="flex-shrink-0">
-        {true && <IncidentBanner />}
+        {ongoingIncident && <IncidentBanner />}
         {showNoticeBanner && <NoticeBanner />}
         <OrganizationResourceBanner />
         {clockSkewBanner && <ClockSkewBanner />}
