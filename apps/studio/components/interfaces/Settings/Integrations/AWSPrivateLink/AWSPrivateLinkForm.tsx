@@ -91,9 +91,11 @@ const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormP
                 <Card className="mb-6">
                   <CardContent className="flex items-center gap-2">
                     <p className="text-sm flex-1">
-                      {account.status === 'READY'
+                      {account.status === 'ASSOCIATION_ACCEPTED'
+                        ? 'This connection is active. The resource share has been accepted by the AWS account owner and the connection is established.'
+                        : account.status === 'READY'
                         ? <>
-                            This connection is ready. It may be awaiting acceptance from the AWS account owner or already accepted. Association requests are automatically deleted if not accepted within 12 hours.
+                            This connection is ready. It may be awaiting acceptance from the AWS account owner. Association requests are automatically deleted if not accepted within 12 hours.
                             <br />
                             <a 
                               href="https://supabase.com/docs/guides/platform/privatelink#step-2-accept-resource-share" 
@@ -110,7 +112,9 @@ const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormP
                     </p>
                     <Badge 
                       variant={
-                        account.status === 'READY'
+                        account.status === 'ASSOCIATION_ACCEPTED'
+                          ? 'success'
+                          : account.status === 'READY'
                           ? 'success'
                           : account.status === 'CREATING'
                           ? 'warning'
@@ -119,7 +123,9 @@ const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormP
                           : 'warning'
                       }
                     >
-                      {account.status === 'READY'
+                      {account.status === 'ASSOCIATION_ACCEPTED'
+                        ? 'Connected'
+                        : account.status === 'READY'
                         ? 'Ready'
                         : account.status === 'CREATING'
                         ? 'Creating'
