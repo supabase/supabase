@@ -114,7 +114,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
             <AlertError
               error={error}
               subject="Failed to retrieve access tokens"
-              className="rounded-none border-0 m-0"
+              className="rounded-none border-0"
             />
           </TableCell>
         </TableRow>
