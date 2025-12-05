@@ -105,7 +105,6 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
 
   useEffect(() => {
     if (!isLoadingIndexAdvisorResult && !hasTrackedTabView) {
-      console.log('tracking tab view')
       track('index_advisor_tab_clicked', {
         hasRecommendations: hasIndexRecommendation,
         isIndexAdvisorEnabled: isIndexAdvisorEnabled,
