@@ -302,7 +302,7 @@ describe('Policies.utils - Policy Generation', () => {
     })
 
     it('should handle API errors gracefully and return empty array', async () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
       mockGenerateSqlPolicy.mockRejectedValue(new Error('API error'))
 
       const policies = await generateAiPoliciesForTable({
@@ -313,12 +313,9 @@ describe('Policies.utils - Policy Generation', () => {
       })
 
       expect(policies).toEqual([])
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'AI policy generation failed:',
-        expect.any(Error)
-      )
+      expect(consoleLogSpy).toHaveBeenCalledWith('AI policy generation failed:', expect.any(Error))
 
-      consoleErrorSpy.mockRestore()
+      consoleLogSpy.mockRestore()
     })
 
     it('should trim column names before sending to API', async () => {
