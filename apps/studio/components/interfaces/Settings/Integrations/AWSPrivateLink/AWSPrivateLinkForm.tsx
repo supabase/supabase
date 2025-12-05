@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 
 import { InlineLink } from 'components/ui/InlineLink'
 import { useAWSAccountCreateMutation } from 'data/aws-accounts/aws-account-create-mutation'
@@ -83,7 +84,12 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
           awsAccountId: values.awsAccountId,
           accountName: values.accountName,
         },
-        { onSuccess: () => onOpenChange(false) }
+        {
+          onSuccess: () => {
+            toast.success('Successfully added AWS account')
+            onOpenChange(false)
+          },
+        }
       )
     }
   }
