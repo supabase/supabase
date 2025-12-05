@@ -25,6 +25,7 @@ import {
   cn,
 } from 'ui'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { Feature } from 'data/entitlements/entitlements.constants'
 
 const CustomDomainSidePanel = () => {
   const { ref: projectRef } = useParams()
