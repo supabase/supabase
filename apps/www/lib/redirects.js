@@ -2434,6 +2434,11 @@ module.exports = [
     source: '/docs/guides/platform/oauth-apps/authorize-an-oauth-app',
     destination: '/docs/guides/platform/oauth-apps/build-a-supabase-integration',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/oauth-apps/build-a-supabase-integration',
+    destination: '/docs/guides/platform/oauth-apps/build-a-supabase-oauth-integration',
+  },
   { permanent: true, source: '/docs/reference/cli/config', destination: '/docs/guides/cli/config' },
   {
     permanent: true,
