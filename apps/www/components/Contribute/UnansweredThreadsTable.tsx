@@ -1,16 +1,23 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { Clock, Filter, List, Search, X } from 'lucide-react'
+import Link from 'next/link'
+import { parseAsString, useQueryState } from 'nuqs'
 import type { ReactNode } from 'react'
-import { useQueryState, parseAsString } from 'nuqs'
-import { useRouter } from 'next/navigation'
-import { Clock, MessageCircle, Github, Search, Filter, List, BotMessageSquare } from 'lucide-react'
-import { Badge, Button, Input_Shadcn_, cn } from 'ui'
-import { Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { useEffect, useMemo, useState } from 'react'
+import {
+  Badge,
+  Button,
+  cn,
+  Input_Shadcn_,
+  Tabs_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+} from 'ui'
 
 import type { ThreadRow } from '~/types/contribute'
-import { ChannelBadge } from './ChannelBadge'
 import { FilterPopover } from './FilterPopover'
+import { DiscordIcon, GitHubIcon, RedditIcon } from './Icons'
 
 function ThreadsTable({
   threads,
@@ -118,6 +125,11 @@ export function UnansweredThreadsTable({
     }
   }
 
+  function handleClearSearch() {
+    setSearchInput('')
+    setSearch(null)
+  }
+
   // Sync local input with URL state
   useEffect(() => {
     setSearchInput(search || '')
@@ -169,21 +181,36 @@ export function UnansweredThreadsTable({
               value="discord"
               className="gap-2 px-4 data-[state=active]:bg-surface-300 border-none"
             >
-              <BotMessageSquare className="h-4 w-4" />
+              <DiscordIcon
+                className={cn(
+                  'h-4 w-4',
+                  currentTab === 'discord' ? 'text-[#5865F2]' : 'text-foreground-lighter'
+                )}
+              />
               Discord
             </TabsTrigger_Shadcn_>
             <TabsTrigger_Shadcn_
               value="reddit"
               className="gap-2 px-4 data-[state=active]:bg-surface-300 border-none"
             >
-              <MessageCircle className="h-4 w-4" />
+              <RedditIcon
+                className={cn(
+                  'h-4 w-4',
+                  currentTab === 'reddit' ? 'text-[#FF4500]' : 'text-foreground-lighter'
+                )}
+              />
               Reddit
             </TabsTrigger_Shadcn_>
             <TabsTrigger_Shadcn_
               value="github"
               className="gap-2 px-4 data-[state=active]:bg-surface-300 border-none"
             >
-              <Github className="h-4 w-4" />
+              <GitHubIcon
+                className={cn(
+                  'h-4 w-4',
+                  currentTab === 'github' ? 'text-[#181717]' : 'text-foreground-lighter'
+                )}
+              />
               GitHub
             </TabsTrigger_Shadcn_>
           </TabsList_Shadcn_>
@@ -198,8 +225,18 @@ export function UnansweredThreadsTable({
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 onKeyDown={handleSearchKeyDown}
-                className="pl-10"
+                className={cn('pl-10', searchInput && 'pr-10')}
               />
+              {searchInput && (
+                <Button
+                  type="text"
+                  size="tiny"
+                  icon={<X className="h-4 w-4" />}
+                  onClick={handleClearSearch}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                  aria-label="Clear search"
+                />
+              )}
             </form>
 
             {/* Filter Button */}
@@ -241,7 +278,18 @@ function ThreadRow({
   productArea: string | null
   search: string | null
 }) {
-  const [currentProductArea, setProductArea] = useQueryState('product_area', parseAsString)
+  const [currentProductArea, setProductArea] = useQueryState(
+    'product_area',
+    parseAsString.withOptions({
+      shallow: false,
+    })
+  )
+  const [currentStack, setStack] = useQueryState(
+    'stack',
+    parseAsString.withOptions({
+      shallow: false,
+    })
+  )
 
   function handleProductAreaClick(area: string) {
     if (currentProductArea === area) {
@@ -251,21 +299,52 @@ function ThreadRow({
     }
   }
 
+  function handleStackClick(tech: string) {
+    if (currentStack === tech) {
+      setStack(null)
+    } else {
+      setStack(tech)
+    }
+  }
+
   return (
     <tr className="border-b border-border hover:bg-muted/50 transition-colors">
       <td className="py-4 px-6 w-[45%] min-w-[350px]">
-        <div className="flex flex-col gap-1 overflow-hidden">
-          <a
+        <div className="flex items-center gap-3 overflow-hidden">
+          <div className="flex items-center gap-1.5">
+            {thread.channel === 'discord' && (
+              <DiscordIcon
+                className={cn(
+                  'h-4 w-4',
+                  thread.channel === 'discord' ? 'text-[#5865F2]' : 'text-foreground-lighter'
+                )}
+              />
+            )}
+            {thread.channel === 'reddit' && (
+              <RedditIcon
+                className={cn(
+                  'h-4 w-4',
+                  thread.channel === 'reddit' ? 'text-[#FF4500]' : 'text-foreground-lighter'
+                )}
+              />
+            )}
+            {thread.channel === 'github' && (
+              <GitHubIcon
+                className={cn(
+                  'h-4 w-4',
+                  thread.channel === 'github' ? 'text-[#181717]' : 'text-foreground-lighter'
+                )}
+              />
+            )}
+          </div>
+          <Link
             href={thread.external_activity_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-foreground transition-colors truncate"
+            className="text-foreground transition-colors truncate"
           >
             {highlightText(thread.title, search)}
-          </a>
-          <div className="flex items-center gap-1.5">
-            <ChannelBadge channel={thread.channel} />
-          </div>
+          </Link>
         </div>
       </td>
       <td className="py-4 px-6 w-[20%] min-w-[150px]">
@@ -277,14 +356,7 @@ function ThreadRow({
                 const isActive = productArea === area
                 return (
                   <button key={area} onClick={() => handleProductAreaClick(area)} type="button">
-                    <Badge
-                      variant={isActive ? 'default' : 'success'}
-                      className={`cursor-pointer transition-colors ${
-                        isActive ? 'bg-brand-200 text-brand-foreground' : 'hover:bg-muted'
-                      }`}
-                    >
-                      {area}
-                    </Badge>
+                    <Badge variant={isActive ? 'success' : 'default'}>{area}</Badge>
                   </button>
                 )
               })
@@ -298,11 +370,14 @@ function ThreadRow({
           {thread.stack.length > 0 ? (
             thread.stack
               .filter((tech: string) => tech !== 'Other')
-              .map((tech: string) => (
-                <Badge key={tech} variant="default">
-                  {tech}
-                </Badge>
-              ))
+              .map((tech: string) => {
+                const isActive = currentStack === tech
+                return (
+                  <button key={tech} onClick={() => handleStackClick(tech)} type="button">
+                    <Badge variant={isActive ? 'success' : 'default'}>{tech}</Badge>
+                  </button>
+                )
+              })
           ) : (
             <span className="text-xs text-muted-foreground">—</span>
           )}

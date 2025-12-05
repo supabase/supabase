@@ -105,13 +105,6 @@ export async function getUnansweredThreads(
     throw error
   }
 
-  console.log('Query results:', {
-    count: data?.length,
-    search,
-    hasSearch: !!search,
-    sampleSubjects: data?.slice(0, 3).map((t: any) => t.subject),
-  })
-
   const threads = (data ?? []) as Thread[]
   return threads.map(mapThreadRowToThread)
 }

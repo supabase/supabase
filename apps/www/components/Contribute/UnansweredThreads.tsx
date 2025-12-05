@@ -18,7 +18,7 @@ export async function UnansweredThreads({
       getAllProductAreas(),
       getAllStacks(),
     ])
-    //console.log('threads', threads)
+
     return (
       <UnansweredThreadsTable
         threads={threads}
