@@ -49,9 +49,13 @@ curl https://api.supabase.com/v1/projects \
 
 ### Pico compute instance
 
-Pico instance is our newest compute instance and the only one that scales to zero when not used. Only select customers have access to Pico instances.
+<Admonition type='notice' title='Contact us for access to Pico instances'>
+  
+Only select customers have access to Pico instances. Submit this [form](/solutions/ai-builders#talk-to-partnership-team) to get access.
 
-If you want access to Pico instances contact us.
+</Admonition>
+
+Pico instance is our newest compute instance and the only one that scales to zero when not used.
 
 ### Recommended API keys
 
@@ -60,7 +64,13 @@ Management API endpoints:
 - Get the API keys: [`GET /v1/projects/{ref}/api-keys`](https://api.supabase.com/api/v1#tag/secrets/get/v1/projects/{ref}/api-keys)
 - Enable the API keys: [`POST /v1/projects/{ref}/api-keys`](https://api.supabase.com/api/v1#tag/secrets/post/v1/projects/{ref}/api-keys)
 
-We are in the process of migrating away from our legacy API keys `anon` and `service_role` and towards API keys `publishable` and `secret`. You can learn more by navigating to [Upcoming changes to Supabase API Keys #29260](https://github.com/orgs/supabase/discussions/29260).
+<Admonition type='notice'>
+
+We are in the process of migrating away from our legacy API keys `anon` and `service_role` and towards API keys `publishable` and `secret`.
+
+You can learn more by navigating to [Upcoming changes to Supabase API Keys #29260](https://github.com/orgs/supabase/discussions/29260).
+
+</Admonition>
 
 Get the API keys by making a [`GET /v1/projects/{ref}/api-keys`](https://api.supabase.com/api/v1#tag/secrets/get/v1/projects/{ref}/api-keys) request.
 
@@ -102,6 +112,13 @@ curl 'https://api.supabase.com/v1/projects/{ref}/api-keys?reveal=true' \
 
 Management API endpoint: [`PATCH /v1/projects/{ref}/billing/addons`](https://api.supabase.com/api/v1#tag/billing/patch/v1/projects/{ref}/billing/addons)
 
+<Admonition type='notice'>
+
+Once you have access to [Pico instances](#pico-compute-instance), you will no longer be able to upgrade or downgrade to Nano instances.
+
+</Admonition>
+
+
 You can upgrade and downgrade compute sizes by making requests to [`PATCH /v1/projects/{ref}/billing/addons`](https://api.supabase.com/api/v1#tag/billing/patch/v1/projects/{ref}/billing/addons).
 
 ```sh
@@ -114,8 +131,6 @@ curl 'https://api.supabase.com/v1/projects/{ref}/billing/addons' \
     "addon_variant": "ci_small"
   }'
 ```
-
-Once you have access to [Pico instances](#pico-compute-instance), you will no longer be able to upgrade or downgrade to Nano instances.
 
 ## Configuration changes
 
@@ -163,6 +178,12 @@ curl 'https://api.supabase.com/v1/projects/{ref}/branches' \
 
 Management API endpoint: [`POST /v1/projects/{ref}/database/migrations`](https://api.supabase.com/api/v1#tag/database/post/v1/projects/{ref}/database/migrations)
 
+<Admonition type='notice' title='Contact us for access to migrations endpoint'>
+  
+Only select customers have access to database migrations endpoint. Submit this [form](/solutions/ai-builders#talk-to-partnership-team) to get access.
+
+</Admonition>
+
 For this example we will create a todos table using the [`POST /v1/projects/{ref}/database/migrations`](https://api.supabase.com/api/v1#tag/database/post/v1/projects/{ref}/database/migrations) endpoint.
 
 ```sql
@@ -190,6 +211,12 @@ curl https://api.supabase.com/v1/projects/{ref}/database/migrations \
 
 ### Create a restore point
 
+<Admonition type="note" title="Contact us for access to restore points">
+
+Only select customers have access to restore points. Submit this [form](/solutions/ai-builders#talk-to-partnership-team) to get access.
+
+</Admonition>
+
 After every change you make to the database, it's a good idea to create a restore point. This will allow you to roll back the database if you decide to go in a different direction.
 
 Beware that only database changes are captured when creating a restore point.
@@ -204,15 +231,15 @@ curl https://api.supabase.com/v1/projects/{ref}/database/backups/restore-point \
   }'
 ```
 
-<Admonition type="note" title="Contact us for access to restore points">
-
-Restore points are enabled for a select number of customers. Contact us if you'd like access.
-
-</Admonition>
-
 ### Reverting changes
 
 ![Revert](/docs/img/integrations/revert.png)
+
+<Admonition type="note" title="Contact us for access to restore points">
+
+Only select customers have access to restore points. Submit this [form](/solutions/ai-builders#talk-to-partnership-team) to get access.
+
+</Admonition>
 
 After creating restore points, you are able to revert back to any restore point that you want.
 
@@ -347,6 +374,12 @@ curl https://api.supabase.com/v1/projects/database/backups/restore-pitr \
 ## Claim flow
 
 Management API endpoint: [`GET /v1/oauth/authorize/project-claim`](https://api.supabase.com/api/v1#tag/oauth/get/v1/oauth/authorize/project-claim)
+
+<Admonition type="note" title="Contact us for access to claim flow">
+
+Only select customers have access to claim flow. Submit this [form](/solutions/ai-builders#talk-to-partnership-team) to get access.
+
+</Admonition>
 
 Your users may want to claim the project that currently lives in your org so that they can have more control over it.
 
