@@ -37,7 +37,7 @@ export function SuggestionsManager({ projectRef }: { projectRef: string }) {
     <div className="p-6 pt-4 lg:p-12 lg:pt-12 max-w-3xl mx-auto">
       <h2 className="text-base lg:text-xl font-semibold mb-1">Suggestions</h2>
       <p className="text-muted-foreground mb-4 lg:mb-8 text-sm lg:text-base">
-        Improve your project's security and performance.
+        Improve your project&apos;s security and performance.
       </p>
       {isLoading && (
         <div className="space-y-2">

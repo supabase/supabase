@@ -9,9 +9,9 @@ export const generateAuthMenu = (
     authenticationEmails: boolean
     authenticationMultiFactor: boolean
     authenticationAttackProtection: boolean
-    authenticationAdvanced: boolean
     authenticationShowOverview: boolean
     authenticationOauth21: boolean
+    authenticationPerformance: boolean
   }
 ): ProductMenuGroup[] => {
   const {
@@ -20,9 +20,9 @@ export const generateAuthMenu = (
     authenticationEmails,
     authenticationMultiFactor,
     authenticationAttackProtection,
-    authenticationAdvanced,
     authenticationShowOverview,
     authenticationOauth21,
+    authenticationPerformance,
   } = flags ?? {}
 
   return [
@@ -152,12 +152,12 @@ export const generateAuthMenu = (
                 url: `/project/${ref}/auth/audit-logs`,
                 items: [],
               },
-              ...(authenticationAdvanced
+              ...(authenticationPerformance
                 ? [
                     {
-                      name: 'Advanced',
-                      key: 'advanced',
-                      url: `/project/${ref}/auth/advanced`,
+                      name: 'Performance',
+                      key: 'performance',
+                      url: `/project/${ref}/auth/performance`,
                       items: [],
                     },
                   ]

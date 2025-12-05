@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { useOrganizationAcceptInvitationMutation } from 'data/organization-members/organization-invitation-accept-mutation'
 import { useOrganizationInvitationTokenQuery } from 'data/organization-members/organization-invitation-token-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
 import { Button, cn } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
@@ -15,6 +16,8 @@ export const OrganizationInvite = () => {
   const router = useRouter()
   const { profile } = useProfile()
   const { slug, token } = useParams()
+
+  const isSignUpEnabled = useIsFeatureEnabled('dashboard_auth:sign_up')
 
   const {
     data,
@@ -69,16 +72,18 @@ export const OrganizationInvite = () => {
           <Admonition
             showIcon={false}
             type="default"
-            title="Sign in or create an account first to view this invitation"
+            title={`Sign in${isSignUpEnabled ? ' or create an account' : ''} first to view this invitation`}
             className="mb-0 border-0 rounded-none text-left"
           />
           <div className="p-4 border-muted border-t flex gap-x-3 justify-center">
             <Button asChild type="default">
               <Link href={loginRedirectLink}>Sign in</Link>
             </Button>
-            <Button asChild type="default">
-              <Link href={signupRedirectLink}>Create an account</Link>
-            </Button>
+            {isSignUpEnabled && (
+              <Button asChild type="default">
+                <Link href={signupRedirectLink}>Create an account</Link>
+              </Button>
+            )}
           </div>
         </>
       ) : isLoadingInvitation ? (

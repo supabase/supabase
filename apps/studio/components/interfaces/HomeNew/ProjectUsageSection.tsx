@@ -226,8 +226,8 @@ export const ProjectUsageSection = () => {
   const prevTotalRequests = enabledPrev.reduce((sum, s) => sum + (s.total || 0), 0)
 
   const totalRequestsChangePct = computeChangePercent(totalRequests, prevTotalRequests)
-  const totalDeltaClass = totalRequestsChangePct >= 0 ? 'text-brand' : 'text-destructive'
-  const nonSuccessClass = nonSuccessRate > 0 ? 'text-destructive' : 'text-brand'
+  const totalDeltaClass = totalRequestsChangePct >= 0 ? 'text-brand-link' : 'text-destructive'
+  const nonSuccessClass = nonSuccessRate > 0 ? 'text-destructive' : 'text-brand-link'
 
   return (
     <div className="space-y-6">

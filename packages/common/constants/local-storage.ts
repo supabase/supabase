@@ -86,6 +86,9 @@ export const LOCAL_STORAGE_KEYS = {
   // Index Advisor notice dismissed
   INDEX_ADVISOR_NOTICE_DISMISSED: (ref: string) => `index-advisor-notice-dismissed-${ref}`,
 
+  // Observability banner dismissed
+  OBSERVABILITY_BANNER_DISMISSED: (ref: string) => `observability-banner-dismissed-${ref}`,
+
   /**
    * COMMON
    */
