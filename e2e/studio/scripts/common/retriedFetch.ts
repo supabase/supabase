@@ -7,7 +7,7 @@ export default async function retriedFetch(
   retries: number = 3,
   delayBase: number = 200
 ): Promise<Response> {
-  for (let i = 0; i < retries - 1; i++) {
+  for (let i = 0; i < retries; i++) {
     try {
       const res = await timeoutFetch(input, init, timeout)
       if (res.status >= 100 && res.status < 400) {
