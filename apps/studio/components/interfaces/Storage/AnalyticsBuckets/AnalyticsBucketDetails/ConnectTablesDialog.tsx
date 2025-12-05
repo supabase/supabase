@@ -448,7 +448,7 @@ const EnableReplicationDialogContent = ({ onClose }: { onClose: () => void }) =>
       <DialogSection className="flex flex-col gap-y-2 !p-0">
         <Admonition
           type="warning"
-          className="rounded-none border-0 mb-0"
+          className="rounded-none border-0"
           title={
             noAccessToReplication
               ? 'Replication is currently unavailable for your project'
