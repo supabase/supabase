@@ -334,7 +334,7 @@ export const getNoCodeWorkflowSteps = ({
       icon: <Upload strokeWidth={1} className="text-foreground-muted" size={16} />,
       description:
         "Let's add file storage to your app by creating a bucket and uploading your first file from the buckets dashboard.",
-      actions: [{ label: 'Buckets', href: `/project/${ref}/storage/buckets`, variant: 'default' }],
+      actions: [{ label: 'Buckets', href: `/project/${ref}/storage/files`, variant: 'default' }],
     },
     {
       key: 'create-edge-function',

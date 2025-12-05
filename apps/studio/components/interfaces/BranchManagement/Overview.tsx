@@ -23,6 +23,7 @@ import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import type { Branch } from 'data/branches/branches-query'
 import { branchKeys } from 'data/branches/keys'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
@@ -38,7 +39,6 @@ import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { EditBranchModal } from './EditBranchModal'
 import { PreviewBranchesEmptyState } from './EmptyStates'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 interface OverviewProps {
   isGithubConnected: boolean
@@ -71,7 +71,7 @@ export const Overview = ({
   const { data: selectedOrg } = useSelectedOrganizationQuery()
 
   const { hasAccess: hasAccessToPersistentBranching, isLoading: isLoadingEntitlement } =
-    useCheckEntitlements('persistent_branching')
+    useCheckEntitlements('branching_persistent')
 
   return (
     <>
@@ -219,7 +219,7 @@ const PreviewBranchActions = ({
   const isPersistentBranch = branch.persistent
 
   const { hasAccess: hasAccessToPersistentBranching, isLoading: isLoadingEntitlement } =
-    useCheckEntitlements('persistent_branching')
+    useCheckEntitlements('branching_persistent')
 
   const [showConfirmResetModal, setShowConfirmResetModal] = useState(false)
   const [showBranchModeSwitch, setShowBranchModeSwitch] = useState(false)
