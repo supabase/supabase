@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
 import { useVectorBucketDeleteMutation } from 'data/storage/vector-bucket-delete-mutation'
 import { deleteVectorBucketIndex } from 'data/storage/vector-bucket-index-delete-mutation'
 import { useVectorBucketsIndexesQuery } from 'data/storage/vector-buckets-indexes-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { useS3VectorsWrapperInstance } from './useS3VectorsWrapperInstance'
 
 export interface DeleteVectorBucketModalProps {
