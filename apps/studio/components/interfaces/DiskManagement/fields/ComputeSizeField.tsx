@@ -60,7 +60,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
 
   const { hasAccess: entitledUpdateCompute, isLoading: isEntitlementLoading } =
-    useCheckEntitlements(Feature.COMPUTE_UPDATE_AVAILABLE_SIZES)
+    useCheckEntitlements(Feature.INSTANCES_COMPUTE_AVAILABLE_SIZES)
 
   const showComputePrice = useIsFeatureEnabled('project_addons:show_compute_price')
 

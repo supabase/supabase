@@ -67,7 +67,7 @@ export const AuditLogs = () => {
   )
 
   const { hasAccess: hasAccessToAuditLogs, isLoading: isLoadingEntitlements } =
-    useCheckEntitlements(Feature.AUDIT_LOGS_DAYS)
+    useCheckEntitlements(Feature.SECURITY_AUDIT_LOGS_DAYS)
 
   const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
     useOrganizationAuditLogsQuery(

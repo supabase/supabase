@@ -3,9 +3,9 @@ import type { components } from 'api-types'
 export type FeatureKey = components['schemas']['ListEntitlementsResponse']['features'][number]
 
 export const Feature = {
-  COMPUTE_UPDATE_AVAILABLE_SIZES: 'instances.compute_update_available_sizes',
+  INSTANCES_COMPUTE_AVAILABLE_SIZES: 'instances.compute_update_available_sizes',
   STORAGE_MAX_FILE_SIZE: 'storage.max_file_size',
-  AUDIT_LOGS_DAYS: 'security.audit_logs_days',
+  SECURITY_AUDIT_LOGS_DAYS: 'security.audit_logs_days',
   LOG_RETENTION_DAYS: 'log.retention_days',
   CUSTOM_DOMAIN: 'custom_domain',
   IPV4: 'ipv4',
