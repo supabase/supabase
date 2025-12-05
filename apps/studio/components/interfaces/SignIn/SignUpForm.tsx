@@ -97,7 +97,6 @@ export const SignUpForm = () => {
     let redirectTo: string
 
     if (isInsideOAuthFlow) {
-      // &redirect_to=https%3A%2F%2Fsupabase.com%2Fdashboard%2Forg%3FreturnTo%3D%252Forg
       redirectTo = `${redirectUrlBase}/authorize?auth_id=${searchParams.auth_id}${searchParams.token && `&token=${searchParams.token}`}`
     } else {
       // Use getRedirectToPath to handle redirect_to parameter and other query params
