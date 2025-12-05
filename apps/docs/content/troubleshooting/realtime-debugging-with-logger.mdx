@@ -7,7 +7,7 @@ keywords = [ "debug", "logger", "log_level", "troubleshooting", "diagnostics" ]
 database_id = ""
 ---
 
-**What are logger and log_level parameters?**
+## What are logger and log_level parameters?
 
 The Realtime client provides built-in logging to help you debug connection issues, track messages, and understand what's happening with your real-time connections. Two parameters control logging:
 
@@ -22,9 +22,9 @@ By default, logging is disabled. When enabled, you can see:
 - Channel subscriptions
 - Worker events
 
-**How to enable logging in your Realtime client**
+## How to enable logging in your Realtime client
 
-**Basic logging to console:**
+### Basic logging to console
 
 ```tsx
 import { createClient } from '@supabase/supabase-js'
@@ -38,7 +38,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
 })
 ```
 
-**With log levels for server-side filtering:**
+### With log levels for server-side filtering
 
 ```tsx
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
@@ -51,7 +51,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
 })
 ```
 
-**Understanding log messages**
+## Understanding log messages
 
 The logger receives three parameters: `kind`, `msg`, and `data`.
 
@@ -125,7 +125,7 @@ const channel = supabase
 // Or error messages if subscription failed
 ```
 
-**Debug message delivery issues:**
+## Debug message delivery issues
 
 ```tsx
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
