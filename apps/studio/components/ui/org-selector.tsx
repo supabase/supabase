@@ -1,12 +1,11 @@
 import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { parseAsString, useQueryState } from 'nuqs'
 import type { Organization } from 'types'
 import { Badge, Button, Card, CardHeader, CardTitle, Input_Shadcn_ } from 'ui'
 import { ButtonTooltip } from './ButtonTooltip'
@@ -86,7 +85,6 @@ const OrganizationCard = ({
 }
 
 export function OrganizationSelector({ onSelect, maxOrgsToShow = 5 }: ProjectClaimChooseOrgProps) {
-  const router = useRouter()
   const {
     data: organizations = [],
     isPending: isLoadingOrgs,
@@ -107,30 +105,14 @@ export function OrganizationSelector({ onSelect, maxOrgsToShow = 5 }: ProjectCla
     return organizations.filter((org) => org.name.toLowerCase().includes(search.toLowerCase()))
   }, [organizations, search, showAll, maxOrgsToShow])
 
-  const searchParams = useMemo(() => {
-    const searchParams = new URLSearchParams()
+  const searchParams = new URLSearchParams(location.search)
+  let pathname = location.pathname
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH
+  if (basePath) {
+    pathname = pathname.replace(basePath, '')
+  }
 
-    // Add all existing query params from router.query
-    Object.entries(router.query).forEach(([key, value]) => {
-      if (value !== undefined) {
-        if (Array.isArray(value)) {
-          value.forEach((v) => searchParams.append(key, v))
-        } else {
-          searchParams.set(key, value)
-        }
-      }
-    })
-
-    // Add returnTo parameter
-    let pathname = router.pathname
-    const basePath = process.env.NEXT_PUBLIC_BASE_PATH
-    if (basePath) {
-      pathname = pathname.replace(basePath, '')
-    }
-    searchParams.set('returnTo', pathname)
-
-    return searchParams
-  }, [router.pathname, router.query])
+  searchParams.set('returnTo', pathname)
 
   const onSelectOrg = (orgSlug: string) => {
     onSelect(orgSlug)
