@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useBackupRestoreMutation } from 'data/database/backup-restore-mutation'
 import { DatabaseBackup, useBackupsQuery } from 'data/database/backups-query'
 import { useSetProjectStatus } from 'data/projects/project-detail-query'
@@ -57,10 +57,11 @@ export const BackupsList = () => {
     return (
       <UpgradeToPro
         addon="pitr"
-        icon={<Clock size={20} />}
+        source="backups"
+        featureProposition="have up to 7 days of scheduled backups"
+        icon={<Clock size={20} strokeWidth={1.5} />}
         primaryText="Free Plan does not include project backups."
         secondaryText="Upgrade to the Pro Plan for up to 7 days of scheduled backups."
-        source="backups"
       />
     )
   }

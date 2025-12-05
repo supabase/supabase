@@ -1,12 +1,12 @@
+import { AdvisorPanel } from 'components/ui/AdvisorPanel/AdvisorPanel'
+import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
+import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 import { useRegisterSidebar, useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
-import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
-import { AdvisorPanel } from 'components/ui/AdvisorPanel/AdvisorPanel'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 
 export const SIDEBAR_KEYS = {
   AI_ASSISTANT: 'ai-assistant',

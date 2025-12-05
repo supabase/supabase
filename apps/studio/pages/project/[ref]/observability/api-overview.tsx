@@ -20,6 +20,7 @@ import { useApiReport } from 'data/reports/api-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useCallback } from 'react'
 import type { NextPageWithLayout } from 'types'
+import { ObservabilityLink } from 'components/ui/ObservabilityLink'
 
 export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()
@@ -125,7 +126,7 @@ export const ApiReport: NextPageWithLayout = () => {
           params={params.requestsByCountry}
           error={error.requestsByCountry}
           title="Requests by Geography"
-          tooltip="Number of API Gateway requests per country"
+          tooltip="Number of API Gateway requests per geography"
           data={data.requestsByCountry || []}
           renderer={RequestsByCountryMapRenderer}
           contentClassName="p-0 overflow-hidden"
@@ -177,13 +178,16 @@ export const ApiReport: NextPageWithLayout = () => {
           renderer={NetworkTrafficRenderer}
         />
       </ReportStickyNav>
+      <div className="py-8">
+        <ObservabilityLink />
+      </div>
     </ReportPadding>
   )
 }
 
 ApiReport.getLayout = (page) => (
   <DefaultLayout>
-    <ObservabilityLayout>{page}</ObservabilityLayout>
+    <ObservabilityLayout title="API Gateway">{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 

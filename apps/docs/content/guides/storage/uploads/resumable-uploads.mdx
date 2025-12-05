@@ -302,6 +302,12 @@ Uppy has integrations with different frameworks:
 - [Vue](https://uppy.io/docs/vue/)
 - [Angular](https://uppy.io/docs/angular/)
 
+### Presigned uploads
+
+Resumable uploads also supports using signed upload tokens to created time-limited URLs that you can share to your users by invoking the `createSignedUploadUrl` method on the SDK and including the returned token in the `x-signature` header of the resumable upload.
+
+See this [full example using Uppy with signed URLs](https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-signed-uppy) for more context.
+
 ## Overwriting files
 
 When uploading a file to a path that already exists, the default behavior is to return a `400 Asset Already Exists` error.
