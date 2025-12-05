@@ -2420,6 +2420,46 @@ export interface AdvisorAssistantButtonClickedEvent {
 }
 
 /**
+ * User opened the request upgrade modal (for users without billing permissions).
+ *
+ * @group Events
+ * @source studio
+ */
+export interface RequestUpgradeModalOpenedEvent {
+  action: 'request_upgrade_modal_opened'
+  properties: {
+    /** Target plan being requested */
+    requestedPlan: 'Pro' | 'Team' | 'Enterprise'
+    /** Addon being requested, if applicable */
+    addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+    /** Current organization plan */
+    currentPlan?: string
+    /** Feature context driving the upgrade request */
+    featureProposition?: string
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User submitted a request upgrade form to billing owners.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface RequestUpgradeSubmittedEvent {
+  action: 'request_upgrade_submitted'
+  properties: {
+    /** Target plan being requested */
+    requestedPlan: 'Pro' | 'Team' | 'Enterprise'
+    /** Addon being requested, if applicable */
+    addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+    /** Current organization plan */
+    currentPlan?: string
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2554,3 +2594,5 @@ export type TelemetryEvent =
   | LogDrainConfirmButtonSubmittedEvent
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
+  | RequestUpgradeModalOpenedEvent
+  | RequestUpgradeSubmittedEvent
