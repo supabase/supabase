@@ -434,7 +434,7 @@ export const RequestsByCountryMapRenderer = (
   }
 
   return (
-    <div ref={containerRef} className="w-full h-[560px] relative border-t">
+    <div ref={containerRef} className="w-full h-[420px] relative border-t">
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{ scale: 155 }}
