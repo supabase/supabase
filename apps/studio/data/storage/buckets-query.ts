@@ -24,6 +24,26 @@ export type Bucket = components['schemas']['StorageBucketResponse']
 
 export type BucketType = Bucket['type']
 
+type GetBucketParams = {
+  projectRef?: string
+  bucketId?: string
+}
+
+async function getBucket({ projectRef, bucketId }: GetBucketParams, signal?: AbortSignal) {
+  if (!projectRef) throw new Error('projectRef is required')
+  if (!bucketId) throw new Error('bucketId is required')
+
+  const { data, error } = await get('/platform/storage/{ref}/buckets/{id}', {
+    params: {
+      path: { ref: projectRef, id: bucketId },
+    },
+    signal,
+  })
+
+  if (error) handleError(error)
+  return data
+}
+
 export async function getBuckets({ projectRef }: BucketsVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
 
@@ -90,9 +110,26 @@ const getBucketsPaginated = async (
   return data
 }
 
+type BucketData = Awaited<ReturnType<typeof getBucket>>
 export type BucketsData = Awaited<ReturnType<typeof getBuckets>>
 export type BucketsWithPaginationData = Awaited<ReturnType<typeof getBucketsPaginated>>
 export type BucketsError = ResponseError
+
+const useBucketQuery = <TData = BucketData>(
+  { projectRef, bucketId }: GetBucketParams,
+  { enabled = true, ...options }: UseCustomQueryOptions<BucketData, BucketsError, TData>
+) => {
+  const { data: project } = useSelectedProjectQuery()
+  const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+
+  return useQuery<BucketData, BucketsError, TData>({
+    queryKey: storageKeys.bucket(projectRef, bucketId),
+    queryFn: ({ signal }) => getBucket({ projectRef, bucketId }, signal),
+    enabled: enabled && !!bucketId && isActive,
+    ...options,
+    retry: shouldRetryBucketsQuery,
+  })
+}
 
 export const useBucketsQuery = <TData = BucketsData>(
   { projectRef }: BucketsVariables,
@@ -146,37 +183,32 @@ export const usePaginatedBucketsQuery = <TData = BucketsWithPaginationData>(
  * Tries to get the bucket info from the cache first. If not found, fetches
  * from remote by name.
  */
-export const useBucketInfoQueryPreferCached = (bucketName?: string, projectRef?: string) => {
+export const useBucketInfoQueryPreferCached = (bucketId?: string, projectRef?: string) => {
   const queryClient = useQueryClient()
 
   const cachedBucketInfo = useMemo(() => {
-    if (!bucketName) return undefined
+    if (!bucketId) return undefined
 
     const bucketsPages = queryClient.getQueryData(storageKeys.bucketsList(projectRef)) as
       | UseInfiniteQueryResult<Bucket[]>['data']
       | undefined
     const buckets = bucketsPages?.pages.flatMap((page) => page) ?? []
-    return buckets.find((b) => b.name === bucketName)
-  }, [bucketName, projectRef, queryClient])
+    return buckets.find((b) => b.name === bucketId)
+  }, [bucketId, projectRef, queryClient])
 
-  const shouldFetchBucketInfo = !!bucketName && !cachedBucketInfo
-  const { data: remoteBucketsPages } = usePaginatedBucketsQuery(
+  const shouldFetchBucketInfo = !!bucketId && !cachedBucketInfo
+  const { data: remoteBucketInfo } = useBucketQuery(
     {
       projectRef,
-      search: bucketName,
-      // Sort by name so exact matches appear first
-      sortColumn: 'name',
+      bucketId,
     },
     {
       enabled: shouldFetchBucketInfo,
     }
   )
 
-  if (!bucketName) return undefined
-  if (cachedBucketInfo) return cachedBucketInfo
-
-  const remoteBuckets = remoteBucketsPages?.pages.flatMap((page) => page) ?? []
-  return remoteBuckets.find((b) => b.name === bucketName)
+  if (!bucketId) return undefined
+  return cachedBucketInfo ?? remoteBucketInfo
 }
 
 const shouldRetryBucketsQuery = (failureCount: number, error: unknown) => {
