@@ -150,11 +150,10 @@ export function LogDrains({
                     <div className="flex items-center gap-2">
                       {(() => {
                         const typeMeta = LOG_DRAIN_TYPES.find((t) => t.value === drain.type)
-                        if (!typeMeta?.icon || !React.isValidElement(typeMeta.icon)) return null
-                        return React.cloneElement(typeMeta.icon, {
-                          width: 16,
-                          height: 16,
-                        })
+                        if (!typeMeta?.icon) return null
+                        return (
+                          <span className="h-4 w-4 text-foreground-light">{typeMeta.icon}</span>
+                        )
                       })()}
                       <span className="truncate max-w-40">
                         {LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.name ?? drain.type}
