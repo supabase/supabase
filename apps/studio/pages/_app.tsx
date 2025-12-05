@@ -139,12 +139,12 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         __html: `:root{--font-custom:${customFont.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
                       }}
                     />
-                    {/* Speed up initial API loading times by preconnecting to domain */}
+                    {/* Speed up initial API loading times by pre-connecting to the API domain */}
                     {IS_PLATFORM && (
                       <link
                         rel="preconnect"
                         href={new URL(API_URL).origin}
-                        crossOrigin="anonymous"
+                        crossOrigin="use-credentials"
                       />
                     )}
                   </Head>
