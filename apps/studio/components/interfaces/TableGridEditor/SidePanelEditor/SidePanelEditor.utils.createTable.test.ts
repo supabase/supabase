@@ -86,16 +86,13 @@ describe('createTable', () => {
   }
 
   const mockTableResult = {
-    failedPolicies: [],
-    table: {
-      id: 123,
-      name: 'test_table',
-      schema: 'public',
-      comment: 'A test table',
-      columns: [],
-      primary_keys: [],
-      relationships: [],
-    },
+    id: 123,
+    name: 'test_table',
+    schema: 'public',
+    comment: 'A test table',
+    columns: [],
+    primary_keys: [],
+    relationships: [],
   }
 
   beforeEach(() => {
@@ -160,11 +157,14 @@ describe('createTable', () => {
       expect.objectContaining({
         projectRef,
         connectionString,
-        id: mockTableResult.table.id,
+        id: mockTableResult.id,
       })
     )
 
-    expect(result).toStrictEqual(mockTableResult)
+    expect(result).toStrictEqual({
+      failedPolicies: [],
+      table: mockTableResult,
+    })
   })
 
   it('should create a table with RLS enabled', async () => {
@@ -359,7 +359,10 @@ describe('createTable', () => {
       isRLSEnabled: false,
     })
 
-    expect(result).toStrictEqual(mockTableResult)
+    expect(result).toStrictEqual({
+      failedPolicies: [],
+      table: mockTableResult,
+    })
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       'Failed to track table creation event:',
       expect.any(Error)
