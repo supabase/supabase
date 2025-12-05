@@ -40,6 +40,7 @@ export interface ColumnHeaderProps<R> extends RenderHeaderCellProps<R> {
   columnType: ColumnType
   isPrimaryKey: boolean | undefined
   isEncrypted: boolean | undefined
+  isIndexed: boolean | undefined
   format: string
   foreignKey?: GridForeignKey
 }

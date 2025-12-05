@@ -1,5 +1,5 @@
 import type { XYCoord } from 'dnd-core'
-import { ArrowRight, Key, Link, Lock } from 'lucide-react'
+import { ArrowRight, Key, Link, ListOrdered, Lock } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 
@@ -15,6 +15,7 @@ export function ColumnHeader<R>({
   columnType,
   isPrimaryKey,
   isEncrypted,
+  isIndexed,
   format,
   foreignKey,
 }: ColumnHeaderProps<R>) {
@@ -141,6 +142,16 @@ export function ColumnHeader<R>({
               </TooltipTrigger>
               <TooltipContent side="bottom" className="font-normal">
                 Encrypted column
+              </TooltipContent>
+            </Tooltip>
+          )}
+          {isIndexed && (
+            <Tooltip>
+              <TooltipTrigger>
+                <ListOrdered size={14} strokeWidth={2} />
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="font-normal">
+                This column has an index
               </TooltipContent>
             </Tooltip>
           )}

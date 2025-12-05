@@ -14,6 +14,7 @@ export interface SupaColumn {
   readonly isNullable?: boolean
   readonly isUpdatable?: boolean
   readonly isEncrypted?: boolean
+  readonly isIndexed?: boolean
   readonly foreignKey?: GridForeignKey
   position: number
 }
