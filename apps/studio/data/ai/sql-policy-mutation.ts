@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import type { CreatePolicyBody } from 'data/database-policies/database-policy-create-mutation'
 import { fetchPost } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
-import type { ResponseError } from 'types'
+import { ResponseError } from 'types'
 
 export type SqlPolicyGenerateVariables = {
   tableName: string
@@ -45,7 +45,7 @@ export async function generateSqlPolicy({
     message,
   })
 
-  if ('error' in result) throw result.error
+  if ('error' in result) throw new ResponseError((result.error as any).message, 400)
   return result as SqlPolicyGenerateResponse
 }
 

@@ -504,7 +504,7 @@ export const SidePanelEditor = ({
       if (action === 'create') {
         toastId = toast.loading(`Creating new table: ${payload.name}...`)
 
-        const table = await createTable({
+        const { table, failedPolicies } = await createTable({
           projectRef: project?.ref!,
           connectionString: project?.connectionString,
           toastId,
@@ -530,7 +530,23 @@ export const SidePanelEditor = ({
         ])
 
         // Show success toast after everything is complete
-        toast.success(`Table ${table.name} is good to go!`, { id: toastId })
+        if (failedPolicies.length > 0) {
+          toast.success(
+            `Table ${table.name} is created successfully, but we ran into issues creating ${failedPolicies.length} policie${failedPolicies.length > 1 ? 's' : ''}`,
+            {
+              id: toastId,
+              description: (
+                <ul className="list-disc pl-6">
+                  {failedPolicies.map((x) => (
+                    <li key={x.name}>{x.name}</li>
+                  ))}
+                </ul>
+              ),
+            }
+          )
+        } else {
+          toast.success(`Table ${table.name} is good to go!`, { id: toastId })
+        }
 
         onTableCreated(table)
       } else if (action === 'duplicate' && !!selectedTable) {

@@ -6,6 +6,7 @@ import {
   generateStartingPoliciesForTable,
 } from 'components/interfaces/Auth/Policies/Policies.utils'
 import { AIOptInModal } from 'components/ui/AIAssistantPanel/AIOptInModal'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   ForeignKeyConstraint,
   useForeignKeyConstraintsQuery,
@@ -189,19 +190,29 @@ export const PolicyListEmptyState = ({
                 <p className="text-sm text-foreground-lighter">{description}</p>
               </div>
               <div className="flex items-center gap-2">
-                <Button
+                <ButtonTooltip
                   type="default"
                   size="tiny"
                   onClick={handleGeneratePolicies}
                   loading={isGenerating}
-                  disabled={isGenerating || !isRLSEnabled}
+                  disabled={isGenerating || !isRLSEnabled || !tableName || columns.length === 0}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: !tableName
+                        ? 'Provide a name for your table first before generating policies'
+                        : columns.length === 0
+                          ? 'Create at least one column first before generating policies'
+                          : undefined,
+                    },
+                  }}
                 >
                   {isGenerating
                     ? 'Generating policies...'
                     : generateFailed
                       ? 'Try generating again'
                       : 'Generate policies'}
-                </Button>
+                </ButtonTooltip>
                 {showPermissionButton && (
                   <Button
                     type="default"

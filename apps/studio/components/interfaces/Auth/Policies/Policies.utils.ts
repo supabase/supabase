@@ -373,9 +373,7 @@ export const generateAiPoliciesForTable = async ({
   projectRef: string
   connectionString?: string | null
 }): Promise<GeneratedPolicy[]> => {
-  if (!connectionString) {
-    return []
-  }
+  if (!connectionString) return []
 
   try {
     const aiPolicies = await generateSqlPolicy({
@@ -388,7 +386,7 @@ export const generateAiPoliciesForTable = async ({
     // AI response now includes all structured fields
     return aiPolicies as GeneratedPolicy[]
   } catch (error) {
-    console.error('AI policy generation failed:', error)
+    console.log('AI policy generation failed:', error)
     return []
   }
 }

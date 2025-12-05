@@ -542,7 +542,9 @@ export const TableEditor = ({
         </>
       )}
 
-      {generatePoliciesEnabled && (
+      {/* [Joshen] Temporarily hide this section if duplicating, as we aren't duplicating policies atm when duplicating tables */}
+      {/* We should do this thought, but let's do this in another PR as the current one is already quite big */}
+      {generatePoliciesEnabled && !isDuplicating && (
         <>
           <SidePanel.Separator />
           <SidePanel.Content className="space-y-10 py-6">

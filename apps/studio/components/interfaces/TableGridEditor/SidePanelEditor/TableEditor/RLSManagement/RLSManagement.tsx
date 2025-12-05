@@ -48,7 +48,11 @@ export const RLSManagement = ({
   const schema = table?.schema ?? selectedSchema
 
   const isExistingTable = !!table && !isNewRecord && !isDuplicating
-  const disablePoliciesList = isExistingTable && !isRLSEnabled
+  const generatedPoliciesTargetTable = generatedPolicies[0]?.table
+  const policiesNotRelevantDueToTableNameChange =
+    isNewRecord && tableName !== generatedPoliciesTargetTable
+  const disablePoliciesList =
+    (isExistingTable && !isRLSEnabled) || policiesNotRelevantDueToTableNameChange
 
   const { data: policies } = useDatabasePoliciesQuery(
     {
@@ -128,6 +132,33 @@ export const RLSManagement = ({
         )}
       </div>
 
+      {generatedPolicies.length > 0 && policiesNotRelevantDueToTableNameChange && (
+        <Admonition
+          type="warning"
+          title="Update generated policies with new table name"
+          description={`These policies were previously generated for the table name "${generatedPoliciesTargetTable}"`}
+          actions={
+            <Button
+              type="default"
+              className="w-min mt-3"
+              onClick={() => {
+                const updatedPolicies = generatedPolicies.map((policy) => {
+                  return {
+                    ...policy,
+                    table: tableName,
+                    name: policy.name.replaceAll(generatedPoliciesTargetTable, tableName),
+                    sql: policy.sql.replaceAll(generatedPoliciesTargetTable, tableName),
+                  }
+                })
+                onGeneratedPoliciesChange?.(updatedPolicies)
+              }}
+            >
+              Update policies
+            </Button>
+          }
+        />
+      )}
+
       <Admonition
         // [Joshen] Using CSS to determine visibility here as the onSuccess within ToggleRLSButton doesn't get triggered
         // if we dynamically render this component, since this admonition gets unmounted from the DOM once RLS is updated
@@ -152,7 +183,9 @@ export const RLSManagement = ({
           isNewRecord={isNewRecord}
           isDuplicating={isDuplicating}
           isRLSEnabled={isRLSEnabled}
-          onGeneratedPoliciesChange={onGeneratedPoliciesChange}
+          onGeneratedPoliciesChange={(policies) => {
+            onGeneratedPoliciesChange?.(policies)
+          }}
         />
       ) : (
         <PolicyList

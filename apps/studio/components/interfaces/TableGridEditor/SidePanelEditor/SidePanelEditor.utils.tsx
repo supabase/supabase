@@ -592,11 +592,14 @@ export const createTable = async ({
   // 6. Create generated RLS policies if any
   // [Joshen] Possible area for optimization to create all policies in a single query call
   // Can be subsequently added to the table creation SQL as well for a single transaction
+
+  const failedPolicies: GeneratedPolicy[] = []
   if (generatedPolicies.length > 0 && isRLSEnabled) {
+    toast.loading(`Creating ${generatedPolicies.length} policies for table...`, { id: toastId })
     await Promise.all(
       generatedPolicies.map(async (policy) => {
         try {
-          await createDatabasePolicy({
+          return await createDatabasePolicy({
             projectRef,
             connectionString,
             payload: {
@@ -611,12 +614,11 @@ export const createTable = async ({
             },
           })
         } catch (error: any) {
-          // Continue to show table creation success even if policy creation fails
-          console.error(`Failed to create policy "${policy.name}":`, error)
+          console.error('Failed to generate policy', error.message)
+          failedPolicies.push(policy)
         }
       })
     )
-    // Track successful policy creation
     onCreatePoliciesSuccess?.()
   }
 
@@ -719,7 +721,6 @@ export const createTable = async ({
                 type="horizontal"
                 barClass="bg-brand"
                 labelBottom={`Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`}
-                labelBottomClass=""
                 labelTop={`${progress.toFixed(2)}%`}
                 labelTopClass="tabular-nums"
               />
@@ -759,7 +760,7 @@ export const createTable = async ({
   })
 
   // Finally, return the created table
-  return table
+  return { table, failedPolicies }
 }
 
 /** TODO: Refactor to do in a single transaction */
