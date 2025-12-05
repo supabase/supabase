@@ -1,16 +1,18 @@
-<Accordion
-  type="default"
-  openBehaviour="multiple"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6 [&>div]:space-y-4"
->
+<div className="not-prose my-6">
+  <Accordion
+    type="default"
+    openBehaviour="multiple"
+    chevronAlign="right"
+    justified
+    size="medium"
+    className="rounded-lg border border-foreground/10 bg-surface-100 text-foreground-light [&>div]:space-y-4"
+  >
 
-<AccordionItem
-header={<span className="text-foreground">What you can do with the Metrics API</span>}
-id="how-do-i-check-when-a-user-went-through-mfa"
->
+  <AccordionItem
+    header={<span className="text-foreground font-medium">What you can do with the Metrics API</span>}
+    id="how-do-i-check-when-a-user-went-through-mfa"
+    className="border-0 px-6 py-4"
+  >
 
 Every Supabase project exposes a metrics feed at `https://<project-ref>.supabase.co/customer/v1/privileged/metrics`. Replace `<project-ref>` with the identifier from your project URL or from the dashboard sidebar.
 
@@ -45,6 +47,7 @@ curl -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
     "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys?reveal=true"
 ```
 
-</AccordionItem>
+  </AccordionItem>
 
-</Accordion>
+  </Accordion>
+</div>
