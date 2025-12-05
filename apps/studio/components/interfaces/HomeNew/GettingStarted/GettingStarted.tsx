@@ -1,8 +1,9 @@
-import { BASE_PATH } from 'lib/constants'
 import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+
+import { BASE_PATH } from 'lib/constants'
 import { Badge, Button, Card, CardContent, cn, IconDiscord } from 'ui'
 import { GettingStartedAction, GettingStartedStep } from './GettingStarted.types'
 
