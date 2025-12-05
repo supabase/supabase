@@ -22,6 +22,7 @@ export interface AdmonitionProps {
   }
   layout?: 'horizontal' | 'vertical'
   actions?: ReactNode
+  icon?: ReactNode
 }
 
 const admonitionToAlertMapping: Record<
@@ -104,6 +105,7 @@ export const Admonition = forwardRef<
       layout = 'vertical',
       actions,
       childProps = {},
+      icon,
       ...props
     },
     ref
@@ -122,7 +124,9 @@ export const Admonition = forwardRef<
           props.className
         )}
       >
-        {(showIcon && typeMapped === 'warning') || typeMapped === 'destructive' ? (
+        {!!icon ? (
+          icon
+        ) : (showIcon && typeMapped === 'warning') || typeMapped === 'destructive' ? (
           <WarningIcon />
         ) : showIcon ? (
           <InfoIcon />

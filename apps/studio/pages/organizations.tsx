@@ -15,14 +15,8 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { withAuth } from 'hooks/misc/withAuth'
 import type { NextPageWithLayout } from 'types'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  CriticalIcon,
-  Skeleton,
-} from 'ui'
+import { Button, Skeleton } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 const OrganizationsPage: NextPageWithLayout = () => {
@@ -44,64 +38,58 @@ const OrganizationsPage: NextPageWithLayout = () => {
     <ScaffoldContainer>
       <ScaffoldSection isFullWidth className="flex flex-col gap-y-4">
         {orgNotFound && (
-          <Alert_Shadcn_ variant="destructive">
-            <CriticalIcon />
-            <AlertTitle_Shadcn_>Organization not found</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              That organization (<code>{orgSlug}</code>) does not exist or you don't have access to
-              it.
-            </AlertDescription_Shadcn_>
-            <AlertDescription_Shadcn_ className="mt-3">
-              If you think this is an error, please reach out to the org owner to get access.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+          <Admonition
+            type="destructive"
+            title="Organization not found"
+            description={
+              <>
+                The organization <code className="text-code-inline">{orgSlug}</code> does not exist
+                or you do not have permission to access to it. Contact the the owner if you believe
+                this is a mistake.
+              </>
+            }
+          />
         )}
 
-        {organizations.length === 0 && orgNotFound && <NoOrganizationsState />}
+        {organizations.length > 0 && (
+          <div className="flex items-center justify-between gap-x-2 md:gap-x-3">
+            <Input
+              size="tiny"
+              placeholder="Search for an organization"
+              icon={<Search />}
+              className="w-full flex-1 md:w-64"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
 
-        {isLoading ? (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <Skeleton className="h-[70px] rounded-md" />
-            <Skeleton className="h-[70px] rounded-md" />
-            <Skeleton className="h-[70px] rounded-md" />
-          </div>
-        ) : isError ? (
-          <AlertError error={error} subject="Failed to load organizations" />
-        ) : isSuccess && organizations.length === 0 && !orgNotFound ? (
-          <NoOrganizationsState />
-        ) : (
-          <>
-            <div className="flex items-center justify-between gap-x-2 md:gap-x-3">
-              {organizations.length > 0 && (
-                <Input
-                  size="tiny"
-                  placeholder="Search for an organization"
-                  icon={<Search />}
-                  className="w-full flex-1 md:w-64"
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                />
-              )}
-
-              {organizationCreationEnabled && organizations.length > 0 && (
-                <Button asChild icon={<Plus />} type="primary" className="w-min">
-                  <Link href={`/new`}>New organization</Link>
-                </Button>
-              )}
-            </div>
-
-            {search.length > 0 && filteredOrganizations.length === 0 && (
-              <NoSearchResults searchString={search} />
+            {organizationCreationEnabled && (
+              <Button asChild icon={<Plus />} type="primary" className="w-min">
+                <Link href={`/new`}>New organization</Link>
+              </Button>
             )}
-
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {isSuccess &&
-                filteredOrganizations.map((org) => (
-                  <OrganizationCard key={org.id} organization={org} />
-                ))}
-            </div>
-          </>
+          </div>
         )}
+
+        {isSuccess && organizations.length === 0 && !isError && <NoOrganizationsState />}
+
+        {search.length > 0 && filteredOrganizations.length === 0 && (
+          <NoSearchResults searchString={search} />
+        )}
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {isLoading && (
+            <>
+              <Skeleton className="h-[70px] rounded-md" />
+              <Skeleton className="h-[70px] rounded-md" />
+              <Skeleton className="h-[70px] rounded-md" />
+            </>
+          )}
+          {isError && <AlertError error={error} subject="Failed to load organizations" />}
+          {isSuccess &&
+            filteredOrganizations.map((org) => (
+              <OrganizationCard key={org.id} organization={org} />
+            ))}
+        </div>
       </ScaffoldSection>
     </ScaffoldContainer>
   )

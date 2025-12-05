@@ -5186,7 +5186,13 @@ export interface components {
         value: string
       }
       /** @enum {string} */
-      tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | 'tier_enterprise'
+      tier:
+        | 'tier_free'
+        | 'tier_pro'
+        | 'tier_payg'
+        | 'tier_team'
+        | 'tier_enterprise'
+        | 'tier_platform'
     }
     CreateOrganizationResponse:
       | {
@@ -5204,7 +5210,7 @@ export interface components {
           organization_requires_mfa: boolean
           plan: {
             /** @enum {string} */
-            id: 'free' | 'pro' | 'team' | 'enterprise'
+            id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
             name: string
           }
           restriction_data: {
@@ -5974,11 +5980,11 @@ export interface components {
     }
     DiskAutoscaleConfig: {
       /** @description Growth percentage for disk autoscaling */
-      growth_percent?: number | null
+      growth_percent: number | null
       /** @description Maximum limit the disk size will grow to in GB */
-      max_size_gb?: number | null
+      max_size_gb: number | null
       /** @description Minimum increment size for disk autoscaling in GB */
-      min_increment_gb?: number | null
+      min_increment_gb: number | null
     }
     DiskRequestBody: {
       attributes:
@@ -6510,7 +6516,7 @@ export interface components {
       payment_method_type: string
       plan: {
         /** @enum {string} */
-        id: 'free' | 'pro' | 'team' | 'enterprise'
+        id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
         name: string
       }
       project_addons: {
@@ -6571,7 +6577,7 @@ export interface components {
         /** Format: date-time */
         at: string
         /** @enum {string} */
-        target_plan: 'free' | 'pro' | 'team' | 'enterprise'
+        target_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
         usage_billing_enabled: boolean
       } | null
       usage_billing_enabled: boolean
@@ -7471,7 +7477,7 @@ export interface components {
       organization_requires_mfa: boolean
       plan: {
         /** @enum {string} */
-        id: 'free' | 'pro' | 'team' | 'enterprise'
+        id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
         name: string
       }
       restriction_data: {
@@ -7532,48 +7538,9 @@ export interface components {
       opt_in_tags: string[]
       plan: {
         /** @enum {string} */
-        id: 'free' | 'pro' | 'team' | 'enterprise'
+        id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
         name: string
       }
-      projects: {
-        cloud_provider: string
-        disk_volume_size_gb?: number
-        engine?: string
-        id: number
-        /** @enum {string} */
-        infra_compute_size?:
-          | 'pico'
-          | 'nano'
-          | 'micro'
-          | 'small'
-          | 'medium'
-          | 'large'
-          | 'xlarge'
-          | '2xlarge'
-          | '4xlarge'
-          | '8xlarge'
-          | '12xlarge'
-          | '16xlarge'
-          | '24xlarge'
-          | '24xlarge_optimized_memory'
-          | '24xlarge_optimized_cpu'
-          | '24xlarge_high_memory'
-          | '48xlarge'
-          | '48xlarge_optimized_memory'
-          | '48xlarge_optimized_cpu'
-          | '48xlarge_high_memory'
-        inserted_at: string | null
-        is_branch_enabled: boolean
-        is_physical_backups_enabled: boolean | null
-        name: string
-        organization_id: number
-        organization_slug: string
-        preview_branch_refs: string[]
-        ref: string
-        region: string
-        status: string
-        subscription_id: string | null
-      }[]
       restriction_data: {
         [key: string]: unknown
       } | null
@@ -7641,6 +7608,10 @@ export interface components {
           | 'PITR_28'
           | 'IPV4'
           | 'LOG_DRAIN'
+          | 'LOG_INGESTION'
+          | 'LOG_QUERYING'
+          | 'LOG_STORAGE'
+          | 'ACTIVE_COMPUTE_HOURS'
         usage: number
         usage_original: number
       }[]
@@ -7701,6 +7672,10 @@ export interface components {
           | 'PITR_28'
           | 'IPV4'
           | 'LOG_DRAIN'
+          | 'LOG_INGESTION'
+          | 'LOG_QUERYING'
+          | 'LOG_STORAGE'
+          | 'ACTIVE_COMPUTE_HOURS'
         pricing_free_units?: number
         pricing_package_price?: number
         pricing_package_size?: number
@@ -7779,7 +7754,7 @@ export interface components {
         /** @enum {string} */
         effective_at?: 'now' | 'end_of_billing_period' | 'none'
         /** @enum {string} */
-        id: 'free' | 'pro' | 'team' | 'enterprise'
+        id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
         is_current: boolean
         name: string
         price: number
@@ -8045,9 +8020,9 @@ export interface components {
         name: string
       }[]
       /** @enum {string} */
-      source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise'
+      source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
       /** @enum {string|null} */
-      target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | null
+      target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | 'platform' | null
       valid: boolean
       warnings: {
         key: string
@@ -9616,6 +9591,10 @@ export interface components {
           | 'PITR_28'
           | 'IPV4'
           | 'LOG_DRAIN'
+          | 'LOG_INGESTION'
+          | 'LOG_QUERYING'
+          | 'LOG_STORAGE'
+          | 'ACTIVE_COMPUTE_HOURS'
         usage_original?: number
       }[]
       subscription_id: string
@@ -10541,7 +10520,13 @@ export interface components {
         value: string
       }
       /** @enum {string} */
-      tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | 'tier_enterprise'
+      tier:
+        | 'tier_free'
+        | 'tier_pro'
+        | 'tier_payg'
+        | 'tier_team'
+        | 'tier_enterprise'
+        | 'tier_platform'
     }
     UpdateSubscriptionResponse: {
       pending_payment_intent_secret: string | null

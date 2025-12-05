@@ -21,7 +21,6 @@ import { QueryPerformanceFilterBar } from '../QueryPerformanceFilterBar'
 import { QueryPerformanceGrid } from '../QueryPerformanceGrid'
 import { transformStatementDataToRows } from './WithStatements.utils'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
-import { IndexAdvisorNotice } from '../IndexAdvisor/IndexAdvisorNotice'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface WithStatementsProps {
@@ -68,7 +67,6 @@ export const WithStatements = ({
 
   return (
     <>
-      <IndexAdvisorNotice />
       <QueryPerformanceMetrics />
       <QueryPerformanceFilterBar
         showRolesFilter={true}
