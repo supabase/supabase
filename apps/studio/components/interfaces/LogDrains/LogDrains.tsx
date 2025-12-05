@@ -57,6 +57,7 @@ export function LogDrains({
     }
   )
   const sentryEnabled = useFlag('SentryLogDrain')
+  const axiomEnabled = useFlag('axiomLogDrain')
   const hasLogDrains = !!logDrains?.length
 
   const { mutate: deleteLogDrain } = useDeleteLogDrainMutation({
@@ -87,7 +88,11 @@ export function LogDrains({
     return (
       <>
         <div className="grid lg:grid-cols-2 gap-4">
-          {LOG_DRAIN_TYPES.filter((t) => t.value !== 'sentry' || sentryEnabled).map((src) => (
+          {LOG_DRAIN_TYPES.filter((t) => {
+            if (t.value === 'sentry') return sentryEnabled
+            if (t.value === 'axiom') return axiomEnabled
+            return true
+          }).map((src) => (
             <LogDrainsCard
               key={src.value}
               title={src.name}
@@ -143,13 +148,16 @@ export function LogDrains({
                   </TableCell>
                   <TableCell className="text-foreground-light">
                     <div className="flex items-center gap-2">
-                      {React.cloneElement(
-                        LOG_DRAIN_TYPES.find((t) => t.value === drain.type)
-                          ?.icon as React.ReactElement,
-                        { width: 16, height: 16 }
-                      )}
+                      {(() => {
+                        const typeMeta = LOG_DRAIN_TYPES.find((t) => t.value === drain.type)
+                        if (!typeMeta?.icon || !React.isValidElement(typeMeta.icon)) return null
+                        return React.cloneElement(typeMeta.icon, {
+                          width: 16,
+                          height: 16,
+                        })
+                      })()}
                       <span className="truncate max-w-40">
-                        {LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.name}
+                        {LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.name ?? drain.type}
                       </span>
                     </div>
                   </TableCell>
