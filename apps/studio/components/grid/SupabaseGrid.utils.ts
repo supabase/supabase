@@ -4,7 +4,7 @@ import { useEffect, useMemo } from 'react'
 import { CalculatedColumn, CellKeyboardEvent } from 'react-data-grid'
 
 import type { Filter, SavedState } from 'components/grid/types'
-import { Entity, isTableLike } from 'data/table-editor/table-editor-types'
+import { TableEditorEntity, isTableLike, Entity } from 'data/table-editor/table-editor-types'
 import { copyToClipboard } from 'ui'
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
@@ -64,7 +64,7 @@ export function filtersToUrlParams(filters: Filter[]) {
   })
 }
 
-export function parseSupaTable(table: Entity): SupaTable {
+export function parseSupaTable(table: TableEditorEntity | Entity): SupaTable {
   const columns = table.columns
   const primaryKeys = isTableLike(table) ? table.primary_keys : []
   const relationships = isTableLike(table) ? table.relationships : []
@@ -83,6 +83,9 @@ export function parseSupaTable(table: Entity): SupaTable {
       isUpdatable: column.is_updatable,
       enum: column.enums,
       comment: column.comment,
+
+      // Custom columns that need to be typechecked
+      isIndexed: undefined as boolean | undefined,
       foreignKey: {
         targetTableSchema: null as string | null,
         targetTableName: null as string | null,
@@ -93,6 +96,10 @@ export function parseSupaTable(table: Entity): SupaTable {
     }
     const primaryKey = primaryKeys.find((pk) => pk.name == column.name)
     temp.isPrimaryKey = !!primaryKey
+
+    if ('is_indexed' in column) {
+      temp.isIndexed = column.is_indexed
+    }
 
     const relationship = relationships.find((relation) => {
       return (
