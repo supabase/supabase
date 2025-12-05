@@ -292,6 +292,7 @@ allow_list = [
     "RedwoodJS",
     "Refine",
     "Roboflow",
+    "SaaS",
     "SDKs",
     "SQLAlchemy",
     "SQLModel",
