@@ -14,7 +14,6 @@ import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderC
 import ButtonCard from '~/components/ButtonCard'
 import { Extensions } from '~/components/Extensions'
 import { JwtGenerator } from '~/components/JwtGenerator'
-import { MetricsAccessSection } from '~/components/MetricsAccessSection'
 import { MetricsStackCards } from '~/components/MetricsStackCards'
 import { NavData } from '~/components/NavData'
 import { Price } from '~/components/Price'
@@ -57,7 +56,6 @@ const components = {
   JwtGenerator,
   Link,
   McpConfigPanel,
-  MetricsAccessSection,
   MetricsStackCards,
   NamedCodeBlock,
   NavData,
