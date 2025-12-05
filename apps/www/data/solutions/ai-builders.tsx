@@ -44,7 +44,7 @@ const data: {
       },
       {
         label: 'Build your integration',
-        href: '/solutions/ai-builders#talk-to-partnership-team',
+        href: '/solutions/ai-builders#talk-to-partnerships-team',
         type: 'default' as any,
       },
     ],
