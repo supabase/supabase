@@ -148,13 +148,11 @@ export function LogDrains({
                   </TableCell>
                   <TableCell className="text-foreground-light">
                     <div className="flex items-center gap-2">
-                      {(() => {
-                        const typeMeta = LOG_DRAIN_TYPES.find((t) => t.value === drain.type)
-                        if (!typeMeta?.icon) return null
-                        return (
-                          <span className="h-4 w-4 text-foreground-light">{typeMeta.icon}</span>
-                        )
-                      })()}
+                      {LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.icon && (
+                        <span className="h-4 w-4 text-foreground-light">
+                          {LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.icon}
+                        </span>
+                      )}
                       <span className="truncate max-w-40">
                         {LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.name ?? drain.type}
                       </span>
