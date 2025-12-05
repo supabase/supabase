@@ -488,6 +488,7 @@ export const UsersV2 = () => {
                 icon={<WandSparklesIcon />}
                 onClick={() => setShowCreateIndexesModal(true)}
                 loading={isUpdatingAuthConfig}
+                type="default"
               >
                 Create indexes
               </Button>
