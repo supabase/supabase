@@ -10,14 +10,17 @@ export type AWSAccountDeleteVariables = {
 }
 
 export async function deleteAWSAccount({ projectRef, awsAccountId }: AWSAccountDeleteVariables) {
-  const { data, error } = await del('/platform/projects/{ref}/privatelink/associations/aws-account/{aws_account_id}', {
-    params: {
-      path: { 
-        ref: projectRef,
-        aws_account_id: awsAccountId,
+  const { data, error } = await del(
+    '/platform/projects/{ref}/privatelink/associations/aws-account/{aws_account_id}',
+    {
+      params: {
+        path: {
+          ref: projectRef,
+          aws_account_id: awsAccountId,
+        },
       },
-    },
-  })
+    }
+  )
 
   if (error) handleError(error)
   return data

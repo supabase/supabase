@@ -4,7 +4,13 @@ import { Badge } from 'ui'
 interface AWSPrivateLinkAccountItemProps {
   aws_account_id: string
   account_name?: string
-  status: 'CREATING' | 'READY' | 'ASSOCIATION_REQUEST_EXPIRED' | 'ASSOCIATION_ACCEPTED' | 'CREATION_FAILED' | 'DELETING'
+  status:
+    | 'CREATING'
+    | 'READY'
+    | 'ASSOCIATION_REQUEST_EXPIRED'
+    | 'ASSOCIATION_ACCEPTED'
+    | 'CREATION_FAILED'
+    | 'DELETING'
   shared_at: string | null
   onClick: () => void
   onDelete: () => void

@@ -24,7 +24,7 @@ const AWSPrivateLinkSection = () => {
   const { data: accounts } = useAWSAccountsQuery({ projectRef: project?.ref })
   const { mutate: deleteAccount } = useAWSAccountDeleteMutation()
 
-  const isTeamsOrEnterpriseAndUp = 
+  const isTeamsOrEnterpriseAndUp =
     organization?.plan?.id === 'enterprise' || organization?.plan?.id === 'team'
   const promptPlanUpgrade = IS_PLATFORM && !isTeamsOrEnterpriseAndUp
 

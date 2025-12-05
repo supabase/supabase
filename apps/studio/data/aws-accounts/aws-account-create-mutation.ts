@@ -15,15 +15,18 @@ export async function createAWSAccount({
   awsAccountId,
   accountName,
 }: AWSAccountCreateVariables) {
-  const { data, error } = await post('/platform/projects/{ref}/privatelink/associations/aws-account', {
-    params: {
-      path: { ref: projectRef },
-    },
-    body: {
-      aws_account_id: awsAccountId,
-      account_name: accountName,
-    },
-  })
+  const { data, error } = await post(
+    '/platform/projects/{ref}/privatelink/associations/aws-account',
+    {
+      params: {
+        path: { ref: projectRef },
+      },
+      body: {
+        aws_account_id: awsAccountId,
+        account_name: accountName,
+      },
+    }
+  )
 
   if (error) handleError(error)
   return data
