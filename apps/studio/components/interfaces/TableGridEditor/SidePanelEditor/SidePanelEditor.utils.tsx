@@ -515,7 +515,7 @@ export const createTable = async ({
   importContent?: ImportContent
   organizationSlug?: string
   generatedPolicies?: GeneratedPolicy[]
-  onCreatePoliciesSuccess: () => void
+  onCreatePoliciesSuccess?: () => void
 }) => {
   const queryClient = getQueryClient()
 
@@ -617,7 +617,7 @@ export const createTable = async ({
       })
     )
     // Track successful policy creation
-    onCreatePoliciesSuccess()
+    onCreatePoliciesSuccess?.()
   }
 
   // Track table creation event (fire-and-forget to avoid blocking)
