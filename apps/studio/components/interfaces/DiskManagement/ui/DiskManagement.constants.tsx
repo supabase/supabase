@@ -57,6 +57,7 @@ export const PLAN_DETAILS: Record<PlanId, PlanDetails> = {
   pro: { includedDiskGB: { gp3: 8, io2: 0 } },
   team: { includedDiskGB: { gp3: 8, io2: 0 } },
   enterprise: { includedDiskGB: { gp3: 8, io2: 0 } },
+  platform: { includedDiskGB: { gp3: 8, io2: 0 } },
 }
 
 export const COMPUTE_BASELINE_IOPS = {

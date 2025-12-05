@@ -63,6 +63,7 @@
     "next-mdx-remote": "^4.4.1",
     "next-seo": "^6.5.0",
     "next-themes": "^0.3.0",
+    "nuqs": "^2.8.1",
     "openai": "^4.75.1",
     "parse-numeric-range": "^1.3.0",
     "react": "catalog:",

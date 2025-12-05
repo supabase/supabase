@@ -25,7 +25,7 @@ import ChartHandler from 'components/ui/Charts/ChartHandler'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { LazyComposedChartHandler } from 'components/ui/Charts/ComposedChartHandler'
 import { ReportSettings } from 'components/ui/Charts/ReportSettings'
-import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
+import { ObservabilityLink } from 'components/ui/ObservabilityLink'
 import Panel from 'components/ui/Panel'
 import { analyticsKeys } from 'data/analytics/keys'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
@@ -204,7 +204,6 @@ const DatabaseUsage = () => {
   return (
     <>
       <ReportHeader showDatabaseSelector title="Database" />
-      <GrafanaPromoBanner />
       <ReportStickyNav
         content={
           <>
@@ -414,6 +413,9 @@ const DatabaseUsage = () => {
           hideModal={setshowIncreaseDiskSizeModal}
         />
       </section>
+      <div className="py-8">
+        <ObservabilityLink />
+      </div>
     </>
   )
 }

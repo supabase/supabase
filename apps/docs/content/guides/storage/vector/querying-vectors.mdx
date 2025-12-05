@@ -253,12 +253,12 @@ if (!error) {
 
 ```sql
 -- Retrieve specific vectors by key
-SELECT
+select
   key,
   data as embedding,
   metadata
-FROM s3_vectors.documents_openai
-WHERE key IN ('doc-1', 'doc-2', 'doc-3');
+from s3_vectors.documents_openai
+where key in ('doc-1', 'doc-2', 'doc-3');
 ```
 
 </TabPanel>
@@ -308,14 +308,12 @@ do {
 
 ```sql
 -- List all vectors with pagination
-SELECT
+select
   key,
   metadata
-FROM s3_vectors.documents_openai
-ORDER BY key ASC
-LIMIT 100
-OFFSET 0;
-
+from s3_vectors.documents_openai
+order by key asc
+limit 100 offset 0;
 -- To paginate, increase OFFSET for next page:
 -- OFFSET 100 for page 2, OFFSET 200 for page 3, etc.
 ```
