@@ -1036,7 +1036,7 @@ describe('SupportFormPage', () => {
     renderSupportFormPage()
 
     await waitFor(() => {
-      expect(screen.getByText('Try the AI Assistant')).toBeInTheDocument()
+      expect(screen.getByText('Try Supabase Assistant')).toBeInTheDocument()
     })
   })
 

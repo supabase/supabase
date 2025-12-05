@@ -11,3 +11,20 @@
       'branching    pricing      postgres';
   }
 }
+
+.features-grid-extended {
+  grid-template-areas:
+    'postgres            mgmt-api'
+    'pricing             branching'
+    'project-claim-flow  platform-kit'
+    'pico-instances      pico-instances';
+}
+
+@media (min-width: 1280px) {
+  .features-grid-extended {
+    grid-template-areas:
+      'postgres     mgmt-api            mgmt-api'
+      'pricing      branching           project-claim-flow'
+      'platform-kit pico-instances      pico-instances';
+  }
+}
