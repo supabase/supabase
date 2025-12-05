@@ -86,13 +86,16 @@ describe('createTable', () => {
   }
 
   const mockTableResult = {
-    id: 123,
-    name: 'test_table',
-    schema: 'public',
-    comment: 'A test table',
-    columns: [],
-    primary_keys: [],
-    relationships: [],
+    failedPolicies: [],
+    table: {
+      id: 123,
+      name: 'test_table',
+      schema: 'public',
+      comment: 'A test table',
+      columns: [],
+      primary_keys: [],
+      relationships: [],
+    },
   }
 
   beforeEach(() => {
