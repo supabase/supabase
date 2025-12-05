@@ -351,7 +351,7 @@ export const StorageSettings = () => {
                                   <p>
                                     Remove or decrease the limit on{' '}
                                     <InlineLink
-                                      href={`/project/${projectRef}/storage/buckets/${affectedBuckets[0]}`}
+                                      href={`/project/${projectRef}/storage/files/buckets/${affectedBuckets[0]}`}
                                       className="text-destructive decoration-destructive-500 hover:decoration-destructive"
                                     >
                                       {affectedBuckets[0]}
@@ -382,7 +382,7 @@ export const StorageSettings = () => {
                                                     className="hover:underline underline-offset-2"
                                                   >
                                                     <Link
-                                                      href={`/project/${projectRef}/storage/buckets/${name}`}
+                                                      href={`/project/${projectRef}/storage/files/buckets/${name}`}
                                                     >
                                                       {bucket?.name} ({formattedLimit.value}
                                                       {formattedLimit.unit})
