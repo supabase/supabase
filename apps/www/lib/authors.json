@@ -741,11 +741,41 @@
     "author_image_url": "/images/avatars/seth-kramer.jpeg"
   },
   {
+    "author_id": "cemal_kilic",
+    "author": "Cemal Kılıç",
+    "username": "cemalkilic",
+    "position": "Engineering",
+    "author_url": "https://github.com/cemalkilic",
+    "author_image_url": "https://github.com/cemalkilic.png"
+  },
+  {
     "author_id": "riccardo_busetti",
     "author": "Riccardo Busetti",
     "username": "iambriccardo",
     "position": "Engineering",
     "author_url": "https://github.com/iambriccardo",
     "author_image_url": "https://github.com/iambriccardo.png"
+  },
+  {
+    "author_id": "fady",
+    "author": "Fady Abdelmalik",
+    "position": "Engineering",
+    "author_url": "https://github.com/issuedat",
+    "author_image_url": "https://github.com/issuedat.png"
+  },
+  {
+    "author_id": "danny",
+    "author": "Danny White",
+    "position": "Product Design",
+    "author_url": "https://github.com/dnywh",
+    "author_image_url": "https://github.com/dnywh.png"
+  },
+  {
+    "author_id": "matt_rossman",
+    "author": "Matt Rossman",
+    "username": "mattrossman",
+    "position": "Engineering",
+    "author_url": "https://twitter.com/the_ross_man",
+    "author_image_url": "https://github.com/mattrossman.png"
   }
 ]

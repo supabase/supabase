@@ -52,8 +52,10 @@ export const AddHookDropdown = ({
   const nonEnterpriseHookOptions = hooks.filter((h) => !isValidHook(h) && !h.enterprise)
   const enterpriseHookOptions = hooks.filter((h) => !isValidHook(h) && h.enterprise)
 
-  const isTeamsOrEnterprisePlan =
-    organization?.plan.id === 'team' || organization?.plan.id === 'enterprise'
+  const hasAccessToAdvancedHooks =
+    organization?.plan.id === 'team' ||
+    organization?.plan.id === 'enterprise' ||
+    organization?.plan.id === 'platform'
 
   if (!canUpdateAuthHook) {
     return (
@@ -87,7 +89,7 @@ export const AddHookDropdown = ({
 
         <DropdownMenuSeparator />
 
-        {!isTeamsOrEnterprisePlan && (
+        {!hasAccessToAdvancedHooks && (
           <DropdownMenuLabel className="grid gap-1 bg-surface-200">
             <p className="text-foreground-light">Team or Enterprise Plan required</p>
             <p className="text-foreground-lighter text-xs">
@@ -97,10 +99,10 @@ export const AddHookDropdown = ({
           </DropdownMenuLabel>
         )}
         {enterpriseHookOptions.map((h) =>
-          isTeamsOrEnterprisePlan ? (
+          hasAccessToAdvancedHooks ? (
             <DropdownMenuItem
               key={h.title}
-              disabled={!isTeamsOrEnterprisePlan}
+              disabled={!hasAccessToAdvancedHooks}
               className=""
               onClick={() => onSelectHook(h.title)}
             >
@@ -109,7 +111,7 @@ export const AddHookDropdown = ({
           ) : (
             <DropdownMenuItem
               key={h.title}
-              disabled={!isTeamsOrEnterprisePlan}
+              disabled={!hasAccessToAdvancedHooks}
               onClick={() => onSelectHook(h.title)}
             >
               {h.title}
