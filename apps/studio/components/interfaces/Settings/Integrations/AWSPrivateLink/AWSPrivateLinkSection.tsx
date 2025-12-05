@@ -13,6 +13,7 @@ import { useAWSAccountsQuery } from 'data/aws-accounts/aws-accounts-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
+import { toast } from 'sonner'
 import { Button, Card, CardContent, cn } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
@@ -23,15 +24,22 @@ export const AWSPrivateLinkSection = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const { data: accounts } = useAWSAccountsQuery({ projectRef: project?.ref })
-  const { mutate: deleteAccount } = useAWSAccountDeleteMutation()
-
-  const isTeamsOrEnterpriseAndUp =
-    organization?.plan?.id === 'enterprise' || organization?.plan?.id === 'team'
-  const promptPlanUpgrade = IS_PLATFORM && !isTeamsOrEnterpriseAndUp
 
   const [selectedAccount, setSelectedAccount] = useState<any>(null)
   const [showForm, setShowForm] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+
+  const { mutate: deleteAccount, isPending: isDeleting } = useAWSAccountDeleteMutation({
+    onSuccess: () => {
+      toast.success('Account will be deleted shortly')
+      setShowDeleteModal(false)
+      setSelectedAccount(null)
+    },
+  })
+
+  const isTeamsOrEnterpriseAndUp =
+    organization?.plan?.id === 'enterprise' || organization?.plan?.id === 'team'
+  const promptPlanUpgrade = IS_PLATFORM && !isTeamsOrEnterpriseAndUp
 
   const onAddAccount = () => {
     setSelectedAccount(null)
@@ -52,8 +60,6 @@ export const AWSPrivateLinkSection = () => {
     if (selectedAccount && project) {
       deleteAccount({ projectRef: project.ref, awsAccountId: selectedAccount.aws_account_id })
     }
-    setShowDeleteModal(false)
-    setSelectedAccount(null)
   }
 
   return (
@@ -121,6 +127,7 @@ export const AWSPrivateLinkSection = () => {
         visible={showDeleteModal}
         title="Confirm to delete AWS Account"
         confirmLabel="Delete"
+        loading={isDeleting}
         onCancel={() => setShowDeleteModal(false)}
         onConfirm={onConfirmDelete}
       >
