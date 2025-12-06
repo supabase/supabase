@@ -16,6 +16,8 @@ export interface AlertErrorProps {
   error?: { message: string } | null
   className?: string
   showIcon?: boolean
+  showInstructions?: boolean
+  showErrorPrefix?: boolean
   additionalActions?: React.ReactNode
 }
 
@@ -27,6 +29,8 @@ export const AlertError = ({
   error,
   className,
   showIcon = true,
+  showInstructions = true,
+  showErrorPrefix = true,
   children,
   additionalActions,
 }: PropsWithChildren<AlertErrorProps>) => {
@@ -39,12 +43,19 @@ export const AlertError = ({
       {showIcon && <WarningIcon className="h-4 w-4" strokeWidth={2} />}
       <AlertTitle_Shadcn_ className="text-foreground">{subject}</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_ className="flex flex-col gap-3 break-words">
-        <div>
-          {error?.message && <p className="text-left">Error: {formattedErrorMessage}</p>}
-          <p className="text-left">
-            Try refreshing your browser, but if the issue persists for more than a few minutes,
-            please reach out to us via support.
-          </p>
+        <div className="space-y-2">
+          {error?.message && (
+            <p className="text-left">
+              {showErrorPrefix && 'Error: '}
+              {formattedErrorMessage}
+            </p>
+          )}
+          {showInstructions && (
+            <p className="text-left">
+              Try refreshing your browser, but if the issue persists for more than a few minutes,
+              please reach out to us via support.
+            </p>
+          )}
         </div>
         {children}
         <div className="flex gap-2">
