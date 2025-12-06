@@ -72255,7 +72255,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Perform a function call."
+          "shortText": "Perform a function call.",
+          "examples": [
+            {
+              "id": "example-1",
+              "name": "Example 1",
+              "code": "\`\`\`ts\\n// For cross-schema functions where type inference fails, use overrideTypes:\\nconst { data } = await supabase\\n  .schema('schema_b')\\n  .rpc('function_a', {})\\n  .overrideTypes<{ id: string; user_id: string }[]>()\\n\`\`\`"
+            }
+          ]
         }
       },
       "@supabase/postgrest-js.PostgrestClient.schema": {
@@ -88122,7 +88129,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             },
             "isOptional": true,
             "comment": {
-              "shortText": "Optional file upload options including cacheControl and contentType."
+              "shortText": "HTTP headers (cacheControl, contentType, etc.).\\n**Note:** The \`upsert\` option has no effect here. To enable upsert behavior,\\npass \`{ upsert: true }\` when calling \`createSignedUploadUrl()\` instead."
             }
           }
         ],
