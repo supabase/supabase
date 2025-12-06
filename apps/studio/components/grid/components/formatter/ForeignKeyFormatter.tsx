@@ -23,7 +23,7 @@ export const ForeignKeyFormatter = (props: Props) => {
   const { tableId, row, column } = props
   const { data: project } = useSelectedProjectQuery()
 
-  const { data, isLoading } = useTableEditorQuery({
+  const { data, isPending: isLoading } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id: tableId,
@@ -38,7 +38,7 @@ export const ForeignKeyFormatter = (props: Props) => {
       r.source_column_name === column.name
   )
 
-  const { data: targetTable, isLoading: isLoadingTargetTable } = useTableQuery<PostgresTable>(
+  const { data: targetTable, isPending: isLoadingTargetTable } = useTableQuery<PostgresTable>(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,

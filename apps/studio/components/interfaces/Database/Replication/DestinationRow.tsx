@@ -60,7 +60,7 @@ export const DestinationRow = ({
   const {
     data: pipelineStatusData,
     error: pipelineStatusError,
-    isLoading: isPipelineStatusLoading,
+    isPending: isPipelineStatusLoading,
     isError: isPipelineStatusError,
     isSuccess: isPipelineStatusSuccess,
   } = useReplicationPipelineStatusQuery(

@@ -23,11 +23,11 @@ import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DataPoint } from 'data/analytics/constants'
+import { mapMultiResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
 import {
   InfraMonitoringAttribute,
   useInfraMonitoringAttributesQuery,
 } from 'data/analytics/infra-monitoring-query'
-import { mapMultiResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
@@ -62,7 +62,7 @@ export const InfrastructureActivity = () => {
   const state = useDatabaseSelectorStateSnapshot()
   const [dateRange, setDateRange] = useState<any>()
 
-  const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
+  const { data: subscription, isPending: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: organization?.slug,
   })
   const isFreePlan = organization?.plan?.id === 'free'
@@ -153,7 +153,7 @@ export const InfrastructureActivity = () => {
     }
   }
 
-  const { data: infraMonitoringData, isLoading: isLoadingInfraData } =
+  const { data: infraMonitoringData, isPending: isLoadingInfraData } =
     useInfraMonitoringAttributesQuery({
       projectRef,
       attributes: INFRA_ATTRIBUTES,

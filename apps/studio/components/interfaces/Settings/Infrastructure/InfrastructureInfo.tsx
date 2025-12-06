@@ -42,7 +42,7 @@ const InfrastructureInfo = () => {
   const {
     data,
     error,
-    isLoading: isLoadingUpgradeEligibility,
+    isPending: isLoadingUpgradeEligibility,
     isError: isErrorUpgradeEligibility,
     isSuccess: isSuccessUpgradeEligibility,
   } = useProjectUpgradeEligibilityQuery({
@@ -52,7 +52,7 @@ const InfrastructureInfo = () => {
   const {
     data: serviceVersions,
     error: serviceVersionsError,
-    isLoading: isLoadingServiceVersions,
+    isPending: isLoadingServiceVersions,
     isError: isErrorServiceVersions,
     isSuccess: isSuccessServiceVersions,
   } = useProjectServiceVersionsQuery({ projectRef: ref })

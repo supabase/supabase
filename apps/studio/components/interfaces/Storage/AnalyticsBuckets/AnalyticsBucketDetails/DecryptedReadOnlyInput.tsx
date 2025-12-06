@@ -24,7 +24,7 @@ export const DecryptedReadOnlyInput = ({
   const { data: project } = useSelectedProjectQuery()
   const [showHidden, setShowHidden] = useState(false)
 
-  const { data: decryptedValue, isLoading: isDecryptedValueLoading } =
+  const { data: decryptedValue, isPending: isDecryptedValueLoading } =
     useVaultSecretDecryptedValueQuery(
       {
         projectRef: project?.ref,

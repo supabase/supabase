@@ -42,7 +42,7 @@ const CostControl = ({}: CostControlProps) => {
   const {
     data: subscription,
     error,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
   } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: canReadSubscriptions })

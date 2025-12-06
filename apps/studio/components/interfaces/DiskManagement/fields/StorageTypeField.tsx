@@ -38,7 +38,7 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
 
   const isIo2Supported = IO2_AVAILABLE_REGIONS.includes(project?.region ?? '')
 
-  const { isLoading, error, isError } = useDiskAttributesQuery({ projectRef })
+  const { isPending: isLoading, error, isError } = useDiskAttributesQuery({ projectRef })
 
   return (
     <FormField_Shadcn_

@@ -30,7 +30,7 @@ export const OrganizationDropdown = () => {
   const router = useRouter()
   const { slug: routeSlug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
+  const { data: organizations, isPending: isLoadingOrganizations } = useOrganizationsQuery()
 
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
 

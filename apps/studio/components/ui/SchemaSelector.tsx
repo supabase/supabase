@@ -60,7 +60,7 @@ const SchemaSelector = ({
   const { data: project } = useSelectedProjectQuery()
   const {
     data,
-    isLoading: isSchemasLoading,
+    isPending: isSchemasLoading,
     isSuccess: isSchemasSuccess,
     isError: isSchemasError,
     error: schemasError,

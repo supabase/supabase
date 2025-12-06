@@ -97,7 +97,7 @@ export const TableList = ({
     data: tables,
     error: tablesError,
     isError: isErrorTables,
-    isLoading: isLoadingTables,
+    isPending: isLoadingTables,
     isSuccess: isSuccessTables,
   } = useTablesQuery(
     {
@@ -120,7 +120,7 @@ export const TableList = ({
     data: views,
     error: viewsError,
     isError: isErrorViews,
-    isLoading: isLoadingViews,
+    isPending: isLoadingViews,
     isSuccess: isSuccessViews,
   } = useViewsQuery(
     {
@@ -141,7 +141,7 @@ export const TableList = ({
     data: materializedViews,
     error: materializedViewsError,
     isError: isErrorMaterializedViews,
-    isLoading: isLoadingMaterializedViews,
+    isPending: isLoadingMaterializedViews,
     isSuccess: isSuccessMaterializedViews,
   } = useMaterializedViewsQuery(
     {
@@ -164,7 +164,7 @@ export const TableList = ({
     data: foreignTables,
     error: foreignTablesError,
     isError: isErrorForeignTables,
-    isLoading: isLoadingForeignTables,
+    isPending: isLoadingForeignTables,
     isSuccess: isSuccessForeignTables,
   } = useForeignTablesQuery(
     {

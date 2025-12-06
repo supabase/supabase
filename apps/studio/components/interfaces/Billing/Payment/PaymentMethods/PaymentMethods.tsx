@@ -40,7 +40,7 @@ const PaymentMethods = () => {
   const {
     data: paymentMethods,
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useOrganizationPaymentMethodsQuery({ slug })

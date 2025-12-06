@@ -67,7 +67,7 @@ const useLogsQuery = (
   const {
     data,
     error: rqError,
-    isLoading,
+    isPending: isLoading,
     isRefetching,
     refetch,
   } = useQuery({

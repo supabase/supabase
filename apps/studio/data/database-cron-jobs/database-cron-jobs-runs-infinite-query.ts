@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { last } from 'lodash'
 
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -59,9 +59,15 @@ export const useCronJobRunsInfiniteQuery = <TData = DatabaseCronJobRunData>(
   {
     enabled = true,
     ...options
-  }: UseCustomInfiniteQueryOptions<DatabaseCronJobRunData, DatabaseCronJobError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<
+    DatabaseCronJobRunData,
+    DatabaseCronJobError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    string | undefined
+  > = {}
 ) =>
-  useInfiniteQuery<DatabaseCronJobRunData, DatabaseCronJobError, TData>({
+  useInfiniteQuery({
     queryKey: databaseCronJobsKeys.runsInfinite(projectRef, jobId, { status }),
     queryFn: ({ pageParam }) => {
       return getDatabaseCronJobRuns({
@@ -73,7 +79,7 @@ export const useCronJobRunsInfiniteQuery = <TData = DatabaseCronJobRunData>(
     },
     staleTime: 0,
     enabled: enabled && typeof projectRef !== 'undefined',
-
+    initialPageParam: undefined,
     getNextPageParam(lastPage) {
       const hasNextPage = lastPage.length <= CRON_JOB_RUNS_PAGE_SIZE
       if (!hasNextPage) return undefined

@@ -137,7 +137,7 @@ export const CreateBranchModal = () => {
   const {
     data: connections,
     error: connectionsError,
-    isLoading: isLoadingConnections,
+    isPending: isLoadingConnections,
     isSuccess: isSuccessConnections,
     isError: isErrorConnections,
   } = useGitHubConnectionsQuery(
@@ -159,7 +159,7 @@ export const CreateBranchModal = () => {
 
   const {
     data: disk,
-    isLoading: isLoadingDiskAttr,
+    isPending: isLoadingDiskAttr,
     isError: isErrorDiskAttr,
   } = useDiskAttributesQuery({ projectRef }, { enabled: showCreateBranchModal && withData })
   const projectDiskAttributes = disk?.attributes ?? {

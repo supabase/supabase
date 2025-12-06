@@ -56,7 +56,7 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
   const { mutate: sendEvent } = useSendEventMutation()
 
   const debouncedSearch = useDebounce(search, 300)
-  const { data, isLoading } = useContentQuery({
+  const { data, isPending: isLoading } = useContentQuery({
     projectRef,
     type: 'sql',
     name: debouncedSearch.length === 0 ? undefined : debouncedSearch,

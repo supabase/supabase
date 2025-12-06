@@ -35,7 +35,7 @@ export const LangSelector = ({
   const { ref: projectRef } = useParams()
 
   const { canReadAPIKeys } = useApiKeysVisibility()
-  const { data: apiKeys = [], isLoading: isLoadingAPIKeys } = useAPIKeysQuery(
+  const { data: apiKeys = [], isPending: isLoadingAPIKeys } = useAPIKeysQuery(
     {
       projectRef,
       reveal: false,

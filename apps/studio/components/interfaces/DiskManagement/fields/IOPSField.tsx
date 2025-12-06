@@ -31,7 +31,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
   const watchedComputeSize = watch('computeSize')
   const watchedIOPS = watch('provisionedIOPS') ?? 0
 
-  const { isLoading, error, isError } = useDiskAttributesQuery({ projectRef })
+  const { isPending: isLoading, error, isError } = useDiskAttributesQuery({ projectRef })
 
   const iopsPrice = calculateIOPSPrice({
     oldStorageType: formState.defaultValues?.storageType as DiskType,

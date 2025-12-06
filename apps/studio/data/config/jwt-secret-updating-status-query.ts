@@ -56,16 +56,17 @@ export const useJwtSecretUpdatingStatusQuery = <TData = JwtSecretUpdatingStatusD
 ) => {
   const client = useQueryClient()
 
-  const query = useQuery<JwtSecretUpdatingStatusData, JwtSecretUpdatingStatusError, TData>({
+  const query = useQuery({
     queryKey: configKeys.jwtSecretUpdatingStatus(projectRef),
     queryFn: ({ signal }) => getJwtSecretUpdatingStatus({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
-    refetchInterval(data) {
+    refetchInterval: (query) => {
+      const data = query.state.data
       if (!data) {
         return false
       }
 
-      const { jwtSecretUpdateStatus } = data as unknown as JwtSecretUpdatingStatusResponse
+      const { jwtSecretUpdateStatus } = data
 
       const interval = jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating ? 1000 : false
 

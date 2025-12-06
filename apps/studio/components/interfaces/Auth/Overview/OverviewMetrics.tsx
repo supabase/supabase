@@ -199,13 +199,13 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
     authSuccessRatePrevious
   )
 
-  const { data: respErrData, isLoading: isLoadingResp } = useQuery({
+  const { data: respErrData, isPending: isLoadingResp } = useQuery({
     queryKey: ['auth-overview', ref, 'top-response-errors'],
     queryFn: () => fetchTopResponseErrors(ref as string),
     enabled: !!ref,
   })
 
-  const { data: codeErrData, isLoading: isLoadingCodes } = useQuery({
+  const { data: codeErrData, isPending: isLoadingCodes } = useQuery({
     queryKey: ['auth-overview', ref, 'top-auth-error-codes'],
     queryFn: () => fetchTopAuthErrorCodes(ref as string),
     enabled: !!ref,

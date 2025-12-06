@@ -62,7 +62,7 @@ export const QueueCreatedAtCell = ({ queue }: QueueCellProps) => (
 export const QueueSizeCell = ({ queue }: QueueCellProps) => {
   const { data: selectedProject } = useSelectedProjectQuery()
 
-  const { data: metrics, isLoading } = useQueuesMetricsQuery(
+  const { data: metrics, isPending: isLoading } = useQueuesMetricsQuery(
     {
       queueName: queue.queue_name,
       projectRef: selectedProject?.ref,

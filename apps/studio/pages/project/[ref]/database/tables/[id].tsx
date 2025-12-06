@@ -23,7 +23,7 @@ const DatabaseTables: NextPageWithLayout = () => {
   const id = _id ? Number(_id) : undefined
 
   const { data: project } = useSelectedProjectQuery()
-  const { data: selectedTable, isLoading } = useTableEditorQuery({
+  const { data: selectedTable, isPending: isLoading } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id,

@@ -20,7 +20,11 @@ export const UserReportPage: NextPageWithLayout = () => {
   const { profile } = useProfile()
   const [showCreateReportModal, setShowCreateReportModal] = useState(false)
 
-  const { isLoading, isSuccess, data } = useContentQuery({
+  const {
+    isPending: isLoading,
+    isSuccess,
+    data,
+  } = useContentQuery({
     projectRef: ref,
     type: 'report',
   })

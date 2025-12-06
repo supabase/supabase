@@ -122,7 +122,7 @@ function SupportFormWrapper({ children }: PropsWithChildren) {
 }
 
 function SupportFormHeader() {
-  const { data, isLoading, isError } = usePlatformStatusQuery()
+  const { data, isPending: isLoading, isError } = usePlatformStatusQuery()
   const isHealthy = data?.isHealthy
 
   return (

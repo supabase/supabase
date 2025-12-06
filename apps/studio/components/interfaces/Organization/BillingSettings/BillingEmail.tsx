@@ -51,7 +51,7 @@ const BillingEmail = () => {
     'organizations'
   )
 
-  const { data: billingCustomer, isLoading: loadingBillingCustomer } =
+  const { data: billingCustomer, isPending: loadingBillingCustomer } =
     useOrganizationCustomerProfileQuery({ slug }, { enabled: canReadBillingEmail })
 
   const form = useForm<z.infer<typeof formSchema>>({

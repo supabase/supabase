@@ -37,7 +37,7 @@ const CodePage = () => {
   })
   const {
     data: functionBody,
-    isLoading: isLoadingFiles,
+    isPending: isLoadingFiles,
     isError: isErrorLoadingFiles,
     isSuccess: isSuccessLoadingFiles,
     error: filesError,

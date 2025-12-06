@@ -54,7 +54,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
   const isOrioleDb = useIsOrioleDb()
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
-  const { isLoading: isLoadingProject } = useSelectedProjectQuery()
+  const { isPending: isLoadingProject } = useSelectedProjectQuery()
 
   const isAws = useIsAwsCloudProvider()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
@@ -78,7 +78,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
     data,
     error,
     refetch: refetchReplicas,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess: isSuccessReplicas,
   } = useReadReplicasQuery({ projectRef })

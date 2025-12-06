@@ -1,14 +1,14 @@
 import dayjs from 'dayjs'
 
-import useDbQuery, { DbQueryHook } from 'hooks/analytics/useDbQuery'
-import useLogsQuery, { LogsQueryHook } from 'hooks/analytics/useLogsQuery'
-import type { BaseQueries, PresetConfig, ReportQuery } from './Reports.types'
 import {
   isUnixMicro,
   unixMicroToIsoTimestamp,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { REPORT_STATUS_CODE_COLORS } from 'data/reports/report.utils'
+import useDbQuery, { DbQueryHook } from 'hooks/analytics/useDbQuery'
+import useLogsQuery, { LogsQueryHook } from 'hooks/analytics/useLogsQuery'
 import { getHttpStatusCodeInfo } from 'lib/http-status-codes'
+import type { BaseQueries, PresetConfig, ReportQuery } from './Reports.types'
 
 /**
  * Converts a query params string to an object

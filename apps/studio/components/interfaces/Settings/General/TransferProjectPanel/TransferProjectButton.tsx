@@ -44,7 +44,7 @@ export const TransferProjectButton = () => {
   const {
     data: transferPreviewData,
     error: transferPreviewError,
-    isLoading: transferPreviewIsLoading,
+    isPending: transferPreviewIsLoading,
   } = useProjectTransferPreviewQuery(
     { projectRef, targetOrganizationSlug: selectedOrg },
     { enabled: !isTransferring && isOpen }

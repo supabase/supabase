@@ -29,7 +29,7 @@ const SSLConfiguration = () => {
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
   const {
     data: sslEnforcementConfiguration,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
   } = useSSLEnforcementQuery({
     projectRef: ref,

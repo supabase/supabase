@@ -104,7 +104,7 @@ const JWTSettings = () => {
     { enabled: canReadAPIKeys }
   )
 
-  const { data: authConfig, isLoading: isLoadingAuthConfig } = useAuthConfigQuery({ projectRef })
+  const { data: authConfig, isPending: isLoadingAuthConfig } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isPending: isUpdatingAuthConfig } =
     useAuthConfigUpdateMutation()
 

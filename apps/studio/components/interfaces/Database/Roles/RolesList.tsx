@@ -40,7 +40,7 @@ export const RolesList = () => {
   })
   const maxConnectionLimit = maxConnData?.maxConnections
 
-  const { data, isLoading } = useDatabaseRolesQuery({
+  const { data, isPending: isLoading } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

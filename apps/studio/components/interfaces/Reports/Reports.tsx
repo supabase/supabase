@@ -61,7 +61,7 @@ const Reports = () => {
 
   const {
     data: userContents,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
   } = useContentQuery({
     projectRef: ref,

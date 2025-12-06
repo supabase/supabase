@@ -34,7 +34,7 @@ export const PublicationsTables = () => {
 
   const {
     data: tablesData = [],
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
     error,

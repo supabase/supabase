@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
 import { get } from 'data/fetchers'
 import { UseCustomInfiniteQueryOptions } from 'types'
@@ -62,13 +62,20 @@ export const useSqlSnippetsQuery = <TData = SqlSnippetsData>(
   {
     enabled = true,
     ...options
-  }: UseCustomInfiniteQueryOptions<SqlSnippetsData, SqlSnippetsError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<
+    SqlSnippetsData,
+    SqlSnippetsError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    string | undefined
+  > = {}
 ) =>
-  useInfiniteQuery<SqlSnippetsData, SqlSnippetsError, TData>({
+  useInfiniteQuery({
     queryKey: contentKeys.sqlSnippets(projectRef, { sort, name, visibility, favorite }),
     queryFn: ({ signal, pageParam: cursor }) =>
       getSqlSnippets({ projectRef, cursor, sort, name, visibility, favorite }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
+    initialPageParam: undefined,
     getNextPageParam(lastPage) {
       return lastPage.cursor
     },

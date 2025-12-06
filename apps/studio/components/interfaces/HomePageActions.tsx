@@ -19,6 +19,7 @@ import {
   ToggleGroupItem,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { keepPreviousData } from '@tanstack/react-query'
 
 interface HomePageActionsProps {
   slug?: string
@@ -49,7 +50,7 @@ export const HomePageActions = ({
       search: search.length === 0 ? search : debouncedSearch,
       statuses: filterStatus,
     },
-    { keepPreviousData: true }
+    { placeholderData: keepPreviousData }
   )
 
   return (

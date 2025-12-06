@@ -43,7 +43,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
   const [defaultSchema, setDefaultSchema] = useState()
   const [fetchingSchemaInfo, setFetchingSchemaInfo] = useState(false)
 
-  const { data: schemas, isLoading: isSchemasLoading } = useSchemasQuery(
+  const { data: schemas, isPending: isSchemasLoading } = useSchemasQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,

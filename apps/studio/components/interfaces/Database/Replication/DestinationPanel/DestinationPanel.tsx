@@ -200,7 +200,7 @@ export const DestinationPanel = ({
     isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
 
   const selectedPublication = publications.find((pub) => pub.name === publicationName)
-  const { data: checkPrimaryKeysExistsData, isLoading: isLoadingCheck } = useCheckPrimaryKeysExists(
+  const { data: checkPrimaryKeysExistsData, isPending: isLoadingCheck } = useCheckPrimaryKeysExists(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,

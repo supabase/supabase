@@ -10,7 +10,7 @@ export const useS3VectorsWrapperExtension = (): {
   state: 'not-found' | 'loading' | 'installed' | 'needs-upgrade' | 'not-installed'
 } => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: extensionsData, isLoading: isExtensionsLoading } = useDatabaseExtensionsQuery({
+  const { data: extensionsData, isPending: isExtensionsLoading } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

@@ -1,6 +1,6 @@
-import { useMemo } from 'react'
 import { useBranchDiffQuery } from 'data/branches/branch-diff-query'
 import { useMigrationsQuery } from 'data/database/migrations-query'
+import { useMemo } from 'react'
 import { useEdgeFunctionsDiff, type EdgeFunctionsDiffResult } from './useEdgeFunctionsDiff'
 
 interface UseBranchMergeDiffProps {
@@ -54,7 +54,7 @@ export const useBranchMergeDiff = ({
   // Get database diff
   const {
     data: diffContent,
-    isLoading: isDatabaseDiffLoading,
+    isPending: isDatabaseDiffLoading,
     isRefetching: isDatabaseDiffRefetching,
     error: databaseDiffError,
     refetch: refetchDatabaseDiff,

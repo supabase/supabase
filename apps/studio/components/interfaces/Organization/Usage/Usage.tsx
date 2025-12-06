@@ -47,7 +47,7 @@ export const Usage = () => {
   const {
     data: subscription,
     error: subscriptionError,
-    isLoading: isLoadingSubscription,
+    isPending: isLoadingSubscription,
     isError: isErrorSubscription,
     isSuccess: isSuccessSubscription,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
@@ -102,7 +102,7 @@ export const Usage = () => {
   const {
     data: orgDailyStats,
     error: orgDailyStatsError,
-    isLoading: isLoadingOrgDailyStats,
+    isPending: isLoadingOrgDailyStats,
     isError: isErrorOrgDailyStats,
   } = useOrgDailyStatsQuery({
     orgSlug: slug,

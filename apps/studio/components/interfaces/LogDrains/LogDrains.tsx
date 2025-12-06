@@ -6,7 +6,7 @@ import { IS_PLATFORM, useFlag, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useTrack } from 'lib/telemetry/track'
 import {
   Button,
@@ -29,7 +29,6 @@ import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { LogDrainsCard } from './LogDrainsCard'
 import { LogDrainsEmpty } from './LogDrainsEmpty'
 import { VoteLink } from './VoteLink'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 export function LogDrains({
   onNewDrainClick,
@@ -46,7 +45,7 @@ export function LogDrains({
   const { ref } = useParams()
   const {
     data: logDrains,
-    isLoading,
+    isPending: isLoading,
     refetch,
     error,
     isError,

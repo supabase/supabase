@@ -5,6 +5,7 @@ import PartnerIcon from 'components/ui/PartnerIcon'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import type { IntegrationName } from 'data/integrations/integrations.types'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { ChevronDown } from 'lucide-react'
 import type { Organization } from 'types'
 import {
   Badge,
@@ -20,7 +21,6 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
-import { ChevronDown } from 'lucide-react'
 
 export interface OrganizationPickerProps {
   integrationName: IntegrationName
@@ -41,7 +41,7 @@ const OrganizationPicker = ({
   const ref = useRef<HTMLButtonElement>(null)
 
   const { data: integrationData } = useIntegrationsQuery()
-  const { data: organizationsData, isLoading: isLoadingOrganization } = useOrganizationsQuery()
+  const { data: organizationsData, isPending: isLoadingOrganization } = useOrganizationsQuery()
 
   const installed = useMemo(
     () =>

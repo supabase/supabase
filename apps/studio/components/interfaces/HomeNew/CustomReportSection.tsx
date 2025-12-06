@@ -39,6 +39,7 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { Dashboards } from 'types'
 import { Button } from 'ui'
 import { Row } from 'ui-patterns'
+import { keepPreviousData } from '@tanstack/react-query'
 
 export function CustomReportSection() {
   const startDate = dayjs().subtract(7, 'day').toISOString()
@@ -56,7 +57,7 @@ export function CustomReportSection() {
 
   const { data: reportsData } = useContentInfiniteQuery(
     { projectRef: ref, type: 'report', name: 'Home', limit: 1 },
-    { keepPreviousData: true }
+    { placeholderData: keepPreviousData }
   )
   const homeReport = reportsData?.pages?.[0]?.content?.[0] as Content | undefined
   const reportContent = homeReport?.content as Dashboards.Content | undefined

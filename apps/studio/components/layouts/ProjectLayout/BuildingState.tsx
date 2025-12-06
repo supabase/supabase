@@ -35,7 +35,8 @@ const BuildingState = () => {
     { projectRef: ref },
     {
       enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
-      refetchInterval: (data) => {
+      refetchInterval: (query) => {
+        const data = query.state.data
         return data?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
       },
     }

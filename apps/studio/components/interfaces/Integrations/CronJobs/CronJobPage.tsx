@@ -36,7 +36,7 @@ export const CronJobPage = () => {
 
   const jobId = Number(childId)
 
-  const { data: job, isLoading } = useCronJobQuery({
+  const { data: job, isPending: isLoading } = useCronJobQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id: jobId,

@@ -16,9 +16,9 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
 import { Menu, cn } from 'ui'
+import { InnerSideBarEmptyPanel } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ObservabilityMenuItem } from './ObservabilityMenuItem'
-import { InnerSideBarEmptyPanel } from 'ui-patterns'
 
 const ObservabilityMenu = () => {
   const router = useRouter()
@@ -58,11 +58,11 @@ const ObservabilityMenu = () => {
     return queryString ? `?${queryString}` : ''
   }, [router.query])
 
-  const { data: content, isLoading } = useContentQuery({
+  const { data: content, isPending: isLoading } = useContentQuery({
     projectRef: ref,
     type: 'report',
   })
-  const { mutate: deleteReport, isLoading: isDeleting } = useContentDeleteMutation({
+  const { mutate: deleteReport, isPending: isDeleting } = useContentDeleteMutation({
     onSuccess: () => {
       setDeleteModalOpen(false)
       toast.success('Successfully deleted report')

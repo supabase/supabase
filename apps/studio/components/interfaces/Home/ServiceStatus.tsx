@@ -93,11 +93,12 @@ export const ServiceStatus = () => {
   const isBranch = project?.parentRef !== project?.ref
 
   // Get branches data when on a branch
-  const { data: branches, isLoading: isBranchesLoading } = useBranchesQuery(
+  const { data: branches, isPending: isBranchesLoading } = useBranchesQuery(
     { projectRef: isBranch ? project?.parentRef : undefined },
     {
       enabled: isBranch,
-      refetchInterval: (data) => {
+      refetchInterval: (query) => {
+        const data = query.state.data
         if (!data) return false
         const currentBranch = data.find((branch) => branch.project_ref === ref)
         return ['FUNCTIONS_DEPLOYED', 'MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(
@@ -116,14 +117,15 @@ export const ServiceStatus = () => {
   // [Joshen] Need pooler service check eventually
   const {
     data: status,
-    isLoading,
+    isPending: isLoading,
     refetch: refetchServiceStatus,
   } = useProjectServiceStatusQuery(
     {
       projectRef: ref,
     },
     {
-      refetchInterval: (data) => {
+      refetchInterval: (query) => {
+        const data = query.state.data
         return data?.some((service) => !service.healthy) ? 5000 : false
       },
     }
@@ -134,7 +136,8 @@ export const ServiceStatus = () => {
         projectRef: ref,
       },
       {
-        refetchInterval: (data) => {
+        refetchInterval: (query) => {
+          const data = query.state.data
           return !data?.healthy ? 5000 : false
         },
       }

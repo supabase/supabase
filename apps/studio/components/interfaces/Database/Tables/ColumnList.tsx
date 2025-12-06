@@ -48,7 +48,7 @@ export const ColumnList = ({
     data: selectedTable,
     error,
     isError,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
   } = useTableEditorQuery({
     projectRef: project?.ref,

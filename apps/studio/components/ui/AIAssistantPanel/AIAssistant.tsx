@@ -49,7 +49,7 @@ interface AIAssistantProps {
 export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
-  const { data: selectedOrganization, isLoading: isLoadingOrganization } =
+  const { data: selectedOrganization, isPending: isLoadingOrganization } =
     useSelectedOrganizationQuery()
   const { ref, id: entityId } = useParams()
   const searchParams = useSearchParamsShallow()

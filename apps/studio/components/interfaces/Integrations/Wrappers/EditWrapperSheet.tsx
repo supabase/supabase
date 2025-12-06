@@ -44,7 +44,7 @@ export const EditWrapperSheet = ({
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
 
-  const { data: secrets, isLoading: isSecretsLoading } = useVaultSecretsQuery({
+  const { data: secrets, isPending: isSecretsLoading } = useVaultSecretsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

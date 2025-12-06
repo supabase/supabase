@@ -17,7 +17,7 @@ export const ActivityStats = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { data: branchesData, isLoading: isLoadingBranches } = useBranchesQuery({
+  const { data: branchesData, isPending: isLoadingBranches } = useBranchesQuery({
     projectRef: project?.parent_project_ref ?? project?.ref,
   })
   const isDefaultProject = project?.parent_project_ref === undefined
@@ -37,7 +37,7 @@ export const ActivityStats = () => {
       )[0]
   }, [branchesData])
 
-  const { data: migrationsData, isLoading: isLoadingMigrations } = useMigrationsQuery({
+  const { data: migrationsData, isPending: isLoadingMigrations } = useMigrationsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -46,7 +46,7 @@ export const ActivityStats = () => {
     [migrationsData]
   )
 
-  const { data: backupsData, isLoading: isLoadingBackups } = useBackupsQuery({
+  const { data: backupsData, isPending: isLoadingBackups } = useBackupsQuery({
     projectRef: project?.ref,
   })
   const latestBackup = useMemo(() => {

@@ -57,13 +57,15 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   const { resolvedTheme } = useTheme()
   const paymentRef = useRef<PaymentMethodElementRef | null>(null)
   const [setupNewPaymentMethod, setSetupNewPaymentMethod] = useState<boolean | null>(null)
-  const { data: customerProfile, isLoading: isCustomerProfileLoading } =
+  const { data: customerProfile, isPending: isCustomerProfileLoading } =
     useOrganizationCustomerProfileQuery({
       slug,
     })
-  const { data: taxId, isLoading: isCustomerTaxIdLoading } = useOrganizationTaxIdQuery({ slug })
+  const { data: taxId, isPending: isCustomerTaxIdLoading } = useOrganizationTaxIdQuery({ slug })
 
-  const { data: allPaymentMethods, isLoading } = useOrganizationPaymentMethodsQuery({ slug })
+  const { data: allPaymentMethods, isPending: isLoading } = useOrganizationPaymentMethodsQuery({
+    slug,
+  })
 
   const paymentMethods = useMemo(() => {
     if (!allPaymentMethods)

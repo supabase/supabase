@@ -37,7 +37,7 @@ import { getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
+import { useRefreshHandler, useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
@@ -89,7 +89,7 @@ const DatabaseUsage = () => {
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
 
   const report = useDatabaseReport()
-  const { data, params, largeObjectsSql, isLoading, refresh } = report
+  const { data, params, largeObjectsSql, isPending: isLoading, refresh } = report
 
   const { data: databaseSizeData } = useDatabaseSizeQuery({
     projectRef: project?.ref,

@@ -17,7 +17,7 @@ import { cn } from 'ui'
 const GenericOrganizationPage: NextPage = () => {
   const router = useRouter()
 
-  const { data: organizations, isLoading } = useOrganizationsQuery()
+  const { data: organizations, isPending: isLoading } = useOrganizationsQuery()
   const { routeSlug, ...queryParams } = router.query
   const queryString =
     Object.keys(queryParams).length > 0

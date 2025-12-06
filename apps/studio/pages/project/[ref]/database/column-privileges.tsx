@@ -49,7 +49,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
 
   const {
     data: tableList,
-    isLoading: isLoadingTables,
+    isPending: isLoadingTables,
     isSuccess: isSuccessTables,
   } = useTablesQuery({
     projectRef: project?.ref,
@@ -66,7 +66,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
     }
   }, [isSuccessTables, tableList, selectedSchema, selectedTable])
 
-  const { data: allRoles, isLoading: isLoadingRoles } = useDatabaseRolesQuery({
+  const { data: allRoles, isPending: isLoadingRoles } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -77,7 +77,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
 
   const {
     data: allTablePrivileges,
-    isLoading: isLoadingTablePrivileges,
+    isPending: isLoadingTablePrivileges,
     isError: isErrorTablePrivileges,
     error: errorTablePrivileges,
   } = useTablePrivilegesQuery({
@@ -103,7 +103,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
 
   const {
     data: allColumnPrivileges,
-    isLoading: isLoadingColumnPrivileges,
+    isPending: isLoadingColumnPrivileges,
     isError: isErrorColumnPrivileges,
     error: errorColumnPrivileges,
   } = useColumnPrivilegesQuery({

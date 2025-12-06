@@ -29,7 +29,7 @@ interface AddPaymentMethodFormProps {
 const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const { data: customerProfile, isLoading: customerProfileLoading } =
+  const { data: customerProfile, isPending: customerProfileLoading } =
     useOrganizationCustomerProfileQuery({
       slug: selectedOrganization?.slug,
     })
@@ -42,7 +42,7 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
   const { mutateAsync: markAsDefault } = useOrganizationPaymentMethodMarkAsDefaultMutation()
   const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation()
   const { mutateAsync: updateTaxId } = useOrganizationTaxIdUpdateMutation()
-  const { data: taxId, isLoading: isCustomerTaxIdLoading } = useOrganizationTaxIdQuery({
+  const { data: taxId, isPending: isCustomerTaxIdLoading } = useOrganizationTaxIdQuery({
     slug: selectedOrganization?.slug,
   })
 

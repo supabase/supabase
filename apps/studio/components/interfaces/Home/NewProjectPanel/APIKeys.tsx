@@ -52,7 +52,7 @@ export const APIKeys = () => {
   const {
     data: settings,
     isError: isProjectSettingsError,
-    isLoading: isProjectSettingsLoading,
+    isPending: isProjectSettingsLoading,
   } = useProjectSettingsV2Query({ projectRef })
 
   const { canReadAPIKeys } = useApiKeysVisibility()
@@ -64,7 +64,7 @@ export const APIKeys = () => {
   const {
     data,
     isError: isJwtSecretUpdateStatusError,
-    isLoading: isJwtSecretUpdateStatusLoading,
+    isPending: isJwtSecretUpdateStatusLoading,
   } = useJwtSecretUpdatingStatusQuery(
     { projectRef },
     { enabled: !isProjectSettingsLoading && isApiKeysEmpty }

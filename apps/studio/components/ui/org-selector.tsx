@@ -87,7 +87,7 @@ const OrganizationCard = ({
 export function OrganizationSelector({ onSelect, maxOrgsToShow = 5 }: ProjectClaimChooseOrgProps) {
   const {
     data: organizations = [],
-    isLoading: isLoadingOrgs,
+    isPending: isLoadingOrgs,
     isSuccess: isSuccessOrgs,
     isError: isErrorOrgs,
   } = useOrganizationsQuery()

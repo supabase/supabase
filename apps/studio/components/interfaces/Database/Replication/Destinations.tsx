@@ -32,7 +32,7 @@ export const Destinations = () => {
   const {
     data: sourcesData,
     error: sourcesError,
-    isLoading: isSourcesLoading,
+    isPending: isSourcesLoading,
     isError: isSourcesError,
     isSuccess: isSourcesSuccess,
   } = useReplicationSourcesQuery({
@@ -45,7 +45,7 @@ export const Destinations = () => {
   const {
     data: destinationsData,
     error: destinationsError,
-    isLoading: isDestinationsLoading,
+    isPending: isDestinationsLoading,
     isError: isDestinationsError,
     isSuccess: isDestinationsSuccess,
   } = useReplicationDestinationsQuery({
@@ -55,7 +55,7 @@ export const Destinations = () => {
   const {
     data: pipelinesData,
     error: pipelinesError,
-    isLoading: isPipelinesLoading,
+    isPending: isPipelinesLoading,
     isError: isPipelinesError,
     isSuccess: isPipelinesSuccess,
   } = useReplicationPipelinesQuery({

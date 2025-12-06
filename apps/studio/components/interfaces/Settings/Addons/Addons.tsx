@@ -58,7 +58,7 @@ export const Addons = () => {
   ])
 
   const { data: selectedOrg } = useSelectedOrganizationQuery()
-  const { data: selectedProject, isLoading: isLoadingProject } = useSelectedProjectQuery()
+  const { data: selectedProject, isPending: isLoadingProject } = useSelectedProjectQuery()
   const { data: parentProject } = useProjectDetailQuery({
     ref: selectedProject?.parent_project_ref,
   })
@@ -102,7 +102,7 @@ export const Addons = () => {
   const {
     data: addons,
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useProjectAddonsQuery({ projectRef })

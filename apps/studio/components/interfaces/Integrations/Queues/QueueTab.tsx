@@ -46,7 +46,7 @@ export const QueueTab = () => {
   const [deleteQueueModalShown, setDeleteQueueModalShown] = useState(false)
   const [selectedTypes, setSelectedTypes] = useState<QUEUE_MESSAGE_TYPE[]>([])
 
-  const { data: tables, isLoading: isLoadingTables } = useTablesQuery({
+  const { data: tables, isPending: isLoadingTables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: 'pgmq',
@@ -66,7 +66,13 @@ export const QueueTab = () => {
     connectionString: project?.connectionString,
   })
 
-  const { data, error, isLoading, fetchNextPage, isFetching } = useQueueMessagesInfiniteQuery(
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    fetchNextPage,
+    isFetching,
+  } = useQueueMessagesInfiniteQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,

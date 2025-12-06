@@ -1,4 +1,5 @@
 import { THRESHOLD_COUNT } from '@supabase/pg-meta/src/query/table-row-query'
+import { keepPreviousData } from '@tanstack/react-query'
 import { isEqual } from 'lodash'
 import { ChevronDown, List } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -79,7 +80,7 @@ export const SortPopoverPrimitive = ({
       enforceExactCount: snap.enforceExactCount,
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
-    { keepPreviousData: true, enabled: tableQueriesEnabled }
+    { placeholderData: keepPreviousData, enabled: tableQueriesEnabled }
   )
   const isLargeTable = (countData?.count ?? 0) > THRESHOLD_COUNT
 

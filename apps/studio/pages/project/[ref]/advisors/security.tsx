@@ -29,7 +29,12 @@ const ProjectLints: NextPageWithLayout = () => {
   const [currentTab, setCurrentTab] = useState<LINTER_LEVELS>(
     (preset as LINTER_LEVELS) ?? LINTER_LEVELS.ERROR
   )
-  const { data, isLoading, isRefetching, refetch } = useProjectLintsQuery({
+  const {
+    data,
+    isPending: isLoading,
+    isRefetching,
+    refetch,
+  } = useProjectLintsQuery({
     projectRef: project?.ref,
   })
 

@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
@@ -68,21 +69,28 @@ export const AuditLogs = () => {
   const { hasAccess: hasAccessToAuditLogs, isLoading: isLoadingEntitlements } =
     useCheckEntitlements('security.audit_logs_days')
 
-  const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
-    useOrganizationAuditLogsQuery(
-      {
-        slug,
-        iso_timestamp_start: dateRange.from,
-        iso_timestamp_end: dateRange.to,
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    isRefetching,
+    refetch,
+  } = useOrganizationAuditLogsQuery(
+    {
+      slug,
+      iso_timestamp_start: dateRange.from,
+      iso_timestamp_end: dateRange.to,
+    },
+    {
+      enabled: canReadAuditLogs,
+      retry: false,
+      refetchOnWindowFocus: (query) => {
+        return !query.state.error?.message.endsWith(logsUpgradeError)
       },
-      {
-        enabled: canReadAuditLogs,
-        retry: false,
-        refetchOnWindowFocus: (query) => {
-          return !query.state.error?.message.endsWith(logsUpgradeError)
-        },
-      }
-    )
+    }
+  )
 
   const isLogsNotAvailableBasedOnPlan = isError && !hasAccessToAuditLogs
   const isRangeExceededError = isError && error.message.includes('range exceeded')
@@ -97,7 +105,7 @@ export const AuditLogs = () => {
     fetchNextPage,
   } = useOrgProjectsInfiniteQuery(
     { slug, search: search.length === 0 ? search : debouncedSearch },
-    { keepPreviousData: true, enabled: showFilters }
+    { placeholderData: keepPreviousData, enabled: showFilters }
   )
   const { data: organizations } = useOrganizationsQuery({
     enabled: showFilters,

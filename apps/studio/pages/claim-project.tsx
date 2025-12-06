@@ -35,7 +35,7 @@ const ClaimProjectPage: NextPageWithLayout = () => {
 
   const {
     data: requester,
-    isLoading: isLoadingRequester,
+    isPending: isLoadingRequester,
     isError: isErrorRequester,
     error: errorRequester,
   } = useApiAuthorizationQuery({ id: auth_id })
@@ -49,7 +49,7 @@ const ClaimProjectPage: NextPageWithLayout = () => {
     data: projectClaim,
     error: errorProjectClaim,
     isError: isErrorProjectClaim,
-    isLoading: isLoadingProjectClaim,
+    isPending: isLoadingProjectClaim,
     isSuccess: isSuccessProjectClaim,
   } = useOrganizationProjectClaimQuery(
     {

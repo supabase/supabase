@@ -9,7 +9,7 @@ import { LogoLoader } from 'ui'
 
 export const LogPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const { isLoading } = useSupavisorConfigurationQuery({ projectRef: ref ?? 'default' })
+  const { isPending: isLoading } = useSupavisorConfigurationQuery({ projectRef: ref ?? 'default' })
 
   // this prevents initial load of pooler logs before config has been retrieved
   if (isLoading) return <LogoLoader />

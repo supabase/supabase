@@ -30,7 +30,7 @@ export const AuthProvidersForm = () => {
   const {
     data: authConfig,
     error: authConfigError,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })

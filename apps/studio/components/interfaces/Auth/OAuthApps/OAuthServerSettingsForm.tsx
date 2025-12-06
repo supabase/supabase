@@ -74,7 +74,7 @@ export const OAuthServerSettingsForm = () => {
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
-    isLoading: isAuthConfigLoading,
+    isPending: isAuthConfigLoading,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isPending } = useAuthConfigUpdateMutation({

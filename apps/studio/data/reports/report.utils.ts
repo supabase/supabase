@@ -39,7 +39,7 @@ export const REPORT_STATUS_CODE_COLORS: { [key: string]: { light: string; dark: 
 }
 
 export const useEdgeFnIdToName = ({ projectRef }: { projectRef: string }) => {
-  const { data: edgeFunctions, isLoading } = useEdgeFunctionsQuery({
+  const { data: edgeFunctions, isPending: isLoading } = useEdgeFunctionsQuery({
     projectRef,
   })
 

@@ -74,7 +74,7 @@ export const NamespaceWithTables = ({
 
   const {
     data: tablesData = [],
-    isLoading: isLoadingNamespaceTables,
+    isPending: isLoadingNamespaceTables,
     isSuccess: isSuccessNamespaceTables,
   } = useIcebergNamespaceTablesQuery(
     {
@@ -83,8 +83,8 @@ export const NamespaceWithTables = ({
       projectRef,
     },
     {
-      refetchInterval: (_data) => {
-        const data = _data ?? []
+      refetchInterval: (query) => {
+        const data = query.state.data ?? []
         if (pollIntervalNamespaceTables === 0) return false
 
         const publicationTables = publication?.tables ?? []

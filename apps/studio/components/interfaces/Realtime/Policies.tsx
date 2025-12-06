@@ -20,7 +20,7 @@ export const RealtimePolicies = () => {
 
   const {
     data: tables,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
     error,
@@ -40,7 +40,7 @@ export const RealtimePolicies = () => {
   )
   const {
     data: policies,
-    isLoading: isLoadingPolicies,
+    isPending: isLoadingPolicies,
     isError: isPoliciesError,
     error: policiesError,
   } = useDatabasePoliciesQuery({

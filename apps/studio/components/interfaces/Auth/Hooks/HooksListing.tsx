@@ -33,7 +33,7 @@ export const HooksListing = () => {
     data: authConfig,
     error: authConfigError,
     isError,
-    isLoading,
+    isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
 
   const [selectedHookForDeletion, setSelectedHookForDeletion] = useState<Hook | null>(null)

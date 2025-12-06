@@ -13,7 +13,7 @@ import DeleteFactorModal from './DeleteFactorModal'
 export const TOTPFactors = () => {
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
   const [factorToBeDeleted, setFactorToBeDeleted] = useState<string | null>(null)
-  const { data, isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
+  const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
 
   return (
     <>

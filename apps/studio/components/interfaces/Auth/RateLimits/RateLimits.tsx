@@ -44,7 +44,7 @@ export const RateLimits = () => {
   const {
     data: authConfig,
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })

@@ -55,7 +55,12 @@ export const RealtimeSettings = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data, error, isLoading, isError } = useRealtimeConfigurationQuery({
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isError,
+  } = useRealtimeConfigurationQuery({
     projectRef,
   })
 

@@ -29,7 +29,7 @@ export const WebhooksListTab = () => {
     'triggers'
   )
 
-  const { data: hooks, isLoading: isLoadingHooks } = useDatabaseHooksQuery({
+  const { data: hooks, isPending: isLoadingHooks } = useDatabaseHooksQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

@@ -37,7 +37,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
   const {
     data: members = [],
     error: membersError,
-    isLoading: isLoadingMembers,
+    isPending: isLoadingMembers,
     isError: isErrorMembers,
     isSuccess: isSuccessMembers,
   } = useOrganizationMembersQuery({ slug })

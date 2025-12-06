@@ -67,7 +67,7 @@ export const SchemaGraph = () => {
     data: schemas,
     error: errorSchemas,
     isSuccess: isSuccessSchemas,
-    isLoading: isLoadingSchemas,
+    isPending: isLoadingSchemas,
     isError: isErrorSchemas,
   } = useSchemasQuery({
     projectRef: project?.ref,
@@ -78,7 +78,7 @@ export const SchemaGraph = () => {
     data: tables,
     error: errorTables,
     isSuccess: isSuccessTables,
-    isLoading: isLoadingTables,
+    isPending: isLoadingTables,
     isError: isErrorTables,
   } = useTablesQuery({
     projectRef: project?.ref,

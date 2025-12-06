@@ -36,7 +36,11 @@ const buildFunctionUrl = (slug: string, projectRef: string, restUrl?: string) =>
 export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
   const { ref } = useParams()
   const { data: selectedProject } = useSelectedProjectQuery()
-  const { data: functions, isSuccess, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
+  const {
+    data: functions,
+    isSuccess,
+    isPending: isLoading,
+  } = useEdgeFunctionsQuery({ projectRef: ref })
 
   const edgeFunctions = useMemo(() => functions ?? [], [functions])
 

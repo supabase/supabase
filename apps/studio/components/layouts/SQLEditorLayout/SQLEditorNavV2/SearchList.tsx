@@ -1,6 +1,7 @@
 import { Loader2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
@@ -31,24 +32,29 @@ export const SearchList = ({ search }: SearchListProps) => {
   const [selectedSnippetToRename, setSelectedSnippetToRename] = useState<Snippet>()
   const [selectedSnippetToDelete, setSelectedSnippetToDelete] = useState<Snippet>()
 
-  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useContentInfiniteQuery(
-      {
-        projectRef,
-        type: 'sql',
-        limit: SNIPPET_PAGE_LIMIT,
-        name: search.length === 0 ? undefined : search,
-      },
-      { keepPreviousData: true }
-    )
+  const {
+    data,
+    isPending: isLoading,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useContentInfiniteQuery(
+    {
+      projectRef,
+      type: 'sql',
+      limit: SNIPPET_PAGE_LIMIT,
+      name: search.length === 0 ? undefined : search,
+    },
+    { placeholderData: keepPreviousData }
+  )
 
-  const { data: count, isLoading: isLoadingCount } = useContentCountQuery(
+  const { data: count, isPending: isLoadingCount } = useContentCountQuery(
     {
       projectRef,
       type: 'sql',
       name: search,
     },
-    { keepPreviousData: true }
+    { placeholderData: keepPreviousData }
   )
   const totalNumber = count ? count.private + count.shared : 0
 

@@ -1,9 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { sortBy } from 'lodash'
 import { RefreshCw, Search, X } from 'lucide-react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
-import { parseAsBoolean, useQueryState } from 'nuqs'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -50,7 +50,14 @@ export const SecretsManagement = () => {
     'tables'
   )
 
-  const { data, isLoading, isRefetching, refetch, error, isError } = useVaultSecretsQuery({
+  const {
+    data,
+    isPending: isLoading,
+    isRefetching,
+    refetch,
+    error,
+    isError,
+  } = useVaultSecretsQuery({
     projectRef: project?.ref!,
     connectionString: project?.connectionString,
   })

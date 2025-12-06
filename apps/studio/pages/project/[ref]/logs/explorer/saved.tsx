@@ -14,7 +14,7 @@ import { Loading } from 'ui'
 // [Joshen] This page looks like its not longer in use from a UI POV - double checking and deprecate + add redirects
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const { data, isLoading } = useContentQuery({
+  const { data, isPending: isLoading } = useContentQuery({
     projectRef: ref,
     type: 'log_sql',
   })

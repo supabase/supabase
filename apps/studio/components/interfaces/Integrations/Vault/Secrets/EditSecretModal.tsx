@@ -43,7 +43,7 @@ const formId = 'edit-vault-secret-form'
 const EditSecretModal = ({ visible, secret, onClose }: EditSecretModalProps) => {
   const [showSecretValue, setShowSecretValue] = useState(false)
   const { data: project } = useSelectedProjectQuery()
-  const { data, isLoading: isLoadingSecretValue } = useVaultSecretDecryptedValueQuery(
+  const { data, isPending: isLoadingSecretValue } = useVaultSecretDecryptedValueQuery(
     {
       projectRef: project?.ref,
       id: secret.id,

@@ -34,7 +34,7 @@ export const ComplianceConfig = () => {
     data: settings,
     error,
     isError,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
   } = useProjectSettingsV2Query({ projectRef: ref })
   const initialIsSensitive = settings?.is_sensitive || false

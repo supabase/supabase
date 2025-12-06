@@ -38,7 +38,7 @@ export function RotateKeyDialog({
   const [isPreviouslyUsedUnderstood, setPreviouslyUsedUnderstood] = useState(false)
   const [isEdgeFunctionsVerifyJWTUnderstood, setEdgeFunctionsVerifyJWTUnderstood] = useState(false)
 
-  const { data: edgeFunctions, isLoading: isLoadingEdgeFunctions } = useEdgeFunctionsQuery({
+  const { data: edgeFunctions, isPending: isLoadingEdgeFunctions } = useEdgeFunctionsQuery({
     projectRef,
   })
 

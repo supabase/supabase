@@ -53,7 +53,7 @@ const SpendCapSidePanel = () => {
   const visible = snap.panelKey === 'costControl'
   const onClose = () => snap.setPanelKey(undefined)
 
-  const { data: subscription, isLoading } = useOrgSubscriptionQuery({ orgSlug: slug })
+  const { data: subscription, isPending: isLoading } = useOrgSubscriptionQuery({ orgSlug: slug })
   const { mutate: updateOrgSubscription, isPending: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
       onSuccess: () => {

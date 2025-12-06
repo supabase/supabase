@@ -4,7 +4,7 @@ import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 
 export const LoadingState = () => {
   const { ref } = useParams()
-  const { data: project, isLoading } = useProjectDetailQuery({ ref })
+  const { data: project, isPending: isLoading } = useProjectDetailQuery({ ref })
 
   const projectName = ref !== 'default' ? project?.name : 'Welcome to your project'
 

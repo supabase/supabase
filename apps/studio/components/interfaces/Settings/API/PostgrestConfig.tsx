@@ -87,7 +87,7 @@ export const PostgrestConfig = () => {
   const {
     data: config,
     isError,
-    isLoading: isLoadingConfig,
+    isPending: isLoadingConfig,
   } = useProjectPostgrestConfigQuery({ projectRef })
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -95,7 +95,7 @@ export const PostgrestConfig = () => {
   })
   const {
     data: allSchemas = [],
-    isLoading: isLoadingSchemas,
+    isPending: isLoadingSchemas,
     isSuccess: isSuccessSchemas,
   } = useSchemasQuery({
     projectRef: project?.ref,

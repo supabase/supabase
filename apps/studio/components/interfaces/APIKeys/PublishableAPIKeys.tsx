@@ -28,7 +28,7 @@ export const PublishableAPIKeys = () => {
   const { canReadAPIKeys, isLoading: isLoadingVisibility } = useApiKeysVisibility()
   const {
     data: apiKeysData,
-    isLoading: isLoadingApiKeys,
+    isPending: isLoadingApiKeys,
     error,
   } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
 
@@ -94,7 +94,7 @@ const ApiKeyInput = () => {
   const { canReadAPIKeys, isLoading: isPermissionsLoading } = useApiKeysVisibility()
   const {
     data: apiKeysData,
-    isLoading: isApiKeysLoading,
+    isPending: isApiKeysLoading,
     error,
   } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
 
