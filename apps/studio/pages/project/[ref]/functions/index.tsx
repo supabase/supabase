@@ -46,6 +46,7 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { Admonition } from 'ui-patterns'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -93,13 +94,21 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     <PageContainer size="large">
       <PageSection>
         <PageSectionContent>
-          {IS_PLATFORM ? (
-            <>
-              {isLoading && <GenericSkeletonLoader />}
-              {isError && <AlertError error={error} subject="Failed to retrieve edge functions" />}
-              {isSuccess && (
-                <>
-                  {hasFunctions ? (
+          <div className="flex flex-col gap-6">
+            {isLoading && <GenericSkeletonLoader />}
+            {isError &&
+              (IS_PLATFORM ? (
+                <AlertError error={error} subject="Failed to retrieve edge functions" />
+              ) : (
+                <Admonition type="warning" title="Failed to retrieve edge functions">
+                  <p className="prose [&>code]:text-xs text-sm">
+                    Local functions can be found at <code>supabase/functions</code> folder.
+                  </p>
+                </Admonition>
+              ))}
+            {isSuccess && (
+              <>
+                {hasFunctions ? (
                     <div className="space-y-4">
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-2">
@@ -163,14 +172,12 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                       </Card>
                     </div>
                   ) : (
-                    <FunctionsEmptyState />
-                  )}
-                </>
-              )}
-            </>
-          ) : (
-            <FunctionsEmptyStateLocal />
-          )}
+                  <FunctionsEmptyState />
+                )}
+              </>
+            )}
+            {!IS_PLATFORM && <FunctionsEmptyStateLocal />}
+          </div>
         </PageSectionContent>
       </PageSection>
     </PageContainer>
