@@ -40,6 +40,10 @@ export const authKeys = {
     }
   ) => ['projects', projectRef, 'users-count', params] as const,
 
+  usersIndexStatuses: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'users-index-statuses'] as const,
+  indexWorkerStatus: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'index-worker-status'] as const,
   authConfig: (projectRef: string | undefined) => ['projects', projectRef, 'auth-config'] as const,
   accessToken: () => ['access-token'] as const,
   overviewMetrics: (projectRef: string | undefined) =>
