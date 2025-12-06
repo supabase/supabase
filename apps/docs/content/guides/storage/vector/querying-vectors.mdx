@@ -57,6 +57,34 @@ if (error) {
 ```
 
 </TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+from supabase import create_client
+
+supabase = create_client('https://your-project.supabase.co', 'your-service-key')
+
+index = supabase.storage.vectors().from_('embeddings').index('documents-openai')
+
+# Query with a vector embedding
+results = index.query(
+    query_vector={'float32': [0.1, 0.2, 0.3]},  # ... embedding of 1536 dimensions
+    topK=5,
+    return_distance=True,
+    return_metadata=True
+)
+
+if results:
+    # Results are ranked by similarity (lowest distance = most similar)
+    for rank, result in enumerate(results.vectors, 1):
+        print(f'{rank}. {result.metadata.get("title") if result.metadata else "N/A"}')
+        if result.distance is not None:
+            print(f'   Similarity score: {result.distance:.4f}')
+```
+
+</TabPanel>
+</$Show>
 
 <TabPanel id="sql" label="SQL (via S3 Vector Wrapper)">
 
@@ -139,6 +167,55 @@ results.forEach((result) => {
 ```
 
 </TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+from supabase import create_client
+from openai import OpenAI
+import os
+
+supabase = create_client(...)
+openai = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+
+async def semantic_search(query, top_k=5):
+    # Embed the query
+    query_embedding = openai.embeddings.create(
+        model='text-embedding-3-small',
+        input=query
+    )
+
+    query_vector = query_embedding.data[0].embedding
+
+    # Search for similar vectors
+    results = supabase.storage.vectors() \
+        .from_('embeddings') \
+        .index('documents-openai') \
+        .query(
+            query_vector={'float32': query_vector},
+            topK=top_k,
+            return_distance=True,
+            return_metadata=True
+        )
+
+    return [
+        {
+            'id': result.key,
+            'title': result.metadata.get('title') if result.metadata else None,
+            'similarity': 1 - result.distance if result.distance else 0,  # Convert distance to similarity (0-1)
+            'metadata': result.metadata
+        }
+        for result in results.vectors
+    ]
+
+# Usage
+results = semantic_search('How do I use vector search?')
+for result in results:
+    print(f'{result["title"]} ({result["similarity"] * 100:.1f}% similar)')
+```
+
+</TabPanel>
+</$Show>
 
 <TabPanel id="sql" label="SQL (via S3 Vector Wrapper)">
 
@@ -197,6 +274,31 @@ const { data } = await index.queryVectors({
 ```
 
 </TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+index = supabase.storage.vectors() \
+    .from_('embeddings') \
+    .index('documents-openai')
+
+# Search with metadata filter
+results = index.query(
+    query_vector={'float32': [...embedding...]},
+    topK=10,
+    filter={
+        # Filter by metadata fields
+        'category': 'electronics',
+        'in_stock': True,
+        'price': {'$lte': 500}  # Less than or equal to 500
+    },
+    return_distance=True,
+    return_metadata=True
+)
+```
+
+</TabPanel>
+</$Show>
 
 <TabPanel id="sql" label="SQL (via S3 Vector Wrapper)">
 
@@ -248,6 +350,21 @@ if (!error) {
 ```
 
 </TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+index = supabase.storage.vectors().from_('embeddings').index('documents-openai')
+
+results = index.get('doc-1', 'doc-2', 'doc-3', return_data=True, return_metadata=True)
+
+if results:
+    for vector in results.vectors:
+        print(f'{vector.key}: {vector.metadata.get("title") if vector.metadata else "N/A"}')
+```
+
+</TabPanel>
+</$Show>
 
 <TabPanel id="sql" label="SQL (via S3 Vector Wrapper)">
 
@@ -303,6 +420,39 @@ do {
 ```
 
 </TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+index = supabase.storage.vectors().from_('embeddings').index('documents-openai')
+
+next_token = None
+page_count = 0
+
+while True:
+    results = index.list(
+        max_results=100,
+        next_token=next_token,
+        return_data=False,  # Don't return embeddings for faster response
+        return_metadata=True
+    )
+
+    if not results:
+        break
+
+    page_count += 1
+    print(f'Page {page_count}: {len(results.vectors)} vectors')
+
+    for vector in results.vectors:
+        print(f'  - {vector.key}: {vector.metadata.get("title") if vector.metadata else "N/A"}')
+
+    next_token = results.nextToken
+    if not next_token:
+        break
+```
+
+</TabPanel>
+</$Show>
 
 <TabPanel id="sql" label="SQL (via S3 Vector Wrapper)">
 
@@ -368,6 +518,39 @@ async function hybridSearch(queryVector, filters) {
 ```
 
 </TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+def hybrid_search(query_vector, filters):
+    index = supabase.storage.vectors().from_('embeddings').index('documents-openai')
+
+    # Get similar vectors with filters
+    vector_results = index.query(
+        query_vector={'float32': query_vector},
+        topK=100,
+        filter=filters,
+        return_distance=True,
+        return_metadata=True
+    )
+
+    # Get additional details from relational database
+    doc_ids = [v.metadata.get('doc_id') for v in vector_results.vectors if v.metadata and v.metadata.get('doc_id')]
+    details_response = supabase.table('documents').select('*').in_('id', doc_ids).execute()
+    details = details_response.data if details_response.data else []
+
+    # Merge results
+    return [
+        {
+            **vector.__dict__ if hasattr(vector, '__dict__') else {},
+            **next((d for d in details if d['id'] == vector.metadata.get('doc_id')), {})
+        }
+        for vector in vector_results.vectors
+    ]
+```
+
+</TabPanel>
+</$Show>
 
 <TabPanel id="sql" label="SQL (via S3 Vector Wrapper)">
 
@@ -397,6 +580,15 @@ LIMIT 50;
 ## Real-world examples
 
 ### RAG (retrieval-augmented generation)
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
 
 ```typescript
 import OpenAI from 'openai'
@@ -445,7 +637,71 @@ async function retrieveContextForLLM(userQuery) {
 }
 ```
 
+</TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+from openai import OpenAI
+from supabase import create_client
+
+async def retrieve_context_for_llm(user_query):
+    supabase = create_client(...)
+    openai = OpenAI()
+
+    # 1. Embed the user query
+    query_embedding = openai.embeddings.create(
+        model='text-embedding-3-small',
+        input=user_query
+    )
+
+    # 2. Retrieve relevant documents
+    vector_results = supabase.storage.vectors() \
+        .from_('embeddings') \
+        .index('documents-openai') \
+        .query(
+            query_vector={'float32': query_embedding.data[0].embedding},
+            topK=5,
+            return_metadata=True
+        )
+
+    # 3. Use vectors to augment LLM prompt
+    context = '\n\n'.join(
+        v.metadata.get('content', '') if v.metadata else ''
+        for v in vector_results.vectors
+    )
+
+    response = openai.chat.completions.create(
+        model='gpt-4',
+        messages=[
+            {
+                'role': 'system',
+                'content': f'Use the following context to answer the user\'s question:\n\n{context}'
+            },
+            {
+                'role': 'user',
+                'content': user_query
+            }
+        ]
+    )
+
+    return response.choices[0].message.content
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
+
 ### Product recommendations
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
 
 ```typescript
 async function recommendProducts(userEmbedding, topK = 5) {
@@ -473,7 +729,50 @@ async function recommendProducts(userEmbedding, topK = 5) {
 }
 ```
 
+</TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+def recommend_products(user_embedding, top_k=5):
+    supabase = create_client(...)
+
+    # Find similar products
+    results = supabase.storage.vectors() \
+        .from_('embeddings') \
+        .index('products-openai') \
+        .query(
+            query_vector={'float32': user_embedding},
+            topK=top_k,
+            filter={'in_stock': True},
+            return_metadata=True
+        )
+
+    return [
+        {
+            'id': result.metadata.get('product_id') if result.metadata else None,
+            'name': result.metadata.get('name') if result.metadata else None,
+            'price': result.metadata.get('price') if result.metadata else None,
+            'similarity': 1 - result.distance if result.distance else 0
+        }
+        for result in results.vectors
+    ]
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
+
 ### Filtering before similarity search
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
 
 ```typescript
 // Use metadata filters to reduce search scope
@@ -485,6 +784,23 @@ const { data } = await index.queryVectors({
   },
 })
 ```
+
+</TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+# Use metadata filters to reduce search scope
+results = index.query(
+    query_vector=query_vector,
+    topK=100,
+    filter={'category': 'electronics'}  # Pre-filter by category
+)
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
 
 ## Next steps
 

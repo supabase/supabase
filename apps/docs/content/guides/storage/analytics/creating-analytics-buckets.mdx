@@ -17,7 +17,16 @@ You can create an analytics bucket using either the Supabase SDK or the Supabase
 
 ### Using the Supabase SDK
 
-```ts
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
+
+```typescript
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://your-project.supabase.co', 'your-service-key')
@@ -30,6 +39,24 @@ if (error) {
   console.log('Analytics bucket created:', data)
 }
 ```
+
+</TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+from supabase import create_client
+
+supabase = create_client('https://your-project.supabase.co', 'your-service-key')
+
+response = supabase.storage.analytics().create('analytics-data')
+
+print('Analytics bucket created:', response)
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
 
 ### Using the Supabase Dashboard
 
