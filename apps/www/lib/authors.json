@@ -777,5 +777,13 @@
     "position": "Engineering",
     "author_url": "https://twitter.com/the_ross_man",
     "author_image_url": "https://github.com/mattrossman.png"
+  },
+  {
+    "author_id": "eduardo_gurgel",
+    "author": "Eduardo Gurgel",
+    "username": "edgurgel",
+    "position": "Engineering",
+    "author_url": "https://github.com/edgurgel",
+    "author_image_url": "https://github.com/edgurgel.png"
   }
 ]
