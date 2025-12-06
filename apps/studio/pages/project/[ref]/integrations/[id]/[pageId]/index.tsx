@@ -3,15 +3,35 @@ import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integra
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
-import { NavigationItem, PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useRouter } from 'next/compat/router'
+import Link from 'next/link'
 import { useEffect, useMemo } from 'react'
 import type { NextPageWithLayout } from 'types'
-import { Admonition } from 'ui-patterns'
+import {
+  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
+  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
+  BreadcrumbList_Shadcn_ as BreadcrumbList,
+  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
+  NavMenu,
+  NavMenuItem,
+} from 'ui'
+import {
+  Admonition,
+  PageContainer,
+  PageHeader,
+  PageHeaderBreadcrumb,
+  PageHeaderDescription,
+  PageHeaderIcon,
+  PageHeaderMeta,
+  PageHeaderNavigationTabs,
+  PageHeaderSummary,
+  PageHeaderTitle,
+  PageSection,
+  PageSectionContent,
+} from 'ui-patterns'
 
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -46,6 +66,8 @@ const IntegrationPage: NextPageWithLayout = () => {
     },
   ]
 
+  type NavigationItem = { label: string; href: string; active?: boolean }
+
   // Create navigation items from integration navigation
   const navigationItems: NavigationItem[] = useMemo(() => {
     if (!integration?.navigation) return []
@@ -76,7 +98,7 @@ const IntegrationPage: NextPageWithLayout = () => {
     ) {
       router.replace(`/project/${ref}/integrations/${id}/overview`)
     }
-  }, [installation, isIntegrationsLoading, pageId, router])
+  }, [installation, isIntegrationsLoading, pageId, router, ref, id])
 
   // Determine page title, icon, and subtitle based on state
   const pageTitle = integration?.name || 'Integration not found'
@@ -95,24 +117,26 @@ const IntegrationPage: NextPageWithLayout = () => {
   const content = useMemo(() => {
     if (!router?.isReady || isIntegrationsLoading) {
       return (
-        <ScaffoldContainer size="full">
-          <ScaffoldSection isFullWidth>
-            <GenericSkeletonLoader />
-          </ScaffoldSection>
-        </ScaffoldContainer>
+        <PageContainer size="full">
+          <PageSection>
+            <PageSectionContent>
+              <GenericSkeletonLoader />
+            </PageSectionContent>
+          </PageSection>
+        </PageContainer>
       )
     } else if (!Component || !id || !integration) {
       return (
-        <ScaffoldContainer size="full">
-          <ScaffoldSection isFullWidth>
+        <PageSection>
+          <PageSectionContent>
             <Admonition type="warning" title="This integration is not currently available">
               Please try again later or contact support if the problem persists.
             </Admonition>
-          </ScaffoldSection>
-        </ScaffoldContainer>
+          </PageSectionContent>
+        </PageSection>
       )
     } else {
-      return <Component />
+      return Component && <Component />
     }
   }, [router?.isReady, isIntegrationsLoading, id, integration, Component])
 
@@ -125,16 +149,41 @@ const IntegrationPage: NextPageWithLayout = () => {
   }
 
   return (
-    <PageLayout
-      title={pageTitle}
-      icon={pageIcon}
-      subtitle={pageSubTitle}
-      size="full"
-      breadcrumbs={breadcrumbItems}
-      navigationItems={navigationItems}
-    >
+    <>
+      <PageHeader size="full">
+        <PageHeaderBreadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href={`/project/${ref}/integrations`}>Integrations</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>{integration?.name || 'Integration not found'}</BreadcrumbItem>
+          </BreadcrumbList>
+        </PageHeaderBreadcrumb>
+        <PageHeaderMeta>
+          {pageIcon && <PageHeaderIcon>{pageIcon}</PageHeaderIcon>}
+          <PageHeaderSummary>
+            <PageHeaderTitle>{pageTitle}</PageHeaderTitle>
+            <PageHeaderDescription>{pageSubTitle}</PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+        {navigationItems.length > 0 && (
+          <PageHeaderNavigationTabs>
+            <NavMenu>
+              {navigationItems.map((nav) => (
+                <NavMenuItem key={nav.href} active={nav.active ?? false}>
+                  <Link href={nav.href}>{nav.label}</Link>
+                </NavMenuItem>
+              ))}
+            </NavMenu>
+          </PageHeaderNavigationTabs>
+        )}
+      </PageHeader>
+
       {content}
-    </PageLayout>
+    </>
   )
 }
 

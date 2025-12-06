@@ -1,11 +1,25 @@
 import dayjs from 'dayjs'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { NavigationItem, PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { useQueuesQuery } from 'data/database-queues/database-queues-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DATETIME_FORMAT } from 'lib/constants'
+import {
+  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
+  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
+  BreadcrumbList_Shadcn_ as BreadcrumbList,
+  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
+} from 'ui'
+import {
+  PageHeader,
+  PageHeaderBreadcrumb,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 import { QueueTab } from './QueueTab'
 
 export const QueuePage = () => {
@@ -21,24 +35,6 @@ export const QueuePage = () => {
 
   const currentQueue = queues?.find((queue) => queue.queue_name === childId)
 
-  const breadcrumbItems = [
-    {
-      label: 'Integrations',
-      href: `/project/${ref}/integrations`,
-    },
-    {
-      label: 'Queues',
-      href: pageId
-        ? `/project/${ref}/integrations/${id}/${pageId}`
-        : `/project/${ref}/integrations/${id}`,
-    },
-    {
-      label: childId,
-    },
-  ]
-
-  const navigationItems: NavigationItem[] = []
-
   const pageTitle = childLabel || childId || 'Queue'
 
   const getQueueType = (queue: typeof currentQueue) => {
@@ -51,14 +47,42 @@ export const QueuePage = () => {
     : undefined
 
   return (
-    <PageLayout
-      title={pageTitle}
-      subtitle={pageSubtitle}
-      size="full"
-      breadcrumbs={breadcrumbItems}
-      navigationItems={navigationItems}
-    >
+    <>
+      <PageHeader size="full" className="pb-6">
+        <PageHeaderBreadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href={`/project/${ref}/integrations`}>Integrations</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link
+                  href={
+                    pageId
+                      ? `/project/${ref}/integrations/${id}/${pageId}`
+                      : `/project/${ref}/integrations/${id}`
+                  }
+                >
+                  Queues
+                </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>{childId}</BreadcrumbItem>
+          </BreadcrumbList>
+        </PageHeaderBreadcrumb>
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>{pageTitle}</PageHeaderTitle>
+            {pageSubtitle && <PageHeaderDescription>{pageSubtitle}</PageHeaderDescription>}
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+
       <QueueTab />
-    </PageLayout>
+    </>
   )
 }
