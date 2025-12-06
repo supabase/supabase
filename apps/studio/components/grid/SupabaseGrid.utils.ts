@@ -5,13 +5,13 @@ import { CalculatedColumn, CellKeyboardEvent } from 'react-data-grid'
 
 import type { Filter, SavedState } from 'components/grid/types'
 import { Entity, isTableLike } from 'data/table-editor/table-editor-types'
+import { useSearchParams } from 'next/navigation'
+import { parseAsBoolean, parseAsNativeArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { copyToClipboard } from 'ui'
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
 import type { Sort, SupaColumn, SupaTable } from './types'
 import { formatClipboardValue } from './utils/common'
-import { parseAsNativeArrayOf, parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
-import { useSearchParams } from 'next/navigation'
 
 export const LOAD_TAB_FROM_CACHE_PARAM = 'loadFromCache'
 
@@ -67,6 +67,7 @@ export function filtersToUrlParams(filters: Filter[]) {
 export function parseSupaTable(table: Entity): SupaTable {
   const columns = table.columns
   const primaryKeys = isTableLike(table) ? table.primary_keys : []
+  const uniqueIndexes = isTableLike(table) ? table.unique_indexes : []
   const relationships = isTableLike(table) ? table.relationships : []
 
   const supaColumns: SupaColumn[] = columns.map((column) => {
@@ -116,8 +117,14 @@ export function parseSupaTable(table: Entity): SupaTable {
     name: table.name,
     comment: table.comment,
     schema: table.schema,
+    type: table.entity_type,
     columns: supaColumns,
     estimateRowCount: isTableLike(table) ? table.live_rows_estimate : 0,
+    primaryKey: primaryKeys?.length > 0 ? primaryKeys.map((col) => col.name) : undefined,
+    uniqueIndexes:
+      !!uniqueIndexes && uniqueIndexes.length > 0
+        ? uniqueIndexes.map(({ columns }) => columns)
+        : undefined,
   }
 }
 
