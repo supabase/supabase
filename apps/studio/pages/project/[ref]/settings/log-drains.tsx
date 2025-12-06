@@ -34,6 +34,7 @@ import { ChevronDown } from 'lucide-react'
 import { cloneElement } from 'react'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useFlag } from 'common'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
   const { can: canManageLogDrains, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -51,6 +52,9 @@ const LogDrainsSettings: NextPageWithLayout = () => {
 
   const { hasAccess: hasAccessToLogDrains, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('log_drains')
+
+  const sentryEnabled = useFlag('SentryLogDrain')
+  const axiomEnabled = useFlag('axiomLogDrain')
 
   const { data: logDrains } = useLogDrainsQuery(
     { ref },
@@ -212,7 +216,11 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                     />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" side="bottom">
-                    {LOG_DRAIN_TYPES.map((drainType) => (
+                    {LOG_DRAIN_TYPES.filter((t) => {
+                      if (t.value === 'sentry') return sentryEnabled
+                      if (t.value === 'axiom') return axiomEnabled
+                      return true
+                    }).map((drainType) => (
                       <DropdownMenuItem
                         key={drainType.value}
                         onClick={() => handleNewClick(drainType.value)}

@@ -211,6 +211,20 @@ All fields from the log event are attached as attributes to the Sentry log, whic
 
 If you are self-hosting Sentry, Sentry Logs are only supported in self-hosted version [25.9.0](https://github.com/getsentry/self-hosted/releases/tag/25.9.0) and later.
 
+## Axiom
+
+Logs sent to a specified Axiom's dataset as JSON of a raw log event,
+with timestamp modified to be parsed by ingestion endpoint.
+
+To set up the Axiom log drain, you have to:
+
+1. Create a dataset for ingestion in Axiom dashboard -> Datasets
+2. Generate an Axiom API Token with permission to ingest into the created dataset (see [Axiom docs](https://axiom.co/docs/reference/tokens#create-basic-api-token))
+3. Create log drain in [Supabase dashboard](/dashboard/project/_/settings/log-drains), providing:
+   - Name of the dataset
+   - API token
+4. Watch for events in the Stream panel of Axiom dashboard
+
 ## Pricing
 
 For a detailed breakdown of how charges are calculated, refer to [Manage Log Drain usage](/docs/guides/platform/manage-your-usage/log-drains).
