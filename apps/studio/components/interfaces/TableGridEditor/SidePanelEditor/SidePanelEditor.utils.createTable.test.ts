@@ -141,6 +141,7 @@ describe('createTable', () => {
       event: {
         action: 'table_created',
         properties: {
+          has_generated_policies: false,
           method: 'table_editor',
           schema_name: 'public',
           table_name: 'test_table',
@@ -160,7 +161,10 @@ describe('createTable', () => {
       })
     )
 
-    expect(result).toStrictEqual(mockTableResult)
+    expect(result).toStrictEqual({
+      failedPolicies: [],
+      table: mockTableResult,
+    })
   })
 
   it('should create a table with RLS enabled', async () => {
@@ -355,7 +359,10 @@ describe('createTable', () => {
       isRLSEnabled: false,
     })
 
-    expect(result).toStrictEqual(mockTableResult)
+    expect(result).toStrictEqual({
+      failedPolicies: [],
+      table: mockTableResult,
+    })
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       'Failed to track table creation event:',
       expect.any(Error)

@@ -1905,6 +1905,10 @@ export interface TableCreatedEvent {
      * Name of the table created
      */
     table_name?: string
+    /**
+     * Whether RLS policies were generated and saved with the table
+     */
+    has_generated_policies?: boolean
   }
   groups: Partial<TelemetryGroups>
 }
@@ -1959,6 +1963,64 @@ export interface TableRLSEnabledEvent {
     table_name?: string
   }
   groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the generate policies button in the table editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface RLSGeneratePoliciesClickedEvent {
+  action: 'rls_generate_policies_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User removed a generated policy from the table editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface RLSGeneratedPolicyRemovedEvent {
+  action: 'rls_generated_policy_removed'
+  groups: TelemetryGroups
+}
+
+/**
+ * User successfully created generated RLS policies for a table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface RLSGeneratedPoliciesCreatedEvent {
+  action: 'rls_generated_policies_created'
+  groups: TelemetryGroups
+}
+
+/**
+ * User was exposed to the generate policies experiment (shown or not shown the Generate Policies button).
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface TableCreateGeneratePoliciesExperimentExposedEvent {
+  action: 'table_create_generate_policies_experiment_exposed'
+  properties: {
+    /**
+     * Whether the generate policies feature is enabled
+     */
+    enabled: boolean
+    /**
+     * Days since project creation (to segment by new user cohorts)
+     */
+    days_since_project_creation: number
+  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -2577,6 +2639,10 @@ export type TelemetryEvent =
   | TableCreatedEvent
   | TableDataAddedEvent
   | TableRLSEnabledEvent
+  | RLSGeneratePoliciesClickedEvent
+  | RLSGeneratedPolicyRemovedEvent
+  | RLSGeneratedPoliciesCreatedEvent
+  | TableCreateGeneratePoliciesExperimentExposedEvent
   | TableQuickstartOpenedEvent
   | TableQuickstartAIPromptSubmittedEvent
   | TableQuickstartAIGenerationCompletedEvent
