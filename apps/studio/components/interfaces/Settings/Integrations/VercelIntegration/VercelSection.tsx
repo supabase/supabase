@@ -36,7 +36,7 @@ import { Button, cn } from 'ui'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import VercelIntegrationConnectionForm from './VercelIntegrationConnectionForm'
 
-const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
+export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
@@ -155,7 +155,7 @@ You can change the scope of the access for Supabase by configuring
 
   return (
     <ScaffoldContainer>
-      <ScaffoldSection>
+      <ScaffoldSection className="py-12">
         <ScaffoldSectionDetail title={VercelTitle}>
           <Markdown content={VercelDetailsSection} />
           <IntegrationImageHandler title="vercel" />
@@ -253,5 +253,3 @@ You can change the scope of the access for Supabase by configuring
     </ScaffoldContainer>
   )
 }
-
-export default VercelSection

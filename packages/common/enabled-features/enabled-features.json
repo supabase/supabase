@@ -72,6 +72,7 @@
   "integrations:partners": true,
   "integrations:wrappers": true,
   "integrations:vercel": true,
+  "integrations:aws_private_link": true,
 
   "infrastructure:read_replicas": true,
 

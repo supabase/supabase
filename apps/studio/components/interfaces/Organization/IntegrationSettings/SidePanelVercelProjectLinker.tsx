@@ -24,7 +24,7 @@ const VERCEL_ICON = (
   </svg>
 )
 
-const SidePanelVercelProjectLinker = () => {
+export const SidePanelVercelProjectLinker = () => {
   const { ref } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const sidePanelStateSnapshot = useSidePanelsStateSnapshot()
