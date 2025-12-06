@@ -20,6 +20,9 @@ import {
 import { Skeleton, cn } from 'ui'
 
 // Regular memo erases generics, so this helper adds them back
+// any here is intentional to allow for generic components and does not affect
+// type safety of the wrapped component
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const typedMemo = <Component extends (props: any) => JSX.Element | null>(
   component: Component,
   propsAreEqual?: (
@@ -175,7 +178,7 @@ export const InfiniteListSizer = ({
   )
 }
 
-type RowComponentBaseProps<Item> = {
+export type RowComponentBaseProps<Item> = {
   index: number
   item: Item
   style?: CSSProperties
