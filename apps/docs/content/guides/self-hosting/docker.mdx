@@ -163,7 +163,7 @@ psql 'postgres://postgres.your-tenant-id:your-super-secret-and-long-postgres-pas
 
 The default tenant ID is `your-tenant-id`, and the default password is `your-super-secret-and-long-postgres-password`. You should change these as soon as possible using the [instructions below](#update-secrets).
 
-By default, the database is not accessible from outside the local machine but the pooler is. You can [change this](#exposing-your-postgres-database) by updating the `docker-compose.yml` file.
+By default, the database is not accessible from outside the local machine but the pooler is. You can [change this](#exposing-your-postgres-database) by updating the `compose.yaml` file.
 
 You may also want to connect to your Postgres database via an ORM or another direct method other than `psql`.
 
@@ -185,7 +185,7 @@ You'll want to update the Studio(Dashboard) frequently to get the latest feature
 
 1. Visit the [supabase/studio](https://hub.docker.com/r/supabase/studio/tags) image in the [Supabase Docker Hub](https://hub.docker.com/u/supabase)
 2. Find the latest version (tag) number. It will look something like `20241029-46e1e40`
-3. Update the `image` field in the `docker-compose.yml` file to the new version. It should look like this: `image: supabase/studio:20241028-a265374`
+3. Update the `image` field in the `compose.yaml` file to the new version. It should look like this: `image: supabase/studio:20241028-a265374`
 4. Run `docker compose pull` and then `docker compose up -d` to restart the service with the new version.
 
 ## Securing your services
@@ -269,11 +269,11 @@ Be aware that this will result in downtime. Simply restarting the services does 
 
 ## Stopping all services
 
-You can stop Supabase by running `docker compose stop` in same directory as your `docker-compose.yml` file.
+You can stop Supabase by running `docker compose stop` in same directory as your `compose.yaml` file.
 
 ## Uninstalling
 
-You can stop Supabase by running the following in same directory as your `docker-compose.yml` file:
+You can stop Supabase by running the following in same directory as your `compose.yaml` file:
 
 ```sh
 # Stop docker and remove volumes:
@@ -342,11 +342,11 @@ Each system has a number of configuration options which can be found in the rele
 - [Kong](https://docs.konghq.com/gateway/latest/install/docker/)
 - [Supavisor](https://supabase.github.io/supavisor/development/docs/)
 
-These configuration items are generally added to the `env` section of each service, inside the `docker-compose.yml` section. If these configuration items are sensitive, they should be stored in a [secret manager](/docs/guides/self-hosting#managing-your-secrets) or using an `.env` file and then referenced using the `${}` syntax.
+These configuration items are generally added to the `env` section of each service, inside the `compose.yaml` section. If these configuration items are sensitive, they should be stored in a [secret manager](/docs/guides/self-hosting#managing-your-secrets) or using an `.env` file and then referenced using the `${}` syntax.
 
 <$CodeTabs>
 
-```yml name=docker-compose.yml
+```yml name=compose.yaml
 services:
   rest:
     image: postgrest/postgrest
@@ -384,7 +384,7 @@ We recommend using [AWS SES](https://aws.amazon.com/ses/). It's extremely cheap 
 
 By default all files are stored locally on the server. You can configure the Storage service to use S3 by updating the following environment variables:
 
-```yaml docker-compose.yml
+```yaml compose.yaml
 storage:
   environment: STORAGE_BACKEND=s3
     GLOBAL_S3_BUCKET=name-of-your-s3-bucket
@@ -399,7 +399,7 @@ Configuring the Supabase AI Assistant is optional. By adding your own `OPENAI_AP
 
 <$CodeTabs>
 
-```yaml name=docker-compose.yml
+```yaml name=compose.yaml
 services:
   studio:
     image: supabase/studio
@@ -426,9 +426,9 @@ For more information on configuring and using Supavisor, see the [Supavisor docu
 
 #### Exposing your Postgres database
 
-If you need direct access to the Postgres database without going through Supavisor, you can expose it by updating the `docker-compose.yml` file:
+If you need direct access to the Postgres database without going through Supavisor, you can expose it by updating the `compose.yaml` file:
 
-```yaml docker-compose.yml
+```yaml compose.yaml
 # Comment or remove the supavisor section of the docker-compose file
 #  supavisor:
 #    ports:
