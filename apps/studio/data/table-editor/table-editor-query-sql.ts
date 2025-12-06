@@ -142,6 +142,7 @@ export function getTableEditorSql(id?: number) {
                     (b.relkind in ('v', 'f') and pg_column_is_updatable(b.id, a.attnum, false))
                 ),
                 'is_unique', uniques.table_id is not null,
+                'is_indexed', indexed_cols.table_id is not null,
                 'check', check_constraints.definition,
                 'comment', col_description(c.oid, a.attnum),
                 'enums', coalesce(
@@ -171,6 +172,13 @@ export function getTableEditorSql(id?: number) {
             where contype = 'u' and cardinality(conkey) = 1
             group by conrelid, conkey[1]
         ) as uniques on uniques.table_id = a.attrelid and uniques.ordinal_position = a.attnum
+        left join (
+            select distinct
+                i.indrelid as table_id,
+                unnest(i.indkey) as ordinal_position
+            from pg_index i
+            where i.indisvalid
+        ) as indexed_cols on indexed_cols.table_id = a.attrelid and indexed_cols.ordinal_position = a.attnum
         left join (
             select distinct on (conrelid, conkey[1])
                 conrelid as table_id,

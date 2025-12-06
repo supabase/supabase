@@ -72,6 +72,7 @@ export function getGridColumns(
           columnType={columnType}
           isPrimaryKey={x.isPrimaryKey}
           isEncrypted={x.isEncrypted}
+          isIndexed={x.isIndexed}
           format={x.format}
           foreignKey={x.foreignKey}
         />

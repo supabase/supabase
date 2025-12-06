@@ -51,6 +51,21 @@ export type Entity = Table | PartitionedTable | View | MaterializedView | Foreig
 
 export type TableLike = Table | PartitionedTable
 
+export interface TableEditorColumn extends PostgresColumn {
+  is_indexed: boolean
+}
+
+type WithTableEditorColumns<T extends { columns: PostgresColumn[] }> = Omit<T, 'columns'> & {
+  columns: TableEditorColumn[]
+}
+
+export type TableEditorEntity =
+  | WithTableEditorColumns<Table>
+  | WithTableEditorColumns<PartitionedTable>
+  | WithTableEditorColumns<View>
+  | WithTableEditorColumns<MaterializedView>
+  | WithTableEditorColumns<ForeignTable>
+
 export function isTable(entity?: Entity): entity is Table {
   return entity?.entity_type === ENTITY_TYPE.TABLE
 }
