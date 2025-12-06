@@ -491,8 +491,12 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/ai-prompts' as `/${string}`,
         },
         {
-          name: 'Model context protocol (MCP)',
+          name: 'Supabase MCP server',
           url: '/guides/getting-started/mcp' as `/${string}`,
+        },
+        {
+          name: 'Deploy MCP servers',
+          url: '/guides/getting-started/byom' as `/${string}`,
         },
       ],
     },
