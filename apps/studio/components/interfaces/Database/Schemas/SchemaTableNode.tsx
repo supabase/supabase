@@ -1,4 +1,4 @@
-import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
+import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
 import { DiamondIcon, ExternalLink, Fingerprint, Hash, Key, Table2 } from 'lucide-react'
 import Link from 'next/link'
 import { Handle, NodeProps } from 'reactflow'
@@ -10,6 +10,9 @@ export const TABLE_NODE_WIDTH = 320
 export const TABLE_NODE_ROW_HEIGHT = 40
 
 export type TableNodeData = {
+  tableSchema: string
+  tableName: string
+  tableId: number
   id?: number
   name: string
   ref: string
@@ -68,9 +71,7 @@ export const TableNode = ({
             </div>
             {data.id && !placeholder && (
               <Button asChild type="text" className="px-0 w-[16px] h-[16px] rounded">
-                <Link
-                  href={`/project/${data.ref}/editor/${data.id}?${LOAD_TAB_FROM_CACHE_PARAM}=true`}
-                >
+                <Link href={buildTableEditorUrl(data.ref, data.name, data.id, data.schema)}>
                   <ExternalLink size={10} className="text-foreground-light" />
                 </Link>
               </Button>
