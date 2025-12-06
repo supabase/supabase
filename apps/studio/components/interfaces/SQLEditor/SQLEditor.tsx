@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import ResizableAIWidget from 'components/ui/AIEditor/ResizableAIWidget'
 import { GridFooter } from 'components/ui/GridFooter'
@@ -22,9 +22,10 @@ import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { generateDeterministicUuid } from 'lib/api/snippets.browser'
 import { BASE_PATH } from 'lib/constants'
 import { formatSql } from 'lib/formatSql'
-import { detectOS, uuidv4 } from 'lib/helpers'
+import { detectOS } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
@@ -38,6 +39,7 @@ import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
@@ -49,11 +51,11 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
 import {
+  generateSnippetTitle,
   ROWS_PER_PAGE_OPTIONS,
   sqlAiDisclaimerComment,
   untitledSnippetTitle,
@@ -123,8 +125,13 @@ export const SQLEditor = () => {
 
   // generate an id to be used for new snippets. The dependency on urlId is to avoid a bug which
   // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
+  const generatedNewSnippetName = useMemo(
+    () => generateSnippetTitle(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [urlId]
+  )
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const generatedId = useMemo(() => uuidv4(), [urlId])
+  const generatedId = useMemo(() => generateDeterministicUuid([generatedNewSnippetName]), [urlId])
   // the id is stable across renders - it depends either on the url or on the memoized generated id
   const id = !urlId || urlId === 'new' ? generatedId : urlId
 
@@ -285,7 +292,11 @@ export const SQLEditor = () => {
           return
         }
 
-        if (!isHipaaProjectDisallowed && snippet?.snippet.name === untitledSnippetTitle) {
+        if (
+          !isHipaaProjectDisallowed &&
+          snippet?.snippet.name.startsWith(untitledSnippetTitle) &&
+          IS_PLATFORM
+        ) {
           // Intentionally don't await title gen (lazy)
           setAiTitle(id, sql)
         }
@@ -349,7 +360,6 @@ export const SQLEditor = () => {
 
       try {
         const snippet = createSqlSnippetSkeletonV2({
-          id: uuidv4(),
           name,
           sql,
           owner_id: profile.id,
@@ -749,6 +759,7 @@ export const SQLEditor = () => {
                           : ''
                       }
                       id={id}
+                      snippetName={snapV2.snippets[id]?.snippet.name ?? generatedNewSnippetName}
                       className={cn(isDiffOpen && 'hidden')}
                       editorRef={editorRef}
                       monacoRef={monacoRef}
