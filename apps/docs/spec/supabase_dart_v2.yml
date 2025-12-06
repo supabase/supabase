@@ -5513,7 +5513,7 @@ functions:
               (2, 'viola'),
               (3, 'cello');
             ```
-        reponse: |
+        response: |
           ```json
           [
             {
