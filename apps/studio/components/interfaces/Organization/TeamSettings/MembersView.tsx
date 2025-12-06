@@ -140,7 +140,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                                 type="note"
                                 title="You are currently assigned with project scoped roles in this organization"
                                 description="All other members within the organization will not be visible to you"
-                                className="m-0 bg-alternative border-0 rounded-none"
+                                className="bg-alternative border-0 rounded-none"
                               />
                             </TableCell>
                           </TableRow>,

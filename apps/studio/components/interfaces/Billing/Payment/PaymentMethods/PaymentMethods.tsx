@@ -97,7 +97,6 @@ const PaymentMethods = () => {
                     <Admonition
                       type="note"
                       layout="horizontal"
-                      className="mb-0"
                       title="Payment is currently by invoice"
                       description="You get a monthly invoice and payment link via email. To change your payment
                       method, please contact us via our support form."

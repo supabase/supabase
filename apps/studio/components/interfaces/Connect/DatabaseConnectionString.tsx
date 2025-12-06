@@ -529,7 +529,7 @@ export const DatabaseConnectionString = () => {
                     <Admonition
                       type="warning"
                       title="Highly recommended to not use Session Pooler"
-                      className="[&>div]:gap-0 px-8 [&>svg]:left-7 border-0 border-b rounded-none border-border-muted !py-4 mb-0"
+                      className="[&>div]:gap-0 px-8 [&>svg]:left-7 border-0 border-b rounded-none border-border-muted !py-4"
                     >
                       <p className="text-sm text-foreground-lighter !mb-0">
                         If you are using Session Pooler, we recommend switching to Direct
