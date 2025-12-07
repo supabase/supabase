@@ -689,6 +689,60 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/chat-sessions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List chat sessions for project */
+    get: operations['ChatSessionsController_listChatSessions']
+    put?: never
+    /** Create new chat session */
+    post: operations['ChatSessionsController_createChatSession']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/chat-sessions/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Delete chat session (soft delete) */
+    delete: operations['ChatSessionsController_deleteChatSession']
+    options?: never
+    head?: never
+    /** Update chat session */
+    patch: operations['ChatSessionsController_updateChatSession']
+    trace?: never
+  }
+  '/v1/projects/{ref}/chat-sessions/{id}/messages': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get messages for chat session */
+    get: operations['ChatSessionsController_getMessages']
+    put?: never
+    /** Save messages (called from generate-v4 onFinish) */
+    post: operations['ChatSessionsController_saveMessages']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/claim-token': {
     parameters: {
       query?: never
@@ -2372,6 +2426,50 @@ export interface components {
         version: number
       }[]
     }
+    ChatMessage: {
+      id: string
+      metadata?: {
+        [key: string]: unknown
+      }
+      parts: (
+        | {
+            text: string
+            /** @enum {string} */
+            type: 'text'
+          }
+        | {
+            args?: unknown
+            toolCallId: string
+            toolName: string
+            /** @enum {string} */
+            type: 'tool-call'
+          }
+        | {
+            result?: unknown
+            toolCallId: string
+            toolName: string
+            /** @enum {string} */
+            type: 'tool-result'
+          }
+        | {
+            data?: unknown
+            type: string
+          }
+      )[]
+      /** @enum {string} */
+      role: 'user' | 'assistant' | 'system'
+    }
+    ChatSession: {
+      created_at: string
+      deleted_at?: string | null
+      /** Format: uuid */
+      id: string
+      name: string
+      project_ref: string
+      updated_at: string
+      /** Format: uuid */
+      user_id: string
+    }
     CreateApiKeyBody: {
       description?: string | null
       name: string
@@ -2428,6 +2526,9 @@ export interface components {
         [key: string]: string
       }
       with_data?: boolean
+    }
+    CreateChatSessionBody: {
+      name?: string
     }
     CreateOrganizationV1: {
       name: string
@@ -3377,6 +3478,41 @@ export interface components {
     RemoveReadReplicaBody: {
       database_identifier: string
     }
+    SaveMessagesBody: {
+      messages: {
+        id: string
+        metadata?: {
+          [key: string]: unknown
+        }
+        parts: (
+          | {
+              text: string
+              /** @enum {string} */
+              type: 'text'
+            }
+          | {
+              args?: unknown
+              toolCallId: string
+              toolName: string
+              /** @enum {string} */
+              type: 'tool-call'
+            }
+          | {
+              result?: unknown
+              toolCallId: string
+              toolName: string
+              /** @enum {string} */
+              type: 'tool-result'
+            }
+          | {
+              data?: unknown
+              type: string
+            }
+        )[]
+        /** @enum {string} */
+        role: 'user' | 'assistant' | 'system'
+      }[]
+    }
     SecretResponse: {
       name: string
       updated_at?: string
@@ -3840,6 +3976,9 @@ export interface components {
         | 'MIGRATIONS_FAILED'
         | 'FUNCTIONS_DEPLOYED'
         | 'FUNCTIONS_FAILED'
+    }
+    UpdateChatSessionBody: {
+      name?: string
     }
     UpdateCustomHostnameBody: {
       custom_hostname: string
@@ -6711,6 +6850,276 @@ export interface operations {
       }
       /** @description Failed to fetch database branch */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ChatSessionsController_listChatSessions: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ChatSession'][]
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ChatSessionsController_createChatSession: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateChatSessionBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ChatSession']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ChatSessionsController_deleteChatSession: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ChatSessionsController_updateChatSession: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateChatSessionBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ChatSession']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ChatSessionsController_getMessages: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ChatMessage'][]
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ChatSessionsController_saveMessages: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveMessagesBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
         headers: {
           [name: string]: unknown
         }

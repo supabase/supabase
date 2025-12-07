@@ -1,7 +1,13 @@
 import { Check, ChevronDown, Edit, Plus, Trash, X } from 'lucide-react'
 import { useState } from 'react'
 
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useChatSessionCreateMutation } from 'data/chat-sessions/chat-session-create-mutation'
+import { useChatSessionDeleteMutation } from 'data/chat-sessions/chat-session-delete-mutation'
+import { useChatSessionUpdateMutation } from 'data/chat-sessions/chat-session-update-mutation'
+import { useChatSessionsQuery } from 'data/chat-sessions/chat-sessions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
+import { useAiAssistantState, useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Button,
   cn,
@@ -24,17 +30,32 @@ interface AIAssistantChatSelectorProps {
 }
 
 export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSelectorProps) => {
+  const { data: project } = useSelectedProjectQuery()
   const snap = useAiAssistantStateSnapshot()
-  const currentChat = snap.activeChat?.name
+  const state = useAiAssistantState()
+
+  const shouldFetchSessions = IS_PLATFORM && !!project?.ref
+
+  // Fetch chats from server
+  const { data: sessions = [] } = useChatSessionsQuery(
+    { projectRef: project?.ref },
+    { enabled: shouldFetchSessions && !disabled, retry: false }
+  )
+
+  // Mutations
+  const createSession = useChatSessionCreateMutation()
+  const updateSession = useChatSessionUpdateMutation()
+  const deleteSession = useChatSessionDeleteMutation()
 
   const [chatSelectorOpen, setChatSelectorOpen] = useState(false)
   const [editingChatId, setEditingChatId] = useState<string | null>(null)
   const [editingChatName, setEditingChatName] = useState('')
 
-  const chats = Object.entries(snap.chats)
+  // Find current chat
+  const currentChat = sessions.find((s) => s.id === snap.activeChatId)
 
   const handleSelectChat = (id: string) => {
-    snap.selectChat(id)
+    state.setActiveChatId(id)
     setChatSelectorOpen(false)
   }
 
@@ -42,7 +63,22 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
     if (e) {
       e.stopPropagation()
     }
-    snap.deleteChat(id)
+    if (!project?.ref) return
+
+    deleteSession.mutate(
+      { id, projectRef: project.ref },
+      {
+        onSuccess: () => {
+          // If deleting the active chat, switch to another one
+          if (id === snap.activeChatId && sessions.length > 1) {
+            const remainingSessions = sessions.filter((s) => s.id !== id)
+            if (remainingSessions.length > 0) {
+              state.setActiveChatId(remainingSessions[0].id)
+            }
+          }
+        },
+      }
+    )
   }
 
   const handleStartEditChat = (id: string, name: string, e?: React.MouseEvent) => {
@@ -57,10 +93,20 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
     if (e) {
       e.stopPropagation()
     }
-    if (editingChatId && editingChatName.trim()) {
-      snap.renameChat(editingChatId, editingChatName.trim())
-      setEditingChatId(null)
-      setEditingChatName('')
+    if (editingChatId && editingChatName.trim() && project?.ref) {
+      updateSession.mutate(
+        {
+          id: editingChatId,
+          name: editingChatName.trim(),
+          projectRef: project.ref,
+        },
+        {
+          onSuccess: () => {
+            setEditingChatId(null)
+            setEditingChatName('')
+          },
+        }
+      )
     }
   }
 
@@ -84,6 +130,20 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
     }
   }
 
+  const handleNewChat = () => {
+    if (!project?.ref) return
+
+    createSession.mutate(
+      { projectRef: project.ref },
+      {
+        onSuccess: (newSession) => {
+          state.setActiveChatId(newSession.id)
+          setChatSelectorOpen(false)
+        },
+      }
+    )
+  }
+
   return (
     <Popover_Shadcn_ open={chatSelectorOpen} onOpenChange={setChatSelectorOpen}>
       <PopoverTrigger_Shadcn_ asChild>
@@ -93,7 +153,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
           iconRight={<ChevronDown size={14} />}
           className="max-w-64 truncate"
         >
-          {currentChat}
+          {currentChat?.name || 'New chat'}
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="w-[250px] p-0" align="start">
@@ -102,19 +162,18 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
           <CommandList_Shadcn_>
             <CommandEmpty_Shadcn_>No chats found.</CommandEmpty_Shadcn_>
             <CommandGroup_Shadcn_>
-              <ScrollArea className={chats.length > 4 ? 'h-40' : ''}>
-                {/* @ts-ignore */}
-                {chats.map(([id, chat]) => (
+              <ScrollArea className={sessions.length > 4 ? 'h-40' : ''}>
+                {sessions.map((session) => (
                   <CommandItem_Shadcn_
-                    key={id}
-                    value={id}
-                    onSelect={() => handleSelectChat(id)}
+                    key={session.id}
+                    value={session.id}
+                    onSelect={() => handleSelectChat(session.id)}
                     className="flex items-center justify-between gap-2 py-1 w-full overflow-hidden group"
-                    keywords={!!chat.name ? [chat.name] : undefined}
+                    keywords={session.name ? [session.name] : undefined}
                     disabled={disabled}
                   >
                     <div className="flex items-center w-full flex-1 min-w-0">
-                      {editingChatId === id ? (
+                      {editingChatId === session.id ? (
                         <div className="flex items-center gap-2 w-full">
                           <Input_Shadcn_
                             value={editingChatName}
@@ -158,30 +217,30 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
                           <Check
                             className={cn(
                               'mr-2 h-4 w-4 flex-shrink-0',
-                              snap.activeChatId === id ? 'opacity-100' : 'opacity-0'
+                              snap.activeChatId === session.id ? 'opacity-100' : 'opacity-0'
                             )}
                           />
                           <span className="truncate flex-1 min-w-0 overflow-hidden">
-                            {chat.name}
+                            {session.name}
                           </span>
                         </>
                       )}
                     </div>
-                    {editingChatId !== id && (
+                    {editingChatId !== session.id && (
                       <div className="flex items-center gap-x-0 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
                           type="text"
                           size="tiny"
                           icon={<Edit size={14} />}
-                          onClick={(e) => handleStartEditChat(id, chat.name, e)}
+                          onClick={(e) => handleStartEditChat(session.id, session.name, e)}
                           className="h-6 w-6"
                         />
-                        {chats.length > 1 && (
+                        {sessions.length > 1 && (
                           <Button
                             type="text"
                             size="tiny"
                             icon={<Trash size={14} />}
-                            onClick={(e) => handleDeleteChat(id, e)}
+                            onClick={(e) => handleDeleteChat(session.id, e)}
                             className="h-6 w-6"
                           />
                         )}
@@ -195,15 +254,9 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
             <CommandGroup_Shadcn_>
               <CommandItem_Shadcn_
                 className="cursor-pointer w-full gap-x-2"
-                onSelect={() => {
-                  snap.newChat()
-                  setChatSelectorOpen(false)
-                }}
-                onClick={() => {
-                  snap.newChat()
-                  setChatSelectorOpen(false)
-                }}
-                disabled={disabled}
+                onSelect={handleNewChat}
+                onClick={handleNewChat}
+                disabled={disabled || createSession.isLoading}
               >
                 <Plus size={14} strokeWidth={1.5} />
                 <span>Start a new chat</span>

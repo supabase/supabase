@@ -1,10 +1,18 @@
 import pgMeta from '@supabase/pg-meta'
-import { convertToModelMessages, type ModelMessage, stepCountIs, streamText } from 'ai'
+import {
+  convertToModelMessages,
+  createIdGenerator,
+  type ModelMessage,
+  stepCountIs,
+  streamText,
+  type UIMessage,
+} from 'ai'
 import { source } from 'common-tags'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
 import { IS_PLATFORM } from 'common'
+import { get, post } from 'data/fetchers'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
@@ -55,7 +63,8 @@ const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
 export default wrapper
 
 const requestBodySchema = z.object({
-  messages: z.array(z.any()),
+  message: z.any(), // Single message from the user
+  chatId: z.string().uuid().optional(), // Chat session ID
   projectRef: z.string(),
   connectionString: z.string(),
   schema: z.string().optional(),
@@ -81,13 +90,32 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const {
-    messages: rawMessages,
+    message,
+    chatId,
     projectRef,
     connectionString,
     orgSlug,
     chatName,
     model: requestedModel,
   } = data
+
+  // Load previous messages from the database if chatId is provided
+  let previousMessages: UIMessage[] = []
+  if (chatId && projectRef) {
+    try {
+      const { data } = await get(`/v1/projects/{ref}/chat-sessions/{id}/messages`, {
+        params: { path: { ref: projectRef, id: chatId } },
+      })
+      if (data) {
+        previousMessages = data
+      }
+    } catch (error) {
+      console.error('Failed to load previous messages:', error)
+      // Continue without previous messages
+    }
+  }
+
+  const rawMessages = [...previousMessages, message]
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let isLimited = false
@@ -235,8 +263,23 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       abortSignal: abortController.signal,
     })
 
-    result.pipeUIMessageStreamToResponse(res, {
+    const uiMessageStreamResponse = result.toUIMessageStreamResponse({
+      originalMessages: rawMessages,
+      generateMessageId: createIdGenerator({ prefix: 'msg', size: 16 }),
       sendReasoning: true,
+      onFinish: async ({ messages }) => {
+        // Save messages to database if chatId is provided
+        if (chatId && projectRef) {
+          try {
+            await post(`/v1/projects/{ref}/chat-sessions/{id}/messages`, {
+              params: { path: { ref: projectRef, id: chatId } },
+              body: { messages },
+            })
+          } catch (error) {
+            console.error('Failed to save messages:', error)
+          }
+        }
+      },
       onError: (error) => {
         if (error == null) {
           return 'unknown error'
@@ -253,6 +296,27 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         return JSON.stringify(error)
       },
     })
+
+    // Stream the response
+    res.writeHead(uiMessageStreamResponse.status, {
+      'Content-Type': 'text/plain; charset=utf-8',
+      ...Object.fromEntries(uiMessageStreamResponse.headers.entries()),
+    })
+
+    if (uiMessageStreamResponse.body) {
+      const reader = uiMessageStreamResponse.body.getReader()
+      try {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          res.write(value)
+        }
+      } finally {
+        reader.releaseLock()
+      }
+    }
+
+    res.end()
   } catch (error) {
     console.error('Error in handlePost:', error)
     if (error instanceof Error) {

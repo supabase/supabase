@@ -12,6 +12,9 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { useRateMessageMutation } from 'data/ai/rate-message-mutation'
+import { useChatSessionCreateMutation } from 'data/chat-sessions/chat-session-create-mutation'
+import { useChatSessionMessagesQuery } from 'data/chat-sessions/chat-session-messages-query'
+import { useChatSessionsQuery } from 'data/chat-sessions/chat-sessions-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
@@ -62,6 +65,39 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const state = useAiAssistantState()
   const { closeSidebar, activeSidebar } = useSidebarManagerSnapshot()
 
+  // Avoid hammering the API when project ref is unavailable or if previous calls failed
+  const shouldFetchSessions = IS_PLATFORM && !!project?.ref && !disablePrompts
+  const [sessionFetchError, setSessionFetchError] = useState<string | null>(null)
+
+  // Load sessions from server
+  const {
+    data: sessions = [],
+    isLoading: isLoadingSessions,
+    error: chatSessionsError,
+  } = useChatSessionsQuery(
+    { projectRef: project?.ref },
+    {
+      enabled: shouldFetchSessions,
+      retry: false,
+      onError: (err) => {
+        setSessionFetchError(err.message ?? 'Failed to load chat sessions')
+      },
+    }
+  )
+
+  // Load messages for active chat
+  const { data: initialMessages = [] } = useChatSessionMessagesQuery(
+    { id: snap.activeChatId, projectRef: project?.ref },
+    { enabled: shouldFetchSessions && !!snap.activeChatId && !chatSessionsError }
+  )
+
+  const createSession = useChatSessionCreateMutation()
+
+  const [updatedOptInSinceMCP] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
+    false
+  )
+
   const isPaidPlan = selectedOrganization?.plan?.id !== 'free'
 
   const selectedModel = useMemo<AssistantModel>(() => {
@@ -75,11 +111,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     return model
   }, [isPaidPlan, snap.model])
 
-  const [updatedOptInSinceMCP] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
-    false
-  )
-
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
@@ -88,8 +119,39 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     !!selectedOrganization &&
     (aiOptInLevel === 'disabled' || aiOptInLevel === 'schema')
 
-  // Add a ref to store the last user message
-  const lastUserMessageRef = useRef<MessageType | null>(null)
+  // // Initialize active chat if none selected
+  // useEffect(() => {
+  //   if (!shouldFetchSessions || isLoadingSessions || chatSessionsError) return
+  //   if (!snap.activeChatId && sessions.length > 0) {
+  //     // Select the most recently updated chat
+  //     const mostRecentSession = sessions.sort(
+  //       (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+  //     )[0]
+  //     state.setActiveChatId(mostRecentSession.id)
+  //   } else if (!snap.activeChatId && sessions.length === 0 && project?.ref) {
+  //     // Create a new chat if none exist
+  //     createSession.mutate(
+  //       { projectRef: project.ref },
+  //       {
+  //         onSuccess: (newSession) => {
+  //           state.setActiveChatId(newSession.id)
+  //         },
+  //         onError: (err) => {
+  //           setSessionFetchError(err.message ?? 'Failed to create chat session')
+  //         },
+  //       }
+  //     )
+  //   }
+  // }, [
+  //   shouldFetchSessions,
+  //   isLoadingSessions,
+  //   chatSessionsError,
+  //   sessions,
+  //   snap.activeChatId,
+  //   project?.ref,
+  //   state,
+  //   createSession,
+  // ])
 
   // Keep latest selected organization to avoid stale values in useChat transport
   const selectedOrganizationRef = useRef(selectedOrganization)
@@ -122,7 +184,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const currentTable = tables?.find((t) => t.id.toString() === entityId)
   const currentSchema = searchParams?.get('schema') ?? 'public'
-  const currentChat = snap.activeChat?.name
+  const currentChat = sessions.find((s) => s.id === snap.activeChatId)?.name
 
   // Update context in state
   useEffect(() => {
@@ -146,8 +208,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     regenerate,
   } = useChat({
     id: snap.activeChatId,
-    ...(snap.activeChatId && snap.chatInstances[snap.activeChatId]
-      ? { chat: snap.chatInstances[snap.activeChatId] }
+    ...(snap.activeChatId
+      ? { chat: state.getChatInstance(snap.activeChatId, initialMessages) }
       : {}),
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
     onError: onErrorChat,
@@ -312,8 +374,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       id: uuidv4(),
     } as MessageType
 
-    snap.clearSqlSnippets()
-    lastUserMessageRef.current = payload
+    state.clearSqlSnippets()
     sendMessage(payload, {
       body: {
         schema: currentSchema,
@@ -341,12 +402,34 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     }
   }
 
+  const handleNewChat = () => {
+    if (!project?.ref) return
+
+    createSession.mutate(
+      { projectRef: project.ref },
+      {
+        onSuccess: (newSession) => {
+          state.setActiveChatId(newSession.id)
+        },
+      }
+    )
+  }
+
   const handleClearMessages = () => {
     if (isChatLoading) stop()
-    snap.clearMessages()
-    setMessages([])
-    lastUserMessageRef.current = null
-    setEditingMessageId(null)
+    // Create a new chat to replace the current one
+    if (project?.ref) {
+      createSession.mutate(
+        { projectRef: project.ref },
+        {
+          onSuccess: (newSession) => {
+            state.setActiveChatId(newSession.id)
+            setMessages([])
+            setEditingMessageId(null)
+          },
+        }
+      )
+    }
   }
 
   useEffect(() => {
@@ -395,7 +478,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       <div className={cn('flex flex-col h-full w-full md:h-full max-h-[100dvh]', className)}>
         <AIAssistantHeader
           isChatLoading={isChatLoading}
-          onNewChat={snap.newChat}
+          onNewChat={handleNewChat}
           onCloseAssistant={() => closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)}
           showMetadataWarning={showMetadataWarning}
           updatedOptInSinceMCP={updatedOptInSinceMCP}
@@ -431,7 +514,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       <Button
                         type="default"
                         size="tiny"
-                        onClick={() => snap.newChat()}
+                        onClick={handleNewChat}
                         className="text-xs"
                       >
                         New chat

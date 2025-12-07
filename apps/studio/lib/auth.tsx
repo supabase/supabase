@@ -9,7 +9,6 @@ import {
   posthogClient,
   useAuthError,
 } from 'common'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
 
 const AuthErrorToaster = ({ children }: PropsWithChildren) => {
@@ -42,16 +41,13 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
 export function useSignOut() {
   const queryClient = useQueryClient()
-  const { clearStorage: clearAssistantStorage } = useAiAssistantStateSnapshot()
 
   return useCallback(async () => {
     const result = await gotrueClient.signOut()
     posthogClient.reset()
     clearLocalStorage()
-    // Clear Assistant IndexedDB
-    await clearAssistantStorage()
     queryClient.clear()
 
     return result
-  }, [queryClient, clearAssistantStorage])
+  }, [queryClient])
 }
