@@ -123,7 +123,8 @@
         "AI_PRO_MODEL",
         "AI_NORMAL_MODEL",
         "SUPPORT_SUPABASE_SECRET_KEY",
-        "NEXT_PUBLIC_IS_NIMBUS"
+        "NEXT_PUBLIC_IS_NIMBUS",
+        "NEXT_PUBLIC_ONGOING_INCIDENT"
       ],
       "passThroughEnv": ["CURRENT_CLI_VERSION", "VERCEL_GIT_COMMIT_SHA"],
       "outputs": [".next/**", "!.next/cache/**"]
