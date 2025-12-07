@@ -86,7 +86,7 @@ export const AlertError = ({
           <ContactSupportButton projectRef={projectRef} subject={subject} error={error} />
         )
       }
-      className={className ? className : undefined}
+      className={className}
     />
   )
 }
