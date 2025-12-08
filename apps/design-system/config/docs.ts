@@ -89,11 +89,6 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Alert Error',
-          href: '/docs/fragments/alert-error',
-          items: [],
-        },
-        {
           title: 'Assistant Chat',
           href: '/docs/fragments/assistant-chat',
           items: [],
