@@ -43,7 +43,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
     const numberDisplay = totalErrors.toString()
     return (
       <h2>
-        Assistant found {numberDisplay} {issuesText}
+        Advisor found {numberDisplay} {issuesText}
       </h2>
     )
   }, [totalErrors])
