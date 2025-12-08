@@ -8,9 +8,10 @@ import { Admonition } from 'ui-patterns'
 interface AlphaNoticeProps {
   entity: string
   feedbackUrl: string
+  className?: string
 }
 
-export const AlphaNotice = ({ entity, feedbackUrl }: AlphaNoticeProps) => {
+export const AlphaNotice = ({ entity, feedbackUrl, className }: AlphaNoticeProps) => {
   return (
     <Admonition
       showIcon={false}
@@ -23,6 +24,7 @@ export const AlphaNotice = ({ entity, feedbackUrl }: AlphaNoticeProps) => {
           </Link>
         </Button>
       }
+      className={className}
     >
       {/* Background image */}
       <div className="absolute -inset-16 z-0 opacity-50">
