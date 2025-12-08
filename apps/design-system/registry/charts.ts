@@ -49,4 +49,12 @@ export const charts: Registry = [
     category: 'Charts',
     subcategory: 'Composed',
   },
+  {
+    name: 'chart-composed-actions',
+    type: 'components:block',
+    registryDependencies: ['chart'],
+    files: ['block/chart-composed-actions.tsx'],
+    category: 'Charts',
+    subcategory: 'Composed',
+  },
 ]

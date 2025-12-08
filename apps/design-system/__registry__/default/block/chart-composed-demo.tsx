@@ -2,32 +2,19 @@
 
 import {
   Chart,
-  ChartActions,
   ChartCard,
   ChartContent,
   ChartHeader,
-  ChartTitle,
   ChartEmptyState,
   ChartLoadingState,
   ChartMetric,
-  ChartFooter,
 } from 'ui-patterns/Chart'
-import { BarChart2, ExternalLink } from 'lucide-react'
+import { BarChart2 } from 'lucide-react'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 import { useState, useEffect } from 'react'
 
 export default function ComposedChartDemo() {
   const [isLoading, setIsLoading] = useState(true)
-
-  const actions = [
-    {
-      label: 'Open in Logs Explorer',
-      onClick: () => {
-        alert('Ta da! You clicked me! 🎉')
-      },
-      icon: <ExternalLink size={12} />,
-    },
-  ]
 
   const data = Array.from({ length: 60 }, (_, i) => {
     const date = new Date()
@@ -53,12 +40,6 @@ export default function ComposedChartDemo() {
     <div className="w-8/12">
       <Chart isLoading={isLoading}>
         <ChartCard>
-          {/* <ChartHeader>
-            <ChartTitle tooltip="This is a tooltip">My Chart Title</ChartTitle>
-
-            <ChartActions actions={actions} />
-          </ChartHeader> */}
-
           <ChartHeader>
             <ChartMetric
               label="Total Users"
@@ -70,7 +51,6 @@ export default function ComposedChartDemo() {
               <ChartMetric label="Err" value="736" status="negative" align="end" />
             </div>
           </ChartHeader>
-
           <ChartContent
             isEmpty={data.length === 0}
             emptyState={
@@ -86,8 +66,6 @@ export default function ComposedChartDemo() {
               <LogsBarChart data={data} isFullHeight={true} />
             </div>
           </ChartContent>
-
-          {/* <ChartFooter>Footer here, pass a table here etc.</ChartFooter> */}
         </ChartCard>
       </Chart>
     </div>
