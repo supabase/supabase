@@ -47,7 +47,7 @@ export function useApiKeysCommands() {
           badge: () => (
             <span className="flex items-center gap-x-1">
               <Badge>Project: {project?.name}</Badge>
-              <Badge className="capitalize">{publishableKey.type}</Badge>
+              <Badge>{publishableKey.type}</Badge>
             </span>
           ),
           icon: () => <Key />,
@@ -63,7 +63,7 @@ export function useApiKeysCommands() {
             badge: () => (
               <span className="flex items-center gap-x-1">
                 <Badge>Project: {project?.name}</Badge>
-                <Badge className="capitalize">{key.type}</Badge>
+                <Badge>{key.type}</Badge>
               </span>
             ),
             icon: () => <Key />,
@@ -81,7 +81,7 @@ export function useApiKeysCommands() {
             <span className="flex items-center gap-x-1">
               <Badge>Project: {project?.name}</Badge>
               <Badge>Public</Badge>
-              <Badge className="capitalize">{anonKey.type}</Badge>
+              <Badge>{anonKey.type}</Badge>
             </span>
           ),
           icon: () => <Key />,
@@ -98,7 +98,7 @@ export function useApiKeysCommands() {
             <span className="flex items-center gap-x-1">
               <Badge>Project: {project?.name}</Badge>
               <Badge variant="destructive">Secret</Badge>
-              <Badge className="capitalize">{serviceKey.type}</Badge>
+              <Badge>{serviceKey.type}</Badge>
             </span>
           ),
           icon: () => <Key />,
