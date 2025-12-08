@@ -1,5 +1,6 @@
 import { BarChart, Shield } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
+import ReactMarkdown from 'react-markdown'
 
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
@@ -37,7 +38,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
   const totalErrors = errorLints.length
 
   const titleContent = useMemo(() => {
-    if (totalErrors === 0) return <h2>Assistant found no issues</h2>
+    if (totalErrors === 0) return <h2>Advisor found no issues</h2>
     const issuesText = totalErrors === 1 ? 'issue' : 'issues'
     const numberDisplay = totalErrors.toString()
     return (
@@ -138,8 +139,10 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
                     />
                   </CardHeader>
                   <CardContent className="p-6 pt-16 flex flex-col justify-end flex-1 overflow-auto">
-                    {lint.detail ? lint.detail.substring(0, 100) : lint.title}
-                    {lint.detail && lint.detail.length > 100 && '...'}
+                    <h3 className="mb-1">{lint.title}</h3>
+                    <ReactMarkdown className="leading-6 text-sm text-foreground-light">
+                      {lint.detail && lint.detail.replace(/\\`/g, '`')}
+                    </ReactMarkdown>
                   </CardContent>
                 </Card>
               )
@@ -155,8 +158,8 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
 
 function EmptyState() {
   return (
-    <Card className="bg-transparent">
-      <CardContent className="flex flex-col items-center justify-center gap-2 p-16">
+    <Card className="bg-transparent h-64">
+      <CardContent className="flex flex-col items-center justify-center gap-2 p-16 h-full">
         <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
         <p className="text-sm text-foreground-light text-center">
           No security or performance errors found
