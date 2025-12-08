@@ -104,7 +104,7 @@ export const useRealtimeMessages = (
     const realtimeOptions = merge(DEFAULT_REALTIME_OPTIONS, { params: { log_level: logLevel } })
 
     const options = {
-      vsn: '1.0.0',
+      vsn: '2.0.0',
       headers: DEFAULT_GLOBAL_OPTIONS.headers,
       ...realtimeOptions,
       params: { apikey: token, ...realtimeOptions.params },

@@ -1,10 +1,11 @@
+import { ArrowRight, ExternalLink, Info, Key, Timer } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
+
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
 import { JWTSigningKey } from 'data/jwt-signing-keys/jwt-signing-keys-query'
-import { ArrowRight, ExternalLink, Info, Key, Timer } from 'lucide-react'
-import { useState } from 'react'
-import { toast } from 'sonner'
 import {
   Badge,
   Button,
@@ -71,7 +72,7 @@ export function RotateKeyDialog({
               'px-4 py-1 gap-2 flex flex-row items-center uppercase'
             )}
           >
-            <Timer className="size-4" />
+            <Timer size={14} />
             Standby key
           </Badge>
           <div>
@@ -84,7 +85,7 @@ export function RotateKeyDialog({
                 'px-4 py-1 gap-2 flex flex-row items-center uppercase'
               )}
             >
-              <Key className="size-4" />
+              <Key size={14} />
               Current key
             </Badge>
           </div>
@@ -102,7 +103,7 @@ export function RotateKeyDialog({
               'px-4 py-1 gap-2 flex flex-row items-center uppercase'
             )}
           >
-            <Key className="size-4" />
+            <Key size={14} />
             Current key
           </Badge>
           <div>
@@ -114,7 +115,7 @@ export function RotateKeyDialog({
               'px-4 py-1 gap-2 flex flex-row items-center uppercase'
             )}
           >
-            <Timer className="size-4" />
+            <Timer size={14} />
             Previous key
           </Badge>
           <div />

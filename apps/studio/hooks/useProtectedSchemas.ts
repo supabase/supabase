@@ -19,6 +19,7 @@ import { useSelectedProjectQuery } from './misc/useSelectedProject'
 export const INTERNAL_SCHEMAS = [
   'auth',
   'cron',
+  'etl',
   'extensions',
   'information_schema',
   'net',

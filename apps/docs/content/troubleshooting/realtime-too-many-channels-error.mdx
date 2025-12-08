@@ -1,0 +1,247 @@
+---
+title = "Fixing the TooManyChannels Error"
+github_url = ""
+date_created = "2025-11-28T00:00:00+00:00"
+topics = [ "realtime" ]
+keywords = [ "channels", "useEffect", "react", "memory leak", "quota", "TooManyChannels", "ChannelRateLimitReached", "unsubscribe", "cleanup" ]
+database_id = ""
+---
+
+{/* supa-mdx-lint-disable Rule003Spelling */}
+
+## What is the TooManyChannels error?
+
+The TooManyChannels error occurs when your application tries to create more than the allowed number of Realtime channels. When you exceed this limit, you'll see an error with the code `ChannelRateLimitReached`.
+
+This limit exists to protect both your application and Supabase servers from resource exhaustion.
+
+## What causes TooManyChannels errors?
+
+{/* supa-mdx-lint-enable Rule003Spelling */}
+The most common cause is accidentally creating channels without cleaning them up, especially in React applications. This happens when:
+
+{/* supa-mdx-lint-disable Rule003Spelling */}
+
+- Components create channels on every render without unsubscribing
+- `useEffect` runs multiple times due to missing or incorrect dependencies
+- Components unmount without cleaning up their channels
+- Development mode in React (StrictMode) causes effects to run twice
+  {/* supa-mdx-lint-enable Rule003Spelling */}
+
+Each time you call `supabase.channel('topic').subscribe()`, a new channel is created unless you properly clean it up.
+{/* supa-mdx-lint-disable Rule003Spelling */}
+Here's the most common mistake that might lead to TooManyChannels errors:
+{/* supa-mdx-lint-enable Rule003Spelling */}
+
+```tsx
+// ❌ WRONG - Creates new channel on every render
+function ChatRoom() {
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+  useEffect(() => {
+    const channel = supabase.channel('chat')
+
+    channel
+      .on('broadcast', { event: 'message' }, (payload) => {
+        console.log(payload)
+      })
+      .subscribe()
+
+    // Missing cleanup!
+  }, []) // supabase is missing from dependencies
+
+  return <div>Chat</div>
+}
+```
+
+Why this fails:
+
+- Creating `supabase` client inside component causes it to change on every render
+- Missing `supabase` from dependencies array
+- No cleanup function to unsubscribe the channel
+- Each render creates a new channel that's never removed
+
+## The correct approach
+
+```tsx
+// ✅ CORRECT - Properly manages channel lifecycle
+import { useEffect } from 'react'
+import { createClient } from '@supabase/supabase-js'
+
+// Create client outside component (singleton)
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+function ChatRoom() {
+  useEffect(() => {
+    const channel = supabase
+      .channel('chat')
+      .on('broadcast', { event: 'message' }, (payload) => {
+        console.log(payload)
+      })
+      .subscribe()
+
+    // Cleanup function - ALWAYS unsubscribe!
+    return () => {
+      channel.unsubscribe()
+    }
+  }, []) // Empty dependencies because supabase is stable
+
+  return <div>Chat</div>
+}
+```
+
+## How to debug channel creation
+
+Check how many channels your app has created:
+
+```tsx
+import { useEffect } from 'react'
+
+function ChannelDebugger() {
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const channels = supabase.getChannels()
+      console.log(`Active channels: ${channels.length}`)
+      console.log(
+        'Channel topics:',
+        channels.map((c) => c.topic)
+      )
+    }, 2000)
+
+    return () => clearInterval(interval)
+  }, [supabase])
+
+  return <div>Check console for channel count</div>
+}
+```
+
+If you see the number climbing, you have a leak. Look for:
+
+- Channel count increasing without user action
+- Same channel topics appearing multiple times
+- Count going up when navigating between pages
+
+## Best practices for channel management
+
+### 1. Create Supabase client outside components
+
+```tsx
+// ✅ Create once at module level
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+function MyComponent() {
+  // Use the stable client
+}
+```
+
+### 2. Always unsubscribe in cleanup
+
+```tsx
+useEffect(() => {
+  const channel = supabase.channel('topic').subscribe()
+
+  return () => {
+    channel.unsubscribe()
+  }
+}, [])
+```
+
+### 3. Use stable channel names
+
+```tsx
+// ❌ WRONG - Creates new channel topic on every render
+function BadExample({ userId }) {
+  useEffect(() => {
+    const channel = supabase
+      .channel(`user-${Math.random()}`) // Random topic!
+      .subscribe()
+
+    return () => {
+      channel.unsubscribe()
+    }
+  }, [userId])
+}
+
+// ✅ CORRECT - Predictable channel topic
+function GoodExample({ userId }) {
+  useEffect(() => {
+    const channel = supabase.channel(`user-${userId}`).subscribe()
+
+    return () => {
+      channel.unsubscribe()
+    }
+  }, [userId])
+}
+```
+
+### 4. Reuse channels when possible
+
+The Supabase client automatically reuses channels with the same topic:
+
+```tsx
+// These return the same channel instance
+const channel1 = supabase.channel('chat')
+const channel2 = supabase.channel('chat') // Same as channel1
+
+console.log(channel1 === channel2) // true
+```
+
+### 5. Handle strict mode in development
+
+{/* supa-mdx-lint-disable Rule003Spelling */}
+React StrictMode intentionally runs effects twice in development. Your cleanup function will handle this:
+{/* supa-mdx-lint-enable Rule003Spelling */}
+
+```tsx
+// This works correctly even in StrictMode
+useEffect(() => {
+  console.log('Effect running')
+  const channel = supabase.channel('chat').subscribe()
+
+  return () => {
+    console.log('Cleanup running')
+    channel.unsubscribe()
+  }
+}, [])
+```
+
+{/* supa-mdx-lint-disable Rule003Spelling */}
+
+### 6. Clean up on unmount for dynamic channels
+
+If you create channels based on props:
+
+```tsx
+function RoomComponent({ roomId }) {
+  useEffect(() => {
+    const channel = supabase
+      .channel(`room:${roomId}`)
+      .on('broadcast', { event: 'message' }, handleMessage)
+      .subscribe()
+
+    return () => {
+      channel.unsubscribe()
+    }
+  }, [roomId]) // Re-subscribe when roomId changes
+}
+```
+
+### 7. Remove all channels when disconnecting
+
+When logging out or leaving your app:
+
+```tsx
+function LogoutButton() {
+  const handleLogout = async () => {
+    // Clean up all channels before logout
+    await supabase.removeAllChannels()
+
+    // Then handle logout
+    await supabase.auth.signOut()
+  }
+
+  return <button onClick={handleLogout}>Logout</button>
+}
+```

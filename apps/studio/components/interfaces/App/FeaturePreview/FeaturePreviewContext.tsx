@@ -28,13 +28,10 @@ export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 
 export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
   const { hasLoaded } = useContext(FeatureFlagContext)
-  const securityNotificationsFlag = useFlag('securityNotifications')
 
   // [Joshen] Similar logic to feature flagging previews, we can use flags to default opt in previews
   const isDefaultOptIn = (feature: (typeof FEATURE_PREVIEWS)[number]) => {
     switch (feature.key) {
-      case LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS:
-        return securityNotificationsFlag
       default:
         return false
     }
@@ -106,11 +103,6 @@ export const useIsBranching2Enabled = () => {
 export const useIsAdvisorRulesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
-}
-
-export const useIsSecurityNotificationsEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS]
 }
 
 export const useFeaturePreviewModal = () => {
