@@ -81,15 +81,16 @@ export const SupabaseSelect = () => {
 
         {/* Content */}
         <div className="flex flex-col justify-end h-full px-4 lg:px-8 py-0 relative">
-          <h2 className="font-bold tracking-tight text-6xl md:text-7xl lg:text-[5.6rem]">
+          <h2 className="font-medium tracking-tighter text-6xl md:text-7xl lg:text-[5.6rem]">
             Supabase Select
           </h2>
         </div>
       </section>
 
       <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 lg:px-8 py-12">
-        <h3 className="text-2xl">Our first user conference was a blast</h3>
-        <p className="text-base text-foreground-lighter mt-4">Thank you for being part of it.</p>
+        <h3 className="text-lg">
+          Our first user conference was a blast — Thank you for being part of it.
+        </h3>
       </div>
 
       {/* Grid separator top */}

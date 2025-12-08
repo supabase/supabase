@@ -1,9 +1,4 @@
-'use client'
-
-import { useState } from 'react'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown } from 'lucide-react'
 import { AnimatedGridBackground } from '../AnimatedGridBackground'
 import { cn } from 'ui'
 
@@ -244,88 +239,43 @@ const months: Month[] = [
   },
 ]
 
-function MonthAccordion({
-  month,
-  isOpen,
-  onToggle,
-}: {
-  month: Month
-  isOpen: boolean
-  onToggle: () => void
-}) {
+function MonthSection({ month }: { month: Month }) {
   return (
     <div>
-      <button
-        onClick={onToggle}
-        className="w-full px-6 lg:px-8 py-2.5 md:py-4 flex items-center justify-between hover:bg-surface-75 transition-colors"
-      >
-        <div className="flex items-center gap-3">
-          <span className="text-base font-medium">{month.name}</span>
-          {month.isLaunchWeek && (
-            <span className="text-xs bg-brand/10 text-brand px-2 py-0.5 rounded-full">
-              Launch Week
-            </span>
-          )}
-          <span className="text-sm text-foreground-muted">
-            {month.announcements.length} announcements
+      <div className="px-6 lg:px-8 py-2.5 md:py-4 flex items-center gap-3">
+        <span className="text-base font-medium">{month.name}</span>
+        {month.isLaunchWeek && (
+          <span className="text-xs bg-brand/10 text-brand px-2 py-0.5 rounded-full">
+            Launch Week
           </span>
-        </div>
-        <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
-          <ChevronDown className="w-5 h-5 text-foreground-muted" />
-        </motion.div>
-      </button>
-
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="overflow-hidden"
-          >
-            <ul className="px-6 lg:px-8 pb-4 space-y-2">
-              {month.announcements.map((announcement) => (
-                <li key={announcement.title}>
-                  <Link
-                    href={announcement.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center gap-2 text-sm text-foreground-light hover:text-foreground transition-colors"
-                  >
-                    <span className="text-foreground-muted group-hover:text-foreground transition-colors">
-                      →
-                    </span>
-                    {announcement.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
         )}
-      </AnimatePresence>
+        <span className="text-sm text-foreground-muted">
+          {month.announcements.length} announcements
+        </span>
+      </div>
+
+      <ul className="px-6 lg:px-8 pb-4 space-y-2">
+        {month.announcements.map((announcement) => (
+          <li key={announcement.title}>
+            <Link
+              href={announcement.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center gap-2 text-sm text-foreground-light hover:text-foreground transition-colors"
+            >
+              <span className="text-foreground-muted group-hover:text-foreground transition-colors">
+                →
+              </span>
+              {announcement.title}
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
 
 export const ProductAnnouncements = () => {
-  // All months open by default
-  const [openMonths, setOpenMonths] = useState<Set<string>>(
-    () => new Set(months.map((m) => m.name))
-  )
-
-  const handleToggle = (monthName: string) => {
-    setOpenMonths((prev) => {
-      const next = new Set(prev)
-      if (next.has(monthName)) {
-        next.delete(monthName)
-      } else {
-        next.add(monthName)
-      }
-      return next
-    })
-  }
-
   return (
     <>
       <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x">
@@ -344,17 +294,15 @@ export const ProductAnnouncements = () => {
 
         {/* Content */}
         <div className="flex flex-col justify-end h-full px-4 lg:px-8 py-0 relative">
-          <h2 className="font-bold tracking-tight text-6xl md:text-7xl lg:text-[5.6rem]">
+          <h2 className="font-medium tracking-tighter text-6xl md:text-7xl lg:text-[5.6rem]">
             Launch <span className="line-through text-foreground-muted">Week</span> Year
           </h2>
         </div>
       </section>
 
       <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 lg:px-8 py-12">
-        <h3 className="text-2xl">Product Announcements</h3>
-        <p className="text-base text-foreground-lighter mt-4">
-          Everything we shipped in 2025. Click on a month to explore.
-        </p>
+        <h3 className="text-lg">Product Announcements</h3>
+        <p className="text-base text-foreground-lighter mt-4">Everything we shipped in 2025.</p>
       </div>
 
       {/* Months accordion - 2 columns, top-to-bottom flow */}
@@ -380,11 +328,7 @@ export const ProductAnnouncements = () => {
                   index === reordered.length - 1 && 'border-b-0'
                 )}
               >
-                <MonthAccordion
-                  month={month}
-                  isOpen={openMonths.has(month.name)}
-                  onToggle={() => handleToggle(month.name)}
-                />
+                <MonthSection month={month} />
               </div>
             ))
           })()}

@@ -1,39 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import NumberFlow from '@number-flow/react'
 import { AnimatedGridBackground } from '../AnimatedGridBackground'
-
-interface AnimatedCounterProps {
-  value: number
-  increment: number
-  intervalMs?: number
-  compact?: boolean
-}
-
-function AnimatedCounter({ value, increment, intervalMs = 1000, compact }: AnimatedCounterProps) {
-  const [count, setCount] = useState(value)
-
-  useEffect(() => {
-    if (increment <= 0) return
-
-    const interval = setInterval(() => {
-      setCount((prev) => prev + increment)
-    }, intervalMs)
-
-    return () => clearInterval(interval)
-  }, [increment, intervalMs])
-
-  return (
-    <NumberFlow
-      value={count}
-      format={compact ? { notation: 'compact', maximumFractionDigits: 1 } : undefined}
-      transformTiming={{ duration: 500, easing: 'ease-out' }}
-      spinTiming={{ duration: 500, easing: 'ease-out' }}
-      opacityTiming={{ duration: 300, easing: 'ease-out' }}
-    />
-  )
-}
+import { AnimatedCounter } from '../AnimatedCounter'
 
 const heroStats = [
   {
@@ -108,15 +76,15 @@ export const Devs = () => {
         {/* Content */}
         <div className="flex flex-col justify-end h-full px-4 py-0 relative">
           <div className="flex justify-between items-center">
-            <h2 className="font-bold tracking-tight text-6xl md:text-7xl lg:text-[5.6rem]">
-              Devs <span className="text-brand">💚</span> Supabase
+            <h2 className="font-medium tracking-tighter text-6xl md:text-7xl lg:text-[5.6rem]">
+              Devs <span className="text-brand">love</span> Supabase
             </h2>
           </div>
         </div>
       </section>
 
       <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 lg:px-8 py-12">
-        <p className="text-xl text-foreground-light max-w-2xl">
+        <p className="text-lg text-foreground-light max-w-2xl">
           In 2025, developers around the world shipped faster, scaled further, and built things we
           never imagined. Here is what you accomplished on Supabase.
         </p>
@@ -129,14 +97,14 @@ export const Devs = () => {
           className="relative max-w-[60rem] mx-auto border-x border-b p-8 bg-surface-75"
         >
           <div className="flex flex-col gap-2">
-            <p className="text-4xl md:text-5xl font-mono font-bold text-brand tracking-tight">
+            <p className="text-4xl md:text-5xl font-mono font-medium text-brand tracking-tighter">
               <AnimatedCounter
                 value={stat.number}
                 increment={stat.increment}
                 intervalMs={stat.intervalMs}
               />
             </p>
-            <p className="text-lg text-foreground-light">{stat.headline}</p>
+            <p className="text-base text-foreground-light">{stat.headline}</p>
           </div>
         </div>
       ))}
@@ -158,7 +126,7 @@ export const Devs = () => {
                   >
                     <div className="flex flex-col gap-2">
                       <p
-                        className={`text-2xl md:text-3xl font-mono font-bold tracking-tight ${stat.increment > 0 ? 'text-brand' : 'text-foreground'}`}
+                        className={`text-2xl md:text-3xl font-mono font-medium tracking-tighter ${stat.increment > 0 ? 'text-brand' : 'text-foreground'}`}
                       >
                         {stat.suffix ? (
                           <>

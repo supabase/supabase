@@ -129,7 +129,7 @@ function FloatingBoxes() {
       {floatingBoxes.map((box) => (
         <motion.div
           key={box.id}
-          className={cn('absolute pointer-events-none', box.type === 'stripes' && 'border')}
+          className={cn('absolute pointer-events-none border')}
           style={{
             top: `${box.top}%`,
             left: `${box.left}%`,

@@ -35,7 +35,7 @@ export const YearOfAI = () => {
         {/* Content */}
         <div className="flex flex-col justify-end h-full px-4 lg:px-8 py-0 relative">
           <div className="flex justify-between items-center">
-            <h2 className="font-bold tracking-tight text-6xl md:text-7xl lg:text-[5.6rem]">
+            <h2 className="font-medium tracking-tighter text-6xl md:text-7xl lg:text-[5.6rem]">
               Year of AI
             </h2>
           </div>
@@ -43,7 +43,7 @@ export const YearOfAI = () => {
       </section>
 
       <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 lg:px-8 py-12 grid md:grid-cols-2 gap-8 items-start">
-        <h3 className="text-2xl">
+        <h3 className="text-lg">
           Developers are not just writing code. They're talking to their databases.
         </h3>
 
@@ -55,7 +55,7 @@ export const YearOfAI = () => {
 
       <div className="relative max-w-[60rem] mx-auto border-x border-b">
         <div className="px-4 lg:px-8 py-4">
-          <h3 className="text-lg text-foreground-light">Top MCP Tools by Usage</h3>
+          <h3 className="text-base text-foreground-light">Top MCP Tools by Usage</h3>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 border-t border-muted">
@@ -68,7 +68,7 @@ export const YearOfAI = () => {
       </div>
 
       <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 lg:px-8 py-12 grid md:grid-cols-2 gap-8">
-        <h3 className="text-2xl">The tools developers use have changed, dramatically.</h3>
+        <h3 className="text-lg">The tools developers use have changed, dramatically.</h3>
 
         <p className="text-base text-foreground-lighter">
           Cursor and Claude Code together represent 50% of all MCP users. The old guard is being
@@ -78,7 +78,7 @@ export const YearOfAI = () => {
 
       <div className="relative max-w-[60rem] mx-auto border-x border-b">
         <div className="px-4 lg:px-8 py-4">
-          <h3 className="text-lg text-foreground-light">Top Platforms by Users</h3>
+          <h3 className="text-base text-foreground-light">Top Platforms by Users</h3>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 border-t border-muted">
           {platformRankings.map((item) => (

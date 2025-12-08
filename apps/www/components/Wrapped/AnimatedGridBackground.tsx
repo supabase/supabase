@@ -1,12 +1,11 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { motion, useInView } from 'framer-motion'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Dots, Stripes } from './Visuals'
 
 const STAGGER_DELAY = 0.05
 const MOVE_INTERVAL = 2000 // Time between moves in ms
-const MOVE_DURATION = 0.5 // Animation duration in seconds
 
 type TileType = 'dots' | 'stripes'
 
@@ -129,11 +128,16 @@ export function AnimatedGridBackground({
     }
   }, [tilePositions, getAdjacentCells, getOccupiedCells])
 
-  // Set up the movement interval
+  // Ref for viewport detection
+  const containerRef = useRef<HTMLDivElement>(null)
+  const isInView = useInView(containerRef, { once: true, amount: 0.2 })
+
+  // Set up the movement interval (only when in view)
   useEffect(() => {
+    if (!isInView) return
     const interval = setInterval(moveRandomTile, MOVE_INTERVAL)
     return () => clearInterval(interval)
-  }, [moveRandomTile])
+  }, [moveRandomTile, isInView])
 
   // Calculate position offset for animation
   const getCellPosition = (cell: number) => {
@@ -148,14 +152,24 @@ export function AnimatedGridBackground({
     const initial = getCellPosition(initialCell)
     const current = getCellPosition(currentCell)
 
-    const xOffset = (current.col - initial.col) * 100
-    const yOffset = (current.row - initial.row) * 100
+    const colDiff = current.col - initial.col
+    const rowDiff = current.row - initial.row
 
-    return { x: `${xOffset}%`, y: `${yOffset}%` }
+    // Account for 1px border between cells
+    const xOffset = colDiff * 100
+    const yOffset = rowDiff * 100
+    const xBorderOffset = colDiff
+    const yBorderOffset = rowDiff
+
+    return {
+      x: `calc(${xOffset}% + ${xBorderOffset}px)`,
+      y: `calc(${yOffset}% + ${yBorderOffset}px)`,
+    }
   }
 
   return (
     <div
+      ref={containerRef}
       className={`absolute inset-0 grid h-full [&>*]:border-muted [&>*]:border-r [&>*]:border-b`}
       style={{
         gridTemplateColumns: `repeat(${cols}, 1fr)`,
@@ -184,12 +198,16 @@ export function AnimatedGridBackground({
               <motion.div
                 className="absolute inset-0"
                 initial={{ opacity: 0, scale: 0.98 }}
-                animate={{
-                  opacity: 1,
-                  scale: 1,
-                  x: getTileTransform(tile.id, tile.initialCell).x,
-                  y: getTileTransform(tile.id, tile.initialCell).y,
-                }}
+                animate={
+                  isInView
+                    ? {
+                        opacity: 1,
+                        scale: 1,
+                        x: getTileTransform(tile.id, tile.initialCell).x,
+                        y: getTileTransform(tile.id, tile.initialCell).y,
+                      }
+                    : { opacity: 0, scale: 0.98 }
+                }
                 transition={{
                   opacity: {
                     delay: initialDelay + diagonalIndex * STAGGER_DELAY,
@@ -199,8 +217,8 @@ export function AnimatedGridBackground({
                     delay: initialDelay + diagonalIndex * STAGGER_DELAY,
                     duration: 0.3,
                   },
-                  x: { type: 'spring', stiffness: 200, damping: 20 },
-                  y: { type: 'spring', stiffness: 200, damping: 20 },
+                  x: { type: 'spring', duration: 0.69, bounce: 0.12 },
+                  y: { type: 'spring', duration: 0.69, bounce: 0.12 },
                 }}
               >
                 {tile.type === 'dots' ? <Dots /> : <Stripes />}
