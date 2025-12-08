@@ -151,21 +151,15 @@ Use the key generator below to obtain and configure the following secure keys in
 
 - `JWT_SECRET`: Used by PostgREST and GoTrue to sign and verify JWTs.
 - `ANON_KEY`: Client-side API key with limited permissions (`anon` role). Use this in your frontend applications.
-- `SERVICE_ROLE_KEY`: Server-side API key with full database access (`service_role` role). Never expose this in client code. 
+- `SERVICE_ROLE_KEY`: Server-side API key with full database access (`service_role` role). Never expose this in client code.
 
-<Admonition type="danger">
+<JwtGeneratorSimple />
 
-    Do not reload this page or change the JWT Secret between generating the `ANON_KEY` and `SERVICE_ROLE_KEY`.
+1. Copy the generated value and update `JWT_SECRET` in the `.env` file. Do not share this secret publicly or commit it to version control.
+2. Copy the generated value and update `ANON_KEY` in the `.env` file.
+3. Copy the generated value and update `SERVICE_ROLE_KEY` in the `.env` file.
 
-</Admonition>
-
-How to generate the keys:
-
-1. **Save JWT Secret**: Copy the generated value and update `JWT_SECRET` in the `.env` file. Do not share this secret publicly or commit it to version control.
-2. **Generate ANON_KEY**: Select `ANON_KEY` from the dropdown, and click "Generate JWT." Copy the generated value and update `ANON_KEY` in the `.env` file.
-3. **Generate SERVICE_ROLE_KEY**: Select `SERVICE_KEY` from the dropdown, and click "Generate JWT." Copy the generated value and update `SERVICE_ROLE_KEY` in the `.env` file.
-
-<JwtGenerator />
+The generated keys expire in 5 years. You can verify them at [jwt.io](https://jwt.io) using the JWT secret.
 
 ### Configure other keys, and important URLs
 
@@ -173,9 +167,9 @@ Edit the following settings in the `.env` file:
 
 - `SECRET_KEY_BASE`: encryption key for securing Realtime and Supavisor communications. (Must be at least 64 characters; generate with `openssl rand -base64 48`)
 - `VAULT_ENC_KEY`: encryption key used by Supavisor for storing encrypted configuration. (Must be exactly 32 characters; generate with `openssl rand -hex 16`)
-- `PG_META_CRYPTO_KEY`: encryption key for securing connection strings used by Studio against postgres-meta. (Must be at least 32 characters; generate with `openssl rand -base64 32`)
-- `LOGFLARE_PUBLIC_ACCESS_TOKEN`: API token for log ingestion and querying. Used by Vector and Studio to send and query logs. (Use a strong random string of at least 32 characters)
-- `LOGFLARE_PRIVATE_ACCESS_TOKEN`: API token for Logflare management operations. Used by Studio for administrative tasks. Never expose client-side. (Use a strong random string of at least 32 characters)
+- `PG_META_CRYPTO_KEY`: encryption key for securing connection strings used by Studio against postgres-meta. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
+- `LOGFLARE_PUBLIC_ACCESS_TOKEN`: API token for log ingestion and querying. Used by Vector and Studio to send and query logs. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
+- `LOGFLARE_PRIVATE_ACCESS_TOKEN`: API token for Logflare management operations. Used by Studio for administrative tasks. Never expose client-side. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
 
 Review and change URL environment variables:
 
@@ -289,17 +283,17 @@ Each of the APIs is available through the same API gateway:
 
 ## Updating
 
-The versions of each service in the Docker Compose file are updated periodically, following new releases and bug fixes. You can update any services yourself by changing the version numbers in the Docker Compose file and pulling new images. You can find all the latest Supabase images on [Supabase Docker Hub](https://hub.docker.com/u/supabase).
+We publish stable releases of the Docker Compose setup approximately once a month. To update, pull the latest changes from the repository and restart the services. If you want to run different versions of individual services, you can change the image tags in the Docker Compose file, but compatibility is not guaranteed. All Supabase images are available on [Docker Hub](https://hub.docker.com/u/supabase).
 
 To follow the changes and updates, refer to the self-hosted Supabase [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md).
 
-You will need to restart services to pick up the changes, which may result in downtime for your applications and users.
+You need to restart services to pick up the changes, which may result in downtime for your applications and users.
 
 **Example:**
 You'd like to update or rollback the Studio image. Follow the steps below:
 
 1. Check the [supabase/studio](https://hub.docker.com/r/supabase/studio/tags) images on [Supabase Docker Hub](https://hub.docker.com/u/supabase)
-2. Find the latest version (tag) number. It will look something like `2025.11.26-sha-8f096b5`
+2. Find the latest version (tag) number. It looks something like `2025.11.26-sha-8f096b5`
 3. Update the `image` field in the `docker-compose.yml` file. It should look like this: `image: supabase/studio:2025.11.26-sha-8f096b5`
 4. Run `docker compose pull`, followed by `docker compose down && docker compose up -d` to restart Supabase.
 
@@ -314,7 +308,7 @@ docker compose down -v
 
 <Admonition type="danger">
 
-    Be careful — the following will destroy all data, including the database and storage volumes!
+    Be careful — the following destroys all data, including the database and storage volumes!
 
 </Admonition>
 
@@ -364,7 +358,7 @@ You can find all the default extensions inside the [schema migration scripts rep
 
 ### Configuring services
 
-Each service has a number of configuration options that can be found in the related documentation.
+Each service has a number of configuration options you can find in the related documentation.
 
 Configuration options are generally added to the `.env` file and referenced in `docker-compose.yml` service definitions, e.g.,
 
@@ -387,7 +381,7 @@ JWT_SECRET=${JWT_SECRET}
 
 ### Common configuration tasks
 
-Each Supabase service can be configured separately through environment variables and configuration files. Below are the most common configuration options.
+You can configure each Supabase service separately through environment variables and configuration files. Below are the most common configuration options.
 
 #### Configuring an email server
 

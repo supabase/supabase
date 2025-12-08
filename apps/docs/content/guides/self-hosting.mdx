@@ -10,13 +10,6 @@ Self-hosted Supabase lets you run the entire Supabase stack on your own computer
 - **Supabase CLI / Local Development**: A lightweight [local environment](/docs/guides/local-development) for development and testing only.
 - **Managed Supabase** platform: If you want to try managed Supabase for free, visit [supabase.com/dashboard](/dashboard).
 
-When you self-host, **you are responsible for**:
-
-- Server provisioning and maintenance
-- Security hardening and keeping services updated
-- Backups and disaster recovery
-- Monitoring and uptime
-
 Self-hosting is a good fit if you need full control over your data, have compliance requirements that prevent using managed services, or want to run Supabase in an isolated environment.
 
 ## No telemetry
@@ -44,7 +37,7 @@ If you're an enterprise using self-hosted Supabase, we'd love to hear from you. 
 ## Community supported
 
 {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
-There are several community-driven projects to help you deploy Supabase. These projects may be outdated and are seeking active maintainers. If you're interested in maintaining one of these projects, please [reach out](/open-source/contributing/supasquad).
+There are several community-driven projects to help you deploy Supabase. These projects may be outdated and are seeking active maintainers. If you're interested in maintaining one of these projects, [contact the community team](/open-source/contributing/supasquad).
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
   {community.map((x) => (
@@ -79,3 +72,12 @@ export const community = [
     href: 'https://github.com/supabase-community/supabase-traefik',
   },
 ]
+
+## Responsibility model
+
+When you self-host, **you are responsible for**:
+
+- Server provisioning and maintenance
+- Security hardening and keeping OS and services updated
+- Backups and disaster recovery
+- Monitoring and uptime
