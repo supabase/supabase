@@ -76,7 +76,9 @@ const CodePage = () => {
     if (isDeploying || !ref || !functionSlug || !selectedFunction || files.length === 0) return
 
     try {
-      const newEntrypointPath = selectedFunction.entrypoint_path?.split('/').pop()
+      const entrypoint_path =
+        functionBody?.metadata?.deno2_entrypoint_path ?? selectedFunction.entrypoint_path
+      const newEntrypointPath = entrypoint_path?.split('/').pop()
       const newImportMapPath = selectedFunction.import_map_path?.split('/').pop()
 
       const entrypointExists = fileExists(newEntrypointPath)
@@ -143,10 +145,17 @@ const CodePage = () => {
   }
 
   useEffect(() => {
+    if (!functionBody) {
+      return
+    }
+
+    const entrypoint_path =
+      functionBody.metadata?.deno2_entrypoint_path ?? selectedFunction?.entrypoint_path
+
     // Set files from API response when available
-    if (selectedFunction?.entrypoint_path && functionBody) {
+    if (entrypoint_path) {
       const base_path = getBasePath(
-        selectedFunction?.entrypoint_path,
+        entrypoint_path,
         functionBody.files.map((file) => file.name)
       )
       const filesWithRelPath = functionBody.files
