@@ -200,7 +200,7 @@ export const OAuthAppsList = () => {
         {newOAuthApp?.client_secret && (
           <NewOAuthAppBanner oauthApp={newOAuthApp} onClose={() => setNewOAuthApp(undefined)} />
         )}
-        {true && (
+        {!isOAuthServerEnabled && (
           <Admonition
             type="default"
             layout="horizontal"
