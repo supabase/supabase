@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useToggleLegacyAPIKeysMutation } from 'data/api-keys/legacy-api-key-toggle-mutation'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
@@ -21,7 +22,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from 'ui'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import Panel from '../Panel'
 
 export const ToggleLegacyApiKeysPanel = () => {

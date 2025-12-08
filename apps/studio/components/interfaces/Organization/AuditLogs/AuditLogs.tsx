@@ -15,7 +15,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import {
   AuditLog,
@@ -153,31 +153,13 @@ export const AuditLogs = () => {
     return (
       <ScaffoldContainer>
         <ScaffoldSection isFullWidth>
-          <Alert_Shadcn_
-            variant="default"
-            title="Organization Audit Logs are not available on Free or Pro plans"
-          >
-            <WarningIcon />
-            <div className="flex flex-col md:flex-row pt-1 gap-4">
-              <div className="grow">
-                <AlertTitle_Shadcn_>
-                  Organization Audit Logs are not available on Free or Pro plans
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
-                  <p>
-                    Upgrade to Team or Enterprise to view up to 62 days of Audit Logs for your
-                    organization.
-                  </p>
-                </AlertDescription_Shadcn_>
-              </div>
-
-              <div className="flex items-center">
-                <UpgradePlanButton source="auditLogs" plan="Team" type="primary">
-                  Upgrade subscription
-                </UpgradePlanButton>
-              </div>
-            </div>
-          </Alert_Shadcn_>
+          <UpgradeToPro
+            plan="Team"
+            source="organizationAuditLogs"
+            primaryText="Organization Audit Logs are not available on Free or Pro plans"
+            secondaryText="Upgrade to Team or Enterprise to view up to 62 days of Audit Logs for your organization."
+            featureProposition="enable audit logs"
+          />
         </ScaffoldSection>
       </ScaffoldContainer>
     )

@@ -22,6 +22,7 @@ export interface AdmonitionProps {
   }
   layout?: 'horizontal' | 'vertical'
   actions?: ReactNode
+  icon?: ReactNode
 }
 
 const admonitionToAlertMapping: Record<
@@ -78,16 +79,6 @@ const admonitionSVG = cva('', {
   },
 })
 
-const admonitionBase = cva('', {
-  variants: {
-    type: {
-      default: `bg-surface-200/25 border border-default`,
-      warning: `bg-alternative border border-default`,
-      destructive: `bg-alternative border border-default`,
-    },
-  },
-})
-
 export const Admonition = forwardRef<
   React.ElementRef<typeof Alert_Shadcn_>,
   React.ComponentPropsWithoutRef<typeof Alert_Shadcn_> & AdmonitionProps
@@ -104,6 +95,7 @@ export const Admonition = forwardRef<
       layout = 'vertical',
       actions,
       childProps = {},
+      icon,
       ...props
     },
     ref
@@ -115,14 +107,11 @@ export const Admonition = forwardRef<
         ref={ref}
         variant={typeMapped}
         {...props}
-        className={cn(
-          'mb-2',
-          admonitionSVG({ type: typeMapped }),
-          admonitionBase({ type: typeMapped }),
-          props.className
-        )}
+        className={cn(admonitionSVG({ type: typeMapped }), props.className)}
       >
-        {(showIcon && typeMapped === 'warning') || typeMapped === 'destructive' ? (
+        {!!icon ? (
+          icon
+        ) : (showIcon && typeMapped === 'warning') || typeMapped === 'destructive' ? (
           <WarningIcon />
         ) : showIcon ? (
           <InfoIcon />
