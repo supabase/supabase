@@ -55,13 +55,12 @@ export const UpgradePlanButton = ({
   const subject = `Enquiry to upgrade ${!!plan ? `to ${plan} ` : ''}plan for organization`
   const message = `Name: ${organization?.name}\nSlug: ${slug}\nRequested plan: ${plan ?? PLAN_REQUEST_EMPTY_PLACEHOLDER}`
 
-  const href = billingAll
-    ? isFreePlan
-      ? `/org/${slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
-      : addon === 'spendCap'
-        ? `/org/${slug ?? '_'}/billing?panel=costControl&source=${source}`
-        : `/project/${ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
-    : '/'
+  const href =
+    addon === 'spendCap'
+      ? `/org/${slug ?? '_'}/billing?panel=costControl&source=${source}`
+      : !!addon && !isFreePlan
+        ? `/project/${ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
+        : `/org/${slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
 
   const linkChildren = children || (!!addon ? 'Enable add-on' : `Upgrade to ${plan}`)
   const link = billingAll ? (

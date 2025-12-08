@@ -83,7 +83,7 @@ export const AWSPrivateLinkSection = () => {
                 {promptPlanUpgrade && (
                   <div className="mb-6">
                     <UpgradeToPro
-                      primaryText="Upgrade to Team or Enterprise to unlock AWS PrivateLink"
+                      primaryText="Upgrade to Team or Enterprise to use AWS PrivateLink"
                       secondaryText="Connect your AWS VPC privately to your Supabase project using AWS PrivateLink."
                       buttonText="Upgrade to Team"
                       source="aws-privatelink-integration"
