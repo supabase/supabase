@@ -1,10 +1,11 @@
 import type { XYCoord } from 'dnd-core'
-import { ArrowRight, Key, Link, Lock } from 'lucide-react'
+import { ArrowRight, Key, Link, Lock, TrendingUp } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 
 import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import { useColumnHasIndexSuggestion } from '../../context/TableIndexAdvisorContext'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
@@ -24,6 +25,7 @@ export function ColumnHeader<R>({
   const columnFormat = getColumnFormat(columnType, format)
   const snap = useTableEditorTableStateSnapshot()
   const hoverValue = column.name as string
+  const hasIndexSuggestion = useColumnHasIndexSuggestion(column.name as string)
 
   // keep snap.gridColumns' order in sync with data grid component
   useEffect(() => {
@@ -141,6 +143,16 @@ export function ColumnHeader<R>({
               </TooltipTrigger>
               <TooltipContent side="bottom" className="font-normal">
                 Encrypted column
+              </TooltipContent>
+            </Tooltip>
+          )}
+          {hasIndexSuggestion && (
+            <Tooltip>
+              <TooltipTrigger>
+                <TrendingUp size={14} strokeWidth={2} className="text-warning" />
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="font-normal">
+                An index on this column might improve query performance
               </TooltipContent>
             </Tooltip>
           )}

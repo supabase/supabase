@@ -8,6 +8,7 @@ import {
   parseSupaTable,
   saveTableEditorStateToLocalStorageDebounced,
 } from 'components/grid/SupabaseGrid.utils'
+import { TableIndexAdvisorProvider } from 'components/grid/context/TableIndexAdvisorContext'
 import { SupaRow } from 'components/grid/types'
 import { getInitialGridColumns } from 'components/grid/utils/column'
 import { getGridColumns } from 'components/grid/utils/gridColumns'
@@ -226,7 +227,9 @@ export const TableEditorTableStateContextProvider = ({
 
   return (
     <TableEditorTableStateContext.Provider value={state}>
-      {children}
+      <TableIndexAdvisorProvider schema={state.table.schema ?? 'public'} table={state.table.name}>
+        {children}
+      </TableIndexAdvisorProvider>
     </TableEditorTableStateContext.Provider>
   )
 }
