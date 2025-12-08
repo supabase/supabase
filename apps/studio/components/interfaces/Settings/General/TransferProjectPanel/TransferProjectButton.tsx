@@ -270,14 +270,14 @@ export const TransferProjectButton = () => {
                   <Admonition
                     type="danger"
                     title="Project cannot be transferred"
-                    description={<p>{transferPreviewError.message}</p>}
+                    description={transferPreviewError.message}
                   />
                 )}
                 {transferError && (
                   <Admonition
                     type="danger"
                     title="Project cannot be transferred"
-                    description={<p>{transferError.message}</p>}
+                    description={transferError.message}
                   />
                 )}
               </div>

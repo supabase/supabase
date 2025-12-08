@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { boolean, object } from 'yup'
 
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
+import { AlertError } from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
@@ -180,7 +180,10 @@ export const AuditLogsForm = () => {
                           auth logs
                         </InlineLink>
                         . You are responsible for backing up, copying, or migrating existing data
-                        from the <code className="text-code-inline">{AUDIT_LOG_ENTRIES_TABLE}</code>{' '}
+                        from the{' '}
+                        <code className="text-code-inline !break-keep">
+                          {AUDIT_LOG_ENTRIES_TABLE}
+                        </code>{' '}
                         table if needed.
                       </p>
                     }
