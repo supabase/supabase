@@ -13,7 +13,7 @@ import { AuthSmsProviderConfig } from '~/components/AuthSmsProviderConfig'
 import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderConfig.Warnings'
 import ButtonCard from '~/components/ButtonCard'
 import { Extensions } from '~/components/Extensions'
-import { JwtGenerator } from '~/components/JwtGenerator'
+import { JwtGenerator, JwtGeneratorSimple } from '~/components/JwtGenerator'
 import { NavData } from '~/components/NavData'
 import { Price } from '~/components/Price'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
@@ -53,6 +53,7 @@ const components = {
   IconX: X,
   Image: (props: any) => <Image fill alt="" className="object-contain" {...props} />,
   JwtGenerator,
+  JwtGeneratorSimple,
   Link,
   McpConfigPanel,
   NamedCodeBlock,
