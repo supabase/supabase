@@ -109,7 +109,7 @@ const PolicyTableRowComponent = ({
         <Admonition
           showIcon={false}
           type="warning"
-          className="mb-0 border-0 border-y rounded-none [&>div]:text-foreground-light h-[50px] py-0 flex items-center"
+          className="border-0 border-y rounded-none [&>div]:text-foreground-light h-[50px] py-0 flex items-center"
         >
           No data will be selectable via Supabase APIs as this schema is not exposed. You may
           configure this in your project's{' '}
