@@ -7,9 +7,9 @@ import {
   IntegrationLoadingCard,
 } from 'components/interfaces/Integrations/Landing/IntegrationCard'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
-import AlertError from 'components/ui/AlertError'
+import { AlertError } from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { DOCS_URL } from 'lib/constants'

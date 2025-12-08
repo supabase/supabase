@@ -1,19 +1,21 @@
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useMemo } from 'react'
+
 import { useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useRouter } from 'next/compat/router'
-import Link from 'next/link'
-import { useEffect, useMemo } from 'react'
 import type { NextPageWithLayout } from 'types'
 import {
   BreadcrumbItem_Shadcn_ as BreadcrumbItem,
   BreadcrumbLink_Shadcn_ as BreadcrumbLink,
   BreadcrumbList_Shadcn_ as BreadcrumbList,
+  BreadcrumbPage_Shadcn_ as BreadcrumbPage,
   BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
   NavMenu,
   NavMenuItem,
@@ -32,6 +34,8 @@ import {
   PageSection,
   PageSectionContent,
 } from 'ui-patterns'
+
+type NavigationItem = { label: string; href: string; active?: boolean }
 
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -54,19 +58,6 @@ const IntegrationPage: NextPageWithLayout = () => {
     () => integration?.navigate(id!, pageId, childId),
     [integration, id, pageId, childId]
   )
-
-  // Create breadcrumb items
-  const breadcrumbItems = [
-    {
-      label: 'Integrations',
-      href: `/project/${ref}/integrations`,
-    },
-    {
-      label: integration?.name || 'Integration not found',
-    },
-  ]
-
-  type NavigationItem = { label: string; href: string; active?: boolean }
 
   // Create navigation items from integration navigation
   const navigationItems: NavigationItem[] = useMemo(() => {
@@ -159,7 +150,9 @@ const IntegrationPage: NextPageWithLayout = () => {
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
-            <BreadcrumbItem>{integration?.name || 'Integration not found'}</BreadcrumbItem>
+            <BreadcrumbItem>
+              <BreadcrumbPage>{integration?.name || 'Integration not found'}</BreadcrumbPage>
+            </BreadcrumbItem>
           </BreadcrumbList>
         </PageHeaderBreadcrumb>
         <PageHeaderMeta>

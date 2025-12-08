@@ -1,6 +1,6 @@
 import { useParams } from 'common'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import IntegrationsLayout from 'components/layouts/Integrations/layout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
+import { IntegrationsLayout } from 'components/layouts/Integrations/layout'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useRouter } from 'next/compat/router'
 import { useEffect } from 'react'

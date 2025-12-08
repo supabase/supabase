@@ -10,6 +10,7 @@ import {
   BreadcrumbItem_Shadcn_ as BreadcrumbItem,
   BreadcrumbLink_Shadcn_ as BreadcrumbLink,
   BreadcrumbList_Shadcn_ as BreadcrumbList,
+  BreadcrumbPage_Shadcn_ as BreadcrumbPage,
   BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
 } from 'ui'
 import {
@@ -71,7 +72,9 @@ export const QueuePage = () => {
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
-            <BreadcrumbItem>{childId}</BreadcrumbItem>
+            <BreadcrumbItem>
+              <BreadcrumbPage>{childId}</BreadcrumbPage>
+            </BreadcrumbItem>
           </BreadcrumbList>
         </PageHeaderBreadcrumb>
         <PageHeaderMeta>

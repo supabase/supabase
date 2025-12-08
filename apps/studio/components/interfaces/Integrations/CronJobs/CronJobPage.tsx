@@ -13,6 +13,7 @@ import {
   BreadcrumbItem_Shadcn_ as BreadcrumbItem,
   BreadcrumbLink_Shadcn_ as BreadcrumbLink,
   BreadcrumbList_Shadcn_ as BreadcrumbList,
+  BreadcrumbPage_Shadcn_ as BreadcrumbPage,
   BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
   Button,
   cn,
@@ -169,19 +170,13 @@ export const CronJobPage = () => {
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link
-                  href={
-                    pageId
-                      ? `/project/${ref}/integrations/${id}/${pageId}`
-                      : `/project/${ref}/integrations/${id}`
-                  }
-                >
-                  Cron
-                </Link>
+                <Link href={`/project/${ref}/integrations/${id}/${pageId}`}>Cron</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
-            <BreadcrumbItem>{childLabel ?? job?.jobname ?? 'Cron Job'}</BreadcrumbItem>
+            <BreadcrumbItem>
+              <BreadcrumbPage>{childLabel ?? job?.jobname ?? 'Cron Job'}</BreadcrumbPage>
+            </BreadcrumbItem>
           </BreadcrumbList>
         </PageHeaderBreadcrumb>
         <PageHeaderMeta>
