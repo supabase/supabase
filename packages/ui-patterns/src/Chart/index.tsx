@@ -15,7 +15,18 @@ import {
 } from 'ui'
 import { HelpCircle, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { BarChart, Bar, XAxis, YAxis } from 'recharts'
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  Area,
+  AreaChart,
+  Tooltip as RechartsTooltip,
+  TooltipProps as RechartsTooltipProps,
+} from 'recharts'
+import dayjs from 'dayjs'
 
 /* Chart Config */
 export type ChartConfig = {
@@ -204,6 +215,7 @@ ChartActions.displayName = 'ChartActions'
 interface ChartMetricProps extends React.HTMLAttributes<HTMLDivElement> {
   label: string
   value: string | number | null | undefined
+  diffValue?: string | number | null | undefined
   status?: 'positive' | 'negative' | 'warning' | 'default'
   align?: 'start' | 'end'
   tooltip?: string
@@ -211,8 +223,27 @@ interface ChartMetricProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const ChartMetric = React.forwardRef<HTMLDivElement, ChartMetricProps>(
-  ({ label, value, className, status, align = 'start', tooltip, ...props }, ref) => {
+  ({ label, value, diffValue, className, status, align = 'start', tooltip, ...props }, ref) => {
     const { isLoading } = useChart()
+
+    const { variant, formattedDiffValue } = useMemo(() => {
+      if (diffValue === null || diffValue === undefined) {
+        return { variant: 'default' as const, formattedDiffValue: null }
+      }
+
+      const numValue = typeof diffValue === 'string' ? parseFloat(diffValue) : diffValue
+
+      if (isNaN(numValue)) {
+        return { variant: 'default' as const, formattedDiffValue: String(diffValue) }
+      }
+
+      const variant: 'positive' | 'negative' | 'default' =
+        numValue > 0 ? 'positive' : numValue < 0 ? 'negative' : 'default'
+
+      const formattedDiffValue = numValue > 0 ? `+${diffValue}` : String(diffValue)
+
+      return { variant, formattedDiffValue }
+    }, [diffValue])
 
     return (
       <div
@@ -255,6 +286,9 @@ const ChartMetric = React.forwardRef<HTMLDivElement, ChartMetricProps>(
         <span className="text-foreground text-xl tabular-nums">
           {isLoading ? <Skeleton className="w-12 h-6" /> : value}
         </span>
+        {diffValue !== null && diffValue !== undefined && !isLoading && (
+          <ChartValueDifferential variant={variant}>{formattedDiffValue}</ChartValueDifferential>
+        )}
       </div>
     )
   }
@@ -266,6 +300,7 @@ interface ChartContentProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
   className?: string
   isEmpty?: boolean
+  hasPadding?: boolean
   emptyState?: React.ReactNode
   loadingState?: React.ReactNode
   disabledActions?: ChartAction[]
@@ -273,7 +308,16 @@ interface ChartContentProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const ChartContent = React.forwardRef<HTMLDivElement, ChartContentProps>(
   (
-    { children, className, isEmpty = false, emptyState, loadingState, disabledActions, ...props },
+    {
+      children,
+      className,
+      isEmpty = false,
+      hasPadding = true,
+      emptyState,
+      loadingState,
+      disabledActions,
+      ...props
+    },
     ref
   ) => {
     const { isLoading, isDisabled } = useChart()
@@ -291,7 +335,7 @@ const ChartContent = React.forwardRef<HTMLDivElement, ChartContentProps>(
     }
 
     return (
-      <div ref={ref} className={cn('px-6 pt-4 pb-6', className)} {...props}>
+      <div ref={ref} className={cn(hasPadding && 'px-6 pt-4 pb-6', className)} {...props}>
         {isLoading ? loadingState : isEmpty ? emptyState : children}
       </div>
     )
@@ -442,6 +486,106 @@ const ChartFooter = React.forwardRef<HTMLDivElement, ChartFooterProps>(
 )
 ChartFooter.displayName = 'ChartFooter'
 
+/* Metric Chart Components */
+interface ChartValueDifferentialProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: 'positive' | 'negative' | 'default'
+}
+
+const ChartValueDifferential = React.forwardRef<HTMLDivElement, ChartValueDifferentialProps>(
+  ({ className, variant = 'default', ...props }, ref) => {
+    const { isLoading } = useChart()
+
+    if (isLoading) {
+      return <Skeleton className="w-16 h-5" />
+    }
+
+    return (
+      <span
+        ref={ref}
+        className={cn(
+          variant === 'positive'
+            ? 'text-brand'
+            : variant === 'negative'
+              ? 'text-destructive'
+              : 'text-foreground-light',
+          'tabular-nums text-sm',
+          className
+        )}
+        {...props}
+      />
+    )
+  }
+)
+ChartValueDifferential.displayName = 'ChartValueDifferential'
+
+const ChartSparklineTooltip = ({ active, payload, label }: RechartsTooltipProps<any, any>) => {
+  if (!active || !payload || !payload.length) return null
+
+  const formatTimestamp = (timestamp: string) => {
+    const date = dayjs(timestamp)
+    const hour = date.hour()
+    const period = hour >= 12 ? 'pm' : 'am'
+    const displayHour = hour % 12 || 12
+
+    return `${date.format('MMM D')}, ${displayHour}${period}`
+  }
+
+  return (
+    <div className="bg-black/90 text-white p-2 rounded text-xs">
+      {label && (
+        <div className="dark:text-foreground-light text-white/60">
+          {formatTimestamp(payload[0].payload.timestamp)}
+        </div>
+      )}
+      <div>{payload[0].value.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+    </div>
+  )
+}
+
+interface ChartSparklineProps extends React.HTMLAttributes<HTMLDivElement> {
+  data?: Array<{ value: number; [key: string]: any }>
+  dataKey?: string
+  className?: string
+}
+
+const ChartSparkline = React.forwardRef<HTMLDivElement, ChartSparklineProps>(
+  ({ className, data, dataKey, ...props }, ref) => {
+    const { isLoading } = useChart()
+    if (isLoading) {
+      return <Skeleton className="w-full h-[56px] rounded-none" />
+    }
+
+    if (!data || data.length === 0) {
+      return null
+    }
+
+    return (
+      <div ref={ref} className={cn('w-full h-24 pt-4 relative', className)} {...props}>
+        <ResponsiveContainer width="100%" height="100%" className="relative">
+          <AreaChart data={data} margin={{ top: 5, left: 0, right: 0, bottom: 0 }}>
+            <defs>
+              <linearGradient id="sparklineGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="hsl(var(--brand-default))" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="hsl(var(--brand-default))" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <RechartsTooltip content={<ChartSparklineTooltip />} />
+            <Area
+              type="step"
+              dataKey={dataKey || 'value'}
+              fill="url(#sparklineGradient)"
+              fillOpacity={0.1}
+              stroke="hsl(var(--brand-default))"
+              strokeWidth={1.5}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    )
+  }
+)
+ChartSparkline.displayName = 'ChartSparkline'
+
 /* Exports */
 export {
   Chart,
@@ -455,6 +599,9 @@ export {
   ChartLoadingState,
   ChartDisabledState,
   ChartFooter,
+  ChartValueDifferential,
+  ChartSparklineTooltip,
+  ChartSparkline,
 }
 export { ChartBar, type ChartBarTick, type ChartBarProps } from './charts/chart-bar'
 export { ChartLine, type ChartLineTick, type ChartLineProps } from './charts/chart-line'
