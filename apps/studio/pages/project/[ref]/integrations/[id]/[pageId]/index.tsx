@@ -136,7 +136,7 @@ const IntegrationPage: NextPageWithLayout = () => {
         </PageSection>
       )
     } else {
-      return Component && <Component />
+      return <Component />
     }
   }, [router?.isReady, isIntegrationsLoading, id, integration, Component])
 
