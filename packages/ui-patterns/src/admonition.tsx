@@ -156,7 +156,14 @@ export const Admonition = forwardRef<
               {children}
             </div>
           )}
-          {actions}
+          <div
+            className={cn(
+              'flex flex-row gap-3',
+              layout === 'vertical' ? 'mt-3 items-start' : 'items-center'
+            )}
+          >
+            {actions}
+          </div>
         </div>
       </Alert_Shadcn_>
     )
