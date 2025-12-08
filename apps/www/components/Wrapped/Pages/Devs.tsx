@@ -2,6 +2,7 @@
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { AnimatedGridBackground } from '../AnimatedGridBackground'
 import { AnimatedCounter } from '../AnimatedCounter'
 =======
@@ -43,6 +44,10 @@ function AnimatedCounter({ value, increment, intervalMs = 1000, compact }: Anima
   )
 }
 >>>>>>> 3525bdad4d (wip)
+=======
+import { AnimatedGridBackground } from '../AnimatedGridBackground'
+import { AnimatedCounter } from '../AnimatedCounter'
+>>>>>>> f735fc1b6b (optimize imgs)
 
 const heroStats = [
   {
@@ -144,7 +149,11 @@ export const Devs = () => {
         {/* Content */}
         <div className="flex flex-col justify-end h-full px-4 py-0 relative">
           <div className="flex justify-between items-center">
+<<<<<<< HEAD
             <h2 className="font-medium tracking-tighter text-6xl md:text-7xl lg:text-[5.6rem] translate-y-2 lg:translate-y-[10px]">
+=======
+            <h2 className="font-medium tracking-tighter text-6xl md:text-7xl lg:text-[5.6rem]">
+>>>>>>> f735fc1b6b (optimize imgs)
               Devs <span className="text-brand">love</span> Supabase
             </h2>
 =======
@@ -178,10 +187,13 @@ export const Devs = () => {
 <<<<<<< HEAD
       <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 lg:px-8 py-12">
         <p className="text-lg text-foreground-light max-w-2xl">
+<<<<<<< HEAD
 =======
       <div className="relative max-w-[60rem] mx-auto border-x border-b px-8 py-12">
         <p className="text-xl text-foreground-light max-w-2xl">
 >>>>>>> 3525bdad4d (wip)
+=======
+>>>>>>> f735fc1b6b (optimize imgs)
           In 2025, developers around the world shipped faster, scaled further, and built things we
           never imagined. Here is what you accomplished on Supabase.
         </p>
@@ -195,10 +207,14 @@ export const Devs = () => {
         >
           <div className="flex flex-col gap-2">
 <<<<<<< HEAD
+<<<<<<< HEAD
             <p className="text-4xl md:text-5xl font-mono font-medium text-brand tracking-tighter">
 =======
             <p className="text-4xl md:text-5xl font-mono font-bold text-brand tracking-tight">
 >>>>>>> 3525bdad4d (wip)
+=======
+            <p className="text-4xl md:text-5xl font-mono font-medium text-brand tracking-tighter">
+>>>>>>> f735fc1b6b (optimize imgs)
               <AnimatedCounter
                 value={stat.number}
                 increment={stat.increment}
@@ -206,10 +222,14 @@ export const Devs = () => {
               />
             </p>
 <<<<<<< HEAD
+<<<<<<< HEAD
             <p className="text-base text-foreground-light">{stat.headline}</p>
 =======
             <p className="text-lg text-foreground-light">{stat.headline}</p>
 >>>>>>> 3525bdad4d (wip)
+=======
+            <p className="text-base text-foreground-light">{stat.headline}</p>
+>>>>>>> f735fc1b6b (optimize imgs)
           </div>
         </div>
       ))}
@@ -237,6 +257,7 @@ export const Devs = () => {
                     <div className="flex flex-col gap-2">
                       <p
                         className={`text-2xl md:text-3xl font-mono font-medium tracking-tighter ${stat.increment > 0 ? 'text-brand' : 'text-foreground'}`}
+<<<<<<< HEAD
 =======
                     className="px-6 py-8 border-r border-b border-muted [&:nth-child(2n)]:border-r-0 lg:[&:nth-child(2n)]:border-r [&:nth-child(4n)]:border-r-0"
                   >
@@ -244,6 +265,8 @@ export const Devs = () => {
                       <p
                         className={`text-2xl md:text-3xl font-mono font-bold tracking-tight ${stat.increment > 0 ? 'text-brand' : 'text-foreground'}`}
 >>>>>>> 3525bdad4d (wip)
+=======
+>>>>>>> f735fc1b6b (optimize imgs)
                       >
                         {stat.suffix ? (
                           <>

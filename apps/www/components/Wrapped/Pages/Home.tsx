@@ -260,6 +260,7 @@ export function Home() {
         />
 
         {/* Content */}
+<<<<<<< HEAD
         <div className="flex flex-col justify-end h-full px-8 py-0 relative">
           <h1 className="font-bold tracking-tight text-[5.6rem]">Supabase Wrapped</h1>
         </div>
@@ -267,6 +268,17 @@ export function Home() {
 
       <div className="relative max-w-[60rem] mx-auto border-x border-b px-8 py-12">
         <article className="text-2xl">
+=======
+        <div className="flex flex-col justify-end h-full px-4 lg:px-8 py-0 relative">
+          <h1 className="font-medium tracking-tighter text-6xl md:text-7xl lg:text-[5.6rem]">
+            Supabase Wrapped
+          </h1>
+        </div>
+      </section>
+
+      <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 lg:px-8 py-12">
+        <article className="text-lg">
+>>>>>>> f735fc1b6b (optimize imgs)
           <p>You created more Supabase databases in 2025 than in all previous years combined.</p>
         </article>
       </div>

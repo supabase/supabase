@@ -1,20 +1,28 @@
 'use client'
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { motion, useInView } from 'framer-motion'
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 =======
 import { motion } from 'framer-motion'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 >>>>>>> c9e9354b96 (single page)
+=======
+import { motion, useInView } from 'framer-motion'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+>>>>>>> f735fc1b6b (optimize imgs)
 import { Dots, Stripes } from './Visuals'
 
 const STAGGER_DELAY = 0.05
 const MOVE_INTERVAL = 2000 // Time between moves in ms
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 const MOVE_DURATION = 0.5 // Animation duration in seconds
 >>>>>>> c9e9354b96 (single page)
+=======
+>>>>>>> f735fc1b6b (optimize imgs)
 
 type TileType = 'dots' | 'stripes'
 
@@ -175,11 +183,15 @@ export function AnimatedGridBackground({
   }, [tilePositions, getAdjacentCells, getOccupiedCells])
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> f735fc1b6b (optimize imgs)
   // Ref for viewport detection
   const containerRef = useRef<HTMLDivElement>(null)
   const isInView = useInView(containerRef, { once: true, amount: 0.2 })
 
   // Set up the movement interval (only when in view)
+<<<<<<< HEAD
   useEffect(() => {
     if (!isInView) return
     const interval = setInterval(moveRandomTile, MOVE_INTERVAL)
@@ -187,11 +199,18 @@ export function AnimatedGridBackground({
   }, [moveRandomTile, isInView])
 =======
   // Set up the movement interval
+=======
+>>>>>>> f735fc1b6b (optimize imgs)
   useEffect(() => {
+    if (!isInView) return
     const interval = setInterval(moveRandomTile, MOVE_INTERVAL)
     return () => clearInterval(interval)
+<<<<<<< HEAD
   }, [moveRandomTile])
 >>>>>>> c9e9354b96 (single page)
+=======
+  }, [moveRandomTile, isInView])
+>>>>>>> f735fc1b6b (optimize imgs)
 
   // Calculate position offset for animation
   const getCellPosition = (cell: number) => {
@@ -206,6 +225,7 @@ export function AnimatedGridBackground({
     const initial = getCellPosition(initialCell)
     const current = getCellPosition(currentCell)
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     const colDiff = current.col - initial.col
     const rowDiff = current.row - initial.row
@@ -226,13 +246,33 @@ export function AnimatedGridBackground({
 
     return { x: `${xOffset}%`, y: `${yOffset}%` }
 >>>>>>> c9e9354b96 (single page)
+=======
+    const colDiff = current.col - initial.col
+    const rowDiff = current.row - initial.row
+
+    // Account for 1px border between cells
+    const xOffset = colDiff * 100
+    const yOffset = rowDiff * 100
+    const xBorderOffset = colDiff
+    const yBorderOffset = rowDiff
+
+    return {
+      x: `calc(${xOffset}% + ${xBorderOffset}px)`,
+      y: `calc(${yOffset}% + ${yBorderOffset}px)`,
+    }
+>>>>>>> f735fc1b6b (optimize imgs)
   }
 
   return (
     <div
 <<<<<<< HEAD
+<<<<<<< HEAD
       ref={containerRef}
       className={`absolute inset-0 grid h-full [&>*]:border-muted [&>*]:border-r [&>*]:border-b overflow-hidden`}
+=======
+      ref={containerRef}
+      className={`absolute inset-0 grid h-full [&>*]:border-muted [&>*]:border-r [&>*]:border-b`}
+>>>>>>> f735fc1b6b (optimize imgs)
       style={{
         gridTemplateColumns: `repeat(${cols}, 1fr)`,
         gridTemplateRows: `repeat(${actualRows}, 1fr)`,
@@ -267,6 +307,9 @@ export function AnimatedGridBackground({
                 className="absolute inset-0"
                 initial={{ opacity: 0, scale: 0.98 }}
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> f735fc1b6b (optimize imgs)
                 animate={
                   isInView
                     ? {
@@ -277,6 +320,7 @@ export function AnimatedGridBackground({
                       }
                     : { opacity: 0, scale: 0.98 }
                 }
+<<<<<<< HEAD
 =======
                 animate={{
                   opacity: 1,
@@ -285,6 +329,8 @@ export function AnimatedGridBackground({
                   y: getTileTransform(tile.id, tile.initialCell).y,
                 }}
 >>>>>>> c9e9354b96 (single page)
+=======
+>>>>>>> f735fc1b6b (optimize imgs)
                 transition={{
                   opacity: {
                     delay: initialDelay + diagonalIndex * STAGGER_DELAY,
@@ -295,12 +341,17 @@ export function AnimatedGridBackground({
                     duration: 0.3,
                   },
 <<<<<<< HEAD
+<<<<<<< HEAD
                   x: { type: 'spring', duration: 0.69, bounce: 0.12 },
                   y: { type: 'spring', duration: 0.69, bounce: 0.12 },
 =======
                   x: { type: 'spring', stiffness: 200, damping: 20 },
                   y: { type: 'spring', stiffness: 200, damping: 20 },
 >>>>>>> c9e9354b96 (single page)
+=======
+                  x: { type: 'spring', duration: 0.69, bounce: 0.12 },
+                  y: { type: 'spring', duration: 0.69, bounce: 0.12 },
+>>>>>>> f735fc1b6b (optimize imgs)
                 }}
               >
                 {tile.type === 'dots' ? <Dots /> : <Stripes />}

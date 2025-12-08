@@ -37,7 +37,11 @@ export const YearOfAI = () => {
         {/* Content */}
         <div className="flex flex-col justify-end h-full px-4 lg:px-8 py-0 relative">
           <div className="flex justify-between items-center">
+<<<<<<< HEAD
             <h2 className="font-medium tracking-tighter text-6xl md:text-7xl lg:text-[5.6rem] translate-y-2 lg:translate-y-[10px]">
+=======
+            <h2 className="font-medium tracking-tighter text-6xl md:text-7xl lg:text-[5.6rem]">
+>>>>>>> f735fc1b6b (optimize imgs)
               Year of AI
             </h2>
 =======
@@ -113,10 +117,13 @@ export const YearOfAI = () => {
 <<<<<<< HEAD
         <div className="px-4 lg:px-8 py-4">
           <h3 className="text-base text-foreground-light">Top MCP Tools by Usage</h3>
+<<<<<<< HEAD
 =======
         <div className="px-8 py-4">
           <h3 className="text-lg text-foreground-light">Top MCP Tools by Usage</h3>
 >>>>>>> 3525bdad4d (wip)
+=======
+>>>>>>> f735fc1b6b (optimize imgs)
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 border-t border-muted">
@@ -139,10 +146,13 @@ export const YearOfAI = () => {
 <<<<<<< HEAD
       <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 lg:px-8 py-12 grid md:grid-cols-2 gap-8">
         <h3 className="text-lg">The tools developers use have changed, dramatically.</h3>
+<<<<<<< HEAD
 =======
       <div className="relative max-w-[60rem] mx-auto border-x border-b px-8 py-12 grid grid-cols-2 gap-8">
         <h2 className="text-2xl">The tools developers use have changed, dramatically.</h2>
 >>>>>>> 3525bdad4d (wip)
+=======
+>>>>>>> f735fc1b6b (optimize imgs)
 
         <p className="text-base text-foreground-lighter">
           Cursor and Claude Code together represent 50% of all MCP users. The old guard is being
@@ -154,10 +164,13 @@ export const YearOfAI = () => {
 <<<<<<< HEAD
         <div className="px-4 lg:px-8 py-4">
           <h3 className="text-base text-foreground-light">Top Platforms by Users</h3>
+<<<<<<< HEAD
 =======
         <div className="px-8 py-4">
           <h3 className="text-lg text-foreground-light">Top Platforms by Users</h3>
 >>>>>>> 3525bdad4d (wip)
+=======
+>>>>>>> f735fc1b6b (optimize imgs)
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 border-t border-muted">
           {platformRankings.map((item) => (
