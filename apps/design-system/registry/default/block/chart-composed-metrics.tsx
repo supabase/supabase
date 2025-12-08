@@ -55,6 +55,32 @@ export default function ChartComposedMetrics() {
       </Chart>
       <Chart isLoading={!data.length}>
         <ChartCard>
+          <ChartHeader className="pb-4" align="start">
+            <ChartMetric label="Sign Ups" value={127} />
+            <ChartActions actions={actions} />
+          </ChartHeader>
+        </ChartCard>
+      </Chart>
+      <Chart isLoading={!data.length}>
+        <ChartCard>
+          <ChartHeader align="start">
+            <ChartMetric
+              label="Active Users"
+              value={averageValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              diffValue={diffPercentage.toFixed(2) + '%'}
+            />
+            <ChartActions actions={actions} />
+          </ChartHeader>
+          <ChartContent
+            hasPadding={false}
+            loadingState={<Skeleton className="w-full h-[6rem] rounded-none mt-4" />}
+          >
+            <ChartSparkline data={data} dataKey="value" />
+          </ChartContent>
+        </ChartCard>
+      </Chart>
+      <Chart isLoading={!data.length}>
+        <ChartCard>
           <ChartHeader align="start">
             <ChartMetric
               label="Active Users"
