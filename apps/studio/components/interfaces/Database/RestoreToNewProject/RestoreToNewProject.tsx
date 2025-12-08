@@ -11,6 +11,7 @@ import { projectSpecToMonthlyPrice } from 'components/interfaces/Database/Backup
 import { DiskType } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
 import { Markdown } from 'components/interfaces/Markdown'
 import AlertError from 'components/ui/AlertError'
+import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -165,13 +166,7 @@ export const RestoreToNewProject = () => {
         description={
           <>
             Physical backups must be enabled to restore your database to a new project.{' '}
-            <Link
-              target="_blank"
-              className="underline"
-              href={`${DOCS_URL}/guides/platform/backups`}
-            >
-              Learn more
-            </Link>
+            <InlineLink href={`${DOCS_URL}/guides/platform/backups`}>Learn more</InlineLink>
           </>
         }
       />
