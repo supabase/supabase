@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetTitle,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
@@ -40,8 +41,8 @@ import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFi
 interface QueryPerformanceGridProps {
   aggregatedData: QueryPerformanceRow[]
   isLoading: boolean
-  currentSelectedQuery?: string | null // Make optional
-  onCurrentSelectQuery?: (query: string) => void // Make optional
+  currentSelectedQuery?: string | null
+  onCurrentSelectQuery?: (query: string) => void
 }
 
 const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
@@ -397,14 +398,6 @@ export const QueryPerformanceGrid = ({
     return data
   }, [aggregatedData, sort, search, roles, callsFilter])
 
-  const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
-  const query = (selectedQuery ?? '').trim().toLowerCase()
-  const showIndexSuggestions =
-    (query.startsWith('select') ||
-      query.startsWith('with pgrst_source') ||
-      query.startsWith('with pgrst_payload')) &&
-    hasIndexRecommendations(reportData[selectedRow!]?.index_advisor_result, true)
-
   useEffect(() => {
     setSelectedRow(undefined)
   }, [search, roles, urlSort, order, callsFilter])
@@ -445,6 +438,25 @@ export const QueryPerformanceGrid = ({
     }
   }, [handleKeyDown])
 
+  const isSelectQuery = (query: string | undefined): boolean => {
+    if (!query) return false
+    const formattedQuery = query.trim().toLowerCase()
+    return (
+      formattedQuery.startsWith('select') ||
+      formattedQuery.startsWith('with pgrst_source') ||
+      formattedQuery.startsWith('with pgrst_payload')
+    )
+  }
+
+  useEffect(() => {
+    if (selectedRow !== undefined && view === 'suggestion') {
+      const query = reportData[selectedRow]?.query
+      if (!isSelectQuery(query)) {
+        setView('details')
+      }
+    }
+  }, [selectedRow, view, reportData])
+
   return (
     <div className="relative flex flex-grow bg-alternative min-h-0">
       <div ref={dataGridContainerRef} className="flex-1 min-w-0 overflow-x-auto">
@@ -460,10 +472,14 @@ export const QueryPerformanceGrid = ({
             const isSelected = idx === selectedRow
             const query = reportData[idx]?.query
             const isCharted = currentSelectedQuery ? currentSelectedQuery === query : false
+            const hasRecommendations = hasIndexRecommendations(
+              reportData[idx]?.index_advisor_result,
+              true
+            )
 
             return [
-              `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
-              `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:!border-l-foreground' : ''}`,
+              `${isSelected ? (hasRecommendations ? 'bg-warning/10 hover:bg-warning/20' : 'bg-surface-300 dark:bg-surface-300') : hasRecommendations ? 'bg-warning/10 hover:bg-warning/20' : 'bg-200 hover:bg-surface-200'} cursor-pointer`,
+              `${isSelected ? (hasRecommendations ? '[&>div:first-child]:border-l-4 border-l-warning [&>div]:border-l-warning' : '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:!border-l-foreground') : ''}`,
               `${isCharted ? 'bg-surface-200 dark:bg-surface-200' : ''}`,
               `${isCharted ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-brand' : ''}`,
               '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
@@ -480,16 +496,18 @@ export const QueryPerformanceGrid = ({
                     event.stopPropagation()
 
                     if (typeof idx === 'number' && idx >= 0) {
-                      // If onCurrentSelectQuery is provided, use the chart selection logic
                       if (onCurrentSelectQuery) {
                         const query = reportData[idx]?.query
                         if (query) {
                           onCurrentSelectQuery(query)
                         }
                       } else {
-                        // Otherwise, open the detail panel
                         setSelectedRow(idx)
-                        setView('details')
+                        const hasRecommendations = hasIndexRecommendations(
+                          reportData[idx]?.index_advisor_result,
+                          true
+                        )
+                        setView(hasRecommendations ? 'suggestion' : 'details')
                         gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                       }
                     }
@@ -526,6 +544,9 @@ export const QueryPerformanceGrid = ({
         modal={false}
       >
         <SheetTitle className="sr-only">Query details</SheetTitle>
+        <SheetDescription className="sr-only">
+          Query Performance Details &amp; Indexes
+        </SheetDescription>
         <SheetContent
           side="right"
           className="flex flex-col h-full bg-studio border-l lg:!w-[calc(100vw-802px)] max-w-[700px] w-full"
@@ -549,7 +570,7 @@ export const QueryPerformanceGrid = ({
                 >
                   Query details
                 </TabsTrigger_Shadcn_>
-                {showIndexSuggestions && (
+                {selectedRow !== undefined && isSelectQuery(reportData[selectedRow]?.query) && (
                   <TabsTrigger_Shadcn_
                     value="suggestion"
                     className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
@@ -569,12 +590,14 @@ export const QueryPerformanceGrid = ({
                 />
               )}
             </TabsContent_Shadcn_>
-            <TabsContent_Shadcn_
-              value="suggestion"
-              className="mt-0 flex-grow min-h-0 overflow-y-auto"
-            >
-              {selectedRow !== undefined && <QueryIndexes selectedRow={reportData[selectedRow]} />}
-            </TabsContent_Shadcn_>
+            {selectedRow !== undefined && isSelectQuery(reportData[selectedRow]?.query) && (
+              <TabsContent_Shadcn_
+                value="suggestion"
+                className="mt-0 flex-grow min-h-0 overflow-y-auto"
+              >
+                <QueryIndexes selectedRow={reportData[selectedRow]} />
+              </TabsContent_Shadcn_>
+            )}
           </Tabs_Shadcn_>
         </SheetContent>
       </Sheet>

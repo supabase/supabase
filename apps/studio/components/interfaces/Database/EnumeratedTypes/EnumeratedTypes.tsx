@@ -90,7 +90,7 @@ export const EnumeratedTypes = () => {
             className="w-full lg:w-52"
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search for a type"
-            icon={<Search size={14} />}
+            icon={<Search />}
           />
         </div>
 

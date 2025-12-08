@@ -1,21 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
-import { parseAsBoolean, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
+import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
 import { useS3VectorsWrapperCreateMutation } from 'data/storage/s3-vectors-wrapper-create-mutation'
 import { useVectorBucketCreateMutation } from 'data/storage/vector-bucket-create-mutation'
 import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
@@ -28,7 +24,6 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  DialogTrigger,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -36,7 +31,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { inverseValidBucketNameRegex, validBucketNameRegex } from '../CreateBucketModal.utils'
+import { validVectorBucketName } from './CreateVectorBucketDialog.utils'
 import { useS3VectorsWrapperExtension } from './useS3VectorsWrapper'
 import { getVectorBucketFDWSchemaName } from './VectorBuckets.utils'
 
@@ -44,12 +39,36 @@ const FormSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, 'Please provide a name for your bucket')
-    .max(100, 'Bucket name should be below 100 characters')
+    .min(3, 'Bucket name should be at least 3 characters')
+    .max(63, 'Bucket name should be up to 63 characters')
     .superRefine((name, ctx) => {
-      if (!validBucketNameRegex.test(name)) {
-        const [match] = name.match(inverseValidBucketNameRegex) ?? []
-        ctx.addIssue({
+      if (!validVectorBucketName.test(name)) {
+        if (/[A-Z]/.test(name)) {
+          return ctx.addIssue({
+            path: [],
+            code: z.ZodIssueCode.custom,
+            message: 'Bucket name can only be lowercase characters',
+          })
+        }
+
+        if (!/^[a-z0-9]/.test(name)) {
+          return ctx.addIssue({
+            path: [],
+            code: z.ZodIssueCode.custom,
+            message: 'Bucket name must start with a lowercase letter or number.',
+          })
+        }
+
+        if (!/[a-z0-9]$/.test(name)) {
+          return ctx.addIssue({
+            path: [],
+            code: z.ZodIssueCode.custom,
+            message: 'Bucket name must end with a lowercase letter or number.',
+          })
+        }
+
+        const [match] = name.match(/[^a-z0-9-]/) ?? []
+        return ctx.addIssue({
           path: [],
           code: z.ZodIssueCode.custom,
           message: !!match
@@ -64,17 +83,17 @@ const formId = 'create-storage-bucket-form'
 
 export type CreateBucketForm = z.infer<typeof FormSchema>
 
-export const CreateVectorBucketDialog = () => {
+export const CreateVectorBucketDialog = ({
+  visible,
+  setVisible,
+}: {
+  visible: boolean
+  setVisible: (visible: boolean) => void
+}) => {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
   const [isLoading, setIsLoading] = useState(false)
-
-  const [visible, setVisible] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
-  const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const { data } = useVectorBucketsQuery({ projectRef: ref })
 
@@ -88,13 +107,16 @@ export const CreateVectorBucketDialog = () => {
     onError: () => {},
   })
 
-  const { state: wrappersExtensionState } = useS3VectorsWrapperExtension()
+  const { extension: wrappersExtension, state: wrappersExtensionState } =
+    useS3VectorsWrapperExtension()
 
   const { mutateAsync: createS3VectorsWrapper } = useS3VectorsWrapperCreateMutation()
 
   const { mutateAsync: createSchema } = useSchemaCreateMutation({
     onError: () => {},
   })
+
+  const { mutateAsync: enableExtension } = useDatabaseExtensionEnableMutation()
 
   const onSubmit: SubmitHandler<CreateBucketForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
@@ -114,7 +136,25 @@ export const CreateVectorBucketDialog = () => {
     }
 
     try {
-      if (wrappersExtensionState === 'installed') {
+      if (!wrappersExtension) throw new Error('Unable to find wrappers extension.')
+      if (wrappersExtensionState === 'not-installed') {
+        // when it's not installed, we need to enable the extension and create the wrapper
+        await enableExtension({
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
+          name: wrappersExtension.name,
+          schema: wrappersExtension.schema ?? 'extensions',
+          version: wrappersExtension.default_version,
+        })
+
+        await createS3VectorsWrapper({ bucketName: values.name })
+
+        await createSchema({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          name: getVectorBucketFDWSchemaName(values.name),
+        })
+      } else if (wrappersExtensionState === 'installed') {
         await createS3VectorsWrapper({ bucketName: values.name })
 
         await createSchema({
@@ -142,33 +182,10 @@ export const CreateVectorBucketDialog = () => {
 
   useEffect(() => {
     if (!visible) form.reset()
-  }, [visible])
+  }, [visible, form])
 
   return (
     <Dialog open={visible} onOpenChange={setVisible}>
-      <DialogTrigger asChild>
-        <ButtonTooltip
-          block
-          size="tiny"
-          type="primary"
-          className="w-fit"
-          icon={<Plus size={14} />}
-          disabled={!canCreateBuckets}
-          tabIndex={!canCreateBuckets ? -1 : 0}
-          onClick={() => setVisible(true)}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: !canCreateBuckets
-                ? 'You need additional permissions to create buckets'
-                : undefined,
-            },
-          }}
-        >
-          New bucket
-        </ButtonTooltip>
-      </DialogTrigger>
-
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create vector bucket</DialogTitle>

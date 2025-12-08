@@ -37,7 +37,7 @@ const PROVIDER_EMAIL = {
       description:
         'Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API.',
       type: 'boolean',
-      link: 'https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection',
+      link: `${DOCS_URL}/guides/auth/password-security#password-strength-and-leaked-password-protection`,
       isPaid: true,
     },
     PASSWORD_MIN_LENGTH: {
@@ -523,7 +523,7 @@ const EXTERNAL_PROVIDER_APPLE = {
     EXTERNAL_APPLE_CLIENT_ID: string()
       .matches(/^\S+$/, 'Client IDs should not contain spaces.')
       .matches(
-        /^([a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*(,[a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*)*)$/i,
+        /^([a-z0-9-]+(\.[a-z0-9-]+)*(,[a-z0-9-]+(\.[a-z0-9-]+)*)*)$/i,
         'Invalid characters. Each ID should follow a reverse-domain style string (e.g. com.example.app). Use commas to separate multiple IDs.'
       )
       .when('EXTERNAL_APPLE_ENABLED', {

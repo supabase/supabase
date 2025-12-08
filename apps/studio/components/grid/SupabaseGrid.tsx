@@ -44,7 +44,7 @@ export const SupabaseGrid = ({
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
 
-  const { filters, onApplyFilters } = useTableFilter()
+  const { filters } = useTableFilter()
   const { sorts, onApplySorts } = useTableSort()
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
@@ -104,8 +104,6 @@ export const SupabaseGrid = ({
               isLoading={isLoading}
               isSuccess={isSuccess}
               isError={isError}
-              filters={filters}
-              onApplyFilters={onApplyFilters}
             />
             <Footer enableForeignRowsQuery={tableQueriesEnabled} />
             <Shortcuts gridRef={gridRef} rows={rows} />

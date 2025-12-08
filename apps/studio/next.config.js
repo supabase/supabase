@@ -33,9 +33,6 @@ const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   assetPrefix: getAssetPrefix(),
   output: 'standalone',
-  experimental: {
-    webpackBuildWorker: true,
-  },
   async rewrites() {
     return [
       {
@@ -130,6 +127,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/project/:ref/auth/advanced',
+        destination: '/project/:ref/auth/performance',
+        permanent: true,
+      },
+      {
         source: '/project/:ref/database',
         destination: '/project/:ref/database/tables',
         permanent: true,
@@ -158,6 +160,11 @@ const nextConfig = {
         source: '/project/:ref/storage/buckets/:bucketId',
         destination: '/project/:ref/storage/files/buckets/:bucketId',
         permanent: true,
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/api-keys/new',
+        destination: '/project/:ref/settings/api-keys',
       },
       {
         source: '/project/:ref/settings/storage',
@@ -236,6 +243,11 @@ const nextConfig = {
         source: '/project/:ref/settings/billing/subscription',
         destination: '/org/_/billing',
         permanent: true,
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/jwt/signing-keys',
+        destination: '/project/:ref/settings/jwt',
       },
       {
         source: '/project/:ref/database/api-logs',
@@ -557,26 +569,6 @@ const nextConfig = {
       },
     },
   },
-  // Both configs for turbopack and webpack need to exist (and sync) because Nextjs still uses webpack for production building
-  webpack(config) {
-    config.module?.rules
-      .find((rule) => rule.oneOf)
-      .oneOf.forEach((rule) => {
-        if (rule.issuer?.and?.[0]?.toString().includes('_app')) {
-          const and = rule.issuer.and
-          rule.issuer.or = [/[\\/]node_modules[\\/]monaco-editor[\\/]/, { and }]
-          delete rule.issuer.and
-        }
-      })
-
-    // .md files to be loaded as raw text
-    config.module.rules.push({
-      test: /\.md$/,
-      type: 'asset/source',
-    })
-
-    return config
-  },
   onDemandEntries: {
     maxInactiveAge: 24 * 60 * 60 * 1000,
     pagesBufferLength: 100,
@@ -586,13 +578,8 @@ const nextConfig = {
     // For production, we run typechecks separate from the build command (pnpm typecheck && pnpm build)
     ignoreBuildErrors: true,
   },
-  eslint: {
-    // We are already running linting via GH action, this will skip linting during production build on Vercel
-    ignoreDuringBuilds: true,
-  },
 }
 
-// module.exports = withBundleAnalyzer(nextConfig)
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
 module.exports =
