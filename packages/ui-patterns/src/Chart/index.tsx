@@ -96,16 +96,18 @@ ChartCard.displayName = 'ChartCard'
 
 /* Chart Header Components */
 interface ChartHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+  align?: 'start' | 'center'
   children: React.ReactNode
 }
 
 const ChartHeader = React.forwardRef<HTMLDivElement, ChartHeaderProps>(
-  ({ children, className, ...props }, ref) => {
+  ({ children, className, align = 'center', ...props }, ref) => {
     return (
       <div
         ref={ref}
         className={cn(
-          'py-4 px-6 flex flex-row items-center justify-between gap-2 space-y-0 pb-0 border-b-0 relative',
+          'py-4 px-6 flex flex-row justify-between gap-2 space-y-0 pb-0 border-b-0 relative',
+          align === 'center' ? 'items-center' : 'items-start',
           className
         )}
         {...props}

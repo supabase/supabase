@@ -46,7 +46,7 @@ export default function ChartComposedMetrics() {
     <div className="grid grid-cols-2 gap-6 w-full">
       <Chart isLoading={!data.length}>
         <ChartCard>
-          <ChartHeader className="pb-4">
+          <ChartHeader className="pb-4" align="start">
             <ChartMetric label="Slow Queries" value={0} />
             <ChartActions actions={actions} />
           </ChartHeader>
@@ -54,7 +54,7 @@ export default function ChartComposedMetrics() {
       </Chart>
       <Chart isLoading={!data.length}>
         <ChartCard>
-          <ChartHeader>
+          <ChartHeader align="start">
             <ChartMetric
               label="Active Users"
               value={averageValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
