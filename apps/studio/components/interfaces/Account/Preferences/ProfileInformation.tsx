@@ -16,6 +16,7 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Select_Shadcn_,
+  Separator,
 } from 'ui'
 import z from 'zod'
 
@@ -23,7 +24,6 @@ import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query
 import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
 import { useProfile } from 'lib/profile'
 import { groupBy } from 'lodash'
-import type { FormSchema } from 'types'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const FormSchema = z.object({
@@ -82,85 +82,98 @@ export const ProfileInformation = () => {
       <form id={formId} className="space-y-6 w-full" onSubmit={form.handleSubmit(onSubmit)}>
         <Card className="mb-8">
           <CardHeader>Profile Information</CardHeader>
-          <CardContent className="flex flex-col gap-y-2">
+          <CardContent className="space-y-4">
             <FormField_Shadcn_
               control={form.control}
               name="first_name"
               render={({ field }) => (
-                <FormItemLayout label="First name" layout="horizontal">
-                  <FormControl_Shadcn_ className="col-span-8">
-                    <Input_Shadcn_ {...field} className="w-72" />
+                <FormItemLayout
+                  label="First name"
+                  layout="flex-row-reverse"
+                  className="[&>div]:md:w-1/2"
+                >
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
             />
+
+            <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
+
             <FormField_Shadcn_
               control={form.control}
               name="last_name"
               render={({ field }) => (
-                <FormItemLayout label="Last name" layout="horizontal">
-                  <FormControl_Shadcn_ className="col-span-8">
-                    <Input_Shadcn_ {...field} className="w-72" />
+                <FormItemLayout
+                  label="Last name"
+                  layout="flex-row-reverse"
+                  className="[&>div]:md:w-1/2"
+                >
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
             />
+
+            <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
+
             <FormField_Shadcn_
               control={form.control}
               name="primary_email"
               render={({ field }) => (
-                <FormItemLayout label="Primary email" layout="horizontal">
-                  <FormControl_Shadcn_ className="col-span-8">
-                    <div className="flex flex-col gap-1">
-                      <Select_Shadcn_
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={profile?.is_sso_user}
-                      >
-                        <SelectTrigger_Shadcn_ className="col-span-8 w-72">
-                          <SelectValue_Shadcn_ placeholder="Select primary email" />
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_ className="col-span-8">
-                          {isIdentitiesSuccess &&
-                            dedupedIdentityEmails.map((email) => (
-                              <SelectItem_Shadcn_ key={email} value={email}>
-                                {email}
-                              </SelectItem_Shadcn_>
-                            ))}
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
-                      {(profile?.is_sso_user && (
-                        <p className="text-xs text-foreground-light">
-                          Primary email is managed by your SSO provider and cannot be changed here.
-                        </p>
-                      )) || (
-                        <p className="text-xs text-foreground-light">
-                          Primary email is used for account notifications.
-                        </p>
-                      )}
-                    </div>
+                <FormItemLayout
+                  label="Primary email"
+                  layout="flex-row-reverse"
+                  className="[&>div]:md:w-1/2"
+                  description={
+                    profile?.is_sso_user
+                      ? 'Primary email is managed by your SSO provider and cannot be changed here.'
+                      : 'Primary email is used for account notifications.'
+                  }
+                >
+                  <FormControl_Shadcn_>
+                    <Select_Shadcn_
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={profile?.is_sso_user}
+                    >
+                      <SelectTrigger_Shadcn_>
+                        <SelectValue_Shadcn_ placeholder="Select primary email" />
+                      </SelectTrigger_Shadcn_>
+                      <SelectContent_Shadcn_>
+                        {isIdentitiesSuccess &&
+                          dedupedIdentityEmails.map((email) => (
+                            <SelectItem_Shadcn_ key={email} value={email}>
+                              {email}
+                            </SelectItem_Shadcn_>
+                          ))}
+                      </SelectContent_Shadcn_>
+                    </Select_Shadcn_>
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
             />
+
+            <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
+
             <FormField_Shadcn_
               control={form.control}
               name="username"
               render={({ field }) => (
-                <FormItemLayout label="Username" layout="horizontal">
-                  <FormControl_Shadcn_ className="col-span-8">
-                    <div className="flex flex-col gap-1">
-                      <Input_Shadcn_ {...field} className="w-72" disabled={profile?.is_sso_user} />
-                      {(profile?.is_sso_user && (
-                        <p className="text-xs text-foreground-light">
-                          Username is managed by your SSO provider and cannot be changed here.
-                        </p>
-                      )) || (
-                        <p className="text-xs text-foreground-light">
-                          Username appears as a display name throughout the dashboard.
-                        </p>
-                      )}
-                    </div>
+                <FormItemLayout
+                  label="Username"
+                  layout="flex-row-reverse"
+                  className="[&>div]:md:w-1/2"
+                  description={
+                    profile?.is_sso_user
+                      ? 'Username is managed by your SSO provider and cannot be changed here.'
+                      : 'Username appears as a display name throughout the dashboard.'
+                  }
+                >
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} disabled={profile?.is_sso_user} />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
