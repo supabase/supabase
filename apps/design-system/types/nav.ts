@@ -11,7 +11,7 @@ export interface NavItem {
 
 export interface NavItemWithChildren extends NavItem {
   items: NavItemWithChildren[]
-  sortOrder: 'manual' | 'alphabetical' // Sidebar navigation sort order
+  sortOrder?: 'manual' | 'alphabetical' // Sidebar navigation sort order for top-level sections
 }
 
 export interface MainNavItem extends NavItem {}
