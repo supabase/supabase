@@ -76,7 +76,7 @@ export const Devs = () => {
         {/* Content */}
         <div className="flex flex-col justify-end h-full px-4 py-0 relative">
           <div className="flex justify-between items-center">
-            <h2 className="font-medium tracking-tighter text-6xl md:text-7xl lg:text-[5.6rem]">
+            <h2 className="font-medium tracking-tighter text-6xl md:text-7xl lg:text-[5.6rem] translate-y-2 lg:translate-y-[10px]">
               Devs <span className="text-brand">love</span> Supabase
             </h2>
           </div>

@@ -170,7 +170,7 @@ export function AnimatedGridBackground({
   return (
     <div
       ref={containerRef}
-      className={`absolute inset-0 grid h-full [&>*]:border-muted [&>*]:border-r [&>*]:border-b`}
+      className={`absolute inset-0 grid h-full [&>*]:border-muted [&>*]:border-r [&>*]:border-b overflow-hidden`}
       style={{
         gridTemplateColumns: `repeat(${cols}, 1fr)`,
         gridTemplateRows: `repeat(${actualRows}, 1fr)`,

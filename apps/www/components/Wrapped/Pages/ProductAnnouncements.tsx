@@ -294,15 +294,14 @@ export const ProductAnnouncements = () => {
 
         {/* Content */}
         <div className="flex flex-col justify-end h-full px-4 lg:px-8 py-0 relative">
-          <h2 className="font-medium tracking-tighter text-6xl md:text-7xl lg:text-[5.6rem]">
+          <h2 className="font-medium tracking-tighter text-6xl md:text-7xl lg:text-[5.6rem] translate-y-2 lg:translate-y-[10px]">
             Launch <span className="line-through text-foreground-muted">Week</span> Year
           </h2>
         </div>
       </section>
 
       <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 lg:px-8 py-12">
-        <h3 className="text-lg">Product Announcements</h3>
-        <p className="text-base text-foreground-lighter mt-4">Everything we shipped in 2025.</p>
+        <h3 className="text-lg">Product Announcements — Everything we shipped in 2025.</h3>
       </div>
 
       {/* Months accordion - 2 columns, top-to-bottom flow */}
