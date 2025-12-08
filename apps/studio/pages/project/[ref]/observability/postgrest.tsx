@@ -15,13 +15,14 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
 import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
 import type { NextPageWithLayout } from 'types'
+import { ObservabilityLink } from 'components/ui/ObservabilityLink'
 
 const PostgRESTReport: NextPageWithLayout = () => {
   return (
@@ -95,9 +96,16 @@ const PostgrestReport = () => {
     handleDatePickerChangeFromHook(values)
   }
 
+  const onRefreshReport = useRefreshHandler(
+    datePickerValue,
+    datePickerHelpers,
+    handleDatePickerChange,
+    refetch
+  )
+
   return (
     <>
-      <ReportHeader showDatabaseSelector={false} title="PostgREST" />
+      <ReportHeader showDatabaseSelector={false} title="Data API" />
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2">
@@ -108,7 +116,7 @@ const PostgrestReport = () => {
                 icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
                 className="w-7"
                 tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-                onClick={() => refetch()}
+                onClick={onRefreshReport}
               />
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
@@ -159,6 +167,9 @@ const PostgrestReport = () => {
           />
         </div>
       </ReportStickyNav>
+      <div className="py-8">
+        <ObservabilityLink />
+      </div>
     </>
   )
 }

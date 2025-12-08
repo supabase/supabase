@@ -16,6 +16,7 @@ Amy Q
 Andrew Valleteau
 Andrey A
 Angelico de los Reyes
+Anna Weihl
 Ant Wilson
 Ariuna K
 Artur Zakirov
@@ -87,6 +88,7 @@ Jess Shears
 Jim Brodeur
 Jim Chanco Jr
 Joakim Ahrlin
+Joel Low
 John Pena
 John Schaeffer
 Jon M
@@ -109,6 +111,7 @@ Krishna Sai Vandavasi
 Lakshan Perera
 Laura C
 Laurence Isla
+Leigh Anne Applewhite
 Lenny Urbanowski
 Leonardo Santiago
 Long Hoang
@@ -126,6 +129,7 @@ Monica Khoury
 Mykhailo Mischa Lieibenson
 Nick B
 Nick Littman
+Nick Nowlan
 Nyannyacha
 Oli R
 Pamela Chia
@@ -165,6 +169,7 @@ Taryn King
 Terry Sutton
 Thomas E
 Thor Schaeff
+Tim Frietas
 Timothy Lim
 Tom Ashley
 Tom G

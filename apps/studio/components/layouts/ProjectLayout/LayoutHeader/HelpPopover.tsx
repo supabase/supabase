@@ -134,17 +134,22 @@ export const HelpPopover = () => {
               {IS_PLATFORM && (
                 <>
                   <ButtonGroupItem
+                    asChild
                     size="tiny"
                     icon={<Activity strokeWidth={1.5} size={14} />}
-                    asChild
                   >
                     <a href="https://status.supabase.com/" target="_blank" rel="noreferrer">
                       Supabase status
                     </a>
                   </ButtonGroupItem>
 
-                  <ButtonGroupItem size="tiny" icon={<Mail strokeWidth={1.5} size={14} />}>
-                    <SupportLink queryParams={supportLinkQueryParams}>Contact support</SupportLink>
+                  <ButtonGroupItem asChild size="tiny" icon={<Mail strokeWidth={1.5} size={14} />}>
+                    <SupportLink
+                      queryParams={supportLinkQueryParams}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Contact support
+                    </SupportLink>
                   </ButtonGroupItem>
                 </>
               )}

@@ -3,6 +3,7 @@ export { default as ExampleTemplate } from './_example-template';
 export { default as AnalyticsBucket } from './analytics-bucket';
 export { default as ApiDocs } from './api-docs';
 export { default as Auth } from './auth';
+export { default as BoxPlus } from './box-plus';
 export { default as BucketPlus } from './bucket-plus';
 export { default as Database } from './database';
 export { default as Datadog } from './datadog';

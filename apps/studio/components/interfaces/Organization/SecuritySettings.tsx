@@ -11,7 +11,7 @@ import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationMfaToggleMutation } from 'data/organizations/organization-mfa-mutation'
 import { useOrganizationMfaQuery } from 'data/organizations/organization-mfa-query'
@@ -20,9 +20,6 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Button,
   Card,
   CardContent,
@@ -34,7 +31,6 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -112,28 +108,12 @@ export const SecuritySettings = () => {
     <ScaffoldContainer>
       <ScaffoldSection isFullWidth>
         {!isPaidPlan ? (
-          <Alert_Shadcn_
-            variant="default"
-            title="Organization MFA enforcement is not available on Free plan"
-          >
-            <WarningIcon />
-            <div className="flex flex-col md:flex-row pt-1 gap-4">
-              <div className="grow">
-                <AlertTitle_Shadcn_>
-                  Organization MFA enforcement is not available on Free plan
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
-                  <p>Upgrade to Pro or above to enforce MFA requirements for your organization.</p>
-                </AlertDescription_Shadcn_>
-              </div>
-
-              <div className="flex items-center">
-                <UpgradePlanButton type="primary" source="mfa" plan="Pro">
-                  Upgrade subscription
-                </UpgradePlanButton>
-              </div>
-            </div>
-          </Alert_Shadcn_>
+          <UpgradeToPro
+            source="organizationMfa"
+            primaryText="Organization MFA enforcement is not available on Free plan"
+            secondaryText="Upgrade to Pro or above to enforce MFA requirements for your organization."
+            featureProposition="enforce MFA requirements"
+          />
         ) : (
           <>
             {isLoadingMfa || isLoadingPermissions ? (
