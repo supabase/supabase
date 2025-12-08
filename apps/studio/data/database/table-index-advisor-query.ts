@@ -67,10 +67,10 @@ select
   tq.total_time,
   tq.mean_time,
   coalesce(ia.index_statements, '{}') as index_statements,
-  coalesce(ia.startup_cost_before, 0) as startup_cost_before,
-  coalesce(ia.startup_cost_after, 0) as startup_cost_after,
-  coalesce(ia.total_cost_before, 0) as total_cost_before,
-  coalesce(ia.total_cost_after, 0) as total_cost_after
+  coalesce((ia.startup_cost_before)::numeric, 0) as startup_cost_before,
+  coalesce((ia.startup_cost_after)::numeric, 0) as startup_cost_after,
+  coalesce((ia.total_cost_before)::numeric, 0) as total_cost_before,
+  coalesce((ia.total_cost_after)::numeric, 0) as total_cost_after
 from top_queries tq
 left join lateral (
   select * from index_advisor(tq.query)

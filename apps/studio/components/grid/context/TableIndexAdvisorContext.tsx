@@ -1,7 +1,10 @@
 import { createContext, useContext, PropsWithChildren } from 'react'
 
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
-import { useTableIndexAdvisorQuery, TableIndexAdvisorData } from 'data/database/table-index-advisor-query'
+import {
+  useTableIndexAdvisorQuery,
+  TableIndexAdvisorData,
+} from 'data/database/table-index-advisor-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 interface TableIndexAdvisorContextValue {
@@ -63,5 +66,3 @@ export function useColumnHasIndexSuggestion(columnName: string): boolean {
   const { columnsWithSuggestions } = useTableIndexAdvisor()
   return columnsWithSuggestions.includes(columnName)
 }
-
-
