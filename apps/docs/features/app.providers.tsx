@@ -8,6 +8,7 @@ import { AuthContainer } from './auth/auth.client'
 import { DocsCommandMenu, DocsCommandProvider } from './command'
 import { QueryClientProvider } from './data/queryClient.client'
 import { PageTelemetry } from './telemetry/telemetry.client'
+import { PageObservability } from './observability/observability.client'
 import { ScrollRestoration } from './ui/helpers.scroll.client'
 import { ThemeSandbox } from './ui/theme.client'
 
@@ -19,7 +20,7 @@ function GlobalProviders({ children }: PropsWithChildren) {
     <QueryClientProvider>
       <AuthContainer>
         <FeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
-          <PageTelemetry />
+          <PageObservability />
           <ScrollRestoration />
           <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
             <TooltipProvider delayDuration={0}>
