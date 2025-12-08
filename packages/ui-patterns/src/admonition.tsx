@@ -23,6 +23,7 @@ export interface AdmonitionProps {
   layout?: 'horizontal' | 'vertical'
   actions?: ReactNode
   icon?: ReactNode
+  className?: string
 }
 
 const admonitionToAlertMapping: Record<
