@@ -127,7 +127,7 @@ export const Admonition = forwardRef<
               <AlertTitle_Shadcn_
                 {...childProps.title}
                 className={cn(
-                  'text mt-0.5 flex gap-3 text-sm [&_p]:mb-1.5 [&_p]:mt-0',
+                  'text mt-0.5 flex gap-3 text-sm',
                   !label && 'flex-col',
                   childProps.title?.className
                 )}
@@ -143,14 +143,14 @@ export const Admonition = forwardRef<
               {children && (
                 <AlertDescription_Shadcn_
                   {...childProps.description}
-                  className={cn('[&_p]:mb-1.5 [&_p]:mt-0', childProps?.description?.className)}
+                  className={cn('', childProps?.description?.className)}
                 >
                   {children}
                 </AlertDescription_Shadcn_>
               )}
             </div>
           ) : (
-            <div className="text mt [&_p]:mb-1.5 [&_p]:mt-0 mt-0.5 [&_p:last-child]:mb-0">
+            <div className="text my-0.5 [&_p]:mt-0 [&_p]:mb-1.5 [&_p:last-child]:mb-0">
               {children}
             </div>
           )}
