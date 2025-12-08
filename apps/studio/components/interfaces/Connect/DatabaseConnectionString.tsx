@@ -1,5 +1,4 @@
 import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
-import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
 import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
 
@@ -529,7 +528,7 @@ export const DatabaseConnectionString = () => {
                     <Admonition
                       type="warning"
                       title="Highly recommended to not use Session Pooler"
-                      className="[&>div]:gap-0 px-8 [&>svg]:left-7 border-0 border-b rounded-none border-border-muted !py-4"
+                      className="my-8"
                     >
                       <p className="text-sm text-foreground-lighter !mb-0">
                         If you are using Session Pooler, we recommend switching to Direct

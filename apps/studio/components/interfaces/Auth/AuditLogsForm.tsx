@@ -171,20 +171,20 @@ export const AuditLogsForm = () => {
                     type="warning"
                     className="mt-4"
                     title="Disabling PostgreSQL storage will not automatically migrate or transfer existing audit log data"
-                  >
-                    <p className="!mb-0 !leading-normal prose text-foreground-light text-sm max-w-full">
-                      Future audit logs will only appear in the project's{' '}
-                      <InlineLink
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href={`/project/${projectRef}/logs/explorer?q=select%0A++cast(timestamp+as+datetime)+as+timestamp%2C%0A++event_message%2C+metadata+%0Afrom+auth_audit_logs+%0Alimit+10%0A`}
-                      >
-                        auth logs
-                      </InlineLink>
-                      . You are responsible for backing up, copying, or migrating existing data from
-                      the <code>{AUDIT_LOG_ENTRIES_TABLE}</code> table if needed.
-                    </p>
-                  </Admonition>
+                    description={
+                      <p>
+                        Future audit logs will only appear in the project’s{' '}
+                        <InlineLink
+                          href={`/project/${projectRef}/logs/explorer?q=select%0A++cast(timestamp+as+datetime)+as+timestamp%2C%0A++event_message%2C+metadata+%0Afrom+auth_audit_logs+%0Alimit+10%0A`}
+                        >
+                          auth logs
+                        </InlineLink>
+                        . You are responsible for backing up, copying, or migrating existing data
+                        from the <code className="text-code-inline">{AUDIT_LOG_ENTRIES_TABLE}</code>{' '}
+                        table if needed.
+                      </p>
+                    }
+                  />
                 )}
               </CardContent>
 

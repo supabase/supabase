@@ -221,7 +221,7 @@ export const StorageSettings = () => {
   return (
     <PageContainer>
       <PageSection>
-        <PageSectionContent>
+        <PageSectionContent className="flex flex-col gap-y-8">
           <Form_Shadcn_ {...form}>
             {isLoading || isLoadingPermissions ? (
               <GenericSkeletonLoader />
