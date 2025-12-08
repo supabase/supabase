@@ -1,5 +1,5 @@
 import { ChevronDown, Download, ExternalLink } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -35,21 +35,24 @@ export const PauseDisabledState = () => {
   )
   const latestBackup = pauseStatus?.latest_downloadable_backup_id
 
-  const { data: storageArchive } = useStorageArchiveQuery(
+  const { data: storageArchive, isSuccess: isStorageArchiveSuccess } = useStorageArchiveQuery(
     { projectRef: ref },
     {
       refetchInterval,
       refetchOnWindowFocus: false,
-      onSuccess: (data) => {
-        if (data.fileUrl && refetchInterval !== false) {
-          toast.success('Downloading storage objects', { id: toastId })
-          setToastId(undefined)
-          setRefetchInterval(false)
-          downloadStorageArchive(data.fileUrl)
-        }
-      },
     }
   )
+
+  useEffect(() => {
+    if (!isStorageArchiveSuccess) return
+    if (storageArchive.fileUrl && refetchInterval !== false) {
+      toast.success('Downloading storage objects', { id: toastId })
+      setToastId(undefined)
+      setRefetchInterval(false)
+      downloadStorageArchive(storageArchive.fileUrl)
+    }
+  }, [isStorageArchiveSuccess, storageArchive, refetchInterval])
+
   const storageArchiveUrl = storageArchive?.fileUrl
 
   const { mutate: downloadBackup } = useBackupDownloadMutation({
@@ -118,7 +121,7 @@ export const PauseDisabledState = () => {
       <Admonition
         showIcon={false}
         type="warning"
-        className="mb-0 rounded-none border-0 px-6"
+        className="rounded-none border-0 px-6"
         title="Project can no longer be restored through the dashboard"
       >
         <p className="!leading-normal !mb-3">

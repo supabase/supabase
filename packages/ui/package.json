@@ -60,6 +60,7 @@
     "input-otp": "^1.2.3",
     "lodash": "^4.17.21",
     "lucide-react": "^0.436.0",
+    "mermaid": "^11.12.1",
     "next-themes": "^0.3.0",
     "prism-react-renderer": "^2.3.1",
     "prop-types": "^15.7.2",

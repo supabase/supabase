@@ -51,7 +51,8 @@ export const MAX_EXPORT_ROW_COUNT = 500000
 export const MAX_EXPORT_ROW_COUNT_MESSAGE = (
   <>
     Sorry! We're unable to support exporting row counts larger than{' '}
-    {MAX_EXPORT_ROW_COUNT.toLocaleString()} at the moment. Alternatively, you may consider using
+    {MAX_EXPORT_ROW_COUNT.toLocaleString('en-US')} at the moment. Alternatively, you may consider
+    using{' '}
     <Link href={`${DOCS_URL}/reference/cli/supabase-db-dump`} target="_blank">
       pg_dump
     </Link>{' '}
@@ -76,7 +77,7 @@ export const Header = ({ customHeader, isRefetching, tableQueriesEnabled = true 
         ) : snap.selectedRows.size > 0 ? (
           <RowHeader tableQueriesEnabled={tableQueriesEnabled} />
         ) : (
-          <DefaultHeader />
+          <DefaultHeader tableQueriesEnabled={tableQueriesEnabled} />
         )}
         <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
       </div>
@@ -84,7 +85,9 @@ export const Header = ({ customHeader, isRefetching, tableQueriesEnabled = true 
   )
 }
 
-const DefaultHeader = () => {
+const DefaultHeader = ({
+  tableQueriesEnabled = true,
+}: Pick<HeaderProps, 'tableQueriesEnabled'>) => {
   const { ref: projectRef } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
 
@@ -107,7 +110,7 @@ const DefaultHeader = () => {
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
         <FilterPopover />
-        <SortPopover />
+        <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
       </div>
       {canAddNew && (
         <>

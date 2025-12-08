@@ -1,11 +1,14 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
-import { memo, useMemo } from 'react'
+import { memo, useCallback, useMemo, useRef } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useTablesRolesAccessQuery } from 'data/tables/tables-roles-access-query'
+import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
+import { useQueryStateWithSelect, handleErrorOnDelete } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Alert_Shadcn_,
@@ -21,6 +24,7 @@ import {
   TableRow,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { usePoliciesData } from '../PoliciesDataContext'
 import { PolicyRow } from './PolicyRow'
@@ -105,7 +109,7 @@ const PolicyTableRowComponent = ({
         <Admonition
           showIcon={false}
           type="warning"
-          className="mb-0 border-0 border-y rounded-none [&>div]:text-foreground-light h-[50px] py-0 flex items-center"
+          className="border-0 border-y rounded-none [&>div]:text-foreground-light h-[50px] py-0 flex items-center"
         >
           No data will be selectable via Supabase APIs as this schema is not exposed. You may
           configure this in your project's{' '}

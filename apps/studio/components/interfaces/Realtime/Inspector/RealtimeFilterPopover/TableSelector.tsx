@@ -1,4 +1,9 @@
+import { debounce } from 'lodash'
+import { Check, Code, Loader } from 'lucide-react'
 import { useEffect, useState } from 'react'
+
+import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -15,11 +20,6 @@ import {
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
-
-import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { debounce } from 'lodash'
-import { Check, Code, Loader } from 'lucide-react'
 
 interface TableSelectorProps {
   className?: string
@@ -125,7 +125,9 @@ const TableSelector = ({
                 <>
                   <CommandGroup_Shadcn_ forceMount>
                     <ScrollArea className={(entities || []).length > 7 ? 'h-[210px]' : ''}>
-                      <CommandEmpty_Shadcn_>No tables found</CommandEmpty_Shadcn_>
+                      {entities.length === 0 && (
+                        <CommandEmpty_Shadcn_>No tables found</CommandEmpty_Shadcn_>
+                      )}
                       {!searchInput && (
                         <CommandItem_Shadcn_
                           key="all-tables"
