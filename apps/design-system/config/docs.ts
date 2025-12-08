@@ -9,6 +9,7 @@ export const docsConfig: DocsConfig = {
   sidebarNav: [
     {
       title: 'Getting Started',
+      sortOrder: 'manual',
       items: [
         {
           title: 'Introduction',
@@ -49,6 +50,7 @@ export const docsConfig: DocsConfig = {
     },
     {
       title: 'UI Patterns',
+      sortOrder: 'alphabetical',
       items: [
         {
           title: 'Navigation',
@@ -74,6 +76,7 @@ export const docsConfig: DocsConfig = {
     },
     {
       title: 'Fragment Components',
+      sortOrder: 'alphabetical',
       items: [
         {
           title: 'Introduction',
@@ -86,12 +89,17 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Alert Error',
+          href: '/docs/fragments/alert-error',
+          items: [],
+        },
+        {
           title: 'Assistant Chat',
           href: '/docs/fragments/assistant-chat',
           items: [],
         },
         {
-          title: 'EmptyStatePresentational',
+          title: 'Empty State Presentational',
           href: '/docs/fragments/empty-state-presentational',
           items: [],
         },
@@ -169,6 +177,7 @@ export const docsConfig: DocsConfig = {
     },
     {
       title: 'Atom Components',
+      sortOrder: 'alphabetical',
       items: [
         {
           title: 'Introduction',
