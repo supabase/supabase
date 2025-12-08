@@ -82,6 +82,7 @@ export const docsConfig: DocsConfig = {
           title: 'Introduction',
           href: '/docs/components/fragment-components',
           items: [],
+          priority: true,
         },
         {
           title: 'Admonition',
@@ -178,6 +179,7 @@ export const docsConfig: DocsConfig = {
           title: 'Introduction',
           href: '/docs/components/atom-components',
           items: [],
+          priority: true,
         },
         {
           title: 'Accordion',

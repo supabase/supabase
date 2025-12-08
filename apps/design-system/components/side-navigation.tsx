@@ -10,7 +10,13 @@ function SideNavigation() {
             {section.title}
           </div>
           {(section.sortOrder === 'alphabetical'
-            ? [...section.items].sort((a, b) => a.title.localeCompare(b.title))
+            ? (() => {
+                const priorityItems = section.items.filter((item) => item.priority)
+                const regularItems = section.items
+                  .filter((item) => !item.priority)
+                  .sort((a, b) => a.title.localeCompare(b.title))
+                return [...priorityItems, ...regularItems]
+              })()
             : section.items
           ).map((item, i) => (
             <NavigationItem item={item} key={`${item.href}-${i}`} />
