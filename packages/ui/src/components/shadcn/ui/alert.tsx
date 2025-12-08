@@ -43,20 +43,28 @@ AlertTitle.displayName = 'AlertTitle'
 const AlertDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      'text-sm text-foreground-light font-normal',
-      // Optically align text in container
-      'mb-0.5',
-      // Handle paragraphs
-      '[&_p]:mb-0.5 [&_p:last-child]:mb-0',
-      className
-    )}
-    {...props}
-  />
-))
+>(({ className, children, ...props }, ref) => {
+  // Automatically wrap primitive text nodes (string/number) in <p> tags for semantic HTML
+  const content =
+    typeof children === 'string' || typeof children === 'number' ? <p>{children}</p> : children
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        'text-sm text-foreground-light font-normal',
+        // Optically align text in container
+        'mb-0.5',
+        // Handle paragraphs
+        '[&_p]:mb-0.5 [&_p:last-child]:mb-0',
+        className
+      )}
+      {...props}
+    >
+      {content}
+    </div>
+  )
+})
 AlertDescription.displayName = 'AlertDescription'
 
 export { Alert, AlertDescription, AlertTitle }
