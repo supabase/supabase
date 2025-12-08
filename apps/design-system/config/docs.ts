@@ -292,6 +292,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Field',
+          href: '/docs/components/field',
+          items: [],
+        },
+        {
           title: 'Form',
           href: '/docs/components/form',
           items: [],
