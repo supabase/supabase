@@ -8,7 +8,7 @@ export const alertVariants = cva(
     // Container
     'relative w-full text-sm rounded-lg border p-4',
     // Icon SVG
-    ' [&>svg~*]:pl-10 [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg]:w-[23px] [&>svg]:h-[23px] [&>svg]:p-1 [&>svg]:flex [&>svg]:rounded'
+    '[&>svg~*]:pl-10 [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg]:w-[23px] [&>svg]:h-[23px] [&>svg]:p-1 [&>svg]:flex [&>svg]:rounded'
   ),
   {
     variants: {
@@ -50,6 +50,8 @@ const AlertDescription = React.forwardRef<
       'text-sm text-foreground-light font-normal',
       // Optically align text in container
       'mb-0.5',
+      // Handle paragraphs
+      '[&_p]:mb-0.5 [&_p:last-child]:mb-0',
       className
     )}
     {...props}
