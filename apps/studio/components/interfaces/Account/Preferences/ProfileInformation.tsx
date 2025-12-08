@@ -93,7 +93,7 @@ export const ProfileInformation = () => {
                   className="[&>div]:md:w-1/2"
                 >
                   <FormControl_Shadcn_>
-                    <Input_Shadcn_ {...field} />
+                    <Input_Shadcn_ {...field} placeholder="First name" />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
@@ -111,7 +111,7 @@ export const ProfileInformation = () => {
                   className="[&>div]:md:w-1/2"
                 >
                   <FormControl_Shadcn_>
-                    <Input_Shadcn_ {...field} />
+                    <Input_Shadcn_ {...field} placeholder="Last name" />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
@@ -173,7 +173,11 @@ export const ProfileInformation = () => {
                   }
                 >
                   <FormControl_Shadcn_>
-                    <Input_Shadcn_ {...field} disabled={profile?.is_sso_user} />
+                    <Input_Shadcn_
+                      {...field}
+                      disabled={profile?.is_sso_user}
+                      placeholder="Username"
+                    />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
