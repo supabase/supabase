@@ -139,7 +139,10 @@ export const FilterPopover = ({ portal = true }: FilterPopoverProps) => {
   // Create filter properties from table columns
   const filterProperties: FilterProperty[] = useMemo(() => {
     const columns = snap.table?.columns ?? []
-    const defaultOperators = FilterOperatorOptions.map((op) => ({ value: op.value, label: op.label }))
+    const defaultOperators = FilterOperatorOptions.map((op) => ({
+      value: op.value,
+      label: op.label,
+    }))
     const stringOperators = [
       { value: '~~*', label: 'ilike operator' },
       ...defaultOperators.filter((op) => op.value !== '~~*'),
@@ -267,6 +270,7 @@ export const FilterPopover = ({ portal = true }: FilterPopoverProps) => {
       onFreeformTextChange={setFreeformText}
       actions={actions}
       isLoading={isGenerating}
+      variant="pill"
       className="bg-transparent border-0"
     />
   )

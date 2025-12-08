@@ -274,7 +274,7 @@ const FunctionsList = () => {
                     disabled={!canCreateFunctions}
                     onClick={() => createFunction()}
                     className="flex-grow"
-                    size="small"
+                    size="tiny"
                     tooltip={{
                       content: {
                         side: 'bottom',
@@ -288,7 +288,7 @@ const FunctionsList = () => {
                   </ButtonTooltip>
                   <ButtonTooltip
                     type="default"
-                    size="small"
+                    size="tiny"
                     disabled={!canCreateFunctions}
                     className="px-1 pointer-events-auto"
                     icon={<AiIconAnimation size={16} />}

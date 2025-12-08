@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { Search } from 'lucide-react'
 import { cn } from 'ui'
-import { FilterBarRoot, useFilterBar } from './FilterBarContext'
+import { FilterBarRoot, useFilterBar, type FilterBarVariant } from './FilterBarContext'
 import { FilterGroup } from './FilterGroup'
 import { FilterBarAction, FilterGroup as FilterGroupType, FilterProperty } from './types'
 
@@ -17,22 +17,30 @@ export type FilterBarProps = {
   isLoading?: boolean
   className?: string
   supportsOperators?: boolean
+  variant?: FilterBarVariant
 }
 
 function FilterBarContent({ className }: { className?: string }) {
-  const { filters, error, optionsError, isLoading } = useFilterBar()
+  const { filters, error, optionsError, isLoading, variant } = useFilterBar()
 
   return (
     <div className="w-full space-y-2 relative">
       <div
         className={cn(
-          'relative flex items-center gap-2 w-full border rounded-md h-[34px] bg-foreground/[.026] cursor-text p-0 px-2 overflow-auto',
+          'relative flex items-stretch gap-0 w-full border rounded-md h-full bg-foreground/[.026] cursor-text p-0 pr-2 overflow-auto',
           className
         )}
       >
-        <Search className="text-foreground-muted w-4 h-4 sticky left-0 shrink-0" />
+        <div
+          className={cn(
+            'flex items-center shrink-0 px-2 bg-surface-200',
+            variant === 'pill' ? 'bg-transparent border-r-0' : 'border-r'
+          )}
+        >
+          <Search className="text-foreground-muted w-4 h-4 sticky" />
+        </div>
         <motion.div
-          className="flex-1 flex flex-wrap items-center gap-1 h-full"
+          className="flex-1 flex flex-wrap items-stretch gap-0"
           animate={{ opacity: isLoading ? 0.5 : 1 }}
           transition={{
             duration: 1,
@@ -88,6 +96,7 @@ export function FilterBar({
   isLoading,
   className,
   supportsOperators = false,
+  variant = 'default',
 }: FilterBarProps) {
   return (
     <FilterBarRoot
@@ -99,6 +108,7 @@ export function FilterBar({
       actions={actions}
       isLoading={isLoading}
       supportsOperators={supportsOperators}
+      variant={variant}
     >
       <FilterBarContent className={className} />
     </FilterBarRoot>

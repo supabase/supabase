@@ -1,7 +1,13 @@
 'use client'
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Input_Shadcn_, Popover_Shadcn_, PopoverAnchor_Shadcn_, PopoverContent_Shadcn_ } from 'ui'
+import {
+  cn,
+  Input_Shadcn_,
+  Popover_Shadcn_,
+  PopoverAnchor_Shadcn_,
+  PopoverContent_Shadcn_,
+} from 'ui'
 import { DefaultCommandList } from './DefaultCommandList'
 import { useFilterBar } from './FilterBarContext'
 import { FilterCondition } from './FilterCondition'
@@ -23,6 +29,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     isLoading,
     supportsOperators,
     actions,
+    variant,
     handleInputBlur,
     handleGroupFreeformFocus,
     handleGroupFreeformChange,
@@ -83,14 +90,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
         actions,
         supportsOperators,
       }),
-    [
-      filterProperties,
-      isActive,
-      freeformText,
-      localFreeformValue,
-      actions,
-      supportsOperators,
-    ]
+    [filterProperties, isActive, freeformText, localFreeformValue, actions, supportsOperators]
   )
 
   // Only the root group should expand to fill available space
@@ -115,13 +115,19 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
   return (
     <div
       ref={wrapperRef}
-      className={`flex items-center gap-1 rounded shrink-0 ${
+      className={`flex items-stretch gap-0 shrink-0 ${
         path.length > 0
           ? "before:content-['('] before:text-foreground-muted after:content-[')'] after:text-foreground-muted"
           : ''
-      } ${isRootGroup ? 'flex-1 min-w-0' : ''}`}
+      } ${isRootGroup ? 'flex-1 min-w-0' : ''} ${variant === 'pill' ? 'py-2' : ''}`}
     >
-      <div className={`flex items-center gap-1 ${isRootGroup ? 'flex-1 min-w-0' : ''}`}>
+      <div
+        className={cn(
+          'flex items-stretch',
+          isRootGroup ? 'flex-1 min-w-0' : '',
+          variant === 'pill' ? 'gap-1' : 'gap-0'
+        )}
+      >
         {group.conditions.map((condition, index) => {
           const currentPath = [...path, index]
 
@@ -165,8 +171,10 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                 onFocus={() => handleGroupFreeformFocus(path)}
                 onBlur={handleFreeformBlur}
                 onKeyDown={handleFreeformKeyDown}
-                className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 h-6 w-full flex-1 min-w-0"
-                placeholder={group.conditions.length === 0 ? 'Search or filter...' : '+'}
+                className="border-none bg-transparent text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full flex-1 h-auto min-w-0 px-2 py-0"
+                placeholder={
+                  group.conditions.length === 0 ? 'Search or filter...' : '+ Search or filter...'
+                }
                 disabled={isLoading}
               />
             ) : (
@@ -179,11 +187,11 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                   onFocus={() => handleGroupFreeformFocus(path)}
                   onBlur={handleFreeformBlur}
                   onKeyDown={handleFreeformKeyDown}
-                  className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 h-6 w-full absolute left-0 top-0"
-                  placeholder="+"
+                  className="h-full border-none bg-transparent py-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0 px-2"
+                  placeholder="+ Add filter"
                   disabled={isLoading}
                 />
-                <span className="invisible whitespace-pre text-xs block h-6">
+                <span className="invisible whitespace-pre text-xs block">
                   {(isActive ? freeformText : localFreeformValue) || '+'}
                 </span>
               </div>

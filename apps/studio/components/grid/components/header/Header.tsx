@@ -64,8 +64,8 @@ export type HeaderProps = {
 
 const DefaultHeader = () => {
   return (
-    <div className="flex items-center gap-2 flex-1">
-      <div className="flex-1 min-w-0">
+    <div className="flex-1 min-w-0 flex items-center gap-2 flex-1 h-full">
+      <div className="flex-1 min-w-0 h-full">
         <FilterPopover />
       </div>
       <div className="flex items-center gap-2 shrink-0">
@@ -202,7 +202,7 @@ export const Header = ({ customHeader, isRefetching, tableQueriesEnabled = true 
 
   return (
     <div>
-      <div className="flex h-10 items-center justify-between bg-dash-sidebar dark:bg-surface-100 px-1.5 py-1.5 gap-2 overflow-x-auto ">
+      <div className="flex h-10 items-stretch justify-between bg-dash-sidebar dark:bg-surface-100 px-1.5 py-0 gap-2 overflow-x-auto ">
         {customHeader ? (
           customHeader
         ) : snap.selectedRows.size > 0 ? (

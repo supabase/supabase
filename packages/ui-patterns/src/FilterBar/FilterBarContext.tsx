@@ -1,18 +1,18 @@
 'use client'
 
-import React, { createContext, useContext, useRef, useCallback } from 'react'
-import { FilterBarAction, FilterProperty, FilterGroup } from './types'
+import React, { createContext, useCallback, useContext, useRef } from 'react'
 import { ActiveInput, useFilterBarState, useOptionsCache } from './hooks'
-import { useKeyboardNavigation } from './useKeyboardNavigation'
-import { useCommandHandling } from './useCommandHandling'
 import { MenuItem } from './menuItems'
+import { FilterBarAction, FilterGroup, FilterProperty } from './types'
+import { useCommandHandling } from './useCommandHandling'
+import { useKeyboardNavigation } from './useKeyboardNavigation'
 import {
   findConditionByPath,
   isAsyncOptionsFunction,
   removeFromGroup,
-  updateNestedValue,
-  updateNestedOperator,
   updateNestedLogicalOperator,
+  updateNestedOperator,
+  updateNestedValue,
 } from './utils'
 
 export type FilterBarContextValue = {
@@ -49,6 +49,7 @@ export type FilterBarContextValue = {
 
   // Config
   supportsOperators: boolean
+  variant: FilterBarVariant
   actions?: FilterBarAction[]
 
   // Refs
@@ -75,7 +76,10 @@ export type FilterBarRootProps = {
   actions?: FilterBarAction[]
   isLoading?: boolean
   supportsOperators?: boolean
+  variant?: FilterBarVariant
 }
+
+export type FilterBarVariant = 'default' | 'pill'
 
 export function FilterBarRoot({
   children,
@@ -87,6 +91,7 @@ export function FilterBarRoot({
   actions,
   isLoading: externalLoading,
   supportsOperators = false,
+  variant = 'default',
 }: FilterBarRootProps) {
   const rootRef = useRef<HTMLDivElement>(null)
 
@@ -100,12 +105,8 @@ export function FilterBarRoot({
     setIsCommandMenuVisible,
   } = useFilterBarState()
 
-  const {
-    loadingOptions,
-    propertyOptionsCache,
-    loadPropertyOptions,
-    optionsError,
-  } = useOptionsCache()
+  const { loadingOptions, propertyOptionsCache, loadPropertyOptions, optionsError } =
+    useOptionsCache()
 
   const handleInputChange = useCallback(
     (path: number[], value: string) => {
@@ -178,7 +179,14 @@ export function FilterBarRoot({
         }
       }
     },
-    [filters, filterProperties, loadPropertyOptions, setActiveInput, setIsCommandMenuVisible, hideTimeoutRef]
+    [
+      filters,
+      filterProperties,
+      loadPropertyOptions,
+      setActiveInput,
+      setIsCommandMenuVisible,
+      hideTimeoutRef,
+    ]
   )
 
   const handleOperatorFocus = useCallback(
@@ -284,6 +292,7 @@ export function FilterBarRoot({
 
     // Config
     supportsOperators,
+    variant,
     actions,
 
     // Refs
@@ -292,7 +301,7 @@ export function FilterBarRoot({
 
   return (
     <FilterBarContext.Provider value={contextValue}>
-      <div ref={rootRef} data-filterbar-root>
+      <div ref={rootRef} data-filterbar-root className="h-full min-h-[26px] flex items-stretch">
         {children}
       </div>
     </FilterBarContext.Provider>

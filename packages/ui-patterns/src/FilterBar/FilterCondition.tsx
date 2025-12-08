@@ -4,6 +4,7 @@ import { X } from 'lucide-react'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
+  cn,
   Input_Shadcn_,
   Popover_Shadcn_,
   PopoverAnchor_Shadcn_,
@@ -44,6 +45,7 @@ export function FilterCondition({
     handleRemoveCondition,
     handleSelectMenuItem,
     setActiveInput,
+    variant,
   } = useFilterBar()
 
   const operatorRef = useRef<HTMLInputElement>(null)
@@ -190,17 +192,20 @@ export function FilterCondition({
   return (
     <div
       ref={wrapperRef}
-      className="flex items-center rounded px-2 h-6 bg-muted border group shrink-0"
+      className={cn(
+        'flex items-stretch px-0 bg-muted group shrink-0',
+        variant === 'pill' ? 'rounded border' : 'border-r'
+      )}
     >
       <span
-        className="text-xs mr-1 cursor-pointer shrink-0 whitespace-nowrap text-foreground-light"
+        className="text-xs pl-2 pr-1 cursor-pointer shrink-0 whitespace-nowrap text-foreground-light h-full flex items-center"
         onClick={() => handleLabelClick(path)}
       >
         {property.label}
       </span>
       <Popover_Shadcn_ open={isOperatorActive && !isLoading && operatorItems.length > 0}>
         <PopoverAnchor_Shadcn_ asChild>
-          <div className="relative inline-block mr-1">
+          <div className="relative inline-block">
             <Input_Shadcn_
               ref={operatorRef}
               type="text"
@@ -209,11 +214,11 @@ export function FilterCondition({
               onFocus={() => handleOperatorFocus(path)}
               onBlur={handleOperatorBlur}
               onKeyDown={handleOperatorKeyDown}
-              className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 h-6 text-foreground-light w-full absolute left-0 top-0"
+              className="h-full border-none bg-transparent py-0 px-1 text-center text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground-light w-full absolute left-0 top-0"
               disabled={isLoading}
               aria-label={`Operator for ${property.label}`}
             />
-            <span className="invisible whitespace-pre text-xs block h-6">
+            <span className="invisible whitespace-pre text-xs block px-1 shrink-0 px-1">
               {condition.operator || ' '}
             </span>
           </div>
@@ -242,7 +247,7 @@ export function FilterCondition({
       </Popover_Shadcn_>
       <Popover_Shadcn_ open={isActive && !isLoading && (showValueCustom || valueItems.length > 0)}>
         <PopoverAnchor_Shadcn_ asChild>
-          <div className="relative inline-block mr-1 max-w-[150px]">
+          <div className="relative inline-block max-w-[150px]">
             <Input_Shadcn_
               ref={valueRef}
               type="text"
@@ -251,11 +256,11 @@ export function FilterCondition({
               onFocus={() => handleInputFocus(path)}
               onBlur={handleValueBlur}
               onKeyDown={handleValueKeyDown}
-              className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 h-6 w-full absolute left-0 top-0"
+              className="h-full border-none bg-transparent py-0 px-1 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0"
               disabled={isLoading}
               aria-label={`Value for ${property.label}`}
             />
-            <span className="invisible whitespace-pre text-xs block h-6">
+            <span className="invisible whitespace-pre text-xs block px-1">
               {(condition.value ?? '').toString() || ' '}
             </span>
           </div>
@@ -306,13 +311,13 @@ export function FilterCondition({
         size="tiny"
         icon={
           <X
-            strokeWidth={1.5}
-            size={12}
-            className="group-hover:text-foreground text-foreground-light"
+            strokeWidth={1}
+            size={10}
+            className="group-hover:text-foreground text-foreground-lighter"
           />
         }
         onClick={onRemove}
-        className="group hover:text-foreground !hover:bg-surface-600 p-0"
+        className="group hover:text-foreground !hover:bg-surface-600 rounded-none px-1 h-auto py-0 px-1"
         aria-label={`Remove ${property.label} filter`}
       />
     </div>
