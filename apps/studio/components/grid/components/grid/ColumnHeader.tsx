@@ -5,7 +5,10 @@ import { useDrag, useDrop } from 'react-dnd'
 
 import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { useColumnHasIndexSuggestion } from '../../context/TableIndexAdvisorContext'
+import {
+  useColumnHasIndexSuggestion,
+  useTableIndexAdvisor,
+} from '../../context/TableIndexAdvisorContext'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
@@ -26,6 +29,7 @@ export function ColumnHeader<R>({
   const snap = useTableEditorTableStateSnapshot()
   const hoverValue = column.name as string
   const hasIndexSuggestion = useColumnHasIndexSuggestion(column.name as string)
+  const { openSheet } = useTableIndexAdvisor()
 
   // keep snap.gridColumns' order in sync with data grid component
   useEffect(() => {
@@ -148,11 +152,16 @@ export function ColumnHeader<R>({
           )}
           {hasIndexSuggestion && (
             <Tooltip>
-              <TooltipTrigger>
-                <TrendingUp size={14} strokeWidth={2} className="text-warning" />
+              <TooltipTrigger asChild>
+                <button
+                  className="flex items-center"
+                  onClick={() => openSheet(column.name as string)}
+                >
+                  <TrendingUp size={14} strokeWidth={2} className="text-warning" />
+                </button>
               </TooltipTrigger>
               <TooltipContent side="bottom" className="font-normal">
-                An index on this column might improve query performance
+                Index might improve performance. Click for details.
               </TooltipContent>
             </Tooltip>
           )}
