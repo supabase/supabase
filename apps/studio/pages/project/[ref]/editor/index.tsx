@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 import { useParams } from 'common'
-import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
+import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
@@ -11,7 +11,7 @@ import { TableEditorMenu } from 'components/layouts/TableEditorLayout/TableEdito
 import { NewTab } from 'components/layouts/Tabs/NewTab'
 import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { editorEntityTypes, useTabsStateSnapshot } from 'state/tabs'
+import { editorEntityTypes, Tab, useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
@@ -34,16 +34,31 @@ const TableEditorPage: NextPageWithLayout = () => {
         editorEntityTypes.table.includes(tabStore.tabsMap[id]?.type)
       )
 
-      // Handle redirect to last opened table tab, or last table tab
+      let lastOpenedTableData: Tab | undefined
       if (lastOpenedTable !== undefined) {
+        lastOpenedTableData = tabStore.tabsMap[lastOpenedTable]
+      }
+
+      // Handle redirect to last opened table tab, or last table tab
+      if (lastOpenedTableData) {
         router.push(
-          `/project/${projectRef}/editor/${history.editor}?${LOAD_TAB_FROM_CACHE_PARAM}=true`
+          buildTableEditorUrl(
+            projectRef!,
+            lastOpenedTableData.metadata.name!,
+            lastOpenedTableData.metadata.tableId!,
+            lastOpenedTableData.metadata.schema
+          )
         )
       } else if (lastTabId) {
         const lastTab = tabStore.tabsMap[lastTabId]
         if (lastTab)
           router.push(
-            `/project/${projectRef}/editor/${lastTab.metadata?.tableId}?${LOAD_TAB_FROM_CACHE_PARAM}=true`
+            buildTableEditorUrl(
+              projectRef!,
+              lastTab.metadata?.name!,
+              lastTab.metadata?.tableId!,
+              lastTab.metadata?.schema
+            )
           )
       }
     }
