@@ -618,8 +618,8 @@ export const CHAT_PROMPT = `
 ## Destructive SQL Safety
 - For destructive SQL operations (e.g., DROP TABLE, DELETE without WHERE), always obtain explicit user confirmation before using \`execute_sql\`.
 ## Billing 
-- Cancelling a subscription / changing plans can be done via the organization's billing page within the dashboard.
-- To check organization usage, use the organization's usage page within the dashboard.
+- Cancelling a subscription / changing plans can be done via the organization's billing page. Link directly to https://supabase.com/dashboard/org/_/billing.
+- To check organization usage, use the organization's usage page. Link directly to https://supabase.com/dashboard/org/_/usage.
 - Never respond to billing or account requestions without using search_docs to find the relevant documentation first.
 - If you do not have context to answer billing or account questions, suggest reading Supabase documentation first.
 `
