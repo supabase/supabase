@@ -1,5 +1,11 @@
 import { createClient } from '@supabase/supabase-js'
-import type { Thread, ThreadRow, ThreadSource } from '~/types/contribute'
+import type {
+  LeaderboardPeriod,
+  LeaderboardRow,
+  Thread,
+  ThreadRow,
+  ThreadSource,
+} from '~/types/contribute'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_CONTRIBUTE_URL as string
 const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_CONTRIBUTE_PUBLISHABLE_KEY as string
@@ -204,4 +210,18 @@ export async function getAllStacks(): Promise<string[]> {
   })
 
   return Array.from(stacks).sort()
+}
+
+export const LEADERBOARD_PERIODS = ['all', 'year', 'quarter', 'month', 'week', 'today'] as const
+
+export async function getLeaderboard(
+  period: (typeof LEADERBOARD_PERIODS)[number]
+): Promise<LeaderboardRow[]> {
+  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+  const { data, error } = await supabase.rpc('get_leaderboard', {
+    period: period,
+  })
+
+  if (error) throw error
+  return data ?? []
 }

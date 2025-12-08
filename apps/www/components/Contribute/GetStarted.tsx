@@ -1,5 +1,6 @@
-import { Lightbulb, MessageCircle, BookOpen, Award } from 'lucide-react'
-import { Card, CardContent } from 'ui'
+import Link from 'next/link'
+import { Lightbulb, MessageCircle, BookOpen, Award, ArrowRight } from 'lucide-react'
+import { Button, Card, CardContent } from 'ui'
 
 const steps = [
   {
@@ -30,7 +31,7 @@ export function GetStarted() {
       <div className="flex flex-col gap-2 text-center">
         <h2 className="text-2xl md:text-2l text-foreground">Not sure where to start?</h2>
         <p className="text-lg text-foreground">
-          Contributing is easy! Here's how you can help the community today.
+          Contributing is easy! Here&apos;s how you can help the community today.
         </p>
       </div>
 
@@ -56,6 +57,13 @@ export function GetStarted() {
             </Card>
           )
         })}
+      </div>
+
+      {/* Leaderboard CTA */}
+      <div className="mt-10 flex justify-center">
+        <Button asChild type="default" iconRight={<ArrowRight className="h-4 w-4" />}>
+          <Link href="/contribute/leaderboard">Browse the helper leaderboard</Link>
+        </Button>
       </div>
     </section>
   )

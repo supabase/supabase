@@ -22,3 +22,10 @@ export interface ThreadRow {
   thread_key: string | null
   message_count: number | null
 }
+
+export type LeaderboardPeriod = 'all' | 'year' | 'quarter' | 'month' | 'week' | 'today'
+
+export type LeaderboardRow = {
+  author: string | null // sometimes author can be null
+  reply_count: number // bigint comes back as number via supabase-js
+}
