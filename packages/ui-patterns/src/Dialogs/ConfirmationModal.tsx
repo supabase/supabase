@@ -101,7 +101,7 @@ export const ConfirmationModal = forwardRef<
               type={variant as 'default' | 'destructive' | 'warning'}
               label={alert.title}
               description={alert.description}
-              className="border-r-0 border-l-0 rounded-none -mt-px"
+              className="border-x-0 rounded-none -mt-px"
               {...alert?.base}
             />
           )}
