@@ -78,6 +78,7 @@ Container for chart header content like title and actions.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | `React.ReactNode` | - | Header content (typically ChartTitle, ChartActions, or ChartMetric) |
+| `align` | `'start' \| 'center'` | `'center'` | Alignment of header content |
 | `className` | `string` | - | Additional CSS classes |
 | `...props` | `React.HTMLAttributes<HTMLDivElement>` | - | All standard div props |
 
@@ -122,6 +123,7 @@ Displays a metric value with optional status indicator.
 |------|------|---------|-------------|
 | `label` | `string` | - | Metric label text |
 | `value` | `string \| number \| null \| undefined` | - | Metric value to display |
+| `diffValue` | `string \| number \| null \| undefined` | - | Differential value to display (shown as +/- change) |
 | `status` | `'positive' \| 'negative' \| 'warning' \| 'default'` | - | Status indicator color |
 | `align` | `'start' \| 'end'` | `'start'` | Alignment of the metric |
 | `tooltip` | `string` | - | Tooltip text shown on help icon hover |
@@ -136,6 +138,7 @@ Container for the main chart visualization. Handles loading and empty states.
 |------|------|---------|-------------|
 | `children` | `React.ReactNode` | - | Chart visualization content |
 | `isEmpty` | `boolean` | `false` | Whether to show empty state |
+| `hasPadding` | `boolean` | `true` | Whether to apply padding to the content area |
 | `emptyState` | `React.ReactNode` | - | Custom empty state component |
 | `loadingState` | `React.ReactNode` | - | Custom loading state component |
 | `disabledActions` | `ChartAction[]` | - | Actions to show when chart is disabled |
@@ -198,7 +201,7 @@ Line chart component for displaying time-series data.
 |------|------|---------|-------------|
 | `data` | `ChartLineTick[]` | - | Array of data points with timestamp |
 | `dataKey` | `string` | - | Key in data object to plot |
-| `config` | `ChartConfig` | - | Chart configuration for styling |
+| `config` | `ChartConfig?` | - | Chart configuration for styling |
 | `onLineClick` | `(datum: ChartLineTick, tooltipData?: CategoricalChartState) => void` | - | Click handler for line points |
 | `DateTimeFormat` | `string` | `'MMM D, YYYY, hh:mma'` | Date format for tooltips and labels |
 | `isFullHeight` | `boolean` | `false` | Whether chart should take full height |
@@ -231,7 +234,7 @@ Line chart component for displaying time-series data.
 | `handleMouseMove` | `(e: { activeLabel?: string; coordinates?: string }) => void` | Mouse move handler |
 | `handleMouseUp` | `(e: { chartX?: number; chartY?: number }) => void` | Mouse up handler |
 | `coordinates` | `{ left?: string; right?: string }` | Highlight area coordinates |
-| `clearHighlight` | `() => void` | Function to clear highlight |
+| `clearHighlight` | `() => void?` | Optional function to clear highlight |
 
 #### ChartHighlightAction Type
 
@@ -239,8 +242,8 @@ Line chart component for displaying time-series data.
 |----------|------|-------------|
 | `id` | `string` | Unique identifier for the action |
 | `label` | `string \| ((ctx: { start: string; end: string; clear: () => void }) => string)` | Action label or function that returns label |
-| `icon` | `ReactNode` | Optional icon component |
-| `isDisabled` | `(ctx: { start: string; end: string; clear: () => void }) => boolean` | Function to determine if action is disabled |
+| `icon` | `ReactNode?` | Optional icon component |
+| `isDisabled` | `(ctx: { start: string; end: string; clear: () => void }) => boolean?` | Optional function to determine if action is disabled |
 | `onSelect` | `(ctx: { start: string; end: string; clear: () => void }) => void` | Action selection handler |
 
 ### ChartBar
@@ -251,7 +254,7 @@ Bar chart component for displaying time-series data.
 |------|------|---------|-------------|
 | `data` | `ChartBarTick[]` | - | Array of data points with timestamp |
 | `dataKey` | `string` | - | Key in data object to plot |
-| `config` | `ChartConfig` | - | Chart configuration for styling |
+| `config` | `ChartConfig?` | - | Chart configuration for styling |
 | `onBarClick` | `(datum: ChartBarTick, tooltipData?: CategoricalChartState) => void` | - | Click handler for bars |
 | `DateTimeFormat` | `string` | `'MMM D, YYYY, hh:mma'` | Date format for tooltips and labels |
 | `isFullHeight` | `boolean` | `false` | Whether chart should take full height |

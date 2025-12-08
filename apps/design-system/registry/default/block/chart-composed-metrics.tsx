@@ -13,6 +13,7 @@ import {
 } from 'ui-patterns/Chart'
 import { ExternalLink } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { Skeleton } from 'ui'
 
 export default function ChartComposedMetrics() {
   const [data, setData] = useState<Array<{ value: number; timestamp: string }>>([])
@@ -62,7 +63,10 @@ export default function ChartComposedMetrics() {
             />
             <ChartActions actions={actions} />
           </ChartHeader>
-          <ChartContent hasPadding={false}>
+          <ChartContent
+            hasPadding={false}
+            loadingState={<Skeleton className="w-full h-[6rem] rounded-none mt-4" />}
+          >
             <ChartSparkline data={data} dataKey="value" />
           </ChartContent>
         </ChartCard>

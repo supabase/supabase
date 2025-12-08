@@ -305,6 +305,7 @@ interface ChartContentProps extends React.HTMLAttributes<HTMLDivElement> {
   hasPadding?: boolean
   emptyState?: React.ReactNode
   loadingState?: React.ReactNode
+  disabledState?: React.ReactNode
   disabledActions?: ChartAction[]
 }
 
@@ -317,28 +318,30 @@ const ChartContent = React.forwardRef<HTMLDivElement, ChartContentProps>(
       hasPadding = true,
       emptyState,
       loadingState,
+      disabledState,
       disabledActions,
       ...props
     },
     ref
   ) => {
     const { isLoading, isDisabled } = useChart()
+    let content: React.ReactNode
+    let shouldApplyPadding = hasPadding
 
     if (isDisabled) {
-      return (
-        <div ref={ref} className={cn('px-6 pt-4 pb-6', className)} {...props}>
-          <ChartDisabledState
-            label="API Processing Time"
-            description="This chart is available from pro plan and above"
-            actions={disabledActions}
-          />
-        </div>
-      )
+      content = disabledState
+      shouldApplyPadding = true
+    } else if (isLoading) {
+      content = loadingState
+    } else if (isEmpty) {
+      content = emptyState
+    } else {
+      content = children
     }
 
     return (
-      <div ref={ref} className={cn(hasPadding && 'px-6 pt-4 pb-6', className)} {...props}>
-        {isLoading ? loadingState : isEmpty ? emptyState : children}
+      <div ref={ref} className={cn(shouldApplyPadding && 'px-6 pt-4 pb-6', className)} {...props}>
+        {content}
       </div>
     )
   }
@@ -389,6 +392,7 @@ ChartLoadingState.displayName = 'ChartLoadingState'
 
 /* Chart Disabled State */
 type ChartDisabledStateActions = {
+  icon?: React.ReactNode
   label: string
   href?: string
   onClick?: () => void
@@ -396,16 +400,16 @@ type ChartDisabledStateActions = {
   className?: string
 }
 interface ChartDisabledStateProps extends React.HTMLAttributes<HTMLDivElement> {
+  icon?: React.ReactNode
   label: string
   description: string
   actions?: ChartDisabledStateActions[]
 }
 
-const ChartDisabledState = ({ label, description, actions }: ChartDisabledStateProps) => {
+const ChartDisabledState = ({ icon, label, description, actions }: ChartDisabledStateProps) => {
   const [isHoveringButton, setIsHoveringButton] = useState(false)
   const startDate = '2025-01-01'
 
-  // Generate demo data similar to ReportChartUpsell
   const getExpDemoChartData = useMemo(() => {
     return new Array(20).fill(0).map((_, index) => ({
       period_start: new Date(startDate).getTime() + index * 1000,
@@ -446,6 +450,11 @@ const ChartDisabledState = ({ label, description, actions }: ChartDisabledStateP
         </ChartContainer>
       </div>
       <div className="absolute inset-0 bg-surface-100/80 backdrop-blur-md w-full h-full flex flex-col items-center justify-center">
+        {icon && (
+          <div className="flex items-center justify-center w-6 h-6 text-foreground-lighter mb-1">
+            {icon}
+          </div>
+        )}
         <h3 className="text-sm font-medium text-foreground">{label}</h3>
         <p className="text-sm text-foreground-light">{description}</p>
         {actions && actions.length > 0 && (
@@ -552,11 +561,6 @@ interface ChartSparklineProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const ChartSparkline = React.forwardRef<HTMLDivElement, ChartSparklineProps>(
   ({ className, data, dataKey, ...props }, ref) => {
-    const { isLoading } = useChart()
-    if (isLoading) {
-      return <Skeleton className="w-full h-[56px] rounded-none" />
-    }
-
     if (!data || data.length === 0) {
       return null
     }
