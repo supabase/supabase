@@ -43,7 +43,7 @@ import {
   formatDelta,
 } from './ProjectUsage.metrics'
 
-const LOG_RETENTION = { free: 1, pro: 7, team: 28, enterprise: 90 }
+const LOG_RETENTION = { free: 1, pro: 7, team: 28, enterprise: 90, platform: 1 }
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -52,7 +52,7 @@ const CHART_INTERVALS: ChartIntervals[] = [
     startValue: 1,
     startUnit: 'hour',
     format: 'MMM D, h:mma',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
   },
   {
     key: '1day',
@@ -60,7 +60,7 @@ const CHART_INTERVALS: ChartIntervals[] = [
     startValue: 24,
     startUnit: 'hour',
     format: 'MMM D, ha',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
   },
   {
     key: '7day',
@@ -226,8 +226,8 @@ export const ProjectUsageSection = () => {
   const prevTotalRequests = enabledPrev.reduce((sum, s) => sum + (s.total || 0), 0)
 
   const totalRequestsChangePct = computeChangePercent(totalRequests, prevTotalRequests)
-  const totalDeltaClass = totalRequestsChangePct >= 0 ? 'text-brand' : 'text-destructive'
-  const nonSuccessClass = nonSuccessRate > 0 ? 'text-destructive' : 'text-brand'
+  const totalDeltaClass = totalRequestsChangePct >= 0 ? 'text-brand-link' : 'text-destructive'
+  const nonSuccessClass = nonSuccessRate > 0 ? 'text-destructive' : 'text-brand-link'
 
   return (
     <div className="space-y-6">

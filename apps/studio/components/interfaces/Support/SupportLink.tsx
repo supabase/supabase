@@ -14,7 +14,14 @@ export const SupportLink = ({
   const href = createSupportFormUrl(queryParams ?? {})
 
   return (
-    <Link {...props} href={href} onClick={takeBreadcrumbSnapshot}>
+    <Link
+      {...props}
+      href={href}
+      onClick={(event) => {
+        takeBreadcrumbSnapshot()
+        props.onClick?.(event)
+      }}
+    >
       {children}
     </Link>
   )

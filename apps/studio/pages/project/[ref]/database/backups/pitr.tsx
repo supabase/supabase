@@ -7,13 +7,11 @@ import { PITRNotice } from 'components/interfaces/Database/Backups/PITR/PITRNoti
 import { PITRSelection } from 'components/interfaces/Database/Backups/PITR/PITRSelection'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -22,22 +20,39 @@ import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderMeta,
+  PageHeaderNavigationTabs,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection>
-        <div className="col-span-12">
-          <div className="space-y-6">
-            <FormHeader className="!mb-0" title="Database Backups" />
-            <DatabaseBackupsNav active="pitr" />
+    <>
+      <PageHeader>
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Database Backups</PageHeaderTitle>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+        <PageHeaderNavigationTabs>
+          <DatabaseBackupsNav active="pitr" />
+        </PageHeaderNavigationTabs>
+      </PageHeader>
+      <PageContainer>
+        <PageSection>
+          <PageSectionContent>
             <div className="space-y-8">
               <PITR />
             </div>
-          </div>
-        </div>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    </>
   )
 }
 
@@ -89,6 +104,7 @@ const PITR = () => {
             <UpgradeToPro
               addon="pitr"
               source="pitr"
+              featureProposition="enable Point in Time Recovery"
               primaryText="Point in Time Recovery is a Pro Plan add-on."
               secondaryText={
                 plan === 'free'

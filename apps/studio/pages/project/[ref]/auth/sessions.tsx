@@ -3,12 +3,19 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { SessionsAuthSettingsForm } from 'components/interfaces/Auth/SessionsAuthSettingsForm/SessionsAuthSettingsForm'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const SessionsPage: NextPageWithLayout = () => {
   const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
@@ -21,28 +28,35 @@ const SessionsPage: NextPageWithLayout = () => {
   }
 
   return (
-    <ScaffoldContainer>
-      {!isPermissionsLoaded ? (
-        <ScaffoldSection isFullWidth>
-          <GenericSkeletonLoader />
-        </ScaffoldSection>
-      ) : (
-        <SessionsAuthSettingsForm />
-      )}
-    </ScaffoldContainer>
+    <>
+      <PageHeader size="default">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>User Sessions</PageHeaderTitle>
+            <PageHeaderDescription>
+              Configure settings for user sessions and refresh tokens
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="default">
+        {!isPermissionsLoaded ? (
+          <PageSection>
+            <PageSectionContent>
+              <GenericSkeletonLoader />
+            </PageSectionContent>
+          </PageSection>
+        ) : (
+          <SessionsAuthSettingsForm />
+        )}
+      </PageContainer>
+    </>
   )
 }
 
 SessionsPage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>
-      <PageLayout
-        title="User Sessions"
-        subtitle="Configure settings for user sessions and refresh tokens"
-      >
-        {page}
-      </PageLayout>
-    </AuthLayout>
+    <AuthLayout>{page}</AuthLayout>
   </DefaultLayout>
 )
 

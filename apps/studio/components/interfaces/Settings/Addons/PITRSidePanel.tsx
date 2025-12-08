@@ -8,13 +8,14 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -22,7 +23,6 @@ import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
 import {
-  Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -77,7 +77,7 @@ const PITRSidePanel = () => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
 
-  const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
+  const { mutate: updateAddon, isPending: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully updated point in time recovery duration`)
       closePanel()
@@ -86,7 +86,7 @@ const PITRSidePanel = () => {
       toast.error(`Unable to update PITR: ${error.message}`)
     },
   })
-  const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
+  const { mutate: removeAddon, isPending: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled point in time recovery`)
       closePanel()
@@ -105,7 +105,7 @@ const PITRSidePanel = () => {
   const availableOptions = availableAddons.find((addon) => addon.type === 'pitr')?.variants ?? []
 
   const hasChanges = selectedOption !== (subscriptionPitr?.variant.identifier ?? 'pitr_0')
-  const isFreePlan = subscription?.plan?.id === 'free'
+  const { hasAccess: hasAccessToPitrVariants } = useCheckEntitlements('pitr.available_variants')
   const selectedPitr = availableOptions.find((option) => option.identifier === selectedOption)
   const hasSufficientCompute =
     !!subscriptionCompute && subscriptionCompute.variant.identifier !== 'ci_micro'
@@ -147,7 +147,7 @@ const PITRSidePanel = () => {
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
       disabled={
-        isFreePlan ||
+        !hasAccessToPitrVariants ||
         isLoading ||
         !hasChanges ||
         isSubmitting ||
@@ -158,8 +158,8 @@ const PITRSidePanel = () => {
       tooltip={
         blockDowngradeDueToHipaa
           ? 'Unable to disable PITR with HIPAA add-on'
-          : isFreePlan
-            ? 'Unable to enable point in time recovery on a Free Plan'
+          : !hasAccessToPitrVariants
+            ? 'Unable to enable point in time recovery on your Plan'
             : !canUpdatePitr
               ? 'You do not have permission to update PITR'
               : undefined
@@ -194,7 +194,10 @@ const PITRSidePanel = () => {
                 return (
                   <div
                     key={option.id}
-                    className={cn('col-span-3 group space-y-1', isFreePlan && 'opacity-75')}
+                    className={cn(
+                      'col-span-3 group space-y-1',
+                      !hasAccessToPitrVariants && 'opacity-75'
+                    )}
                     onClick={() => {
                       setSelectedCategory(option.id)
                       if (option.id === 'off') {
@@ -267,33 +270,22 @@ const PITRSidePanel = () => {
 
           {selectedCategory === 'on' && (
             <div className="!mt-8 pb-4">
-              {isFreePlan ? (
-                <Alert
-                  withIcon
-                  variant="info"
+              {!hasAccessToPitrVariants ? (
+                <UpgradeToPro
                   className="mb-4"
-                  title="Changing your Point-In-Time-Recovery is only available on the Pro Plan"
-                  actions={<UpgradePlanButton source="pitrSidePanel" plan="Pro" />}
-                >
-                  Upgrade your plan to change PITR for your project
-                </Alert>
+                  addon="pitr"
+                  primaryText="Changing your Point-In-Time-Recovery is only available on the Pro Plan"
+                  secondaryText="Upgrade your plan to change PITR for your project"
+                  featureProposition="enable PITR"
+                />
               ) : !hasSufficientCompute ? (
-                <Alert
-                  withIcon
-                  variant="warning"
+                <UpgradeToPro
                   className="mb-4"
-                  title="Your project is required to minimally be on a Small compute size to enable PITR"
-                  actions={[
-                    <Button asChild key="change-compute" type="default">
-                      <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
-                        Change compute size
-                      </Link>
-                    </Button>,
-                  ]}
-                >
-                  This is to ensure that your project has enough resources to execute PITR
-                  successfully
-                </Alert>
+                  addon="computeSize"
+                  primaryText="Project needs to be at least on a Small compute size to enable PITR"
+                  secondaryText="This ensures enough resources to execute PITR successfully"
+                  featureProposition="enable PITR"
+                />
               ) : null}
 
               <Radio.Group
@@ -306,7 +298,7 @@ const PITRSidePanel = () => {
                 {availableOptions.map((option) => (
                   <Radio
                     name="pitr"
-                    disabled={isFreePlan || subscriptionCompute === undefined}
+                    disabled={!hasAccessToPitrVariants || subscriptionCompute === undefined}
                     className="col-span-4 !p-0"
                     key={option.identifier}
                     checked={selectedOption === option.identifier}

@@ -11,7 +11,7 @@ export const useSelectedAnalyticsBucket = () => {
     {
       enabled: hasIcebergEnabled,
       select(data) {
-        return data.find((x) => x.id === bucketId)
+        return data.find((x) => x.name === bucketId)
       },
     }
   )

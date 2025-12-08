@@ -1,5 +1,5 @@
 import { Check, Lightbulb, Table2 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
@@ -32,6 +32,10 @@ import {
   createIndexes,
   hasIndexRecommendations,
 } from './IndexAdvisor/index-advisor.utils'
+import { EnableIndexAdvisorButton } from './IndexAdvisor/EnableIndexAdvisorButton'
+import { DocsButton } from 'components/ui/DocsButton'
+import { DOCS_URL } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
 
 interface QueryIndexesProps {
   selectedRow: any
@@ -46,6 +50,8 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
   const { data: project } = useSelectedProjectQuery()
   const [showStartupCosts, setShowStartupCosts] = useState(false)
   const [isExecuting, setIsExecuting] = useState(false)
+  const track = useTrack()
+  const [hasTrackedTabView, setHasTrackedTabView] = useState(false)
 
   const {
     data: usedIndexes,
@@ -97,10 +103,27 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
 
   const invalidateQueries = useIndexInvalidation()
 
+  useEffect(() => {
+    if (!isLoadingIndexAdvisorResult && !hasTrackedTabView) {
+      track('index_advisor_tab_clicked', {
+        hasRecommendations: hasIndexRecommendation,
+        isIndexAdvisorEnabled: isIndexAdvisorEnabled,
+      })
+      setHasTrackedTabView(true)
+    }
+  }, [
+    isLoadingIndexAdvisorResult,
+    hasIndexRecommendation,
+    hasTrackedTabView,
+    track,
+    isIndexAdvisorEnabled,
+  ])
+
   const createIndex = async () => {
     if (index_statements.length === 0) return
 
     setIsExecuting(true)
+    track('index_advisor_create_indexes_button_clicked')
 
     try {
       await createIndexes({
@@ -122,11 +145,30 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
     }
   }
 
+  if (!isLoadingExtensions && !isIndexAdvisorEnabled) {
+    return (
+      <QueryPanelContainer className="h-full">
+        <QueryPanelSection className="pt-2">
+          <div className="border rounded border-dashed flex flex-col items-center justify-center py-4 px-12 gap-y-1 text-center">
+            <p className="text-sm text-foreground-light">Enable Index Advisor</p>
+            <p className="text-center text-xs text-foreground-lighter mb-2">
+              Recommends indexes to improve query performance.
+            </p>
+            <div className="flex items-center gap-x-2">
+              <DocsButton href={`${DOCS_URL}/guides/database/extensions/index_advisor`} />
+              <EnableIndexAdvisorButton />
+            </div>
+          </div>
+        </QueryPanelSection>
+      </QueryPanelContainer>
+    )
+  }
+
   return (
     <QueryPanelContainer className="h-full">
       <QueryPanelSection className="pt-2 mb-6">
         <div className="mb-4 flex flex-col gap-y-1">
-          <h4>Indexes in use</h4>
+          <h4 className="mb-2">Indexes in use</h4>
           <p className="text-sm text-foreground-light">
             This query is using the following index{(usedIndexes ?? []).length > 1 ? 's' : ''}:
           </p>
@@ -142,7 +184,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
         {isSuccess && (
           <div>
             {usedIndexes.length === 0 && (
-              <div className="border rounded border-dashed flex flex-col items-center justify-center py-4 px-20 gap-y-1">
+              <div className="border rounded border-dashed flex flex-col items-center justify-center py-4 px-12 gap-y-1 text-center">
                 <p className="text-sm text-foreground-light">
                   No indexes are involved in this query
                 </p>
@@ -173,7 +215,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
       </QueryPanelSection>
       <QueryPanelSection className="flex flex-col gap-y-6 py-6 border-t">
         <div className="flex flex-col gap-y-1">
-          <h4>New index recommendations</h4>
+          <h4 className="mb-2">New index recommendations</h4>
           {isLoadingExtensions ? (
             <GenericSkeletonLoader />
           ) : !isIndexAdvisorEnabled ? (
@@ -252,8 +294,8 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
         <>
           <QueryPanelSection className="py-6 border-t">
             <div className="flex flex-col gap-y-1">
-              <h4>Query costs</h4>
-              <div className="border rounded-md flex flex-col bg-surface-100 mt-3">
+              <h4 className="mb-2">Query costs</h4>
+              <div className="border rounded-md flex flex-col bg-surface-100">
                 <QueryPanelScoreSection
                   name="Total cost of query"
                   description="An estimate of how long it will take to return all the rows (Includes start up cost)"
@@ -280,7 +322,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
           </QueryPanelSection>
           <QueryPanelSection className="py-6 border-t">
             <div className="flex flex-col gap-y-2">
-              <h4>FAQ</h4>
+              <h4 className="mb-2">FAQ</h4>
               <Accordion_Shadcn_ collapsible type="single" className="border rounded-md">
                 <AccordionItem_Shadcn_ value="1">
                   <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition [&[data-state=open]]:text-foreground">
