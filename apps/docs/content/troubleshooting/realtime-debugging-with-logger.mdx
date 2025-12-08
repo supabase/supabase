@@ -1,0 +1,162 @@
+---
+title = "Debug Realtime with Logger and Log Levels"
+github_url = ""
+date_created = "2025-11-28T00:00:00+00:00"
+topics = [ "realtime" ]
+keywords = [ "debug", "logger", "log_level", "troubleshooting", "diagnostics" ]
+database_id = ""
+---
+
+## What are logger and log_level parameters?
+
+The Realtime client provides built-in logging to help you debug connection issues, track messages, and understand what's happening with your real-time connections. Two parameters control logging:
+
+- **`logger`**: A custom function to handle log messages
+- **`logLevel`**: Controls which messages the server logs (`info`, `warn`, or `error`)
+
+By default, logging is disabled. When enabled, you can see:
+
+- Messages sent and received
+- Connection events (connect, disconnect, errors)
+- Heartbeat status
+- Channel subscriptions
+- Worker events
+
+## How to enable logging in your Realtime client
+
+### Basic logging to console
+
+```tsx
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  realtime: {
+    logger: (kind, msg, data) => {
+      console.log(`${kind}: ${msg}`, data)
+    },
+  },
+})
+```
+
+### With log levels for server-side filtering
+
+```tsx
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  realtime: {
+    logLevel: 'info', // 'info' | 'warn' | 'error'
+    logger: (kind, msg, data) => {
+      console.log(`[${kind}] ${msg}`, data)
+    },
+  },
+})
+```
+
+## Understanding log messages
+
+The logger receives three parameters: `kind`, `msg`, and `data`.
+
+**Log kinds you'll see:**
+
+**`push`** - Messages sent to the server
+
+```
+push: realtime:chat heartbeat (42) {}
+push: realtime:chat phx_join (1) { config: {...} }
+```
+
+**`receive`** - Messages received from server
+
+```
+receive: ok realtime:chat phx_reply (1) { response: {...} }
+receive: realtime:chat broadcast { event: 'message', payload: {...} }
+```
+
+**`transport`** - Connection events
+
+```
+transport: connected to wss://project.supabase.co/realtime/v1
+transport: heartbeat timeout. Attempting to re-establish connection
+transport: close CloseEvent {...}
+transport: leaving duplicate topic "realtime:chat"
+```
+
+**`error`** - Error events
+
+```
+error: error in heartbeat callback Error: ...
+error: error waiting for auth on connect Error: ...
+```
+
+**`worker`** - Web Worker events
+
+```
+worker: starting default worker
+worker: starting worker for from /worker.js
+worker: worker error message
+```
+
+**Common debugging scenarios**
+
+**Debug why channel won't subscribe:**
+
+```tsx
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  realtime: {
+    logger: (kind, msg, data) => {
+      console.log(`[${kind}] ${msg}`, data)
+    },
+  },
+})
+
+const channel = supabase
+  .channel('debug-channel')
+  .on('broadcast', { event: 'test' }, (payload) => {
+    console.log('Received:', payload)
+  })
+  .subscribe((status, err) => {
+    console.log('Subscribe status:', status, err)
+  })
+
+// Check logs for:
+// push: realtime:debug-channel phx_join - subscription attempt
+// receive: ok realtime:debug-channel phx_reply - successful subscription
+// Or error messages if subscription failed
+```
+
+## Debug message delivery issues
+
+```tsx
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  realtime: {
+    logger: (kind, msg, data) => {
+      if (kind === 'push' || kind === 'receive') {
+        console.log(`[${kind}] ${msg}`, data)
+      }
+    },
+  },
+})
+
+const channel = supabase.channel('chat', { config: { broadcast: { self: true } } })
+
+channel.on('broadcast', { event: 'message' }, (payload) => {
+  console.log('Message received:', payload)
+})
+// Send message after subscribing
+channel.subscribe((status, err) => {
+  if (status == 'SUBSCRIBED') {
+    channel.send({
+      type: 'broadcast',
+      event: 'message',
+      payload: { text: 'Hello' },
+    })
+  } else {
+    console.error({ status, err })
+  }
+})
+
+// Check logs:
+// push: realtime:chat broadcast - message sent
+// receive: realtime:chat broadcast - message received (if self: true)
+```

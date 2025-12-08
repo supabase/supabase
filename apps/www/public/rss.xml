@@ -7,6 +7,13 @@
       <lastBuildDate>Thu, 04 Dec 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/introducing-supabase-for-platforms</guid>
+  <title>Introducing Supabase for Platforms</title>
+  <link>https://supabase.com/blog/introducing-supabase-for-platforms</link>
+  <description>White-label Supabase backends for your platform or tools</description>
+  <pubDate>Thu, 05 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/adding-async-streaming-to-pg-fdw</guid>
   <title>Adding Async Streaming to Postgres Foreign Data Wrappers</title>
   <link>https://supabase.com/blog/adding-async-streaming-to-pg-fdw</link>
