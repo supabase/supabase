@@ -120,7 +120,7 @@ const StorageListV2MigrationDialog = () => {
 
         <Admonition
           type="warning"
-          className="mb-0 rounded-none border-x-0 border-t-0"
+          className="rounded-none border-x-0 border-t-0"
           title="Migration required to optimise the database schema for upgrade"
           description="We recommend running the update during periods of lower activity, although minimal to no disruption is expected."
         />
