@@ -1,5 +1,4 @@
 import { GlobeAltIcon } from '@heroicons/react/outline'
-import { Check } from 'lucide-react'
 import { GetServerSideProps } from 'next'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
@@ -471,7 +470,7 @@ const JobItem = ({ job }: { job: JobItemProps }) => {
         <div className="flex items-center gap-4">
           <Badge>
             <GlobeAltIcon className="w-3 h-3" />
-            <span className="ml-1">{job.location}</span>
+            <span>{job.location}</span>
           </Badge>
           <span className="hidden md:block">{job.employment}</span>
         </div>

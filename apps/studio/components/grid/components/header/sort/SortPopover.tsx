@@ -7,17 +7,26 @@ import { SortPopoverPrimitive } from './SortPopoverPrimitive'
 
 export interface SortPopoverProps {
   portal?: boolean
+  tableQueriesEnabled?: boolean
 }
 
-export const SortPopover = ({ portal = true }: SortPopoverProps) => {
+export const SortPopover = ({ portal = true, tableQueriesEnabled }: SortPopoverProps) => {
   const { urlSorts, onApplySorts } = useTableSort()
-  const tableState = useTableEditorTableStateSnapshot()
-  const tableName = tableState?.table?.name || ''
+
+  const snap = useTableEditorTableStateSnapshot()
+  const tableName = snap.table?.name || ''
 
   // Convert string[] to Sort[]
   const sorts = useMemo(() => {
     return tableName && urlSorts ? formatSortURLParams(tableName, urlSorts) : []
   }, [tableName, urlSorts])
 
-  return <SortPopoverPrimitive portal={portal} sorts={sorts} onApplySorts={onApplySorts} />
+  return (
+    <SortPopoverPrimitive
+      portal={portal}
+      sorts={sorts}
+      onApplySorts={onApplySorts}
+      tableQueriesEnabled={tableQueriesEnabled}
+    />
+  )
 }

@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { useFlag, useParams } from 'common'
 import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
 import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
@@ -37,7 +38,6 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { SigningKeysComingSoonBanner } from '../signing-keys-coming-soon'
 import { StartUsingJwtSigningKeysBanner } from '../start-using-keys-banner'
 import { ActionPanel } from './action-panel'
@@ -236,6 +236,7 @@ export const JWTSecretKeysTable = () => {
                       <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                         Type
                       </TableHead>
+                      <TableHead />
                       <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                         Actions
                       </TableHead>
