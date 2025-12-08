@@ -63,7 +63,8 @@ export function useTableCreateGeneratePolicies({
       const daysSinceCreation = dayjs.utc().diff(insertedDate, 'day')
 
       track('table_create_generate_policies_experiment_exposed', {
-        enabled: tableCreateGeneratePoliciesFlag,
+        experiment_id: 'table_create_generate_policies',
+        variant: tableCreateGeneratePoliciesFlag ? 'treatment' : 'control',
         days_since_project_creation: daysSinceCreation,
       })
     } catch {
