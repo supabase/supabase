@@ -1,6 +1,5 @@
 import { BarChart, Shield } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
-import ReactMarkdown from 'react-markdown'
 
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
@@ -15,6 +14,7 @@ import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AiIconAnimation, Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 import { Row } from 'ui-patterns'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { Markdown } from '../Markdown'
 
 export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: boolean }) => {
   const { ref: projectRef } = useParams()
@@ -140,9 +140,9 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
                   </CardHeader>
                   <CardContent className="p-6 pt-16 flex flex-col justify-end flex-1 overflow-auto">
                     <h3 className="mb-1">{lint.title}</h3>
-                    <ReactMarkdown className="leading-6 text-sm text-foreground-light">
+                    <Markdown className="leading-6 text-sm text-foreground-light">
                       {lint.detail && lint.detail.replace(/\\`/g, '`')}
-                    </ReactMarkdown>
+                    </Markdown>
                   </CardContent>
                 </Card>
               )
