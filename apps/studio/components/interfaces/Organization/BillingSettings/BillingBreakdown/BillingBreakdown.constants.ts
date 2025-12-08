@@ -150,4 +150,28 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
     units: 'absolute',
     category: 'Database',
   },
+  {
+    key: PricingMetric.LOG_INGESTION,
+    name: 'Log Ingestion',
+    units: 'bytes',
+    category: 'Logs',
+  },
+  {
+    key: PricingMetric.LOG_QUERYING,
+    name: 'Log Query',
+    units: 'bytes',
+    category: 'Logs',
+  },
+  {
+    key: PricingMetric.LOG_STORAGE,
+    name: 'Log Storage',
+    units: 'bytes',
+    category: 'Logs',
+  },
+  {
+    key: PricingMetric.ACTIVE_COMPUTE_HOURS,
+    name: 'Active Compute Hours',
+    units: 'absolute',
+    category: 'compute',
+  },
 ]
