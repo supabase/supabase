@@ -43,8 +43,8 @@ export default function FieldResponsive() {
             </Field>
             <FieldSeparator />
             <Field orientation="responsive">
-              <Button type="submit">Submit</Button>
-              <Button type="button" variant="outline">
+              <Button htmlType="submit">Submit</Button>
+              <Button htmlType="button" type="default">
                 Cancel
               </Button>
             </Field>

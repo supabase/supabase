@@ -112,8 +112,8 @@ export default function FieldDemo() {
             </FieldGroup>
           </FieldSet>
           <Field orientation="horizontal">
-            <Button type="submit">Submit</Button>
-            <Button variant="outline" type="button">
+            <Button htmlType="submit">Submit</Button>
+            <Button htmlType="button" type="default">
               Cancel
             </Button>
           </Field>
