@@ -5,9 +5,9 @@ import type {
   Entitlement,
   EntitlementConfig,
   EntitlementType,
+  FeatureKey,
 } from 'data/entitlements/entitlements-query'
 import { IS_PLATFORM } from 'lib/constants'
-import { type FeatureKey } from 'data/entitlements/entitlements.constants'
 
 function isNumericConfig(
   config: EntitlementConfig,
