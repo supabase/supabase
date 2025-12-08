@@ -119,7 +119,9 @@ export const Admonition = forwardRef<
         <div
           className={cn(
             'flex',
-            layout === 'vertical' ? 'flex-col' : 'flex-row items-center justify-between gap-x-6'
+            layout === 'vertical'
+              ? 'flex-col'
+              : 'flex-row items-center justify-between gap-x-6 lg:gap-x-8'
           )}
         >
           {label || title ? (

@@ -200,11 +200,11 @@ export const OAuthAppsList = () => {
         {newOAuthApp?.client_secret && (
           <NewOAuthAppBanner oauthApp={newOAuthApp} onClose={() => setNewOAuthApp(undefined)} />
         )}
-        {!isOAuthServerEnabled && (
+        {true && (
           <Admonition
             type="default"
             layout="horizontal"
-            className="mb-8 [&>div]:!translate-y-0"
+            className="mb-8"
             title="OAuth Server is disabled"
             description="Enable OAuth Server to make your project act as an identity provider for third-party applications."
             actions={
