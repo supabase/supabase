@@ -3973,10 +3973,10 @@ export interface paths {
       cookie?: never
     }
     /** Gets list of namespaces from a bucket */
-    get: operations['StorageAnalyticsBucketNamespacesController_getBuckets']
+    get: operations['StorageAnalyticsBucketNamespacesController_getNamespaces']
     put?: never
     /** Create a namespace within a bucket */
-    post: operations['StorageAnalyticsBucketNamespacesController_createBucket']
+    post: operations['StorageAnalyticsBucketNamespacesController_createNamespace']
     delete?: never
     options?: never
     head?: never
@@ -3994,7 +3994,7 @@ export interface paths {
     put?: never
     post?: never
     /** Drop a namespace within an analytics bucket */
-    delete: operations['StorageAnalyticsBucketNamespaceController_deleteBucket']
+    delete: operations['StorageAnalyticsBucketNamespaceController_deleteNamespace']
     options?: never
     head?: never
     patch?: never
@@ -4008,7 +4008,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets list of tables from a namespace */
-    get: operations['StorageAnalyticsBucketNamespaceTablesController_getBuckets']
+    get: operations['StorageAnalyticsBucketNamespaceTablesController_getTables']
     put?: never
     /** Create a table within a namespace */
     post: operations['StorageAnalyticsBucketNamespaceTablesController_createTable']
@@ -24671,7 +24671,7 @@ export interface operations {
       }
     }
   }
-  StorageAnalyticsBucketNamespacesController_getBuckets: {
+  StorageAnalyticsBucketNamespacesController_getNamespaces: {
     parameters: {
       query?: never
       header?: never
@@ -24723,7 +24723,7 @@ export interface operations {
       }
     }
   }
-  StorageAnalyticsBucketNamespacesController_createBucket: {
+  StorageAnalyticsBucketNamespacesController_createNamespace: {
     parameters: {
       query?: never
       header?: never
@@ -24777,7 +24777,7 @@ export interface operations {
       }
     }
   }
-  StorageAnalyticsBucketNamespaceController_deleteBucket: {
+  StorageAnalyticsBucketNamespaceController_deleteNamespace: {
     parameters: {
       query?: never
       header?: never
@@ -24828,7 +24828,7 @@ export interface operations {
       }
     }
   }
-  StorageAnalyticsBucketNamespaceTablesController_getBuckets: {
+  StorageAnalyticsBucketNamespaceTablesController_getTables: {
     parameters: {
       query?: never
       header?: never
