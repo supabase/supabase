@@ -1303,6 +1303,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "slider-minMax-range": {
+      name: "slider-minMax-range",
+      type: "components:example",
+      registryDependencies: ["slider"],
+      component: React.lazy(() => import("@/registry/default/example/slider-minMax-range")),
+      source: "",
+      files: ["registry/default/example/slider-minMax-range.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "sonner-demo": {
       name: "sonner-demo",
       type: "components:example",
