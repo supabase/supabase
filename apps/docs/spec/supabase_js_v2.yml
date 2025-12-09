@@ -2256,12 +2256,6 @@ functions:
           ```
   - id: auth-js-gotrueclient-initialize
     $ref: '@supabase/auth-js.GoTrueClient.initialize'
-  - id: auth-js-gotrueclient-isthrowonerrorenabled
-    $ref: '@supabase/auth-js.GoTrueClient.isThrowOnErrorEnabled'
-  - id: auth-js-authimplicitgrantredirecterror-tojson
-    $ref: '@supabase/auth-js.AuthImplicitGrantRedirectError.toJSON'
-  - id: auth-js-authpkcegrantcodeexchangeerror-tojson
-    $ref: '@supabase/auth-js.AuthPKCEGrantCodeExchangeError.toJSON'
   - id: auth-mfa-api
     title: 'Overview'
     notes: |
