@@ -64,39 +64,39 @@ function getCanonicalPath(methodPath: string): string {
   // Map supabase-js classes to their original packages
   const reexportMap: Record<string, string> = {
     // Auth classes
-    'GoTrueClient': '@supabase/auth-js',
-    'GoTrueAdminApi': '@supabase/auth-js',
-    'GoTrueAdminMFAApi': '@supabase/auth-js',
-    'GoTrueAdminOAuthApi': '@supabase/auth-js',
-    'GoTrueMFAApi': '@supabase/auth-js',
-    'AuthOAuthServerApi': '@supabase/auth-js',
-    'AuthApiError': '@supabase/auth-js',
-    'AuthError': '@supabase/auth-js',
-    'AuthImplicitGrantRedirectError': '@supabase/auth-js',
-    'AuthInvalidCredentialsError': '@supabase/auth-js',
-    'AuthInvalidJwtError': '@supabase/auth-js',
-    'AuthInvalidTokenResponseError': '@supabase/auth-js',
-    'AuthPKCEGrantCodeExchangeError': '@supabase/auth-js',
-    'AuthRetryableFetchError': '@supabase/auth-js',
-    'AuthSessionMissingError': '@supabase/auth-js',
-    'AuthUnknownError': '@supabase/auth-js',
-    'AuthWeakPasswordError': '@supabase/auth-js',
-    'CustomAuthError': '@supabase/auth-js',
-    'NavigatorLockAcquireTimeoutError': '@supabase/auth-js',
+    GoTrueClient: '@supabase/auth-js',
+    GoTrueAdminApi: '@supabase/auth-js',
+    GoTrueAdminMFAApi: '@supabase/auth-js',
+    GoTrueAdminOAuthApi: '@supabase/auth-js',
+    GoTrueMFAApi: '@supabase/auth-js',
+    AuthOAuthServerApi: '@supabase/auth-js',
+    AuthApiError: '@supabase/auth-js',
+    AuthError: '@supabase/auth-js',
+    AuthImplicitGrantRedirectError: '@supabase/auth-js',
+    AuthInvalidCredentialsError: '@supabase/auth-js',
+    AuthInvalidJwtError: '@supabase/auth-js',
+    AuthInvalidTokenResponseError: '@supabase/auth-js',
+    AuthPKCEGrantCodeExchangeError: '@supabase/auth-js',
+    AuthRetryableFetchError: '@supabase/auth-js',
+    AuthSessionMissingError: '@supabase/auth-js',
+    AuthUnknownError: '@supabase/auth-js',
+    AuthWeakPasswordError: '@supabase/auth-js',
+    CustomAuthError: '@supabase/auth-js',
+    NavigatorLockAcquireTimeoutError: '@supabase/auth-js',
     // Realtime classes
-    'RealtimeChannel': '@supabase/realtime-js',
-    'RealtimeClient': '@supabase/realtime-js',
-    'RealtimePresence': '@supabase/realtime-js',
-    'WebSocketFactory': '@supabase/realtime-js',
-    'WebSocketLike': '@supabase/realtime-js',
-    'WebSocketLikeConstructor': '@supabase/realtime-js',
+    RealtimeChannel: '@supabase/realtime-js',
+    RealtimeClient: '@supabase/realtime-js',
+    RealtimePresence: '@supabase/realtime-js',
+    WebSocketFactory: '@supabase/realtime-js',
+    WebSocketLike: '@supabase/realtime-js',
+    WebSocketLikeConstructor: '@supabase/realtime-js',
     // Postgrest classes
-    'PostgrestError': '@supabase/postgrest-js',
+    PostgrestError: '@supabase/postgrest-js',
     // Functions classes
-    'FunctionsError': '@supabase/functions-js',
-    'FunctionsFetchError': '@supabase/functions-js',
-    'FunctionsHttpError': '@supabase/functions-js',
-    'FunctionsRelayError': '@supabase/functions-js',
+    FunctionsError: '@supabase/functions-js',
+    FunctionsFetchError: '@supabase/functions-js',
+    FunctionsHttpError: '@supabase/functions-js',
+    FunctionsRelayError: '@supabase/functions-js',
   }
 
   if (methodPath.startsWith('@supabase/supabase-js.')) {
@@ -222,15 +222,24 @@ console.log('║                    SKIPPED CATEGORIES                         �
 console.log('╚═══════════════════════════════════════════════════════════════╝')
 
 console.log(`\n[Constructors] (${constructors.length} items)`)
-constructors.sort().slice(0, 5).forEach((m) => console.log(`  - ${m}`))
+constructors
+  .sort()
+  .slice(0, 5)
+  .forEach((m) => console.log(`  - ${m}`))
 if (constructors.length > 5) console.log(`  ... and ${constructors.length - 5} more`)
 
 console.log(`\n[Error Constructors] (${errorConstructors.length} items)`)
-errorConstructors.sort().slice(0, 5).forEach((m) => console.log(`  - ${m}`))
+errorConstructors
+  .sort()
+  .slice(0, 5)
+  .forEach((m) => console.log(`  - ${m}`))
 if (errorConstructors.length > 5) console.log(`  ... and ${errorConstructors.length - 5} more`)
 
 console.log(`\n[Internal/Private Methods] (${internalMethods.length} items)`)
-internalMethods.sort().slice(0, 5).forEach((m) => console.log(`  - ${m}`))
+internalMethods
+  .sort()
+  .slice(0, 5)
+  .forEach((m) => console.log(`  - ${m}`))
 if (internalMethods.length > 5) console.log(`  ... and ${internalMethods.length - 5} more`)
 
 // Final summary
