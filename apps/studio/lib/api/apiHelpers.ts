@@ -25,7 +25,7 @@ export function constructHeaders(headers: { [prop: string]: any }) {
     )
     return {
       ...cleansedHeaders,
-      ...(IS_PLATFORM ? {} : { apiKey: `${process.env.SUPABASE_SERVICE_KEY}` }),
+      ...(IS_PLATFORM && { apiKey: `${process.env.SUPABASE_SERVICE_KEY}` }),
     }
   } else {
     return {
