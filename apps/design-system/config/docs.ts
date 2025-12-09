@@ -54,8 +54,9 @@ export const docsConfig: DocsConfig = {
       items: [
         {
           title: 'Introduction',
-          href: '/docs/ui-patterns/ui-pattern-components',
+          href: '/docs/ui-patterns/ui-patterns',
           items: [],
+          priority: true,
         },
         {
           title: 'Navigation',
