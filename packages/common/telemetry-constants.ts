@@ -1131,6 +1131,34 @@ export interface IndexAdvisorBannerDismissButtonClickedEvent {
 }
 
 /**
+ * Index Advisor tab clicked event.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/query-performance
+ */
+export interface IndexAdvisorTabClickedEvent {
+  action: 'index_advisor_tab_clicked'
+  properties: {
+    hasRecommendations: boolean
+    isIndexAdvisorEnabled: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Index Advisor create indexes button clicked event.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/query-performance
+ */
+export interface IndexAdvisorCreateIndexesButtonClickedEvent {
+  action: 'index_advisor_create_indexes_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the dismiss button on a banner in studio Observability pages.
  *
  * @group Events
@@ -2536,6 +2564,8 @@ export type TelemetryEvent =
   | IndexAdvisorBannerEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorDialogEnableButtonClickedEvent
+  | IndexAdvisorTabClickedEvent
+  | IndexAdvisorCreateIndexesButtonClickedEvent
   | EdgeFunctionDeployButtonClickedEvent
   | EdgeFunctionDeployUpdatesConfirmClickedEvent
   | EdgeFunctionAiAssistantButtonClickedEvent

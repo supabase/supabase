@@ -21,7 +21,7 @@ const tanstackQueryConfig = {
   plugins: { '@tanstack/query': fixupPluginRules(tanstackQuery) },
   rules: {
     '@tanstack/query/exhaustive-deps': 'warn',
-    '@tanstack/query/no-deprecated-options': 'warn',
+    '@tanstack/query/no-deprecated-options': 'error',
     '@tanstack/query/prefer-query-object-syntax': 'warn',
     '@tanstack/query/stable-query-client': 'warn',
   },

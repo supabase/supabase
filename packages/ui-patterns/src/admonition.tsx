@@ -107,7 +107,7 @@ export const Admonition = forwardRef<
         ref={ref}
         variant={typeMapped}
         {...props}
-        className={cn('mb-2', admonitionSVG({ type: typeMapped }), props.className)}
+        className={cn(admonitionSVG({ type: typeMapped }), props.className)}
       >
         {!!icon ? (
           icon

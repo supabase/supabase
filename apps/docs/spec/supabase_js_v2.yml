@@ -2254,6 +2254,8 @@ functions:
             "error": null
           }
           ```
+  - id: auth-js-gotrueclient-initialize
+    $ref: '@supabase/auth-js.GoTrueClient.initialize'
   - id: auth-mfa-api
     title: 'Overview'
     notes: |
@@ -3225,8 +3227,9 @@ functions:
             { ban_duration: '100y' }
           )
           ```
+  - id: auth-js-gotrueadminapi-signout
+    $ref: '@supabase/auth-js.GoTrueAdminApi.signOut'
   - id: mfa-list-factors-admin
-    title: 'mfa.listFactors()'
     $ref: '@supabase/auth-js.GoTrueAdminMFAApi.listFactors'
     examples:
       - id: list-factors
@@ -7645,78 +7648,45 @@ functions:
   - id: supabase-js-supabaseclient-schema
     title: SupabaseClient.schema()
     $ref: '@supabase/supabase-js.SupabaseClient.schema'
-  - id: auth-js-gotrueadminapi-constructor
-    title: new GoTrueAdminApi()
-    $ref: '@supabase/auth-js.GoTrueAdminApi.constructor'
-    examples:
-      - id: auth-js-gotrueadminapi-constructor-example-1
-        name: Example 1
-        code: |-
-          ```ts
-          import { GoTrueAdminApi } from '@supabase/auth-js'
+  - id: oauth-server-api
+    title: 'OAuth Server API'
+    notes: |
+      The OAuth Server API allows you to build custom OAuth consent screens for your application.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
 
-          const admin = new GoTrueAdminApi({
-            url: 'https://xyzcompany.supabase.co/auth/v1',
-            headers: { Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}` },
-          })
-          ```
-  - id: auth-js-gotrueadminapi-signout
-    title: GoTrueAdminApi.signOut()
-    $ref: '@supabase/auth-js.GoTrueAdminApi.signOut'
-  - id: auth-js-gotrueclient-constructor
-    title: new GoTrueClient()
-    $ref: '@supabase/auth-js.GoTrueClient.constructor'
-    examples:
-      - id: auth-js-gotrueclient-constructor-example-1
-        name: Example 1
-        code: |-
-          ```ts
-          import { GoTrueClient } from '@supabase/auth-js'
-
-          const auth = new GoTrueClient({
-            url: 'https://xyzcompany.supabase.co/auth/v1',
-            headers: { apikey: 'public-anon-key' },
-            storageKey: 'supabase-auth',
-          })
-          ```
-  - id: auth-js-gotrueclient-initialize
-    title: GoTrueClient.initialize()
-    $ref: '@supabase/auth-js.GoTrueClient.initialize'
-  - id: auth-js-gotrueclient-isthrowonerrorenabled
-    title: GoTrueClient.isThrowOnErrorEnabled()
-    $ref: '@supabase/auth-js.GoTrueClient.isThrowOnErrorEnabled'
   - id: auth-js-authoauthserverapi-approveauthorization
-    title: AuthOAuthServerApi.approveAuthorization()
     $ref: '@supabase/auth-js.AuthOAuthServerApi.approveAuthorization'
   - id: auth-js-authoauthserverapi-denyauthorization
-    title: AuthOAuthServerApi.denyAuthorization()
     $ref: '@supabase/auth-js.AuthOAuthServerApi.denyAuthorization'
   - id: auth-js-authoauthserverapi-getauthorizationdetails
-    title: AuthOAuthServerApi.getAuthorizationDetails()
     $ref: '@supabase/auth-js.AuthOAuthServerApi.getAuthorizationDetails'
+  - id: auth-js-authoauthserverapi-listgrants
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.listGrants'
+  - id: auth-js-authoauthserverapi-revokegrant
+    title: AuthOAuthServerApi.revokeGrant()
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.revokeGrant'
+  - id: oauth-admin-api
+    title: 'OAuth Admin API'
+    notes: |
+      The OAuth Admin API allows you to manage OAuth clients programmatically.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+      These functions should only be called on a server. Never expose your `service_role` key in the browser.
+
   - id: auth-js-gotrueadminoauthapi-createclient
-    title: GoTrueAdminOAuthApi.createClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.createClient'
   - id: auth-js-gotrueadminoauthapi-deleteclient
-    title: GoTrueAdminOAuthApi.deleteClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.deleteClient'
   - id: auth-js-gotrueadminoauthapi-getclient
-    title: GoTrueAdminOAuthApi.getClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.getClient'
   - id: auth-js-gotrueadminoauthapi-listclients
-    title: GoTrueAdminOAuthApi.listClients()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.listClients'
   - id: auth-js-gotrueadminoauthapi-regenerateclientsecret
-    title: GoTrueAdminOAuthApi.regenerateClientSecret()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.regenerateClientSecret'
   - id: auth-js-gotrueadminoauthapi-updateclient
-    title: GoTrueAdminOAuthApi.updateClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.updateClient'
   - id: auth-js-gotruemfaapi-listfactors
-    title: GoTrueMFAApi.listFactors()
     $ref: '@supabase/auth-js.GoTrueMFAApi.listFactors'
   - id: postgrest-js-postgrestbuilder-constructor
-    title: new PostgrestBuilder()
     $ref: '@supabase/postgrest-js.PostgrestBuilder.constructor'
     examples:
       - id: postgrest-js-postgrestbuilder-constructor-example-1

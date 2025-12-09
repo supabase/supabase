@@ -7762,6 +7762,14 @@ functions:
         type: string
         description: |
           The file path, including the current file name. For example `"folder/image.png"`.
+      - name: options
+        isOptional: true
+        type: CreateSignedUploadUrlOptions
+        subContent:
+          - name: upsert
+            isOptional: true
+            type: string
+            description: When upsert is set to true, the file is overwritten if it exists. When set to false, an error is thrown if the object already exists. Defaults to false.
     examples:
       - id: create-signed-url
         name: Create Signed URL
@@ -7771,6 +7779,24 @@ functions:
               supabase.storage
               .from_("avatars")
               .create_signed_upload_url("folder/avatar1.png")
+          )
+          ```
+        response: |
+          ```json
+          {
+            "signedUrl": "https://example.supabase.co/storage/v1/object/upload/sign/avatars/folder/cat.jpg?token=<TOKEN>",
+              "path": "folder/cat.jpg",
+              "token": "<TOKEN>"
+          }
+          ```
+      - id: create-signed-url-upsert
+        name: Create Signed URL with upsert
+        code: |
+          ```python
+          response = (
+              supabase.storage
+              .from_("avatars")
+              .create_signed_upload_url("folder/avatar1.png", {"upsert": "true"})
           )
           ```
         response: |
@@ -7805,7 +7831,7 @@ functions:
         description: The body of the file to be stored in the bucket.
       - name: options
         isOptional: false
-        type: FileOptions
+        type: UploadSignedUrlFileOptions
         subContent:
           - name: cache-control
             isOptional: true
@@ -7817,10 +7843,6 @@ functions:
             type: string
             description: |
               The `Content-Type` header value. Should be specified if using a `file` that is neither `Blob` nor `File` nor `FormData`, otherwise will default to `text/plain;charset=UTF-8`.
-          - name: upsert
-            isOptional: true
-            type: string
-            description: When upsert is set to true, the file is overwritten if it exists. When set to false, an error is thrown if the object already exists. Defaults to false.
     examples:
       - id: create-signed-url
         name: Create Signed URL
