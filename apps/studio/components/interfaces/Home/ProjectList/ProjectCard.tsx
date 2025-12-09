@@ -55,7 +55,7 @@ export const ProjectCard = ({
         title={
           <div className="w-full flex flex-col gap-y-4 justify-between px-5">
             {/* Text */}
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-y-0.5">
               <h5 className="text-sm flex-shrink truncate pr-5">{name}</h5>
               <p className="text-sm text-foreground-lighter">{desc}</p>
             </div>
@@ -70,7 +70,7 @@ export const ProjectCard = ({
                 />
               )}
               {isVercelIntegrated && (
-                <div className="bg-surface-100 w-5 h-5 p-1 border border-strong rounded-md flex items-center text-black dark:text-white">
+                <div className="bg-surface-100 w-5 h-5 p-1 border border-strong rounded-md flex items-center justify-center text-black dark:text-white">
                   <InlineSVG
                     src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
                     title="Vercel Icon"
@@ -80,7 +80,7 @@ export const ProjectCard = ({
               )}
               {isGithubIntegrated && (
                 <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md">
-                  <div className="w-5 h-5 p-1 flex items-center">
+                  <div className="w-5 h-5 p-1 flex items-center justify-center">
                     <Github size={12} strokeWidth={1.5} />
                   </div>
                   <p className="text-xs text-foreground-light truncate">{githubRepository}</p>

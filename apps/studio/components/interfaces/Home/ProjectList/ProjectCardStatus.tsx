@@ -3,15 +3,7 @@ import { AlertTriangle, Info, PauseCircle, RefreshCcw } from 'lucide-react'
 import { RESOURCE_WARNING_MESSAGES } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
-import {
-  Alert_Shadcn_,
-  AlertTitle_Shadcn_,
-  Badge,
-  cn,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { InferredProjectStatus } from './ProjectCard.utils'
 
 export interface ProjectCardWarningsProps {
@@ -174,34 +166,39 @@ export const ProjectCardStatus = ({
   // Don't render alert if no title is available
   if (!alertTitle) return null
 
+  // Bespoke status
   return (
-    <Alert_Shadcn_
-      variant={alertType}
-      className={cn(
-        'border-0 p-5 pb-[1.25rem]',
-        'bg-transparent',
-        '[&>svg]:left-[1.25rem] [&>svg]:top-3.5 [&>svg]:border',
-        !isCritical ? '[&>svg]:text-foreground [&>svg]:bg-surface-100' : ''
-      )}
-    >
-      {['isPaused', 'isPausing'].includes(projectStatus ?? '') ? (
-        <PauseCircle strokeWidth={1.5} size={12} />
-      ) : ['isRestoring', 'isComingUp', 'isRestarting', 'isResizing'].includes(
-          projectStatus ?? ''
-        ) ? (
-        <RefreshCcw strokeWidth={1.5} size={12} />
-      ) : (
-        <AlertTriangle strokeWidth={1.5} size={12} />
-      )}
-      <div className="flex justify-between items-center w-full gap-x-1">
-        <AlertTitle_Shadcn_ className="text-xs mb-0">{alertTitle}</AlertTitle_Shadcn_>
+    <div role="alert" className={cn('w-full p-5 pb-[1.25rem] flex flex-row gap-x-2 items-center')}>
+      {/* Icon */}
+      <div
+        className={cn(
+          'shrink-0 w-6 h-6 border border-strong rounded-md flex items-center justify-center',
+          !isCritical && '[&>svg]:text-foreground [&>svg]:bg-surface-100'
+        )}
+      >
+        {['isPaused', 'isPausing'].includes(projectStatus ?? '') ? (
+          <PauseCircle strokeWidth={1.5} size={14} />
+        ) : ['isRestoring', 'isComingUp', 'isRestarting', 'isResizing'].includes(
+            projectStatus ?? ''
+          ) ? (
+          <RefreshCcw strokeWidth={1.5} size={14} />
+        ) : (
+          <AlertTriangle strokeWidth={1.5} size={14} />
+        )}
+      </div>
+      {/* Text and tooltip icon */}
+      <div className="flex items-center w-full gap-x-1.5 min-w-0">
+        <p className="text-xs truncate min-w-0 flex-1">{alertTitle}</p>
         <Tooltip>
           <TooltipTrigger>
-            <Info size={14} className="text-foreground-light hover:text-foreground" />
+            <Info
+              size={12}
+              className="text-foreground-lighter hover:text-foreground transition-colors"
+            />
           </TooltipTrigger>
           <TooltipContent side="bottom">{alertDescription}</TooltipContent>
         </Tooltip>
       </div>
-    </Alert_Shadcn_>
+    </div>
   )
 }
