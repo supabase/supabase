@@ -40,7 +40,7 @@ const SizeAndCounts = ({
         (metric) => metric === PricingMetric.STORAGE_SIZE
       ),
     },
-     [PricingMetric.DATABASE_SIZE]: {
+    [PricingMetric.DATABASE_SIZE]: {
       isLoading: isLoadingOrgDailyStats,
       margin: 14,
       data: dailyUsageToDataPoints(
