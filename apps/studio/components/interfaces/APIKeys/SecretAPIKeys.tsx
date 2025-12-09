@@ -150,7 +150,7 @@ export const SecretAPIKeys = () => {
               <TableRow className="bg-200">
                 <TableHead>Name</TableHead>
                 <TableHead>API Key</TableHead>
-                <TableHead className="hidden lg:table-cell">Last Used</TableHead>
+                {/* <TableHead className="hidden lg:table-cell">Last Used</TableHead> */}
                 <TableHead />
               </TableRow>
             </TableHeader>
