@@ -39,12 +39,13 @@ import { useTrack } from 'lib/telemetry/track'
 
 interface QueryIndexesProps {
   selectedRow: any
+  highlightContext?: string
 }
 
 // [Joshen] There's several more UX things we can do to help ease the learning curve of indexes I think
 // e.g understanding "costs", what numbers of "costs" are actually considered insignificant
 
-export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
+export const QueryIndexes = ({ selectedRow, highlightContext }: QueryIndexesProps) => {
   // [Joshen] TODO implement this logic once the linter rules are in
   const isLinterWarning = false
   const { data: project } = useSelectedProjectQuery()
@@ -166,6 +167,17 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
 
   return (
     <QueryPanelContainer className="h-full">
+      {highlightContext && (
+        <QueryPanelSection className="pt-2 pb-0">
+          <Alert_Shadcn_ className="[&>svg]:text-foreground-light">
+            <Lightbulb size={16} />
+            <AlertTitle_Shadcn_>Index recommendations for {highlightContext}</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              These recommendations can help improve queries that involve this column.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        </QueryPanelSection>
+      )}
       <QueryPanelSection className="pt-2 mb-6">
         <div className="mb-4 flex flex-col gap-y-1">
           <h4 className="mb-2">Indexes in use</h4>

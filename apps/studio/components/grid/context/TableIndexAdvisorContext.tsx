@@ -103,7 +103,12 @@ export function TableIndexAdvisorProvider({
           <SheetHeader className="border-b px-5 py-3">
             <SheetTitle>Index Recommendations</SheetTitle>
           </SheetHeader>
-          {selectedSuggestion && <QueryIndexes selectedRow={{ query: selectedSuggestion.query }} />}
+          {selectedSuggestion && (
+            <QueryIndexes
+              selectedRow={{ query: selectedSuggestion.query }}
+              highlightContext={selectedColumn ? `column "${selectedColumn}"` : undefined}
+            />
+          )}
         </SheetContent>
       </Sheet>
     </TableIndexAdvisorContext.Provider>
