@@ -108,6 +108,7 @@ const FunctionList = ({
               <Button
                 type="text"
                 className="text-link-table-cell text-sm p-0 hover:bg-transparent title"
+                disabled={isLocked}
                 onClick={() => editFunction(x)}
                 title={x.name}
               >
