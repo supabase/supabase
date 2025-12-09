@@ -36,9 +36,10 @@ import { EnableIndexAdvisorButton } from './IndexAdvisor/EnableIndexAdvisorButto
 import { DocsButton } from 'components/ui/DocsButton'
 import { DOCS_URL } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
+import { QueryPerformanceRow } from './QueryPerformance.types'
 
 interface QueryIndexesProps {
-  selectedRow: any
+  selectedRow: Pick<QueryPerformanceRow, 'query'>
   columnName?: string
   suggestedSelectQuery?: string
 }
