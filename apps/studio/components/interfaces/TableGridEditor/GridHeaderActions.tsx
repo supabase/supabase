@@ -1,11 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Lock, MousePointer2, PlusCircle, Unlock } from 'lucide-react'
+import { Lightbulb, Lock, MousePointer2, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { RefreshButton } from 'components/grid/components/header/RefreshButton'
+import { useTableIndexAdvisor } from 'components/grid/context/TableIndexAdvisorContext'
+import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -63,6 +65,10 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
 
   // need project lints to get security status for views
   const { data: lints = [] } = useProjectLintsQuery({ projectRef: project?.ref })
+
+  // Use table-specific index advisor context
+  const { isAvailable: isIndexAdvisorAvailable, isEnabled: isIndexAdvisorEnabled } =
+    useTableIndexAdvisor()
 
   const isTable = isTableLike(table)
   const isForeignTable = isTableLikeForeignTable(table)
@@ -335,6 +341,32 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
               </Popover_Shadcn_>
             )
           ) : null}
+
+          {isTable && isIndexAdvisorAvailable && !isIndexAdvisorEnabled && (
+            <Popover_Shadcn_ modal={false}>
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button type="default" icon={<Lightbulb strokeWidth={1.5} />}>
+                  Index Advisor
+                </Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_ portal className="w-80 text-sm" align="end">
+                <h4 className="flex items-center gap-2">
+                  <Lightbulb size={16} /> Index Advisor
+                </h4>
+                <div className="grid gap-2 mt-4 text-foreground-light text-xs">
+                  <p>
+                    Index Advisor recommends indexes to improve query performance on this table.
+                  </p>
+                  <p>
+                    Enable Index Advisor to get recommendations based on your actual query patterns.
+                  </p>
+                  <div className="mt-2">
+                    <EnableIndexAdvisorButton />
+                  </div>
+                </div>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
+          )}
 
           {isTable && activeRealtimeVariant === RealtimeButtonVariant.TRIGGERS ? (
             <Button

@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from 'ui'
 
 interface TableIndexAdvisorContextValue {
   isLoading: boolean
+  isAvailable: boolean
   isEnabled: boolean
   columnsWithSuggestions: string[]
   suggestions: TableIndexAdvisorData['suggestions']
@@ -21,6 +22,7 @@ interface TableIndexAdvisorContextValue {
 
 const TableIndexAdvisorContext = createContext<TableIndexAdvisorContextValue>({
   isLoading: false,
+  isAvailable: false,
   isEnabled: false,
   columnsWithSuggestions: [],
   suggestions: [],
@@ -39,7 +41,7 @@ export function TableIndexAdvisorProvider({
   table,
 }: PropsWithChildren<TableIndexAdvisorProviderProps>) {
   const { data: project } = useSelectedProjectQuery()
-  const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
+  const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [selectedColumn, setSelectedColumn] = useState<string | null>(null)
 
@@ -88,6 +90,7 @@ export function TableIndexAdvisorProvider({
 
   const value: TableIndexAdvisorContextValue = {
     isLoading,
+    isAvailable: isIndexAdvisorAvailable,
     isEnabled: isIndexAdvisorEnabled,
     columnsWithSuggestions: data?.columnsWithSuggestions ?? [],
     suggestions: data?.suggestions ?? [],
