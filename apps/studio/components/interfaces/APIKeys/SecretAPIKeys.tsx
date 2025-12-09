@@ -24,10 +24,10 @@ import CreateSecretAPIKeyDialog from './CreateSecretAPIKeyDialog'
 import { useApiKeysVisibility } from './hooks/useApiKeysVisibility'
 
 interface LastSeenData {
-  [hash: string]: { timestamp: string }
+  [hash: string]: { timestamp: number; relative: string }
 }
 
-function useLastSeen(projectRef: string): LastSeenData {
+function useLastSeen(projectRef: string): { data?: LastSeenData; isLoading: boolean } {
   const now = useRef(new Date()).current
 
   const query = useLogsQuery(projectRef, {
@@ -38,17 +38,23 @@ function useLastSeen(projectRef: string): LastSeenData {
 
   return useMemo(() => {
     if (query.isLoading || !query.logData) {
-      return {}
+      return { data: undefined, isLoading: query.isLoading }
     }
 
     const now = dayjs()
 
-    return (query.logData as unknown as { timestamp: number; hash: string }[]).reduce((a, i) => {
-      a[i.hash] = {
-        timestamp: `${dayjs.duration(now.diff(dayjs(i.timestamp))).humanize(false)} ago`,
-      }
-      return a
-    }, {} as LastSeenData)
+    const lastSeen = (query.logData as unknown as { timestamp: number; hash: string }[]).reduce(
+      (a, i) => {
+        a[i.hash] = {
+          timestamp: i.timestamp,
+          relative: `${dayjs.duration(now.diff(dayjs(i.timestamp))).humanize(false)} ago`,
+        }
+        return a
+      },
+      {} as LastSeenData
+    )
+
+    return { data: lastSeen, isLoading: query.isLoading }
   }, [query])
 }
 
@@ -63,7 +69,7 @@ export const SecretAPIKeys = () => {
     isError: isErrorApiKeys,
   } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
 
-  const lastSeen = useLastSeen(projectRef ?? '')
+  const { data: lastSeen, isLoading: isLoadingLastSeen } = useLastSeen(projectRef ?? '')
 
   const secretApiKeys = useMemo(
     () =>
@@ -144,7 +150,7 @@ export const SecretAPIKeys = () => {
               <TableRow className="bg-200">
                 <TableHead>Name</TableHead>
                 <TableHead>API Key</TableHead>
-                <TableHead className="hidden lg:table-cell">Last Seen</TableHead>
+                <TableHead className="hidden lg:table-cell">Last Used</TableHead>
                 <TableHead />
               </TableRow>
             </TableHeader>
@@ -153,7 +159,8 @@ export const SecretAPIKeys = () => {
                 <APIKeyRow
                   key={apiKey.id}
                   apiKey={apiKey}
-                  lastSeen={lastSeen[apiKey.hash]}
+                  lastSeen={lastSeen?.[apiKey.hash]}
+                  isLoadingLastSeen={isLoadingLastSeen}
                   isDeleting={apiKeyToDelete?.id === apiKey.id && isDeletingAPIKey}
                   onDelete={() => onDeleteAPIKey(apiKey)}
                   setKeyToDelete={setAPIKeyToDelete}
