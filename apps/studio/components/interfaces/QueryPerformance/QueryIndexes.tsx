@@ -172,7 +172,7 @@ export const QueryIndexes = ({
   }
 
   return (
-    <QueryPanelContainer className="h-full overflow-y-auto">
+    <QueryPanelContainer className="h-full overflow-y-auto py-0 pt-4">
       {(columnName || suggestedSelectQuery) && (
         <QueryPanelSection className="pt-2 pb-6 border-b">
           <div className="flex flex-col gap-y-3">
