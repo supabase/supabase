@@ -111,8 +111,8 @@ export const ComplianceConfig = () => {
                   </TooltipTrigger>
                   {!canUpdateComplianceConfig && (
                     <TooltipContent side="bottom" className="w-64 text-center">
-                      You need additional permissions to update the compliance configuration for your
-                      project
+                      You need additional permissions to update the compliance configuration for
+                      your project
                     </TooltipContent>
                   )}
                 </Tooltip>
