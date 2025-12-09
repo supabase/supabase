@@ -133,7 +133,7 @@ export const ProjectCardStatus = ({
   }
 
   if (renderMode === 'badge') {
-    // Don't render if no title is available
+    // Render a fallback en dash if no title is available
     if (!alertTitle) return <span className="text-xs text-foreground-muted">–</span>
 
     const badgeVariant = isCritical
@@ -163,10 +163,9 @@ export const ProjectCardStatus = ({
     )
   }
 
-  // Don't render alert if no title is available
+  // Only render if an alert title is available
   if (!alertTitle) return null
 
-  // Bespoke status
   return (
     <div role="alert" className={cn('w-full p-5 pb-[1.25rem] flex flex-row gap-x-2 items-center')}>
       {/* Icon */}
