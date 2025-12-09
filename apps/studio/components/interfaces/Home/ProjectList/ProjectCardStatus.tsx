@@ -172,8 +172,10 @@ export const ProjectCardStatus = ({
       {/* Icon */}
       <div
         className={cn(
-          'shrink-0 w-6 h-6 border border-strong rounded-md flex items-center justify-center',
-          !isCritical && '[&>svg]:text-foreground [&>svg]:bg-surface-100'
+          'shrink-0 w-6 h-6 border rounded-md flex items-center justify-center',
+          alertType === 'destructive' && 'border-destructive-400 [&>svg]:text-destructive-600',
+          alertType === 'warning' && 'border-warning-400 [&>svg]:text-warning-600',
+          alertType === 'default' && 'border-strong [&>svg]:text-foreground'
         )}
       >
         {['isPaused', 'isPausing'].includes(projectStatus ?? '') ? (
@@ -187,8 +189,8 @@ export const ProjectCardStatus = ({
         )}
       </div>
       {/* Text and tooltip icon */}
-      <div className="flex items-center w-full gap-x-1.5 min-w-0">
-        <p className="text-xs truncate min-w-0 flex-1">{alertTitle}</p>
+      <div className="flex items-center w-full gap-x-2">
+        <p className="text-xs">{alertTitle}</p>
         <Tooltip>
           <TooltipTrigger>
             <Info
