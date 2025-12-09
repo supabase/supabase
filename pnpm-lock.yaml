@@ -6,12 +6,63 @@ settings:
 
 catalogs:
   default:
+    '@sentry/nextjs':
+      specifier: ^10.26.0
+      version: 10.27.0
+    '@supabase/auth-js':
+      specifier: 2.86.0
+      version: 2.86.0
+    '@supabase/postgrest-js':
+      specifier: 2.86.0
+      version: 2.86.0
+    '@supabase/realtime-js':
+      specifier: 2.86.0
+      version: 2.86.0
     '@supabase/supabase-js':
       specifier: 2.86.0
       version: 2.86.0
+    '@types/node':
+      specifier: ^22.0.0
+      version: 22.13.14
+    '@types/react':
+      specifier: ^18.3.0
+      version: 18.3.3
+    '@types/react-dom':
+      specifier: ^18.3.0
+      version: 18.3.0
+    next:
+      specifier: ^15.5.7
+      version: 15.5.7
+    react:
+      specifier: ^18.3.0
+      version: 18.3.1
+    react-dom:
+      specifier: ^18.3.0
+      version: 18.3.1
+    recharts:
+      specifier: ^2.15.4
+      version: 2.15.4
+    tailwindcss:
+      specifier: 3.4.1
+      version: 3.4.1
     tsx:
       specifier: 4.20.3
       version: 4.20.3
+    typescript:
+      specifier: ~5.9.0
+      version: 5.9.2
+    valtio:
+      specifier: ^1.12.0
+      version: 1.12.0
+    vite:
+      specifier: ^7.1.11
+      version: 7.1.11
+    vitest:
+      specifier: ^3.2.0
+      version: 3.2.4
+    zod:
+      specifier: ^3.25.76
+      version: 3.25.76
 
 overrides:
   '@eslint/eslintrc>js-yaml': ^4.1.1
@@ -2234,7 +2285,7 @@ importers:
         specifier: ^2.2.6
         version: 2.2.6(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-separator':
-        specifier: ^1.1.1
+        specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-slider':
         specifier: ^1.3.6
