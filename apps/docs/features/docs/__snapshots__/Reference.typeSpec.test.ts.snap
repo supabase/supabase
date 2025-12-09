@@ -36258,7 +36258,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Sets the JWT access token used for channel subscription authorization and Realtime RLS.\\n\\nIf param is null it will use the \`accessToken\` callback function or the token set on the client.\\n\\nOn callback used, it will set the value of the token internal to the client."
+          "shortText": "Sets the JWT access token used for channel subscription authorization and Realtime RLS.\\n\\nIf param is null it will use the \`accessToken\` callback function or the token set on the client.\\n\\nOn callback used, it will set the value of the token internal to the client.\\n\\nWhen a token is explicitly provided, it will be preserved across channel operations\\n(including removeChannel and resubscribe). The \`accessToken\` callback will not be\\ninvoked until \`setAuth()\` is called without arguments.",
+          "examples": [
+            {
+              "id": "example-1",
+              "name": "Example 1",
+              "code": "\`\`\`ts\\n// Use a manual token (preserved across resubscribes, ignores accessToken callback)\\nclient.realtime.setAuth('my-custom-jwt')\\n\\n// Switch back to using the accessToken callback\\nclient.realtime.setAuth()\\n\`\`\`"
+            }
+          ]
         }
       },
       "@supabase/supabase-js.RealtimeChannel.httpSend": {
@@ -72255,7 +72262,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Perform a function call."
+          "shortText": "Perform a function call.",
+          "examples": [
+            {
+              "id": "example-1",
+              "name": "Example 1",
+              "code": "\`\`\`ts\\n// For cross-schema functions where type inference fails, use overrideTypes:\\nconst { data } = await supabase\\n  .schema('schema_b')\\n  .rpc('function_a', {})\\n  .overrideTypes<{ id: string; user_id: string }[]>()\\n\`\`\`"
+            }
+          ]
         }
       },
       "@supabase/postgrest-js.PostgrestClient.schema": {
@@ -77578,7 +77592,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Sets the JWT access token used for channel subscription authorization and Realtime RLS.\\n\\nIf param is null it will use the \`accessToken\` callback function or the token set on the client.\\n\\nOn callback used, it will set the value of the token internal to the client."
+          "shortText": "Sets the JWT access token used for channel subscription authorization and Realtime RLS.\\n\\nIf param is null it will use the \`accessToken\` callback function or the token set on the client.\\n\\nOn callback used, it will set the value of the token internal to the client.\\n\\nWhen a token is explicitly provided, it will be preserved across channel operations\\n(including removeChannel and resubscribe). The \`accessToken\` callback will not be\\ninvoked until \`setAuth()\` is called without arguments.",
+          "examples": [
+            {
+              "id": "example-1",
+              "name": "Example 1",
+              "code": "\`\`\`ts\\n// Use a manual token (preserved across resubscribes, ignores accessToken callback)\\nclient.realtime.setAuth('my-custom-jwt')\\n\\n// Switch back to using the accessToken callback\\nclient.realtime.setAuth()\\n\`\`\`"
+            }
+          ]
         }
       },
       "@supabase/realtime-js.RealtimeChannel.httpSend": {
@@ -83340,7 +83361,32 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                         "name": "QueryVectorsResponse",
                         "properties": [
                           {
-                            "name": "matches",
+                            "name": "distanceMetric",
+                            "type": {
+                              "type": "union",
+                              "name": "DistanceMetric",
+                              "subTypes": [
+                                {
+                                  "type": "literal",
+                                  "value": "cosine"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "euclidean"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "dotproduct"
+                                }
+                              ]
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "The distance metric used for the similarity search"
+                            }
+                          },
+                          {
+                            "name": "vectors",
                             "type": {
                               "type": "array",
                               "elemType": {
@@ -84238,11 +84284,11 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "IcebergRestCatalog"
+            "name": "WrappedIcebergRestCatalog"
           }
         },
         "comment": {
-          "shortText": "Get an Iceberg REST Catalog client configured for a specific analytics bucket\\nUse this to perform advanced table and namespace operations within the bucket\\nThe returned client provides full access to the Apache Iceberg REST Catalog API\\n\\n**Public alpha:** This API is part of a public alpha release and may not be available to your account type.",
+          "shortText": "Get an Iceberg REST Catalog client configured for a specific analytics bucket\\nUse this to perform advanced table and namespace operations within the bucket\\nThe returned client provides full access to the Apache Iceberg REST Catalog API\\nwith the Supabase \`{ data, error }\` pattern for consistent error handling on all operations.\\n\\n**Public alpha:** This API is part of a public alpha release and may not be available to your account type.",
           "tags": [
             {
               "tag": "alpha",
@@ -84253,27 +84299,22 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             {
               "id": "get-catalog-and-create-table",
               "name": "Get catalog and create table",
-              "code": "\`\`\`js\\n// First, create an analytics bucket\\nconst { data: bucket, error: bucketError } = await supabase\\n  .storage\\n  .analytics\\n  .createBucket('analytics-data')\\n\\n// Get the Iceberg catalog for that bucket\\nconst catalog = supabase.storage.analytics.from('analytics-data')\\n\\n// Create a namespace\\nawait catalog.createNamespace({ namespace: ['default'] })\\n\\n// Create a table with schema\\nawait catalog.createTable(\\n  { namespace: ['default'] },\\n  {\\n    name: 'events',\\n    schema: {\\n      type: 'struct',\\n      fields: [\\n        { id: 1, name: 'id', type: 'long', required: true },\\n        { id: 2, name: 'timestamp', type: 'timestamp', required: true },\\n        { id: 3, name: 'user_id', type: 'string', required: false }\\n      ],\\n      'schema-id': 0,\\n      'identifier-field-ids': [1]\\n    },\\n    'partition-spec': {\\n      'spec-id': 0,\\n      fields: []\\n    },\\n    'write-order': {\\n      'order-id': 0,\\n      fields: []\\n    },\\n    properties: {\\n      'write.format.default': 'parquet'\\n    }\\n  }\\n)\\n\`\`\`"
+              "code": "\`\`\`js\\n// First, create an analytics bucket\\nconst { data: bucket, error: bucketError } = await supabase\\n  .storage\\n  .analytics\\n  .createBucket('analytics-data')\\n\\n// Get the Iceberg catalog for that bucket\\nconst catalog = supabase.storage.analytics.from('analytics-data')\\n\\n// Create a namespace\\nconst { error: nsError } = await catalog.createNamespace({ namespace: ['default'] })\\n\\n// Create a table with schema\\nconst { data: tableMetadata, error: tableError } = await catalog.createTable(\\n  { namespace: ['default'] },\\n  {\\n    name: 'events',\\n    schema: {\\n      type: 'struct',\\n      fields: [\\n        { id: 1, name: 'id', type: 'long', required: true },\\n        { id: 2, name: 'timestamp', type: 'timestamp', required: true },\\n        { id: 3, name: 'user_id', type: 'string', required: false }\\n      ],\\n      'schema-id': 0,\\n      'identifier-field-ids': [1]\\n    },\\n    'partition-spec': {\\n      'spec-id': 0,\\n      fields: []\\n    },\\n    'write-order': {\\n      'order-id': 0,\\n      fields: []\\n    },\\n    properties: {\\n      'write.format.default': 'parquet'\\n    }\\n  }\\n)\\n\`\`\`"
             },
             {
               "id": "list-tables-in-namespace",
               "name": "List tables in namespace",
-              "code": "\`\`\`js\\nconst catalog = supabase.storage.analytics.from('analytics-data')\\n\\n// List all tables in the default namespace\\nconst tables = await catalog.listTables({ namespace: ['default'] })\\nconsole.log(tables) // [{ namespace: ['default'], name: 'events' }]\\n\`\`\`"
+              "code": "\`\`\`js\\nconst catalog = supabase.storage.analytics.from('analytics-data')\\n\\n// List all tables in the default namespace\\nconst { data: tables, error: listError } = await catalog.listTables({ namespace: ['default'] })\\nif (listError) {\\n  if (listError.isNotFound()) {\\n    console.log('Namespace not found')\\n  }\\n  return\\n}\\nconsole.log(tables) // [{ namespace: ['default'], name: 'events' }]\\n\`\`\`"
             },
             {
               "id": "working-with-namespaces",
               "name": "Working with namespaces",
-              "code": "\`\`\`js\\nconst catalog = supabase.storage.analytics.from('analytics-data')\\n\\n// List all namespaces\\nconst namespaces = await catalog.listNamespaces()\\n\\n// Create namespace with properties\\nawait catalog.createNamespace(\\n  { namespace: ['production'] },\\n  { properties: { owner: 'data-team', env: 'prod' } }\\n)\\n\`\`\`"
+              "code": "\`\`\`js\\nconst catalog = supabase.storage.analytics.from('analytics-data')\\n\\n// List all namespaces\\nconst { data: namespaces } = await catalog.listNamespaces()\\n\\n// Create namespace with properties\\nawait catalog.createNamespace(\\n  { namespace: ['production'] },\\n  { properties: { owner: 'data-team', env: 'prod' } }\\n)\\n\`\`\`"
             },
             {
               "id": "cleanup-operations",
               "name": "Cleanup operations",
-              "code": "\`\`\`js\\nconst catalog = supabase.storage.analytics.from('analytics-data')\\n\\n// Drop table with purge option (removes all data)\\nawait catalog.dropTable(\\n  { namespace: ['default'], name: 'events' },\\n  { purge: true }\\n)\\n\\n// Drop namespace (must be empty)\\nawait catalog.dropNamespace({ namespace: ['default'] })\\n\`\`\`"
-            },
-            {
-              "id": "error-handling-with-catalog-operations",
-              "name": "Error handling with catalog operations",
-              "code": "\`\`\`js\\nimport { IcebergError } from 'iceberg-js'\\n\\nconst catalog = supabase.storage.analytics.from('analytics-data')\\n\\ntry {\\n  await catalog.dropTable({ namespace: ['default'], name: 'events' }, { purge: true })\\n} catch (error) {\\n  // Handle 404 errors (resource not found)\\n  const is404 =\\n    (error instanceof IcebergError && error.status === 404) ||\\n    error?.status === 404 ||\\n    error?.details?.error?.code === 404\\n\\n  if (is404) {\\n    console.log('Table does not exist')\\n  } else {\\n    throw error // Re-throw other errors\\n  }\\n}\\n\`\`\`"
+              "code": "\`\`\`js\\nconst catalog = supabase.storage.analytics.from('analytics-data')\\n\\n// Drop table with purge option (removes all data)\\nconst { error: dropError } = await catalog.dropTable(\\n  { namespace: ['default'], name: 'events' },\\n  { purge: true }\\n)\\n\\nif (dropError?.isNotFound()) {\\n  console.log('Table does not exist')\\n}\\n\\n// Drop namespace (must be empty)\\nawait catalog.dropNamespace({ namespace: ['default'] })\\n\`\`\`"
             }
           ]
         }
@@ -88122,7 +88163,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             },
             "isOptional": true,
             "comment": {
-              "shortText": "Optional file upload options including cacheControl and contentType."
+              "shortText": "HTTP headers (cacheControl, contentType, etc.).\\n**Note:** The \`upsert\` option has no effect here. To enable upsert behavior,\\npass \`{ upsert: true }\` when calling \`createSignedUploadUrl()\` instead."
             }
           }
         ],
