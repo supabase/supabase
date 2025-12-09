@@ -24,10 +24,14 @@ type UsersVariables = {
   /** If set, uses optimized prefix search for the specified column */
   column?: OptimizedSearchColumns
   startAt?: string
+
+  improvedSearchEnabled?: boolean
 }
 
 export type Filter = 'verified' | 'unverified' | 'anonymous'
-export type User = components['schemas']['UserBody'] & { providers: readonly string[] }
+export type User = components['schemas']['UserBody'] & { providers: readonly string[] } & {
+  name: string
+}
 
 export const useUsersInfiniteQuery = <TData = UsersData>(
   {
@@ -39,6 +43,8 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
     sort,
     order,
     column,
+
+    improvedSearchEnabled = false,
   }: UsersVariables,
   { enabled = true, ...options }: UseCustomInfiniteQueryOptions<UsersData, UsersError, TData> = {}
 ) => {
@@ -69,6 +75,7 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
             limit: USERS_PAGE_LIMIT,
             column,
             startAt: column ? (pageParam as string) : undefined,
+            improvedSearchEnabled,
           }),
         },
         signal

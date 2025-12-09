@@ -13,6 +13,8 @@ interface getPaginatedUsersSQLProps {
   /** If set, uses fast queries but these don't allow any sorting so the above parameters are completely ignored. */
   column?: OptimizedSearchColumns
   startAt?: string
+
+  improvedSearchEnabled?: boolean
 }
 
 const DEFAULT_LIMIT = 50
@@ -28,7 +30,22 @@ export const getPaginatedUsersSQL = ({
 
   column,
   startAt,
+
+  improvedSearchEnabled = false,
 }: getPaginatedUsersSQLProps) => {
+  if (improvedSearchEnabled) {
+    return getImprovedPaginatedUsersSQL({
+      column: column ?? 'email',
+      keywords,
+      verified,
+      providers,
+      sort,
+      order,
+      page,
+      limit,
+    })
+  }
+
   // IMPORTANT: DO NOT CHANGE THESE QUERIES EVEN IN THE SLIGHTEST WITHOUT CONSULTING WITH AUTH TEAM.
   const offset = page * limit
   const hasValidKeywords = keywords && keywords !== ''
@@ -136,6 +153,130 @@ select
 from
   users_data;
   `.trim()
+
+  return usersQuery
+}
+
+/**
+ * Generates SQL for improved paginated user search that leverages specific indexes.
+ *
+ * Indexes leveraged:
+ * - idx_users_email (btree) - for email prefix searches and sorting by email
+ * - idx_users_email_trgm - for email trigram/fuzzy searches
+ * - idx_users_created_at_desc - for sorting by created_at
+ * - idx_users_last_sign_in_at_desc - for sorting by last_sign_in_at
+ * - idx_users_name_trgm - for name trigram searches on raw_user_meta_data->>'name'
+ * - users_phone_key (btree) - for phone prefix searches and sorting by phone
+ */
+export const getImprovedPaginatedUsersSQL = ({
+  column,
+  keywords,
+  verified,
+  providers,
+  sort,
+  order,
+  page = 0,
+  limit = DEFAULT_LIMIT,
+}: getPaginatedUsersSQLProps) => {
+  const offset = page * limit
+  const hasValidKeywords = keywords && keywords !== ''
+  const formattedKeywords = hasValidKeywords ? keywords.replaceAll("'", "''") : ''
+
+  const conditions: string[] = []
+
+  // Column-specific search condition
+  if (hasValidKeywords) {
+    if (column === 'email') {
+      // Use trigram index for fuzzy matching
+      conditions.push(`email ILIKE '%${formattedKeywords}%'`)
+    } else if (column === 'phone') {
+      // Use btree index with prefix matching
+      const range = stringRange(formattedKeywords)
+      if (range[1]) {
+        conditions.push(`phone >= '${range[0]}' AND phone < '${range[1]}'`)
+      } else {
+        conditions.push(`phone >= '${range[0]}'`)
+      }
+    } else if (column === 'id') {
+      // Exact match on UUID
+      conditions.push(`id = '${formattedKeywords}'`)
+    } else if (column === 'name') {
+      // Use trigram index on raw_user_meta_data->>'name'
+      conditions.push(`raw_user_meta_data->>'name' ILIKE '%${formattedKeywords}%'`)
+    }
+  }
+
+  // Verified filter
+  if (verified === 'verified') {
+    conditions.push(`(email_confirmed_at IS NOT NULL OR phone_confirmed_at IS NOT NULL)`)
+  } else if (verified === 'anonymous') {
+    conditions.push(`is_anonymous IS TRUE`)
+  } else if (verified === 'unverified') {
+    conditions.push(`(email_confirmed_at IS NULL AND phone_confirmed_at IS NULL)`)
+  }
+
+  // Providers filter
+  if (providers && providers.length > 0) {
+    if (providers.includes('saml 2.0')) {
+      conditions.push(
+        `(SELECT jsonb_agg(CASE WHEN value ~ '^sso' THEN 'sso' ELSE value END) FROM jsonb_array_elements_text((raw_app_meta_data ->> 'providers')::jsonb)) ?| array[${providers.map((p) => (p === 'saml 2.0' ? `'sso'` : `'${p}'`)).join(', ')}]`
+      )
+    } else {
+      conditions.push(
+        `(raw_app_meta_data->>'providers')::jsonb ?| array[${providers.map((p) => `'${p}'`).join(', ')}]`
+      )
+    }
+  }
+
+  const combinedConditions = conditions.map((x) => `(${x})`).join(' AND ')
+  const sortOn = sort ?? 'created_at'
+  const sortOrder = order ?? 'desc'
+
+  const whereClause = conditions.length > 0 ? `WHERE ${combinedConditions}` : ''
+
+  const usersData = `
+    SELECT
+      auth.users.id,
+      auth.users.email,
+      auth.users.banned_until,
+      auth.users.created_at,
+      auth.users.confirmed_at,
+      auth.users.confirmation_sent_at,
+      auth.users.is_anonymous,
+      auth.users.is_sso_user,
+      auth.users.invited_at,
+      auth.users.last_sign_in_at,
+      auth.users.phone,
+      auth.users.raw_app_meta_data,
+      auth.users.raw_user_meta_data
+    FROM
+      auth.users
+    ${whereClause}
+    ORDER BY
+      "${sortOn}" ${sortOrder}
+    LIMIT
+      ${limit}
+    OFFSET
+      ${offset}`
+
+  const usersQuery = `
+WITH
+  users_data AS (${usersData})
+SELECT
+  *,
+  COALESCE(
+    (
+      SELECT
+        array_agg(DISTINCT i.provider)
+      FROM
+        auth.identities i
+      WHERE
+        i.user_id = users_data.id
+    ),
+    '{}'::text[]
+  ) AS providers
+FROM
+  users_data;`.trim()
 
   return usersQuery
 }
