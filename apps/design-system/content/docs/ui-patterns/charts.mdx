@@ -27,23 +27,25 @@ Our charts use a combination of our own presentational components and [Recharts]
 
 ### Basic Chart Types
 
-<ComponentPreview name="chart-composed-basic" peekCode wide />
+<ComponentPreview name="chart-composed-basic" wide />
 
 ### Chart States
 
-<ComponentPreview name="chart-composed-states" peekCode wide />
+<ComponentPreview name="chart-composed-states" wide />
 
 ### Charts as Standalone Metrics
 
-<ComponentPreview name="chart-composed-metrics" peekCode wide />
+<ComponentPreview name="chart-composed-metrics" wide />
 
 ### Charts with Actions
 
-<ComponentPreview name="chart-composed-actions" peekCode wide />
+<ComponentPreview name="chart-composed-actions" wide />
 
 ### Chart with Table
 
-<ComponentPreview name="chart-composed-table" peekCode wide />
+<ComponentPreview name="chart-composed-table" wide />
+
+You can pass through our [Table](/docs/components/table) component to the `ChartFooter` and expect it to be styled correctly. There is no additional need to style the table, `ChartFooter` will handle the styling for you.
 
 ## API
 
@@ -137,9 +139,9 @@ Container for the main chart visualization. Handles loading and empty states.
 | ----------------- | -------------------------------------- | ------- | -------------------------------------------- |
 | `children`        | `React.ReactNode`                      | -       | Chart visualization content                  |
 | `isEmpty`         | `boolean`                              | `false` | Whether to show empty state                  |
-| `hasPadding`      | `boolean`                              | `true`  | Whether to apply padding to the content area |
 | `emptyState`      | `React.ReactNode`                      | -       | Custom empty state component                 |
 | `loadingState`    | `React.ReactNode`                      | -       | Custom loading state component               |
+| `disabledState`   | `React.ReactNode`                      | -       | Custom disabled state component              |
 | `disabledActions` | `ChartAction[]`                        | -       | Actions to show when chart is disabled       |
 | `className`       | `string`                               | -       | Additional CSS classes                       |
 | `...props`        | `React.HTMLAttributes<HTMLDivElement>` | -       | All standard div props                       |

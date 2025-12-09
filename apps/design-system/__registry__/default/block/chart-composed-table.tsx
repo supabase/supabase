@@ -52,10 +52,8 @@ export default function ChartComposedTable() {
         <ChartCard>
           <ChartHeader>
             <ChartTitle tooltip="This is a tooltip">Standard Bar Chart</ChartTitle>
-
             <ChartActions actions={actions} />
           </ChartHeader>
-
           <ChartContent
             isEmpty={data.length === 0}
             emptyState={
@@ -81,24 +79,21 @@ export default function ChartComposedTable() {
               />
             </div>
           </ChartContent>
-
           <ChartFooter>
             <Table>
               <TableHeader>
-                <TableRow className="!bg-transparent">
-                  <TableHead className="!py-1.5 h-auto">Timestamp</TableHead>
-                  <TableHead className="!py-1.5 h-auto text-right">Standard Score</TableHead>
+                <TableRow>
+                  <TableHead>Timestamp</TableHead>
+                  <TableHead className="text-right">Standard Score</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {data.slice(0, 3).map((item) => (
                   <TableRow key={item.timestamp}>
-                    <TableCell className="py-2 text-xs text-foreground-light">
+                    <TableCell className="text-foreground-light">
                       {format(new Date(item.timestamp), 'MMM d, yyyy h:mm a')}
                     </TableCell>
-                    <TableCell className="py-2 text-right text-xs tabular-nums">
-                      {item.standard_score}
-                    </TableCell>
+                    <TableCell className="text-right tabular-nums">{item.standard_score}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
