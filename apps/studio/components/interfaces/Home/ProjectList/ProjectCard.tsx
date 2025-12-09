@@ -56,10 +56,10 @@ export const ProjectCard = ({
           <div className="w-full flex flex-col gap-y-4 justify-between px-5">
             {/* Text */}
             <div className="flex flex-col">
-              <h5 className="flex-shrink truncate text-sm pr-4 font-medium">{name}</h5>
+              <h5 className="text-sm flex-shrink truncate pr-5">{name}</h5>
               <p className="text-sm text-foreground-lighter">{desc}</p>
             </div>
-            {/* Status */}
+            {/* Compute and integrations */}
             <div className="flex items-center gap-x-1.5">
               {project.status !== 'INACTIVE' && projectHomepageShowInstanceSize && (
                 <ComputeBadgeWrapper
