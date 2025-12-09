@@ -39,33 +39,36 @@ export const Header = () => {
 export const NoFilterResults = ({
   filterStatus,
   resetFilterStatus,
+  withinTableCell = false,
   className,
 }: {
   filterStatus: string[]
   resetFilterStatus?: () => void
+  withinTableCell?: boolean
   className?: string
 }) => {
   return (
     <div
       className={cn(
-        'bg-surface-100 px-4 md:px-6 py-4 rounded flex items-center justify-between border border-default',
+        'flex items-center justify-between',
+        !withinTableCell && 'bg-surface-100 px-4 md:px-6 py-4 rounded-md border border-default',
         className
       )}
     >
-      <div className="space-y-1">
+      <div className="text-sm flex flex-col gap-y-0.5">
         {/* [Joshen] Just keeping it simple for now unless we decide to extend this to other statuses */}
-        <p className="text-sm text-foreground">
+        <p className="text-foreground">
           {filterStatus.length === 0
             ? `No projects found`
             : `No ${filterStatus[0] === 'INACTIVE' ? 'paused' : 'active'} projects found`}
         </p>
-        <p className="text-sm text-foreground-light">
+        <p className="text-foreground-lighter">
           Your search for projects with the specified status did not return any results
         </p>
       </div>
       {resetFilterStatus !== undefined && (
         <Button type="default" onClick={() => resetFilterStatus()}>
-          Reset filter
+          Reset filter{filterStatus.length > 1 && `s`}
         </Button>
       )}
     </div>

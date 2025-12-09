@@ -1,6 +1,6 @@
+import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react'
 import type { ComponentProps } from 'react'
 import * as React from 'react'
-import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react'
 
 import { cn } from '../../../lib/utils/cn'
 import { ShadowScrollArea } from '../../ShadowScrollArea'
@@ -74,6 +74,8 @@ const TableHead = React.forwardRef<
     ref={ref}
     className={cn(
       'h-10 px-4 text-left align-middle heading-meta whitespace-nowrap text-foreground-lighter [&:has([role=checkbox])]:pr-0',
+      // Transition text color when NoSearchResults or NoFilterResults empty state is shown
+      'transition-colors',
       className
     )}
     {...props}

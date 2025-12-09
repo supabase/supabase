@@ -95,6 +95,8 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
   const noResultsFromStatusFilter =
     filterStatus.length > 0 && isSuccessProjects && orgProjects.length === 0
 
+  const noResults = noResultsFromStatusFilter || noResultsFromSearch
+
   const githubConnections = connections?.map((connection) => ({
     id: String(connection.id),
     added_by: {
@@ -153,28 +155,38 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
           {/* [Joshen] Ideally we can figure out sticky table headers here */}
           <TableHeader>
             <TableRow>
-              <TableHead>Project</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Compute</TableHead>
-              <TableHead>Region</TableHead>
-              <TableHead>Created</TableHead>
+              <TableHead className={noResults && 'text-foreground-muted'}>
+                Project
+              </TableHead>
+              <TableHead className={noResults && 'text-foreground-muted'}>
+                Status
+              </TableHead>
+              <TableHead className={noResults && 'text-foreground-muted'}>
+                Compute
+              </TableHead>
+              <TableHead className={noResults && 'text-foreground-muted'}>
+                Region
+              </TableHead>
+              <TableHead className={noResults && 'text-foreground-muted'}>
+                Created
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {noResultsFromStatusFilter ? (
-              <TableRow>
-                <TableCell colSpan={5} className="p-0">
+              <TableRow className="[&>td]:hover:bg-inherit">
+                <TableCell colSpan={5}>
                   <NoFilterResults
                     filterStatus={filterStatus}
                     resetFilterStatus={() => setFilterStatus([])}
-                    className="border-0"
+                    withinTableCell
                   />
                 </TableCell>
               </TableRow>
             ) : noResultsFromSearch ? (
-              <TableRow>
-                <TableCell colSpan={5} className="p-0">
-                  <NoSearchResults searchString={search} className="border-0" />
+              <TableRow className="[&>td]:hover:bg-inherit">
+                <TableCell colSpan={5}>
+                  <NoSearchResults searchString={search} withinTableCell />
                 </TableCell>
               </TableRow>
             ) : (
