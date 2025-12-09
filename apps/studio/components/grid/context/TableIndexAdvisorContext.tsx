@@ -48,7 +48,7 @@ export function TableIndexAdvisorProvider({
   const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
   const queryClient = useQueryClient()
   const [isSheetOpen, setIsSheetOpen] = useState(false)
-  const [selectedColumn, setSelectedColumn] = useState<string | null>(null)
+  const [selectedColumn, setSelectedColumn] = useState<string | undefined>(undefined)
 
   const { data, isLoading } = useTableIndexAdvisorQuery(
     {
@@ -69,7 +69,7 @@ export function TableIndexAdvisorProvider({
 
   const closeSheet = useCallback(() => {
     setIsSheetOpen(false)
-    setSelectedColumn(null)
+    setSelectedColumn(undefined)
   }, [])
 
   const getSuggestionsForColumn = useCallback(
@@ -123,7 +123,8 @@ export function TableIndexAdvisorProvider({
           {selectedSuggestion && (
             <QueryIndexes
               selectedRow={{ query: selectedSuggestion.query }}
-              highlightContext={selectedColumn ? `column "${selectedColumn}"` : undefined}
+              columnName={selectedColumn}
+              suggestedSelectQuery={selectedSuggestion.query}
             />
           )}
         </SheetContent>

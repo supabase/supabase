@@ -1,4 +1,4 @@
-import { Check, Lightbulb, Table2 } from 'lucide-react'
+import { Check, Table2, Lightbulb } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
@@ -39,13 +39,18 @@ import { useTrack } from 'lib/telemetry/track'
 
 interface QueryIndexesProps {
   selectedRow: any
-  highlightContext?: string
+  columnName?: string
+  suggestedSelectQuery?: string
 }
 
 // [Joshen] There's several more UX things we can do to help ease the learning curve of indexes I think
 // e.g understanding "costs", what numbers of "costs" are actually considered insignificant
 
-export const QueryIndexes = ({ selectedRow, highlightContext }: QueryIndexesProps) => {
+export const QueryIndexes = ({
+  selectedRow,
+  columnName,
+  suggestedSelectQuery,
+}: QueryIndexesProps) => {
   // [Joshen] TODO implement this logic once the linter rules are in
   const isLinterWarning = false
   const { data: project } = useSelectedProjectQuery()
@@ -167,15 +172,33 @@ export const QueryIndexes = ({ selectedRow, highlightContext }: QueryIndexesProp
 
   return (
     <QueryPanelContainer className="h-full">
-      {highlightContext && (
-        <QueryPanelSection className="pt-2 pb-0">
-          <Alert_Shadcn_ className="[&>svg]:text-foreground-light">
-            <Lightbulb size={16} />
-            <AlertTitle_Shadcn_>Index recommendations for {highlightContext}</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              These recommendations can help improve queries that involve this column.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+      {(columnName || suggestedSelectQuery) && (
+        <QueryPanelSection className="pt-2 pb-6 border-b">
+          <div className="flex flex-col gap-y-3">
+            <div>
+              <h4 className="mb-2">Recommendation reason</h4>
+              {columnName && (
+                <p className="text-sm text-foreground-light">
+                  Recommendation for column: <span className="font-mono">{columnName}</span>
+                </p>
+              )}
+            </div>
+            {suggestedSelectQuery && (
+              <div className="flex flex-col gap-y-4">
+                <p className="text-sm text-foreground-light">Based on the following query:</p>
+                <CodeBlock
+                  hideLineNumbers
+                  value={suggestedSelectQuery}
+                  language="sql"
+                  className={cn(
+                    'max-w-full max-h-[200px]',
+                    '!py-2 !px-2.5 prose dark:prose-dark',
+                    '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
+                  )}
+                />
+              </div>
+            )}
+          </div>
         </QueryPanelSection>
       )}
       <QueryPanelSection className="pt-2 mb-6">
