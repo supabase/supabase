@@ -19,7 +19,6 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import {
   PageSection,
   PageSectionContent,
@@ -28,6 +27,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 export const AccountConnections = () => {
   const {
@@ -99,7 +99,7 @@ export const AccountConnections = () => {
                 <div>
                   <p className="text-sm">GitHub</p>
                   <p className="text-sm text-foreground-lighter">
-                    Sync GitHub repos to Supabase projects for automatic branch creation and merging
+                    Sync repos to Supabase projects for automatic branch creation and merging
                   </p>
                 </div>
               </div>
