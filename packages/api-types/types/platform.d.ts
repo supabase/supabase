@@ -1171,6 +1171,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/upgrade-request': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Request organization upgrade - notifies billing owners */
+    post: operations['UpgradeRequestController_requestUpgrade']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/cloud-marketplace/link': {
     parameters: {
       query?: never
@@ -4124,23 +4141,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/storage/{ref}/buckets/{id}/objects/download': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Downloads a file from a private bucket */
-    post: operations['StorageObjectsController_download']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/storage/{ref}/buckets/{id}/objects/list': {
     parameters: {
       query?: never
@@ -5980,11 +5980,11 @@ export interface components {
     }
     DiskAutoscaleConfig: {
       /** @description Growth percentage for disk autoscaling */
-      growth_percent?: number | null
+      growth_percent: number | null
       /** @description Maximum limit the disk size will grow to in GB */
-      max_size_gb?: number | null
+      max_size_gb: number | null
       /** @description Minimum increment size for disk autoscaling in GB */
-      min_increment_gb?: number | null
+      min_increment_gb: number | null
     }
     DiskRequestBody: {
       attributes:
@@ -6058,22 +6058,6 @@ export interface components {
     }
     DownloadBackupResponse: {
       fileUrl: string
-    }
-    DownloadObjectBody: {
-      options?: {
-        download?: boolean
-        downloadName?: string
-        transform?: {
-          /** @enum {string} */
-          format?: 'origin'
-          height?: number
-          quality?: number
-          /** @enum {string} */
-          resize?: 'cover' | 'contain' | 'fill'
-          width?: number
-        }
-      }
-      path: string
     }
     DynamicRegisterOAuthAppBody: {
       client_name: string
@@ -7136,7 +7120,20 @@ export interface components {
               set: string[]
             }
         feature: {
-          key: string
+          /** @enum {string} */
+          key:
+            | 'instances.compute_update_available_sizes'
+            | 'storage.max_file_size'
+            | 'security.audit_logs_days'
+            | 'log.retention_days'
+            | 'custom_domain'
+            | 'ipv4'
+            | 'pitr.available_variants'
+            | 'log_drains'
+            | 'branching_limit'
+            | 'branching_persistent'
+            | 'auth.mfa_phone'
+            | 'auth.hooks'
           /** @enum {string} */
           type: 'boolean' | 'numeric' | 'set'
         }
@@ -7557,45 +7554,6 @@ export interface components {
         id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
         name: string
       }
-      projects: {
-        cloud_provider: string
-        disk_volume_size_gb?: number
-        engine?: string
-        id: number
-        /** @enum {string} */
-        infra_compute_size?:
-          | 'pico'
-          | 'nano'
-          | 'micro'
-          | 'small'
-          | 'medium'
-          | 'large'
-          | 'xlarge'
-          | '2xlarge'
-          | '4xlarge'
-          | '8xlarge'
-          | '12xlarge'
-          | '16xlarge'
-          | '24xlarge'
-          | '24xlarge_optimized_memory'
-          | '24xlarge_optimized_cpu'
-          | '24xlarge_high_memory'
-          | '48xlarge'
-          | '48xlarge_optimized_memory'
-          | '48xlarge_optimized_cpu'
-          | '48xlarge_high_memory'
-        inserted_at: string | null
-        is_branch_enabled: boolean
-        is_physical_backups_enabled: boolean | null
-        name: string
-        organization_id: number
-        organization_slug: string
-        preview_branch_refs: string[]
-        ref: string
-        region: string
-        status: string
-        subscription_id: string | null
-      }[]
       restriction_data: {
         [key: string]: unknown
       } | null
@@ -8999,6 +8957,14 @@ export interface components {
         schema: string
       }[]
     }
+    RequestUpgradeBody: {
+      note?: string
+      /** @enum {string} */
+      requested_plan: 'Pro' | 'Team' | 'Enterprise'
+    }
+    RequestUpgradeResponse: {
+      message: string
+    }
     ResetPasswordBody: {
       /** Format: email */
       email: string
@@ -9290,7 +9256,7 @@ export interface components {
         upstreamTarget: 'main' | 'canary'
       }
       features: {
-        icebergCatalog?: {
+        icebergCatalog: {
           enabled: boolean
           maxCatalogs: number
           maxNamespaces: number
@@ -9302,7 +9268,7 @@ export interface components {
         s3Protocol: {
           enabled: boolean
         }
-        vectorBuckets?: {
+        vectorBuckets: {
           enabled: boolean
           maxBuckets: number
           maxIndexes: number
@@ -9388,7 +9354,6 @@ export interface components {
         vectorBucketName: string
       }[]
     }
-    StreamableFile: Record<string, never>
     SupavisorConfigResponse: {
       connection_string: string
       /** @description Use connection_string instead */
@@ -10536,10 +10501,10 @@ export interface components {
           maxNamespaces: number
           maxTables: number
         }
-        imageTransformation: {
+        imageTransformation?: {
           enabled: boolean
         }
-        s3Protocol: {
+        s3Protocol?: {
           enabled: boolean
         }
         vectorBuckets?: {
@@ -14086,6 +14051,61 @@ export interface operations {
         content?: never
       }
       /** @description Failed to preview subscription changes */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  UpgradeRequestController_requestUpgrade: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RequestUpgradeBody']
+      }
+    }
+    responses: {
+      /** @description Upgrade request has been sent to billing owners */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RequestUpgradeResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to send upgrade request */
       500: {
         headers: {
           [name: string]: unknown
@@ -25484,62 +25504,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to copy object */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StorageObjectsController_download: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Storage bucket id */
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['DownloadObjectBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['StreamableFile']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to download the file */
       500: {
         headers: {
           [name: string]: unknown

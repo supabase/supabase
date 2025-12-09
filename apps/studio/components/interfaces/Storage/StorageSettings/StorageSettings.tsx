@@ -11,7 +11,7 @@ import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import { useBucketsQuery } from 'data/storage/buckets-query'
@@ -351,7 +351,7 @@ export const StorageSettings = () => {
                                   <p>
                                     Remove or decrease the limit on{' '}
                                     <InlineLink
-                                      href={`/project/${projectRef}/storage/buckets/${affectedBuckets[0]}`}
+                                      href={`/project/${projectRef}/storage/files/buckets/${affectedBuckets[0]}`}
                                       className="text-destructive decoration-destructive-500 hover:decoration-destructive"
                                     >
                                       {affectedBuckets[0]}
@@ -382,7 +382,7 @@ export const StorageSettings = () => {
                                                     className="hover:underline underline-offset-2"
                                                   >
                                                     <Link
-                                                      href={`/project/${projectRef}/storage/buckets/${name}`}
+                                                      href={`/project/${projectRef}/storage/files/buckets/${name}`}
                                                     >
                                                       {bucket?.name} ({formattedLimit.value}
                                                       {formattedLimit.unit})
@@ -408,22 +408,25 @@ export const StorageSettings = () => {
                         {isFreeTier && (
                           <UpgradeToPro
                             fullWidth
+                            source="storageSizeLimit"
+                            featureProposition="configure upload file size limits in Storage"
                             primaryText="Free Plan has a fixed upload file size limit of 50 MB."
                             secondaryText={`Upgrade to Pro Plan for a configurable upload file size limit of ${formatBytes(
                               STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
                             )} and unlock image transformations.`}
-                            source="storageSizeLimit"
                           />
                         )}
                         {isSpendCapOn && (
                           <UpgradeToPro
                             fullWidth
+                            addon="spendCap"
+                            source="storageSizeLimit"
+                            featureProposition="increase the file upload size limits in Storage"
                             buttonText="Disable Spend Cap"
                             primaryText="Reduced max upload file size limit due to Spend Cap"
                             secondaryText={`Disable your Spend Cap to allow file uploads of up to ${formatBytes(
                               STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
                             )}.`}
-                            source="storageSizeLimit"
                           />
                         )}
 

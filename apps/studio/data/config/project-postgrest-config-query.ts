@@ -25,7 +25,7 @@ export async function getProjectPostgrestConfig(
   })
   if (error) handleError(error)
   // [Joshen] Not sure why but db_pool isn't part of the API typing
-  // https://github.com/supabase/infrastructure/blob/develop/api/src/routes/platform/projects/ref/config/postgrest.dto.ts#L6
+  // https://github.com/supabase/platform/blob/develop/api/src/routes/platform/projects/ref/config/postgrest.dto.ts#L6
   return data as unknown as PostgrestConfigResponse
 }
 

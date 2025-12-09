@@ -12,7 +12,14 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "dotenv": "^16.5.0",
-    "@playwright/test": "^1.52.0"
+    "@playwright/test": "^1.52.0",
+    "@supabase/supabase-js": "catalog:",
+    "cross-fetch": "^4.1.0",
+    "dotenv": "^16.5.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^9.9.0",
+    "api-types": "workspace:*",
+    "tsx": "catalog:"
   }
 }

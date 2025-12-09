@@ -4,20 +4,6 @@ import {
   JwtSecretUpdateProgress,
   JwtSecretUpdateStatus,
 } from '@supabase/shared-types/out/events'
-
-import { useFlag, useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FormActions } from 'components/ui/Forms/FormActions'
-import Panel from 'components/ui/Panel'
-import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutation'
-import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { uuidv4 } from 'lib/helpers'
 import {
   AlertCircle,
   ChevronDown,
@@ -37,6 +23,21 @@ import {
 import Link from 'next/link'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { toast } from 'sonner'
+
+import { useFlag, useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import Panel from 'components/ui/Panel'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
+import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutation'
+import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { uuidv4 } from 'lib/helpers'
 import {
   Button,
   DropdownMenu,
@@ -50,7 +51,6 @@ import {
   Modal,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { number, object } from 'yup'
 import { useApiKeysVisibility } from '../APIKeys/hooks/useApiKeysVisibility'
 import {
