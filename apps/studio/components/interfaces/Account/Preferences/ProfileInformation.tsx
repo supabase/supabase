@@ -114,7 +114,7 @@ export const ProfileInformation = () => {
                   render={({ field }) => (
                     <FormItemLayout label="Last name" layout="flex-row-reverse">
                       <FormControl_Shadcn_ className="col-span-8">
-                        <Input_Shadcn_ {...field} className="w-72" />
+                        <Input_Shadcn_ {...field} placeholder="Last name" className="w-72" />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
