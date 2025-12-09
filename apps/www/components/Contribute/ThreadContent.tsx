@@ -35,7 +35,7 @@ export async function ThreadContent({ id }: { id: string }) {
       </Suspense>
 
       <div className="grid gap-4 mb-6">
-        {thread.product_areas.length > 0 && (
+        {thread.product_areas.filter((area: string) => area !== 'Other').length > 0 && (
           <div>
             <h3 className="text-sm font-semibold text-foreground mb-2">Product Areas</h3>
             <div className="flex flex-wrap gap-2">
@@ -50,7 +50,7 @@ export async function ThreadContent({ id }: { id: string }) {
           </div>
         )}
 
-        {thread.stack.length > 0 && (
+        {thread.stack.filter((tech: string) => tech !== 'Other').length > 0 && (
           <div>
             <h3 className="text-sm font-semibold text-foreground mb-2">Stack</h3>
             <div className="flex flex-wrap gap-2">
@@ -68,7 +68,7 @@ export async function ThreadContent({ id }: { id: string }) {
       <div className="pt-6 border-t border-border">
         <Button asChild type="default" className="w-full sm:w-auto">
           <a href={thread.external_activity_url} target="_blank" rel="noopener noreferrer">
-            View on{' '}
+            Help on{' '}
             {thread.channel === 'discord'
               ? 'Discord'
               : thread.channel === 'reddit'

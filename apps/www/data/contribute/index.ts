@@ -8,7 +8,7 @@ import type {
 } from '~/types/contribute'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_CONTRIBUTE_URL as string
-const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_CONTRIBUTE_PUBLISHABLE_KEY as string
+const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_CONTRIBUTE_PUBLISHABLE_KEY as string
 
 function formatTimeAgo(date: Date): string {
   const now = new Date()
@@ -60,7 +60,7 @@ export async function getUnansweredThreads(
   stack?: string,
   search?: string
 ): Promise<ThreadRow[]> {
-  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+  const supabase = createClient(supabaseUrl, supabasePublishableKey)
 
   const twentyFourHoursAgo = new Date()
   twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24)
@@ -119,7 +119,7 @@ export async function getUnansweredThreads(
 }
 
 export async function getThreadById(id: string): Promise<ThreadRow | null> {
-  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+  const supabase = createClient(supabaseUrl, supabasePublishableKey)
 
   const { data, error } = await supabase
     .from('contribute_threads')
@@ -142,7 +142,7 @@ export async function getThreadById(id: string): Promise<ThreadRow | null> {
 }
 
 export async function getThreadRepliesById(thread_key: string | null) {
-  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+  const supabase = createClient(supabaseUrl, supabasePublishableKey)
 
   if (!thread_key) {
     return { question: null, replies: [] }
@@ -167,7 +167,7 @@ export async function getThreadRepliesById(thread_key: string | null) {
 }
 
 export async function getAllProductAreas(): Promise<string[]> {
-  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+  const supabase = createClient(supabaseUrl, supabasePublishableKey)
 
   const { data, error } = await supabase
     .from('contribute_threads')
@@ -190,7 +190,7 @@ export async function getAllProductAreas(): Promise<string[]> {
 }
 
 export async function getAllStacks(): Promise<string[]> {
-  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+  const supabase = createClient(supabaseUrl, supabasePublishableKey)
 
   const { data, error } = await supabase
     .from('contribute_threads')
@@ -217,7 +217,7 @@ export const LEADERBOARD_PERIODS = ['all', 'year', 'quarter', 'month', 'week', '
 export async function getLeaderboard(
   period: (typeof LEADERBOARD_PERIODS)[number]
 ): Promise<LeaderboardRow[]> {
-  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+  const supabase = createClient(supabaseUrl, supabasePublishableKey)
   const { data, error } = await supabase.rpc('get_leaderboard', {
     period: period,
   })

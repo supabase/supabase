@@ -13,9 +13,7 @@ export async function Conversation({ thread_key }: { thread_key: string | null }
       <div className="grid gap-4">
         {question && question.content && (
           <div className="border border-border rounded-lg p-4 bg-surface-100">
-            <p className="text-foreground mb-3 w-full wrap-break-word break-all">
-              {question.content}
-            </p>
+            <p className="text-foreground mb-3 w-full">{question.content}</p>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               {question.author && (
                 <>
