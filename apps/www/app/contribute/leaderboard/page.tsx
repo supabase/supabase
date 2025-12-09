@@ -19,6 +19,8 @@ export default async function LeaderboardPage({
 }: {
   searchParams: Promise<{ period?: string }>
 }) {
+  // turn this page off for now
+  return
   const params = await searchParams
   const periodParam = params.period
   const validPeriod = LEADERBOARD_PERIODS.includes(
