@@ -26,7 +26,7 @@ export const RevokeCredentialModal = ({
   onClose,
 }: RevokeCredentialModalProps) => {
   const { ref: projectRef } = useParams()
-  const { mutate: deleteS3AccessKey, isLoading: isDeleting } = useS3AccessKeyDeleteMutation({
+  const { mutate: deleteS3AccessKey, isPending: isDeleting } = useS3AccessKeyDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully revoked S3 access key')
       onClose()
@@ -34,7 +34,7 @@ export const RevokeCredentialModal = ({
   })
 
   return (
-    <Dialog open={visible}>
+    <Dialog open={visible} onOpenChange={onClose}>
       <DialogContent size="small">
         <DialogHeader>
           <DialogTitle>

@@ -15,9 +15,16 @@ export async function generateStaticParams() {
   return categories.map((category: string) => ({ category }))
 }
 
+export const revalidate = 30
 export const dynamic = 'force-static'
 
-export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+export async function generateMetadata({
+  params: paramsPromise,
+}: {
+  params: Promise<Params>
+}): Promise<Metadata> {
+  const params = await paramsPromise
+
   const capitalizedCategory = capitalize(params?.category.replaceAll('-', ' '))
   return {
     title: `Blog | ${capitalizedCategory}`,
@@ -25,7 +32,13 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   }
 }
 
-export default async function CategoriesPage({ params }: { params: Params }) {
+export default async function CategoriesPage({
+  params: paramsPromise,
+}: {
+  params: Promise<Params>
+}) {
+  const params = await paramsPromise
+
   const staticPosts = getSortedPosts({
     directory: '_blog',
     limit: 0,

@@ -64,7 +64,10 @@ const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
 export default wrapper
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  const { model, error: modelError } = await getModel()
+  const { model, error: modelError } = await getModel({
+    provider: 'openai',
+    routingKey: 'onboarding',
+  })
 
   if (modelError) {
     return res.status(500).json({ error: modelError.message })

@@ -1,5 +1,6 @@
 import { IS_PLATFORM } from 'common'
 import { useBranchCommands } from 'components/interfaces/BranchManagement/Branch.Commands'
+import { useConnectCommands } from 'components/interfaces/Connect/Connect.Commands'
 import {
   useQueryTableCommands,
   useSnippetCommands,
@@ -20,6 +21,7 @@ import { orderCommandSectionsByPriority } from './ordering'
 export default function StudioCommandMenu() {
   useApiKeysCommands()
   useApiUrlCommand()
+  useConnectCommands()
   useProjectLevelTableEditorCommands()
   useProjectSwitchCommand()
   useConfigureOrganizationCommand()

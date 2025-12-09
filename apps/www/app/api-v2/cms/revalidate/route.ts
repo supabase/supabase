@@ -1,27 +1,32 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
+import { revalidatePath } from 'next/cache'
+import { NextRequest, NextResponse } from 'next/server'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // Check for secret to confirm this is a valid request
-  if (req.query.secret !== process.env.CMS_PREVIEW_SECRET) {
-    return res.status(401).json({ message: 'Invalid token' })
-  }
-
-  const { path } = req.query
-
-  if (!path) {
-    return res.status(400).json({ message: 'Missing path parameter' })
-  }
-
+export async function POST(request: NextRequest) {
   try {
-    // This will revalidate the specific page
-    await res.revalidate(String(path))
+    const body = await request.json()
+    const { secret, path } = body
 
-    return res.json({ revalidated: true, path })
+    // Check for secret to confirm this is a valid request
+    if (secret !== process.env.CMS_PREVIEW_SECRET) {
+      return NextResponse.json({ message: 'Invalid token' }, { status: 401 })
+    }
+
+    if (!path) {
+      return NextResponse.json({ message: 'Missing path parameter' }, { status: 400 })
+    }
+
+    // This will revalidate the specific page
+    revalidatePath(path)
+
+    return NextResponse.json({ revalidated: true, path })
   } catch (error) {
     console.error('[Revalidate API] Error during revalidation:', error)
-    return res.status(500).json({
-      message: 'Error revalidating',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    })
+    return NextResponse.json(
+      {
+        message: 'Error revalidating',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    )
   }
 }

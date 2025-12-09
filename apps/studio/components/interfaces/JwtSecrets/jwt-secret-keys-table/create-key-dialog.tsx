@@ -25,10 +25,6 @@ import {
 
 const RSA_JWK_REQUIRED_PROPERTIES = ['kty', 'n', 'e', 'p', 'q', 'd', 'dq', 'dp', 'qi']
 const EC_JWK_REQUIRED_PROPERTIES = ['kty', 'crv', 'x', 'y', 'd']
-const ALLOWED_JWK_PROPERTIES = new Set([
-  ...RSA_JWK_REQUIRED_PROPERTIES,
-  ...EC_JWK_REQUIRED_PROPERTIES,
-])
 
 export const CreateKeyDialog = ({
   projectRef,
@@ -105,7 +101,7 @@ export const CreateKeyDialog = ({
     return null
   }, [privateKey, newKeyAlgorithm])
 
-  const { mutate, isLoading: isLoadingMutation } = useJWTSigningKeyCreateMutation({
+  const { mutate, isPending: isPendingMutation } = useJWTSigningKeyCreateMutation({
     onSuccess: () => {
       toast.success('Standby key created successfully')
       onClose()
@@ -145,11 +141,7 @@ export const CreateKeyDialog = ({
                     .replace(/=/g, '')
                 : stringToBase64URL(privateKey),
             }
-          : Object.fromEntries(
-              Object.entries(JSON.parse(privateKey)).filter(([prop]) =>
-                ALLOWED_JWK_PROPERTIES.has(prop)
-              )
-            )
+          : JSON.parse(privateKey)
         : null,
     })
   }
@@ -184,7 +176,7 @@ export const CreateKeyDialog = ({
             <SelectContent_Shadcn_>
               <SelectItem_Shadcn_ value="ES256">
                 <span>ES256 (ECC)</span>
-                <Badge variant="brand" className="ml-2">
+                <Badge variant="success" className="ml-2">
                   Recommended
                 </Badge>
               </SelectItem_Shadcn_>
@@ -242,8 +234,8 @@ export const CreateKeyDialog = ({
       <DialogFooter>
         <Button
           onClick={() => handleAddNewStandbyKey()}
-          disabled={isLoadingMutation || !!privateKeyMessage}
-          loading={isLoadingMutation}
+          disabled={isPendingMutation || !!privateKeyMessage}
+          loading={isPendingMutation}
         >
           Create standby key
         </Button>

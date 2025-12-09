@@ -1,3 +1,4 @@
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { BASE_PATH } from 'lib/constants'
 import { useTheme } from 'next-themes'
 import Head from 'next/head'
@@ -9,10 +10,12 @@ export interface APIAuthorizationLayoutProps {}
 
 const APIAuthorizationLayout = ({ children }: PropsWithChildren<APIAuthorizationLayoutProps>) => {
   const { resolvedTheme } = useTheme()
+  const { appTitle } = useCustomContent(['app:title'])
+
   return (
     <>
       <Head>
-        <title>Authorize API access | Supabase</title>
+        <title>Authorize API access | {appTitle || 'Supabase'}</title>
       </Head>
       <main className="h-screen flex flex-col w-full h-full overflow-y-auto">
         <div>

@@ -1,11 +1,13 @@
-import { ArrowRight, Check, Minus, User, X } from 'lucide-react'
+import { ArrowRight, Check, User, X } from 'lucide-react'
 import Link from 'next/link'
+import { useMemo } from 'react'
 
+import { useParams } from 'common'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { ProfileImage } from 'components/ui/ProfileImage'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { getGitHubProfileImgUrl } from 'lib/github'
 import { useProfile } from 'lib/profile'
@@ -32,42 +34,25 @@ const MEMBER_ORIGIN_TO_MANAGED_BY = {
 } as const
 
 export const MemberRow = ({ member }: MemberRowProps) => {
+  const { slug } = useParams()
   const { profile } = useProfile()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const { data } = useProjectsQuery()
-  const projects = data?.projects ?? []
   const { data: roles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
     slug: selectedOrganization?.slug,
   })
-
-  const orgProjects = projects?.filter((p) => p.organization_id === selectedOrganization?.id)
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
+
+  const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
+  const orgProjects =
+    useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
+
   const isInvitedUser = Boolean(member.invited_id)
   const isEmailUser = member.username === member.primary_email
   const isFlyUser = Boolean(member.primary_email?.endsWith('customer.fly.io'))
 
   const profileImageUrl =
     isInvitedUser || isEmailUser || isFlyUser ? undefined : getGitHubProfileImgUrl(member.username)
-
-  // [Joshen] From project role POV, mask any roles for other projects
-  const isObfuscated =
-    member.role_ids.filter((id) => {
-      const role = [
-        ...(roles?.org_scoped_roles ?? []),
-        ...(roles?.project_scoped_roles ?? []),
-      ].find((role) => role.id === id)
-      const isOrgScope = role?.project_ids === null
-      if (isOrgScope) return false
-
-      const appliedProjects = (role?.project_ids ?? [])
-        .map((id) => {
-          return projects?.find((p) => p.id === id)?.name ?? ''
-        })
-        .filter((x) => x.length > 0)
-
-      return appliedProjects.length === 0
-    }).length > 0
 
   return (
     <TableRow>
@@ -90,7 +75,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
           />
           <div className="flex item-center gap-x-2">
             <p className="text-foreground-light truncate">{member.primary_email}</p>
-            {member.gotrue_id === profile?.gotrue_id && <Badge color="scale">You</Badge>}
+            {member.gotrue_id === profile?.gotrue_id && <Badge>You</Badge>}
           </div>
 
           {(member.metadata as any)?.origin && (
@@ -129,8 +114,6 @@ export const MemberRow = ({ member }: MemberRowProps) => {
       <TableCell className="max-w-64">
         {isLoadingRoles ? (
           <ShimmeringLoader className="w-32" />
-        ) : isObfuscated ? (
-          <Minus strokeWidth={1.5} size={20} />
         ) : (
           member.role_ids.map((id) => {
             const orgScopedRole = (roles?.org_scoped_roles ?? []).find((role) => role.id === id)
@@ -140,12 +123,10 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             const role = orgScopedRole || projectScopedRole
             const roleName = (role?.name ?? '').split('_')[0]
             const projectsApplied =
-              role?.project_ids === null
+              role?.projects.length === 0
                 ? orgProjects?.map((p) => p.name) ?? []
-                : (role?.project_ids ?? [])
-                    .map((id) => {
-                      return orgProjects?.find((p) => p.id === id)?.name ?? ''
-                    })
+                : (role?.projects ?? [])
+                    .map(({ ref }) => orgProjects?.find((p) => p.ref === ref)?.name ?? '')
                     .filter((x) => x.length > 0)
 
             return (
@@ -162,7 +143,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
                       <HoverCard_Shadcn_ openDelay={200}>
                         <HoverCardTrigger_Shadcn_ asChild>
                           <span className="text-foreground">
-                            {role?.project_ids === null
+                            {role?.projects.length === 0
                               ? 'Organization'
                               : `${projectsApplied.length} project${projectsApplied.length > 1 ? 's' : ''}`}
                           </span>

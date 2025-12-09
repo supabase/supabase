@@ -5,6 +5,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import { createPortal } from 'react-dom'
 
 import { useParams } from 'common'
+import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import { EMPTY_ARR } from 'lib/void'
@@ -16,12 +17,13 @@ import { Shortcuts } from './components/common/Shortcuts'
 import { Footer } from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
 import { Header, HeaderProps } from './components/header/Header'
-import { RowContextMenu } from './components/menu'
+import { RowContextMenu } from './components/menu/RowContextMenu'
 import { GridProps } from './types'
 
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
+import { validateMsSqlSorting } from './MsSqlValidation'
 
 export const SupabaseGrid = ({
   customHeader,
@@ -42,10 +44,15 @@ export const SupabaseGrid = ({
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
 
-  const { filters, onApplyFilters } = useTableFilter()
+  const { filters } = useTableFilter()
   const { sorts, onApplySorts } = useTableSort()
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
+
+  const msSqlWarning = isMsSqlForeignTable(snap.originalTable)
+    ? validateMsSqlSorting({ filters, sorts, table: snap.originalTable })
+    : { warning: null }
+  const tableQueriesEnabled = msSqlWarning.warning === null
 
   const { data, error, isSuccess, isError, isLoading, isRefetching } = useTableRowsQuery(
     {
@@ -60,17 +67,11 @@ export const SupabaseGrid = ({
     },
     {
       keepPreviousData: true,
-      retryDelay: (retryAttempt, error: any) => {
+      enabled: tableQueriesEnabled,
+      retry: (_, error: any) => {
         const doesNotExistError = error && error.message?.includes('does not exist')
-        const tooManyRequestsError = error.message?.includes('Too Many Requests')
-        const vaultError = error.message?.includes('query vault failed')
-
         if (doesNotExistError) onApplySorts([])
-
-        if (retryAttempt > 3 || doesNotExistError || tooManyRequestsError || vaultError) {
-          return Infinity
-        }
-        return 5000
+        return false
       },
     }
   )
@@ -84,7 +85,13 @@ export const SupabaseGrid = ({
   return (
     <DndProvider backend={HTML5Backend} context={window}>
       <div className="sb-grid h-full flex flex-col">
-        <Header customHeader={customHeader} isRefetching={isRefetching} />
+        <Header
+          customHeader={customHeader}
+          isRefetching={isRefetching}
+          tableQueriesEnabled={tableQueriesEnabled}
+        />
+
+        {msSqlWarning.warning !== null && <msSqlWarning.Component />}
 
         {children || (
           <>
@@ -93,13 +100,12 @@ export const SupabaseGrid = ({
               {...gridProps}
               rows={rows}
               error={error}
+              isDisabled={!tableQueriesEnabled}
               isLoading={isLoading}
               isSuccess={isSuccess}
               isError={isError}
-              filters={filters}
-              onApplyFilters={onApplyFilters}
             />
-            <Footer />
+            <Footer enableForeignRowsQuery={tableQueriesEnabled} />
             <Shortcuts gridRef={gridRef} rows={rows} />
           </>
         )}

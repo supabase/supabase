@@ -59,18 +59,51 @@ Content after the show block.
     expect(isFeatureEnabled).toHaveBeenCalledWith('test-feature')
   })
 
-  it('should remove entire $Show block and children when feature is disabled', async () => {
+  it('should keep children when negated feature is disabled', async () => {
     vi.mocked(isFeatureEnabled).mockReturnValue(false)
 
     const markdown = `
 # Test content
 
-<$Show if="disabled-feature">
-This content should NOT be visible when feature is disabled.
+<$Show if="!negated-feature">
+This content should be visible when the feature is disabled.
 
-## This heading should also be removed
+## Additional content
 
-Some more content that should be hidden.
+More text that should remain.
+</$Show>
+
+Content after the show block.
+`.trim()
+
+    const mdast = fromDocsMarkdown(markdown)
+    const transformed = showRemark()(mdast)
+    const output = toMarkdown(transformed, { extensions: [mdxToMarkdown()] })
+
+    const expected = `
+# Test content
+
+This content should be visible when the feature is disabled.
+
+## Additional content
+
+More text that should remain.
+
+Content after the show block.
+`.trimStart()
+
+    expect(output).toEqual(expected)
+    expect(isFeatureEnabled).toHaveBeenCalledWith('negated-feature')
+  })
+
+  it('should remove $Show block when negated feature is enabled', async () => {
+    vi.mocked(isFeatureEnabled).mockReturnValue(true)
+
+    const markdown = `
+# Test content
+
+<$Show if="!enabled-negated-feature">
+This content should NOT be visible because the feature is enabled.
 </$Show>
 
 Content after the show block should remain.
@@ -87,7 +120,7 @@ Content after the show block should remain.
 `.trimStart()
 
     expect(output).toEqual(expected)
-    expect(isFeatureEnabled).toHaveBeenCalledWith('disabled-feature')
+    expect(isFeatureEnabled).toHaveBeenCalledWith('enabled-negated-feature')
   })
 
   it('should handle multiple $Show blocks with different feature flags', async () => {

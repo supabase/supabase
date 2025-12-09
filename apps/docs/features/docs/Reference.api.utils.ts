@@ -24,6 +24,7 @@ export interface IApiEndPoint {
   }
   tags?: Array<string>
   security?: Array<ISecurityOption>
+  'x-oauth-scope'?: string
 }
 
 export type ISchema =
@@ -188,5 +189,10 @@ export function getTypeDisplayFromSchema(schema: ISchema) {
     return {
       displayName: 'object',
     }
+  }
+
+  // Default fallback for unhandled schema types
+  return {
+    displayName: 'unknown',
   }
 }

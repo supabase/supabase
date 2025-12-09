@@ -2,23 +2,24 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { isArray } from 'lodash'
 import { Check, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useParams } from 'common'
 import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
 import { getPlanChangeType } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
+import { RequestUpgradeToBillingOwners } from 'components/ui/RequestUpgradeToBillingOwners'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
 import { useOrganizationQuery } from 'data/organizations/organization-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import type { OrgPlan } from 'data/subscriptions/types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { formatCurrency } from 'lib/helpers'
@@ -47,7 +48,8 @@ const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
     }
   }
 }
-const PlanUpdateSidePanel = () => {
+
+export const PlanUpdateSidePanel = () => {
   const router = useRouter()
   const { slug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
@@ -60,14 +62,17 @@ const PlanUpdateSidePanel = () => {
   const [showDowngradeError, setShowDowngradeError] = useState(false)
   const [selectedTier, setSelectedTier] = useState<'tier_free' | 'tier_pro' | 'tier_team'>()
 
-  const canUpdateSubscription = useCheckPermissions(
+  const { can: canUpdateSubscription } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
-  const { data: projectsData } = useProjectsQuery()
-  const orgProjects = (projectsData?.projects ?? []).filter(
-    (it) => it.organization_id === selectedOrganization?.id
-  )
+
+  const { data: orgProjectsData } = useOrgProjectsInfiniteQuery({ slug })
+  const orgProjects =
+    useMemo(
+      () => orgProjectsData?.pages.flatMap((page) => page.projects),
+      [orgProjectsData?.pages]
+    ) || []
 
   const { data } = useOrganizationQuery({ slug })
   const hasOrioleProjects = !!data?.has_oriole_project
@@ -88,8 +93,6 @@ const PlanUpdateSidePanel = () => {
   const { data: plans, isLoading: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
 
-  const billingPartner = subscription?.billing_partner
-
   const {
     data: subscriptionPreview,
     error: subscriptionPreviewError,
@@ -100,6 +103,9 @@ const PlanUpdateSidePanel = () => {
   const availablePlans: OrgPlan[] = plans?.plans ?? []
   const hasMembersExceedingFreeTierLimit =
     (membersExceededLimit || []).length > 0 &&
+    // [Joshen] Note that orgProjects is paginated so there's a chance this may omit certain projects
+    // Although I don't foresee this affecting a majority of users. Ideally perhaps we could return
+    // this data from the organization query
     orgProjects.filter((it) => it.status !== 'INACTIVE' && it.status !== 'GOING_DOWN').length > 0
 
   useEffect(() => {
@@ -178,6 +184,11 @@ const PlanUpdateSidePanel = () => {
               const features = plan.features
               const footer = plan.footer
 
+              const source = Array.isArray(router.query.source)
+                ? router.query.source[0]
+                : router.query.source
+              const shouldHighlight = source === 'log-drains-empty-state' && plan.id === 'tier_team'
+
               if (plan.id === 'tier_enterprise') {
                 return <EnterpriseCard key={plan.id} plan={plan} isCurrentPlan={isCurrentPlan} />
               }
@@ -187,18 +198,20 @@ const PlanUpdateSidePanel = () => {
                   key={plan.id}
                   className={cn(
                     'px-4 py-4 flex flex-col items-start justify-between',
-                    'border rounded-md col-span-12 md:col-span-4 bg-surface-200'
+                    'border rounded-md col-span-12 md:col-span-4 bg-surface-200',
+                    shouldHighlight &&
+                      'ring-4 ring-brand animate-[pulse_1.5s_ease-in-out_1] shadow-md shadow-brand/40'
                   )}
                 >
                   <div className="w-full">
                     <div className="flex items-center space-x-2">
-                      <p className="text-brand text-sm uppercase">{plan.name}</p>
+                      <p className="text-brand-link text-sm uppercase">{plan.name}</p>
                       {isCurrentPlan ? (
                         <div className="text-xs bg-surface-300 text-foreground-light rounded px-2 py-0.5">
                           Current plan
                         </div>
                       ) : plan.nameBadge ? (
-                        <div className="text-xs bg-brand-400 text-brand-600 rounded px-2 py-0.5">
+                        <div className="text-xs bg-brand-300 dark:bg-brand-400 text-brand-600 rounded px-2 py-0.5">
                           {plan.nameBadge}
                         </div>
                       ) : null}
@@ -220,19 +233,21 @@ const PlanUpdateSidePanel = () => {
                       <Button block disabled type="default">
                         Current plan
                       </Button>
+                    ) : !canUpdateSubscription ? (
+                      <RequestUpgradeToBillingOwners block plan={plan.name as 'Pro' | 'Team'} />
                     ) : (
                       <ButtonTooltip
                         block
                         type={isDowngradeOption ? 'default' : 'primary'}
                         disabled={
                           subscription?.plan?.id === 'enterprise' ||
+                          subscription?.plan?.id === 'platform' ||
                           // Downgrades to free are still allowed through the dashboard given we have much better control about showing customers the impact + any possible issues with downgrading to free
                           (selectedOrganization?.managed_by !== MANAGED_BY.SUPABASE &&
                             plan.id !== 'tier_free') ||
                           // Orgs managed by AWS marketplace are not allowed to change the plan
                           selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE ||
-                          hasOrioleProjects ||
-                          !canUpdateSubscription
+                          hasOrioleProjects
                         }
                         onClick={() => {
                           setSelectedTier(plan.id as any)
@@ -250,16 +265,14 @@ const PlanUpdateSidePanel = () => {
                             side: 'bottom',
                             className: hasOrioleProjects ? 'w-96 text-center' : '',
                             text:
-                              subscription?.plan?.id === 'enterprise'
-                                ? 'Reach out to us via support to update your plan from Enterprise'
+                              subscription?.plan?.id === 'enterprise' ||
+                              subscription?.plan?.id === 'platform'
+                                ? 'Reach out to us via support to update your plan'
                                 : hasOrioleProjects
                                   ? 'Your organization has projects that are using the OrioleDB extension which is only available on the Free plan. Remove all OrioleDB projects before changing your plan.'
-                                  : !canUpdateSubscription
-                                    ? 'You do not have permission to change the subscription plan'
-                                    : selectedOrganization?.managed_by ===
-                                        MANAGED_BY.AWS_MARKETPLACE
-                                      ? 'You cannot change the plan for an organization managed by AWS Marketplace'
-                                      : undefined,
+                                  : selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE
+                                    ? 'You cannot change the plan for an organization managed by AWS Marketplace'
+                                    : undefined,
                           },
                         }}
                       >
@@ -359,5 +372,3 @@ const PlanUpdateSidePanel = () => {
     </>
   )
 }
-
-export default PlanUpdateSidePanel

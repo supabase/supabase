@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
 
+import { DOCS_URL } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { Button } from 'ui'
 import {
@@ -85,7 +86,7 @@ export const parseSpreadsheet = (
         previewRows = results.data.slice(0, 20)
         if (results.errors.length > 0) {
           const formattedErrors = results.errors.map((error) => {
-            return { ...error, data: results.data[error.row] }
+            if (error) return { ...error, data: results.data[error.row] }
           })
           errors.push(...formattedErrors)
         }
@@ -182,7 +183,7 @@ export function flagInvalidFileImport(file: File): boolean {
         <p>For bulk data loading, we recommend doing so directly through the database.</p>
         <Button asChild type="default" icon={<ExternalLink />} className="!mt-2">
           <Link
-            href="https://supabase.com/docs/guides/database/tables#bulk-data-loading"
+            href={`${DOCS_URL}/guides/database/tables#bulk-data-loading`}
             target="_blank"
             rel="noreferrer"
           >

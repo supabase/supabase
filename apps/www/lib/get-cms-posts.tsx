@@ -288,7 +288,7 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
           'Content-Type': 'application/json',
           ...(CMS_API_KEY && { Authorization: `Bearer ${CMS_API_KEY}` }),
         },
-        cache: 'no-store',
+        // cache: 'no-store',
         next: { revalidate: 0 },
       })
 
@@ -300,7 +300,7 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
             'Content-Type': 'application/json',
             ...(CMS_API_KEY && { Authorization: `Bearer ${CMS_API_KEY}` }),
           },
-          cache: 'no-store',
+          // cache: 'no-store',
           next: { revalidate: 0 },
         })
       }
@@ -490,8 +490,8 @@ export async function getAllCMSPosts({
           'Content-Type': 'application/json',
           ...(CMS_API_KEY && { Authorization: `Bearer ${CMS_API_KEY}` }),
         },
-        cache: 'no-store', // Ensure we always get fresh data
-        next: { revalidate: 0 }, // Disable caching for this fetch
+        // cache: 'no-store', // Ensure we always get fresh data
+        next: { revalidate: 30 }, // Disable caching for this fetch
       }
     )
 

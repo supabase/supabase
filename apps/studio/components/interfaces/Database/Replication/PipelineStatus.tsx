@@ -1,21 +1,15 @@
 import { AlertTriangle, Loader2 } from 'lucide-react'
 
 import { useParams } from 'common'
+import { DotPing } from 'components/ui/DotPing'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { cn, Tooltip, TooltipContent, TooltipTrigger, WarningIcon } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { getPipelineStateMessages } from './Pipeline.utils'
-
-export enum PipelineStatusName {
-  FAILED = 'failed',
-  STARTING = 'starting',
-  STARTED = 'started',
-  STOPPED = 'stopped',
-  UNKNOWN = 'unknown',
-}
+import { PipelineStatusName } from './Replication.constants'
 
 interface PipelineStatusProps {
   pipelineStatus: ReplicationPipelineStatusData['status'] | undefined
@@ -93,7 +87,7 @@ export const PipelineStatus = ({
         case PipelineStatusName.STARTED:
           return {
             label: 'Running',
-            dot: <div className="w-2 h-2 bg-brand-600 rounded-full" />,
+            dot: <DotPing animate={true} variant="primary" />,
             color: 'text-brand-600',
             tooltip: stateMessages.message,
           }
@@ -102,6 +96,13 @@ export const PipelineStatus = ({
             label: 'Stopped',
             dot: <div className="w-2 h-2 bg-foreground-lighter rounded-full" />,
             color: 'text-foreground-light',
+            tooltip: stateMessages.message,
+          }
+        case PipelineStatusName.STOPPING:
+          return {
+            label: 'Stopping',
+            dot: <Loader2 className="animate-spin w-3 h-3 text-warning" />,
+            color: 'text-warning',
             tooltip: stateMessages.message,
           }
         case PipelineStatusName.UNKNOWN:
@@ -133,10 +134,10 @@ export const PipelineStatus = ({
   const statusConfig = getStatusConfig()
 
   const pipelineLogsUrl = pipelineId
-    ? `/project/${ref}/logs/etl-replication-logs?f=${encodeURIComponent(
+    ? `/project/${ref}/logs/replication-logs?f=${encodeURIComponent(
         JSON.stringify({ pipeline_id: pipelineId })
       )}`
-    : `/project/${ref}/logs/etl-replication-logs`
+    : `/project/${ref}/logs/replication-logs`
 
   return (
     <>

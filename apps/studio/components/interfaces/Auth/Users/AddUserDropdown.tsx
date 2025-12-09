@@ -1,9 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronDown, Mail, UserPlus } from 'lucide-react'
-import { useState } from 'react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 import CreateUserModal from './CreateUserModal'
@@ -12,17 +12,23 @@ import InviteUserModal from './InviteUserModal'
 export const AddUserDropdown = () => {
   const showSendInvitation = useIsFeatureEnabled('authentication:show_send_invitation')
 
-  const { can: canInviteUsers } = useAsyncCheckProjectPermissions(
+  const { can: canInviteUsers } = useAsyncCheckPermissions(
     PermissionAction.AUTH_EXECUTE,
     'invite_user'
   )
-  const { can: canCreateUsers } = useAsyncCheckProjectPermissions(
+  const { can: canCreateUsers } = useAsyncCheckPermissions(
     PermissionAction.AUTH_EXECUTE,
     'create_user'
   )
 
-  const [inviteVisible, setInviteVisible] = useState(false)
-  const [createVisible, setCreateVisible] = useState(false)
+  const [inviteVisible, setInviteVisible] = useQueryState(
+    'invite',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [createVisible, setCreateVisible] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   return (
     <>

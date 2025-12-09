@@ -10,8 +10,9 @@ import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { Button, IconBroadcast, IconDatabaseChanges, IconPresence, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import MessageSelection from './MessageSelection'
@@ -34,7 +35,7 @@ const NoResultAlert = ({
 }) => {
   const { ref } = useParams()
 
-  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckProjectPermissions(
+  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'service_api_keys'
   )
@@ -98,7 +99,7 @@ const NoResultAlert = ({
                 <p className="text-foreground">Not sure what to do?</p>
                 <p className="text-foreground-lighter text-xs">Browse our documentation</p>
               </div>
-              <DocsButton href="https://supabase.com/docs/guides/realtime" />
+              <DocsButton href={`${DOCS_URL}/guides/realtime`} />
             </div>
           </div>
         </>

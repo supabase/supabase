@@ -155,7 +155,7 @@ Deno.serve((req) => {
     return new Response('Auth token not provided', { status: 403 })
   }
 
-  const { error, data } = await supabase.auth.getUser(jwt)
+  const { error, data } = await supabase.auth.getClaims()
 
   if (error) {
     console.error(error)
@@ -210,8 +210,7 @@ Deno.serve((req) => {
     return new Response('Auth token not provided', { status: 403 })
   }
 
-  const { error, data } = await supabase.auth.getUser(jwt)
-
+  const { error, data } = await supabase.auth.getClaims()
   if (error) {
     console.error(error)
     return new Response('Invalid token provided', { status: 403 })

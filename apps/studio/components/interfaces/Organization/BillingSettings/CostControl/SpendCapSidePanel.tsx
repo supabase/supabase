@@ -9,12 +9,13 @@ import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { BASE_PATH, DOCS_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { ChevronRight, ExternalLink } from 'lucide-react'
 import { pricing } from 'shared-data/pricing'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, Button, Collapsible, SidePanel, cn } from 'ui'
-import { ExternalLink, ChevronRight } from 'lucide-react'
+import { Button, Collapsible, SidePanel, cn } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
 const SPEND_CAP_OPTIONS: {
   name: string
@@ -43,7 +44,7 @@ const SpendCapSidePanel = () => {
   const [showUsageCosts, setShowUsageCosts] = useState(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
 
-  const canUpdateSpendCap = useCheckPermissions(
+  const { can: canUpdateSpendCap } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
@@ -53,7 +54,7 @@ const SpendCapSidePanel = () => {
   const onClose = () => snap.setPanelKey(undefined)
 
   const { data: subscription, isLoading } = useOrgSubscriptionQuery({ orgSlug: slug })
-  const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
+  const { mutate: updateOrgSubscription, isPending: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
       onSuccess: () => {
         toast.success(`Successfully ${isTurningOnCap ? 'enabled' : 'disabled'} spend cap`)
@@ -74,7 +75,6 @@ const SpendCapSidePanel = () => {
     if (visible && subscription !== undefined) {
       setSelectedOption(isSpendCapOn ? 'on' : 'off')
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, isLoading, subscription, isSpendCapOn])
 
   const onConfirm = async () => {
@@ -108,7 +108,7 @@ const SpendCapSidePanel = () => {
           <h4>Spend cap</h4>
           <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
-              href="https://supabase.com/docs/guides/platform/cost-control#spend-cap"
+              href={`${DOCS_URL}/guides/platform/cost-control#spend-cap`}
               target="_blank"
               rel="noreferrer"
             >
@@ -184,18 +184,17 @@ const SpendCapSidePanel = () => {
           </Collapsible>
 
           {isFreePlan && (
-            <Alert
-              withIcon
-              variant="info"
+            <Admonition
+              type="note"
+              layout="horizontal"
               title="Toggling of the spend cap is only available on the Pro Plan"
+              description="Upgrade your plan to disable the spend cap"
               actions={
                 <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
                   View available plans
                 </Button>
               }
-            >
-              Upgrade your plan to disable the spend cap
-            </Alert>
+            />
           )}
 
           <div className="!mt-8 pb-4">
@@ -240,23 +239,19 @@ const SpendCapSidePanel = () => {
           </div>
 
           {selectedOption === 'on' ? (
-            <Alert
-              withIcon
-              variant="warning"
+            <Admonition
+              type="warning"
               title="Your projects could become unresponsive or enter read only mode"
-            >
-              Exceeding the included quota allowance with spend cap enabled can cause your projects
-              to become unresponsive or enter read only mode.
-            </Alert>
+              description="Exceeding the included quota allowance with spend cap enabled can cause your projects
+              to become unresponsive or enter read only mode."
+            />
           ) : (
-            <Alert
-              withIcon
-              variant="info"
+            <Admonition
+              type="note"
               title="Charges apply for usage beyond included quota allowance"
-            >
-              Your projects will always remain responsive and active, and charges only apply when
-              exceeding the included quota limit.
-            </Alert>
+              description="Your projects will always remain responsive and active, and charges only apply when
+              exceeding the included quota limit."
+            />
           )}
 
           {hasChanges && (

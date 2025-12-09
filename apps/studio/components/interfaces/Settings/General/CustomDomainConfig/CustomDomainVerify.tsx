@@ -1,6 +1,5 @@
 import { AlertCircle, HelpCircle, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -9,8 +8,9 @@ import Panel from 'components/ui/Panel'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
-import { useInterval } from 'hooks/misc/useInterval'
+import { useCustomDomainReverifyQuery } from 'data/custom-domains/custom-domains-reverify-query'
+import { DOCS_URL } from 'lib/constants'
+import { useEffect } from 'react'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -23,7 +23,6 @@ import { DNSTableHeaders } from './DNSTableHeaders'
 
 const CustomDomainVerify = () => {
   const { ref: projectRef } = useParams()
-  const [isNotVerifiedYet, setIsNotVerifiedYet] = useState(false)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
 
@@ -32,20 +31,35 @@ const CustomDomainVerify = () => {
   const isSSLCertificateDeploying =
     customDomain?.ssl.status !== undefined && customDomain.ssl.txt_name === undefined
 
-  const { mutate: reverifyCustomDomain, isLoading: isReverifyLoading } =
-    useCustomDomainReverifyMutation({
-      onSuccess: (res) => {
-        if (res.status === '2_initiated') setIsNotVerifiedYet(true)
-      },
-    })
-
-  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation({
+  const { mutate: deleteCustomDomain, isPending: isDeleting } = useCustomDomainDeleteMutation({
     onSuccess: () => {
       toast.success(
         'Custom domain setup cancelled successfully. It may take a few seconds before your custom domain is fully removed, so you may need to refresh your browser.'
       )
     },
   })
+
+  const {
+    data: reverifyData,
+    refetch: refetchReverify,
+    isFetching: isReverifyLoading,
+    isError: isReverifyError,
+    error: reverifyError,
+  } = useCustomDomainReverifyQuery(
+    { projectRef },
+    {
+      // Poll every 10 seconds if the SSL certificate is being deployed
+      refetchInterval: isSSLCertificateDeploying && !isDeleting ? 10000 : false,
+    }
+  )
+
+  useEffect(() => {
+    if (isReverifyError) {
+      toast.error(reverifyError?.message)
+    }
+  }, [isReverifyError, reverifyError])
+
+  const isNotVerifiedYet = reverifyData?.status === '2_initiated'
 
   const hasCAAErrors = customDomain?.ssl.validation_errors?.reduce(
     (acc, error) => acc || error.message.includes('caa_error'),
@@ -55,14 +69,8 @@ const CustomDomainVerify = () => {
 
   const onReverifyCustomDomain = () => {
     if (!projectRef) return console.error('Project ref is required')
-    reverifyCustomDomain({ projectRef })
+    refetchReverify()
   }
-
-  useInterval(
-    onReverifyCustomDomain,
-    // Poll every 5 seconds if the SSL certificate is being deployed
-    isSSLCertificateDeploying && !isDeleting ? 5000 : false
-  )
 
   const onCancelCustomDomain = async () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -110,7 +118,7 @@ const CustomDomainVerify = () => {
                       <Link
                         target="_blank"
                         rel="noreferrer"
-                        href={`https://whatsmydns.net/#TXT/${customDomain?.hostname}`}
+                        href={`https://whatsmydns.net/#TXT/${customDomain?.ssl.txt_name}`}
                         className="text-brand"
                       >
                         here
@@ -139,8 +147,8 @@ const CustomDomainVerify = () => {
             </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
               Please add a CAA record allowing "digicert.com" to issue certificates for{' '}
-              <code className="text-xs">{customDomain?.hostname}</code>. For example:{' '}
-              <code className="text-xs">0 issue "digicert.com"</code>
+              <code className="text-code-inline">{customDomain?.hostname}</code>. For example:{' '}
+              <code className="text-code-inline">0 issue "digicert.com"</code>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
@@ -191,7 +199,7 @@ const CustomDomainVerify = () => {
 
       <Panel.Content>
         <div className="flex items-center justify-between">
-          <DocsButton href="https://supabase.com/docs/guides/platform/custom-domains" />
+          <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
           <div className="flex items-center space-x-2">
             <Button
               type="default"

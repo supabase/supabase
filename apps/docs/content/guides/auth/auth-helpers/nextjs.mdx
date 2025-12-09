@@ -3,12 +3,14 @@ id: 'nextjs'
 title: 'Supabase Auth with the Next.js App Router'
 description: 'Authentication and Authorization helpers for creating an authenticated Supabase client with the Next.js 13 App Router.'
 sidebar_label: 'Next.js'
-sitemapPriority: 0.5
+sitemapPriority: 0.3
 ---
 
 <Admonition type="caution">
 
-The `auth-helpers` are now deprecated. Use `@supabase/ssr` to set up Auth for your Next.js app. See the [Next.js Server-Side Auth guide](/docs/guides/auth/server-side/nextjs) to learn how.
+The Auth helpers package is deprecated. Use the new `@supabase/ssr` package for Server Side Authentication. `@supabase/ssr` takes the core concepts of the Auth Helpers package and makes them available to any server framework. Read the [migration doc](/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers) to learn more.
+
+We recommend setting up Auth for your Next.js app with `@supabase/ssr` instead. Read the [Next.js Server-Side Auth guide](/docs/guides/auth/server-side/nextjs?router=pages) to learn how.
 
 </Admonition>
 
@@ -51,7 +53,7 @@ npm install @supabase/auth-helpers-nextjs @supabase/supabase-js
 
 ## Declare environment variables
 
-Retrieve your project's URL and anon key from your [API settings](https://supabase.com/dashboard/project/_/settings/api), and create a `.env.local` file with the following environment variables:
+Retrieve your project's URL and anon key from your [API settings](/dashboard/project/_/settings/api), and create a `.env.local` file with the following environment variables:
 
 ```bash .env.local
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url

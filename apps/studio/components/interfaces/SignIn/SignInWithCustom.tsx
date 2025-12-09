@@ -1,8 +1,8 @@
-import * as Sentry from '@sentry/nextjs'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { BASE_PATH } from 'lib/constants'
+import { captureCriticalError } from 'lib/error-reporting'
 import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button } from 'ui'
 
@@ -29,13 +29,13 @@ export const SignInWithCustom = ({ providerName }: SignInWithCustomProps) => {
       const { error } = await auth.signInWithOAuth({
         // @ts-expect-error - providerName is a string
         provider: providerName.toLowerCase(),
-        options: { redirectTo },
+        options: { redirectTo, scopes: 'email' },
       })
 
       if (error) throw error
     } catch (error: any) {
       toast.error(`Failed to sign in via ${providerName}: ${error.message}`)
-      Sentry.captureMessage('[CRITICAL] Failed to sign in via GH: ' + error.message)
+      captureCriticalError(error, `sign in via ${providerName}`)
       setLoading(false)
     }
   }

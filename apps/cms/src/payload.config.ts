@@ -102,7 +102,7 @@ export default buildConfig({
   // Global configuration for better performance
   globals: [],
   graphQL: {
-    disable: process.env.NODE_ENV !== 'development', // Disable GraphQL in production for better performance
+    disable: true,
   },
   // Reduce payload init overhead
   telemetry: false,

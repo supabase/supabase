@@ -133,9 +133,9 @@ To learn more about Wasm FDW, visit [Wrappers official documentation](https://su
 
 Foreign Data Wrappers do not provide Row Level Security, thus it is not advised to expose them via your API. Wrappers should _always_ be stored in a private schema. For example, if you are connecting to your Stripe account, you should create a `stripe` schema to store all of your foreign tables inside. This schema should _not_ be added to the “Additional Schemas” setting in the API section.
 
-If you want to expose any of the foreign table columns to your public API, you can create a [Database Function with security definer](https://supabase.com/docs/guides/database/functions#security-definer-vs-invoker) in the `public` schema, and then you can interact with your foreign table through API. For better access control, the function should have appropriate filters on the foreign table to apply security rules based on your business needs.
+If you want to expose any of the foreign table columns to your public API, you can create a [Database Function with security definer](/docs/guides/database/functions#security-definer-vs-invoker) in the `public` schema, and then you can interact with your foreign table through API. For better access control, the function should have appropriate filters on the foreign table to apply security rules based on your business needs.
 
-As an example, go to [SQL Editor](https://supabase.com/dashboard/project/_/sql/new) and then follow below steps,
+As an example, go to [SQL Editor](/dashboard/project/_/sql/new) and then follow below steps,
 
 1. Create a Stripe Products foreign table:
 

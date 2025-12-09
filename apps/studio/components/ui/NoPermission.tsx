@@ -1,17 +1,18 @@
 import { AlertCircle } from 'lucide-react'
+import { cn } from 'ui'
 
 interface NoPermissionProps {
   resourceText: string
   isFullPage?: boolean
 }
 
-const NoPermission = ({ resourceText, isFullPage = false }: NoPermissionProps) => {
+export const NoPermission = ({ resourceText, isFullPage = false }: NoPermissionProps) => {
   const NoPermissionMessage = () => (
     <div
-      className={[
+      className={cn(
         'block w-full rounded border border-opacity-20 py-4 px-6',
-        'border-overlay bg-surface-200',
-      ].join(' ')}
+        'border bg-surface-200'
+      )}
     >
       <div className="flex space-x-3">
         <div className="mt-1">

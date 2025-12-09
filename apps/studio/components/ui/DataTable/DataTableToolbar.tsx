@@ -37,7 +37,7 @@ export function DataTableToolbar({ renderActions }: DataTableToolbarProps) {
           <TooltipTrigger asChild>
             <Button
               size="tiny"
-              type="outline"
+              type="default"
               icon={open ? <PanelLeftClose /> : <PanelLeftOpen />}
               onClick={() => setOpen((prev) => !prev)}
               className="hidden sm:flex"

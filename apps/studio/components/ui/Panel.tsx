@@ -13,6 +13,7 @@ interface PanelProps {
   wrapWithLoading?: boolean
   noHideOverflow?: boolean
   titleClasses?: string
+  footerClasses?: string
 }
 
 /**
@@ -41,7 +42,7 @@ function Panel(props: PropsWithChildren<PanelProps>) {
         </div>
       )}
       {props.children}
-      {props.footer && <Footer>{props.footer}</Footer>}
+      {props.footer && <Footer className={props.footerClasses}>{props.footer}</Footer>}
     </div>
   )
 
@@ -56,9 +57,9 @@ function Content({ children, className }: { children: ReactNode; className?: str
   return <div className={cn('px-4 py-4', className)}>{children}</div>
 }
 
-function Footer({ children }: { children: ReactNode; className?: string }) {
+function Footer({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className="bg-surface-100 border-t border-default">
+    <div className={cn('bg-surface-100 border-t border-default', className)}>
       <div className="flex h-12 items-center px-4">{children}</div>
     </div>
   )

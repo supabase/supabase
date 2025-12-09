@@ -10,7 +10,7 @@ import prettier from 'prettier'
 // Constants for CMS integration
 const CMS_SITE_ORIGIN =
   process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
-    ? 'https://supabase.com'
+    ? 'https://cms.supabase.com'
     : process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL &&
         typeof process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL === 'string'
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL?.replace('zone-www-dot-com-git-', 'cms-git-')}`
@@ -220,9 +220,7 @@ async function generate() {
   /**
    * write sitemaps
    */
-  // eslint-disable-next-line no-sync
   writeFileSync('public/sitemap.xml', sitemapRouter)
-  // eslint-disable-next-line no-sync
   writeFileSync('public/sitemap_www.xml', formatted)
 }
 

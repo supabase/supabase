@@ -29,27 +29,31 @@ const ProductHeader = ({ footerPosition = 'left', ...props }: Props) => (
     )}
   >
     <SectionContainer className={cn('!py-0 grid grid-cols-12', props.sectionContainerClassName)}>
-      <div className="relative z-10 col-span-12 gap-8 lg:col-span-5">
-        <div>
-          {(props.icon || props.title) && (
-            <div className="mb-4 flex items-center gap-3">
-              {props.icon && <ProductIcon icon={props.icon} />}
-              {props.title && (
-                <span
-                  className="text-brand-600 dark:text-brand font-mono uppercase"
-                  key={`product-name-${props.title}`}
-                >
-                  {props.title}
-                </span>
-              )}
-            </div>
-          )}
-          <h1 className="h1 text-3xl md:!text-4xl lg:!text-4xl 2xl:!text-6xl tracking-[-.15px]">
-            {props.h1}
-          </h1>
-        </div>
+      <div
+        className={cn(
+          'relative z-10 col-span-12 lg:col-span-5',
+          // if not image is present, center the content
+          !props.image && 'lg:col-start-4 lg:col-end-10 text-center flex flex-col items-center'
+        )}
+      >
+        {(props.icon || props.title) && (
+          <div className="mb-4 flex items-center gap-3">
+            {props.icon && <ProductIcon icon={props.icon} />}
+            {props.title && (
+              <span
+                className="text-brand-600 dark:text-brand font-mono uppercase"
+                key={`product-name-${props.title}`}
+              >
+                {props.title}
+              </span>
+            )}
+          </div>
+        )}
+        <h1 className="h1 text-3xl md:!text-4xl lg:!text-4xl 2xl:!text-6xl tracking-[-.15px]">
+          {props.h1}
+        </h1>
         {props.subheader && (
-          <div className="mb-4 md:mb-8">
+          <div className="">
             {props.subheader.map((subheader, i) => {
               return (
                 <p className="p lg:text-lg max-w-lg lg:max-w-none" key={i}>
@@ -59,7 +63,7 @@ const ProductHeader = ({ footerPosition = 'left', ...props }: Props) => (
             })}
           </div>
         )}
-        <div className="flex flex-row md:flex-row md:items-center gap-2 mt-2">
+        <div className="flex flex-row md:flex-row md:items-center gap-2 mt-4">
           {props.ctas?.map((cta) => (
             <Button
               key={cta.href}

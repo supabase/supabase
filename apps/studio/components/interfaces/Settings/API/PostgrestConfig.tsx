@@ -15,8 +15,9 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -54,7 +55,7 @@ import { HardenAPIModal } from './HardenAPIModal'
 const formSchema = z
   .object({
     dbSchema: z.array(z.string()),
-    dbExtraSearchPath: z.string(),
+    dbExtraSearchPath: z.array(z.string()),
     maxRows: z.number().max(1000000, "Can't be more than 1,000,000"),
     dbPool: z
       .number()
@@ -83,16 +84,27 @@ export const PostgrestConfig = () => {
 
   const [showModal, setShowModal] = useState(false)
 
-  const { data: config, isError, isLoading } = useProjectPostgrestConfigQuery({ projectRef })
+  const {
+    data: config,
+    isError,
+    isLoading: isLoadingConfig,
+  } = useProjectPostgrestConfigQuery({ projectRef })
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data: schemas, isLoading: isLoadingSchemas } = useSchemasQuery({
+  const {
+    data: allSchemas = [],
+    isLoading: isLoadingSchemas,
+    isSuccess: isSuccessSchemas,
+  } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { mutate: updatePostgrestConfig, isLoading: isUpdating } =
+
+  const isLoading = isLoadingConfig || isLoadingSchemas
+
+  const { mutate: updatePostgrestConfig, isPending: isUpdating } =
     useProjectPostgrestConfigUpdateMutation({
       onSuccess: () => {
         toast.success('Successfully saved settings')
@@ -102,7 +114,7 @@ export const PostgrestConfig = () => {
   const formId = 'project-postgres-config'
   const hiddenSchema = ['auth', 'pgbouncer', 'hooks', 'extensions']
   const { can: canUpdatePostgrestConfig, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckProjectPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
+    useAsyncCheckPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
 
   const isGraphqlExtensionEnabled =
     (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
@@ -111,7 +123,10 @@ export const PostgrestConfig = () => {
   const defaultValues = {
     dbSchema,
     maxRows: config?.max_rows,
-    dbExtraSearchPath: config?.db_extra_search_path,
+    dbExtraSearchPath: (config?.db_extra_search_path ?? '')
+      .split(',')
+      .map((x) => x.trim())
+      .filter((x) => x.length > 0 && allSchemas.find((y) => y.name === x)),
     dbPool: config?.db_pool,
   }
 
@@ -121,9 +136,9 @@ export const PostgrestConfig = () => {
     defaultValues,
   })
 
-  const schema =
-    schemas
-      ?.filter((x) => {
+  const schemas =
+    allSchemas
+      .filter((x) => {
         const find = indexOf(hiddenSchema, x.name)
         if (find < 0) return x
       })
@@ -148,20 +163,20 @@ export const PostgrestConfig = () => {
       projectRef,
       dbSchema: values.dbSchema.join(', '),
       maxRows: values.maxRows,
-      dbExtraSearchPath: values.dbExtraSearchPath,
+      dbExtraSearchPath: values.dbExtraSearchPath.join(','),
       dbPool: values.dbPool ? values.dbPool : null,
     })
   }
 
   useEffect(() => {
-    if (config) {
+    if (config && isSuccessSchemas) {
       /**
        * Checks if enableDataApi should be enabled or disabled
        * based on the db_schema value being empty string
        */
       resetForm()
     }
-  }, [config])
+  }, [config, isSuccessSchemas])
 
   const isDataApiEnabledInForm = form.getValues('enableDataApi')
 
@@ -170,7 +185,7 @@ export const PostgrestConfig = () => {
       <CardHeader className="flex-row items-center justify-between">
         Data API Settings
         <div className="flex items-center gap-x-2">
-          <DocsButton href="https://supabase.com/docs/guides/database/connecting-to-postgres#data-apis" />
+          <DocsButton href={`${DOCS_URL}/guides/database/connecting-to-postgres#data-apis`} />
           <Button type="default" icon={<Lock />} onClick={() => setShowModal(true)}>
             Harden Data API
           </Button>
@@ -233,7 +248,7 @@ export const PostgrestConfig = () => {
                               </p>
                               <p>
                                 You will see errors from the Postgrest endpoint
-                                <code className="text-xs">/rest/v1/</code>.
+                                <code className="text-code-inline">/rest/v1/</code>.
                               </p>
                             </AlertDescription_Shadcn_>
                           </Alert_Shadcn_>
@@ -276,21 +291,16 @@ export const PostgrestConfig = () => {
                                 />
                                 <MultiSelectorContent>
                                   <MultiSelectorList>
-                                    {schema.length <= 0 ? (
+                                    {schemas.length <= 0 ? (
                                       <MultiSelectorItem key="empty" value="no">
                                         no
                                       </MultiSelectorItem>
                                     ) : (
-                                      <>
-                                        {schema.map((x) => (
-                                          <MultiSelectorItem
-                                            key={x.id + '-' + x.name}
-                                            value={x.name}
-                                          >
-                                            {x.name}
-                                          </MultiSelectorItem>
-                                        ))}
-                                      </>
+                                      schemas.map((x) => (
+                                        <MultiSelectorItem key={x.id + '-' + x.name} value={x.name}>
+                                          {x.name}
+                                        </MultiSelectorItem>
+                                      ))
                                     )}
                                   </MultiSelectorList>
                                 </MultiSelectorContent>
@@ -306,14 +316,15 @@ export const PostgrestConfig = () => {
                                   <>
                                     <p className="prose text-sm">
                                       You will not be able to query tables and views in the{' '}
-                                      <code className="text-xs">public</code> schema via supabase-js
-                                      or HTTP clients.
+                                      <code className="text-code-inline">public</code> schema via
+                                      supabase-js or HTTP clients.
                                     </p>
                                     {isGraphqlExtensionEnabled && (
                                       <>
                                         <p className="prose text-sm mt-2">
-                                          Tables in the <code className="text-xs">public</code>{' '}
-                                          schema are still exposed over our GraphQL endpoints.
+                                          Tables in the{' '}
+                                          <code className="text-code-inline">public</code> schema
+                                          are still exposed over our GraphQL endpoints.
                                         </p>
                                         <Button asChild type="default" className="mt-2">
                                           <Link href={`/project/${projectRef}/database/extensions`}>
@@ -340,15 +351,43 @@ export const PostgrestConfig = () => {
                             className="w-full px-8 py-8"
                             layout="horizontal"
                             label="Extra search path"
-                            description="Extra schemas to add to the search path of every request. Multiple schemas must be comma-separated."
+                            description="Extra schemas to add to the search path of every request."
                           >
-                            <FormControl_Shadcn_>
-                              <Input_Shadcn_
+                            {isLoadingSchemas ? (
+                              <div className="col-span-12 flex flex-col gap-2 lg:col-span-7">
+                                <Skeleton className="w-full h-[38px]" />
+                              </div>
+                            ) : (
+                              <MultiSelector
+                                onValuesChange={field.onChange}
+                                values={field.value}
                                 size="small"
                                 disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
-                                {...field}
-                              />
-                            </FormControl_Shadcn_>
+                              >
+                                <MultiSelectorTrigger
+                                  mode="inline-combobox"
+                                  label="Select schemas to add to search path..."
+                                  badgeLimit="wrap"
+                                  showIcon={false}
+                                  deletableBadge
+                                />
+                                <MultiSelectorContent>
+                                  <MultiSelectorList>
+                                    {allSchemas.length <= 0 ? (
+                                      <MultiSelectorItem key="empty" value="no">
+                                        no
+                                      </MultiSelectorItem>
+                                    ) : (
+                                      allSchemas.map((x) => (
+                                        <MultiSelectorItem key={x.id + '-' + x.name} value={x.name}>
+                                          {x.name}
+                                        </MultiSelectorItem>
+                                      ))
+                                    )}
+                                  </MultiSelectorList>
+                                </MultiSelectorContent>
+                              </MultiSelector>
+                            )}
                           </FormItemLayout>
                         </FormItem_Shadcn_>
                       )}

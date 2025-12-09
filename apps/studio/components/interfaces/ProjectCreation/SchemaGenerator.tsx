@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
 import { onErrorChat } from 'components/ui/AIAssistantPanel/AIAssistant.utils'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { BASE_PATH } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
 import { AiIconAnimation, Button, Label_Shadcn_, Textarea } from 'ui'
 
 interface SupabaseService {
@@ -34,7 +34,7 @@ export const SchemaGenerator = ({
   const [hasSql, setHasSql] = useState(false)
 
   const [promptIntendSent, setPromptIntendSent] = useState(false)
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const { messages, setMessages, sendMessage, status, addToolResult } = useChat({
     id: 'schema-generator',
@@ -193,18 +193,12 @@ export const SchemaGenerator = ({
                 const isNewPrompt = messages.length == 0
                 // distinguish between initial step or second step
                 if (step === 'initial') {
-                  sendEvent({
-                    action: 'project_creation_initial_step_prompt_intended',
-                    properties: {
-                      isNewPrompt,
-                    },
+                  track('project_creation_initial_step_prompt_intended', {
+                    isNewPrompt,
                   })
                 } else {
-                  sendEvent({
-                    action: 'project_creation_second_step_prompt_intended',
-                    properties: {
-                      isNewPrompt,
-                    },
+                  track('project_creation_second_step_prompt_intended', {
+                    isNewPrompt,
                   })
                 }
                 setPromptIntendSent(true)

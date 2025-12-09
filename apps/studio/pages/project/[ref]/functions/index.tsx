@@ -1,7 +1,16 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Search, X } from 'lucide-react'
+import React, { useMemo, useState } from 'react'
+import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { DeployEdgeFunctionButton } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionButton'
+import {
+  EdgeFunctionsSort,
+  EdgeFunctionsSortColumn,
+  EdgeFunctionsSortDropdown,
+  EdgeFunctionsSortOrder,
+  EDGE_FUNCTIONS_SORT_VALUES,
+} from 'components/interfaces/EdgeFunctions/EdgeFunctionsSortDropdown'
 import { EdgeFunctionsListItem } from 'components/interfaces/Functions/EdgeFunctionsListItem'
 import {
   FunctionsEmptyState,
@@ -9,15 +18,34 @@ import {
 } from 'components/interfaces/Functions/FunctionsEmptyState'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { IS_PLATFORM } from 'lib/constants'
+import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
-import { Button, Table, TableHead, TableRow, TableHeader, TableBody, Card } from 'ui'
+import {
+  Button,
+  Card,
+  Input_Shadcn_,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -29,31 +57,42 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     isSuccess,
   } = useEdgeFunctionsQuery({ projectRef: ref })
 
+  const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
+  const [sort, setSortQueryParam] = useQueryState(
+    'sort',
+    parseAsStringLiteral<EdgeFunctionsSort>(EDGE_FUNCTIONS_SORT_VALUES).withDefault('name:asc')
+  )
+
+  const filteredFunctions = useMemo(() => {
+    const temp = (functions ?? []).filter((x) =>
+      x.name.toLowerCase().includes(search.toLowerCase())
+    )
+    const [sortCol, sortOrder] = sort.split(':') as [
+      EdgeFunctionsSortColumn,
+      EdgeFunctionsSortOrder,
+    ]
+    const orderMultiplier = sortOrder === 'asc' ? 1 : -1
+
+    return temp.sort((a, b) => {
+      if (sortCol === 'name') {
+        return a.name.localeCompare(b.name) * orderMultiplier
+      }
+      if (sortCol === 'created_at') {
+        return (a.created_at - b.created_at) * orderMultiplier
+      }
+      if (sortCol === 'updated_at') {
+        return (a.updated_at - b.updated_at) * orderMultiplier
+      }
+      return 0
+    })
+  }, [functions, search, sort])
+
   const hasFunctions = (functions ?? []).length > 0
 
-  const secondaryActions = [
-    <DocsButton key="docs" href="https://supabase.com/docs/guides/functions" />,
-    <Button asChild key="edge-function-examples" type="default" icon={<ExternalLink />}>
-      <a
-        target="_blank"
-        rel="noreferrer"
-        href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
-      >
-        Examples
-      </a>
-    </Button>,
-  ]
-
   return (
-    <PageLayout
-      size="large"
-      title="Edge Functions"
-      subtitle="Deploy edge functions to handle complex business logic"
-      primaryActions={IS_PLATFORM ? <DeployEdgeFunctionButton /> : undefined}
-      secondaryActions={secondaryActions}
-    >
-      <ScaffoldContainer size="large">
-        <ScaffoldSection isFullWidth>
+    <PageContainer size="large">
+      <PageSection>
+        <PageSectionContent>
           {IS_PLATFORM ? (
             <>
               {isLoading && <GenericSkeletonLoader />}
@@ -61,28 +100,68 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
               {isSuccess && (
                 <>
                   {hasFunctions ? (
-                    <Card>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>URL</TableHead>
-                            <TableHead className="hidden 2xl:table-cell">Created</TableHead>
-                            <TableHead className="lg:table-cell">Last updated</TableHead>
-                            <TableHead className="lg:table-cell">Deployments</TableHead>
-                          </TableRow>
-                        </TableHeader>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
+                          <div className="relative">
+                            <Input
+                              placeholder="Search function names"
+                              icon={<Search />}
+                              size="tiny"
+                              className="w-32 md:w-64"
+                              value={search}
+                              onChange={(event) => setSearch(event.target.value)}
+                              actions={[
+                                search && (
+                                  <Button
+                                    size="tiny"
+                                    type="text"
+                                    icon={<X />}
+                                    onClick={() => setSearch('')}
+                                    className="p-0 h-5 w-5"
+                                  />
+                                ),
+                              ]}
+                            />
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <EdgeFunctionsSortDropdown value={sort} onChange={setSortQueryParam} />
+                        </div>
+                      </div>
+                      <Card>
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Name</TableHead>
+                              <TableHead>URL</TableHead>
+                              <TableHead className="hidden 2xl:table-cell">Created</TableHead>
+                              <TableHead className="lg:table-cell">Last updated</TableHead>
+                              <TableHead className="lg:table-cell">Deployments</TableHead>
+                            </TableRow>
+                          </TableHeader>
 
-                        <TableBody>
-                          <>
-                            {functions.length > 0 &&
-                              functions.map((item) => (
-                                <EdgeFunctionsListItem key={item.id} function={item} />
-                              ))}
-                          </>
-                        </TableBody>
-                      </Table>
-                    </Card>
+                          <TableBody>
+                            <>
+                              {filteredFunctions.length > 0 ? (
+                                filteredFunctions.map((item) => (
+                                  <EdgeFunctionsListItem key={item.id} function={item} />
+                                ))
+                              ) : (
+                                <TableRow>
+                                  <TableCell colSpan={5}>
+                                    <p className="text-sm text-foreground">No results found</p>
+                                    <p className="text-sm text-foreground-light">
+                                      Your search for "{search}" did not return any results
+                                    </p>
+                                  </TableCell>
+                                </TableRow>
+                              )}
+                            </>
+                          </TableBody>
+                        </Table>
+                      </Card>
+                    </div>
                   ) : (
                     <FunctionsEmptyState />
                   )}
@@ -92,16 +171,44 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
           ) : (
             <FunctionsEmptyStateLocal />
           )}
-        </ScaffoldSection>
-      </ScaffoldContainer>
-    </PageLayout>
+        </PageSectionContent>
+      </PageSection>
+    </PageContainer>
   )
 }
 
-EdgeFunctionsPage.getLayout = (page) => {
+EdgeFunctionsPage.getLayout = (page: React.ReactElement) => {
   return (
     <DefaultLayout>
-      <EdgeFunctionsLayout>{page}</EdgeFunctionsLayout>
+      <EdgeFunctionsLayout>
+        <div className="w-full min-h-full flex flex-col items-stretch">
+          <PageHeader size="large">
+            <PageHeaderMeta>
+              <PageHeaderSummary>
+                <PageHeaderTitle>Edge Functions</PageHeaderTitle>
+                <PageHeaderDescription>
+                  Deploy edge functions to handle complex business logic
+                </PageHeaderDescription>
+              </PageHeaderSummary>
+              <PageHeaderAside>
+                <DocsButton href={`${DOCS_URL}/guides/functions`} />
+                <Button asChild type="default" icon={<ExternalLink />}>
+                  <a
+                    target="_blank"
+                    rel="noreferrer"
+                    href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
+                  >
+                    Examples
+                  </a>
+                </Button>
+                {IS_PLATFORM && <DeployEdgeFunctionButton />}
+              </PageHeaderAside>
+            </PageHeaderMeta>
+          </PageHeader>
+
+          {page}
+        </div>
+      </EdgeFunctionsLayout>
     </DefaultLayout>
   )
 }

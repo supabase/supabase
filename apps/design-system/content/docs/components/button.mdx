@@ -122,3 +122,13 @@ Displaying only an Icon in a button.
 Supports slot behavior with `asChild` prop.
 
 <ComponentPreview name="button-as-child" />
+
+## Accessibility
+
+[Keyboard focus](../accessibility#focus-management) is automatically handled:
+
+- Enabled buttons default to `tabIndex={0}` (keyboard accessible)
+- Disabled buttons default to `tabIndex={-1}` (removed from tab order)
+- You can still override with an explicit `tabIndex` prop when needed
+
+You therefore don't need to manually set `tabIndex`, as Button handles it automatically based on its `disabled` state.

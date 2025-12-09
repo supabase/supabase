@@ -1,6 +1,12 @@
 import { EdgeFunctions, RESTApi, SqlEditor } from 'icons'
 import { ScrollText } from 'lucide-react'
 
+export const cronPattern =
+  /^(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)(\s+(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)){4}$/
+
+// detect seconds like "10 seconds" or normal cron syntax like "*/5 * * * *"
+export const secondsPattern = /^\d+\s+seconds*$/
+
 export const CRONJOB_TYPES = [
   'http_request',
   'edge_function',

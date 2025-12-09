@@ -6,28 +6,6 @@ interface DocsConfig {
 }
 
 export const docsConfig: DocsConfig = {
-  // mainNav: [
-  //   {
-  //     title: 'Documentation',
-  //     href: '/docs',
-  //   },
-  //   {
-  //     title: 'Components',
-  //     href: '/docs/components/accordion',
-  //   },
-  //   {
-  //     title: 'Themes',
-  //     href: '/themes',
-  //   },
-  //   {
-  //     title: 'Examples',
-  //     href: '/examples',
-  //   },
-  //   {
-  //     title: 'Blocks',
-  //     href: '/blocks',
-  //   },
-  // ],
   sidebarNav: [
     {
       title: 'Getting Started',
@@ -48,6 +26,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Typography',
+          href: '/docs/typography',
+          items: [],
+        },
+        {
           title: 'Theming',
           href: '/docs/theming',
           items: [],
@@ -58,13 +41,33 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Figma',
-          href: '/docs/figma',
+          title: 'Accessibility',
+          href: '/docs/accessibility',
+          items: [],
+        },
+      ],
+    },
+    {
+      title: 'UI Patterns',
+      items: [
+        {
+          title: 'Navigation',
+          href: '/docs/ui-patterns/navigation',
           items: [],
         },
         {
-          title: 'Changelog',
-          href: '/docs/changelog',
+          title: 'Layout',
+          href: '/docs/ui-patterns/layout',
+          items: [],
+        },
+        {
+          title: 'Empty States',
+          href: '/docs/ui-patterns/empty-states',
+          items: [],
+        },
+        {
+          title: 'Forms',
+          href: '/docs/ui-patterns/forms',
           items: [],
         },
       ],
@@ -88,8 +91,28 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'EmptyStatePresentational',
+          href: '/docs/fragments/empty-state-presentational',
+          items: [],
+        },
+        {
           title: 'Modal',
           href: '/docs/fragments/modal',
+          items: [],
+        },
+        {
+          title: 'Page Container',
+          href: '/docs/fragments/page-container',
+          items: [],
+        },
+        {
+          title: 'Page Header',
+          href: '/docs/fragments/page-header',
+          items: [],
+        },
+        {
+          title: 'Page Section',
+          href: '/docs/fragments/page-section',
           items: [],
         },
         {
@@ -105,6 +128,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Inner Side Menu',
           href: '/docs/fragments/inner-side-menu',
+          items: [],
+        },
+        {
+          title: 'Data Input',
+          href: '/docs/fragments/data-input',
           items: [],
         },
         {
@@ -125,6 +153,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Logs Bar Chart',
           href: '/docs/fragments/logs-bar-chart',
+          items: [],
+        },
+        {
+          title: 'Metric Card',
+          href: '/docs/fragments/metric-card',
           items: [],
         },
         {
@@ -285,8 +318,19 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Mermaid',
+          href: '/docs/components/mermaid',
+          items: [],
+          label: 'New',
+        },
+        {
           title: 'Menubar',
           href: '/docs/components/menubar',
+          items: [],
+        },
+        {
+          title: 'NavMenu',
+          href: '/docs/components/nav-menu',
           items: [],
         },
         {
