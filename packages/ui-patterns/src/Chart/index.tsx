@@ -478,6 +478,8 @@ const ChartDisabledState = ({ icon, label, description, actions }: ChartDisabled
 ChartDisabledState.displayName = 'ChartDisabledState'
 
 /* Chart Footer */
+const chartTableClasses = `[&_tr]:border-b [&_tr]:border-border [&_thead_tr]:!bg-transparent [&_thead_th]:!py-2 [&_thead_th]:h-auto [&_tbody_td]:py-2.5 [&_tbody_td]:text-xs [&_table]:mb-1 [&_table]:border-b [&_table]:border-border`
+
 interface ChartFooterProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
 }
@@ -485,7 +487,7 @@ interface ChartFooterProps extends React.HTMLAttributes<HTMLDivElement> {
 const ChartFooter = React.forwardRef<HTMLDivElement, ChartFooterProps>(
   ({ children, className, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn('border-t', className)} {...props}>
+      <div ref={ref} className={cn('border-t', className, chartTableClasses)} {...props}>
         {children}
       </div>
     )
