@@ -28,7 +28,7 @@ export default function ChartComposedStates() {
   const disabledActions = [
     {
       label: 'Upgrade to Pro',
-      href: '/pro',
+      href: '#',
     },
   ]
 
@@ -78,7 +78,7 @@ export default function ChartComposedStates() {
               <ChartDisabledState
                 icon={<Badge variant="success">Pro</Badge>}
                 label="API Processing Time"
-                description="This chart is available from pro plan and above"
+                description="This chart is available on the Pro plan and above"
                 actions={disabledActions}
               />
             }
