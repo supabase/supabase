@@ -107,7 +107,7 @@ const FunctionList = ({
             <TableCell className="truncate">
               <Button
                 type="text"
-                className="text-link-table-cell text-sm p-0 hover:bg-transparent title"
+                className="text-link-table-cell text-sm disabled:opacity-100 disabled:no-underline p-0 hover:bg-transparent title"
                 disabled={isLocked}
                 onClick={() => editFunction(x)}
                 title={x.name}
