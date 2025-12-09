@@ -1,5 +1,5 @@
 import type { XYCoord } from 'dnd-core'
-import { ArrowRight, Key, Link, Lock, TrendingUp } from 'lucide-react'
+import { ArrowRight, Key, Link, Lock, Lightbulb } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 
@@ -157,7 +157,7 @@ export function ColumnHeader<R>({
                   className="flex items-center"
                   onClick={() => openSheet(column.name as string)}
                 >
-                  <TrendingUp size={14} strokeWidth={2} className="text-warning" />
+                  <Lightbulb size={14} strokeWidth={2} className="!text-warning" />
                 </button>
               </TooltipTrigger>
               <TooltipContent side="bottom" className="font-normal">
