@@ -14,6 +14,7 @@ import {
 import { ShimmeringLoader, TimestampInfo } from 'ui-patterns'
 import { APIKeyDeleteDialog } from './APIKeyDeleteDialog'
 import { ApiKeyPill } from './ApiKeyPill'
+import { useFlag } from 'common'
 
 export const APIKeyRow = ({
   apiKey,
@@ -33,6 +34,8 @@ export const APIKeyRow = ({
   setKeyToDelete: (id: string | null) => void
 }) => {
   const MotionTableRow = motion.create(TableRow)
+
+  const hideApiKeyLastUsed = useFlag('HideApiKeyLastUsed')
 
   return (
     <>
@@ -62,21 +65,23 @@ export const APIKeyRow = ({
           </div>
         </TableCell>
 
-        <TableCell className="py-2 min-w-0 whitespace-nowrap hidden lg:table-cell">
-          <div className="truncate" title={lastSeen?.timestamp.toString() || 'Never used'}>
-            {isLoadingLastSeen ? (
-              <ShimmeringLoader />
-            ) : lastSeen?.timestamp ? (
-              <TimestampInfo
-                className="text-sm"
-                utcTimestamp={lastSeen?.timestamp}
-                label={lastSeen.relative}
-              />
-            ) : (
-              <span className="text-foreground-lighter">Never used</span>
-            )}
-          </div>
-        </TableCell>
+        {!hideApiKeyLastUsed && (
+          <TableCell className="py-2 min-w-0 whitespace-nowrap hidden lg:table-cell">
+            <div className="truncate" title={lastSeen?.timestamp.toString() || 'Never used'}>
+              {isLoadingLastSeen ? (
+                <ShimmeringLoader />
+              ) : lastSeen?.timestamp ? (
+                <TimestampInfo
+                  className="text-sm"
+                  utcTimestamp={lastSeen?.timestamp}
+                  label={lastSeen.relative}
+                />
+              ) : (
+                <span className="text-foreground-lighter">Never used</span>
+              )}
+            </div>
+          </TableCell>
+        )}
 
         <TableCell className="py-2">
           <div className="flex justify-end">
