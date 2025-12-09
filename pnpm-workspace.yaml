@@ -49,6 +49,7 @@ minimumReleaseAgeExclude:
   - iceberg-js
   - next@15.5.7 || 16.0.7
   - '@next/env@15.5.7 || 16.0.7'
+  - '@vitejs/plugin-rsc'
 
 onlyBuiltDependencies:
   - supabase
