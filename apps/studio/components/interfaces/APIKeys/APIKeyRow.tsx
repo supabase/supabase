@@ -28,7 +28,7 @@ export const APIKeyRow = ({
   lastSeen?: { timestamp: number; relative: string }
   isDeleting: boolean
   isDeleteModalOpen: boolean
-  isLoadingLastSeen: boolean
+  isLoadingLastSeen?: boolean
   onDelete: () => void
   setKeyToDelete: (id: string | null) => void
 }) => {
@@ -62,21 +62,23 @@ export const APIKeyRow = ({
           </div>
         </TableCell>
 
-        <TableCell className="py-2 min-w-0 whitespace-nowrap hidden lg:table-cell">
-          <div className="truncate" title={lastSeen?.timestamp.toString() || 'Never used'}>
-            {isLoadingLastSeen ? (
-              <ShimmeringLoader />
-            ) : lastSeen?.timestamp ? (
-              <TimestampInfo
-                className="text-sm"
-                utcTimestamp={lastSeen?.timestamp}
-                label={lastSeen.relative}
-              />
-            ) : (
-              <span className="text-foreground-lighter">Never used</span>
-            )}
-          </div>
-        </TableCell>
+        {isLoadingLastSeen !== undefined && (
+          <TableCell className="py-2 min-w-0 whitespace-nowrap hidden lg:table-cell">
+            <div className="truncate" title={lastSeen?.timestamp.toString() || 'Never used'}>
+              {isLoadingLastSeen ? (
+                <ShimmeringLoader />
+              ) : lastSeen?.timestamp ? (
+                <TimestampInfo
+                  className="text-sm"
+                  utcTimestamp={lastSeen?.timestamp}
+                  label={lastSeen.relative}
+                />
+              ) : (
+                <span className="text-foreground-lighter">Never used</span>
+              )}
+            </div>
+          </TableCell>
+        )}
 
         <TableCell className="py-2">
           <div className="flex justify-end">

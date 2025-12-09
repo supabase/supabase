@@ -69,7 +69,7 @@ export const SecretAPIKeys = () => {
     isError: isErrorApiKeys,
   } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
 
-  const { data: lastSeen, isLoading: isLoadingLastSeen } = useLastSeen(projectRef ?? '')
+  // const { data: lastSeen, isLoading: isLoadingLastSeen } = useLastSeen(projectRef ?? '')
 
   const secretApiKeys = useMemo(
     () =>
@@ -159,8 +159,8 @@ export const SecretAPIKeys = () => {
                 <APIKeyRow
                   key={apiKey.id}
                   apiKey={apiKey}
-                  lastSeen={lastSeen?.[apiKey.hash]}
-                  isLoadingLastSeen={isLoadingLastSeen}
+                  // lastSeen={lastSeen?.[apiKey.hash]}
+                  // isLoadingLastSeen={isLoadingLastSeen}
                   isDeleting={apiKeyToDelete?.id === apiKey.id && isDeletingAPIKey}
                   onDelete={() => onDeleteAPIKey(apiKey)}
                   setKeyToDelete={setAPIKeyToDelete}

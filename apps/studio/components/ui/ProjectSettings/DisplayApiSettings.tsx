@@ -51,24 +51,25 @@ export const DisplayApiSettings = ({
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
 
-  const { isLoading: isLoadingLastUsed, logData: lastUsedLogData } = useLastUsedAPIKeysLogQuery(
-    projectRef!
-  )
+  // const { isLoading: isLoadingLastUsed, logData: lastUsedLogData } = useLastUsedAPIKeysLogQuery(
+  //   projectRef!
+  // )
 
-  const lastUsedAPIKeys = useMemo(() => {
-    if (apiKeys.length < 1 || !lastUsedLogData || lastUsedLogData.length < 1) {
-      return {}
-    }
+  // const lastUsedAPIKeys = useMemo(() => {
+  //   if (apiKeys.length < 1 || !lastUsedLogData || lastUsedLogData.length < 1) {
+  //     return {}
+  //   }
 
-    try {
-      return getLastUsedAPIKeys(apiKeys, lastUsedLogData)
-    } catch (e: any) {
-      toast.error('Failed to identify when the anon and service_role keys were last used')
-      console.error(e)
-      return {}
-    }
-  }, [lastUsedLogData, apiKeys])
+  //   try {
+  //     return getLastUsedAPIKeys(apiKeys, lastUsedLogData)
+  //   } catch (e: any) {
+  //     toast.error('Failed to identify when the anon and service_role keys were last used')
+  //     console.error(e)
+  //     return {}
+  //   }
+  // }, [lastUsedLogData, apiKeys])
 
+  const lastUsedAPIKeys = {}
   return (
     <Panel
       noMargin
