@@ -744,6 +744,51 @@
         ]
       },
       {
+        "id": "oauth-server-api",
+        "isFunc": false,
+        "title": "OAuth Server",
+        "slug": "auth-admin-oauth-server",
+        "product": "auth-admin",
+        "type": "function",
+        "items": [
+          {
+            "id": "auth-js-authoauthserverapi-getauthorizationdetails",
+            "title": "Get authorization details",
+            "slug": "auth-admin-oauth-getauthorizationdetails",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "auth-js-authoauthserverapi-approveauthorization",
+            "title": "Approve authorization",
+            "slug": "auth-admin-oauth-approveauthorization",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "auth-js-authoauthserverapi-denyauthorization",
+            "title": "Deny authorization",
+            "slug": "auth-admin-oauth-denyauthorization",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "auth-js-authoauthserverapi-listgrants",
+            "title": "List grants",
+            "slug": "auth-admin-oauth-listgrants",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "auth-js-authoauthserverapi-revokegrant",
+            "title": "Revoke grant",
+            "slug": "auth-admin-oauth-revokegrant",
+            "product": "auth-admin",
+            "type": "function"
+          }
+        ]
+      },
+      {
         "id": "admin-api",
         "title": "Auth Admin",
         "slug": "admin-api",
@@ -833,51 +878,7 @@
             "product": "auth-admin",
             "type": "function"
           },
-          {
-            "id": "oauth-server-api",
-            "isFunc": false,
-            "title": "OAuth Server",
-            "slug": "auth-admin-oauth-server",
-            "product": "auth-admin",
-            "type": "function",
-            "items": [
-              {
-                "id": "auth-js-authoauthserverapi-getauthorizationdetails",
-                "title": "Get authorization details",
-                "slug": "auth-admin-oauth-getauthorizationdetails",
-                "product": "auth-admin",
-                "type": "function"
-              },
-              {
-                "id": "auth-js-authoauthserverapi-approveauthorization",
-                "title": "Approve authorization",
-                "slug": "auth-admin-oauth-approveauthorization",
-                "product": "auth-admin",
-                "type": "function"
-              },
-              {
-                "id": "auth-js-authoauthserverapi-denyauthorization",
-                "title": "Deny authorization",
-                "slug": "auth-admin-oauth-denyauthorization",
-                "product": "auth-admin",
-                "type": "function"
-              },
-              {
-                "id": "auth-js-authoauthserverapi-listgrants",
-                "title": "List grants",
-                "slug": "auth-admin-oauth-listgrants",
-                "product": "auth-admin",
-                "type": "function"
-              },
-              {
-                "id": "auth-js-authoauthserverapi-revokegrant",
-                "title": "Revoke grant",
-                "slug": "auth-admin-oauth-revokegrant",
-                "product": "auth-admin",
-                "type": "function"
-              }
-            ]
-          },
+
           {
             "id": "oauth-admin-api",
             "isFunc": false,

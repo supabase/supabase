@@ -58,56 +58,52 @@ function categorizeMethod(methodPath: string): 'public' | 'constructor' | 'error
   return 'public'
 }
 
-// Get the "canonical" path (prefer original package over supabase-js re-exports)
-function getCanonicalPath(methodPath: string): string {
-  // supabase-js re-exports from auth-js, storage-js, etc.
-  // Map supabase-js classes to their original packages
-  const reexportMap: Record<string, string> = {
-    // Auth classes
-    GoTrueClient: '@supabase/auth-js',
-    GoTrueAdminApi: '@supabase/auth-js',
-    GoTrueAdminMFAApi: '@supabase/auth-js',
-    GoTrueAdminOAuthApi: '@supabase/auth-js',
-    GoTrueMFAApi: '@supabase/auth-js',
-    AuthOAuthServerApi: '@supabase/auth-js',
-    AuthApiError: '@supabase/auth-js',
-    AuthError: '@supabase/auth-js',
-    AuthImplicitGrantRedirectError: '@supabase/auth-js',
-    AuthInvalidCredentialsError: '@supabase/auth-js',
-    AuthInvalidJwtError: '@supabase/auth-js',
-    AuthInvalidTokenResponseError: '@supabase/auth-js',
-    AuthPKCEGrantCodeExchangeError: '@supabase/auth-js',
-    AuthRetryableFetchError: '@supabase/auth-js',
-    AuthSessionMissingError: '@supabase/auth-js',
-    AuthUnknownError: '@supabase/auth-js',
-    AuthWeakPasswordError: '@supabase/auth-js',
-    CustomAuthError: '@supabase/auth-js',
-    NavigatorLockAcquireTimeoutError: '@supabase/auth-js',
-    // Realtime classes
-    RealtimeChannel: '@supabase/realtime-js',
-    RealtimeClient: '@supabase/realtime-js',
-    RealtimePresence: '@supabase/realtime-js',
-    WebSocketFactory: '@supabase/realtime-js',
-    WebSocketLike: '@supabase/realtime-js',
-    WebSocketLikeConstructor: '@supabase/realtime-js',
-    // Postgrest classes
-    PostgrestError: '@supabase/postgrest-js',
-    // Functions classes
-    FunctionsError: '@supabase/functions-js',
-    FunctionsFetchError: '@supabase/functions-js',
-    FunctionsHttpError: '@supabase/functions-js',
-    FunctionsRelayError: '@supabase/functions-js',
+// Dynamically detect re-exports from typeSpec data
+// If a class exists in both @supabase/supabase-js and another @supabase/* package,
+// prefer the other package (which is the original source)
+function buildReexportMap(typeSpecModules: TypeSpecModule[]): Map<string, string> {
+  const classToPackages = new Map<string, Set<string>>()
+
+  for (const mod of typeSpecModules) {
+    for (const methodPath of Object.keys(mod.methods)) {
+      const parts = methodPath.split('.')
+      const pkg = parts[0]
+      const className = parts[1]
+      if (pkg?.startsWith('@supabase/') && className) {
+        if (!classToPackages.has(className)) {
+          classToPackages.set(className, new Set())
+        }
+        classToPackages.get(className)!.add(pkg)
+      }
+    }
   }
 
+  // For classes in multiple packages, map supabase-js to the original package
+  const reexportMap = new Map<string, string>()
+  for (const [className, packages] of classToPackages) {
+    if (packages.has('@supabase/supabase-js') && packages.size > 1) {
+      // Find the original package (not supabase-js)
+      for (const pkg of packages) {
+        if (pkg !== '@supabase/supabase-js') {
+          reexportMap.set(className, pkg)
+          break
+        }
+      }
+    }
+  }
+  return reexportMap
+}
+
+// Get the "canonical" path (prefer original package over supabase-js re-exports)
+function getCanonicalPath(methodPath: string, reexportMap: Map<string, string>): string {
   if (methodPath.startsWith('@supabase/supabase-js.')) {
     const parts = methodPath.split('.')
     const className = parts[1]
-    const originalPkg = reexportMap[className]
+    const originalPkg = reexportMap.get(className)
     if (originalPkg) {
       return methodPath.replace('@supabase/supabase-js', originalPkg)
     }
   }
-
   return methodPath
 }
 
@@ -129,6 +125,9 @@ for (const mod of typeSpecModules) {
   }
 }
 
+// Build re-export map dynamically from typeSpec data
+const reexportMap = buildReexportMap(typeSpecModules)
+
 // Load YAML and get all documented $ref values (normalized)
 const yamlPath = join(SPEC_DIR, 'supabase_js_v2.yml')
 const spec = yaml.load(readFileSync(yamlPath, 'utf8')) as YamlSpec
@@ -148,7 +147,7 @@ const undocumented: string[] = []
 
 for (const method of allMethods) {
   // Get canonical path first (prefer original packages over supabase-js re-exports)
-  const canonical = getCanonicalPath(method)
+  const canonical = getCanonicalPath(method, reexportMap)
 
   // Skip if already processed this canonical path
   if (seenCanonical.has(canonical)) {
