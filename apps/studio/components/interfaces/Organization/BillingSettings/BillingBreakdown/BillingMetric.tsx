@@ -66,7 +66,6 @@ export const BillingMetric = ({
 
   const isUsageBillingEnabled = subscription?.usage_billing_enabled === true
 
-  console.log(usageMeta)
   const hasLimit = !!usageMeta.unlimited === false
   const isApproachingLimit = hasLimit && usageRatio >= USAGE_APPROACHING_THRESHOLD
   const isExceededLimit = relativeToSubscription && hasLimit && usageRatio >= 1
