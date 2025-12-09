@@ -78,7 +78,7 @@ export const EdgeFunctionSecrets = () => {
     <TableHead key="secret-value" className="flex items-center gap-x-2">
       Digest <Badge variant="default">SHA256</Badge>
     </TableHead>,
-    <TableHead key="secret-updated-at">Updated at</TableHead>,
+    <TableHead key="secret-updated-at">Updated</TableHead>,
     <TableHead key="actions" />,
   ]
 

@@ -72,7 +72,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
           </button>
         </div>
       </TableCell>
-      <TableCell className="hidden 2xl:table-cell">
+      <TableCell className="hidden 2xl:table-cell whitespace-nowrap">
         <p className="text-foreground-light">
           {dayjs(item.created_at).format('DD MMM, YYYY HH:mm')}
         </p>
