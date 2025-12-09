@@ -83,7 +83,7 @@ export const ProjectCard = ({
                   <div className="w-5 h-5 p-1 flex items-center">
                     <Github size={12} strokeWidth={1.5} />
                   </div>
-                  <p className="text-xs text-foreground-light truncate">Foo</p>
+                  <p className="text-xs text-foreground-light truncate">{githubRepository}</p>
                 </div>
               )}
             </div>
