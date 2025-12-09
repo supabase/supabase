@@ -705,6 +705,13 @@
             "slug": "auth-mfa-getauthenticatorassurancelevel",
             "product": "auth",
             "type": "function"
+          },
+          {
+            "id": "auth-js-gotruemfaapi-listfactors",
+            "title": "List all factors for current user",
+            "slug": "auth-mfa-listfactors",
+            "product": "auth",
+            "type": "function"
           }
         ]
       },
@@ -783,6 +790,96 @@
             "slug": "auth-admin-mfa-deletefactor",
             "product": "auth-admin",
             "type": "function"
+          },
+          {
+            "id": "mfa-list-factors-admin",
+            "title": "List all factors for a user (admin)",
+            "slug": "auth-admin-mfa-listfactors-admin",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "oauth-server-api",
+            "isFunc": false,
+            "title": "OAuth Server",
+            "slug": "auth-admin-oauth-server",
+            "product": "auth-admin",
+            "type": "function",
+            "items": [
+              {
+                "id": "auth-js-authoauthserverapi-getauthorizationdetails",
+                "title": "Get authorization details",
+                "slug": "auth-admin-oauth-getauthorizationdetails",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "auth-js-authoauthserverapi-approveauthorization",
+                "title": "Approve authorization",
+                "slug": "auth-admin-oauth-approveauthorization",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "auth-js-authoauthserverapi-denyauthorization",
+                "title": "Deny authorization",
+                "slug": "auth-admin-oauth-denyauthorization",
+                "product": "auth-admin",
+                "type": "function"
+              }
+            ]
+          },
+          {
+            "id": "oauth-admin-api",
+            "isFunc": false,
+            "title": "OAuth Admin",
+            "slug": "auth-admin-oauth-admin",
+            "product": "auth-admin",
+            "type": "function",
+            "items": [
+              {
+                "id": "auth-js-gotrueadminoauthapi-listclients",
+                "title": "List OAuth clients",
+                "slug": "auth-admin-oauth-listclients",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "auth-js-gotrueadminoauthapi-getclient",
+                "title": "Get OAuth client",
+                "slug": "auth-admin-oauth-getclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "auth-js-gotrueadminoauthapi-createclient",
+                "title": "Create OAuth client",
+                "slug": "auth-admin-oauth-createclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "auth-js-gotrueadminoauthapi-updateclient",
+                "title": "Update OAuth client",
+                "slug": "auth-admin-oauth-updateclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "auth-js-gotrueadminoauthapi-deleteclient",
+                "title": "Delete OAuth client",
+                "slug": "auth-admin-oauth-deleteclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "auth-js-gotrueadminoauthapi-regenerateclientsecret",
+                "title": "Regenerate client secret",
+                "slug": "auth-admin-oauth-regenerateclientsecret",
+                "product": "auth-admin",
+                "type": "function"
+              }
+            ]
           }
         ]
       }

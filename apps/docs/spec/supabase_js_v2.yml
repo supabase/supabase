@@ -7685,6 +7685,12 @@ functions:
   - id: auth-js-gotrueclient-isthrowonerrorenabled
     title: GoTrueClient.isThrowOnErrorEnabled()
     $ref: '@supabase/auth-js.GoTrueClient.isThrowOnErrorEnabled'
+  - id: oauth-server-api
+    title: 'OAuth Server API'
+    notes: |
+      The OAuth Server API allows you to build custom OAuth consent screens for your application.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+
   - id: auth-js-authoauthserverapi-approveauthorization
     title: AuthOAuthServerApi.approveAuthorization()
     $ref: '@supabase/auth-js.AuthOAuthServerApi.approveAuthorization'
@@ -7694,6 +7700,13 @@ functions:
   - id: auth-js-authoauthserverapi-getauthorizationdetails
     title: AuthOAuthServerApi.getAuthorizationDetails()
     $ref: '@supabase/auth-js.AuthOAuthServerApi.getAuthorizationDetails'
+  - id: oauth-admin-api
+    title: 'OAuth Admin API'
+    notes: |
+      The OAuth Admin API allows you to manage OAuth clients programmatically.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+      These functions should only be called on a server. Never expose your `service_role` key in the browser.
+
   - id: auth-js-gotrueadminoauthapi-createclient
     title: GoTrueAdminOAuthApi.createClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.createClient'
