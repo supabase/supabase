@@ -116,9 +116,9 @@ export function TableIndexAdvisorProvider({
     <TableIndexAdvisorContext.Provider value={value}>
       {children}
       <Sheet open={isSheetOpen} onOpenChange={(open) => !open && closeSheet()}>
-        <SheetContent className="flex flex-col gap-0 p-0 sm:max-w-[420px]">
+        <SheetContent className="flex flex-col gap-0 p-0 sm:max-w-[500px]">
           <SheetHeader className="border-b px-5 py-3">
-            <SheetTitle>Index Recommendations</SheetTitle>
+            <SheetTitle>Index Recommendation</SheetTitle>
           </SheetHeader>
           {selectedSuggestion && (
             <QueryIndexes
