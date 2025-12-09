@@ -20,6 +20,8 @@ export interface UsageSectionProps {
   subscription?: OrgSubscription
   chartMeta: ChartMeta
   currentBillingCycleSelected: boolean
+  startDate?: string
+  endDate?: string
 }
 
 const UsageSection = ({
@@ -29,6 +31,8 @@ const UsageSection = ({
   chartMeta,
   subscription,
   currentBillingCycleSelected,
+  startDate,
+  endDate,
 }: UsageSectionProps) => {
   const {
     data: usage,
@@ -36,7 +40,12 @@ const UsageSection = ({
     isLoading: isLoadingUsage,
     isError: isErrorUsage,
     isSuccess: isSuccessUsage,
-  } = useOrgUsageQuery({ orgSlug })
+  } = useOrgUsageQuery({
+    orgSlug,
+    projectRef,
+    start: !currentBillingCycleSelected && startDate ? new Date(startDate) : undefined,
+    end: !currentBillingCycleSelected && endDate ? new Date(endDate) : undefined,
+  })
 
   const categoryMeta = USAGE_CATEGORIES(subscription).find(
     (category) => category.key === categoryKey

@@ -51,6 +51,7 @@ export interface TextConfirmModalProps {
   description?: React.ComponentProps<typeof FormDescription_Shadcn_>
   blockDeleteButton?: boolean
   errorMessage?: string
+  enableCopy?: boolean
 }
 
 export const TextConfirmModal = forwardRef<
@@ -79,6 +80,7 @@ export const TextConfirmModal = forwardRef<
       blockDeleteButton = true,
       variant = 'default',
       errorMessage = 'Value entered does not match',
+      enableCopy = false,
       ...props
     },
     ref
@@ -171,21 +173,27 @@ export const TextConfirmModal = forwardRef<
                 name="confirmValue"
                 render={({ field }) => (
                   <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                    <FormLabel_Shadcn_ {...label}>
+                    <FormLabel_Shadcn_ {...label} enableSelection={!enableCopy}>
                       Type{' '}
-                      <Button
-                        type="default"
-                        className="h-[23px] px-1.5 py-0 border-muted text-sm whitespace-pre break-all"
-                        iconRight={
-                          showCopied ? <Check strokeWidth={2} className="text-brand" /> : <Copy />
-                        }
-                        onClick={() => {
-                          setShowCopied(true)
-                          copyToClipboard(confirmString)
-                        }}
-                      >
-                        {confirmString}
-                      </Button>{' '}
+                      {enableCopy ? (
+                        <Button
+                          type="default"
+                          className="h-[23px] px-1.5 py-0 border-muted text-sm whitespace-pre break-all"
+                          iconRight={
+                            showCopied ? <Check strokeWidth={2} className="text-brand" /> : <Copy />
+                          }
+                          onClick={() => {
+                            setShowCopied(true)
+                            copyToClipboard(confirmString)
+                          }}
+                        >
+                          {confirmString}
+                        </Button>
+                      ) : (
+                        <span className="text-foreground break-all whitespace-pre">
+                          {confirmString}
+                        </span>
+                      )}{' '}
                       to confirm.
                     </FormLabel_Shadcn_>
                     <FormControl_Shadcn_>

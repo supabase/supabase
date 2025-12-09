@@ -16,6 +16,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "EmptyStatePresentational": {
+      name: "EmptyStatePresentational",
+      type: "components:fragment",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/../../packages/ui-patterns/src/EmptyStatePresentational")),
+      source: "",
+      files: ["registry/default//EmptyStatePresentational/index.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "TextConfirmModal": {
       name: "TextConfirmModal",
       type: "components:fragment",
@@ -89,6 +100,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/admonition-demo")),
       source: "",
       files: ["registry/default/example/admonition-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "admonition-button": {
+      name: "admonition-button",
+      type: "components:example",
+      registryDependencies: ["admonition"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-button")),
+      source: "",
+      files: ["registry/default/example/admonition-button.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -181,24 +203,13 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "badge-destructive": {
-      name: "badge-destructive",
+    "badge-state": {
+      name: "badge-state",
       type: "components:example",
       registryDependencies: ["badge"],
-      component: React.lazy(() => import("@/registry/default/example/badge-destructive")),
+      component: React.lazy(() => import("@/registry/default/example/badge-state")),
       source: "",
-      files: ["registry/default/example/badge-destructive.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "badge-outline": {
-      name: "badge-outline",
-      type: "components:example",
-      registryDependencies: ["badge"],
-      component: React.lazy(() => import("@/registry/default/example/badge-outline")),
-      source: "",
-      files: ["registry/default/example/badge-outline.tsx"],
+      files: ["registry/default/example/badge-state.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -1292,6 +1303,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "slider-minMax-range": {
+      name: "slider-minMax-range",
+      type: "components:example",
+      registryDependencies: ["slider"],
+      component: React.lazy(() => import("@/registry/default/example/slider-minMax-range")),
+      source: "",
+      files: ["registry/default/example/slider-minMax-range.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "sonner-demo": {
       name: "sonner-demo",
       type: "components:example",
@@ -1827,6 +1849,160 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/form-item-layout-demo")),
       source: "",
       files: ["registry/default/example/form-item-layout-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-choice-card": {
+      name: "field-choice-card",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-choice-card")),
+      source: "",
+      files: ["registry/default/example/field-choice-card.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-checkbox": {
+      name: "field-checkbox",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-checkbox")),
+      source: "",
+      files: ["registry/default/example/field-checkbox.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-demo": {
+      name: "field-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-demo")),
+      source: "",
+      files: ["registry/default/example/field-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-fieldset": {
+      name: "field-fieldset",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-fieldset")),
+      source: "",
+      files: ["registry/default/example/field-fieldset.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-input": {
+      name: "field-input",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-input")),
+      source: "",
+      files: ["registry/default/example/field-input.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-group": {
+      name: "field-group",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-group")),
+      source: "",
+      files: ["registry/default/example/field-group.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-radio": {
+      name: "field-radio",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-radio")),
+      source: "",
+      files: ["registry/default/example/field-radio.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-responsive": {
+      name: "field-responsive",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-responsive")),
+      source: "",
+      files: ["registry/default/example/field-responsive.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-select": {
+      name: "field-select",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-select")),
+      source: "",
+      files: ["registry/default/example/field-select.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-slider": {
+      name: "field-slider",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-slider")),
+      source: "",
+      files: ["registry/default/example/field-slider.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-switch": {
+      name: "field-switch",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-switch")),
+      source: "",
+      files: ["registry/default/example/field-switch.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-textarea": {
+      name: "field-textarea",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-textarea")),
+      source: "",
+      files: ["registry/default/example/field-textarea.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "form-patterns-pagelayout": {
+      name: "form-patterns-pagelayout",
+      type: "components:example",
+      registryDependencies: ["form","card","input","button","select","switch","checkbox","textarea","radio-group","calendar","popover","multi-select"],
+      component: React.lazy(() => import("@/registry/default/example/form-patterns-pagelayout")),
+      source: "",
+      files: ["registry/default/example/form-patterns-pagelayout.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "form-patterns-sidepanel": {
+      name: "form-patterns-sidepanel",
+      type: "components:example",
+      registryDependencies: ["form","sheet","input","button","select","switch","checkbox","textarea","radio-group","calendar","popover","multi-select"],
+      component: React.lazy(() => import("@/registry/default/example/form-patterns-sidepanel")),
+      source: "",
+      files: ["registry/default/example/form-patterns-sidepanel.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -2447,13 +2623,35 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "empty-state-initial-state-presentational": {
-      name: "empty-state-initial-state-presentational",
+    "empty-state-presentational-demo": {
+      name: "empty-state-presentational-demo",
       type: "components:example",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/empty-state-initial-state-presentational")),
+      component: React.lazy(() => import("@/registry/default/example/empty-state-presentational-demo")),
       source: "",
-      files: ["registry/default/example/empty-state-initial-state-presentational.tsx"],
+      files: ["registry/default/example/empty-state-presentational-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "empty-state-presentational-buttons": {
+      name: "empty-state-presentational-buttons",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/empty-state-presentational-buttons")),
+      source: "",
+      files: ["registry/default/example/empty-state-presentational-buttons.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "empty-state-presentational-icon": {
+      name: "empty-state-presentational-icon",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/empty-state-presentational-icon")),
+      source: "",
+      files: ["registry/default/example/empty-state-presentational-icon.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -2520,6 +2718,116 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/metric-card-with-icon-link-tooltip")),
       source: "",
       files: ["registry/default/example/metric-card-with-icon-link-tooltip.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-demo": {
+      name: "mermaid-demo",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-demo")),
+      source: "",
+      files: ["registry/default/example/mermaid-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-flowchart": {
+      name: "mermaid-flowchart",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-flowchart")),
+      source: "",
+      files: ["registry/default/example/mermaid-flowchart.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-er-diagram": {
+      name: "mermaid-er-diagram",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-er-diagram")),
+      source: "",
+      files: ["registry/default/example/mermaid-er-diagram.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-sequence-async": {
+      name: "mermaid-sequence-async",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-sequence-async")),
+      source: "",
+      files: ["registry/default/example/mermaid-sequence-async.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-sequence-sync": {
+      name: "mermaid-sequence-sync",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-sequence-sync")),
+      source: "",
+      files: ["registry/default/example/mermaid-sequence-sync.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-oauth-flow": {
+      name: "mermaid-oauth-flow",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-oauth-flow")),
+      source: "",
+      files: ["registry/default/example/mermaid-oauth-flow.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-flowchart-subgraph": {
+      name: "mermaid-flowchart-subgraph",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-flowchart-subgraph")),
+      source: "",
+      files: ["registry/default/example/mermaid-flowchart-subgraph.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-sequence-api": {
+      name: "mermaid-sequence-api",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-sequence-api")),
+      source: "",
+      files: ["registry/default/example/mermaid-sequence-api.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-er-simple": {
+      name: "mermaid-er-simple",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-er-simple")),
+      source: "",
+      files: ["registry/default/example/mermaid-er-simple.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "mermaid-basic": {
+      name: "mermaid-basic",
+      type: "components:example",
+      registryDependencies: ["mermaid"],
+      component: React.lazy(() => import("@/registry/default/example/mermaid-basic")),
+      source: "",
+      files: ["registry/default/example/mermaid-basic.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

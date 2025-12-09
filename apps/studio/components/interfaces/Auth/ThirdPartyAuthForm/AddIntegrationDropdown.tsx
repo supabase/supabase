@@ -21,6 +21,7 @@ import {
 interface AddIntegrationDropdownProps {
   buttonText?: string
   align?: 'end' | 'center'
+  type?: 'primary' | 'default'
   onSelectIntegrationType: (type: INTEGRATION_TYPES) => void
 }
 
@@ -47,6 +48,7 @@ const ProviderDropdownItem = ({
 }
 
 export const AddIntegrationDropdown = ({
+  type = 'primary',
   align = 'end',
   onSelectIntegrationType,
 }: AddIntegrationDropdownProps) => {
@@ -55,12 +57,12 @@ export const AddIntegrationDropdown = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="primary" iconRight={<ChevronDown size={14} strokeWidth={1} />}>
+        <Button type={type} iconRight={<ChevronDown />}>
           Add provider
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align={align} className="w-56">
-        <DropdownMenuLabel>Select Provider</DropdownMenuLabel>
+        <DropdownMenuLabel>Select provider</DropdownMenuLabel>
         <DropdownMenuSeparator />
 
         <ProviderDropdownItem type="firebase" onSelectIntegrationType={onSelectIntegrationType} />

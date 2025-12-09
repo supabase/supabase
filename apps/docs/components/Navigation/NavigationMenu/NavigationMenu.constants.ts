@@ -801,6 +801,16 @@ export const auth: NavMenuConstant = {
       ],
     },
     {
+      name: 'OAuth 2.1 Server',
+      items: [
+        { name: 'Overview', url: '/guides/auth/oauth-server' },
+        { name: 'Getting Started', url: '/guides/auth/oauth-server/getting-started' },
+        { name: 'OAuth Flows', url: '/guides/auth/oauth-server/oauth-flows' },
+        { name: 'MCP Authentication', url: '/guides/auth/oauth-server/mcp-authentication' },
+        { name: 'Token Security & RLS', url: '/guides/auth/oauth-server/token-security' },
+      ],
+    },
+    {
       name: 'Third-party auth',
       enabled: allAuthProvidersEnabled,
       items: [
@@ -1155,14 +1165,6 @@ export const database: NavMenuConstant = {
               url: '/guides/database/replication/replication-setup' as `/${string}`,
             },
             {
-              name: 'Destinations',
-              url: '/guides/database/replication/replication-destinations' as `/${string}`,
-              items: [
-                { name: 'BigQuery', url: '/guides/database/replication/replication-bigquery' },
-                { name: 'Iceberg', url: '/guides/database/replication/replication-iceberg' },
-              ],
-            },
-            {
               name: 'Monitoring',
               url: '/guides/database/replication/replication-monitoring' as `/${string}`,
             },
@@ -1170,7 +1172,7 @@ export const database: NavMenuConstant = {
           ],
         },
         {
-          name: 'Manual Replication',
+          name: 'Manual replication',
           url: '/guides/database/replication/manual-replication-setup' as `/${string}`,
           items: [
             {
@@ -2407,6 +2409,7 @@ export const security: NavMenuConstant = {
         { name: 'Platform configuration', url: '/guides/security/platform-security' },
         { name: 'Product configuration', url: '/guides/security/product-security' },
         { name: 'Security testing', url: '/guides/security/security-testing' },
+        { name: 'Platform Audit Logs', url: '/guides/security/platform-audit-logs' },
       ],
     },
     {
@@ -2751,6 +2754,28 @@ export const telemetry: NavMenuConstant = {
         {
           name: 'Metrics',
           url: '/guides/telemetry/metrics' as `/${string}`,
+          items: [
+            {
+              name: 'Overview',
+              url: '/guides/telemetry/metrics' as `/${string}`,
+            },
+            {
+              name: 'Grafana Cloud',
+              url: '/guides/telemetry/metrics/grafana-cloud' as `/${string}`,
+            },
+            {
+              name: 'Grafana self-hosted',
+              url: '/guides/telemetry/metrics/grafana-self-hosted' as `/${string}`,
+            },
+            {
+              name: 'Datadog',
+              url: '/guides/telemetry/metrics/datadog' as `/${string}`,
+            },
+            {
+              name: 'Vendor-agnostic setup',
+              url: '/guides/telemetry/metrics/vendor-agnostic' as `/${string}`,
+            },
+          ],
         },
         {
           name: 'Sentry integration',
@@ -2926,21 +2951,24 @@ export const integrations: NavMenuConstant = {
     },
     {
       name: 'Build Your Own',
-      url: undefined,
       items: [
         {
-          name: 'Build a Supabase integration',
-          url: '/guides/integrations/build-a-supabase-integration',
+          name: 'Supabase OAuth Integration',
+          url: '/guides/integrations/build-a-supabase-oauth-integration',
           items: [
             {
               name: 'Overview',
-              url: '/guides/integrations/build-a-supabase-integration' as `/${string}`,
+              url: '/guides/integrations/build-a-supabase-oauth-integration',
             },
             {
               name: 'OAuth scopes',
-              url: '/guides/integrations/build-a-supabase-integration/oauth-scopes' as `/${string}`,
+              url: '/guides/integrations/build-a-supabase-oauth-integration/oauth-scopes',
             },
           ],
+        },
+        {
+          name: 'Supabase for Platforms',
+          url: '/guides/integrations/supabase-for-platforms',
         },
       ],
     },

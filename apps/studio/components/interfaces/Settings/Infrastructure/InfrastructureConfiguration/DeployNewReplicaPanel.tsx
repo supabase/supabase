@@ -76,17 +76,17 @@ const DeployNewReplicaPanel = ({
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
   const { data: diskConfiguration } = useDiskAttributesQuery({ projectRef })
 
-  const isNotOnTeamOrEnterprisePlan = useMemo(
-    () => !['team', 'enterprise'].includes(org?.plan.id ?? ''),
+  const isNotOnHigherPlan = useMemo(
+    () => !['team', 'enterprise', 'platform'].includes(org?.plan.id ?? ''),
     [org]
   )
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
-    enabled: isNotOnTeamOrEnterprisePlan,
+    enabled: isNotOnHigherPlan,
   })
   const overdueInvoices = (allOverdueInvoices ?? []).filter(
     (x) => x.organization_id === project?.organization_id
   )
-  const hasOverdueInvoices = overdueInvoices.length > 0 && isNotOnTeamOrEnterprisePlan
+  const hasOverdueInvoices = overdueInvoices.length > 0 && isNotOnHigherPlan
   const isAwsK8s = useIsAwsK8sCloudProvider()
 
   // Opting for useState temporarily as Listbox doesn't seem to work with react-hook-form yet

@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
-
+import { DOCS_URL } from 'lib/constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
@@ -219,7 +219,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
         {showIndexCreationNotice && (
           <Admonition
             type="warning"
-            className="mb-0 border-x-0 border-t-0 rounded-none"
+            className="border-x-0 border-t-0 rounded-none"
             title="Vector table creation is currently only supported for projects in us-east-1"
             description={`This is only applicable to projects on local/staging (Project is currently in ${project.region})`}
           />
@@ -327,9 +327,10 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
             <SheetSection className="space-y-4">
               <div className="flex items-center justify-between">
                 <label className="text-sm text-foreground">Metadata keys</label>
-                <DocsButton href="https://supabase.com/docs/guides/storage/vector" />
+                <DocsButton
+                  href={`${DOCS_URL}/guides/storage/vector/storing-vectors#metadata-best-practices`}
+                />
               </div>
-
               <div className="space-y-2">
                 {fields.map((field, index) => (
                   <div key={field.id} className="flex items-start gap-2">
