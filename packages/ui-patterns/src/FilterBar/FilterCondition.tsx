@@ -214,7 +214,7 @@ export function FilterCondition({
               onFocus={() => handleOperatorFocus(path)}
               onBlur={handleOperatorBlur}
               onKeyDown={handleOperatorKeyDown}
-              className="h-full border-none bg-transparent py-0 px-1 text-center text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground-light w-full absolute left-0 top-0"
+              className="h-full border-none bg-transparent py-0 px-1 text-center text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-brand w-full absolute left-0 top-0"
               disabled={isLoading}
               aria-label={`Operator for ${property.label}`}
             />

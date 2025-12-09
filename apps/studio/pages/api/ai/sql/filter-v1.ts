@@ -16,11 +16,21 @@ const filterOptionSchema = z.union([
     .passthrough(),
 ])
 
+const filterOperatorSchema = z.union([
+  z.string(),
+  z
+    .object({
+      label: z.string().optional(),
+      value: z.string().optional(),
+    })
+    .passthrough(),
+])
+
 const filterPropertySchema = z.object({
   label: z.string(),
   name: z.string(),
   type: z.enum(['string', 'number', 'date', 'boolean']),
-  operators: z.array(z.string()).optional(),
+  operators: z.array(filterOperatorSchema).optional(),
   options: z.array(filterOptionSchema).optional(),
 })
 
@@ -44,7 +54,9 @@ const filterGroupSchema: z.ZodType<FilterGroupType> = z.lazy(() =>
 
 const requestSchema = z.object({
   prompt: z.string().min(1, 'Prompt is required'),
-  filterProperties: z.array(filterPropertySchema).min(1, 'At least one filter property is required'),
+  filterProperties: z
+    .array(filterPropertySchema)
+    .min(1, 'At least one filter property is required'),
   currentPath: z.array(z.number()).optional(),
 })
 
@@ -82,7 +94,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
     const normalizedFilterProperties = filterProperties.map((property) => ({
       ...property,
-      operators: property.operators && property.operators.length > 0 ? property.operators : ['='],
+      operators: serializeOperators(property.operators),
       options: serializeOptions(property.options),
     }))
 
@@ -143,11 +155,16 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-function isFilterGroup(condition: FilterGroupType | z.infer<typeof filterConditionSchema>): condition is FilterGroupType {
+function isFilterGroup(
+  condition: FilterGroupType | z.infer<typeof filterConditionSchema>
+): condition is FilterGroupType {
   return 'logicalOperator' in condition
 }
 
-function validateFilterGroup(group: FilterGroupType, properties: z.infer<typeof filterPropertySchema>[]) {
+function validateFilterGroup(
+  group: FilterGroupType,
+  properties: z.infer<typeof filterPropertySchema>[]
+) {
   return group.conditions.every((condition) => {
     if (isFilterGroup(condition)) {
       return validateFilterGroup(condition, properties)
@@ -186,6 +203,21 @@ function serializeOptions(options?: z.infer<typeof filterPropertySchema>['option
     .filter((value): value is string => Boolean(value))
 
   return serialized.length > 0 ? serialized : undefined
+}
+
+function serializeOperators(operators?: z.infer<typeof filterPropertySchema>['operators']) {
+  if (!operators || !Array.isArray(operators) || operators.length === 0) return ['=']
+
+  const serialized = operators
+    .map((operator) => {
+      if (typeof operator === 'string') return operator
+      if (operator?.value) return operator.value
+      if (operator?.label) return operator.label
+      return null
+    })
+    .filter((value): value is string => Boolean(value))
+
+  return serialized.length > 0 ? serialized : ['=']
 }
 
 const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
