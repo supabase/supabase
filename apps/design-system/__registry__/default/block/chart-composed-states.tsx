@@ -10,7 +10,9 @@ import {
   ChartContent,
   ChartEmptyState,
   ChartLoadingState,
+  ChartDisabledState,
 } from 'ui-patterns/Chart'
+import { Badge } from 'ui'
 
 export default function ChartComposedStates() {
   const actions = [
@@ -26,7 +28,7 @@ export default function ChartComposedStates() {
   const disabledActions = [
     {
       label: 'Upgrade to Pro',
-      href: '/pro',
+      href: '#',
     },
   ]
 
@@ -70,7 +72,17 @@ export default function ChartComposedStates() {
             <ChartTitle tooltip="This is a tooltip">Response Errors</ChartTitle>
             <ChartActions actions={actions} />
           </ChartHeader>
-          <ChartContent loadingState={<ChartLoadingState />} disabledActions={disabledActions}>
+          <ChartContent
+            loadingState={<ChartLoadingState />}
+            disabledState={
+              <ChartDisabledState
+                icon={<Badge variant="success">Pro</Badge>}
+                label="API Processing Time"
+                description="This chart is available on the Pro plan and above"
+                actions={disabledActions}
+              />
+            }
+          >
             My chart here...
           </ChartContent>
         </ChartCard>
