@@ -301,7 +301,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                       </InfoTooltip>
                     </TableCell>
                     <TableCell className="text-right font-medium py-2 px-0" translate="no">
-                      {formatCurrency(upcomingInvoice?.amount_projected) ?? '-'}
+                      {formatCurrency(upcomingInvoice.amount_projected) ?? '-'}
                     </TableCell>
                   </TableRow>
                 )}
