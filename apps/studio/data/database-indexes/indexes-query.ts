@@ -1,6 +1,6 @@
-import { getIndexesSQL } from '@supabase/pg-meta/src/sql/studio/get-indexes'
 import { useQuery } from '@tanstack/react-query'
 
+import { getIndexesSQL } from 'data/sql/queries/get-indexes'
 import { UseCustomQueryOptions } from 'types'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseIndexesKeys } from './keys'
