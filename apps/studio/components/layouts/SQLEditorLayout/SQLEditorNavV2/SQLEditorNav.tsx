@@ -294,7 +294,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     },
   })
 
-  const { mutate: deleteFolder, isLoading: isDeletingFolder } = useSQLSnippetFoldersDeleteMutation({
+  const { mutate: deleteFolder, isPending: isDeletingFolder } = useSQLSnippetFoldersDeleteMutation({
     onSuccess: (_, vars) => {
       toast.success('Successfully deleted folder')
       const { ids } = vars

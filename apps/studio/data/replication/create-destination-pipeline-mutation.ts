@@ -16,7 +16,7 @@ export type BigQueryDestinationConfig = {
 export type IcebergDestinationConfig = {
   projectRef: string
   warehouseName: string
-  namespace: string
+  namespace?: string
   catalogToken: string
   s3AccessKeyId: string
   s3SecretAccessKey: string
@@ -59,6 +59,7 @@ async function createDestinationPipeline(
 
   if ('bigQuery' in destinationConfig) {
     const { projectId, datasetId, serviceAccountKey, maxStalenessMins } = destinationConfig.bigQuery
+
     destination_config = {
       big_query: {
         project_id: projectId,
@@ -70,19 +71,20 @@ async function createDestinationPipeline(
   } else if ('iceberg' in destinationConfig) {
     const {
       projectRef: icebergProjectRef,
-      warehouseName,
       namespace,
+      warehouseName,
       catalogToken,
       s3AccessKeyId,
       s3SecretAccessKey,
       s3Region,
     } = destinationConfig.iceberg
+
     destination_config = {
       iceberg: {
         supabase: {
+          namespace,
           project_ref: icebergProjectRef,
           warehouse_name: warehouseName,
-          namespace: namespace,
           catalog_token: catalogToken,
           s3_access_key_id: s3AccessKeyId,
           s3_secret_access_key: s3SecretAccessKey,

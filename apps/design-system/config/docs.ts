@@ -26,6 +26,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Typography',
+          href: '/docs/typography',
+          items: [],
+        },
+        {
           title: 'Theming',
           href: '/docs/theming',
           items: [],
@@ -36,13 +41,8 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Figma',
-          href: '/docs/figma',
-          items: [],
-        },
-        {
-          title: 'Changelog',
-          href: '/docs/changelog',
+          title: 'Accessibility',
+          href: '/docs/accessibility',
           items: [],
         },
       ],
@@ -51,13 +51,28 @@ export const docsConfig: DocsConfig = {
       title: 'UI Patterns',
       items: [
         {
+          title: 'Introduction',
+          href: '/docs/ui-patterns/ui-pattern-components',
+          items: [],
+        },
+        {
           title: 'Navigation',
           href: '/docs/ui-patterns/navigation',
           items: [],
         },
         {
+          title: 'Layout',
+          href: '/docs/ui-patterns/layout',
+          items: [],
+        },
+        {
           title: 'Empty States',
           href: '/docs/ui-patterns/empty-states',
+          items: [],
+        },
+        {
+          title: 'Forms',
+          href: '/docs/ui-patterns/forms',
           items: [],
         },
       ],
@@ -67,7 +82,7 @@ export const docsConfig: DocsConfig = {
       items: [
         {
           title: 'Introduction',
-          href: '/docs/components/fragment-components',
+          href: '/docs/fragments/fragment-components',
           items: [],
         },
         {
@@ -81,8 +96,28 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'EmptyStatePresentational',
+          href: '/docs/fragments/empty-state-presentational',
+          items: [],
+        },
+        {
           title: 'Modal',
           href: '/docs/fragments/modal',
+          items: [],
+        },
+        {
+          title: 'Page Container',
+          href: '/docs/fragments/page-container',
+          items: [],
+        },
+        {
+          title: 'Page Header',
+          href: '/docs/fragments/page-header',
+          items: [],
+        },
+        {
+          title: 'Page Section',
+          href: '/docs/fragments/page-section',
           items: [],
         },
         {
@@ -123,6 +158,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Logs Bar Chart',
           href: '/docs/fragments/logs-bar-chart',
+          items: [],
+        },
+        {
+          title: 'Metric Card',
+          href: '/docs/fragments/metric-card',
           items: [],
         },
         {
@@ -257,6 +297,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Field',
+          href: '/docs/components/field',
+          items: [],
+        },
+        {
           title: 'Form',
           href: '/docs/components/form',
           items: [],
@@ -281,6 +326,12 @@ export const docsConfig: DocsConfig = {
           title: 'Label',
           href: '/docs/components/label',
           items: [],
+        },
+        {
+          title: 'Mermaid',
+          href: '/docs/components/mermaid',
+          items: [],
+          label: 'New',
         },
         {
           title: 'Menubar',

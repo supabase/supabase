@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
 
 import { useFlag, useParams } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
@@ -19,7 +19,6 @@ import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
-import { LayoutSidebar } from './LayoutSidebar'
 import { LoadingState } from './LoadingState'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import { PauseFailedState } from './PauseFailedState'
@@ -84,7 +83,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     ref
   ) => {
     const router = useRouter()
-    const [isClient, setIsClient] = useState(false)
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
     const { mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
@@ -111,9 +109,9 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
     const showPausedState = isPaused && !ignorePausedState
 
-    useEffect(() => {
-      setIsClient(true)
-    }, [])
+    const sidebarMinSizePercentage = 1
+    const sidebarDefaultSizePercentage = 15
+    const sidebarMaxSizePercentage = 33
 
     return (
       <>
@@ -132,12 +130,14 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
           <meta name="description" content="Supabase Studio" />
         </Head>
         <div className="flex flex-row h-full w-full">
-          <ResizablePanelGroup direction="horizontal" autoSaveId="project-layout">
+          {/*  autoSaveId="project-layout" */}
+          <ResizablePanelGroup direction="horizontal">
             {showProductMenu && productMenu && (
               <ResizablePanel
                 order={1}
-                maxSize={33}
-                defaultSize={1}
+                minSize={sidebarMinSizePercentage}
+                maxSize={sidebarMaxSizePercentage}
+                defaultSize={sidebarDefaultSizePercentage}
                 id="panel-left"
                 className={cn(
                   'hidden md:block',
@@ -180,41 +180,30 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
               />
             )}
             <ResizablePanel
-              defaultSize={1}
               order={2}
-              id="panel-right"
-              className="h-full flex flex-col w-full"
+              minSize={100 - sidebarMaxSizePercentage}
+              maxSize={100 - sidebarMinSizePercentage}
+              defaultSize={100 - sidebarDefaultSizePercentage}
+              id="panel-project-content"
+              className={cn('h-full flex flex-col w-full xl:min-w-[600px] bg-dash-sidebar')}
             >
-              <ResizablePanelGroup
-                direction="horizontal"
-                className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
-                autoSaveId="project-layout-content"
+              <main
+                className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden @container"
+                ref={ref}
               >
-                <ResizablePanel
-                  id="panel-content"
-                  defaultSize={1}
-                  className={cn('w-full xl:min-w-[600px] bg-dash-sidebar')}
-                >
-                  <main
-                    className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden @container"
-                    ref={ref}
-                  >
-                    {showPausedState ? (
-                      <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
-                        <div className="w-full">
-                          <ProjectPausedState product={product} />
-                        </div>
-                      </div>
-                    ) : (
-                      <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
-                        <ResourceExhaustionWarningBanner />
-                        {children}
-                      </ContentWrapper>
-                    )}
-                  </main>
-                </ResizablePanel>
-                <LayoutSidebar />
-              </ResizablePanelGroup>
+                {showPausedState ? (
+                  <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+                    <div className="w-full">
+                      <ProjectPausedState product={product} />
+                    </div>
+                  </div>
+                ) : (
+                  <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
+                    <ResourceExhaustionWarningBanner />
+                    {children}
+                  </ContentWrapper>
+                )}
+              </main>
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
@@ -303,9 +292,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const isProjectBuilding =
     selectedProject?.status === PROJECT_STATUS.COMING_UP ||
     selectedProject?.status === PROJECT_STATUS.UNKNOWN
-  const isProjectPausing =
-    selectedProject?.status === PROJECT_STATUS.GOING_DOWN ||
-    selectedProject?.status === PROJECT_STATUS.PAUSING
+  const isProjectPausing = selectedProject?.status === PROJECT_STATUS.PAUSING
   const isProjectPauseFailed = selectedProject?.status === PROJECT_STATUS.PAUSE_FAILED
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
 

@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
@@ -21,7 +22,11 @@ export const GraphiQLTab = () => {
 
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
 
-  const { data: apiKeys, isFetched } = useAPIKeysQuery({ projectRef, reveal: true })
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: apiKeys, isFetched } = useAPIKeysQuery(
+    { projectRef, reveal: true },
+    { enabled: canReadAPIKeys }
+  )
   const { serviceKey, secretKey } = getKeys(apiKeys)
 
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })

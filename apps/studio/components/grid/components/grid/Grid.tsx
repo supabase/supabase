@@ -2,6 +2,7 @@ import { forwardRef, memo, Ref, useRef } from 'react'
 import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
 import { ref as valtioRef } from 'valtio'
 
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
@@ -14,7 +15,7 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import type { Filter, GridProps, SupaRow } from '../../types'
+import type { GridProps, SupaRow } from '../../types'
 import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
 import RowRenderer from './RowRenderer'
@@ -26,11 +27,10 @@ const rowKeyGetter = (row: SupaRow) => {
 interface IGrid extends GridProps {
   rows: any[]
   error: any
+  isDisabled?: boolean
   isLoading: boolean
   isSuccess: boolean
   isError: boolean
-  filters: Filter[]
-  onApplyFilters: (appliedFilters: Filter[]) => void
 }
 
 // [Joshen] Just for visibility this is causing some hook errors in the browser
@@ -45,16 +45,16 @@ export const Grid = memo(
         rowClass,
         rows,
         error,
+        isDisabled = false,
         isLoading,
         isSuccess,
         isError,
-        filters,
-        onApplyFilters,
       },
       ref: Ref<DataGridHandle> | undefined
     ) => {
       const tableEditorSnap = useTableEditorStateSnapshot()
       const snap = useTableEditorTableStateSnapshot()
+      const { filters, onApplyFilters } = useTableFilter()
 
       const { data: org } = useSelectedOrganizationQuery()
       const { data: project } = useSelectedProjectQuery()
@@ -145,7 +145,7 @@ export const Grid = memo(
           {(rows ?? []).length === 0 && (
             <div
               className={cn(
-                'absolute top-9 p-2 w-full z-[1]',
+                'absolute top-9 p-2 w-full z-[1] pointer-events-none',
                 isTableEmpty && isDraggedOver && 'border-2 border-dashed',
                 isValidFileDraggedOver ? 'border-brand-600' : 'border-destructive-600'
               )}
@@ -154,7 +154,7 @@ export const Grid = memo(
               onDragLeave={onDragOver}
               onDrop={onFileDrop}
             >
-              {isLoading && <GenericSkeletonLoader />}
+              {isLoading && !isDisabled && <GenericSkeletonLoader />}
 
               {isError && <GridError error={error} />}
 
@@ -175,7 +175,7 @@ export const Grid = memo(
                     </div>
                   ) : (filters ?? []).length === 0 ? (
                     <div className="flex flex-col items-center justify-center col-span-full h-full">
-                      <p className="text-sm text-light">
+                      <p className="text-sm text-light pointer-events-auto">
                         {isDraggedOver ? (
                           isValidFileDraggedOver ? (
                             'Drop your CSV file here'
@@ -188,7 +188,7 @@ export const Grid = memo(
                       </p>
                       {tableEntityType === ENTITY_TYPE.FOREIGN_TABLE ? (
                         <div className="flex items-center space-x-2 mt-4">
-                          <p className="text-sm text-light">
+                          <p className="text-sm text-light pointer-events-auto">
                             This table is a foreign table. Add data to the connected source to get
                             started.
                           </p>
@@ -213,7 +213,7 @@ export const Grid = memo(
                             >
                               Import data from CSV
                             </Button>
-                            <p className="text-xs text-foreground-light">
+                            <p className="text-xs text-foreground-light pointer-events-auto">
                               or drag and drop a CSV file here
                             </p>
                           </div>
@@ -222,7 +222,7 @@ export const Grid = memo(
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center col-span-full h-full">
-                      <p className="text-sm text-light">
+                      <p className="text-sm text-light pointer-events-auto">
                         The filters applied have returned no results from this table
                       </p>
                       <div className="flex items-center space-x-2 mt-4">

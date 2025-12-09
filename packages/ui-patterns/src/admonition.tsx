@@ -1,5 +1,5 @@
 import { cva } from 'class-variance-authority'
-import { forwardRef, ReactNode } from 'react'
+import { ComponentProps, forwardRef, ReactNode } from 'react'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, cn } from 'ui'
 
 export interface AdmonitionProps {
@@ -14,14 +14,15 @@ export interface AdmonitionProps {
     | 'warning'
   label?: string
   title?: string
-  description?: string | React.ReactNode
+  description?: string | ReactNode
   showIcon?: boolean
   childProps?: {
-    title?: React.ComponentProps<typeof AlertTitle_Shadcn_>
-    description?: React.ComponentProps<typeof AlertDescription_Shadcn_>
+    title?: ComponentProps<typeof AlertTitle_Shadcn_>
+    description?: ComponentProps<typeof AlertDescription_Shadcn_>
   }
   layout?: 'horizontal' | 'vertical'
   actions?: ReactNode
+  icon?: ReactNode
 }
 
 const admonitionToAlertMapping: Record<
@@ -78,16 +79,6 @@ const admonitionSVG = cva('', {
   },
 })
 
-const admonitionBase = cva('', {
-  variants: {
-    type: {
-      default: `bg-surface-200/25 border border-default`,
-      warning: `bg-alternative border border-default`,
-      destructive: `bg-alternative border border-default`,
-    },
-  },
-})
-
 export const Admonition = forwardRef<
   React.ElementRef<typeof Alert_Shadcn_>,
   React.ComponentPropsWithoutRef<typeof Alert_Shadcn_> & AdmonitionProps
@@ -103,6 +94,8 @@ export const Admonition = forwardRef<
       children,
       layout = 'vertical',
       actions,
+      childProps = {},
+      icon,
       ...props
     },
     ref
@@ -114,14 +107,11 @@ export const Admonition = forwardRef<
         ref={ref}
         variant={typeMapped}
         {...props}
-        className={cn(
-          'mb-2',
-          admonitionSVG({ type: typeMapped }),
-          admonitionBase({ type: typeMapped }),
-          props.className
-        )}
+        className={cn(admonitionSVG({ type: typeMapped }), props.className)}
       >
-        {(showIcon && typeMapped === 'warning') || typeMapped === 'destructive' ? (
+        {!!icon ? (
+          icon
+        ) : (showIcon && typeMapped === 'warning') || typeMapped === 'destructive' ? (
           <WarningIcon />
         ) : showIcon ? (
           <InfoIcon />
@@ -135,28 +125,25 @@ export const Admonition = forwardRef<
           {label || title ? (
             <div>
               <AlertTitle_Shadcn_
-                {...props.childProps?.title}
+                {...childProps.title}
                 className={cn(
                   'text mt-0.5 flex gap-3 text-sm [&_p]:mb-1.5 [&_p]:mt-0',
                   !label && 'flex-col',
-                  props.childProps?.title?.className
+                  childProps.title?.className
                 )}
               >
                 {label || title}
               </AlertTitle_Shadcn_>
               {description && (
-                <AlertDescription_Shadcn_ className={props.childProps?.description?.className}>
+                <AlertDescription_Shadcn_ className={childProps.description?.className}>
                   {description}
                 </AlertDescription_Shadcn_>
               )}
               {/* // children is to handle Docs and MDX issues with children and <p> elements */}
               {children && (
                 <AlertDescription_Shadcn_
-                  {...props.childProps?.description}
-                  className={cn(
-                    '[&_p]:mb-1.5 [&_p]:mt-0',
-                    props.childProps?.description?.className
-                  )}
+                  {...childProps.description}
+                  className={cn('[&_p]:mb-1.5 [&_p]:mt-0', childProps?.description?.className)}
                 >
                   {children}
                 </AlertDescription_Shadcn_>

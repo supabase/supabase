@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useFlag, useParams } from 'common'
-import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPrimaryKeysExists } from 'data/database/primary-keys-exists-query'
@@ -14,6 +14,7 @@ import { useCreateDestinationPipelineMutation } from 'data/replication/create-de
 import { useReplicationDestinationByIdQuery } from 'data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
+import { useRestartPipelineHelper } from 'data/replication/restart-pipeline-helper'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
 import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
@@ -35,6 +36,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
+import { NewPublicationPanel } from '../NewPublicationPanel'
 import { ReplicationDisclaimerDialog } from '../ReplicationDisclaimerDialog'
 import { AdvancedSettings } from './AdvancedSettings'
 import { DestinationNameInput } from './DestinationNameInput'
@@ -87,27 +89,29 @@ export const DestinationPanel = ({
 
   const editMode = !!existingDestination
   const [showDisclaimerDialog, setShowDisclaimerDialog] = useState(false)
+  const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
   const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
     null
   )
   const [isFormInteracting, setIsFormInteracting] = useState(false)
 
-  const { mutateAsync: createDestinationPipeline, isLoading: creatingDestinationPipeline } =
+  const { mutateAsync: createDestinationPipeline, isPending: creatingDestinationPipeline } =
     useCreateDestinationPipelineMutation({
       onSuccess: () => form.reset(defaultValues),
     })
 
-  const { mutateAsync: updateDestinationPipeline, isLoading: updatingDestinationPipeline } =
+  const { mutateAsync: updateDestinationPipeline, isPending: updatingDestinationPipeline } =
     useUpdateDestinationPipelineMutation({
       onSuccess: () => form.reset(defaultValues),
     })
 
-  const { mutateAsync: startPipeline, isLoading: startingPipeline } = useStartPipelineMutation()
+  const { mutateAsync: startPipeline, isPending: startingPipeline } = useStartPipelineMutation()
+  const { restartPipeline } = useRestartPipelineHelper()
 
-  const { mutateAsync: createS3AccessKey, isLoading: isCreatingS3AccessKey } =
+  const { mutateAsync: createS3AccessKey, isPending: isCreatingS3AccessKey } =
     useS3AccessKeyCreateMutation()
 
-  const { mutateAsync: createNamespace, isLoading: isCreatingNamespace } =
+  const { mutateAsync: createNamespace, isPending: isCreatingNamespace } =
     useIcebergNamespaceCreateMutation()
 
   const {
@@ -126,7 +130,11 @@ export const DestinationPanel = ({
     pipelineId: existingDestination?.pipelineId,
   })
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef, reveal: true })
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: apiKeys } = useAPIKeysQuery(
+    { projectRef, reveal: true },
+    { enabled: canReadAPIKeys }
+  )
   const { serviceKey } = getKeys(apiKeys)
   const catalogToken = serviceKey?.api_key ?? ''
 
@@ -212,20 +220,11 @@ export const DestinationPanel = ({
   // Helper function to handle namespace creation if needed
   const resolveNamespace = async (data: z.infer<typeof FormSchema>) => {
     if (data.namespace === CREATE_NEW_NAMESPACE) {
-      if (!data.newNamespaceName) {
-        throw new Error('New namespace name is required')
-      }
-
-      // Construct catalog URI for namespace creation
-      const protocol = projectSettings?.app_config?.protocol ?? 'https'
-      const endpoint =
-        projectSettings?.app_config?.storage_endpoint || projectSettings?.app_config?.endpoint
-      const catalogUri = getCatalogURI(project?.ref ?? '', protocol, endpoint)
+      if (!data.newNamespaceName) throw new Error('New namespace name is required')
 
       await createNamespace({
-        catalogUri,
+        projectRef,
         warehouse: data.warehouseName!,
-        token: catalogToken,
         namespace: data.newNamespaceName,
       })
 
@@ -313,6 +312,7 @@ export const DestinationPanel = ({
             snapshot
           )
           toast.success('Settings applied. Restarting the pipeline...')
+          restartPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         } else {
           setRequestStatus(
             existingDestination.pipelineId,
@@ -320,8 +320,8 @@ export const DestinationPanel = ({
             snapshot
           )
           toast.success('Settings applied. Starting the pipeline...')
+          startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         }
-        startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         onClose()
       } else {
         let destinationConfig: any = {}
@@ -436,7 +436,11 @@ export const DestinationPanel = ({
   return (
     <>
       <Sheet open={visible} onOpenChange={onClose}>
-        <SheetContent showClose={false} size="default">
+        <SheetContent
+          showClose={false}
+          size="default"
+          className={publicationPanelVisible ? 'right-32' : 'right-0'}
+        >
           <div className="flex flex-col h-full" tabIndex={-1}>
             <SheetHeader>
               <SheetTitle>{editMode ? 'Edit destination' : 'Create a new destination'}</SheetTitle>
@@ -463,7 +467,12 @@ export const DestinationPanel = ({
 
                       <div className="space-y-4">
                         <DestinationNameInput form={form} />
-                        <PublicationSelection form={form} sourceId={sourceId} visible={visible} />
+                        <PublicationSelection
+                          form={form}
+                          sourceId={sourceId}
+                          visible={visible}
+                          onSelectNewPublication={() => setPublicationPanelVisible(true)}
+                        />
                       </div>
                     </div>
                     <DialogSectionSeparator />
@@ -509,6 +518,12 @@ export const DestinationPanel = ({
           </div>
         </SheetContent>
       </Sheet>
+
+      <NewPublicationPanel
+        sourceId={sourceId}
+        visible={publicationPanelVisible}
+        onClose={() => setPublicationPanelVisible(false)}
+      />
 
       <ReplicationDisclaimerDialog
         open={showDisclaimerDialog}

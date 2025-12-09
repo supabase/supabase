@@ -1,7 +1,7 @@
 import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
 import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
-import Link from 'next/link'
 
 import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
@@ -15,7 +15,7 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
+import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -209,7 +209,12 @@ export const DatabaseConnectionString = () => {
     const lang = connectionInfo?.lang ?? 'Unknown'
     sendEvent({
       action: 'connection_string_copied',
-      properties: { connectionType, lang, connectionMethod: connectionStringMethod },
+      properties: {
+        connectionType,
+        lang,
+        connectionMethod: connectionStringMethod,
+        connectionTab: 'Connection String',
+      },
       groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
   }
@@ -330,15 +335,13 @@ export const DatabaseConnectionString = () => {
         <p className="text-xs inline-flex items-center gap-1 text-foreground-lighter">
           <BookOpen size={12} strokeWidth={1.5} className="-mb-px" /> Learn how to connect to your
           Postgres databases.
-          <Link
-            href="https://supabase.com/docs/guides/database/connecting-to-postgres"
-            className="underline transition hover:text-foreground inline-flex items-center gap-1"
-            target="_blank"
-            rel="noreferrer"
+          <InlineLink
             title="Read docs"
+            className="flex items-center gap-x-1"
+            href={`${DOCS_URL}/guides/database/connecting-to-postgres`}
           >
             Read docs <ExternalLink size={12} strokeWidth={1.5} />
-          </Link>
+          </InlineLink>
         </p>
       </div>
 
@@ -491,11 +494,9 @@ export const DatabaseConnectionString = () => {
                             }
                             className="text-foreground !bg-dash-sidebar justify-between"
                           >
-                            <div className="text-xs flex items-center py-2 px-1">
+                            <div className="text-xs flex items-center gap-x-2 py-2 px-1">
                               <span>Using the Shared Pooler</span>
-                              <Badge variant={'brand'} size={'small'} className="ml-2">
-                                IPv4 compatible
-                              </Badge>
+                              <Badge variant="success">IPv4 compatible</Badge>
                             </div>
                           </Button>
                         </CollapsibleTrigger_Shadcn_>
@@ -528,7 +529,7 @@ export const DatabaseConnectionString = () => {
                     <Admonition
                       type="warning"
                       title="Highly recommended to not use Session Pooler"
-                      className="[&>div]:gap-0 px-8 [&>svg]:left-7 border-0 border-b rounded-none border-border-muted !py-4 mb-0"
+                      className="[&>div]:gap-0 px-8 [&>svg]:left-7 border-0 border-b rounded-none border-border-muted !py-4"
                     >
                       <p className="text-sm text-foreground-lighter !mb-0">
                         If you are using Session Pooler, we recommend switching to Direct

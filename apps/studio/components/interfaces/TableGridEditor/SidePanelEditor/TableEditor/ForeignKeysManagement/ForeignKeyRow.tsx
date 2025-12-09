@@ -49,7 +49,7 @@ export const ForeignKeyRow = ({
             {status !== undefined && (
               <Badge
                 variant={
-                  status === 'ADD' ? 'brand' : status === 'UPDATE' ? 'warning' : 'destructive'
+                  status === 'ADD' ? 'success' : status === 'UPDATE' ? 'warning' : 'destructive'
                 }
               >
                 {status}
@@ -96,7 +96,7 @@ export const ForeignKeyRow = ({
                 {x.source || '[column_name]'}
               </code>
               <ArrowRight size={16} />
-              <code className="text-xs">
+              <code className="text-code-inline">
                 {foreignKey.schema}.{foreignKey.table}.{x.target}
               </code>
             </div>

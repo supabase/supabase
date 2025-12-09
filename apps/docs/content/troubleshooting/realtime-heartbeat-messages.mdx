@@ -1,0 +1,247 @@
+---
+title = "Understanding and Monitoring Realtime Heartbeats"
+github_url = ""
+date_created = "2025-11-28T00:00:00+00:00"
+topics = [ "realtime" ]
+keywords = [ "heartbeat", "connection", "websocket", "keep-alive", "timeout", "onHeartbeat", "heartbeatCallback", "reconnect" ]
+database_id = ""
+---
+
+## What are heartbeat messages?
+
+Heartbeat messages are periodic signals sent between the Realtime client and server to verify that the WebSocket connection is alive and functioning properly. The client sends a heartbeat message on the `phoenix` topic with the event type `heartbeat` at regular intervals (default: 25 seconds), and the server responds with a `phx_reply` message.
+
+These messages serve as a keep-alive mechanism to detect connection issues that might not be immediately apparent, such as silent network failures or intermediary proxy timeouts.
+
+## Why heartbeats matter
+
+Heartbeat messages are critical for maintaining reliable real-time connections:
+
+- **Connection health monitoring**: They detect when a connection has silently failed without triggering WebSocket close events
+- **Automatic recovery**: When heartbeats time out, the client automatically attempts to reconnect
+- **Network proxy compatibility**: Many network proxies and load balancers close idle connections; heartbeats keep the connection active
+- **Early issue detection**: Heartbeat timeouts alert you to connection problems before users experience message delivery failures
+
+Without heartbeats, your application might appear connected while being unable to send or receive messages.
+
+## How to handle heartbeat messages
+
+You can monitor heartbeat lifecycle events using the `onHeartbeat` method:
+
+```tsx
+import { useEffect } from 'react'
+import { createClient } from '@supabase/supabase-js'
+
+function MyComponent() {
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+  useEffect(() => {
+    supabase.realtime.onHeartbeat((status) => {
+      console.log('Heartbeat status:', status)
+      // status can be: 'sent', 'ok', 'error', 'timeout', or 'disconnected'
+    })
+  }, [supabase])
+
+  return <div>Your app content</div>
+}
+```
+
+Or configure the callback during client initialization:
+
+```tsx
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  realtime: {
+    heartbeatCallback: (status) => {
+      console.log('Heartbeat status:', status)
+    },
+  },
+})
+```
+
+## Troubleshooting heartbeat issues
+
+### Frequent heartbeat timeouts
+
+If you're seeing frequent `timeout` status in your heartbeat callback:
+
+- **Network instability**: Check your network connection quality
+- **Firewall/proxy issues**: Corporate firewalls or proxies might interfere with WebSocket connections
+- **Mobile app suspension**: On mobile, the app can be suspended which can stop the heartbeat timers
+
+**Connection not reconnecting after timeout**
+
+The client automatically attempts reconnection with exponential backoff (1s, 2s, 5s, 10s). If you need to manually reconnect:
+
+```tsx
+import { useState, useEffect } from 'react'
+import { createClient } from '@supabase/supabase-js'
+
+function ConnectionStatus() {
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+  const [isConnected, setIsConnected] = useState(true)
+
+  useEffect(() => {
+    supabase.realtime.onHeartbeat((status) => {
+      if (status === 'ok') {
+        setIsConnected(true)
+      } else if (status === 'timeout' || status === 'disconnected') {
+        setIsConnected(false)
+      }
+    })
+  }, [supabase])
+
+  const handleReconnect = () => {
+    supabase.realtime.connect()
+  }
+
+  return (
+    <div>
+      <p>Status: {isConnected ? 'Connected' : 'Disconnected'}</p>
+      {!isConnected && <button onClick={handleReconnect}>Reconnect</button>}
+    </div>
+  )
+}
+```
+
+### Customizing heartbeat interval
+
+You can adjust the heartbeat frequency when creating your Supabase client in React:
+
+```tsx
+import { createClient } from '@supabase/supabase-js'
+import { useMemo } from 'react'
+
+function App() {
+  const supabase = useMemo(
+    () =>
+      createClient(SUPABASE_URL, SUPABASE_KEY, {
+        realtime: {
+          heartbeatIntervalMs: 15000, // Send heartbeat every 15 seconds (default: 25000)
+        },
+      }),
+    []
+  )
+
+  return <YourApp supabase={supabase} />
+}
+```
+
+Note: Increasing the interval reduces network traffic but delays detection of connection failures. Decreasing it improves detection speed but increases overhead.
+
+### Heartbeat errors in Web workers
+
+For React applications with long-running connections, use Web Workers to prevent browser tab throttling:
+
+```tsx
+import { createClient } from '@supabase/supabase-js'
+import { useMemo } from 'react'
+
+function App() {
+  const supabase = useMemo(
+    () =>
+      createClient(SUPABASE_URL, SUPABASE_KEY, {
+        realtime: {
+          worker: true,
+          workerUrl: '/worker.js', // Optional: Place in public folder
+        },
+      }),
+    []
+  )
+
+  return <YourApp supabase={supabase} />
+}
+```
+
+If the worker fails to start, check:
+
+- Browser Web Worker support is available
+- Worker script is in the public folder and accessible
+- CORS headers allow loading the worker script
+
+## Best practices
+
+### Show connection status to users
+
+Display connection status with a simple indicator:
+
+```tsx
+import { useState, useEffect } from 'react'
+import { createClient } from '@supabase/supabase-js'
+
+function ConnectionIndicator() {
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+  const [status, setStatus] = useState('healthy')
+
+  useEffect(() => {
+    supabase.realtime.onHeartbeat((heartbeatStatus) => {
+      if (heartbeatStatus === 'ok') {
+        setStatus('healthy')
+      } else if (heartbeatStatus === 'timeout') {
+        setStatus('poor')
+      } else if (heartbeatStatus === 'disconnected') {
+        setStatus('disconnected')
+      }
+    })
+  }, [supabase])
+
+  return (
+    <div>
+      <span>Connection: {status}</span>
+    </div>
+  )
+}
+```
+
+### Reconnect when React Native app comes to foreground
+
+Ensure connection is active when user opens your app:
+
+```tsx
+import { useEffect } from 'react'
+import { AppState } from 'react-native'
+import { createClient } from '@supabase/supabase-js'
+
+function App() {
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (nextAppState === 'active') {
+        if (!supabase.realtime.isConnected()) {
+          supabase.realtime.connect()
+        }
+      }
+    })
+
+    return () => {
+      subscription.remove()
+    }
+  }, [supabase])
+
+  return <YourApp />
+}
+```
+
+### Monitor connection in your entire app
+
+Set up monitoring when you create your Supabase client:
+
+```tsx
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  realtime: {
+    heartbeatCallback: (status) => {
+      if (status === 'ok') {
+        console.log('Connection healthy')
+      } else if (status === 'timeout') {
+        console.warn('Connection slow')
+      } else if (status === 'disconnected') {
+        console.error('Disconnected')
+      }
+    },
+  },
+})
+
+export default supabase
+```

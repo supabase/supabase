@@ -10,7 +10,7 @@ import {
 import { InlineLink } from 'components/ui/InlineLink'
 import { DOCS_URL } from 'lib/constants'
 import { Card } from 'ui'
-import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './constants'
+import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './AnalyticsBucketDetails.constants'
 import { CopyEnvButton } from './CopyEnvButton'
 import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
 import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperInstance'
@@ -23,9 +23,11 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName?: string
   const { data: wrapperInstance } = useAnalyticsBucketWrapperInstance({ bucketId: bucketName })
   const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
 
+  if (!wrapperInstance) return null
+
   return (
     <ScaffoldSection isFullWidth>
-      <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">
+      <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8 pt-0">
         <div>
           <ScaffoldSectionTitle>Connection details</ScaffoldSectionTitle>
           <ScaffoldSectionDescription>
@@ -35,7 +37,6 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName?: string
             >
               Learn more
             </InlineLink>
-            .
           </ScaffoldSectionDescription>
         </div>
         <CopyEnvButton
