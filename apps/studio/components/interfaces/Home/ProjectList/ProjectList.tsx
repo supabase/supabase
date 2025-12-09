@@ -15,17 +15,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import { isAtBottom } from 'lib/helpers'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import type { Organization } from 'types'
-import {
-  Card,
-  cn,
-  LoadingLine,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui'
+import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import {
   LoadingCardView,
   LoadingTableRow,
@@ -161,18 +151,13 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
       <Card className="flex-1 min-h-0 overflow-y-auto mb-8" onScroll={handleScroll}>
         <Table>
           {/* [Joshen] Ideally we can figure out sticky table headers here */}
-          <TableHeader className="[&>tr>th]:sticky [&>tr>th]:top-0">
+          <TableHeader>
             <TableRow>
               <TableHead>Project</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Compute</TableHead>
               <TableHead>Region</TableHead>
               <TableHead>Created</TableHead>
-            </TableRow>
-            <TableRow className="!border-b-0">
-              <TableCell colSpan={5} className="p-0">
-                <LoadingLine loading={isFetching} />
-              </TableCell>
             </TableRow>
           </TableHeader>
           <TableBody>
