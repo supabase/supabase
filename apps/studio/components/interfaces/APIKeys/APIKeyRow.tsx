@@ -35,7 +35,7 @@ export const APIKeyRow = ({
 }) => {
   const MotionTableRow = motion.create(TableRow)
 
-  const hideApiKeyLastUsed = useFlag('HideApiKeyLastUsed')
+  const hideApiKeyLastUsed = useFlag('HideApiKeyLastUsed', true)
 
   return (
     <>
