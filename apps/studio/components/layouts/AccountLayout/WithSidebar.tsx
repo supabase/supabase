@@ -1,10 +1,10 @@
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren, ReactNode } from 'react'
+import { useAppStateSnapshot } from 'state/app-state'
 import { cn, Menu } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import type { SidebarSection } from './AccountLayout.types'
-import { useAppStateSnapshot } from 'state/app-state'
 
 interface WithSidebarProps {
   title: string
@@ -49,7 +49,7 @@ export const WithSidebar = ({
       )}
       <div className="flex flex-1 flex-col">
         <div className="flex-1 flex-grow overflow-y-auto">
-          <div className="mx-auto max-w-7xl w-full px-6 lg:px-14 xl:px-28 2xl:px-32 py-16">
+          <div className="mx-auto max-w-7xl w-full md:px-6 lg:px-14 xl:px-28 2xl:px-32 py-16">
             {children}
           </div>
         </div>

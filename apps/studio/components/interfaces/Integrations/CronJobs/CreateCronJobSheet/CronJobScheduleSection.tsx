@@ -48,7 +48,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
     { name: 'Every Monday at 2 AM', expression: '0 2 * * 1' },
   ] as const
 
-  const { mutate: generateCronSyntax, isLoading: isGeneratingCron } = useSqlCronGenerateMutation({
+  const { mutate: generateCronSyntax, isPending: isGeneratingCron } = useSqlCronGenerateMutation({
     onSuccess: (expression) => {
       form.setValue('schedule', expression, {
         shouldValidate: true,

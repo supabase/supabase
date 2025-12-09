@@ -9,7 +9,7 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -71,18 +71,20 @@ const GitHubSection = () => {
                   branch, keep your production branch in sync, and automatically create preview
                   branches for every pull request.
                 </p>
-                {promptProPlanUpgrade && (
+                {promptProPlanUpgrade ? (
                   <div className="mb-6">
                     <UpgradeToPro
+                      source="github-integration"
+                      featureProposition="use GitHub integrations"
                       primaryText="Upgrade to unlock GitHub integration"
                       secondaryText="Connect your GitHub repository to automatically sync preview branches and deploy changes."
-                      source="github-integration"
                     />
                   </div>
+                ) : (
+                  <div className={cn(promptProPlanUpgrade && 'opacity-25 pointer-events-none')}>
+                    <GitHubIntegrationConnectionForm connection={existingConnection} />
+                  </div>
                 )}
-                <div className={cn(promptProPlanUpgrade && 'opacity-25 pointer-events-none')}>
-                  <GitHubIntegrationConnectionForm connection={existingConnection} />
-                </div>
               </div>
             </div>
           )}

@@ -26,14 +26,6 @@ export type TableField = {
   default?: string // Must be string for table editor compatibility
   description?: string
   isPrimary?: boolean
-  isForeign?: boolean
-  references?: string
-}
-
-export type TableRelationship = {
-  from: string
-  to: string
-  type: 'one-to-one' | 'one-to-many' | 'many-to-many' | 'many-to-one'
 }
 
 export enum TableSource {
@@ -45,13 +37,7 @@ export enum QuickstartVariant {
   CONTROL = 'control',
   AI = 'ai',
   TEMPLATES = 'templates',
-}
-
-export enum ViewMode {
-  INITIAL = 'initial',
-  AI_INPUT = 'ai-input',
-  AI_RESULTS = 'ai-results',
-  CATEGORY_SELECTED = 'category-selected',
+  ASSISTANT = 'assistant',
 }
 
 export type TableSuggestion = {
@@ -59,7 +45,6 @@ export type TableSuggestion = {
   fields: TableField[]
   rationale?: string
   source: TableSource
-  relationships?: TableRelationship[]
 }
 
 export type AIGeneratedSchema = {
@@ -70,13 +55,10 @@ export type AIGeneratedSchema = {
       name: string
       type: string
       isPrimary?: boolean
-      isForeign?: boolean
-      references?: string
       isNullable?: boolean
       defaultValue?: string
       isUnique?: boolean
     }>
-    relationships?: TableRelationship[]
   }>
   summary: string
 }

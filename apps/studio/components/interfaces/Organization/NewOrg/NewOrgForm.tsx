@@ -2,10 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Elements } from '@stripe/react-stripe-js'
 import type { PaymentIntentResult, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
-import _ from 'lodash'
+import { groupBy } from 'lodash'
 import { HelpCircle } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -16,6 +15,10 @@ import { z } from 'zod'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
+import {
+  NewPaymentMethodElement,
+  type PaymentMethodElementRef,
+} from 'components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
 import { InlineLink } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
@@ -41,16 +44,9 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Switch,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import {
-  NewPaymentMethodElement,
-  type PaymentMethodElementRef,
-} from '../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
+import { UpgradeExistingOrganizationCallout } from './UpgradeExistingOrganizationCallout'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -132,11 +128,8 @@ export const NewOrgForm = ({
   // in onSubmit below, which isn't a critical functionality imo so am okay for now. But ideally perhaps this data can
   // be computed on the API and returned in /profile or something (since this data is on the account level)
   const projectsByOrg = useMemo(() => {
-    return _.groupBy(projects, 'organization_slug')
+    return groupBy(projects, 'organization_slug')
   }, [projects])
-
-  const [isOrgCreationConfirmationModalVisible, setIsOrgCreationConfirmationModalVisible] =
-    useState(false)
 
   const stripeOptionsPaymentMethod: StripeElementsOptions = useMemo(
     () =>
@@ -197,6 +190,11 @@ export const NewOrgForm = ({
   const [paymentConfirmationLoading, setPaymentConfirmationLoading] = useState(false)
   const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
   const [paymentIntentSecret, setPaymentIntentSecret] = useState<string | null>(null)
+
+  const hasFreeOrgWithProjects = useMemo(
+    () => freeOrgs.some((it) => projectsByOrg[it.slug]?.length > 0),
+    [freeOrgs, projectsByOrg]
+  )
 
   const { mutate: createOrganization } = useOrganizationCreateMutation({
     onSuccess: async (org) => {
@@ -299,14 +297,6 @@ export const NewOrgForm = ({
   const paymentRef = useRef<PaymentMethodElementRef | null>(null)
 
   const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (formValues) => {
-    debugger
-    const hasFreeOrgWithProjects = freeOrgs.some((it) => projectsByOrg[it.slug]?.length > 0)
-
-    if (hasFreeOrgWithProjects && formValues.plan !== 'FREE') {
-      setIsOrgCreationConfirmationModalVisible(true)
-      return
-    }
-
     setNewOrgLoading(true)
 
     if (formValues.plan === 'FREE') {
@@ -479,15 +469,7 @@ export const NewOrgForm = ({
                       description={
                         <>
                           Which plan fits your organization's needs best?{' '}
-                          <InlineLink
-                            href="https://supabase.com/pricing"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-inherit hover:text-foreground transition-colors"
-                          >
-                            Learn more
-                          </InlineLink>
-                          .
+                          <InlineLink href="https://supabase.com/pricing">Learn more</InlineLink>.
                         </>
                       }
                     >
@@ -570,85 +552,12 @@ export const NewOrgForm = ({
                 </Elements>
               </Panel.Content>
             )}
+
+            {hasFreeOrgWithProjects && form.getValues('plan') !== 'FREE' && (
+              <UpgradeExistingOrganizationCallout />
+            )}
           </div>
         </Panel>
-
-        <ConfirmationModal
-          size="large"
-          loading={newOrgLoading}
-          visible={isOrgCreationConfirmationModalVisible}
-          title="Confirm organization creation"
-          confirmLabel="Create new organization"
-          onCancel={() => setIsOrgCreationConfirmationModalVisible(false)}
-          onConfirm={async () => {
-            await onSubmit(form.getValues())
-            setIsOrgCreationConfirmationModalVisible(false)
-          }}
-          variant={'warning'}
-        >
-          <p className="text-sm text-foreground-light">
-            Supabase{' '}
-            <InlineLink
-              href="https://supabase.com/docs/guides/platform/billing-on-supabase"
-              target="_blank"
-              rel="noreferrer"
-              className="text-inherit hover:text-foreground transition-colors"
-            >
-              bills per organization
-            </InlineLink>
-            . If you want to upgrade your existing projects, upgrade your existing organization
-            instead.
-          </p>
-
-          <ul className="mt-4 divide-y divide-border-muted border-t border-t-border-muted">
-            {freeOrgs
-              .filter((it) => projectsByOrg[it.slug]?.length > 0)
-              .map((org) => {
-                const orgProjects = projectsByOrg[org.slug].map((it) => it.name)
-
-                return (
-                  <li
-                    key={`org_${org.slug}`}
-                    className="pt-3 [&:not(:last-child)]:pb-3 flex items-center justify-between"
-                  >
-                    <div className="flex flex-col">
-                      <h3 className="text-sm">{org.name}</h3>
-
-                      <div className="text-foreground-lighter text-xs">
-                        {orgProjects.length <= 2 ? (
-                          <span>{orgProjects.join(' and ')}</span>
-                        ) : (
-                          <div>
-                            {orgProjects.slice(0, 2).join(', ')} and{' '}
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <span className="underline decoration-dotted">
-                                  {orgProjects.length - 2} other{' '}
-                                  {orgProjects.length === 3 ? 'project' : 'project'}
-                                </span>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <ul className="list-disc list-inside">
-                                  {orgProjects.slice(2).map((project) => (
-                                    <li>{project}</li>
-                                  ))}
-                                </ul>
-                              </TooltipContent>
-                            </Tooltip>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <Button asChild type="default" size="tiny">
-                      <Link href={`/org/${org.slug}/billing?panel=subscriptionPlan`}>
-                        Change plan
-                      </Link>
-                    </Button>
-                  </li>
-                )
-              })}
-          </ul>
-        </ConfirmationModal>
 
         {stripePromise && paymentIntentSecret && paymentMethod && (
           <Elements stripe={stripePromise} options={stripeOptionsConfirm}>

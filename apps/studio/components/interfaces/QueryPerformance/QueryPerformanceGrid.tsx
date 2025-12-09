@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetTitle,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
@@ -34,12 +35,14 @@ import {
 } from './QueryPerformance.constants'
 import { QueryPerformanceRow } from './QueryPerformance.types'
 import { formatDuration } from './QueryPerformance.utils'
+import { parseAsString, parseAsArrayOf, parseAsJson, useQueryStates } from 'nuqs'
+import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 
 interface QueryPerformanceGridProps {
   aggregatedData: QueryPerformanceRow[]
   isLoading: boolean
-  currentSelectedQuery?: string | null // Make optional
-  onCurrentSelectQuery?: (query: string) => void // Make optional
+  currentSelectedQuery?: string | null
+  onCurrentSelectQuery?: (query: string) => void
 }
 
 const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
@@ -72,7 +75,17 @@ export const QueryPerformanceGrid = ({
 }: QueryPerformanceGridProps) => {
   const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
-  const { sort: urlSort, order, roles, search } = useParams()
+  const { sort: urlSort, order } = useParams()
+  const [{ search, roles, callsFilter }] = useQueryStates({
+    search: parseAsString.withDefault(''),
+    roles: parseAsArrayOf(parseAsString).withDefault([]),
+    callsFilter: parseAsJson<NumericFilter | null>(
+      (value) => value as NumericFilter | null
+    ).withDefault({
+      operator: '>=',
+      value: 0,
+    } as NumericFilter),
+  })
   const dataGridContainerRef = useRef<HTMLDivElement>(null)
 
   const [view, setView] = useState<'details' | 'suggestion'>('details')
@@ -280,11 +293,14 @@ export const QueryPerformanceGrid = ({
         }
 
         if (col.id === 'cache_hit_rate') {
+          const numericValue = typeof value === 'number' ? value : parseFloat(value)
           return (
             <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
-              {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
-                <p className={cn(value.toFixed(2) === '0.00' && 'text-foreground-lighter')}>
-                  {value.toLocaleString(undefined, {
+              {typeof numericValue === 'number' &&
+              !isNaN(numericValue) &&
+              isFinite(numericValue) ? (
+                <p className={cn(numericValue.toFixed(2) === '0.00' && 'text-foreground-lighter')}>
+                  {numericValue.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
@@ -338,6 +354,29 @@ export const QueryPerformanceGrid = ({
       data = data.filter((row) => row.rolname && roles.includes(row.rolname))
     }
 
+    if (callsFilter) {
+      const { operator, value } = callsFilter
+      data = data.filter((row) => {
+        const calls = row.calls || 0
+        switch (operator) {
+          case '=':
+            return calls === value
+          case '>=':
+            return calls >= value
+          case '<=':
+            return calls <= value
+          case '>':
+            return calls > value
+          case '<':
+            return calls < value
+          case '!=':
+            return calls !== value
+          default:
+            return true
+        }
+      })
+    }
+
     if (sort?.column === 'prop_total_time') {
       data.sort((a, b) => {
         const aValue = a.prop_total_time || 0
@@ -357,19 +396,11 @@ export const QueryPerformanceGrid = ({
     }
 
     return data
-  }, [aggregatedData, sort, search, roles])
-
-  const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
-  const query = (selectedQuery ?? '').trim().toLowerCase()
-  const showIndexSuggestions =
-    (query.startsWith('select') ||
-      query.startsWith('with pgrst_source') ||
-      query.startsWith('with pgrst_payload')) &&
-    hasIndexRecommendations(reportData[selectedRow!]?.index_advisor_result, true)
+  }, [aggregatedData, sort, search, roles, callsFilter])
 
   useEffect(() => {
     setSelectedRow(undefined)
-  }, [search, roles, urlSort, order])
+  }, [search, roles, urlSort, order, callsFilter])
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -407,6 +438,25 @@ export const QueryPerformanceGrid = ({
     }
   }, [handleKeyDown])
 
+  const isSelectQuery = (query: string | undefined): boolean => {
+    if (!query) return false
+    const formattedQuery = query.trim().toLowerCase()
+    return (
+      formattedQuery.startsWith('select') ||
+      formattedQuery.startsWith('with pgrst_source') ||
+      formattedQuery.startsWith('with pgrst_payload')
+    )
+  }
+
+  useEffect(() => {
+    if (selectedRow !== undefined && view === 'suggestion') {
+      const query = reportData[selectedRow]?.query
+      if (!isSelectQuery(query)) {
+        setView('details')
+      }
+    }
+  }, [selectedRow, view, reportData])
+
   return (
     <div className="relative flex flex-grow bg-alternative min-h-0">
       <div ref={dataGridContainerRef} className="flex-1 min-w-0 overflow-x-auto">
@@ -422,10 +472,14 @@ export const QueryPerformanceGrid = ({
             const isSelected = idx === selectedRow
             const query = reportData[idx]?.query
             const isCharted = currentSelectedQuery ? currentSelectedQuery === query : false
+            const hasRecommendations = hasIndexRecommendations(
+              reportData[idx]?.index_advisor_result,
+              true
+            )
 
             return [
-              `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
-              `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:!border-l-foreground' : ''}`,
+              `${isSelected ? (hasRecommendations ? 'bg-warning/10 hover:bg-warning/20' : 'bg-surface-300 dark:bg-surface-300') : hasRecommendations ? 'bg-warning/10 hover:bg-warning/20' : 'bg-200 hover:bg-surface-200'} cursor-pointer`,
+              `${isSelected ? (hasRecommendations ? '[&>div:first-child]:border-l-4 border-l-warning [&>div]:border-l-warning' : '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:!border-l-foreground') : ''}`,
               `${isCharted ? 'bg-surface-200 dark:bg-surface-200' : ''}`,
               `${isCharted ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-brand' : ''}`,
               '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
@@ -442,16 +496,18 @@ export const QueryPerformanceGrid = ({
                     event.stopPropagation()
 
                     if (typeof idx === 'number' && idx >= 0) {
-                      // If onCurrentSelectQuery is provided, use the chart selection logic
                       if (onCurrentSelectQuery) {
                         const query = reportData[idx]?.query
                         if (query) {
                           onCurrentSelectQuery(query)
                         }
                       } else {
-                        // Otherwise, open the detail panel
                         setSelectedRow(idx)
-                        setView('details')
+                        const hasRecommendations = hasIndexRecommendations(
+                          reportData[idx]?.index_advisor_result,
+                          true
+                        )
+                        setView(hasRecommendations ? 'suggestion' : 'details')
                         gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                       }
                     }
@@ -488,6 +544,9 @@ export const QueryPerformanceGrid = ({
         modal={false}
       >
         <SheetTitle className="sr-only">Query details</SheetTitle>
+        <SheetDescription className="sr-only">
+          Query Performance Details &amp; Indexes
+        </SheetDescription>
         <SheetContent
           side="right"
           className="flex flex-col h-full bg-studio border-l lg:!w-[calc(100vw-802px)] max-w-[700px] w-full"
@@ -511,7 +570,7 @@ export const QueryPerformanceGrid = ({
                 >
                   Query details
                 </TabsTrigger_Shadcn_>
-                {showIndexSuggestions && (
+                {selectedRow !== undefined && isSelectQuery(reportData[selectedRow]?.query) && (
                   <TabsTrigger_Shadcn_
                     value="suggestion"
                     className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
@@ -531,12 +590,14 @@ export const QueryPerformanceGrid = ({
                 />
               )}
             </TabsContent_Shadcn_>
-            <TabsContent_Shadcn_
-              value="suggestion"
-              className="mt-0 flex-grow min-h-0 overflow-y-auto"
-            >
-              {selectedRow !== undefined && <QueryIndexes selectedRow={reportData[selectedRow]} />}
-            </TabsContent_Shadcn_>
+            {selectedRow !== undefined && isSelectQuery(reportData[selectedRow]?.query) && (
+              <TabsContent_Shadcn_
+                value="suggestion"
+                className="mt-0 flex-grow min-h-0 overflow-y-auto"
+              >
+                <QueryIndexes selectedRow={reportData[selectedRow]} />
+              </TabsContent_Shadcn_>
+            )}
           </Tabs_Shadcn_>
         </SheetContent>
       </Sheet>

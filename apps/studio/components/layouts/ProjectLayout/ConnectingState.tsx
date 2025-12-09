@@ -51,7 +51,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
           <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:space-y-0 lg:space-x-6">
             <h1 className="text-3xl">{project.name}</h1>
             <div>
-              <Badge variant="brand">
+              <Badge variant="success">
                 <div className="flex items-center gap-2">
                   <Loader className="animate-spin" size={12} />
                   <span>Connecting to project</span>
@@ -91,7 +91,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
                 </Button>
                 <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                   <Link
-                    href={`${DOCS_URL}/guides/platform/troubleshooting#unable-to-connect-to-your-supabase-project`}
+                    href={`${DOCS_URL}/guides/troubleshooting?products=platform#unable-to-connect-to-your-supabase-project`}
                     className="translate-y-[1px]"
                   >
                     Troubleshooting

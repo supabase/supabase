@@ -1,8 +1,8 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
 import type { components } from 'api-types'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { replicationKeys } from './keys'
 
 type ReplicationDestinationByIdParams = { projectRef?: string; destinationId?: number }
@@ -31,13 +31,11 @@ export const useReplicationDestinationByIdQuery = <TData = ReplicationDestinatio
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ReplicationDestinationByIdData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<ReplicationDestinationByIdData, ResponseError, TData> = {}
 ) =>
-  useQuery<ReplicationDestinationByIdData, ResponseError, TData>(
-    replicationKeys.destinationById(projectRef, destinationId),
-    ({ signal }) => fetchReplicationDestinationById({ projectRef, destinationId }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof destinationId !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ReplicationDestinationByIdData, ResponseError, TData>({
+    queryKey: replicationKeys.destinationById(projectRef, destinationId),
+    queryFn: ({ signal }) => fetchReplicationDestinationById({ projectRef, destinationId }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof destinationId !== 'undefined',
+    ...options,
+  })

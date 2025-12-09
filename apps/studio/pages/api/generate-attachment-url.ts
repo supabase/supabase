@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
+import { DASHBOARD_LOG_BUCKET } from 'components/interfaces/Support/dashboard-logs'
 import apiWrapper from 'lib/api/apiWrapper'
 import { getUserClaims } from 'lib/gotrue'
 
@@ -9,7 +10,9 @@ export const maxDuration = 120
 
 const GenerateAttachmentUrlSchema = z.object({
   filenames: z.array(z.string()),
-  bucket: z.enum(['support-attachments', 'feedback-attachments']).default('support-attachments'),
+  bucket: z
+    .enum(['support-attachments', 'feedback-attachments', DASHBOARD_LOG_BUCKET])
+    .default('support-attachments'),
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {

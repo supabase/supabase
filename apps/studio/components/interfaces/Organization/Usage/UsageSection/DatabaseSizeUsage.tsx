@@ -19,7 +19,7 @@ import { CategoryAttribute } from '../Usage.constants'
 
 export interface DatabaseSizeUsageProps {
   slug: string
-  projectRef?: string
+  projectRef?: string | null
   attribute: CategoryAttribute
   subscription?: OrgSubscription
   usage?: OrgUsageResponse
@@ -114,7 +114,7 @@ const DatabaseSizeUsage = ({
                       </span>
                       <Button asChild type="default" size={'tiny'}>
                         <Link
-                          href={`/project/${project.ref}/reports/database#database-size-report`}
+                          href={`/project/${project.ref}/observability/database#database-size-report`}
                         >
                           Manage Database Size
                         </Link>

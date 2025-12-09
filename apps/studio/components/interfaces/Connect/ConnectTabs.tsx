@@ -20,7 +20,7 @@ interface ConnectTabContentProps {
   children: ReactNode
   value: string
 }
-const ConnectTabs = ({ children, value, onValueChange }: ConnectFileTabProps) => {
+export const ConnectTabs = ({ children, value, onValueChange }: ConnectFileTabProps) => {
   const firstChild = children[0]
 
   const defaultValue = isValidElement(firstChild)
@@ -34,7 +34,7 @@ const ConnectTabs = ({ children, value, onValueChange }: ConnectFileTabProps) =>
   )
 }
 
-const ConnectTabTrigger = ({ value }: ConnectTabTriggerProps) => {
+export const ConnectTabTrigger = ({ value }: ConnectTabTriggerProps) => {
   return (
     <TabsTrigger_Shadcn_
       value={value}
@@ -46,7 +46,7 @@ const ConnectTabTrigger = ({ value }: ConnectTabTriggerProps) => {
   )
 }
 
-const ConnectTabTriggers = ({ children }: ConnectTabTriggersProps) => {
+export const ConnectTabTriggers = ({ children }: ConnectTabTriggersProps) => {
   return (
     <TabsList_Shadcn_ className="bg-surface-100 px-5 rounded-lg rounded-b-none gap-5">
       {children}
@@ -61,5 +61,3 @@ export const ConnectTabContent = ({ value, children }: ConnectTabContentProps) =
     </TabsContent_Shadcn_>
   )
 }
-
-export { ConnectTabs, ConnectTabTrigger, ConnectTabTriggers }

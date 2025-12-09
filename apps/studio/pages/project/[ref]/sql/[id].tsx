@@ -1,8 +1,8 @@
+import { usePrevious } from '@uidotdev/usehooks'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
-import { usePrevious } from '@uidotdev/usehooks'
 import { useParams } from 'common/hooks/useParams'
 import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
 import DefaultLayout from 'components/layouts/DefaultLayout'

@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { contentKeys } from './keys'
 
 export type CreateSQLSnippetFolderVariables = {
@@ -36,31 +36,33 @@ export const useSQLSnippetFolderCreateMutation = ({
   invalidateQueriesOnSuccess = true,
   ...options
 }: Omit<
-  UseMutationOptions<CreateSQLSnippetFolderData, ResponseError, CreateSQLSnippetFolderVariables>,
+  UseCustomMutationOptions<
+    CreateSQLSnippetFolderData,
+    ResponseError,
+    CreateSQLSnippetFolderVariables
+  >,
   'mutationFn'
 > & {
   invalidateQueriesOnSuccess?: boolean
 } = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CreateSQLSnippetFolderData, ResponseError, CreateSQLSnippetFolderVariables>(
-    (args) => createSQLSnippetFolder(args),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        if (invalidateQueriesOnSuccess) {
-          await queryClient.invalidateQueries(contentKeys.folders(projectRef))
-        }
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create folder: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<CreateSQLSnippetFolderData, ResponseError, CreateSQLSnippetFolderVariables>({
+    mutationFn: (args) => createSQLSnippetFolder(args),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      if (invalidateQueriesOnSuccess) {
+        await queryClient.invalidateQueries({ queryKey: contentKeys.folders(projectRef) })
+      }
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create folder: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

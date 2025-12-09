@@ -32,22 +32,22 @@ jobs:
         test_number: [1]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           sparse-checkout: |
             apps/studio
             packages
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         name: Install pnpm
         with:
           run_install: false
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
       - name: Install deps
-        run: pnpm i
+        run: pnpm install --frozen-lockfile
         working-directory: ./
       - name: Run Tests
         env:
@@ -57,7 +57,7 @@ jobs:
         working-directory: ./apps/studio
 
       - name: Upload coverage results to Coveralls
-        uses: coverallsapp/github-action@master
+        uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.6
         with:
           parallel: true
           flag-name: studio-tests
@@ -72,7 +72,7 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: Coveralls Finished
-        uses: coverallsapp/github-action@master
+        uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.6
         with:
           parallel-finished: true
           github-token: ${{ secrets.GITHUB_TOKEN }}

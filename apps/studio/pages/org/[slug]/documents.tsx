@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Documents } from 'components/interfaces/Organization'
+import { Documents } from 'components/interfaces/Organization/Documents/Documents'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'

@@ -1,9 +1,8 @@
 import type { JwtPayload } from '@supabase/supabase-js'
-import { getAccessToken, type User } from 'common/auth'
+import { type User } from 'common/auth'
 import { gotrueClient } from 'common/gotrue'
 
 export const auth = gotrueClient
-export { getAccessToken }
 
 export const DEFAULT_FALLBACK_PATH = '/organizations'
 

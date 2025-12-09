@@ -1,23 +1,20 @@
-import { Query } from '@supabase/pg-meta/src/query'
+import { Query, type QueryFilter } from '@supabase/pg-meta/src/query'
 import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
-import {
-  useQuery,
-  useQueryClient,
-  type QueryClient,
-  type UseQueryOptions,
-} from '@tanstack/react-query'
+import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 
-import { THRESHOLD_COUNT } from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
 import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
+import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
 import {
   ROLE_IMPERSONATION_NO_RESULTS,
   RoleImpersonationState,
   wrapWithRoleImpersonation,
 } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
+import { ResponseError, UseCustomQueryOptions } from 'types'
 import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
 import { tableRowKeys } from './keys'
 import { formatFilterValue } from './utils'
@@ -31,16 +28,62 @@ export interface GetTableRowsArgs {
   roleImpersonationState?: RoleImpersonationState
 }
 
-// return the primary key columns if exists, otherwise return the first column to use as a default sort
-const getDefaultOrderByColumns = (table: SupaTable) => {
-  const primaryKeyColumns = table.columns.filter((col) => col?.isPrimaryKey).map((col) => col.name)
-  if (primaryKeyColumns.length === 0) {
-    const eligibleColumnsForSorting = table.columns.filter((x) => !x.dataType.includes('json'))
-    if (eligibleColumnsForSorting.length > 0) return [eligibleColumnsForSorting[0]?.name]
-    else return []
-  } else {
-    return primaryKeyColumns
+/**
+ * Get the preferred columns for sorting of a table.
+ *
+ * Use the primary key if it exists, otherwise use a unique index with
+ * non-nullable columns. If all else fails, fall back to any sortable column.
+ */
+const getPreferredOrderByColumns = (
+  table: SupaTable
+): { cursorPaginationEligible: string[][]; cursorPaginationNonEligible: string[] } => {
+  const cursorPaginationEligible: string[][] = []
+  const cursorPaginationNonEligible: string[] = []
+
+  const primaryKeyColumns = table.primaryKey
+  if (primaryKeyColumns) {
+    cursorPaginationEligible.push(primaryKeyColumns)
   }
+
+  const uniqueIndexes = table.uniqueIndexes
+  const cursorFriendlyUniqueIndexes = uniqueIndexes?.filter((index) => {
+    return index.every((columnName) => {
+      const column = table.columns.find((column) => column.name === columnName)
+      return !!column && !column.isNullable
+    })
+  })
+  if (cursorFriendlyUniqueIndexes) {
+    cursorPaginationEligible.push(...cursorFriendlyUniqueIndexes)
+  }
+
+  const eligibleColumnsForSorting = table.columns.filter((x) => !x.dataType.includes('json'))
+  cursorPaginationNonEligible.push(...eligibleColumnsForSorting.map((col) => col.name))
+
+  return {
+    cursorPaginationEligible,
+    cursorPaginationNonEligible,
+  }
+}
+
+function getErrorCode(error: any): number | undefined {
+  // Our custom ResponseError's use 'code' instead of 'status'
+  if (error instanceof ResponseError) {
+    return error.code
+  }
+  return error.status
+}
+
+function getRetryAfter(error: any): number | undefined {
+  if (error instanceof ResponseError) {
+    return error.retryAfter
+  }
+
+  const headerRetry = error.headers?.get('retry-after')
+  if (headerRetry) {
+    return parseInt(headerRetry)
+  }
+
+  return undefined
 }
 
 async function sleep(ms: number) {
@@ -50,17 +93,18 @@ async function sleep(ms: number) {
 export async function executeWithRetry<T>(
   fn: () => Promise<T>,
   maxRetries: number = 3,
-  baseDelay: number = 500
+  baseDelay: number = 1000
 ): Promise<T> {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn()
-    } catch (error: any) {
-      // Our custom ResponseError's use 'code' instead of 'status'
-      if ((error?.status ?? error?.code) === 429 && attempt < maxRetries) {
+    } catch (error: unknown) {
+      const errorCode = getErrorCode(error)
+      if (errorCode === 429 && attempt < maxRetries) {
         // Get retry delay from headers or use exponential backoff (1s, then 2s, then 4s)
-        const retryAfter = error.headers?.get('retry-after')
-        const delayMs = retryAfter ? parseInt(retryAfter) * 1000 : baseDelay * Math.pow(2, attempt)
+        const retryAfter = getRetryAfter(error)
+        const delayMs = retryAfter ? retryAfter * 1000 : baseDelay * Math.pow(2, attempt)
+
         await sleep(delayMs)
         continue
       }
@@ -70,6 +114,11 @@ export async function executeWithRetry<T>(
   throw new Error('Max retries reached without success')
 }
 
+const checkIfCtidAvailable = (table: SupaTable): boolean =>
+  table.type === ENTITY_TYPE.TABLE ||
+  table.type === ENTITY_TYPE.PARTITIONED_TABLE ||
+  table.type === ENTITY_TYPE.MATERIALIZED_VIEW
+
 export const getAllTableRowsSql = ({
   table,
   filters = [],
@@ -78,7 +127,7 @@ export const getAllTableRowsSql = ({
   table: SupaTable
   filters?: Filter[]
   sorts?: Sort[]
-}) => {
+}): { sql: QueryFilter; cursorColumns: string[] | false } => {
   const query = new Query()
 
   const arrayBasedColumns = table.columns
@@ -98,36 +147,54 @@ export const getAllTableRowsSql = ({
       queryChains = queryChains.filter(filter.column, filter.operator, value)
     })
 
-  // Always enforce deterministic ordering for pagination/export
-  const primaryKeys = getDefaultOrderByColumns(table)
+  let cursorColumns: string[] | false = false
+  const { cursorPaginationEligible, cursorPaginationNonEligible } =
+    getPreferredOrderByColumns(table)
+
+  const hasCtid = checkIfCtidAvailable(table)
+
   if (sorts.length === 0) {
-    if (primaryKeys.length > 0) {
-      primaryKeys.forEach((col) => {
+    if (cursorPaginationEligible.length > 0) {
+      cursorColumns = cursorPaginationEligible[0]
+      cursorPaginationEligible[0].forEach((col) => {
         queryChains = queryChains.order(table.name, col)
       })
+      // Cursor paginated columns do not require ctid fallback as they
+      // guarantee uniqueness
+    } else if (cursorPaginationNonEligible.length > 0) {
+      queryChains = queryChains.order(table.name, cursorPaginationNonEligible[0])
+      if (hasCtid) {
+        queryChains = queryChains.order(table.name, 'ctid')
+      }
+    } else {
+      if (hasCtid) {
+        queryChains = queryChains.order(table.name, 'ctid')
+      }
     }
   } else {
     sorts.forEach((sort) => {
       queryChains = queryChains.order(sort.table, sort.column, sort.ascending, sort.nullsFirst)
     })
 
-    // Add primary keys as tie-breakers so page order doesn't shuffle
-    if (primaryKeys.length > 0) {
+    // Add tie-breakers so page order doesn't shuffle
+    const tieBreaker = cursorPaginationEligible[0]
+    if (tieBreaker) {
       const sortedColumns = new Set(
         sorts.filter((s) => s.table === table.name).map((s) => s.column)
       )
-      primaryKeys
-        .filter((pk) => !sortedColumns.has(pk))
-        .forEach((pk) => {
-          queryChains = queryChains.order(table.name, pk)
+      tieBreaker
+        .filter((col) => !sortedColumns.has(col))
+        .forEach((col) => {
+          queryChains = queryChains.order(table.name, col)
         })
+    } else {
+      if (hasCtid) {
+        queryChains = queryChains.order(table.name, 'ctid')
+      }
     }
   }
 
-  // Final tie-breaker: use system column ctid to guarantee a stable, unique order
-  queryChains = queryChains.order(table.name, 'ctid')
-
-  return queryChains
+  return { sql: queryChains, cursorColumns }
 }
 
 // TODO: fetchAllTableRows is used for CSV export, but since it doesn't actually truncate anything, (compare to getTableRows)
@@ -159,35 +226,79 @@ export const fetchAllTableRows = async ({
   }
 
   const rows: any[] = []
-  const queryChains = getAllTableRowsSql({ table, sorts, filters })
+  const { sql: queryChains, cursorColumns } = getAllTableRowsSql({
+    table,
+    sorts,
+    filters,
+  })
 
   const rowsPerPage = 500
   const THROTTLE_DELAY = 500
 
-  let page = -1
-  while (true) {
-    page += 1
-    const from = page * rowsPerPage
-    const to = (page + 1) * rowsPerPage - 1
-    const query = wrapWithRoleImpersonation(
-      queryChains.range(from, to).toSql(),
-      roleImpersonationState
-    )
+  if (cursorColumns) {
+    let cursor: Record<string, any> | null = null
+    while (true) {
+      let queryChainsWithCursor = queryChains.clone()
 
-    try {
-      const { result } = await executeWithRetry(async () =>
-        executeSql({ projectRef, connectionString, sql: query })
+      if (cursor) {
+        queryChainsWithCursor = queryChainsWithCursor.filter(
+          cursorColumns,
+          '>',
+          cursorColumns.map((col) => cursor![col])
+        )
+      }
+      const query = wrapWithRoleImpersonation(
+        queryChainsWithCursor.range(0, rowsPerPage - 1).toSql(),
+        roleImpersonationState
       )
-      rows.push(...result)
-      progressCallback?.(rows.length)
 
-      if (result.length < rowsPerPage) break
+      try {
+        const { result } = await executeWithRetry(async () =>
+          executeSql({ projectRef, connectionString, sql: query })
+        )
+        rows.push(...result)
+        progressCallback?.(rows.length)
 
-      await sleep(THROTTLE_DELAY)
-    } catch (error) {
-      throw new Error(
-        `Error fetching all table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
+        cursor = {}
+        for (const col of cursorColumns) {
+          cursor[col] = result[result.length - 1]?.[col]
+        }
+
+        if (result.length < rowsPerPage) break
+
+        await sleep(THROTTLE_DELAY)
+      } catch (error) {
+        throw new Error(
+          `Error fetching all table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
+        )
+      }
+    }
+  } else {
+    let page = -1
+    while (true) {
+      page += 1
+      const from = page * rowsPerPage
+      const to = (page + 1) * rowsPerPage - 1
+      const query = wrapWithRoleImpersonation(
+        queryChains.range(from, to).toSql(),
+        roleImpersonationState
       )
+
+      try {
+        const { result } = await executeWithRetry(async () =>
+          executeSql({ projectRef, connectionString, sql: query })
+        )
+        rows.push(...result)
+        progressCallback?.(rows.length)
+
+        if (result.length < rowsPerPage) break
+
+        await sleep(THROTTLE_DELAY)
+      } catch (error) {
+        throw new Error(
+          `Error fetching all table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
+        )
+      }
     }
   }
 
@@ -231,8 +342,27 @@ export async function getTableRows(
 
   const table = parseSupaTable(entity)
 
+  const equalityFilterColumns = filters
+    ?.filter((filter) => filter.operator === '=' || filter.operator === 'is')
+    .flatMap((filter) => filter.column)
+
+  // There is an edge case for MS SQL foreign tables, where the Postgres query
+  // planner may drop sorts that are redundant with filters, resulting in
+  // invalid MS SQL syntax. To prevent this, we exclude potentially conflicting
+  // columns from potential default sort columns.
+  const excludedColumns = isMsSqlForeignTable(entity)
+    ? Array.from(new Set(equalityFilterColumns))
+    : undefined
+
   const sql = wrapWithRoleImpersonation(
-    getTableRowsSql({ table: entity, filters, sorts, limit, page }),
+    getTableRowsSql({
+      table: entity,
+      filters,
+      sorts,
+      limit,
+      page,
+      sortExcludedColumns: excludedColumns,
+    }),
     roleImpersonationState
   )
 
@@ -260,33 +390,31 @@ export async function getTableRows(
 
 export const useTableRowsQuery = <TData = TableRowsData>(
   { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>,
-  { enabled = true, ...options }: UseQueryOptions<TableRowsData, TableRowsError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<TableRowsData, TableRowsError, TData> = {}
 ) => {
   const queryClient = useQueryClient()
-  return useQuery<TableRowsData, TableRowsError, TData>(
-    tableRowKeys.tableRows(projectRef, {
+  return useQuery<TableRowsData, TableRowsError, TData>({
+    queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
       ...args,
     }),
-    ({ signal }) =>
+    queryFn: ({ signal }) =>
       getTableRows({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
-      ...options,
-    }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
+    ...options,
+  })
 }
 
 export function prefetchTableRows(
   client: QueryClient,
   { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>
 ) {
-  return client.fetchQuery(
-    tableRowKeys.tableRows(projectRef, {
+  return client.fetchQuery({
+    queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
       ...args,
     }),
-    ({ signal }) =>
-      getTableRows({ queryClient: client, projectRef, connectionString, tableId, ...args }, signal)
-  )
+    queryFn: ({ signal }) =>
+      getTableRows({ queryClient: client, projectRef, connectionString, tableId, ...args }, signal),
+  })
 }

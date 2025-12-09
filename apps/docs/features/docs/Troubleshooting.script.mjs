@@ -258,15 +258,15 @@ async function updateChecksumIfNeeded(entry) {
 
 /**
  * Converts relative links to absolute URLs for GitHub discussions using MDAST
- * @param {string} content - The markdown content to process
+ * @param {string} content - The markdown content to process (already stripped of JSX)
  */
 function rewriteRelativeLinks(content) {
   const baseUrl = 'https://supabase.com'
 
   // Parse the markdown to AST
   const mdast = fromMarkdown(content, {
-    extensions: [gfm(), mdxjs()],
-    mdastExtensions: [gfmFromMarkdown(), mdxFromMarkdown()],
+    extensions: [gfm()],
+    mdastExtensions: [gfmFromMarkdown()],
   })
 
   // Walk the tree and modify link nodes
@@ -288,7 +288,7 @@ function rewriteRelativeLinks(content) {
   visitNode(mdast)
 
   // Convert back to markdown
-  return toMarkdown(mdast, { extensions: [gfmToMarkdown(), mdxToMarkdown()] })
+  return toMarkdown(mdast, { extensions: [gfmToMarkdown()] })
 }
 
 /**

@@ -6,8 +6,8 @@ import { Handle, NodeProps } from 'reactflow'
 import { Button, cn } from 'ui'
 
 // ReactFlow is scaling everything by the factor of 2
-const TABLE_NODE_WIDTH = 320
-const TABLE_NODE_ROW_HEIGHT = 40
+export const TABLE_NODE_WIDTH = 320
+export const TABLE_NODE_ROW_HEIGHT = 40
 
 export type TableNodeData = {
   id?: number
@@ -25,7 +25,7 @@ export type TableNodeData = {
   }[]
 }
 
-const TableNode = ({
+export const TableNode = ({
   data,
   targetPosition,
   sourcePosition,
@@ -155,5 +155,3 @@ const TableNode = ({
     </>
   )
 }
-
-export { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNode }

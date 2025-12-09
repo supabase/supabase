@@ -2,7 +2,6 @@ import { ChevronRight } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 
 import Panel from 'components/ui/Panel'
-import { CreateProjectForm } from 'pages/new/[slug]'
 import {
   Badge,
   cn,
@@ -17,6 +16,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { CreateProjectForm } from './ProjectCreation.schema'
 
 interface SecurityOptionsProps {
   form: UseFormReturn<CreateProjectForm>
@@ -106,17 +106,16 @@ export const SecurityOptions = ({
                           value="false"
                           // @ts-ignore
                           label={
-                            <>
-                              Use public schema for Data API
-                              <Badge color="scale" className="ml-2">
-                                Default
-                              </Badge>
-                            </>
+                            <div className="flex items-center gap-2">
+                              <span>Use public schema for Data API</span>
+                              <Badge>Default</Badge>
+                            </div>
                           }
                           // @ts-ignore
                           description={
                             <>
-                              Query all tables in the <code className="text-xs">public</code> schema
+                              Query all tables in the{' '}
+                              <code className="text-code-inline !text-[11px]">public</code> schema
                             </>
                           }
                           className="[&>div>div>p]:text-left [&>div>div>p]:text-xs"
@@ -132,7 +131,7 @@ export const SecurityOptions = ({
                           description={
                             <>
                               Query allowlisted tables in a dedicated{' '}
-                              <code className="text-xs">api</code> schema
+                              <code className="text-code-inline !text-[11px]">api</code> schema
                             </>
                           }
                           className="[&>div>div>p]:text-left [&>div>div>p]:text-xs"

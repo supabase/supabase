@@ -13,7 +13,7 @@ import { ReviewWithAI } from 'components/interfaces/BranchManagement/ReviewWithA
 import WorkflowLogsCard from 'components/interfaces/BranchManagement/WorkflowLogsCard'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
+import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -94,7 +94,7 @@ const MergePage: NextPageWithLayout = () => {
     currentBranchCreatedAt: currentBranch?.created_at,
   })
 
-  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
+  const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to update branch: ${error.message}`)
     },
@@ -189,7 +189,7 @@ const MergePage: NextPageWithLayout = () => {
     })
   }, [router])
 
-  const { mutate: pushBranch, isLoading: isPushing } = useBranchPushMutation({
+  const { mutate: pushBranch, isPending: isPushing } = useBranchPushMutation({
     onSuccess: (data) => {
       toast.success('Branch update initiated!')
       if (data?.workflow_run_id) {
@@ -215,7 +215,7 @@ const MergePage: NextPageWithLayout = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { mutate: mergeBranch, isLoading: isMerging } = useBranchMergeMutation({
+  const { mutate: mergeBranch, isPending: isMerging } = useBranchMergeMutation({
     onSuccess: (data) => {
       setIsSubmitting(false)
       if (data.workflowRunId) {
@@ -256,7 +256,7 @@ const MergePage: NextPageWithLayout = () => {
     },
   })
 
-  const { mutate: deleteBranch, isLoading: isDeleting } = useBranchDeleteMutation({
+  const { mutate: deleteBranch, isPending: isDeleting } = useBranchDeleteMutation({
     onSuccess: () => {
       toast.success('Branch closed successfully')
       router.push(`/project/${parentProjectRef}/branches`)
@@ -313,20 +313,6 @@ const MergePage: NextPageWithLayout = () => {
     })
   }
 
-  const handleReadyForReview = () => {
-    if (!ref || !parentProjectRef) return
-    updateBranch(
-      {
-        branchRef: ref,
-        projectRef: parentProjectRef,
-        requestReview: true,
-      },
-      {
-        onSuccess: () => toast.success('Successfully marked as ready for review'),
-      }
-    )
-  }
-
   const breadcrumbs = useMemo(
     () => [
       {
@@ -334,7 +320,7 @@ const MergePage: NextPageWithLayout = () => {
         href: `/project/${project?.ref}/branches/merge-requests`,
       },
     ],
-    [parentProjectRef]
+    [project?.ref]
   )
 
   const currentTab = (router.query.tab as string) || 'database'

@@ -1,14 +1,17 @@
 import { Activity, ExternalLink, Shield } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import { EntityTypeIcon, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
+import { EntityTypeIcon, createLintSummaryPrompt } from 'components/interfaces/Linter/Linter.utils'
 import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useAdvisorStateSnapshot } from 'state/advisor-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Card,
@@ -45,6 +48,8 @@ export const AdvisorWidget = () => {
     }
   )
   const snap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
+  const { setSelectedItem } = useAdvisorStateSnapshot()
 
   const securityLints = useMemo(
     () => (lints ?? []).filter((lint: Lint) => lint.categories.includes('SECURITY')),
@@ -71,6 +76,14 @@ export const AdvisorWidget = () => {
   const top5SlowestQueries = useMemo(
     () => ((slowestQueriesData ?? []) as SlowQuery[]).slice(0, 5),
     [slowestQueriesData]
+  )
+
+  const handleLintClick = useCallback(
+    (lint: Lint) => {
+      setSelectedItem(lint.cache_key, 'lint')
+      openSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
+    },
+    [setSelectedItem, openSidebar]
   )
 
   const totalIssues =
@@ -131,15 +144,15 @@ export const AdvisorWidget = () => {
                   className="text-sm w-full border-b my-0 last:border-b-0 group px-4 "
                 >
                   <div className="flex items-center justify-between w-full group">
-                    <Link
-                      href={`/project/${projectRef}/advisors/${title.toLowerCase()}?id=${lint.cache_key}&preset=${lint.level}`}
-                      className="flex items-center gap-2 transition truncate flex-1 min-w-0 py-3"
+                    <button
+                      onClick={() => handleLintClick(lint)}
+                      className="flex items-center gap-2 transition truncate flex-1 min-w-0 py-3 text-left"
                     >
                       <EntityTypeIcon type={lint.metadata?.type} />
                       <p className="flex-1 font-mono text-xs leading-6 text-xs text-foreground-light group-hover:text-foreground truncate">
                         {lintText.replace(/\\`/g, '`')}
                       </p>
-                    </Link>
+                    </button>
                     <ButtonTooltip
                       type="text"
                       className="px-1 opacity-0 group-hover:opacity-100 w-7"
@@ -147,19 +160,14 @@ export const AdvisorWidget = () => {
                       onClick={(e) => {
                         e.stopPropagation()
                         e.preventDefault()
+                        openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                         snap.newChat({
                           name: 'Summarize lint',
-                          open: true,
-                          initialInput: `Summarize the issue and suggest fixes for the following lint item:
-  Title: ${lintInfoMap.find((item) => item.name === lint.name)?.title ?? lint.title}
-  Entity: ${(lint.metadata && (lint.metadata.entity || (lint.metadata.schema && lint.metadata.name && `${lint.metadata.schema}.${lint.metadata.name}`))) ?? 'N/A'}
-  Schema: ${lint.metadata?.schema ?? 'N/A'}
-  Issue Details: ${lint.detail ? lint.detail.replace(/\`/g, '`') : 'N/A'}
-  Description: ${lint.description ? lint.description.replace(/\`/g, '`') : 'N/A'}`,
+                          initialInput: createLintSummaryPrompt(lint),
                         })
                       }}
                       tooltip={{
-                        content: { side: 'bottom', text: 'What is this issue?' },
+                        content: { side: 'bottom', text: 'Help me fix this issue' },
                       }}
                     />
                   </div>
@@ -179,13 +187,13 @@ export const AdvisorWidget = () => {
   }
 
   return (
-    <div>
+    <div className="@container">
       {isLoadingLints ? (
         <ShimmeringLoader className="w-96 mb-6" />
       ) : (
         <div className="flex justify-between items-center mb-6">{titleContent}</div>
       )}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 @xl:grid-cols-2 gap-4">
         <Card className="h-80">
           <Tabs value={selectedTab} className="h-full flex flex-col">
             <CardHeader className="h-10 py-0 pl-4 pr-2 flex flex-row items-center justify-between flex-0">
@@ -269,7 +277,7 @@ export const AdvisorWidget = () => {
                 },
               }}
             >
-              <Link href={`/project/${projectRef}/advisors/query-performance`} />
+              <Link href={`/project/${projectRef}/reports/query-performance`} />
             </ButtonTooltip>
           </CardHeader>
           <CardContent className="!p-0 flex-1 overflow-y-auto">

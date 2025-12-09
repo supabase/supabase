@@ -9,7 +9,7 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { Input } from 'ui'
 
-const DisplayConfigSettings = () => {
+export const DisplayConfigSettings = () => {
   const { ref: projectRef } = useParams()
   const {
     data: settings,
@@ -90,8 +90,6 @@ const DisplayConfigSettings = () => {
     </ConfigContentWrapper>
   )
 }
-
-export default DisplayConfigSettings
 
 const ConfigContentWrapper = ({ children }: PropsWithChildren<{}>) => {
   return (

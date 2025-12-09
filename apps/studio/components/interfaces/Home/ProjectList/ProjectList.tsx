@@ -3,7 +3,7 @@ import { UIEvent, useMemo } from 'react'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
-import NoSearchResults from 'components/ui/NoSearchResults'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
@@ -241,6 +241,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
           {sortedProjects?.map((project) => (
             <ProjectCard
               key={project.ref}
+              slug={slug}
               project={project}
               rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
               resourceWarnings={resourceWarnings?.find(

@@ -1,11 +1,11 @@
 'use client'
 
 import dayjs from 'dayjs'
+import { formatBytes } from 'lib/helpers'
 import { useState } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
 import { numberFormatter } from './Charts.utils'
-import { formatBytes } from 'lib/helpers'
 
 export interface ReportAttributes {
   id?: string
@@ -129,7 +129,7 @@ export const calculateTotalChartAggregate = (
     ?.filter((p) => !ignoreAttributes?.includes(p.dataKey))
     .reduce((acc, curr) => acc + curr.value, 0)
 
-const CustomTooltip = ({
+export const CustomTooltip = ({
   active,
   payload,
   label,
@@ -173,6 +173,8 @@ const CustomTooltip = ({
       ...(maxValueAttribute?.attribute ? [maxValueAttribute.attribute] : []),
     ]
 
+    const localTimeZone = dayjs.tz.guess()
+
     const total = showTotal && calculateTotalChartAggregate(payload, attributesToIgnoreFromTotal)
 
     const getIcon = (color: string, isMax: boolean) =>
@@ -212,6 +214,7 @@ const CustomTooltip = ({
           !isActiveHoveredChart && 'opacity-0'
         )}
       >
+        <p className="text-foreground-light text-xs">{localTimeZone}</p>
         <p className="font-medium">{dayjs(timestamp).format(DateTimeFormats.FULL_SECONDS)}</p>
         <div className="grid gap-0">
           {payload.reverse().map((entry: any, index: number) => (
@@ -256,7 +259,7 @@ interface CustomLabelProps {
   hiddenAttributes?: Set<string>
 }
 
-const CustomLabel = ({
+export const CustomLabel = ({
   payload,
   attributes,
   showMaxValue,
@@ -338,5 +341,3 @@ const CustomLabel = ({
     </div>
   )
 }
-
-export { CustomLabel, CustomTooltip }

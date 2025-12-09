@@ -1,7 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
 import { platformKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export type PlatformStatusResponse = {
   isHealthy: boolean
@@ -17,10 +18,10 @@ export type PlatformStatusData = Awaited<ReturnType<typeof getPlatformStatus>>
 export type PlatformStatusError = unknown
 
 export const usePlatformStatusQuery = <TData = PlatformStatusData>(
-  options: UseQueryOptions<PlatformStatusData, PlatformStatusError, TData> = {}
+  options: UseCustomQueryOptions<PlatformStatusData, PlatformStatusError, TData> = {}
 ) =>
-  useQuery<PlatformStatusData, PlatformStatusError, TData>(
-    platformKeys.status(),
-    ({ signal }) => getPlatformStatus(signal),
-    options
-  )
+  useQuery<PlatformStatusData, PlatformStatusError, TData>({
+    queryKey: platformKeys.status(),
+    queryFn: ({ signal }) => getPlatformStatus(signal),
+    ...options,
+  })

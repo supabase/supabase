@@ -1,6 +1,7 @@
 import { useParams } from 'common'
 import { Button, Input, copyToClipboard } from 'ui'
 
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -11,9 +12,10 @@ import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
 
-const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) => {
+export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) => {
   const { ref } = useParams()
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref })
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref }, { enabled: canReadAPIKeys })
   const { data } = useProjectSettingsV2Query({ projectRef: ref })
   const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
@@ -139,5 +141,3 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
     </>
   )
 }
-
-export default Introduction

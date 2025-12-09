@@ -5,6 +5,7 @@ import type { UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 // End of third-party imports
 
+import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
 import InformationBox from 'components/ui/InformationBox'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
@@ -31,6 +32,7 @@ interface ProjectAndPlanProps {
   projectRef: string | null
   category: ExtendedSupportCategories
   subscriptionPlanId: string | undefined
+  showPlanExpectationInfo?: boolean
 }
 
 export function ProjectAndPlanInfo({
@@ -39,6 +41,7 @@ export function ProjectAndPlanInfo({
   projectRef,
   category,
   subscriptionPlanId,
+  showPlanExpectationInfo = true,
 }: ProjectAndPlanProps) {
   const { ref } = useHighlightProjectRefContext()
   const hasProjectSelected = projectRef && projectRef !== NO_PROJECT_MARKER
@@ -52,9 +55,13 @@ export function ProjectAndPlanInfo({
         <Admonition type="default" title="Please note that no project has been selected" />
       )}
 
-      {orgSlug && subscriptionPlanId !== 'enterprise' && category !== 'Login_issues' && (
-        <PlanExpectationInfoBox orgSlug={orgSlug} planId={subscriptionPlanId} />
-      )}
+      {showPlanExpectationInfo &&
+        orgSlug &&
+        subscriptionPlanId !== 'enterprise' &&
+        subscriptionPlanId !== 'platform' &&
+        category !== 'Login_issues' && (
+          <PlanExpectationInfoBox orgSlug={orgSlug} planId={subscriptionPlanId} />
+        )}
     </div>
   )
 }
@@ -66,6 +73,8 @@ interface ProjectSelectorProps {
 }
 
 function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
+  const { projectRef: urlProjectRef } = useParams()
+
   return (
     <FormField_Shadcn_
       name="projectRef"
@@ -81,7 +90,7 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
               slug={!orgSlug || orgSlug === NO_ORG_MARKER ? undefined : orgSlug}
               selectedRef={field.value}
               onInitialLoad={(projects) => {
-                if (!projectRef || projectRef === NO_PROJECT_MARKER)
+                if (!urlProjectRef && (!projectRef || projectRef === NO_PROJECT_MARKER))
                   field.onChange(projects[0]?.ref ?? NO_PROJECT_MARKER)
               }}
               onSelect={(project) => field.onChange(project.ref)}

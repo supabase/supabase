@@ -4,11 +4,13 @@ import { useCallback, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { FRAMEWORKS } from 'components/interfaces/Connect/Connect.constants'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Button, Card, CardContent, ToggleGroup, ToggleGroupItem } from 'ui'
 import { FrameworkSelector } from './FrameworkSelector'
 import { GettingStarted } from './GettingStarted'
@@ -36,6 +38,7 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
   const { data: organization } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const [selectedFramework, setSelectedFramework] = useState<string>(DEFAULT_FRAMEWORK_KEY)
   const workflow: 'no-code' | 'code' | null = value === 'code' || value === 'no-code' ? value : null
@@ -44,46 +47,75 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
   const statuses = useGettingStartedProgress()
 
   const openAiChat = useCallback(
-    (name: string, initialInput: string) => aiSnap.newChat({ name, open: true, initialInput }),
-    [aiSnap]
+    (name: string, initialInput: string) => {
+      openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+      aiSnap.newChat({ name, initialInput })
+    },
+    [aiSnap, openSidebar]
   )
 
-  const openConnect = useCallback(() => {
-    router.push(
-      {
-        pathname: router.pathname,
-        query: {
-          ...router.query,
-          showConnect: true,
-          connectTab: 'frameworks',
-          framework: selectedFramework,
+  const connectPresetLinks = useMemo(() => {
+    const basePath = router.asPath.split('?')[0]
+    const parent = FRAMEWORKS.find((f) => f.key === selectedFramework)
+    if (!parent) {
+      return [
+        {
+          label: 'Connect',
+          href: `${basePath}?showConnect=true&connectTab=frameworks`,
         },
-      },
-      undefined,
-      { shallow: true }
-    )
-  }, [router, selectedFramework])
+      ]
+    }
 
-  const connectActions: GettingStartedAction[] = useMemo(
-    () => [
-      {
-        label: 'Framework selector',
-        component: (
-          <FrameworkSelector
-            value={selectedFramework}
-            onChange={setSelectedFramework}
-            items={FRAMEWORKS}
-          />
-        ),
-      },
+    let using: string | undefined
+    let withKey: string | undefined
+    if (parent.children && parent.children.length > 0) {
+      // prefer App Router for Nextjs by default
+      if (parent.key === 'nextjs') {
+        const appChild = parent.children.find((c) => c.key === 'app') || parent.children[0]
+        using = appChild?.key
+        withKey = appChild?.children?.[0]?.key
+      } else {
+        using = parent.children[0]?.key
+        withKey = parent.children[0]?.children?.[0]?.key
+      }
+    }
+
+    const qs = new URLSearchParams({
+      showConnect: 'true',
+      connectTab: 'frameworks',
+      framework: parent.key,
+    })
+    if (using) qs.set('using', using)
+    if (withKey) qs.set('with', withKey)
+
+    return [
       {
         label: 'Connect',
-        variant: 'primary',
-        onClick: openConnect,
+        href: `${basePath}?${qs.toString()}`,
       },
-    ],
-    [openConnect, selectedFramework]
-  )
+    ]
+  }, [router.asPath, selectedFramework])
+
+  const connectActions: GettingStartedAction[] = useMemo(() => {
+    const selector: GettingStartedAction = {
+      label: 'Framework selector',
+      component: (
+        <FrameworkSelector
+          value={selectedFramework}
+          onChange={setSelectedFramework}
+          items={FRAMEWORKS}
+        />
+      ),
+    }
+
+    const linkActions: GettingStartedAction[] = connectPresetLinks.map((lnk) => ({
+      label: 'Connect',
+      href: lnk.href,
+      variant: 'primary',
+    }))
+
+    return [selector, ...linkActions]
+  }, [connectPresetLinks, selectedFramework])
 
   const codeSteps: GettingStartedStep[] = useMemo(
     () =>
