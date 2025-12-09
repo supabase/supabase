@@ -6,7 +6,7 @@ import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApi
 import { PublishableAPIKeys } from 'components/interfaces/APIKeys/PublishableAPIKeys'
 import { SecretAPIKeys } from 'components/interfaces/APIKeys/SecretAPIKeys'
 import ApiKeysLayout from 'components/layouts/APIKeys/APIKeysLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { DisableInteraction } from 'components/ui/DisableInteraction'
 import type { NextPageWithLayout } from 'types'

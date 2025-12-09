@@ -20,7 +20,7 @@ import {
   TableRow,
 } from 'ui/src/components/shadcn/ui/table'
 import { APIKeyRow } from './APIKeyRow'
-import CreateSecretAPIKeyDialog from './CreateSecretAPIKeyDialog'
+import { CreateSecretAPIKeyDialog } from './CreateSecretAPIKeyDialog'
 import { useApiKeysVisibility } from './hooks/useApiKeysVisibility'
 
 interface LastSeenData {
@@ -85,7 +85,7 @@ export const SecretAPIKeys = () => {
   const deletingAPIKeyIdRef = useRef<string | null>(null)
 
   const { setValue: setAPIKeyToDelete, value: apiKeyToDelete } = useQueryStateWithSelect({
-    urlKey: 'delete',
+    urlKey: 'deleteSecretKey',
     select: (id: string) => (id ? secretApiKeys?.find((key) => key.id === id) : undefined),
     enabled: !!secretApiKeys?.length,
     onError: (_error, selectedId) =>
@@ -94,7 +94,7 @@ export const SecretAPIKeys = () => {
 
   const { mutate: deleteAPIKey, isPending: isDeletingAPIKey } = useAPIKeyDeleteMutation({
     onSuccess: () => {
-      toast.success(`Successfully deleted API key`)
+      toast.success('Successfully deleted secret key')
       setAPIKeyToDelete(null)
     },
     onError: () => {
