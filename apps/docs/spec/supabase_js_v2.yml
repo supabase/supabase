@@ -7657,13 +7657,15 @@ functions:
   - id: auth-js-authoauthserverapi-denyauthorization
     title: AuthOAuthServerApi.denyAuthorization()
     $ref: '@supabase/auth-js.AuthOAuthServerApi.denyAuthorization'
-  - id: oauth-server-api
-    title: 'Overview'
-    notes: |
-      This section contains methods for working with OAuth Server.
   - id: auth-js-authoauthserverapi-getauthorizationdetails
     title: AuthOAuthServerApi.getAuthorizationDetails()
     $ref: '@supabase/auth-js.AuthOAuthServerApi.getAuthorizationDetails'
+  - id: auth-js-authoauthserverapi-listgrants
+    title: AuthOAuthServerApi.listGrants()
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.listGrants'
+  - id: auth-js-authoauthserverapi-revokegrant
+    title: AuthOAuthServerApi.revokeGrant()
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.revokeGrant'
   - id: oauth-admin-api
     title: 'OAuth Admin API'
     notes: |
@@ -7680,10 +7682,6 @@ functions:
   - id: auth-js-gotrueadminoauthapi-getclient
     title: GoTrueAdminOAuthApi.getClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.getClient'
-  - id: oauth-admin-api
-    title: 'Overview'
-    notes: |
-      This section contains methods for working with OAuth Admin.
   - id: auth-js-gotrueadminoauthapi-listclients
     title: GoTrueAdminOAuthApi.listClients()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.listClients'

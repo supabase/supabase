@@ -826,6 +826,20 @@
                 "slug": "auth-admin-oauth-denyauthorization",
                 "product": "auth-admin",
                 "type": "function"
+              },
+              {
+                "id": "auth-js-authoauthserverapi-listgrants",
+                "title": "List grants",
+                "slug": "auth-admin-oauth-listgrants",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "auth-js-authoauthserverapi-revokegrant",
+                "title": "Revoke grant",
+                "slug": "auth-admin-oauth-revokegrant",
+                "product": "auth-admin",
+                "type": "function"
               }
             ]
           },
