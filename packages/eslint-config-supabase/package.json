@@ -13,6 +13,7 @@
     "@eslint/js": "^9.0.0",
     "@tanstack/eslint-plugin-query": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^8.48.0",
+    "@typescript-eslint/parser": "^8.48.0",
     "eslint-config-next": "^15.5.0",
     "eslint-config-prettier": "^10.0.0",
     "eslint-config-turbo": "^2.5.0",

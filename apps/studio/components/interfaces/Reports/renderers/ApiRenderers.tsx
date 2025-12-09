@@ -434,7 +434,7 @@ export const RequestsByCountryMapRenderer = (
   }
 
   return (
-    <div ref={containerRef} className="w-full h-[560px] relative border-t">
+    <div ref={containerRef} className="w-full h-[420px] relative border-t">
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{ scale: 155 }}
@@ -453,6 +453,10 @@ export const RequestsByCountryMapRenderer = (
                   const iso2 = extractIso2FromFeatureProps(
                     (geo.properties || undefined) as Record<string, unknown> | undefined
                   )
+                  // Skip Antarctica entirely (causes hover issues)
+                  if ((title || '').toLowerCase() === 'antarctica') {
+                    return null
+                  }
                   const value = iso2 ? countsByIso2[iso2] || 0 : 0
                   const baseOpacity = getFillOpacity(value, max, theme)
                   const tooltipTitle = title
@@ -580,6 +584,8 @@ export const RequestsByCountryMapRenderer = (
                   for (const iso2 in countsByIso2) {
                     const count = countsByIso2[iso2]
                     if (count <= 0) continue
+                    // Do not render Antarctica
+                    if (iso2.toUpperCase() === 'AQ') continue
                     if (present.has(iso2)) continue
                     if (!isKnownCountryCode(iso2)) continue
                     const ll = COUNTRY_LAT_LON[iso2]
