@@ -7645,46 +7645,6 @@ functions:
   - id: supabase-js-supabaseclient-schema
     title: SupabaseClient.schema()
     $ref: '@supabase/supabase-js.SupabaseClient.schema'
-  - id: auth-js-gotrueadminapi-constructor
-    title: new GoTrueAdminApi()
-    $ref: '@supabase/auth-js.GoTrueAdminApi.constructor'
-    examples:
-      - id: auth-js-gotrueadminapi-constructor-example-1
-        name: Example 1
-        code: |-
-          ```ts
-          import { GoTrueAdminApi } from '@supabase/auth-js'
-
-          const admin = new GoTrueAdminApi({
-            url: 'https://xyzcompany.supabase.co/auth/v1',
-            headers: { Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}` },
-          })
-          ```
-  - id: auth-js-gotrueadminapi-signout
-    title: GoTrueAdminApi.signOut()
-    $ref: '@supabase/auth-js.GoTrueAdminApi.signOut'
-  - id: auth-js-gotrueclient-constructor
-    title: new GoTrueClient()
-    $ref: '@supabase/auth-js.GoTrueClient.constructor'
-    examples:
-      - id: auth-js-gotrueclient-constructor-example-1
-        name: Example 1
-        code: |-
-          ```ts
-          import { GoTrueClient } from '@supabase/auth-js'
-
-          const auth = new GoTrueClient({
-            url: 'https://xyzcompany.supabase.co/auth/v1',
-            headers: { apikey: 'public-anon-key' },
-            storageKey: 'supabase-auth',
-          })
-          ```
-  - id: auth-js-gotrueclient-initialize
-    title: GoTrueClient.initialize()
-    $ref: '@supabase/auth-js.GoTrueClient.initialize'
-  - id: auth-js-gotrueclient-isthrowonerrorenabled
-    title: GoTrueClient.isThrowOnErrorEnabled()
-    $ref: '@supabase/auth-js.GoTrueClient.isThrowOnErrorEnabled'
   - id: oauth-server-api
     title: 'OAuth Server API'
     notes: |
@@ -7697,6 +7657,10 @@ functions:
   - id: auth-js-authoauthserverapi-denyauthorization
     title: AuthOAuthServerApi.denyAuthorization()
     $ref: '@supabase/auth-js.AuthOAuthServerApi.denyAuthorization'
+  - id: oauth-server-api
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with OAuth Server.
   - id: auth-js-authoauthserverapi-getauthorizationdetails
     title: AuthOAuthServerApi.getAuthorizationDetails()
     $ref: '@supabase/auth-js.AuthOAuthServerApi.getAuthorizationDetails'
@@ -7716,6 +7680,10 @@ functions:
   - id: auth-js-gotrueadminoauthapi-getclient
     title: GoTrueAdminOAuthApi.getClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.getClient'
+  - id: oauth-admin-api
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with OAuth Admin.
   - id: auth-js-gotrueadminoauthapi-listclients
     title: GoTrueAdminOAuthApi.listClients()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.listClients'
