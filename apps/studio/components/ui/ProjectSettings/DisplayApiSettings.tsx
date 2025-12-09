@@ -51,7 +51,7 @@ export const DisplayApiSettings = ({
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
 
-  const hideApiKeyLastUsed = useFlag('HideApiKeyLastUsed')
+  const hideApiKeyLastUsed = useFlag('HideApiKeyLastUsed') ?? true
   const { isLoading: isLoadingLastUsed, logData: lastUsedLogData } = useLastUsedAPIKeysLogQuery(
     projectRef!,
     !hideApiKeyLastUsed
