@@ -1,3 +1,4 @@
+import { Badge } from 'ui'
 import { getThreadRepliesById } from '~/data/contribute'
 
 export async function Conversation({ thread_key }: { thread_key: string | null }) {
@@ -12,9 +13,16 @@ export async function Conversation({ thread_key }: { thread_key: string | null }
       <div className="grid gap-4">
         {question && question.content && (
           <div className="border border-border rounded-lg p-4 bg-surface-100">
-            <p className="text-foreground mb-3">{question.content}</p>
+            <p className="text-foreground mb-3 w-full wrap-break-word break-all">
+              {question.content}
+            </p>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              {question.author && <span>{question.author}</span>}
+              {question.author && (
+                <>
+                  <Badge variant="success">OP</Badge>
+                  <span>{question.author}</span>
+                </>
+              )}
               {question.author && question.ts && <span>•</span>}
               {question.ts && question.external_activity_url ? (
                 <a
@@ -42,11 +50,20 @@ export async function Conversation({ thread_key }: { thread_key: string | null }
               external_activity_url: string | null
             }) => {
               const timestamp = reply.ts ? new Date(reply.ts).toLocaleString() : null
+              const isOP = reply.author === question?.author
+
               return (
                 <div key={reply.id} className="border border-border rounded-lg p-4 bg-surface-100">
-                  <p className="text-foreground mb-3">{reply.content}</p>
+                  <p className="text-foreground mb-3 w-full wrap-break-word break-all">
+                    {reply.content}
+                  </p>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    {reply.author && <span>{reply.author}</span>}
+                    {reply.author && (
+                      <>
+                        {isOP && <Badge variant="success">OP</Badge>}
+                        <span>{reply.author}</span>
+                      </>
+                    )}
                     {reply.author && timestamp && <span>•</span>}
                     {timestamp && reply.external_activity_url ? (
                       <a
