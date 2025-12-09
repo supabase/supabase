@@ -68,7 +68,6 @@
     "openai": "^5.9.0",
     "openapi-fetch": "0.12.4",
     "react": "catalog:",
-    "react-docgen": "^7.0.3",
     "react-dom": "catalog:",
     "react-hook-form": "^7.45.0",
     "react-markdown": "^10.1.0",
