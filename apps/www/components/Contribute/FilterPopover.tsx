@@ -75,30 +75,32 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
             <div className="grid gap-3">
               <h3 className="text-sm  text-muted-foreground">Product Area</h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                {allProductAreas.map((area) => {
-                  const isSelected = productArea === area
-                  return (
-                    <button
-                      key={area}
-                      type="button"
-                      onClick={() => handleProductAreaClick(area)}
-                      className={cn(
-                        'flex items-center gap-1.5 px-2 py-1 rounded-md text-sm text-foreground transition-colors',
-                        isSelected
-                          ? 'bg-brand-200 text-brand-foreground border border-brand-300'
-                          : 'bg-surface-200 hover:bg-surface-300'
-                      )}
-                    >
-                      <Check
+                {allProductAreas
+                  .filter((area) => area !== 'Other')
+                  .map((area) => {
+                    const isSelected = productArea === area
+                    return (
+                      <button
+                        key={area}
+                        type="button"
+                        onClick={() => handleProductAreaClick(area)}
                         className={cn(
-                          'h-3.5 w-3.5 shrink-0',
-                          isSelected ? 'opacity-100' : 'opacity-0'
+                          'flex items-center gap-1.5 px-2 py-1 rounded-md text-sm text-foreground transition-colors',
+                          isSelected
+                            ? 'bg-brand-200 text-brand-foreground border border-brand-300'
+                            : 'bg-surface-200 hover:bg-surface-300'
                         )}
-                      />
-                      <span className="text-left">{area}</span>
-                    </button>
-                  )
-                })}
+                      >
+                        <Check
+                          className={cn(
+                            'h-3.5 w-3.5 shrink-0',
+                            isSelected ? 'opacity-100' : 'opacity-0'
+                          )}
+                        />
+                        <span className="text-left">{area}</span>
+                      </button>
+                    )
+                  })}
               </div>
             </div>
 
