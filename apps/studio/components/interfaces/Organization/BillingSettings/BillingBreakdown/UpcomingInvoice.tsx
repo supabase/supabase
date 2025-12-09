@@ -288,20 +288,23 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                     {formatCurrency(upcomingInvoice?.amount_total) ?? '-'}
                   </TableCell>
                 </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium py-2 px-0 flex items-center">
-                    <span className="mr-2">Projected Costs</span>
-                    <InfoTooltip className="max-w-xs">
-                      Projected costs at the end of the billing cycle. Includes predictable costs
-                      for Compute Hours, IPv4, Custom Domain and Point-In-Time-Recovery, but no
-                      costs for metrics like MAU, storage or function invocations. Final amounts may
-                      vary depending on your usage.
-                    </InfoTooltip>
-                  </TableCell>
-                  <TableCell className="text-right font-medium py-2 px-0" translate="no">
-                    {formatCurrency(upcomingInvoice?.amount_projected) ?? '-'}
-                  </TableCell>
-                </TableRow>
+
+                {upcomingInvoice?.amount_projected && (
+                  <TableRow>
+                    <TableCell className="font-medium py-2 px-0 flex items-center">
+                      <span className="mr-2">Projected Costs</span>
+                      <InfoTooltip className="max-w-xs">
+                        Projected costs at the end of the billing cycle. Includes predictable costs
+                        for Compute Hours, IPv4, Custom Domain and Point-In-Time-Recovery, but no
+                        costs for metrics like MAU, storage or function invocations. Final amounts
+                        may vary depending on your usage.
+                      </InfoTooltip>
+                    </TableCell>
+                    <TableCell className="text-right font-medium py-2 px-0" translate="no">
+                      {formatCurrency(upcomingInvoice.amount_projected) ?? '-'}
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableFooter>
             </Table>
           </div>
