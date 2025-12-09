@@ -102,7 +102,7 @@ export const ProjectTableRow = ({
               computeSize={getComputeSize(project)}
             />
           ) : (
-            <span className="text-xs text-foreground-light">-</span>
+            <span className="text-xs text-foreground-muted">–</span>
           )}
         </div>
       </TableCell>

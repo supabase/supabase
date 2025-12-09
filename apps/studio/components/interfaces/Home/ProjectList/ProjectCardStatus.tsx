@@ -17,7 +17,7 @@ import { InferredProjectStatus } from './ProjectCard.utils'
 export interface ProjectCardWarningsProps {
   resourceWarnings?: ResourceWarning
   projectStatus: InferredProjectStatus
-  renderMode?: 'alert' | 'badge' // New prop to control rendering mode
+  renderMode?: 'alert' | 'badge'
 }
 
 export const ProjectCardStatus = ({
@@ -130,12 +130,20 @@ export const ProjectCardStatus = ({
     projectStatus === 'isHealthy'
   ) {
     if (renderMode === 'badge') {
-      return <Badge variant="success">Active</Badge>
+      return (
+        // Badge must be wrapped in a div in order to be centered in table cell
+        <div className="flex items-center">
+          <Badge variant="success">Active</Badge>
+        </div>
+      )
     }
     return null
   }
 
   if (renderMode === 'badge') {
+    // Don't render if no title is available
+    if (!alertTitle) return <span className="text-xs text-foreground-muted">–</span>
+
     const badgeVariant = isCritical
       ? 'destructive'
       : activeWarnings.length > 0 ||
@@ -146,21 +154,25 @@ export const ProjectCardStatus = ({
           ? 'success'
           : 'default'
 
-    return alertDescription ? (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Badge className="rounded-md" variant={badgeVariant}>
-            {alertTitle}
-          </Badge>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">{alertDescription}</TooltipContent>
-      </Tooltip>
-    ) : (
-      <Badge className="rounded-md" variant={badgeVariant}>
-        {alertTitle}
-      </Badge>
+    return (
+      // Badge must be wrapped in a div in order to be centered in table cell
+      <div className="flex items-center">
+        {alertDescription ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge variant={badgeVariant}>{alertTitle}</Badge>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">{alertDescription}</TooltipContent>
+          </Tooltip>
+        ) : (
+          <Badge variant={badgeVariant}>{alertTitle}</Badge>
+        )}
+      </div>
     )
   }
+
+  // Don't render alert if no title is available
+  if (!alertTitle) return null
 
   return (
     <Alert_Shadcn_
