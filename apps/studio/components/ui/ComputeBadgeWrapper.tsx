@@ -79,7 +79,7 @@ export const ComputeBadgeWrapper = ({
   return (
     <HoverCard onOpenChange={() => setOpenState(!open)} openDelay={280}>
       <HoverCardTrigger asChild className="group" onClick={(e) => e.stopPropagation()}>
-        <div>
+        <div className="flex items-center">
           <ComputeBadge infraComputeSize={computeSize} />
         </div>
       </HoverCardTrigger>
