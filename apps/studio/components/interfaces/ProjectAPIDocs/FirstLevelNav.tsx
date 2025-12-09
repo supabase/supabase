@@ -1,25 +1,41 @@
-import { useParams } from 'common'
 import Link from 'next/link'
-import { Fragment } from 'react'
+import { Fragment, type ReactNode } from 'react'
 import SVG from 'react-inlinesvg'
 
+import { useParams } from 'common'
+import { InfiniteListDefault, type RowComponentBaseProps } from 'components/ui/InfiniteList'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
-import { useBucketsQuery } from 'data/storage/buckets-query'
+import { usePaginatedBucketsQuery, type Bucket } from 'data/storage/buckets-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { Book, BookOpen } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns'
 import { navigateToSection } from './Content/Content.utils'
-import { DOCS_CONTENT, DOCS_MENU } from './ProjectAPIDocs.constants'
+import { API_DOCS_CATEGORIES, DOCS_CONTENT, DOCS_MENU } from './ProjectAPIDocs.constants'
 
-const Separator = () => <div className="border-t !mt-3 pb-1 mx-3" />
+type DocsSections = typeof DOCS_MENU
+type DocsSection = DocsSections[number]
+type DocsSectionsSubset = readonly DocsSection[]
+type DocsCategory = DocsSection['key']
+type DocsContentRegistry = typeof DOCS_CONTENT
+type DocsSnippet = DocsContentRegistry[keyof DocsContentRegistry]
 
-const FirstLevelNav = () => {
-  const { ref } = useParams()
-  const snap = useAppStateSnapshot()
+const Separator = () => <hr className="border-t !mt-3 pb-1 mx-3" />
 
+const MENU_BUTTON_CLASSES = cn(
+  'w-full px-4',
+  'text-left text-sm text-foreground-light',
+  'transition hover:text-foreground'
+)
+
+/**
+ * Gets the docs menu items based on feature flags.
+ * @returns An array of menu items to be displayed in the docs navigation.
+ */
+const useDocsMenu = (): DocsSectionsSubset => {
   const {
     projectAuthAll: authEnabled,
     projectStorageAll: storageEnabled,
@@ -32,122 +48,59 @@ const FirstLevelNav = () => {
     'realtime:all',
   ])
 
-  const docsMenu = DOCS_MENU.filter((item) => {
+  return DOCS_MENU.filter((item) => {
     if (item.key === 'user-management') return authEnabled
     if (item.key === 'storage') return storageEnabled
     if (item.key === 'edge-functions') return edgeFunctionsEnabled
     if (item.key === 'realtime') return realtimeEnabled
     return true
   })
+}
 
-  const { data } = useOpenAPISpecQuery({ projectRef: ref })
-  const tables = data?.tables ?? []
-  const functions = data?.functions ?? []
+/**
+ * Gets the content snippets for a given documentation category.
+ * @param category - The category of documentation to retrieve snippets for.
+ * @returns An array of content snippets belonging to the specified category.
+ */
+const getSectionSnippets = (category: DocsCategory): DocsSnippet[] =>
+  Object.values(DOCS_CONTENT).filter((snippet) => snippet.category === category)
 
-  const { data: buckets } = useBucketsQuery({ projectRef: ref })
-  const { data: edgeFunctions } = useEdgeFunctionsQuery({ projectRef: ref })
+export const FirstLevelNav = (): ReactNode => {
+  const { ref } = useParams()
+
+  const snap = useAppStateSnapshot()
+  const currentSection = snap.activeDocsSection[0]
+
+  const docsMenu = useDocsMenu()
 
   return (
     <>
-      <div className="px-2 py-4  border-b">
+      <nav aria-labelledby="api-docs-rest-categories" className="px-2 py-4  border-b">
+        <h2 id="api-docs-rest-categories" className="sr-only">
+          REST API Docs
+        </h2>
         {docsMenu.map((item) => {
-          const isActive = snap.activeDocsSection[0] === item.key
-          const sections = Object.values(DOCS_CONTENT).filter(
-            (snippet) => snippet.category === item.key
-          )
+          const isActive = currentSection === item.key
 
-          // [Joshen] Need to find the right UI component for accessbility
           return (
             <Fragment key={item.key}>
-              <div
-                className={`cursor-pointer text-sm py-2 px-3 rounded-md transition ${
-                  isActive ? 'bg-surface-300' : ''
-                }`}
+              <button
+                aria-current={isActive ? 'page' : undefined}
+                className={cn(
+                  'w-full px-3 py-2 rounded-md',
+                  'text-left text-sm',
+                  'transition',
+                  isActive && 'bg-surface-300'
+                )}
                 onClick={() => snap.setActiveDocsSection([item.key])}
               >
                 {item.name}
-              </div>
-              {isActive && sections.length > 0 && (
-                <div className="space-y-2 py-2">
-                  {sections.map((section) => (
-                    <p
-                      key={section.key}
-                      title={section.title}
-                      className="text-sm text-foreground-light px-4 hover:text-foreground transition cursor-pointer"
-                      onClick={() => {
-                        snap.setActiveDocsSection([item.key])
-                        navigateToSection(section.key)
-                      }}
-                    >
-                      {section.title}
-                    </p>
-                  ))}
-                  {item.key === 'entities' && (
-                    <>
-                      {tables.length > 0 && <Separator />}
-                      {tables.map((table) => (
-                        <p
-                          key={table.name}
-                          title={table.name}
-                          className="text-sm text-foreground-light px-4 hover:text-foreground transition cursor-pointer"
-                          onClick={() => snap.setActiveDocsSection([item.key, table.name])}
-                        >
-                          {table.name}
-                        </p>
-                      ))}
-                    </>
-                  )}
-                  {item.key === 'stored-procedures' && (
-                    <>
-                      {functions.length > 0 && <Separator />}
-                      {functions.map((fn) => (
-                        <p
-                          key={fn.name}
-                          title={fn.name}
-                          className="text-sm text-foreground-light px-4 hover:text-foreground transition cursor-pointer"
-                          onClick={() => snap.setActiveDocsSection([item.key, fn.name])}
-                        >
-                          {fn.name}
-                        </p>
-                      ))}
-                    </>
-                  )}
-                  {item.key === 'storage' && (
-                    <>
-                      {(buckets ?? []).length > 0 && <Separator />}
-                      {(buckets ?? []).map((bucket) => (
-                        <p
-                          key={bucket.name}
-                          title={bucket.name}
-                          className="text-sm text-foreground-light px-4 hover:text-foreground transition cursor-pointer"
-                          onClick={() => snap.setActiveDocsSection([item.key, bucket.name])}
-                        >
-                          {bucket.name}
-                        </p>
-                      ))}
-                    </>
-                  )}
-                  {item.key === 'edge-functions' && (
-                    <>
-                      {(edgeFunctions ?? []).length > 0 && <Separator />}
-                      {(edgeFunctions ?? []).map((fn) => (
-                        <p
-                          key={fn.name}
-                          title={fn.name}
-                          className="text-sm text-foreground-light px-4 hover:text-foreground transition cursor-pointer"
-                          onClick={() => snap.setActiveDocsSection([item.key, fn.name])}
-                        >
-                          {fn.name}
-                        </p>
-                      ))}
-                    </>
-                  )}
-                </div>
-              )}
+              </button>
+              {isActive && <Subsections category={item.key} />}
             </Fragment>
           )
         })}
-      </div>
+      </nav>
 
       <div className="px-2 py-4 border-b">
         <Button
@@ -202,4 +155,164 @@ const FirstLevelNav = () => {
   )
 }
 
-export default FirstLevelNav
+type SubsectionsProps = {
+  category: DocsCategory
+}
+
+const Subsections = ({ category }: SubsectionsProps): ReactNode => {
+  const snippets = getSectionSnippets(category)
+
+  return (
+    <div className="space-y-2 py-2">
+      {snippets.map((snippet) => (
+        <button
+          key={snippet.key}
+          className={MENU_BUTTON_CLASSES}
+          onClick={() => {
+            navigateToSection(snippet.key)
+          }}
+        >
+          {snippet.title}
+        </button>
+      ))}
+      {category === API_DOCS_CATEGORIES.ENTITIES && <TablesSubsections />}
+      {category === API_DOCS_CATEGORIES.STORED_PROCEDURES && <DbFunctionsSubsections />}
+      {category === API_DOCS_CATEGORIES.STORAGE && <StorageSubsections />}
+      {category === API_DOCS_CATEGORIES.EDGE_FUNCTIONS && <EdgeFunctionsSubsections />}
+    </div>
+  )
+}
+
+const TablesSubsections = (): ReactNode => {
+  const { ref } = useParams()
+  const snap = useAppStateSnapshot()
+
+  const { data, isLoading } = useOpenAPISpecQuery(
+    { projectRef: ref },
+    { staleTime: 1000 * 60 * 10 }
+  )
+  const tables = data?.tables ?? []
+
+  // TODO: handle infinite loading of tables
+  return (
+    <>
+      {isLoading && <LoadingIndicator />}
+      {tables.length > 0 && <Separator />}
+      {tables.map((table) => (
+        <button
+          key={table.name}
+          className={MENU_BUTTON_CLASSES}
+          onClick={() => snap.setActiveDocsSection([API_DOCS_CATEGORIES.ENTITIES, table.name])}
+        >
+          {table.name}
+        </button>
+      ))}
+    </>
+  )
+}
+
+const DbFunctionsSubsections = (): ReactNode => {
+  const { ref } = useParams()
+  const snap = useAppStateSnapshot()
+
+  const { data, isLoading } = useOpenAPISpecQuery(
+    { projectRef: ref },
+    { staleTime: 1000 * 60 * 10 }
+  )
+  const functions = data?.functions ?? []
+
+  // TODO: handle virtualization of DB functions
+  return (
+    <>
+      {isLoading && <LoadingIndicator />}
+      {functions.length > 0 && <Separator />}
+      {functions.map((fn) => (
+        <button
+          key={fn.name}
+          className={MENU_BUTTON_CLASSES}
+          onClick={() =>
+            snap.setActiveDocsSection([API_DOCS_CATEGORIES.STORED_PROCEDURES, fn.name])
+          }
+        >
+          {fn.name}
+        </button>
+      ))}
+    </>
+  )
+}
+
+const BucketButton = ({ item: bucket, style }: RowComponentBaseProps<Bucket>) => {
+  const snap = useAppStateSnapshot()
+
+  return (
+    <button
+      key={bucket.name}
+      className={cn(MENU_BUTTON_CLASSES, 'py-1')}
+      style={style}
+      onClick={() => snap.setActiveDocsSection([API_DOCS_CATEGORIES.STORAGE, bucket.name])}
+    >
+      {bucket.name}
+    </button>
+  )
+}
+
+const StorageSubsections = (): ReactNode => {
+  const { ref } = useParams()
+
+  const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
+    usePaginatedBucketsQuery({
+      projectRef: ref,
+    })
+  const buckets = data?.pages.flatMap((page) => page) ?? []
+
+  return (
+    <>
+      {isLoading && <LoadingIndicator />}
+      {buckets.length > 0 && <Separator />}
+      <InfiniteListDefault
+        className="max-h-80"
+        items={buckets}
+        getItemKey={(idx) => buckets[idx]?.name}
+        getItemSize={() => 28}
+        hasNextPage={!!hasNextPage}
+        isLoadingNextPage={isFetchingNextPage}
+        onLoadNextPage={fetchNextPage}
+        ItemComponent={BucketButton}
+        LoaderComponent={({ style }) => <LoadingIndicator style={{ ...style, width: '75%' }} />}
+      />
+    </>
+  )
+}
+
+const EdgeFunctionsSubsections = (): ReactNode => {
+  const { ref } = useParams()
+  const snap = useAppStateSnapshot()
+
+  const { data: edgeFunctions, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
+
+  // TODO: handle virtualization of edge functions
+  return (
+    <>
+      {isLoading && <LoadingIndicator />}
+      {(edgeFunctions ?? []).length > 0 && <Separator />}
+      {(edgeFunctions ?? []).map((fn) => (
+        <button
+          key={fn.name}
+          className={MENU_BUTTON_CLASSES}
+          onClick={() => snap.setActiveDocsSection([API_DOCS_CATEGORIES.EDGE_FUNCTIONS, fn.name])}
+        >
+          {fn.name}
+        </button>
+      ))}
+    </>
+  )
+}
+
+type LoadingIndicatorProps = {
+  className?: string
+  style?: React.CSSProperties
+}
+
+const LoadingIndicator = ({ className, style }: LoadingIndicatorProps) => (
+  <ShimmeringLoader style={style} className={cn('mx-2', className)} />
+)

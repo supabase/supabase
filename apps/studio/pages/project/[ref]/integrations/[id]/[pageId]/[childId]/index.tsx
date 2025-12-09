@@ -1,15 +1,23 @@
+import { useRouter } from 'next/router'
+import { useEffect, useMemo } from 'react'
+
 import { useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useRouter } from 'next/compat/router'
-import { useEffect, useMemo } from 'react'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -49,27 +57,35 @@ const IntegrationPage: NextPageWithLayout = () => {
   const content = useMemo(() => {
     if (!router?.isReady || isIntegrationsLoading) {
       return (
-        <ScaffoldContainer size="full">
-          <ScaffoldSection isFullWidth>
-            <GenericSkeletonLoader />
-          </ScaffoldSection>
-        </ScaffoldContainer>
+        <PageContainer size="full">
+          <PageSection>
+            <PageSectionContent>
+              <GenericSkeletonLoader />
+            </PageSectionContent>
+          </PageSection>
+        </PageContainer>
       )
     } else if (!Component || !id || !integration) {
       return (
-        <PageLayout
-          title="Integration not found"
-          subtitle="If you think this is an error, please contact support"
-          size="full"
-        >
-          <ScaffoldContainer size="full">
-            <ScaffoldSection isFullWidth>
+        <PageContainer size="full">
+          <PageHeader size="full">
+            <PageHeaderMeta>
+              <PageHeaderSummary>
+                <PageHeaderTitle>Integration not found</PageHeaderTitle>
+                <PageHeaderDescription>
+                  If you think this is an error, please contact support.
+                </PageHeaderDescription>
+              </PageHeaderSummary>
+            </PageHeaderMeta>
+          </PageHeader>
+          <PageSection>
+            <PageSectionContent>
               <Admonition type="warning" title="This integration is not currently available">
                 Please try again later or contact support if the problem persists.
               </Admonition>
-            </ScaffoldSection>
-          </ScaffoldContainer>
-        </PageLayout>
+            </PageSectionContent>
+          </PageSection>
+        </PageContainer>
       )
     } else {
       return <Component />

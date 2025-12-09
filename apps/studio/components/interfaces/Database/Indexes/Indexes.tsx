@@ -177,10 +177,10 @@ const Indexes = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead key="schema">Schema</TableHead>
                       <TableHead key="table">Table</TableHead>
+                      <TableHead key="columns">Columns</TableHead>
                       <TableHead key="name">Name</TableHead>
-                      <TableHead key="buttons"></TableHead>
+                      <TableHead key="buttons" />
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -208,10 +208,10 @@ const Indexes = () => {
                       indexes.map((index) => (
                         <TableRow key={index.name}>
                           <TableCell>
-                            <p title={index.schema}>{index.schema}</p>
+                            <p title={index.table}>{index.table}</p>
                           </TableCell>
                           <TableCell>
-                            <p title={index.table}>{index.table}</p>
+                            <p title={index.columns}>{index.columns}</p>
                           </TableCell>
                           <TableCell>
                             <p title={index.name}>{index.name}</p>

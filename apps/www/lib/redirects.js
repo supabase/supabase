@@ -2436,8 +2436,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/platform/oauth-apps/build-a-supabase-integration',
-    destination: '/docs/guides/platform/oauth-apps/build-a-supabase-oauth-integration',
+    source: '/docs/guides/integrations/build-a-supabase-integration',
+    destination: '/docs/guides/integrations/build-a-supabase-oauth-integration',
   },
   { permanent: true, source: '/docs/reference/cli/config', destination: '/docs/guides/cli/config' },
   {

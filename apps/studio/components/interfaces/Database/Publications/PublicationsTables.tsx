@@ -77,7 +77,7 @@ export const PublicationsTables = () => {
           {!isLoadingPermissions && !canUpdatePublications && (
             <Admonition
               type="note"
-              className="w-[500px] m-0"
+              className="w-[500px]"
               title="You need additional permissions to update database replications"
             />
           )}

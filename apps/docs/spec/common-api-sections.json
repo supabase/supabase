@@ -812,7 +812,7 @@
   },
   {
     "type": "category",
-    "title": "Realtime Config",
+    "title": "Realtime",
     "items": [
       {
         "id": "v1-get-realtime-config",

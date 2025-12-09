@@ -121,7 +121,7 @@ export const PauseDisabledState = () => {
       <Admonition
         showIcon={false}
         type="warning"
-        className="mb-0 rounded-none border-0 px-6"
+        className="rounded-none border-0 px-6"
         title="Project can no longer be restored through the dashboard"
       >
         <p className="!leading-normal !mb-3">

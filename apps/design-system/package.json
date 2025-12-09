@@ -32,7 +32,6 @@
     "react": "catalog:",
     "react-data-grid": "7.0.0-beta.41",
     "react-day-picker": "^9.11.1",
-    "react-docgen": "^7.0.3",
     "react-dom": "catalog:",
     "react-hook-form": "^7.45.0",
     "react-inlinesvg": "^4.0.4",

@@ -762,6 +762,12 @@ export const examples: Registry = [
     files: ['example/slider-demo.tsx'],
   },
   {
+    name: 'slider-minMax-range',
+    type: 'components:example',
+    registryDependencies: ['slider'],
+    files: ['example/slider-minMax-range.tsx'],
+  },
+  {
     name: 'sonner-demo',
     type: 'components:example',
     registryDependencies: ['sonner'],
@@ -1037,6 +1043,66 @@ export const examples: Registry = [
     name: 'form-item-layout-demo',
     type: 'components:example',
     files: ['example/form-item-layout-demo.tsx'],
+  },
+  {
+    name: 'field-choice-card',
+    type: 'components:example',
+    files: ['example/field-choice-card.tsx'],
+  },
+  {
+    name: 'field-checkbox',
+    type: 'components:example',
+    files: ['example/field-checkbox.tsx'],
+  },
+  {
+    name: 'field-demo',
+    type: 'components:example',
+    files: ['example/field-demo.tsx'],
+  },
+  {
+    name: 'field-fieldset',
+    type: 'components:example',
+    files: ['example/field-fieldset.tsx'],
+  },
+  {
+    name: 'field-input',
+    type: 'components:example',
+    files: ['example/field-input.tsx'],
+  },
+  {
+    name: 'field-group',
+    type: 'components:example',
+    files: ['example/field-group.tsx'],
+  },
+  {
+    name: 'field-radio',
+    type: 'components:example',
+    files: ['example/field-radio.tsx'],
+  },
+  {
+    name: 'field-responsive',
+    type: 'components:example',
+    files: ['example/field-responsive.tsx'],
+  },
+  {
+    name: 'field-select',
+    type: 'components:example',
+    files: ['example/field-select.tsx'],
+  },
+  {
+    name: 'field-slider',
+    type: 'components:example',
+    files: ['example/field-slider.tsx'],
+  },
+  {
+    name: 'field-switch',
+    type: 'components:example',
+    files: ['example/field-switch.tsx'],
+  },
+  {
+    name: 'field-textarea',
+    type: 'components:example',
+    files: ['example/field-textarea.tsx'],
   },
   {
     name: 'form-patterns-pagelayout',

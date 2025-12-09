@@ -1,13 +1,16 @@
+import type { CSSProperties } from 'react'
 import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 export interface ShimmeringLoader {
   className?: string
+  style?: CSSProperties
   delayIndex?: number
   animationDelay?: number
 }
 
 export const ShimmeringLoader = ({
   className,
+  style,
   delayIndex = 0,
   animationDelay = 150,
 }: ShimmeringLoader) => {
@@ -15,6 +18,7 @@ export const ShimmeringLoader = ({
     <div
       className={cn('shimmering-loader rounded py-3', className)}
       style={{
+        ...style,
         animationFillMode: 'backwards',
         animationDelay: `${delayIndex * animationDelay}ms`,
       }}

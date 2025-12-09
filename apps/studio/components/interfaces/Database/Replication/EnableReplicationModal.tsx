@@ -51,7 +51,7 @@ export const EnableReplicationModal = () => {
         <DialogSection className="flex flex-col gap-y-2 !p-0">
           <Admonition
             type="warning"
-            className="rounded-none border-0 mb-0"
+            className="rounded-none border-0"
             title="Replication is currently in Alpha"
           >
             <p className="text-sm !leading-normal">

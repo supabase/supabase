@@ -73,7 +73,7 @@ export const OrganizationInvite = () => {
             showIcon={false}
             type="default"
             title={`Sign in${isSignUpEnabled ? ' or create an account' : ''} first to view this invitation`}
-            className="mb-0 border-0 rounded-none text-left"
+            className="border-0 rounded-none text-left"
           />
           <div className="p-4 border-muted border-t flex gap-x-3 justify-center">
             <Button asChild type="default">
@@ -96,7 +96,7 @@ export const OrganizationInvite = () => {
             type="default"
             title="Invalid invitation"
             description="This organization invite is no longer valid as it has either been accepted or declined"
-            className="mb-0 border-0 rounded-none text-left"
+            className="border-0 rounded-none text-left"
           />
           <div className="p-4 border-muted border-t">
             <Button type="default" asChild>

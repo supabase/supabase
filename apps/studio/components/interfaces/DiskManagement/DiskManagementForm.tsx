@@ -397,7 +397,6 @@ export function DiskManagementForm() {
                     {!isReadOnlyMode && usedPercentage >= 90 && isWithinCooldownWindow && (
                       <Admonition
                         type="destructive"
-                        className="mb-0"
                         title="Database size is currently over 90% of disk size"
                         description="Your project will enter read-only mode once you reach 95% of the disk space to prevent your database from exceeding the disk limitations"
                       >
@@ -411,7 +410,6 @@ export function DiskManagementForm() {
                     {isReadOnlyMode && (
                       <Admonition
                         type="destructive"
-                        className="mb-0"
                         title="Project is currently in read-only mode"
                         description="You will need to manually override read-only mode and reduce the database size to below 95% of the disk size"
                       >

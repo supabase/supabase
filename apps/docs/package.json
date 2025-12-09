@@ -70,7 +70,7 @@
     "graphql-validation-complexity": "^0.4.2",
     "gray-matter": "^4.0.3",
     "hast-util-has-property": "^2.0.1",
-    "hast-util-to-html": "^9.0.0",
+    "hast-util-to-html": "^9.0.5",
     "icons": "workspace:*",
     "isbot": "^5.1.2",
     "js-yaml": "^3.14.2",

@@ -785,5 +785,12 @@
     "position": "Engineering",
     "author_url": "https://github.com/edgurgel",
     "author_image_url": "https://github.com/edgurgel.png"
+  },
+  {
+    "author_id": "katerina_skroumpelou",
+    "author": "Katerina Skroumpelou",
+    "position": "Engineering",
+    "author_url": "https://github.com/mandarini",
+    "author_image_url": "https://github.com/mandarini.png"
   }
 ]

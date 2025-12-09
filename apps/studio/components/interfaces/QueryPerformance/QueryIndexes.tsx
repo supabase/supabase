@@ -1,5 +1,5 @@
 import { Check, Lightbulb, Table2 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
@@ -35,6 +35,7 @@ import {
 import { EnableIndexAdvisorButton } from './IndexAdvisor/EnableIndexAdvisorButton'
 import { DocsButton } from 'components/ui/DocsButton'
 import { DOCS_URL } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
 
 interface QueryIndexesProps {
   selectedRow: any
@@ -49,6 +50,8 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
   const { data: project } = useSelectedProjectQuery()
   const [showStartupCosts, setShowStartupCosts] = useState(false)
   const [isExecuting, setIsExecuting] = useState(false)
+  const track = useTrack()
+  const [hasTrackedTabView, setHasTrackedTabView] = useState(false)
 
   const {
     data: usedIndexes,
@@ -100,10 +103,27 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
 
   const invalidateQueries = useIndexInvalidation()
 
+  useEffect(() => {
+    if (!isLoadingIndexAdvisorResult && !hasTrackedTabView) {
+      track('index_advisor_tab_clicked', {
+        hasRecommendations: hasIndexRecommendation,
+        isIndexAdvisorEnabled: isIndexAdvisorEnabled,
+      })
+      setHasTrackedTabView(true)
+    }
+  }, [
+    isLoadingIndexAdvisorResult,
+    hasIndexRecommendation,
+    hasTrackedTabView,
+    track,
+    isIndexAdvisorEnabled,
+  ])
+
   const createIndex = async () => {
     if (index_statements.length === 0) return
 
     setIsExecuting(true)
+    track('index_advisor_create_indexes_button_clicked')
 
     try {
       await createIndexes({

@@ -1,4 +1,6 @@
 export const storageKeys = {
+  bucket: (projectRef: string | undefined, bucketId: string | undefined) =>
+    ['projects', projectRef, 'buckets', bucketId] as const,
   buckets: (projectRef: string | undefined) => ['projects', projectRef, 'buckets'] as const,
   bucketsList: (
     projectRef: string | undefined,

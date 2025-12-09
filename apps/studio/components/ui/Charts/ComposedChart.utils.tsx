@@ -158,7 +158,9 @@ export const CustomTooltip = ({
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_fs_')) ||
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('pg_database_size'))
     const isNetworkChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('network_'))
-    const shouldFormatBytes = isRamChart || isDBSizeChart || isNetworkChart
+    const isBytesFormat = format === 'bytes' || format === 'bytes-per-second'
+    const shouldFormatBytes = isBytesFormat || isRamChart || isDBSizeChart || isNetworkChart
+    const byteUnitSuffix = format === 'bytes-per-second' ? '/s' : ''
 
     const attributesToIgnore =
       attributes?.filter((a) => a.omitFromTotal)?.map((a) => a.attribute) ?? []
@@ -180,6 +182,13 @@ export const CustomTooltip = ({
     const getIcon = (color: string, isMax: boolean) =>
       isMax ? <MaxConnectionsIcon /> : <CustomIcon color={color} />
 
+    const formatNumeric = (value: number) => {
+      if (!shouldFormatBytes && valuePrecision === 0 && value > 0 && value < 1) return '<1'
+      return shouldFormatBytes
+        ? formatBytes(isNetworkChart ? Math.abs(value) : value, valuePrecision)
+        : numberFormatter(value, valuePrecision)
+    }
+
     const LabelItem = ({ entry }: { entry: any }) => {
       const attribute = attributes?.find((a: MultiAttribute) => a?.attribute === entry.name)
       const percentage = ((entry.value / maxValue) * 100).toFixed(valuePrecision)
@@ -192,9 +201,7 @@ export const CustomTooltip = ({
             {attribute?.label || entry.name}
           </span>
           <span className="ml-3.5 flex items-end gap-1">
-            {shouldFormatBytes
-              ? formatBytes(isNetworkChart ? Math.abs(entry.value) : entry.value, valuePrecision)
-              : numberFormatter(entry.value, valuePrecision)}
+            {formatNumeric(entry.value) + (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
             {isPercentage ? '%' : ''}
             {format === 'ms' ? 'ms' : ''}
 
@@ -225,9 +232,8 @@ export const CustomTooltip = ({
               <span className="flex-grow text-foreground-lighter">Total</span>
               <div className="flex items-end gap-1">
                 <span className="text-base">
-                  {shouldFormatBytes
-                    ? formatBytes(total as number, valuePrecision)
-                    : numberFormatter(total as number, valuePrecision)}
+                  {formatNumeric(total as number) +
+                    (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
                   {isPercentage ? '%' : ''}
                   {format === 'ms' ? 'ms' : ''}
                 </span>

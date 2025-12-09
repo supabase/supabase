@@ -662,7 +662,7 @@ testRunner('table editor', () => {
     const downloadJsonPath = await downloadJson.path()
     const jsonContent = fs.readFileSync(downloadJsonPath, 'utf-8')
     expect(jsonContent).toBe(
-      `[{"idx":0,"id":4,"created_at":"2025-01-01 12:00:00+00","pw_column":"value 4 to export"},{"idx":1,"id":5,"created_at":"2025-01-01 12:00:00+00","pw_column":"value 5 to export"},{"idx":2,"id":6,"created_at":"2025-01-01 12:00:00+00","pw_column":"value 6 to export"}]`
+      `[{"id":4,"created_at":"2025-01-01 12:00:00+00","pw_column":"value 4 to export"},{"id":5,"created_at":"2025-01-01 12:00:00+00","pw_column":"value 5 to export"},{"id":6,"created_at":"2025-01-01 12:00:00+00","pw_column":"value 6 to export"}]`
     )
     await page.waitForTimeout(1000) // wait for event processing to complete
     fs.unlinkSync(downloadJsonPath)

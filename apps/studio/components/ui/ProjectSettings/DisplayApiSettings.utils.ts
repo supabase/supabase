@@ -3,13 +3,17 @@ import { useRef } from 'react'
 
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 
-export function useLastUsedAPIKeysLogQuery(projectRef: string) {
+export function useLastUsedAPIKeysLogQuery(projectRef: string, enabled?: boolean) {
   const now = useRef(new Date()).current
-  return useLogsQuery(projectRef, {
-    iso_timestamp_start: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
-    iso_timestamp_end: now.toISOString(),
-    sql: "-- last-used-anon--service_role-api-keys\nSELECT unix_millis(max(timestamp)) as timestamp, payload.role, payload.signature_prefix FROM edge_logs cross join unnest(metadata) as m cross join unnest(m.request) as request cross join unnest(request.sb) as sb cross join unnest(sb.jwt) as jwt cross join unnest(jwt.apikey) as apikey cross join unnest(apikey.payload) as payload WHERE apikey.invalid is null and payload.issuer = 'supabase' and payload.algorithm = 'HS256' and payload.role in ('anon', 'service_role') GROUP BY payload.role, payload.signature_prefix",
-  })
+  return useLogsQuery(
+    projectRef,
+    {
+      iso_timestamp_start: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
+      iso_timestamp_end: now.toISOString(),
+      sql: "-- last-used-anon--service_role-api-keys\nSELECT unix_millis(max(timestamp)) as timestamp, payload.role, payload.signature_prefix FROM edge_logs cross join unnest(metadata) as m cross join unnest(m.request) as request cross join unnest(request.sb) as sb cross join unnest(sb.jwt) as jwt cross join unnest(jwt.apikey) as apikey cross join unnest(apikey.payload) as payload WHERE apikey.invalid is null and payload.issuer = 'supabase' and payload.algorithm = 'HS256' and payload.role in ('anon', 'service_role') GROUP BY payload.role, payload.signature_prefix",
+    },
+    enabled
+  )
 }
 
 export function getLastUsedAPIKeys(

@@ -5,12 +5,16 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { NavigationItem, PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { useCronJobQuery } from 'data/database-cron-jobs/database-cron-job-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import {
+  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
+  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
+  BreadcrumbList_Shadcn_ as BreadcrumbList,
+  BreadcrumbPage_Shadcn_ as BreadcrumbPage,
+  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
   Button,
   cn,
   CodeBlock,
@@ -21,6 +25,15 @@ import {
   TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderBreadcrumb,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { CreateCronJobSheet } from './CreateCronJobSheet/CreateCronJobSheet'
 import { isSecondsFormat, parseCronJobCommand } from './CronJobs.utils'
@@ -59,24 +72,6 @@ export const CronJobPage = () => {
       setIsEditSheetOpen(false)
     },
   })
-
-  const breadcrumbItems = [
-    {
-      label: 'Integrations',
-      href: `/project/${ref}/integrations`,
-    },
-    {
-      label: 'Cron',
-      href: pageId
-        ? `/project/${ref}/integrations/${id}/${pageId}`
-        : `/project/${ref}/integrations/${id}`,
-    },
-    {
-      label: childLabel ?? job?.jobname ?? '',
-    },
-  ]
-
-  const navigationItems: NavigationItem[] = []
 
   const pageTitle = childLabel || childId || 'Cron Job'
 
@@ -164,17 +159,37 @@ export const CronJobPage = () => {
 
   return (
     <>
-      <PageLayout
-        title={pageTitle}
-        size="full"
-        breadcrumbs={breadcrumbItems}
-        navigationItems={navigationItems}
-        secondaryActions={secondaryActions}
-        subtitle={isLoading ? <ShimmeringLoader className="py-0 h-[20px] w-96" /> : pageSubtitle}
-        className="border-b-0"
-      >
-        <PreviousRunsTab />
-      </PageLayout>
+      <PageHeader size="full" className="pb-6">
+        <PageHeaderBreadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href={`/project/${ref}/integrations`}>Integrations</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href={`/project/${ref}/integrations/${id}/${pageId}`}>Cron</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{childLabel ?? job?.jobname ?? 'Cron Job'}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </PageHeaderBreadcrumb>
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>{pageTitle}</PageHeaderTitle>
+            <PageHeaderDescription>
+              {isLoading ? <ShimmeringLoader className="py-0 h-[20px] w-96" /> : pageSubtitle}
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+          {secondaryActions.length > 0 && <PageHeaderAside>{secondaryActions}</PageHeaderAside>}
+        </PageHeaderMeta>
+      </PageHeader>
+      <PreviousRunsTab />
 
       <Sheet open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen}>
         <SheetContent size="lg">
