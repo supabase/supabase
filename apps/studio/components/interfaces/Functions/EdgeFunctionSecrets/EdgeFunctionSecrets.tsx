@@ -59,7 +59,7 @@ export const EdgeFunctionSecrets = () => {
 
   const { mutate: deleteSecret, isPending: isDeleting } = useSecretsDeleteMutation({
     onSuccess: (_, variables) => {
-      toast.success(`Successfully deleted ${variables.secrets[0]}`)
+      toast.success(`Successfully deleted secret “${variables.secrets[0]}”`)
       setSelectedSecretToDelete(null)
     },
     onError: () => {
@@ -78,7 +78,7 @@ export const EdgeFunctionSecrets = () => {
     <TableHead key="secret-value" className="flex items-center gap-x-2">
       Digest <Badge variant="default">SHA256</Badge>
     </TableHead>,
-    <TableHead key="secret-updated-at">Updated at</TableHead>,
+    <TableHead key="secret-updated-at">Updated</TableHead>,
     <TableHead key="actions" />,
   ]
 
@@ -96,7 +96,7 @@ export const EdgeFunctionSecrets = () => {
 
           {isSuccess && (
             <>
-              <div className="mb-6">
+              <div className="mb-10">
                 {!canUpdateSecrets ? (
                   <NoPermission resourceText="manage this project's edge function secrets" />
                 ) : (
@@ -134,7 +134,7 @@ export const EdgeFunctionSecrets = () => {
                             />
                           ))
                         ) : secrets.length === 0 && searchString.length > 0 ? (
-                          <TableRow>
+                          <TableRow className="[&>td]:hover:bg-inherit">
                             <TableCell colSpan={headers.length}>
                               <p className="text-sm text-foreground">No results found</p>
                               <p className="text-sm text-foreground-light">
@@ -143,7 +143,7 @@ export const EdgeFunctionSecrets = () => {
                             </TableCell>
                           </TableRow>
                         ) : (
-                          <TableRow>
+                          <TableRow className="[&>td]:hover:bg-inherit">
                             <TableCell colSpan={headers.length}>
                               <p className="text-sm text-foreground">No secrets created</p>
                               <p className="text-sm text-foreground-light">
@@ -174,7 +174,7 @@ export const EdgeFunctionSecrets = () => {
         visible={!!selectedSecretToDelete}
         confirmLabel="Delete secret"
         confirmLabelLoading="Deleting secret"
-        title={`Confirm to delete secret "${selectedSecretToDelete?.name}"`}
+        title={`Delete secret “${selectedSecretToDelete?.name}”`}
         onCancel={() => setSelectedSecretToDelete(null)}
         onConfirm={() => {
           if (selectedSecretToDelete) {
@@ -184,8 +184,8 @@ export const EdgeFunctionSecrets = () => {
         }}
       >
         <p className="text-sm">
-          Before removing this secret, ensure none of your Edge Functions are actively using it.
-          This action cannot be undone.
+          Ensure none of your edge functions are actively using this secret before deleting it. This
+          action cannot be undone.
         </p>
       </ConfirmationModal>
     </>
