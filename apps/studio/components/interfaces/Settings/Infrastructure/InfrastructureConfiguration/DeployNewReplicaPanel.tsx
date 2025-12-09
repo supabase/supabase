@@ -76,17 +76,17 @@ const DeployNewReplicaPanel = ({
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
   const { data: diskConfiguration } = useDiskAttributesQuery({ projectRef })
 
-  const isNotOnTeamOrEnterprisePlan = useMemo(
-    () => !['team', 'enterprise'].includes(org?.plan.id ?? ''),
+  const isNotOnHigherPlan = useMemo(
+    () => !['team', 'enterprise', 'platform'].includes(org?.plan.id ?? ''),
     [org]
   )
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
-    enabled: isNotOnTeamOrEnterprisePlan,
+    enabled: isNotOnHigherPlan,
   })
   const overdueInvoices = (allOverdueInvoices ?? []).filter(
     (x) => x.organization_id === project?.organization_id
   )
-  const hasOverdueInvoices = overdueInvoices.length > 0 && isNotOnTeamOrEnterprisePlan
+  const hasOverdueInvoices = overdueInvoices.length > 0 && isNotOnHigherPlan
   const isAwsK8s = useIsAwsK8sCloudProvider()
 
   // Opting for useState temporarily as Listbox doesn't seem to work with react-hook-form yet
@@ -125,7 +125,7 @@ const DeployNewReplicaPanel = ({
   const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion)
   const [selectedCompute, setSelectedCompute] = useState(defaultCompute)
 
-  useProjectDetailQuery(
+  const { data: projectDetail, isSuccess: isProjectDetailSuccess } = useProjectDetailQuery(
     { ref: projectRef },
     {
       refetchInterval,
@@ -136,7 +136,14 @@ const DeployNewReplicaPanel = ({
     }
   )
 
-  const { mutate: enablePhysicalBackups, isLoading: isEnabling } = useEnablePhysicalBackupsMutation(
+  useEffect(() => {
+    if (!isProjectDetailSuccess) return
+    if (projectDetail.is_physical_backups_enabled) {
+      setRefetchInterval(false)
+    }
+  }, [projectDetail?.is_physical_backups_enabled, isProjectDetailSuccess])
+
+  const { mutate: enablePhysicalBackups, isPending: isEnabling } = useEnablePhysicalBackupsMutation(
     {
       onSuccess: () => {
         toast.success(
@@ -147,7 +154,7 @@ const DeployNewReplicaPanel = ({
     }
   )
 
-  const { mutate: setUpReplica, isLoading: isSettingUp } = useReadReplicaSetUpMutation({
+  const { mutate: setUpReplica, isPending: isSettingUp } = useReadReplicaSetUpMutation({
     onSuccess: () => {
       const region = AVAILABLE_REPLICA_REGIONS.find((r) => r.key === selectedRegion)?.name
       toast.success(`Spinning up new replica in ${region ?? ' Unknown'}...`)

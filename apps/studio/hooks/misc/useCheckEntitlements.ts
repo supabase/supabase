@@ -5,7 +5,9 @@ import type {
   Entitlement,
   EntitlementConfig,
   EntitlementType,
+  FeatureKey,
 } from 'data/entitlements/entitlements-query'
+import { IS_PLATFORM } from 'lib/constants'
 
 function isNumericConfig(
   config: EntitlementConfig,
@@ -54,7 +56,7 @@ function getEntitlementSetValues(entitlement: Entitlement | null): string[] {
 }
 
 export function useCheckEntitlements(
-  featureKey: string,
+  featureKey: FeatureKey,
   organizationSlug?: string,
   options?: {
     enabled?: boolean
@@ -71,7 +73,7 @@ export function useCheckEntitlements(
   })
 
   const finalOrgSlug = organizationSlug || selectedOrg?.slug
-  const enabled = options?.enabled !== false && !!finalOrgSlug
+  const enabled = IS_PLATFORM ? options?.enabled !== false && !!finalOrgSlug : false
 
   const {
     data: entitlementsData,
@@ -100,7 +102,7 @@ export function useCheckEntitlements(
     : isSuccessEntitlements
 
   return {
-    hasAccess: entitlement?.hasAccess ?? false,
+    hasAccess: IS_PLATFORM ? entitlement?.hasAccess ?? false : true,
     isLoading,
     isSuccess,
     getEntitlementNumericValue: () => getEntitlementNumericValue(entitlement),

@@ -27,7 +27,9 @@ export function ColumnHeader<R>({
 
   // keep snap.gridColumns' order in sync with data grid component
   useEffect(() => {
-    if (snap.gridColumns[columnIdx].key != columnKey) {
+    const snapGridColumnKey = snap.gridColumns[columnIdx]?.key
+
+    if (snapGridColumnKey != columnKey) {
       snap.updateColumnIdx(columnKey, columnIdx)
     }
   }, [columnKey, columnIdx, snap.gridColumns])

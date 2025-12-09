@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { snakeCase, uniq } from 'lodash'
+import { uniq } from 'lodash'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -14,33 +14,37 @@ import { getFDWs } from 'data/fdw/fdws-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Form_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Modal, Separator } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import type { WrapperMeta } from '../Integrations/Wrappers/Wrappers.types'
 import { formatWrapperTables } from '../Integrations/Wrappers/Wrappers.utils'
-import SchemaEditor from '../TableGridEditor/SidePanelEditor/SchemaEditor'
+import { SchemaEditor } from '../TableGridEditor/SidePanelEditor/SchemaEditor'
+import { getAnalyticsBucketFDWServerName } from './AnalyticsBuckets/AnalyticsBucketDetails/AnalyticsBucketDetails.utils'
+import { useAnalyticsBucketAssociatedEntities } from './AnalyticsBuckets/AnalyticsBucketDetails/useAnalyticsBucketAssociatedEntities'
 import { getDecryptedParameters } from './ImportForeignSchemaDialog.utils'
 
 export interface ImportForeignSchemaDialogProps {
-  bucketName: string
   namespace: string
-  wrapperMeta: WrapperMeta
   circumstance?: 'fresh' | 'clash'
   visible: boolean
   onClose: () => void
 }
 
 export const ImportForeignSchemaDialog = ({
-  bucketName,
   namespace,
-  wrapperMeta,
   visible,
   onClose,
   circumstance = 'fresh',
 }: ImportForeignSchemaDialogProps) => {
+  const { ref, bucketId: bucketName } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { ref } = useParams()
   const [loading, setLoading] = useState(false)
   const [createSchemaSheetOpen, setCreateSchemaSheetOpen] = useState(false)
 
+  const { data: schemas } = useSchemasQuery({ projectRef: project?.ref! })
+  const { icebergWrapperMeta: wrapperMeta } = useAnalyticsBucketAssociatedEntities({
+    projectRef: ref,
+    bucketId: bucketName,
+  })
+
+  const { mutateAsync: createSchema } = useSchemaCreateMutation()
   const { mutateAsync: importForeignSchema } = useFDWImportForeignSchemaMutation({})
   const { mutateAsync: updateFDW } = useFDWUpdateMutation({
     onSuccess: () => {
@@ -48,8 +52,6 @@ export const ImportForeignSchemaDialog = ({
       onClose()
     },
   })
-
-  const { data: schemas } = useSchemasQuery({ projectRef: project?.ref! })
 
   const FormSchema = z.object({
     bucketName: z.string().trim(),
@@ -73,16 +75,15 @@ export const ImportForeignSchemaDialog = ({
     defaultValues: {
       bucketName,
       sourceNamespace: namespace,
-      targetSchema: '',
+      targetSchema: `fdw_analytics_${namespace}`,
     },
   })
 
-  const { mutateAsync: createSchema } = useSchemaCreateMutation()
-
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
-    const serverName = `${snakeCase(values.bucketName)}_fdw_server`
+    const serverName = getAnalyticsBucketFDWServerName(values.bucketName)
 
     if (!ref) return console.error('Project ref is required')
+    if (!wrapperMeta) return console.error('Wrapper meta is required')
     setLoading(true)
 
     try {
@@ -150,7 +151,7 @@ export const ImportForeignSchemaDialog = ({
       form.reset({
         bucketName,
         sourceNamespace: namespace,
-        targetSchema: '',
+        targetSchema: `fdw_analytics_${namespace}`,
       })
     }
   }, [visible, form, bucketName, namespace])

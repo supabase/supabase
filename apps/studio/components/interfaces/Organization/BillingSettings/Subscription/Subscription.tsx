@@ -41,7 +41,8 @@ const Subscription = () => {
   const currentPlan = subscription?.plan
   const planName = currentPlan?.name ?? 'Unknown'
 
-  const canChangeTier = !projectUpdateDisabled && !['enterprise'].includes(currentPlan?.id ?? '')
+  const canChangeTier =
+    !projectUpdateDisabled && !['enterprise', 'platform'].includes(currentPlan?.id ?? '')
 
   return (
     <>

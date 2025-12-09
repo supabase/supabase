@@ -21,7 +21,7 @@ import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
 import type { Dictionary } from 'types'
 import { Button, Checkbox, Input, SidePanel, Toggle } from 'ui'
-import ActionBar from '../ActionBar'
+import { ActionBar } from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
@@ -62,7 +62,7 @@ export interface ColumnEditorProps {
   updateEditorDirty: () => void
 }
 
-const ColumnEditor = ({
+export const ColumnEditor = ({
   column,
   selectedTable,
   visible = false,
@@ -373,5 +373,3 @@ const ColumnEditor = ({
     </SidePanel>
   )
 }
-
-export default ColumnEditor

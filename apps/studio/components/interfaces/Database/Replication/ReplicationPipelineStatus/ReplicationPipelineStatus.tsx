@@ -13,6 +13,7 @@ import {
   X,
 } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -24,6 +25,7 @@ import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id
 import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
+import { useRestartPipelineHelper } from 'data/replication/restart-pipeline-helper'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import {
@@ -52,7 +54,8 @@ import { SlotLagMetricsInline, SlotLagMetricsList } from './SlotLagMetrics'
  */
 export const ReplicationPipelineStatus = () => {
   const { ref: projectRef, pipelineId: _pipelineId } = useParams()
-  const [filterString, setFilterString] = useState<string>('')
+  const [searchString, setSearchString] = useQueryState('search', parseAsString.withDefault(''))
+
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
 
   const pipelineId = Number(_pipelineId)
@@ -101,8 +104,9 @@ export const ReplicationPipelineStatus = () => {
   })
   const hasUpdate = Boolean(versionData?.new_version)
 
-  const { mutateAsync: startPipeline, isLoading: isStartingPipeline } = useStartPipelineMutation()
-  const { mutateAsync: stopPipeline, isLoading: isStoppingPipeline } = useStopPipelineMutation()
+  const { mutateAsync: startPipeline, isPending: isStartingPipeline } = useStartPipelineMutation()
+  const { mutateAsync: stopPipeline, isPending: isStoppingPipeline } = useStopPipelineMutation()
+  const { restartPipeline } = useRestartPipelineHelper()
 
   const destinationName = pipeline?.destination_name
   const statusName = getStatusName(pipelineStatusData?.status)
@@ -111,10 +115,10 @@ export const ReplicationPipelineStatus = () => {
   const tableStatuses = replicationStatusData?.table_statuses || []
   const applyLagMetrics = replicationStatusData?.apply_lag
   const filteredTableStatuses =
-    filterString.length === 0
+    searchString.length === 0
       ? tableStatuses
       : tableStatuses.filter((table) =>
-          table.table_name.toLowerCase().includes(filterString.toLowerCase())
+          table.table_name.toLowerCase().includes(searchString.toLowerCase())
         )
   const tablesWithLag = tableStatuses.filter((table) => Boolean(table.table_sync_lag))
 
@@ -130,7 +134,7 @@ export const ReplicationPipelineStatus = () => {
       ? `${Math.round(STATUS_REFRESH_FREQUENCY_MS / 1000)}s`
       : `${STATUS_REFRESH_FREQUENCY_MS}ms`
 
-  const logsUrl = `/project/${projectRef}/logs/etl-replication-logs${
+  const logsUrl = `/project/${projectRef}/logs/replication-logs${
     pipelineId ? `?f=${encodeURIComponent(JSON.stringify({ pipeline_id: pipelineId }))}` : ''
   }`
 
@@ -167,7 +171,7 @@ export const ReplicationPipelineStatus = () => {
         await stopPipeline({ projectRef, pipelineId: pipeline.id })
       } else if (statusName === 'failed') {
         setRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
-        await startPipeline({ projectRef, pipelineId: pipeline.id })
+        await restartPipeline({ projectRef, pipelineId: pipeline.id })
       }
     } catch (error) {
       toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
@@ -211,21 +215,21 @@ export const ReplicationPipelineStatus = () => {
               </Button>
             )}
             <Input
-              icon={<Search size={12} />}
-              className="pl-7 h-[26px] text-xs"
+              icon={<Search />}
+              className="text-xs"
               placeholder="Search for tables"
-              value={filterString}
+              value={searchString}
               disabled={isPipelineError}
-              onChange={(e) => setFilterString(e.target.value)}
+              onChange={(e) => setSearchString(e.target.value)}
               actions={
-                filterString.length > 0
+                searchString.length > 0
                   ? [
                       <X
                         key="close"
                         className="mx-2 cursor-pointer text-foreground"
                         size={14}
-                        strokeWidth={2}
-                        onClick={() => setFilterString('')}
+                        strokeWidth={1.5}
+                        onClick={() => setSearchString('')}
                       />,
                     ]
                   : undefined
@@ -365,7 +369,7 @@ export const ReplicationPipelineStatus = () => {
                           <div className="space-y-1">
                             <p className="text-sm text-foreground">No results found</p>
                             <p className="text-sm text-foreground-light">
-                              Your search for "{filterString}" did not return any results
+                              Your search for "{searchString}" did not return any results
                             </p>
                           </div>
                         </Table.td>
@@ -409,7 +413,7 @@ export const ReplicationPipelineStatus = () => {
                                 Status unavailable while pipeline is {config.badge.toLowerCase()}
                               </p>
                             ) : (
-                              <div className="space-y-3">
+                              <div className="flex flex-col gap-y-2">
                                 <div className="text-sm text-foreground">
                                   {statusConfig.description}
                                 </div>
@@ -457,6 +461,7 @@ export const ReplicationPipelineStatus = () => {
           </div>
         )}
       </div>
+
       <UpdateVersionModal
         visible={showUpdateVersionModal}
         pipeline={pipeline}

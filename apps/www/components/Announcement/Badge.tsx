@@ -56,7 +56,7 @@ const AnnouncementBadge = ({
       )}
     >
       {badge && (
-        <Badge variant="brand" size="large" className="py-1 announcement-badge">
+        <Badge variant="success" className="py-1 announcement-badge">
           {badge}
         </Badge>
       )}
