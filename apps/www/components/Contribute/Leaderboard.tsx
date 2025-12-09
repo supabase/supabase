@@ -57,7 +57,7 @@ export function LeaderboardClient({
 
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-semibold text-foreground">Community Leaderboard</h1>
+        <h1 className="text-3xl font-semibold text-foreground">Top Community Contributors</h1>
         <Link
           href="/contribute/leaderboard/how-it-works"
           className="text-sm text-foreground-lighter hover:text-foreground transition-colors"
