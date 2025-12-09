@@ -36258,7 +36258,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Sets the JWT access token used for channel subscription authorization and Realtime RLS.\\n\\nIf param is null it will use the \`accessToken\` callback function or the token set on the client.\\n\\nOn callback used, it will set the value of the token internal to the client."
+          "shortText": "Sets the JWT access token used for channel subscription authorization and Realtime RLS.\\n\\nIf param is null it will use the \`accessToken\` callback function or the token set on the client.\\n\\nOn callback used, it will set the value of the token internal to the client.\\n\\nWhen a token is explicitly provided, it will be preserved across channel operations\\n(including removeChannel and resubscribe). The \`accessToken\` callback will not be\\ninvoked until \`setAuth()\` is called without arguments.",
+          "examples": [
+            {
+              "id": "example-1",
+              "name": "Example 1",
+              "code": "\`\`\`ts\\n// Use a manual token (preserved across resubscribes, ignores accessToken callback)\\nclient.realtime.setAuth('my-custom-jwt')\\n\\n// Switch back to using the accessToken callback\\nclient.realtime.setAuth()\\n\`\`\`"
+            }
+          ]
         }
       },
       "@supabase/supabase-js.RealtimeChannel.httpSend": {
@@ -77585,7 +77592,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Sets the JWT access token used for channel subscription authorization and Realtime RLS.\\n\\nIf param is null it will use the \`accessToken\` callback function or the token set on the client.\\n\\nOn callback used, it will set the value of the token internal to the client."
+          "shortText": "Sets the JWT access token used for channel subscription authorization and Realtime RLS.\\n\\nIf param is null it will use the \`accessToken\` callback function or the token set on the client.\\n\\nOn callback used, it will set the value of the token internal to the client.\\n\\nWhen a token is explicitly provided, it will be preserved across channel operations\\n(including removeChannel and resubscribe). The \`accessToken\` callback will not be\\ninvoked until \`setAuth()\` is called without arguments.",
+          "examples": [
+            {
+              "id": "example-1",
+              "name": "Example 1",
+              "code": "\`\`\`ts\\n// Use a manual token (preserved across resubscribes, ignores accessToken callback)\\nclient.realtime.setAuth('my-custom-jwt')\\n\\n// Switch back to using the accessToken callback\\nclient.realtime.setAuth()\\n\`\`\`"
+            }
+          ]
         }
       },
       "@supabase/realtime-js.RealtimeChannel.httpSend": {
