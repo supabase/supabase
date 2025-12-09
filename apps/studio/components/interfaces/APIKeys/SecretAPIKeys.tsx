@@ -79,7 +79,7 @@ export const SecretAPIKeys = () => {
     isError: isErrorApiKeys,
   } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
 
-  const hideApiKeyLastUsed = useFlag('HideApiKeyLastUsed')
+  const hideApiKeyLastUsed = useFlag('HideApiKeyLastUsed') ?? true
   const { data: lastSeen, isLoading: isLoadingLastSeen } = useLastSeen(
     projectRef ?? '',
     !hideApiKeyLastUsed
