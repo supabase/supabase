@@ -4,9 +4,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Fri, 05 Dec 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Mon, 08 Dec 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/introducing-iceberg-js</guid>
+  <title>Introducing iceberg-js: A JavaScript Client for Apache Iceberg</title>
+  <link>https://supabase.com/blog/introducing-iceberg-js</link>
+  <description>A minimal, vendor-agnostic JavaScript client for the Apache Iceberg REST Catalog API, providing type-safe catalog management for JavaScript and TypeScript developers.</description>
+  <pubDate>Mon, 08 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/introducing-supabase-for-platforms</guid>
   <title>Introducing Supabase for Platforms</title>
   <link>https://supabase.com/blog/introducing-supabase-for-platforms</link>
