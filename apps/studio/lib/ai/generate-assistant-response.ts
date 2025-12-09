@@ -1,13 +1,14 @@
+import * as ai from 'ai'
 import {
   convertToModelMessages,
   isToolUIPart,
   type LanguageModel,
   type ModelMessage,
   stepCountIs,
-  streamText,
   type ToolSet,
   type UIMessage,
 } from 'ai'
+import { wrapAISDK } from 'braintrust'
 import { source } from 'common-tags'
 
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
@@ -22,6 +23,8 @@ import {
   LIMITATIONS_PROMPT,
 } from 'lib/ai/prompts'
 import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
+
+const { streamText } = wrapAISDK(ai)
 
 export async function generateAssistantResponse({
   messages: rawMessages,

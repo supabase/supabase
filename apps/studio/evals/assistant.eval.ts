@@ -1,7 +1,8 @@
 import { openai } from '@ai-sdk/openai'
-import { Factuality } from 'autoevals'
 import { Eval } from 'braintrust'
+import { AssertionScorer } from 'lib/ai/evals/scorer'
 import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
+import { getMockTools } from 'lib/ai/tools'
 import assert from 'node:assert'
 
 assert(process.env.BRAINTRUST_PROJECT_ID, 'BRAINTRUST_PROJECT_ID is not set')
@@ -13,19 +14,28 @@ Eval('Assistant', {
     return [
       {
         input: 'Hello!',
-        expected: 'Hello, world!',
+        expected: [{ type: 'text_includes' as const, substring: 'Hi' }],
+      },
+      {
+        input: 'How do I implement IP address rate limiting? Use search_docs.',
+        expected: [{ type: 'tools_include' as const, tool: 'search_docs' }],
       },
     ]
   },
   task: async (input) => {
     const result = await generateAssistantResponse({
-      model: openai('gpt-5'),
+      model: openai('gpt-5-mini'),
       messages: [{ id: '1', role: 'user', parts: [{ type: 'text', text: input }] }],
-      tools: {},
+      tools: await getMockTools(),
     })
 
     const text = await result.text
-    return text
+    const toolCalls = await result.toolCalls
+
+    return {
+      text: text,
+      tools: toolCalls.map((call) => call.toolName),
+    }
   },
-  scores: [Factuality],
+  scores: [AssertionScorer],
 })
