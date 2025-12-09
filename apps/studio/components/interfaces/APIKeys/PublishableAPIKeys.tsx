@@ -17,15 +17,15 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { APIKeyRow } from './APIKeyRow'
 import { CreatePublishableAPIKeyDialog } from './CreatePublishableAPIKeyDialog'
 import { useApiKeysVisibility } from './hooks/useApiKeysVisibility'
 
 export const PublishableAPIKeys = () => {
   const { ref: projectRef } = useParams()
+  const { hasApiKeys, canReadAPIKeys, isLoading: isLoadingPermissions } = useApiKeysVisibility()
 
-  const { canReadAPIKeys, isLoading: isLoadingPermissions } = useApiKeysVisibility()
   const {
     error,
     data: apiKeysData = [],
@@ -95,6 +95,15 @@ export const PublishableAPIKeys = () => {
             </TableHeader>
 
             <TableBody>
+              {hasApiKeys && publishableApiKeys.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={3} className="p-0">
+                    <Admonition showIcon={false} type="default" className="border-0 rounded-none">
+                      <p className="text-foreground-light">No publishable keys created yet</p>
+                    </Admonition>
+                  </TableCell>
+                </TableRow>
+              )}
               {publishableApiKeys.map((apiKey) => (
                 <APIKeyRow
                   showLastSeen={false}

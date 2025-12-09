@@ -24,7 +24,7 @@ export function useApiKeysVisibility(): ApiKeysVisibilityState {
     '*'
   )
 
-  const { data: apiKeysData, isLoading: isLoadingApiKeys } = useAPIKeysQuery(
+  const { data: apiKeysData = [], isLoading: isLoadingApiKeys } = useAPIKeysQuery(
     {
       projectRef,
       reveal: false,
@@ -32,14 +32,14 @@ export function useApiKeysVisibility(): ApiKeysVisibilityState {
     { enabled: canReadAPIKeys }
   )
 
-  const publishableApiKeys = useMemo(
-    () => apiKeysData?.filter(({ type }) => type === 'publishable') ?? [],
+  const newApiKeys = useMemo(
+    () => apiKeysData.filter(({ type }) => type === 'publishable' || type === 'secret') ?? [],
     [apiKeysData]
   )
 
   // Check if there are any publishable API keys
   // we don't check for secret keys because they can be optionally deleted
-  const hasApiKeys = publishableApiKeys.length > 0
+  const hasApiKeys = newApiKeys.length > 0
 
   // Can initialize API keys when in rollout, has permissions, not loading, and no API keys yet
   const canInitApiKeys = canReadAPIKeys && !isLoadingApiKeys && !hasApiKeys
