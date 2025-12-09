@@ -130,7 +130,6 @@ export const TableEditor = ({
     : realtimeEnabledTables.some((t) => t.id === table?.id)
 
   const { activeVariant: activeRealtimeVariant } = useRealtimeExperiment({
-    projectInsertedAt: project?.inserted_at,
     isTable: !isNewRecord,
     isRealtimeEnabled,
   })
