@@ -206,14 +206,16 @@ export const DisplayApiSettings = ({
               />
             </FormLayout>
 
-            <div
-              className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
-              data-invisible={isLoadingLastUsed}
-            >
-              {lastUsedAPIKeys[x.api_key]
-                ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
-                : 'No requests in the past 24 hours.'}
-            </div>
+            {!hideApiKeyLastUsed && (
+              <div
+                className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
+                data-invisible={isLoadingLastUsed}
+              >
+                {lastUsedAPIKeys[x.api_key]
+                  ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
+                  : 'No requests in the past 24 hours.'}
+              </div>
+            )}
           </Panel.Content>
         ))
       )}
