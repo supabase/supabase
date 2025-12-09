@@ -38,9 +38,7 @@ const ProjectsPage: NextPageWithLayout = () => {
             }
           />
         ) : (
-          // [Joshen] Very odd, but the h-px here is required for ProjectList to have a max
-          // height based on the remaining space that it can grow to
-          <div className="flex flex-col gap-y-4 flex-grow h-px">
+          <div className="flex flex-col gap-y-4">
             <HomePageActions showViewToggle={true} />
             <ProjectList />
           </div>
