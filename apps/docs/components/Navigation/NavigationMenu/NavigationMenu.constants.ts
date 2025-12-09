@@ -2262,7 +2262,6 @@ export const ai: NavMenuConstant = {
 export const local_development: NavMenuConstant = {
   icon: 'dev-cli',
   title: 'Local Dev / CLI',
-  enabled: localDevelopmentEnabled,
   url: '/guides/local-development',
   items: [
     { name: 'Overview', url: '/guides/local-development' },
@@ -2278,6 +2277,7 @@ export const local_development: NavMenuConstant = {
     {
       name: 'Local development',
       url: undefined,
+      enabled: localDevelopmentEnabled,
       items: [
         { name: 'Getting started', url: '/guides/local-development/overview' },
         {
@@ -2305,6 +2305,7 @@ export const local_development: NavMenuConstant = {
     {
       name: 'Testing',
       url: undefined,
+      enabled: localDevelopmentEnabled,
       items: [
         { name: 'Getting started', url: '/guides/local-development/testing/overview' },
         {

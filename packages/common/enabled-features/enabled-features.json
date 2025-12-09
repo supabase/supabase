@@ -58,7 +58,7 @@
   "docs:full_getting_started": true,
   "docs:full_platform": true,
   "docs:hide_cli_profiles": true,
-  "docs:local_development": true,
+  "docs:local_development": false,
   "docs:mobile_tutorials": true,
   "docs:pgtap": true,
   "docs:production_checklist": true,
