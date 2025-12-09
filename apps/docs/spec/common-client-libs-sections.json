@@ -659,6 +659,34 @@
         "type": "function"
       },
       {
+        "id": "auth-js-gotrueclient-initialize",
+        "title": "Initialize client session",
+        "slug": "auth-initialize",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "auth-js-gotrueclient-isthrowonerrorenabled",
+        "title": "Check if throw on error is enabled",
+        "slug": "auth-isthrowonerrorenabled",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "auth-js-authimplicitgrantredirecterror-tojson",
+        "title": "Serialize implicit grant redirect error",
+        "slug": "auth-implicitgrantredirecterror-tojson",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "auth-js-authpkcegrantcodeexchangeerror-tojson",
+        "title": "Serialize PKCE code exchange error",
+        "slug": "auth-pkcegrantcodeexchangeerror-tojson",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "auth-mfa-api",
         "title": "Auth MFA",
         "slug": "auth-mfa-api",
@@ -774,6 +802,13 @@
             "id": "update-user-by-id",
             "title": "Update a user",
             "slug": "auth-admin-updateuserbyid",
+            "product": "auth-admin",
+            "type": "function"
+          },
+          {
+            "id": "auth-js-gotrueadminapi-signout",
+            "title": "Sign out a user (admin)",
+            "slug": "auth-admin-signout",
             "product": "auth-admin",
             "type": "function"
           },

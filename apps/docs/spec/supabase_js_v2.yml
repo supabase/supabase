@@ -2254,6 +2254,14 @@ functions:
             "error": null
           }
           ```
+  - id: auth-js-gotrueclient-initialize
+    $ref: '@supabase/auth-js.GoTrueClient.initialize'
+  - id: auth-js-gotrueclient-isthrowonerrorenabled
+    $ref: '@supabase/auth-js.GoTrueClient.isThrowOnErrorEnabled'
+  - id: auth-js-authimplicitgrantredirecterror-tojson
+    $ref: '@supabase/auth-js.AuthImplicitGrantRedirectError.toJSON'
+  - id: auth-js-authpkcegrantcodeexchangeerror-tojson
+    $ref: '@supabase/auth-js.AuthPKCEGrantCodeExchangeError.toJSON'
   - id: auth-mfa-api
     title: 'Overview'
     notes: |
@@ -3225,8 +3233,9 @@ functions:
             { ban_duration: '100y' }
           )
           ```
+  - id: auth-js-gotrueadminapi-signout
+    $ref: '@supabase/auth-js.GoTrueAdminApi.signOut'
   - id: mfa-list-factors-admin
-    title: 'mfa.listFactors()'
     $ref: '@supabase/auth-js.GoTrueAdminMFAApi.listFactors'
     examples:
       - id: list-factors
@@ -7652,16 +7661,12 @@ functions:
       Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
 
   - id: auth-js-authoauthserverapi-approveauthorization
-    title: AuthOAuthServerApi.approveAuthorization()
     $ref: '@supabase/auth-js.AuthOAuthServerApi.approveAuthorization'
   - id: auth-js-authoauthserverapi-denyauthorization
-    title: AuthOAuthServerApi.denyAuthorization()
     $ref: '@supabase/auth-js.AuthOAuthServerApi.denyAuthorization'
   - id: auth-js-authoauthserverapi-getauthorizationdetails
-    title: AuthOAuthServerApi.getAuthorizationDetails()
     $ref: '@supabase/auth-js.AuthOAuthServerApi.getAuthorizationDetails'
   - id: auth-js-authoauthserverapi-listgrants
-    title: AuthOAuthServerApi.listGrants()
     $ref: '@supabase/auth-js.AuthOAuthServerApi.listGrants'
   - id: auth-js-authoauthserverapi-revokegrant
     title: AuthOAuthServerApi.revokeGrant()
@@ -7674,28 +7679,20 @@ functions:
       These functions should only be called on a server. Never expose your `service_role` key in the browser.
 
   - id: auth-js-gotrueadminoauthapi-createclient
-    title: GoTrueAdminOAuthApi.createClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.createClient'
   - id: auth-js-gotrueadminoauthapi-deleteclient
-    title: GoTrueAdminOAuthApi.deleteClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.deleteClient'
   - id: auth-js-gotrueadminoauthapi-getclient
-    title: GoTrueAdminOAuthApi.getClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.getClient'
   - id: auth-js-gotrueadminoauthapi-listclients
-    title: GoTrueAdminOAuthApi.listClients()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.listClients'
   - id: auth-js-gotrueadminoauthapi-regenerateclientsecret
-    title: GoTrueAdminOAuthApi.regenerateClientSecret()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.regenerateClientSecret'
   - id: auth-js-gotrueadminoauthapi-updateclient
-    title: GoTrueAdminOAuthApi.updateClient()
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.updateClient'
   - id: auth-js-gotruemfaapi-listfactors
-    title: GoTrueMFAApi.listFactors()
     $ref: '@supabase/auth-js.GoTrueMFAApi.listFactors'
   - id: postgrest-js-postgrestbuilder-constructor
-    title: new PostgrestBuilder()
     $ref: '@supabase/postgrest-js.PostgrestBuilder.constructor'
     examples:
       - id: postgrest-js-postgrestbuilder-constructor-example-1
