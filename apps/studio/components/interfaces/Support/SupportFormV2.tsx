@@ -7,6 +7,7 @@ import { useConstant, useFlag } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
+import { OrganizationPlanID } from 'data/organizations/organization-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useGenerateAttachmentURLsMutation } from 'data/support/generate-attachment-urls-mutation'
 import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
@@ -41,10 +42,7 @@ import {
   uploadDashboardLog,
 } from './dashboard-logs'
 
-const useIsSimplifiedForm = (
-  slug: string,
-  subscriptionPlanId: 'free' | 'pro' | 'team' | 'enterprise' | 'platform' | undefined
-) => {
+const useIsSimplifiedForm = (slug: string, subscriptionPlanId?: OrganizationPlanID) => {
   const simplifiedSupportForm = useFlag('simplifiedSupportForm')
 
   if (subscriptionPlanId === 'platform') {
@@ -55,6 +53,7 @@ const useIsSimplifiedForm = (
     const slugs = (simplifiedSupportForm as string).split(',').map((x) => x.trim())
     return slugs.includes(slug)
   }
+
   return false
 }
 
