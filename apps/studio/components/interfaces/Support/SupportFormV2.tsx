@@ -41,8 +41,16 @@ import {
   uploadDashboardLog,
 } from './dashboard-logs'
 
-const useIsSimplifiedForm = (slug: string) => {
+const useIsSimplifiedForm = (
+  slug: string,
+  subscriptionPlanId: 'free' | 'pro' | 'team' | 'enterprise' | 'platform' | undefined
+) => {
   const simplifiedSupportForm = useFlag('simplifiedSupportForm')
+
+  if (subscriptionPlanId === 'platform') {
+    return true
+  }
+
   if (typeof simplifiedSupportForm === 'string') {
     const slugs = (simplifiedSupportForm as string).split(',').map((x) => x.trim())
     return slugs.includes(slug)
@@ -62,13 +70,13 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
   const respondToEmail = profile?.primary_email ?? 'your email'
 
   const { organizationSlug, projectRef, category, severity, subject, library } = form.watch()
-  const simplifiedSupportForm = useIsSimplifiedForm(organizationSlug)
 
   const selectedOrgSlug = organizationSlug === NO_ORG_MARKER ? null : organizationSlug
   const selectedProjectRef = projectRef === NO_PROJECT_MARKER ? null : projectRef
 
   const { data: organizations } = useOrganizationsQuery()
   const subscriptionPlanId = getOrgSubscriptionPlan(organizations, selectedOrgSlug)
+  const simplifiedSupportForm = useIsSimplifiedForm(organizationSlug, subscriptionPlanId)
 
   const attachmentUpload = useAttachmentUpload()
   const { mutateAsync: uploadDashboardLogFn } = useGenerateAttachmentURLsMutation()
