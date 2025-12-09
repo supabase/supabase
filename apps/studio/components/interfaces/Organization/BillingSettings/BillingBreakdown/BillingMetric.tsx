@@ -66,6 +66,7 @@ export const BillingMetric = ({
 
   const isUsageBillingEnabled = subscription?.usage_billing_enabled === true
 
+  console.log(usageMeta)
   const hasLimit = !!usageMeta.unlimited === false
   const isApproachingLimit = hasLimit && usageRatio >= USAGE_APPROACHING_THRESHOLD
   const isExceededLimit = relativeToSubscription && hasLimit && usageRatio >= 1
@@ -100,7 +101,10 @@ export const BillingMetric = ({
                 <span className="text-sm" translate="no">
                   ({formatCurrency(usageMeta.cost)})
                 </span>
-              ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
+              ) : usageMeta.available_in_plan &&
+                usageMeta.pricing_free_units !== 0 &&
+                !usageMeta.unlimited &&
+                relativeToSubscription ? (
                 <span className="text-sm">{percentageLabel}</span>
               ) : null}
             </Link>
@@ -112,7 +116,10 @@ export const BillingMetric = ({
                 <span className="text-sm" translate="no">
                   ({formatCurrency(usageMeta.cost)})
                 </span>
-              ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
+              ) : usageMeta.available_in_plan &&
+                usageMeta.pricing_free_units !== 0 &&
+                !usageMeta.unlimited &&
+                relativeToSubscription ? (
                 <span className="text-sm">{percentageLabel}</span>
               ) : null}
             </div>
@@ -120,7 +127,9 @@ export const BillingMetric = ({
 
           {usageMeta.available_in_plan ? (
             <div>
-              {relativeToSubscription && !usageMeta.unlimited ? (
+              {relativeToSubscription &&
+              !usageMeta.unlimited &&
+              usageMeta.pricing_free_units !== 0 ? (
                 <svg className="h-8 w-8 -rotate-90 transform">
                   <circle
                     cx={15}

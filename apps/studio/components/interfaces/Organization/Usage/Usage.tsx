@@ -30,6 +30,8 @@ import Compute from './Compute'
 import Egress from './Egress'
 import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
+import ActiveCompute from './ActiveCompute'
+import OrgLogUsage from './OrgLogUsage'
 
 export const Usage = () => {
   const { slug } = useParams()
@@ -292,6 +294,13 @@ export const Usage = () => {
         <Compute orgDailyStats={orgDailyStats} isLoadingOrgDailyStats={isLoadingOrgDailyStats} />
       )}
 
+      {subscription?.plan.id === 'platform' && (
+        <ActiveCompute
+          orgDailyStats={orgDailyStats}
+          isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+        />
+      )}
+
       <Egress
         orgSlug={slug as string}
         projectRef={selectedProjectRef}
@@ -324,6 +333,19 @@ export const Usage = () => {
         orgDailyStats={orgDailyStats}
         isLoadingOrgDailyStats={isLoadingOrgDailyStats}
       />
+
+      {subscription?.plan.id === 'platform' && (
+        <OrgLogUsage
+          orgSlug={slug as string}
+          projectRef={selectedProjectRef}
+          subscription={subscription}
+          startDate={startDate}
+          endDate={endDate}
+          currentBillingCycleSelected={currentBillingCycleSelected}
+          orgDailyStats={orgDailyStats}
+          isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+        />
+      )}
     </>
   )
 }
