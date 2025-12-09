@@ -302,7 +302,6 @@ interface ChartContentProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
   className?: string
   isEmpty?: boolean
-  hasPadding?: boolean
   emptyState?: React.ReactNode
   loadingState?: React.ReactNode
   disabledState?: React.ReactNode
@@ -315,7 +314,6 @@ const ChartContent = React.forwardRef<HTMLDivElement, ChartContentProps>(
       children,
       className,
       isEmpty = false,
-      hasPadding = true,
       emptyState,
       loadingState,
       disabledState,
@@ -326,11 +324,9 @@ const ChartContent = React.forwardRef<HTMLDivElement, ChartContentProps>(
   ) => {
     const { isLoading, isDisabled } = useChart()
     let content: React.ReactNode
-    let shouldApplyPadding = hasPadding
 
     if (isDisabled) {
       content = disabledState
-      shouldApplyPadding = true
     } else if (isLoading) {
       content = loadingState
     } else if (isEmpty) {
@@ -340,7 +336,7 @@ const ChartContent = React.forwardRef<HTMLDivElement, ChartContentProps>(
     }
 
     return (
-      <div ref={ref} className={cn(shouldApplyPadding && 'px-6 pt-4 pb-6', className)} {...props}>
+      <div ref={ref} className={cn('px-6 pt-4 pb-6', className)} {...props}>
         {content}
       </div>
     )

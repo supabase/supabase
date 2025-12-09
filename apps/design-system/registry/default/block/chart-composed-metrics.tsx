@@ -8,8 +8,6 @@ import {
   ChartContent,
   ChartMetric,
   ChartSparkline,
-  ChartSparklineTooltip,
-  ChartValueDifferential,
 } from 'ui-patterns/Chart'
 import { ExternalLink } from 'lucide-react'
 import { useState, useEffect } from 'react'
@@ -72,7 +70,7 @@ export default function ChartComposedMetrics() {
             <ChartActions actions={actions} />
           </ChartHeader>
           <ChartContent
-            hasPadding={false}
+            className="p-0"
             loadingState={<Skeleton className="w-full h-[6rem] rounded-none mt-4" />}
           >
             <ChartSparkline data={data} dataKey="value" />
@@ -90,7 +88,7 @@ export default function ChartComposedMetrics() {
             <ChartActions actions={actions} />
           </ChartHeader>
           <ChartContent
-            hasPadding={false}
+            className="p-0"
             loadingState={<Skeleton className="w-full h-[6rem] rounded-none mt-4" />}
           >
             <ChartSparkline data={data} dataKey="value" />
