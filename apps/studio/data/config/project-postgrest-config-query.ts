@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
 
 export type ProjectPostgrestConfigVariables = {
@@ -25,7 +25,7 @@ export async function getProjectPostgrestConfig(
   })
   if (error) handleError(error)
   // [Joshen] Not sure why but db_pool isn't part of the API typing
-  // https://github.com/supabase/infrastructure/blob/develop/api/src/routes/platform/projects/ref/config/postgrest.dto.ts#L6
+  // https://github.com/supabase/platform/blob/develop/api/src/routes/platform/projects/ref/config/postgrest.dto.ts#L6
   return data as unknown as PostgrestConfigResponse
 }
 
@@ -37,7 +37,7 @@ export const useProjectPostgrestConfigQuery = <TData = ProjectPostgrestConfigDat
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectPostgrestConfigData, ProjectPostgrestConfigError, TData> = {}
+  }: UseCustomQueryOptions<ProjectPostgrestConfigData, ProjectPostgrestConfigError, TData> = {}
 ) =>
   useQuery<ProjectPostgrestConfigData, ProjectPostgrestConfigError, TData>({
     queryKey: configKeys.postgrest(projectRef),

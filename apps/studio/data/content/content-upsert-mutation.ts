@@ -1,14 +1,15 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, put } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import type { Content } from './content-query'
 import { contentKeys } from './keys'
 
 export type UpsertContentPayload = Omit<components['schemas']['UpsertContentBody'], 'content'> & {
   content: Partial<Content['content']>
+  favorite?: boolean
 }
 
 export type UpsertContentVariables = {
@@ -39,7 +40,7 @@ export const useContentUpsertMutation = ({
   invalidateQueriesOnSuccess = true,
   ...options
 }: Omit<
-  UseMutationOptions<UpsertContentData, ResponseError, UpsertContentVariables>,
+  UseCustomMutationOptions<UpsertContentData, ResponseError, UpsertContentVariables>,
   'mutationFn'
 > & {
   invalidateQueriesOnSuccess?: boolean
@@ -52,8 +53,8 @@ export const useContentUpsertMutation = ({
       const { projectRef } = variables
       if (invalidateQueriesOnSuccess) {
         await Promise.all([
-          queryClient.invalidateQueries(contentKeys.allContentLists(projectRef)),
-          queryClient.invalidateQueries(contentKeys.infiniteList(projectRef)),
+          queryClient.invalidateQueries({ queryKey: contentKeys.allContentLists(projectRef) }),
+          queryClient.invalidateQueries({ queryKey: contentKeys.infiniteList(projectRef) }),
         ])
       }
       await onSuccess?.(data, variables, context)

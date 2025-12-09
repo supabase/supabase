@@ -1,7 +1,7 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { handleError, post } from 'data/fetchers'
 import { toast } from 'sonner'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { clientSecretKeys } from './keys'
 
 export type ClientSecretCreateVariables = {
@@ -23,7 +23,7 @@ export const useClientSecretCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<any, ResponseError, ClientSecretCreateVariables>,
+  UseCustomMutationOptions<any, ResponseError, ClientSecretCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -32,7 +32,7 @@ export const useClientSecretCreateMutation = ({
     mutationFn: (vars) => createClientSecret(vars),
     async onSuccess(data, variables, context) {
       const { slug, appId } = variables
-      await queryClient.invalidateQueries(clientSecretKeys.list(slug, appId))
+      await queryClient.invalidateQueries({ queryKey: clientSecretKeys.list(slug, appId) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

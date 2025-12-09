@@ -1,13 +1,15 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { useMemo, useRef } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { APIKeysData, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
+import type { APIKeysData } from 'data/api-keys/api-keys-query'
+import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { Card, EyeOffIcon } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import {
@@ -19,12 +21,13 @@ import {
 } from 'ui/src/components/shadcn/ui/table'
 import { APIKeyRow } from './APIKeyRow'
 import CreateSecretAPIKeyDialog from './CreateSecretAPIKeyDialog'
+import { useApiKeysVisibility } from './hooks/useApiKeysVisibility'
 
 interface LastSeenData {
-  [hash: string]: { timestamp: string }
+  [hash: string]: { timestamp: number; relative: string }
 }
 
-function useLastSeen(projectRef: string): LastSeenData {
+function useLastSeen(projectRef: string): { data?: LastSeenData; isLoading: boolean } {
   const now = useRef(new Date()).current
 
   const query = useLogsQuery(projectRef, {
@@ -35,35 +38,38 @@ function useLastSeen(projectRef: string): LastSeenData {
 
   return useMemo(() => {
     if (query.isLoading || !query.logData) {
-      return {}
+      return { data: undefined, isLoading: query.isLoading }
     }
 
     const now = dayjs()
 
-    return (query.logData as unknown as { timestamp: number; hash: string }[]).reduce((a, i) => {
-      a[i.hash] = {
-        timestamp: `${dayjs.duration(now.diff(dayjs(i.timestamp))).humanize(false)} ago`,
-      }
-      return a
-    }, {} as LastSeenData)
+    const lastSeen = (query.logData as unknown as { timestamp: number; hash: string }[]).reduce(
+      (a, i) => {
+        a[i.hash] = {
+          timestamp: i.timestamp,
+          relative: `${dayjs.duration(now.diff(dayjs(i.timestamp))).humanize(false)} ago`,
+        }
+        return a
+      },
+      {} as LastSeenData
+    )
+
+    return { data: lastSeen, isLoading: query.isLoading }
   }, [query])
 }
 
 export const SecretAPIKeys = () => {
   const { ref: projectRef } = useParams()
+
+  const { canReadAPIKeys, isLoading: isLoadingPermissions } = useApiKeysVisibility()
   const {
     data: apiKeysData,
     error,
     isLoading: isLoadingApiKeys,
     isError: isErrorApiKeys,
-  } = useAPIKeysQuery({ projectRef, reveal: false })
+  } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
 
-  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    '*'
-  )
-
-  const lastSeen = useLastSeen(projectRef!)
+  const { data: lastSeen, isLoading: isLoadingLastSeen } = useLastSeen(projectRef ?? '')
 
   const secretApiKeys = useMemo(
     () =>
@@ -75,6 +81,34 @@ export const SecretAPIKeys = () => {
 
   const empty = secretApiKeys?.length === 0 && !isLoadingApiKeys && !isLoadingPermissions
 
+  // Track the ID being deleted to exclude it from error checking
+  const deletingAPIKeyIdRef = useRef<string | null>(null)
+
+  const { setValue: setAPIKeyToDelete, value: apiKeyToDelete } = useQueryStateWithSelect({
+    urlKey: 'delete',
+    select: (id: string) => (id ? secretApiKeys?.find((key) => key.id === id) : undefined),
+    enabled: !!secretApiKeys?.length,
+    onError: (_error, selectedId) =>
+      handleErrorOnDelete(deletingAPIKeyIdRef, selectedId, `API Key not found`),
+  })
+
+  const { mutate: deleteAPIKey, isPending: isDeletingAPIKey } = useAPIKeyDeleteMutation({
+    onSuccess: () => {
+      toast.success(`Successfully deleted API key`)
+      setAPIKeyToDelete(null)
+    },
+    onError: () => {
+      deletingAPIKeyIdRef.current = null
+    },
+  })
+
+  const onDeleteAPIKey = (apiKey: Extract<APIKeysData[number], { type: 'secret' }>) => {
+    if (!projectRef) return console.error('Project ref is required')
+    if (!apiKey.id) return console.error('API key ID is required')
+    deletingAPIKeyIdRef.current = apiKey.id
+    deleteAPIKey({ projectRef, id: apiKey.id })
+  }
+
   return (
     <div className="pb-30">
       <FormHeader
@@ -83,9 +117,7 @@ export const SecretAPIKeys = () => {
         actions={<CreateSecretAPIKeyDialog />}
       />
 
-      {isLoadingApiKeys || isLoadingPermissions ? (
-        <GenericSkeletonLoader />
-      ) : !canReadAPIKeys ? (
+      {!canReadAPIKeys && !isLoadingPermissions ? (
         <Card>
           <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
             <EyeOffIcon />
@@ -97,6 +129,8 @@ export const SecretAPIKeys = () => {
             </p>
           </div>
         </Card>
+      ) : isLoadingApiKeys || isLoadingPermissions ? (
+        <GenericSkeletonLoader />
       ) : isErrorApiKeys ? (
         <AlertError error={error} subject="Failed to load secret API keys" />
       ) : empty ? (
@@ -116,13 +150,22 @@ export const SecretAPIKeys = () => {
               <TableRow className="bg-200">
                 <TableHead>Name</TableHead>
                 <TableHead>API Key</TableHead>
-                <TableHead className="hidden lg:table-cell">Last Seen</TableHead>
+                <TableHead className="hidden lg:table-cell">Last Used</TableHead>
                 <TableHead />
               </TableRow>
             </TableHeader>
             <TableBody>
               {secretApiKeys.map((apiKey) => (
-                <APIKeyRow key={apiKey.id} apiKey={apiKey} lastSeen={lastSeen[apiKey.hash]} />
+                <APIKeyRow
+                  key={apiKey.id}
+                  apiKey={apiKey}
+                  lastSeen={lastSeen?.[apiKey.hash]}
+                  isLoadingLastSeen={isLoadingLastSeen}
+                  isDeleting={apiKeyToDelete?.id === apiKey.id && isDeletingAPIKey}
+                  onDelete={() => onDeleteAPIKey(apiKey)}
+                  setKeyToDelete={setAPIKeyToDelete}
+                  isDeleteModalOpen={apiKeyToDelete?.id === apiKey.id}
+                />
               ))}
             </TableBody>
           </Table>

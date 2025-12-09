@@ -1,10 +1,8 @@
-import { debounce } from 'lodash'
-import { useRef } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import passwordStrength from 'lib/password-strength'
+import { passwordStrength } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import { FormControl_Shadcn_, FormField_Shadcn_ } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -37,15 +35,11 @@ export const DatabasePasswordInput = ({
     setPasswordStrengthMessage(message)
   }
 
-  const delayedCheckPasswordStrength = useRef(
-    debounce((value) => checkPasswordStrength(value), 300)
-  ).current
-
   // [Refactor] DB Password could be a common component used in multiple pages with repeated logic
   function generatePassword() {
     const password = generateStrongPassword()
     form.setValue('dbPass', password)
-    delayedCheckPasswordStrength(password)
+    checkPasswordStrength(password)
   }
 
   return (
@@ -88,7 +82,7 @@ export const DatabasePasswordInput = ({
                       await form.setValue('dbPassStrength', 0)
                       await form.trigger('dbPass')
                     } else {
-                      await delayedCheckPasswordStrength(value)
+                      await checkPasswordStrength(value)
                     }
                   }}
                 />

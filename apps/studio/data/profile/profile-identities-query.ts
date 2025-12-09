@@ -1,8 +1,9 @@
 import type { UserIdentity } from '@supabase/supabase-js'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { auth } from 'lib/gotrue'
 import { profileKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export async function getProfileIdentities() {
   // getSession() uses a cached user object, which is almost never stale as the
@@ -28,7 +29,7 @@ type ProfileIdentitiesError = any
 export const useProfileIdentitiesQuery = <TData = ProfileIdentitiesData>({
   enabled = true,
   ...options
-}: UseQueryOptions<ProfileIdentitiesData, ProfileIdentitiesError, TData> = {}) => {
+}: UseCustomQueryOptions<ProfileIdentitiesData, ProfileIdentitiesError, TData> = {}) => {
   return useQuery<ProfileIdentitiesData, ProfileIdentitiesError, TData>({
     queryKey: profileKeys.identities(),
     queryFn: () => getProfileIdentities(),

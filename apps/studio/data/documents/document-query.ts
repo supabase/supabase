@@ -1,6 +1,6 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { documentKeys } from './keys'
 
 export type DocType = 'standard-security-questionnaire' | 'soc2-type-2-report'
@@ -45,7 +45,7 @@ export type DocumentError = ResponseError
 
 export const useDocumentQuery = <TData = DocumentData>(
   { orgSlug, docType }: DocumentVariables,
-  { enabled = true, ...options }: UseQueryOptions<DocumentData, DocumentError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<DocumentData, DocumentError, TData> = {}
 ) =>
   useQuery<DocumentData, DocumentError, TData>({
     queryKey: documentKeys.resource(orgSlug, docType),

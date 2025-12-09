@@ -1,10 +1,10 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { PostgresMaterializedView } from '@supabase/postgres-meta'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { materializedViewKeys } from './keys'
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type MaterializedViewsVariables = {
   projectRef?: string
@@ -49,7 +49,7 @@ export const useMaterializedViewsQuery = <TData = MaterializedViewsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<MaterializedViewsData, MaterializedViewsError, TData> = {}
+  }: UseCustomQueryOptions<MaterializedViewsData, MaterializedViewsError, TData> = {}
 ) =>
   useQuery<MaterializedViewsData, MaterializedViewsError, TData>({
     queryKey: schema

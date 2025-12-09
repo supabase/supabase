@@ -1,7 +1,7 @@
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseTriggerKeys } from './keys'
 
 export type DatabaseTriggersVariables = {
@@ -43,7 +43,7 @@ export const useDatabaseHooksQuery = <TData = DatabaseTriggersData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<DatabaseTriggersData, DatabaseTriggersError, TData> = {}
+  }: UseCustomQueryOptions<DatabaseTriggersData, DatabaseTriggersError, TData> = {}
 ) =>
   useQuery<DatabaseTriggersData, DatabaseTriggersError, TData>({
     queryKey: databaseTriggerKeys.list(projectRef),
@@ -65,7 +65,7 @@ export const useDatabaseTriggersQuery = <TData = DatabaseTriggersData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<DatabaseTriggersData, DatabaseTriggersError, TData> = {}
+  }: UseCustomQueryOptions<DatabaseTriggersData, DatabaseTriggersError, TData> = {}
 ) =>
   useQuery<DatabaseTriggersData, DatabaseTriggersError, TData>({
     queryKey: databaseTriggerKeys.list(projectRef),

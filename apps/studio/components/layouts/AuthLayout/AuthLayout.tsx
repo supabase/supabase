@@ -2,12 +2,11 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
 import { useFlag, useParams } from 'common'
-import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { withAuth } from 'hooks/misc/withAuth'
-import { ProjectLayout } from '../ProjectLayout/ProjectLayout'
+import { ProjectLayout } from '../ProjectLayout'
 import { generateAuthMenu } from './AuthLayout.utils'
 
 const AuthProductMenu = () => {
@@ -15,7 +14,7 @@ const AuthProductMenu = () => {
   const { ref: projectRef = 'default' } = useParams()
 
   const authenticationShowOverview = useFlag('authOverviewPage')
-  const authenticationShowSecurityNotifications = useIsSecurityNotificationsEnabled()
+  const authenticationOauth21 = useFlag('EnableOAuth21')
 
   const {
     authenticationSignInProviders,
@@ -23,14 +22,14 @@ const AuthProductMenu = () => {
     authenticationEmails,
     authenticationMultiFactor,
     authenticationAttackProtection,
-    authenticationAdvanced,
+    authenticationPerformance,
   } = useIsFeatureEnabled([
     'authentication:sign_in_providers',
     'authentication:rate_limits',
     'authentication:emails',
     'authentication:multi_factor',
     'authentication:attack_protection',
-    'authentication:advanced',
+    'authentication:performance',
   ])
 
   useAuthConfigPrefetch({ projectRef })
@@ -45,9 +44,9 @@ const AuthProductMenu = () => {
         authenticationEmails,
         authenticationMultiFactor,
         authenticationAttackProtection,
-        authenticationAdvanced,
         authenticationShowOverview,
-        authenticationShowSecurityNotifications,
+        authenticationOauth21,
+        authenticationPerformance,
       })}
     />
   )

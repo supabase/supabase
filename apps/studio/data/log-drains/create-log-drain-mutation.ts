@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { logDrainsKeys } from './keys'
 
 export type LogDrainCreateVariables = {
@@ -36,7 +36,7 @@ export const useCreateLogDrainMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<LogDrainCreateData, ResponseError, LogDrainCreateVariables>,
+  UseCustomMutationOptions<LogDrainCreateData, ResponseError, LogDrainCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -46,7 +46,7 @@ export const useCreateLogDrainMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 
-      await queryClient.invalidateQueries(logDrainsKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: logDrainsKeys.list(projectRef) })
 
       await onSuccess?.(data, variables, context)
     },

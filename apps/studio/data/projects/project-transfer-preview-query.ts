@@ -1,6 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { handleError, post } from 'data/fetchers'
+import { UseCustomQueryOptions } from 'types'
 import { projectKeys } from './keys'
 
 export type ProjectTransferPreviewVariables = {
@@ -35,7 +36,7 @@ export const useProjectTransferPreviewQuery = <TData = ProjectTransferPreviewDat
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectTransferPreviewData, ProjectTransferPreviewError, TData> = {}
+  }: UseCustomQueryOptions<ProjectTransferPreviewData, ProjectTransferPreviewError, TData> = {}
 ) =>
   useQuery<ProjectTransferPreviewData, ProjectTransferPreviewError, TData>({
     queryKey: projectKeys.projectTransferPreview(projectRef, targetOrganizationSlug),
@@ -43,21 +44,4 @@ export const useProjectTransferPreviewQuery = <TData = ProjectTransferPreviewDat
     enabled:
       enabled && typeof projectRef !== 'undefined' && typeof targetOrganizationSlug !== 'undefined',
     ...options,
-    retry: (failureCount, error) => {
-      // Don't retry on 400s
-      if (
-        typeof error === 'object' &&
-        error !== null &&
-        'code' in error &&
-        (error as any).code === 400
-      ) {
-        return false
-      }
-
-      if (failureCount < 3) {
-        return true
-      }
-
-      return false
-    },
   })

@@ -3,16 +3,16 @@ import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constant
 import { LogsPreviewer } from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
-import { Loading } from 'components/ui/Loading'
 import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
 import type { NextPageWithLayout } from 'types'
+import { LogoLoader } from 'ui'
 
 export const LogPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { isLoading } = useSupavisorConfigurationQuery({ projectRef: ref ?? 'default' })
 
   // this prevents initial load of pooler logs before config has been retrieved
-  if (isLoading) return <Loading />
+  if (isLoading) return <LogoLoader />
 
   return (
     <LogsPreviewer

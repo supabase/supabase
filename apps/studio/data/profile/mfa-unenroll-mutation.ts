@@ -1,8 +1,9 @@
 import type { AuthMFAUnenrollResponse, MFAUnenrollParams } from '@supabase/supabase-js'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { auth } from 'lib/gotrue'
 import { toast } from 'sonner'
 import { profileKeys } from './keys'
+import { UseCustomMutationOptions } from 'types'
 
 const mfaUnenroll = async (params: MFAUnenrollParams) => {
   const { error, data } = await auth.mfa.unenroll(params)
@@ -19,7 +20,7 @@ export const useMfaUnenrollMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<CustomMFAUnenrollResponse, CustomMFAUnenrollError, MFAUnenrollParams>,
+  UseCustomMutationOptions<CustomMFAUnenrollResponse, CustomMFAUnenrollError, MFAUnenrollParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -29,8 +30,8 @@ export const useMfaUnenrollMutation = ({
     async onSuccess(data, variables, context) {
       // when a factor is unenrolled, the aaLevel is bumped down if it's the last factor
       await Promise.all([
-        queryClient.invalidateQueries(profileKeys.mfaFactors()),
-        queryClient.invalidateQueries(profileKeys.aaLevel()),
+        queryClient.invalidateQueries({ queryKey: profileKeys.mfaFactors() }),
+        queryClient.invalidateQueries({ queryKey: profileKeys.aaLevel() }),
       ])
 
       await onSuccess?.(data, variables, context)

@@ -12,7 +12,7 @@ import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
 
-const Entities = ({ language }: ContentProps) => {
+export const Entities = ({ language }: ContentProps) => {
   const { ref } = useParams()
   const [isGeneratingTypes, setIsGeneratingTypes] = useState(false)
 
@@ -62,5 +62,3 @@ const Entities = ({ language }: ContentProps) => {
     </>
   )
 }
-
-export default Entities

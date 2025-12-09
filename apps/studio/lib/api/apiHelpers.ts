@@ -25,9 +25,9 @@ export function constructHeaders(headers: { [prop: string]: any }) {
     )
     return {
       ...cleansedHeaders,
-      ...(IS_PLATFORM
-        ? { apiKey: `${process.env.READ_ONLY_API_KEY}` }
-        : { apiKey: `${process.env.SUPABASE_SERVICE_KEY}` }),
+      // [Joshen] JFYI both Alaister and I checked on this and realised this might not be used actually
+      // Could be safe to remove but leaving it here for now
+      ...(!IS_PLATFORM && { apiKey: `${process.env.SUPABASE_SERVICE_KEY}` }),
     }
   } else {
     return {

@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { serviceStatusKeys } from './keys'
 
 export type ProjectServiceStatusVariables = {
@@ -37,7 +37,7 @@ export const useProjectServiceStatusQuery = <TData = ProjectServiceStatusData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectServiceStatusData, ProjectServiceStatusError, TData> = {}
+  }: UseCustomQueryOptions<ProjectServiceStatusData, ProjectServiceStatusError, TData> = {}
 ) =>
   useQuery<ProjectServiceStatusData, ProjectServiceStatusError, TData>({
     queryKey: serviceStatusKeys.serviceStatus(projectRef),

@@ -23,7 +23,7 @@ import { ChartMeta } from './UsageSection'
 
 export interface AttributeUsageProps {
   slug: string
-  projectRef?: string
+  projectRef?: string | null
   attribute: CategoryAttribute
   usage?: OrgUsageResponse
   usageMeta?: OrgMetricsUsage

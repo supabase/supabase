@@ -43,7 +43,9 @@ export function useIndexInvalidation() {
 
   return useCallback(() => {
     queryPerformanceQuery.runQuery()
-    queryClient.invalidateQueries(databaseKeys.indexAdvisorFromQuery(project?.ref, ''))
-    queryClient.invalidateQueries(databaseIndexesKeys.list(project?.ref))
+    queryClient.invalidateQueries({
+      queryKey: databaseKeys.indexAdvisorFromQuery(project?.ref, ''),
+    })
+    queryClient.invalidateQueries({ queryKey: databaseIndexesKeys.list(project?.ref) })
   }, [queryPerformanceQuery, queryClient, project?.ref])
 }

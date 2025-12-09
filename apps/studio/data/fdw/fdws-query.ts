@@ -1,6 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { fdwKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export const getFDWsSql = () => {
   const sql = /* SQL */ `
@@ -87,7 +88,7 @@ export type FDWsError = ExecuteSqlError
 
 export const useFDWsQuery = <TData = FDWsData>(
   { projectRef, connectionString }: FDWsVariables,
-  { enabled = true, ...options }: UseQueryOptions<FDWsData, FDWsError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<FDWsData, FDWsError, TData> = {}
 ) =>
   useQuery<FDWsData, FDWsError, TData>({
     queryKey: fdwKeys.list(projectRef),

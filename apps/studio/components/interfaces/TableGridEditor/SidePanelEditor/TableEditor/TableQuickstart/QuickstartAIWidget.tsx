@@ -15,6 +15,7 @@ import { AI_QUICK_IDEAS } from './constants'
 import type { TableSuggestion } from './types'
 import { useAITableGeneration } from './useAITableGeneration'
 import { convertTableSuggestionToTableField } from './utils'
+import { useTrack } from 'lib/telemetry/track'
 
 interface QuickstartAIWidgetProps {
   onSelectTable: (tableData: Partial<TableField>) => void
@@ -26,6 +27,7 @@ const SUCCESS_MESSAGE_DURATION_MS = 3000
 export const QuickstartAIWidget = ({ onSelectTable, disabled }: QuickstartAIWidgetProps) => {
   const [lastGeneratedPrompt, setLastGeneratedPrompt] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+  const track = useTrack()
 
   const {
     generateTables,
@@ -53,32 +55,66 @@ export const QuickstartAIWidget = ({ onSelectTable, disabled }: QuickstartAIWidg
 
   const handleSelectTemplate = useCallback(
     (template: TableSuggestion) => {
+      track('table_quickstart_template_clicked', {
+        tableName: template.tableName,
+        columnCount: template.fields.length,
+        source: 'ai',
+      })
+
       const tableField = convertTableSuggestionToTableField(template)
       onSelectTable(tableField)
       toast.success(`Applied ${template.tableName} template. You can customize the fields below.`, {
         duration: SUCCESS_MESSAGE_DURATION_MS,
       })
     },
-    [onSelectTable]
+    [onSelectTable, track]
   )
 
   const handleGenerateTables = useCallback(
-    async (promptOverride?: string) => {
+    async ({
+      promptOverride,
+      wasQuickIdea = false,
+    }: { promptOverride?: string; wasQuickIdea?: boolean } = {}) => {
       const promptToUse = promptOverride ?? aiPrompt
       if (!promptToUse.trim() || isGenerating) return
 
-      await generateTables(promptToUse)
-      setLastGeneratedPrompt(promptToUse)
+      track('table_quickstart_ai_prompt_submitted', {
+        promptLength: promptToUse.length,
+        wasQuickIdea,
+      })
+
+      try {
+        const tables = await generateTables(promptToUse)
+
+        track('table_quickstart_ai_generation_completed', {
+          success: tables.length > 0,
+          tablesGenerated: tables.length,
+          promptLength: promptToUse.length,
+        })
+
+        setLastGeneratedPrompt(promptToUse)
+      } catch (error) {
+        track('table_quickstart_ai_generation_completed', {
+          success: false,
+          tablesGenerated: 0,
+          promptLength: promptToUse.length,
+          errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        })
+      }
     },
-    [aiPrompt, generateTables, isGenerating]
+    [aiPrompt, generateTables, isGenerating, track]
   )
 
   const handleQuickIdea = useCallback(
     (idea: string) => {
+      track('table_quickstart_quick_idea_clicked', {
+        ideaText: idea,
+      })
+
       setAiPrompt(idea)
-      handleGenerateTables(idea)
+      handleGenerateTables({ promptOverride: idea, wasQuickIdea: true })
     },
-    [handleGenerateTables, setAiPrompt]
+    [handleGenerateTables, setAiPrompt, track]
   )
 
   return (

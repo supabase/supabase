@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test'
-import { test } from '../utils/test'
-import { toUrl } from '../utils/to-url'
+import { test } from '../utils/test.js'
+import { toUrl } from '../utils/to-url.js'
 const LOGS_PAGES = [
   { label: 'API Gateway', route: 'edge-logs' },
   { label: 'Postgres', route: 'postgres-logs' },

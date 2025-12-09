@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type ProjectRestartServicesVariables = {
   ref: string
@@ -52,7 +52,11 @@ export const useProjectRestartServicesMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ProjectRestartServicesData, ResponseError, ProjectRestartServicesVariables>,
+  UseCustomMutationOptions<
+    ProjectRestartServicesData,
+    ResponseError,
+    ProjectRestartServicesVariables
+  >,
   'mutationFn'
 > = {}) => {
   return useMutation<ProjectRestartServicesData, ResponseError, ProjectRestartServicesVariables>({

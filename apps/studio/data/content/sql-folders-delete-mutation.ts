@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { contentKeys } from './keys'
 
 export type DeleteSQLSnippetFoldersVariables = {
@@ -32,7 +32,11 @@ export const useSQLSnippetFoldersDeleteMutation = ({
   invalidateQueriesOnSuccess = true,
   ...options
 }: Omit<
-  UseMutationOptions<DeleteSQLSnippetFoldersData, ResponseError, DeleteSQLSnippetFoldersVariables>,
+  UseCustomMutationOptions<
+    DeleteSQLSnippetFoldersData,
+    ResponseError,
+    DeleteSQLSnippetFoldersVariables
+  >,
   'mutationFn'
 > & {
   invalidateQueriesOnSuccess?: boolean
@@ -44,7 +48,7 @@ export const useSQLSnippetFoldersDeleteMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       if (invalidateQueriesOnSuccess) {
-        await queryClient.invalidateQueries(contentKeys.folders(projectRef))
+        await queryClient.invalidateQueries({ queryKey: contentKeys.folders(projectRef) })
       }
       await onSuccess?.(data, variables, context)
     },

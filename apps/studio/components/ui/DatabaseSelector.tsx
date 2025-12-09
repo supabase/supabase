@@ -38,6 +38,7 @@ interface DatabaseSelectorProps {
   onSelectId?: (id: string) => void // Optional callback
   onCreateReplicaClick?: () => void
   portal?: boolean
+  className?: string
 }
 
 const DatabaseSelector = ({
@@ -48,6 +49,7 @@ const DatabaseSelector = ({
   buttonProps,
   onCreateReplicaClick = noop,
   portal = true,
+  className,
 }: DatabaseSelectorProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
@@ -79,7 +81,7 @@ const DatabaseSelector = ({
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <div className="flex cursor-pointer">
+        <div className={cn('flex cursor-pointer', className)}>
           <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
             Source
           </span>

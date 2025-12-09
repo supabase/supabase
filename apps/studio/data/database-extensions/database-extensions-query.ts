@@ -1,10 +1,10 @@
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseExtensionsKeys } from './keys'
 
 export type DatabaseExtension = components['schemas']['PostgresExtension']
@@ -50,7 +50,7 @@ export const useDatabaseExtensionsQuery = <TData = DatabaseExtensionsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<DatabaseExtensionsData, DatabaseExtensionsError, TData> = {}
+  }: UseCustomQueryOptions<DatabaseExtensionsData, DatabaseExtensionsError, TData> = {}
 ) => {
   const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY

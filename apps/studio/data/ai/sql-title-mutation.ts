@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { constructHeaders, fetchHandler } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
-import { ResponseError } from 'types'
+import { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type SqlTitleGenerateResponse = {
   title: string
@@ -45,7 +45,7 @@ export const useSqlTitleGenerateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<SqlTitleGenerateData, ResponseError, SqlTitleGenerateVariables>,
+  UseCustomMutationOptions<SqlTitleGenerateData, ResponseError, SqlTitleGenerateVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<SqlTitleGenerateData, ResponseError, SqlTitleGenerateVariables>({

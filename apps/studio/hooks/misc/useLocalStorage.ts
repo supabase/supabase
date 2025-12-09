@@ -89,7 +89,7 @@ export function useLocalStorageQuery<T>(key: string, initialValue: T) {
     }
 
     queryClient.setQueryData(queryKey, valueToStore)
-    queryClient.invalidateQueries(queryKey)
+    queryClient.invalidateQueries({ queryKey })
   }
 
   return [storedValue, setValue, { isSuccess, isLoading, isError, error }] as const

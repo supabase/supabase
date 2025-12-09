@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import type { Dashboards, LogSqlSnippets, SqlSnippets } from 'types'
+import type { Dashboards, LogSqlSnippets, SqlSnippets, UseCustomQueryOptions } from 'types'
 import { contentKeys } from './keys'
 
 export type ContentBase = components['schemas']['GetUserContentResponse']['data'][number]
@@ -59,7 +59,7 @@ export type ContentError = unknown
 /** @deprecated Use useContentInfiniteQuery from content-infinite-query instead */
 export const useContentQuery = <TData = ContentData>(
   { projectRef, type, name, limit }: GetContentVariables,
-  { enabled = true, ...options }: UseQueryOptions<ContentData, ContentError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<ContentData, ContentError, TData> = {}
 ) =>
   useQuery<ContentData, ContentError, TData>({
     queryKey: contentKeys.list(projectRef, { type, name, limit }),

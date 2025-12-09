@@ -115,6 +115,9 @@ const logIndexedDB = (message: string, ...args: any[]) => {
   })()
 }
 
+/**
+ * Reference to a function that captures exceptions for debugging purposes to be sent to Sentry.
+ */
 let captureException: ((e: any) => any) | null = null
 
 export function setCaptureException(fn: typeof captureException) {
@@ -144,10 +147,32 @@ async function debuggableNavigatorLock<R>(
       }
 
       console.error(
-        `Waited for over 10s to acquire an Auth client lock`,
+        `Waited for over 10s to acquire an Auth client lock, will steal the lock to unblock`,
         await navigator.locks.query(),
         stackException
       )
+
+      // quickly steal the lock and release it so that others can acquire it,
+      // while leaving the code that was holding it to continue running
+      navigator.locks
+        .request(
+          name,
+          {
+            steal: true,
+          },
+          async () => {
+            await new Promise((accept) => {
+              setTimeout(accept, 0)
+            })
+
+            console.error('Lock was stolen and now released', stackException)
+          }
+        )
+        .catch((e: any) => {
+          if (captureException) {
+            captureException(e)
+          }
+        })
     })()
   }, 10000)
 

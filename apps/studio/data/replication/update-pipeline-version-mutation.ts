@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { replicationKeys } from './keys'
 
 type UpdatePipelineVersionParams = {
@@ -39,7 +39,7 @@ export const useUpdatePipelineVersionMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<UpdatePipelineVersionData, ResponseError, UpdatePipelineVersionParams>,
+  UseCustomMutationOptions<UpdatePipelineVersionData, ResponseError, UpdatePipelineVersionParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -49,16 +49,18 @@ export const useUpdatePipelineVersionMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables
       // Ensure the version dot updates promptly
-      await queryClient.invalidateQueries(replicationKeys.pipelinesVersion(projectRef, pipelineId))
+      await queryClient.invalidateQueries({
+        queryKey: replicationKeys.pipelinesVersion(projectRef, pipelineId),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(error, variables, context) {
       const { projectRef, pipelineId } = variables
       if (error?.code === 404) {
         // Default image changed meanwhile. Refresh version info so UI reflects latest state.
-        await queryClient.invalidateQueries(
-          replicationKeys.pipelinesVersion(projectRef, pipelineId)
-        )
+        await queryClient.invalidateQueries({
+          queryKey: replicationKeys.pipelinesVersion(projectRef, pipelineId),
+        })
       } else if (onError === undefined) {
         toast.error(`Failed to update pipeline version: ${error.message}`)
       } else {
