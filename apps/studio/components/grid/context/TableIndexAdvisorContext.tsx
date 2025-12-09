@@ -1,7 +1,9 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { createContext, useContext, PropsWithChildren, useState, useCallback } from 'react'
 
 import { QueryIndexes } from 'components/interfaces/QueryPerformance/QueryIndexes'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
+import { databaseKeys } from 'data/database/keys'
 import {
   useTableIndexAdvisorQuery,
   TableIndexAdvisorData,
@@ -18,6 +20,7 @@ interface TableIndexAdvisorContextValue {
   suggestions: TableIndexAdvisorData['suggestions']
   openSheet: (columnName: string) => void
   getSuggestionsForColumn: (columnName: string) => IndexAdvisorSuggestion[]
+  invalidate: () => Promise<void>
 }
 
 const TableIndexAdvisorContext = createContext<TableIndexAdvisorContextValue>({
@@ -28,6 +31,7 @@ const TableIndexAdvisorContext = createContext<TableIndexAdvisorContextValue>({
   suggestions: [],
   openSheet: () => {},
   getSuggestionsForColumn: () => [],
+  invalidate: async () => {},
 })
 
 interface TableIndexAdvisorProviderProps {
@@ -42,6 +46,7 @@ export function TableIndexAdvisorProvider({
 }: PropsWithChildren<TableIndexAdvisorProviderProps>) {
   const { data: project } = useSelectedProjectQuery()
   const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
+  const queryClient = useQueryClient()
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [selectedColumn, setSelectedColumn] = useState<string | null>(null)
 
@@ -85,6 +90,14 @@ export function TableIndexAdvisorProvider({
     [data?.suggestions]
   )
 
+  const invalidate = useCallback(async () => {
+    if (project?.ref && schema && table) {
+      await queryClient.invalidateQueries({
+        queryKey: databaseKeys.tableIndexAdvisor(project.ref, schema, table),
+      })
+    }
+  }, [queryClient, project?.ref, schema, table])
+
   // Get the first suggestion for the selected column to pass to QueryIndexes
   const selectedSuggestion = selectedColumn ? getSuggestionsForColumn(selectedColumn)[0] : null
 
@@ -96,6 +109,7 @@ export function TableIndexAdvisorProvider({
     suggestions: data?.suggestions ?? [],
     openSheet,
     getSuggestionsForColumn,
+    invalidate,
   }
 
   return (
