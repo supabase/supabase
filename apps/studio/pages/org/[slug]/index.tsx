@@ -24,7 +24,7 @@ const ProjectsPage: NextPageWithLayout = () => {
           <Admonition
             type="note"
             layout="horizontal"
-            title={`The organization “${org?.name}” requires MFA`}
+            title={`${org?.name} requires MFA`}
             description={
               <>
                 Set up multi-factor authentication (MFA) on your account to access this
