@@ -1303,6 +1303,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "slider-minMax-range": {
+      name: "slider-minMax-range",
+      type: "components:example",
+      registryDependencies: ["slider"],
+      component: React.lazy(() => import("@/registry/default/example/slider-minMax-range")),
+      source: "",
+      files: ["registry/default/example/slider-minMax-range.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "sonner-demo": {
       name: "sonner-demo",
       type: "components:example",
@@ -1838,6 +1849,138 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/form-item-layout-demo")),
       source: "",
       files: ["registry/default/example/form-item-layout-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-choice-card": {
+      name: "field-choice-card",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-choice-card")),
+      source: "",
+      files: ["registry/default/example/field-choice-card.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-checkbox": {
+      name: "field-checkbox",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-checkbox")),
+      source: "",
+      files: ["registry/default/example/field-checkbox.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-demo": {
+      name: "field-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-demo")),
+      source: "",
+      files: ["registry/default/example/field-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-fieldset": {
+      name: "field-fieldset",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-fieldset")),
+      source: "",
+      files: ["registry/default/example/field-fieldset.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-input": {
+      name: "field-input",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-input")),
+      source: "",
+      files: ["registry/default/example/field-input.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-group": {
+      name: "field-group",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-group")),
+      source: "",
+      files: ["registry/default/example/field-group.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-radio": {
+      name: "field-radio",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-radio")),
+      source: "",
+      files: ["registry/default/example/field-radio.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-responsive": {
+      name: "field-responsive",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-responsive")),
+      source: "",
+      files: ["registry/default/example/field-responsive.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-select": {
+      name: "field-select",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-select")),
+      source: "",
+      files: ["registry/default/example/field-select.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-slider": {
+      name: "field-slider",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-slider")),
+      source: "",
+      files: ["registry/default/example/field-slider.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-switch": {
+      name: "field-switch",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-switch")),
+      source: "",
+      files: ["registry/default/example/field-switch.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "field-textarea": {
+      name: "field-textarea",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/field-textarea")),
+      source: "",
+      files: ["registry/default/example/field-textarea.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
