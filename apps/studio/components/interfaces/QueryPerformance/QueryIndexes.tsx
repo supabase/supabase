@@ -42,6 +42,8 @@ interface QueryIndexesProps {
   selectedRow: Pick<QueryPerformanceRow, 'query'>
   columnName?: string
   suggestedSelectQuery?: string
+
+  onClose?: () => void
 }
 
 // [Joshen] There's several more UX things we can do to help ease the learning curve of indexes I think
@@ -51,6 +53,7 @@ export const QueryIndexes = ({
   selectedRow,
   columnName,
   suggestedSelectQuery,
+  onClose,
 }: QueryIndexesProps) => {
   // [Joshen] TODO implement this logic once the linter rules are in
   const isLinterWarning = false
@@ -149,6 +152,8 @@ export const QueryIndexes = ({
       setIsExecuting(false)
     } finally {
       setIsExecuting(false)
+
+      onClose?.()
     }
   }
 

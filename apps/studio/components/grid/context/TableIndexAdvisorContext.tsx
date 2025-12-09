@@ -125,6 +125,7 @@ export function TableIndexAdvisorProvider({
               selectedRow={{ query: selectedSuggestion.query }}
               columnName={selectedColumn}
               suggestedSelectQuery={selectedSuggestion.query}
+              onClose={closeSheet}
             />
           )}
         </SheetContent>
