@@ -178,6 +178,7 @@ export const ProfileInformation = () => {
                           <Input_Shadcn_
                             {...field}
                             className="w-72"
+                            placeholder="Username"
                             disabled={profile?.is_sso_user}
                           />
                         </div>
