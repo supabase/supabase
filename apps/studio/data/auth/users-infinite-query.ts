@@ -29,9 +29,7 @@ type UsersVariables = {
 }
 
 export type Filter = 'verified' | 'unverified' | 'anonymous'
-export type User = components['schemas']['UserBody'] & { providers: readonly string[] } & {
-  name: string
-}
+export type User = components['schemas']['UserBody'] & { providers: readonly string[] }
 
 export const useUsersInfiniteQuery = <TData = UsersData>(
   {
