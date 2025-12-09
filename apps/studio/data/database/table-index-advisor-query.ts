@@ -185,10 +185,7 @@ export function useTableIndexAdvisorQuery<TData = TableIndexAdvisorData>(
     enabled:
       enabled &&
       typeof projectRef !== 'undefined' &&
-      typeof schema !== 'undefined' &&
-      schema !== '' &&
-      typeof table !== 'undefined' &&
-      table !== '',
+      !!schema && !!table
     retry: false,
     staleTime: 5 * 60 * 1000,
     ...options,
