@@ -21,6 +21,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { LOCAL_STORAGE_KEYS } from 'common'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
 export const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
@@ -48,11 +49,11 @@ export const ThemeSettings = () => {
           aria-label="Choose a theme"
           defaultValue={theme}
           value={theme}
-          className="flex flex-wrap gap-2 md:gap-5"
+          className="flex flex-wrap gap-2 xl:gap-4"
         >
           {singleThemes.map((theme: Theme) => (
             <RadioGroupLargeItem_Shadcn_
-              className="p-3"
+              className="p-3 flex-grow w-32 lg:w-36 xl:w-40"
               key={theme.value}
               value={theme.value}
               label={theme.name}
@@ -67,27 +68,19 @@ export const ThemeSettings = () => {
 
   return (
     <Panel title={<h5 key="panel-title">Appearance</h5>}>
-      <Panel.Content className="grid gap-8 !py-5">
-        <div className="grid grid-cols-12">
-          <div className="col-span-full md:col-span-4 flex flex-col gap-5">
-            <Label_Shadcn_ htmlFor="theme" className="text-light">
-              Theme mode
-            </Label_Shadcn_>
-            <p className="text-sm text-foreground-light max-w-[220px]">
-              Choose how Supabase looks to you. Select a single theme, or sync with your system.
-            </p>
-          </div>
-
-          <div className="col-span-full md:col-span-8 flex flex-col gap-4">
-            <p className="text-sm text-light">Supabase will use your selected theme</p>
-            <SingleThemeSelection />
-          </div>
-        </div>
+      <Panel.Content className="space-y-4 !py-4">
+        <FormLayout
+          layout="flex-row-reverse"
+          label="Theme mode"
+          description="Choose how Supabase looks to you. Select a single theme, or sync with your system."
+          className="!flex !flex-col-reverse lg:!flex-row-reverse items-start [&>div]:lg:w-1/2 [&>div>div]:md:w-full"
+        >
+          <SingleThemeSelection />
+        </FormLayout>
       </Panel.Content>
-      <Separator />
+      <Separator className="bg-border" />
       <Panel.Content>
-        <FormItemLayout
-          isReactForm={false}
+        <FormLayout
           label="Sidebar behavior"
           layout="flex-row-reverse"
           description="Choose your preferred sidebar behavior: open, closed, or expand on hover."
@@ -106,7 +99,7 @@ export const ThemeSettings = () => {
               <SelectItem_Shadcn_ value="expandable">Expand on hover</SelectItem_Shadcn_>
             </SelectContent_Shadcn_>
           </Select_Shadcn_>
-        </FormItemLayout>
+        </FormLayout>
       </Panel.Content>
     </Panel>
   )

@@ -80,7 +80,7 @@ export const ProfileInformation = () => {
   return (
     <Form_Shadcn_ {...form}>
       <form id={formId} className="space-y-6 w-full" onSubmit={form.handleSubmit(onSubmit)}>
-        <Card className="mb-8">
+        <Card className="mb-4 md:mb-8">
           <CardHeader>Profile Information</CardHeader>
           <CardContent className="space-y-4">
             <FormField_Shadcn_
