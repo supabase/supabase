@@ -155,21 +155,11 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
           {/* [Joshen] Ideally we can figure out sticky table headers here */}
           <TableHeader>
             <TableRow>
-              <TableHead className={noResults && 'text-foreground-muted'}>
-                Project
-              </TableHead>
-              <TableHead className={noResults && 'text-foreground-muted'}>
-                Status
-              </TableHead>
-              <TableHead className={noResults && 'text-foreground-muted'}>
-                Compute
-              </TableHead>
-              <TableHead className={noResults && 'text-foreground-muted'}>
-                Region
-              </TableHead>
-              <TableHead className={noResults && 'text-foreground-muted'}>
-                Created
-              </TableHead>
+              <TableHead className={noResults && 'text-foreground-muted'}>Project</TableHead>
+              <TableHead className={noResults && 'text-foreground-muted'}>Status</TableHead>
+              <TableHead className={noResults && 'text-foreground-muted'}>Compute</TableHead>
+              <TableHead className={noResults && 'text-foreground-muted'}>Region</TableHead>
+              <TableHead className={noResults && 'text-foreground-muted'}>Created</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
