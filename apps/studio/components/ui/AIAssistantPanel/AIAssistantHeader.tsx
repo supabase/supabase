@@ -103,7 +103,7 @@ export const AIAssistantHeader = ({
                     ? 'Sharing query data in addition to schema can further improve responses. Update AI settings to enable this.'
                     : ''
           }
-          className="border-0 border-b rounded-none bg-background mb-0"
+          className="border-0 border-b rounded-none bg-background"
         >
           {!isHipaaProjectDisallowed && (
             <Button type="default" className="w-fit mt-4" onClick={() => setIsOptInModalOpen(true)}>

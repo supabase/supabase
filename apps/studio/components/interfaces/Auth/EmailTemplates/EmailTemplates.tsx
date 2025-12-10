@@ -30,7 +30,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import {
   PageSection,
   PageSectionContent,
@@ -39,7 +39,6 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
-import { EmailRateLimitsAlert } from '../EmailRateLimitsAlert'
 import { slugifyTitle } from './EmailTemplates.utils'
 
 const notificationEnabledKeys = TEMPLATES_SCHEMAS.filter(
@@ -142,9 +141,26 @@ export const EmailTemplates = () => {
       {isSuccess && (
         <>
           {builtInSMTP && (
-            <div className="mt-12">
-              <EmailRateLimitsAlert />
-            </div>
+            <Admonition
+              type="warning"
+              title="Set up custom SMTP"
+              description={
+                <p>
+                  You’re using the built-in email service. This service has rate limits and is not
+                  meant to be used for production apps.{' '}
+                  <InlineLink href={`${DOCS_URL}/guides/platform/going-into-prod#auth-rate-limits`}>
+                    Learn more
+                  </InlineLink>{' '}
+                </p>
+              }
+              layout="horizontal"
+              className="mt-12 mb-10"
+              actions={
+                <Button asChild type="default" className="mt-2">
+                  <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
+                </Button>
+              }
+            />
           )}
           <PageSection className="!pt-0">
             <PageSectionMeta>

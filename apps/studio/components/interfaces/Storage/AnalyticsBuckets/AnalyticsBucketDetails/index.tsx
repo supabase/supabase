@@ -367,7 +367,7 @@ const ExtensionNotInstalled = ({
   return (
     <>
       <ScaffoldSection isFullWidth>
-        <Admonition type="warning" title="Missing required extension" className="mb-0">
+        <Admonition type="warning" title="Missing required extension">
           <p>
             The Wrappers extension is required in order to query analytics tables.{' '}
             {databaseNeedsUpgrading &&
@@ -418,7 +418,7 @@ const ExtensionNeedsUpgrade = ({
   return (
     <>
       <ScaffoldSection isFullWidth>
-        <Admonition type="warning" title="Outdated extension version" className="mb-0">
+        <Admonition type="warning" title="Outdated extension version">
           <p>
             The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
             {wrapperMeta.minimumExtensionVersion}. You have version{' '}
@@ -460,7 +460,7 @@ const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
   return (
     <>
       <ScaffoldSection isFullWidth>
-        <Admonition type="warning" title="Missing integration" className="mb-0">
+        <Admonition type="warning" title="Missing integration">
           <p>The Iceberg Wrapper integration is required in order to query analytics tables.</p>
           <Button type="default" loading={isCreatingIcebergWrapper} onClick={onSetupWrapper}>
             Install wrapper

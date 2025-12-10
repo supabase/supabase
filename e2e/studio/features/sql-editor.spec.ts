@@ -6,6 +6,7 @@ import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { waitForApiResponseWithTimeout } from '../utils/wait-for-response-with-timeout.js'
 import { waitForApiResponse } from '../utils/wait-for-response.js'
+import { env } from '../env.config.js'
 
 const sqlSnippetName = 'pw_sql_snippet'
 const sqlSnippetNameDuplicate = 'pw_sql_snippet (Duplicate)'
@@ -50,6 +51,11 @@ const deleteFolder = async (page: Page, ref: string, folderName: string) => {
 }
 
 test.describe('SQL Editor', () => {
+  test.skip(
+    env.IS_PLATFORM,
+    'This test does not work in hosted environments. Self hosted mode is supported.'
+  )
+
   let page: Page
 
   test.beforeAll(async ({ browser, ref }) => {
@@ -100,7 +106,7 @@ test.describe('SQL Editor', () => {
     // remove sql snippets for "Untitled query" and "pw_sql_snippet"
     const privateSnippet = page.getByLabel('private-snippets')
     let privateSnippetText = await privateSnippet.textContent()
-    while (privateSnippetText.includes(newSqlSnippetName)) {
+    while (privateSnippetText?.includes(newSqlSnippetName)) {
       await deleteSqlSnippet(page, ref, newSqlSnippetName)
       privateSnippetText =
         (await page.getByLabel('private-snippets').count()) > 0
@@ -108,7 +114,7 @@ test.describe('SQL Editor', () => {
           : ''
     }
 
-    while (privateSnippetText.includes(sqlSnippetName)) {
+    while (privateSnippetText?.includes(sqlSnippetName)) {
       await deleteSqlSnippet(page, ref, sqlSnippetName)
       privateSnippetText =
         (await page.getByLabel('private-snippets').count()) > 0
@@ -298,12 +304,12 @@ hello world`)
       await deleteSqlSnippet(page, ref, sqlSnippetNameShare)
     }
 
-    if ((await page.getByRole('button', { name: 'Shared' }).textContent()).includes('(')) {
+    if ((await page.getByRole('button', { name: 'Shared' })?.textContent())?.includes('(')) {
       const sharedSnippetSection = page.getByLabel('project-level-snippets')
       await page.getByRole('button', { name: 'Shared' }).click()
 
       let sharedSnippetText = await sharedSnippetSection.textContent()
-      while (sharedSnippetText.includes(sqlSnippetNameShare)) {
+      while (sharedSnippetText?.includes(sqlSnippetNameShare)) {
         await sharedSnippetSection.getByText(sqlSnippetName).last().click({ button: 'right' })
         await page.getByRole('menuitem', { name: 'Delete query' }).click()
         await expect(page.getByRole('heading', { name: 'Confirm to delete query' })).toBeVisible()
@@ -521,7 +527,7 @@ hello world`)
     const searchBar = page.getByRole('textbox', { name: 'Search queries...' })
     await searchBar.fill('Duplicate')
     await expect(page.getByText(sqlSnippetName, { exact: true })).not.toBeVisible()
-    await expect(page.getByRole('link', { name: sqlSnippetNameDuplicate })).toBeVisible()
+    await expect(page.getByTitle(sqlSnippetNameDuplicate, { exact: true })).toBeVisible()
     await expect(page.getByText('result found')).toBeVisible()
     await searchBar.fill('') // clear search bar
 

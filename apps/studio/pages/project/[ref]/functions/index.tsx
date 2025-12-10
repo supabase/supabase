@@ -126,7 +126,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                               <TableHead>Name</TableHead>
                               <TableHead>URL</TableHead>
                               <TableHead className="hidden 2xl:table-cell">Created</TableHead>
-                              <TableHead className="lg:table-cell">Last updated</TableHead>
+                              <TableHead className="lg:table-cell">Updated</TableHead>
                               <TableHead className="lg:table-cell">Deployments</TableHead>
                             </TableRow>
                           </TableHeader>
@@ -177,7 +177,7 @@ EdgeFunctionsPage.getLayout = (page: React.ReactElement) => {
               <PageHeaderSummary>
                 <PageHeaderTitle>Edge Functions</PageHeaderTitle>
                 <PageHeaderDescription>
-                  Deploy edge functions to handle complex business logic
+                  Run server-side logic close to your users
                 </PageHeaderDescription>
               </PageHeaderSummary>
               <PageHeaderAside>

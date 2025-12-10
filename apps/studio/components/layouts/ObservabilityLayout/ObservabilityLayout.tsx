@@ -55,7 +55,6 @@ const ObservabilityLayoutContent = ({
 
   useEffect(() => {
     const isQueryPerformancePage = pathname?.includes('/query-performance')
-    const wasQueryPerformancePage = prevPathnameRef.current?.includes('/query-performance')
 
     if (
       isQueryPerformancePage &&
@@ -69,7 +68,7 @@ const ObservabilityLayoutContent = ({
         content: <BannerIndexAdvisor />,
         priority: 3,
       })
-    } else if (isIndexAdvisorBannerDismissed || !isQueryPerformancePage) {
+    } else if (isIndexAdvisorBannerDismissed || !isQueryPerformancePage || isIndexAdvisorEnabled) {
       dismissBanner('index-advisor-banner')
     }
 

@@ -1,23 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
+
+import { getIndexesSQL } from 'data/sql/queries/get-indexes'
+import { UseCustomQueryOptions } from 'types'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseIndexesKeys } from './keys'
-import { UseCustomQueryOptions } from 'types'
 
 type GetIndexesArgs = {
   schema?: string
-}
-
-export const getIndexesSql = ({ schema }: GetIndexesArgs) => {
-  const sql = /* SQL */ `
-SELECT schemaname as "schema",
-  tablename as "table",
-  indexname as "name",
-  indexdef as "definition"
-FROM pg_indexes
-WHERE schemaname = '${schema}';
-`.trim()
-
-  return sql
 }
 
 export type DatabaseIndex = {
@@ -25,7 +14,7 @@ export type DatabaseIndex = {
   schema: string
   table: string
   definition: string
-  enabled: boolean
+  columns: string // Comma-separated strings
 }
 
 export type IndexesVariables = GetIndexesArgs & {
@@ -41,7 +30,7 @@ export async function getIndexes(
     throw new Error('schema is required')
   }
 
-  const sql = getIndexesSql({ schema })
+  const sql = getIndexesSQL({ schema })
 
   const { result } = await executeSql(
     { projectRef, connectionString, sql, queryKey: ['indexes', schema] },

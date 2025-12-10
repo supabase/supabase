@@ -8559,7 +8559,12 @@
                           "required": ["enabled", "maxBuckets", "maxIndexes"]
                         }
                       },
-                      "required": ["imageTransformation", "s3Protocol"]
+                      "required": [
+                        "imageTransformation",
+                        "s3Protocol",
+                        "icebergCatalog",
+                        "vectorBuckets"
+                      ]
                     },
                     "capabilities": {
                       "type": "object",
@@ -8711,8 +8716,7 @@
                         },
                         "required": ["enabled", "maxBuckets", "maxIndexes"]
                       }
-                    },
-                    "required": ["imageTransformation", "s3Protocol"]
+                    }
                   },
                   "external": {
                     "type": "object",
@@ -12896,7 +12900,7 @@
           }
         ],
         "summary": "Gets realtime configuration",
-        "tags": ["Realtime Config"]
+        "tags": ["Realtime"]
       },
       "patch": {
         "operationId": "v1-update-realtime-config",
@@ -13003,7 +13007,7 @@
           }
         ],
         "summary": "Updates realtime configuration",
-        "tags": ["Realtime Config"]
+        "tags": ["Realtime"]
       }
     },
     "/v1/projects/{ref}/config/auth/third-party-auth": {
@@ -19333,7 +19337,7 @@
                     },
                     "plan": {
                       "type": "string",
-                      "enum": ["free", "pro", "team", "enterprise"]
+                      "enum": ["free", "pro", "team", "enterprise", "platform"]
                     },
                     "opt_in_tags": {
                       "type": "array",
@@ -19496,11 +19500,11 @@
                         },
                         "source_subscription_plan": {
                           "type": "string",
-                          "enum": ["free", "pro", "team", "enterprise"]
+                          "enum": ["free", "pro", "team", "enterprise", "platform"]
                         },
                         "target_subscription_plan": {
                           "type": "string",
-                          "enum": ["free", "pro", "team", "enterprise"],
+                          "enum": ["free", "pro", "team", "enterprise", "platform"],
                           "nullable": true
                         }
                       },
@@ -22562,7 +22566,7 @@
                 "required": ["enabled", "maxBuckets", "maxIndexes"]
               }
             },
-            "required": ["imageTransformation", "s3Protocol"]
+            "required": ["imageTransformation", "s3Protocol", "icebergCatalog", "vectorBuckets"]
           },
           "capabilities": {
             "type": "object",
@@ -22670,8 +22674,7 @@
                 },
                 "required": ["enabled", "maxBuckets", "maxIndexes"]
               }
-            },
-            "required": ["imageTransformation", "s3Protocol"]
+            }
           },
           "external": {
             "type": "object",
@@ -27523,7 +27526,7 @@
           },
           "plan": {
             "type": "string",
-            "enum": ["free", "pro", "team", "enterprise"]
+            "enum": ["free", "pro", "team", "enterprise", "platform"]
           },
           "opt_in_tags": {
             "type": "array",
@@ -27629,11 +27632,11 @@
               },
               "source_subscription_plan": {
                 "type": "string",
-                "enum": ["free", "pro", "team", "enterprise"]
+                "enum": ["free", "pro", "team", "enterprise", "platform"]
               },
               "target_subscription_plan": {
                 "type": "string",
-                "enum": ["free", "pro", "team", "enterprise"],
+                "enum": ["free", "pro", "team", "enterprise", "platform"],
                 "nullable": true
               }
             },

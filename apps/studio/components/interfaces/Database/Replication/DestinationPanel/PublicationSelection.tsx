@@ -71,14 +71,14 @@ export const PublicationSelection = ({
               />
             </FormControl_Shadcn_>
             {isSelectedPublicationMissing ? (
-              <Admonition type="warning" className="mt-2 mb-0">
+              <Admonition type="warning" className="mt-2">
                 <p className="!leading-normal">
                   The publication <strong className="text-foreground">{publicationName}</strong> was
                   not found, it may have been renamed or deleted, please select another one.
                 </p>
               </Admonition>
             ) : hasTablesWithNoPrimaryKeys ? (
-              <Admonition type="warning" className="mt-2 mb-0">
+              <Admonition type="warning" className="mt-2">
                 <p className="!leading-normal">
                   Replication requires every table in the publication to have a primary key to work,
                   which these tables are missing:
