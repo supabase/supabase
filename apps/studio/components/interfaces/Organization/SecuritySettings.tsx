@@ -59,7 +59,7 @@ export const SecuritySettings = () => {
   const {
     data: mfaConfig,
     error: mfaError,
-    isLoading: isLoadingMfa,
+    isPending: isLoadingMfa,
     isError: isErrorMfa,
     isSuccess: isSuccessMfa,
   } = useOrganizationMfaQuery({ slug }, { enabled: isPaidPlan && canReadMfaConfig })

@@ -45,7 +45,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
     error: factorsError,
     isError: isErrorFactors,
     isSuccess: isSuccessFactors,
-    isLoading: isLoadingFactors,
+    isPending: isLoadingFactors,
   } = useMfaListFactorsQuery()
   const {
     mutate: mfaChallengeAndVerify,
@@ -97,7 +97,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
         error={error}
         subject="Error while signing in"
         additionalActions={
-          <Button asChild type="warning" className="w-min">
+          <Button asChild type="default">
             <Link href="/sign-in">Back to sign in</Link>
           </Button>
         }

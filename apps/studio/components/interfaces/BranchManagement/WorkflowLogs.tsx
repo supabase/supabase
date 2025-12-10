@@ -45,7 +45,7 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
   const {
     data: workflowRuns,
     isSuccess: isWorkflowRunsSuccess,
-    isLoading: isWorkflowRunsLoading,
+    isPending: isWorkflowRunsLoading,
     isError: isWorkflowRunsError,
     error: workflowRunsError,
   } = useActionsQuery({ ref: projectRef }, { enabled: isOpen })
@@ -57,7 +57,7 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
   const {
     data: workflowRunLogs,
     isSuccess: isWorkflowRunLogsSuccess,
-    isLoading: isWorkflowRunLogsLoading,
+    isPending: isWorkflowRunLogsLoading,
     isError: isWorkflowRunLogsError,
     error: workflowRunLogsError,
   } = useActionRunLogsQuery(
