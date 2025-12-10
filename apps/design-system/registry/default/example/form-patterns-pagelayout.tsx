@@ -128,7 +128,6 @@ export default function FormPatternsPageLayout() {
                         layout="flex-row-reverse"
                         label="Text Input"
                         description="Single-line text entry for short values"
-                        className="[&>div]:md:w-1/2"
                       >
                         <FormControl_Shadcn_>
                           <Input_Shadcn_ {...field} placeholder="Enter text" />
@@ -148,7 +147,6 @@ export default function FormPatternsPageLayout() {
                         layout="flex-row-reverse"
                         label="Password Input"
                         description="Masked input for secure text entry"
-                        className="[&>div]:md:w-1/2"
                       >
                         <FormControl_Shadcn_>
                           <Input_Shadcn_ {...field} type="password" placeholder="Enter password" />
@@ -168,7 +166,6 @@ export default function FormPatternsPageLayout() {
                         layout="flex-row-reverse"
                         label="Copyable Input"
                         description="Read-only input with copy-to-clipboard functionality"
-                        className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
                       >
                         <FormControl_Shadcn_>
                           <Input
@@ -194,7 +191,6 @@ export default function FormPatternsPageLayout() {
                         layout="flex-row-reverse"
                         label="Number Input"
                         description="Numeric input with min/max validation"
-                        className="[&>div]:md:w-1/2"
                       >
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
@@ -220,7 +216,6 @@ export default function FormPatternsPageLayout() {
                         layout="flex-row-reverse"
                         label="Input with Units"
                         description="Input with additional unit label"
-                        className="[&>div]:md:w-1/2"
                       >
                         <FormControl_Shadcn_>
                           <PrePostTab postTab="MB" className="w-full">
@@ -242,7 +237,6 @@ export default function FormPatternsPageLayout() {
                         layout="flex-row-reverse"
                         label="Textarea"
                         description="Multi-line text input for longer content"
-                        className="[&>div]:md:w-1/2"
                       >
                         <FormControl_Shadcn_>
                           <Textarea
@@ -267,7 +261,6 @@ export default function FormPatternsPageLayout() {
                         layout="flex-row-reverse"
                         label="Icon upload"
                         description="For icons, avatars, or small images with preview"
-                        className="[&>div]:md:w-1/2"
                       >
                         <FormControl_Shadcn_>
                           <div className="flex gap-4 items-center">
@@ -334,7 +327,6 @@ export default function FormPatternsPageLayout() {
                         layout="flex-row-reverse"
                         label="File Upload"
                         description="Drag-and-drop or select files for upload"
-                        className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
                       >
                         <FormControl_Shadcn_>
                           <div
@@ -443,7 +435,6 @@ export default function FormPatternsPageLayout() {
                     layout="flex-row-reverse"
                     label="Checkbox"
                     description="Boolean values or multiple selections"
-                    className="[&>div]:md:w-1/2"
                   >
                     <div className="w-full flex flex-col gap-4">
                       <FormField_Shadcn_
@@ -523,7 +514,6 @@ export default function FormPatternsPageLayout() {
                         layout="flex-row-reverse"
                         label="Select (Dropdown)"
                         description="Single selection from a list of options"
-                        className="[&>div]:md:w-1/2"
                       >
                         <FormControl_Shadcn_>
                           <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
@@ -558,7 +548,6 @@ export default function FormPatternsPageLayout() {
                         layout="flex-row-reverse"
                         label="Multi-Select"
                         description="Multiple selection from a list"
-                        className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
                       >
                         <MultiSelector
                           onValuesChange={field.onChange}
@@ -596,7 +585,6 @@ export default function FormPatternsPageLayout() {
                         layout="flex-row-reverse"
                         label="Radio Group"
                         description="Single selection from multiple options"
-                        className="[&>div]:md:w-1/2"
                       >
                         <FormControl_Shadcn_>
                           <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
@@ -627,7 +615,6 @@ export default function FormPatternsPageLayout() {
                         layout="flex-row-reverse"
                         label="Date Picker"
                         description="Date selection with calendar popover"
-                        className="[&>div]:md:w-1/2"
                       >
                         <FormControl_Shadcn_>
                           <Popover_Shadcn_>
@@ -665,7 +652,6 @@ export default function FormPatternsPageLayout() {
                         layout="flex-row-reverse"
                         label="Field Array"
                         description="Dynamic list for adding/removing items"
-                        className="[&>div]:md:w-1/2"
                       >
                         <div className="space-y-2 w-full">
                           {fields.map((field, index) => (
@@ -712,9 +698,8 @@ export default function FormPatternsPageLayout() {
                     layout="flex-row-reverse"
                     label="Action Field"
                     description="Button or link for navigation or performable actions"
-                    className="[&>div]:md:w-1/2"
                   >
-                    <div className="flex gap-2 items-center">
+                    <div className="flex gap-2 items-center justify-end">
                       <Button
                         type="default"
                         icon={<ExternalLink size={14} />}
