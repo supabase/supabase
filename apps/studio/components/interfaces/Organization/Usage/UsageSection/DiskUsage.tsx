@@ -39,10 +39,13 @@ export const DiskUsage = ({
   usage,
   currentBillingCycleSelected,
 }: DiskUsageProps) => {
-  const { data, isError, isLoading, isSuccess, error } = useOrgProjectsInfiniteQuery(
-    { slug },
-    { enabled: currentBillingCycleSelected }
-  )
+  const {
+    data,
+    isError,
+    isPending: isLoading,
+    isSuccess,
+    error,
+  } = useOrgProjectsInfiniteQuery({ slug }, { enabled: currentBillingCycleSelected })
   const projects = useMemo(() => data?.pages.flatMap((page) => page.projects) || [], [data?.pages])
 
   const relevantProjects = useMemo(() => {

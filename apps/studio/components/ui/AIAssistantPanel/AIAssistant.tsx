@@ -49,7 +49,7 @@ interface AIAssistantProps {
 export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
-  const { data: selectedOrganization, isLoading: isLoadingOrganization } =
+  const { data: selectedOrganization, isPending: isLoadingOrganization } =
     useSelectedOrganizationQuery()
   const { ref, id: entityId } = useParams()
   const searchParams = useSearchParamsShallow()
@@ -103,7 +103,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const [messageRatings, setMessageRatings] = useState<Record<string, 'positive' | 'negative'>>({})
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
-  const isApiKeySet = IS_PLATFORM || !!check?.hasKey
+  const isApiKeySet = !!check?.hasKey
 
   const { mutateAsync: rateMessage } = useRateMessageMutation()
 

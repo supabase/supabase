@@ -65,7 +65,7 @@ export const ReplicationPipelineStatus = () => {
   const {
     data: pipeline,
     error: pipelineError,
-    isLoading: isPipelineLoading,
+    isPending: isPipelineLoading,
     isError: isPipelineError,
   } = useReplicationPipelineByIdQuery({
     projectRef,
@@ -88,7 +88,7 @@ export const ReplicationPipelineStatus = () => {
 
   const {
     data: replicationStatusData,
-    isLoading: isStatusLoading,
+    isPending: isStatusLoading,
     isError: isStatusError,
   } = useReplicationPipelineReplicationStatusQuery(
     { projectRef, pipelineId },
