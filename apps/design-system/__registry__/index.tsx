@@ -1380,6 +1380,39 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "table-actions": {
+      name: "table-actions",
+      type: "components:example",
+      registryDependencies: ["table"],
+      component: React.lazy(() => import("@/registry/default/example/table-actions")),
+      source: "",
+      files: ["registry/default/example/table-actions.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "table-icons": {
+      name: "table-icons",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/table-icons")),
+      source: "",
+      files: ["registry/default/example/table-icons.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "table-sort": {
+      name: "table-sort",
+      type: "components:example",
+      registryDependencies: ["table"],
+      component: React.lazy(() => import("@/registry/default/example/table-sort")),
+      source: "",
+      files: ["registry/default/example/table-sort.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "tabs-demo": {
       name: "tabs-demo",
       type: "components:example",

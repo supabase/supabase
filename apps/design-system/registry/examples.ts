@@ -804,6 +804,23 @@ export const examples: Registry = [
     files: ['example/table-demo.tsx'],
   },
   {
+    name: 'table-actions',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-actions.tsx'],
+  },
+  {
+    name: 'table-icons',
+    type: 'components:example',
+    files: ['example/table-icons.tsx'],
+  },
+  {
+    name: 'table-sort',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-sort.tsx'],
+  },
+  {
     name: 'tabs-demo',
     type: 'components:example',
     registryDependencies: ['tabs'],
