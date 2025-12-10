@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { MoreVertical } from 'lucide-react'
 
+import { useFlag } from 'common'
 import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import type { APIKeysData } from 'data/api-keys/api-keys-query'
 import {
@@ -36,6 +37,8 @@ export const APIKeyRow = ({
 }) => {
   const MotionTableRow = motion.create(TableRow)
 
+  const hideApiKeyLastUsed = useFlag('HideApiKeyLastUsed')
+
   return (
     <>
       <MotionTableRow
@@ -65,7 +68,7 @@ export const APIKeyRow = ({
           </div>
         </TableCell>
 
-        {showLastSeen && (
+        {showLastSeen && !hideApiKeyLastUsed && (
           <TableCell className="py-2 min-w-0 whitespace-nowrap hidden lg:table-cell">
             <div className="truncate" title={lastSeen?.timestamp.toString() || 'Never used'}>
               {isLoadingLastSeen ? (

@@ -1,15 +1,15 @@
 import { ExternalLink, Search, X } from 'lucide-react'
-import React, { useMemo, useState } from 'react'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
+import React, { useMemo } from 'react'
 
 import { useParams } from 'common'
 import { DeployEdgeFunctionButton } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionButton'
 import {
+  EDGE_FUNCTIONS_SORT_VALUES,
   EdgeFunctionsSort,
   EdgeFunctionsSortColumn,
   EdgeFunctionsSortDropdown,
   EdgeFunctionsSortOrder,
-  EDGE_FUNCTIONS_SORT_VALUES,
 } from 'components/interfaces/EdgeFunctions/EdgeFunctionsSortDropdown'
 import { EdgeFunctionsListItem } from 'components/interfaces/Functions/EdgeFunctionsListItem'
 import {
@@ -24,17 +24,8 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
-import {
-  Button,
-  Card,
-  Input_Shadcn_,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui'
+import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -45,7 +36,6 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
-import { Input } from 'ui-patterns/DataInputs/Input'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -136,7 +126,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                               <TableHead>Name</TableHead>
                               <TableHead>URL</TableHead>
                               <TableHead className="hidden 2xl:table-cell">Created</TableHead>
-                              <TableHead className="lg:table-cell">Last updated</TableHead>
+                              <TableHead className="lg:table-cell">Updated</TableHead>
                               <TableHead className="lg:table-cell">Deployments</TableHead>
                             </TableRow>
                           </TableHeader>
@@ -187,7 +177,7 @@ EdgeFunctionsPage.getLayout = (page: React.ReactElement) => {
               <PageHeaderSummary>
                 <PageHeaderTitle>Edge Functions</PageHeaderTitle>
                 <PageHeaderDescription>
-                  Deploy edge functions to handle complex business logic
+                  Run server-side logic close to your users
                 </PageHeaderDescription>
               </PageHeaderSummary>
               <PageHeaderAside>

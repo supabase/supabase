@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { useMemo, useRef } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
@@ -27,14 +27,24 @@ interface LastSeenData {
   [hash: string]: { timestamp: number; relative: string }
 }
 
-function useLastSeen(projectRef: string): { data?: LastSeenData; isLoading: boolean } {
+function useLastSeen(
+  projectRef: string,
+  enabled?: boolean
+): {
+  data?: LastSeenData
+  isLoading: boolean
+} {
   const now = useRef(new Date()).current
 
-  const query = useLogsQuery(projectRef, {
-    iso_timestamp_start: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
-    iso_timestamp_end: now.toISOString(),
-    sql: "-- last-used-secret-api-keys\nSELECT unix_millis(max(timestamp)) as timestamp, apikey.`hash` FROM edge_logs cross join unnest(metadata) as m cross join unnest(m.request) as request cross join unnest(request.sb) as sb cross join unnest(sb.apikey) as sbapikey cross join unnest(sbapikey.apikey) as apikey WHERE apikey.error is null and apikey.`hash` is not null and apikey.prefix like 'sb_secret_%' GROUP BY apikey.`hash`",
-  })
+  const query = useLogsQuery(
+    projectRef,
+    {
+      iso_timestamp_start: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
+      iso_timestamp_end: now.toISOString(),
+      sql: "-- last-used-secret-api-keys\nSELECT unix_millis(max(timestamp)) as timestamp, apikey.`hash` FROM edge_logs cross join unnest(metadata) as m cross join unnest(m.request) as request cross join unnest(request.sb) as sb cross join unnest(sb.apikey) as sbapikey cross join unnest(sbapikey.apikey) as apikey WHERE apikey.error is null and apikey.`hash` is not null and apikey.prefix like 'sb_secret_%' GROUP BY apikey.`hash`",
+    },
+    enabled
+  )
 
   return useMemo(() => {
     if (query.isLoading || !query.logData) {
@@ -69,7 +79,11 @@ export const SecretAPIKeys = () => {
     isError: isErrorApiKeys,
   } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
 
-  const { data: lastSeen, isLoading: isLoadingLastSeen } = useLastSeen(projectRef ?? '')
+  const hideApiKeyLastUsed = useFlag('HideApiKeyLastUsed') ?? true
+  const { data: lastSeen, isLoading: isLoadingLastSeen } = useLastSeen(
+    projectRef ?? '',
+    !hideApiKeyLastUsed
+  )
 
   const secretApiKeys = useMemo(
     () =>
@@ -150,7 +164,9 @@ export const SecretAPIKeys = () => {
               <TableRow className="bg-200">
                 <TableHead>Name</TableHead>
                 <TableHead>API Key</TableHead>
-                <TableHead className="hidden lg:table-cell">Last Used</TableHead>
+                {!hideApiKeyLastUsed && (
+                  <TableHead className="hidden lg:table-cell">Last Used</TableHead>
+                )}
                 <TableHead />
               </TableRow>
             </TableHeader>

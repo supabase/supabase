@@ -51,6 +51,11 @@ export const docsConfig: DocsConfig = {
       title: 'UI Patterns',
       items: [
         {
+          title: 'Introduction',
+          href: '/docs/ui-patterns/ui-pattern-components',
+          items: [],
+        },
+        {
           title: 'Navigation',
           href: '/docs/ui-patterns/navigation',
           items: [],
@@ -77,7 +82,7 @@ export const docsConfig: DocsConfig = {
       items: [
         {
           title: 'Introduction',
-          href: '/docs/components/fragment-components',
+          href: '/docs/fragments/fragment-components',
           items: [],
         },
         {
@@ -289,6 +294,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Dropdown Menu',
           href: '/docs/components/dropdown-menu',
+          items: [],
+        },
+        {
+          title: 'Field',
+          href: '/docs/components/field',
           items: [],
         },
         {
