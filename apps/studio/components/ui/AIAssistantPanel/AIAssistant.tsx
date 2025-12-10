@@ -103,7 +103,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const [messageRatings, setMessageRatings] = useState<Record<string, 'positive' | 'negative'>>({})
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
-  const isApiKeySet = IS_PLATFORM || !!check?.hasKey
+  const isApiKeySet = !!check?.hasKey
 
   const { mutateAsync: rateMessage } = useRateMessageMutation()
 
