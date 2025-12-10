@@ -41,11 +41,7 @@ const ContactSupportButton = ({
   )
 }
 
-/**
- * @deprecated Use `import { Admonition } from "ui-patterns/admonition"` instead
- */
 // [Joshen] To standardize the language for all error UIs
-
 export const AlertError = ({
   projectRef,
   subject,

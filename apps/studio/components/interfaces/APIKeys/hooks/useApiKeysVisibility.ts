@@ -16,6 +16,9 @@ interface ApiKeysVisibilityState {
 /**
  * A hook that provides visibility states for API keys UI components
  * Consolidates logic for determining access to API keys functionality
+ *
+ * @deprecated [Joshen] This feels unnecessary - we're mainly using this for permissions
+ * checking which each component can just call useAsyncCheckPermissions directly
  */
 export function useApiKeysVisibility(): ApiKeysVisibilityState {
   const { ref: projectRef } = useParams()

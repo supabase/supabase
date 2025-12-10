@@ -1,11 +1,14 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useMemo, useRef } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
+import { AlertError } from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { NoPermission } from 'components/ui/NoPermission'
 import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
 import { APIKeysData, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import {
   Card,
@@ -20,11 +23,13 @@ import {
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { APIKeyRow } from './APIKeyRow'
 import { CreatePublishableAPIKeyDialog } from './CreatePublishableAPIKeyDialog'
-import { useApiKeysVisibility } from './hooks/useApiKeysVisibility'
 
 export const PublishableAPIKeys = () => {
   const { ref: projectRef } = useParams()
-  const { hasApiKeys, canReadAPIKeys, isLoading: isLoadingPermissions } = useApiKeysVisibility()
+  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.SECRETS_READ,
+    '*'
+  )
 
   const {
     error,
@@ -32,6 +37,12 @@ export const PublishableAPIKeys = () => {
     isLoading: isLoadingApiKeys,
     isError: isErrorApiKeys,
   } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
+
+  const newApiKeys = useMemo(
+    () => apiKeysData.filter(({ type }) => type === 'publishable' || type === 'secret') ?? [],
+    [apiKeysData]
+  )
+  const hasApiKeys = newApiKeys.length > 0
 
   const publishableApiKeys = useMemo(
     () =>
@@ -79,7 +90,9 @@ export const PublishableAPIKeys = () => {
         actions={<CreatePublishableAPIKeyDialog />}
       />
 
-      {isLoadingApiKeys || isLoadingPermissions ? (
+      {!canReadAPIKeys && !isLoadingPermissions ? (
+        <NoPermission resourceText="view API keys" />
+      ) : isLoadingApiKeys || isLoadingPermissions ? (
         <GenericSkeletonLoader />
       ) : isErrorApiKeys ? (
         <AlertError error={error} subject="Failed to load secret API keys" />
