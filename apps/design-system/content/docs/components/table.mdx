@@ -62,32 +62,32 @@ The Table component is wrapped in a `ShadowScrollArea` by default, which provide
 
 ## Structure
 
-Table is comprised of the following [Shadcn primitives](https://ui.shadcn.com/docs/components/table) which map directly to HTML counterparts:
+Table is comprised of the following [Shadcn primitives](https://ui.shadcn.com/docs/components/table) which map directly to their HTML counterparts:
 
-| Component     | HTML element |
-| ------------- | ------------ |
-| Table         | `<table>`    |
-| Table Body    | `<tbody>`    |
-| Table Caption | `<caption>`  |
-| Table Cell    | `<td>`       |
-| Table Footer  | `<tfoot>`    |
-| Table Head    | `<th>`       |
-| Table Header  | `<thead>`    |
-| Table Row     | `<tr>`       |
+| Component     | HTML element                                                                                |
+| ------------- | ------------------------------------------------------------------------------------------- |
+| Table         | [`<table>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/table)     |
+| Table Body    | [`<tbody>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/tbody)     |
+| Table Caption | [`<caption>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/caption) |
+| Table Cell    | [`<td>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/td)           |
+| Table Footer  | [`<tfoot>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/tfoot)     |
+| Table Head    | [`<th>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/th)           |
+| Table Header  | [`<thead>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/thead)     |
+| Table Row     | [`<tr>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/tr)           |
 
-These components follow standard HTML semantics and best practices.
+Table and its child components follow their HTML element counterparts for semantics, accessibility, and best practices.
 
 ### Table Caption
 
 Table Caption describes a table’s purpose or content. Think of it like the label of a diagram. It should only contain a single text node.
 
-Just like its `<caption>` counterpart, Table Caption should be the first child of a `<table>` element irrespective of visual positioning.
+Just like its `<caption>` counterpart, Table Caption should be the first child of a Table element (before a Table Body) irrespective of its final visual positioning.
 
 ### Table Footer
 
 Table Footer is a semantic grouping for the final rows of a table, typically used for column summaries, totals, or footnotes that relate to the data in the body of the table.
 
-Table Footer typically contains the same child elements as a regular Table Row, such as Table Row and Table Cell.
+Table Footer typically contains the same child elements as a Table Body, such as Table Row and Table Cell, and is a sibling of Table Body.
 
 ## Examples
 
