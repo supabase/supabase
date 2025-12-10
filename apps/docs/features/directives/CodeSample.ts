@@ -33,12 +33,12 @@
 
 import * as acorn from 'acorn'
 import tsPlugin from 'acorn-typescript'
-import { type DefinitionContent, type BlockContent, type Code, type Root } from 'mdast'
+import amaro from 'amaro'
+import { type BlockContent, type Code, type DefinitionContent, type Root } from 'mdast'
 import type { MdxJsxAttributeValueExpression, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import assert from 'node:assert'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { removeTypes } from 'remove-types'
 import { type Parent } from 'unist'
 import { visitParents } from 'unist-util-visit-parents'
 import { z, type SafeParseError } from 'zod'
@@ -260,7 +260,7 @@ async function rewriteNodes(contentMap: Map<MdxJsxFlowElement, [CodeSampleMeta, 
 
     let processedContent = content
     if (meta.convertToJs) {
-      processedContent = await removeTypes(content)
+      const { code: processedContent } = amaro.transformSync(content, { mode: 'strip-only' })
       // Convert TypeScript/TSX language to JavaScript/JSX when converting types
       assert(
         lang === 'typescript' || lang === 'tsx',
