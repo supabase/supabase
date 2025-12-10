@@ -2,43 +2,12 @@ import { IS_PLATFORM } from 'common'
 import { generateDeterministicUuid } from 'lib/api/snippets.browser'
 import { removeCommentsFromSql, uuidv4 } from 'lib/helpers'
 import type { SnippetWithContent } from 'state/sql-editor-v2'
-import type { SqlSnippets, UserContent } from 'types'
 import {
   NEW_SQL_SNIPPET_SKELETON,
   destructiveSqlRegex,
   sqlAiDisclaimerComment,
 } from './SQLEditor.constants'
-import { ContentDiff, DiffType } from './SQLEditor.types'
-
-/**
- * @deprecated
- */
-export const createSqlSnippetSkeleton = ({
-  id,
-  name,
-  sql,
-  owner_id,
-  project_id,
-}: {
-  id?: string
-  name?: string
-  sql?: string
-  owner_id?: number
-  project_id?: number
-} = {}): UserContent<SqlSnippets.Content> => {
-  return {
-    ...NEW_SQL_SNIPPET_SKELETON,
-    id,
-    ...(name && { name }),
-    ...(owner_id && { owner_id }),
-    ...(project_id && { project_id }),
-    content: {
-      ...NEW_SQL_SNIPPET_SKELETON.content,
-      content_id: id ?? '',
-      sql: sql ?? '',
-    },
-  }
-}
+import { ContentDiff } from './SQLEditor.types'
 
 export const createSqlSnippetSkeletonV2 = ({
   name,
@@ -71,32 +40,6 @@ export const createSqlSnippetSkeletonV2 = ({
       sql: sql ?? '',
     } as any,
     isNotSavedInDatabaseYet: true,
-  }
-}
-
-export function getDiffTypeButtonLabel(diffType: DiffType) {
-  switch (diffType) {
-    case DiffType.Modification:
-      return 'Accept change'
-    case DiffType.Addition:
-      return 'Accept addition'
-    case DiffType.NewSnippet:
-      return 'Create new snippet'
-    default:
-      throw new Error(`Unknown diff type '${diffType}'`)
-  }
-}
-
-export function getDiffTypeDropdownLabel(diffType: DiffType) {
-  switch (diffType) {
-    case DiffType.Modification:
-      return 'Compare as change'
-    case DiffType.Addition:
-      return 'Compare as addition'
-    case DiffType.NewSnippet:
-      return 'Compare as new snippet'
-    default:
-      throw new Error(`Unknown diff type '${diffType}'`)
   }
 }
 
