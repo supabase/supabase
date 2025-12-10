@@ -57,6 +57,7 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
         setSidebarUrlParam(null)
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSidebar])
 
   // Handle toggling of sidebars on page init
@@ -69,6 +70,7 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
           sidebarURLParamRef.current as (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS]
         )
       ) {
+        console.log('Open sidebar based on URL')
         openSidebar(sidebarURLParamRef.current)
       } else if (
         !!sidebarLocalStorageRef.current &&
@@ -79,6 +81,7 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
         openSidebar(sidebarLocalStorageRef.current)
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady, isLoadedLocalStorage])
 
   return <>{children}</>
