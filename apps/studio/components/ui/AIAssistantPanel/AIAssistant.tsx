@@ -52,7 +52,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { data: project } = useSelectedProjectQuery()
   const searchParams = useSearchParamsShallow()
 
-  const { data: selectedOrganization, isLoading: isLoadingOrganization } =
+  const { data: selectedOrganization, isPending: isLoadingOrganization } =
     useSelectedOrganizationQuery()
 
   useHotKey(() => cancelEdit(), 'Escape')
@@ -123,7 +123,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const currentTable = tables?.find((t) => t.id.toString() === entityId)
   const currentSchema = searchParams?.get('schema') ?? 'public'
-  const currentChat = snap.activeChat?.name
 
   // Update context in state
   useEffect(() => {

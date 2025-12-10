@@ -50,7 +50,7 @@ const useDbQuery = ({
   const {
     data,
     error: rqError,
-    isLoading,
+    isPending,
     isRefetching,
     refetch,
   } = useQuery({
@@ -81,7 +81,7 @@ const useDbQuery = ({
   return {
     error,
     data,
-    isLoading,
+    isLoading: isPending,
     isRefetching,
     params,
     runQuery: refetch,

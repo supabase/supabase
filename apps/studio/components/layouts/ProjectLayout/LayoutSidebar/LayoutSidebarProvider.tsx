@@ -7,6 +7,7 @@ import { AdvisorPanel } from 'components/ui/AdvisorPanel/AdvisorPanel'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import useLatest from 'hooks/misc/useLatest'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -28,6 +29,9 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   const [sidebarURLParam, setSidebarUrlParam] = useQueryState('sidebar', parseAsString)
   const [sidebarLocalStorage, setSidebarLocalStorage, { isSuccess: isLoadedLocalStorage }] =
     useLocalStorageQuery(LOCAL_STORAGE_KEYS.LAST_OPENED_SIDE_BAR(project?.ref ?? ''), '')
+
+  const sidebarURLParamRef = useLatest(sidebarURLParam)
+  const sidebarLocalStorageRef = useLatest(sidebarLocalStorage)
 
   useRegisterSidebar(SIDEBAR_KEYS.AI_ASSISTANT, () => <AIAssistant />, {}, 'i', !!project)
   useRegisterSidebar(SIDEBAR_KEYS.EDITOR_PANEL, () => <EditorPanel />, {}, 'e', !!project)
@@ -60,19 +64,19 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     if (router.isReady && isLoadedLocalStorage) {
       if (
-        typeof sidebarURLParam === 'string' &&
+        typeof sidebarURLParamRef.current === 'string' &&
         Object.values(SIDEBAR_KEYS).includes(
-          sidebarURLParam as (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS]
+          sidebarURLParamRef.current as (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS]
         )
       ) {
-        openSidebar(sidebarURLParam)
+        openSidebar(sidebarURLParamRef.current)
       } else if (
-        !!sidebarLocalStorage &&
+        !!sidebarLocalStorageRef.current &&
         Object.values(SIDEBAR_KEYS).includes(
-          sidebarLocalStorage as (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS]
+          sidebarLocalStorageRef.current as (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS]
         )
       ) {
-        openSidebar(sidebarLocalStorage)
+        openSidebar(sidebarLocalStorageRef.current)
       }
     }
   }, [router.isReady, isLoadedLocalStorage])

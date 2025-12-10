@@ -34,7 +34,13 @@ export const ForeignKeysManagement = ({
   const [open, setOpen] = useState(false)
   const [selectedFk, setSelectedFk] = useState<ForeignKey>()
 
-  const { data, error, isLoading, isSuccess, isError } = useForeignKeyConstraintsQuery({
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+  } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: selectedSchema,

@@ -30,7 +30,7 @@ export const QueuesTab = () => {
   const {
     data: queues,
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isRefetching,
     refetch,
