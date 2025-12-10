@@ -76,7 +76,7 @@ const RedirectToTemplates = () => {
     'custom_config_gotrue'
   )
 
-  const { data: authConfig, isLoading: isLoadingConfig } = useAuthConfigQuery({ projectRef })
+  const { data: authConfig, isPending: isLoadingConfig } = useAuthConfigQuery({ projectRef })
 
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
     onError: (error) => {

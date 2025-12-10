@@ -45,7 +45,7 @@ export const OngoingQueriesPanel = () => {
     data,
     error,
     isError,
-    isLoading: isLoadingOngoingQueries,
+    isPending: isLoadingOngoingQueries,
     isFetching: isFetchingOngoingQueries,
     refetch,
   } = useOngoingQueriesQuery(

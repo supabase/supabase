@@ -78,7 +78,6 @@
     "rehype-slug": "^5.1.0",
     "remark": "^15.0.1",
     "remark-gfm": "^3.0.1",
-    "remark-html": "^16.0.1",
     "shared-data": "workspace:*",
     "swiper": "^11.0.7",
     "typed.js": "^2.0.16",
