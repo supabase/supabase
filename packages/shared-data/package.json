@@ -8,9 +8,6 @@
     "preinstall": "npx only-allow pnpm",
     "clean": "rimraf node_modules"
   },
-  "dependencies": {
-    "zod": "catalog:"
-  },
   "author": "",
   "license": "MIT"
 }
