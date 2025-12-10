@@ -38,6 +38,12 @@ Create a new Edge Function for your MCP server:
 supabase functions new simple-mcp-server
 ```
 
+<Admonition type="tip">
+
+This tutorial uses the [official MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk), but you can use any MCP framework that's compatible with the [Edge Runtime](/docs/guides/functions), such as [mcp-lite](https://github.com/nicobytes/mcp-lite), [mcp-use](https://github.com/mcp-use/mcp-use), or [mcp-handler](https://github.com/mcp-handler/mcp-handler).
+
+</Admonition>
+
 Replace the contents of `supabase/functions/simple-mcp-server/index.ts` with:
 
 ```ts
@@ -237,49 +243,11 @@ server.registerTool(
 
 ## Add authentication
 
-Secure your MCP server with [Supabase Auth OAuth 2.1 flow](/docs/guides/auth/oauth-server). Learn how to enable OAuth in your project [here](/docs/guides/auth/oauth-server/mcp-authentication).
+<Admonition type="caution">
 
-Authentication occurs inside the MCP server, not at the Edge Function layer.
+MCP authentication is not yet supported on Edge Functions. For now, MCP servers deployed on Supabase Edge Functions are publicly accessible.
 
-### Protect the MCP endpoint
-
-```ts
-app.all('/mcp', async (c) => {
-  // Verify the Authorization header
-  const authHeader = c.req.header('Authorization')
-  if (!authHeader?.startsWith('Bearer ')) {
-    return c.json(
-      { error: 'unauthorized' },
-      {
-        status: 401,
-        headers: { 'WWW-Authenticate': 'Bearer' },
-      }
-    )
-  }
-
-  const token = authHeader.slice(7)
-  // Validate token with Supabase Auth
-  // See MCP Authentication guide for details
-
-  const transport = new StreamableHTTPTransport()
-  await server.connect(transport)
-  return transport.handleRequest(c)
-})
-```
-
-### Expose OAuth metadata
-
-Create a `.well-known/oauth-protected-resource` endpoint for MCP client discovery:
-
-```ts
-app.get('/.well-known/oauth-protected-resource', (c) => {
-  const projectRef = Deno.env.get('SUPABASE_PROJECT_REF')
-  return c.json({
-    resource: `https://${projectRef}.supabase.co/functions/v1/simple-mcp-server`,
-    authorization_servers: [`https://${projectRef}.supabase.co/auth/v1`],
-  })
-})
-```
+</Admonition>
 
 ## Examples
 
