@@ -35,11 +35,11 @@ export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
 export const ProjectDropdown = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
+  const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const isBranch = project?.parentRef !== project?.ref
-  const { data: parentProject, isLoading: isLoadingParentProject } = useProjectDetailQuery(
+  const { data: parentProject, isPending: isLoadingParentProject } = useProjectDetailQuery(
     { ref: project?.parent_project_ref },
     { enabled: isBranch }
   )

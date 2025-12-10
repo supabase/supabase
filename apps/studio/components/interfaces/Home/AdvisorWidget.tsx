@@ -6,9 +6,9 @@ import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { EntityTypeIcon, createLintSummaryPrompt } from 'components/interfaces/Linter/Linter.utils'
 import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useAdvisorStateSnapshot } from 'state/advisor-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
@@ -41,7 +41,7 @@ interface SlowQuery {
 export const AdvisorWidget = () => {
   const { ref: projectRef } = useParams()
   const [selectedTab, setSelectedTab] = useState<'security' | 'performance'>('security')
-  const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery({ projectRef })
+  const { data: lints, isPending: isLoadingLints } = useProjectLintsQuery({ projectRef })
   const { data: slowestQueriesData, isLoading: isLoadingSlowestQueries } = useQueryPerformanceQuery(
     {
       preset: 'slowestExecutionTime',
