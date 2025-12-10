@@ -1,12 +1,12 @@
 import { act, screen, waitFor } from '@testing-library/react'
-import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { LayoutSidebar } from './index'
-import { LayoutSidebarProvider, SIDEBAR_KEYS } from './LayoutSidebarProvider'
 import { sidebarManagerState } from 'state/sidebar-manager-state'
 import { render } from 'tests/helpers'
 import { routerMock } from 'tests/lib/route-mock'
 import { ResizablePanel, ResizablePanelGroup } from 'ui'
+import { LayoutSidebar } from './index'
+import { LayoutSidebarProvider, SIDEBAR_KEYS } from './LayoutSidebarProvider'
 
 vi.mock('components/ui/AIAssistantPanel/AIAssistant', () => ({
   AIAssistant: () => <div data-testid="ai-assistant-sidebar">AI Assistant</div>,
@@ -19,6 +19,13 @@ vi.mock('components/ui/EditorPanel/EditorPanel', () => ({
 vi.mock('components/ui/AdvisorPanel/AdvisorPanel', () => ({
   AdvisorPanel: () => <div data-testid="advisor-panel-sidebar">Advisor Panel</div>,
 }))
+
+vi.mock('nuqs', async () => {
+  let queryValue = 'example'
+  return {
+    useQueryState: () => [queryValue, (v: string) => (queryValue = v)],
+  }
+})
 
 const mockProject = {
   id: 1,
