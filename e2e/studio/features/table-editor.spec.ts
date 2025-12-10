@@ -73,7 +73,7 @@ const createTable = async (page: Page, ref: string, tableName: string) => {
   await expect(
     page.getByRole('button', { name: `View ${tableName}`, exact: true }),
     'Table should be visible after creation'
-  ).toBeVisible({ timeout: 15_000 })
+  ).toBeVisible()
 }
 
 const deleteTable = async (page: Page, ref: string, tableName: string) => {
