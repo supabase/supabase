@@ -166,7 +166,7 @@ export function useFlag<T = boolean>(name: string) {
   const flagStore = useFeatureFlags()
   const store = flagStore.configcat
 
-  // Flag store is empty means config cat is not loaded yet, return default value
+  // Flag store is empty means config cat is not loaded yet, return false
   if (isObjectEmpty(store)) {
     return false
   }
