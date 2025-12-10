@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
@@ -67,6 +67,7 @@ const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
+  const reportGranularityV2 = useFlag('reportGranularityV2')
 
   const {
     selectedDateRange,
@@ -78,7 +79,7 @@ const DatabaseUsage = () => {
     showUpgradePrompt,
     setShowUpgradePrompt,
     handleDatePickerChange,
-  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES, reportGranularityV2)
 
   const state = useDatabaseSelectorStateSnapshot()
   const queryClient = useQueryClient()
