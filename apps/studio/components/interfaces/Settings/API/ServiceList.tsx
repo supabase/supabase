@@ -89,7 +89,7 @@ export const ServiceList = () => {
                 </Alert_Shadcn_>
               ) : (
                 <FormLayout
-                  layout="horizontal"
+                  layout="flex-row-reverse"
                   label={
                     isCustomDomainActive ? (
                       <div className="flex items-center space-x-2">
@@ -100,6 +100,7 @@ export const ServiceList = () => {
                       'URL'
                     )
                   }
+                  className="[&>div]:md:w-1/2 [&>div>div]:w-full [&>div]:min-w-100"
                   description={
                     loadBalancerSelected
                       ? 'RESTful endpoint for querying and managing your databases through your load balancer'
