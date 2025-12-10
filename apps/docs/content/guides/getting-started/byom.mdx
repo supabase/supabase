@@ -37,6 +37,20 @@ Create a new Edge Function for your MCP server:
 supabase functions new simple-mcp-server
 ```
 
+Create a `deno.json` file in `supabase/functions/simple-mcp-server/` with the required dependencies:
+
+```json
+{
+  "imports": {
+    "@hono/mcp": "npm:@hono/mcp@^0.1.1",
+    "@modelcontextprotocol/sdk": "npm:@modelcontextprotocol/sdk@^1.24.3",
+    "@modelcontextprotocol/sdk/": "npm:/@modelcontextprotocol/sdk@^1.24.3/",
+    "hono": "npm:hono@^4.9.2",
+    "zod": "npm:zod@^4.1.13"
+  }
+}
+```
+
 <Admonition type="tip">
 
 This tutorial uses the [official MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk), but you can use any MCP framework that's compatible with the [Edge Runtime](/docs/guides/functions), such as [mcp-lite](https://github.com/fiberplane/mcp-lite), [mcp-use](https://github.com/mcp-use/mcp-use), or [mcp-handler](https://github.com/mcp-handler/mcp-handler).
@@ -85,20 +99,6 @@ app.all('/mcp', async (c) => {
 })
 
 Deno.serve(app.fetch)
-```
-
-Create a `deno.json` file in `supabase/functions/simple-mcp-server/` with the required dependencies:
-
-```json
-{
-  "imports": {
-    "@hono/mcp": "npm:@hono/mcp@^0.1.1",
-    "@modelcontextprotocol/sdk": "npm:@modelcontextprotocol/sdk@^1.24.3",
-    "@modelcontextprotocol/sdk/": "npm:/@modelcontextprotocol/sdk@^1.24.3/",
-    "hono": "npm:hono@^4.9.2",
-    "zod": "npm:zod@^4.1.13"
-  }
-}
 ```
 
 ### Understanding the code
