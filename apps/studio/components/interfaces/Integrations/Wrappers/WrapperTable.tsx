@@ -5,7 +5,7 @@ import { useParams } from 'common'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Card, Table, TableBody, TableCaption, TableHead, TableHeader, TableRow } from 'ui'
+import { Card, cn, Table, TableBody, TableCaption, TableHead, TableHeader, TableRow } from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import WrapperRow from './WrapperRow'
 import { wrapperMetaComparator } from './Wrappers.utils'
@@ -65,10 +65,6 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
   return (
     <Card className="max-w-5xl">
       <Table>
-        <TableCaption>
-          {wrappers.length} {integration?.name}
-          {wrappers.length > 1 ? 's' : ''} created
-        </TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead className="w-[220px]">Name</TableHead>
@@ -95,6 +91,10 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
             )
           })}
         </TableBody>
+        <TableCaption className={cn('text-xs', wrappers.length === 0 ? 'border-t-0' : '')}>
+          {wrappers.length} {integration?.name}
+          {wrappers.length > 1 ? 's' : ''} created
+        </TableCaption>
       </Table>
     </Card>
   )

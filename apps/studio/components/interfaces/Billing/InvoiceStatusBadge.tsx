@@ -57,17 +57,17 @@ const InvoiceStatusBadge = ({
           {statusMapping?.label || status}
         </Badge>
       </TooltipTrigger>
-      <TooltipContent side="bottom" className="max-w-xs">
+      <TooltipContent side="bottom" className="max-w-xs [&>p]:text-center [&>div>p]:text-center">
         {[InvoiceStatus.OPEN, InvoiceStatus.ISSUED, InvoiceStatus.UNCOLLECTIBLE].includes(status) &&
           (paymentProcessing ? (
             <div className="space-y-1">
-              <p className="text-xs text-foreground">
+              <p>
                 While most credit card payments get processed instantly, some Indian card providers
                 may take up to 72 hours to process payments. We’re still waiting for your card
                 provider to process this payment.
               </p>
 
-              <p className="text-xs text-foreground">
+              <p>
                 We recommend proactively{' '}
                 <InlineLink href={`${DOCS_URL}/guides/platform/credits#credit-top-ups`}>
                   topping up your credits
@@ -76,13 +76,13 @@ const InvoiceStatusBadge = ({
               </p>
             </div>
           ) : paymentAttempted ? (
-            <p className="text-xs text-foreground">
+            <p>
               We were not able to collect the payment. Make sure you have a valid payment method and
               enough funds. Outstanding invoices may cause restrictions. You can manually pay the
               invoice using the “Pay now” button.
             </p>
           ) : (
-            <p className="text-xs text-foreground">
+            <p>
               The invoice will soon be charged for. Please make sure to pay in a timely manner,
               especially if you pay via invoice instead of card. You can pay the invoice using your
               card using the “Pay now” button.
@@ -90,15 +90,11 @@ const InvoiceStatusBadge = ({
           ))}
 
         {status === InvoiceStatus.PAID && (
-          <p className="text-xs text-foreground">
-            The invoice has been paid successfully. No further action is required on your side.
-          </p>
+          <p>The invoice has been paid successfully. No further action is required on your side.</p>
         )}
 
         {status === InvoiceStatus.VOID && (
-          <p className="text-xs text-foreground">
-            This invoice has been forgiven. No further action is required on your side.
-          </p>
+          <p>This invoice has been forgiven. No further action is required on your side.</p>
         )}
       </TooltipContent>
     </Tooltip>

@@ -547,6 +547,7 @@ export const createTable = async ({
       comment: columnPayload.comment,
       check: columnPayload.check,
     })
+    console.log({ columnSQL })
     sqlStatements.push(columnSQL)
   }
 
