@@ -28,12 +28,12 @@ export const DisplayApiSettings = ({
   const {
     data: settings,
     isError: isProjectSettingsError,
-    isLoading: isProjectSettingsLoading,
+    isPending: isProjectSettingsLoading,
   } = useProjectSettingsV2Query({ projectRef })
   const {
     data,
     isError: isJwtSecretUpdateStatusError,
-    isLoading: isJwtSecretUpdateStatusLoading,
+    isPending: isJwtSecretUpdateStatusLoading,
   } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 

@@ -139,14 +139,14 @@ export const DatabaseConnectionString = () => {
   const {
     data: pgbouncerConfig,
     error: pgbouncerError,
-    isLoading: isLoadingPgbouncerConfig,
+    isPending: isLoadingPgbouncerConfig,
     isError: isErrorPgbouncerConfig,
     isSuccess: isSuccessPgBouncerConfig,
   } = usePgbouncerConfigQuery({ projectRef })
   const {
     data: supavisorConfig,
     error: supavisorConfigError,
-    isLoading: isLoadingSupavisorConfig,
+    isPending: isLoadingSupavisorConfig,
     isError: isErrorSupavisorConfig,
     isSuccess: isSuccessSupavisorConfig,
   } = useSupavisorConfigurationQuery({ projectRef })
@@ -154,7 +154,7 @@ export const DatabaseConnectionString = () => {
   const {
     data: databases,
     error: readReplicasError,
-    isLoading: isLoadingReadReplicas,
+    isPending: isLoadingReadReplicas,
     isError: isErrorReadReplicas,
     isSuccess: isSuccessReadReplicas,
   } = useReadReplicasQuery({ projectRef })

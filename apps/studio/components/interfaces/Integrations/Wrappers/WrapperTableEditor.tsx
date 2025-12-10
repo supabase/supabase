@@ -219,7 +219,7 @@ const TableForm = ({
   const { data: project } = useSelectedProjectQuery()
   const {
     data: schemas,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
   } = useSchemasQuery({
     projectRef: project?.ref,

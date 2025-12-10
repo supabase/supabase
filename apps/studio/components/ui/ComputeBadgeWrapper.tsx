@@ -42,7 +42,7 @@ export const ComputeBadgeWrapper = ({
   const cpuArchitecture = getCloudProviderArchitecture(cloudProvider)
 
   // fetches addons
-  const { data: addons, isLoading: isLoadingAddons } = useProjectAddonsQuery(
+  const { data: addons, isPending: isLoadingAddons } = useProjectAddonsQuery(
     { projectRef },
     { enabled: open }
   )
@@ -65,7 +65,7 @@ export const ComputeBadgeWrapper = ({
 
   const isHighestCompute = computeSize === highestComputeAvailable?.replace('ci_', '')
 
-  const { data, isLoading: isLoadingSubscriptions } = useOrgSubscriptionQuery(
+  const { data, isPending: isLoadingSubscriptions } = useOrgSubscriptionQuery(
     { orgSlug: slug },
     { enabled: open }
   )

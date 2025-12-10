@@ -43,7 +43,7 @@ const Indexes = () => {
   const {
     data: allIndexes,
     error: indexesError,
-    isLoading: isLoadingIndexes,
+    isPending: isLoadingIndexes,
     isSuccess: isSuccessIndexes,
     isError: isErrorIndexes,
   } = useIndexesQuery({
@@ -75,7 +75,7 @@ const Indexes = () => {
 
   const {
     data: schemas,
-    isLoading: isLoadingSchemas,
+    isPending: isLoadingSchemas,
     isSuccess: isSuccessSchemas,
     isError: isErrorSchemas,
   } = useSchemasQuery({

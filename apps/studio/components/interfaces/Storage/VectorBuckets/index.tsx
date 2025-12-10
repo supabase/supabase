@@ -38,7 +38,7 @@ export const VectorsBuckets = () => {
     data,
     error: bucketsError,
     isError: isErrorBuckets,
-    isLoading: isLoadingBuckets,
+    isPending: isLoadingBuckets,
     isSuccess: isSuccessBuckets,
   } = useVectorBucketsQuery({ projectRef })
   const bucketsList = data?.vectorBuckets ?? []
