@@ -101,7 +101,7 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Empty State Presentational',
+          title: 'EmptyStatePresentational',
           href: '/docs/fragments/empty-state-presentational',
           items: [],
         },
