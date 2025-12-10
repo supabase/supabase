@@ -122,14 +122,17 @@ export const InvoicesSettings = () => {
           {isLoading ? (
             new Array(6).fill(0).map((_, idx) => (
               <TableRow key={`loading-${idx}`}>
-                <TableCell colSpan={6}>
+                <TableCell colSpan={invoices.length > 0 ? 6 : 5}>
                   <ShimmeringLoader />
                 </TableCell>
               </TableRow>
             ))
           ) : isError ? (
             <TableRow className="rounded-b">
-              <TableCell colSpan={6} className="!p-0 !rounded-b overflow-hidden">
+              <TableCell
+                colSpan={invoices.length > 0 ? 6 : 5}
+                className="!p-0 !rounded-b overflow-hidden"
+              >
                 <AlertError
                   className="border-0 rounded-none"
                   error={error}
