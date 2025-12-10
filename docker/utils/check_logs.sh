@@ -51,7 +51,7 @@ docker compose logs rest | grep -q -i 'Schema cache loaded in.*milliseconds' || 
 
 echo "===> Checking analytics..."
 docker compose logs analytics | grep -q -i 'Access LogflareWeb.Endpoint at http://localhost:4000' && \
-docker compose logs analytics | grep -q -i -m 1 'All logs logged!' || fail_msg analytics
+docker compose logs analytics | grep -q -i -m 1 'Initializing alerts scheduler' || fail_msg analytics
 
 echo "===> Checking postgres..."
 docker compose logs db | grep -q -i -E 'PostgreSQL init process complete; ready for start up.|Skipping initialization' || fail_msg db
