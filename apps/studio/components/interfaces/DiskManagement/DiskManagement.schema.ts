@@ -9,7 +9,7 @@ import {
   calculateMaxIopsAllowedForDiskSizeWithio2,
   formatNumber,
 } from './DiskManagement.utils'
-import { DISK_LIMITS, DiskType } from './ui/DiskManagement.constants'
+import { COMPUTE_MAX_THROUGHPUT, DISK_LIMITS, DiskType } from './ui/DiskManagement.constants'
 
 const baseSchema = z.object({
   storageType: z.enum(['io2', 'gp3']).describe('Type of storage: io2 or gp3'),
@@ -55,7 +55,7 @@ export const CreateDiskStorageSchema = ({
   const validateDiskConfiguration = !isFlyProject && !isAwsNimbusProject && !isAwsK8sProject
 
   const schema = baseSchema.superRefine((data, ctx) => {
-    const { storageType, totalSize, provisionedIOPS, throughput, maxSizeGb } = data
+    const { storageType, totalSize, provisionedIOPS, throughput, maxSizeGb, computeSize } = data
 
     if (validateDiskConfiguration && totalSize < 8) {
       ctx.addIssue({
@@ -141,6 +141,8 @@ export const CreateDiskStorageSchema = ({
 
     if (validateDiskConfiguration && storageType === 'gp3') {
       const maxIopsAllowedForDiskSizeWithGp3 = calculateMaxIopsAllowedForDiskSizeWithGp3(totalSize)
+      const computeMaxThroughput =
+        COMPUTE_MAX_THROUGHPUT[computeSize ?? 'ci_micro'] ?? DISK_LIMITS[DiskType.GP3].maxThroughput
 
       if (provisionedIOPS > DISK_LIMITS[DiskType.GP3].maxIops) {
         ctx.addIssue({
@@ -176,16 +178,18 @@ export const CreateDiskStorageSchema = ({
       }
 
       if (throughput !== undefined) {
-        const maxThroughput = Math.min(0.25 * provisionedIOPS, 1000)
-
-        if (throughput > DISK_LIMITS['gp3'].maxThroughput) {
+        // gp3 requires roughly 4 IOPS per 1 MB/s of throughput (0.25 MB/s per IOPS), capped by gp3 max
+        const iopsThroughputLimit = Math.min(
+          0.25 * provisionedIOPS,
+          DISK_LIMITS[DiskType.GP3].maxThroughput
+        )
+        if (throughput > computeMaxThroughput) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Throughput can not exceed ${formatNumber(maxThroughput)} MB/s`,
+            message: `Throughput cannot exceed ${formatNumber(computeMaxThroughput)} MB/s for the selected compute size.`,
             path: ['throughput'],
           })
-        }
-        if (throughput > maxThroughput) {
+        } else if (throughput > iopsThroughputLimit) {
           const iopsRequiredForThroughput = calculateIopsRequiredForThroughput(throughput)
           ctx.addIssue({
             code: z.ZodIssueCode.custom,

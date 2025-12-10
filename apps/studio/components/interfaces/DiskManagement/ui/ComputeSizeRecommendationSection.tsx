@@ -9,10 +9,7 @@ import {
   calculateMaxIopsAllowedForComputeSize,
   mapAddOnVariantIdToComputeSize,
 } from '../DiskManagement.utils'
-import {
-  COMPUTE_BASELINE_IOPS,
-  RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
-} from './DiskManagement.constants'
+import { COMPUTE_MAX_IOPS, RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3 } from './DiskManagement.constants'
 
 interface ComputeSizeRecommendationSectionProps {
   actions?: ReactNode
@@ -32,6 +29,8 @@ export function ComputeSizeRecommendationSection({
   const isVisible =
     iops > maxIOPSforComputeSize && !RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3.includes(computeSize)
 
+  const hasComputeSize = !!computeSize
+
   return (
     <AnimatePresence initial={false}>
       {isVisible && (
@@ -43,7 +42,11 @@ export function ComputeSizeRecommendationSection({
         >
           <Admonition
             type="default"
-            title={`Your Compute size can only support a baseline IOPS of ${COMPUTE_BASELINE_IOPS[computeSize]}`}
+            title={
+              hasComputeSize
+                ? `Your compute size supports up to ${COMPUTE_MAX_IOPS[computeSize]} IOPS`
+                : 'Could not determine your compute size. Please contact support if this persists.'
+            }
           >
             <div className="flex flex-col gap-2">
               <div>

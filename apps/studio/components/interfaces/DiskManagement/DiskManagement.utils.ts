@@ -1,6 +1,7 @@
 import { ProjectDetail } from 'data/projects/project-detail-query'
 import { PlanId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
+import { z } from 'zod'
 import {
   ComputeInstanceAddonVariantId,
   ComputeInstanceSize,
@@ -8,6 +9,7 @@ import {
 } from './DiskManagement.types'
 import {
   COMPUTE_BASELINE_IOPS,
+  COMPUTE_MAX_IOPS,
   DISK_LIMITS,
   DISK_PRICING,
   DiskType,
@@ -159,6 +161,9 @@ export const calculateThroughputPrice = ({
   return { oldPrice: '0.00', newPrice: '0.00' }
 }
 
+const computeSizeSchema = z.enum(Object.keys(COMPUTE_MAX_IOPS) as [string, ...string[]])
+type ComputeSizeKey = z.infer<typeof computeSizeSchema>
+
 export function getAvailableComputeOptions(availableAddons: any[], projectCloudProvider?: string) {
   const computeOptions =
     availableAddons
@@ -251,21 +256,26 @@ export const calculateIopsRequiredForThroughput = (throughput: number) => {
 }
 
 export const calculateMaxIopsAllowedForComputeSize = (computeSize: string): number => {
-  return COMPUTE_BASELINE_IOPS[computeSize as keyof typeof COMPUTE_BASELINE_IOPS] || 0
+  const parsed = computeSizeSchema.safeParse(computeSize)
+  if (!parsed.success) return 0
+  return COMPUTE_MAX_IOPS[parsed.data]
 }
 
 export const calculateComputeSizeRequiredForIops = (
   iops: number
 ): ComputeInstanceAddonVariantId | undefined => {
-  const computeSizes = Object.entries(COMPUTE_BASELINE_IOPS).sort((a, b) => a[1] - b[1])
+  const computeSizes: [ComputeSizeKey, number][] = Object.entries(COMPUTE_MAX_IOPS)
+    .map(([size, baselineIops]) => [computeSizeSchema.parse(size), baselineIops])
+    .sort((a, b) => a[1] - b[1])
+
   for (const [size, baselineIops] of computeSizes) {
     if (iops <= baselineIops) {
-      return size as ComputeInstanceAddonVariantId
+      return size
     }
   }
 
   // fallback to largest compute size - this should never happen though :-/
-  return computeSizes[computeSizes.length - 1][0] as ComputeInstanceAddonVariantId
+  return computeSizes[computeSizes.length - 1]?.[0]
 }
 
 export const calculateDiskSizeRequiredForIops = (provisionedIOPS: number): number | undefined => {
