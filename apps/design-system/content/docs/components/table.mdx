@@ -10,21 +10,6 @@ Table is an opinionated `<table>` element for basic tabular data presentation. I
 
 <ComponentPreview name="table-demo" peekCode wide />
 
-Table is comprised of the following [Shadcn primitives](https://ui.shadcn.com/docs/components/table) which map directly to HTML counterparts:
-
-| Component      | HTML element |
-| -------------- | ------------ |
-| `Table`        | `<table>`    |
-| `TableBody`    | `<tbody>`    |
-| `TableCaption` | `<caption>`  |
-| `TableCell`    | `<td>`       |
-| `TableFooter`  | `<tfoot>`    |
-| `TableHead`    | `<th>`       |
-| `TableHeader`  | `<thead>`    |
-| `TableRow`     | `<tr>`       |
-
-These components follow standard HTML semantics and best practices. For example, `TableCaption` (just like `<caption>`) should only ever contain inline elements as children, and be placed at the start of a `<table>` irrespective of visual positioning.
-
 ## Usage
 
 ```tsx
@@ -71,23 +56,48 @@ import {
 
 Columns will naturally take the width of their content unless otherwise specified. Specific column widths may be useful for controlling layout shift or for aligning multiple Table instances vertically.
 
-`TableHead` includes a `whitespace-nowrap` utility class to prevent its text from wrapping. `TableCell` must have any custom width specified, as there are legitimate use cases for both wrapping (or truncated) text.
+Table Head includes a `whitespace-nowrap` utility class to prevent its text from wrapping. Table Cell must have any custom width specified, as there are legitimate use cases for both wrapping (or truncated) text.
 
 The Table component is wrapped in a `ShadowScrollArea` by default, which provides horizontal scrolling on smaller screens when the table content exceeds the viewport width.
 
-## Positioning
+## Structure
 
-The `TableCaption` component is positioned at the bottom of the table visually using the `caption-bottom` CSS class, regardless of its position in the DOM. This allows you to place it at the start of the `<table>` element (as required by HTML semantics) while displaying it at the bottom.
+Table is comprised of the following [Shadcn primitives](https://ui.shadcn.com/docs/components/table) which map directly to HTML counterparts:
+
+| Component     | HTML element |
+| ------------- | ------------ |
+| Table         | `<table>`    |
+| Table Body    | `<tbody>`    |
+| Table Caption | `<caption>`  |
+| Table Cell    | `<td>`       |
+| Table Footer  | `<tfoot>`    |
+| Table Head    | `<th>`       |
+| Table Header  | `<thead>`    |
+| Table Row     | `<tr>`       |
+
+These components follow standard HTML semantics and best practices.
+
+### Table Caption
+
+Table Caption describes a table’s purpose or content. Think of it like the label of a diagram. It should only contain a single text node.
+
+Just like its `<caption>` counterpart, Table Caption should be the first child of a `<table>` element irrespective of visual positioning.
+
+### Table Footer
+
+Table Footer is a semantic grouping for the final rows of a table, typically used for column summaries, totals, or footnotes that relate to the data in the body of the table.
+
+Table Footer typically contains the same child elements as a regular Table Row, such as Table Row and Table Cell.
 
 ## Examples
 
 ### Empty state
 
-When displaying an empty state within a table, dim the `TableHead` text to indicate that no data is present. Use consistent zero results presentation across your application to maintain a cohesive user experience.
+When displaying an empty state within a table, dim the Table Head text to indicate that no data is present. Use consistent zero results presentation across your application to maintain a cohesive user experience.
 
 <ComponentPreview name="empty-state-zero-items-table" />
 
-To prevent the empty state row from being highlighted on hover, apply the `[&>td]:hover:bg-inherit` class to the `TableRow` containing the empty state message.
+To prevent the empty state row from being highlighted on hover, apply the `[&>td]:hover:bg-inherit` class to the Table Row containing the empty state message.
 
 ```tsx showLineNumbers {1}
 <TableRow className="[&>td]:hover:bg-inherit">
@@ -104,7 +114,7 @@ See [Empty States](../ui-patterns/empty-states) for more information.
 
 ### Sortable columns
 
-Use `TableHeadSort` inside `TableHead` to enable column sorting. This component provides visual indicators for sort state (ascending, descending, or unsorted) and handles click interactions.
+Use `TableHeadSort` inside Table Head to enable column sorting. This component provides visual indicators for sort state (ascending, descending, or unsorted) and handles click interactions.
 
 ```tsx
 import { TableHeadSort } from 'ui'
@@ -136,7 +146,7 @@ The component displays:
 
 ### Row icons
 
-When adding icon columns to your table, use [Accessibility](../accessibility) markup by including a screen reader-only label in the corresponding `TableHead` using the `sr-only` class. This ensures that assistive technologies can properly identify the column's purpose. Remove these icon cells when loading or displaying zero results to maintain a clean and consistent table structure.
+When adding icon columns to your table, use [Accessibility](../accessibility) markup by including a screen reader-only label in the corresponding Table Head using the `sr-only` class. This ensures that assistive technologies can properly identify the column's purpose. Remove these icon cells when loading or displaying zero results to maintain a clean and consistent table structure.
 
 <ComponentPreview name="table-icons" />
 
@@ -173,6 +183,6 @@ Place action columns at the end of the table to maintain a logical reading flow.
 
 Use the Table component for simple, static tabular data presentation with a fixed number of rows. It's ideal for basic tables that don't require complex interactions and are part of a larger page layout. The Table component provides a lightweight solution for straightforward data display needs.
 
-For more complex use cases, consider using the [DataTable](../components/data-table) component, which provides built-in sorting, filtering, and pagination capabilities. The `DataTable` component also supports row selection, column visibility controls, and full-viewport table layouts.
+For more complex use cases, consider using the [Data Table](../components/data-table) component, which provides built-in sorting, filtering, and pagination capabilities. The Data Table component also supports row selection, column visibility controls, and full-viewport table layouts.
 
 For additional guidance on table patterns and best practices, see the [Tables](../ui-patterns/tables) documentation.
