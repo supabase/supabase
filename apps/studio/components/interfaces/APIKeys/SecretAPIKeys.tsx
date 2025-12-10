@@ -80,7 +80,7 @@ export const SecretAPIKeys = () => {
   const {
     data: apiKeysData,
     error,
-    isLoading: isLoadingApiKeys,
+    isPending: isLoadingApiKeys,
     isError: isErrorApiKeys,
   } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
 

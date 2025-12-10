@@ -1,6 +1,4 @@
-import { useMemo, useCallback } from 'react'
 import { useQueries, useQueryClient } from '@tanstack/react-query'
-import { handleError } from 'data/fetchers'
 import {
   getEdgeFunctionBody,
   type EdgeFunctionBodyData,
@@ -9,8 +7,10 @@ import {
   useEdgeFunctionsQuery,
   type EdgeFunctionsData,
 } from 'data/edge-functions/edge-functions-query'
-import { basename } from 'path'
 import { edgeFunctionsKeys } from 'data/edge-functions/keys'
+import { handleError } from 'data/fetchers'
+import { basename } from 'path'
+import { useCallback, useMemo } from 'react'
 
 interface UseEdgeFunctionsDiffProps {
   currentBranchRef?: string
@@ -58,7 +58,7 @@ export const useEdgeFunctionsDiff = ({
   // Fetch edge functions for both branches
   const {
     data: currentBranchFunctions,
-    isLoading: isCurrentFunctionsLoading,
+    isPending: isCurrentFunctionsLoading,
     refetch: refetchCurrentBranchFunctions,
   } = useEdgeFunctionsQuery(
     { projectRef: currentBranchRef },
@@ -71,7 +71,7 @@ export const useEdgeFunctionsDiff = ({
 
   const {
     data: mainBranchFunctions,
-    isLoading: isMainFunctionsLoading,
+    isPending: isMainFunctionsLoading,
     refetch: refetchMainBranchFunctions,
   } = useEdgeFunctionsQuery(
     { projectRef: mainBranchRef },

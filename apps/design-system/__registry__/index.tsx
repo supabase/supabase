@@ -148,17 +148,6 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "alert-destructive": {
-      name: "alert-destructive",
-      type: "components:example",
-      registryDependencies: ["alert"],
-      component: React.lazy(() => import("@/registry/default/example/alert-destructive")),
-      source: "",
-      files: ["registry/default/example/alert-destructive.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
     "alert-dialog-demo": {
       name: "alert-dialog-demo",
       type: "components:example",

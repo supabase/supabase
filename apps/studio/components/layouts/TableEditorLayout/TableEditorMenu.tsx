@@ -40,6 +40,7 @@ import {
 import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import EntityListItem from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
+import { keepPreviousData } from '@tanstack/react-query'
 
 export const TableEditorMenu = () => {
   const { id: _id, ref: projectRef } = useParams()
@@ -76,7 +77,7 @@ export const TableEditorMenu = () => {
       filterTypes: visibleTypes,
     },
     {
-      keepPreviousData: Boolean(searchText),
+      placeholderData: Boolean(searchText) ? keepPreviousData : undefined,
     }
   )
 

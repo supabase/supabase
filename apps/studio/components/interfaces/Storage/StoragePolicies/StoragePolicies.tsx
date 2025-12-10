@@ -47,12 +47,12 @@ export const StoragePolicies = () => {
     parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true })
   )
 
-  const { data: buckets = [], isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef })
+  const { data: buckets = [], isPending: isLoadingBuckets } = useBucketsQuery({ projectRef })
 
   const {
     data: policies = [],
     refetch,
-    isLoading: isLoadingPolicies,
+    isPending: isLoadingPolicies,
   } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,

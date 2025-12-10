@@ -9,6 +9,7 @@ export const docsConfig: DocsConfig = {
   sidebarNav: [
     {
       title: 'Getting Started',
+      sortOrder: 'manual',
       items: [
         {
           title: 'Introduction',
@@ -49,11 +50,13 @@ export const docsConfig: DocsConfig = {
     },
     {
       title: 'UI Patterns',
+      sortOrder: 'alphabetical',
       items: [
         {
           title: 'Introduction',
-          href: '/docs/ui-patterns/ui-pattern-components',
+          href: '/docs/ui-patterns/ui-patterns',
           items: [],
+          priority: true,
         },
         {
           title: 'Navigation',
@@ -79,11 +82,13 @@ export const docsConfig: DocsConfig = {
     },
     {
       title: 'Fragment Components',
+      sortOrder: 'alphabetical',
       items: [
         {
           title: 'Introduction',
           href: '/docs/fragments/fragment-components',
           items: [],
+          priority: true,
         },
         {
           title: 'Admonition',
@@ -174,11 +179,13 @@ export const docsConfig: DocsConfig = {
     },
     {
       title: 'Atom Components',
+      sortOrder: 'alphabetical',
       items: [
         {
           title: 'Introduction',
           href: '/docs/components/atom-components',
           items: [],
+          priority: true,
         },
         {
           title: 'Accordion',

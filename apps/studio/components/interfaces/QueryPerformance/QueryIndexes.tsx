@@ -1,13 +1,16 @@
 import { Check, Lightbulb, Table2 } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useGetIndexAdvisorResult } from 'data/database/retrieve-index-advisor-result-query'
 import { useGetIndexesFromSelectQuery } from 'data/database/retrieve-index-from-select-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
 import {
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
@@ -23,19 +26,16 @@ import {
   cn,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { IndexAdvisorDisabledState } from './IndexAdvisor/IndexAdvisorDisabledState'
-import { IndexImprovementText } from './IndexAdvisor/IndexImprovementText'
-import { QueryPanelContainer, QueryPanelScoreSection, QueryPanelSection } from './QueryPanel'
 import { useIndexInvalidation } from './hooks/useIndexInvalidation'
+import { EnableIndexAdvisorButton } from './IndexAdvisor/EnableIndexAdvisorButton'
 import {
   calculateImprovement,
   createIndexes,
   hasIndexRecommendations,
 } from './IndexAdvisor/index-advisor.utils'
-import { EnableIndexAdvisorButton } from './IndexAdvisor/EnableIndexAdvisorButton'
-import { DocsButton } from 'components/ui/DocsButton'
-import { DOCS_URL } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
+import { IndexAdvisorDisabledState } from './IndexAdvisor/IndexAdvisorDisabledState'
+import { IndexImprovementText } from './IndexAdvisor/IndexImprovementText'
+import { QueryPanelContainer, QueryPanelScoreSection, QueryPanelSection } from './QueryPanel'
 
 interface QueryIndexesProps {
   selectedRow: any
@@ -56,7 +56,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
   const {
     data: usedIndexes,
     isSuccess,
-    isLoading,
+    isPending: isLoading,
     isError,
     error,
   } = useGetIndexesFromSelectQuery({
@@ -65,7 +65,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
     query: selectedRow?.['query'],
   })
 
-  const { data: extensions, isLoading: isLoadingExtensions } = useDatabaseExtensionsQuery({
+  const { data: extensions, isPending: isLoadingExtensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

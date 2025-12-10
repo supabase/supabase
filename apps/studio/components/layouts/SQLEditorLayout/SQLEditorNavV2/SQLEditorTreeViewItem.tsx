@@ -15,6 +15,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, useEffect } from 'react'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
@@ -126,7 +127,7 @@ export const SQLEditorTreeViewItem = ({
     isFetchingNextPage: isFetchingNextPageInFolder,
     hasNextPage: hasNextPageInFolder,
     fetchNextPage: fetchNestPageInFolder,
-    isPreviousData,
+    isPlaceholderData,
     isFetching,
   } = useSQLSnippetFolderContentsQuery(
     {
@@ -137,7 +138,7 @@ export const SQLEditorTreeViewItem = ({
     },
     {
       enabled: isEnabled,
-      keepPreviousData: true,
+      placeholderData: keepPreviousData,
     }
   )
   useEffect(() => {
@@ -157,11 +158,11 @@ export const SQLEditorTreeViewItem = ({
   useEffect(() => {
     if (isEnabled) {
       onFolderContentsChangeRef.current?.({
-        isLoading: isLoading || (isPreviousData && isFetching),
+        isLoading: isLoading || (isPlaceholderData && isFetching),
         snippets: data?.pages.flatMap((page) => page.contents ?? []),
       })
     }
-  }, [data?.pages, isFetching, isLoading, isPreviousData, isEnabled])
+  }, [data?.pages, isFetching, isLoading, isPlaceholderData, isEnabled])
 
   const isInFolder = parentId !== undefined
 

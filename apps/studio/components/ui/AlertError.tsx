@@ -74,10 +74,10 @@ export const AlertError = ({
       }
       actions={
         additionalActions ? (
-          <div className="flex gap-2 mt-3">
+          <>
             {additionalActions}
             <ContactSupportButton projectRef={projectRef} subject={subject} error={error} />
-          </div>
+          </>
         ) : (
           <ContactSupportButton projectRef={projectRef} subject={subject} error={error} />
         )

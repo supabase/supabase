@@ -5,6 +5,7 @@ import { UIEvent, useMemo, useRef, useState } from 'react'
 import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet/CreateCronJobSheet'
 import AlertError from 'components/ui/AlertError'
@@ -65,7 +66,7 @@ export const CronjobsTab = () => {
       connectionString: project?.connectionString,
       searchTerm: searchQuery,
     },
-    { keepPreviousData: Boolean(searchQuery), staleTime: Infinity }
+    { placeholderData: Boolean(searchQuery) ? keepPreviousData : undefined, staleTime: Infinity }
   )
   const cronJobs = useMemo(() => data?.pages.flatMap((p) => p) || [], [data?.pages])
 
@@ -91,7 +92,7 @@ export const CronjobsTab = () => {
       handleErrorOnDelete(deletingCronJobIdRef, selectedId, `Cron job not found`),
   })
 
-  const { data: count, isLoading: isLoadingCount } = useCronJobsCountQuery({
+  const { data: count, isPending: isLoadingCount } = useCronJobsCountQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

@@ -37,7 +37,7 @@ export function ApiKeyPill({
   const {
     data,
     error,
-    isLoading,
+    isPending: isLoading,
     refetch: refetchApiKey,
   } = useAPIKeyIdQuery(
     {
@@ -48,7 +48,7 @@ export function ApiKeyPill({
     {
       enabled: show, // Only run query when show is true
       staleTime: 0, // Always consider data stale
-      cacheTime: 0, // Don't cache the key data
+      gcTime: 0, // Don't cache the key data
     }
   )
 

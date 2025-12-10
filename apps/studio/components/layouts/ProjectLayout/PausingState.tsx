@@ -23,7 +23,8 @@ const PausingState = ({ project }: PausingStateProps) => {
     { projectRef: ref },
     {
       enabled: startPolling,
-      refetchInterval: (data) => {
+      refetchInterval: (query) => {
+        const data = query.state.data
         return data?.status === PROJECT_STATUS.INACTIVE ? false : 2000
       },
     }

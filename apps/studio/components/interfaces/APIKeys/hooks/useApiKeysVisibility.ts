@@ -27,7 +27,7 @@ export function useApiKeysVisibility(): ApiKeysVisibilityState {
     '*'
   )
 
-  const { data: apiKeysData = [], isLoading: isLoadingApiKeys } = useAPIKeysQuery(
+  const { data: apiKeysData = [], isPending: isLoadingApiKeys } = useAPIKeysQuery(
     {
       projectRef,
       reveal: false,
