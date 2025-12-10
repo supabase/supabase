@@ -215,23 +215,23 @@ hello world`)
   })
 
   test('snippet favourite works as expected', async ({ ref }) => {
-    if (!isCLI()) {
-      // clean up private snippets and snippets shared with the team
-      await waitForApiResponseWithTimeout(
-        page,
-        (response) => response.url().includes('query?key=table-columns'),
-        3000
-      )
-      const privateSnippetSection = page.getByLabel('private-snippets')
-      if ((await privateSnippetSection.getByText(newSqlSnippetName, { exact: true }).count()) > 0) {
-        await deleteSqlSnippet(page, ref, newSqlSnippetName)
-      }
+    test.skip(isCLI(), 'This test does not work in self-hosted environments.')
 
-      if (
-        (await privateSnippetSection.getByText(sqlSnippetNameFavorite, { exact: true }).count()) > 0
-      ) {
-        await deleteSqlSnippet(page, ref, sqlSnippetNameFavorite)
-      }
+    // clean up private snippets and snippets shared with the team
+    await waitForApiResponseWithTimeout(
+      page,
+      (response) => response.url().includes('query?key=table-columns'),
+      3000
+    )
+    const privateSnippetSection = page.getByLabel('private-snippets')
+    if ((await privateSnippetSection.getByText(newSqlSnippetName, { exact: true }).count()) > 0) {
+      await deleteSqlSnippet(page, ref, newSqlSnippetName)
+    }
+
+    if (
+      (await privateSnippetSection.getByText(sqlSnippetNameFavorite, { exact: true }).count()) > 0
+    ) {
+      await deleteSqlSnippet(page, ref, sqlSnippetNameFavorite)
     }
 
     // create sql snippet
@@ -242,7 +242,6 @@ hello world`)
     await page.getByTestId('sql-run-button').click()
 
     // rename snippet
-    const privateSnippetSection = page.getByLabel('private-snippets')
     await privateSnippetSection.getByText(newSqlSnippetName).click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Rename query', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Rename' })).toBeVisible()
