@@ -63,7 +63,7 @@ export const VectorsBuckets = () => {
     <>
       <PageContainer>
         <PageSection>
-          <PageSectionContent>
+          <PageSectionContent className="flex flex-col gap-y-8">
             <AlphaNotice
               entity="Vector buckets"
               feedbackUrl="https://github.com/orgs/supabase/discussions/40815"
