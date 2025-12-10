@@ -8,6 +8,7 @@ import { Devs } from '~/components/Wrapped/Pages/Devs'
 import { SupabaseSelect } from '~/components/Wrapped/Pages/SupabaseSelect'
 import { CustomerStories } from '~/components/Wrapped/Pages/CustomerStories'
 import { ProductAnnouncements } from '~/components/Wrapped/Pages/ProductAnnouncements'
+import { AnnouncementsTimeline } from '~/components/Wrapped/Pages/AnnouncementsTimeline'
 
 export default function SupabaseWrappedPage() {
   return (
@@ -16,7 +17,8 @@ export default function SupabaseWrappedPage() {
       <Intro />
       <YearOfAI />
       <Devs />
-      <ProductAnnouncements />
+      {/*<ProductAnnouncements />*/}
+      <AnnouncementsTimeline />
       <SupabaseSelect />
       <CustomerStories />
     </DefaultLayout>
