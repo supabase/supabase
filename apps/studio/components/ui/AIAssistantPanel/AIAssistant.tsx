@@ -472,8 +472,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
             suggestions={
               snap.suggestions as
-              | { title?: string; prompts?: { label: string; description: string }[] }
-              | undefined
+                | { title?: string; prompts?: { label: string; description: string }[] }
+                | undefined
             }
             onValueChange={(val) => setValue(val)}
             onFocusInput={() => inputRef.current?.focus()}
