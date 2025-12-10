@@ -5,6 +5,7 @@ import {
   COMPUTE_DISK_LIMITS,
   COMPUTE_MAX_IOPS,
   COMPUTE_MAX_THROUGHPUT,
+  computeInstanceAddonVariantIdSchema,
 } from './compute-disk-limits'
 import extensions from './extensions.json'
 import logConstants from './logConstants'
@@ -23,6 +24,7 @@ export {
   COMPUTE_DISK_LIMITS,
   COMPUTE_MAX_IOPS,
   COMPUTE_MAX_THROUGHPUT,
+  computeInstanceAddonVariantIdSchema,
   config,
   extensions,
   FLY_REGIONS,

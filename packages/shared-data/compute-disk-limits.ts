@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 /**
  * [Jordi] Use instances.vantage.sh as source of truth for compute disk limits.
  * Eg: https://instances.vantage.sh/aws/ec2/t4g.nano?currency=USD
@@ -146,3 +148,25 @@ export const COMPUTE_BASELINE_THROUGHPUT = Object.fromEntries(
 export const COMPUTE_MAX_THROUGHPUT = Object.fromEntries(
   Object.entries(COMPUTE_DISK_LIMITS).map(([key, value]) => [key, value.maxThroughputMBps])
 )
+
+export const computeInstanceAddonVariantIdSchema = z.enum([
+  'ci_nano',
+  'ci_micro',
+  'ci_small',
+  'ci_medium',
+  'ci_large',
+  'ci_xlarge',
+  'ci_2xlarge',
+  'ci_4xlarge',
+  'ci_8xlarge',
+  'ci_12xlarge',
+  'ci_16xlarge',
+  'ci_24xlarge',
+  'ci_24xlarge_optimized_cpu',
+  'ci_24xlarge_optimized_memory',
+  'ci_24xlarge_high_memory',
+  'ci_48xlarge',
+  'ci_48xlarge_optimized_cpu',
+  'ci_48xlarge_optimized_memory',
+  'ci_48xlarge_high_memory',
+])

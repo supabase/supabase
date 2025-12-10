@@ -1,6 +1,7 @@
 import { ProjectDetail } from 'data/projects/project-detail-query'
 import { PlanId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
+import { computeInstanceAddonVariantIdSchema } from 'shared-data'
 import { z } from 'zod'
 import {
   ComputeInstanceAddonVariantId,
@@ -265,17 +266,24 @@ export const calculateComputeSizeRequiredForIops = (
   iops: number
 ): ComputeInstanceAddonVariantId | undefined => {
   const computeSizes: [ComputeSizeKey, number][] = Object.entries(COMPUTE_MAX_IOPS)
-    .map(([size, baselineIops]) => [computeSizeSchema.parse(size), baselineIops])
+    .map(([size, baselineIops]): [ComputeSizeKey, number] => [
+      computeSizeSchema.parse(size),
+      baselineIops,
+    ])
     .sort((a, b) => a[1] - b[1])
 
   for (const [size, baselineIops] of computeSizes) {
     if (iops <= baselineIops) {
-      return size
+      const parsed = computeInstanceAddonVariantIdSchema.safeParse(size)
+      return parsed.success ? parsed.data : undefined
     }
   }
 
   // fallback to largest compute size - this should never happen though :-/
-  return computeSizes[computeSizes.length - 1]?.[0]
+  const fallbackSize = computeSizes[computeSizes.length - 1]?.[0]
+  if (!fallbackSize) return undefined
+  const parsed = computeInstanceAddonVariantIdSchema.safeParse(fallbackSize)
+  return parsed.success ? parsed.data : undefined
 }
 
 export const calculateDiskSizeRequiredForIops = (provisionedIOPS: number): number | undefined => {
