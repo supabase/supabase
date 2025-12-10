@@ -1,8 +1,9 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
-import { difference, groupBy } from 'lodash'
+import { difference } from 'lodash'
 import { useRouter } from 'next/router'
 
 import { Bucket } from 'data/storage/buckets-query'
+import { createWrappedSymbol } from 'lib/helpers'
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from './Storage.constants'
 import type { StoragePolicyFormField } from './Storage.types'
 
@@ -16,13 +17,18 @@ const shortHash = (str: string) => {
   return new Uint32Array([hash])[0].toString(36)
 }
 
+export type PoliciesByBucket = { name: string | Symbol; policies: PostgresPolicy[] }[]
+
 /**
  * Formats the policies from the objects table in the storage schema
  * to be consumable for the storage policies dashboard.
- * Output: [{ bucket: <string>, policies: <Policy[]> }]
- * @param {Array} policies: All policies from a table in a schema
+ *
+ * @param policies All policies from a table in a schema
  */
-export const formatPoliciesForStorage = (buckets: Bucket[], policies: PostgresPolicy[]) => {
+export const formatPoliciesForStorage = (
+  buckets: Bucket[],
+  policies: PostgresPolicy[]
+): PoliciesByBucket => {
   if (policies.length === 0) return []
 
   /**
@@ -34,14 +40,19 @@ export const formatPoliciesForStorage = (buckets: Bucket[], policies: PostgresPo
    */
   const formattedPolicies = formatStoragePolicies(buckets, policies)
 
-  /**
-   * Package policies by grouping them by bucket:
-   * [{ name: <string>, policies: <Policy[]> }]
-   */
   const policiesByBucket = groupPoliciesByBucket(formattedPolicies)
-
   return policiesByBucket
 }
+
+/**
+ * Policy that belongs to a bucket which is not loaded yet (might not have been
+ * paginated to yet, or might have been deleted)
+ */
+export const UNKNOWN_BUCKET_SYMBOL = createWrappedSymbol('unknown-bucket', 'Unknown')
+/**
+ * Policy that is not associated with a specific bucket
+ */
+export const UNGROUPED_POLICY_SYMBOL = createWrappedSymbol('ungrouped-policy', 'Ungrouped')
 
 const formatStoragePolicies = (buckets: Bucket[], policies: PostgresPolicy[]) => {
   const availableBuckets = buckets.map((bucket) => bucket.name)
@@ -53,16 +64,16 @@ const formatStoragePolicies = (buckets: Bucket[], policies: PostgresPolicy[]) =>
         ? extractBucketNameFromDefinition(policyDefinition)
         : extractBucketNameFromDefinition(policyCheck)
 
-    if (bucketName && availableBuckets.includes(bucketName)) {
-      // [JOSHEN TODO] We cannot override definition here anymore cause we're gonna be using the auth editor
-      // const definition = policyDefinition !== null ? policyDefinition : policyCheck
+    if (bucketName) {
+      const isBucketLoaded = availableBuckets.includes(bucketName)
+
       return {
         ...policy,
-        bucket: bucketName,
+        bucket: isBucketLoaded ? bucketName : UNKNOWN_BUCKET_SYMBOL,
       }
     }
 
-    return { ...policy, bucket: 'Ungrouped' }
+    return { ...policy, bucket: UNGROUPED_POLICY_SYMBOL }
   })
 
   return formattedPolicies
@@ -78,11 +89,11 @@ export const extractBucketNameFromDefinition = (definition: string | null) => {
   return bucketDefinition ? bucketDefinition.split("'")[1] : null
 }
 
-const groupPoliciesByBucket = (policies: (PostgresPolicy & { bucket: string })[]) => {
-  const policiesByBucket = groupBy(policies, 'bucket')
-  return Object.keys(policiesByBucket).map((bucketName) => {
-    return { name: bucketName, policies: policiesByBucket[bucketName] }
-  })
+const groupPoliciesByBucket = (policies: (PostgresPolicy & { bucket: string | Symbol })[]) => {
+  const policiesByBucket = Map.groupBy(policies, (policy) => policy.bucket)
+  return [
+    ...policiesByBucket.entries().map(([bucketName, policies]) => ({ name: bucketName, policies })),
+  ]
 }
 
 export const createPayloadsForAddPolicy = (
