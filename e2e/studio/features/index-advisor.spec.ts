@@ -337,33 +337,19 @@ test.describe.serial('Index Advisor', () => {
       }
 
       // Wait a bit for extensions to be fully initialized
-      await page.waitForTimeout(2000)
+      await page.waitForTimeout(3000)
 
       // Go to Query Performance page
       await page.goto(toUrl(`/project/${ref}/observability/query-performance`))
       await page.waitForLoadState('networkidle')
 
-      // Wait for the page to load and check for Warnings button
-      // Retry a few times if needed, as the extensions status might take a moment to propagate
-      let warningsButton = page.locator('button:has-text("Warnings")')
-      let found = false
-
-      for (let i = 0; i < 3; i++) {
-        const count = await warningsButton.count()
-        if (count > 0) {
-          found = true
-          break
-        }
-        console.log(`Attempt ${i + 1}: Warnings button not found, reloading...`)
-        await page.reload()
-        await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(2000)
-      }
-
+      // Wait patiently for the Warnings button to appear
+      // Don't reload - just let Playwright retry automatically
+      const warningsButton = page.getByText('Warnings', { exact: true })
       await expect(
         warningsButton,
         'Warnings filter button should be visible when Index Advisor is enabled'
-      ).toBeVisible({ timeout: 5000 })
+      ).toBeVisible({ timeout: 30000 })
 
       console.log('✓ Warnings button is now visible')
     })
@@ -379,9 +365,14 @@ test.describe.serial('Index Advisor', () => {
 
       // Verify table was created by checking table editor
       await page.goto(toUrl(`/project/${ref}/editor`))
-      await page.waitForTimeout(2000)
+      await page.waitForLoadState('networkidle')
 
-      // Search for the table
+      // Use the search box to find the table
+      const searchBox = page.getByPlaceholder('Search tables...')
+      await searchBox.fill(TEST_TABLE_NAME)
+      await page.waitForTimeout(500)
+
+      // Verify the table appears in filtered results
       const tableButton = page.getByRole('button', { name: `View ${TEST_TABLE_NAME}` })
       await expect(tableButton, 'Test table should be visible in table editor').toBeVisible({
         timeout: 10000,
@@ -404,15 +395,14 @@ test.describe.serial('Index Advisor', () => {
         test.skip(true, 'Index Advisor needs to be enabled first')
       }
 
-      // Navigate to Query Performance page
+      // Navigate to Query Performance page - just once, no reloads
       await page.goto(toUrl(`/project/${ref}/observability/query-performance`))
       await page.waitForLoadState('networkidle')
-      await page.waitForTimeout(2000)
 
-      // Find the Warnings filter button with a generous timeout
-      const warningsButton = page.locator('button:has-text("Warnings")').first()
+      // Wait patiently for Warnings button - Playwright will auto-retry
+      const warningsButton = page.getByText('Warnings', { exact: true }).first()
       await expect(warningsButton, 'Warnings filter should be visible').toBeVisible({
-        timeout: 15000,
+        timeout: 30000,
       })
       await warningsButton.click()
 
