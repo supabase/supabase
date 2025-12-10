@@ -66,7 +66,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
     projectRef,
     bucketId,
   })
-  const { data, isLoading: isLoadingPipelineStatus } = useReplicationPipelineStatusQuery({
+  const { data, isPending: isLoadingPipelineStatus } = useReplicationPipelineStatusQuery({
     projectRef,
     pipelineId: pipeline?.id,
   })
