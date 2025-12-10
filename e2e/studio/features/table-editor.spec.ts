@@ -8,6 +8,7 @@ import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { waitForApiResponseWithTimeout } from '../utils/wait-for-response-with-timeout.js'
 import {
+  createApiResponseWaiter,
   waitForApiResponse,
   waitForGridDataToLoad,
   waitForTableToLoad,
@@ -601,15 +602,22 @@ testRunner('table editor', () => {
     // test pagination (page 1 -> page 2)
     await expect(page.getByRole('gridcell', { name: 'value 7', exact: true })).toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'value 101', exact: true })).not.toBeVisible()
+    const waitForPageChange = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=table-rows-')
     await page.getByLabel('Table grid footer').getByRole('button').nth(1).click()
-    await waitForGridDataToLoad(page, ref) // retrieve next page data
+    await waitForPageChange // retrieve next page data
     await expect(page.getByRole('gridcell', { name: 'value 7', exact: true })).not.toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'value 101', exact: true })).toBeVisible()
 
     // change pagination size (100 -> 500)
     await page.getByRole('button', { name: 'rows' }).click()
+    const waitForPaginationChange = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=table-rows-'
+    )
     await page.getByRole('menuitem', { name: '500 rows' }).click()
-    await waitForGridDataToLoad(page, ref) // retrieve updated pagination size data
+    await waitForPaginationChange // retrieve updated pagination size data
     await expect(page.getByRole('gridcell', { name: 'value 7', exact: true })).toBeVisible()
     await page.getByRole('grid').evaluate((element) => {
       element.scrollTop = element.scrollHeight
