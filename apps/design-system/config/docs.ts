@@ -75,6 +75,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/ui-patterns/forms',
           items: [],
         },
+        {
+          title: 'Modality',
+          href: '/docs/ui-patterns/modality',
+          items: [],
+        },
       ],
     },
     {
