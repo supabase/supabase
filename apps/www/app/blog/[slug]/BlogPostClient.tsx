@@ -1,12 +1,12 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useLivePreview } from '@payloadcms/live-preview-react'
 
 import authors from 'lib/authors.json'
 import { CMS_SITE_ORIGIN } from 'lib/constants'
-import { isNotNullOrUndefined } from 'lib/helpers'
+import { isBrowser, isNotNullOrUndefined } from 'lib/helpers'
 import { generateTocFromMarkdown } from 'lib/toc'
 import { convertRichTextToMarkdown } from '~/lib/cms/convertRichTextToMarkdown'
 
@@ -29,12 +29,65 @@ export default function BlogPostClient(props: BlogPostPageProps) {
   const [previewData] = useState<ProcessedBlogData>(props.blog)
   const [processedToc, setProcessedToc] = useState<{ content: string; json: any[] } | null>(null)
   const shouldUseLivePreview = isDraftMode && 'isCMS' in props.blog && props.blog.isCMS
+  const hasScrolledToHash = useRef(false)
 
   const { data: livePreviewData, isLoading: isLivePreviewLoading } = useLivePreview({
     initialData: props.blog,
     serverURL: CMS_SITE_ORIGIN || 'http://localhost:3030',
     depth: 2,
   })
+
+  // Handle scrolling to anchor link on initial page load
+  // This is needed because the content is dynamically loaded and the browser's
+  // native hash scrolling happens before the target element exists
+  useEffect(() => {
+    if (!isBrowser || hasScrolledToHash.current) return
+
+    const hash = window.location.hash
+    if (!hash) return
+
+    const targetId = hash.slice(1) // Remove the leading #
+    if (!targetId) return
+
+    const scrollToTarget = (element: HTMLElement) => {
+      hasScrolledToHash.current = true
+      // Small delay to ensure layout is complete
+      requestAnimationFrame(() => {
+        element.scrollIntoView({ behavior: 'smooth' })
+      })
+    }
+
+    // Check if element already exists (in case of fast render)
+    const existingElement = document.getElementById(targetId)
+    if (existingElement) {
+      scrollToTarget(existingElement)
+      return
+    }
+
+    // Use a MutationObserver to wait for the target element to appear in the DOM
+    const observer = new MutationObserver(() => {
+      const targetElement = document.getElementById(targetId)
+      if (targetElement) {
+        observer.disconnect()
+        scrollToTarget(targetElement)
+      }
+    })
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    })
+
+    // Cleanup timeout to prevent indefinite observation
+    const timeoutId = setTimeout(() => {
+      observer.disconnect()
+    }, 5000)
+
+    return () => {
+      observer.disconnect()
+      clearTimeout(timeoutId)
+    }
+  }, [])
 
   // Generate TOC for LivePreview data when content changes
   useEffect(() => {
