@@ -39,7 +39,7 @@ export function DiskSizeField({
   const { data: project } = useSelectedProjectQuery()
 
   const {
-    isLoading: isLoadingDiskAttributes,
+    isPending: isLoadingDiskAttributes,
     error: diskAttributesError,
     isError: isDiskAttributesError,
   } = useDiskAttributesQuery(

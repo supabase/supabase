@@ -87,7 +87,7 @@ export const PostgrestConfig = () => {
   const {
     data: config,
     isError,
-    isLoading: isLoadingConfig,
+    isPending: isLoadingConfig,
   } = useProjectPostgrestConfigQuery({ projectRef })
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -95,7 +95,7 @@ export const PostgrestConfig = () => {
   })
   const {
     data: allSchemas = [],
-    isLoading: isLoadingSchemas,
+    isPending: isLoadingSchemas,
     isSuccess: isSuccessSchemas,
   } = useSchemasQuery({
     projectRef: project?.ref,
@@ -112,7 +112,17 @@ export const PostgrestConfig = () => {
     })
 
   const formId = 'project-postgres-config'
-  const hiddenSchema = ['auth', 'pgbouncer', 'hooks', 'extensions']
+  const hiddenSchema = [
+    'auth',
+    'pgbouncer',
+    'hooks',
+    'extensions',
+    'vault',
+    'storage',
+    'realtime',
+    'pgsodium',
+    'pgsodium_masks',
+  ]
   const { can: canUpdatePostgrestConfig, isSuccess: isPermissionsLoaded } =
     useAsyncCheckPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
 

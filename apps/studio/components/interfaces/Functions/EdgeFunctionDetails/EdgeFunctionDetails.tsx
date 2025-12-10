@@ -96,7 +96,7 @@ export const EdgeFunctionDetails = () => {
   const {
     data: selectedFunction,
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useEdgeFunctionQuery({

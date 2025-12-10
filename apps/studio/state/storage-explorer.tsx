@@ -987,7 +987,7 @@ function createStorageExplorerState({
       const queryClient = getQueryClient()
       const storageConfiguration = queryClient
         .getQueryCache()
-        .find(configKeys.storage(state.projectRef))?.state.data as
+        .find({ queryKey: configKeys.storage(state.projectRef) })?.state.data as
         | ProjectStorageConfigResponse
         | undefined
       const fileSizeLimit = storageConfiguration?.fileSizeLimit
