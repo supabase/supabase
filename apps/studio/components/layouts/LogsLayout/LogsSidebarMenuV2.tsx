@@ -101,7 +101,7 @@ export function LogsSidebarMenuV2() {
   ])
 
   const enablePgReplicate = useIsETLPrivateAlpha()
-  const { data: etlData, isLoading: isETLLoading } = useReplicationSourcesQuery(
+  const { data: etlData, isPending: isETLLoading } = useReplicationSourcesQuery(
     {
       projectRef: ref,
     },
@@ -119,7 +119,7 @@ export function LogsSidebarMenuV2() {
   const { plan: orgPlan } = useCurrentOrgPlan()
   const isFreePlan = orgPlan?.id === 'free'
 
-  const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery({
+  const { data: savedQueriesRes, isPending: savedQueriesLoading } = useContentQuery({
     projectRef: ref,
     type: 'log_sql',
   })

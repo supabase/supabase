@@ -151,7 +151,7 @@ const FunctionsList = () => {
   const {
     data: functions,
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
   } = useDatabaseFunctionsQuery({
     projectRef: project?.ref,

@@ -7,11 +7,11 @@ import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartC
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import { AnalyticsInterval } from 'data/analytics/constants'
+import { mapMultiResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
 import {
   InfraMonitoringAttribute,
   useInfraMonitoringAttributesQuery,
 } from 'data/analytics/infra-monitoring-query'
-import { mapMultiResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
 import {
   ProjectDailyStatsAttribute,
   useProjectDailyStatsQuery,
@@ -70,7 +70,7 @@ export const ChartBlock = ({
   const {
     data: dailyStatsData,
     isFetching: isFetchingDailyStats,
-    isLoading: isLoadingDailyStats,
+    isPending: isLoadingDailyStats,
   } = useProjectDailyStatsQuery(
     {
       projectRef: ref as string,
@@ -84,7 +84,7 @@ export const ChartBlock = ({
   const {
     data: infraMonitoringRawData,
     isFetching: isFetchingInfraMonitoring,
-    isLoading: isLoadingInfraMonitoring,
+    isPending: isLoadingInfraMonitoring,
   } = useInfraMonitoringAttributesQuery(
     {
       projectRef: ref as string,

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { MoreVertical } from 'lucide-react'
 
+import { useFlag } from 'common'
 import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import type { APIKeysData } from 'data/api-keys/api-keys-query'
 import {
@@ -14,7 +15,6 @@ import {
 import { ShimmeringLoader, TimestampInfo } from 'ui-patterns'
 import { APIKeyDeleteDialog } from './APIKeyDeleteDialog'
 import { ApiKeyPill } from './ApiKeyPill'
-import { useFlag } from 'common'
 
 export const APIKeyRow = ({
   apiKey,
@@ -34,8 +34,7 @@ export const APIKeyRow = ({
   setKeyToDelete: (id: string | null) => void
 }) => {
   const MotionTableRow = motion.create(TableRow)
-
-  const hideApiKeyLastUsed = useFlag('HideApiKeyLastUsed')
+  const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
 
   return (
     <>
@@ -65,7 +64,7 @@ export const APIKeyRow = ({
           </div>
         </TableCell>
 
-        {!hideApiKeyLastUsed && (
+        {showApiKeysLastUsed && (
           <TableCell className="py-2 min-w-0 whitespace-nowrap hidden lg:table-cell">
             <div className="truncate" title={lastSeen?.timestamp.toString() || 'Never used'}>
               {isLoadingLastSeen ? (
