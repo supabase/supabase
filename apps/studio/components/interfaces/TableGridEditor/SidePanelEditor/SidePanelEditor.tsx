@@ -553,7 +553,7 @@ export const SidePanelEditor = ({
         // Track experiment conversion if user is in the experiment
         if (generatePoliciesFlag !== undefined) {
           track('table_create_generate_policies_experiment_converted', {
-            experiment_id: 'table_create_generate_policies',
+            experiment_id: 'tableCreateGeneratePolicies',
             variant: generatePoliciesFlag ? 'treatment' : 'control',
             has_rls_enabled: isRLSEnabled,
             has_rls_policies: generatedPolicies.length > 0,

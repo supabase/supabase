@@ -1956,7 +1956,7 @@ export interface TableCreateGeneratePoliciesExperimentConvertedEvent {
     /**
      * Experiment identifier for tracking
      */
-    experiment_id: 'table_create_generate_policies'
+    experiment_id: 'tableCreateGeneratePolicies'
     /**
      * Experiment variant: 'control' (feature disabled) or 'treatment' (feature enabled)
      */
@@ -1990,7 +1990,7 @@ export interface TableCreateGeneratePoliciesExperimentExposedEvent {
     /**
      * Experiment identifier for tracking
      */
-    experiment_id: 'table_create_generate_policies'
+    experiment_id: 'tableCreateGeneratePolicies'
     /**
      * Experiment variant: 'control' (feature disabled) or 'treatment' (feature enabled)
      */
