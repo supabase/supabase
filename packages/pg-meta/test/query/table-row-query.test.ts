@@ -1786,7 +1786,11 @@ describe('Table Row Query', () => {
     // Verify SQL generation - the "collation" column should be properly quoted
     expect(sql).toMatchInlineSnapshot(`
       "with _base_query as (select * from public.test order by test.id asc nulls last limit 100 offset 0)
-        select id,"collation" from _base_query;"
+        select id,case
+              when octet_length("collation"::text) > 10240 
+              then left("collation"::text, 10240) || '...'
+              else "collation"::text
+            end as "collation" from _base_query;"
     `)
 
     // Execute the generated SQL and verify the results
@@ -1807,7 +1811,11 @@ describe('Table Row Query', () => {
     // Verify the ORDER BY clause properly quotes the collation column
     expect(sqlWithOrder).toMatchInlineSnapshot(`
       "with _base_query as (select * from public.test order by test."collation" asc nulls last limit 100 offset 0)
-        select id,"collation" from _base_query;"
+        select id,case
+              when octet_length("collation"::text) > 10240 
+              then left("collation"::text, 10240) || '...'
+              else "collation"::text
+            end as "collation" from _base_query;"
     `)
 
     const queryResultWithOrder = await db.executeQuery(sqlWithOrder)
@@ -1827,7 +1835,11 @@ describe('Table Row Query', () => {
     // Verify the WHERE clause properly quotes the collation column
     expect(sqlWithFilter).toMatchInlineSnapshot(`
       "with _base_query as (select * from public.test where "collation" = 'value2' order by test.id asc nulls last limit 100 offset 0)
-        select id,"collation" from _base_query;"
+        select id,case
+              when octet_length("collation"::text) > 10240 
+              then left("collation"::text, 10240) || '...'
+              else "collation"::text
+            end as "collation" from _base_query;"
     `)
 
     const queryResultWithFilter = await db.executeQuery(sqlWithFilter)

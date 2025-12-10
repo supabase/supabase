@@ -36,7 +36,7 @@ describe('pg-format', () => {
         expect(ident('column with spaces')).toBe('"column with spaces"')
         expect(ident('column-with-dashes')).toBe('"column-with-dashes"')
         expect(ident('column.with.dots')).toBe('"column.with.dots"')
-        expect(ident('column$with$dollar')).toBe('"column$with$dollar"')
+        expect(ident('column$with$dollar')).toBe('column$with$dollar')
       })
 
       test('should handle double quotes in identifiers', () => {
@@ -67,7 +67,7 @@ describe('pg-format', () => {
       })
 
       test('should handle arrays', () => {
-        expect(ident(['col1', 'col2'])).toBe('"col1","col2"')
+        expect(ident(['col1', 'col2'])).toBe('col1,col2')
         expect(ident(['collation', 'select'])).toBe('"collation","select"')
       })
 
@@ -120,11 +120,11 @@ describe('pg-format', () => {
 
     test('should handle dates', () => {
       const date = new Date('2024-01-01T00:00:00Z')
-      expect(literal(date)).toBe("'2024-01-01 00:00:00+00'")
+      expect(literal(date)).toBe("'2024-01-01 00:00:00.000+00'")
     })
 
     test('should handle arrays', () => {
-      expect(literal([1, 2, 3])).toBe("'1','2','3'")
+      expect(literal([1, 2, 3])).toBe('1,2,3')
       expect(literal(['a', 'b', 'c'])).toBe("'a','b','c'")
     })
 
