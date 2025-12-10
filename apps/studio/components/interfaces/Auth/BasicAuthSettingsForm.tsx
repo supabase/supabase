@@ -58,7 +58,7 @@ export const BasicAuthSettingsForm = () => {
     error: authConfigError,
     isError,
     isSuccess,
-    isLoading,
+    isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
 

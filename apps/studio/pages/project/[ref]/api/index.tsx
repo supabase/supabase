@@ -37,7 +37,7 @@ const DocView = () => {
   const {
     data: jsonSchema,
     error: jsonSchemaError,
-    isLoading,
+    isPending: isLoading,
     refetch,
   } = useProjectJsonSchemaQuery({ projectRef })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })

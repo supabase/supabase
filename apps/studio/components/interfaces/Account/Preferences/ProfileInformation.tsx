@@ -40,7 +40,7 @@ export const ProfileInformation = () => {
 
   const {
     data: identityData,
-    isLoading: isIdentitiesLoading,
+    isPending: isIdentitiesLoading,
     isSuccess: isIdentitiesSuccess,
   } = useProfileIdentitiesQuery()
   const identities = (identityData?.identities ?? []).filter((x) => x.identity_data?.email !== null)

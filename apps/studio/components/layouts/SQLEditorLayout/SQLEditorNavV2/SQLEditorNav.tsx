@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import { MoveQueryModal } from 'components/interfaces/SQLEditor/MoveQueryModal'
@@ -85,12 +86,12 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     data: privateSnippetsPages,
     isSuccess,
     isLoading,
-    isPreviousData,
+    isPlaceholderData,
     isFetching,
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useSQLSnippetFoldersQuery({ projectRef, sort }, { keepPreviousData: true })
+  } = useSQLSnippetFoldersQuery({ projectRef, sort }, { placeholderData: keepPreviousData })
 
   const [subResults, setSubResults] = useState<{
     [id: string]: { snippets?: Snippet[]; isLoading: boolean }
@@ -122,7 +123,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       },
       {
         snippets: rootSnippets,
-        isLoading: isLoading || (isPreviousData && isFetching),
+        isLoading: isLoading || (isPlaceholderData && isFetching),
         snippetIds: new Set<string>(rootSnippets.map((snippet) => snippet.id)),
       }
     )
@@ -133,7 +134,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     }
 
     return snippetInfo
-  }, [privateSnippetsPages?.pages, subResults, isLoading, isPreviousData, isFetching, snippet])
+  }, [privateSnippetsPages?.pages, subResults, isLoading, isPlaceholderData, isFetching, snippet])
 
   const privateSnippets = useMemo(
     () =>
@@ -171,7 +172,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   // =================
   const {
     data: favoriteSqlSnippetsData,
-    isLoading: isLoadingFavoriteSqlSnippets,
+    isPending: isLoadingFavoriteSqlSnippets,
     hasNextPage: hasMoreFavoriteSqlSnippets,
     fetchNextPage: fetchNextFavoriteSqlSnippets,
     isFetchingNextPage: isFetchingMoreFavoriteSqlSnippets,
@@ -182,7 +183,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       favorite: true,
       sort,
     },
-    { enabled: showFavoriteSnippets, keepPreviousData: true }
+    { enabled: showFavoriteSnippets, placeholderData: keepPreviousData }
   )
 
   const favoriteSnippets = useMemo(() => {
@@ -233,7 +234,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       visibility: 'project',
       sort,
     },
-    { enabled: showSharedSnippets, keepPreviousData: true }
+    { enabled: showSharedSnippets, placeholderData: keepPreviousData }
   )
 
   const sharedSnippets = useMemo(() => {

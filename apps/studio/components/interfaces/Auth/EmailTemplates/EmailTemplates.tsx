@@ -72,7 +72,7 @@ export const EmailTemplates = () => {
   const {
     data: authConfig,
     error: authConfigError,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
@@ -119,50 +119,46 @@ export const EmailTemplates = () => {
   return (
     <>
       {isError && (
-        <PageSection className="!pt-0">
+        <PageSection>
           <PageSectionContent>
-            <AlertError
-              className="mt-12"
-              error={authConfigError}
-              subject="Failed to retrieve auth configuration"
-            />
+            <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
           </PageSectionContent>
         </PageSection>
       )}
       {isLoading && (
-        <PageSection className="!pt-0">
+        <PageSection>
           <PageSectionContent>
-            <div className="w-[854px] mt-12">
-              <GenericSkeletonLoader />
-            </div>
+            <GenericSkeletonLoader />
           </PageSectionContent>
         </PageSection>
       )}
       {isSuccess && (
         <>
-          {builtInSMTP && (
-            <Admonition
-              type="warning"
-              title="Set up custom SMTP"
-              description={
-                <p>
-                  You’re using the built-in email service. This service has rate limits and is not
-                  meant to be used for production apps.{' '}
-                  <InlineLink href={`${DOCS_URL}/guides/platform/going-into-prod#auth-rate-limits`}>
-                    Learn more
-                  </InlineLink>{' '}
-                </p>
-              }
-              layout="horizontal"
-              className="mt-12 mb-10"
-              actions={
-                <Button asChild type="default" className="mt-2">
-                  <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
-                </Button>
-              }
-            />
-          )}
-          <PageSection className="!pt-0">
+          <PageSection>
+            {builtInSMTP && (
+              <Admonition
+                type="warning"
+                title="Set up custom SMTP"
+                description={
+                  <p>
+                    You’re using the built-in email service. This service has rate limits and is not
+                    meant to be used for production apps.{' '}
+                    <InlineLink
+                      href={`${DOCS_URL}/guides/platform/going-into-prod#auth-rate-limits`}
+                    >
+                      Learn more
+                    </InlineLink>{' '}
+                  </p>
+                }
+                layout="horizontal"
+                className="mb-4"
+                actions={
+                  <Button asChild type="default">
+                    <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
+                  </Button>
+                }
+              />
+            )}
             <PageSectionMeta>
               <PageSectionSummary>
                 <PageSectionTitle>Authentication</PageSectionTitle>

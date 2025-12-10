@@ -1,4 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import {
   ExternalLinkIcon,
@@ -194,7 +194,7 @@ export const UsersV2 = () => {
       providers: [],
       forceExactCount: false,
     },
-    { keepPreviousData: true }
+    { placeholderData: keepPreviousData }
   )
   const totalUsers = totalUsersCountData?.count ?? 0
   const isCountWithinThresholdForSortBy = totalUsers <= SORT_BY_VALUE_COUNT_THRESHOLD
@@ -253,7 +253,8 @@ export const UsersV2 = () => {
    * 2. They have not opted in yet (authConfig.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST is false)
    * 3. They have < threshold number of users
    */
-  const isCountWithinThresholdForOptIn = totalUsers <= IMPROVED_SEARCH_COUNT_THRESHOLD
+  const isCountWithinThresholdForOptIn =
+    isCountLoaded && totalUsers <= IMPROVED_SEARCH_COUNT_THRESHOLD
   const showImprovedSearchOptIn =
     isImprovedUserSearchFlagEnabled &&
     authConfig?.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST === false &&
@@ -299,7 +300,7 @@ export const UsersV2 = () => {
       improvedSearchEnabled: improvedSearchEnabled,
     },
     {
-      keepPreviousData: Boolean(filterKeywords),
+      placeholderData: Boolean(filterKeywords) ? keepPreviousData : undefined,
       // [Joshen] This is to prevent the dashboard from invalidating when refocusing as it may create
       // a barrage of requests to invalidate each page esp when the project has many many users.
       staleTime: Infinity,

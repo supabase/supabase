@@ -190,7 +190,7 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
               title="This looks like an issue that’s better handled by support"
               className="rounded-none border-x-0 border-b-0"
             >
-              <p className="text-xs text-foreground-light !leading-normal !mb-0">
+              <p>
                 Please{' '}
                 <SupportLink
                   className={cn(InlineLinkClassName)}
@@ -198,7 +198,7 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
                 >
                   open a support ticket
                 </SupportLink>{' '}
-                to get help with this issue, as we do not reply to all product feedback.
+                to get help, as we do not reply to all product feedback.
               </p>
             </Admonition>
           </motion.div>
