@@ -32,7 +32,7 @@ async function checkIndexAdvisorExtensionsEnabled(page: Page, ref: string): Prom
   try {
     await waitForApiResponse(page, 'pg-meta', ref, 'extensions')
   } catch (e) {
-    console.warn('Extensions API timeout, continuing anyway:', e.message)
+    console.warn('Extensions API timeout, continuing anyway:', (e as Error).message)
     // Wait for page to be in a stable state
     await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {})
   }
@@ -90,7 +90,7 @@ async function enableIndexAdvisorViaExtensions(page: Page, ref: string): Promise
   try {
     await waitForApiResponse(page, 'pg-meta', ref, 'extensions')
   } catch (e) {
-    console.warn('Extensions API timeout, continuing anyway:', e.message)
+    console.warn('Extensions API timeout, continuing anyway:', (e as Error).message)
     await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {})
   }
 
@@ -123,7 +123,7 @@ async function enableIndexAdvisorViaExtensions(page: Page, ref: string): Promise
     try {
       await extensionEnableWait
     } catch (e) {
-      console.warn('Extension enable API timeout:', e.message)
+      console.warn('Extension enable API timeout:', (e as Error).message)
     }
 
     // Wait for switch to become checked (indicates extension is enabled)
@@ -157,7 +157,7 @@ async function enableIndexAdvisorViaExtensions(page: Page, ref: string): Promise
     try {
       await extensionEnableWait
     } catch (e) {
-      console.warn('Extension enable API timeout:', e.message)
+      console.warn('Extension enable API timeout:', (e as Error).message)
     }
 
     // Wait for switch to become checked (indicates extension is enabled)
@@ -195,7 +195,7 @@ INSERT INTO ${TEST_TABLE_NAME} VALUES (1, 'test'), (2, 'demo'), (3, 'test');`
   try {
     await sqlMutationPromise
   } catch (e) {
-    console.warn('SQL execution API timeout:', e.message)
+    console.warn('SQL execution API timeout:', (e as Error).message)
     // Wait a bit for the query to potentially complete
     await page.waitForTimeout(2000)
   }
@@ -227,7 +227,7 @@ async function runQueryNeedingIndex(page: Page, ref: string): Promise<void> {
     try {
       await sqlMutationPromise
     } catch (e) {
-      console.warn(`SQL execution API timeout on attempt ${i + 1}:`, e.message)
+      console.warn(`SQL execution API timeout on attempt ${i + 1}:`, (e as Error).message)
       await page.waitForTimeout(1000)
     }
   }
@@ -273,10 +273,10 @@ test.describe.serial('Index Advisor', () => {
       try {
         await sqlMutationPromise
       } catch (e) {
-        console.warn('Cleanup SQL timeout:', e.message)
+        console.warn('Cleanup SQL timeout:', (e as Error).message)
       }
     } catch (e) {
-      console.log('Failed to clean up test table:', e.message)
+      console.log('Failed to clean up test table:', (e as Error).message)
     }
 
     await page.close()
@@ -291,7 +291,7 @@ test.describe.serial('Index Advisor', () => {
       try {
         await waitForApiResponse(page, 'pg-meta', ref, 'extensions')
       } catch (e) {
-        console.warn('Extensions API timeout, continuing anyway:', e.message)
+        console.warn('Extensions API timeout, continuing anyway:', (e as Error).message)
         await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {})
       }
 
@@ -428,7 +428,7 @@ test.describe.serial('Index Advisor', () => {
       try {
         await extensionCreateWait
       } catch (e) {
-        console.warn('Extension create API timeout:', e.message)
+        console.warn('Extension create API timeout:', (e as Error).message)
       }
 
       // Verify success (this is the real confirmation)
