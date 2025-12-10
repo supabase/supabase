@@ -336,7 +336,7 @@ export function CreateResourcePanel() {
 - **Date Picker**: `Calendar` inside `Popover_Shadcn_` with a trigger button
 - **Copyable Input**: Use `Input` from `ui-patterns/DataInputs/Input` with `copy` and `readOnly` props
 - **Field Array**: Use `useFieldArray` from `react-hook-form` for dynamic add/remove fields
-- **Action Field**: Use `FormItemLayout` without form control, just buttons for navigation or performable actions
+- **Action Field**: Use `FormItemLayout` without form control, just buttons for navigation or performable actions. Wrap buttons in a div with `justify-end` to align them to the right
 
 ## Cards
 
