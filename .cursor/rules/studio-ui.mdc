@@ -139,7 +139,7 @@ Forms in Supabase Studio should follow consistent patterns to ensure a cohesive 
 
 ### Layout Selection
 
-- **Page layouts**: Use `FormItemLayout` with `layout="flex-row-reverse"` for horizontal alignment. Forms should be wrapped in a `Card` with `CardContent` and `CardFooter` for actions. Use `Separator` between form fields. The layout automatically handles consistent input widths (50% on md, 40% on xl, min-w-72).
+- **Page layouts**: Use `FormItemLayout` with `layout="flex-row-reverse"` for horizontal alignment. Forms should be wrapped in a `Card` with `CardContent` and `CardFooter` for actions. Use `Separator` between form fields. The layout automatically handles consistent input widths (50% on md, 40% on xl, min-w-100).
 - **Side panels (wide)**: Use `FormItemLayout` with `layout="horizontal"`. Use `SheetSection` to wrap each field group.
 - **Side panels (narrow, size="sm" or below)**: Use `FormItemLayout` with `layout="vertical"`
 
@@ -298,7 +298,7 @@ export function CreateResourcePanel() {
                 name="name"
                 render={({ field }) => (
                   <FormItemLayout layout="horizontal" label="Name" description="A descriptive name">
-                    <FormControl_Shadcn_ className="col-span-6 min-w-72">
+                    <FormControl_Shadcn_ className="col-span-6 min-w-100">
                       <Input_Shadcn_ {...field} placeholder="Enter name" />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
