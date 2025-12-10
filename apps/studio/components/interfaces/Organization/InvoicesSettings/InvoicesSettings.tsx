@@ -151,12 +151,7 @@ export const InvoicesSettings = () => {
                 return (
                   <TableRow key={x.id}>
                     <TableCell className="w-2">
-                      <FileText
-                        aria-label="invoice icon"
-                        aria-hidden="true"
-                        size={16}
-                        className="text-foreground-muted"
-                      />
+                      <FileText aria-hidden="true" size={16} className="text-foreground-muted" />
                     </TableCell>
                     <TableCell>
                       <p>{dayjs(x.period_end * 1000).format('MMM DD, YYYY')}</p>
