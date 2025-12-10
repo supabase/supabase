@@ -621,7 +621,7 @@ importers:
         version: 3.25.76
     devDependencies:
       '@babel/preset-typescript':
-        specifier: 7.27.1
+        specifier: '*'
         version: 7.27.1(@babel/core@7.28.4(supports-color@8.1.1))(supports-color@8.1.1)
       '@graphiql/toolkit':
         specifier: ^0.9.1
