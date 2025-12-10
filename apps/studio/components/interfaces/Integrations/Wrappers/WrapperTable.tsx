@@ -5,7 +5,17 @@ import { useParams } from 'common'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Card, cn, Table, TableBody, TableCaption, TableHead, TableHeader, TableRow } from 'ui'
+import {
+  Card,
+  cn,
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import WrapperRow from './WrapperRow'
 import { wrapperMetaComparator } from './Wrappers.utils'
@@ -91,10 +101,22 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
             )
           })}
         </TableBody>
-        <TableCaption className={cn('text-xs', wrappers.length === 0 ? 'border-t-0' : '')}>
-          {wrappers.length} {integration?.name}
-          {wrappers.length > 1 ? 's' : ''} created
-        </TableCaption>
+        <TableFooter
+          className={cn(
+            'text-xs font-normal text-center text-foreground-muted',
+            // Prevent the footer from being highlighted on hover
+            '[&>tr>td]:hover:bg-inherit',
+            // Conditionally remove the border-top if there are no wrappers
+            wrappers.length === 0 ? 'border-t-0' : ''
+          )}
+        >
+          <TableRow>
+            <TableCell colSpan={4}>
+              {wrappers.length} {integration?.name}
+              {wrappers.length > 1 ? 's' : ''} created
+            </TableCell>
+          </TableRow>
+        </TableFooter>
       </Table>
     </Card>
   )
