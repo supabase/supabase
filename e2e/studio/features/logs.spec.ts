@@ -60,7 +60,7 @@ test.describe('Logs', () => {
 
       await expect(logsTable, {
         message: 'Logs table should be visible',
-      }).toBeVisible({ timeout: 20000 })
+      }).toBeVisible()
 
       /**
        * Shows the logs data without errors
@@ -75,13 +75,13 @@ test.describe('Logs', () => {
       const gridcells = page.getByText('Random event message')
       await expect(gridcells, {
         message: 'Grid cell should be visible before clicking',
-      }).toBeVisible({ timeout: 20000 })
+      }).toBeVisible()
       await gridcells.click()
 
       const tabPanel = page.getByTestId('log-selection')
       await expect(tabPanel, {
         message: 'Log selection panel should be visible after clicking a log',
-      }).toBeVisible({ timeout: 20000 })
+      }).toBeVisible()
 
       // Assert known fixed values instead of extracting text
       await expect(tabPanel, {

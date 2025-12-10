@@ -39,6 +39,9 @@ export default defineConfig({
   forbidOnly: IS_CI,
   retries: IS_CI ? 5 : 0,
   maxFailures: 3,
+  expect: {
+    timeout: 20_000,
+  },
   // Due to rate API rate limits run tests in serial mode on platform.
   fullyParallel: !env.IS_PLATFORM,
   workers: env.IS_PLATFORM ? 1 : 3,
