@@ -291,7 +291,8 @@ export const UsersV2 = () => {
       providers: selectedProviders,
       sort: sortColumn as 'id' | 'created_at' | 'email' | 'phone',
       order: sortOrder as 'asc' | 'desc',
-      ...(specificFilterColumn !== 'freeform' && !improvedSearchEnabled
+      // improved search will always have a column specified
+      ...(specificFilterColumn !== 'freeform' || improvedSearchEnabled
         ? { column: specificFilterColumn as OptimizedSearchColumns }
         : { column: undefined }),
 

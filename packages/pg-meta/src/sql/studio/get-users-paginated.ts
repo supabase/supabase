@@ -1,6 +1,11 @@
 import { prefixToUUID, stringRange } from './get-users-common'
 import { OptimizedSearchColumns } from './get-users-types'
 
+export interface UsersCursor {
+  sort: string
+  id: string
+}
+
 interface getPaginatedUsersSQLProps {
   page?: number
   verified?: 'verified' | 'unverified' | 'anonymous'
@@ -14,6 +19,8 @@ interface getPaginatedUsersSQLProps {
   column?: OptimizedSearchColumns
   startAt?: string
 
+  /** Cursor for cursor-based pagination (used by improved search) */
+  cursor?: UsersCursor
   improvedSearchEnabled?: boolean
 }
 
@@ -30,6 +37,7 @@ export const getPaginatedUsersSQL = ({
 
   column,
   startAt,
+  cursor,
 
   improvedSearchEnabled = false,
 }: getPaginatedUsersSQLProps) => {
@@ -41,8 +49,8 @@ export const getPaginatedUsersSQL = ({
       providers,
       sort,
       order,
-      page,
       limit,
+      cursor,
     })
   }
 
@@ -159,6 +167,7 @@ from
 
 /**
  * Generates SQL for improved paginated user search that leverages specific indexes.
+ * Uses cursor-based pagination for efficient and consistent paging.
  *
  * Indexes leveraged:
  * - idx_users_email (btree) - for email prefix searches and sorting by email
@@ -175,10 +184,9 @@ export const getImprovedPaginatedUsersSQL = ({
   providers,
   sort,
   order,
-  page = 0,
+  cursor,
   limit = DEFAULT_LIMIT,
 }: getPaginatedUsersSQLProps) => {
-  const offset = page * limit
   const hasValidKeywords = keywords && keywords !== ''
   const formattedKeywords = hasValidKeywords ? keywords.replaceAll("'", "''") : ''
 
@@ -228,11 +236,26 @@ export const getImprovedPaginatedUsersSQL = ({
     }
   }
 
-  const combinedConditions = conditions.map((x) => `(${x})`).join(' AND ')
   const sortOn = sort ?? 'created_at'
   const sortOrder = order ?? 'desc'
 
+  // Cursor-based pagination: fetch rows after the cursor position
+  if (cursor) {
+    const operator = sortOrder === 'desc' ? '<' : '>'
+    // When sorting by id, no need for a composite cursor since id is already unique
+    if (sortOn === 'id') {
+      conditions.push(`id ${operator} '${cursor.id}'::uuid`)
+    } else {
+      conditions.push(`("${sortOn}", id) ${operator} ('${cursor.sort}', '${cursor.id}'::uuid)`)
+    }
+  }
+
+  const combinedConditions = conditions.map((x) => `(${x})`).join(' AND ')
   const whereClause = conditions.length > 0 ? `WHERE ${combinedConditions}` : ''
+
+  // Order by sort column, with id as tie breaker (unless already sorting by id)
+  const orderByClause =
+    sortOn === 'id' ? `"${sortOn}" ${sortOrder}` : `"${sortOn}" ${sortOrder}, id ${sortOrder}`
 
   const usersData = `
     SELECT
@@ -253,11 +276,9 @@ export const getImprovedPaginatedUsersSQL = ({
       auth.users
     ${whereClause}
     ORDER BY
-      "${sortOn}" ${sortOrder}
+      ${orderByClause}
     LIMIT
-      ${limit}
-    OFFSET
-      ${offset}`
+      ${limit}`
 
   const usersQuery = `
 WITH
