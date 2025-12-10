@@ -34,7 +34,6 @@ export const APIKeyRow = ({
   setKeyToDelete: (id: string | null) => void
 }) => {
   const MotionTableRow = motion.create(TableRow)
-
   const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
 
   return (
