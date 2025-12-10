@@ -30,6 +30,7 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
+  PrePostTab,
   Separator,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -225,7 +226,7 @@ export const ConnectionPooling = () => {
                   name="default_pool_size"
                   render={({ field }) => (
                     <FormItemLayout
-                      layout="horizontal"
+                      layout="flex-row-reverse"
                       label="Pool Size"
                       description={
                         <p>
@@ -234,18 +235,21 @@ export const ConnectionPooling = () => {
                           based on your compute size of {computeSize}.
                         </p>
                       }
+                      className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full [&>div>div>div]:min-w-100"
                     >
                       <FormControl_Shadcn_>
-                        <Input_Shadcn_
-                          {...field}
-                          type="number"
-                          className="w-full"
-                          value={field.value || ''}
-                          placeholder={defaultPoolSize.toString()}
-                          {...form.register('default_pool_size', {
-                            setValueAs: setValueAsNullableNumber,
-                          })}
-                        />
+                        <PrePostTab postTab="Connections" className="w-full">
+                          <Input_Shadcn_
+                            {...field}
+                            type="number"
+                            className="w-full"
+                            value={field.value || ''}
+                            placeholder={defaultPoolSize.toString()}
+                            {...form.register('default_pool_size', {
+                              setValueAs: setValueAsNullableNumber,
+                            })}
+                          />
+                        </PrePostTab>
                       </FormControl_Shadcn_>
                       {!!maxConnData &&
                         (default_pool_size ?? 15) > maxConnData.maxConnections * 0.8 && (
@@ -269,8 +273,9 @@ export const ConnectionPooling = () => {
                   name="max_client_conn"
                   render={({ field }) => (
                     <FormItemLayout
-                      layout="horizontal"
+                      layout="flex-row-reverse"
                       label="Max Client Connections"
+                      className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full [&>div>div>div]:min-w-100"
                       description={
                         <>
                           <p>
@@ -291,17 +296,19 @@ export const ConnectionPooling = () => {
                       }
                     >
                       <FormControl_Shadcn_>
-                        <Input_Shadcn_
-                          {...field}
-                          type="number"
-                          className="w-full"
-                          value={pgbouncerConfig?.max_client_conn || ''}
-                          disabled={true}
-                          placeholder={defaultMaxClientConn.toString()}
-                          {...form.register('max_client_conn', {
-                            setValueAs: setValueAsNullableNumber,
-                          })}
-                        />
+                        <PrePostTab postTab="Clients" className="w-full">
+                          <Input_Shadcn_
+                            {...field}
+                            type="number"
+                            className="w-full"
+                            value={pgbouncerConfig?.max_client_conn || ''}
+                            disabled={true}
+                            placeholder={defaultMaxClientConn.toString()}
+                            {...form.register('max_client_conn', {
+                              setValueAs: setValueAsNullableNumber,
+                            })}
+                          />
+                        </PrePostTab>
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
