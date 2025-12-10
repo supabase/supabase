@@ -101,7 +101,7 @@ export const General = () => {
               <FormPanel
                 disabled={!canUpdateProject}
                 footer={
-                  <div className="flex py-4 px-8">
+                  <div className="flex py-4 px-[var(--card-padding-x)]">
                     <FormActions
                       form={formId}
                       isSubmitting={isUpdating}
@@ -139,7 +139,7 @@ export const General = () => {
       )}
       <div className="mt-6" id="restart-project">
         <FormPanel>
-          <div className="flex flex-col px-8 py-4">
+          <div className="flex flex-col py-4 px-[var(--card-padding-x)]">
             <div className="flex flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4">
               <div>
                 <p className="text-sm">
@@ -155,7 +155,7 @@ export const General = () => {
             </div>
           </div>
           <div
-            className="flex w-full flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4 px-8 py-4"
+            className="flex w-full flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4 px-[var(--card-padding-x)] py-4"
             id="pause-project"
           >
             <div>
