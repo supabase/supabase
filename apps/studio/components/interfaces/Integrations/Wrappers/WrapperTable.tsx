@@ -3,18 +3,9 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
-import {
-  Card,
-  CardContent,
-  Table,
-  TableBody,
-  TableCaption,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Card, Table, TableBody, TableCaption, TableHead, TableHeader, TableRow } from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import WrapperRow from './WrapperRow'
 import { wrapperMetaComparator } from './Wrappers.utils'
@@ -73,38 +64,38 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
 
   return (
     <Card className="max-w-5xl">
-      <CardContent className="p-0 pb-3">
-        <Table className="">
-          <TableCaption className="text-xs">
-            {wrappers.length} {integration?.name}
-            {wrappers.length > 1 ? 's' : ''} created
-          </TableCaption>
-          <TableHeader className="font-mono uppercase text-xs [&_th]:h-auto [&_th]:py-2">
-            <TableRow className="rounded">
-              <TableHead className="w-[220px]">Name</TableHead>
-              <TableHead>Tables</TableHead>
-              <TableHead>Encrypted key</TableHead>
-              <TableHead className="text-right w-24"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody className="[&_td]:py-0 [&_tr]:h-[50px] [&_tr]:border-dotted bg-surface-100">
-            {(isLatest ? wrappers.slice(0, 3) : wrappers).map((x) => {
-              return (
-                <WrapperRow
-                  key={x.id}
-                  wrapper={x}
-                  wrappers={wrappers}
-                  selectedWrapperToEdit={selectedWrapperToEdit}
-                  selectedWrapperToDelete={selectedWrapperToDelete}
-                  setSelectedWrapperToEdit={setSelectedWrapperToEdit}
-                  setSelectedWrapperToDelete={setSelectedWrapperToDelete}
-                  deletingWrapperIdRef={deletingWrapperIdRef}
-                />
-              )
-            })}
-          </TableBody>
-        </Table>
-      </CardContent>
+      <Table>
+        <TableCaption>
+          {wrappers.length} {integration?.name}
+          {wrappers.length > 1 ? 's' : ''} created
+        </TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[220px]">Name</TableHead>
+            <TableHead>Tables</TableHead>
+            <TableHead>Encrypted key</TableHead>
+            <TableHead className="w-24">
+              <span className="sr-only">Actions</span>
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {(isLatest ? wrappers.slice(0, 3) : wrappers).map((x) => {
+            return (
+              <WrapperRow
+                key={x.id}
+                wrapper={x}
+                wrappers={wrappers}
+                selectedWrapperToEdit={selectedWrapperToEdit}
+                selectedWrapperToDelete={selectedWrapperToDelete}
+                setSelectedWrapperToEdit={setSelectedWrapperToEdit}
+                setSelectedWrapperToDelete={setSelectedWrapperToDelete}
+                deletingWrapperIdRef={deletingWrapperIdRef}
+              />
+            )
+          })}
+        </TableBody>
+      </Table>
     </Card>
   )
 }
