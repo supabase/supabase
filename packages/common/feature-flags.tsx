@@ -162,18 +162,18 @@ const isObjectEmpty = (obj: Object) => {
   return Object.keys(obj).length === 0
 }
 
-export function useFlag<T = boolean>(name: string, defaultValue = false) {
+export function useFlag<T = boolean>(name: string) {
   const flagStore = useFeatureFlags()
   const store = flagStore.configcat
 
   // Flag store is empty means config cat is not loaded yet, return default value
   if (isObjectEmpty(store)) {
-    return defaultValue
+    return false
   }
 
   if (store[name] === undefined) {
     console.error(`Flag key "${name}" does not exist in ConfigCat flag store`)
-    return defaultValue
+    return false
   }
 
   return store[name] as T
