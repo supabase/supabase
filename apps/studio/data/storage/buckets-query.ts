@@ -1,4 +1,11 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import {
+  InfiniteData,
+  keepPreviousData,
+  useInfiniteQuery,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
+import { useMemo } from 'react'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
@@ -17,6 +24,26 @@ export type BucketsVariables = { projectRef?: string }
 export type Bucket = components['schemas']['StorageBucketResponse']
 
 export type BucketType = Bucket['type']
+
+type GetBucketParams = {
+  projectRef?: string
+  bucketId?: string
+}
+
+async function getBucket({ projectRef, bucketId }: GetBucketParams, signal?: AbortSignal) {
+  if (!projectRef) throw new Error('projectRef is required')
+  if (!bucketId) throw new Error('bucketId is required')
+
+  const { data, error } = await get('/platform/storage/{ref}/buckets/{id}', {
+    params: {
+      path: { ref: projectRef, id: bucketId },
+    },
+    signal,
+  })
+
+  if (error) handleError(error)
+  return data
+}
 
 export async function getBuckets({ projectRef }: BucketsVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -84,9 +111,26 @@ const getBucketsPaginated = async (
   return data
 }
 
+type BucketData = Awaited<ReturnType<typeof getBucket>>
 export type BucketsData = Awaited<ReturnType<typeof getBuckets>>
 export type BucketsWithPaginationData = Awaited<ReturnType<typeof getBucketsPaginated>>
 export type BucketsError = ResponseError
+
+const useBucketQuery = <TData = BucketData>(
+  { projectRef, bucketId }: GetBucketParams,
+  { enabled = true, ...options }: UseCustomQueryOptions<BucketData, BucketsError, TData>
+) => {
+  const { data: project } = useSelectedProjectQuery()
+  const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+
+  return useQuery<BucketData, BucketsError, TData>({
+    queryKey: storageKeys.bucket(projectRef, bucketId),
+    queryFn: ({ signal }) => getBucket({ projectRef, bucketId }, signal),
+    enabled: enabled && !!bucketId && isActive,
+    ...options,
+    retry: shouldRetryBucketsQuery,
+  })
+}
 
 export const useBucketsQuery = <TData = BucketsData>(
   { projectRef }: BucketsVariables,
@@ -109,19 +153,26 @@ export const usePaginatedBucketsQuery = <TData = BucketsWithPaginationData>(
   {
     enabled = true,
     ...options
-  }: UseCustomInfiniteQueryOptions<BucketsWithPaginationData, BucketsError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<
+    BucketsWithPaginationData,
+    BucketsError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    number
+  > = {}
 ) => {
   const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  const { keepPreviousData, ...restOptions } = options
-  const resolvedKeepPreviousData = keepPreviousData ?? true
+  const { placeholderData, ...restOptions } = options
+  const resolvedPlaceholderData = placeholderData ?? keepPreviousData
 
-  return useInfiniteQuery<BucketsWithPaginationData, BucketsError, TData>({
+  return useInfiniteQuery({
     queryKey: storageKeys.bucketsList(projectRef, params),
     queryFn: ({ signal, pageParam }) =>
       getBucketsPaginated({ projectRef, page: pageParam, ...params }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && isActive,
+    initialPageParam: 0,
     getNextPageParam: (lastPage, pages) => {
       const nextPageNumber = pages.length
       const limit = params.limit ?? DEFAULT_PAGE_SIZE
@@ -131,9 +182,41 @@ export const usePaginatedBucketsQuery = <TData = BucketsWithPaginationData>(
       return nextPageNumber
     },
     ...restOptions,
-    keepPreviousData: resolvedKeepPreviousData,
+    placeholderData: resolvedPlaceholderData,
     retry: shouldRetryBucketsQuery,
   })
+}
+
+/**
+ * Tries to get the bucket info from the cache first. If not found, fetches
+ * from remote by name.
+ */
+export const useBucketInfoQueryPreferCached = (bucketId?: string, projectRef?: string) => {
+  const queryClient = useQueryClient()
+
+  const cachedBucketInfo = useMemo(() => {
+    if (!bucketId) return undefined
+
+    const bucketsPages = queryClient.getQueryData(storageKeys.bucketsList(projectRef)) as
+      | InfiniteData<Bucket[]>
+      | undefined
+    const buckets = bucketsPages?.pages.flatMap((page) => page) ?? []
+    return buckets.find((b) => b.name === bucketId)
+  }, [bucketId, projectRef, queryClient])
+
+  const shouldFetchBucketInfo = !!bucketId && !cachedBucketInfo
+  const { data: remoteBucketInfo } = useBucketQuery(
+    {
+      projectRef,
+      bucketId,
+    },
+    {
+      enabled: shouldFetchBucketInfo,
+    }
+  )
+
+  if (!bucketId) return undefined
+  return cachedBucketInfo ?? remoteBucketInfo
 }
 
 const shouldRetryBucketsQuery = (failureCount: number, error: unknown) => {
