@@ -112,7 +112,17 @@ export const PostgrestConfig = () => {
     })
 
   const formId = 'project-postgres-config'
-  const hiddenSchema = ['auth', 'pgbouncer', 'hooks', 'extensions']
+  const hiddenSchema = [
+    'auth',
+    'pgbouncer',
+    'hooks',
+    'extensions',
+    'vault',
+    'storage',
+    'realtime',
+    'pgsodium',
+    'pgsodium_masks',
+  ]
   const { can: canUpdatePostgrestConfig, isSuccess: isPermissionsLoaded } =
     useAsyncCheckPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
 
