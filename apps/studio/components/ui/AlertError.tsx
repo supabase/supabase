@@ -2,21 +2,43 @@ import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { PropsWithChildren } from 'react'
 
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  WarningIcon,
-} from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+
+import { Button } from 'ui'
 
 export interface AlertErrorProps {
   projectRef?: string
   subject?: string
   error?: { message: string } | null
+  layout?: 'vertical' | 'horizontal'
   className?: string
   showIcon?: boolean
   additionalActions?: React.ReactNode
+}
+
+const ContactSupportButton = ({
+  projectRef,
+  subject,
+  error,
+}: {
+  projectRef?: string
+  subject?: string
+  error?: { message: string } | null
+}) => {
+  return (
+    <Button asChild type="default" className="w-min">
+      <SupportLink
+        queryParams={{
+          category: SupportCategories.DASHBOARD_BUG,
+          projectRef,
+          subject,
+          error: error?.message,
+        }}
+      >
+        Contact support
+      </SupportLink>
+    </Button>
+  )
 }
 
 // [Joshen] To standardize the language for all error UIs
@@ -27,6 +49,7 @@ export const AlertError = ({
   error,
   className,
   showIcon = true,
+  layout = 'horizontal',
   children,
   additionalActions,
 }: PropsWithChildren<AlertErrorProps>) => {
@@ -35,35 +58,33 @@ export const AlertError = ({
     : error?.message
 
   return (
-    <Alert_Shadcn_ className={className} variant="warning" title={subject}>
-      {showIcon && <WarningIcon className="h-4 w-4" strokeWidth={2} />}
-      <AlertTitle_Shadcn_ className="text-foreground">{subject}</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_ className="flex flex-col gap-3 break-words">
-        <div>
-          {error?.message && <p className="text-left">Error: {formattedErrorMessage}</p>}
-          <p className="text-left">
-            Try refreshing your browser, but if the issue persists for more than a few minutes,
-            please reach out to us via support.
+    <Admonition
+      type="warning"
+      layout={additionalActions ? 'vertical' : layout}
+      showIcon={showIcon}
+      title={subject}
+      description={
+        <>
+          {error?.message && <p>Error: {formattedErrorMessage}</p>}
+          <p>
+            Try refreshing your browser. If the issue persists for more than a few minutes, please
+            reach out to us via support.
           </p>
-        </div>
-        {children}
-        <div className="flex gap-2">
-          {additionalActions}
-          <Button asChild type="warning" className="w-min">
-            <SupportLink
-              queryParams={{
-                category: SupportCategories.DASHBOARD_BUG,
-                projectRef,
-                subject,
-                error: error?.message,
-              }}
-            >
-              Contact support
-            </SupportLink>
-          </Button>
-        </div>
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+          {children}
+        </>
+      }
+      actions={
+        additionalActions ? (
+          <>
+            {additionalActions}
+            <ContactSupportButton projectRef={projectRef} subject={subject} error={error} />
+          </>
+        ) : (
+          <ContactSupportButton projectRef={projectRef} subject={subject} error={error} />
+        )
+      }
+      className={className}
+    />
   )
 }
 

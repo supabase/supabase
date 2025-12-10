@@ -5,6 +5,7 @@ import {
   Lock,
   LockIcon,
   Ruler,
+  Scaling,
   Table2,
   TextSearch,
   Unlock,
@@ -162,6 +163,15 @@ export const lintInfoMap: LintInfo[] = [
     linkText: 'View settings',
     docsLink: `${DOCS_URL}/guides/platform/going-into-prod#security`,
     category: 'security',
+  },
+  {
+    name: 'auth_db_connections_absolute',
+    title: 'Auth Absolute Connection Management Strategy',
+    icon: <Scaling className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/auth/performance`,
+    linkText: 'View settings',
+    docsLink: `${DOCS_URL}/guides/platform/going-into-prod`,
+    category: 'performance',
   },
   {
     name: 'rls_references_user_metadata',

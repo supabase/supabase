@@ -8,11 +8,25 @@ import { Admonition } from 'ui-patterns'
 interface AlphaNoticeProps {
   entity: string
   feedbackUrl: string
+  className?: string
 }
 
-export const AlphaNotice = ({ entity, feedbackUrl }: AlphaNoticeProps) => {
+export const AlphaNotice = ({ entity, feedbackUrl, className }: AlphaNoticeProps) => {
   return (
-    <Admonition showIcon={false} type="tip" className="relative mb-8 overflow-hidden">
+    <Admonition
+      showIcon={false}
+      type="tip"
+      layout="horizontal"
+      actions={
+        <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />} className="mt-2">
+          <Link target="_blank" rel="noopener noreferrer" href={feedbackUrl}>
+            Share feedback
+          </Link>
+        </Button>
+      }
+      className={className}
+    >
+      {/* Background image */}
       <div className="absolute -inset-16 z-0 opacity-50">
         <img
           src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
@@ -27,7 +41,8 @@ export const AlphaNotice = ({ entity, feedbackUrl }: AlphaNoticeProps) => {
         <div className="absolute inset-0 bg-gradient-to-r from-background-alternative to-transparent" />
       </div>
 
-      <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-8 justify-between px-2 py-1">
+      {/* Content */}
+      <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-8 justify-between px-2">
         <div className="flex flex-col gap-y-0.5">
           <div className="flex flex-col gap-y-2 items-start">
             <Badge variant="success" className="-ml-0.5">
@@ -41,11 +56,6 @@ export const AlphaNotice = ({ entity, feedbackUrl }: AlphaNoticeProps) => {
             refine the experience and expand access.
           </p>
         </div>
-        <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />} className="mt-2">
-          <Link target="_blank" rel="noopener noreferrer" href={feedbackUrl}>
-            Share feedback
-          </Link>
-        </Button>
       </div>
     </Admonition>
   )

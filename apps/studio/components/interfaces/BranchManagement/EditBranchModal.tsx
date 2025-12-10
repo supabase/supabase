@@ -61,7 +61,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   const {
     data: connections,
     error: connectionsError,
-    isLoading: isLoadingConnections,
+    isPending: isLoadingConnections,
     isSuccess: isSuccessConnections,
     isError: isErrorConnections,
   } = useGitHubConnectionsQuery({

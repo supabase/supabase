@@ -5,6 +5,9 @@ import { organizationKeys } from 'data/organizations/keys'
 import { UseCustomQueryOptions } from 'types'
 import { ResponseError } from 'types/base'
 
+export type FeatureKey =
+  components['schemas']['ListEntitlementsResponse']['entitlements'][number]['feature']['key']
+
 export type EntitlementsVariables = {
   slug: string
 }
