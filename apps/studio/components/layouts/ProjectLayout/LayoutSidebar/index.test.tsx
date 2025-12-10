@@ -24,6 +24,7 @@ vi.mock('nuqs', async () => {
   let queryValue = 'example'
   return {
     useQueryState: () => [queryValue, (v: string) => (queryValue = v)],
+    parseAsString: () => {},
   }
 })
 
