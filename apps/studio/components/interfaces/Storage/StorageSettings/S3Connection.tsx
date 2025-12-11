@@ -157,7 +157,7 @@ export const S3Connection = () => {
                   <GenericSkeletonLoader />
                 ) : isProjectActive ? (
                   <Card>
-                    <CardContent className="pt-6">
+                    <CardContent>
                       <FormField_Shadcn_
                         name="s3ConnectionEnabled"
                         control={form.control}
@@ -181,36 +181,34 @@ export const S3Connection = () => {
                       />
                     </CardContent>
 
-                    <CardContent className="py-6">
-                      <div className="flex flex-col gap-y-4">
-                        <FormItemLayout
-                          layout="flex-row-reverse"
-                          className="[&>div]:md:w-1/2 [&>div>div]:w-full [&>div]:min-w-100"
-                          label="Endpoint"
-                          isReactForm={false}
-                        >
-                          <Input readOnly copy value={s3connectionUrl} />
-                        </FormItemLayout>
+                    <CardContent>
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        className="[&>div]:md:w-1/2 [&>div>div]:w-full [&>div]:min-w-100"
+                        label="Endpoint"
+                        isReactForm={false}
+                      >
+                        <Input readOnly copy value={s3connectionUrl} />
+                      </FormItemLayout>
+                    </CardContent>
 
-                        <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
-
-                        <FormItemLayout
-                          layout="flex-row-reverse"
-                          className="[&>div]:md:w-1/2 [&>div>div]:w-full [&>div]:min-w-100"
-                          label="Region"
-                          isReactForm={false}
-                        >
-                          <Input
-                            readOnly
-                            copy
-                            value={project?.region}
-                            data-1p-ignore
-                            data-lpignore="true"
-                            data-form-type="other"
-                            data-bwignore
-                          />
-                        </FormItemLayout>
-                      </div>
+                    <CardContent>
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        className="[&>div]:md:w-1/2 [&>div>div]:w-full [&>div]:min-w-100"
+                        label="Region"
+                        isReactForm={false}
+                      >
+                        <Input
+                          readOnly
+                          copy
+                          value={project?.region}
+                          data-1p-ignore
+                          data-lpignore="true"
+                          data-form-type="other"
+                          data-bwignore
+                        />
+                      </FormItemLayout>
                     </CardContent>
 
                     {!isLoadingPermissions && !canUpdateStorageSettings && (

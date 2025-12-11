@@ -244,9 +244,9 @@ export const StorageSettings = () => {
                         {isListV2Upgrading && <StorageListV2MigratingCallout />}
                       </>
                     )}
-                    <form id={formId} className="" onSubmit={form.handleSubmit(onSubmit)}>
+                    <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
                       <Card>
-                        <CardContent className="pt-6">
+                        <CardContent>
                           <FormField_Shadcn_
                             control={form.control}
                             name="imageTransformationEnabled"
