@@ -1,10 +1,14 @@
 ---
 id: 'send-email-hook'
 title: 'Send Email Hook'
-subtitle: 'Use a custom email provider to send authentication messages.'
+subtitle: 'Use your own email service to send authentication emails.'
 ---
 
-The Send Email Hook runs before an email is sent and allows for flexibility around email sending. You can use this hook to configure a backup email provider or to add internationalization to your emails.
+The Send Email Hook replaces Supabase's built-in email sending. You can use this hook to:
+
+- Send emails using your own email provider
+- Add internationalization or custom logic
+- Fall back to another provider if your primary one fails
 
 **Inputs**
 

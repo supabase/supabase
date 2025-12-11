@@ -73,7 +73,7 @@ export const VectorBucketDetails = () => {
     { enabled: isSuccess && !!_bucket }
   )
 
-  const { data, isLoading: isLoadingIndexes } = useVectorBucketsIndexesQuery({
+  const { data, isPending: isLoadingIndexes } = useVectorBucketsIndexesQuery({
     projectRef,
     vectorBucketName: bucket?.vectorBucketName,
   })
