@@ -7,12 +7,12 @@ import { AnimatedGridBackground } from '../AnimatedGridBackground'
 
 const stats = [
   { label: 'GitHub stars', value: '+10,000' },
-  { label: 'Databases created', value: '14M+' },
+  { label: 'Databases created', value: '15M+' },
   { label: 'Realtime messages', value: '280B+' },
   { label: 'Edge Functions invoked', value: '49B+' },
   { label: 'Petabytes stored', value: '64 PB' },
   { label: 'Peak connections', value: '193K' },
-  { label: 'Projects created', value: '11M+' },
+  { label: 'Projects created', value: '12M+' },
   { label: 'Images transformed', value: '64M+' },
 ]
 

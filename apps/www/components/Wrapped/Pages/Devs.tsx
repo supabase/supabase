@@ -6,13 +6,13 @@ import { AnimatedCounter } from '../AnimatedCounter'
 const heroStats = [
   {
     headline: 'More databases created in 2025 than in all previous years combined',
-    number: 14_196_130,
+    number: 14_984_823,
     increment: 1,
     intervalMs: 1000,
   },
   {
     headline: 'Projects created',
-    number: 11_212_051,
+    number: 11_808_815,
     increment: 1,
     intervalMs: 500,
   },

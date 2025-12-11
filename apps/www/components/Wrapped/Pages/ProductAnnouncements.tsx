@@ -211,8 +211,8 @@ const months: Month[] = [
     name: 'November 2025',
     announcements: [
       {
-        title: 'Broadcast Replay GA',
-        url: 'https://supabase.com/docs/guides/realtime/broadcast#broadcast-replay',
+        title: 'Realtime Broadcast Replay',
+        url: 'https://supabase.com/blog/realtime-broadcast-replay',
       },
       {
         title: 'Auth email template customization',
@@ -226,15 +226,28 @@ const months: Month[] = [
   },
   {
     name: 'December 2025',
+    isLaunchWeek: true,
     announcements: [
-      { title: 'Supabase ETL (private alpha)', url: 'https://supabase.com/blog' },
-      { title: 'Analytics Buckets (public alpha)', url: 'https://supabase.com/blog' },
-      { title: 'Vector Buckets (public alpha)', url: 'https://supabase.com/blog' },
-      { title: 'New Auth Templates', url: 'https://supabase.com/blog' },
-      { title: 'Supabase OAuth Server', url: 'https://supabase.com/blog' },
-      { title: 'Supabase in AWS Marketplace', url: 'https://supabase.com/blog' },
-      { title: 'NodeJS Edge Functions support', url: 'https://supabase.com/blog' },
-      { title: 'Edge Functions download without Docker', url: 'https://supabase.com/blog' },
+      { title: 'Supabase ETL', url: 'https://supabase.com/blog/introducing-supabase-etl' },
+      {
+        title: 'Analytics Buckets',
+        url: 'https://supabase.com/blog/introducing-analytics-buckets',
+      },
+      { title: 'Vector Buckets', url: 'https://supabase.com/blog/vector-buckets' },
+      { title: 'iceberg-js', url: 'https://supabase.com/blog/introducing-iceberg-js' },
+      {
+        title: 'Supabase for Platforms',
+        url: 'https://supabase.com/blog/introducing-supabase-for-platforms',
+      },
+      {
+        title: 'Sign in with Your App (OAuth2 Provider)',
+        url: 'https://supabase.com/blog/oauth2-provider',
+      },
+      { title: 'Supabase for Kiro IDE', url: 'https://supabase.com/blog/supabase-power-for-kiro' },
+      {
+        title: 'Async Streaming for Postgres Foreign Data Wrappers',
+        url: 'https://supabase.com/blog/async-postgres-fdws',
+      },
     ],
   },
 ]
