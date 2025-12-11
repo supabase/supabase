@@ -3,3 +3,5 @@
 
 ALTER DATABASE postgres SET "app.settings.jwt_secret" TO :'jwt_secret';
 ALTER DATABASE postgres SET "app.settings.jwt_exp" TO :'jwt_exp';
+
+ALTER DATABASE postgres RESET "supautils.disable_program";
