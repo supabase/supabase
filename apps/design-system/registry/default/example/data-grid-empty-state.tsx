@@ -3,7 +3,7 @@ import DataGrid, { Column } from 'react-data-grid'
 import 'react-data-grid/lib/styles.css'
 import { cn } from 'ui'
 
-export default function EmptyStateZeroItemsDataGrid() {
+export default function DataGridEmptyState() {
   const columns: Column<{ id: string; name: string; email: string }>[] = [
     { key: 'name', name: 'Display name', minWidth: 200, resizable: true },
     { key: 'email', name: 'Email', minWidth: 250, resizable: true },
