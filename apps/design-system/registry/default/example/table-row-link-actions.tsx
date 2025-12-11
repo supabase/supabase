@@ -66,7 +66,7 @@ export default function TableRowLinkActions() {
               tabIndex={0}
             >
               <TableCell className="w-1">
-                <Shield aria-label="bucket icon" size={16} className="text-foreground-muted" />
+                <Shield aria-label="policy icon" size={16} className="text-foreground-muted" />
               </TableCell>
               <TableCell>{policy.name}</TableCell>
               <TableCell>
