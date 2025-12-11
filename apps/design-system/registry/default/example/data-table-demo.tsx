@@ -7,6 +7,8 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table'
@@ -99,16 +101,19 @@ export const columns: ColumnDef<Payment>[] = [
   {
     accessorKey: 'status',
     header: 'Status',
+    enableSorting: true,
     cell: ({ row }) => <div className="capitalize">{row.getValue('status')}</div>,
   },
   {
     accessorKey: 'email',
     header: 'Email',
+    enableSorting: true,
     cell: ({ row }) => <div className="lowercase">{row.getValue('email')}</div>,
   },
   {
     accessorKey: 'amount',
     header: () => <div className="text-right">Amount</div>,
+    enableSorting: true,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('amount'))
 
@@ -147,63 +152,52 @@ export const columns: ColumnDef<Payment>[] = [
   },
 ]
 
-type ColumnSort =
-  | 'email:asc'
-  | 'email:desc'
-  | 'status:asc'
-  | 'status:desc'
-  | 'amount:asc'
-  | 'amount:desc'
-
 export default function DataTableDemo() {
-  const [sort, setSort] = React.useState<ColumnSort | ''>('')
+  const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
 
-  const handleSortChange = (column: string) => {
-    const [currentCol, currentOrder] = sort.split(':') as [string, 'asc' | 'desc' | '']
-    if (currentCol === column) {
-      // Cycle through: asc -> desc -> no sort
-      if (currentOrder === 'asc') {
-        setSort(`${column}:desc` as ColumnSort)
+  // Convert TanStack Table's SortingState to the string format expected by TableHeadSort
+  const getSortString = React.useMemo(() => {
+    if (sorting.length === 0) return ''
+    const sort = sorting[0]
+    return `${sort.id}:${sort.desc ? 'desc' : 'asc'}`
+  }, [sorting])
+
+  // Handle sort changes from TableHeadSort and convert to TanStack Table's SortingState
+  const handleSortChange = React.useCallback(
+    (column: string) => {
+      const currentSort = sorting.find((s) => s.id === column)
+      if (currentSort) {
+        if (currentSort.desc) {
+          // Cycle: desc -> remove sort
+          setSorting([])
+        } else {
+          // Cycle: asc -> desc
+          setSorting([{ id: column, desc: true }])
+        }
       } else {
-        setSort('')
+        // New column, start with asc
+        setSorting([{ id: column, desc: false }])
       }
-    } else {
-      // New column, start with asc
-      setSort(`${column}:asc` as ColumnSort)
-    }
-  }
-
-  const sortedData = React.useMemo(() => {
-    if (!sort) return data
-
-    const [sortCol, sortOrder] = sort.split(':') as [string, 'asc' | 'desc']
-    const orderMultiplier = sortOrder === 'asc' ? 1 : -1
-
-    return [...data].sort((a, b) => {
-      if (sortCol === 'email') {
-        return a.email.localeCompare(b.email) * orderMultiplier
-      } else if (sortCol === 'status') {
-        return a.status.localeCompare(b.status) * orderMultiplier
-      } else if (sortCol === 'amount') {
-        return (a.amount - b.amount) * orderMultiplier
-      }
-      return 0
-    })
-  }, [sort])
+    },
+    [sorting]
+  )
 
   const table = useReactTable({
-    data: sortedData,
+    data,
     columns,
+    onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
+      sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
@@ -254,7 +248,7 @@ export default function DataTableDemo() {
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   const columnId = header.column.id
-                  const isSortableColumn = ['email', 'status', 'amount'].includes(columnId)
+                  const canSort = header.column.getCanSort()
 
                   return (
                     <TableHead
@@ -267,18 +261,14 @@ export default function DataTableDemo() {
                             : undefined
                       }
                     >
-                      {header.isPlaceholder ? null : isSortableColumn ? (
+                      {header.isPlaceholder ? null : canSort ? (
                         <TableHeadSort
                           column={columnId}
-                          currentSort={sort}
+                          currentSort={getSortString}
                           onSortChange={handleSortChange}
                           className={columnId === 'amount' ? 'justify-end' : undefined}
                         >
-                          {columnId === 'email'
-                            ? 'Email'
-                            : columnId === 'status'
-                              ? 'Status'
-                              : 'Amount'}
+                          {flexRender(header.column.columnDef.header, header.getContext())}
                         </TableHeadSort>
                       ) : (
                         flexRender(header.column.columnDef.header, header.getContext())
