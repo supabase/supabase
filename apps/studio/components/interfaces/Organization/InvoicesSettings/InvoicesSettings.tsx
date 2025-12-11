@@ -142,10 +142,8 @@ export const InvoicesSettings = () => {
             </TableRow>
           ) : invoices.length === 0 ? (
             <TableRow className="[&>td]:hover:bg-inherit">
-              <TableCell colSpan={6} className="py-6">
-                <p className="text-foreground-lighter">
-                  {isLoading ? 'Checking for invoices' : 'No invoices for this organization yet'}
-                </p>
+              <TableCell colSpan={5} className="py-6">
+                <p className="text-foreground-lighter">No invoices for this organization yet</p>
               </TableCell>
             </TableRow>
           ) : (
@@ -210,7 +208,7 @@ export const InvoicesSettings = () => {
           <div className="flex items-center gap-x-2" aria-label="Pagination">
             <Button
               icon={<ChevronLeft />}
-              aria-label={`Go to page ${page - 1}`}
+              aria-label="Previous page"
               type="default"
               size="tiny"
               disabled={page === 1}
@@ -218,7 +216,7 @@ export const InvoicesSettings = () => {
             />
             <Button
               icon={<ChevronRight />}
-              aria-label={`Go to page ${page + 1}`}
+              aria-label="Next page"
               type="default"
               size="tiny"
               disabled={page * PAGE_LIMIT >= (count ?? 0)}
