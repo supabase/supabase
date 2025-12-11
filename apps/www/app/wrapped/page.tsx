@@ -17,8 +17,7 @@ export default function SupabaseWrappedPage() {
       <Intro />
       <YearOfAI />
       <Devs />
-      {/*<ProductAnnouncements />*/}
-      <AnnouncementsTimeline />
+      <ProductAnnouncements />
       <SupabaseSelect />
       <CustomerStories />
     </DefaultLayout>
