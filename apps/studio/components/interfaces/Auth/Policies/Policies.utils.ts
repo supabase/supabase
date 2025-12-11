@@ -1,6 +1,7 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { has, isEmpty, isEqual } from 'lodash'
 
+import { ident } from '@supabase/pg-meta/src/pg-format'
 import { generateSqlPolicy } from 'data/ai/sql-policy-mutation'
 import type { CreatePolicyBody } from 'data/database-policies/database-policy-create-mutation'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
@@ -279,23 +280,29 @@ const buildPolicyExpression = (path: Relationship[]): string => {
 
   // Indirect path - build EXISTS with JOINs
   const [first, ...rest] = path
-  const firstTarget = `${first.target_table_schema}.${first.target_table_name}`
-  const source = `${first.source_schema}.${first.source_table_name}`
+  const firstTarget = `${ident(first.target_table_schema)}.${ident(first.target_table_name)}`
+  const source = `${ident(first.source_schema)}.${ident(first.source_table_name)}`
   const last = path[path.length - 1]
 
   const joins = rest
     .slice(0, -1)
-    .map(
-      (r) =>
-        `join ${r.target_table_schema}.${r.target_table_name} on ${r.target_table_schema}.${r.target_table_name}.${r.target_column_name} = ${r.source_schema}.${r.source_table_name}.${r.source_column_name}`
-    )
+    .map((r) => {
+      const targetSchema = ident(r.target_table_schema)
+      const targetTable = ident(r.target_table_name)
+      const targetColumn = ident(r.target_column_name)
+
+      const sourceSchema = ident(r.source_schema)
+      const sourceTable = ident(r.source_table_name)
+      const sourceColumn = ident(r.source_column_name)
+      return `join ${targetSchema}.${targetTable} on ${targetSchema}.${targetTable}.${targetColumn} = ${sourceSchema}.${sourceTable}.${sourceColumn}`
+    })
     .join('\n  ')
 
   return `exists (
   select 1 from ${firstTarget}
   ${joins}
-  where ${firstTarget}.${first.target_column_name} = ${source}.${first.source_column_name}
-  and ${last.source_schema}.${last.source_table_name}.${last.source_column_name} = (select auth.uid())
+  where ${firstTarget}.${ident(first.target_column_name)} = ${source}.${ident(first.source_column_name)}
+  and ${ident(last.source_schema)}.${ident(last.source_table_name)}.${ident(last.source_column_name)} = (select auth.uid())
 )`
 }
 
@@ -308,8 +315,8 @@ const buildPoliciesForPath = (
   const targetCol = path[0].source_column_name
 
   return (['SELECT', 'INSERT', 'UPDATE', 'DELETE'] as const).map((command) => {
-    const name = `Enable ${command.toLowerCase()} access for users based on ${targetCol}`
-    const base = `CREATE POLICY "${name}" ON "${table.schema}"."${table.name}" AS PERMISSIVE FOR ${command} TO public`
+    const name = `Enable ${command.toLowerCase()} access for users based on ${ident(targetCol)}`
+    const base = `CREATE POLICY "${name}" ON ${ident(table.schema)}.${ident(table.name)} AS PERMISSIVE FOR ${command} TO public`
 
     const sql =
       command === 'INSERT'

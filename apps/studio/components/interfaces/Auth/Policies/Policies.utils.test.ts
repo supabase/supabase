@@ -212,7 +212,7 @@ describe('Policies.utils - Policy Generation', () => {
 
         const selectPolicy = policies.find((p) => p.command === 'SELECT')
         expect(selectPolicy?.sql).toContain('CREATE POLICY')
-        expect(selectPolicy?.sql).toContain('"public"."posts"')
+        expect(selectPolicy?.sql).toContain('public.posts')
         expect(selectPolicy?.sql).toContain('AS PERMISSIVE FOR SELECT')
         expect(selectPolicy?.sql).toContain('TO public')
         expect(selectPolicy?.sql).toContain('USING')
@@ -239,7 +239,7 @@ describe('Policies.utils - Policy Generation', () => {
 
       expect(policies).toHaveLength(4)
       expect(policies[0].schema).toBe('private')
-      expect(policies[0].sql).toContain('"private"."documents"')
+      expect(policies[0].sql).toContain('private.documents')
     })
   })
 
@@ -247,7 +247,7 @@ describe('Policies.utils - Policy Generation', () => {
     const mockAiPolicies: GeneratedPolicy[] = [
       {
         name: 'ai_select_policy',
-        sql: 'CREATE POLICY "ai_select_policy" ON "public"."posts" FOR SELECT USING (true);',
+        sql: 'CREATE POLICY "ai_select_policy" ON public.posts FOR SELECT USING (true);',
         command: 'SELECT',
         table: 'posts',
         schema: 'public',
@@ -340,7 +340,7 @@ describe('Policies.utils - Policy Generation', () => {
     const mockAiPolicies: GeneratedPolicy[] = [
       {
         name: 'ai_policy',
-        sql: 'CREATE POLICY "ai_policy" ON "public"."posts" FOR SELECT USING (true);',
+        sql: 'CREATE POLICY "ai_policy" ON public.posts FOR SELECT USING (true);',
         command: 'SELECT',
         table: 'posts',
         schema: 'public',
