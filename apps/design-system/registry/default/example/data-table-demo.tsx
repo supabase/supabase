@@ -8,16 +8,14 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+import { ChevronDown, MoreHorizontal } from "lucide-react"
 
 import {
   Button_Shadcn_,
-  Checkbox,
+  Checkbox_Shadcn_,
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
@@ -30,6 +28,7 @@ import {
   TableBody,
   TableCell,
   TableHead,
+  TableHeadSort,
   TableHeader,
   TableRow,
 } from 'ui'
@@ -78,17 +77,17 @@ export const columns: ColumnDef<Payment>[] = [
   {
     id: "select",
     header: ({ table }) => (
-      <Checkbox
+      <Checkbox_Shadcn_
         checked={
           table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
+          (table.getIsSomePageRowsSelected() ? "indeterminate" : false)
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
       />
     ),
     cell: ({ row }) => (
-      <Checkbox
+      <Checkbox_Shadcn_
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
@@ -106,17 +105,7 @@ export const columns: ColumnDef<Payment>[] = [
   },
   {
     accessorKey: "email",
-    header: ({ column }) => {
-      return (
-        <Button_Shadcn_
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <ArrowUpDown />
-        </Button_Shadcn_>
-      )
-    },
+    header: "Email",
     cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
   },
   {
@@ -165,8 +154,10 @@ export const columns: ColumnDef<Payment>[] = [
   },
 ]
 
+type EmailSort = 'email:asc' | 'email:desc'
+
 export default function DataTableDemo() {
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [sort, setSort] = React.useState<EmailSort | ''>('')
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   )
@@ -174,19 +165,45 @@ export default function DataTableDemo() {
     React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
 
+  const handleSortChange = (column: string) => {
+    const [currentCol, currentOrder] = sort.split(':') as [string, 'asc' | 'desc' | '']
+    if (currentCol === column) {
+      // Cycle through: asc -> desc -> no sort
+      if (currentOrder === 'asc') {
+        setSort(`${column}:desc` as EmailSort)
+      } else {
+        setSort('')
+      }
+    } else {
+      // New column, start with asc
+      setSort(`${column}:asc` as EmailSort)
+    }
+  }
+
+  const sortedData = React.useMemo(() => {
+    if (!sort) return data
+    
+    const [sortCol, sortOrder] = sort.split(':') as ['email', 'asc' | 'desc']
+    const orderMultiplier = sortOrder === 'asc' ? 1 : -1
+
+    return [...data].sort((a, b) => {
+      if (sortCol === 'email') {
+        return a.email.localeCompare(b.email) * orderMultiplier
+      }
+      return 0
+    })
+  }, [sort])
+
   const table = useReactTable({
-    data,
+    data: sortedData,
     columns,
-    onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
-      sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
@@ -197,7 +214,8 @@ export default function DataTableDemo() {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
+          size="tiny"
+          placeholder="Filter by email"
           value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("email")?.setFilterValue(event.target.value)
@@ -206,7 +224,7 @@ export default function DataTableDemo() {
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button_Shadcn_ variant="outline" className="ml-auto">
+            <Button_Shadcn_ variant="outline" className="ml-auto" size="tiny">
               Columns <ChevronDown />
             </Button_Shadcn_>
           </DropdownMenuTrigger>
@@ -237,13 +255,24 @@ export default function DataTableDemo() {
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
+                  const isEmailColumn = header.column.id === 'email'
                   return (
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
+                        : isEmailColumn ? (
+                            <TableHeadSort
+                              column="email"
+                              currentSort={sort}
+                              onSortChange={handleSortChange}
+                            >
+                              Email
+                            </TableHeadSort>
+                          ) : (
+                            flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )
                           )}
                     </TableHead>
                   )
@@ -257,9 +286,19 @@ export default function DataTableDemo() {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  // className="bg-surface-75"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className={
+                        cell.column.id === 'email'
+                          ? 'text-foreground-lighter'
+                          : cell.column.id === 'amount'
+                            ? 'font-mono'
+                            : undefined
+                      }
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -282,14 +321,14 @@ export default function DataTableDemo() {
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="text-muted-foreground flex-1 text-sm">
+        <div className="text-foreground-muted flex-1 text-xs">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {table.getFilteredRowModel().rows.length} row(s) selected
         </div>
         <div className="space-x-2">
           <Button_Shadcn_
             variant="outline"
-            size="sm"
+            size="tiny"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
@@ -297,7 +336,7 @@ export default function DataTableDemo() {
           </Button_Shadcn_>
           <Button_Shadcn_
             variant="outline"
-            size="sm"
+            size="tiny"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
