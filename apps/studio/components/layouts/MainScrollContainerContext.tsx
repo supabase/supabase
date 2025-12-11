@@ -19,20 +19,10 @@ export const MainScrollContainerProvider = ({ children }: { children: ReactNode 
 
 export const useSetMainScrollContainer = () => {
   const context = useContext(SetMainScrollContainerContext)
-
-  if (!context) {
-    throw new Error('useSetMainScrollContainer must be used within a MainScrollContainerProvider')
-  }
-
   return context
 }
 
 export const useMainScrollContainer = () => {
   const context = useContext(MainScrollContainerContext)
-
-  if (!context) {
-    throw new Error('useMainScrollContainer must be used within a MainScrollContainerProvider')
-  }
-
   return context
 }

@@ -68,7 +68,7 @@ export const BucketsPolicies = ({
               Write policies for each bucket to control access to the bucket and its contents
             </PageSectionDescription>
           </PageSectionSummary>
-          <CollapsibleTrigger_Shadcn_>
+          <CollapsibleTrigger_Shadcn_ asChild>
             <button>
               <span className="sr-only">Toggle bucket list</span>
               <ChevronUp

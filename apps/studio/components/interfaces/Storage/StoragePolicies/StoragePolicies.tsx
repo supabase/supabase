@@ -98,7 +98,10 @@ export const StoragePolicies = () => {
     (x) => x.schema === 'storage' && x.table === 'objects'
   )
 
-  const formattedStorageObjectPolicies = formatPoliciesForStorage(buckets, storageObjectsPolicies)
+  const formattedStorageObjectPolicies = useMemo(
+    () => formatPoliciesForStorage(buckets, storageObjectsPolicies),
+    [buckets, storageObjectsPolicies]
+  )
 
   const ungroupedPolicies =
     formattedStorageObjectPolicies.find((x) => x.name === UNGROUPED_POLICY_SYMBOL)?.policies ?? []
