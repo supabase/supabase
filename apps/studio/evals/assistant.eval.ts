@@ -2,7 +2,7 @@ import { openai } from '@ai-sdk/openai'
 import { Eval } from 'braintrust'
 import { AssertionScorer } from 'lib/ai/evals/scorer'
 import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
-import { getMockTools } from 'lib/ai/tools'
+import { getMockTools } from 'lib/ai/tools/mock-tools'
 import assert from 'node:assert'
 
 assert(process.env.BRAINTRUST_PROJECT_ID, 'BRAINTRUST_PROJECT_ID is not set')
@@ -29,12 +29,17 @@ Eval('Assistant', {
       tools: await getMockTools(),
     })
 
-    const text = await result.text
-    const toolCalls = await result.toolCalls
+    const textLastStep = await result.text
+
+    // `result.toolCalls` only shows the last step, instead aggregate tools across all steps
+    const steps = await result.steps
+    const toolNamesAllStepsFlattened = steps.flatMap((step) =>
+      step.toolCalls.map((call) => call.toolName)
+    )
 
     return {
-      text: text,
-      tools: toolCalls.map((call) => call.toolName),
+      text: textLastStep,
+      tools: toolNamesAllStepsFlattened,
     }
   },
   scores: [AssertionScorer],
