@@ -275,7 +275,7 @@ const buildPolicyExpression = (path: Relationship[]): string => {
 
   // Direct FK to auth.users
   if (path.length === 1) {
-    return `(select auth.uid()) = ${path[0].source_column_name}`
+    return `(select auth.uid()) = ${ident(path[0].source_column_name)}`
   }
 
   // Indirect path - build EXISTS with JOINs

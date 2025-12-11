@@ -41,7 +41,6 @@ export const ToggleRLSButton = ({
       {
         onSuccess: () => {
           toast.success(`Row Level Security has been ${action.toLowerCase()} for this table.`)
-          console.log('asd')
           onSuccess?.(!isRLSEnabled)
           setShowConfirmation(false)
         },

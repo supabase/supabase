@@ -89,7 +89,7 @@ export const PolicyListEmptyState = ({
       description:
         "Automatic policy generation wasn't possible for this table. Update the schema and try again, or add policies manually after creating the table.",
     }
-  }, [generateFailed])
+  }, [generateFailed, includeSchemaMetadata])
 
   const { title, description } = emptyStateMessage
   const showPermissionButton = generateFailed && !includeSchemaMetadata

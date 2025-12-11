@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import type { CreatePolicyBody } from 'data/database-policies/database-policy-create-mutation'
 import { fetchPost } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
-import { ResponseError } from 'types'
+import { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type SqlPolicyGenerateVariables = {
   tableName: string
@@ -49,28 +49,28 @@ export async function generateSqlPolicy({
   return result as SqlPolicyGenerateResponse
 }
 
+type SqlPolicyGenerateData = Awaited<ReturnType<typeof generateSqlPolicy>>
+
 export const useSqlPolicyGenerateMutation = ({
   onSuccess,
   onError,
   ...options
-}: {
-  onSuccess?: (data: SqlPolicyGenerateResponse, variables: SqlPolicyGenerateVariables) => void
-  onError?: (error: ResponseError, variables: SqlPolicyGenerateVariables) => void
-} = {}) => {
-  return useMutation<SqlPolicyGenerateResponse, ResponseError, SqlPolicyGenerateVariables>(
-    (vars) => generateSqlPolicy(vars),
-    {
-      async onSuccess(data, variables) {
-        await onSuccess?.(data, variables)
-      },
-      async onError(data, variables) {
-        if (onError === undefined) {
-          toast.error(`Failed to generate policy: ${data.message}`)
-        } else {
-          onError(data, variables)
-        }
-      },
-      ...options,
-    }
-  )
+}: Omit<
+  UseCustomMutationOptions<SqlPolicyGenerateData, ResponseError, SqlPolicyGenerateVariables>,
+  'mutationFn'
+> = {}) => {
+  return useMutation<SqlPolicyGenerateResponse, ResponseError, SqlPolicyGenerateVariables>({
+    mutationFn: (vars) => generateSqlPolicy(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to generate policy: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -123,7 +123,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
         Requirements:
         - Use the available planning and schema tools (like "list_policies" or "list_tables") to inspect the "${schema}" schema and existing policies before generating new ones.
-        - Ensure policies stricly adhere to the existing schema
+        - Ensure policies strictly adhere to the existing schema
         - Return a curated list of recommended CREATE POLICY statements as JSON.
         - Each policy must include: name, sql, command (SELECT/INSERT/UPDATE/DELETE/ALL), action (PERMISSIVE/RESTRICTIVE), roles (array of role names).
         - Include "definition" (USING clause expression without the USING keyword) for SELECT, UPDATE, DELETE policies.
