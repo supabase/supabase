@@ -26,7 +26,13 @@ const OrganizationsPage: NextPageWithLayout = () => {
   const { error: orgNotFoundError, org: orgSlug } = useParams()
   const orgNotFound = orgNotFoundError === 'org_not_found'
 
-  const { data: organizations = [], error, isLoading, isError, isSuccess } = useOrganizationsQuery()
+  const {
+    data: organizations = [],
+    error,
+    isPending: isLoading,
+    isError,
+    isSuccess,
+  } = useOrganizationsQuery()
 
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
   const filteredOrganizations =

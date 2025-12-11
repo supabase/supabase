@@ -43,8 +43,7 @@ export const formatPoliciesForStorage = (buckets: Bucket[], policies: PostgresPo
   return policiesByBucket
 }
 
-/* Start: Internal methods to support formatPoliciesForStorage but exported for tests to cover */
-const formatStoragePolicies = (buckets: any[], policies: any[]) => {
+const formatStoragePolicies = (buckets: Bucket[], policies: PostgresPolicy[]) => {
   const availableBuckets = buckets.map((bucket) => bucket.name)
   const formattedPolicies = policies.map((policy) => {
     const { definition: policyDefinition, check: policyCheck } = policy
@@ -69,7 +68,9 @@ const formatStoragePolicies = (buckets: any[], policies: any[]) => {
   return formattedPolicies
 }
 
-const extractBucketNameFromDefinition = (definition: string) => {
+export const extractBucketNameFromDefinition = (definition: string | null) => {
+  if (!definition) return null
+
   const definitionSegments = definition?.split(' AND ') ?? []
   const [bucketDefinition] = definitionSegments.filter((segment: string) =>
     segment.includes('bucket_id')
@@ -77,14 +78,12 @@ const extractBucketNameFromDefinition = (definition: string) => {
   return bucketDefinition ? bucketDefinition.split("'")[1] : null
 }
 
-const groupPoliciesByBucket = (policies: any[]) => {
+const groupPoliciesByBucket = (policies: (PostgresPolicy & { bucket: string })[]) => {
   const policiesByBucket = groupBy(policies, 'bucket')
   return Object.keys(policiesByBucket).map((bucketName) => {
     return { name: bucketName, policies: policiesByBucket[bucketName] }
   })
 }
-
-/* End: Internal methods to support formatPoliciesForStorage but exported for tests to cover */
 
 export const createPayloadsForAddPolicy = (
   bucketName = '',

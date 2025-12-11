@@ -39,10 +39,10 @@ const DiskSizeConfigurationModal = ({
 }: DiskSizeConfigurationProps) => {
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
+  const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
   const { lastDatabaseResizeAt } = project ?? {}
 
-  const { data: projectSubscriptionData, isLoading: isLoadingSubscription } =
+  const { data: projectSubscriptionData, isPending: isLoadingSubscription } =
     useOrgSubscriptionQuery({ orgSlug: organization?.slug }, { enabled: visible })
 
   const isLoading = isLoadingProject || isLoadingSubscription

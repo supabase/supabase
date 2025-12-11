@@ -45,20 +45,20 @@ export const useProjectUpgradingStatusQuery = <TData = ProjectUpgradingStatusDat
 ) => {
   const client = useQueryClient()
 
-  const query = useQuery<ProjectUpgradingStatusData, ProjectUpgradingStatusError, TData>({
+  const query = useQuery({
     queryKey: configKeys.upgradeStatus(projectRef),
     queryFn: ({ signal }) => getProjectUpgradingStatus({ projectRef, trackingId }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
-    refetchInterval(data) {
-      const response = data as unknown as ProjectUpgradingStatusData
-      if (!response) return false
+    refetchInterval: (query) => {
+      const data = query.state.data
+      if (!data) return false
 
       const interval =
         // Transited to UPGRADING state via client, but job not yet picked up
         (projectStatus === PROJECT_STATUS.UPGRADING &&
-          response.databaseUpgradeStatus?.status !== DatabaseUpgradeStatus.Upgrading) ||
+          data.databaseUpgradeStatus?.status !== DatabaseUpgradeStatus.Upgrading) ||
         // Project currently getting upgraded
-        response.databaseUpgradeStatus?.status === DatabaseUpgradeStatus.Upgrading
+        data.databaseUpgradeStatus?.status === DatabaseUpgradeStatus.Upgrading
           ? 5000
           : false
 
@@ -70,7 +70,7 @@ export const useProjectUpgradingStatusQuery = <TData = ProjectUpgradingStatusDat
 
   useEffect(() => {
     if (!query.isSuccess) return
-    const response = query.data as unknown as ProjectUpgradingStatusData
+    const response = query.data as ProjectUpgradingStatusData
     if (response.databaseUpgradeStatus?.status === DatabaseUpgradeStatus.Upgraded) {
       client.invalidateQueries({ queryKey: configKeys.upgradeEligibility(projectRef) })
     }
