@@ -557,11 +557,16 @@ export function ExplainVisualizer({ rows, onShowRaw }: ExplainVisualizerProps) {
   }, [parsedTree])
 
   // Assign step numbers and calculate total steps
+  // PostgreSQL executes children in reverse order for joins:
+  // - For Hash Join: the Hash (inner/build) side executes first, then the outer/probe side
+  // - The second child in EXPLAIN output is typically the "build" side
   const totalSteps = useMemo(() => {
     let stepCounter = 1
     const assignSteps = (node: ExplainNode) => {
-      // Process children first (they execute before parent)
-      node.children.forEach(assignSteps)
+      // Process children in REVERSE order (inner/build side first, then outer/probe)
+      // This matches PostgreSQL's actual execution order
+      const children = [...node.children].reverse()
+      children.forEach(assignSteps)
       node._stepNumber = stepCounter++
     }
     parsedTree.forEach(assignSteps)
