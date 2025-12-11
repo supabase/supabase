@@ -90,7 +90,13 @@ export const extractBucketNameFromDefinition = (definition: string | null) => {
 }
 
 const groupPoliciesByBucket = (policies: (PostgresPolicy & { bucket: string | Symbol })[]) => {
-  const policiesByBucket = Map.groupBy(policies, (policy) => policy.bucket)
+  const policiesByBucket = new Map<string | Symbol, PostgresPolicy[]>()
+  policies.forEach((policy) => {
+    if (!policiesByBucket.has(policy.bucket)) {
+      policiesByBucket.set(policy.bucket, [])
+    }
+    policiesByBucket.get(policy.bucket)?.push(policy)
+  })
   return [
     ...policiesByBucket.entries().map(([bucketName, policies]) => ({ name: bucketName, policies })),
   ]
