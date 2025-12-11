@@ -41,17 +41,15 @@ export default function AboutPage() {
                   <div className="mb-4">
                     <MessageCircle className="h-8 w-8 text-foreground" strokeWidth={1.5} />
                   </div>
-                  <h2 className="text-lg text-foreground mb-3">Help Others Across the Community</h2>
-                  <p className="text-foreground-lighter mb-4">
-                    A massive portion of Supabase knowledge lives in the community: Discord, GitHub
-                    Discussions, Reddit, Twitter, and StackOverflow. Helping others unlock problems
-                    is one of the most effective ways to strengthen the ecosystem.
+                  <h2 className="text-lg text-foreground mb-2">Help Others Across the Community</h2>
+                  <p className="text-foreground-lighter mb-3">
+                    Help unblock others by answering questions in Discord, GitHub Discussions,
+                    Reddit, Twitter, and StackOverflow.
                   </p>
-                  <ul className="grid gap-2 text-sm text-foreground-lighter list-disc list-inside">
+                  <ul className="grid gap-2 text-sm text-foreground-lighter list-disc list-inside ml-3">
                     <li>Answer developer questions in Discord or GitHub</li>
                     <li>Share solutions on Reddit or StackOverflow</li>
                     <li>Help triage issues and route users to the right resources</li>
-                    <li>Write quick snippets, examples, or clarifications for common problems</li>
                   </ul>
                 </CardContent>
               </Card>
@@ -61,19 +59,16 @@ export default function AboutPage() {
                   <div className="mb-4">
                     <Link2 className="h-8 w-8 text-foreground" strokeWidth={1.5} />
                   </div>
-                  <h2 className="text-lg text-foreground mb-3">
+                  <h2 className="text-lg text-foreground mb-2">
                     Build and Maintain Open Source Projects
                   </h2>
-                  <p className="text-foreground-lighter mb-4">
-                    Supabase is powered by many open source repositories and a large ecosystem of
-                    community-driven libraries. Contributors can help by fixing bugs, improving
-                    performance, writing new features, or maintaining integrations that extend the
-                    platform.
+                  <p className="text-foreground-lighter mb-3">
+                    Contribute to and help maintain the many open source repositories and the large
+                    ecosystem of community-driven libraries that power Supabase.
                   </p>
-                  <ul className="grid gap-2 text-sm text-foreground-lighter list-disc list-inside">
+                  <ul className="grid gap-2 text-sm text-foreground-lighter list-disc list-inside ml-3">
                     <li>Improve or extend client libraries</li>
-                    <li>Maintain open source SDKs</li>
-                    <li>Contribute to tooling, CLIs, or utility packages</li>
+                    <li>Contribute to open source tooling, CLIs, or utility packages</li>
                     <li>Review PRs and triage issues</li>
                   </ul>
                 </CardContent>
@@ -84,12 +79,12 @@ export default function AboutPage() {
                   <div className="mb-4">
                     <BookOpen className="h-8 w-8 text-foreground" strokeWidth={1.5} />
                   </div>
-                  <h2 className="text-lg text-foreground mb-3">Write docs and guides</h2>
-                  <p className="text-foreground-lighter mb-4">
+                  <h2 className="text-lg text-foreground mb-2">Write docs and guides</h2>
+                  <p className="text-foreground-lighter mb-3">
                     Help us make Supabase easier to learn and use by improving clarity, adding
                     examples, or filling in gaps.
                   </p>
-                  <ul className="grid gap-2 text-sm text-foreground-lighter list-disc list-inside">
+                  <ul className="grid gap-2 text-sm text-foreground-lighter list-disc list-inside ml-3">
                     <li>Add code examples and use cases</li>
                     <li>Rewrite sections for clarity and consistency</li>
                     <li>Create new tutorials or deep-dives</li>
@@ -102,19 +97,17 @@ export default function AboutPage() {
                   <div className="mb-4">
                     <User className="h-8 w-8 text-foreground" strokeWidth={1.5} />
                   </div>
-                  <h2 className="text-lg text-foreground mb-3">
+                  <h2 className="text-lg text-foreground mb-2">
                     That thing you do better than anyone
                   </h2>
-                  <p className="text-foreground-lighter mb-4">
+                  <p className="text-foreground-lighter mb-3">
                     Do you have a unique skill or perspective that you can share with the community?
                     We'd love to hear from you.
                   </p>
-                  <ul className="grid gap-2 text-sm text-foreground-lighter list-disc list-inside">
-                    <li>
-                      Got a unique skill or perspective that you can share with the community?
-                    </li>
+                  <ul className="grid gap-2 text-sm text-foreground-lighter list-disc list-inside ml-3">
+                    <li>Got a unique perspective that you can share?</li>
                     <li>Got a niche skill that not many people have?</li>
-                    <li>Know one of our core technologies better than anyone else?</li>
+                    <li>Know one of our core tools better than anyone else?</li>
                   </ul>
                 </CardContent>
               </Card>
