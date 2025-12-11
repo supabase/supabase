@@ -27,28 +27,32 @@ Chromium-based browsers and Firefox handle this automatically via the Tab key. S
 
 Interactive page elements should also provide visual feedback upon selection via a `focus-visible` state. We use consistent focus styles such as `inset-focus` so users recognize this state instantly.
 
-[Button](../components/button) has all of the above built-in. Bespoke interactive elements however, such as the below clickable [TableRow](../components/table), require these props to be added manually:
+[Button](components/button) has all of the above built-in. Bespoke interactive elements however, such as the below interactive [Table Row](components/table#examples), require these props to be added manually:
 
-```tsx showLineNumbers {3, 5-11}
+```tsx showLineNumbers {4-14}
 <TableRow
   key={id}
   className="relative cursor-pointer h-16 inset-focus"
-  onClick={(event) => handleBucketNavigation(name, event)}
+  onClick={(event) => {
+    if (event.currentTarget !== event.target) return
+    handleBucketNavigation(bucket.id, event)
+  }}
   onKeyDown={(event) => {
+    if (event.currentTarget !== event.target) return
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
-      handleBucketNavigation(name, event)
+      handleBucketNavigation(bucket.id, event)
     }
   }}
   tabIndex={0}
 >
-  <TableCell>
-    <p>{name}</p>
-  </TableCell>
+  <TableCell>{name}</TableCell>
 </TableRow>
 ```
 
 Consider also affordances like `ctrl` and `meta` key support for opening in a new tab. Anything that you can do with a mouse input should be replicable by keyboard.
+
+See the examples within [Table](components/table#examples) for more.
 
 ### Radio groups
 

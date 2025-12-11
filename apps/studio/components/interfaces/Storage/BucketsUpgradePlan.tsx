@@ -10,7 +10,7 @@ export const BucketsUpgradePlan = ({ type }: { type: 'analytics' | 'vector' }) =
   return (
     <PageContainer>
       <PageSection>
-        <PageSectionContent>
+        <PageSectionContent className="flex flex-col gap-y-8">
           <AlphaNotice
             entity={type === 'analytics' ? 'Analytics buckets' : 'Vector buckets'}
             feedbackUrl={

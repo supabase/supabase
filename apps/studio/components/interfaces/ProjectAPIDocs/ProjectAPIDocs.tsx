@@ -18,9 +18,9 @@ import { RPC } from './Content/RPC'
 import { Storage } from './Content/Storage'
 import { StoredProcedures } from './Content/StoredProcedures'
 import { UserManagement } from './Content/UserManagement'
-import FirstLevelNav from './FirstLevelNav'
+import { FirstLevelNav } from './FirstLevelNav'
 import LanguageSelector from './LanguageSelector'
-import SecondLevelNav from './SecondLevelNav'
+import { SecondLevelNav } from './SecondLevelNav'
 
 /**
  * [Joshen] Reminder: when we choose to release this as a main feature

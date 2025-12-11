@@ -15,7 +15,13 @@ type SystemRole = (typeof SYSTEM_ROLES)[number]
 
 export const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const { data, error, isLoading, isError, isSuccess } = useDatabaseRolesQuery({
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isError,
+    isSuccess,
+  } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

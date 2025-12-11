@@ -11,7 +11,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:2025.11.26-sha-8f096b5
+    image: supabase/studio:2025.12.09-sha-434634f
     restart: unless-stopped
     healthcheck:
       test:
@@ -173,7 +173,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v13.0.7
+    image: postgrest/postgrest:v14.1
     restart: unless-stopped
     depends_on:
       db:
@@ -197,7 +197,7 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.65.3
+    image: supabase/realtime:v2.68.0
     restart: unless-stopped
     depends_on:
       db:
@@ -235,7 +235,7 @@ services:
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.32.0
+    image: supabase/storage-api:v1.33.0
     restart: unless-stopped
     volumes:
       - ./volumes/storage:/var/lib/storage:z
@@ -320,7 +320,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.69.25
+    image: supabase/edge-runtime:v1.69.28
     restart: unless-stopped
     volumes:
       - ./volumes/functions:/home/deno/functions:Z
@@ -344,7 +344,7 @@ services:
 
   analytics:
     container_name: supabase-analytics
-    image: supabase/logflare:1.26.13
+    image: supabase/logflare:1.26.25
     restart: unless-stopped
     ports:
       - 4000:4000

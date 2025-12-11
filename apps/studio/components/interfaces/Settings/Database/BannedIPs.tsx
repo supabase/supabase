@@ -25,7 +25,7 @@ const BannedIPs = () => {
   const [selectedIPToUnban, setSelectedIPToUnban] = useState<string | null>(null) // Track the selected IP for unban
 
   const {
-    isLoading: isLoadingIPList,
+    isPending: isLoadingIPList,
     isFetching: isFetchingIPList,
     data: ipList,
     error: ipListError,

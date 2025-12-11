@@ -491,8 +491,12 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/ai-prompts' as `/${string}`,
         },
         {
-          name: 'Model context protocol (MCP)',
+          name: 'Supabase MCP server',
           url: '/guides/getting-started/mcp' as `/${string}`,
+        },
+        {
+          name: 'Deploy MCP servers',
+          url: '/guides/getting-started/byom' as `/${string}`,
         },
       ],
     },
@@ -2769,7 +2773,7 @@ export const telemetry: NavMenuConstant = {
             },
             {
               name: 'Datadog',
-              url: '/guides/telemetry/metrics/datadog' as `/${string}`,
+              url: 'https://docs.datadoghq.com/integrations/supabase/' as `/${string}`,
             },
             {
               name: 'Vendor-agnostic setup',
