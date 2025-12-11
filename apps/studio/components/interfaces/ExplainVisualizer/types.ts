@@ -11,8 +11,6 @@ export interface ExplainNode {
   raw: string
   // Parsed detail fields
   rowsRemovedByFilter?: number
-  // Assigned during rendering
-  _stepNumber?: number
 }
 
 export interface QueryPlanRow {

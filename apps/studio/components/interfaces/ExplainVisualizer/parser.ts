@@ -214,23 +214,6 @@ export function calculateMaxCost(tree: ExplainNode[]): number {
   return tree.reduce((max, node) => Math.max(max, getNodeMax(node)), 0)
 }
 
-// Assign step numbers and calculate total steps
-// PostgreSQL executes children in reverse order for joins:
-// - For Hash Join: the Hash (inner/build) side executes first, then the outer/probe side
-// - The second child in EXPLAIN output is typically the "build" side
-function assignSteps(counter: number, node: ExplainNode): number {
-  // Process children in REVERSE order (inner/build side first, then outer/probe)
-  // This matches PostgreSQL's actual execution order
-  const children = [...node.children].reverse()
-  const afterChildren = children.reduce(assignSteps, counter)
-  node._stepNumber = afterChildren
-  return afterChildren + 1
-}
-
-export function assignStepNumbers(tree: ExplainNode[]): number {
-  return tree.reduce(assignSteps, 1) - 1
-}
-
 // Calculate summary stats
 export function calculateSummary(tree: ExplainNode[]): ExplainSummary {
   const stats: ExplainSummary = {

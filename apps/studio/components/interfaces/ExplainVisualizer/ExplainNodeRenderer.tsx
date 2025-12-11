@@ -1,4 +1,4 @@
-import { ArrowDown, Clock } from 'lucide-react'
+import { ArrowRight, ArrowUp, Clock } from 'lucide-react'
 import { cn } from 'ui'
 import { getOperationColor, getOperationDescription, getOperationIcon } from './utils'
 
@@ -10,8 +10,7 @@ export interface ExplainNodeRendererProps {
   depth: number
   maxCost: number
   parentHasMore: boolean[]
-  stepNumber: number
-  totalSteps: number
+  isRoot?: boolean
 }
 
 // Render a single node in the tree
@@ -21,14 +20,14 @@ export function ExplainNodeRenderer({
   depth,
   maxCost,
   parentHasMore,
-  stepNumber,
-  totalSteps,
+  isRoot = false,
 }: ExplainNodeRendererProps) {
   const Icon = getOperationIcon(node.operation)
   const colorClass = getOperationColor(node.operation)
   const costValue = node.cost?.end || node.actualTime?.end || 0
   const costWidth = maxCost > 0 ? (costValue / maxCost) * 100 : 0
   const description = getOperationDescription(node.operation, node)
+  const isLeaf = node.children.length === 0
 
   // Split details by newline to show each on its own line
   const detailLines = node.details ? node.details.split('\n').filter(Boolean) : []
@@ -73,19 +72,24 @@ export function ExplainNodeRenderer({
         )}
         style={{ marginLeft: `${depth * 32}px` }}
       >
-        {/* Step number */}
+        {/* Pipeline flow indicator */}
         <div className="flex flex-col items-center gap-1">
           <div
             className={cn(
-              'flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold',
-              stepNumber === totalSteps
+              'flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center',
+              isRoot
                 ? 'bg-brand/20 text-brand'
-                : 'bg-surface-300 text-foreground-light'
+                : isLeaf
+                  ? 'bg-surface-300 text-foreground-light'
+                  : 'bg-surface-200 text-foreground-muted'
             )}
           >
-            {stepNumber}
+            {isRoot ? (
+              <span className="text-xs font-medium">→</span>
+            ) : (
+              <ArrowUp size={14} className={isLeaf ? 'text-foreground-light' : ''} />
+            )}
           </div>
-          {node.children.length > 0 && <ArrowDown size={12} className="text-foreground-muted" />}
         </div>
 
         {/* Icon */}
@@ -156,11 +160,11 @@ export function ExplainNodeRenderer({
                   <span className="text-foreground-lighter">
                     {totalRowsScanned.toLocaleString()} rows
                   </span>
-                  <ArrowDown size={10} className="text-foreground-muted rotate-[-90deg]" />
+                  <ArrowRight size={10} className="text-foreground-muted" />
                   <span className="text-destructive-600 font-medium">
                     -{rowsFiltered.toLocaleString()}
                   </span>
-                  <ArrowDown size={10} className="text-foreground-muted rotate-[-90deg]" />
+                  <ArrowRight size={10} className="text-foreground-muted" />
                   <span className="text-brand font-medium">
                     {node.actualRows?.toLocaleString()} rows
                   </span>
@@ -176,7 +180,7 @@ export function ExplainNodeRenderer({
                   {node.actualRows !== null && (
                     <>
                       {node.rows !== null && (
-                        <ArrowDown size={10} className="text-foreground-muted rotate-[-90deg]" />
+                        <ArrowRight size={10} className="text-foreground-muted" />
                       )}
                       <span className="text-foreground-light font-medium">
                         {node.actualRows.toLocaleString()} rows
@@ -221,8 +225,6 @@ export function ExplainNodeRenderer({
               depth={depth + 1}
               maxCost={maxCost}
               parentHasMore={[...parentHasMore, !isLast]}
-              stepNumber={child._stepNumber ?? 0}
-              totalSteps={totalSteps}
             />
           ))}
         </div>
