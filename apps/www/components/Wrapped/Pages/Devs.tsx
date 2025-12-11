@@ -54,7 +54,7 @@ const gridStats = [
   },
   {
     headline: 'One of the top 100 repos on Github',
-    number: 94.5,
+    number: 94_500,
     increment: 0,
     suffix: 'stars',
   },
@@ -62,13 +62,12 @@ const gridStats = [
     headline: 'paid to fund open source',
     number: 662_357.71,
     increment: 0,
-    suffix: '$',
+    suffix: 'USD',
   },
   {
     headline: 'Commits to our repos by community members',
     number: 1_421,
     increment: 0,
-    suffix: 'commits',
   },
 ]
 
@@ -150,10 +149,11 @@ export const Devs = () => {
                           {stat.suffix ? (
                             <>
                               {new Intl.NumberFormat('en-US', {
+                                notation: 'compact',
                                 maximumFractionDigits: stat.number % 1 !== 0 ? 2 : 0,
                                 minimumFractionDigits: stat.number % 1 !== 0 ? 1 : 0,
                               }).format(stat.number)}
-                              <span className="text-lg ml-1">{stat.suffix}</span>
+                              <span className="text-lg ml-1.5 font-medium tracking-tight">{stat.suffix}</span>
                             </>
                           ) 
                           : (
