@@ -1,7 +1,8 @@
 import { Users } from 'lucide-react'
-import DataGrid, { Column } from 'react-data-grid'
+import { useState } from 'react'
+import DataGrid, { Column, useRowSelection } from 'react-data-grid'
 import 'react-data-grid/lib/styles.css'
-import { cn } from 'ui'
+import { Checkbox_Shadcn_, cn } from 'ui'
 
 type User = {
   id: string
@@ -11,7 +12,37 @@ type User = {
 }
 
 export default function DataGridDemo() {
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
+
   const columns: Column<User>[] = [
+    {
+      key: 'checkbox',
+      name: '',
+      width: 50,
+      resizable: false,
+      headerCellClass: 'border-default border-r border-b',
+      renderCell: ({ row }) => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [isRowSelected, onRowSelectionChange] = useRowSelection()
+
+        return (
+          <div className="flex items-center justify-center h-full">
+            <Checkbox_Shadcn_
+              checked={isRowSelected}
+              onClick={(e) => {
+                e.stopPropagation()
+                onRowSelectionChange({
+                  row,
+                  type: 'ROW',
+                  checked: !isRowSelected,
+                  isShiftClick: e.shiftKey,
+                })
+              }}
+            />
+          </div>
+        )
+      },
+    },
     {
       key: 'name',
       name: 'Display name',
@@ -107,27 +138,20 @@ export default function DataGridDemo() {
         columns={columns}
         rows={rows}
         rowKeyGetter={(row: User) => row.id}
-        rowClass={() => {
+        rowClass={(row, idx) => {
+          const isSelected = selectedRows.has(row.id)
+          const isLastRow = idx === rows.length - 1
           return cn(
-            'bg-surface-75 cursor-pointer',
+            'bg-surface-75',
+            isSelected && 'bg-surface-200',
             '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
-            '[&>.rdg-cell]:border-secondary [&>.rdg-cell:not(:last-child)]:border-r [&>.rdg-cell]:border-b',
-            '[&>.rdg-cell:first-child>div]:ml-8'
+            '[&>.rdg-cell]:border-secondary [&>.rdg-cell:not(:last-child)]:border-r',
+            !isLastRow && '[&>.rdg-cell]:border-b',
+            '[&>.rdg-cell:nth-child(2)>div]:ml-8'
           )
         }}
-        renderers={{
-          noRowsFallback: (
-            <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-              <Users className="text-foreground-lighter" strokeWidth={1} />
-              <div className="text-center">
-                <p className="text-foreground">No users in your project</p>
-                <p className="text-foreground-light">
-                  There are currently no users who signed up to your project
-                </p>
-              </div>
-            </div>
-          ),
-        }}
+        selectedRows={selectedRows}
+        onSelectedRowsChange={setSelectedRows}
       />
     </div>
   )
