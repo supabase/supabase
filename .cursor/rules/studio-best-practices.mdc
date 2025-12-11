@@ -3,7 +3,7 @@ description: React best practices and coding standards for Studio
 globs:
   - apps/studio/**/*.tsx
   - apps/studio/**/*.ts
-alwaysApply: false
+alwaysApply: true
 ---
 
 # Studio Best Practices
