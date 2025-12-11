@@ -24,7 +24,6 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { formatSql } from 'lib/formatSql'
-import { detectOS, uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
@@ -353,7 +352,6 @@ export const SQLEditor = () => {
 
       try {
         const snippet = createSqlSnippetSkeletonV2({
-          id: uuidv4(),
           name,
           sql,
           owner_id: profile.id,

@@ -20,7 +20,6 @@ import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from 'data/content/
 import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippetFolders, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
@@ -661,7 +660,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                     onSelectCreate={() => {
                       if (profile && project) {
                         const snippet = createSqlSnippetSkeletonV2({
-                          id: uuidv4(),
                           name: untitledSnippetTitle,
                           owner_id: profile?.id,
                           project_id: project?.id,
