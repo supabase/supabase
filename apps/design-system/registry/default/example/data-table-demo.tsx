@@ -152,6 +152,13 @@ export const columns: ColumnDef<Payment>[] = [
   },
 ]
 
+/**
+ * Demo React component showcasing a client-side data table with sorting, filtering, column visibility, row selection, and pagination controls.
+ *
+ * Renders a fully interactive table UI bound to local state and TanStack Table: filter input for email, column visibility dropdown, sortable headers with three-state cycling, per-row selection checkboxes, row action menu, and previous/next pagination controls.
+ *
+ * @returns A React element that renders the interactive data table demo.
+ */
 export default function DataTableDemo() {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])

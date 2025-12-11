@@ -10,6 +10,15 @@ type User = {
   phone: string
 }
 
+/**
+ * Render a data grid demo with selectable rows and sample user data.
+ *
+ * Renders a DataGrid configured with a checkbox column for per-row selection, columns for display name,
+ * email, and phone, and ten hard-coded sample users. Selection state is managed internally and applied
+ * to row styling.
+ *
+ * @returns A React element that renders the configured DataGrid with row selection and sample rows.
+ */
 export default function DataGridDemo() {
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
 
