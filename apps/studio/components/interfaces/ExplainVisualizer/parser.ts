@@ -141,7 +141,7 @@ function createNode(
       node.cost = { start: parseFloat(costMatch[1]), end: parseFloat(costMatch[2]) }
     }
 
-    // Parse rows=N
+    // Parse rows=N (estimated rows, always the first occurrence)
     const rowsMatch = metrics.match(/rows=(\d+)/)
     if (rowsMatch) {
       node.rows = parseInt(rowsMatch[1], 10)
@@ -160,12 +160,13 @@ function createNode(
         start: parseFloat(actualTimeMatch[1]),
         end: parseFloat(actualTimeMatch[2]),
       }
-    }
 
-    // Parse actual rows=N
-    const actualRowsMatch = metrics.match(/actual rows=(\d+)/)
-    if (actualRowsMatch) {
-      node.actualRows = parseInt(actualRowsMatch[1], 10)
+      // When EXPLAIN ANALYZE is used, the second rows= value (after actual time) is the actual rows
+      const actualTimePart = metrics.substring(metrics.indexOf('actual time='))
+      const actualRowsMatch = actualTimePart.match(/rows=(\d+)/)
+      if (actualRowsMatch) {
+        node.actualRows = parseInt(actualRowsMatch[1], 10)
+      }
     }
   }
 

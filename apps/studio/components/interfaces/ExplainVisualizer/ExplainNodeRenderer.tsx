@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowUp, Clock } from 'lucide-react'
+import { ArrowLeft, ArrowLeftRight, ArrowRight, ArrowUp, Clock } from 'lucide-react'
 import { cn } from 'ui'
 import { getOperationColor, getOperationDescription, getOperationIcon } from './utils'
 
@@ -42,29 +42,6 @@ export function ExplainNodeRenderer({
 
   return (
     <div className="relative">
-      {/* Vertical connection lines from ancestors */}
-      {parentHasMore.map(
-        (hasMore, i) =>
-          hasMore && (
-            <div
-              key={i}
-              className="absolute top-0 bottom-0 w-px bg-border"
-              style={{ left: `${i * 32 + 16}px` }}
-            />
-          )
-      )}
-
-      {/* Horizontal connector for this node */}
-      {depth > 0 && (
-        <div
-          className="absolute top-5 h-px bg-border"
-          style={{
-            left: `${(depth - 1) * 32 + 16}px`,
-            width: '16px',
-          }}
-        />
-      )}
-
       {/* Node content */}
       <div
         className={cn(
@@ -85,24 +62,15 @@ export function ExplainNodeRenderer({
             )}
           >
             {isRoot ? (
-              <span className="text-xs font-medium">→</span>
+              <ArrowRight size={14} className={'text-brand'} />
             ) : (
-              <ArrowUp size={14} className={isLeaf ? 'text-foreground-light' : ''} />
+              <ArrowUp size={14} className={'text-foreground-light'} />
             )}
           </div>
         </div>
 
         {/* Icon */}
-        <div
-          className={cn(
-            'flex-shrink-0 mt-0.5 rounded-lg p-2',
-            colorClass === 'text-warning' && 'bg-warning/10',
-            colorClass === 'text-brand' && 'bg-brand/10',
-            colorClass === 'text-purple-500' && 'bg-purple-500/10',
-            colorClass === 'text-blue-500' && 'bg-blue-500/10',
-            colorClass === 'text-foreground' && 'bg-surface-200'
-          )}
-        >
+        <div className={cn('flex-shrink-0 mt-0.5 rounded-lg p-2')}>
           <Icon size={18} strokeWidth={2} className={colorClass} />
         </div>
 
@@ -119,7 +87,7 @@ export function ExplainNodeRenderer({
           </div>
 
           {/* Description */}
-          {description && <p className="text-xs text-foreground-lighter mt-0.5">{description}</p>}
+          {description && <p className="text-xs text-foreground-lighter mt-1">{description}</p>}
 
           {/* Metrics row */}
           <div className="flex items-center gap-3 mt-2 flex-wrap">
@@ -144,53 +112,60 @@ export function ExplainNodeRenderer({
             )}
 
             {node.actualTime && (
-              <div className="flex items-center gap-1 text-xs text-foreground-lighter">
-                <Clock size={12} />
-                <span className="font-mono font-medium">{node.actualTime.end.toFixed(2)}ms</span>
-              </div>
-            )}
-          </div>
-
-          {/* Row flow visualization */}
-          {(node.actualRows !== null || node.rows !== null) && (
-            <div className="flex items-center gap-2 mt-2 text-xs">
-              {totalRowsScanned !== null && rowsFiltered ? (
-                // Show filter flow: input → filtered → output
-                <div className="flex items-center gap-1.5 bg-surface-200 rounded-md px-2 py-1">
-                  <span className="text-foreground-lighter">
-                    {totalRowsScanned.toLocaleString()} rows
-                  </span>
-                  <ArrowRight size={10} className="text-foreground-muted" />
-                  <span className="text-destructive-600 font-medium">
-                    -{rowsFiltered.toLocaleString()}
-                  </span>
-                  <ArrowRight size={10} className="text-foreground-muted" />
-                  <span className="text-brand font-medium">
-                    {node.actualRows?.toLocaleString()} rows
-                  </span>
+              <>
+                <span className="text-foreground-muted text-xs">|</span>
+                <div className="flex items-center gap-1 text-xs text-foreground-lighter">
+                  <Clock size={12} />
+                  <span className="font-mono font-medium">{node.actualTime.end.toFixed(2)}ms</span>
                 </div>
-              ) : (
-                // Simple row count
-                <div className="flex items-center gap-2 bg-surface-200 rounded-md px-2 py-1">
-                  {node.rows !== null && (
-                    <span className="text-foreground-lighter">
-                      est. {node.rows.toLocaleString()}
-                    </span>
-                  )}
-                  {node.actualRows !== null && (
+              </>
+            )}
+
+            {/* Row count */}
+            {(node.actualRows !== null || node.rows !== null) && (
+              <>
+                <span className="text-foreground-muted text-xs">|</span>
+                <div className="flex items-center gap-1.5 text-xs text-foreground-lighter">
+                  {totalRowsScanned !== null && rowsFiltered ? (
+                    // Show filter flow: input → filtered → output
                     <>
-                      {node.rows !== null && (
-                        <ArrowRight size={10} className="text-foreground-muted" />
-                      )}
-                      <span className="text-foreground-light font-medium">
-                        {node.actualRows.toLocaleString()} rows
+                      <span>{totalRowsScanned.toLocaleString()} rows</span>
+                      <ArrowRight size={10} className="text-foreground-muted" />
+                      <span className="text-destructive-600 font-medium">
+                        -{rowsFiltered.toLocaleString()}
                       </span>
+                      <ArrowRight size={10} className="text-foreground-muted" />
+                      <span className="text-brand font-medium">
+                        {node.actualRows?.toLocaleString()} rows
+                      </span>
+                    </>
+                  ) : node.actualRows !== null &&
+                    node.rows !== null &&
+                    node.actualRows === node.rows ? (
+                    // Same estimate and actual - just show the count
+                    <span className="text-foreground-light font-medium">
+                      {node.actualRows.toLocaleString()} rows
+                    </span>
+                  ) : (
+                    // Different or only one value - show comparison
+                    <>
+                      {node.rows !== null && <span>est. {node.rows.toLocaleString()}</span>}
+                      {node.actualRows !== null && (
+                        <>
+                          {node.rows !== null && (
+                            <ArrowRight size={10} className="text-foreground-muted" />
+                          )}
+                          <span className="text-foreground-light font-medium">
+                            {node.actualRows.toLocaleString()} rows
+                          </span>
+                        </>
+                      )}
                     </>
                   )}
                 </div>
-              )}
-            </div>
-          )}
+              </>
+            )}
+          </div>
 
           {/* Detail lines (Filter, Hash Cond, etc.) */}
           {detailLines.length > 0 && (

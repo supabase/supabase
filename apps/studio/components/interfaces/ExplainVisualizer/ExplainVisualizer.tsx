@@ -101,7 +101,7 @@ export function ExplainVisualizer({ rows, onShowRaw }: ExplainVisualizerProps) {
             <span>Index Scan (fast lookup)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <GitMerge size={12} className="text-purple-500" />
+            <GitMerge size={12} className="text-foreground-light" />
             <span>Join</span>
           </div>
           <div className="flex items-center gap-1.5">

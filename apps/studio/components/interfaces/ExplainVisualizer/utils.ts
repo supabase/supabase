@@ -83,7 +83,7 @@ export function getOperationColor(operation: string): string {
   const op = operation.toLowerCase()
   if (op.includes('seq scan')) return 'text-warning'
   if (op.includes('index')) return 'text-brand'
-  if (op.includes('join')) return 'text-purple-500'
-  if (op.includes('sort') || op.includes('aggregate')) return 'text-blue-500'
-  return 'text-foreground'
+  if (op.includes('join')) return 'text-foreground-light'
+  if (op.includes('sort') || op.includes('aggregate')) return 'text-foreground-light'
+  return 'text-foreground-light'
 }
