@@ -203,7 +203,9 @@ export const InvoicesSettings = () => {
           <p className="text-foreground-muted text-sm">
             {isErrorCount
               ? 'Failed to retrieve total number of invoices'
-              : `Showing ${offset + 1} to ${offset + invoices.length} out of ${count} invoices`}
+              : typeof count === 'number'
+                ? `Showing ${offset + 1} to ${offset + invoices.length} out of ${count} invoices`
+                : `Showing ${offset + 1} to ${offset + invoices.length} invoices`}
           </p>
           <div className="flex items-center gap-x-2" aria-label="Pagination">
             <Button
