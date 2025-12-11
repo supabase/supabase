@@ -2747,7 +2747,7 @@ export const Index: Record<string, any> = {
     "data-table-demo": {
       name: "data-table-demo",
       type: "components:example",
-      registryDependencies: undefined,
+      registryDependencies: ["table"],
       component: React.lazy(() => import("@/registry/default/example/data-table-demo")),
       source: "",
       files: ["registry/default/example/data-table-demo.tsx"],

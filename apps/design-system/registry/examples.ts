@@ -1487,6 +1487,7 @@ export const examples: Registry = [
   {
     name: 'data-table-demo',
     type: 'components:example',
+    registryDependencies: ['table'],
     files: ['example/data-table-demo.tsx'],
   },
   {
