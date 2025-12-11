@@ -9,10 +9,10 @@ import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/databas
 import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { isValidHttpUrl, uuidv4 } from 'lib/helpers'
 import { Button, Form, SidePanel } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import CloseConfirmationModal from 'ui-patterns/Dialogs/CloseConfirmationModal'
 import { FormContents } from './FormContents'
 
 export interface EditHookPanelProps {
@@ -334,18 +334,3 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
     </>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)

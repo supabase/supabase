@@ -8,7 +8,7 @@ import { useParams } from 'common'
 import { useCronJobQuery } from 'data/database-cron-jobs/database-cron-job-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import {
   BreadcrumbItem_Shadcn_ as BreadcrumbItem,
   BreadcrumbLink_Shadcn_ as BreadcrumbLink,
@@ -24,7 +24,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import CloseConfirmationModal from 'ui-patterns/Dialogs/CloseConfirmationModal'
 import {
   PageHeader,
   PageHeaderAside,
@@ -144,16 +144,16 @@ export const CronJobPage = () => {
     </Button>,
     ...(isValidEdgeFunction
       ? [
-          <Button key="view-edge-logs" asChild type="outline">
-            <Link
-              target="_blank"
-              rel="noopener noreferrer"
-              href={`/project/${project?.ref}/functions/${edgeFunctionSlug}/logs`}
-            >
-              View Edge Function logs
-            </Link>
-          </Button>,
-        ]
+        <Button key="view-edge-logs" asChild type="outline">
+          <Link
+            target="_blank"
+            rel="noopener noreferrer"
+            href={`/project/${project?.ref}/functions/${edgeFunctionSlug}/logs`}
+          >
+            View Edge Function logs
+          </Link>
+        </Button>,
+      ]
       : []),
   ]
 
@@ -213,18 +213,3 @@ export const CronJobPage = () => {
     </>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)
