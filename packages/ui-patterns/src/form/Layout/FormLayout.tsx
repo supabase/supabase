@@ -233,7 +233,8 @@ const FlexContainer = cva('', {
     },
     {
       layout: 'flex-row-reverse',
-      className: 'flex flex-col justify-center items-start md:items-end shrink-0',
+      className:
+        'flex flex-col justify-center items-start md:items-end shrink-0 md:w-1/2 xl:w-2/5 md:min-w-100 [&>div]:md:w-full',
     },
   ],
 })
