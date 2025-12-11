@@ -27,7 +27,7 @@ export default async function ContributePage({
           <div className="flex-1 flex flex-col gap-8 w-full">
             <div className="max-w-5xl mx-auto px-5 w-full">
               <Hero />
-              <GetStarted />
+              {/* <GetStarted /> */}
             </div>
             <UnansweredThreads
               product_area={product_area}
