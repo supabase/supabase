@@ -7,7 +7,7 @@ import { getRenderingTools } from './rendering-tools'
  */
 export async function getMockTools() {
   // Always include rendering tools
-  let tools: ToolSet = getRenderingTools()
+  const tools = getRenderingTools()
 
   const mcpTools = await getMcpTools({
     accessToken: 'mock-access-token',
@@ -24,12 +24,10 @@ export async function getMockTools() {
         execute: async () => ({ status: 'successful' }),
       },
     ])
-  ) as ToolSet
+  ) as typeof mcpTools
 
-  tools = {
+  return {
     ...tools,
     ...mockedMcpTools,
   }
-
-  return tools
 }

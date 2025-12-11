@@ -1,6 +1,6 @@
 import { openai } from '@ai-sdk/openai'
 import { Eval } from 'braintrust'
-import { AssertionScorer } from 'lib/ai/evals/scorer'
+import { Assertion, AssertionScorer } from 'lib/ai/evals/scorer'
 import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
 import { getMockTools } from 'lib/ai/tools/mock-tools'
 import assert from 'node:assert'
@@ -14,13 +14,13 @@ Eval('Assistant', {
     return [
       {
         input: 'Hello!',
-        expected: [{ type: 'text_includes' as const, substring: 'Hi' }],
+        expected: [{ type: 'text_includes', substring: 'Hi' }],
       },
       {
         input: 'How do I implement IP address rate limiting? Use search_docs.',
-        expected: [{ type: 'tools_include' as const, tool: 'search_docs' }],
+        expected: [{ type: 'tools_include', tool: 'search_docs' }],
       },
-    ]
+    ] satisfies Array<{ input: string; expected: Assertion[] }>
   },
   task: async (input) => {
     const result = await generateAssistantResponse({

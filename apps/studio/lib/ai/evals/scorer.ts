@@ -1,4 +1,5 @@
 import { EvalScorer } from 'braintrust'
+import type { getMockTools } from 'lib/ai/tools/mock-tools'
 
 type Input = string
 
@@ -7,10 +8,12 @@ type Output = {
   tools: string[]
 }
 
-type Assertion =
+type MockToolName = keyof Awaited<ReturnType<typeof getMockTools>>
+
+export type Assertion =
   | {
       type: 'tools_include'
-      tool: string
+      tool: MockToolName
     }
   | {
       type: 'text_includes'
