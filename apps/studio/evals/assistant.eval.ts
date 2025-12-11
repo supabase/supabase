@@ -22,7 +22,7 @@ Eval('Assistant', {
         expected: [{ type: 'text_includes', substring: 'Hi' }],
       },
       {
-        input: 'How do I implement IP address rate limiting? Use search_docs.',
+        input: 'How do I implement IP address rate limiting?',
         expected: [{ type: 'tools_include', tool: 'search_docs' }],
       },
       {
@@ -30,6 +30,7 @@ Eval('Assistant', {
         expected: [
           { type: 'tools_include', tool: 'get_advisors' },
           { type: 'tools_include', tool: 'get_logs' },
+          { type: 'llm_criteria_met', criteria: 'Response reflects there are RLS issues to fix.' },
         ],
       },
     ] satisfies Array<{ input: string; expected: EvalAssertion[] }>
