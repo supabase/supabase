@@ -219,7 +219,7 @@ export const RealtimeSettings = () => {
                         <>
                           <FormItemLayout
                             layout="flex-row-reverse"
-                            label="Allow public access"
+                            label="Allow public access to channels"
                             description="If disabled, only private channels will be allowed"
                           >
                             <FormControl_Shadcn_>
@@ -308,7 +308,7 @@ export const RealtimeSettings = () => {
                           description="Sets maximum number of concurrent clients that can connect to your Realtime service"
                         >
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="users" className="uppercase">
+                            <PrePostTab postTab="clients" className="uppercase">
                               <Input_Shadcn_
                                 {...field}
                                 type="number"
@@ -321,164 +321,158 @@ export const RealtimeSettings = () => {
                       )}
                     />
                   </CardContent>
-                  <CardContent>
+                  <CardContent className="space-y-2">
                     <FormField_Shadcn_
                       control={form.control}
                       name="max_events_per_second"
                       render={({ field }) => (
-                        <>
-                          <FormItemLayout
-                            layout="flex-row-reverse"
-                            label="Max events per second"
-                            description="Sets maximum number of events per second that can be sent to your Realtime service"
-                          >
-                            <FormControl_Shadcn_>
-                              <PrePostTab postTab="events/s" className="uppercase">
-                                <Input_Shadcn_
-                                  {...field}
-                                  type="number"
-                                  disabled={!isUsageBillingEnabled || !canUpdateConfig}
-                                  value={field.value || ''}
-                                />
-                              </PrePostTab>
-                            </FormControl_Shadcn_>
-                          </FormItemLayout>
-                          {isSuccessOrganization && !isUsageBillingEnabled && (
-                            <Admonition showIcon={false} type="default">
-                              <div className="flex items-center gap-x-2">
-                                <div>
-                                  <h5 className="text-foreground mb-1">
-                                    Spend cap needs to be disabled to configure this value
-                                  </h5>
-                                  <p className="text-foreground-light">
-                                    {isFreePlan
-                                      ? 'Upgrade to the Pro plan first to disable spend cap'
-                                      : 'You may adjust this setting in the organization billing settings'}
-                                  </p>
-                                </div>
-                                <div className="flex-grow flex items-center justify-end">
-                                  {isFreePlan ? (
-                                    <UpgradePlanButton
-                                      source="realtimeSettings"
-                                      addon="spendCap"
-                                      featureProposition="configure the max events per second parameter of realtime settings"
-                                    />
-                                  ) : (
-                                    <ToggleSpendCapButton />
-                                  )}
-                                </div>
-                              </div>
-                            </Admonition>
-                          )}
-                        </>
+                        <FormItemLayout
+                          layout="flex-row-reverse"
+                          label="Max events per second"
+                          description="Sets maximum number of events per second that can be sent to your Realtime service"
+                        >
+                          <FormControl_Shadcn_>
+                            <PrePostTab postTab="events/s" className="uppercase">
+                              <Input_Shadcn_
+                                {...field}
+                                type="number"
+                                disabled={!isUsageBillingEnabled || !canUpdateConfig}
+                                value={field.value || ''}
+                              />
+                            </PrePostTab>
+                          </FormControl_Shadcn_>
+                        </FormItemLayout>
                       )}
                     />
+                    {isSuccessOrganization && !isUsageBillingEnabled && (
+                      <Admonition showIcon={false} type="default">
+                        <div className="flex items-center gap-x-2">
+                          <div>
+                            <h5 className="text-foreground mb-1">
+                              Spend cap needs to be disabled to configure this value
+                            </h5>
+                            <p className="text-foreground-light">
+                              {isFreePlan
+                                ? 'Upgrade to the Pro plan first to disable spend cap'
+                                : 'You may adjust this setting in the organization billing settings'}
+                            </p>
+                          </div>
+                          <div className="flex-grow flex items-center justify-end">
+                            {isFreePlan ? (
+                              <UpgradePlanButton
+                                source="realtimeSettings"
+                                addon="spendCap"
+                                featureProposition="configure the max events per second parameter of realtime settings"
+                              />
+                            ) : (
+                              <ToggleSpendCapButton />
+                            )}
+                          </div>
+                        </div>
+                      </Admonition>
+                    )}
                   </CardContent>
-                  <CardContent>
+                  <CardContent className="space-y-2">
                     <FormField_Shadcn_
                       control={form.control}
                       name="max_presence_events_per_second"
                       render={({ field }) => (
-                        <>
-                          <FormItemLayout
-                            layout="flex-row-reverse"
-                            label="Max presence events per second"
-                            description="Sets maximum number of presence events per second that can be sent to your Realtime service"
-                          >
-                            <FormControl_Shadcn_>
-                              <PrePostTab postTab="events/s" className="uppercase">
-                                <Input_Shadcn_
-                                  {...field}
-                                  type="number"
-                                  disabled={!isUsageBillingEnabled || !canUpdateConfig}
-                                  value={field.value || ''}
-                                />
-                              </PrePostTab>
-                            </FormControl_Shadcn_>
-                          </FormItemLayout>
-                          {isSuccessOrganization && !isUsageBillingEnabled && (
-                            <Admonition showIcon={false} type="default">
-                              <div className="flex items-center gap-x-2">
-                                <div>
-                                  <h5 className="text-foreground mb-1">
-                                    Spend cap needs to be disabled to configure this value
-                                  </h5>
-                                  <p className="text-foreground-light">
-                                    {isFreePlan
-                                      ? 'Upgrade to the Pro plan first to disable spend cap'
-                                      : 'You may adjust this setting in the organization billing settings'}
-                                  </p>
-                                </div>
-                                <div className="flex-grow flex items-center justify-end">
-                                  {isFreePlan ? (
-                                    <UpgradePlanButton
-                                      source="realtimeSettings"
-                                      addon="spendCap"
-                                      featureProposition="configure the max presence events per second parameter of realtime settings"
-                                    />
-                                  ) : (
-                                    <ToggleSpendCapButton />
-                                  )}
-                                </div>
-                              </div>
-                            </Admonition>
-                          )}
-                        </>
+                        <FormItemLayout
+                          layout="flex-row-reverse"
+                          label="Max presence events per second"
+                          description="Sets maximum number of presence events per second that can be sent to your Realtime service"
+                        >
+                          <FormControl_Shadcn_>
+                            <PrePostTab postTab="events/s" className="uppercase">
+                              <Input_Shadcn_
+                                {...field}
+                                type="number"
+                                disabled={!isUsageBillingEnabled || !canUpdateConfig}
+                                value={field.value || ''}
+                              />
+                            </PrePostTab>
+                          </FormControl_Shadcn_>
+                        </FormItemLayout>
                       )}
                     />
+                    {isSuccessOrganization && !isUsageBillingEnabled && (
+                      <Admonition showIcon={false} type="default">
+                        <div className="flex items-center gap-x-2">
+                          <div>
+                            <h5 className="text-foreground mb-1">
+                              Spend cap needs to be disabled to configure this value
+                            </h5>
+                            <p className="text-foreground-light">
+                              {isFreePlan
+                                ? 'Upgrade to the Pro plan first to disable spend cap'
+                                : 'You may adjust this setting in the organization billing settings'}
+                            </p>
+                          </div>
+                          <div className="flex-grow flex items-center justify-end">
+                            {isFreePlan ? (
+                              <UpgradePlanButton
+                                source="realtimeSettings"
+                                addon="spendCap"
+                                featureProposition="configure the max presence events per second parameter of realtime settings"
+                              />
+                            ) : (
+                              <ToggleSpendCapButton />
+                            )}
+                          </div>
+                        </div>
+                      </Admonition>
+                    )}
                   </CardContent>
-                  <CardContent>
+                  <CardContent className="space-y-2">
                     <FormField_Shadcn_
                       control={form.control}
                       name="max_payload_size_in_kb"
                       render={({ field }) => (
-                        <>
-                          <FormItemLayout
-                            layout="flex-row-reverse"
-                            label="Max payload size in KB"
-                            description="Sets maximum number of payload size in KB that can be sent to your Realtime service"
-                          >
-                            <FormControl_Shadcn_>
-                              <PrePostTab postTab="KB" className="uppercase">
-                                <Input_Shadcn_
-                                  {...field}
-                                  type="number"
-                                  disabled={!isUsageBillingEnabled || !canUpdateConfig}
-                                  value={field.value || ''}
-                                />
-                              </PrePostTab>
-                            </FormControl_Shadcn_>
-                          </FormItemLayout>
-                          {isSuccessOrganization && !isUsageBillingEnabled && (
-                            <Admonition showIcon={false} type="default">
-                              <div className="flex items-center gap-x-2">
-                                <div>
-                                  <h5 className="text-foreground mb-1">
-                                    Spend cap needs to be disabled to configure this value
-                                  </h5>
-                                  <p className="text-foreground-light">
-                                    {isFreePlan
-                                      ? 'Upgrade to the Pro plan first to disable spend cap'
-                                      : 'You may adjust this setting in the organization billing settings'}
-                                  </p>
-                                </div>
-                                <div className="flex-grow flex items-center justify-end">
-                                  {isFreePlan ? (
-                                    <UpgradePlanButton
-                                      addon="spendCap"
-                                      source="realtimeSettings"
-                                      featureProposition="configure the max payload size parameter of realtime settings"
-                                    />
-                                  ) : (
-                                    <ToggleSpendCapButton />
-                                  )}
-                                </div>
-                              </div>
-                            </Admonition>
-                          )}
-                        </>
+                        <FormItemLayout
+                          layout="flex-row-reverse"
+                          label="Max payload size in KB"
+                          description="Sets maximum number of payload size in KB that can be sent to your Realtime service"
+                        >
+                          <FormControl_Shadcn_>
+                            <PrePostTab postTab="KB" className="uppercase">
+                              <Input_Shadcn_
+                                {...field}
+                                type="number"
+                                disabled={!isUsageBillingEnabled || !canUpdateConfig}
+                                value={field.value || ''}
+                              />
+                            </PrePostTab>
+                          </FormControl_Shadcn_>
+                        </FormItemLayout>
                       )}
                     />
+                    {isSuccessOrganization && !isUsageBillingEnabled && (
+                      <Admonition showIcon={false} type="default">
+                        <div className="flex items-center gap-x-2">
+                          <div>
+                            <h5 className="text-foreground mb-1">
+                              Spend cap needs to be disabled to configure this value
+                            </h5>
+                            <p className="text-foreground-light">
+                              {isFreePlan
+                                ? 'Upgrade to the Pro plan first to disable spend cap'
+                                : 'You may adjust this setting in the organization billing settings'}
+                            </p>
+                          </div>
+                          <div className="flex-grow flex items-center justify-end">
+                            {isFreePlan ? (
+                              <UpgradePlanButton
+                                addon="spendCap"
+                                source="realtimeSettings"
+                                featureProposition="configure the max payload size parameter of realtime settings"
+                              />
+                            ) : (
+                              <ToggleSpendCapButton />
+                            )}
+                          </div>
+                        </div>
+                      </Admonition>
+                    )}
                   </CardContent>
                 </>
               )}
