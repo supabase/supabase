@@ -27,7 +27,7 @@ export function SpendCapDisabledSection() {
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.2 }}
         >
-          <Admonition type="default" className="mb-0">
+          <Admonition type="default">
             <AlertTitle>Disable spend cap to manage Disk configuration</AlertTitle>
             <AlertDescription>
               To access disk management features, you need to disable your spend cap. These features

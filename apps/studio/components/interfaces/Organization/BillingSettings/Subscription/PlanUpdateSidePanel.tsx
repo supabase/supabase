@@ -90,13 +90,13 @@ export const PlanUpdateSidePanel = () => {
   const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
     orgSlug: slug,
   })
-  const { data: plans, isLoading: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
+  const { data: plans, isPending: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
 
   const {
     data: subscriptionPreview,
     error: subscriptionPreviewError,
-    isLoading: subscriptionPreviewIsLoading,
+    isPending: subscriptionPreviewIsLoading,
     isSuccess: subscriptionPreviewInitialized,
   } = useOrganizationBillingSubscriptionPreview({ tier: selectedTier, organizationSlug: slug })
 
@@ -241,6 +241,7 @@ export const PlanUpdateSidePanel = () => {
                         type={isDowngradeOption ? 'default' : 'primary'}
                         disabled={
                           subscription?.plan?.id === 'enterprise' ||
+                          subscription?.plan?.id === 'platform' ||
                           // Downgrades to free are still allowed through the dashboard given we have much better control about showing customers the impact + any possible issues with downgrading to free
                           (selectedOrganization?.managed_by !== MANAGED_BY.SUPABASE &&
                             plan.id !== 'tier_free') ||
@@ -264,8 +265,9 @@ export const PlanUpdateSidePanel = () => {
                             side: 'bottom',
                             className: hasOrioleProjects ? 'w-96 text-center' : '',
                             text:
-                              subscription?.plan?.id === 'enterprise'
-                                ? 'Reach out to us via support to update your plan from Enterprise'
+                              subscription?.plan?.id === 'enterprise' ||
+                              subscription?.plan?.id === 'platform'
+                                ? 'Reach out to us via support to update your plan'
                                 : hasOrioleProjects
                                   ? 'Your organization has projects that are using the OrioleDB extension which is only available on the Free plan. Remove all OrioleDB projects before changing your plan.'
                                   : selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE

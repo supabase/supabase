@@ -79,7 +79,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
   const [isOpen, setIsOpen] = useState(false)
   const [token, setToken] = useState<AccessToken | undefined>(undefined)
 
-  const { data: tokens, error, isLoading, isError } = useAccessTokensQuery()
+  const { data: tokens, error, isPending: isLoading, isError } = useAccessTokensQuery()
 
   const { mutate: deleteToken } = useAccessTokenDeleteMutation({
     onSuccess: (_, vars) => {

@@ -39,7 +39,7 @@ export const ErrorDetailsButton = ({ tableName, reason, solution }: ErrorDetails
         <DialogSection className="!p-0">
           <div className="px-4 py-3">
             <p className="text-sm text-foreground-light">
-              The following error occured during replication:
+              The following error occurred during replication:
             </p>
           </div>
           <CodeBlock

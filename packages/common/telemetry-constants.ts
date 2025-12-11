@@ -1083,6 +1083,94 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
 }
 
 /**
+ * User clicks on Metrics API banner CTA button in studio Observability pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/*
+ */
+export interface ObservabilityBannerCtaButtonClickedEvent {
+  action: 'observability_banner_cta_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * Index Advisor banner enable button clicked event.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/query-performance
+ */
+export interface IndexAdvisorBannerEnableButtonClickedEvent {
+  action: 'index_advisor_banner_enable_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * Index Advisor dialog enable button clicked event.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/query-performance
+ */
+export interface IndexAdvisorDialogEnableButtonClickedEvent {
+  action: 'index_advisor_dialog_enable_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * Index Advisor banner dimissed event.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/query-performance
+ */
+export interface IndexAdvisorBannerDismissButtonClickedEvent {
+  action: 'index_advisor_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * Index Advisor tab clicked event.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/query-performance
+ */
+export interface IndexAdvisorTabClickedEvent {
+  action: 'index_advisor_tab_clicked'
+  properties: {
+    hasRecommendations: boolean
+    isIndexAdvisorEnabled: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Index Advisor create indexes button clicked event.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/query-performance
+ */
+export interface IndexAdvisorCreateIndexesButtonClickedEvent {
+  action: 'index_advisor_create_indexes_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the dismiss button on a banner in studio Observability pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/*
+ */
+export interface ObservabilityBannerDismissButtonClickedEvent {
+  action: 'observability_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the deploy button for an Edge Function.
  *
  * @group Events
@@ -2422,6 +2510,46 @@ export interface AdvisorAssistantButtonClickedEvent {
 }
 
 /**
+ * User opened the request upgrade modal (for users without billing permissions).
+ *
+ * @group Events
+ * @source studio
+ */
+export interface RequestUpgradeModalOpenedEvent {
+  action: 'request_upgrade_modal_opened'
+  properties: {
+    /** Target plan being requested */
+    requestedPlan: 'Pro' | 'Team' | 'Enterprise'
+    /** Addon being requested, if applicable */
+    addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+    /** Current organization plan */
+    currentPlan?: string
+    /** Feature context driving the upgrade request */
+    featureProposition?: string
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User submitted a request upgrade form to billing owners.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface RequestUpgradeSubmittedEvent {
+  action: 'request_upgrade_submitted'
+  properties: {
+    /** Target plan being requested */
+    requestedPlan: 'Pro' | 'Team' | 'Enterprise'
+    /** Addon being requested, if applicable */
+    addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+    /** Current organization plan */
+    currentPlan?: string
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2493,6 +2621,13 @@ export type TelemetryEvent =
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
+  | ObservabilityBannerCtaButtonClickedEvent
+  | ObservabilityBannerDismissButtonClickedEvent
+  | IndexAdvisorBannerEnableButtonClickedEvent
+  | IndexAdvisorBannerDismissButtonClickedEvent
+  | IndexAdvisorDialogEnableButtonClickedEvent
+  | IndexAdvisorTabClickedEvent
+  | IndexAdvisorCreateIndexesButtonClickedEvent
   | EdgeFunctionDeployButtonClickedEvent
   | EdgeFunctionDeployUpdatesConfirmClickedEvent
   | EdgeFunctionAiAssistantButtonClickedEvent
@@ -2555,3 +2690,5 @@ export type TelemetryEvent =
   | LogDrainConfirmButtonSubmittedEvent
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
+  | RequestUpgradeModalOpenedEvent
+  | RequestUpgradeSubmittedEvent

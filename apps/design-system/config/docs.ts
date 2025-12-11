@@ -9,6 +9,7 @@ export const docsConfig: DocsConfig = {
   sidebarNav: [
     {
       title: 'Getting Started',
+      sortOrder: 'manual',
       items: [
         {
           title: 'Introduction',
@@ -49,15 +50,17 @@ export const docsConfig: DocsConfig = {
     },
     {
       title: 'UI Patterns',
+      sortOrder: 'alphabetical',
       items: [
         {
-          title: 'Navigation',
-          href: '/docs/ui-patterns/navigation',
+          title: 'Introduction',
+          href: '/docs/ui-patterns/ui-patterns',
           items: [],
+          priority: true,
         },
         {
-          title: 'Layout',
-          href: '/docs/ui-patterns/layout',
+          title: 'Charts',
+          href: '/docs/ui-patterns/charts',
           items: [],
         },
         {
@@ -70,15 +73,32 @@ export const docsConfig: DocsConfig = {
           href: '/docs/ui-patterns/forms',
           items: [],
         },
+        {
+          title: 'Layout',
+          href: '/docs/ui-patterns/layout',
+          items: [],
+        },
+        {
+          title: 'Navigation',
+          href: '/docs/ui-patterns/navigation',
+          items: [],
+        },
+        {
+          title: 'Tables',
+          href: '/docs/ui-patterns/tables',
+          items: [],
+        },
       ],
     },
     {
       title: 'Fragment Components',
+      sortOrder: 'alphabetical',
       items: [
         {
           title: 'Introduction',
-          href: '/docs/components/fragment-components',
+          href: '/docs/fragments/fragment-components',
           items: [],
+          priority: true,
         },
         {
           title: 'Admonition',
@@ -169,11 +189,13 @@ export const docsConfig: DocsConfig = {
     },
     {
       title: 'Atom Components',
+      sortOrder: 'alphabetical',
       items: [
         {
           title: 'Introduction',
           href: '/docs/components/atom-components',
           items: [],
+          priority: true,
         },
         {
           title: 'Accordion',
@@ -232,11 +254,6 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Chart',
-          href: '/docs/components/chart',
-          items: [],
-        },
-        {
           title: 'Checkbox',
           href: '/docs/components/checkbox',
           items: [],
@@ -289,6 +306,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Dropdown Menu',
           href: '/docs/components/dropdown-menu',
+          items: [],
+        },
+        {
+          title: 'Field',
+          href: '/docs/components/field',
           items: [],
         },
         {

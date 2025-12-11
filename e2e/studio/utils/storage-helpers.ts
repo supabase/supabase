@@ -1,6 +1,6 @@
 import { expect, Page } from '@playwright/test'
-import { toUrl } from './to-url.js'
 import { waitForApiResponse } from './wait-for-response.js'
+import { toUrl } from './to-url.js'
 
 /**
  * Dismisses any visible toast notifications
@@ -69,7 +69,7 @@ export const createBucket = async (
   await expect(
     page.getByRole('row').filter({ hasText: bucketName }),
     `Bucket ${bucketName} should be visible after creation`
-  ).toBeVisible({ timeout: 15_000 })
+  ).toBeVisible()
 }
 
 /**
@@ -130,28 +130,24 @@ export const navigateToBucket = async (page: Page, ref: string, bucketName: stri
   const bucketRow = page.getByRole('row').filter({ hasText: bucketName })
   await expect(bucketRow, `Bucket row for ${bucketName} should be visible`).toBeVisible()
 
-  // Click the bucket and wait for page to load
-  const navigationPromise = page.waitForURL(
-    new RegExp(`/storage/files/buckets/${encodeURIComponent(bucketName)}`)
+  // Wait for the objects list API request to complete
+  const objectsListPromise = page.waitForResponse(
+    (response) =>
+      response.url().includes(`/platform/storage/${ref}/buckets/${bucketName}/objects/list`) &&
+      response.request().method() === 'POST' &&
+      (response.status() === 200 || response.status() === 201)
   )
-  const apiPromise = waitForApiResponse(
-    page,
-    'storage',
-    ref,
-    `buckets/${bucketName}/objects/list`,
-    {
-      method: 'POST',
-    }
-  )
+
   await bucketRow.click()
-  await navigationPromise
-  await apiPromise
+
+  // Wait for the API response
+  await objectsListPromise
 
   // Verify we're in the bucket by checking the breadcrumb or "Edit bucket" button
   await expect(
     page.getByRole('button', { name: 'Edit bucket' }),
     `Should be in bucket ${bucketName}`
-  ).toBeVisible({ timeout: 10_000 })
+  ).toBeVisible()
 }
 
 /**
@@ -175,7 +171,7 @@ export const createFolder = async (page: Page, folderName: string) => {
   await expect(
     page.getByTitle(folderName),
     `Folder ${folderName} should be visible after creation`
-  ).toBeVisible({ timeout: 10_000 })
+  ).toBeVisible()
 }
 
 /**
@@ -190,7 +186,7 @@ export const uploadFile = async (page: Page, filePath: string, fileName: string)
   await fileInput.setInputFiles(filePath)
 
   // Wait for upload to complete - file should appear in the explorer
-  await page.waitForTimeout(2000) // Allow time for upload to process
+  await page.waitForTimeout(15_000) // Allow time for upload to process
 
   // Verify file appears in the explorer by title
   await expect(
@@ -221,7 +217,7 @@ export const deleteItem = async (page: Page, itemName: string) => {
   await expect(
     page.getByTitle(itemName),
     `Item ${itemName} should not be visible after deletion`
-  ).not.toBeVisible({ timeout: 10_000 })
+  ).not.toBeVisible()
 }
 
 /**

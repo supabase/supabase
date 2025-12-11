@@ -64,7 +64,13 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
     connectionString: project?.connectionString,
   })
 
-  const { data, error, isLoading, isSuccess, isError } = useDatabaseRolesQuery({
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+  } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

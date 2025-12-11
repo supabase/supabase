@@ -65,11 +65,11 @@ export const SSOConfig = () => {
 
   const { data: organization } = useSelectedOrganizationQuery()
   const plan = organization?.plan.id
-  const canSetupSSOConfig = ['team', 'enterprise'].includes(plan ?? '')
+  const canSetupSSOConfig = ['team', 'enterprise', 'platform'].includes(plan ?? '')
 
   const {
     data: ssoConfig,
-    isLoading: isLoadingSSOConfig,
+    isPending: isLoadingSSOConfig,
     isSuccess,
     isError,
     error: configError,

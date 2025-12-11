@@ -18,12 +18,16 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useBranchQuery } from 'data/branches/branch-query'
 import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import type { Branch } from 'data/branches/branches-query'
 import { branchKeys } from 'data/branches/keys'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   DropdownMenu,
@@ -31,8 +35,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { EditBranchModal } from './EditBranchModal'
 import { PreviewBranchesEmptyState } from './EmptyStates'
@@ -65,6 +68,10 @@ export const Overview = ({
     (branch) => branch.persistent
   )
   const { ref: projectRef } = useParams()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
+
+  const { hasAccess: hasAccessToPersistentBranching, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('branching_persistent')
 
   return (
     <>
@@ -98,17 +105,41 @@ export const Overview = ({
 
       {/* Persistent Branches Section */}
       <BranchManagementSection header="Persistent branches">
-        {isLoading && <BranchLoader />}
-        {isSuccess && persistentBranches.length === 0 && (
-          <div className="flex items-center flex-col justify-center w-full py-10">
-            <p>No persistent branches</p>
-            <p className="text-foreground-light text-center">
-              Persistent branches are long-lived, cannot be reset, and are ideal for staging
-              environments.
-            </p>
-          </div>
-        )}
+        {(isLoading || isLoadingEntitlement) && <BranchLoader />}
         {isSuccess &&
+          !isLoadingEntitlement &&
+          !hasAccessToPersistentBranching &&
+          IS_PLATFORM &&
+          persistentBranches.length === 0 && (
+            <div className="px-6 py-10 flex items-center justify-between">
+              <div className="flex flex-col gap-1">
+                <p className="text-sm">Upgrade to unlock persistent branches</p>
+                <p className="text-sm text-foreground-light">
+                  Persistent branches are long-lived, cannot be reset, and are ideal for staging
+                  environments.
+                </p>
+              </div>
+              <Button type="primary" asChild>
+                <Link href={`/org/${selectedOrg?.slug}/billing?panel=subscriptionPlan`}>
+                  Upgrade
+                </Link>
+              </Button>
+            </div>
+          )}
+        {isSuccess &&
+          !isLoadingEntitlement &&
+          hasAccessToPersistentBranching &&
+          persistentBranches.length === 0 && (
+            <div className="flex items-center flex-col justify-center w-full py-10">
+              <p>No persistent branches</p>
+              <p className="text-foreground-light text-center">
+                Persistent branches are long-lived, cannot be reset, and are ideal for staging
+                environments.
+              </p>
+            </div>
+          )}
+        {isSuccess &&
+          !isLoadingEntitlement &&
           persistentBranches.map((branch) => {
             return (
               <BranchRow
@@ -186,6 +217,9 @@ const PreviewBranchActions = ({
   const { data } = useBranchQuery({ projectRef, branchRef })
   const isBranchActiveHealthy = data?.status === 'ACTIVE_HEALTHY'
   const isPersistentBranch = branch.persistent
+
+  const { hasAccess: hasAccessToPersistentBranching, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('branching_persistent')
 
   const [showConfirmResetModal, setShowConfirmResetModal] = useState(false)
   const [showBranchModeSwitch, setShowBranchModeSwitch] = useState(false)
@@ -266,7 +300,9 @@ const PreviewBranchActions = ({
 
           <DropdownMenuItemTooltip
             className="gap-x-2"
-            disabled={!isBranchActiveHealthy}
+            disabled={
+              !isBranchActiveHealthy || (!branch.persistent && !hasAccessToPersistentBranching)
+            }
             onSelect={(e) => {
               e.stopPropagation()
               setShowBranchModeSwitch(true)
@@ -280,7 +316,9 @@ const PreviewBranchActions = ({
                 side: 'left',
                 text: !isBranchActiveHealthy
                   ? 'Branch is still initializing. Please wait for it to become healthy before switching.'
-                  : undefined,
+                  : !branch.persistent && !hasAccessToPersistentBranching
+                    ? 'Upgrade your plan to access persistent branches'
+                    : undefined,
               },
             }}
           >

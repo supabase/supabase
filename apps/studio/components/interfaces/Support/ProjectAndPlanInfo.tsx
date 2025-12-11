@@ -52,16 +52,13 @@ export function ProjectAndPlanInfo({
       <ProjectRefHighlighted projectRef={projectRef} />
 
       {!hasProjectSelected && (
-        <Admonition
-          type="default"
-          className="mb-0"
-          title="Please note that no project has been selected"
-        />
+        <Admonition type="default" title="Please note that no project has been selected" />
       )}
 
       {showPlanExpectationInfo &&
         orgSlug &&
         subscriptionPlanId !== 'enterprise' &&
+        subscriptionPlanId !== 'platform' &&
         category !== 'Login_issues' && (
           <PlanExpectationInfoBox orgSlug={orgSlug} planId={subscriptionPlanId} />
         )}
