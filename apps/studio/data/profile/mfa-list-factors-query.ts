@@ -1,7 +1,8 @@
 import type { AuthMFAListFactorsResponse, Factor } from '@supabase/supabase-js'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { auth } from 'lib/gotrue'
 import { profileKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export async function getMfaListFactors() {
   const { error, data } = await auth.mfa.listFactors()
@@ -17,13 +18,11 @@ type CustomMFAListFactorsError = NonNullable<AuthMFAListFactorsResponse['error']
 export const useMfaListFactorsQuery = <TData = CustomMFAListFactorsData>({
   enabled = true,
   ...options
-}: UseQueryOptions<CustomMFAListFactorsData, CustomMFAListFactorsError, TData> = {}) => {
-  return useQuery<CustomMFAListFactorsData, CustomMFAListFactorsError, TData>(
-    profileKeys.mfaFactors(),
-    () => getMfaListFactors(),
-    {
-      staleTime: 1000 * 60 * 30, // default good for 30 mins
-      ...options,
-    }
-  )
+}: UseCustomQueryOptions<CustomMFAListFactorsData, CustomMFAListFactorsError, TData> = {}) => {
+  return useQuery<CustomMFAListFactorsData, CustomMFAListFactorsError, TData>({
+    queryKey: profileKeys.mfaFactors(),
+    queryFn: () => getMfaListFactors(),
+    staleTime: 1000 * 60 * 30,
+    ...options,
+  })
 }

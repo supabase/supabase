@@ -227,7 +227,7 @@ export const FRAMEWORKS: ConnectionType[] = [
   },
   {
     key: 'refine',
-    label: 'refine',
+    label: 'Refine',
     icon: 'refine',
     guideLink: `${DOCS_URL}/guides/getting-started/quickstarts/refine`,
     children: [
@@ -350,8 +350,35 @@ export const CONNECTION_TYPES = [
   { key: 'frameworks', label: 'App Frameworks', obj: FRAMEWORKS },
   { key: 'mobiles', label: 'Mobile Frameworks', obj: MOBILES },
   { key: 'orms', label: 'ORMs', obj: ORMS },
+  { key: 'mcp', label: 'MCP', obj: [] },
 ]
 
 export const PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT =
   'Purchase IPv4 add-on or use Shared Pooler if on a IPv4 network'
 export const IPV4_ADDON_TEXT = 'Connections are IPv4 proxied with IPv4 add-on'
+
+export type ConnectionStringMethod = 'direct' | 'transaction' | 'session'
+
+export const connectionStringMethodOptions: Record<
+  ConnectionStringMethod,
+  { value: string; label: string; description: string }
+> = {
+  direct: {
+    value: 'direct',
+    label: 'Direct connection',
+    description:
+      'Ideal for applications with persistent and long-lived connections, such as those running on virtual machines or long-standing containers.',
+  },
+  transaction: {
+    value: 'transaction',
+    label: 'Transaction pooler',
+    description:
+      'Ideal for stateless applications like serverless functions where each interaction with Postgres is brief and isolated.',
+  },
+  session: {
+    value: 'session',
+    label: 'Session pooler',
+    description:
+      'Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network.',
+  },
+}

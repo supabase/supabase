@@ -30,7 +30,7 @@ For getting a single item based on parameter(s). `id` is used in this example bu
 For updating a resource. This can easily be adapted to work for create, delete, or any verb that is needed. You may need to modify the `invalidateQueries` section depending on your use case. For example removing:
 
 ```ts
-queryClient.invalidateQueries(resourceKeys.resource(projectRef, id))
+queryClient.invalidateQueries({ queryKey: resourceKeys.resource(projectRef, id) })
 ```
 
 if you are creating a new resource.

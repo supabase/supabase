@@ -1,5 +1,5 @@
-import { docsConfig } from '@/config/docs'
 import NavigationItem from '@/components/side-navigation-item'
+import { docsConfig } from '@/config/docs'
 
 function SideNavigation() {
   return (
@@ -9,7 +9,16 @@ function SideNavigation() {
           <div className="font-mono uppercase text-xs text-foreground-lighter/75 mb-2 px-6 tracking-widest">
             {section.title}
           </div>
-          {section.items.map((item, i) => (
+          {(section.sortOrder === 'alphabetical'
+            ? (() => {
+                const priorityItems = section.items.filter((item) => item.priority)
+                const regularItems = section.items
+                  .filter((item) => !item.priority)
+                  .sort((a, b) => a.title.localeCompare(b.title))
+                return [...priorityItems, ...regularItems]
+              })()
+            : section.items
+          ).map((item, i) => (
             <NavigationItem item={item} key={`${item.href}-${i}`} />
           ))}
         </div>

@@ -16,6 +16,7 @@ import {
   checkForWithClause,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { get } from 'data/fetchers'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from 'lib/constants'
 
 export interface LogsQueryHook {
@@ -46,6 +47,8 @@ const useLogsQuery = (
       : defaultHelper.calcTo(),
   })
 
+  const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
+
   useEffect(() => {
     setParams((prev) => ({
       ...prev,
@@ -64,12 +67,12 @@ const useLogsQuery = (
   const {
     data,
     error: rqError,
-    isLoading,
+    isPending: isLoading,
     isRefetching,
     refetch,
-  } = useQuery(
-    ['projects', projectRef, 'logs', params],
-    async ({ signal }) => {
+  } = useQuery({
+    queryKey: ['projects', projectRef, 'logs', params],
+    queryFn: async ({ signal }) => {
       const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
         params: {
           path: { ref: projectRef },
@@ -83,11 +86,9 @@ const useLogsQuery = (
 
       return data as unknown as Logs
     },
-    {
-      enabled: _enabled,
-      refetchOnWindowFocus: false,
-    }
-  )
+    enabled: _enabled,
+    refetchOnWindowFocus: false,
+  })
 
   let error: null | string | object = rqError ? (rqError as any).message : null
 
@@ -113,10 +114,19 @@ const useLogsQuery = (
     setParams((prev) => ({ ...prev, sql: newQuery }))
   }
 
+  const logData = (data?.result ?? []).map((x) => {
+    if (logsMetadata) {
+      return x
+    } else {
+      const { metadata, ...log } = x
+      return log
+    }
+  })
+
   return {
     params,
     isLoading: (_enabled && isLoading) || isRefetching,
-    logData: data?.result ?? [],
+    logData: logData,
     error,
     changeQuery,
     runQuery: () => refetch(),

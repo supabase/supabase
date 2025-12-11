@@ -1,8 +1,7 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { configKeys } from './keys'
 
 export type JwtSecretUpdateVariables = {
@@ -38,23 +37,23 @@ export const useJwtSecretUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<JwtSecretUpdateData, ResponseError, JwtSecretUpdateVariables>,
+  UseCustomMutationOptions<JwtSecretUpdateData, ResponseError, JwtSecretUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<JwtSecretUpdateData, ResponseError, JwtSecretUpdateVariables>(
-    (vars) => updateJwtSecret(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(configKeys.jwtSecretUpdatingStatus(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        await onError?.(data, variables, context)
-      },
-      ...options,
-    }
-  )
+  return useMutation<JwtSecretUpdateData, ResponseError, JwtSecretUpdateVariables>({
+    mutationFn: (vars) => updateJwtSecret(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({
+        queryKey: configKeys.jwtSecretUpdatingStatus(projectRef),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      await onError?.(data, variables, context)
+    },
+    ...options,
+  })
 }

@@ -34,16 +34,7 @@ parameters:
     default: ''
     type: 'string'
     description: |
-      Allows you to pass in an API key that will used for authentication for ingestion only. This is intended for programmatic usage where an external program sets the API key. A default ingestion API key will be automatically generated.
-  - id: 'LOGFLARE_PRIVATE_ACCESS_TOKEN' # {string} A unique identifier for this param.
-    title: 'LOGFLARE_PRIVATE_ACCESS_TOKEN' # {string} Any name.
-    tags: ['general'] # {string[]} These tags are useful for grouping parameters
-    links: [] # {string[]} These tags are useful for grouping parameters
-    required: true
-    default: ''
-    type: 'string'
-    description: |
-      Allows you to pass in an Management API key that will used for authentication. This is intended for programmatic usage where an external program sets the API key. This key is considered secret.
+      Allows you to pass in an API key that will used for authentication. This is intended for programmatic usage where an external program sets the API key.  If this value is not provided, the default API key will be automatically generated.
   - id: 'LOGFLARE_SUPABASE_MODE' # {string} A unique identifier for this param.
     title: 'LOGFLARE_SUPABASE_MODE' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters

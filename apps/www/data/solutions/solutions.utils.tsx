@@ -103,6 +103,11 @@ export interface FrameworkLinkProps {
   docs: string
 }
 
+export interface PostGridProps {
+  header: React.ReactNode
+  subheader: React.ReactNode
+}
+
 export const FrameworkLink = ({ framework }: { framework: FrameworkLinkProps }) => {
   const isXs = useBreakpoint(640)
   return (

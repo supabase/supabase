@@ -5,6 +5,7 @@ import {
   Lock,
   LockIcon,
   Ruler,
+  Scaling,
   Table2,
   TextSearch,
   Unlock,
@@ -164,6 +165,15 @@ export const lintInfoMap: LintInfo[] = [
     category: 'security',
   },
   {
+    name: 'auth_db_connections_absolute',
+    title: 'Auth Absolute Connection Management Strategy',
+    icon: <Scaling className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/auth/performance`,
+    linkText: 'View settings',
+    docsLink: `${DOCS_URL}/guides/platform/going-into-prod`,
+    category: 'performance',
+  },
+  {
     name: 'rls_references_user_metadata',
     title: 'RLS references user metadata',
     icon: <User className="text-foreground-muted" size={15} strokeWidth={1} />,
@@ -312,7 +322,7 @@ export const LintCTA = ({
 
   return (
     <Button asChild type="default">
-      <Link href={link} target="_blank" rel="noreferrer" className="no-underline">
+      <Link href={link} rel="noreferrer" className="no-underline">
         {linkText}
       </Link>
     </Button>
@@ -343,7 +353,7 @@ export const LintEntity = ({ metadata }: { metadata: Lint['metadata'] }) => {
 
 export const LintCategoryBadge = ({ category }: { category: string }) => {
   return (
-    <Badge variant={category === 'SECURITY' ? 'destructive' : 'warning'} className="capitalize">
+    <Badge variant={category === 'SECURITY' ? 'destructive' : 'warning'}>
       {category.toLowerCase()}
     </Badge>
   )

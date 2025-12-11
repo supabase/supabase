@@ -4,7 +4,8 @@ import 'dotenv/config'
 import fs from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 
-import { isFeatureEnabled } from 'common/enabled-features'
+import { isFeatureEnabled } from '../../../packages/common/enabled-features/index.js'
+import { getCustomContent } from '../lib/custom-content/getCustomContent.js'
 import {
   fetchCliLibReferenceSource,
   fetchCSharpLibReferenceSource,
@@ -34,6 +35,8 @@ const {
   sdkPython: sdkPythonEnabled,
   sdkSwift: sdkSwiftEnabled,
 } = isFeatureEnabled(['sdk:csharp', 'sdk:dart', 'sdk:kotlin', 'sdk:python', 'sdk:swift'])
+
+const { metadataTitle } = getCustomContent(['metadata:title'])
 
 function toLink(source: Source) {
   return `[${source.title}](https://supabase.com/${source.relPath})`
@@ -115,7 +118,7 @@ async function generateMainLlmsTxt() {
   const sourceLinks = SOURCES.filter((source) => source.enabled !== false)
     .map((source) => `- ${toLink(source)}`)
     .join('\n')
-  const fullText = `# Supabase Docs\n\n${sourceLinks}`
+  const fullText = `# ${metadataTitle}\n\n${sourceLinks}`
   fs.writeFile('public/llms.txt', fullText)
 }
 

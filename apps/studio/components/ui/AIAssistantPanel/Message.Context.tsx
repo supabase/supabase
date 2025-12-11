@@ -18,6 +18,7 @@ export interface MessageInfo {
   isLastMessage?: boolean
 
   state: 'idle' | 'editing' | 'predecessor-editing'
+  rating?: 'positive' | 'negative' | null
 }
 
 export interface MessageActions {
@@ -26,6 +27,7 @@ export interface MessageActions {
   onDelete: (id: string) => void
   onEdit: (id: string) => void
   onCancelEdit: () => void
+  onRate?: (id: string, rating: 'positive' | 'negative', reason?: string) => void
 }
 
 const MessageInfoContext = createContext<MessageInfo | null>(null)
