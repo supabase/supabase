@@ -35,21 +35,6 @@ const ThemeSwitcherDropdown = () => {
     return null
   }
 
-  function SingleThemeSelection() {
-    return (
-      <form>
-        <RadioGroup_Shadcn_
-          name="theme"
-          onValueChange={setTheme}
-          aria-label="Choose a theme"
-          defaultValue={theme}
-          value={theme}
-          className="flex flex-wrap gap-3"
-        ></RadioGroup_Shadcn_>
-      </form>
-    )
-  }
-
   const iconClasses = 'text-foreground-lighter group-data-[state=open]:text-foreground'
 
   return (
