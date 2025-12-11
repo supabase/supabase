@@ -6,10 +6,8 @@ import { StreamableHTTPTransport } from "@hono/mcp";
 import { Hono } from "hono";
 import { z } from "zod";
 
-// Edge Functions route to /<functionName>/*, so set the base path accordingly.
-// Change this to your function name
-const functionName = "mcp";
-const app = new Hono().basePath(`/${functionName}`);
+// Create Hono app
+const app = new Hono();
 
 // Create your MCP server
 const server = new McpServer({
