@@ -139,7 +139,7 @@ Forms in Supabase Studio should follow consistent patterns to ensure a cohesive 
 
 ### Layout Selection
 
-- **Page layouts**: Use `FormItemLayout` with `layout="flex-row-reverse"` for horizontal alignment. Forms should be wrapped in a `Card` with `CardContent` and `CardFooter` for actions. Use `Separator` between form fields. The layout automatically handles consistent input widths (50% on md, 40% on xl, min-w-100).
+- **Page layouts**: Use `FormItemLayout` with `layout="flex-row-reverse"` for horizontal alignment. Forms should be wrapped in a `Card` with each form field in its own `CardContent`, and `CardFooter` for actions. The layout automatically handles consistent input widths (50% on md, 40% on xl, min-w-100).
 - **Side panels (wide)**: Use `FormItemLayout` with `layout="horizontal"`. Use `SheetSection` to wrap each field group.
 - **Side panels (narrow, size="sm" or below)**: Use `FormItemLayout` with `layout="vertical"`
 
@@ -159,7 +159,6 @@ import {
   FormField_Shadcn_,
   FormControl_Shadcn_,
   Input_Shadcn_,
-  Separator,
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -185,7 +184,7 @@ export function SettingsForm() {
     <Form_Shadcn_ {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <Card>
-          <CardContent className="pt-6 space-y-6">
+          <CardContent>
             <FormField_Shadcn_
               control={form.control}
               name="name"
@@ -201,9 +200,8 @@ export function SettingsForm() {
                 </FormItemLayout>
               )}
             />
-
-            <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
-
+          </CardContent>
+          <CardContent>
             <FormField_Shadcn_
               control={form.control}
               name="enableFeature"
@@ -251,7 +249,6 @@ import {
   FormField_Shadcn_,
   FormControl_Shadcn_,
   Input_Shadcn_,
-  Separator,
   Sheet,
   SheetContent,
   SheetFooter,

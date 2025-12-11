@@ -27,7 +27,6 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Separator,
   Switch,
   Textarea,
 } from 'ui'
@@ -116,10 +115,10 @@ export default function FormPatternsPageLayout() {
         </PageSectionMeta>
         <PageSectionContent>
           <Form_Shadcn_ {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)}>
               <Card>
-                <CardContent className="pt-6 space-y-6">
-                  {/* Text Input */}
+                {/* Text Input */}
+                <CardContent>
                   <FormField_Shadcn_
                     control={form.control}
                     name="name"
@@ -135,10 +134,10 @@ export default function FormPatternsPageLayout() {
                       </FormItemLayout>
                     )}
                   />
+                </CardContent>
 
-                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
-
-                  {/* Password Input */}
+                {/* Password Input */}
+                <CardContent>
                   <FormField_Shadcn_
                     control={form.control}
                     name="password"
@@ -154,10 +153,10 @@ export default function FormPatternsPageLayout() {
                       </FormItemLayout>
                     )}
                   />
+                </CardContent>
 
-                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
-
-                  {/* Copyable Input */}
+                {/* Copyable Input */}
+                <CardContent>
                   <FormField_Shadcn_
                     control={form.control}
                     name="apiKey"
@@ -179,10 +178,10 @@ export default function FormPatternsPageLayout() {
                       </FormItemLayout>
                     )}
                   />
+                </CardContent>
 
-                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
-
-                  {/* Number Input */}
+                {/* Number Input */}
+                <CardContent>
                   <FormField_Shadcn_
                     control={form.control}
                     name="maxConnections"
@@ -204,10 +203,10 @@ export default function FormPatternsPageLayout() {
                       </FormItemLayout>
                     )}
                   />
+                </CardContent>
 
-                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
-
-                  {/* Input with Units */}
+                {/* Input with Units */}
+                <CardContent>
                   <FormField_Shadcn_
                     control={form.control}
                     name="duration"
@@ -225,10 +224,10 @@ export default function FormPatternsPageLayout() {
                       </FormItemLayout>
                     )}
                   />
+                </CardContent>
 
-                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
-
-                  {/* Textarea */}
+                {/* Textarea */}
+                <CardContent>
                   <FormField_Shadcn_
                     control={form.control}
                     name="description"
@@ -249,10 +248,10 @@ export default function FormPatternsPageLayout() {
                       </FormItemLayout>
                     )}
                   />
+                </CardContent>
 
-                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
-
-                  {/* Icon Upload */}
+                {/* Icon Upload */}
+                <CardContent>
                   <FormField_Shadcn_
                     control={form.control}
                     name="description"
@@ -315,10 +314,10 @@ export default function FormPatternsPageLayout() {
                       </FormItemLayout>
                     )}
                   />
+                </CardContent>
 
-                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
-
-                  {/* File Upload */}
+                {/* File Upload */}
+                <CardContent>
                   <FormField_Shadcn_
                     control={form.control}
                     name="description"
@@ -408,10 +407,10 @@ export default function FormPatternsPageLayout() {
                       </FormItemLayout>
                     )}
                   />
+                </CardContent>
 
-                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
-
-                  {/* Switch */}
+                {/* Switch */}
+                <CardContent>
                   <FormField_Shadcn_
                     control={form.control}
                     name="enableFeature"
@@ -427,10 +426,10 @@ export default function FormPatternsPageLayout() {
                       </FormItemLayout>
                     )}
                   />
+                </CardContent>
 
-                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
-
-                  {/* Checkbox */}
+                {/* Checkbox */}
+                <CardContent>
                   <FormItemLayout
                     layout="flex-row-reverse"
                     label="Checkbox"
@@ -502,10 +501,10 @@ export default function FormPatternsPageLayout() {
                       />
                     </div>
                   </FormItemLayout>
+                </CardContent>
 
-                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
-
-                  {/* Select */}
+                {/* Select */}
+                <CardContent>
                   <FormField_Shadcn_
                     control={form.control}
                     name="region"
@@ -536,10 +535,10 @@ export default function FormPatternsPageLayout() {
                       </FormItemLayout>
                     )}
                   />
+                </CardContent>
 
-                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
-
-                  {/* Multi-Select */}
+                {/* Multi-Select */}
+                <CardContent>
                   <FormField_Shadcn_
                     control={form.control}
                     name="schemas"
@@ -573,10 +572,10 @@ export default function FormPatternsPageLayout() {
                       </FormItemLayout>
                     )}
                   />
+                </CardContent>
 
-                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
-
-                  {/* Radio Group */}
+                {/* Radio Group */}
+                <CardContent>
                   <FormField_Shadcn_
                     control={form.control}
                     name="queueType"
@@ -603,10 +602,10 @@ export default function FormPatternsPageLayout() {
                       </FormItemLayout>
                     )}
                   />
+                </CardContent>
 
-                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
-
-                  {/* Date Picker */}
+                {/* Date Picker */}
+                <CardContent>
                   <FormField_Shadcn_
                     control={form.control}
                     name="expiryDate"
@@ -640,10 +639,10 @@ export default function FormPatternsPageLayout() {
                       </FormItemLayout>
                     )}
                   />
+                </CardContent>
 
-                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
-
-                  {/* Field Array */}
+                {/* Field Array */}
+                <CardContent>
                   <FormField_Shadcn_
                     control={form.control}
                     name="redirectUris"
@@ -690,10 +689,10 @@ export default function FormPatternsPageLayout() {
                       </FormItemLayout>
                     )}
                   />
+                </CardContent>
 
-                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
-
-                  {/* Action Field */}
+                {/* Action Field */}
+                <CardContent>
                   <FormItemLayout
                     layout="flex-row-reverse"
                     label="Action Field"
