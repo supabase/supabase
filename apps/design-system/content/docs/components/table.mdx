@@ -177,12 +177,34 @@ When adding icon columns to your table, use [Accessibility](../accessibility) ma
 
 Place action columns at the end of the table to maintain a logical reading flow. When multiple actions are available, display one primary action as a button and place additional options in a folded menu (such as a dropdown menu with an ellipsis icon). This approach keeps the table interface clean while providing access to all necessary actions.
 
+#### Basic actions
+
+Constrain all interactivity to the action column. Exceptions to this rule are described in the examples that follow.
+
 <ComponentPreview name="table-actions" />
+
+#### Cross-links
+
+It may be necessary to link to other areas from within a table row. Consider using the `text-link-table-cell` CSS class to hint at interactivity whilst also making it clear it is a tertiary action.
+
+<ComponentPreview name="table-cross-link" />
+
+Do not make the entire row interactive when using cross-links, as the chances of mis-taps are increased.
+
+#### Row as navigation
+
+Buckets for example. Do not put any other actions on if you can avoid it.
+
+<ComponentPreview name="table-row-link" />
+
+Pay close attention to [Accessibility](/accessibility#focus-management) requirements such as focus management.
+
+If you must, consider nesting all actions in an overflow menu and maintaining a chevron like Policies:
+
+<ComponentPreview name="table-row-link-actions" />
 
 ## Related
 
-Use the Table component for simple, static tabular data presentation with a fixed number of rows. It's ideal for basic tables that don't require complex interactions and are part of a larger page layout. The Table component provides a lightweight solution for straightforward data display needs.
+Use the Table component for simple, static tabular data presentation with a fixed number of rows. Consider using [Data Table](../components/data-table) for more complex cases as it provides built-in sorting, filtering, and pagination capabilities.
 
-For more complex use cases, consider using the [Data Table](../components/data-table) component, which provides built-in sorting, filtering, and pagination capabilities. The Data Table component also supports row selection, column visibility controls, and full-viewport table layouts.
-
-For additional guidance on table patterns and best practices, see the [Tables](../ui-patterns/tables) documentation.
+Refer to [Tables](../ui-patterns/tables) for broader guidance and best practices on presenting tabular data.

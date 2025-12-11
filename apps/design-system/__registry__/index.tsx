@@ -1358,6 +1358,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "table-cross-link": {
+      name: "table-cross-link",
+      type: "components:example",
+      registryDependencies: ["table"],
+      component: React.lazy(() => import("@/registry/default/example/table-cross-link")),
+      source: "",
+      files: ["registry/default/example/table-cross-link.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "table-demo": {
       name: "table-demo",
       type: "components:example",
@@ -1387,6 +1398,28 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/table-icons")),
       source: "",
       files: ["registry/default/example/table-icons.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "table-row-link": {
+      name: "table-row-link",
+      type: "components:example",
+      registryDependencies: ["table"],
+      component: React.lazy(() => import("@/registry/default/example/table-row-link")),
+      source: "",
+      files: ["registry/default/example/table-row-link.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "table-row-link-actions": {
+      name: "table-row-link-actions",
+      type: "components:example",
+      registryDependencies: ["table"],
+      component: React.lazy(() => import("@/registry/default/example/table-row-link-actions")),
+      source: "",
+      files: ["registry/default/example/table-row-link-actions.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
