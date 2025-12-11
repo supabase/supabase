@@ -806,6 +806,7 @@ export const examples: Registry = [
   {
     name: 'table-icons',
     type: 'components:example',
+    registryDependencies: ['table'],
     files: ['example/table-icons.tsx'],
   },
   {

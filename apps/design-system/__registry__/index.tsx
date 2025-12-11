@@ -1383,7 +1383,7 @@ export const Index: Record<string, any> = {
     "table-icons": {
       name: "table-icons",
       type: "components:example",
-      registryDependencies: undefined,
+      registryDependencies: ["table"],
       component: React.lazy(() => import("@/registry/default/example/table-icons")),
       source: "",
       files: ["registry/default/example/table-icons.tsx"],
