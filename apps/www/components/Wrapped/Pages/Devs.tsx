@@ -52,6 +52,24 @@ const gridStats = [
     increment: 0,
     suffix: 'PB',
   },
+  {
+    headline: 'One of the top 100 repos on Github',
+    number: 94.5,
+    increment: 0,
+    suffix: 'stars',
+  },
+  {
+    headline: 'paid to fund open source',
+    number: 662_357.71,
+    increment: 0,
+    suffix: '$',
+  },
+  {
+    headline: 'Commits to our repos by community members',
+    number: 1_421,
+    increment: 0,
+    suffix: 'commits',
+  },
 ]
 
 export const Devs = () => {
@@ -125,18 +143,25 @@ export const Devs = () => {
                     className="p-8 border-r border-b border-muted [&:nth-child(2n)]:border-r-0 lg:[&:nth-child(2n)]:border-r [&:nth-child(4n)]:border-r-0"
                   >
                     <div className="flex flex-col gap-2">
-                      <p
-                        className={`text-2xl md:text-3xl font-mono font-medium tracking-tighter ${stat.increment > 0 ? 'text-brand' : 'text-foreground'}`}
-                      >
-                        {stat.suffix ? (
-                          <>
-                            {stat.number}
-                            <span className="text-lg ml-1">{stat.suffix}</span>
-                          </>
-                        ) : (
-                          <AnimatedCounter value={stat.number} increment={stat.increment} compact />
-                        )}
-                      </p>
+                      <div className="flex flex-col">
+                        <p
+                          className={`text-2xl md:text-3xl font-mono font-medium tracking-tighter ${stat.increment > 0 ? 'text-brand' : 'text-foreground'}`}
+                        >
+                          {stat.suffix ? (
+                            <>
+                              {new Intl.NumberFormat('en-US', {
+                                maximumFractionDigits: stat.number % 1 !== 0 ? 2 : 0,
+                                minimumFractionDigits: stat.number % 1 !== 0 ? 1 : 0,
+                              }).format(stat.number)}
+                              <span className="text-lg ml-1">{stat.suffix}</span>
+                            </>
+                          ) 
+                          : (
+                            <AnimatedCounter value={stat.number} increment={stat.increment} compact />
+                          )}
+                        </p>
+                       
+                      </div>
                       <p className="text-sm text-foreground-lighter">{stat.headline}</p>
                     </div>
                   </div>
