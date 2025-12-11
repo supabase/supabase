@@ -13,7 +13,6 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  RadioGroupLargeItem_Shadcn_,
   RadioGroup_Shadcn_,
   Theme,
   singleThemes,
@@ -51,7 +50,7 @@ const ThemeSwitcherDropdown = () => {
     )
   }
 
-  const iconClasses = 'text-foreground-light group-data-[state=open]:text-foreground'
+  const iconClasses = 'text-foreground-lighter group-data-[state=open]:text-foreground'
 
   return (
     <>
@@ -68,7 +67,7 @@ const ThemeSwitcherDropdown = () => {
                 <Moon className={iconClasses} />
               )
             }
-          ></Button>
+          />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" align="end">
           <DropdownMenuLabel>Theme</DropdownMenuLabel>
