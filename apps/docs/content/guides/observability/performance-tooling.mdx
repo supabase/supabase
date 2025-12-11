@@ -1,0 +1,56 @@
+---
+id: 'observability-performance-tooling'
+title: 'Performance tools & extensions'
+description: 'Mix Supabase advisors with Postgres extensions to tune performance and right-size compute.'
+---
+
+There are many ways to optimize your database: Supabase-built advisors highlight the biggest wins, and Postgres extensions give you deep visibility when you want to go hands-on. Use the cards below to jump into the relevant playbooks, whether you need to tune SQL, understand wait events, or validate that your compute size still fits.
+
+<div className="grid gap-4 not-prose md:grid-cols-12">
+  {performanceToolingCards.map((card) => (
+    <div className="col-span-12 md:col-span-6 xl:col-span-4" key={card.title}>
+      <Link href={card.href} passHref>
+        <GlassPanel title={card.title}>
+          <div className="space-y-3">
+            <p className="text-foreground-light">{card.description}</p>
+            <span className="text-sm text-foreground-lighter">View the guide</span>
+          </div>
+        </GlassPanel>
+      </Link>
+    </div>
+  ))}
+</div>
+
+<p className="mt-8 text-foreground-lighter">
+  More right-sizing playbooks and extension walkthroughs are on the way. Tell us what you’d like to
+  see in the #observability channel of Discord.
+</p>
+
+export const performanceToolingCards = [
+  {
+    title: 'Query optimization',
+    description: 'Identify slow SQL patterns and apply EXPLAIN plans plus planner hints.',
+    href: '/docs/guides/database/query-optimization',
+  },
+  {
+    title: 'Debugging performance',
+    description: 'Correlate logs, wait events, and metrics when latency suddenly spikes.',
+    href: '/docs/guides/database/debugging-performance',
+  },
+  {
+    title: 'Index advisor',
+    description:
+      'Use the built-in advisor to simulate indexes and apply the best candidates safely.',
+    href: '/docs/guides/database/extensions/index_advisor',
+  },
+  {
+    title: 'pg_stat_statements',
+    description: 'Enable the extension to rank slow queries and validate optimizations over time.',
+    href: '/docs/guides/database/extensions/pg_stat_statements',
+  },
+  {
+    title: 'Manage compute & disk',
+    description: 'Review compute tiers, disk budgets, and when to upgrade vs optimize.',
+    href: '/docs/guides/platform/manage-your-usage/compute-and-disk',
+  },
+]

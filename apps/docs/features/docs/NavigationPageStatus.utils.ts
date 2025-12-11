@@ -34,6 +34,7 @@ const SECTION_NAV_MAPS: Record<string, NavMenuConstant> = {
   graphql,
   integrations,
   'local-development': local_development,
+  observability: telemetry,
   platform,
   queues,
   realtime,

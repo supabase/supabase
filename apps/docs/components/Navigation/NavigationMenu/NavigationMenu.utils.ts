@@ -132,6 +132,7 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.Integrations
     case pathname.startsWith('local-development'):
       return MenuId.LocalDevelopment
+    case pathname.startsWith('observability'):
     case pathname.startsWith('telemetry'):
       return MenuId.Telemetry
     case pathname.startsWith('platform'):
