@@ -44,11 +44,7 @@ const TableFooter = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <tfoot
-    ref={ref}
-    className={cn('bg-primary font-medium text-primary-foreground', className)}
-    {...props}
-  />
+  <tfoot ref={ref} className={cn('border-t font-medium', className)} {...props} />
 ))
 TableFooter.displayName = 'TableFooter'
 
@@ -165,7 +161,16 @@ const TableCaption = React.forwardRef<
   HTMLTableCaptionElement,
   React.HTMLAttributes<HTMLTableCaptionElement>
 >(({ className, ...props }, ref) => (
-  <caption ref={ref} className={cn('mt-4 text-sm text-foreground-muted', className)} {...props} />
+  <caption
+    ref={ref}
+    className={cn(
+      'border-t', // TableCaption is aligned by parent Table at caption-bottom
+      'p-4 text-sm text-foreground-muted', // Match styling of TableCell
+      className
+    )}
+    // Should only contain inline elements
+    {...props}
+  />
 ))
 TableCaption.displayName = 'TableCaption'
 

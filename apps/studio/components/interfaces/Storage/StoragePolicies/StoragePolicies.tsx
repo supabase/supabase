@@ -1,22 +1,19 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { useParams } from 'common'
 import { isEmpty } from 'lodash'
-import { Search, X } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import PolicyEditorModal from 'components/interfaces/Auth/Policies/PolicyEditorModal'
-import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
-import { useBucketsQuery } from 'data/storage/buckets-query'
+import { usePaginatedBucketsQuery } from 'data/storage/buckets-query'
+import { useDebouncedValue } from 'hooks/misc/useDebouncedValue'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -27,10 +24,10 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import { formatPoliciesForStorage } from '../Storage.utils'
+import { formatPoliciesForStorage, UNGROUPED_POLICY_SYMBOL } from '../Storage.utils'
 import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
+import { BucketsPolicies, type SelectBucketPolicyForAction } from './StoragePoliciesBucketsSection'
 import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
-import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 
 export const StoragePolicies = () => {
   const { ref: projectRef } = useParams()
@@ -46,8 +43,19 @@ export const StoragePolicies = () => {
     'search',
     parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true })
   )
+  const debouncedSearchString = useDebouncedValue(searchString, 250)
 
-  const { data: buckets = [], isPending: isLoadingBuckets } = useBucketsQuery({ projectRef })
+  const {
+    data: bucketsData,
+    isPending: isLoadingBuckets,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = usePaginatedBucketsQuery({
+    projectRef,
+    search: debouncedSearchString || undefined,
+  })
+  const buckets = useMemo(() => bucketsData?.pages.flatMap((page) => page) ?? [], [bucketsData])
 
   const {
     data: policies = [],
@@ -81,50 +89,46 @@ export const StoragePolicies = () => {
 
   const showGeneralPolicyEditor = !isEmpty(isEditingPolicyForBucket) && !showStoragePolicyEditor
 
-  // Policies under storage.objects
-  const storageObjectsPolicies = policies.filter(
-    (x) => x.schema === 'storage' && x.table === 'objects'
-  )
-  const formattedStorageObjectPolicies = formatPoliciesForStorage(buckets, storageObjectsPolicies)
-  const ungroupedPolicies =
-    formattedStorageObjectPolicies.find((x) => x.name === 'Ungrouped')?.policies ?? []
-
   // Policies under storage.buckets
   const storageBucketPolicies = policies.filter(
     (x) => x.schema === 'storage' && x.table === 'buckets'
   )
+  // Policies under storage.objects
+  const storageObjectsPolicies = policies.filter(
+    (x) => x.schema === 'storage' && x.table === 'objects'
+  )
 
-  /**
-   * Filter buckets based on search string
-   * - Filter buckets by name matching the search string
-   * - Show all policies for filtered buckets (policies are not filtered)
-   */
-  const filteredBucketsWithPolicies = useMemo(() => {
-    const searchFilter = searchString?.toLowerCase() || ''
+  const formattedStorageObjectPolicies = useMemo(
+    () => formatPoliciesForStorage(buckets, storageObjectsPolicies),
+    [buckets, storageObjectsPolicies]
+  )
 
-    // Filter buckets by name if search filter is present
-    const filteredBucketsList = searchFilter
-      ? buckets.filter((bucket) => bucket.name.toLowerCase().includes(searchFilter))
-      : buckets
+  const ungroupedPolicies =
+    formattedStorageObjectPolicies.find((x) => x.name === UNGROUPED_POLICY_SYMBOL)?.policies ?? []
 
+  const bucketsWithPolicies = useMemo(() => {
     // Get policies for filtered buckets (show all policies, don't filter them)
-    // Show all filtered buckets, even if they don't have policies (similar to auth/policies.tsx)
-    const filteredBucketsWithPoliciesList = filteredBucketsList.map((bucket) => {
-      const policies =
+    // Show all filtered buckets, even if they don't have policies
+    return buckets.map((bucket) => {
+      const bucketPolicies =
         formattedStorageObjectPolicies.find((x) => x.name === bucket.name)?.policies ?? []
-      return { bucket, policies }
+      return { bucket, policies: bucketPolicies }
     })
+  }, [buckets, formattedStorageObjectPolicies])
 
-    // Schema-level policies should always be shown, unaffected by search filter
-    return filteredBucketsWithPoliciesList
-  }, [buckets, searchString, formattedStorageObjectPolicies])
-
-  const onSelectPolicyAdd = (bucketName = '', table = '') => {
+  const onSelectPolicyAdd: SelectBucketPolicyForAction['addPolicy'] = (
+    bucketName = '',
+    table = ''
+  ) => {
     setSelectedPolicyToEdit(undefined)
     setIsEditingPolicyForBucket({ bucket: bucketName, table })
   }
 
-  const onSelectPolicyEdit = (policy: any, bucketName = '', table = '') => {
+  const onSelectPolicyEdit: SelectBucketPolicyForAction['editPolicy'] = (
+    policy,
+    bucketName = '',
+    table = ''
+  ) => {
     setIsEditingPolicyForBucket({ bucket: bucketName, table })
     setSelectedPolicyToEdit(policy)
   }
@@ -133,7 +137,8 @@ export const StoragePolicies = () => {
     setIsEditingPolicyForBucket(undefined)
   }
 
-  const onSelectPolicyDelete = (policy: any) => setSelectedPolicyToDelete(policy)
+  const onSelectPolicyDelete: SelectBucketPolicyForAction['deletePolicy'] = (policy: any) =>
+    setSelectedPolicyToDelete(policy)
   const onCancelPolicyDelete = () => setSelectedPolicyToDelete(undefined)
 
   const onSavePolicySuccess = async () => {
@@ -237,72 +242,22 @@ export const StoragePolicies = () => {
           </PageSection>
         ) : (
           <div>
-            <PageSection>
-              <PageSectionMeta>
-                <PageSectionSummary>
-                  <PageSectionTitle>Buckets</PageSectionTitle>
-                  <PageSectionDescription>
-                    Write policies for each bucket to control access to the bucket and its contents
-                  </PageSectionDescription>
-                </PageSectionSummary>
-              </PageSectionMeta>
-              <PageSectionContent>
-                {buckets.length === 0 && <StoragePoliciesPlaceholder />}
-
-                {buckets.length > 0 && (
-                  <div className="mb-4">
-                    <Input
-                      size="tiny"
-                      placeholder="Filter buckets"
-                      className="block"
-                      containerClassName="w-full lg:w-52"
-                      value={searchString || ''}
-                      onChange={(e) => {
-                        const str = e.target.value
-                        setSearchString(str)
-                      }}
-                      icon={<Search />}
-                      actions={
-                        searchString ? (
-                          <Button
-                            size="tiny"
-                            type="text"
-                            className="p-0 h-5 w-5"
-                            icon={<X />}
-                            onClick={() => setSearchString('')}
-                          />
-                        ) : null
-                      }
-                    />
-                  </div>
-                )}
-
-                {searchString.length > 0 && filteredBucketsWithPolicies.length === 0 && (
-                  <NoSearchResults
-                    searchString={searchString}
-                    onResetFilter={() => setSearchString('')}
-                  />
-                )}
-
-                {/* Sections for policies grouped by buckets */}
-                <div className="flex flex-col gap-y-4">
-                  {filteredBucketsWithPolicies.map(({ bucket, policies }) => {
-                    return (
-                      <StoragePoliciesBucketRow
-                        key={bucket.name}
-                        table="objects"
-                        label={bucket.name}
-                        bucket={bucket}
-                        policies={policies}
-                        onSelectPolicyAdd={onSelectPolicyAdd}
-                        onSelectPolicyEdit={onSelectPolicyEdit}
-                        onSelectPolicyDelete={onSelectPolicyDelete}
-                      />
-                    )
-                  })}
-                </div>
-              </PageSectionContent>
-            </PageSection>
+            <BucketsPolicies
+              buckets={bucketsWithPolicies}
+              search={searchString}
+              debouncedSearch={debouncedSearchString}
+              setSearch={setSearchString}
+              actions={{
+                addPolicy: onSelectPolicyAdd,
+                editPolicy: onSelectPolicyEdit,
+                deletePolicy: onSelectPolicyDelete,
+              }}
+              pagination={{
+                hasNextPage,
+                isFetchingNextPage,
+                fetchNextPage,
+              }}
+            />
 
             <PageSection>
               <PageSectionMeta>
