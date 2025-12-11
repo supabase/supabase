@@ -9,5 +9,8 @@
     "clean": "rimraf node_modules"
   },
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "zod": "catalog:"
+  }
 }

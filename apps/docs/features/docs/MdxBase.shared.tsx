@@ -19,6 +19,7 @@ import { NavData } from '~/components/NavData'
 import { Price } from '~/components/Price'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
 import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
+import { ComputeDiskLimitsTableRows } from '~/components/ComputeDiskLimitsTable'
 import { RegionsList, SmartRegionsList } from '~/components/RegionsList'
 import { SharedData } from '~/components/SharedData'
 import StepHikeCompact from '~/components/StepHikeCompact'
@@ -49,6 +50,7 @@ const components = {
   ButtonCard,
   CodeSampleDummy,
   CodeSampleWrapper,
+  ComputeDiskLimitsTableRows,
   CostWarning,
   ErrorCodes,
   Extensions,
