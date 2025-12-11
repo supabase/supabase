@@ -26,6 +26,7 @@ import {
 } from 'ui'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { CollapseButton } from './CollapseButton'
+import { SaveButton } from './SaveButton'
 import { SortableTab } from './SortableTab'
 import { TabPreview } from './TabPreview'
 
@@ -48,7 +49,8 @@ export const EditorTabs = () => {
     .map((id) => tabs.tabsMap[id])
     .filter((tab) => tab !== undefined) as Tab[]
 
-  const hasNewTab = router.asPath.includes('/new')
+  // We no longer have an empty new tab for SQL editor, only table editor
+  const hasNewTab = router.asPath.includes('/new') && editor === 'table'
 
   // Filter by editor type - only show SQL tabs for SQL editor and table tabs for table editor
   const editorTabs = !!editor
@@ -221,7 +223,7 @@ export const EditorTabs = () => {
           <AnimatePresence initial={false}>
             {!hasNewTab && (
               <motion.button
-                className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0 border-b"
+                className="flex items-center justify-center w-10 h-10 bg hover:bg-surface-100 shrink-0 border-b sticky right-0"
                 onClick={() =>
                   router.push(
                     `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
@@ -239,8 +241,13 @@ export const EditorTabs = () => {
               </motion.button>
             )}
           </AnimatePresence>
-          <div className="grow h-full border-b pr-6" />
+          <div className="grow h-full border-b" />
         </TabsList_Shadcn_>
+        {editor === 'sql' && (
+          <div className="flex items-center border-b pr-4 shrink-0">
+            <SaveButton />
+          </div>
+        )}
       </Tabs_Shadcn_>
 
       <DragOverlay dropAnimation={null}>

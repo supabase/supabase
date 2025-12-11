@@ -228,15 +228,17 @@ export const sqlEditorState = proxy({
   },
 
   addResult: (id: string, results: any[], autoLimit?: number) => {
-    if (sqlEditorState.results[id]) {
-      sqlEditorState.results[id].unshift({ rows: results, autoLimit })
+    if (!sqlEditorState.results[id]) {
+      sqlEditorState.results[id] = []
     }
+    sqlEditorState.results[id].unshift({ rows: results, autoLimit })
   },
 
   addResultError: (id: string, error: any, autoLimit?: number) => {
-    if (sqlEditorState.results[id]) {
-      sqlEditorState.results[id].unshift({ rows: [], error, autoLimit })
+    if (!sqlEditorState.results[id]) {
+      sqlEditorState.results[id] = []
     }
+    sqlEditorState.results[id].unshift({ rows: [], error, autoLimit })
   },
 
   resetResult: (id: string) => {
