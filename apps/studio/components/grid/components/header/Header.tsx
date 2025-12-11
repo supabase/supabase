@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ReactNode, useState } from 'react'
 import { toast } from 'sonner'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { useTableSort } from 'components/grid/hooks/useTableSort'
@@ -273,7 +274,7 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
       enforceExactCount: snap.enforceExactCount,
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
-    { keepPreviousData: true, enabled: tableQueriesEnabled }
+    { placeholderData: keepPreviousData, enabled: tableQueriesEnabled }
   )
 
   const allRows = data?.rows ?? []

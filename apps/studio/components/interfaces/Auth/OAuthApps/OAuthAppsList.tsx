@@ -62,7 +62,7 @@ type OAuthAppsSortOrder = OAuthAppsSort extends `${string}:${infer Order}` ? Ord
 
 export const OAuthAppsList = () => {
   const { ref: projectRef } = useParams()
-  const { data: authConfig, isLoading: isAuthConfigLoading } = useAuthConfigQuery({ projectRef })
+  const { data: authConfig, isPending: isAuthConfigLoading } = useAuthConfigQuery({ projectRef })
   const isOAuthServerEnabled = !!authConfig?.OAUTH_SERVER_ENABLED
   const [newOAuthApp, setNewOAuthApp] = useState<OAuthClient | undefined>(undefined)
   const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
@@ -71,10 +71,12 @@ export const OAuthAppsList = () => {
   const [filteredClientTypes, setFilteredClientTypes] = useState<string[]>([])
   const deletingOAuthAppIdRef = useRef<string | null>(null)
 
-  const { data, isLoading, isError, error } = useOAuthServerAppsQuery(
-    { projectRef },
-    { enabled: isOAuthServerEnabled }
-  )
+  const {
+    data,
+    isPending: isLoading,
+    isError,
+    error,
+  } = useOAuthServerAppsQuery({ projectRef }, { enabled: isOAuthServerEnabled })
 
   const { mutateAsync: regenerateSecret, isPending: isRegenerating } =
     useOAuthServerAppRegenerateSecretMutation({
@@ -112,7 +114,7 @@ export const OAuthAppsList = () => {
       handleErrorOnDelete(deletingOAuthAppIdRef, selectedId, `OAuth App not found`),
   })
 
-  const { mutate: deleteOAuthApp, isLoading: isDeletingApp } = useOAuthServerAppDeleteMutation({
+  const { mutate: deleteOAuthApp, isPending: isDeletingApp } = useOAuthServerAppDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted OAuth app`)
       setSelectedAppToDelete(null)
@@ -204,7 +206,7 @@ export const OAuthAppsList = () => {
           <Admonition
             type="default"
             layout="horizontal"
-            className="mb-8 [&>div]:!translate-y-0"
+            className="mb-8"
             title="OAuth Server is disabled"
             description="Enable OAuth Server to make your project act as an identity provider for third-party applications."
             actions={

@@ -40,14 +40,14 @@ export const BillingCustomerData = () => {
   const {
     data: customerProfile,
     error,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
   } = useOrganizationCustomerProfileQuery({ slug }, { enabled: canReadBillingCustomerData })
 
   const {
     data: taxId,
     error: errorLoadingTaxId,
-    isLoading: isLoadingTaxId,
+    isPending: isLoadingTaxId,
     isSuccess: loadedTaxId,
   } = useOrganizationTaxIdQuery({ slug })
 

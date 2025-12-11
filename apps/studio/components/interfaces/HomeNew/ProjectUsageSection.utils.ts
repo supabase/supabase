@@ -1,5 +1,5 @@
-import { useProjectMetricsQuery } from 'data/analytics/project-metrics-query'
 import type { ProjectMetricsRow } from 'data/analytics/project-metrics-query'
+import { useProjectMetricsQuery } from 'data/analytics/project-metrics-query'
 
 type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
 
@@ -108,7 +108,12 @@ export const useServiceStats = (
   projectRef: string,
   interval: '1hr' | '1day' | '7day'
 ): ServiceStatsMap => {
-  const { data, isLoading, error, refetch } = useProjectMetricsQuery({ projectRef, interval })
+  const {
+    data,
+    isPending: isLoading,
+    error,
+    refetch,
+  } = useProjectMetricsQuery({ projectRef, interval })
 
   return toServiceStatsMap({
     data,

@@ -1,4 +1,5 @@
-import { useQueryClient } from '@tanstack/react-query'
+import pgMeta from '@supabase/pg-meta'
+import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import {
   ExternalLinkIcon,
@@ -12,18 +13,22 @@ import {
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
-import pgMeta from '@supabase/pg-meta'
 
 import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import AlertError from 'components/ui/AlertError'
+import { AlertError } from 'components/ui/AlertError'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { InlineLink } from 'components/ui/InlineLink'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useIndexWorkerStatusQuery } from 'data/auth/index-worker-status-query'
 import { authKeys } from 'data/auth/keys'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
+import { useUserIndexStatusesQuery } from 'data/auth/user-search-indexes-query'
 import { useUsersCountQuery } from 'data/auth/users-count-query'
 import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -33,6 +38,7 @@ import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
+import Link from 'next/link'
 import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import {
   Alert_Shadcn_,
@@ -69,12 +75,6 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useUserIndexStatusesQuery } from 'data/auth/user-search-indexes-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useIndexWorkerStatusQuery } from 'data/auth/index-worker-status-query'
-import { InlineLink } from 'components/ui/InlineLink'
-import Link from 'next/link'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 const IMPROVED_SEARCH_COUNT_THRESHOLD = 10_000
@@ -190,7 +190,7 @@ export const UsersV2 = () => {
       providers: [],
       forceExactCount: false,
     },
-    { keepPreviousData: true }
+    { placeholderData: keepPreviousData }
   )
   const totalUsers = totalUsersCountData?.count ?? 0
   const isCountWithinThresholdForSortBy = totalUsers <= SORT_BY_VALUE_COUNT_THRESHOLD
@@ -223,7 +223,7 @@ export const UsersV2 = () => {
         : { column: undefined }),
     },
     {
-      keepPreviousData: Boolean(filterKeywords),
+      placeholderData: Boolean(filterKeywords) ? keepPreviousData : undefined,
       // [Joshen] This is to prevent the dashboard from invalidating when refocusing as it may create
       // a barrage of requests to invalidate each page esp when the project has many many users.
       staleTime: Infinity,
