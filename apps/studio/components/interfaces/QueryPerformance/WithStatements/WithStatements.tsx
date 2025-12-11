@@ -182,7 +182,11 @@ export const WithStatements = ({
       <QueryPerformanceGrid
         aggregatedData={processedData}
         isLoading={isLoading}
-        error={mainQueryError ? errorMessage : null}
+        error={
+          mainQueryError
+            ? getErrorMessage(mainQueryError) || 'Failed to load query performance data'
+            : null
+        }
         onRetry={handleRefresh}
       />
       <div
