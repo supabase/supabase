@@ -6,7 +6,7 @@ import { Realtime, Database, Auth } from 'icons/src/icons'
 export default function Home() {
   return (
     <div className="relative gap-4 px-6 py-6 lg:py-8">
-      <div className="mx-auto w-full min-w-0 max-w-6xl flex flex-col gap-10">
+      <div className="mx-auto w-full min-w-0 max-w-4xl flex flex-col gap-10">
         <div className="flex flex-col gap-2 justify-start">
           <h1 className="text-2xl lg:text-4xl text-foreground">Supabase Design System</h1>
           <h2 className="md:text-xl text-base text-foreground-light font-light">
@@ -15,8 +15,8 @@ export default function Home() {
         </div>
 
         <div className="grid md:grid-cols-2 grid-cols-1 gap-4">
-          <Link href="/docs/components/atom-components">
-            <div className="p-6 gap-4 flex flex-col justify-between bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
+          <Link href="/docs/components/atom-components" className="h-full flex">
+            <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
               <div className="flex items-center justify-start min-h-[24px]">
                 <HomepageSvgHandler name="atoms" className="w-6 h-6" />
               </div>
@@ -26,8 +26,8 @@ export default function Home() {
               </div>
             </div>
           </Link>
-          <Link href="/docs/components/fragment-components">
-            <div className="p-6 gap-4 flex flex-col justify-between bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
+          <Link href="/docs/components/fragment-components" className="h-full flex">
+            <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
               <div className="flex items-center justify-start min-h-[24px]">
                 <HomepageSvgHandler name="fragments" className="w-6 h-6" />
               </div>
@@ -37,8 +37,8 @@ export default function Home() {
               </div>
             </div>
           </Link>
-          <Link href="/docs/components/ui-patterns">
-            <div className="p-6 gap-4 flex flex-col justify-between bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
+          <Link href="/docs/components/ui-patterns" className="h-full flex">
+            <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
               <div className="flex items-center justify-start min-h-[24px]">
                 <HomepageSvgHandler name="ui-patterns" className="w-6 h-6" />
               </div>
@@ -50,8 +50,8 @@ export default function Home() {
               </div>
             </div>
           </Link>
-          <Link href="/docs/color-usage">
-            <div className="p-6 gap-4 flex flex-col justify-between bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
+          <Link href="/docs/color-usage" className="h-full flex">
+            <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
               <div className="flex flex-col gap-2 min-h-[24px]">
                 <div className="flex items-center flex-row flex-wrap gap-2">
                   <div className="w-5 h-5 border border-brand flex-shrink-0" />
@@ -66,8 +66,8 @@ export default function Home() {
             </div>
           </Link>
 
-          <Link href="/docs/theming">
-            <div className="p-6 gap-4 flex flex-col justify-between bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
+          <Link href="/docs/theming" className="h-full flex">
+            <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
               <div className="flex items-center justify-start min-h-[24px] text-brand">
                 <Paintbrush className="w-6 h-6" strokeWidth={1.5} stroke="currentColor" />
               </div>
@@ -78,8 +78,8 @@ export default function Home() {
             </div>
           </Link>
 
-          <Link href="/docs/icons">
-            <div className="p-6 gap-4 flex flex-col justify-between bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
+          <Link href="/docs/icons" className="h-full flex">
+            <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
               <div className="flex items-center justify-start min-h-[24px] gap-3 text-brand">
                 <Realtime className="w-5 h-5" strokeWidth={1.5} stroke="currentColor" />
                 <Database className="w-5 h-5 opacity-60" strokeWidth={1.5} stroke="currentColor" />
