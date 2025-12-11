@@ -7,7 +7,7 @@ import Link from 'next/link'
 import React from 'react'
 import { useMobileSidebar } from '@/hooks/use-mobile-sidebar'
 
-const NavigationItem: React.FC<{ item: SidebarNavItem }> = React.memo(({ item }) => {
+export const NavigationItem: React.FC<{ item: SidebarNavItem }> = React.memo(({ item }) => {
   const pathname = usePathname()
   const { setOpen } = useMobileSidebar()
 
@@ -47,5 +47,3 @@ const NavigationItem: React.FC<{ item: SidebarNavItem }> = React.memo(({ item })
 })
 
 NavigationItem.displayName = 'NavigationItem'
-
-export default NavigationItem

@@ -1,4 +1,4 @@
-import NavigationItem from '@/components/side-navigation-item'
+import { NavigationItem } from '@/components/side-navigation-item'
 import { docsConfig } from '@/config/docs'
 
 export const SideNavigation = () => {
