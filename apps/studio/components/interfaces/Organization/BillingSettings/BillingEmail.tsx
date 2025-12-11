@@ -117,7 +117,7 @@ const BillingEmail = () => {
             <form id={FORM_ID} onSubmit={form.handleSubmit(onUpdateOrganizationEmail)}>
               <FormPanel
                 footer={
-                  <div className="flex py-4 px-[var(--card-padding-x)]">
+                  <div className="flex py-4 px-8">
                     <FormActions
                       form={FORM_ID}
                       isSubmitting={isUpdating}

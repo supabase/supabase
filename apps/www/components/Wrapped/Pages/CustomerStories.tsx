@@ -93,11 +93,7 @@ export const CustomerStories = () => {
 
         {/* Content */}
         <div className="flex flex-col justify-end h-full px-4 lg:px-8 py-0 relative">
-<<<<<<< HEAD
           <h2 className="font-medium tracking-tighter text-6xl md:text-7xl lg:text-[5.6rem] -mt-4 translate-y-2 lg:translate-y-[10px]">
-=======
-          <h2 className="font-medium tracking-tighter text-6xl md:text-7xl lg:text-[5.6rem]">
->>>>>>> f735fc1b6b (optimize imgs)
             Customer Stories
           </h2>
         </div>
@@ -105,11 +101,7 @@ export const CustomerStories = () => {
 
       {/* NOTE (Alan): extra padding here to optically align subheading wuth header.*/}
       <div className="relative max-w-[60rem] mx-auto border-x border-b px-6 lg:px-10 py-12">
-<<<<<<< HEAD
         <h3 className="text-lg">Customers count on Supabase.</h3>
-=======
-        <h3 className="text-lg">Customers count on Supabase</h3>
->>>>>>> f735fc1b6b (optimize imgs)
       </div>
 
       {/* Testimonials grid */}

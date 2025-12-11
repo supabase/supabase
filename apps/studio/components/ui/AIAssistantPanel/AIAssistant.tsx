@@ -48,12 +48,11 @@ interface AIAssistantProps {
 
 export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
-  const { ref, id: entityId } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const searchParams = useSearchParamsShallow()
-
   const { data: selectedOrganization, isPending: isLoadingOrganization } =
     useSelectedOrganizationQuery()
+  const { ref, id: entityId } = useParams()
+  const searchParams = useSearchParamsShallow()
 
   useHotKey(() => cancelEdit(), 'Escape')
 
@@ -61,7 +60,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { snippets } = useSqlEditorV2StateSnapshot()
   const snap = useAiAssistantStateSnapshot()
   const state = useAiAssistantState()
-  const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
+  const { closeSidebar, activeSidebar } = useSidebarManagerSnapshot()
 
   const isPaidPlan = selectedOrganization?.plan?.id !== 'free'
 
@@ -104,7 +103,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const [messageRatings, setMessageRatings] = useState<Record<string, 'positive' | 'negative'>>({})
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
-  const isApiKeySet = !!check?.hasKey
+  const isApiKeySet = IS_PLATFORM || !!check?.hasKey
 
   const { mutateAsync: rateMessage } = useRateMessageMutation()
 
@@ -123,6 +122,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const currentTable = tables?.find((t) => t.id.toString() === entityId)
   const currentSchema = searchParams?.get('schema') ?? 'public'
+  const currentChat = snap.activeChat?.name
 
   // Update context in state
   useEffect(() => {

@@ -3,13 +3,11 @@ import { CalculatedColumn } from 'react-data-grid'
 import { proxy, ref, subscribe, useSnapshot } from 'valtio'
 import { proxySet } from 'valtio/utils'
 
-import { useFlag } from 'common'
 import {
   loadTableEditorStateFromLocalStorage,
   parseSupaTable,
   saveTableEditorStateToLocalStorageDebounced,
 } from 'components/grid/SupabaseGrid.utils'
-import { TableIndexAdvisorProvider } from 'components/grid/context/TableIndexAdvisorContext'
 import { SupaRow } from 'components/grid/types'
 import { getInitialGridColumns } from 'components/grid/utils/column'
 import { getGridColumns } from 'components/grid/utils/gridColumns'
@@ -178,7 +176,6 @@ export const TableEditorTableStateContextProvider = ({
   table,
   ...props
 }: PropsWithChildren<TableEditorTableStateContextProviderProps>) => {
-  const showIndexAdvisor = useFlag('ShowIndexAdvisorOnTableEditor')
   const tableEditorSnap = useTableEditorStateSnapshot()
   const state = useRef(
     createTableEditorTableState({
@@ -229,13 +226,7 @@ export const TableEditorTableStateContextProvider = ({
 
   return (
     <TableEditorTableStateContext.Provider value={state}>
-      {showIndexAdvisor && state.table.schema ? (
-        <TableIndexAdvisorProvider schema={state.table.schema ?? 'public'} table={state.table.name}>
-          {children}
-        </TableIndexAdvisorProvider>
-      ) : (
-        children
-      )}
+      {children}
     </TableEditorTableStateContext.Provider>
   )
 }

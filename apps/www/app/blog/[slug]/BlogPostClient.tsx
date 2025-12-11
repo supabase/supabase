@@ -9,7 +9,6 @@ import { CMS_SITE_ORIGIN } from 'lib/constants'
 import { isNotNullOrUndefined } from 'lib/helpers'
 import { generateTocFromMarkdown } from 'lib/toc'
 import { convertRichTextToMarkdown } from '~/lib/cms/convertRichTextToMarkdown'
-import useActiveAnchors from 'hooks/useActiveAnchors'
 
 import type { Blog, BlogData, CMSAuthor, PostReturnType, ProcessedBlogData } from 'types/post'
 
@@ -28,10 +27,6 @@ type BlogPostPageProps = {
 export default function BlogPostClient(props: BlogPostPageProps) {
   const isDraftMode = props.isDraftMode
   const [previewData] = useState<ProcessedBlogData>(props.blog)
-
-  // Enable scroll-to-anchor functionality and TOC highlighting
-  useActiveAnchors()
-
   const [processedToc, setProcessedToc] = useState<{ content: string; json: any[] } | null>(null)
   const shouldUseLivePreview = isDraftMode && 'isCMS' in props.blog && props.blog.isCMS
 

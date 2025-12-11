@@ -1,7 +1,5 @@
 'use client'
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 import { useRef, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from 'ui'
@@ -229,60 +227,5 @@ export function Home() {
         </article>
       </div>
     </div>
-=======
-import { Button } from 'ui'
-import { motion } from 'framer-motion'
-import { useWrapped } from '../WrappedContext'
-import { Dots, Stripes } from '../Visuals'
-
-const GRID_COLS = 5
-const STAGGER_DELAY = 0.05
-=======
-import { AnimatedGridBackground } from '../AnimatedGridBackground'
->>>>>>> c9e9354b96 (single page)
-
-export function Home() {
-  return (
-    <>
-      <section className="relative max-w-[60rem] aspect-[4/3] mx-auto border-x border-b">
-        {/* Grid background */}
-        <AnimatedGridBackground
-          cols={5}
-          rows={4}
-          tiles={[
-            { cell: 1, type: 'dots' },
-            { cell: 6, type: 'dots' },
-            { cell: 7, type: 'stripes' },
-            { cell: 8, type: 'stripes' },
-            { cell: 13, type: 'dots' },
-            { cell: 18, type: 'dots' },
-          ]}
-        />
-
-        {/* Content */}
-<<<<<<< HEAD
-        <div className="flex flex-col justify-end h-full px-8 py-0 relative">
-          <h1 className="font-bold tracking-tight text-[5.6rem]">Supabase Wrapped</h1>
-        </div>
-      </section>
-
-      <div className="relative max-w-[60rem] mx-auto border-x border-b px-8 py-12">
-        <article className="text-2xl">
-=======
-        <div className="flex flex-col justify-end h-full px-4 lg:px-8 py-0 relative">
-          <h1 className="font-medium tracking-tighter text-6xl md:text-7xl lg:text-[5.6rem]">
-            Supabase Wrapped
-          </h1>
-        </div>
-      </section>
-
-      <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 lg:px-8 py-12">
-        <article className="text-lg">
->>>>>>> f735fc1b6b (optimize imgs)
-          <p>You created more Supabase databases in 2025 than in all previous years combined.</p>
-        </article>
-      </div>
-    </>
->>>>>>> 3525bdad4d (wip)
   )
 }

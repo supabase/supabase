@@ -81,11 +81,7 @@ export const SupabaseSelect = () => {
 
         {/* Content */}
         <div className="flex flex-col justify-end h-full px-4 lg:px-8 py-0 relative">
-<<<<<<< HEAD
           <h2 className="font-medium tracking-tighter text-6xl md:text-7xl lg:text-[5.6rem] translate-y-2 lg:translate-y-[10px]">
-=======
-          <h2 className="font-medium tracking-tighter text-6xl md:text-7xl lg:text-[5.6rem]">
->>>>>>> f735fc1b6b (optimize imgs)
             Supabase Select
           </h2>
         </div>

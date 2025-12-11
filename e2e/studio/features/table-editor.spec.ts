@@ -8,7 +8,6 @@ import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { waitForApiResponseWithTimeout } from '../utils/wait-for-response-with-timeout.js'
 import {
-  createApiResponseWaiter,
   waitForApiResponse,
   waitForGridDataToLoad,
   waitForTableToLoad,
@@ -73,7 +72,7 @@ const createTable = async (page: Page, ref: string, tableName: string) => {
   await expect(
     page.getByRole('button', { name: `View ${tableName}`, exact: true }),
     'Table should be visible after creation'
-  ).toBeVisible()
+  ).toBeVisible({ timeout: 15_000 })
 }
 
 const deleteTable = async (page: Page, ref: string, tableName: string) => {
@@ -494,14 +493,8 @@ testRunner('table editor', () => {
     await page.getByRole('button', { name: 'id', exact: true }).click()
     await page.getByRole('menuitem', { name: colName }).click()
     await page.getByRole('textbox', { name: 'Enter a value' }).fill('789')
-    const waitForFilterApply = createApiResponseWaiter(
-      page,
-      'pg-meta',
-      ref,
-      'query?key=table-rows-'
-    )
     await page.getByRole('button', { name: 'Apply filter' }).click()
-    await waitForFilterApply
+    await waitForGridDataToLoad(page, ref)
     await page.waitForTimeout(500)
     await page.getByRole('button', { name: 'Filtered by 1 rule' }).click({ force: true })
     await expect(page.getByRole('gridcell', { name: '789' })).toBeVisible()
@@ -558,14 +551,8 @@ testRunner('table editor', () => {
     await page.getByRole('button', { name: 'Sort', exact: true }).click()
     await page.getByRole('button', { name: 'Pick a column to sort by' }).click()
     await page.getByRole('menuitem', { name: colName }).click()
-    const waitForSortingApply = createApiResponseWaiter(
-      page,
-      'pg-meta',
-      ref,
-      'query?key=table-rows-'
-    )
     await page.getByRole('button', { name: 'Apply sorting' }).click()
-    await waitForSortingApply
+    await waitForGridDataToLoad(page, ref)
     await page.getByRole('button', { name: 'Sorted by 1 rule' }).click()
 
     // Verify sorted row content asc lexicographically for strings
@@ -593,11 +580,8 @@ testRunner('table editor', () => {
     await page.getByRole('tab', { name: 'Upload CSV' }).click()
     await page.setInputFiles('input[type="file"]', csvFilePath)
     await expect(page.getByText('A total of 50 rows will be')).toBeVisible()
-    const waitForCsvInsert = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
-      method: 'POST',
-    })
     await page.getByRole('button', { name: 'Import data' }).click()
-    await waitForCsvInsert // insert data
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' }) // insert data
     await waitForGridDataToLoad(page, ref) // retrieve updated data
     await expect(page.getByText('50 records')).toBeVisible()
 
@@ -609,33 +593,23 @@ testRunner('table editor', () => {
     await page.getByRole('tab', { name: 'Paste text' }).click()
     await page.getByRole('textbox').fill(fileContent)
     await expect(page.getByText('A total of 51 rows will be')).toBeVisible()
-    const waitForPasteInsert = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
-      method: 'POST',
-    })
     await page.getByRole('button', { name: 'Import data' }).click()
-    await waitForPasteInsert // insert data
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' }) // insert data
     await waitForGridDataToLoad(page, ref) // retrieve updated data
     await expect(page.getByText('101 records')).toBeVisible()
 
     // test pagination (page 1 -> page 2)
     await expect(page.getByRole('gridcell', { name: 'value 7', exact: true })).toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'value 101', exact: true })).not.toBeVisible()
-    const waitForPageChange = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=table-rows-')
     await page.getByLabel('Table grid footer').getByRole('button').nth(1).click()
-    await waitForPageChange // retrieve next page data
+    await waitForGridDataToLoad(page, ref) // retrieve next page data
     await expect(page.getByRole('gridcell', { name: 'value 7', exact: true })).not.toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'value 101', exact: true })).toBeVisible()
 
     // change pagination size (100 -> 500)
     await page.getByRole('button', { name: 'rows' }).click()
-    const waitForPaginationChange = createApiResponseWaiter(
-      page,
-      'pg-meta',
-      ref,
-      'query?key=table-rows-'
-    )
     await page.getByRole('menuitem', { name: '500 rows' }).click()
-    await waitForPaginationChange // retrieve updated pagination size data
+    await waitForGridDataToLoad(page, ref) // retrieve updated pagination size data
     await expect(page.getByRole('gridcell', { name: 'value 7', exact: true })).toBeVisible()
     await page.getByRole('grid').evaluate((element) => {
       element.scrollTop = element.scrollHeight
@@ -651,11 +625,8 @@ testRunner('table editor', () => {
     await page.getByRole('row', { name: 'value 3 to delete' }).getByRole('checkbox').click()
     await page.getByRole('button', { name: 'Delete 3 rows' }).click()
     await expect(page.getByText('delete the selected 3 rows')).toBeVisible()
-    const waitForDeleteRows = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
-      method: 'POST',
-    })
     await page.getByRole('button', { name: 'Delete' }).click()
-    await waitForDeleteRows // delete selected rows
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' }) // delete selected rows
     await waitForGridDataToLoad(page, ref) // retrieve row data
 
     // export selected rows when multiple rows action is selected
@@ -734,12 +705,9 @@ testRunner('table editor', () => {
     // select all actions works (delete action)
     await page.getByRole('checkbox', { name: 'Select All' }).click()
     await page.getByRole('button', { name: 'Delete 98 rows' }).click()
-    const waitForDeleteAllRows = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
-      method: 'POST',
-    })
     await page.getByRole('button', { name: 'Delete' }).click()
     await expect(page.getByText('delete the selected 98 rows')).toBeVisible()
-    await waitForDeleteAllRows // delete all rows
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' }) // delete all rows
     await waitForGridDataToLoad(page, ref) // retrieve rows data
     await expect(page.getByRole('gridcell', { name: 'value 7' })).not.toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'value 101' })).not.toBeVisible()

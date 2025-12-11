@@ -59,7 +59,7 @@ test.describe.serial('Storage', () => {
     await expect(
       bucketRow.getByText('Public', { exact: true }),
       'Bucket should be marked as Public'
-    ).toBeVisible()
+    ).toBeVisible({ timeout: 10000 })
   })
 
   test('can edit bucket settings', async ({ page, ref }) => {
@@ -91,7 +91,7 @@ test.describe.serial('Storage', () => {
     await expect(
       page.getByText('Public').first(),
       'Bucket should now be marked as Public'
-    ).toBeVisible()
+    ).toBeVisible({ timeout: 10_000 })
   })
 
   test('can delete a bucket', async ({ page, ref }) => {

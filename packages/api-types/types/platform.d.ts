@@ -7127,7 +7127,6 @@ export interface components {
             | 'security.audit_logs_days'
             | 'log.retention_days'
             | 'custom_domain'
-            | 'vanity_subdomain'
             | 'ipv4'
             | 'pitr.available_variants'
             | 'log_drains'
@@ -7135,8 +7134,6 @@ export interface components {
             | 'branching_persistent'
             | 'auth.mfa_phone'
             | 'auth.hooks'
-            | 'auth.platform.sso'
-            | 'backup.retention_days'
           /** @enum {string} */
           type: 'boolean' | 'numeric' | 'set'
         }

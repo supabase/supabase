@@ -9,10 +9,6 @@ import { aiKeys } from './keys'
 // so we can disable the chat editor and add a warning about manually adding the key
 
 export async function checkOpenAIKey(signal?: AbortSignal) {
-  if (IS_PLATFORM) {
-    return { hasKey: true }
-  }
-
   const headers = await constructHeaders()
   const response = await fetchHandler(`${BASE_PATH}/api/ai/sql/check-api-key`, {
     headers,
@@ -41,6 +37,6 @@ export const useCheckOpenAIKeyQuery = <TData = ResourceData>({
   useQuery<ResourceData, ResourceError, TData>({
     queryKey: aiKeys.apiKey(),
     queryFn: ({ signal }) => checkOpenAIKey(signal),
-    enabled: enabled,
+    enabled: !IS_PLATFORM && enabled,
     ...options,
   })

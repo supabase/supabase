@@ -77,7 +77,7 @@ export const ForeignKeySelector = ({
     includeColumns: false,
   })
 
-  const { data: selectedTable, isLoading: isLoadingSelectedTable } = useTableQuery<PostgresTable>(
+  const { data: selectedTable, isPending: isLoadingSelectedTable } = useTableQuery<PostgresTable>(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,

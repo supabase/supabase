@@ -1,12 +1,12 @@
 import { act, screen, waitFor } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest'
 
+import { LayoutSidebar } from './index'
+import { LayoutSidebarProvider, SIDEBAR_KEYS } from './LayoutSidebarProvider'
 import { sidebarManagerState } from 'state/sidebar-manager-state'
 import { render } from 'tests/helpers'
 import { routerMock } from 'tests/lib/route-mock'
 import { ResizablePanel, ResizablePanelGroup } from 'ui'
-import { LayoutSidebar } from './index'
-import { LayoutSidebarProvider, SIDEBAR_KEYS } from './LayoutSidebarProvider'
 
 vi.mock('components/ui/AIAssistantPanel/AIAssistant', () => ({
   AIAssistant: () => <div data-testid="ai-assistant-sidebar">AI Assistant</div>,
@@ -19,14 +19,6 @@ vi.mock('components/ui/EditorPanel/EditorPanel', () => ({
 vi.mock('components/ui/AdvisorPanel/AdvisorPanel', () => ({
   AdvisorPanel: () => <div data-testid="advisor-panel-sidebar">Advisor Panel</div>,
 }))
-
-vi.mock('nuqs', async () => {
-  let queryValue = 'ai-assistant'
-  return {
-    useQueryState: () => [queryValue, (v: string) => (queryValue = v)],
-    parseAsString: () => {},
-  }
-})
 
 const mockProject = {
   id: 1,
@@ -135,6 +127,14 @@ describe('LayoutSidebar', () => {
     expect(sidebar).toBeTruthy()
   })
 
+  it('auto-opens when sidebar query param matches a registered sidebar', async () => {
+    routerMock.setCurrentUrl(`/?sidebar=${SIDEBAR_KEYS.AI_ASSISTANT}`)
+
+    renderSidebar()
+
+    await screen.findByTestId('ai-assistant-sidebar')
+  })
+
   describe('at organization level', () => {
     beforeEach(() => {
       routerMock.setCurrentUrl('/org/default')
@@ -184,11 +184,4 @@ describe('LayoutSidebar', () => {
       expect(await screen.findByTestId('advisor-panel-sidebar')).toBeTruthy()
     })
   })
-
-  // [Joshen] JFYI temporarily commented this one out - I'm struggling to figure out the mocking to get this to work
-  // it('auto-opens when sidebar query param matches a registered sidebar', async () => {
-  //   routerMock.setCurrentUrl(`/?sidebar=${SIDEBAR_KEYS.AI_ASSISTANT}`)
-  //   renderSidebar()
-  //   await screen.findByTestId('ai-assistant-sidebar')
-  // })
 })

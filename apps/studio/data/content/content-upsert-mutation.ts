@@ -6,7 +6,6 @@ import { handleError, put } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import type { Content } from './content-query'
 import { contentKeys } from './keys'
-import type { Snippet } from './sql-folders-query'
 
 export type UpsertContentPayload = Omit<components['schemas']['UpsertContentBody'], 'content'> & {
   content: Partial<Content['content']>
@@ -30,7 +29,7 @@ export async function upsertContent(
   })
   if (error) handleError(error)
 
-  return data as Snippet | null
+  return data
 }
 
 export type UpsertContentData = Awaited<ReturnType<typeof upsertContent>>
