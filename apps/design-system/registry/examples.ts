@@ -792,10 +792,46 @@ export const examples: Registry = [
     files: ['example/switch-form.tsx'],
   },
   {
+    name: 'table-cross-link',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-cross-link.tsx'],
+  },
+  {
     name: 'table-demo',
     type: 'components:example',
     registryDependencies: ['table'],
     files: ['example/table-demo.tsx'],
+  },
+  {
+    name: 'table-actions',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-actions.tsx'],
+  },
+  {
+    name: 'table-icons',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-icons.tsx'],
+  },
+  {
+    name: 'table-row-link',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-row-link.tsx'],
+  },
+  {
+    name: 'table-row-link-actions',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-row-link-actions.tsx'],
+  },
+  {
+    name: 'table-sort',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-sort.tsx'],
   },
   {
     name: 'tabs-demo',
@@ -1439,9 +1475,20 @@ export const examples: Registry = [
     files: ['example/empty-state-initial-state-informational.tsx'],
   },
   {
-    name: 'empty-state-zero-items-data-grid',
+    name: 'data-grid-demo',
     type: 'components:example',
-    files: ['example/empty-state-zero-items-data-grid.tsx'],
+    files: ['example/data-grid-demo.tsx'],
+  },
+  {
+    name: 'data-grid-empty-state',
+    type: 'components:example',
+    files: ['example/data-grid-empty-state.tsx'],
+  },
+  {
+    name: 'data-table-demo',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/data-table-demo.tsx'],
   },
   {
     name: 'metric-card',

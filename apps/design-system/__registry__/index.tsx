@@ -1358,6 +1358,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "table-cross-link": {
+      name: "table-cross-link",
+      type: "components:example",
+      registryDependencies: ["table"],
+      component: React.lazy(() => import("@/registry/default/example/table-cross-link")),
+      source: "",
+      files: ["registry/default/example/table-cross-link.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "table-demo": {
       name: "table-demo",
       type: "components:example",
@@ -1365,6 +1376,61 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/table-demo")),
       source: "",
       files: ["registry/default/example/table-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "table-actions": {
+      name: "table-actions",
+      type: "components:example",
+      registryDependencies: ["table"],
+      component: React.lazy(() => import("@/registry/default/example/table-actions")),
+      source: "",
+      files: ["registry/default/example/table-actions.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "table-icons": {
+      name: "table-icons",
+      type: "components:example",
+      registryDependencies: ["table"],
+      component: React.lazy(() => import("@/registry/default/example/table-icons")),
+      source: "",
+      files: ["registry/default/example/table-icons.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "table-row-link": {
+      name: "table-row-link",
+      type: "components:example",
+      registryDependencies: ["table"],
+      component: React.lazy(() => import("@/registry/default/example/table-row-link")),
+      source: "",
+      files: ["registry/default/example/table-row-link.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "table-row-link-actions": {
+      name: "table-row-link-actions",
+      type: "components:example",
+      registryDependencies: ["table"],
+      component: React.lazy(() => import("@/registry/default/example/table-row-link-actions")),
+      source: "",
+      files: ["registry/default/example/table-row-link-actions.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "table-sort": {
+      name: "table-sort",
+      type: "components:example",
+      registryDependencies: ["table"],
+      component: React.lazy(() => import("@/registry/default/example/table-sort")),
+      source: "",
+      files: ["registry/default/example/table-sort.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -2656,13 +2722,35 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "empty-state-zero-items-data-grid": {
-      name: "empty-state-zero-items-data-grid",
+    "data-grid-demo": {
+      name: "data-grid-demo",
       type: "components:example",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/empty-state-zero-items-data-grid")),
+      component: React.lazy(() => import("@/registry/default/example/data-grid-demo")),
       source: "",
-      files: ["registry/default/example/empty-state-zero-items-data-grid.tsx"],
+      files: ["registry/default/example/data-grid-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "data-grid-empty-state": {
+      name: "data-grid-empty-state",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/data-grid-empty-state")),
+      source: "",
+      files: ["registry/default/example/data-grid-empty-state.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "data-table-demo": {
+      name: "data-table-demo",
+      type: "components:example",
+      registryDependencies: ["table"],
+      component: React.lazy(() => import("@/registry/default/example/data-table-demo")),
+      source: "",
+      files: ["registry/default/example/data-table-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
