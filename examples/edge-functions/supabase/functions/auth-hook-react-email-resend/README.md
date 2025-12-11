@@ -1,5 +1,7 @@
 # Supabase Auth Send Email Hook with React Email and Resend
 
+This example uses Resend, but you can adapt it to work with other email providers like [Forward Email](https://forwardemail.net/).
+
 - [Supabase docs](https://supabase.com/docs/guides/auth/auth-hooks/send-email-hook?queryGroups=language&language=http)
 - [React Email Docs](https://react.email/docs/introduction)
 - [Create a Resend account](https://resend.com/)
