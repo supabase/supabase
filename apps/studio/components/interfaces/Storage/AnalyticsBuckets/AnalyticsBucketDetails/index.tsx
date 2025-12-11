@@ -81,7 +81,8 @@ export const AnalyticBucketDetails = () => {
   const { data, isSuccess: isSuccessPipelineStatus } = useReplicationPipelineStatusQuery(
     { projectRef, pipelineId: pipeline?.id },
     {
-      refetchInterval: (data) => {
+      refetchInterval: (query) => {
+        const data = query.state.data
         if (data?.status.name !== 'started') return 4000
         else return false
       },
@@ -115,7 +116,7 @@ export const AnalyticBucketDetails = () => {
 
   const {
     data: namespacesData = [],
-    isLoading: isLoadingNamespaces,
+    isPending: isLoadingNamespaces,
     isSuccess: isSuccessNamespaces,
   } = useIcebergNamespacesQuery(
     {
@@ -123,12 +124,12 @@ export const AnalyticBucketDetails = () => {
       warehouse: wrapperValues.warehouse,
     },
     {
-      refetchInterval: (_data) => {
-        const data = _data ?? []
+      refetchInterval: (query) => {
+        const data = query.state.data
         if (pollIntervalNamespaces === 0) return false
 
         const publicationTableSchemas = publication?.tables.map((x) => x.schema) ?? []
-        const isSynced = !publicationTableSchemas.some((x) => !data.includes(x))
+        const isSynced = !publicationTableSchemas.some((x) => !data?.includes(x))
         if (isSynced) {
           setPollIntervalNamespaces(0)
           return false

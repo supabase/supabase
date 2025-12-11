@@ -20,7 +20,7 @@ const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
   } = useRouter()
 
   const { data: organizations, isFetched: isOrganizationsFetched } = useOrganizationsQuery()
-  const { data: onboardingInfo, isLoading: isLoadingOnboardingInfo } =
+  const { data: onboardingInfo, isPending: isLoadingOnboardingInfo } =
     useCloudMarketplaceOnboardingInfoQuery({
       buyerId: buyerId as string,
     })

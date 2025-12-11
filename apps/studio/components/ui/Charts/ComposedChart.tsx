@@ -223,7 +223,12 @@ export function ComposedChart({
 
     if (shouldFormatBytes) {
       const bytesValue = isNetworkChart ? Math.abs(value) : value
-      return formatBytes(bytesValue, valuePrecision)
+      const formatted = formatBytes(bytesValue, valuePrecision)
+      return format === 'bytes-per-second' ? `${formatted}/s` : formatted
+    }
+
+    if (valuePrecision === 0 && value > 0 && value < 1) {
+      return '<1'
     }
 
     return numberFormatter(value, valuePrecision)
@@ -290,7 +295,9 @@ export function ComposedChart({
     att.name.toLowerCase().includes('pg_database_size')
   )
   const isNetworkChart = chartData?.some((att: any) => att.name.toLowerCase().includes('network_'))
-  const shouldFormatBytes = isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
+  const isBytesFormat = format === 'bytes' || format === 'bytes-per-second'
+  const shouldFormatBytes =
+    isBytesFormat || isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
   //*
   // Set the y-axis domain
   // to the highest value in the chart data for percentage charts
