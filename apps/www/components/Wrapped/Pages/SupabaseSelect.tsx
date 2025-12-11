@@ -178,11 +178,15 @@ function GalleryGrid() {
   useEffect(() => {
     if (!isInView) return
 
+    let isCancelled = false
     const timeouts: NodeJS.Timeout[] = []
 
     const scheduleRotation = (slotIndex: number) => {
+      if (isCancelled) return
+      
       const delay = 5000 + Math.random() * 5000 // 5-10 seconds
       const timeoutId = setTimeout(() => {
+        if (isCancelled) return
         rotateSlot(slotIndex)
         scheduleRotation(slotIndex)
       }, delay)
@@ -193,12 +197,14 @@ function GalleryGrid() {
     gallerySlots.forEach((_, index) => {
       const initialDelay = Math.random() * 3000 // Stagger start times
       const timeoutId = setTimeout(() => {
+        if (isCancelled) return
         scheduleRotation(index)
       }, initialDelay)
       timeouts.push(timeoutId)
     })
 
     return () => {
+      isCancelled = true
       timeouts.forEach(clearTimeout)
     }
   }, [isInView, rotateSlot])
