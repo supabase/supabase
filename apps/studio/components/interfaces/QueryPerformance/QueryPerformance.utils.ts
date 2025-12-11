@@ -68,8 +68,18 @@ export function captureQueryPerformanceError(
       errorMessage: context.errorMessage,
     })
 
-    const errorMessage = getErrorMessage(error)
+    if (error instanceof Error) {
+      Sentry.captureException(error)
+      return
+    }
 
-    Sentry.captureException(new Error(errorMessage || 'Query performance error'))
+    const errorMessage = getErrorMessage(error)
+    const errorToCapture = new Error(errorMessage || 'Query performance error')
+
+    if (error !== null && error !== undefined) {
+      errorToCapture.cause = error
+    }
+
+    Sentry.captureException(errorToCapture)
   })
 }
