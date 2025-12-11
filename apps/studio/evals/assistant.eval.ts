@@ -1,12 +1,17 @@
 import { openai } from '@ai-sdk/openai'
 import { Eval } from 'braintrust'
-import { Assertion, AssertionScorer } from 'lib/ai/evals/scorer'
+import { Assertion, createAssertionScorer } from 'lib/ai/evals/scorer'
 import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
 import { getMockTools } from 'lib/ai/tools/mock-tools'
 import assert from 'node:assert'
 
 assert(process.env.BRAINTRUST_PROJECT_ID, 'BRAINTRUST_PROJECT_ID is not set')
 assert(process.env.OPENAI_API_KEY, 'OPENAI_API_KEY is not set')
+
+type MockToolName = keyof Awaited<ReturnType<typeof getMockTools>>
+type EvalAssertion = Assertion<MockToolName>
+
+const AssertionScorer = createAssertionScorer<MockToolName>()
 
 Eval('Assistant', {
   projectId: process.env.BRAINTRUST_PROJECT_ID,
@@ -20,7 +25,7 @@ Eval('Assistant', {
         input: 'How do I implement IP address rate limiting? Use search_docs.',
         expected: [{ type: 'tools_include', tool: 'search_docs' }],
       },
-    ] satisfies Array<{ input: string; expected: Assertion[] }>
+    ] satisfies Array<{ input: string; expected: EvalAssertion[] }>
   },
   task: async (input) => {
     const result = await generateAssistantResponse({
