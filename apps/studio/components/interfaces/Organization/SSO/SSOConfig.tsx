@@ -28,6 +28,7 @@ import { AttributeMapping } from './AttributeMapping'
 import { JoinOrganizationOnSignup } from './JoinOrganizationOnSignup'
 import { SSODomains } from './SSODomains'
 import { SSOMetadata } from './SSOMetadata'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 const FormSchema = z
   .object({
@@ -65,7 +66,8 @@ export const SSOConfig = () => {
 
   const { data: organization } = useSelectedOrganizationQuery()
   const plan = organization?.plan.id
-  const canSetupSSOConfig = ['team', 'enterprise', 'platform'].includes(plan ?? '')
+  const { hasAccess: hasAccessToSso, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('auth.platform.sso')
 
   const {
     data: ssoConfig,
@@ -154,7 +156,7 @@ export const SSOConfig = () => {
   return (
     <ScaffoldContainer>
       <ScaffoldSection isFullWidth>
-        {!!plan && !canSetupSSOConfig ? (
+        {!!plan && !isLoadingEntitlement && !hasAccessToSso ? (
           <UpgradeToPro
             plan="Team"
             source="organizationSso"
@@ -164,7 +166,7 @@ export const SSOConfig = () => {
           />
         ) : (
           <>
-            {isLoadingSSOConfig && (
+            {(isLoadingSSOConfig || isLoadingEntitlement) && (
               <Card>
                 <CardContent>
                   <GenericSkeletonLoader />
