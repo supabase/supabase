@@ -404,3 +404,31 @@ type AsyncState<T> =
   | { status: 'success'; data: T }
   | { status: 'error'; error: Error }
 ```
+
+### Avoid type casting, prefer validation with zod
+
+Never use type casting (e.g., `as any`, `as Type`). Instead, validate values at runtime using zod schemas. This ensures type safety and catches runtime errors.
+
+```tsx
+// ❌ Bad - type casting bypasses type checking
+const user = apiResponse as User
+const data = unknownValue as string
+
+// ✅ Good - validate with zod schema
+const userSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string().email(),
+})
+
+const user = userSchema.parse(apiResponse)
+const data = z.string().parse(unknownValue)
+
+// ✅ Good - safe parsing with error handling
+const result = userSchema.safeParse(apiResponse)
+if (result.success) {
+  const user = result.data
+} else {
+  // handle validation errors
+}
+```
