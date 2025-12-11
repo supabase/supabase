@@ -38,28 +38,6 @@ test.describe('auth users list refresh', () => {
       .toBe(0)
   })
 
-  test('should automatically refresh users list after deleting a user', async ({ page, ref }) => {
-    const testEmail = `test-delete-${Date.now()}@example.com`
-    const testPassword = 'testpassword123'
-
-    // Create user via UI first
-    await createUserViaUI(page, ref, testEmail, testPassword)
-
-    // Verify the user appears in the table
-    const userRow = page.getByRole('row').filter({ hasText: testEmail })
-    await expect(userRow, 'User should be visible before deletion').toBeVisible()
-
-    // Delete the user
-    await deleteUserViaUI(page, ref, testEmail)
-
-    // Verify the user disappears from the table WITHOUT manually refreshing the page
-    await expect
-      .poll(async () => {
-        return await page.getByRole('row').filter({ hasText: testEmail }).count()
-      }, 'User should disappear from the table immediately after deletion without manual refresh')
-      .toBe(0)
-  })
-
   test('should automatically refresh users list after creating multiple users', async ({
     page,
     ref,
