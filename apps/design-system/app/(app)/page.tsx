@@ -5,23 +5,16 @@ export default function Home() {
   return (
     <div className="relative gap-6 px-6 py-6 lg:py-8 lg:px-6">
       <div className="mx-auto w-full min-w-0 max-w-6xl flex flex-col gap-10">
-        <div className="flex flex-col gap-8 justify-start">
-          {/* <div>
-            <DesignSystemMarks />
-          </div> */}
-          <div>
-            <h1 className="text-4xl text-foreground mb-3">Supabase Design System</h1>
-            <h2 className="text-xl text-foreground-light font-light">
-              Design resources for building consistent user experiences
-            </h2>
-          </div>
+        <div className="flex flex-col gap-2 justify-start">
+          <h1 className="text-2xl lg:text-4xl text-foreground">Supabase Design System</h1>
+          <h2 className="md:text-xl text-base text-foreground-light font-light">
+            Design resources for building consistent user experiences
+          </h2>
         </div>
 
-        {/* Homepage items */}
-
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 grid-cols-1 gap-6">
           <Link href="/docs/components/atom-components">
-            <div className="px-10 py-8 min-h-[18rem] flex flex-col justify-between bg-surface-75/50 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
+            <div className="p-6 min-h-[18rem] flex flex-col justify-between bg-surface-75/50 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
               <HomepageSvgHandler name="atoms-illustration" />
               <div>
                 <h3 className="font-medium text-foreground">Atom components</h3>
@@ -30,7 +23,7 @@ export default function Home() {
             </div>
           </Link>
           <Link href="/docs/components/fragment-components">
-            <div className="px-10 py-8 min-h-[18rem] flex flex-col justify-between bg-surface-75/50 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
+            <div className="p-6 min-h-[18rem] flex flex-col justify-between bg-surface-75/50 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
               <HomepageSvgHandler name="fragments-illustration" />
               <div>
                 <h3 className="font-medium text-foreground">Fragment components</h3>
@@ -39,7 +32,7 @@ export default function Home() {
             </div>
           </Link>
           <Link href="/docs/color-usage">
-            <div className="px-10 py-8 min-h-[18rem] flex flex-col justify-between bg-surface-75/50 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
+            <div className="p-6 min-h-[18rem] flex flex-col justify-between bg-surface-75/50 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
               <div className="flex flex-col gap-1">
                 <div className="flex flex-row gap-0.5">
                   <div className="w-3 h-16 rounded border bg-foreground"></div>
@@ -89,7 +82,7 @@ export default function Home() {
           </Link>
 
           <Link href="/docs/theming">
-            <div className="px-10 py-8 min-h-[18rem] flex flex-col justify-between bg-surface-75/50 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
+            <div className="p-6 min-h-[18rem] flex flex-col justify-between bg-surface-75/50 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
               <HomepageSvgHandler name="fragments-illustration" />
               <div>
                 <h3 className="font-medium text-foreground">Theming</h3>
