@@ -13,7 +13,6 @@ export interface ExplainNodeRendererProps {
   isRoot?: boolean
 }
 
-// Render a single node in the tree
 export function ExplainNodeRenderer({
   node,
   isLast,
@@ -29,13 +28,10 @@ export function ExplainNodeRenderer({
   const description = getOperationDescription(node.operation, node)
   const isLeaf = node.children.length === 0
 
-  // Split details by newline to show each on its own line
   const detailLines = node.details ? node.details.split('\n').filter(Boolean) : []
 
-  // Extract the target table/index name from details
   const targetName = detailLines.length > 0 && !detailLines[0].includes(':') ? detailLines[0] : null
 
-  // Calculate rows filtered out
   const rowsFiltered = node.rowsRemovedByFilter
   const totalRowsScanned =
     rowsFiltered && node.actualRows !== null ? node.actualRows + rowsFiltered : null
@@ -176,10 +172,7 @@ export function ExplainNodeRenderer({
                 // Skip "Rows Removed" as we show it in the flow visualization
                 if (detail.includes('Rows Removed by Filter')) return null
                 return (
-                  <div
-                    key={idx}
-                    className="text-xs text-foreground-lighter font-mono bg-surface-100 px-2 py-1 rounded"
-                  >
+                  <div key={idx} className="text-xs text-foreground font-mono py-1 rounded">
                     {detail}
                   </div>
                 )

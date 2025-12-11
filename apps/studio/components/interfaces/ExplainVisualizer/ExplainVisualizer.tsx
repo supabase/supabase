@@ -95,7 +95,7 @@ export function ExplainVisualizer({ rows, onShowRaw }: ExplainVisualizerProps) {
       </div>
 
       {/* Tree visualization */}
-      <div className="overflow-auto flex-1">
+      <div className="p-4 overflow-auto flex-1">
         {parsedTree.map((node, idx) => (
           <ExplainNodeRenderer
             key={idx}
