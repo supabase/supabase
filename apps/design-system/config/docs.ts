@@ -284,11 +284,6 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Data Table',
-          href: '/docs/components/data-table',
-          items: [],
-        },
-        {
           title: 'Date Picker',
           href: '/docs/components/date-picker',
           items: [],
