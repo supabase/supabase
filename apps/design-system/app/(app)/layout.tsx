@@ -1,4 +1,4 @@
-import SideNavigation from '@/components/side-navigation'
+import { SideNavigation } from '@/components/side-navigation'
 import { SiteFooter } from '@/components/site-footer'
 import { TopNavigation } from '@/components/top-navigation'
 import { ScrollArea } from 'ui'
