@@ -26,7 +26,7 @@ export default function Home() {
               </div>
             </div>
           </Link>
-          <Link href="/docs/components/fragment-components" className="h-full flex">
+          <Link href="/docs/fragments/fragment-components" className="h-full flex">
             <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
               <div className="flex items-center justify-start min-h-[24px]">
                 <HomepageSvgHandler name="fragments" className="w-6 h-6" />

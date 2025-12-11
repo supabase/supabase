@@ -14,7 +14,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
       <main className="flex-1 max-w-site mx-auto w-full border-l border-r border-b">
         <div className="flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] lg:grid-cols-[240px_minmax(0,1fr)]">
           <aside className="fixed top-10 z-30 hidden h-[calc(100vh-3rem)] w-full shrink-0 md:sticky md:block border-r">
-            <ScrollArea className="h-full py-6 lg:py-8">
+            <ScrollArea className="h-full">
               <SideNavigation />
             </ScrollArea>
           </aside>
