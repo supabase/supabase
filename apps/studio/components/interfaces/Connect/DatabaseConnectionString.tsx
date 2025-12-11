@@ -1,5 +1,4 @@
 import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
-import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
 import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
 
@@ -34,7 +33,6 @@ import {
   Separator,
   cn,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
 import {
   CONNECTION_PARAMETERS,
   type ConnectionStringMethod,
@@ -141,14 +139,14 @@ export const DatabaseConnectionString = () => {
   const {
     data: pgbouncerConfig,
     error: pgbouncerError,
-    isLoading: isLoadingPgbouncerConfig,
+    isPending: isLoadingPgbouncerConfig,
     isError: isErrorPgbouncerConfig,
     isSuccess: isSuccessPgBouncerConfig,
   } = usePgbouncerConfigQuery({ projectRef })
   const {
     data: supavisorConfig,
     error: supavisorConfigError,
-    isLoading: isLoadingSupavisorConfig,
+    isPending: isLoadingSupavisorConfig,
     isError: isErrorSupavisorConfig,
     isSuccess: isSuccessSupavisorConfig,
   } = useSupavisorConfigurationQuery({ projectRef })
@@ -156,7 +154,7 @@ export const DatabaseConnectionString = () => {
   const {
     data: databases,
     error: readReplicasError,
-    isLoading: isLoadingReadReplicas,
+    isPending: isLoadingReadReplicas,
     isError: isErrorReadReplicas,
     isSuccess: isSuccessReadReplicas,
   } = useReadReplicasQuery({ projectRef })
@@ -524,50 +522,36 @@ export const DatabaseConnectionString = () => {
               )}
 
               {selectedMethod === 'session' && IS_PLATFORM && (
-                <>
-                  {sharedPoolerPreferred && ipv4Addon && (
-                    <Admonition
-                      type="warning"
-                      title="Highly recommended to not use Session Pooler"
-                      className="[&>div]:gap-0 px-8 [&>svg]:left-7 border-0 border-b rounded-none border-border-muted !py-4"
-                    >
-                      <p className="text-sm text-foreground-lighter !mb-0">
-                        If you are using Session Pooler, we recommend switching to Direct
-                        Connection.
-                      </p>
-                    </Admonition>
+                <ConnectionPanel
+                  type="session"
+                  title={connectionStringMethodOptions.session.label}
+                  contentType={contentType}
+                  lang={lang}
+                  badge="Shared Pooler"
+                  fileTitle={fileTitle}
+                  description={connectionStringMethodOptions.session.description}
+                  connectionString={supavisorConnectionStrings['pooler'][selectedTab].replace(
+                    '6543',
+                    '5432'
                   )}
-                  <ConnectionPanel
-                    type="session"
-                    title={connectionStringMethodOptions.session.label}
-                    contentType={contentType}
-                    lang={lang}
-                    badge="Shared Pooler"
-                    fileTitle={fileTitle}
-                    description={connectionStringMethodOptions.session.description}
-                    connectionString={supavisorConnectionStrings['pooler'][selectedTab].replace(
-                      '6543',
-                      '5432'
-                    )}
-                    ipv4Status={{
-                      type: 'success',
-                      title: 'IPv4 compatible',
-                      description: 'Session pooler connections are IPv4 proxied for free',
-                      links: undefined,
-                    }}
-                    parameters={[
-                      { ...CONNECTION_PARAMETERS.host, value: sharedPoolerConfig?.db_host ?? '' },
-                      { ...CONNECTION_PARAMETERS.port, value: '5432' },
-                      {
-                        ...CONNECTION_PARAMETERS.database,
-                        value: sharedPoolerConfig?.db_name ?? '',
-                      },
-                      { ...CONNECTION_PARAMETERS.user, value: sharedPoolerConfig?.db_user ?? '' },
-                      { ...CONNECTION_PARAMETERS.pool_mode, value: 'session' },
-                    ]}
-                    onCopyCallback={() => handleCopy(selectedTab, 'session_pooler')}
-                  />
-                </>
+                  ipv4Status={{
+                    type: 'success',
+                    title: 'IPv4 compatible',
+                    description: 'Session pooler connections are IPv4 proxied for free',
+                    links: undefined,
+                  }}
+                  parameters={[
+                    { ...CONNECTION_PARAMETERS.host, value: sharedPoolerConfig?.db_host ?? '' },
+                    { ...CONNECTION_PARAMETERS.port, value: '5432' },
+                    {
+                      ...CONNECTION_PARAMETERS.database,
+                      value: sharedPoolerConfig?.db_name ?? '',
+                    },
+                    { ...CONNECTION_PARAMETERS.user, value: sharedPoolerConfig?.db_user ?? '' },
+                    { ...CONNECTION_PARAMETERS.pool_mode, value: 'session' },
+                  ]}
+                  onCopyCallback={() => handleCopy(selectedTab, 'session_pooler')}
+                />
               )}
             </div>
           </div>
@@ -654,10 +638,18 @@ const ConnectionStringMethodSelectItem = ({
   const badges: ReactNode[] = []
 
   if (method !== 'direct') {
-    badges.push(<Badge className="flex gap-x-1">Shared Pooler</Badge>)
+    badges.push(
+      <Badge key="direct" className="flex gap-x-1">
+        Shared Pooler
+      </Badge>
+    )
   }
   if (poolerBadge === 'Dedicated Pooler') {
-    badges.push(<Badge className="flex gap-x-1">{poolerBadge}</Badge>)
+    badges.push(
+      <Badge key="dedicated" className="flex gap-x-1">
+        {poolerBadge}
+      </Badge>
+    )
   }
 
   return (

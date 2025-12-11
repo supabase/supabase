@@ -30,7 +30,13 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
 
-  const { data: backups, error, isLoading, isError, isSuccess } = useBackupsQuery({ projectRef })
+  const {
+    data: backups,
+    error,
+    isPending: isLoading,
+    isError,
+    isSuccess,
+  } = useBackupsQuery({ projectRef })
 
   const isOrioleDbInAws = useIsOrioleDbInAws()
   const isPitrEnabled = backups?.pitr_enabled

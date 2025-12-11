@@ -138,7 +138,7 @@ export const AnalyticsBucketFields = ({
   const {
     data: keysData,
     isSuccess: isSuccessKeys,
-    isLoading: isLoadingKeys,
+    isPending: isLoadingKeys,
     isError: isErrorKeys,
   } = useStorageCredentialsQuery({ projectRef })
   const s3Keys = keysData?.data ?? []
@@ -149,7 +149,7 @@ export const AnalyticsBucketFields = ({
 
   const {
     data: analyticsBuckets = [],
-    isLoading: isLoadingBuckets,
+    isPending: isLoadingBuckets,
     isError: isErrorBuckets,
   } = useAnalyticsBucketsQuery({ projectRef })
 
@@ -157,7 +157,7 @@ export const AnalyticsBucketFields = ({
 
   const {
     data: namespaces = [],
-    isLoading: isLoadingNamespaces,
+    isPending: isLoadingNamespaces,
     isError: isErrorNamespaces,
   } = useIcebergNamespacesQuery(
     {

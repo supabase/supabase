@@ -43,7 +43,7 @@ export const PublicationsList = () => {
   const {
     data = [],
     error,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
   } = useDatabasePublicationsQuery({
