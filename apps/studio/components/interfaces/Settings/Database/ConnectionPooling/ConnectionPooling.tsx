@@ -61,7 +61,7 @@ export const ConnectionPooling = () => {
   const {
     data: pgbouncerConfig,
     error: pgbouncerConfigError,
-    isLoading: isLoadingPgbouncerConfig,
+    isPending: isLoadingPgbouncerConfig,
     isError: isErrorPgbouncerConfig,
     isSuccess: isSuccessPgbouncerConfig,
   } = usePgbouncerConfigQuery({ projectRef })

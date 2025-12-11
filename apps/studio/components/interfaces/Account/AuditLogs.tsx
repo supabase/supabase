@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LogDetailsPanel } from 'components/interfaces/AuditLogs/LogDetailsPanel'
 import Table from 'components/to-be-cleaned/Table'
@@ -43,22 +44,29 @@ export const AuditLogs = () => {
     fetchNextPage,
   } = useProjectsInfiniteQuery(
     { search: search.length === 0 ? search : debouncedSearch },
-    { keepPreviousData: true }
+    { placeholderData: keepPreviousData }
   )
   const projects =
     useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 
   const { data: organizations } = useOrganizationsQuery()
-  const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
-    useProfileAuditLogsQuery(
-      {
-        iso_timestamp_start: dateRange.from,
-        iso_timestamp_end: dateRange.to,
-      },
-      {
-        retry: false,
-      }
-    )
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    isRefetching,
+    refetch,
+  } = useProfileAuditLogsQuery(
+    {
+      iso_timestamp_start: dateRange.from,
+      iso_timestamp_end: dateRange.to,
+    },
+    {
+      retry: false,
+    }
+  )
 
   const logs = data?.result ?? []
   const sortedLogs = logs

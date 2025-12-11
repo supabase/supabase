@@ -15,6 +15,8 @@ import {
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from '../QueryPerformance.constants'
 import { useIndexAdvisorStatus } from './useIsIndexAdvisorStatus'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { useTableIndexAdvisor } from 'components/grid/context/TableIndexAdvisorContext'
 
 export function useIndexInvalidation() {
   const router = useRouter()
@@ -28,6 +30,8 @@ export function useIndexInvalidation() {
     order: parseAsString,
     preset: parseAsString.withDefault('unified'),
   })
+
+  const { invalidate: invalidateTableIndexAdvisor } = useTableIndexAdvisor()
 
   const preset = QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES]
   const orderBy = !!sort ? ({ column: sort, order } as QueryPerformanceSort) : undefined
@@ -47,5 +51,7 @@ export function useIndexInvalidation() {
       queryKey: databaseKeys.indexAdvisorFromQuery(project?.ref, ''),
     })
     queryClient.invalidateQueries({ queryKey: databaseIndexesKeys.list(project?.ref) })
-  }, [queryPerformanceQuery, queryClient, project?.ref])
+
+    invalidateTableIndexAdvisor()
+  }, [queryPerformanceQuery, queryClient, project?.ref, invalidateTableIndexAdvisor])
 }

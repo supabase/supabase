@@ -24,7 +24,7 @@ export const OrganizationInvite = () => {
     error,
     isSuccess: isSuccessInvitation,
     isError: isErrorInvitation,
-    isLoading: isLoadingInvitation,
+    isPending: isLoadingInvitation,
   } = useOrganizationInvitationTokenQuery(
     { slug, token },
     {

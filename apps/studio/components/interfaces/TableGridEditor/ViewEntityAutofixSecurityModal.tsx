@@ -23,7 +23,11 @@ export default function ViewEntityAutofixSecurityModal({
 }: ViewEntityAutofixSecurityModalProps) {
   const { data: project } = useSelectedProjectQuery()
   const queryClient = useQueryClient()
-  const { isSuccess, isLoading, data } = useViewDefinitionQuery(
+  const {
+    isSuccess,
+    isPending: isLoading,
+    data,
+  } = useViewDefinitionQuery(
     {
       id: table?.id,
       projectRef: project?.ref,
