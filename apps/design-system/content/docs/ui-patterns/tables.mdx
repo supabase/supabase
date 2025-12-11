@@ -12,8 +12,8 @@ The choice of table component depends on several factors: the complexity of the 
 There are three main table components, each optimized for different use cases:
 
 - [Table](../components/table) is a low-level, presentational table component.
-- [Data Table](../components/data-table) builds on [Table](../components/table) and TanStack Table to provide a feature-rich data browsing experience (sorting, filtering, pagination, etc.).
-- Data Grid is a separate grid implementation used for highly interactive, spreadsheet-like surfaces and very large datasets.
+- [Data Table](../components/data-table) builds on [Table](../components/table) and [TanStack Table](https://tanstack.com/table) to provide a feature-rich data browsing experience (sorting, filtering, pagination, etc.).
+- [Data Grid](#data-grid) is a separate grid implementation used for highly interactive, spreadsheet-like surfaces and very large datasets.
 
 A shorthand is that Table is for tables inline on the page. Data Table is for full-width presentations. Data Grid is similar but predates Data Table, and will soon be deprecated.
 
@@ -31,7 +31,7 @@ Data Table and Data Grid are both _pattern-components_, meaning they are so besp
 
 ### Data Table
 
-[Data Table](../components/data-table) is a pattern-component built on top of [Table](../components/table) and TanStack Table. It is designed to extend Table with column definitions and row models (via TanStack) and for more complex sorting, filtering, and row actions. is designed for immersive, data-heavy experiences. Use it when:
+[Data Table](../components/data-table) is a pattern-component built on top of [Table](../components/table) and [TanStack Table](https://tanstack.com/table). It is designed to extend Table with column definitions and row models (via TanStack) and for more complex sorting, filtering, and row actions. is designed for immersive, data-heavy experiences. Use it when:
 
 - Displaying large datasets that require pagination
 - Users need to perform complex sort, filter, or search actions through the data
@@ -43,7 +43,7 @@ Data Table and Data Grid are both _pattern-components_, meaning they are so besp
 
 Data Grid is a Studio-only pattern-component and therefore not available in the Design System. It is based on [React Data Grid](https://comcast.github.io/react-data-grid/#/CommonFeatures) and originally adopted for areas like Table Editor, Query Performance, and other high-interaction surfaces.
 
-Use it only when you need virtualization, column resizing, or complex cell editing. Otherwise Data Table is simpler and more flexible.
+Use it only when you need virtualization, column resizing, or complex cell editing. Otherwise [Data Table](#data-table) is simpler and more flexible.
 
 <ComponentPreview name="data-grid-demo" peekCode wide />
 

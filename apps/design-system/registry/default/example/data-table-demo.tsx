@@ -38,31 +38,31 @@ const data: Payment[] = [
     id: "m5gr84i9",
     amount: 316,
     status: "success",
-    email: "ken99@example.com",
+    email: "wallace@example.com",
   },
   {
     id: "3u1reuv4",
     amount: 242,
     status: "success",
-    email: "Abe45@example.com",
+    email: "wendolene@example.com",
   },
   {
     id: "derv1ws0",
     amount: 837,
     status: "processing",
-    email: "Monserrat44@example.com",
+    email: "piella@example.com",
   },
   {
     id: "5kma53ae",
     amount: 874,
     status: "success",
-    email: "Silas22@example.com",
+    email: "victor@example.com",
   },
   {
     id: "bhqecj4p",
     amount: 721,
     status: "failed",
-    email: "carmella@example.com",
+    email: "feathers@example.com",
   },
 ]
 
@@ -120,12 +120,13 @@ export const columns: ColumnDef<Payment>[] = [
         currency: "USD",
       }).format(amount)
 
-      return <div className="text-right font-medium">{formatted}</div>
+      return <div className="text-right">{formatted}</div>
     },
   },
   {
     id: "actions",
     enableHiding: false,
+    header: () => <span className="sr-only">Actions</span>,
     cell: ({ row }) => {
       const payment = row.original
 
@@ -138,9 +139,7 @@ export const columns: ColumnDef<Payment>[] = [
               icon={<MoreVertical />}
             />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
+          <DropdownMenuContent align="end" className="max-w-48">            <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(payment.id)}
             >
               Copy payment ID
@@ -155,10 +154,10 @@ export const columns: ColumnDef<Payment>[] = [
   },
 ]
 
-type EmailSort = 'email:asc' | 'email:desc'
+type ColumnSort = 'email:asc' | 'email:desc' | 'status:asc' | 'status:desc' | 'amount:asc' | 'amount:desc'
 
 export default function DataTableDemo() {
-  const [sort, setSort] = React.useState<EmailSort | ''>('')
+  const [sort, setSort] = React.useState<ColumnSort | ''>('')
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   )
@@ -171,25 +170,29 @@ export default function DataTableDemo() {
     if (currentCol === column) {
       // Cycle through: asc -> desc -> no sort
       if (currentOrder === 'asc') {
-        setSort(`${column}:desc` as EmailSort)
+        setSort(`${column}:desc` as ColumnSort)
       } else {
         setSort('')
       }
     } else {
       // New column, start with asc
-      setSort(`${column}:asc` as EmailSort)
+      setSort(`${column}:asc` as ColumnSort)
     }
   }
 
   const sortedData = React.useMemo(() => {
     if (!sort) return data
     
-    const [sortCol, sortOrder] = sort.split(':') as ['email', 'asc' | 'desc']
+    const [sortCol, sortOrder] = sort.split(':') as [string, 'asc' | 'desc']
     const orderMultiplier = sortOrder === 'asc' ? 1 : -1
 
     return [...data].sort((a, b) => {
       if (sortCol === 'email') {
         return a.email.localeCompare(b.email) * orderMultiplier
+      } else if (sortCol === 'status') {
+        return a.status.localeCompare(b.status) * orderMultiplier
+      } else if (sortCol === 'amount') {
+        return (a.amount - b.amount) * orderMultiplier
       }
       return 0
     })
@@ -229,7 +232,7 @@ export default function DataTableDemo() {
               Columns
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="max-w-32">
+          <DropdownMenuContent align="end" className="max-w-48">
             {table
               .getAllColumns()
               .filter((column) => column.getCanHide())
@@ -250,24 +253,36 @@ export default function DataTableDemo() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="overflow-hidden rounded-md border">
+      <div className="overflow-hidden rounded-md border bg-surface-75">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
-                  const isEmailColumn = header.column.id === 'email'
+                  const columnId = header.column.id
+                  const isSortableColumn = ['email', 'status', 'amount'].includes(columnId)
+                  
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead 
+                      key={header.id} 
+                      className={
+                        columnId === 'amount' 
+                          ? 'text-right' 
+                          : columnId === 'actions'
+                            ? 'w-1'
+                            : undefined
+                      }
+                    >
                       {header.isPlaceholder
                         ? null
-                        : isEmailColumn ? (
+                        : isSortableColumn ? (
                             <TableHeadSort
-                              column="email"
+                              column={columnId}
                               currentSort={sort}
                               onSortChange={handleSortChange}
+                              className={columnId === 'amount' ? 'justify-end' : undefined}
                             >
-                              Email
+                              {columnId === 'email' ? 'Email' : columnId === 'status' ? 'Status' : 'Amount'}
                             </TableHeadSort>
                           ) : (
                             flexRender(
@@ -287,7 +302,6 @@ export default function DataTableDemo() {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  // className="bg-surface-75"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
@@ -295,8 +309,8 @@ export default function DataTableDemo() {
                       className={
                         cell.column.id === 'email'
                           ? 'text-foreground-lighter'
-                          : cell.column.id === 'amount'
-                            ? 'font-mono'
+                          : cell.column.id === 'actions'
+                            ? 'w-1'
                             : undefined
                       }
                     >
