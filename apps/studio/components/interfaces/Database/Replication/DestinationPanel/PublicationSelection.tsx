@@ -31,7 +31,7 @@ export const PublicationSelection = ({
 
   const {
     data: publications = [],
-    isLoading: isLoadingPublications,
+    isPending: isLoadingPublications,
     isSuccess: isSuccessPublications,
   } = useReplicationPublicationsQuery({ projectRef, sourceId })
 
@@ -40,7 +40,7 @@ export const PublicationSelection = ({
   const isSelectedPublicationMissing =
     isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
 
-  const { data: checkPrimaryKeysExistsData, isLoading: isLoadingCheck } = useCheckPrimaryKeysExists(
+  const { data: checkPrimaryKeysExistsData, isPending: isLoadingCheck } = useCheckPrimaryKeysExists(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,

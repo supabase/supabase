@@ -20,7 +20,7 @@ import 'ui/build/css/themes/light.css'
 
 import { loader } from '@monaco-editor/react'
 import * as Sentry from '@sentry/nextjs'
-import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
+import { HydrationBoundary, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
@@ -48,6 +48,7 @@ import { FeaturePreviewContextProvider } from 'components/interfaces/App/Feature
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from 'components/interfaces/App/RouteValidationWrapper'
+import { MainScrollContainerProvider } from 'components/layouts/MainScrollContainerContext'
 import { GlobalErrorBoundaryState } from 'components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { useRootQueryClient } from 'data/query-client'
 import { customFont, sourceCodePro } from 'fonts'
@@ -120,7 +121,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
       <QueryClientProvider client={queryClient}>
         <NuqsAdapter>
-          <Hydrate state={pageProps.dehydratedState}>
+          <HydrationBoundary state={pageProps.dehydratedState}>
             <AuthProvider>
               <FeatureFlagProvider
                 API_URL={API_URL}
@@ -160,7 +161,9 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         <AppBannerContextProvider>
                           <CommandProvider>
                             <FeaturePreviewContextProvider>
-                              {getLayout(<Component {...pageProps} />)}
+                              <MainScrollContainerProvider>
+                                {getLayout(<Component {...pageProps} />)}
+                              </MainScrollContainerProvider>
                               <StudioCommandMenu />
                               <FeaturePreviewModal />
                             </FeaturePreviewContextProvider>
@@ -173,12 +176,12 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   </TooltipProvider>
                   <Telemetry />
                   {!isTestEnv && (
-                    <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+                    <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
                   )}
                 </ProfileProvider>
               </FeatureFlagProvider>
             </AuthProvider>
-          </Hydrate>
+          </HydrationBoundary>
         </NuqsAdapter>
       </QueryClientProvider>
       <TelemetryTagManager />

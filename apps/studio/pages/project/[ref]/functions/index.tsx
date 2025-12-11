@@ -42,7 +42,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
   const {
     data: functions,
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useEdgeFunctionsQuery({ projectRef: ref })

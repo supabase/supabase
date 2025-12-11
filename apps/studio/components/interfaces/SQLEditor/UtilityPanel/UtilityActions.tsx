@@ -92,23 +92,27 @@ const UtilityActions = ({
             </span>
             {intellisenseEnabled && <Check className="text-brand" size={16} />}
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className="gap-x-2"
-            onClick={() => {
-              if (isFavorite) removeFavorite()
-              else addFavorite()
-            }}
-          >
-            <Heart
-              size={14}
-              strokeWidth={2}
-              className={
-                isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
-              }
-            />
-            {isFavorite ? 'Remove from' : 'Add to'} favorites
-          </DropdownMenuItem>
+          {IS_PLATFORM && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="gap-x-2"
+                onClick={() => {
+                  if (isFavorite) removeFavorite()
+                  else addFavorite()
+                }}
+              >
+                <Heart
+                  size={14}
+                  strokeWidth={2}
+                  className={
+                    isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
+                  }
+                />
+                {isFavorite ? 'Remove from' : 'Add to'} favorites
+              </DropdownMenuItem>
+            </>
+          )}
           <DropdownMenuItem className="gap-x-2" onClick={prettifyQuery}>
             <AlignLeft size={14} strokeWidth={2} className="text-foreground-light" />
             Prettify SQL

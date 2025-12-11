@@ -1,5 +1,6 @@
 import { UIEvent, useMemo } from 'react'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -75,14 +76,14 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
       statuses: filterStatus,
     },
     {
-      keepPreviousData: true,
+      placeholderData: keepPreviousData,
     }
   )
   const orgProjects =
     useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
 
   const {
-    isLoading: _isLoadingPermissions,
+    isPending: _isLoadingPermissions,
     isError: isErrorPermissions,
     error: permissionsError,
   } = usePermissionsQuery()
