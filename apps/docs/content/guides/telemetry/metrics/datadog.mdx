@@ -1,0 +1,83 @@
+---
+id: 'metrics-datadog'
+title: 'Metrics API with Datadog'
+description: 'Scrape Supabase metrics with the Datadog Agent or Prometheus integrations'
+---
+
+Datadog can ingest the Supabase Metrics API through its [OpenMetrics integration](https://docs.datadoghq.com/integrations/openmetrics/) or by proxying Prometheus data into Datadog’s time-series store. This guide covers both options so you can monitor database health alongside application metrics, logs, and traces in one place.
+
+<Admonition type="note">
+
+Datadog publishes a [Supabase integration reference](https://docs.datadoghq.com/integrations/supabase/) that uses the same Metrics API outlined here. That integration is managed by Datadog and is not officially supported by Supabase.
+
+</Admonition>
+
+## Prerequisites
+
+- Supabase service role key (or another secret key) with Metrics API access.
+- Datadog API/APP keys (for SaaS) and the Datadog Agent installed wherever you plan to run the scraper.
+
+<$Partial path="metrics_access.mdx" />
+
+## Option A: Datadog agent + OpenMetrics check
+
+1. Install the Datadog Agent on a host that can reach `https://<project-ref>.supabase.co`.
+2. Enable the OpenMetrics integration by creating `openmetrics.d/conf.yaml` (Linux path: `/etc/datadog-agent/conf.d/openmetrics.d/conf.yaml`):
+
+```yaml
+init_config:
+
+instances:
+  - openmetrics_endpoint: https://<project-ref>.supabase.co/customer/v1/privileged/metrics
+    namespace: supabase
+    metrics:
+      - 'supabase_*'
+    auth_type: basic
+    username: service_role
+    password: { { env "SUPABASE_SERVICE_ROLE_KEY" } }
+    ssl_verify: true
+    prometheus_timeout: 30
+    labels_mapper:
+      project: project_ref
+```
+
+3. Restart the Datadog Agent (`sudo systemctl restart datadog-agent`).
+4. In Datadog, search for metrics with the `supabase.` prefix. Create dashboards or notebooks to visualize CPU, IO, replication, and connection metrics.
+
+### Tuning tips
+
+- Set `min_collection_interval: 60` to match Supabase’s one-minute refresh cadence.
+- Use `labels_mapper` to rename high-cardinality labels into shorter Datadog tag keys.
+- If you monitor multiple projects, duplicate the instance block with a unique `namespace` and tag each project (`tags: ["supabase_project:<ref>"]`).
+
+## Option B: Prometheus remote write into Datadog
+
+If you already run [Prometheus](https://prometheus.io/docs/prometheus/latest/installation/) (self-hosted or managed), push scraped metrics into Datadog using the [Prometheus Remote Write integration](https://docs.datadoghq.com/integrations/guide/prometheus_remote_write/):
+
+1. Configure Prometheus with the Supabase scrape job (see the [self-hosted guide](/guides/telemetry/metrics/grafana-self-hosted#1-deploy-prometheus)).
+2. Add a `remote_write` section to `prometheus.yml` that targets Datadog’s endpoint:
+
+```yaml
+remote_write:
+  - url: https://api.datadoghq.com/api/v1/prometheus/write?api_key=<DD_API_KEY>
+    write_relabel_configs:
+      - source_labels: [job]
+        target_label: datadog_namespace
+        replacement: supabase
+```
+
+3. (Optional) Use [Datadog’s Prometheus mapping profiles](https://docs.datadoghq.com/integrations/guide/prometheus-metrics-map/) to convert metric/label names into Datadog-friendly conventions.
+
+## Dashboards and alerts
+
+- Use the Datadog Dashboard Gallery to build widgets for CPU usage, tuple IO, replication lag, and connection saturation.
+- Create monitors (for example, `avg(last_5m):supabase_pg_stat_database_xact_commit{project:<ref>} > 5e5`) to detect runaway workloads.
+- Tag metrics with `env`, `service`, or `team` so you can slice Supabase telemetry the same way you slice application telemetry.
+
+## Troubleshooting
+
+- **401 errors:** rotate the service role key in Supabase and update the Datadog credentials.
+- **SSL errors:** ensure the host trusts the standard certificate authorities used by `*.supabase.co`.
+- **High cardinality warnings:** filter out labels such as `datname` or `application_name` if you only need aggregate views.
+
+[← Back to the Metrics API landing](/guides/telemetry/metrics)

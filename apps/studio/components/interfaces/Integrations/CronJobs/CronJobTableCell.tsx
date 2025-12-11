@@ -1,6 +1,6 @@
 import parser from 'cron-parser'
 import dayjs from 'dayjs'
-import { Clipboard, Edit, MoreVertical, Play, Trash } from 'lucide-react'
+import { Copy, Edit, MoreVertical, Play, Trash } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -103,13 +103,13 @@ export const CronJobTableCell = ({
           ? getNextRun(schedule, latest_run)
           : value
 
-  const { mutate: runCronJob, isLoading: isRunning } = useDatabaseCronJobRunCommandMutation({
+  const { mutate: runCronJob, isPending: isRunning } = useDatabaseCronJobRunCommandMutation({
     onSuccess: () => {
       toast.success(`Command from "${jobname}" ran successfully`)
     },
   })
 
-  const { mutate: toggleDatabaseCronJob, isLoading: isToggling } = useDatabaseCronJobToggleMutation(
+  const { mutate: toggleDatabaseCronJob, isPending: isToggling } = useDatabaseCronJobToggleMutation(
     {
       onSuccess: (_, vars) => {
         toast.success(`Successfully ${vars.active ? 'enabled' : 'disabled'} "${jobname}"`)
@@ -149,17 +149,25 @@ export const CronJobTableCell = ({
               onClick={(e) => e.stopPropagation()}
             />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-42">
-            <DropdownMenuItem
-              className="gap-x-2"
-              onClick={(e) => {
-                e.stopPropagation()
-                onRunCronJob()
-              }}
-            >
-              <Play size={12} />
-              Run command
-            </DropdownMenuItem>
+          <DropdownMenuContent align="end" className="w-60 space-y-1">
+            <Tooltip>
+              <TooltipTrigger className="w-full">
+                <DropdownMenuItem
+                  className="gap-x-2"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onRunCronJob()
+                  }}
+                >
+                  <Play size={12} />
+                  Run command
+                </DropdownMenuItem>
+              </TooltipTrigger>
+              <TooltipContent>
+                Manual runs execute the command immediately and will not appear in the cron jobs
+                table.
+              </TooltipContent>
+            </Tooltip>
             <DropdownMenuItem
               className="gap-x-2"
               onClick={(e) => {
@@ -295,7 +303,7 @@ export const CronJobTableCell = ({
           onFocusCapture={(e) => e.stopPropagation()}
           onSelect={() => copyToClipboard(formattedValue)}
         >
-          <Clipboard size={12} />
+          <Copy size={12} />
           <span>Copy {col.name.toLowerCase()}</span>
         </ContextMenuItem_Shadcn_>
 

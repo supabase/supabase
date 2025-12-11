@@ -1,8 +1,8 @@
-import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import type { operations } from 'data/api'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { actionKeys } from './keys'
 
 export type ActionsVariables = operations['v1-list-action-runs']['parameters']['path']
@@ -25,10 +25,12 @@ export type ActionStatus = ActionRunStep['status']
 
 export const useActionsQuery = <TData = ActionsData>(
   { ref }: ActionsVariables,
-  { enabled = true, ...options }: UseQueryOptions<ActionsData, ActionsError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<ActionsData, ActionsError, TData> = {}
 ) =>
-  useQuery<ActionsData, ActionsError, TData>(
-    actionKeys.list(ref),
-    ({ signal }) => listActionRuns({ ref }, signal),
-    { enabled: enabled && Boolean(ref), staleTime: 0, ...options }
-  )
+  useQuery<ActionsData, ActionsError, TData>({
+    queryKey: actionKeys.list(ref),
+    queryFn: ({ signal }) => listActionRuns({ ref }, signal),
+    enabled: enabled && Boolean(ref),
+    staleTime: 0,
+    ...options,
+  })

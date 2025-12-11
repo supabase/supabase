@@ -1,6 +1,8 @@
+import { PostgresPolicy } from '@supabase/postgres-meta'
 import { difference, groupBy } from 'lodash'
 import { useRouter } from 'next/router'
 
+import { Bucket } from 'data/storage/buckets-query'
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from './Storage.constants'
 import type { StoragePolicyFormField } from './Storage.types'
 
@@ -20,8 +22,8 @@ const shortHash = (str: string) => {
  * Output: [{ bucket: <string>, policies: <Policy[]> }]
  * @param {Array} policies: All policies from a table in a schema
  */
-export const formatPoliciesForStorage = (buckets: any[], policies: any[]) => {
-  if (policies.length === 0) return policies
+export const formatPoliciesForStorage = (buckets: Bucket[], policies: PostgresPolicy[]) => {
+  if (policies.length === 0) return []
 
   /**
    * Format policies from storage objects to:
@@ -41,8 +43,7 @@ export const formatPoliciesForStorage = (buckets: any[], policies: any[]) => {
   return policiesByBucket
 }
 
-/* Start: Internal methods to support formatPoliciesForStorage but exported for tests to cover */
-const formatStoragePolicies = (buckets: any[], policies: any[]) => {
+const formatStoragePolicies = (buckets: Bucket[], policies: PostgresPolicy[]) => {
   const availableBuckets = buckets.map((bucket) => bucket.name)
   const formattedPolicies = policies.map((policy) => {
     const { definition: policyDefinition, check: policyCheck } = policy
@@ -67,7 +68,9 @@ const formatStoragePolicies = (buckets: any[], policies: any[]) => {
   return formattedPolicies
 }
 
-const extractBucketNameFromDefinition = (definition: string) => {
+export const extractBucketNameFromDefinition = (definition: string | null) => {
+  if (!definition) return null
+
   const definitionSegments = definition?.split(' AND ') ?? []
   const [bucketDefinition] = definitionSegments.filter((segment: string) =>
     segment.includes('bucket_id')
@@ -75,14 +78,12 @@ const extractBucketNameFromDefinition = (definition: string) => {
   return bucketDefinition ? bucketDefinition.split("'")[1] : null
 }
 
-const groupPoliciesByBucket = (policies: any[]) => {
+const groupPoliciesByBucket = (policies: (PostgresPolicy & { bucket: string })[]) => {
   const policiesByBucket = groupBy(policies, 'bucket')
   return Object.keys(policiesByBucket).map((bucketName) => {
     return { name: bucketName, policies: policiesByBucket[bucketName] }
   })
 }
-
-/* End: Internal methods to support formatPoliciesForStorage but exported for tests to cover */
 
 export const createPayloadsForAddPolicy = (
   bucketName = '',

@@ -52,9 +52,9 @@
       "type": "boolean",
       "description": "Enable the authentication attack protection page"
     },
-    "authentication:advanced": {
+    "authentication:performance": {
       "type": "boolean",
-      "description": "Enable the authentication advanced page"
+      "description": "Enable the authentication performance page"
     },
 
     "authentication:show_providers": {
@@ -95,6 +95,14 @@
       "description": "Enable the billing settings page"
     },
 
+    "branding:large_logo": {
+      "type": "boolean",
+      "description": "Show larger logo sizes throughout the apps"
+    },
+    "cli:disable_custom_profiles": {
+      "type": "boolean",
+      "description": "Disable custom CLI profiles feature"
+    },
     "dashboard_auth:sign_up": {
       "type": "boolean",
       "description": "Enable the sign up page in the dashboard"
@@ -114,6 +122,10 @@
     "dashboard_auth:show_testimonial": {
       "type": "boolean",
       "description": "Enable the testimonial on the sign in/up page"
+    },
+    "dashboard_auth:show_tos": {
+      "type": "boolean",
+      "description": "Enable the terms of service link on the sign in/up page"
     },
 
     "database:replication": {
@@ -168,6 +180,10 @@
     "docs:footer": {
       "type": "boolean",
       "description": "Enable footer on docs site"
+    },
+    "docs:navigation_dropdown_links_home": {
+      "type": "boolean",
+      "description": "Should the navigation dropdown homepage link go to Supabase.com or the dashboard"
     },
     "docs:framework_quickstarts": {
       "type": "boolean",
@@ -266,6 +282,10 @@
     "organization:show_security_settings": {
       "type": "boolean",
       "description": "Show the security settings tab in the organization settings page"
+    },
+    "organization:show_legal_documents": {
+      "type": "boolean",
+      "description": "Show the legal documents tab in the organization settings page"
     },
 
     "profile:show_email": {
@@ -389,6 +409,15 @@
       "description": "Enable the Swift SDK"
     },
 
+    "storage:analytics": {
+      "type": "boolean",
+      "description": "Enable Analytics Buckets in Storage"
+    },
+    "storage:vectors": {
+      "type": "boolean",
+      "description": "Enable Vector Buckets in Storage"
+    },
+
     "search:fullIndex": {
       "type": "boolean",
       "description": "Enable the full search index. When true, uses the  full search; when false, uses the alternate search index."
@@ -405,7 +434,7 @@
     "ai:opt_in_level_schema",
     "ai:opt_in_level_schema_and_log",
     "ai:opt_in_level_schema_and_log_and_data",
-    "authentication:advanced",
+    "authentication:performance",
     "authentication:attack_protection",
     "authentication:emails",
     "authentication:multi_factor",
@@ -425,6 +454,7 @@
     "dashboard_auth:sign_in_with_github",
     "dashboard_auth:sign_in_with_sso",
     "dashboard_auth:sign_in_with_email",
+    "dashboard_auth:show_tos",
     "database:replication",
     "database:roles",
     "database:restore_to_new_project",
@@ -462,6 +492,8 @@
     "logs:metadata",
     "logs:show_metadata_ip_template",
     "organization:show_sso_settings",
+    "organization:show_security_settings",
+    "organization:show_legal_documents",
     "project_creation:show_advanced_config",
     "project_homepage:show_instance_size",
     "project_homepage:show_examples",
@@ -486,6 +518,8 @@
     "sdk:kotlin",
     "sdk:python",
     "sdk:swift",
+    "storage:analytics",
+    "storage:vectors",
     "search:fullIndex"
   ],
   "additionalProperties": false

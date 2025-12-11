@@ -45,6 +45,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const isEmailAuth = user.email !== null
   const isPhoneAuth = user.phone !== null
   const isBanned = user.banned_until !== null
+  const isVerified = user.confirmed_at != null
 
   const { authenticationSignInProviders } = useIsFeatureEnabled([
     'authentication:sign_in_providers',
@@ -98,7 +99,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const seconds = Math.floor(mailerOtpExpiry % 60)
   const formattedExpiry = `${mailerOtpExpiry > 60 ? `${minutes} minute${minutes > 1 ? 's' : ''} ${seconds > 0 ? 'and' : ''} ` : ''}${seconds > 0 ? `${seconds} second${seconds > 1 ? 's' : ''}` : ''}`
 
-  const { mutate: resetPassword, isLoading: isResettingPassword } = useUserResetPasswordMutation({
+  const { mutate: resetPassword, isPending: isResettingPassword } = useUserResetPasswordMutation({
     onSuccess: (_, vars) => {
       setSuccessAction('send_recovery')
       toast.success(`Sent password recovery to ${vars.user.email}`)
@@ -107,16 +108,24 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       toast.error(`Failed to send password recovery: ${err.message}`)
     },
   })
-  const { mutate: sendMagicLink, isLoading: isSendingMagicLink } = useUserSendMagicLinkMutation({
+  const { mutate: sendMagicLink, isPending: isSendingMagicLink } = useUserSendMagicLinkMutation({
     onSuccess: (_, vars) => {
       setSuccessAction('send_magic_link')
-      toast.success(`Sent magic link to ${vars.user.email}`)
+      toast.success(
+        isVerified
+          ? `Sent magic link to ${vars.user.email}`
+          : `Sent confirmation email to ${vars.user.email}`
+      )
     },
     onError: (err) => {
-      toast.error(`Failed to send magic link: ${err.message}`)
+      toast.error(
+        isVerified
+          ? `Failed to send magic link: ${err.message}`
+          : `Failed to send confirmation email: ${err.message}`
+      )
     },
   })
-  const { mutate: sendOTP, isLoading: isSendingOTP } = useUserSendOTPMutation({
+  const { mutate: sendOTP, isPending: isSendingOTP } = useUserSendOTPMutation({
     onSuccess: (_, vars) => {
       setSuccessAction('send_otp')
       toast.success(`Sent OTP to ${vars.user.phone}`)
@@ -131,7 +140,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       setIsDeleteFactorsModalOpen(false)
     },
   })
-  const { mutate: updateUser, isLoading: isUpdatingUser } = useUserUpdateMutation({
+  const { mutate: updateUser, isPending: isUpdatingUser } = useUserUpdateMutation({
     onSuccess: () => {
       toast.success('Successfully unbanned user')
       setIsUnbanModalOpen(false)
@@ -173,7 +182,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           <Admonition
             type="warning"
             label={`User banned until ${dayjs(user.banned_until).format(DATE_FORMAT)}`}
-            className="border-r-0 border-l-0 rounded-none -mt-px [&_svg]:ml-0.5 mb-0"
+            className="border-r-0 border-l-0 rounded-none -mt-px [&_svg]:ml-0.5"
           />
         ) : (
           <Separator />
@@ -294,11 +303,15 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 }
               />
               <RowAction
-                title="Send magic link"
-                description="Passwordless login via email for the user"
+                title={isVerified ? 'Send Magic Link' : 'Send confirmation email'}
+                description={
+                  isVerified
+                    ? 'Passwordless login via email for the user'
+                    : 'Send a confirmation email to the user'
+                }
                 button={{
                   icon: <Mail />,
-                  text: 'Send magic link',
+                  text: isVerified ? 'Send magic link' : 'Send confirmation email',
                   isLoading: isSendingMagicLink,
                   disabled: !canSendMagicLink,
                   onClick: () => {
@@ -308,8 +321,10 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 success={
                   successAction === 'send_magic_link'
                     ? {
-                        title: 'Magic link sent',
-                        description: `The link in the email is valid for ${formattedExpiry}`,
+                        title: isVerified ? 'Magic link sent' : 'Confirmation email sent',
+                        description: isVerified
+                          ? `The link in the email is valid for ${formattedExpiry}`
+                          : 'The confirmation email has been sent to the user',
                       }
                     : undefined
                 }

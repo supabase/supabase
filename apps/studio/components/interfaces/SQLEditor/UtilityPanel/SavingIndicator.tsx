@@ -1,7 +1,7 @@
+import { usePrevious } from '@uidotdev/usehooks'
 import { AlertCircle, Check, Loader2, RefreshCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import { usePrevious } from 'hooks/deprecated'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'

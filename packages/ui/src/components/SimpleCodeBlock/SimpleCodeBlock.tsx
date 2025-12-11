@@ -8,11 +8,14 @@
 
 import { useTheme } from 'next-themes'
 import { Highlight, Language, Prism, themes } from 'prism-react-renderer'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { PropsWithChildren, createContext, useContext, useEffect, useRef, useState } from 'react'
 import { copyToClipboard } from '../../lib/utils'
 import { cn } from './../../lib/utils/cn'
 import { Button } from './../Button'
 import { dart } from './prism'
+
+// Context for copy callback - can be provided by parent components
+export const CopyCallbackContext = createContext<(() => void) | undefined>(undefined)
 
 dart(Prism)
 
@@ -26,18 +29,22 @@ interface SimpleCodeBlockProps {
   className?: string
   showCopy?: boolean
   onCopy?: () => void
+  handleCopy?: (value: string) => void
 }
 
+// [Joshen] Refactor: De-dupe with CodeBlock.tsx
 export const SimpleCodeBlock = ({
   children,
   parentClassName,
   className: languageClassName,
   showCopy = true,
   onCopy,
+  handleCopy,
 }: PropsWithChildren<SimpleCodeBlockProps>) => {
   const { resolvedTheme } = useTheme()
   const [showCopied, setShowCopied] = useState(false)
   const target = useRef(null)
+  const contextOnCopy = useContext(CopyCallbackContext)
   let highlightLines: any = []
 
   useEffect(() => {
@@ -53,8 +60,15 @@ export const SimpleCodeBlock = ({
   }
 
   const handleCopyCode = (code: any) => {
-    copyToClipboard(code, () => setShowCopied(true))
-    onCopy?.()
+    if (!!handleCopy) {
+      handleCopy(code)
+    } else {
+      copyToClipboard(code)
+    }
+    setShowCopied(true)
+    // Use prop onCopy if provided, otherwise fall back to context
+    const copyCallback = onCopy || contextOnCopy
+    copyCallback?.()
   }
 
   return (

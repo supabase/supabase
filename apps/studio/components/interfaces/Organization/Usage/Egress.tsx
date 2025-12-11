@@ -1,55 +1,45 @@
 import { DataPoint } from 'data/analytics/constants'
-import { PricingMetric, useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
+import { PricingMetric, type OrgDailyUsageResponse } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import UsageSection from './UsageSection/UsageSection'
+import { dailyUsageToDataPoints } from './Usage.utils'
 
 export interface EgressProps {
   orgSlug: string
-  projectRef?: string
-  startDate: string | undefined
-  endDate: string | undefined
+  projectRef: string | null
   subscription: OrgSubscription | undefined
   currentBillingCycleSelected: boolean
+  orgDailyStats: OrgDailyUsageResponse | undefined
+  isLoadingOrgDailyStats: boolean
+  startDate: string | undefined
+  endDate: string | undefined
 }
 
 const Egress = ({
   orgSlug,
   projectRef,
   subscription,
+  currentBillingCycleSelected,
+  orgDailyStats,
+  isLoadingOrgDailyStats,
   startDate,
   endDate,
-  currentBillingCycleSelected,
 }: EgressProps) => {
-  const { data: egressData, isLoading: isLoadingDbEgressData } = useOrgDailyStatsQuery({
-    orgSlug,
-    projectRef,
-    metric: PricingMetric.EGRESS,
-    interval: '1d',
-    startDate,
-    endDate,
-  })
-
-  const { data: cachedEgressData, isLoading: isLoadingCachedEgress } = useOrgDailyStatsQuery({
-    orgSlug,
-    projectRef,
-    metric: PricingMetric.CACHED_EGRESS,
-    interval: '1d',
-    startDate,
-    endDate,
-  })
-
   const chartMeta: {
     [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
   } = {
     [PricingMetric.EGRESS]: {
-      data: egressData?.data ?? [],
+      data: dailyUsageToDataPoints(orgDailyStats, (metric) => metric === PricingMetric.EGRESS),
       margin: 16,
-      isLoading: isLoadingDbEgressData,
+      isLoading: isLoadingOrgDailyStats,
     },
     [PricingMetric.CACHED_EGRESS]: {
-      data: cachedEgressData?.data ?? [],
+      data: dailyUsageToDataPoints(
+        orgDailyStats,
+        (metric) => metric === PricingMetric.CACHED_EGRESS
+      ),
       margin: 16,
-      isLoading: isLoadingCachedEgress,
+      isLoading: isLoadingOrgDailyStats,
     },
   }
 
@@ -61,6 +51,8 @@ const Egress = ({
       chartMeta={chartMeta}
       subscription={subscription}
       currentBillingCycleSelected={currentBillingCycleSelected}
+      startDate={startDate}
+      endDate={endDate}
     />
   )
 }

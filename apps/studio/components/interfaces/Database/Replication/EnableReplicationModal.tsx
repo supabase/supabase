@@ -20,7 +20,7 @@ export const EnableReplicationModal = () => {
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
 
-  const { mutateAsync: createTenantSource, isLoading: creatingTenantSource } =
+  const { mutate: createTenantSource, isPending: creatingTenantSource } =
     useCreateTenantSourceMutation({
       onSuccess: () => {
         toast.success('Replication has been successfully enabled!')
@@ -33,7 +33,7 @@ export const EnableReplicationModal = () => {
 
   const onEnableReplication = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    await createTenantSource({ projectRef })
+    createTenantSource({ projectRef })
   }
 
   return (
@@ -45,13 +45,13 @@ export const EnableReplicationModal = () => {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Confirm to enable Replication</DialogTitle>
+          <DialogTitle>Enable Replication</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-y-2 !p-0">
           <Admonition
             type="warning"
-            className="rounded-none border-0 mb-0"
+            className="rounded-none border-0"
             title="Replication is currently in Alpha"
           >
             <p className="text-sm !leading-normal">
@@ -59,13 +59,13 @@ export const EnableReplicationModal = () => {
               Availability and behavior can evolve while in Alpha.
             </p>
             <p className="text-sm !leading-normal">
-              Pricing has not been finalized yet. You can enable replication now; we’ll announce
+              Pricing has not been finalized yet. You can enable replication now; we'll announce
               pricing later and notify you before any charges apply.
             </p>
           </Admonition>
         </DialogSection>
         <DialogFooter>
-          <Button type="default" disabled={creatingTenantSource}>
+          <Button type="default" disabled={creatingTenantSource} onClick={() => setOpen(false)}>
             Cancel
           </Button>
           <Button type="primary" loading={creatingTenantSource} onClick={onEnableReplication}>

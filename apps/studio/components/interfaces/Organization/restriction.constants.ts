@@ -24,6 +24,6 @@ export const RESTRICTION_MESSAGES = {
   MISSING_BILLING_INFO: {
     title: 'Missing Billing Information',
     message:
-      'Please add a billing address. If you are a registered business, please add a tax ID too.',
+      'Please add a billing address to avoid restrictions. If you are a registered business, please add a tax ID too.',
   },
 } as const

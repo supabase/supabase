@@ -52,11 +52,12 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   const {
     data: upcomingInvoice,
     error: error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useOrgUpcomingInvoiceQuery({ orgSlug: slug })
 
+  // For non-platform customers, compute is broken down per project and contains a breakdown array
   const computeItems =
     upcomingInvoice?.lines?.filter(
       (item) =>
@@ -81,7 +82,8 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   const otherItems =
     upcomingInvoice?.lines?.filter(
       (item) =>
-        !item.description?.toLowerCase().includes('compute') &&
+        // In case we have no per-project breakdown for compute, we treat it as a regular item for display purposes
+        (!item.usage_metric?.toString()?.startsWith('COMPUTE_HOURS') || !item.breakdown?.length) &&
         !item.description?.toLowerCase().includes('plan')
     ) || []
 
@@ -286,20 +288,23 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                     {formatCurrency(upcomingInvoice?.amount_total) ?? '-'}
                   </TableCell>
                 </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium py-2 px-0 flex items-center">
-                    <span className="mr-2">Projected Costs</span>
-                    <InfoTooltip className="max-w-xs">
-                      Projected costs at the end of the billing cycle. Includes predictable costs
-                      for Compute Hours, IPv4, Custom Domain and Point-In-Time-Recovery, but no
-                      costs for metrics like MAU, storage or function invocations. Final amounts may
-                      vary depending on your usage.
-                    </InfoTooltip>
-                  </TableCell>
-                  <TableCell className="text-right font-medium py-2 px-0" translate="no">
-                    {formatCurrency(upcomingInvoice?.amount_projected) ?? '-'}
-                  </TableCell>
-                </TableRow>
+
+                {upcomingInvoice?.amount_projected && (
+                  <TableRow>
+                    <TableCell className="font-medium py-2 px-0 flex items-center">
+                      <span className="mr-2">Projected Costs</span>
+                      <InfoTooltip className="max-w-xs">
+                        Projected costs at the end of the billing cycle. Includes predictable costs
+                        for Compute Hours, IPv4, Custom Domain and Point-In-Time-Recovery, but no
+                        costs for metrics like MAU, storage or function invocations. Final amounts
+                        may vary depending on your usage.
+                      </InfoTooltip>
+                    </TableCell>
+                    <TableCell className="text-right font-medium py-2 px-0" translate="no">
+                      {formatCurrency(upcomingInvoice.amount_projected) ?? '-'}
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableFooter>
             </Table>
           </div>

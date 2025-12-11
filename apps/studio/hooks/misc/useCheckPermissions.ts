@@ -1,12 +1,12 @@
-import { useIsLoggedIn, useParams } from 'common'
 import jsonLogic from 'json-logic-js'
+import { useMemo } from 'react'
 
+import { useIsLoggedIn, useParams } from 'common'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { IS_PLATFORM } from 'lib/constants'
 import type { Permission } from 'types'
 import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 import { useSelectedProjectQuery } from './useSelectedProject'
-import { useMemo } from 'react'
 
 const toRegexpString = (actionOrResource: string) =>
   `^${actionOrResource.replace('.', '\\.').replace('%', '.*')}$`
@@ -81,7 +81,7 @@ function useGetProjectPermissions(
 ) {
   const {
     data,
-    isLoading: isLoadingPermissions,
+    isPending: isLoadingPermissions,
     isSuccess: isSuccessPermissions,
   } = usePermissionsQuery({
     enabled: permissionsOverride === undefined && enabled,
@@ -91,7 +91,7 @@ function useGetProjectPermissions(
   const getOrganizationDataFromParamsSlug = organizationSlugOverride === undefined && enabled
   const {
     data: organizationData,
-    isLoading: isLoadingOrganization,
+    isPending: isLoadingOrganization,
     isSuccess: isSuccessOrganization,
   } = useSelectedOrganizationQuery({
     enabled: getOrganizationDataFromParamsSlug,
@@ -104,7 +104,7 @@ function useGetProjectPermissions(
   const getProjectDataFromParamsRef = !!urlProjectRef && projectRefOverride === undefined && enabled
   const {
     data: projectData,
-    isLoading: isLoadingProject,
+    isPending: isLoadingProject,
     isSuccess: isSuccessProject,
   } = useSelectedProjectQuery({
     enabled: getProjectDataFromParamsRef,

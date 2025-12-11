@@ -26,9 +26,10 @@ import {
   PREVIEWER_DATEPICKER_HELPERS,
 } from './Logs.constants'
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
-import { maybeShowUpgradePrompt } from './Logs.utils'
+import { maybeShowUpgradePromptIfNotEntitled } from './Logs.utils'
 import { PreviewFilterPanelWithUniversal } from './PreviewFilterPanelWithUniversal'
 import UpgradePrompt from './UpgradePrompt'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 /**
  * Calculates the appropriate time range for bar click filtering based on the current time range duration.
@@ -206,6 +207,9 @@ export const LogsPreviewer = ({
     refresh()
   }
 
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
+  const entitledToAuditLogDays = getEntitlementNumericValue()
+
   const handleSearch: LogSearchCallback = async (event, { query, to, from }) => {
     if (event === 'search-input-change') {
       setSearch(query || '')
@@ -213,8 +217,10 @@ export const LogsPreviewer = ({
     } else if (event === 'event-chart-bar-click') {
       setTimeRange(from || '', to || '')
     } else if (event === 'datepicker-change') {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from || '', organization?.plan?.id)
-
+      const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+        from || '',
+        entitledToAuditLogDays
+      )
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       } else {
@@ -226,7 +232,10 @@ export const LogsPreviewer = ({
   // Show the prompt on page load based on query params
   useEffect(() => {
     if (timestampStart) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(timestampStart, organization?.plan?.id)
+      const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+        timestampStart,
+        entitledToAuditLogDays
+      )
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       }

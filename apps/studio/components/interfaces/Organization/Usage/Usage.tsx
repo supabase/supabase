@@ -1,21 +1,27 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
+import {
+  ScaffoldContainer,
+  ScaffoldHeader,
+  ScaffoldSection,
+  ScaffoldTitle,
+} from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import DateRangePicker from 'components/ui/DateRangePicker'
 import NoPermission from 'components/ui/NoPermission'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { OrgProject } from 'data/projects/org-projects-infinite-query'
+import { useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { Check, ChevronDown } from 'lucide-react'
+import { useQueryState } from 'nuqs'
 import { Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Restriction } from '../BillingSettings/Restriction'
@@ -25,41 +31,30 @@ import Egress from './Egress'
 import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
 
-// [Joshen] JFYI this component could use nuqs to handle `projectRef` state which will help
-// simplify some of the implementation here.
-
 export const Usage = () => {
-  const { slug, projectRef } = useParams()
+  const { slug } = useParams()
 
   const [dateRange, setDateRange] = useState<any>()
-  const [selectedProject, setSelectedProject] = useState<OrgProject>()
 
-  const [selectedProjectRefInputValue, setSelectedProjectRefInputValue] = useState<
-    string | undefined
-  >('all-projects')
+  const [selectedProjectRef, setSelectedProjectRef] = useQueryState('projectRef')
   const [openProjectSelector, setOpenProjectSelector] = useState(false)
-
-  // [Alaister] 'all-projects' is not a valid project ref, it's just used as an extra
-  // state for the select input. As such we need to remove it for the selected project ref
-  const selectedProjectRef =
-    selectedProjectRefInputValue === 'all-projects' ? undefined : selectedProjectRefInputValue
 
   const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
 
-  const { isSuccess: isSuccessProjectDetail } = useProjectDetailQuery({
-    ref: selectedProjectRef,
-  })
-
   const {
     data: subscription,
     error: subscriptionError,
-    isLoading: isLoadingSubscription,
+    isPending: isLoadingSubscription,
     isError: isErrorSubscription,
     isSuccess: isSuccessSubscription,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
+
+  const { data: selectedProject } = useProjectDetailQuery({
+    ref: selectedProjectRef ?? undefined,
+  })
 
   const billingCycleStart = useMemo(() => {
     return dayjs.unix(subscription?.current_period_start ?? 0).utc()
@@ -104,18 +99,22 @@ export const Usage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateRange, subscription])
 
-  useEffect(() => {
-    if (projectRef && isSuccessProjectDetail) {
-      setSelectedProjectRefInputValue(projectRef)
-    }
-    // [Joshen] Since we're already looking at isSuccess
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectRef, isSuccessProjectDetail])
+  const {
+    data: orgDailyStats,
+    error: orgDailyStatsError,
+    isPending: isLoadingOrgDailyStats,
+    isError: isErrorOrgDailyStats,
+  } = useOrgDailyStatsQuery({
+    orgSlug: slug,
+    projectRef: selectedProjectRef ?? undefined,
+    startDate,
+    endDate,
+  })
 
   return (
     <>
       <ScaffoldContainer>
-        <ScaffoldHeader>
+        <ScaffoldHeader className="pt-8">
           <ScaffoldTitle>Usage</ScaffoldTitle>
         </ScaffoldHeader>
       </ScaffoldContainer>
@@ -158,10 +157,9 @@ export const Usage = () => {
                   <OrganizationProjectSelector
                     open={openProjectSelector}
                     setOpen={setOpenProjectSelector}
-                    selectedRef={selectedProjectRefInputValue}
+                    selectedRef={selectedProjectRef}
                     onSelect={(project) => {
-                      setSelectedProject(project)
-                      setSelectedProjectRefInputValue(project.ref)
+                      setSelectedProjectRef(project.ref)
                     }}
                     renderTrigger={() => {
                       return (
@@ -173,14 +171,12 @@ export const Usage = () => {
                           className="justify-between w-[180px]"
                           iconRight={<ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
                         >
-                          {!selectedProject || selectedProjectRefInputValue === 'all-projects'
-                            ? 'All projects'
-                            : selectedProject?.name}
+                          {!selectedProject ? 'All projects' : selectedProject?.name}
                         </Button>
                       )
                     }}
                     renderRow={(project) => {
-                      const isSelected = selectedProjectRefInputValue === project.ref
+                      const isSelected = selectedProjectRef === project.ref
                       return (
                         <div className="w-full flex items-center justify-between">
                           <span className={cn('truncate', isSelected ? 'max-w-60' : 'max-w-64')}>
@@ -196,15 +192,15 @@ export const Usage = () => {
                           className="cursor-pointer flex items-center justify-between w-full"
                           onSelect={() => {
                             setOpenProjectSelector(false)
-                            setSelectedProjectRefInputValue('all-projects')
+                            setSelectedProjectRef(null)
                           }}
                           onClick={() => {
                             setOpenProjectSelector(false)
-                            setSelectedProjectRefInputValue('all-projects')
+                            setSelectedProjectRef(null)
                           }}
                         >
                           All projects
-                          {selectedProjectRefInputValue === 'all-projects' && <Check size={16} />}
+                          {!selectedProjectRef && <Check size={16} />}
                         </CommandItem_Shadcn_>
                       </CommandGroup_Shadcn_>
                     )}
@@ -242,7 +238,18 @@ export const Usage = () => {
         </ScaffoldContainer>
       </div>
 
-      {selectedProjectRef ? (
+      {isErrorOrgDailyStats && (
+        <ScaffoldContainer>
+          <ScaffoldSection isFullWidth className="pb-0">
+            <AlertError
+              error={orgDailyStatsError}
+              subject="Failed to retrieve usage statistics for organization"
+            />
+          </ScaffoldSection>
+        </ScaffoldContainer>
+      )}
+
+      {selectedProject ? (
         <ScaffoldContainer className="mt-5">
           <Admonition
             type="default"
@@ -282,31 +289,29 @@ export const Usage = () => {
       />
 
       {subscription?.plan.id !== 'free' && (
-        <Compute
-          orgSlug={slug as string}
-          projectRef={selectedProjectRef}
-          subscription={subscription}
-          startDate={startDate}
-          endDate={endDate}
-        />
+        <Compute orgDailyStats={orgDailyStats} isLoadingOrgDailyStats={isLoadingOrgDailyStats} />
       )}
 
       <Egress
         orgSlug={slug as string}
         projectRef={selectedProjectRef}
         subscription={subscription}
+        currentBillingCycleSelected={currentBillingCycleSelected}
+        orgDailyStats={orgDailyStats}
+        isLoadingOrgDailyStats={isLoadingOrgDailyStats}
         startDate={startDate}
         endDate={endDate}
-        currentBillingCycleSelected={currentBillingCycleSelected}
       />
 
       <SizeAndCounts
         orgSlug={slug as string}
         projectRef={selectedProjectRef}
         subscription={subscription}
+        currentBillingCycleSelected={currentBillingCycleSelected}
+        orgDailyStats={orgDailyStats}
+        isLoadingOrgDailyStats={isLoadingOrgDailyStats}
         startDate={startDate}
         endDate={endDate}
-        currentBillingCycleSelected={currentBillingCycleSelected}
       />
 
       <Activity
@@ -316,6 +321,8 @@ export const Usage = () => {
         startDate={startDate}
         endDate={endDate}
         currentBillingCycleSelected={currentBillingCycleSelected}
+        orgDailyStats={orgDailyStats}
+        isLoadingOrgDailyStats={isLoadingOrgDailyStats}
       />
     </>
   )

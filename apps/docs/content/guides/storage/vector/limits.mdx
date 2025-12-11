@@ -1,0 +1,21 @@
+---
+title: 'Vector Bucket Limits'
+subtitle: 'Understanding capacity, quotas, and billing for vector buckets.'
+---
+
+<Admonition type="caution" title="This feature is in alpha">
+
+Expect rapid changes, limited features, and possible breaking updates. [Share feedback](https://github.com/orgs/supabase/discussions/40116) as we refine the experience and expand access.
+
+</Admonition>
+
+Vector buckets have default limits during the alpha phase. These limits are designed to ensure fair resource allocation and can be adjusted on a case-by-case basis for production workloads.
+
+## Storage limits
+
+| Limit                   | Value        | Notes                                                 |
+| ----------------------- | ------------ | ----------------------------------------------------- |
+| **Buckets per project** | 10           | Maximum number of vector buckets per Supabase project |
+| **Indexes per bucket**  | 10           | Maximum number of indexes per bucket                  |
+| **Vector dimensions**   | Max 4096     | Maximum dimension size for embeddings                 |
+| **Batch size**          | 1000 vectors | Maximum vectors per single insert/update request      |

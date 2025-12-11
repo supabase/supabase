@@ -142,6 +142,20 @@ class PostHogClient {
       console.error('PostHog identify failed:', error)
     }
   }
+
+  reset() {
+    this.pendingIdentification = null
+    this.pendingGroups = {}
+    this.pendingEvents = []
+
+    if (!this.initialized) return
+
+    try {
+      posthog.reset()
+    } catch (error) {
+      console.error('PostHog reset failed:', error)
+    }
+  }
 }
 
 export const posthogClient = new PostHogClient()

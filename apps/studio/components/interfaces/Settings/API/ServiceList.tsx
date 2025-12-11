@@ -1,4 +1,6 @@
 import { AlertCircle } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
 
 import { useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
@@ -16,17 +18,25 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { PostgrestConfig } from './PostgrestConfig'
 
 export const ServiceList = () => {
-  const { data: project, isLoading } = useSelectedProjectQuery()
+  const { data: project, isPending: isLoading } = useSelectedProjectQuery()
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
+
+  const [querySource, setQuerySource] = useQueryState('source', parseAsString)
 
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
   const {
     data: databases,
     isError,
-    isLoading: isLoadingDatabases,
+    isPending: isLoadingDatabases,
   } = useReadReplicasQuery({ projectRef })
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef })
+
+  useEffect(() => {
+    if (querySource && querySource !== state.selectedDatabaseId) {
+      state.setSelectedDatabaseId(querySource)
+    }
+  }, [querySource, state, projectRef])
 
   // Get the API service
   const isCustomDomainActive = customDomainData?.customDomain?.status === 'active'
@@ -61,6 +71,9 @@ export const ServiceList = () => {
                     ? [{ id: 'load-balancer', name: 'API Load Balancer' }]
                     : []
                 }
+                onSelectId={() => {
+                  setQuerySource(null)
+                }}
               />
             </CardHeader>
             <CardContent>
@@ -95,7 +108,7 @@ export const ServiceList = () => {
                         : 'RESTful endpoint for querying and managing your database'
                   }
                 >
-                  <Input copy readOnly disabled className="input-mono" value={endpoint} />
+                  <Input copy readOnly className="font-mono" value={endpoint} />
                 </FormLayout>
               )}
             </CardContent>

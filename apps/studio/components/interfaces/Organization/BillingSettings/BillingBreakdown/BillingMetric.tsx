@@ -157,7 +157,10 @@ export const BillingMetric = ({
             </div>
           ) : (
             <div>
-              <UpgradePlanButton source={`billingBreakdownUsage${metric.anchor}`}>
+              <UpgradePlanButton
+                source={`billingBreakdownUsage${metric.anchor}`}
+                featureProposition={`to use ${metric.name}`}
+              >
                 Upgrade
               </UpgradePlanButton>
             </div>

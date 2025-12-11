@@ -6,7 +6,7 @@ import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import type { ContentProps } from './Content.types'
 
-const Bucket = ({ language, apikey = 'API_KEY', endpoint }: ContentProps) => {
+export const EdgeFunction = ({ language, apikey = 'API_KEY', endpoint }: ContentProps) => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
   const { data } = useEdgeFunctionsQuery({ projectRef: ref })
@@ -37,5 +37,3 @@ const Bucket = ({ language, apikey = 'API_KEY', endpoint }: ContentProps) => {
     </div>
   )
 }
-
-export default Bucket

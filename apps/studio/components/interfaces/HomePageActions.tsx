@@ -1,13 +1,13 @@
+import { useDebounce } from '@uidotdev/usehooks'
 import { Filter, Grid, List, Loader2, Plus, Search, X } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 
-import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { PROJECT_STATUS } from 'lib/constants'
-import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -19,6 +19,7 @@ import {
   ToggleGroupItem,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { keepPreviousData } from '@tanstack/react-query'
 
 interface HomePageActionsProps {
   slug?: string
@@ -49,7 +50,7 @@ export const HomePageActions = ({
       search: search.length === 0 ? search : debouncedSearch,
       statuses: filterStatus,
     },
-    { keepPreviousData: true }
+    { placeholderData: keepPreviousData }
   )
 
   return (
@@ -57,9 +58,9 @@ export const HomePageActions = ({
       <div className="flex items-center gap-2">
         <Input
           placeholder="Search for a project"
-          icon={<Search size={12} />}
+          icon={<Search />}
           size="tiny"
-          className="w-32 md:w-64 pl-8 [&>div>div>div>input]:!pl-7 [&>div>div>div>div]:!pl-2"
+          className="w-32 md:w-64"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           actions={[
@@ -83,7 +84,13 @@ export const HomePageActions = ({
               icon={<Filter />}
             />
           </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
+          <PopoverContent_Shadcn_
+            className="p-0 w-56"
+            side="bottom"
+            align="center"
+            sideOffset={6}
+            portal={true}
+          >
             <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
               <p className="text-xs">Filter projects by status</p>
               <div className="flex flex-col">
@@ -91,34 +98,22 @@ export const HomePageActions = ({
                   { key: PROJECT_STATUS.ACTIVE_HEALTHY, label: 'Active' },
                   { key: PROJECT_STATUS.INACTIVE, label: 'Paused' },
                 ].map(({ key, label }) => (
-                  <div key={key} className="group flex items-center justify-between py-0.5">
-                    <div className="flex items-center gap-x-2">
-                      <Checkbox_Shadcn_
-                        id={key}
-                        name={key}
-                        checked={filterStatus.length === 0 || filterStatus.includes(key)}
-                        onCheckedChange={() => {
-                          if (filterStatus.includes(key)) {
-                            setFilterStatus(filterStatus.filter((y) => y !== key))
-                          } else if (filterStatus.length === 1) {
-                            setFilterStatus([])
-                          } else {
-                            setFilterStatus(filterStatus.concat([key]))
-                          }
-                        }}
-                      />
-                      <Label_Shadcn_ htmlFor={key} className="capitalize text-xs">
-                        {label}
-                      </Label_Shadcn_>
-                    </div>
-                    <Button
-                      size="tiny"
-                      type="default"
-                      onClick={() => setFilterStatus([key])}
-                      className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
-                    >
-                      Select only
-                    </Button>
+                  <div className="flex items-center gap-x-2 py-1" key={key}>
+                    <Checkbox_Shadcn_
+                      id={key}
+                      name={key}
+                      checked={filterStatus.includes(key)}
+                      onCheckedChange={() => {
+                        if (filterStatus.includes(key)) {
+                          setFilterStatus(filterStatus.filter((y) => y !== key))
+                        } else {
+                          setFilterStatus(filterStatus.concat([key]))
+                        }
+                      }}
+                    />
+                    <Label_Shadcn_ htmlFor={key} className="capitalize text-xs w-full">
+                      {label}
+                    </Label_Shadcn_>
                   </div>
                 ))}
               </div>

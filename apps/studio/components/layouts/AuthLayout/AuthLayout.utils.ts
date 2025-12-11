@@ -9,8 +9,9 @@ export const generateAuthMenu = (
     authenticationEmails: boolean
     authenticationMultiFactor: boolean
     authenticationAttackProtection: boolean
-    authenticationAdvanced: boolean
     authenticationShowOverview: boolean
+    authenticationOauth21: boolean
+    authenticationPerformance: boolean
   }
 ): ProductMenuGroup[] => {
   const {
@@ -19,8 +20,9 @@ export const generateAuthMenu = (
     authenticationEmails,
     authenticationMultiFactor,
     authenticationAttackProtection,
-    authenticationAdvanced,
     authenticationShowOverview,
+    authenticationOauth21,
+    authenticationPerformance,
   } = flags ?? {}
 
   return [
@@ -31,8 +33,38 @@ export const generateAuthMenu = (
           ? [{ name: 'Overview', key: 'overview', url: `/project/${ref}/auth/overview`, items: [] }]
           : []),
         { name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] },
+        ...(authenticationOauth21
+          ? [
+              {
+                name: 'OAuth Apps',
+                key: 'oauth-apps',
+                url: `/project/${ref}/auth/oauth-apps`,
+                items: [],
+              },
+            ]
+          : []),
       ],
     },
+    ...(authenticationEmails && IS_PLATFORM
+      ? [
+          {
+            title: 'Notifications',
+            items: [
+              ...(authenticationEmails
+                ? [
+                    {
+                      name: 'Email',
+                      key: 'email',
+                      pages: ['templates', 'smtp'],
+                      url: `/project/${ref}/auth/templates`,
+                      items: [],
+                    },
+                  ]
+                : []),
+            ],
+          },
+        ]
+      : []),
     {
       title: 'Configuration',
       items: [
@@ -55,6 +87,16 @@ export const generateAuthMenu = (
                     },
                   ]
                 : []),
+              ...(authenticationOauth21
+                ? [
+                    {
+                      name: 'OAuth Server',
+                      key: 'oauth-server',
+                      url: `/project/${ref}/auth/oauth-server`,
+                      label: 'Beta',
+                    },
+                  ]
+                : []),
               {
                 name: 'Sessions',
                 key: 'sessions',
@@ -67,17 +109,6 @@ export const generateAuthMenu = (
                       name: 'Rate Limits',
                       key: 'rate-limits',
                       url: `/project/${ref}/auth/rate-limits`,
-                      items: [],
-                    },
-                  ]
-                : []),
-              ...(authenticationEmails
-                ? [
-                    {
-                      name: 'Emails',
-                      key: 'emails',
-                      pages: ['templates', 'smtp'],
-                      url: `/project/${ref}/auth/templates`,
                       items: [],
                     },
                   ]
@@ -113,21 +144,20 @@ export const generateAuthMenu = (
                 key: 'hooks',
                 url: `/project/${ref}/auth/hooks`,
                 items: [],
-                label: 'BETA',
+                label: 'Beta',
               },
               {
                 name: 'Audit Logs',
                 key: 'audit-logs',
                 url: `/project/${ref}/auth/audit-logs`,
                 items: [],
-                label: 'BETA',
               },
-              ...(authenticationAdvanced
+              ...(authenticationPerformance
                 ? [
                     {
-                      name: 'Advanced',
-                      key: 'advanced',
-                      url: `/project/${ref}/auth/advanced`,
+                      name: 'Performance',
+                      key: 'performance',
+                      url: `/project/${ref}/auth/performance`,
                       items: [],
                     },
                   ]
