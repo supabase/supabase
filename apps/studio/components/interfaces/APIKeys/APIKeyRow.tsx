@@ -36,8 +36,7 @@ export const APIKeyRow = ({
   setKeyToDelete: (id: string | null) => void
 }) => {
   const MotionTableRow = motion.create(TableRow)
-
-  const hideApiKeyLastUsed = useFlag('HideApiKeyLastUsed')
+  const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
 
   return (
     <>
@@ -68,7 +67,7 @@ export const APIKeyRow = ({
           </div>
         </TableCell>
 
-        {showLastSeen && !hideApiKeyLastUsed && (
+        {showLastSeen && showApiKeysLastUsed && (
           <TableCell className="py-2 min-w-0 whitespace-nowrap hidden lg:table-cell">
             <div className="truncate" title={lastSeen?.timestamp.toString() || 'Never used'}>
               {isLoadingLastSeen ? (

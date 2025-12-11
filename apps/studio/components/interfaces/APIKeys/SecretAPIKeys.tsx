@@ -29,10 +29,7 @@ interface LastSeenData {
   [hash: string]: { timestamp: number; relative: string }
 }
 
-function useLastSeen(
-  projectRef: string,
-  enabled?: boolean
-): {
+function useLastSeen({ projectRef, enabled }: { projectRef: string; enabled?: boolean }): {
   data?: LastSeenData
   isLoading: boolean
 } {
@@ -84,11 +81,11 @@ export const SecretAPIKeys = () => {
     isError: isErrorApiKeys,
   } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
 
-  const hideApiKeyLastUsed = useFlag('HideApiKeyLastUsed') ?? true
-  const { data: lastSeen, isLoading: isLoadingLastSeen } = useLastSeen(
-    projectRef ?? '',
-    !hideApiKeyLastUsed
-  )
+  const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
+  const { data: lastSeen, isLoading: isLoadingLastSeen } = useLastSeen({
+    projectRef: projectRef ?? '',
+    enabled: showApiKeysLastUsed,
+  })
 
   const secretApiKeys = useMemo(
     () =>
@@ -159,7 +156,7 @@ export const SecretAPIKeys = () => {
               <TableRow className="bg-200">
                 <TableHead>Name</TableHead>
                 <TableHead>API Key</TableHead>
-                {!hideApiKeyLastUsed && (
+                {showApiKeysLastUsed && (
                   <TableHead className="hidden lg:table-cell">Last Used</TableHead>
                 )}
                 <TableHead />

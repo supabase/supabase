@@ -42,13 +42,13 @@ A [Table](../components/table) instance with zero results should display a singl
 
 <ComponentPreview name="empty-state-zero-items-table" peekCode wide />
 
-#### DataGrid
+#### Data Grid
 
-[DataGrid](../components/data-table) typically spans the full height and width of a container. A classic example is [Users](https://supabase.com/dashboard/project/_/auth/users), which (as it sounds) displays a list of the project’s registered users. Any instance with zero results should display a more prominent empty with a clear title, description, and supporting illustration.
+[Data Grid](../ui-patterns/tables#data-grid) and [Data Table](../ui-patterns/tables#data-table) component patterns typically span the full height and width of a container. A classic example is [Users](https://supabase.com/dashboard/project/_/auth/users), which (as it sounds) displays a list of the project’s registered users. Any instance with zero results should display a more prominent empty with a clear title, description, and supporting illustration.
 
-<ComponentPreview name="empty-state-zero-items-data-grid" peekCode wide />
+<ComponentPreview name="data-grid-empty-state" peekCode wide />
 
-Other DataGrid instances include [Cron Jobs](https://supabase.com/dashboard/project/_/integrations/cron/jobs) and [Queues](https://supabase.com/dashboard/project/_/integrations/queues).
+Other Data Grid instances include [Cron Jobs](https://supabase.com/dashboard/project/_/integrations/cron/jobs) and [Queues](https://supabase.com/dashboard/project/_/integrations/queues).
 
 ## Missing route
 
@@ -61,7 +61,3 @@ Users may accidentally navigate to a non-existent dynamic route, such as a non-e
 For presentational empty states (initial states with value propositions and actions), use the [EmptyStatePresentational](../fragments/empty-state-presentational) component from `ui-patterns`. This component provides a consistent structure with support for icons, titles, descriptions, and action buttons.
 
 For other empty state scenarios (zero results, missing routes, etc), custom components may still be appropriate as the context and needs for each placement can differ significantly.
-
-## External references
-
-- [_Empty States_ on GitHub Primer](https://primer.style/product/ui-patterns/empty-states/)
