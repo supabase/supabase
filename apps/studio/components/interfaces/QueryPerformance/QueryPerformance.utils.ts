@@ -64,7 +64,6 @@ export function captureQueryPerformanceError(
       queryType: context.queryType,
       postgresVersion: context.postgresVersion,
       databaseType: context.databaseType,
-      sql: context.sql?.substring(0, 1000),
       errorMessage: context.errorMessage,
     })
 
