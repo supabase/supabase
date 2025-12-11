@@ -16,6 +16,10 @@ jobs:
     name: Run evals
     runs-on: ubuntu-latest
 
+    env:
+      BRAINTRUST_PROJECT_ID: "ec4bfca4-0f06-4659-8007-9b638e3fdddc" # Hardcoded for testing, not sensitive
+      # BRAINTRUST_PROJECT_ID: ${{ secrets.BRAINTRUST_PROJECT_ID }} # Eventually configure at repo level
+
     steps:
       - name: Checkout
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
