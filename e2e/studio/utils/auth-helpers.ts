@@ -79,13 +79,11 @@ export const deleteUserViaUI = async (page: Page, ref: string, email: string) =>
 }
 
 export const navigateToAuthUsers = async (page: Page, ref: string) => {
-  const userListPromise = waitForApiResponse(page, 'platform/pg-meta', ref, 'query?key=')
-
   await page.goto(toUrl(`/project/${ref}/auth/users`))
 
   // Wait for the page to load by checking for the "Users" heading
   await expect(page.getByRole('heading', { name: 'Users', level: 3 })).toBeVisible()
 
   // Wait for initial users list to load
-  await userListPromise
+  await waitForApiResponse(page, 'platform/pg-meta', ref, 'query?key=')
 }
