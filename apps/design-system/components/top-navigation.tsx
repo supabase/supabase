@@ -11,20 +11,14 @@ function TopNavigation() {
       <nav className="h-14 w-full flex">
         <div className="max-w-site border-b w-full flex flex-row items-center gap-6 mx-auto px-6 border-r border-l justify-between">
           <div className="flex items-center gap-8">
-            <Link href="/">
-              <h1>Supabase Design System</h1>
+            <Link href="/" className="flex items-center gap-2">
+              <h1 className="hidden md:flex line-clamp-1 lg:text-2xl text-base">
+                Supabase Design System
+              </h1>
+              <HomepageSvgHandler name="design-system-marks" className="h-4 w-auto" />
             </Link>
-            <HomepageSvgHandler name="design-system-marks" className="h-4 w-auto" />
           </div>
-          {/* {docsConfig.mainNav.map((section) => (
-            <>
-            <div className="font-mono uppercase text-xs text-foreground-lighter">
-            {section.title}
-            </div>
-            </>
-          ))} */}
-          <div className="flex items-center gap-8">
-            {/* <TopNavigationSearch /> */}
+          <div className="flex items-center gap-2">
             <CommandMenu />
             <ThemeSwitcherDropdown />
           </div>
