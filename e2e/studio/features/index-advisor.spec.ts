@@ -2,10 +2,17 @@ import { expect, Page } from '@playwright/test'
 import { env } from '../env.config.js'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
-import { createApiResponseWaiter, waitForApiResponse } from '../utils/wait-for-response.js'
+import { waitForApiResponse } from '../utils/wait-for-response.js'
 
 /**
  * Index Advisor E2E Tests
+ *
+ * Tests the Index Advisor functionality by:
+ * 1. Checking if extensions are available
+ * 2. Enabling Index Advisor via Database > Extensions page
+ * 3. Verifying the Warnings filter appears after enabling
+ * 4. Creating test tables and running queries
+ * 5. Checking that Index Advisor warnings appear
  *
  * Anti-flakiness measures implemented:
  * - Replaced `waitForTimeout()` with proper element/API waits
@@ -14,7 +21,7 @@ import { createApiResponseWaiter, waitForApiResponse } from '../utils/wait-for-r
  * - Defensive state checking with `refreshIndexAdvisorState()` helper
  * - Cleanup test table in afterAll to prevent interference with subsequent runs
  * - Use longer timeouts for operations that depend on extension initialization
- * - Graceful handling of optional UI elements (banners, save buttons)
+ * - Graceful handling of optional UI elements (save buttons)
  * - All API waits wrapped in try-catch to handle timeouts gracefully
  * - API response waiters set up BEFORE triggering actions (critical for extension enabling)
  */
@@ -326,42 +333,6 @@ test.describe.serial('Index Advisor', () => {
   })
 
   test.describe('Enable Index Advisor', () => {
-    test('should display Index Advisor banner when not enabled', async ({ ref }) => {
-      if (isIndexAdvisorEnabled) {
-        test.skip(true, 'Index Advisor is already enabled')
-      }
-
-      // Navigate to query performance page
-      await page.goto(toUrl(`/project/${ref}/observability/query-performance`))
-      await page.waitForLoadState('networkidle')
-
-      await expect(
-        page.getByRole('heading', { name: 'Query Performance' }),
-        'Query Performance heading should be visible'
-      ).toBeVisible()
-
-      // Check for the banner
-      const banner = page.locator('.fixed.bottom-4.right-4')
-
-      // Wait for potential banner to appear or timeout quickly
-      try {
-        await banner.waitFor({ state: 'visible', timeout: 3000 })
-
-        // Hover over the banner to make it interactive
-        await banner.hover()
-
-        // Wait for banner content to be visible after hover
-        const enableText = page.getByText('Enable Index Advisor')
-        await expect(
-          enableText,
-          'Enable Index Advisor text should be visible in banner'
-        ).toBeVisible({ timeout: 2000 })
-      } catch (e) {
-        // Banner not present, which is fine - it may not always show
-        console.log('Banner not visible, which is acceptable')
-      }
-    })
-
     test('should enable Index Advisor via Database > Extensions page', async ({ ref }) => {
       // Refresh state to ensure it's current
       await refreshIndexAdvisorState(ref)
@@ -375,70 +346,6 @@ test.describe.serial('Index Advisor', () => {
       // Verify both extensions are now enabled and update state
       await refreshIndexAdvisorState(ref)
       expect(isIndexAdvisorEnabled, 'Both extensions should be enabled after enabling').toBe(true)
-    })
-
-    test('should show banner dialog and enable via banner', async ({ ref }) => {
-      // Refresh state to ensure it's current
-      await refreshIndexAdvisorState(ref)
-
-      if (isIndexAdvisorEnabled) {
-        test.skip(true, 'Index Advisor is already enabled')
-      }
-
-      await page.goto(toUrl(`/project/${ref}/observability/query-performance`))
-      await page.waitForLoadState('networkidle')
-
-      const banner = page.locator('.fixed.bottom-4.right-4')
-
-      // Wait for banner to be visible
-      try {
-        await banner.waitFor({ state: 'visible', timeout: 3000 })
-      } catch (e) {
-        test.skip(true, 'Banner is not visible, using extensions page instead')
-      }
-
-      // Hover over the banner
-      await banner.hover()
-
-      // Wait for Enable button to appear after hover
-      const enableButton = page.getByRole('button', { name: 'Enable', exact: true })
-      await enableButton.waitFor({ state: 'visible', timeout: 2000 })
-      await enableButton.click()
-
-      // Verify dialog content
-      const dialogHeading = page.getByRole('heading', { name: 'Enable Index Advisor' })
-      await expect(dialogHeading, 'Dialog title should be visible').toBeVisible({ timeout: 5000 })
-
-      await expect(
-        page.getByText('index_advisor'),
-        'index_advisor extension should be mentioned'
-      ).toBeVisible()
-
-      await expect(page.getByText('hypopg'), 'hypopg extension should be mentioned').toBeVisible()
-
-      // Enable the extensions
-      const extensionCreateWait = createApiResponseWaiter(
-        page,
-        'pg-meta',
-        ref,
-        'query?key=extension-create'
-      )
-      await page.getByRole('button', { name: 'Enable Extensions' }).click()
-
-      try {
-        await extensionCreateWait
-      } catch (e) {
-        console.warn('Extension create API timeout:', (e as Error).message)
-      }
-
-      // Verify success (this is the real confirmation)
-      await expect(
-        page.getByText('Successfully enabled Index Advisor!'),
-        'Success toast should be visible'
-      ).toBeVisible({ timeout: 15000 })
-
-      // Update state
-      await refreshIndexAdvisorState(ref)
     })
 
     test('should show Warnings filter after Index Advisor is enabled', async ({ ref }) => {
