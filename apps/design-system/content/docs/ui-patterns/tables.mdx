@@ -11,28 +11,47 @@ The choice of table component depends on several factors: the complexity of the 
 
 There are three main table components, each optimized for different use cases:
 
-[Table](../components/table) is a low-level, presentational table component.
-[Data Table](../components/data-table) builds on Table and TanStack Table to provide a feature-rich data browsing experience (sorting, filtering, pagination, etc.).
-Data Grid is a separate grid implementation used for highly interactive, spreadsheet-like surfaces and very large datasets.
+- [Table](../components/table) is a low-level, presentational table component.
+- [Data Table](../components/data-table) builds on [Table](../components/table) and TanStack Table to provide a feature-rich data browsing experience (sorting, filtering, pagination, etc.).
+- Data Grid is a separate grid implementation used for highly interactive, spreadsheet-like surfaces and very large datasets.
+
+A shorthand is that Table is for tables inline on the page. Data Table is for full-width presentations. Data Grid is similar but predates Data Table, and will soon be deprecated.
+
+Data Table and Data Grid are both _pattern-components_, meaning they are so bespoke they should be created afresh each time. Rather than simply reusing a compositional component.
 
 ### Table
 
-The [Table](../components/table) component is designed for simple, static tabular data presentation. Use it when:
+[Table](../components/table) is designed for simple, static tabular data presentation. It is a presentational wrapper around the HTML `<table>` element. Use it when:
 
 - Displaying a fixed, known number of rows
 - The data is primarily read-only
 - Sort, filter, or search actions are not required or can be basic
 
+<ComponentPreview name="table-demo" peekCode wide />
+
 ### Data Table
 
-The [Data Table](../components/data-table) component is designed for immersive, data-heavy experiences. Use it when:
+[Data Table](../components/data-table) is a pattern-component built on top of [Table](../components/table) and TanStack Table. It is designed to extend Table with column definitions and row models (via TanStack) and for more complex sorting, filtering, and row actions. is designed for immersive, data-heavy experiences. Use it when:
 
 - Displaying large datasets that require pagination
 - Users need to perform complex sort, filter, or search actions through the data
 - Row selection is required
-- The table is the primary focus of the page
-- Full-viewport layouts are appropriate
 
-## Data Grid
+### Data Grid
 
-Studio-only.
+Data Grid is a Studio-only pattern-component and therefore not available in the Design System. It is based on [React Data Grid](https://comcast.github.io/react-data-grid/#/CommonFeatures) and originally adopted for areas like Table Editor, Query Performance, and other high-interaction surfaces.
+
+Use it only when you need virtualization, column resizing, or complex cell editing. Otherwise Data Table is simpler and more flexible.
+
+## Future
+
+Data Table and Data Grid overlap significantly. We’re looking at consolidating these into one data table component, which will likely be improvements to Data Table given the numerous advantages of TanStack Table and difficulties extending React Data Grid.
+
+The likely end-state will be a single DataTable component built on TanStack Table, with:
+
+- Virtualization
+- Resizable columns
+- Plug-in cell editors
+- Shared filtering/sorting utilities
+- Shared UI patterns (horizontal and vertical filter bars, date pickers, side panels)
+- Accessible HTML table markup
