@@ -22,7 +22,7 @@ const policies = [
   },
 ]
 
-const handleBucketNavigation = (
+const handlePolicyNavigation = (
   bucketId: string,
   event: React.MouseEvent | React.KeyboardEvent
 ) => {
@@ -58,13 +58,13 @@ export default function TableRowLinkActions() {
               className="relative cursor-pointer inset-focus"
               onClick={(event) => {
                 if (event.currentTarget !== event.target) return
-                handleBucketNavigation(policy.id, event)
+                handlePolicyNavigation(policy.id, event)
               }}
               onKeyDown={(event) => {
                 if (event.currentTarget !== event.target) return
                 if (event.key === 'Enter' || event.key === ' ') {
                   event.preventDefault()
-                  handleBucketNavigation(policy.id, event)
+                  handlePolicyNavigation(policy.id, event)
                 }
               }}
               tabIndex={0}

@@ -53,8 +53,12 @@ export default function TableRowLink() {
             <TableRow
               key={bucket.id}
               className="relative cursor-pointer inset-focus"
-              onClick={(event) => handleBucketNavigation(bucket.id, event)}
+              onClick={(event) => {
+                if (event.currentTarget !== event.target) return
+                handleBucketNavigation(bucket.id, event)
+              }}
               onKeyDown={(event) => {
+                if (event.currentTarget !== event.target) return
                 if (event.key === 'Enter' || event.key === ' ') {
                   event.preventDefault()
                   handleBucketNavigation(bucket.id, event)
