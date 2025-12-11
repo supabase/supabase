@@ -19,7 +19,7 @@ import {
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
 import { ChartHeader } from './ChartHeader'
-import { ChartHighlightActions, ChartHighlightAction } from './ChartHighlightActions'
+import { ChartHighlightAction, ChartHighlightActions } from './ChartHighlightActions'
 import {
   CHART_COLORS,
   DateTimeFormats,
@@ -68,6 +68,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   docsUrl?: string
   sql?: string
   highlightActions?: ChartHighlightAction[]
+  showNewBadge?: boolean
 }
 
 export function ComposedChart({
@@ -110,6 +111,7 @@ export function ComposedChart({
   sql,
   highlightActions,
   titleTooltip,
+  showNewBadge,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
   const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
@@ -221,7 +223,12 @@ export function ComposedChart({
 
     if (shouldFormatBytes) {
       const bytesValue = isNetworkChart ? Math.abs(value) : value
-      return formatBytes(bytesValue, valuePrecision)
+      const formatted = formatBytes(bytesValue, valuePrecision)
+      return format === 'bytes-per-second' ? `${formatted}/s` : formatted
+    }
+
+    if (valuePrecision === 0 && value > 0 && value < 1) {
+      return '<1'
     }
 
     return numberFormatter(value, valuePrecision)
@@ -288,7 +295,9 @@ export function ComposedChart({
     att.name.toLowerCase().includes('pg_database_size')
   )
   const isNetworkChart = chartData?.some((att: any) => att.name.toLowerCase().includes('network_'))
-  const shouldFormatBytes = isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
+  const isBytesFormat = format === 'bytes' || format === 'bytes-per-second'
+  const shouldFormatBytes =
+    isBytesFormat || isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
   //*
   // Set the y-axis domain
   // to the highest value in the chart data for percentage charts
@@ -303,6 +312,7 @@ export function ComposedChart({
   if (data.length === 0) {
     return (
       <NoDataPlaceholder
+        hideTotalPlaceholder={highlightedValue === undefined}
         message={emptyStateMessage}
         description="It may take up to 24 hours for data to refresh"
         size={size}
@@ -319,6 +329,7 @@ export function ComposedChart({
       <ChartHeader
         hideHighlightedValue={hideHighlightedValue}
         title={title}
+        showNewBadge={showNewBadge}
         format={format}
         hideHighlightedLabel={hideHighlightedLabel}
         hideHighlightArea={hideHighlightArea}
@@ -350,30 +361,34 @@ export function ComposedChart({
           data={data}
           syncId={syncId}
           style={{ cursor: 'crosshair' }}
-          onMouseMove={(e: any) => {
+          onMouseMove={({ activeLabel, activeTooltipIndex, activePayload }) => {
+            if (!activeTooltipIndex) return
+
             setIsActiveHoveredChart(true)
-            if (e.activeTooltipIndex !== focusDataIndex) {
-              setFocusDataIndex(e.activeTooltipIndex)
-              setActivePayload(e.activePayload)
+            if (activeTooltipIndex !== focusDataIndex) {
+              setFocusDataIndex(activeTooltipIndex)
+              setActivePayload(activePayload ?? [])
             }
 
-            setHover(e.activeTooltipIndex)
+            setHover(activeTooltipIndex)
 
-            const activeTimestamp = data[e.activeTooltipIndex]?.timestamp
+            const activeTimestamp = data[activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseMove({
               activeLabel: activeTimestamp?.toString(),
-              coordinates: e.activeLabel,
+              coordinates: activeLabel,
             })
           }}
-          onMouseDown={(e: any) => {
-            const activeTimestamp = data[e.activeTooltipIndex]?.timestamp
+          onMouseDown={({ activeLabel, activeTooltipIndex }) => {
+            if (!activeTooltipIndex) return
+
+            const activeTimestamp = data[activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseDown({
               activeLabel: activeTimestamp?.toString(),
-              coordinates: e.activeLabel,
+              coordinates: activeLabel,
             })
           }}
           onMouseUp={chartHighlight?.handleMouseUp}
-          onMouseLeave={(e) => {
+          onMouseLeave={() => {
             setIsActiveHoveredChart(false)
             setFocusDataIndex(null)
             setActivePayload(null)

@@ -22,8 +22,8 @@ const CustomDomainsConfigureHostname = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { mutate: checkCNAMERecord, isLoading: isCheckingRecord } = useCheckCNAMERecordMutation()
-  const { mutate: createCustomDomain, isLoading: isCreating } = useCustomDomainCreateMutation()
+  const { mutate: checkCNAMERecord, isPending: isCheckingRecord } = useCheckCNAMERecordMutation()
+  const { mutate: createCustomDomain, isPending: isCreating } = useCustomDomainCreateMutation()
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
 
   const FORM_ID = 'custom-domains-form'
@@ -66,7 +66,7 @@ const CustomDomainsConfigureHostname = () => {
             <FormPanel
               disabled={!canConfigureCustomDomain}
               footer={
-                <div className="flex py-4 px-8">
+                <div className="flex py-4 px-[var(--card-padding-x)]">
                   <FormActions
                     form={FORM_ID}
                     isSubmitting={isCheckingRecord || isCreating}
@@ -101,13 +101,13 @@ const CustomDomainsConfigureHostname = () => {
                 <p className="col-span-12 text-sm lg:col-span-7 leading-6">
                   Set up a CNAME record for{' '}
                   {values.domain ? (
-                    <code className="text-xs">{values.domain}</code>
+                    <code className="text-code-inline">{values.domain}</code>
                   ) : (
                     'your custom domain'
                   )}{' '}
                   resolving to{' '}
                   {endpoint ? (
-                    <code className="text-xs">{endpoint}</code>
+                    <code className="text-code-inline">{endpoint}</code>
                   ) : (
                     "your project's API URL"
                   )}{' '}

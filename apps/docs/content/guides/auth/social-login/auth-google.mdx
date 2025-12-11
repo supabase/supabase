@@ -39,12 +39,12 @@ It's strongly recommended you set up a custom domain and optionally verify your 
 
 </Admonition>
 
-Google's consent screen is shown to users when they sign in. Optionally configure the following to improve the appearance of the screen, increasing the perception of trust by your users:
+Google's consent screen is shown to users when they sign in. Optionally configure one of the following to improve the appearance of the screen, increasing the perception of trust by your users:
 
+1. Verify your application's brand (logo and name) by configuring it in the [Branding](https://console.cloud.google.com/auth/branding) section of the Google Auth Platform console. Brand verification is not automatic and may take a few business days.
 1. Set up a [custom domain for your project](/docs/guides/platform/custom-domains) to present the user with a clear relationship to the website they clicked Sign in with Google on.
    - A good approach is to use `auth.example.com` or `api.example.com`, if your application is hosted on `example.com`.
    - If you don't set this up, users will see `<project-id>.supabase.co` which does not inspire trust and can make your application more susceptible to successful phishing attempts.
-1. Verify your application's brand (logo and name) by configuring it in the [Branding](https://console.cloud.google.com/auth/branding) section of the Google Auth Platform console. Brand verification is not automatic and may take a few business days.
 
 ## Project setup
 
@@ -571,7 +571,7 @@ Future<void> _nativeGoogleSignIn() async {
 
 <TabPanel id="flutter-other" label="Flutter (web, macOS, Windows, Linux)">
 
-Google sign-in with Supabase on Web, macOS, Windows, and Linux is done through the [`signInWithOAuth`](docs/reference/dart/auth-signinwithoauth) method.
+Google sign-in with Supabase on Web, macOS, Windows, and Linux is done through the [`signInWithOAuth`](/docs/reference/dart/auth-signinwithoauth) method.
 
 This method of signing in is web based, and will open a browser window to perform the sign in. For non-web platforms, the user is brought back to the app via [deep linking](/docs/guides/auth/native-mobile-deep-linking?platform=flutter).
 
@@ -702,7 +702,7 @@ When using [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multipla
 
 **Initialize the Supabase Client**
 
-**Note:** You have to create OAuth credentials for both a Web and Android application. [Learn more](https://developers.google.com/identity/one-tap/android/get-started#api-console)
+**Note:** You have to create OAuth credentials for both a Web and Android application. [Learn more](https://developer.android.com/identity/legacy/one-tap/legacy-get-started)
 
 ```kotlin
 val supabaseClient = createSupabaseClient(

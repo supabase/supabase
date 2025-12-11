@@ -72,13 +72,13 @@ These error are normal a side effect of issues in your custom user management lo
 
 Use the hints provided in the error message to fix issues in your custom user management logic.
 
-**Trigger/trigger function related error messages** - [Solution for trigger related issues](#solution-trigger)
+**Trigger/trigger function related error messages** - [Solution for trigger related issues](/docs/guides/troubleshooting/dashboard-errors-when-managing-users-N1ls4A#solution-for-trigger-related-issues)
 
 ```
 "error":"error update user`s last_sign_in field: ERROR: permission denied for table profiles (SQLSTATE 42501)"
 ```
 
-**Constraint related error message** - [Solution for constraint related issues](#solution-constraint)
+**Constraint related error message** - [Solution for constraint related issues](/docs/guides/troubleshooting/dashboard-errors-when-managing-users-N1ls4A#solution-for-constraint-related-issues)
 
 ```
 ERROR:  23503: update or delete on table "users" violates foreign key constraint "profiles_id_fkey" on table "profiles"
@@ -91,7 +91,7 @@ DETAIL:  Key (id)=(7428a53c-75b7-4531-9ae9-1567d9c4ac0a) is still referenced fro
 ERROR: column \"updated_at\" of relation \"profiles\" does not exist (SQLSTATE 42703)
 ```
 
-**Broken search path / incorrect name** - [42P01 related solution](docs/guides/troubleshooting/resolving-42p01-relation-does-not-exist-error-W4_9-V)
+**Broken search path / incorrect name** - [42P01 related solution](/docs/guides/troubleshooting/resolving-42p01-relation-does-not-exist-error-W4_9-V)
 
 ```
 failed to close prepared statement: ERROR: current transaction is aborted, commands ignored until end of transaction block (SQLSTATE 25P02): ERROR: relation \"public.profiles\" does not exist (SQLSTATE 42P01)
@@ -99,7 +99,7 @@ failed to close prepared statement: ERROR: current transaction is aborted, comma
 
 ---
 
-## Solution for constraint related issues [#solution-constraint]
+## Solution for constraint related issues
 
 - Check for foreign/primary key relationship between the `auth.users` table and another table
 - Then ALTER the [behavior](https://stackoverflow.com/questions/5383612/setting-up-table-relations-what-do-cascade-set-null-and-restrict-do) of the relationship and recreate it with a less [restrictive constraint](https://stackoverflow.com/questions/3359329/how-to-change-the-foreign-key-referential-action-behavior).
@@ -107,7 +107,7 @@ failed to close prepared statement: ERROR: current transaction is aborted, comma
 
 ---
 
-## Solution for trigger related issues [#solution-trigger]
+## Solution for trigger related issues
 
 Supabase Auth uses your project's database to store user data. It relies on the `auth` schema, and Supabase restricts access to the `auth` schema to prevent unintended custom changes that could break the functionality of the Auth service.
 

@@ -1,9 +1,10 @@
 import { UIEvent, useMemo } from 'react'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
-import NoSearchResults from 'components/ui/NoSearchResults'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
@@ -75,14 +76,14 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
       statuses: filterStatus,
     },
     {
-      keepPreviousData: true,
+      placeholderData: keepPreviousData,
     }
   )
   const orgProjects =
     useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
 
   const {
-    isLoading: _isLoadingPermissions,
+    isPending: _isLoadingPermissions,
     isError: isErrorPermissions,
     error: permissionsError,
   } = usePermissionsQuery()

@@ -1,11 +1,13 @@
-import { useEntitlementsQuery } from 'data/entitlements/entitlements-query'
-import { useMemo } from 'react'
-import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 import type {
   Entitlement,
   EntitlementConfig,
   EntitlementType,
+  FeatureKey,
 } from 'data/entitlements/entitlements-query'
+import { useEntitlementsQuery } from 'data/entitlements/entitlements-query'
+import { IS_PLATFORM } from 'lib/constants'
+import { useMemo } from 'react'
+import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 
 function isNumericConfig(
   config: EntitlementConfig,
@@ -54,7 +56,7 @@ function getEntitlementSetValues(entitlement: Entitlement | null): string[] {
 }
 
 export function useCheckEntitlements(
-  featureKey: string,
+  featureKey: FeatureKey,
   organizationSlug?: string,
   options?: {
     enabled?: boolean
@@ -64,18 +66,18 @@ export function useCheckEntitlements(
   const shouldGetSelectedOrg = !organizationSlug && options?.enabled !== false
   const {
     data: selectedOrg,
-    isLoading: isLoadingSelectedOrg,
+    isPending: isLoadingSelectedOrg,
     isSuccess: isSuccessSelectedOrg,
   } = useSelectedOrganizationQuery({
     enabled: shouldGetSelectedOrg,
   })
 
   const finalOrgSlug = organizationSlug || selectedOrg?.slug
-  const enabled = options?.enabled !== false && !!finalOrgSlug
+  const enabled = IS_PLATFORM ? options?.enabled !== false && !!finalOrgSlug : false
 
   const {
     data: entitlementsData,
-    isLoading: isLoadingEntitlements,
+    isPending: isLoadingEntitlements,
     isSuccess: isSuccessEntitlements,
   } = useEntitlementsQuery({ slug: finalOrgSlug! }, { enabled })
 
@@ -100,7 +102,7 @@ export function useCheckEntitlements(
     : isSuccessEntitlements
 
   return {
-    hasAccess: entitlement?.hasAccess ?? false,
+    hasAccess: IS_PLATFORM ? entitlement?.hasAccess ?? false : true,
     isLoading,
     isSuccess,
     getEntitlementNumericValue: () => getEntitlementNumericValue(entitlement),

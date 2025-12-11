@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 
 import { useParams } from 'common'
@@ -9,7 +9,6 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { FormControl_Shadcn_, FormField_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { NewPublicationPanel } from '../NewPublicationPanel'
 import { PublicationsComboBox } from '../PublicationsComboBox'
 import type { DestinationPanelSchemaType } from './DestinationPanel.schema'
 
@@ -17,18 +16,22 @@ type PublicationSelectionProps = {
   form: UseFormReturn<DestinationPanelSchemaType>
   sourceId?: number
   visible: boolean
+  onSelectNewPublication: () => void
 }
 
-export const PublicationSelection = ({ form, sourceId, visible }: PublicationSelectionProps) => {
+export const PublicationSelection = ({
+  form,
+  sourceId,
+  visible,
+  onSelectNewPublication,
+}: PublicationSelectionProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { publicationName } = form.watch()
 
-  const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
-
   const {
     data: publications = [],
-    isLoading: isLoadingPublications,
+    isPending: isLoadingPublications,
     isSuccess: isSuccessPublications,
   } = useReplicationPublicationsQuery({ projectRef, sourceId })
 
@@ -37,7 +40,7 @@ export const PublicationSelection = ({ form, sourceId, visible }: PublicationSel
   const isSelectedPublicationMissing =
     isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
 
-  const { data: checkPrimaryKeysExistsData, isLoading: isLoadingCheck } = useCheckPrimaryKeysExists(
+  const { data: checkPrimaryKeysExistsData, isPending: isLoadingCheck } = useCheckPrimaryKeysExists(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -64,18 +67,18 @@ export const PublicationSelection = ({ form, sourceId, visible }: PublicationSel
                 isLoadingPublications={isLoadingPublications}
                 isLoadingCheck={!!selectedPublication && isLoadingCheck}
                 field={field}
-                onNewPublicationClick={() => setPublicationPanelVisible(true)}
+                onNewPublicationClick={() => onSelectNewPublication()}
               />
             </FormControl_Shadcn_>
             {isSelectedPublicationMissing ? (
-              <Admonition type="warning" className="mt-2 mb-0">
+              <Admonition type="warning" className="mt-2">
                 <p className="!leading-normal">
                   The publication <strong className="text-foreground">{publicationName}</strong> was
                   not found, it may have been renamed or deleted, please select another one.
                 </p>
               </Admonition>
             ) : hasTablesWithNoPrimaryKeys ? (
-              <Admonition type="warning" className="mt-2 mb-0">
+              <Admonition type="warning" className="mt-2">
                 <p className="!leading-normal">
                   Replication requires every table in the publication to have a primary key to work,
                   which these tables are missing:
@@ -97,12 +100,6 @@ export const PublicationSelection = ({ form, sourceId, visible }: PublicationSel
             ) : null}
           </FormItemLayout>
         )}
-      />
-
-      <NewPublicationPanel
-        sourceId={sourceId}
-        visible={publicationPanelVisible}
-        onClose={() => setPublicationPanelVisible(false)}
       />
     </>
   )

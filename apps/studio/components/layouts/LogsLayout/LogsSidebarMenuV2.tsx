@@ -8,6 +8,8 @@ import {
   useFeaturePreviewModal,
   useUnifiedLogsPreview,
 } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsETLPrivateAlpha } from 'components/interfaces/Database/Replication/useIsETLPrivateAlpha'
+import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
 import SavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from 'components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -32,7 +34,6 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
-import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
 
 const SupaIcon = ({ className }: { className?: string }) => {
   return (
@@ -99,8 +100,8 @@ export function LogsSidebarMenuV2() {
     'logs:collections',
   ])
 
-  const enablePgReplicate = useFlag('enablePgReplicate')
-  const { data: etlData, isLoading: isETLLoading } = useReplicationSourcesQuery(
+  const enablePgReplicate = useIsETLPrivateAlpha()
+  const { data: etlData, isPending: isETLLoading } = useReplicationSourcesQuery(
     {
       projectRef: ref,
     },
@@ -118,7 +119,7 @@ export function LogsSidebarMenuV2() {
   const { plan: orgPlan } = useCurrentOrgPlan()
   const isFreePlan = orgPlan?.id === 'free'
 
-  const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery({
+  const { data: savedQueriesRes, isPending: savedQueriesLoading } = useContentQuery({
     projectRef: ref,
     type: 'log_sql',
   })
@@ -204,9 +205,9 @@ export function LogsSidebarMenuV2() {
     },
     showETLLogs
       ? {
-          name: 'ETL Replication',
-          key: 'etl_replication_logs',
-          url: `/project/${ref}/logs/etl-replication-logs`,
+          name: 'Replication',
+          key: 'replication_logs',
+          url: `/project/${ref}/logs/replication-logs`,
           items: [],
         }
       : null,
@@ -250,9 +251,9 @@ export function LogsSidebarMenuV2() {
       {unifiedLogsFlagEnabled && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"
-          title="New Logs Interface"
-          description="Unified view across all services with improved filtering and real-time updates"
-          illustration={<Badge variant="brand">Feature Preview</Badge>}
+          title="Introducing unified logs"
+          description="A unified view across all services with improved filtering and real-time updates."
+          illustration={<Badge variant="success">New</Badge>}
           actions={
             <>
               <Button

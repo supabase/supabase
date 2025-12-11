@@ -1,5 +1,5 @@
-import { object, string } from 'yup'
 import type { FormSchema } from 'types'
+import { object, string } from 'yup'
 
 const JSON_SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
 
@@ -8,14 +8,14 @@ const CONFIRMATION: FormSchema = {
   id: 'CONFIRMATION',
   type: 'object',
   title: 'Confirm sign up',
-  purpose: 'Email verification for new user registrations',
+  purpose: 'Ask users to confirm their email address after signing up',
   properties: {
     MAILER_SUBJECTS_CONFIRMATION: {
-      title: 'Subject heading',
+      title: 'Subject',
       type: 'string',
     },
     MAILER_TEMPLATES_CONFIRMATION_CONTENT: {
-      title: 'Message body',
+      title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: ` 
@@ -30,7 +30,7 @@ const CONFIRMATION: FormSchema = {
     },
   },
   validationSchema: object().shape({
-    MAILER_SUBJECTS_CONFIRMATION: string().required('Subject heading is required.'),
+    MAILER_SUBJECTS_CONFIRMATION: string().required('Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'authentication',
@@ -42,14 +42,14 @@ const INVITE: FormSchema = {
   id: 'INVITE',
   type: 'object',
   title: 'Invite user',
-  purpose: "Allows administrators to invite users who don't have accounts yet",
+  purpose: "Invite users who don't yet have an account to sign up",
   properties: {
     MAILER_SUBJECTS_INVITE: {
-      title: 'Subject heading',
+      title: 'Subject',
       type: 'string',
     },
     MAILER_TEMPLATES_INVITE_CONTENT: {
-      title: 'Message body',
+      title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: ` 
@@ -64,7 +64,7 @@ const INVITE: FormSchema = {
     },
   },
   validationSchema: object().shape({
-    MAILER_SUBJECTS_INVITE: string().required('Subject heading is required.'),
+    MAILER_SUBJECTS_INVITE: string().required('Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'authentication',
@@ -76,14 +76,14 @@ const MAGIC_LINK: FormSchema = {
   id: 'MAGIC_LINK',
   type: 'object',
   title: 'Magic link',
-  purpose: 'Passwordless login using email links',
+  purpose: 'Allow users to sign in via a one-time link sent to their email',
   properties: {
     MAILER_SUBJECTS_MAGIC_LINK: {
-      title: 'Subject heading',
+      title: 'Subject',
       type: 'string',
     },
     MAILER_TEMPLATES_MAGIC_LINK_CONTENT: {
-      title: 'Message body',
+      title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: ` 
@@ -98,7 +98,7 @@ const MAGIC_LINK: FormSchema = {
     },
   },
   validationSchema: object().shape({
-    MAILER_SUBJECTS_MAGIC_LINK: string().required('Subject heading is required.'),
+    MAILER_SUBJECTS_MAGIC_LINK: string().required('Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'authentication',
@@ -110,14 +110,14 @@ const EMAIL_CHANGE: FormSchema = {
   id: 'EMAIL_CHANGE',
   type: 'object',
   title: 'Change email address',
-  purpose: 'Verification for email address changes',
+  purpose: 'Ask users to verify their new email address after changing it',
   properties: {
     MAILER_SUBJECTS_EMAIL_CHANGE: {
-      title: 'Subject heading',
+      title: 'Subject',
       type: 'string',
     },
     MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT: {
-      title: 'Message body',
+      title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: ` 
@@ -133,7 +133,7 @@ const EMAIL_CHANGE: FormSchema = {
     },
   },
   validationSchema: object().shape({
-    MAILER_SUBJECTS_EMAIL_CHANGE: string().required('Subject heading is required.'),
+    MAILER_SUBJECTS_EMAIL_CHANGE: string().required('Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'authentication',
@@ -145,14 +145,14 @@ const RECOVERY: FormSchema = {
   id: 'RECOVERY',
   type: 'object',
   title: 'Reset password',
-  purpose: 'Password recovery flow for users who forgot their password',
+  purpose: 'Allow users to reset their password if they forget it',
   properties: {
     MAILER_SUBJECTS_RECOVERY: {
-      title: 'Subject heading',
+      title: 'Subject',
       type: 'string',
     },
     MAILER_TEMPLATES_RECOVERY_CONTENT: {
-      title: 'Message body',
+      title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: ` 
@@ -167,7 +167,7 @@ const RECOVERY: FormSchema = {
     },
   },
   validationSchema: object().shape({
-    MAILER_SUBJECTS_RECOVERY: string().required('Subject heading is required.'),
+    MAILER_SUBJECTS_RECOVERY: string().required('Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'authentication',
@@ -178,15 +178,14 @@ const REAUTHENTICATION: FormSchema = {
   id: 'REAUTHENTICATION',
   type: 'object',
   title: 'Reauthentication',
-  purpose:
-    'Additional verification for sensitive actions (like changing password, deleting account)',
+  purpose: 'Ask users to re-authenticate before performing a sensitive action',
   properties: {
     MAILER_SUBJECTS_REAUTHENTICATION: {
-      title: 'Subject heading',
+      title: 'Subject',
       type: 'string',
     },
     MAILER_TEMPLATES_REAUTHENTICATION_CONTENT: {
-      title: 'Message body',
+      title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: `
@@ -198,7 +197,7 @@ const REAUTHENTICATION: FormSchema = {
     },
   },
   validationSchema: object().shape({
-    MAILER_SUBJECTS_REAUTHENTICATION: string().required('Subject heading is required.'),
+    MAILER_SUBJECTS_REAUTHENTICATION: string().required('Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'authentication',
@@ -210,15 +209,15 @@ const PASSWORD_CHANGED_NOTIFICATION: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'PASSWORD_CHANGED_NOTIFICATION',
   type: 'object',
-  title: 'Password changed notification',
-  purpose: 'Notify a user when their password has been changed',
+  title: 'Password changed',
+  purpose: 'Notify users when their password has changed',
   properties: {
     MAILER_SUBJECTS_PASSWORD_CHANGED_NOTIFICATION: {
-      title: 'Subject heading',
+      title: 'Subject',
       type: 'string',
     },
     MAILER_TEMPLATES_PASSWORD_CHANGED_NOTIFICATION_CONTENT: {
-      title: 'Message body',
+      title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: ` 
@@ -228,9 +227,7 @@ const PASSWORD_CHANGED_NOTIFICATION: FormSchema = {
     },
   },
   validationSchema: object().shape({
-    MAILER_SUBJECTS_PASSWORD_CHANGED_NOTIFICATION: string().required(
-      'Subject heading is required.'
-    ),
+    MAILER_SUBJECTS_PASSWORD_CHANGED_NOTIFICATION: string().required('Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'security',
@@ -241,15 +238,15 @@ const EMAIL_CHANGED_NOTIFICATION: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'EMAIL_CHANGED_NOTIFICATION',
   type: 'object',
-  title: 'Email changed notification',
-  purpose: 'Notify a user when their email address has been changed',
+  title: 'Email address changed',
+  purpose: 'Notify users when their email address has changed',
   properties: {
     MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION: {
-      title: 'Subject heading',
+      title: 'Subject',
       type: 'string',
     },
     MAILER_TEMPLATES_EMAIL_CHANGED_NOTIFICATION_CONTENT: {
-      title: 'Message body',
+      title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: ` 
@@ -260,7 +257,7 @@ const EMAIL_CHANGED_NOTIFICATION: FormSchema = {
     },
   },
   validationSchema: object().shape({
-    MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION: string().required('Subject heading is required.'),
+    MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION: string().required('Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'security',
@@ -271,15 +268,15 @@ const PHONE_CHANGED_NOTIFICATION: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'PHONE_CHANGED_NOTIFICATION',
   type: 'object',
-  title: 'Phone changed notification',
-  purpose: 'Notify a user when the phone number has been changed',
+  title: 'Phone number changed',
+  purpose: 'Notify users when their phone number has changed',
   properties: {
     MAILER_SUBJECTS_PHONE_CHANGED_NOTIFICATION: {
-      title: 'Subject heading',
+      title: 'Subject',
       type: 'string',
     },
     MAILER_TEMPLATES_PHONE_CHANGED_NOTIFICATION_CONTENT: {
-      title: 'Message body',
+      title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: ` 
@@ -291,7 +288,7 @@ const PHONE_CHANGED_NOTIFICATION: FormSchema = {
     },
   },
   validationSchema: object().shape({
-    MAILER_SUBJECTS_PHONE_CHANGED_NOTIFICATION: string().required('Subject heading is required.'),
+    MAILER_SUBJECTS_PHONE_CHANGED_NOTIFICATION: string().required('Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'security',
@@ -302,15 +299,15 @@ const IDENTITY_LINKED_NOTIFICATION: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'IDENTITY_LINKED_NOTIFICATION',
   type: 'object',
-  title: 'Identity linked notification',
-  purpose: 'Notify a user when a new identity has been linked to their account',
+  title: 'Identity linked',
+  purpose: 'Notify users when a new identity has been linked to their account',
   properties: {
     MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION: {
-      title: 'Subject heading',
+      title: 'Subject',
       type: 'string',
     },
     MAILER_TEMPLATES_IDENTITY_LINKED_NOTIFICATION_CONTENT: {
-      title: 'Message body',
+      title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: ` 
@@ -321,7 +318,7 @@ const IDENTITY_LINKED_NOTIFICATION: FormSchema = {
     },
   },
   validationSchema: object().shape({
-    MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION: string().required('Subject heading is required.'),
+    MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION: string().required('Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'security',
@@ -332,15 +329,15 @@ const IDENTITY_UNLINKED_NOTIFICATION: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'IDENTITY_UNLINKED_NOTIFICATION',
   type: 'object',
-  title: 'Identity unlinked notification',
-  purpose: 'Notify a user when an identity has been unlinked from their account',
+  title: 'Identity unlinked',
+  purpose: 'Notify users when an identity has been unlinked from their account',
   properties: {
     MAILER_SUBJECTS_IDENTITY_UNLINKED_NOTIFICATION: {
-      title: 'Subject heading',
+      title: 'Subject',
       type: 'string',
     },
     MAILER_TEMPLATES_IDENTITY_UNLINKED_NOTIFICATION_CONTENT: {
-      title: 'Message body',
+      title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: ` 
@@ -351,9 +348,7 @@ const IDENTITY_UNLINKED_NOTIFICATION: FormSchema = {
     },
   },
   validationSchema: object().shape({
-    MAILER_SUBJECTS_IDENTITY_UNLINKED_NOTIFICATION: string().required(
-      'Subject heading is required.'
-    ),
+    MAILER_SUBJECTS_IDENTITY_UNLINKED_NOTIFICATION: string().required('Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'security',
@@ -364,15 +359,16 @@ const MFA_FACTOR_ENROLLED_NOTIFICATION: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'MFA_FACTOR_ENROLLED_NOTIFICATION',
   type: 'object',
-  title: 'MFA factor enrolled notification',
-  purpose: 'Notify a user when a new MFA factor has been enrolled for their account',
+  title: 'Multi-factor authentication method added',
+  purpose:
+    'Notify users when a new multi-factor authentication method has been added to their account',
   properties: {
     MAILER_SUBJECTS_MFA_FACTOR_ENROLLED_NOTIFICATION: {
-      title: 'Subject heading',
+      title: 'Subject',
       type: 'string',
     },
     MAILER_TEMPLATES_MFA_FACTOR_ENROLLED_NOTIFICATION_CONTENT: {
-      title: 'Message body',
+      title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: ` 
@@ -383,9 +379,7 @@ const MFA_FACTOR_ENROLLED_NOTIFICATION: FormSchema = {
     },
   },
   validationSchema: object().shape({
-    MAILER_SUBJECTS_MFA_FACTOR_ENROLLED_NOTIFICATION: string().required(
-      'Subject heading is required.'
-    ),
+    MAILER_SUBJECTS_MFA_FACTOR_ENROLLED_NOTIFICATION: string().required('Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'security',
@@ -396,15 +390,16 @@ const MFA_FACTOR_UNENROLLED_NOTIFICATION: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'MFA_FACTOR_UNENROLLED_NOTIFICATION',
   type: 'object',
-  title: 'MFA factor unenrolled notification',
-  purpose: 'Notify a user when an MFA factor has been unenrolled from their account',
+  title: 'Multi-factor authentication method removed',
+  purpose:
+    'Notify users when a multi-factor authentication method has been removed from their account',
   properties: {
     MAILER_SUBJECTS_MFA_FACTOR_UNENROLLED_NOTIFICATION: {
-      title: 'Subject heading',
+      title: 'Subject',
       type: 'string',
     },
     MAILER_TEMPLATES_MFA_FACTOR_UNENROLLED_NOTIFICATION_CONTENT: {
-      title: 'Message body',
+      title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: ` 
@@ -415,9 +410,7 @@ const MFA_FACTOR_UNENROLLED_NOTIFICATION: FormSchema = {
     },
   },
   validationSchema: object().shape({
-    MAILER_SUBJECTS_MFA_FACTOR_UNENROLLED_NOTIFICATION: string().required(
-      'Subject heading is required.'
-    ),
+    MAILER_SUBJECTS_MFA_FACTOR_UNENROLLED_NOTIFICATION: string().required('Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'security',

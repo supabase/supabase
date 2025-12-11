@@ -1,56 +1,51 @@
-import { createServerClient, parseCookieHeader } from '@supabase/ssr';
-import { SupabaseClient } from '@supabase/supabase-js';
-import type { Context, MiddlewareHandler } from 'hono';
-import { env } from 'hono/adapter';
-import { setCookie } from 'hono/cookie';
+import { createServerClient, parseCookieHeader } from '@supabase/ssr'
+import { SupabaseClient } from '@supabase/supabase-js'
+import type { Context, MiddlewareHandler } from 'hono'
+import { env } from 'hono/adapter'
+import { setCookie } from 'hono/cookie'
 
 declare module 'hono' {
   interface ContextVariableMap {
-    supabase: SupabaseClient;
+    supabase: SupabaseClient
   }
 }
 
 export const getSupabase = (c: Context) => {
-  return c.get('supabase');
-};
+  return c.get('supabase')
+}
 
 type SupabaseEnv = {
-  VITE_SUPABASE_URL: string;
-  VITE_SUPABASE_ANON_KEY: string;
-};
+  SUPABASE_URL: string
+  SUPABASE_PUBLISHABLE_KEY: string
+}
 
 export const supabaseMiddleware = (): MiddlewareHandler => {
   return async (c, next) => {
-    const supabaseEnv = env<SupabaseEnv>(c);
-    const supabaseUrl =
-      supabaseEnv.VITE_SUPABASE_URL ?? import.meta.env.VITE_SUPABASE_URL;
-    const supabasePublishableKey =
-      supabaseEnv.VITE_SUPABASE_ANON_KEY ??
-      import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const supabaseEnv = env<SupabaseEnv>(c)
+    const supabaseUrl = supabaseEnv.SUPABASE_URL
+    const supabaseAnonKey = supabaseEnv.SUPABASE_PUBLISHABLE_KEY
 
     if (!supabaseUrl) {
-      throw new Error('SUPABASE_URL missing!');
+      throw new Error('SUPABASE_URL missing!')
     }
 
-    if (!supabasePublishableKey) {
-      throw new Error('SUPABASE_ANON_KEY missing!');
+    if (!supabaseAnonKey) {
+      throw new Error('SUPABASE_PUBLISHABLE_KEY missing!')
     }
 
-    const supabase = createServerClient(supabaseUrl, supabasePublishableKey, {
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
       cookies: {
         getAll() {
-          return parseCookieHeader(c.req.header('Cookie') ?? '');
+          return parseCookieHeader(c.req.header('Cookie') ?? '')
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            setCookie(c, name, value, options)
-          );
+          cookiesToSet.forEach(({ name, value, options }) => setCookie(c, name, value, options))
         },
       },
-    });
+    })
 
-    c.set('supabase', supabase);
+    c.set('supabase', supabase)
 
-    await next();
-  };
-};
+    await next()
+  }
+}

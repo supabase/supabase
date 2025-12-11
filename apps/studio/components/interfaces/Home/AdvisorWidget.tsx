@@ -6,9 +6,9 @@ import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { EntityTypeIcon, createLintSummaryPrompt } from 'components/interfaces/Linter/Linter.utils'
 import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useAdvisorStateSnapshot } from 'state/advisor-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
@@ -41,7 +41,7 @@ interface SlowQuery {
 export const AdvisorWidget = () => {
   const { ref: projectRef } = useParams()
   const [selectedTab, setSelectedTab] = useState<'security' | 'performance'>('security')
-  const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery({ projectRef })
+  const { data: lints, isPending: isLoadingLints } = useProjectLintsQuery({ projectRef })
   const { data: slowestQueriesData, isLoading: isLoadingSlowestQueries } = useQueryPerformanceQuery(
     {
       preset: 'slowestExecutionTime',
@@ -49,7 +49,7 @@ export const AdvisorWidget = () => {
   )
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
-  const { setSelectedItemId } = useAdvisorStateSnapshot()
+  const { setSelectedItem } = useAdvisorStateSnapshot()
 
   const securityLints = useMemo(
     () => (lints ?? []).filter((lint: Lint) => lint.categories.includes('SECURITY')),
@@ -80,10 +80,10 @@ export const AdvisorWidget = () => {
 
   const handleLintClick = useCallback(
     (lint: Lint) => {
-      setSelectedItemId(lint.cache_key)
+      setSelectedItem(lint.cache_key, 'lint')
       openSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
     },
-    [setSelectedItemId, openSidebar]
+    [setSelectedItem, openSidebar]
   )
 
   const totalIssues =

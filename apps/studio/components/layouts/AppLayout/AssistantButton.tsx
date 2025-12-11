@@ -29,10 +29,11 @@ export const AssistantButton = () => {
       }}
       tooltip={{
         content: {
+          className: 'p-1 pl-2.5',
           text: (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2.5">
               <span>AI Assistant</span>
-              {isAIAssistantHotkeyEnabled && <KeyboardShortcut keys={['Meta', 'i']} />}
+              {isAIAssistantHotkeyEnabled && <KeyboardShortcut keys={['Meta', 'I']} />}
             </div>
           ),
         },

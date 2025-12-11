@@ -34,12 +34,12 @@ export const ComplianceConfig = () => {
     data: settings,
     error,
     isError,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
   } = useProjectSettingsV2Query({ projectRef: ref })
   const initialIsSensitive = settings?.is_sensitive || false
 
-  const { mutate: updateComplianceConfig, isLoading: isSubmitting } =
+  const { mutate: updateComplianceConfig, isPending: isSubmitting } =
     useComplianceConfigUpdateMutation({
       onSuccess: () => {
         toast.success('Successfully updated project compliance configuration')

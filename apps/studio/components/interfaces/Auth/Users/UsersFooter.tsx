@@ -1,20 +1,22 @@
 import { THRESHOLD_COUNT } from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
+import { keepPreviousData } from '@tanstack/react-query'
 import { HelpCircle, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
+import { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 import { useParams } from 'common'
 import { formatEstimatedCount } from 'components/grid/components/footer/pagination/Pagination.utils'
 import { useUsersCountQuery } from 'data/auth/users-count-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { Filter } from './Users.constants'
+import type { Filter, SpecificFilterColumn } from './Users.constants'
 
 interface UsersFooterProps {
   filter: Filter
   filterKeywords: string
   selectedProviders: string[]
-  specificFilterColumn: string
+  specificFilterColumn: SpecificFilterColumn
 }
 
 export const UsersFooter = ({
@@ -31,7 +33,7 @@ export const UsersFooter = ({
 
   const {
     data: countData,
-    isLoading: isLoadingCount,
+    isPending: isLoadingCount,
     isFetching: isFetchingCount,
     isSuccess: isSuccessCount,
   } = useUsersCountQuery(
@@ -42,8 +44,12 @@ export const UsersFooter = ({
       filter: filter === 'all' ? undefined : filter,
       providers: selectedProviders,
       forceExactCount,
+      // Use optimized search when filtering by specific column
+      ...(specificFilterColumn !== 'freeform'
+        ? { column: specificFilterColumn as OptimizedSearchColumns }
+        : { column: undefined }),
     },
-    { keepPreviousData: true }
+    { placeholderData: keepPreviousData }
   )
   const totalUsers = countData?.count ?? 0
 
