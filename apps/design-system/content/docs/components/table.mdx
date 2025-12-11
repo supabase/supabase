@@ -175,33 +175,43 @@ When adding icon columns to your table, use [Accessibility](../accessibility) ma
 
 ### Actions
 
-Place action columns at the end of the table to maintain a logical reading flow. When multiple actions are available, display one primary action as a button and place additional options in a folded menu (such as a dropdown menu with an ellipsis icon). This approach keeps the table interface clean while providing access to all necessary actions.
+Action should be placed in the last column of each Table Row to maintain a logical reading flow. Users scan table data from left to right, so positioning actions on the right ensures they encounter the primary information first before reaching interactive controls.
 
-#### Basic actions
+#### Multiple actions
 
-Constrain all interactivity to the action column. Exceptions to this rule are described in the examples that follow.
+When multiple actions are available for a row, display one primary action as a button and place additional options in an overflow menu. This keeps the table clean and scannable while providing access to all necessary actions without overwhelming the user.
 
 <ComponentPreview name="table-actions" />
 
 #### Cross-links
 
-It may be necessary to link to other areas from within a table row. Consider using the `text-link-table-cell` CSS class to hint at interactivity whilst also making it clear it is a tertiary action.
+You may need to link to related resources from within table cells. In these cases, use the `text-link-table-cell` CSS class to provide a visual hint that the text is interactive while maintaining its appearance as tertiary content.
 
 <ComponentPreview name="table-cross-link" />
 
-Do not make the entire row interactive when using cross-links, as the chances of mis-taps are increased.
+Avoid making the entire row interactive when using cross-links. Multiple interactive areas within a single row increases the chance of mis-taps and creates ambiguity about which action will be triggered. Keep cross-links as discrete, scannable elements within their respective cells, and maintain a dedicated action column for primary row-level actions.
 
-#### Row as navigation
+#### Row-level navigation
 
-Buckets for example. Do not put any other actions on if you can avoid it.
+The entire Table Row may be tappable. This pattern is most effective when navigation is the sole or primary action for each row, as it provides a large, easy-to-target interaction area.
+
+Avoid adding other actions when using row-level navigation, as multiple interactive areas within a single row create competing affordances and increase interaction complexity.
 
 <ComponentPreview name="table-row-link" />
 
-Pay close attention to [Accessibility](/accessibility#focus-management) requirements such as focus management.
+When implementing row-level navigation, pay close attention to [Accessibility](/accessibility#focus-management) requirements. The row must be keyboard accessible with proper focus management, including:
 
-If you must, consider nesting all actions in an overflow menu and maintaining a chevron like Policies:
+- Handling `Enter` and `Space` key presses for activation
+- Providing visual focus indicators using classes like `inset-focus`
+- Supporting modifier keys (`Ctrl`/`Cmd`) for opening links in new tabs
+
+#### Row navigation with actions
+
+If you must combine row-level navigation with additional actions, nest all secondary actions in an overflow menu and maintain a [ChevronRight](https://lucide.dev/icons/chevron-right) visual indicator to signal that the row is navigable. This pattern preserves the primary navigation affordance while keeping secondary actions accessible but unobtrusive.
 
 <ComponentPreview name="table-row-link-actions" />
+
+This hybrid approach requires careful attention to event handling. Ensure that taps on action buttons stop event propagation to prevent triggering row navigation, and maintain clear visual separation between the navigable row area and the action controls.
 
 ## Related
 
