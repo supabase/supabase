@@ -1,6 +1,27 @@
 import { ChevronRight, EllipsisVertical, Shield } from 'lucide-react'
 import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
+const policies = [
+  {
+    id: 'policy-1',
+    name: 'Anyone can view all active listings',
+    command: 'select',
+    appliedTo: 'public',
+  },
+  {
+    id: 'policy-2',
+    name: 'Users can delete their own listings',
+    command: 'delete',
+    appliedTo: 'authenticated',
+  },
+  {
+    id: 'policy-3',
+    name: 'Admins can update any listing',
+    command: 'update',
+    appliedTo: 'authenticated',
+  },
+]
+
 const handleBucketNavigation = (
   bucketId: string,
   event: React.MouseEvent | React.KeyboardEvent
@@ -13,7 +34,7 @@ const handleBucketNavigation = (
   }
 }
 
-export default function TableRowLink() {
+export default function TableRowLinkActions() {
   return (
     <Card className="w-full">
       <Table>
@@ -31,76 +52,46 @@ export default function TableRowLink() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow
-            className="relative cursor-pointer inset-focus"
-            onClick={(event) => handleBucketNavigation('avatars', event)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault()
-                handleBucketNavigation('avatars', event)
-              }
-            }}
-            tabIndex={0}
-          >
-            <TableCell className="w-1">
-              <Shield aria-label="bucket icon" size={16} className="text-foreground-muted" />
-            </TableCell>
-            <TableCell>Anyone can view all active listings</TableCell>
-            <TableCell>
-              <code className="text-foreground-muted text-code-inline uppercase">select</code>
-            </TableCell>
-            <TableCell className="text-foreground-lighter">public</TableCell>
-            <TableCell className="flex justify-end items-center h-full gap-3">
-              <Button
-                icon={<EllipsisVertical />}
-                aria-label={`More actions`}
-                type="default"
-                size="tiny"
-                className="w-7"
-              />
-              <div>
-                <ChevronRight aria-hidden={true} size={14} className="text-foreground-muted/60" />
-              </div>
-              <button tabIndex={-1} className="sr-only">
-                Go to policy
-              </button>
-            </TableCell>
-          </TableRow>
-          <TableRow
-            className="relative cursor-pointer inset-focus"
-            onClick={(event) => handleBucketNavigation('avatars', event)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault()
-                handleBucketNavigation('avatars', event)
-              }
-            }}
-            tabIndex={0}
-          >
-            <TableCell className="w-1">
-              <Shield aria-label="bucket icon" size={16} className="text-foreground-muted" />
-            </TableCell>
-            <TableCell>Users can delete their own listings</TableCell>
-            <TableCell>
-              <code className="text-foreground-muted text-code-inline uppercase">delete</code>
-            </TableCell>
-            <TableCell className="text-foreground-lighter">authenticated</TableCell>
-            <TableCell className="flex justify-end items-center h-full gap-3">
-              <Button
-                icon={<EllipsisVertical />}
-                aria-label={`More actions`}
-                type="default"
-                size="tiny"
-                className="w-7"
-              />
-              <div>
-                <ChevronRight aria-hidden={true} size={14} className="text-foreground-muted/60" />
-              </div>
-              <button tabIndex={-1} className="sr-only">
-                Go to policy
-              </button>
-            </TableCell>
-          </TableRow>
+          {policies.map((policy) => (
+            <TableRow
+              key={policy.id}
+              className="relative cursor-pointer inset-focus"
+              onClick={(event) => handleBucketNavigation('avatars', event)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  handleBucketNavigation('avatars', event)
+                }
+              }}
+              tabIndex={0}
+            >
+              <TableCell className="w-1">
+                <Shield aria-label="bucket icon" size={16} className="text-foreground-muted" />
+              </TableCell>
+              <TableCell>{policy.name}</TableCell>
+              <TableCell>
+                <code className="text-foreground-muted text-code-inline uppercase">
+                  {policy.command}
+                </code>
+              </TableCell>
+              <TableCell className="text-foreground-lighter">{policy.appliedTo}</TableCell>
+              <TableCell className="flex justify-end items-center h-full gap-3">
+                <Button
+                  icon={<EllipsisVertical />}
+                  aria-label={`More actions`}
+                  type="default"
+                  size="tiny"
+                  className="w-7"
+                />
+                <div>
+                  <ChevronRight aria-hidden={true} size={14} className="text-foreground-muted/60" />
+                </div>
+                <button tabIndex={-1} className="sr-only">
+                  Go to policy
+                </button>
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </Card>
