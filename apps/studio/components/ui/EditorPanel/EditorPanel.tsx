@@ -43,6 +43,7 @@ import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/A
 import AIEditor from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
+import { generateSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 
 export const EditorPanel = () => {
   const {
@@ -235,7 +236,7 @@ export const EditorPanel = () => {
               }
 
               const snippet = createSqlSnippetSkeletonV2({
-                name: 'New query',
+                name: generateSnippetTitle(),
                 sql: currentValue,
                 owner_id: profile.id,
                 project_id: project.id,
