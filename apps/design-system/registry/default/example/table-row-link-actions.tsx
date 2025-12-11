@@ -56,11 +56,11 @@ export default function TableRowLinkActions() {
             <TableRow
               key={policy.id}
               className="relative cursor-pointer inset-focus"
-              onClick={(event) => handleBucketNavigation('avatars', event)}
+              onClick={(event) => handleBucketNavigation(policy.id, event)}
               onKeyDown={(event) => {
                 if (event.key === 'Enter' || event.key === ' ') {
                   event.preventDefault()
-                  handleBucketNavigation('avatars', event)
+                  handleBucketNavigation(policy.id, event)
                 }
               }}
               tabIndex={0}
