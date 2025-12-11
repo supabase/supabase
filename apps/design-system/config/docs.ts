@@ -83,6 +83,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/ui-patterns/navigation',
           items: [],
         },
+        {
+          title: 'Tables',
+          href: '/docs/ui-patterns/tables',
+          items: [],
+        },
       ],
     },
     {
