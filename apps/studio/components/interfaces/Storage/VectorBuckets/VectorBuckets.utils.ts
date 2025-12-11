@@ -8,6 +8,10 @@ export const getVectorBucketFDWSchemaName = (bucketId: string) => {
   return `fdw_vector_${snakeCase(bucketId)}`
 }
 
+export const getVectorBucketFDWServerName = (bucketId: string) => {
+  return `${getVectorBucketFDWName(bucketId)}_server`
+}
+
 export const getVectorBucketFDWName = (bucketId: string) => {
   return `${snakeCase(bucketId)}_fdw`
 }
