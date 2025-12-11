@@ -18,8 +18,14 @@ Before continuing check the comprehensive guide on [JWT Signing Keys](docs/guide
 
 ## Overview
 
-When a HTTP request is sent to Edge Functions we can levarage to Supabase Auth to easily secure our endpoints,
-in the past this verification could be easily trigged from `verify_jwt` [flag](http://localhost:3001/docs/guides/functions/function-configuration#skipping-authorization-checks).
-But unfortunely this method is no longer compatible with the [JWT Signing Keys](docs/guides/auth/signing-keys) and also caused a lot of trouble when trying to [third party integration](https://github.com/orgs/supabase/discussions/34988#discussion-8199151).
-That's we decided to not implicit force JWT verification but suggest patterns and starter templates to handle this task.
-It allows users to own and control the auth code instead of hidding it internally under Edge Runtime infrastructure.
+When a HTTP request is sent to Edge Functions we can levarage to Supabase Auth to secure our endpoints, in the past this verification was controlled from [`verify_jwt` flag](http://localhost:3001/docs/guides/functions/function-configuration#skipping-authorization-checks).
+
+But unfortunely this method is not compatible with the new [JWT Signing Keys](docs/guides/auth/signing-keys) and also caused a lot of trouble when trying to [third party integration](https://github.com/orgs/supabase/discussions/34988#discussion-8199151).
+
+That's why we decided to not implicit force JWT verification but suggest patterns and templates to handle this task. It allow users to own and control the auth code, instead of hidding it internally under Edge Runtime infrastructure.
+
+<Admonition type="warning">
+
+Following the [Upcoming changes](https://github.com/orgs/supabase/discussions/29260) timetable, the `verify_jwt` flag will be still suported and enabled by default. In order to move to new [JWT Signing Keys](docs/guides/auth/signing-keys) you need to manually [skip the authorization checks](http://localhost:3001/docs/guides/functions/function-configuration#skipping-authorization-checks) and follow the steps bellow.
+
+</Admonition>
