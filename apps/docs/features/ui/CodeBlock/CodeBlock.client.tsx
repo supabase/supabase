@@ -141,10 +141,7 @@ export function CodeBlockControls({ content }: { content: string }) {
         <TooltipTrigger asChild>
           <button
             onClick={toggleWrap}
-            className={cn(
-              'border rounded-md p-1',
-              'hover:bg-selection transition'
-            )}
+            className={cn('border rounded-md p-1', 'hover:bg-selection transition')}
             aria-label={isWrapped ? 'Disable word wrap' : 'Enable word wrap'}
           >
             {isWrapped ? (
@@ -154,9 +151,7 @@ export function CodeBlockControls({ content }: { content: string }) {
             )}
           </button>
         </TooltipTrigger>
-        <TooltipContent>
-          {isWrapped ? 'Disable word wrap' : 'Enable word wrap'}
-        </TooltipContent>
+        <TooltipContent>{isWrapped ? 'Disable word wrap' : 'Enable word wrap'}</TooltipContent>
       </Tooltip>
       <CodeCopyButton content={content} />
     </div>

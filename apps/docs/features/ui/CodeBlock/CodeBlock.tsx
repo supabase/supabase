@@ -77,18 +77,22 @@ export async function CodeBlock({
             <>
               {tokens.map((line, idx) => (
                 <Fragment key={idx}>
-                  <div className={cn(
-                    "select-none text-right text-muted bg-control px-2 min-h-5 leading-5",
-                    idx === 0 && "pt-6",
-                    idx === tokens.length - 1 && "pb-6"
-                  )}>
+                  <div
+                    className={cn(
+                      'select-none text-right text-muted bg-control px-2 min-h-5 leading-5',
+                      idx === 0 && 'pt-6',
+                      idx === tokens.length - 1 && 'pb-6'
+                    )}
+                  >
                     {idx + 1}
                   </div>
-                  <div className={cn(
-                    "code-content min-h-5 leading-5 pl-6 pr-6",
-                    idx === 0 && "pt-6",
-                    idx === tokens.length - 1 && "pb-6"
-                  )}>
+                  <div
+                    className={cn(
+                      'code-content min-h-5 leading-5 pl-6 pr-6',
+                      idx === 0 && 'pt-6',
+                      idx === tokens.length - 1 && 'pb-6'
+                    )}
+                  >
                     <CodeLine tokens={line} twoslash={twoslashed?.get(idx)} />
                   </div>
                 </Fragment>
