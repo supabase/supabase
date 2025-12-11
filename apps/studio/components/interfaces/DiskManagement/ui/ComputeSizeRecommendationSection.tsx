@@ -44,7 +44,7 @@ export function ComputeSizeRecommendationSection({
             type="default"
             title={
               hasComputeSize
-                ? `Your compute size supports up to ${COMPUTE_MAX_IOPS[computeSize]} IOPS`
+                ? `Your compute size supports up to ${COMPUTE_MAX_IOPS[computeSize] ?? maxIOPSforComputeSize} IOPS`
                 : 'Could not determine your compute size. Please contact support if this persists.'
             }
           >

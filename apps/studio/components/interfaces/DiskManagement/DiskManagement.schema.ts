@@ -183,7 +183,13 @@ export const CreateDiskStorageSchema = ({
           0.25 * provisionedIOPS,
           DISK_LIMITS[DiskType.GP3].maxThroughput
         )
-        if (throughput > computeMaxThroughput) {
+        if (throughput > DISK_LIMITS[DiskType.GP3].maxThroughput) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Throughput cannot exceed ${formatNumber(DISK_LIMITS[DiskType.GP3].maxThroughput)} MB/s for GP3 disk type.`,
+            path: ['throughput'],
+          })
+        } else if (throughput > computeMaxThroughput) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: `Throughput cannot exceed ${formatNumber(computeMaxThroughput)} MB/s for the selected compute size.`,
