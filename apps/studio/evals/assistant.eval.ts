@@ -25,6 +25,13 @@ Eval('Assistant', {
         input: 'How do I implement IP address rate limiting? Use search_docs.',
         expected: [{ type: 'tools_include', tool: 'search_docs' }],
       },
+      {
+        input: 'Check if my project is having issues right now and tell me what to fix first.',
+        expected: [
+          { type: 'tools_include', tool: 'get_advisors' },
+          { type: 'tools_include', tool: 'get_logs' },
+        ],
+      },
     ] satisfies Array<{ input: string; expected: EvalAssertion[] }>
   },
   task: async (input) => {
