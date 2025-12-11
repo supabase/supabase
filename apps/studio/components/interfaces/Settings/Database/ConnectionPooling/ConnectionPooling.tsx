@@ -141,7 +141,7 @@ export const ConnectionPooling = () => {
   return (
     <section id="connection-pooler">
       <Panel
-        className="!mb-0"
+        noMargin
         title={
           <div className="w-full flex items-center justify-between">
             <div className="flex items-center gap-x-2">
@@ -218,7 +218,7 @@ export const ConnectionPooling = () => {
             <Form_Shadcn_ {...form}>
               <form
                 id={formId}
-                className="flex flex-col gap-y-6 w-full"
+                className="flex flex-col gap-y-4 w-full"
                 onSubmit={form.handleSubmit(onSubmit)}
               >
                 <FormField_Shadcn_
@@ -238,7 +238,7 @@ export const ConnectionPooling = () => {
                       className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full [&>div>div>div]:min-w-100"
                     >
                       <FormControl_Shadcn_>
-                        <PrePostTab postTab="Connections" className="w-full">
+                        <PrePostTab postTab="connections" className="uppercase">
                           <Input_Shadcn_
                             {...field}
                             type="number"
@@ -268,6 +268,8 @@ export const ConnectionPooling = () => {
                   )}
                 />
 
+                <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
+
                 <FormField_Shadcn_
                   control={form.control}
                   name="max_client_conn"
@@ -296,7 +298,7 @@ export const ConnectionPooling = () => {
                       }
                     >
                       <FormControl_Shadcn_>
-                        <PrePostTab postTab="Clients" className="w-full">
+                        <PrePostTab postTab="clients" className="uppercase">
                           <Input_Shadcn_
                             {...field}
                             type="number"
