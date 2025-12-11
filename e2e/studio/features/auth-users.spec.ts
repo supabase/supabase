@@ -6,7 +6,7 @@ import { createUserViaUI, deleteUserViaUI, navigateToAuthUsers } from '../utils/
 
 test.describe('auth users list refresh', () => {
   test.beforeEach(async ({ page, ref }) => {
-    navigateToAuthUsers(page, ref)
+    await navigateToAuthUsers(page, ref)
   })
 
   test('should automatically refresh users list after creating a user', async ({ page, ref }) => {
