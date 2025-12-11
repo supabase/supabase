@@ -15,6 +15,7 @@ import { ChevronDown, MoreVertical } from "lucide-react"
 
 import {
   Button,
+  Card,
   Checkbox_Shadcn_,
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -215,8 +216,9 @@ export default function DataTableDemo() {
   })
 
   return (
-    <div className="w-full">
-      <div className="flex items-center py-4">
+    <div className="w-full flex flex-col gap-4">
+      {/* Filters and column visibility controls */}
+      <div className="flex items-center">
         <Input
           size="tiny"
           placeholder="Filter by email"
@@ -253,7 +255,8 @@ export default function DataTableDemo() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="overflow-hidden rounded-md border bg-surface-75">
+      {/* Table */}
+      <Card className="w-full">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -335,8 +338,9 @@ export default function DataTableDemo() {
             )}
           </TableBody>
         </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
+      </Card>
+      {/* Count and pagination controls */}
+      <div className="flex items-center justify-end space-x-2">
         <div className="text-foreground-muted flex-1 text-xs">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected
