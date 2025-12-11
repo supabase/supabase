@@ -38,12 +38,6 @@ export const examples: Registry = [
     files: ['example/alert-demo.tsx'],
   },
   {
-    name: 'alert-destructive',
-    type: 'components:example',
-    registryDependencies: ['alert'],
-    files: ['example/alert-destructive.tsx'],
-  },
-  {
     name: 'alert-dialog-demo',
     type: 'components:example',
     registryDependencies: ['alert-dialog', 'button'],
@@ -798,10 +792,46 @@ export const examples: Registry = [
     files: ['example/switch-form.tsx'],
   },
   {
+    name: 'table-cross-link',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-cross-link.tsx'],
+  },
+  {
     name: 'table-demo',
     type: 'components:example',
     registryDependencies: ['table'],
     files: ['example/table-demo.tsx'],
+  },
+  {
+    name: 'table-actions',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-actions.tsx'],
+  },
+  {
+    name: 'table-icons',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-icons.tsx'],
+  },
+  {
+    name: 'table-row-link',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-row-link.tsx'],
+  },
+  {
+    name: 'table-row-link-actions',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-row-link-actions.tsx'],
+  },
+  {
+    name: 'table-sort',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-sort.tsx'],
   },
   {
     name: 'tabs-demo',

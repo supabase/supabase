@@ -25,7 +25,7 @@ export const useInstalledIntegrations = () => {
     data,
     error: fdwError,
     isError: isErrorFDWs,
-    isLoading: isFDWLoading,
+    isPending: isFDWLoading,
     isSuccess: isSuccessFDWs,
   } = useFDWsQuery({
     projectRef: project?.ref,
@@ -35,7 +35,7 @@ export const useInstalledIntegrations = () => {
     data: extensions,
     error: extensionsError,
     isError: isErrorExtensions,
-    isLoading: isExtensionsLoading,
+    isPending: isExtensionsLoading,
     isSuccess: isSuccessExtensions,
   } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -46,7 +46,7 @@ export const useInstalledIntegrations = () => {
     data: schemas,
     error: schemasError,
     isError: isErrorSchemas,
-    isLoading: isSchemasLoading,
+    isPending: isSchemasLoading,
     isSuccess: isSuccessSchemas,
   } = useSchemasQuery({
     projectRef: project?.ref,

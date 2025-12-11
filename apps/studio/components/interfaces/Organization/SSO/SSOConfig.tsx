@@ -69,7 +69,7 @@ export const SSOConfig = () => {
 
   const {
     data: ssoConfig,
-    isLoading: isLoadingSSOConfig,
+    isPending: isLoadingSSOConfig,
     isSuccess,
     isError,
     error: configError,

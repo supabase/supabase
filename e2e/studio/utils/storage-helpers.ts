@@ -69,7 +69,7 @@ export const createBucket = async (
   await expect(
     page.getByRole('row').filter({ hasText: bucketName }),
     `Bucket ${bucketName} should be visible after creation`
-  ).toBeVisible({ timeout: 15_000 })
+  ).toBeVisible()
 }
 
 /**
@@ -147,7 +147,7 @@ export const navigateToBucket = async (page: Page, ref: string, bucketName: stri
   await expect(
     page.getByRole('button', { name: 'Edit bucket' }),
     `Should be in bucket ${bucketName}`
-  ).toBeVisible({ timeout: 10_000 })
+  ).toBeVisible()
 }
 
 /**
@@ -171,7 +171,7 @@ export const createFolder = async (page: Page, folderName: string) => {
   await expect(
     page.getByTitle(folderName),
     `Folder ${folderName} should be visible after creation`
-  ).toBeVisible({ timeout: 10_000 })
+  ).toBeVisible()
 }
 
 /**
@@ -217,7 +217,7 @@ export const deleteItem = async (page: Page, itemName: string) => {
   await expect(
     page.getByTitle(itemName),
     `Item ${itemName} should not be visible after deletion`
-  ).not.toBeVisible({ timeout: 10_000 })
+  ).not.toBeVisible()
 }
 
 /**

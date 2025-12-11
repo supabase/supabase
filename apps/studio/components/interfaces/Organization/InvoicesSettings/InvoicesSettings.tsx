@@ -59,7 +59,12 @@ export const InvoicesSettings = () => {
     },
     { enabled: selectedOrganization?.managed_by === 'supabase' }
   )
-  const { data, error, isLoading, isError } = useInvoicesQuery(
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isError,
+  } = useInvoicesQuery(
     {
       slug,
       offset,
