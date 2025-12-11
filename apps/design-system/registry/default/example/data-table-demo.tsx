@@ -11,10 +11,10 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table"
-import { ChevronDown, MoreHorizontal } from "lucide-react"
+import { ChevronDown, MoreVertical } from "lucide-react"
 
 import {
-  Button_Shadcn_,
+  Button,
   Checkbox_Shadcn_,
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -132,10 +132,11 @@ export const columns: ColumnDef<Payment>[] = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button_Shadcn_ variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button_Shadcn_>
+            <Button
+              type="default"
+              className="px-1.5"
+              icon={<MoreVertical />}
+            />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
@@ -224,11 +225,11 @@ export default function DataTableDemo() {
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button_Shadcn_ variant="outline" className="ml-auto" size="tiny">
-              Columns <ChevronDown />
-            </Button_Shadcn_>
+            <Button type="default" className="ml-auto" size="tiny" iconRight={<ChevronDown />}>
+              Columns
+            </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="max-w-32">
             {table
               .getAllColumns()
               .filter((column) => column.getCanHide())
@@ -309,12 +310,13 @@ export default function DataTableDemo() {
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
+                
+                <TableCell colSpan={columns.length}>
+              <p className="text-sm text-foreground">No results found</p>
+              <p className="text-sm text-foreground-lighter">
+                Your search did not return any results
+              </p>
+            </TableCell>
               </TableRow>
             )}
           </TableBody>
@@ -326,22 +328,22 @@ export default function DataTableDemo() {
           {table.getFilteredRowModel().rows.length} row(s) selected
         </div>
         <div className="space-x-2">
-          <Button_Shadcn_
-            variant="outline"
+          <Button
+            type="default"
             size="tiny"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
             Previous
-          </Button_Shadcn_>
-          <Button_Shadcn_
-            variant="outline"
+          </Button>
+          <Button
+            type="default"
             size="tiny"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
             Next
-          </Button_Shadcn_>
+          </Button>
         </div>
       </div>
     </div>
