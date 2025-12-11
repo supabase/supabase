@@ -3224,7 +3224,7 @@ functions:
           ```js
           const { data: user, error } = await supabase.auth.admin.updateUserById(
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
-            { ban_duration: '100y' }
+            { ban_duration: '876000h' }
           )
           ```
   - id: auth-js-gotrueadminapi-signout
