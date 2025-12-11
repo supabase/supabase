@@ -1,7 +1,7 @@
 import NavigationItem from '@/components/side-navigation-item'
 import { docsConfig } from '@/config/docs'
 
-function SideNavigation() {
+export const SideNavigation = () => {
   return (
     <nav className="min-w-[220px] py-6 lg:py-8">
       {docsConfig.sidebarNav.map((section, i) => (
@@ -26,5 +26,3 @@ function SideNavigation() {
     </nav>
   )
 }
-
-export default SideNavigation
