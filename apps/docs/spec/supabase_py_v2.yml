@@ -2816,7 +2816,7 @@ functions:
           )
           ```
 
-  - id: admin-oauth-api
+  - id: oauth-admin-api
     title: 'Overview'
     notes: |
       - OAuth 2.1 client administration endpoints are available via the `supabase.auth.admin.oauth` namespace.
@@ -2824,7 +2824,7 @@ functions:
       - Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
       - This is an alpha feature and may change in the future.
 
-  - id: admin-oauth-list-clients
+  - id: auth-js-gotrueadminoauthapi-listclients
     title: 'admin.oauth.list_clients()'
     description: |
       Lists OAuth clients with optional pagination.
@@ -2862,7 +2862,7 @@ functions:
           )
           ```
 
-  - id: admin-oauth-create-client
+  - id: auth-js-gotrueadminoauthapi-createclient
     title: 'admin.oauth.create_client()'
     description: |
       Creates a new OAuth client.
@@ -2913,7 +2913,7 @@ functions:
           )
           ```
 
-  - id: admin-oauth-update-client
+  - id: auth-js-gotrueadminoauthapi-updateclient
     title: 'admin.oauth.update_client()'
     description: |
       Updates an existing OAuth client.
@@ -2961,7 +2961,7 @@ functions:
           )
           ```
 
-  - id: admin-oauth-get-client
+  - id: auth-js-gotrueadminoauthapi-getclient
     title: 'admin.oauth.get_client()'
     description: |
       Retrieves details of an OAuth client by ID.
@@ -2982,7 +2982,7 @@ functions:
           response = supabase.auth.admin.oauth.get_client("client-id")
           ```
 
-  - id: admin-oauth-delete-client
+  - id: auth-js-gotrueadminoauthapi-deleteclient
     title: 'admin.oauth.delete_client()'
     description: |
       Deletes an OAuth client.
@@ -3003,7 +3003,7 @@ functions:
           supabase.auth.admin.oauth.delete_client("client-id")
           ```
 
-  - id: admin-oauth-regenerate-client-secret
+  - id: auth-js-gotrueadminoauthapi-regenerateclientsecret
     title: 'admin.oauth.regenerate_client_secret()'
     description: |
       Regenerates the client secret for an OAuth client.
@@ -7359,12 +7359,6 @@ functions:
     title: 'Overview'
     notes: |
       This section contains methods for working with File Buckets.
-  - id: analytics-buckets
-    title: 'Overview'
-    notes: |
-      This section contains methods for working with Analytics Buckets.
-      - Analytics buckets are accessed via the `supabase.storage.analytics()` namespace.
-      - Analytics buckets are used for storing and querying analytics data.
 
   - id: list-buckets
     title: 'list_buckets()'
@@ -8399,7 +8393,14 @@ functions:
           )
           ```
 
-  - id: analytics-create
+  - id: analytics-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with Analytics Buckets.
+      - Analytics buckets are accessed via the `supabase.storage.analytics()` namespace.
+      - Analytics buckets are used for storing and querying analytics data.
+
+  - id: storageanalytics-createbucket
     title: 'analytics().create()'
     description: |
       Creates a new Analytics bucket.
@@ -8428,7 +8429,7 @@ functions:
           }
           ```
 
-  - id: analytics-list
+  - id: storageanalytics-listbuckets
     title: 'analytics().list()'
     description: |
       Lists all Analytics buckets with optional filtering and sorting.
@@ -8446,11 +8447,11 @@ functions:
       - name: sort_column
         isOptional: true
         type: string
-        description: "Column to sort by. Options: `id`, `name`, `created_at`, `updated_at`."
+        description: 'Column to sort by. Options: `id`, `name`, `created_at`, `updated_at`.'
       - name: sort_order
         isOptional: true
         type: string
-        description: "Sort order. Options: `asc`, `desc`."
+        description: 'Sort order. Options: `asc`, `desc`.'
       - name: search
         isOptional: true
         type: string
@@ -8474,7 +8475,7 @@ functions:
           ]
           ```
 
-  - id: analytics-delete
+  - id: storageanalytics-deletebucket
     title: 'analytics().delete()'
     description: |
       Deletes an Analytics bucket.
@@ -8499,7 +8500,12 @@ functions:
           }
           ```
 
-  - id: vectors-create-bucket
+  - id: vector-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with Vector Buckets.
+
+  - id: storagevectors-create-bucket
     title: 'vectors().create_bucket()'
     description: |
       Creates a new Vector bucket.
@@ -8519,7 +8525,7 @@ functions:
           supabase.storage.vectors().create_bucket("vectors-bucket")
           ```
 
-  - id: vectors-get-bucket
+  - id: storagevectors-get-bucket
     title: 'vectors().get_bucket()'
     description: |
       Retrieves details of a Vector bucket.
@@ -8547,7 +8553,7 @@ functions:
           }
           ```
 
-  - id: vectors-list-buckets
+  - id: storagevectors-list-buckets
     title: 'vectors().list_buckets()'
     description: |
       Lists all Vector buckets with optional pagination.
@@ -8585,7 +8591,7 @@ functions:
           }
           ```
 
-  - id: vectors-delete-bucket
+  - id: storagevectors-delete-bucket
     title: 'vectors().delete_bucket()'
     description: |
       Deletes a Vector bucket.
@@ -8604,7 +8610,7 @@ functions:
           supabase.storage.vectors().delete_bucket("vectors-bucket")
           ```
 
-  - id: vectors-from-create-index
+  - id: vectorbucket-createindex
     title: 'vectors().from_().create_index()'
     description: |
       Creates a new vector index in a vector bucket.
@@ -8626,7 +8632,7 @@ functions:
       - name: distance_metric
         isOptional: false
         type: string
-        description: "The distance metric to use. Options: `cosine`, `euclidean`."
+        description: 'The distance metric to use. Options: `cosine`, `euclidean`.'
       - name: data_type
         isOptional: false
         type: string
@@ -8648,7 +8654,7 @@ functions:
           )
           ```
 
-  - id: vectors-from-get-index
+  - id: vectorbucket-getindex
     title: 'vectors().from_().get_index()'
     description: |
       Retrieves details of a vector index.
@@ -8671,7 +8677,7 @@ functions:
           response = supabase.storage.vectors().from_("vectors-bucket").get_index("my-index")
           ```
 
-  - id: vectors-from-list-indexes
+  - id: vectorbucket-listindexes
     title: 'vectors().from_().list_indexes()'
     description: |
       Lists all indexes in a vector bucket.
@@ -8702,7 +8708,7 @@ functions:
           response = supabase.storage.vectors().from_("vectors-bucket").list_indexes()
           ```
 
-  - id: vectors-from-delete-index
+  - id: vectorbucket-deleteindex
     title: 'vectors().from_().delete_index()'
     description: |
       Deletes a vector index.
@@ -8725,7 +8731,7 @@ functions:
           supabase.storage.vectors().from_("vectors-bucket").delete_index("my-index")
           ```
 
-  - id: vectors-from-index-put
+  - id: vectorindex-putvectors
     title: 'vectors().from_().index().put()'
     description: |
       Inserts or updates vectors in an index.
@@ -8758,7 +8764,7 @@ functions:
           ])
           ```
 
-  - id: vectors-from-index-get
+  - id: vectorindex-getvectors
     title: 'vectors().from_().index().get()'
     description: |
       Retrieves vectors by their keys.
@@ -8793,7 +8799,7 @@ functions:
           response = supabase.storage.vectors().from_("vectors-bucket").index("my-index").get("vector-1")
           ```
 
-  - id: vectors-from-index-list
+  - id: vectorindex-listvectors
     title: 'vectors().from_().index().list()'
     description: |
       Lists vectors in an index with optional pagination.
@@ -8840,7 +8846,7 @@ functions:
           response = supabase.storage.vectors().from_("vectors-bucket").index("my-index").list()
           ```
 
-  - id: vectors-from-index-query
+  - id: vectorindex-queryvectors
     title: 'vectors().from_().index().query()'
     description: |
       Queries vectors using a query vector to find similar vectors.
@@ -8886,7 +8892,7 @@ functions:
           )
           ```
 
-  - id: vectors-from-index-delete
+  - id: vectorindex-deletevectors
     title: 'vectors().from_().index().delete()'
     description: |
       Deletes vectors by their keys.
