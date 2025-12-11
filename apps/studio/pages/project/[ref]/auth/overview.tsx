@@ -27,7 +27,7 @@ const AuthOverview: NextPageWithLayout = () => {
 
   const {
     data: metrics,
-    isLoading,
+    isPending: isLoading,
     error,
   } = useAuthOverviewQuery({ projectRef: ref }, { enabled: !!ref })
 

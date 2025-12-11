@@ -28,12 +28,12 @@ export const DisplayApiSettings = ({
   const {
     data: settings,
     isError: isProjectSettingsError,
-    isLoading: isProjectSettingsLoading,
+    isPending: isProjectSettingsLoading,
   } = useProjectSettingsV2Query({ projectRef })
   const {
     data,
     isError: isJwtSecretUpdateStatusError,
-    isLoading: isJwtSecretUpdateStatusLoading,
+    isPending: isJwtSecretUpdateStatusLoading,
   } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
@@ -51,18 +51,18 @@ export const DisplayApiSettings = ({
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
 
-  const hideApiKeyLastUsed = useFlag('HideApiKeyLastUsed') ?? true
-  const { isLoading: isLoadingLastUsed, logData: lastUsedLogData } = useLastUsedAPIKeysLogQuery(
-    projectRef!,
-    !hideApiKeyLastUsed
-  )
+  const showApiKeyLastUsed = useFlag('showApiKeysLastUsed')
+  const { isLoading: isLoadingLastUsed, logData: lastUsedLogData } = useLastUsedAPIKeysLogQuery({
+    projectRef: projectRef ?? '',
+    enabled: showApiKeyLastUsed,
+  })
 
   const lastUsedAPIKeys = useMemo(() => {
     if (
       apiKeys.length < 1 ||
       !lastUsedLogData ||
       lastUsedLogData.length < 1 ||
-      hideApiKeyLastUsed
+      !showApiKeyLastUsed
     ) {
       return {}
     }
@@ -74,7 +74,7 @@ export const DisplayApiSettings = ({
       console.error(e)
       return {}
     }
-  }, [lastUsedLogData, apiKeys, hideApiKeyLastUsed])
+  }, [lastUsedLogData, apiKeys, showApiKeyLastUsed])
 
   return (
     <Panel
@@ -206,7 +206,7 @@ export const DisplayApiSettings = ({
               />
             </FormLayout>
 
-            {!hideApiKeyLastUsed && (
+            {showApiKeyLastUsed && (
               <div
                 className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
                 data-invisible={isLoadingLastUsed}

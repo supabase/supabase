@@ -1,11 +1,11 @@
 import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Image } from 'ui'
-import { Heading } from 'ui/src/components/CustomHTMLElements'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition, type AdmonitionProps } from 'ui-patterns/admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
+import { Heading } from 'ui/src/components/CustomHTMLElements'
 import { AiPromptsIndex } from '~/app/guides/getting-started/ai-prompts/[slug]/AiPromptsIndex'
 import { AppleSecretGenerator } from '~/components/AppleSecretGenerator'
 import AuthProviders from '~/components/AuthProviders'
@@ -32,10 +32,15 @@ import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
 
+// Wrap Admonition for Docs-specific styling (within MDX prose, requires a margin-bottom)
+const AdmonitionWithMargin = (props: AdmonitionProps) => {
+  return <Admonition {...props} className="mb-8" />
+}
+
 const components = {
   Accordion,
   AccordionItem,
-  Admonition,
+  Admonition: AdmonitionWithMargin,
   AiPromptsIndex,
   AuthSmsProviderConfig,
   AppleSecretGenerator,

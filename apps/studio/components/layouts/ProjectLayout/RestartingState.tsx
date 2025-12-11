@@ -12,7 +12,8 @@ const RestartingState = () => {
       // setting a refetch interval here will cause the `useSelectedProject()` in `ProjectLayout.tsx` to
       // rerender every 4 seconds while the project is restarting. Once restarting is complete, it will
       // no longer show this state.
-      refetchInterval(data) {
+      refetchInterval: (query) => {
+        const data = query.state.data
         return data?.status !== PROJECT_STATUS.ACTIVE_HEALTHY ? 4000 : false
       },
     }

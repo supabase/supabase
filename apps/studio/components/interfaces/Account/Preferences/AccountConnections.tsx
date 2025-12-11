@@ -23,7 +23,7 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 export const AccountConnections = () => {
   const {
     data: gitHubAuthorization,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
     error,
