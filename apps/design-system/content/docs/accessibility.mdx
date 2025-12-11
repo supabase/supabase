@@ -29,15 +29,19 @@ Interactive page elements should also provide visual feedback upon selection via
 
 [Button](components/button) has all of the above built-in. Bespoke interactive elements however, such as the below interactive [Table Row](components/table#examples), require these props to be added manually:
 
-```tsx showLineNumbers {3, 5-11}
+```tsx showLineNumbers {4-14}
 <TableRow
   key={id}
   className="relative cursor-pointer h-16 inset-focus"
-  onClick={(event) => handleBucketNavigation(name, event)}
+  onClick={(event) => {
+    if (event.currentTarget !== event.target) return
+    handleBucketNavigation(policy.id, event)
+  }}
   onKeyDown={(event) => {
+    if (event.currentTarget !== event.target) return
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
-      handleBucketNavigation(name, event)
+      handleBucketNavigation(policy.id, event)
     }
   }}
   tabIndex={0}
