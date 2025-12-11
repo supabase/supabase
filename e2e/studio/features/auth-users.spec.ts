@@ -2,17 +2,11 @@ import { expect, Page } from '@playwright/test'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { waitForApiResponse } from '../utils/wait-for-response.js'
-import { createUserViaUI, deleteUserViaUI } from '../utils/auth-helpers.js'
+import { createUserViaUI, deleteUserViaUI, navigateToAuthUsers } from '../utils/auth-helpers.js'
 
 test.describe('auth users list refresh', () => {
   test.beforeEach(async ({ page, ref }) => {
-    await page.goto(toUrl(`/project/${ref}/auth/users`))
-
-    // Wait for the page to load by checking for the "Users" heading
-    await expect(page.getByRole('heading', { name: 'Users', level: 3 })).toBeVisible()
-
-    // Wait for initial users list to load
-    await waitForApiResponse(page, 'platform/pg-meta', ref, 'query?key=')
+    navigateToAuthUsers(page, ref)
   })
 
   test('should automatically refresh users list after creating a user', async ({ page, ref }) => {

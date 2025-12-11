@@ -1,6 +1,7 @@
 import { expect, Page } from '@playwright/test'
 import { waitForApiResponse } from './wait-for-response.js'
 import { dismissToastsIfAny } from './dismiss-toast.js'
+import { toUrl } from './to-url.js'
 
 export const createUserViaUI = async (page: Page, ref: string, email: string, password: string) => {
   await dismissToastsIfAny(page)
@@ -78,12 +79,13 @@ export const deleteUserViaUI = async (page: Page, ref: string, email: string) =>
 }
 
 export const navigateToAuthUsers = async (page: Page, ref: string) => {
-  const { toUrl } = await import('./to-url.js')
+  const userListPromise = waitForApiResponse(page, 'platform/pg-meta', ref, 'query?key=')
+
   await page.goto(toUrl(`/project/${ref}/auth/users`))
 
   // Wait for the page to load by checking for the "Users" heading
   await expect(page.getByRole('heading', { name: 'Users', level: 3 })).toBeVisible()
 
   // Wait for initial users list to load
-  await waitForApiResponse(page, 'platform/pg-meta', ref, 'query?key=')
+  await userListPromise
 }
