@@ -34,7 +34,7 @@ export function ExplainVisualizer({ rows, onShowRaw }: ExplainVisualizerProps) {
   return (
     <div className="bg-studio border-t h-full flex flex-col">
       {/* Header */}
-      <div className="border-b bg-surface-100 px-4 py-3">
+      <div className="bg-surface-100 px-4 py-3">
         <div className="flex items-center gap-2">
           <Activity size={16} className="text-foreground-light" />
           <h3 className="text-sm font-medium text-foreground">Query Execution Plan</h3>
@@ -65,33 +65,16 @@ export function ExplainVisualizer({ rows, onShowRaw }: ExplainVisualizerProps) {
         </div>
       </div>
 
-      {/* How to read hint */}
-      <div className="px-4 py-2 bg-surface-200/50 border-b text-xs text-foreground-lighter flex items-center gap-2">
-        <ArrowUp size={12} className="text-foreground-light" />
-        <span className="font-medium text-foreground-light">Pipeline execution:</span>
-        <span>Data flows from child nodes up to parents.</span>
-        <span className="text-border">•</span>
-        <span>Leaf nodes (scans) produce data that gets processed by their ancestors.</span>
-      </div>
-
-      {/* Tree visualization */}
-      <div className="p-4 overflow-auto flex-1">
-        {parsedTree.map((node, idx) => (
-          <ExplainNodeRenderer
-            key={idx}
-            node={node}
-            isLast={idx === parsedTree.length - 1}
-            depth={0}
-            maxCost={maxCost}
-            parentHasMore={[]}
-            isRoot={true}
-          />
-        ))}
-      </div>
-
-      {/* Legend */}
-      <div className="border-t bg-surface-100 px-4 py-2.5 flex-shrink-0">
-        <div className="flex items-center gap-4 text-xs text-foreground-lighter flex-wrap">
+      <div className="px-4 py-2 bg-surface-100 border-b text-xs text-foreground-lighter">
+        <div className="flex items-center gap-2 mb-4">
+          <ArrowUp size={12} className="text-foreground-light" />
+          <span className="font-medium text-foreground-light">How to read:</span>
+          <span>
+            Start at the bottom where data is read from tables, then follow upward as each step
+            processes the results.
+          </span>
+        </div>
+        <div className="flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-1.5">
             <Database size={12} className="text-warning" />
             <span>Seq Scan (full table read)</span>
@@ -109,6 +92,21 @@ export function ExplainVisualizer({ rows, onShowRaw }: ExplainVisualizerProps) {
             <span>Hash (lookup table)</span>
           </div>
         </div>
+      </div>
+
+      {/* Tree visualization */}
+      <div className="overflow-auto flex-1">
+        {parsedTree.map((node, idx) => (
+          <ExplainNodeRenderer
+            key={idx}
+            node={node}
+            isLast={idx === parsedTree.length - 1}
+            depth={0}
+            maxCost={maxCost}
+            parentHasMore={[]}
+            isRoot={true}
+          />
+        ))}
       </div>
     </div>
   )

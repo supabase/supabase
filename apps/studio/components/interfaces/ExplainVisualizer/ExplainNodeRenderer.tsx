@@ -70,7 +70,7 @@ export function ExplainNodeRenderer({
         </div>
 
         {/* Icon */}
-        <div className={cn('flex-shrink-0 mt-0.5 rounded-lg p-2')}>
+        <div className={cn('flex-shrink-0 mt-0.5 rounded-lg px-1')}>
           <Icon size={18} strokeWidth={2} className={colorClass} />
         </div>
 
