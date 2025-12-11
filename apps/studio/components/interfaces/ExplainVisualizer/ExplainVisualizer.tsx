@@ -2,7 +2,13 @@ import { Activity, Clock, Database, GitMerge, Hash, Zap } from 'lucide-react'
 import { useMemo } from 'react'
 import { Badge, Button } from 'ui'
 import { ExplainNodeRenderer } from './ExplainNodeRenderer'
-import { parseExplainOutput, parseNodeDetails } from './parser'
+import {
+  assignStepNumbers,
+  calculateMaxCost,
+  calculateSummary,
+  parseExplainOutput,
+  parseNodeDetails,
+} from './parser'
 import type { ExplainNode, QueryPlanRow } from './types'
 
 export interface ExplainVisualizerProps {
@@ -18,66 +24,9 @@ export function ExplainVisualizer({ rows, onShowRaw }: ExplainVisualizerProps) {
     return tree
   }, [rows])
 
-  // Calculate max cost for scaling the visualization bars
-  const maxCost = useMemo(() => {
-    let max = 0
-    const traverse = (node: ExplainNode) => {
-      const cost = node.cost?.end || node.actualTime?.end || 0
-      if (cost > max) max = cost
-      node.children.forEach(traverse)
-    }
-    parsedTree.forEach(traverse)
-    return max
-  }, [parsedTree])
-
-  // Assign step numbers and calculate total steps
-  // PostgreSQL executes children in reverse order for joins:
-  // - For Hash Join: the Hash (inner/build) side executes first, then the outer/probe side
-  // - The second child in EXPLAIN output is typically the "build" side
-  const totalSteps = useMemo(() => {
-    let stepCounter = 1
-    const assignSteps = (node: ExplainNode) => {
-      // Process children in REVERSE order (inner/build side first, then outer/probe)
-      // This matches PostgreSQL's actual execution order
-      const children = [...node.children].reverse()
-      children.forEach(assignSteps)
-      node._stepNumber = stepCounter++
-    }
-    parsedTree.forEach(assignSteps)
-    return stepCounter - 1
-  }, [parsedTree])
-
-  // Calculate summary stats
-  const summary = useMemo(() => {
-    const stats = {
-      totalTime: 0,
-      totalCost: 0,
-      hasSeqScan: false,
-      seqScanTables: [] as string[],
-      hasIndexScan: false,
-    }
-
-    const traverse = (node: ExplainNode) => {
-      if (node.actualTime) {
-        stats.totalTime = Math.max(stats.totalTime, node.actualTime.end)
-      }
-      if (node.cost) {
-        stats.totalCost = Math.max(stats.totalCost, node.cost.end)
-      }
-      const op = node.operation.toLowerCase()
-      if (op.includes('seq scan')) {
-        stats.hasSeqScan = true
-        const tableMatch = node.details.match(/on\s+(\w+)/)
-        if (tableMatch) stats.seqScanTables.push(tableMatch[1])
-      }
-      if (op.includes('index')) {
-        stats.hasIndexScan = true
-      }
-      node.children.forEach(traverse)
-    }
-    parsedTree.forEach(traverse)
-    return stats
-  }, [parsedTree])
+  const maxCost = useMemo(() => calculateMaxCost(parsedTree), [parsedTree])
+  const totalSteps = useMemo(() => assignStepNumbers(parsedTree), [parsedTree])
+  const summary = useMemo(() => calculateSummary(parsedTree), [parsedTree])
 
   if (parsedTree.length === 0) {
     return (
