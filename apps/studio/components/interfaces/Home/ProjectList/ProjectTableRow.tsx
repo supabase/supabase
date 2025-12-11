@@ -59,7 +59,7 @@ export const ProjectTableRow = ({
             <h5 className="text-sm">{name}</h5>
             <p className="text-sm text-foreground-lighter">ID: {projectRef}</p>
           </div>
-          {/* Compute and integrations */}
+          {/* Integrations */}
           {(isGithubIntegrated || isVercelIntegrated) && (
             <div className="flex items-center gap-x-1.5">
               {isVercelIntegrated && (
