@@ -1,0 +1,196 @@
+import type { ExplainNode, QueryPlanRow } from './types'
+
+// Parse the QUERY PLAN text into a tree structure
+export function parseExplainOutput(rows: readonly QueryPlanRow[]): ExplainNode[] {
+  const lines = rows.map((row) => row['QUERY PLAN'] || '').filter(Boolean)
+  const root: ExplainNode[] = []
+  const stack: { node: ExplainNode; indent: number }[] = []
+
+  // Detail line patterns that should be attached to the previous node
+  const detailPatterns =
+    /^(Filter|Sort Key|Group Key|Hash Cond|Join Filter|Index Cond|Recheck Cond|Rows Removed by Filter|Rows Removed by Index Recheck|Output|Merge Cond|Sort Method|Worker \d+|Buffers|Planning Time|Execution Time|One-Time Filter|InitPlan|SubPlan):/
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
+
+    // Skip empty lines
+    if (!line.trim()) continue
+
+    // Calculate the indentation (number of leading spaces)
+    const leadingMatch = line.match(/^(\s*)/)
+    const leadingSpaces = leadingMatch ? leadingMatch[1].length : 0
+
+    // Check if this line has an arrow (indicates a child operation node)
+    const hasArrow = line.includes('->')
+
+    // Extract the content after any arrow
+    let content = line
+    let effectiveIndent = leadingSpaces
+
+    if (hasArrow) {
+      // Find position of -> and use that for indent calculation
+      const arrowIndex = line.indexOf('->')
+      effectiveIndent = arrowIndex
+      content = line.substring(arrowIndex + 2).trim()
+    } else {
+      content = line.trim()
+    }
+
+    // Skip Planning Time and Execution Time summary lines (at root level)
+    if (
+      content.startsWith('Planning Time:') ||
+      content.startsWith('Execution Time:') ||
+      content.startsWith('Planning:') ||
+      content.startsWith('Execution:')
+    ) {
+      continue
+    }
+
+    // Check if this is a detail line (like Filter:, Sort Key:, etc.)
+    if (detailPatterns.test(content) && stack.length > 0) {
+      // Attach to the most recent node at or above this indentation
+      const currentNode = stack[stack.length - 1].node
+      currentNode.details += (currentNode.details ? '\n' : '') + content
+      continue
+    }
+
+    // Check if this is a continuation of details (indented text without operation pattern)
+    // These are typically wrapped condition expressions
+    if (!hasArrow && stack.length > 0 && leadingSpaces > 0) {
+      const lastItem = stack[stack.length - 1]
+      // If it's more indented than the last node and doesn't look like an operation
+      if (leadingSpaces > lastItem.indent && !content.match(/^\w+.*\(cost=/)) {
+        lastItem.node.details += (lastItem.node.details ? '\n' : '') + content
+        continue
+      }
+    }
+
+    // Parse main operation line: "Operation on table (metrics)"
+    // Match operation with optional metrics in parentheses
+    // Handle multiple metric groups like (cost=...) (actual time=...)
+    const metricsMatch = content.match(/^(.+?)\s*(\([^)]*cost=[^)]+\)(?:\s*\([^)]+\))*)?\s*$/)
+
+    if (!metricsMatch) {
+      continue
+    }
+
+    const [, operationPart, metricsStr] = metricsMatch
+    const metrics = metricsStr
+      ? metricsStr.replace(/^\(|\)$/g, '').replace(/\)\s*\(/g, ' ')
+      : undefined
+
+    // Split operation and object name (e.g., "Seq Scan on users" -> operation: "Seq Scan", details: "users")
+    let operation = operationPart.trim()
+    let details = ''
+
+    // Check for "on tablename" or "using indexname" patterns
+    const onMatch = operationPart.match(/^(.+?)\s+on\s+(.+)$/i)
+    const usingMatch = operationPart.match(/^(.+?)\s+using\s+(.+)$/i)
+
+    if (onMatch) {
+      operation = onMatch[1].trim()
+      details = 'on ' + onMatch[2].trim()
+    } else if (usingMatch) {
+      operation = usingMatch[1].trim()
+      details = 'using ' + usingMatch[2].trim()
+    }
+
+    // Calculate the tree level based on indentation
+    // PostgreSQL typically uses 6 spaces per level for -> nodes
+    const level = hasArrow ? Math.floor(effectiveIndent / 6) + 1 : 0
+
+    const node = createNode(operation, details, metrics, level, line)
+    addNodeToTree(node, effectiveIndent, root, stack)
+  }
+
+  return root
+}
+
+function createNode(
+  operation: string,
+  details: string | undefined,
+  metrics: string | undefined,
+  level: number,
+  raw: string
+): ExplainNode {
+  const node: ExplainNode = {
+    operation: operation.trim(),
+    details: details?.trim() || '',
+    cost: null,
+    rows: null,
+    width: null,
+    actualTime: null,
+    actualRows: null,
+    level,
+    children: [],
+    raw,
+  }
+
+  if (metrics) {
+    // Parse cost=start..end
+    const costMatch = metrics.match(/cost=([\d.]+)\.\.([\d.]+)/)
+    if (costMatch) {
+      node.cost = { start: parseFloat(costMatch[1]), end: parseFloat(costMatch[2]) }
+    }
+
+    // Parse rows=N
+    const rowsMatch = metrics.match(/rows=(\d+)/)
+    if (rowsMatch) {
+      node.rows = parseInt(rowsMatch[1], 10)
+    }
+
+    // Parse width=N
+    const widthMatch = metrics.match(/width=(\d+)/)
+    if (widthMatch) {
+      node.width = parseInt(widthMatch[1], 10)
+    }
+
+    // Parse actual time=start..end
+    const actualTimeMatch = metrics.match(/actual time=([\d.]+)\.\.([\d.]+)/)
+    if (actualTimeMatch) {
+      node.actualTime = {
+        start: parseFloat(actualTimeMatch[1]),
+        end: parseFloat(actualTimeMatch[2]),
+      }
+    }
+
+    // Parse actual rows=N
+    const actualRowsMatch = metrics.match(/actual rows=(\d+)/)
+    if (actualRowsMatch) {
+      node.actualRows = parseInt(actualRowsMatch[1], 10)
+    }
+  }
+
+  return node
+}
+
+// After node creation, parse detail fields like "Rows Removed by Filter"
+export function parseNodeDetails(node: ExplainNode): void {
+  if (node.details) {
+    const rowsRemovedMatch = node.details.match(/Rows Removed by Filter:\s*(\d+)/)
+    if (rowsRemovedMatch) {
+      node.rowsRemovedByFilter = parseInt(rowsRemovedMatch[1], 10)
+    }
+  }
+  node.children.forEach(parseNodeDetails)
+}
+
+function addNodeToTree(
+  node: ExplainNode,
+  indent: number,
+  root: ExplainNode[],
+  stack: { node: ExplainNode; indent: number }[]
+) {
+  // Remove nodes from stack that are at the same or deeper indentation
+  while (stack.length > 0 && stack[stack.length - 1].indent >= indent) {
+    stack.pop()
+  }
+
+  if (stack.length === 0) {
+    root.push(node)
+  } else {
+    stack[stack.length - 1].node.children.push(node)
+  }
+
+  stack.push({ node, indent })
+}

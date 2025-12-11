@@ -13,7 +13,7 @@ import {
   Button,
 } from 'ui'
 import { CellDetailPanel } from './CellDetailPanel'
-import { ExplainVisualizer } from './ExplainVisualizer'
+import { ExplainVisualizer } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer'
 
 function formatClipboardValue(value: any) {
   if (value === null) return ''
