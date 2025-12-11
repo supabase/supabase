@@ -2769,7 +2769,7 @@ export const telemetry: NavMenuConstant = {
             },
             {
               name: 'Datadog',
-              url: '/guides/telemetry/metrics/datadog' as `/${string}`,
+              url: 'https://docs.datadoghq.com/fr/integrations/supabase/' as `/${string}`,
             },
             {
               name: 'Vendor-agnostic setup',
