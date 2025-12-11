@@ -3,8 +3,8 @@ import Link from 'next/link'
 
 export default function Home() {
   return (
-    <main className="relative lg:gap-10 pr-6 lg:py-20">
-      <div className="mx-auto w-full min-w-0 max-w-6xl flex flex-col gap-20">
+    <div className="relative gap-6 px-6 py-6 lg:py-8 lg:px-6">
+      <div className="mx-auto w-full min-w-0 max-w-6xl flex flex-col gap-10">
         <div className="flex flex-col gap-8 justify-start">
           {/* <div>
             <DesignSystemMarks />
@@ -19,7 +19,7 @@ export default function Home() {
 
         {/* Homepage items */}
 
-        <div className="grid grid-cols-2 gap-10">
+        <div className="grid grid-cols-2 gap-6">
           <Link href="/docs/components/atom-components">
             <div className="px-10 py-8 min-h-[18rem] flex flex-col justify-between bg-surface-75/50 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
               <HomepageSvgHandler name="atoms-illustration" />
@@ -109,6 +109,6 @@ export default function Home() {
           </Link>
         </div>
       </div>
-    </main>
+    </div>
   )
 }
