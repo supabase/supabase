@@ -83,8 +83,8 @@ export default async function DocPage(props: DocPageProps) {
   const toc = await getTableOfContents(doc.body.raw)
 
   return (
-    <div className="relative flex gap-6 px-6 py-6 lg:py-8 lg:px-16">
-      <div className="mx-auto w-full min-w-0 max-w-4xl">
+    <div className="relative xl:grid xl:grid-cols-[1fr_160px] gap-6 px-6 py-6 lg:py-8">
+      <div className="mx-auto w-full min-w-0 max-w-4xl flex-1">
         <div className="mb-4 flex items-center space-x-1 text-sm text-foreground-muted">
           <div className="overflow-hidden text-ellipsis whitespace-nowrap">Docs</div>
           <ChevronRight className="h-4 w-4 text-foreground-muted" />
@@ -107,9 +107,9 @@ export default async function DocPage(props: DocPageProps) {
       </div>
       {doc.toc && (
         <div className="hidden text-sm xl:block">
-          <div className="sticky top-16 -mt-10 pt-4">
+          <div className="sticky top-8 -mt-10 pt-8">
             <ScrollArea className="pb-10">
-              <div className="sticky top-16 -mt-10 h-[calc(100vh-3.5rem)] py-12">
+              <div className="h-[calc(100vh-3.5rem)] py-14">
                 <DashboardTableOfContents toc={toc} />
               </div>
             </ScrollArea>

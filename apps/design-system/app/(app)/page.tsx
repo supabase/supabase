@@ -5,7 +5,7 @@ import { Realtime, Database, Auth } from 'icons/src/icons'
 
 export default function Home() {
   return (
-    <div className="relative gap-4 px-6 py-6 lg:py-8 lg:px-16">
+    <div className="relative gap-4 px-6 py-6 lg:py-8">
       <div className="mx-auto w-full min-w-0 max-w-6xl flex flex-col gap-10">
         <div className="flex flex-col gap-2 justify-start">
           <h1 className="text-2xl lg:text-4xl text-foreground">Supabase Design System</h1>
