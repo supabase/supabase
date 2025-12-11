@@ -11,7 +11,7 @@ const pageContainerVariants = cva(['mx-auto w-full @container px-6 xl:px-10'], {
   variants: {
     size: {
       small: 'max-w-[768px]',
-      default: 'max-w-[1080px]',
+      default: 'max-w-[1200px]',
       large: 'max-w-[1600px]',
       full: 'max-w-none',
     },
