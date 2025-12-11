@@ -11,6 +11,7 @@ import {
 import NoPermission from 'components/ui/NoPermission'
 import { getDocument } from 'data/documents/document-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button } from 'ui'
@@ -25,8 +26,8 @@ export const SecurityQuestionnaire = () => {
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
-
-  const currentPlan = organization?.plan
+  const { hasAccess: hasAccessToSecurityQuestionnaire, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('security.questionnaire')
 
   const fetchQuestionnaire = async (orgSlug: string) => {
     try {
@@ -35,8 +36,8 @@ export const SecurityQuestionnaire = () => {
         docType: 'standard-security-questionnaire',
       })
       if (questionnaireLink?.fileUrl) window.open(questionnaireLink.fileUrl, '_blank')
-    } catch (error: any) {
-      toast.error(`Failed to download Security Questionnaire: ${error.message}`)
+    } catch (error: unknown) {
+      toast.error(`Failed to download Security Questionnaire: ${(error as Error).message}`)
     }
   }
 
@@ -53,39 +54,37 @@ export const SecurityQuestionnaire = () => {
           </div>
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {isLoadingPermissions ? (
+          {isLoadingPermissions || isLoadingEntitlement ? (
             <div className="flex items-center justify-center h-full">
               <ShimmeringLoader className="w-24" />
             </div>
           ) : !canReadSubscriptions ? (
             <NoPermission resourceText="access our security questionnaire" />
+          ) : !hasAccessToSecurityQuestionnaire ? (
+            <div className="flex items-center justify-center h-full">
+              <Link
+                href={`/org/${slug}/billing?panel=subscriptionPlan&source=securityQuestionnaire`}
+              >
+                <Button type="default">Upgrade to Team</Button>
+              </Link>
+            </div>
           ) : (
-            <>
-              <div className="flex items-center justify-center h-full">
-                {currentPlan?.id === 'free' || currentPlan?.id === 'pro' ? (
-                  <Link
-                    href={`/org/${slug}/billing?panel=subscriptionPlan&source=securityQuestionnaire`}
-                  >
-                    <Button type="default">Upgrade to Team</Button>
-                  </Link>
-                ) : (
-                  <Button
-                    type="default"
-                    icon={<Download />}
-                    onClick={() => {
-                      sendEvent({
-                        action: 'document_view_button_clicked',
-                        properties: { documentName: 'Standard Security Questionnaire' },
-                        groups: { organization: organization?.slug ?? 'Unknown' },
-                      })
-                      if (slug) fetchQuestionnaire(slug)
-                    }}
-                  >
-                    Download Questionnaire
-                  </Button>
-                )}
-              </div>
-            </>
+            <div className="flex items-center justify-center h-full">
+              <Button
+                type="default"
+                icon={<Download />}
+                onClick={() => {
+                  sendEvent({
+                    action: 'document_view_button_clicked',
+                    properties: { documentName: 'Standard Security Questionnaire' },
+                    groups: { organization: organization?.slug ?? 'Unknown' },
+                  })
+                  if (slug) fetchQuestionnaire(slug)
+                }}
+              >
+                Download Questionnaire
+              </Button>
+            </div>
           )}
         </ScaffoldSectionContent>
       </ScaffoldSection>
