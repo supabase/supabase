@@ -9,6 +9,7 @@ import { useDatabaseExtensionDisableMutation } from 'data/database-extensions/da
 import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { extensions } from 'shared-data'
 import { Button, Switch, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -37,10 +38,10 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
 
   const extensionMeta = extensions.find((item) => item.name === extension.name)
   const docsUrl = extensionMeta?.link.startsWith('/guides')
-    ? `https://supabase.com/docs${extensionMeta?.link}`
+    ? `${DOCS_URL}${extensionMeta?.link}`
     : extensionMeta?.link ?? undefined
 
-  const { mutate: disableExtension, isLoading: isDisabling } = useDatabaseExtensionDisableMutation({
+  const { mutate: disableExtension, isPending: isDisabling } = useDatabaseExtensionDisableMutation({
     onSuccess: () => {
       toast.success(`${extension.name} is off.`)
       setIsDisableModalOpen(false)
@@ -202,9 +203,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
             Are you sure you want to turn OFF the "{extension.name}" extension?
           </p>
           {EXTENSION_DISABLE_WARNINGS[extension.name] && (
-            <Admonition type="warning" className="m-0">
-              {EXTENSION_DISABLE_WARNINGS[extension.name]}
-            </Admonition>
+            <Admonition type="warning">{EXTENSION_DISABLE_WARNINGS[extension.name]}</Admonition>
           )}
         </div>
       </ConfirmationModal>

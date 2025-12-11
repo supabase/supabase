@@ -3,16 +3,7 @@ import type { Column } from 'react-data-grid'
 import type { VaultSecret } from 'types'
 import { cn } from 'ui'
 import SecretRow from './SecretRow'
-
-export type SecretColumnId = 'secret' | 'id' | 'secret_value' | 'updated_at' | 'actions'
-
-export interface SecretTableColumn {
-  id: SecretColumnId
-  name: string
-  minWidth?: number
-  width?: number
-  maxWidth?: number
-}
+import { SecretTableColumn } from './Secrets.types'
 
 export const SECRET_TABLE_COLUMNS: SecretTableColumn[] = [
   { id: 'secret', name: 'Secret', minWidth: 300, width: 360 },
@@ -23,8 +14,10 @@ export const SECRET_TABLE_COLUMNS: SecretTableColumn[] = [
 ]
 
 export const formatSecretColumns = ({
+  onSelectEdit,
   onSelectRemove,
 }: {
+  onSelectEdit: (secret: VaultSecret) => void
   onSelectRemove: (secret: VaultSecret) => void
 }): Column<VaultSecret>[] => {
   return SECRET_TABLE_COLUMNS.map((col) => {
@@ -50,7 +43,14 @@ export const formatSecretColumns = ({
           </div>
         )
       },
-      renderCell: ({ row }) => <SecretRow row={row} col={col} onSelectRemove={onSelectRemove} />,
+      renderCell: ({ row }) => (
+        <SecretRow
+          row={row}
+          col={col}
+          onSelectEdit={onSelectEdit}
+          onSelectRemove={onSelectRemove}
+        />
+      ),
     }
     return result
   })

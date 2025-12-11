@@ -8,7 +8,7 @@ describe('defaultAuthReportFormatter', () => {
     const data = { result: [{ timestamp: String(timestamp), count: 1 }] }
 
     const attributes = [
-      { attribute: 'ActiveUsers', provider: 'logs', label: 'Active Users', enabled: true },
+      { attribute: 'ActiveUsers', provider: 'logs', label: 'Auth Activity', enabled: true },
     ]
 
     const result = defaultAuthReportFormatter(data, attributes)
@@ -28,7 +28,7 @@ describe('defaultAuthReportFormatter', () => {
     }
 
     const attributes = [
-      { attribute: 'active_users', label: 'Active Users' },
+      { attribute: 'active_users', label: 'Auth Activity' },
       { attribute: 'sign_in_attempts', label: 'Sign In Attempts' },
     ]
 
@@ -47,7 +47,7 @@ describe('defaultAuthReportFormatter', () => {
     const data = { result: [] }
 
     const attributes = [
-      { attribute: 'ActiveUsers', provider: 'logs', label: 'Active Users', enabled: true },
+      { attribute: 'ActiveUsers', provider: 'logs', label: 'Auth Activity', enabled: true },
     ]
 
     const result = defaultAuthReportFormatter(data, attributes)

@@ -5,12 +5,13 @@ import Link from 'next/link'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Input } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 import { getLastUsedAPIKeys, useLastUsedAPIKeysLogQuery } from './DisplayApiSettings.utils'
 
 export const DisplayApiSettings = ({
@@ -27,12 +28,12 @@ export const DisplayApiSettings = ({
   const {
     data: settings,
     isError: isProjectSettingsError,
-    isLoading: isProjectSettingsLoading,
+    isPending: isProjectSettingsLoading,
   } = useProjectSettingsV2Query({ projectRef })
   const {
     data,
     isError: isJwtSecretUpdateStatusError,
-    isLoading: isJwtSecretUpdateStatusLoading,
+    isPending: isJwtSecretUpdateStatusLoading,
   } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
@@ -50,12 +51,19 @@ export const DisplayApiSettings = ({
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
 
-  const { isLoading: isLoadingLastUsed, logData: lastUsedLogData } = useLastUsedAPIKeysLogQuery(
-    projectRef!
-  )
+  const showApiKeyLastUsed = useFlag('showApiKeysLastUsed')
+  const { isLoading: isLoadingLastUsed, logData: lastUsedLogData } = useLastUsedAPIKeysLogQuery({
+    projectRef: projectRef ?? '',
+    enabled: showApiKeyLastUsed,
+  })
 
   const lastUsedAPIKeys = useMemo(() => {
-    if (apiKeys.length < 1 || !lastUsedLogData || lastUsedLogData.length < 1) {
+    if (
+      apiKeys.length < 1 ||
+      !lastUsedLogData ||
+      lastUsedLogData.length < 1 ||
+      !showApiKeyLastUsed
+    ) {
       return {}
     }
 
@@ -66,7 +74,7 @@ export const DisplayApiSettings = ({
       console.error(e)
       return {}
     }
-  }, [lastUsedLogData, apiKeys])
+  }, [lastUsedLogData, apiKeys, showApiKeyLastUsed])
 
   return (
     <Panel
@@ -123,42 +131,26 @@ export const DisplayApiSettings = ({
               'border-t border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark'
             }
           >
-            <Input
-              readOnly
-              disabled
+            <FormLayout
               layout="horizontal"
-              className="input-mono"
-              // @ts-ignore
               label={
-                <>
+                <div className="flex items-center space-x-1">
                   {x.tags?.split(',').map((x, i: number) => (
-                    <code key={`${x}${i}`} className="text-xs text-code">
+                    <code key={`${x}${i}`} className="text-code-inline">
                       {x}
                     </code>
                   ))}
                   {x.tags === 'service_role' && (
                     <>
-                      <code className="text-xs text-code !bg-destructive !text-white !border-destructive">
+                      <code className="text-code-inline !bg-destructive !text-white !border-destructive">
                         secret
                       </code>
                     </>
                   )}
-                  {x.tags === 'anon' && <code className="text-xs text-code">public</code>}
-                </>
+                  {x.tags === 'anon' && <code className="text-code-inline">public</code>}
+                </div>
               }
-              copy={canReadAPIKeys && isNotUpdatingJwtSecret}
-              reveal={x.tags !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
-              value={
-                !canReadAPIKeys
-                  ? 'You need additional permissions to view API keys'
-                  : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
-                    ? 'JWT secret update failed, new API key may have issues'
-                    : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
-                      ? 'Updating JWT secret...'
-                      : x?.api_key ?? 'You need additional permissions to view API keys'
-              }
-              onChange={() => {}}
-              descriptionText={
+              description={
                 x.tags === 'service_role' ? (
                   <>
                     This key has the ability to bypass Row Level Security. Never share it publicly.
@@ -195,16 +187,35 @@ export const DisplayApiSettings = ({
                   </>
                 )
               }
-            />
-
-            <div
-              className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
-              data-invisible={isLoadingLastUsed}
             >
-              {lastUsedAPIKeys[x.api_key]
-                ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
-                : 'No requests in the past 24 hours.'}
-            </div>
+              <Input
+                readOnly
+                className="font-mono"
+                copy={canReadAPIKeys && isNotUpdatingJwtSecret}
+                reveal={x.tags !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
+                value={
+                  !canReadAPIKeys
+                    ? 'You need additional permissions to view API keys'
+                    : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
+                      ? 'JWT secret update failed, new API key may have issues'
+                      : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
+                        ? 'Updating JWT secret...'
+                        : x?.api_key ?? 'You need additional permissions to view API keys'
+                }
+                onChange={() => {}}
+              />
+            </FormLayout>
+
+            {showApiKeyLastUsed && (
+              <div
+                className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
+                data-invisible={isLoadingLastUsed}
+              >
+                {lastUsedAPIKeys[x.api_key]
+                  ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
+                  : 'No requests in the past 24 hours.'}
+              </div>
+            )}
           </Panel.Content>
         ))
       )}

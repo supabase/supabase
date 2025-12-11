@@ -41,7 +41,7 @@ const getProviderName = (provider: string) =>
 export const AccountIdentities = () => {
   const router = useRouter()
 
-  const { data, isLoading, isSuccess } = useProfileIdentitiesQuery()
+  const { data, isPending: isLoading, isSuccess } = useProfileIdentitiesQuery()
   const identities = data?.identities ?? []
   const isChangeExpired = data?.email_change_sent_at
     ? dayjs().utc().diff(dayjs(data?.email_change_sent_at).utc(), 'minute') > 10
@@ -50,7 +50,7 @@ export const AccountIdentities = () => {
   const [selectedProviderUnlink, setSelectedProviderUnlink] = useState<string>()
   const [selectedProviderUpdateEmail, setSelectedProviderUpdateEmail] = useState<string>()
 
-  const { mutate: unlinkIdentity, isLoading: isUnlinking } = useUnlinkIdentityMutation({
+  const { mutate: unlinkIdentity, isPending: isUnlinking } = useUnlinkIdentityMutation({
     onSuccess: () => {
       toast.success(
         `Successfully unlinked ${getProviderName(selectedProviderUnlink ?? '')} identity!`

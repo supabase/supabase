@@ -38,6 +38,7 @@ export function ApiKeyPill({
   const {
     data,
     error,
+    isPending: isLoading,
     refetch: refetchApiKey,
   } = useAPIKeyIdQuery(
     {
@@ -48,7 +49,7 @@ export function ApiKeyPill({
     {
       enabled: show, // Only run query when show is true
       staleTime: 0, // Always consider data stale
-      cacheTime: 0, // Don't cache the key data
+      gcTime: 0, // Don't cache the key data
     }
   )
 
@@ -116,9 +117,7 @@ export function ApiKeyPill({
           'w-[100px] sm:w-[140px] md:w-[180px] lg:w-[340px] gap-0 font-mono rounded-full',
           isSecret ? 'overflow-hidden' : '',
           show ? 'ring-1 ring-foreground-lighter ring-opacity-50' : 'ring-0 ring-opacity-0',
-          'transition-all',
-          'cursor-text',
-          'relative'
+          'transition-all cursor-text relative'
         )}
         style={{ userSelect: 'all' }}
       >
@@ -139,6 +138,7 @@ export function ApiKeyPill({
             <Button
               type="outline"
               className="rounded-full px-2 pointer-events-auto"
+              loading={show && isLoading}
               icon={show ? <EyeOff strokeWidth={2} /> : <Eye strokeWidth={2} />}
               onClick={onSubmitToggle}
               disabled={isRestricted}

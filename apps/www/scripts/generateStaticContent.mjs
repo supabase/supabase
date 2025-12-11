@@ -1,8 +1,13 @@
-import { promises as fs } from 'fs'
-import fsSync from 'fs'
+import dayjs from 'dayjs'
+import advancedFormat from 'dayjs/plugin/advancedFormat.js'
+import utc from 'dayjs/plugin/utc.js'
+import fsSync, { promises as fs } from 'fs'
+import matter from 'gray-matter'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import matter from 'gray-matter'
+
+dayjs.extend(utc)
+dayjs.extend(advancedFormat)
 
 // Constants
 const FILENAME_SUBSTRING = 11 // based on YYYY-MM-DD format
@@ -10,7 +15,7 @@ const CMS_SITE_ORIGIN =
   process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
     ? 'https://cms.supabase.com'
     : process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL &&
-        typeof process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL === 'string'
+      typeof process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL === 'string'
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL?.replace('zone-www-dot-com-git-', 'cms-git-')}`
       : 'http://localhost:3030'
 const CMS_API_KEY = process.env.CMS_API_KEY
@@ -134,9 +139,9 @@ const getCMSBlogPosts = async () => {
 }
 
 /**
- * Get latest blog posts from both sources
+ * Get all blog posts from both sources
  */
-const getLatestBlogPosts = async () => {
+const getAllBlogPosts = async () => {
   const staticPosts = getStaticBlogPosts()
 
   const cmsPosts = await getCMSBlogPosts()
@@ -147,8 +152,17 @@ const getLatestBlogPosts = async () => {
   // Filter out posts without valid dates and sort
   const validPosts = allPosts.sort((a, b) => sortDates(a, b, 'desc'))
 
+  return validPosts
+}
+
+/**
+ * Get latest blog posts from both sources
+ */
+const getLatestBlogPosts = async () => {
+  const allPosts = await getAllBlogPosts()
+
   // Return latest 10 posts
-  const latestPosts = validPosts
+  const latestPosts = allPosts
     .slice(0, 10)
     .map(({ title, url, description, date, formattedDate }) => ({
       title,
@@ -240,3 +254,68 @@ await fs.writeFile(
 )
 
 console.log(`✅ Generated static content with ${latestBlogPosts.length} blog posts`)
+
+// Generate RSS feed
+try {
+  const allBlogPosts = await getAllBlogPosts()
+
+  // Transform posts to RSS format
+  const xmlEncode = (str) => {
+    if (str === undefined || str === null) {
+      return ''
+    }
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;')
+  }
+
+  const generateRssItem = (post) => {
+    const encodedTitle = xmlEncode(post.title)
+    const encodedPath = xmlEncode(post.path || post.url || `/blog/${post.slug}`)
+    const encodedDescription = xmlEncode(post.description)
+    const formattedDate = dayjs(post.date)
+      .utcOffset(0, true)
+      .startOf('day')
+      .format('ddd, DD MMM YYYY HH:mm:ss [-0700]')
+
+    return `<item>
+  <guid>https://supabase.com${encodedPath}</guid>
+  <title>${encodedTitle}</title>
+  <link>https://supabase.com${encodedPath}</link>
+  <description>${encodedDescription}</description>
+  <pubDate>${formattedDate}</pubDate>
+</item>
+`
+  }
+
+  const formattedDate = allBlogPosts.length > 0
+    ? dayjs(allBlogPosts[0].date)
+      .utcOffset(0, true)
+      .startOf('day')
+      .format('ddd, DD MMM YYYY HH:mm:ss [-0700]')
+    : dayjs().utcOffset(0, true).startOf('day').format('ddd, DD MMM YYYY HH:mm:ss [-0700]')
+
+  const rss = `
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Supabase Blog</title>
+      <link>https://supabase.com</link>
+      <description>Latest news from Supabase</description>
+      <language>en</language>
+      <lastBuildDate>${formattedDate}</lastBuildDate>
+      <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
+      ${allBlogPosts.map(generateRssItem).join('')}
+    </channel>
+  </rss>
+`
+
+  // Write RSS feed to public directory
+  const rssPath = path.join(__dirname, '../public/rss.xml')
+  await fs.writeFile(rssPath, rss.trim(), 'utf8')
+  console.log(`✅ Generated RSS feed with ${allBlogPosts.length} blog posts`)
+} catch (error) {
+  console.warn('Error generating RSS feed:', error)
+}

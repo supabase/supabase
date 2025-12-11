@@ -14,9 +14,10 @@ import { useComplianceConfigUpdateMutation } from 'data/config/project-complianc
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-const ComplianceConfig = () => {
+export const ComplianceConfig = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [isSensitive, setIsSensitive] = useState(false)
@@ -33,12 +34,12 @@ const ComplianceConfig = () => {
     data: settings,
     error,
     isError,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
   } = useProjectSettingsV2Query({ projectRef: ref })
   const initialIsSensitive = settings?.is_sensitive || false
 
-  const { mutate: updateComplianceConfig, isLoading: isSubmitting } =
+  const { mutate: updateComplianceConfig, isPending: isSubmitting } =
     useComplianceConfigUpdateMutation({
       onSuccess: () => {
         toast.success('Successfully updated project compliance configuration')
@@ -67,7 +68,7 @@ const ComplianceConfig = () => {
           title="High Compliance Configuration"
           description="For projects storing and processing sensitive data (HIPAA)"
         />
-        <DocsButton href="https://supabase.com/docs/guides/platform/hipaa-projects" />
+        <DocsButton href={`${DOCS_URL}/guides/platform/hipaa-projects`} />
       </div>
       <FormPanel>
         <FormSection
@@ -124,5 +125,3 @@ const ComplianceConfig = () => {
     </div>
   )
 }
-
-export default ComplianceConfig

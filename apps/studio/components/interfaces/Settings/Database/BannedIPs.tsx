@@ -14,6 +14,7 @@ import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
 import { useUserIPAddressQuery } from 'data/misc/user-ip-address-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { Badge, Skeleton } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -24,7 +25,7 @@ const BannedIPs = () => {
   const [selectedIPToUnban, setSelectedIPToUnban] = useState<string | null>(null) // Track the selected IP for unban
 
   const {
-    isLoading: isLoadingIPList,
+    isPending: isLoadingIPList,
     isFetching: isFetchingIPList,
     data: ipList,
     error: ipListError,
@@ -45,7 +46,7 @@ const BannedIPs = () => {
     },
   })
 
-  const { mutate: unbanIPs, isLoading: isUnbanning } = useBannedIPsDeleteMutation({
+  const { mutate: unbanIPs, isPending: isUnbanning } = useBannedIPsDeleteMutation({
     onSuccess: () => {
       toast.success('IP address successfully unbanned')
       setSelectedIPToUnban(null) // Reset the selected IP for unban
@@ -78,7 +79,7 @@ const BannedIPs = () => {
           title="Network Bans"
           description="List of IP addresses that are temporarily blocked if their traffic pattern looks abusive"
         />
-        <DocsButton href="https://supabase.com/docs/reference/cli/supabase-network-bans" />
+        <DocsButton href={`${DOCS_URL}/reference/cli/supabase-network-bans`} />
       </div>
       <FormPanel>
         {ipListLoading ? (

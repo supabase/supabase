@@ -1,33 +1,27 @@
-import saveAs from 'file-saver'
-import { Clipboard, Copy, Download, Edit, Lock, MoreVertical, Trash } from 'lucide-react'
+import { Copy, Download, Edit, Lock, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
-import Papa from 'papaparse'
+import { type CSSProperties } from 'react'
 import { toast } from 'sonner'
 
-import { IS_PLATFORM, useParams } from 'common'
-import {
-  MAX_EXPORT_ROW_COUNT,
-  MAX_EXPORT_ROW_COUNT_MESSAGE,
-} from 'components/grid/components/header/Header'
-import { LOAD_TAB_FROM_CACHE_PARAM, parseSupaTable } from 'components/grid/SupabaseGrid.utils'
-import {
-  formatTableRowsToSQL,
-  getEntityLintDetails,
-} from 'components/interfaces/TableGridEditor/TableEntity.utils'
+import { useParams } from 'common'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
+import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
+import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
-import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { InlineLink } from 'components/ui/InlineLink'
 import { getTableDefinition } from 'data/database/table-definition-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-types-infinite-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
-import { getTableEditor } from 'data/table-editor/table-editor-query'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
+import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { formatSql } from 'lib/formatSql'
+import {
+  useRoleImpersonationStateSnapshot,
+  type RoleImpersonationState,
+} from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
@@ -48,12 +42,15 @@ import {
   TooltipTrigger,
   TreeViewItemVariant,
 } from 'ui'
+import { useExportAllRowsAsCsv, useExportAllRowsAsSql } from './ExportAllRows'
 
 export interface EntityListItemProps {
   id: number | string
   projectRef: string
+  item: Entity
   isLocked: boolean
   isActive?: boolean
+  style?: CSSProperties
   onExportCLI: () => void
 }
 
@@ -62,14 +59,15 @@ function isTableLikeEntityListItem(entity: { type?: string }) {
   return entity?.type === ENTITY_TYPE.TABLE || entity?.type === ENTITY_TYPE.PARTITIONED_TABLE
 }
 
-const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
+const EntityListItem = ({
   id,
   projectRef,
   item: entity,
   isLocked,
   isActive: _isActive,
+  style,
   onExportCLI,
-}) => {
+}: EntityListItemProps) => {
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
@@ -81,6 +79,23 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const isOpened = Object.values(tabs.tabsMap).some((tab) => tab.metadata?.tableId === entity.id)
   const isActive = Number(id) === entity.id
   const canEdit = isActive && !isLocked
+
+  const { filters } = useTableFilter()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
+  const { data: countData } = useTableRowsCountQuery(
+    {
+      projectRef,
+      connectionString: project?.connectionString,
+      tableId: entity.id,
+      filters,
+      enforceExactCount: false,
+      roleImpersonationState: roleImpersonationState as RoleImpersonationState,
+    },
+    {
+      enabled: isTableLikeEntityListItem(entity) && isActive,
+    }
+  )
+  const rowCount = countData?.count
 
   const { data: lints = [] } = useProjectLintsQuery({
     projectRef: project?.ref,
@@ -119,123 +134,38 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   ).hasLint
 
   const formatTooltipText = (entityType: string) => {
-    return Object.entries(ENTITY_TYPE)
-      .find(([, value]) => value === entityType)?.[0]
-      ?.toLowerCase()
-      ?.split('_')
-      ?.join(' ')
+    const text =
+      Object.entries(ENTITY_TYPE)
+        .find(([, value]) => value === entityType)?.[0]
+        ?.toLowerCase()
+        ?.split('_')
+        ?.join(' ') || ''
+    // Return sentence case (capitalize first letter only)
+    return text.charAt(0).toUpperCase() + text.slice(1)
   }
 
-  const exportTableAsCSV = async () => {
-    if (IS_PLATFORM && !project?.connectionString) {
-      return console.error('Connection string is required')
-    }
-    const toastId = toast.loading(`Exporting ${entity.name} as CSV...`)
+  const { exportCsv, confirmationModal: exportCsvConfirmationModal } = useExportAllRowsAsCsv({
+    enabled: true,
+    projectRef,
+    connectionString: project?.connectionString ?? null,
+    entity,
+    type: 'fetch_all',
+    totalRows: rowCount,
+  })
 
-    try {
-      const table = await getTableEditor({
-        id: entity.id,
-        projectRef,
-        connectionString: project?.connectionString,
-      })
-      if (isTableLike(table) && table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
-        return toast.error(
-          <div className="text-foreground prose text-sm">{MAX_EXPORT_ROW_COUNT_MESSAGE}</div>,
-          { id: toastId }
-        )
-      }
-
-      const supaTable = table && parseSupaTable(table)
-
-      if (!supaTable) {
-        return toast.error(`Failed to export table: ${entity.name}`, { id: toastId })
-      }
-
-      const rows = await fetchAllTableRows({
-        projectRef,
-        connectionString: project?.connectionString,
-        table: supaTable,
-      })
-      const formattedRows = rows.map((row) => {
-        const formattedRow = row
-        Object.keys(row).map((column) => {
-          if (typeof row[column] === 'object' && row[column] !== null)
-            formattedRow[column] = JSON.stringify(formattedRow[column])
-        })
-        return formattedRow
-      })
-
-      if (formattedRows.length > 0) {
-        const csv = Papa.unparse(formattedRows, {
-          columns: supaTable.columns.map((column) => column.name),
-        })
-        const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-        saveAs(csvData, `${entity!.name}_rows.csv`)
-      }
-
-      toast.success(`Successfully exported ${entity.name} as CSV`, { id: toastId })
-    } catch (error: any) {
-      toast.error(`Failed to export table: ${error.message}`, { id: toastId })
-    }
-  }
-
-  const exportTableAsSQL = async () => {
-    if (IS_PLATFORM && !project?.connectionString) {
-      return console.error('Connection string is required')
-    }
-    const toastId = toast.loading(`Exporting ${entity.name} as SQL...`)
-
-    try {
-      const table = await getTableEditor({
-        id: entity.id,
-        projectRef,
-        connectionString: project?.connectionString,
-      })
-
-      if (isTableLike(table) && table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
-        return toast.error(
-          <div className="text-foreground prose text-sm">{MAX_EXPORT_ROW_COUNT_MESSAGE}</div>,
-          { id: toastId }
-        )
-      }
-
-      const supaTable = table && parseSupaTable(table)
-
-      if (!supaTable) {
-        return toast.error(`Failed to export table: ${entity.name}`, { id: toastId })
-      }
-
-      const rows = await fetchAllTableRows({
-        projectRef,
-        connectionString: project?.connectionString,
-        table: supaTable,
-      })
-
-      const formattedRows = rows.map((row) => {
-        const formattedRow = { ...row }
-        Object.keys(row).forEach((column) => {
-          if (typeof row[column] === 'object' && row[column] !== null) {
-            formattedRow[column] = JSON.stringify(row[column])
-          }
-        })
-        return formattedRow
-      })
-
-      if (formattedRows.length > 0) {
-        const sqlStatements = formatTableRowsToSQL(supaTable, formattedRows)
-        const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })
-        saveAs(sqlData, `${entity!.name}_rows.sql`)
-      }
-
-      toast.success(`Successfully exported ${entity.name} as SQL`, { id: toastId })
-    } catch (error: any) {
-      toast.error(`Failed to export table: ${error.message}`, { id: toastId })
-    }
-  }
+  const { exportSql, confirmationModal: exportSqlConfirmationModal } = useExportAllRowsAsSql({
+    enabled: true,
+    projectRef,
+    connectionString: project?.connectionString ?? null,
+    entity,
+    type: 'fetch_all',
+    totalRows: rowCount,
+  })
 
   return (
     <EditorTablePageLink
       title={entity.name}
+      style={style}
       id={String(entity.id)}
       href={`/project/${projectRef}/editor/${entity.id}?schema=${entity.schema}&${LOAD_TAB_FROM_CACHE_PARAM}=true`}
       role="button"
@@ -309,7 +239,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                   copyToClipboard(entity.name)
                 }}
               >
-                <Clipboard size={12} />
+                <Copy size={12} />
                 <span>Copy name</span>
               </DropdownMenuItem>
 
@@ -341,7 +271,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                     }
                   }}
                 >
-                  <Clipboard size={12} />
+                  <Copy size={12} />
                   <span>Copy table schema</span>
                 </DropdownMenuItem>
               )}
@@ -393,7 +323,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                         className="space-x-2"
                         onClick={(e) => {
                           e.stopPropagation()
-                          exportTableAsCSV()
+                          exportCsv()
                         }}
                       >
                         <span>Export table as CSV</span>
@@ -403,7 +333,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                         className="gap-x-2"
                         onClick={(e) => {
                           e.stopPropagation()
-                          exportTableAsSQL()
+                          exportSql()
                         }}
                       >
                         <span>Export table as SQL</span>
@@ -439,6 +369,8 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
           </DropdownMenu>
         )}
       </>
+      {exportCsvConfirmationModal}
+      {exportSqlConfirmationModal}
     </EditorTablePageLink>
   )
 }

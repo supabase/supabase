@@ -5,7 +5,8 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import * as z from 'zod'
 
 import { useParams } from 'common'
-import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
+import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
@@ -87,14 +88,15 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
   const [response, setResponse] = useState<ResponseData | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef })
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
   const { serviceKey } = getKeys(apiKeys)
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutate: testEdgeFunction, isLoading } = useEdgeFunctionTestMutation({
+  const { mutate: testEdgeFunction, isPending } = useEdgeFunctionTestMutation({
     onSuccess: (res) => setResponse(res),
     onError: (err) => {
       setError(err instanceof Error ? err.message : 'An unknown error occurred')
@@ -192,14 +194,14 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
 
     // Construct custom headers
     const customHeaders: Record<string, string> = {}
-    headerFields.forEach(({ key, value }) => {
+    values.headers.forEach(({ key, value }) => {
       if (key && value) {
         customHeaders[key] = value
       }
     })
 
     // Construct query parameters
-    const queryString = queryParamFields
+    const queryString = values.queryParams
       .filter(({ key, value }) => key && value)
       .map(({ key, value }) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
       .join('&')
@@ -246,7 +248,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                     {...field}
                     size="tiny"
                     placeholder="Enter key..."
-                    disabled={isLoading}
+                    disabled={isPending}
                     className="h-auto py-2 font-mono rounded-none shadow-none bg-transparent border-l-0 border-r-1 border-t-0 border-b-0 border-border"
                   />
                 </FormControl_Shadcn_>
@@ -261,7 +263,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                     {...field}
                     size="tiny"
                     placeholder="Enter value..."
-                    disabled={isLoading}
+                    disabled={isPending}
                     className="h-auto py-2 font-mono rounded-none shadow-none bg-transparent border-none"
                   />
                 </FormControl_Shadcn_>
@@ -308,7 +310,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                           <Select
                             value={field.value}
                             onValueChange={field.onChange}
-                            disabled={isLoading}
+                            disabled={isPending}
                           >
                             <SelectTrigger className="w-full">
                               <SelectValue placeholder="Select method" />
@@ -336,7 +338,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                               {...field}
                               placeholder="Request body (JSON)"
                               rows={3}
-                              disabled={isLoading}
+                              disabled={isPending}
                               className="font-mono text-xs"
                             />
                           </FormControl_Shadcn_>
@@ -404,7 +406,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                         </Tabs>
                       )}
                     </div>
-                  ) : isLoading ? (
+                  ) : isPending ? (
                     <div className="h-full flex flex-col items-center justify-center gap-2">
                       <Loader2 size={24} className="text-foreground-muted animate-spin" />
                       <p className="text-sm text-foreground-light">Sending request...</p>
@@ -430,8 +432,8 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                 <Button
                   type="primary"
                   htmlType="submit"
-                  loading={isLoading}
-                  disabled={isLoading}
+                  loading={isPending}
+                  disabled={isPending}
                   onClick={() =>
                     sendEvent({
                       action: 'edge_function_test_send_button_clicked',

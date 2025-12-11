@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { accessTokenKeys } from './keys'
 
 export async function getAccessTokens(signal?: AbortSignal) {
@@ -20,9 +20,9 @@ export type AccessToken = AccessTokensData[number]
 export const useAccessTokensQuery = <TData = AccessTokensData>({
   enabled = true,
   ...options
-}: UseQueryOptions<AccessTokensData, AccessTokensError, TData> = {}) =>
-  useQuery<AccessTokensData, AccessTokensError, TData>(
-    accessTokenKeys.list(),
-    ({ signal }) => getAccessTokens(signal),
-    options
-  )
+}: UseCustomQueryOptions<AccessTokensData, AccessTokensError, TData> = {}) =>
+  useQuery<AccessTokensData, AccessTokensError, TData>({
+    queryKey: accessTokenKeys.list(),
+    queryFn: ({ signal }) => getAccessTokens(signal),
+    ...options,
+  })

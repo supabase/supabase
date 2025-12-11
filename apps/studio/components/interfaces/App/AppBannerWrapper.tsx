@@ -2,12 +2,13 @@ import { PropsWithChildren } from 'react'
 
 import { useFlag } from 'common'
 import { ClockSkewBanner } from 'components/layouts/AppLayout/ClockSkewBanner'
-import IncidentBanner from 'components/layouts/AppLayout/IncidentBanner'
+import { IncidentBanner } from 'components/layouts/AppLayout/IncidentBanner'
 import { NoticeBanner } from 'components/layouts/AppLayout/NoticeBanner'
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
 
-const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
-  const ongoingIncident = useFlag('ongoingIncident')
+export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
+  const ongoingIncident =
+    useFlag('ongoingIncident') || process.env.NEXT_PUBLIC_ONGOING_INCIDENT === 'true'
   const showNoticeBanner = useFlag('showNoticeBanner')
   const clockSkewBanner = useFlag('clockSkewBanner')
 
@@ -23,5 +24,3 @@ const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
     </div>
   )
 }
-
-export default AppBannerWrapper

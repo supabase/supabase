@@ -1,9 +1,13 @@
 import { AlertOctagon, Lock, ShieldOff } from 'lucide-react'
 
 import { DocsButton } from 'components/ui/DocsButton'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { DOCS_URL } from 'lib/constants'
 import { Alert } from 'ui'
 
 export default function RLSDisableModalContent() {
+  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
+
   return (
     <div className="text-sm text-foreground-light grid gap-4">
       <div className="grid gap-1">
@@ -46,7 +50,7 @@ export default function RLSDisableModalContent() {
       <DocsButton
         abbrev={false}
         className="w-min mt-3"
-        href="https://supabase.com/docs/guides/auth/row-level-security"
+        href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
       />
     </div>
   )

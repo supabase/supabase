@@ -11,6 +11,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -59,7 +60,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data: entities, isLoading: isLoadingEntities } = useEntityTypesQuery({
+  const { data: entities, isPending: isLoadingEntities } = useEntityTypesQuery({
     schemas: [selectedSchema],
     sort: 'alphabetical',
     search: searchTerm,
@@ -68,7 +69,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
   })
   const {
     data: tableColumns,
-    isLoading: isLoadingTableColumns,
+    isPending: isLoadingTableColumns,
     isSuccess: isSuccessTableColumns,
   } = useTableColumnsQuery({
     schema: selectedSchema,
@@ -77,7 +78,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     connectionString: project?.connectionString,
   })
 
-  const { mutate: createIndex, isLoading: isExecuting } = useDatabaseIndexCreateMutation({
+  const { mutate: createIndex, isPending: isExecuting } = useDatabaseIndexCreateMutation({
     onSuccess: () => {
       onClose()
       toast.success(`Successfully created index`)
@@ -379,7 +380,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                   description="More index types may be supported when OrioleDB is no longer in preview"
                 >
                   {/* [Joshen Oriole] Hook up proper docs URL */}
-                  <DocsButton className="mt-2" abbrev={false} href="https://supabase.com/docs" />
+                  <DocsButton className="mt-2" abbrev={false} href={`${DOCS_URL}`} />
                 </Admonition>
               )}
             </SidePanel.Content>

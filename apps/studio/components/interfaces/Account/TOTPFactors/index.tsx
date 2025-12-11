@@ -10,10 +10,10 @@ import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } f
 import { AddNewFactorModal } from './AddNewFactorModal'
 import DeleteFactorModal from './DeleteFactorModal'
 
-const TOTPFactors = () => {
+export const TOTPFactors = () => {
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
   const [factorToBeDeleted, setFactorToBeDeleted] = useState<string | null>(null)
-  const { data, isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
+  const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
 
   return (
     <>
@@ -88,5 +88,3 @@ const TOTPFactors = () => {
     </>
   )
 }
-
-export default TOTPFactors

@@ -302,10 +302,17 @@ const FormContent = memo(function FormContent({
               render={({ field }) => (
                 <FormItem_Shadcn_ className="space-y-1">
                   <FormLabel_Shadcn_ className="text-foreground">
-                    Share some of your recent contributions
+                    Share some of your recent contributions *
                   </FormLabel_Shadcn_>
                   <FormDescription_Shadcn_ className="text-foreground-lighter">
-                    Any relevant links to show your current engagement with the Supabase community.
+                    <p>
+                      Any relevant links to show your current engagement with the Supabase
+                      community.
+                    </p>
+                    <p>
+                      If you haven&apos;t contributed yet, spend some time engaging with the
+                      community, then reapply once you&apos;ve built up a few contributions.
+                    </p>
                   </FormDescription_Shadcn_>
                   <FormControl_Shadcn_>
                     <div className="relative">
@@ -333,7 +340,8 @@ const FormContent = memo(function FormContent({
                     Product Areas of Interest *
                   </FormLabel_Shadcn_>
                   <FormDescription_Shadcn_ className="text-foreground-lighter">
-                    What specific areas would you like to help with? Leave blank if you're not sure.
+                    What specific areas would you like to help with? Leave blank if you&apos;re not
+                    sure.
                   </FormDescription_Shadcn_>
                   <FormControl_Shadcn_>
                     <div className="relative mt-1">
@@ -375,7 +383,7 @@ const FormContent = memo(function FormContent({
                     Skills (frameworks, tools, programming languages)
                   </FormLabel_Shadcn_>
                   <FormDescription_Shadcn_ className="text-foreground-lighter">
-                    Know Postgres really well? React? Python? Rust? Terraform? Add it here!
+                    Know Postgres really well? React? Expo? Python? Rust? Terraform? Add it here!
                   </FormDescription_Shadcn_>
                   <FormControl_Shadcn_>
                     <div className="relative mt-1">

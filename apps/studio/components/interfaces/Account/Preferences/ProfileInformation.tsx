@@ -40,7 +40,7 @@ export const ProfileInformation = () => {
 
   const {
     data: identityData,
-    isLoading: isIdentitiesLoading,
+    isPending: isIdentitiesLoading,
     isSuccess: isIdentitiesSuccess,
   } = useProfileIdentitiesQuery()
   const identities = (identityData?.identities ?? []).filter((x) => x.identity_data?.email !== null)
@@ -59,7 +59,7 @@ export const ProfileInformation = () => {
     values: defaultValues,
   })
 
-  const { mutate: updateProfile, isLoading } = useProfileUpdateMutation({
+  const { mutate: updateProfile, isPending } = useProfileUpdateMutation({
     onSuccess: (data) => {
       toast.success('Successfully saved profile')
       const { first_name, last_name, username, primary_email } = data
@@ -175,7 +175,7 @@ export const ProfileInformation = () => {
             <Button
               type="primary"
               htmlType="submit"
-              loading={isLoading || isIdentitiesLoading}
+              loading={isPending || isIdentitiesLoading}
               disabled={!form.formState.isDirty}
             >
               Save

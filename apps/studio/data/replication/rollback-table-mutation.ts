@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { replicationKeys } from './keys'
 
 export type RollbackType = 'individual' | 'full'
@@ -52,33 +52,33 @@ export const useRollbackTableMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<RollbackTableData, ResponseError, RollbackTableParams>,
+  UseCustomMutationOptions<RollbackTableData, ResponseError, RollbackTableParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<RollbackTableData, ResponseError, RollbackTableParams>(
-    (vars) => rollbackTableState(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, pipelineId } = variables
-        await Promise.all([
-          queryClient.invalidateQueries(replicationKeys.pipelinesStatus(projectRef, pipelineId)),
-          queryClient.invalidateQueries(
-            replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId)
-          ),
-        ])
+  return useMutation<RollbackTableData, ResponseError, RollbackTableParams>({
+    mutationFn: (vars) => rollbackTableState(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, pipelineId } = variables
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId),
+        }),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to rollback table: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to rollback table: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

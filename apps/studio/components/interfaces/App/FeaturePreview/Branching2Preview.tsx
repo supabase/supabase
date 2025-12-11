@@ -1,7 +1,7 @@
 import Image from 'next/image'
 
 import { InlineLink } from 'components/ui/InlineLink'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
 
 export const Branching2Preview = () => {
   return (
@@ -16,7 +16,7 @@ export const Branching2Preview = () => {
       <p className="text-sm text-foreground-light mb-4">
         Create branches, review changes, and merge back into production all through the dashboard.
         Read the below limitations and our{' '}
-        <InlineLink href="https://supabase.com/docs/guides/platform/branching">
+        <InlineLink href={`${DOCS_URL}/guides/platform/branching`}>
           branching documentation
         </InlineLink>{' '}
         before opting in.
