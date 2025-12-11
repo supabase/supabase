@@ -1,11 +1,12 @@
 import { EvalScorer } from 'braintrust'
-import { ClosedQA } from 'autoevals'
+import { ClosedQA, Sql } from 'autoevals'
 
 type Input = string
 
 type Output = {
   text: string
   tools: string[]
+  sqlQueries?: string[]
 }
 
 export type Assertion<ToolName extends string = string> =
@@ -21,20 +22,26 @@ export type Assertion<ToolName extends string = string> =
       type: 'llm_criteria_met'
       criteria: string
     }
+  | {
+      type: 'sql_similar'
+      sql: string
+    }
 
 export function createAssertionScorer<ToolName extends string>(): EvalScorer<
   Input,
   Output,
   Assertion<ToolName>[]
 > {
-  return async ({ output, expected: assertions }) => {
+  return async ({ input, output, expected: assertions }) => {
     const assertionResults: {
       status: string
+      statusDetail?: string
       assertion: Assertion<ToolName>
     }[] = []
 
     for (const assertion of assertions) {
       let passedTest = false
+      let statusDetail: string | undefined
 
       try {
         switch (assertion.type) {
@@ -55,6 +62,29 @@ export function createAssertionScorer<ToolName extends string>(): EvalScorer<
             passedTest = closedQA.score !== null && closedQA.score > 0.5
             break
           }
+          case 'sql_similar': {
+            const sqlQueries = output.sqlQueries || []
+            if (sqlQueries.length === 0) {
+              passedTest = false
+              break
+            }
+            // Check if any of the generated SQL queries are similar to the expected SQL
+            const similarityScores = await Promise.all(
+              sqlQueries.map(async (generatedSql) => {
+                const sqlScore = await Sql({
+                  input,
+                  output: generatedSql,
+                  expected: assertion.sql,
+                })
+                return sqlScore.score ?? 0
+              })
+            )
+            passedTest = similarityScores.some((score) => score > 0.5)
+            statusDetail = similarityScores
+              .map((score, index) => `SQL ${index + 1}: ${score}`)
+              .join('\n')
+            break
+          }
           default:
             throw new Error(`Unknown assertion type`)
         }
@@ -64,6 +94,7 @@ export function createAssertionScorer<ToolName extends string>(): EvalScorer<
 
       assertionResults.push({
         status: passedTest ? 'passed' : 'failed',
+        statusDetail,
         assertion,
       })
     }

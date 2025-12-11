@@ -1,5 +1,6 @@
 import { openai } from '@ai-sdk/openai'
 import { Eval } from 'braintrust'
+import { stripIndent } from 'common-tags'
 import { Assertion, createAssertionScorer } from 'lib/ai/evals/scorer'
 import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
 import { getMockTools } from 'lib/ai/tools/mock-tools'
@@ -33,6 +34,15 @@ Eval('Assistant', {
           { type: 'llm_criteria_met', criteria: 'Response reflects there are RLS issues to fix.' },
         ],
       },
+      {
+        input: 'Create a new table "foods" with columns for "name" and "color"',
+        expected: [
+          {
+            type: 'sql_similar',
+            sql: stripIndent`CREATE TABLE IF NOT EXISTS public.foods ( id bigserial PRIMARY KEY, name text NOT NULL, color text );`,
+          },
+        ],
+      },
     ] satisfies Array<{ input: string; expected: EvalAssertion[] }>
   },
   task: async (input) => {
@@ -50,9 +60,20 @@ Eval('Assistant', {
       step.toolCalls.map((call) => call.toolName)
     )
 
+    const sqlQueries: string[] = []
+
+    for (const step of steps) {
+      for (const call of step.toolCalls) {
+        if (call.toolName === 'execute_sql') {
+          sqlQueries.push(call.input.sql)
+        }
+      }
+    }
+
     return {
       text: textLastStep,
       tools: toolNamesAllStepsFlattened,
+      sqlQueries,
     }
   },
   scores: [AssertionScorer],
