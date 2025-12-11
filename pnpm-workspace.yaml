@@ -43,12 +43,12 @@ minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
+  - 'next'
+  - '@next/*'
   - ai
   - js-yaml
   - supabase
   - iceberg-js
-  - next@15.5.8 || 16.0.9
-  - '@next/env@15.5.8 || 16.0.9'
   - '@vitejs/plugin-rsc'
 
 onlyBuiltDependencies:
