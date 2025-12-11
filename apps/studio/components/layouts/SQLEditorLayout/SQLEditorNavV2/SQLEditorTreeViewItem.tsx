@@ -354,16 +354,19 @@ export const SQLEditorTreeViewItem = ({
                   Move query
                 </ContextMenuItem_Shadcn_>
               )}
-              {onSelectShare !== undefined && !isSharedSnippet && canCreateSQLSnippet && (
-                <ContextMenuItem_Shadcn_
-                  className="gap-x-2"
-                  onSelect={() => onSelectShare()}
-                  onFocusCapture={(e) => e.stopPropagation()}
-                >
-                  <Share size={14} />
-                  Share query with team
-                </ContextMenuItem_Shadcn_>
-              )}
+              {onSelectShare !== undefined &&
+                !isSharedSnippet &&
+                canCreateSQLSnippet &&
+                IS_PLATFORM && (
+                  <ContextMenuItem_Shadcn_
+                    className="gap-x-2"
+                    onSelect={() => onSelectShare()}
+                    onFocusCapture={(e) => e.stopPropagation()}
+                  >
+                    <Share size={14} />
+                    Share query with team
+                  </ContextMenuItem_Shadcn_>
+                )}
               {onSelectUnshare !== undefined && isSharedSnippet && isOwner && (
                 <ContextMenuItem_Shadcn_
                   className="gap-x-2"
@@ -384,19 +387,21 @@ export const SQLEditorTreeViewItem = ({
                   Duplicate query
                 </ContextMenuItem_Shadcn_>
               )}
-              <ContextMenuItem_Shadcn_
-                className="gap-x-2"
-                onSelect={() => onToggleFavorite()}
-                onFocusCapture={(e) => e.stopPropagation()}
-              >
-                <Heart
-                  size={14}
-                  className={cn(
-                    isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
-                  )}
-                />
-                {isFavorite ? 'Remove from' : 'Add to'} favorites
-              </ContextMenuItem_Shadcn_>
+              {IS_PLATFORM && (
+                <ContextMenuItem_Shadcn_
+                  className="gap-x-2"
+                  onSelect={() => onToggleFavorite()}
+                  onFocusCapture={(e) => e.stopPropagation()}
+                >
+                  <Heart
+                    size={14}
+                    className={cn(
+                      isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
+                    )}
+                  />
+                  {isFavorite ? 'Remove from' : 'Add to'} favorites
+                </ContextMenuItem_Shadcn_>
+              )}
               {onSelectDownload !== undefined && IS_PLATFORM && (
                 <ContextMenuItem_Shadcn_
                   className="gap-x-2"
