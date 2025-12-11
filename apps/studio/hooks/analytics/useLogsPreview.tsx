@@ -120,6 +120,7 @@ function useLogsPreview({
       return data as unknown as Logs
     },
     refetchOnWindowFocus: false,
+    initialPageParam: undefined as string | undefined,
     getNextPageParam(lastPage) {
       if ((lastPage.result?.length ?? 0) === 0) {
         return undefined

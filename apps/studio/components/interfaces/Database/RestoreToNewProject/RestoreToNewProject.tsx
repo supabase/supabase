@@ -48,7 +48,7 @@ export const RestoreToNewProject = () => {
   const {
     data: cloneBackups,
     error,
-    isLoading: cloneBackupsLoading,
+    isPending: cloneBackupsLoading,
     isError,
   } = useCloneBackupsQuery({ projectRef: project?.ref }, { enabled: !isFreePlan })
 
@@ -75,7 +75,7 @@ export const RestoreToNewProject = () => {
   const {
     data: cloneStatus,
     refetch: refetchCloneStatus,
-    isLoading: cloneStatusLoading,
+    isPending: cloneStatusLoading,
     isSuccess: isCloneStatusSuccess,
   } = useCloneStatusQuery(
     {
