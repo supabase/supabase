@@ -1,4 +1,4 @@
-import { Copy, Download, Edit, Lock, MoreVertical, Trash } from 'lucide-react'
+import { Copy, Download, Edit, Globe, Lock, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { type CSSProperties } from 'react'
 import { toast } from 'sonner'
@@ -9,11 +9,13 @@ import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import { InlineLink } from 'components/ui/InlineLink'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { getTableDefinition } from 'data/database/table-definition-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-types-infinite-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
+import { useTableApiAccessQuery } from 'data/privileges/table-api-access-query'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -206,15 +208,13 @@ const EntityListItem = ({
           >
             {entity.name}
           </span>
-          <div>
-            <EntityTooltipTrigger
-              entity={entity}
-              tableHasLints={tableHasLints}
-              viewHasLints={viewHasLints}
-              materializedViewHasLints={materializedViewHasLints}
-              foreignTableHasLints={foreignTableHasLints}
-            />
-          </div>
+          <EntityTooltipTrigger
+            entity={entity}
+            tableHasLints={tableHasLints}
+            viewHasLints={viewHasLints}
+            materializedViewHasLints={materializedViewHasLints}
+            foreignTableHasLints={foreignTableHasLints}
+          />
         </div>
 
         {canEdit && (
@@ -389,6 +389,27 @@ const EntityTooltipTrigger = ({
   foreignTableHasLints: boolean
 }) => {
   const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+
+  const { data: postgrestConfig } = useProjectPostgrestConfigQuery({ projectRef: ref })
+
+  const exposedSchemas = postgrestConfig?.db_schema
+    ? postgrestConfig.db_schema.replace(/ /g, '').split(',')
+    : []
+  const isSchemaExposed = exposedSchemas.includes(entity.schema)
+
+  const { data: apiAccessData } = useTableApiAccessQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      relationId: entity.id,
+      schema: entity.schema,
+      tableName: entity.name,
+    },
+    { enabled: isSchemaExposed }
+  )
+
+  const hasAnyApiPrivileges = apiAccessData?.hasApiAccess === true
 
   let tooltipContent = null
   const accessWarning = 'Data is publicly accessible via API'
@@ -447,9 +468,21 @@ const EntityTooltipTrigger = ({
         <TooltipTrigger className="min-w-4">
           <Badge variant="destructive">Unrestricted</Badge>
         </TooltipTrigger>
-        <TooltipContent side="right" className="max-w-52 text-center">
+        <TooltipContent side="right" className="max-w-52">
           {tooltipContent}
         </TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  // Show API exposed badge only if schema is exposed and table has any API privileges enabled
+  if (isSchemaExposed && hasAnyApiPrivileges) {
+    return (
+      <Tooltip>
+        <TooltipTrigger className="min-w-4">
+          <Globe size={14} strokeWidth={1} className="text-foreground-lighter" />
+        </TooltipTrigger>
+        <TooltipContent side="right">This table is exposed via the Data API</TooltipContent>
       </Tooltip>
     )
   }

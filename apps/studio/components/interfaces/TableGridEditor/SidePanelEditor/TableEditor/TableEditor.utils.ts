@@ -8,7 +8,8 @@ import {
 } from '../ColumnEditor/ColumnEditor.utils'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
-import type { ImportContent, TableField } from './TableEditor.types'
+import type { ApiPrivilegesPerRole, ImportContent, TableField } from './TableEditor.types'
+import { API_PRIVILEGE_TYPES } from './TableEditor.types'
 
 type ValidateFieldsReturn = {
   name?: string
@@ -37,6 +38,7 @@ export const generateTableField = (): TableField => {
     columns: DEFAULT_COLUMNS,
     isRLSEnabled: true,
     isRealtimeEnabled: false,
+    apiPrivileges: getDefaultApiPrivileges(),
   }
 }
 
@@ -55,6 +57,7 @@ export const generateTableFieldFromPostgresTable = (
     }),
     isRLSEnabled: table.rls_enabled,
     isRealtimeEnabled,
+    apiPrivileges: undefined,
   }
 }
 
@@ -68,3 +71,8 @@ export const formatImportedContentToColumnFields = (importContent: ImportContent
     })
   return columnFields
 }
+
+export const getDefaultApiPrivileges = (): ApiPrivilegesPerRole => ({
+  anon: [...API_PRIVILEGE_TYPES],
+  authenticated: [...API_PRIVILEGE_TYPES],
+})
