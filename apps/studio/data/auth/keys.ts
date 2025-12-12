@@ -28,7 +28,7 @@ export const authKeys = {
       order?: string
       column?: OptimizedSearchColumns
     }
-  ) => ['projects', projectRef, 'users-infinite', params] as const,
+  ) => ['projects', projectRef, 'users-infinite', params].filter(Boolean),
   usersCount: (
     projectRef: string | undefined,
     params?: {
@@ -38,7 +38,7 @@ export const authKeys = {
       forceExactCount?: boolean
       column?: OptimizedSearchColumns
     }
-  ) => ['projects', projectRef, 'users-count', params] as const,
+  ) => ['projects', projectRef, 'users-count', params].filter(Boolean),
 
   usersIndexStatuses: (projectRef: string | undefined) =>
     ['projects', projectRef, 'users-index-statuses'] as const,
