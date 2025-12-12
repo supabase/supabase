@@ -54,19 +54,17 @@ export function useTableCreateGeneratePolicies({
     if (tableCreateGeneratePoliciesFlag === undefined) return
     if (!projectInsertedAt) return
 
-    hasTrackedExposure.current = true
-
     try {
       const insertedDate = dayjs.utc(projectInsertedAt)
       if (!insertedDate.isValid()) return
 
       const daysSinceCreation = dayjs.utc().diff(insertedDate, 'day')
-
       track('table_create_generate_policies_experiment_exposed', {
         experiment_id: 'tableCreateGeneratePolicies',
         variant: tableCreateGeneratePoliciesFlag ? 'treatment' : 'control',
         days_since_project_creation: daysSinceCreation,
       })
+      hasTrackedExposure.current = true
     } catch {
       hasTrackedExposure.current = false
     }
