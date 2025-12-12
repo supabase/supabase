@@ -5,6 +5,13 @@ import './Input.css'
 export const SIZES = ['small', 'medium']
 
 /**
+ * A legacy input component.
+ * @param {object} props - The component props.
+ * @param {string} [props.className=''] - Additional CSS class names.
+ * @param {string} [props.type='text'] - The type of the input.
+ * @param {'small' | 'medium'} [props.size='medium'] - The size of the input.
+ * @param {boolean} [props.isError=false] - If `true`, the input will have an error style.
+ * @returns {React.ReactElement} The input component.
  * @deprecated Use `import { Input_shadcn_ } from "ui"` with `type="number"` instead or ./ui-patterns/data-inputs/input with `type="number"`
  */
 const Input = ({

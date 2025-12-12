@@ -1,5 +1,11 @@
 import { cn } from '../../lib/utils/cn'
 
+/**
+ * A loading line component that displays a horizontal loading indicator.
+ * @param {object} props - The component props.
+ * @param {boolean} props.loading - If `true`, the loading line will be animated.
+ * @returns {React.ReactElement} The loading line component.
+ */
 export const LoadingLine = ({ loading }: { loading: boolean }) => {
   return (
     <div className="relative overflow-hidden w-full h-px bg-border m-auto">

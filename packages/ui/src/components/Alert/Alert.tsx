@@ -27,6 +27,17 @@ const icons: Record<AlertVariant, React.ReactElement> = {
 }
 
 /**
+ * Displays an alert message with different variants.
+ * @param {object} props - The component props.
+ * @param {AlertVariant} [props.variant='neutral'] - The variant of the alert.
+ * @param {string} [props.className] - Additional CSS class names.
+ * @param {string | React.ReactNode} props.title - The title of the alert.
+ * @param {boolean} [props.withIcon] - Whether to display an icon.
+ * @param {boolean} [props.closable] - Whether the alert can be closed.
+ * @param {React.ReactNode} [props.children] - The content of the alert.
+ * @param {React.ReactNode} [props.icon] - A custom icon to display.
+ * @param {React.ReactNode} [props.actions] - Custom action buttons.
+ * @returns {React.ReactElement} The alert component.
  * @deprecated Use `import { Alert_Shadcn_ } from "ui"` instead. For studio use `Admonition`
  */
 export function Alert({
