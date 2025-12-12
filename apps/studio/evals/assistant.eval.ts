@@ -1,7 +1,13 @@
 import { openai } from '@ai-sdk/openai'
 import { Eval } from 'braintrust'
 import { stripIndent } from 'common-tags'
-import { Assertion, createAssertionScorer } from 'lib/ai/evals/scorer'
+import {
+  AssistantEvalCase,
+  criteriaMetScorer,
+  sqlSimilarityScorer,
+  textIncludesScorer,
+  toolUsageScorer,
+} from 'lib/ai/evals/scorer'
 import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
 import { getMockTools } from 'lib/ai/tools/mock-tools'
 import assert from 'node:assert'
@@ -9,41 +15,32 @@ import assert from 'node:assert'
 assert(process.env.BRAINTRUST_PROJECT_ID, 'BRAINTRUST_PROJECT_ID is not set')
 assert(process.env.OPENAI_API_KEY, 'OPENAI_API_KEY is not set')
 
-type MockToolName = keyof Awaited<ReturnType<typeof getMockTools>>
-type EvalAssertion = Assertion<MockToolName>
-
-const AssertionScorer = createAssertionScorer<MockToolName>()
-
 Eval('Assistant', {
   projectId: process.env.BRAINTRUST_PROJECT_ID,
   data: () => {
     return [
       {
         input: 'Hello!',
-        expected: [{ type: 'text_includes', substring: 'Hi' }],
+        expected: { textIncludes: 'Hi' },
       },
       {
         input: 'How do I implement IP address rate limiting?',
-        expected: [{ type: 'tools_include', tool: 'search_docs' }],
+        expected: { requiredTools: ['search_docs'] },
       },
       {
         input: 'Check if my project is having issues right now and tell me what to fix first.',
-        expected: [
-          { type: 'tools_include', tool: 'get_advisors' },
-          { type: 'tools_include', tool: 'get_logs' },
-          { type: 'llm_criteria_met', criteria: 'Response reflects there are RLS issues to fix.' },
-        ],
+        expected: {
+          requiredTools: ['get_advisors', 'get_logs'],
+          criteria: 'Response reflects there are RLS issues to fix.',
+        },
       },
       {
         input: 'Create a new table "foods" with columns for "name" and "color"',
-        expected: [
-          {
-            type: 'sql_similar',
-            sql: stripIndent`CREATE TABLE IF NOT EXISTS public.foods ( id bigserial PRIMARY KEY, name text NOT NULL, color text );`,
-          },
-        ],
+        expected: {
+          sqlQuery: stripIndent`CREATE TABLE IF NOT EXISTS public.foods ( id bigserial PRIMARY KEY, name text NOT NULL, color text );`,
+        },
       },
-    ] satisfies Array<{ input: string; expected: EvalAssertion[] }>
+    ] satisfies AssistantEvalCase[]
   },
   task: async (input) => {
     const result = await generateAssistantResponse({
@@ -76,5 +73,5 @@ Eval('Assistant', {
       sqlQueries,
     }
   },
-  scores: [AssertionScorer],
+  scores: [toolUsageScorer, sqlSimilarityScorer, criteriaMetScorer, textIncludesScorer],
 })
