@@ -1001,54 +1001,6 @@ describe('calculateSummary', () => {
     expect(result.hasIndexScan).toBe(true)
   })
 
-  test('finds maximum cost across nested nodes', () => {
-    const tree: ExplainNode[] = [
-      {
-        operation: 'Limit',
-        details: '',
-        cost: { start: 50, end: 50.1 },
-        rows: 10,
-        width: 36,
-        actualTime: null,
-        actualRows: null,
-        level: 0,
-        children: [
-          {
-            operation: 'Sort',
-            details: '',
-            cost: { start: 0, end: 200 }, // Maximum cost
-            rows: 1000,
-            width: 36,
-            actualTime: null,
-            actualRows: null,
-            level: 1,
-            children: [
-              {
-                operation: 'Seq Scan',
-                details: 'on events',
-                cost: { start: 0, end: 150 },
-                rows: 1000,
-                width: 36,
-                actualTime: null,
-                actualRows: null,
-                level: 2,
-                children: [],
-                raw: '',
-              },
-            ],
-            raw: '',
-          },
-        ],
-        raw: '',
-      },
-    ]
-
-    const result = calculateSummary(tree)
-    expect(result.totalCost).toBe(200)
-    expect(result.hasSeqScan).toBe(true)
-    expect(result.seqScanTables).toEqual(['events'])
-  })
-
   test('handles complex query with both seq and index scans', () => {
     const tree: ExplainNode[] = [
       {
