@@ -11,6 +11,9 @@ interface PostHogClientConfig {
 }
 
 class PostHogClient {
+  /** True after posthog.init() is called (prevents double-init) */
+  private initStarted = false
+  /** True after the `loaded` callback fires, meaning PostHog has fully bootstrapped */
   private initialized = false
   private pendingGroups: Record<string, string> = {}
   private pendingIdentification: { userId: string; properties?: Record<string, any> } | null = null
@@ -27,7 +30,7 @@ class PostHogClient {
   }
 
   init(hasConsent: boolean = true) {
-    if (this.initialized || typeof window === 'undefined' || !hasConsent) return
+    if (this.initStarted || typeof window === 'undefined' || !hasConsent) return
 
     if (!this.config.apiKey) {
       console.warn('PostHog API key not found. Skipping initialization.')
@@ -72,11 +75,14 @@ class PostHogClient {
           }
         })
         this.pendingEvents = []
+
+        // Mark as fully initialized now that PostHog has bootstrapped
+        this.initialized = true
       },
     }
 
+    this.initStarted = true
     posthog.init(this.config.apiKey, config)
-    this.initialized = true
   }
 
   capturePageView(properties: Record<string, any>, hasConsent: boolean = true) {
@@ -148,7 +154,7 @@ class PostHogClient {
     this.pendingGroups = {}
     this.pendingEvents = []
 
-    if (!this.initialized) return
+    if (!this.initStarted) return
 
     try {
       posthog.reset()
@@ -164,6 +170,10 @@ class PostHogClient {
    *
    * We need to pass this to the backend identify endpoint so that the backend's alias() call
    * uses the correct anonymous ID to link the anonymous profile to the authenticated user.
+   *
+   * Returns undefined if PostHog hasn't fully bootstrapped yet (i.e., before the `loaded`
+   * callback fires). This avoids a race condition where get_distinct_id() might return
+   * undefined during the async initialization window.
    */
   getDistinctId(): string | undefined {
     if (!this.initialized) return undefined
