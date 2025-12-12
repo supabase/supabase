@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition, TimestampInfo } from 'ui-patterns'
 
 export const PauseDisabledState = () => {
   const { ref } = useParams()
@@ -132,6 +132,17 @@ export const PauseDisabledState = () => {
           and cannot be restored through the dashboard. However, your data remains intact and can be
           downloaded as a backup.
         </p>
+
+        {!!pauseStatus?.last_paused_on && (
+          <p className="text-foreground-lighter text-sm">
+            Project last paused on{' '}
+            <TimestampInfo
+              className="text-sm"
+              labelFormat="DD MMM YYYY"
+              utcTimestamp={pauseStatus.last_paused_on}
+            />
+          </p>
+        )}
 
         <div>
           <p className="!leading-normal !mb-1">Recovery options:</p>
