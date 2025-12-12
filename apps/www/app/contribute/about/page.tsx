@@ -1,16 +1,9 @@
 import Link from 'next/link'
-import {
-  ArrowLeft,
-  MessageCircle,
-  Link2,
-  Code,
-  BookOpen,
-  User,
-  LucideMessageCircleQuestion,
-  MessageCircleQuestion,
-} from 'lucide-react'
+import { ArrowLeft, MessageCircle, Link2, BookOpen, User } from 'lucide-react'
 import DefaultLayout from '~/components/Layouts/Default'
-import { Card, CardContent } from 'ui'
+import { GithubAvatar } from '~/components/Contribute/GithubAvatar'
+
+const githubUsers = ['aantti', 'carolmonroe', 'GaryAustin1', 'Hallidayo', 'ihm40', 'j4w8n', 'kallebysantos', 'saltcod', 'silentworks', 'singh-inder', 'tomaspozo', 'tristanbob']
 
 // eslint-disable-next-line no-restricted-exports
 export default function AboutPage() {
@@ -35,14 +28,13 @@ export default function AboutPage() {
                 place for you.
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="bg-card border-border border-t-4 border-t-green-500">
-                <CardContent className="p-6">
-                  <div className="mb-4">
-                    <MessageCircle className="h-8 w-8 text-foreground" strokeWidth={1.5} />
-                  </div>
-                  <h2 className="text-lg text-foreground mb-2">Help Others Across the Community</h2>
-                  <p className="text-foreground-lighter mb-3">
+            <div className="grid gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-[200px_1fr] gap-12 py-6 border-b border-border">
+                <div>
+                  <h2 className="text-xl text-foreground">Help Others Across the Community</h2>
+                </div>
+                <div>
+                  <p className="text-foreground-lighter mb-3 text-lg">
                     Help unblock others by answering questions in Discord, GitHub Discussions,
                     Reddit, Twitter, and StackOverflow.
                   </p>
@@ -51,18 +43,17 @@ export default function AboutPage() {
                     <li>Share solutions on Reddit or StackOverflow</li>
                     <li>Help triage issues and route users to the right resources</li>
                   </ul>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
-              <Card className="bg-card border-border border-t-4 border-t-blue-500">
-                <CardContent className="p-6">
-                  <div className="mb-4">
-                    <Link2 className="h-8 w-8 text-foreground" strokeWidth={1.5} />
-                  </div>
-                  <h2 className="text-lg text-foreground mb-2">
+              <div className="grid grid-cols-2 md:grid-cols-[200px_1fr] gap-12 py-6 border-b border-border">
+                <div>
+                  <h2 className="text-xl text-foreground">
                     Build and Maintain Open Source Projects
                   </h2>
-                  <p className="text-foreground-lighter mb-3">
+                </div>
+                <div>
+                  <p className="text-foreground-lighter mb-3 text-lg">
                     Contribute to and help maintain the many open source repositories and the large
                     ecosystem of community-driven libraries that power Supabase.
                   </p>
@@ -71,16 +62,15 @@ export default function AboutPage() {
                     <li>Contribute to open source tooling, CLIs, or utility packages</li>
                     <li>Review PRs and triage issues</li>
                   </ul>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
-              <Card className="bg-card border-border border-t-4 border-t-orange-500">
-                <CardContent className="p-6">
-                  <div className="mb-4">
-                    <BookOpen className="h-8 w-8 text-foreground" strokeWidth={1.5} />
-                  </div>
-                  <h2 className="text-lg text-foreground mb-2">Write docs and guides</h2>
-                  <p className="text-foreground-lighter mb-3">
+              <div className="grid grid-cols-2 md:grid-cols-[200px_1fr] gap-12 py-6 border-b border-border">
+                <div>
+                  <h2 className="text-xl text-foreground">Write docs and guides</h2>
+                </div>
+                <div>
+                  <p className="text-foreground-lighter mb-3 text-lg">
                     Help us make Supabase easier to learn and use by improving clarity, adding
                     examples, or filling in gaps.
                   </p>
@@ -90,17 +80,15 @@ export default function AboutPage() {
                     <li>Create new tutorials or deep-dives</li>
                     <li>Fix typos, broken links, and outdated info</li>
                   </ul>
-                </CardContent>
-              </Card>
-              <Card className="bg-card border-border border-t-4 border-t-orange-500">
-                <CardContent className="p-6">
-                  <div className="mb-4">
-                    <User className="h-8 w-8 text-foreground" strokeWidth={1.5} />
-                  </div>
-                  <h2 className="text-lg text-foreground mb-2">
-                    That thing you do better than anyone
-                  </h2>
-                  <p className="text-foreground-lighter mb-3">
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-[200px_1fr] gap-12 py-6 border-b border-border">
+                <div>
+                  <h2 className="text-xl text-foreground">That thing you do better than anyone</h2>
+                </div>
+                <div>
+                  <p className="text-foreground-lighter mb-3 text-lg">
                     Do you have a unique skill or perspective that you can share with the community?
                     We'd love to hear from you.
                   </p>
@@ -109,8 +97,8 @@ export default function AboutPage() {
                     <li>Got a niche skill that not many people have?</li>
                     <li>Know one of our core tools better than anyone else?</li>
                   </ul>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
           </div>
           <div className="grid gap-4 mt-12">
@@ -119,6 +107,11 @@ export default function AboutPage() {
               We are a team of developers who are passionate about building the best developer
               platform.
             </p>
+            <div className="flex gap-2 flex-wrap">
+              {githubUsers.map((username) => (
+                <GithubAvatar key={username} username={username} size={48} className="rounded-full" />
+              ))}
+            </div>
           </div>
         </div>
       </main>
