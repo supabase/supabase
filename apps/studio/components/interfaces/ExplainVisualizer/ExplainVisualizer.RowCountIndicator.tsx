@@ -80,7 +80,7 @@ export function RowCountIndicator({
 
   if (showComparison) {
     const accuracy = getEstimationAccuracy()
-    const hasEstimationIssue = accuracy && !['accurate'].includes(accuracy)
+    const hasEstimationIssue = accuracy && accuracy !== 'accurate'
 
     return (
       <Tooltip>
