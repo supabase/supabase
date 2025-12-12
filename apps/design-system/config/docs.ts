@@ -46,6 +46,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/accessibility',
           items: [],
         },
+        {
+          title: 'Copy Writing',
+          href: '/docs/copy-writing',
+          items: [],
+        },
       ],
     },
     {
