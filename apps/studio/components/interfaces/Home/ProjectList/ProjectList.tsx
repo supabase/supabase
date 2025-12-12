@@ -1,4 +1,4 @@
-import { UIEvent, useMemo } from 'react'
+import { useMemo } from 'react'
 
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
@@ -13,7 +13,6 @@ import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
-import { isAtBottom } from 'lib/helpers'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import type { Organization } from 'types'
 import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
@@ -111,12 +110,6 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
     ?.filter((integration) => integration.integration.name === 'Vercel')
     .flatMap((integration) => integration.connections)
 
-  const handleScroll = (event: UIEvent<HTMLDivElement | HTMLUListElement>) => {
-    console.log('handleScroll')
-    if (isLoadingProjects || isFetchingNextPage || !isAtBottom(event)) return
-    fetchNextPage()
-  }
-
   if (isErrorPermissions) {
     return (
       <AlertError
@@ -145,7 +138,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
 
   if (viewMode === 'table') {
     return (
-      <Card className="flex-1 min-h-0 overflow-y-auto mb-8" onScroll={handleScroll}>
+      <Card className="flex-1 min-h-0 overflow-y-auto mb-8">
         <Table>
           {/* [Joshen] Ideally we can figure out sticky table headers here */}
           <TableHeader>
@@ -220,7 +213,6 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
       ) : (
         <div className="flex flex-col gap-y-2 md:gap-y-4 pb-6">
           <ul
-            onScroll={handleScroll}
             className={cn(
               'min-h-0 w-full mx-auto',
               'grid grid-cols-1 gap-2 md:gap-4',
