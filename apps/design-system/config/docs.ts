@@ -74,18 +74,23 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Tables',
+          href: '/docs/ui-patterns/tables',
+          items: [],
+        },
+        {
           title: 'Layout',
           href: '/docs/ui-patterns/layout',
           items: [],
         },
         {
-          title: 'Navigation',
           href: '/docs/ui-patterns/navigation',
+          title: 'Navigation',
           items: [],
         },
         {
-          title: 'Tables',
-          href: '/docs/ui-patterns/tables',
+          href: '/docs/ui-patterns/modality',
+          title: 'Modality',
           items: [],
         },
       ],
@@ -111,7 +116,7 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'EmptyStatePresentational',
+          title: 'Empty State Presentational',
           href: '/docs/fragments/empty-state-presentational',
           items: [],
         },
@@ -138,6 +143,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Text Confirm Dialog',
           href: '/docs/fragments/text-confirm-dialog',
+          items: [],
+        },
+        {
+          title: 'Confirmation Modal',
+          href: '/docs/fragments/confirmation-modal',
           items: [],
         },
         {
