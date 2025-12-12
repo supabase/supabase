@@ -30,6 +30,7 @@ public/sitemap.xml
 # llms.txt (generated)
 public/llms.txt
 public/llms/
+public/llms-openref/
 
 # Copied examples folder
 /examples/
