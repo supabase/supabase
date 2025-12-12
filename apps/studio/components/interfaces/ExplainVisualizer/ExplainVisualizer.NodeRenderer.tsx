@@ -9,6 +9,7 @@ import {
 } from './ExplainVisualizer.utils'
 
 import type { ExplainNode } from './ExplainVisualizer.types'
+import { useMemo } from 'react'
 
 export interface ExplainNodeRendererProps {
   node: ExplainNode
@@ -30,7 +31,14 @@ export function ExplainNodeRenderer({
 
   const detailLines = node.details ? node.details.split('\n').filter(Boolean) : []
 
-  const targetName = detailLines.length > 0 && !detailLines[0].includes(':') ? detailLines[0] : null
+  const hasNonColonPrefixedFirstLine = detailLines.length > 0 && !detailLines[0].includes(':')
+  const targetName = hasNonColonPrefixedFirstLine ? detailLines[0] : null
+
+  const pipelineIndicatorClass = useMemo(() => {
+    if (isRoot) return 'bg-brand/20 text-brand'
+    if (isLeaf) return 'bg-surface-300 text-foreground-light'
+    return 'bg-surface-200 text-foreground-muted'
+  }, [isRoot, isLeaf])
 
   return (
     <div className="relative">
@@ -45,11 +53,7 @@ export function ExplainNodeRenderer({
         <div
           className={cn(
             'flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center',
-            isRoot
-              ? 'bg-brand/20 text-brand'
-              : isLeaf
-                ? 'bg-surface-300 text-foreground-light'
-                : 'bg-surface-200 text-foreground-muted'
+            pipelineIndicatorClass
           )}
         >
           {isRoot ? (
