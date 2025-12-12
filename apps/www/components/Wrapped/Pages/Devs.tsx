@@ -75,7 +75,7 @@ const gridStats = [
 export const Devs = () => {
   return (
     <>
-      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x">
+      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x border-b">
         {/* Grid background */}
         <AnimatedGridBackground
           cols={5}

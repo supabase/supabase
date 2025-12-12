@@ -187,7 +187,7 @@ export function AnimatedGridBackground({
         // Remove right border on last column
         const isLastCol = col === cols - 1
         // Remove bottom border on last row
-        const isLastRow = row === rows - 1
+        const isLastRow = row === actualRows - 1
 
         return (
           <div
