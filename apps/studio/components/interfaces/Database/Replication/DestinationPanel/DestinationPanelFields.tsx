@@ -1,16 +1,15 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 
 import { useParams } from 'common'
-import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   FormControl_Shadcn_,
@@ -123,17 +122,14 @@ export const AnalyticsBucketFields = ({
   const [showSecretAccessKey, setShowSecretAccessKey] = useState(false)
 
   const { ref: projectRef } = useParams()
-  const { data: project } = useSelectedProjectQuery()
 
-  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: apiKeys } = useAPIKeysQuery(
     { projectRef, reveal: true },
     { enabled: canReadAPIKeys }
   )
   const { serviceKey } = getKeys(apiKeys)
   const serviceApiKey = serviceKey?.api_key ?? ''
-
-  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
 
   const {
     data: keysData,
