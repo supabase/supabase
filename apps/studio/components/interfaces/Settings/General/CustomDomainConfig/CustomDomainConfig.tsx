@@ -121,11 +121,7 @@ export const CustomDomainConfig = () => {
             </CardContent>
           </Card>
         ) : status === '0_no_hostname_configured' ? (
-          <Card>
-            <CardContent className="p-0">
-              <CustomDomainsConfigureHostname />
-            </CardContent>
-          </Card>
+          <CustomDomainsConfigureHostname />
         ) : (
           <Card>
             <CardContent className="p-0">
