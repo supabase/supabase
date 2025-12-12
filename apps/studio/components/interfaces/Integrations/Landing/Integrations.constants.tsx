@@ -374,7 +374,13 @@ const TEMPLATE_INTEGRATIONS: IntegrationDefinition[] = [
     missingExtensionsAlert: <UpgradeDatabaseAlert minimumVersion="15.6.1.143" />,
     name: `Stripe Sync Engine`,
     icon: ({ className, ...props } = {}) => (
-      <Receipt className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+      <Image
+        fill
+        src={`${BASE_PATH}/img/icons/stripe-icon.svg`}
+        alt={'Stripe Logo'}
+        className={cn('p-2', className)}
+        {...props}
+      />
     ),
     description:
       'Continously sync your payments, customer, and other data from Stripe to your Postgres database',
