@@ -30,11 +30,50 @@ export function getOperationDescription(operation: string, node: ExplainNode): s
   if (op.includes('bitmap heap scan')) {
     return 'Fetches rows using bitmap'
   }
+  if (op.includes('hash left join')) {
+    return 'Returns all left rows with matching right rows via hash'
+  }
+  if (op.includes('hash right join')) {
+    return 'Returns all right rows with matching left rows via hash'
+  }
+  if (op.includes('hash full join')) {
+    return 'Returns all rows from both tables via hash'
+  }
+  if (op.includes('hash anti join')) {
+    return 'Returns rows without matches via hash'
+  }
+  if (op.includes('hash semi join')) {
+    return 'Returns rows with at least one match via hash'
+  }
   if (op.includes('hash join')) {
     return 'Joins tables using hash lookup'
   }
+  if (op.includes('merge left join')) {
+    return 'Returns all left rows with matching right rows via merge'
+  }
+  if (op.includes('merge right join')) {
+    return 'Returns all right rows with matching left rows via merge'
+  }
+  if (op.includes('merge full join')) {
+    return 'Returns all rows from both tables via merge'
+  }
+  if (op.includes('merge anti join')) {
+    return 'Returns rows without matches via merge'
+  }
+  if (op.includes('merge semi join')) {
+    return 'Returns rows with at least one match via merge'
+  }
   if (op.includes('merge join')) {
     return 'Joins pre-sorted tables'
+  }
+  if (op.includes('nested loop left join')) {
+    return 'Returns all left rows with matching right rows via loop'
+  }
+  if (op.includes('nested loop anti join')) {
+    return 'Returns rows without matches via loop'
+  }
+  if (op.includes('nested loop semi join')) {
+    return 'Returns rows with at least one match via loop'
   }
   if (op.includes('nested loop')) {
     return 'Joins by looping through each row'

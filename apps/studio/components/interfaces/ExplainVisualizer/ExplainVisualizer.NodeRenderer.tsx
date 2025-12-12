@@ -1,5 +1,7 @@
-import { ArrowLeft, ArrowLeftRight, ArrowRight, ArrowUp, Clock } from 'lucide-react'
+import { ArrowRight, ArrowUp, Clock } from 'lucide-react'
 import { cn } from 'ui'
+import { CostIndicator } from './ExplainVisualizer.CostIndicator'
+import { RowCountIndicator } from './ExplainVisualizer.RowCountIndicator'
 import {
   getOperationColor,
   getOperationDescription,
@@ -28,18 +30,11 @@ export function ExplainNodeRenderer({
   const Icon = getOperationIcon(node.operation)
   const colorClass = getOperationColor(node.operation)
   const description = getOperationDescription(node.operation, node)
-
-  const costValue = node.cost?.end || node.actualTime?.end || 0
-  const costWidth = maxCost > 0 ? (costValue / maxCost) * 100 : 0
   const isLeaf = node.children.length === 0
 
   const detailLines = node.details ? node.details.split('\n').filter(Boolean) : []
 
   const targetName = detailLines.length > 0 && !detailLines[0].includes(':') ? detailLines[0] : null
-
-  const rowsFiltered = node.rowsRemovedByFilter
-  const totalRowsScanned =
-    rowsFiltered && node.actualRows !== null ? node.actualRows + rowsFiltered : null
 
   return (
     <div className="relative">
@@ -93,24 +88,7 @@ export function ExplainNodeRenderer({
           {/* Metrics row */}
           <div className="flex items-center gap-3 mt-2 flex-wrap">
             {/* Cost visualization bar */}
-            {node.cost && (
-              <div className="flex items-center gap-2">
-                <div className="w-16 h-1.5 bg-surface-300 rounded-full overflow-hidden">
-                  <div
-                    className={cn(
-                      'h-full rounded-full transition-all',
-                      node.cost.end < 100 && 'bg-brand',
-                      node.cost.end >= 100 && node.cost.end < 1000 && 'bg-warning',
-                      node.cost.end >= 1000 && 'bg-destructive'
-                    )}
-                    style={{ width: `${Math.min(costWidth, 100)}%` }}
-                  />
-                </div>
-                <span className="text-xs text-foreground-lighter">
-                  cost <span className="font-mono font-medium">{node.cost.end.toFixed(1)}</span>
-                </span>
-              </div>
-            )}
+            {node.cost && <CostIndicator cost={node.cost.end} maxCost={maxCost} />}
 
             {node.actualTime && (
               <>
@@ -126,44 +104,11 @@ export function ExplainNodeRenderer({
             {(node.actualRows !== null || node.rows !== null) && (
               <>
                 <span className="text-foreground-muted text-xs">|</span>
-                <div className="flex items-center gap-1.5 text-xs text-foreground-lighter">
-                  {totalRowsScanned !== null && rowsFiltered ? (
-                    // Show filter flow: input → filtered → output
-                    <>
-                      <span>{totalRowsScanned.toLocaleString()} rows</span>
-                      <ArrowRight size={10} className="text-foreground-muted" />
-                      <span className="text-destructive-600 font-medium">
-                        -{rowsFiltered.toLocaleString()}
-                      </span>
-                      <ArrowRight size={10} className="text-foreground-muted" />
-                      <span className="text-brand font-medium">
-                        {node.actualRows?.toLocaleString()} rows
-                      </span>
-                    </>
-                  ) : node.actualRows !== null &&
-                    node.rows !== null &&
-                    node.actualRows === node.rows ? (
-                    // Same estimate and actual - just show the count
-                    <span className="text-foreground-light font-medium">
-                      {node.actualRows.toLocaleString()} rows
-                    </span>
-                  ) : (
-                    // Different or only one value - show comparison
-                    <>
-                      {node.rows !== null && <span>est. {node.rows.toLocaleString()}</span>}
-                      {node.actualRows !== null && (
-                        <>
-                          {node.rows !== null && (
-                            <ArrowRight size={10} className="text-foreground-muted" />
-                          )}
-                          <span className="text-foreground-light font-medium">
-                            {node.actualRows.toLocaleString()} rows
-                          </span>
-                        </>
-                      )}
-                    </>
-                  )}
-                </div>
+                <RowCountIndicator
+                  actualRows={node.actualRows}
+                  estimatedRows={node.rows}
+                  rowsRemovedByFilter={node.rowsRemovedByFilter}
+                />
               </>
             )}
           </div>
