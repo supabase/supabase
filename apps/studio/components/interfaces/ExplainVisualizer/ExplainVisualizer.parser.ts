@@ -235,7 +235,7 @@ export function calculateSummary(tree: ExplainNode[]): ExplainSummary {
     const op = node.operation.toLowerCase()
     if (op.includes('seq scan')) {
       stats.hasSeqScan = true
-      const tableMatch = node.details.match(/on\s+(\w+)/)
+      const tableMatch = node.details.match(/on\s+((?:"[^"]+"|[\w]+)(?:\.(?:"[^"]+"|[\w]+))*)/)
       if (tableMatch) stats.seqScanTables.push(tableMatch[1])
     }
     if (op.includes('index')) {
