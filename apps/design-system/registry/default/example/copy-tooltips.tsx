@@ -16,6 +16,7 @@ export default function CopyTooltips() {
                   type="text"
                   className="flex items-center px-1.5"
                   icon={<Info size={20} strokeWidth={1.5} />}
+                  aria-label="More info"
                 />
               </TooltipTrigger>
               <TooltipContent>
@@ -35,6 +36,7 @@ export default function CopyTooltips() {
                   type="text"
                   className="flex items-center px-1.5"
                   icon={<Info size={20} strokeWidth={1.5} />}
+                  aria-label="More info"
                 />
               </TooltipTrigger>
               <TooltipContent>
