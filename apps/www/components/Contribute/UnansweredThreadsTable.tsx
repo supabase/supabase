@@ -38,23 +38,19 @@ function ThreadsTable({
 
   return (
     <div className="grid gap-4">
-      <div className="overflow-hidden">
-        <table className="w-full table-fixed">
+      <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+        <table className="w-full table-fixed min-w-[900px]">
           <thead className="border-b border-border">
             <tr>
-              <th className="text-left py-3 px-6 text-sm text-foreground min-w-[350px] w-[45%]">
+              <th className="text-left py-3 px-3 md:px-6 text-sm text-foreground w-[45%]">
                 Thread
               </th>
-              <th className="text-left py-3 px-6 text-sm text-foreground min-w-[150px] w-[20%]">
-                Area
-              </th>
-              <th className="text-left py-3 px-6 text-sm text-foreground min-w-[150px] w-[20%]">
-                Stack
-              </th>
-              <th className="text-left py-3 px-6 text-sm text-foreground min-w-[100px] w-[10%]">
+              <th className="text-left py-3 px-3 md:px-6 text-sm text-foreground w-[20%]">Area</th>
+              <th className="text-left py-3 px-3 md:px-6 text-sm text-foreground w-[20%]">Stack</th>
+              <th className="text-left py-3 px-3 md:px-6 text-sm text-foreground w-[10%]">
                 Replies
               </th>
-              <th className="text-left py-3 px-6 text-sm text-foreground min-w-[100px] w-[15%]">
+              <th className="text-left py-3 px-3 md:px-6 text-sm text-foreground w-[15%]">
                 Posted
               </th>
             </tr>
@@ -71,7 +67,7 @@ function ThreadsTable({
           </tbody>
         </table>
       </div>
-      <div className="text-sm text-muted-foreground px-6">
+      <div className="text-sm text-muted-foreground px-3 md:px-6">
         Showing {threads.length} {threads.length === 1 ? 'result' : 'results'}
       </div>
     </div>
@@ -180,8 +176,8 @@ export function UnansweredThreadsTable({
       </div>
 
       {/* Channel Filters */}
-      <div className="flex items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-2 bg-surface-200 rounded-md p-1">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-2 bg-surface-200 rounded-md p-1 overflow-x-auto">
           <Button
             type={currentTab === 'all' ? 'default' : 'text'}
             size="tiny"
@@ -241,9 +237,9 @@ export function UnansweredThreadsTable({
           </Button>
         </div>
 
-        <div className="flex items-center gap-2 flex-1 justify-end">
+        <div className="flex items-center gap-2 flex-1 justify-end w-full md:w-auto">
           {/* Search Input */}
-          <form onSubmit={handleSearchSubmit} className="relative max-w-md w-full">
+          <form onSubmit={handleSearchSubmit} className="relative max-w-md w-full flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input_Shadcn_
               type="text"
@@ -327,7 +323,7 @@ function ThreadRow({
 
   return (
     <tr className="border-b border-border hover:bg-muted/50 transition-colors">
-      <td className="py-4 px-6 w-[45%] min-w-[350px]">
+      <td className="py-4 px-3 md:px-6 w-[45%]">
         <div className="flex items-center gap-3 overflow-hidden">
           <div className="flex items-center gap-1.5">
             {thread.channel === 'discord' && (
@@ -363,7 +359,7 @@ function ThreadRow({
           </Link>
         </div>
       </td>
-      <td className="py-4 px-6 w-[20%] min-w-[150px]">
+      <td className="py-4 px-3 md:px-6 w-[20%]">
         <div className="flex flex-wrap gap-2 overflow-hidden">
           {thread.product_areas.length > 0 ? (
             thread.product_areas
@@ -381,7 +377,7 @@ function ThreadRow({
           )}
         </div>
       </td>
-      <td className="py-4 px-6 w-[20%] min-w-[150px]">
+      <td className="py-4 px-3 md:px-6 w-[20%]">
         <div className="flex flex-wrap gap-2 overflow-hidden">
           {thread.stack.length > 0 ? (
             (() => {
@@ -439,14 +435,14 @@ function ThreadRow({
           )}
         </div>
       </td>
-      <td className="py-4 px-6 w-[10%] min-w-[100px]">
+      <td className="py-4 px-3 md:px-6 w-[10%]">
         <span className="text-sm text-muted-foreground whitespace-nowrap">
           {thread.message_count !== null && thread.message_count !== undefined
             ? Math.max(0, thread.message_count - 1)
             : '—'}
         </span>
       </td>
-      <td className="py-4 px-6 w-[15%] min-w-[100px]">
+      <td className="py-4 px-3 md:px-6 w-[15%]">
         <span className="text-sm text-muted-foreground whitespace-nowrap">{thread.posted}</span>
       </td>
     </tr>

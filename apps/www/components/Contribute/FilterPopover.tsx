@@ -58,7 +58,7 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>{trigger}</PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-[600px] p-0" align="end">
+      <PopoverContent_Shadcn_ className="w-[calc(100vw-2rem)] sm:w-[500px] md:w-[600px] p-0" align="end">
         <div className="p-4">
           {/* Header */}
           <div className="flex flex-row items-center justify-between pb-4">
@@ -70,19 +70,20 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
                   onClick={handleClearAll}
                   iconRight={<X className="h-4 w-4" />}
                 >
-                  Clear all
+                  <span className="hidden xs:inline">Clear all</span>
+                  <span className="xs:hidden">Clear</span>
                 </Button>
               )}
             </div>
           </div>
           <PopoverSeparator />
 
-          <ScrollArea className="h-[430px]">
+          <ScrollArea className="h-[300px] sm:h-[400px] md:h-[430px]">
             <div className="grid gap-8 pb-4 mt-4 pr-4">
               {/* Product Area Section */}
               <div className="grid gap-3">
                 <h3 className="text-sm  text-muted-foreground">Product Area</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                   {allProductAreas
                     .filter((area) => area !== 'Other')
                     .map((area) => {
@@ -115,7 +116,7 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
               {/* Tech Stack Section */}
               <div className="grid gap-3">
                 <h3 className="text-sm  text-muted-foreground">Tech Stack</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                   {allStacks
                     .filter((tech) => tech !== 'Other')
                     .map((tech) => {
