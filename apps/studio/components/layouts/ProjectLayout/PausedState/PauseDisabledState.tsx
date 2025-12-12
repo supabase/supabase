@@ -121,10 +121,10 @@ export const PauseDisabledState = () => {
       <Admonition
         showIcon={false}
         type="warning"
-        className="rounded-none border-0 px-6"
+        className="rounded-none border-0 px-6 [&>div>div>div>]:flex [&>div>div>div>]:flex-col [&>div>div>div>]:gap-y-3"
         title="Project can no longer be restored through the dashboard"
       >
-        <p className="!leading-normal !mb-3">
+        <p className="!leading-normal">
           This project has been paused for over{' '}
           <span className="text-foreground">
             {pauseStatus?.max_days_till_restore_disabled ?? 90} days
