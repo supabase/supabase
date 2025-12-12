@@ -320,12 +320,13 @@ export function useTelemetryIdentify(API_URL: string) {
 
   useEffect(() => {
     if (user?.id) {
-      // Send to backend
+      const anonymousId = posthogClient.getDistinctId()
+
       sendTelemetryIdentify(API_URL, {
         user_id: user.id,
+        ...(anonymousId && { anonymous_id: anonymousId }),
       })
 
-      // Also identify in PostHog client-side
       posthogClient.identify(user.id)
     }
   }, [API_URL, user?.id])
