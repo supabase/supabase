@@ -69,7 +69,7 @@ export const SSOConfig = () => {
 
   const {
     data: ssoConfig,
-    isLoading: isLoadingSSOConfig,
+    isPending: isLoadingSSOConfig,
     isSuccess,
     isError,
     error: configError,
@@ -180,7 +180,7 @@ export const SSOConfig = () => {
               <Form_Shadcn_ {...form}>
                 <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
                   <Card>
-                    <CardContent className="py-8">
+                    <CardContent>
                       <FormField_Shadcn_
                         control={form.control}
                         name="enabled"

@@ -51,7 +51,7 @@ const BranchesPage: NextPageWithLayout = () => {
   const {
     data: connections,
     error: connectionsError,
-    isLoading: isLoadingConnections,
+    isPending: isLoadingConnections,
     isSuccess: isSuccessConnections,
     isError: isErrorConnections,
   } = useGitHubConnectionsQuery({
@@ -61,7 +61,7 @@ const BranchesPage: NextPageWithLayout = () => {
   const {
     data: branches,
     error: branchesError,
-    isLoading: isLoadingBranches,
+    isPending: isLoadingBranches,
     isError: isErrorBranches,
     isSuccess: isSuccessBranches,
   } = useBranchesQuery({ projectRef })

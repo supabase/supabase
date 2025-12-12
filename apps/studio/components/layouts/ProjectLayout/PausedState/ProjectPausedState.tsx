@@ -70,7 +70,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     error: pauseStatusError,
     isError,
     isSuccess: isPauseStatusSuccess,
-    isLoading,
+    isPending: isLoading,
   } = useProjectPauseStatusQuery({ ref }, { enabled: project?.status === PROJECT_STATUS.INACTIVE })
 
   const finalDaysRemainingBeforeRestoreDisabled =

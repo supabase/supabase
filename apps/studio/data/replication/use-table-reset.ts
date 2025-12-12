@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { RollbackType, useRollbackTableMutation } from './rollback-table-mutation'
 import { useRestartPipelineHelper } from './restart-pipeline-helper'
+import { RollbackType, useRollbackTableMutation } from './rollback-table-mutation'
 
 interface UseTableResetParams {
   tableName: string
@@ -17,7 +17,7 @@ export const useTableReset = ({ tableName, onSuccess, onError }: UseTableResetPa
   const [isRestartingPipeline, setIsRestartingPipeline] = useState(false)
   const { restartPipeline } = useRestartPipelineHelper()
 
-  const { mutate: rollbackTable, isLoading: isRollingBack } = useRollbackTableMutation({
+  const { mutate: rollbackTable, isPending: isRollingBack } = useRollbackTableMutation({
     onSuccess: async (_, vars) => {
       const { projectRef, pipelineId } = vars
       toast.success(`Table "${tableName}" reset successfully and pipeline is being restarted`)
