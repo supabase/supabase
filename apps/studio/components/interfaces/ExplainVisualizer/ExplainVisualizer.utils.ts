@@ -21,14 +21,14 @@ export function getOperationDescription(operation: string, node: ExplainNode): s
   if (op.includes('index only scan')) {
     return 'Reads data directly from index (fastest)'
   }
-  if (op.includes('index scan')) {
-    return 'Uses index to find matching rows'
-  }
   if (op.includes('bitmap index scan')) {
     return 'Builds bitmap of matching rows from index'
   }
   if (op.includes('bitmap heap scan')) {
     return 'Fetches rows using bitmap'
+  }
+  if (op.includes('index scan')) {
+    return 'Uses index to find matching rows'
   }
   if (op.includes('hash left join')) {
     return 'Returns all left rows with matching right rows via hash'
