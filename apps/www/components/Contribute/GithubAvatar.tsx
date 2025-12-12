@@ -7,7 +7,7 @@ interface GithubAvatarProps {
   className?: string
 }
 
-export function GithubAvatar({ username, size = 40, className }: GithubAvatarProps) {
+export function GithubAvatar({ username, size = 80, className }: GithubAvatarProps) {
   return (
     <Link
       href={`https://github.com/${username}`}

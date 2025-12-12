@@ -5,15 +5,7 @@ import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
 import type { ReactNode } from 'react'
 import { useEffect, useMemo, useState } from 'react'
-import {
-  Badge,
-  Button,
-  cn,
-  Input_Shadcn_,
-  Tabs_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-} from 'ui'
+import { Badge, Button, cn, Input_Shadcn_ } from 'ui'
 
 import type { ThreadRow } from '~/types/contribute'
 import { FilterPopover } from './FilterPopover'
@@ -169,105 +161,116 @@ export function UnansweredThreadsTable({
         </div>
       </div>
 
-      {/* Tabs */}
-      <Tabs_Shadcn_ value={currentTab} onValueChange={handleTabChange} className="w-full">
-        <div className="flex items-center justify-between gap-4 mb-6">
-          <TabsList_Shadcn_ className="gap-6 bg-surface-200 rounded-md">
-            <TabsTrigger_Shadcn_
-              value="all"
-              className="gap-2 px-4 data-[state=active]:bg-surface-300 border-none"
-            >
-              <List className="h-4 w-4" />
-              All
-            </TabsTrigger_Shadcn_>
-            <TabsTrigger_Shadcn_
-              value="discord"
-              className="gap-2 px-4 data-[state=active]:bg-surface-300 border-none"
-            >
+      {/* Channel Filters */}
+      <div className="flex items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-2 bg-surface-200 rounded-md p-1">
+          <Button
+            type={currentTab === 'all' ? 'default' : 'text'}
+            size="tiny"
+            onClick={() => handleTabChange('all')}
+            icon={<List className="h-4 w-4" />}
+            className={cn(currentTab === 'all' && 'bg-surface-300')}
+          >
+            All
+          </Button>
+          <Button
+            type={currentTab === 'discord' ? 'default' : 'text'}
+            size="tiny"
+            onClick={() => handleTabChange('discord')}
+            icon={
               <DiscordIcon
                 className={cn(
                   'h-4 w-4',
                   currentTab === 'discord' ? 'text-[#5865F2]' : 'text-foreground-lighter'
                 )}
               />
-              Discord
-            </TabsTrigger_Shadcn_>
-            <TabsTrigger_Shadcn_
-              value="reddit"
-              className="gap-2 px-4 data-[state=active]:bg-surface-300 border-none"
-            >
+            }
+            className={cn(currentTab === 'discord' && 'bg-surface-300')}
+          >
+            Discord
+          </Button>
+          <Button
+            type={currentTab === 'reddit' ? 'default' : 'text'}
+            size="tiny"
+            onClick={() => handleTabChange('reddit')}
+            icon={
               <RedditIcon
                 className={cn(
                   'h-4 w-4',
                   currentTab === 'reddit' ? 'text-[#FF4500]' : 'text-foreground-lighter'
                 )}
               />
-              Reddit
-            </TabsTrigger_Shadcn_>
-            <TabsTrigger_Shadcn_
-              value="github"
-              className="gap-2 px-4 data-[state=active]:bg-surface-300 border-none"
-            >
+            }
+            className={cn(currentTab === 'reddit' && 'bg-surface-300')}
+          >
+            Reddit
+          </Button>
+          <Button
+            type={currentTab === 'github' ? 'default' : 'text'}
+            size="tiny"
+            onClick={() => handleTabChange('github')}
+            icon={
               <GitHubIcon
                 className={cn(
                   'h-4 w-4',
                   currentTab === 'github' ? 'text-foreground' : 'text-foreground-lighter'
                 )}
               />
-              GitHub
-            </TabsTrigger_Shadcn_>
-          </TabsList_Shadcn_>
-
-          <div className="flex items-center gap-2 flex-1 justify-end">
-            {/* Search Input */}
-            <form onSubmit={handleSearchSubmit} className="relative max-w-md w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input_Shadcn_
-                type="text"
-                placeholder="Search threads by title..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={handleSearchKeyDown}
-                className={cn('pl-10', searchInput && 'pr-10')}
-              />
-              {searchInput && (
-                <Button
-                  type="text"
-                  size="tiny"
-                  icon={<X className="h-4 w-4" />}
-                  onClick={handleClearSearch}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                  aria-label="Clear search"
-                />
-              )}
-            </form>
-
-            {/* Filter Button */}
-            <FilterPopover
-              allProductAreas={allProductAreas}
-              allStacks={allStacks}
-              trigger={
-                <Button
-                  type="default"
-                  icon={<Filter className="h-4 w-4" />}
-                  className={cn('h-8', activeFilterCount > 0 ? 'bg-surface-200' : '')}
-                >
-                  <span className="flex items-center gap-2">
-                    Filters
-                    {activeFilterCount > 0 && (
-                      <Badge className="bg-brand-200 text-brand-foreground">
-                        {activeFilterCount}
-                      </Badge>
-                    )}
-                  </span>
-                </Button>
-              }
-            />
-          </div>
+            }
+            className={cn(currentTab === 'github' && 'bg-surface-300')}
+          >
+            GitHub
+          </Button>
         </div>
 
-        <ThreadsTable threads={filteredThreads} productArea={productArea} search={search} />
-      </Tabs_Shadcn_>
+        <div className="flex items-center gap-2 flex-1 justify-end">
+          {/* Search Input */}
+          <form onSubmit={handleSearchSubmit} className="relative max-w-md w-full">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input_Shadcn_
+              type="text"
+              placeholder="Search threads by title..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
+              className={cn('pl-10', searchInput && 'pr-10')}
+            />
+            {searchInput && (
+              <Button
+                type="text"
+                size="tiny"
+                icon={<X className="h-4 w-4" />}
+                onClick={handleClearSearch}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                aria-label="Clear search"
+              />
+            )}
+          </form>
+
+          {/* Filter Button */}
+          <FilterPopover
+            allProductAreas={allProductAreas}
+            allStacks={allStacks}
+            trigger={
+              <Button
+                type="default"
+                icon={<Filter className="h-4 w-4" />}
+                className={cn('h-8', activeFilterCount > 0 ? 'bg-surface-200' : '')}
+              >
+                <span className="flex items-center gap-2">
+                  Filters
+                  {activeFilterCount > 0 && (
+                    <Badge className="bg-brand-200 text-brand-foreground">
+                      {activeFilterCount}
+                    </Badge>
+                  )}
+                </span>
+              </Button>
+            }
+          />
+        </div>
+      </div>
+      <ThreadsTable threads={filteredThreads} productArea={productArea} search={search} />
     </section>
   )
 }

@@ -2,8 +2,22 @@ import Link from 'next/link'
 import { ArrowLeft, MessageCircle, Link2, BookOpen, User } from 'lucide-react'
 import DefaultLayout from '~/components/Layouts/Default'
 import { GithubAvatar } from '~/components/Contribute/GithubAvatar'
+import Image from 'next/image'
 
-const githubUsers = ['aantti', 'carolmonroe', 'GaryAustin1', 'Hallidayo', 'ihm40', 'j4w8n', 'kallebysantos', 'saltcod', 'silentworks', 'singh-inder', 'tomaspozo', 'tristanbob']
+const githubUsers = [
+  'aantti',
+  'carolmonroe',
+  'GaryAustin1',
+  'Hallidayo',
+  'k1ng-arthur',
+  'j4w8n',
+  'kallebysantos',
+  'saltcod',
+  'silentworks',
+  'singh-inder',
+  'tomaspozo',
+  'tristanbob',
+]
 
 // eslint-disable-next-line no-restricted-exports
 export default function AboutPage() {
@@ -19,9 +33,42 @@ export default function AboutPage() {
             Back to Contribute
           </Link>
 
+          <h1 className="sr-only">About the contributors program</h1>
           <div className="flex flex-col gap-8">
+            <div className="grid gap-4 mt-12 border-b border-border pb-12">
+              <h2 className="text-3xl text-foreground">Our Mission</h2>
+              <p className="text-lg text-foreground-lighter">
+                We're building a community of helpers and contributors who help developers succeed.
+                We work in the open anywhere our developers are: Discord, GitHub, Reddit, Twitter,
+                Stack Overflow, and more. We want to grow this community to reflect the diversity of
+                our users and their needs.
+              </p>
+              <p className="text-foreground-light">
+                One of Supabase's biggest strengths is its flexibility. You can adopt a single part
+                of the platform or use it end-to-end, and pair it with almost any framework or
+                runtime. That means you might use just the database in a SvelteKit app, or run Edge
+                Functions in a Python app. This openness enables a huge range of technical
+                combinations — and creates a broad surface area to support.
+              </p>
+
+              <div className="grid md:grid-cols-2 mt-6 gap-12">
+                <div>
+                  <p className="text-foreground-light text-lg">
+                    We're looking for people who can help support these many technical combinations.
+                  </p>
+                  <p className="text-foreground-light mt-4">We'd love to have your help!</p>
+                </div>
+                <Image
+                  src="/images/contribute/community-combinations.png"
+                  alt="Community combinations"
+                  width={1000}
+                  height={1000}
+                  className="rounded-md border"
+                />
+              </div>
+            </div>
             <div>
-              <h1 className="text-3xl  text-foreground mb-4">Want to get involved?</h1>
+              <h1 className="text-3xl text-foreground mb-4">Want to get involved?</h1>
               <p className="text-lg text-foreground-lighter">
                 There are many ways to get involved in the Supabase community. Whether you want to
                 write code, polish documentation, or help others build with Supabase, there&apos;s a
@@ -101,15 +148,22 @@ export default function AboutPage() {
               </div>
             </div>
           </div>
+
           <div className="grid gap-4 mt-12">
             <h2 className="text-3xl text-foreground">Who are we?</h2>
-            <p className="text-foreground-lighter">
+            <p className="text-lg text-foreground-lighter">
               We are a team of developers who are passionate about building the best developer
-              platform.
+              platform. We help support the community on Discord, GitHub, Reddit, Twitter, and
+              anywhere else we can find them.
             </p>
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-4 flex-wrap mt-2">
               {githubUsers.map((username) => (
-                <GithubAvatar key={username} username={username} size={48} className="rounded-full" />
+                <GithubAvatar
+                  key={username}
+                  username={username}
+                  size={80}
+                  className="rounded-full"
+                />
               ))}
             </div>
           </div>
