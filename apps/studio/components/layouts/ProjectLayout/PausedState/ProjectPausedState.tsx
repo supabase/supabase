@@ -273,7 +273,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
         confirmLabelLoading="Resuming"
         cancelLabel="Cancel"
       >
-        <div className={cn(showPostgresVersionSelector && 'flex flex-col gap-y-5')}>
+        <div className={cn(showPostgresVersionSelector && 'flex flex-col gap-y-4')}>
           <div className={cn(showPostgresVersionSelector && 'border-b border-border-muted pb-5')}>
             <p className="text-sm">
               {isFreePlan
