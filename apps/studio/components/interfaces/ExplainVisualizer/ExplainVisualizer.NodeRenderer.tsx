@@ -29,7 +29,7 @@ export function ExplainNodeRenderer({
 }: ExplainNodeRendererProps) {
   const Icon = getOperationIcon(node.operation)
   const colorClass = getOperationColor(node.operation)
-  const description = getOperationDescription(node.operation, node)
+  const description = getOperationDescription(node.operation)
   const isLeaf = node.children.length === 0
 
   const detailLines = node.details ? node.details.split('\n').filter(Boolean) : []
