@@ -1046,6 +1046,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/partitions' as `/${string}`,
         },
         {
+          name: 'Migrating to pg_partman',
+          url: '/guides/database/migrating-to-pg-partman' as `/${string}`,
+        },
+        {
           name: 'Managing connections',
           url: '/guides/database/connection-management' as `/${string}`,
         },
@@ -1228,6 +1232,10 @@ export const database: NavMenuConstant = {
         {
           name: 'pg_cron: Schedule Recurring Jobs',
           url: '/guides/database/extensions/pg_cron' as `/${string}`,
+        },
+        {
+          name: 'pg_partman: Partition management',
+          url: '/guides/database/extensions/pg_partman' as `/${string}`,
         },
         {
           name: 'pg_graphql: GraphQL Support',
