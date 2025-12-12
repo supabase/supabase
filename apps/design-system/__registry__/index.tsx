@@ -3063,16 +3063,5 @@ export const Index: Record<string, any> = {
       subcategory: "Copy Writing",
       chunks: []
     },
-    "copy-success-messages": {
-      name: "copy-success-messages",
-      type: "components:example",
-      registryDependencies: ["form"],
-      component: React.lazy(() => import("@/registry/default/example/copy-success-messages")),
-      source: "",
-      files: ["registry/default/example/copy-success-messages.tsx"],
-      category: "Getting Started",
-      subcategory: "Copy Writing",
-      chunks: []
-    },
   },
 }

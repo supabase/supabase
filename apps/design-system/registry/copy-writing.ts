@@ -65,12 +65,4 @@ export const copyWriting: Registry = [
     category: 'Getting Started',
     subcategory: 'Copy Writing',
   },
-  {
-    name: 'copy-success-messages',
-    type: 'components:example',
-    files: ['example/copy-success-messages.tsx'],
-    registryDependencies: ['form'],
-    category: 'Getting Started',
-    subcategory: 'Copy Writing',
-  },
 ]
