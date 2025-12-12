@@ -140,7 +140,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'dev-cli',
             href: '/guides/local-development' as `/${string}`,
             level: 'local_development',
-            enabled: localDevelopmentEnabled,
           },
           {
             label: 'Deployment',
@@ -2266,7 +2265,6 @@ export const ai: NavMenuConstant = {
 export const local_development: NavMenuConstant = {
   icon: 'dev-cli',
   title: 'Local Dev / CLI',
-  enabled: localDevelopmentEnabled,
   url: '/guides/local-development',
   items: [
     { name: 'Overview', url: '/guides/local-development' },
@@ -2275,7 +2273,11 @@ export const local_development: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Getting started', url: '/guides/local-development/cli/getting-started' },
-        { name: 'Configuration', url: '/guides/local-development/cli/config' },
+        {
+          name: 'Configuration',
+          url: '/guides/local-development/cli/config',
+          enabled: localDevelopmentEnabled,
+        },
         { name: 'CLI commands', url: '/reference/cli' },
       ],
     },
@@ -2299,16 +2301,19 @@ export const local_development: NavMenuConstant = {
         {
           name: 'Restoring downloaded backup',
           url: '/guides/local-development/restoring-downloaded-backup' as `/${string}`,
+          enabled: localDevelopmentEnabled,
         },
         {
           name: 'Customizing email templates',
           url: '/guides/local-development/customizing-email-templates' as `/${string}`,
+          enabled: localDevelopmentEnabled,
         },
       ],
     },
     {
       name: 'Testing',
       url: undefined,
+      enabled: localDevelopmentEnabled,
       items: [
         { name: 'Getting started', url: '/guides/local-development/testing/overview' },
         {
