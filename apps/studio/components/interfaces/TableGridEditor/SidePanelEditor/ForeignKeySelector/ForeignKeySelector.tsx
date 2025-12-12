@@ -182,7 +182,6 @@ export const ForeignKeySelector = ({
       if (
         (NUMERICAL_TYPES.includes(sourceType) && NUMERICAL_TYPES.includes(targetType)) ||
         (TEXT_TYPES.includes(sourceType) && TEXT_TYPES.includes(targetType)) ||
-        (TEXT_TYPES.includes(sourceType) && TEXT_TYPES.includes(targetType)) ||
         (sourceType === 'uuid' && targetType === 'uuid')
       )
         return
