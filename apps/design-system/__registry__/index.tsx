@@ -2975,5 +2975,16 @@ export const Index: Record<string, any> = {
       subcategory: "Composed",
       chunks: []
     },
+    "copy-button-verbs": {
+      name: "copy-button-verbs",
+      type: "components:example",
+      registryDependencies: ["button"],
+      component: React.lazy(() => import("@/registry/default/example/copy-button-verbs")),
+      source: "",
+      files: ["registry/default/example/copy-button-verbs.tsx"],
+      category: "Getting Started",
+      subcategory: "Copy Writing",
+      chunks: []
+    },
   },
 }
