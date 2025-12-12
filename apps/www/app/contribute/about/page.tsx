@@ -149,13 +149,7 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <div className="grid gap-4 mt-12">
-            <h2 className="text-3xl text-foreground">Who are we?</h2>
-            <p className="text-lg text-foreground-lighter">
-              We are a team of developers who are passionate about building the best developer
-              platform. We help support the community on Discord, GitHub, Reddit, Twitter, and
-              anywhere else we can find them.
-            </p>
+          <div className="grid md:grid-cols-2 gap-4 mt-12">
             <div className="flex gap-4 flex-wrap mt-2">
               {githubUsers.map((username) => (
                 <GithubAvatar
@@ -165,6 +159,17 @@ export default function AboutPage() {
                   className="rounded-full"
                 />
               ))}
+              <div className="w-[80px] h-[80px] rounded-full bg-foreground flex items-center justify-center text-background hover:opacity-80 transition-opacity">
+                <span className="text-sm font-medium">You?</span>
+              </div>
+            </div>
+            <div>
+              <h2 className="text-3xl text-foreground">Who are we?</h2>
+              <p className="text-lg text-foreground-lighter mt-4">
+                We are a team of developers who are passionate about building the best developer
+                platform. We help support the community on Discord, GitHub, Reddit, Twitter, and
+                anywhere else we can find them.
+              </p>
             </div>
           </div>
         </div>
