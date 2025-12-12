@@ -156,6 +156,25 @@ class PostHogClient {
       console.error('PostHog reset failed:', error)
     }
   }
+
+  /**
+   * Returns the current PostHog distinct_id for the user.
+   * This is the anonymous ID that PostHog uses to track the user before they are identified,
+   * and contains all first-touch attribution data ($initial_referrer, $initial_utm_source, etc.).
+   *
+   * We need to pass this to the backend identify endpoint so that the backend's alias() call
+   * uses the correct anonymous ID to link the anonymous profile to the authenticated user.
+   */
+  getDistinctId(): string | undefined {
+    if (!this.initialized) return undefined
+
+    try {
+      return posthog.get_distinct_id()
+    } catch (error) {
+      console.error('PostHog getDistinctId failed:', error)
+      return undefined
+    }
+  }
 }
 
 export const posthogClient = new PostHogClient()

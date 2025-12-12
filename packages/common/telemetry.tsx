@@ -320,9 +320,16 @@ export function useTelemetryIdentify(API_URL: string) {
 
   useEffect(() => {
     if (user?.id) {
-      // Send to backend
+      // Get the PostHog distinct_id (anonymous ID) before identification.
+      // This is the ID that holds all first-touch attribution data.
+      const anonymousId = posthogClient.getDistinctId()
+
+      // Send to backend with anonymous_id so the backend alias() call
+      // uses the correct PostHog ID instead of generating a new one
       sendTelemetryIdentify(API_URL, {
         user_id: user.id,
+        // Pass the PostHog distinct_id as anonymous_id for proper attribution linking
+        ...(anonymousId && { anonymous_id: anonymousId }),
       })
 
       // Also identify in PostHog client-side
