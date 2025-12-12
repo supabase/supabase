@@ -47,7 +47,7 @@
     "graphql": "^16.11.0",
     "image-size": "2.0.2",
     "lucide-react": "^0.511.0",
-    "next": "catalog:",
+    "next": "^15.5.9",
     "payload": "3.52.0",
     "pg": "^8.16.3",
     "prism-react-renderer": "^2.3.1",
