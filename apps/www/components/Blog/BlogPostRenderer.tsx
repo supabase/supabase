@@ -209,13 +209,14 @@ const BlogPostRenderer = ({
                               ? author.author_image_url
                               : (author.author_image_url as { url: string })?.url || ''
 
+                          const authorId =
+                            (author as any).author_id ||
+                            (author as any).username ||
+                            author.author.toLowerCase().replace(/\s+/g, '_')
+
                           return (
                             <div className="mr-4 w-max" key={`author-${i}-${author.author}`}>
-                              <Link
-                                href={author.author_url}
-                                target="_blank"
-                                className="cursor-pointer"
-                              >
+                              <Link href={`/blog/authors/${authorId}`} className="cursor-pointer">
                                 <div className="flex items-center gap-3">
                                   {authorImageUrl && (
                                     <div className="w-10">
