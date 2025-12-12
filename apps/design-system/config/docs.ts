@@ -74,23 +74,18 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Tables',
-          href: '/docs/ui-patterns/tables',
-          items: [],
-        },
-        {
           title: 'Layout',
           href: '/docs/ui-patterns/layout',
           items: [],
         },
         {
-          href: '/docs/ui-patterns/navigation',
           title: 'Navigation',
+          href: '/docs/ui-patterns/navigation',
           items: [],
         },
         {
-          href: '/docs/ui-patterns/modality',
-          title: 'Modality',
+          title: 'Tables',
+          href: '/docs/ui-patterns/tables',
           items: [],
         },
       ],
@@ -116,7 +111,7 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Empty State Presentational',
+          title: 'EmptyStatePresentational',
           href: '/docs/fragments/empty-state-presentational',
           items: [],
         },
