@@ -83,6 +83,7 @@ function generateRandomBox(id: number, existingBoxes: FloatingBox[]): FloatingBo
 function FloatingBoxes() {
   const [floatingBoxes, setFloatingBoxes] = useState<FloatingBox[]>([])
   const boxIdRef = useRef(0)
+  const lifetimeTimersRef = useRef<Set<NodeJS.Timeout>>(new Set())
 
   useEffect(() => {
     const spawnBox = () => {
@@ -95,9 +96,11 @@ function FloatingBoxes() {
         }
 
         const lifetime = Math.random() * 2000 + 2000
-        setTimeout(() => {
+        const timerId = setTimeout(() => {
           setFloatingBoxes((current) => current.filter((box) => box.id !== id))
+          lifetimeTimersRef.current.delete(timerId)
         }, lifetime)
+        lifetimeTimersRef.current.add(timerId)
 
         return [...prev, newBox]
       })
@@ -121,6 +124,8 @@ function FloatingBoxes() {
     return () => {
       initialTimers.forEach(clearTimeout)
       clearTimeout(intervalId)
+      lifetimeTimersRef.current.forEach(clearTimeout)
+      lifetimeTimersRef.current.clear()
     }
   }, [])
 

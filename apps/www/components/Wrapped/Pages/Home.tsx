@@ -102,6 +102,7 @@ function FloatingStatBubbles() {
   const [bubbles, setBubbles] = useState<FloatingStatBubble[]>([])
   const bubbleIdRef = useRef(0)
   const usedStatIndicesRef = useRef<Set<number>>(new Set())
+  const lifetimeTimersRef = useRef<Set<NodeJS.Timeout>>(new Set())
 
   useEffect(() => {
     const spawnBubble = () => {
@@ -125,10 +126,12 @@ function FloatingStatBubbles() {
         const lifetime =
           Math.random() * (BUBBLE_CONFIG.lifetimeMax - BUBBLE_CONFIG.lifetimeMin) +
           BUBBLE_CONFIG.lifetimeMin
-        setTimeout(() => {
+        const timerId = setTimeout(() => {
           setBubbles((current) => current.filter((bubble) => bubble.id !== id))
           usedStatIndicesRef.current.delete(statIndex)
+          lifetimeTimersRef.current.delete(timerId)
         }, lifetime)
+        lifetimeTimersRef.current.add(timerId)
 
         return [...prev, newBubble]
       })
@@ -152,6 +155,8 @@ function FloatingStatBubbles() {
     return () => {
       initialTimers.forEach(clearTimeout)
       clearTimeout(intervalId)
+      lifetimeTimersRef.current.forEach(clearTimeout)
+      lifetimeTimersRef.current.clear()
     }
   }, [])
 

@@ -33,7 +33,20 @@ export function AnimatedCounter({
     [compact]
   )
 
+  // Update countRef when value prop changes
   useEffect(() => {
+    countRef.current = value
+    if (spanRef.current) {
+      spanRef.current.textContent = formatNumber(value)
+    }
+  }, [value, formatNumber])
+
+  useEffect(() => {
+    // Set initial content
+    if (spanRef.current) {
+      spanRef.current.textContent = formatNumber(countRef.current)
+    }
+
     if (increment <= 0) return
 
     const tick = (timestamp: number) => {
@@ -70,5 +83,5 @@ export function AnimatedCounter({
     }
   }, [increment, intervalMs, formatNumber])
 
-  return <span ref={spanRef}>{formatNumber(value)}</span>
+  return <span ref={spanRef} />
 }
