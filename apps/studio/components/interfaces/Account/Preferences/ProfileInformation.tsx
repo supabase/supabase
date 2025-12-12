@@ -101,7 +101,7 @@ export const ProfileInformation = () => {
                   render={({ field }) => (
                     <FormItemLayout label="First name" layout="flex-row-reverse">
                       <FormControl_Shadcn_ className="col-span-8">
-                        <Input_Shadcn_ {...field} placeholder="First name" className="w-72" />
+                        <Input_Shadcn_ {...field} placeholder="First name" className="w-full" />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
@@ -114,7 +114,7 @@ export const ProfileInformation = () => {
                   render={({ field }) => (
                     <FormItemLayout label="Last name" layout="flex-row-reverse">
                       <FormControl_Shadcn_ className="col-span-8">
-                        <Input_Shadcn_ {...field} placeholder="Last name" className="w-72" />
+                        <Input_Shadcn_ {...field} placeholder="Last name" className="w-full" />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
@@ -141,7 +141,7 @@ export const ProfileInformation = () => {
                             onValueChange={field.onChange}
                             disabled={profile?.is_sso_user}
                           >
-                            <SelectTrigger_Shadcn_ className="col-span-8 w-72">
+                            <SelectTrigger_Shadcn_ className="col-span-8 w-full">
                               <SelectValue_Shadcn_ placeholder="Select primary email" />
                             </SelectTrigger_Shadcn_>
                             <SelectContent_Shadcn_ className="col-span-8">
@@ -177,7 +177,7 @@ export const ProfileInformation = () => {
                         <div className="flex flex-col gap-1">
                           <Input_Shadcn_
                             {...field}
-                            className="w-72"
+                            className="w-full"
                             placeholder="Username"
                             disabled={profile?.is_sso_user}
                           />
