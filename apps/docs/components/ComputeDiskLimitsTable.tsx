@@ -1,4 +1,9 @@
-import { COMPUTE_BASELINE_IOPS, COMPUTE_BASELINE_THROUGHPUT } from 'shared-data'
+import {
+  COMPUTE_BASELINE_IOPS,
+  COMPUTE_BASELINE_THROUGHPUT,
+  COMPUTE_MAX_IOPS,
+  COMPUTE_MAX_THROUGHPUT,
+} from 'shared-data'
 
 export function ComputeDiskLimitsTableRows() {
   const rows = [
@@ -21,7 +26,9 @@ export function ComputeDiskLimitsTableRows() {
         <tr key={row.key}>
           <td>{row.label}</td>
           <td>{COMPUTE_BASELINE_THROUGHPUT[row.key]?.toLocaleString()} MB/s</td>
+          <td>{COMPUTE_MAX_THROUGHPUT[row.key]?.toLocaleString()} MB/s</td>
           <td>{COMPUTE_BASELINE_IOPS[row.key]?.toLocaleString()} IOPS</td>
+          <td>{COMPUTE_MAX_IOPS[row.key]?.toLocaleString()} IOPS</td>
         </tr>
       ))}
     </>
