@@ -370,7 +370,7 @@ const TEMPLATE_INTEGRATIONS: IntegrationDefinition[] = [
   {
     id: 'stripe_sync_engine',
     type: 'custom' as const,
-    requiredExtensions: ['pgmq', 'pg_cron', 'pg_net'],
+    requiredExtensions: ['pgmq', 'supabase_vault', 'pg_cron', 'pg_net'],
     missingExtensionsAlert: <UpgradeDatabaseAlert minimumVersion="15.6.1.143" />,
     name: `Stripe Sync Engine`,
     icon: ({ className, ...props } = {}) => (
