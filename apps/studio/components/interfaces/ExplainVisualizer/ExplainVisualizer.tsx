@@ -5,6 +5,7 @@ import { ExplainNodeRenderer } from './ExplainVisualizer.NodeRenderer'
 import {
   calculateMaxCost,
   calculateSummary,
+  createNodeTree,
   parseExplainOutput,
   parseNodeDetails,
 } from './ExplainVisualizer.parser'
@@ -16,13 +17,7 @@ export interface ExplainVisualizerProps {
 }
 
 export function ExplainVisualizer({ rows, onShowRaw }: ExplainVisualizerProps) {
-  const parsedTree = useMemo(() => {
-    const tree = parseExplainOutput(rows)
-    // Parse additional details from each node
-    tree.forEach(parseNodeDetails)
-    return tree
-  }, [rows])
-
+  const parsedTree = useMemo(() => createNodeTree(rows), [rows])
   const maxCost = useMemo(() => calculateMaxCost(parsedTree), [parsedTree])
   const summary = useMemo(() => calculateSummary(parsedTree), [parsedTree])
 

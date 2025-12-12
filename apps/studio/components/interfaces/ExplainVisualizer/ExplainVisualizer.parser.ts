@@ -246,3 +246,11 @@ export function calculateSummary(tree: ExplainNode[]): ExplainSummary {
   tree.forEach(traverse)
   return stats
 }
+
+export function createNodeTree(rows: readonly QueryPlanRow[]): ExplainNode[] {
+  const tree = parseExplainOutput(rows)
+
+  // Parse additional details from each node
+  tree.forEach(parseNodeDetails)
+  return tree
+}
