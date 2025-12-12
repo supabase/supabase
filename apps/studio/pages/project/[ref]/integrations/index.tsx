@@ -26,13 +26,13 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent, PageSectionMeta } from 'ui-patterns/PageSection'
 
-const FEATURED_INTEGRATIONS = ['cron', 'queues', 'stripe_wrapper']
+const FEATURED_INTEGRATIONS = ['cron', 'queues', 'stripe_sync_engine']
 
 // Featured integration images
 const FEATURED_INTEGRATION_IMAGES: Record<string, string> = {
   cron: 'img/integrations/covers/cron-cover.webp',
   queues: 'img/integrations/covers/queues-cover.png',
-  stripe_wrapper: 'img/integrations/covers/stripe-cover.png',
+  stripe_sync_engine: 'img/integrations/covers/stripe-cover.png',
 }
 
 const IntegrationsPage: NextPageWithLayout = () => {

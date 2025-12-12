@@ -230,7 +230,7 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
         {partner.video && (
           <ExpandableVideo
             videoId={partner.video}
-            // imgUrl={videoThumbnail}
+            imgUrl={videoThumbnail}
             imgOverlayText="Watch an introductory video"
             triggerContainerClassName="w-full"
           />
