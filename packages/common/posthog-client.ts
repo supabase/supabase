@@ -76,7 +76,6 @@ class PostHogClient {
         })
         this.pendingEvents = []
 
-        // Mark as fully initialized now that PostHog has bootstrapped
         this.initialized = true
       },
     }
@@ -164,16 +163,8 @@ class PostHogClient {
   }
 
   /**
-   * Returns the current PostHog distinct_id for the user.
-   * This is the anonymous ID that PostHog uses to track the user before they are identified,
-   * and contains all first-touch attribution data ($initial_referrer, $initial_utm_source, etc.).
-   *
-   * We need to pass this to the backend identify endpoint so that the backend's alias() call
-   * uses the correct anonymous ID to link the anonymous profile to the authenticated user.
-   *
-   * Returns undefined if PostHog hasn't fully bootstrapped yet (i.e., before the `loaded`
-   * callback fires). This avoids a race condition where get_distinct_id() might return
-   * undefined during the async initialization window.
+   * Returns PostHog's distinct_id, which holds first-touch attribution data.
+   * Returns undefined until PostHog's `loaded` callback fires.
    */
   getDistinctId(): string | undefined {
     if (!this.initialized) return undefined
