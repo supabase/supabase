@@ -43,6 +43,7 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector/RoleImpersonationPopover'
 import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
@@ -77,7 +78,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema })
 
-  const { mutate: updateTable, isPending: isUpdatingTable } = useTableUpdateMutation({
+  const { mutate: updateTable } = useTableUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to toggle RLS: ${error.message}`)
     },
@@ -591,18 +592,15 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       />
 
       {isTable && (
-        <ConfirmationModal
+        <ConfirmModal
+          danger={table.rls_enabled}
           visible={rlsConfirmModalOpen}
-          variant={table.rls_enabled ? 'destructive' : 'default'}
-          title={`${table.rls_enabled ? 'Disable' : 'Enable'} Row Level Security`}
-          description={`Are you sure you want to ${
-            table.rls_enabled ? 'disable' : 'enable'
-          } Row Level Security for this table?`}
-          confirmLabel={`${table.rls_enabled ? 'Disable' : 'Enable'} RLS`}
-          confirmLabelLoading={`${table.rls_enabled ? 'Disabling' : 'Enabling'} RLS`}
-          loading={isUpdatingTable}
-          onCancel={closeConfirmModal}
-          onConfirm={onToggleRLS}
+          title="Enable Row Level Security"
+          description="Are you sure you want to enable Row Level Security for this table?"
+          buttonLabel="Enable RLS"
+          buttonLoadingLabel="Updating"
+          onSelectCancel={closeConfirmModal}
+          onSelectConfirm={onToggleRLS}
         />
       )}
     </div>

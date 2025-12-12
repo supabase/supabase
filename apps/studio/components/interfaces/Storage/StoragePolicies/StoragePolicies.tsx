@@ -14,7 +14,7 @@ import { usePaginatedBucketsQuery } from 'data/storage/buckets-query'
 import { useDebouncedValue } from 'hooks/misc/useDebouncedValue'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageSection,
@@ -73,14 +73,13 @@ export const StoragePolicies = () => {
     onError: () => {},
   })
   const { mutateAsync: updateDatabasePolicy } = useDatabasePolicyUpdateMutation()
-  const { mutate: deleteDatabasePolicy, isPending: isDeletingPolicy } =
-    useDatabasePolicyDeleteMutation({
-      onSuccess: async () => {
-        await refetch()
-        toast.success('Successfully deleted policy!')
-        setSelectedPolicyToDelete(undefined)
-      },
-    })
+  const { mutate: deleteDatabasePolicy } = useDatabasePolicyDeleteMutation({
+    onSuccess: async () => {
+      await refetch()
+      toast.success('Successfully deleted policy!')
+      setSelectedPolicyToDelete(undefined)
+    },
+  })
 
   // Only use storage policy editor when creating new policies for buckets
   const showStoragePolicyEditor =
@@ -319,16 +318,15 @@ export const StoragePolicies = () => {
         onSaveSuccess={onSavePolicySuccess}
       />
 
-      <ConfirmationModal
+      <ConfirmModal
+        danger
         visible={!isEmpty(selectedPolicyToDelete)}
-        variant="destructive"
-        title="Delete policy"
-        description={`Are you sure you want to delete the policy "${selectedPolicyToDelete?.name}". This action cannot be undone.`}
-        confirmLabel="Delete"
-        confirmLabelLoading="Deleting"
-        loading={isDeletingPolicy}
-        onCancel={onCancelPolicyDelete}
-        onConfirm={onDeletePolicy}
+        title="Confirm to delete policy"
+        description={`This is permanent! Are you sure you want to delete the policy "${selectedPolicyToDelete?.name}"`}
+        buttonLabel="Delete"
+        buttonLoadingLabel="Deleting"
+        onSelectCancel={onCancelPolicyDelete}
+        onSelectConfirm={onDeletePolicy}
       />
     </>
   )

@@ -8,7 +8,7 @@ import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-qu
 import { DOCS_URL } from 'lib/constants'
 import { Trash } from 'lucide-react'
 import { Button } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
 export type CustomDomainDeleteProps = {
   projectRef?: string
@@ -17,15 +17,14 @@ export type CustomDomainDeleteProps = {
 
 const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProps) => {
   const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false)
-  const { mutate: deleteCustomDomain, isPending: isDeletingCustomDomain } =
-    useCustomDomainDeleteMutation({
-      onSuccess: () => {
-        toast.success(
-          `Successfully deleted custom domain. Refresh your browser to see the changes.`
-        )
-        setIsDeleteConfirmModalVisible(false)
-      },
-    })
+  const { mutate: deleteCustomDomain } = useCustomDomainDeleteMutation({
+    onSuccess: () => {
+      toast.success(
+        `Successfully deleted custom domain. It may take a few seconds before your custom domain is fully removed, hence you may need to refresh your browser.`
+      )
+      setIsDeleteConfirmModalVisible(false)
+    },
+  })
 
   const onDeleteCustomDomain = async () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -40,9 +39,7 @@ const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProp
           <div className="flex items-center space-x-2">
             <code className="text-lg mx-0 flex items-center space-x-2">
               <div className="h-2 w-2 rounded-full bg-brand" />
-              <span>
-                <code className="text-code-inline">{customDomain.hostname}</code>
-              </span>
+              <span>{customDomain.hostname}</span>
             </code>
           </div>
           <p className="text-sm text-foreground-light">
@@ -61,27 +58,27 @@ const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProp
             icon={<Trash />}
             onClick={() => setIsDeleteConfirmModalVisible(true)}
           >
-            Delete custom domain
+            Delete Custom Domain
           </Button>
         </div>
       </Panel.Content>
 
-      <ConfirmationModal
+      <ConfirmModal
+        danger
         visible={isDeleteConfirmModalVisible}
-        variant="destructive"
-        title="Delete custom domain"
-        confirmLabel="Delete"
-        confirmLabelLoading="Deleting"
-        loading={isDeletingCustomDomain}
-        onCancel={() => setIsDeleteConfirmModalVisible(false)}
-        onConfirm={onDeleteCustomDomain}
-      >
-        <p className="text-sm">
-          Are you sure you want to delete the custom domain{' '}
-          <code className="text-code-inline !break-normal">{customDomain.hostname}</code> for your
-          project? You will need to re-verify this domain if you want to use it again.
-        </p>
-      </ConfirmationModal>
+        // @ts-ignore
+        title={
+          <div>
+            Are you sure you want to delete the custom domain{' '}
+            <code className="text-sm">{customDomain.hostname}</code> for the project?
+          </div>
+        }
+        description="Your custom domain will be deactivated. You will need to re-verify your domain if you want to use it again."
+        buttonLabel="Delete"
+        buttonLoadingLabel="Deleting"
+        onSelectCancel={() => setIsDeleteConfirmModalVisible(false)}
+        onSelectConfirm={onDeleteCustomDomain}
+      />
     </>
   )
 }
