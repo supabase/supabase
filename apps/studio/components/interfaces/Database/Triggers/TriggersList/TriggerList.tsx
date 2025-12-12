@@ -99,9 +99,10 @@ export const TriggerList = ({
           <TableCell className="space-x-2">
             <Button
               type="text"
+              disabled={isLocked || !canUpdateTriggers}
               onClick={() => editTrigger(x)}
               title={x.name}
-              className="text-link-table-cell text-left text-sm min-w-0 p-0 hover:bg-transparent font-medium max-w-48 title"
+              className="text-link-table-cell text-left text-sm disabled:opacity-90 disabled:no-underline min-w-0 p-0 hover:bg-transparent font-medium max-w-48 title"
             >
               {x.name}
             </Button>
