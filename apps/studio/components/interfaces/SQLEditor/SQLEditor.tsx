@@ -757,7 +757,11 @@ export const SQLEditor = () => {
                           : ''
                       }
                       id={id}
-                      snippetName={snapV2.snippets[id]?.snippet.name ?? generatedNewSnippetName}
+                      snippetName={
+                        urlId === 'new'
+                          ? generatedNewSnippetName
+                          : snapV2.snippets[id]?.snippet.name ?? generatedNewSnippetName
+                      }
                       className={cn(isDiffOpen && 'hidden')}
                       editorRef={editorRef}
                       monacoRef={monacoRef}
