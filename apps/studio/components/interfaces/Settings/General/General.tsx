@@ -166,6 +166,7 @@ export const General = () => {
                     {form.formState.isDirty && (
                       <Button
                         type="default"
+                        htmlType="button"
                         disabled={isUpdating}
                         onClick={() => form.reset({ name: project?.name ?? '' })}
                       >
