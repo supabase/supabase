@@ -213,6 +213,8 @@ export const General = () => {
                 </div>
                 <RestartServerButton />
               </div>
+            </CardContent>
+            <CardContent>
               <div
                 className="flex w-full flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4"
                 id="pause-project"
