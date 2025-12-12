@@ -8,12 +8,12 @@ export interface ExplainSummary {
   hasIndexScan: boolean
 }
 
-function safeParseFloat(value: string): number | undefined {
+function parseFloatMetric(value: string): number | undefined {
   const parsed = parseFloat(value)
   return Number.isFinite(parsed) ? parsed : undefined
 }
 
-function safeParseInt(value: string): number | undefined {
+function parseIntMetric(value: string): number | undefined {
   const parsed = parseInt(value, 10)
   return Number.isNaN(parsed) ? undefined : parsed
 }
@@ -143,8 +143,8 @@ function createNode(
     // Parse cost=start..end
     const costMatch = metrics.match(/cost=([\d.]+)\.\.([\d.]+)/)
     if (costMatch) {
-      const start = safeParseFloat(costMatch[1])
-      const end = safeParseFloat(costMatch[2])
+      const start = parseFloatMetric(costMatch[1])
+      const end = parseFloatMetric(costMatch[2])
       // Only set cost if both values are valid numbers
       if (start !== undefined && end !== undefined) {
         node.cost = { start, end }
@@ -154,20 +154,20 @@ function createNode(
     // Parse rows=N (estimated rows, always the first occurrence)
     const rowsMatch = metrics.match(/rows=(\d+)/)
     if (rowsMatch) {
-      node.rows = safeParseInt(rowsMatch[1])
+      node.rows = parseIntMetric(rowsMatch[1])
     }
 
     // Parse width=N
     const widthMatch = metrics.match(/width=(\d+)/)
     if (widthMatch) {
-      node.width = safeParseInt(widthMatch[1])
+      node.width = parseIntMetric(widthMatch[1])
     }
 
     // Parse actual time=start..end
     const actualTimeMatch = metrics.match(/actual time=([\d.]+)\.\.([\d.]+)/)
     if (actualTimeMatch) {
-      const start = safeParseFloat(actualTimeMatch[1])
-      const end = safeParseFloat(actualTimeMatch[2])
+      const start = parseFloatMetric(actualTimeMatch[1])
+      const end = parseFloatMetric(actualTimeMatch[2])
       // Only set actualTime if both values are valid numbers
       if (start !== undefined && end !== undefined) {
         node.actualTime = { start, end }
@@ -177,7 +177,7 @@ function createNode(
       const actualTimePart = metrics.substring(metrics.indexOf('actual time='))
       const actualRowsMatch = actualTimePart.match(/rows=(\d+)/)
       if (actualRowsMatch) {
-        node.actualRows = safeParseInt(actualRowsMatch[1])
+        node.actualRows = parseIntMetric(actualRowsMatch[1])
       }
     }
   }
@@ -190,7 +190,7 @@ export function parseNodeDetails(node: ExplainNode): void {
   if (node.details) {
     const rowsRemovedMatch = node.details.match(/Rows Removed by Filter:\s*(\d+)/)
     if (rowsRemovedMatch) {
-      node.rowsRemovedByFilter = safeParseInt(rowsRemovedMatch[1])
+      node.rowsRemovedByFilter = parseIntMetric(rowsRemovedMatch[1])
     }
   }
   node.children.forEach(parseNodeDetails)
