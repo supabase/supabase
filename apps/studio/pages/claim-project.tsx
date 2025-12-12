@@ -35,7 +35,7 @@ const ClaimProjectPage: NextPageWithLayout = () => {
 
   const {
     data: requester,
-    isLoading: isLoadingRequester,
+    isPending: isLoadingRequester,
     isError: isErrorRequester,
     error: errorRequester,
   } = useApiAuthorizationQuery({ id: auth_id })
@@ -49,7 +49,7 @@ const ClaimProjectPage: NextPageWithLayout = () => {
     data: projectClaim,
     error: errorProjectClaim,
     isError: isErrorProjectClaim,
-    isLoading: isLoadingProjectClaim,
+    isPending: isLoadingProjectClaim,
     isSuccess: isSuccessProjectClaim,
   } = useOrganizationProjectClaimQuery(
     {
@@ -76,11 +76,7 @@ const ClaimProjectPage: NextPageWithLayout = () => {
   if ((selectedOrgSlug && claimToken && isErrorProjectClaim) || isErrorRequester) {
     return (
       <ProjectClaimLayout title="Claim a project" className="py-6">
-        <Admonition
-          type="warning"
-          className="mb-0"
-          title="Failed to retrieve project claim request details"
-        >
+        <Admonition type="warning" title="Failed to retrieve project claim request details">
           <p>Please retry your claim request from the requesting app</p>
           {!!errorProjectClaim && <p className="mt-2">Error: {errorProjectClaim?.message}</p>}
           {!!errorRequester && <p className="mt-2">Error: {errorRequester?.message}</p>}
