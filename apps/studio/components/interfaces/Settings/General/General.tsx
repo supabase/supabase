@@ -76,7 +76,7 @@ export const General = () => {
     if (project?.name) {
       form.reset({ name: project.name })
     }
-  }, [form, project?.name])
+  }, [project?.name])
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!project?.ref) return console.error('Ref is required')
