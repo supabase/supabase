@@ -66,7 +66,7 @@ const CustomDomainsConfigureHostname = () => {
             <FormPanel
               disabled={!canConfigureCustomDomain}
               footer={
-                <div className="flex py-4 px-8">
+                <div className="flex py-4 px-[var(--card-padding-x)]">
                   <FormActions
                     form={FORM_ID}
                     isSubmitting={isCheckingRecord || isCreating}
