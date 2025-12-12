@@ -8,12 +8,12 @@ import {
   deleteAllBuckets,
   deleteBucket,
   deleteItem,
-  dismissToastsIfAny,
   downloadFile,
   navigateToBucket,
   renameItem,
   uploadFile,
 } from '../utils/storage-helpers.js'
+import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
 
 const bucketNamePrefix = 'pw_bucket'
 

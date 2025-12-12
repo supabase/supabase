@@ -3,7 +3,14 @@ import DataGrid, { Column } from 'react-data-grid'
 import 'react-data-grid/lib/styles.css'
 import { cn } from 'ui'
 
-export default function EmptyStateZeroItemsDataGrid() {
+/**
+ * Renders a DataGrid configured to display an empty "no users" state.
+ *
+ * The grid includes three columns (Display name, Email, Phone) and no rows, and supplies a centered overlay with an icon and explanatory text when there are no rows.
+ *
+ * @returns A React element containing the configured DataGrid with an empty-state fallback UI.
+ */
+export default function DataGridEmptyState() {
   const columns: Column<{ id: string; name: string; email: string }>[] = [
     { key: 'name', name: 'Display name', minWidth: 200, resizable: true },
     { key: 'email', name: 'Email', minWidth: 250, resizable: true },
