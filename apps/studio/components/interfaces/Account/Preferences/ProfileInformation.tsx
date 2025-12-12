@@ -65,7 +65,7 @@ export const ProfileInformation = () => {
     values: defaultValues,
   })
 
-  const { mutate: updateProfile, isLoading: isUpdatingProfile } = useProfileUpdateMutation({
+  const { mutate: updateProfile, isPending: isUpdatingProfile } = useProfileUpdateMutation({
     onSuccess: (data) => {
       toast.success('Successfully saved profile')
       const { first_name, last_name, username, primary_email } = data

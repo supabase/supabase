@@ -81,7 +81,7 @@ const ProfileCard = () => {
 
         {isSuccess && (
           <>
-            {profileShowInformation && isSuccess ? <ProfileInformation /> : null}
+            {profileShowInformation ? <ProfileInformation /> : null}
             <AccountIdentities />
           </>
         )}
