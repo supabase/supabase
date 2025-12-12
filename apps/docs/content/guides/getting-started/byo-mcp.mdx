@@ -124,9 +124,7 @@ http://localhost:54321/functions/v1/mcp
 
 <Admonition type="note">
 
-The `--no-verify-jwt` flag disables JWT verification at the Edge Function layer so your MCP server can accept unauthenticated requests.
-
-If you need to protect your MCP server, you can omit the `--no-verify-jwt` flag to enable JWT verification at the Edge Function layer. This requires clients to provide a valid Supabase JWT token. However, this doesn't provide full MCP authentication. For that, wait for OAuth 2.1 support on Edge Functions (coming soon).
+The `--no-verify-jwt` flag disables JWT verification at the Edge Function layer so your MCP server can accept unauthenticated requests. Authenticated MCP support is coming soon.
 
 </Admonition>
 
@@ -196,14 +194,6 @@ server.registerTool(
   }
 )
 ```
-
-## Add authentication
-
-<Admonition type="caution">
-
-Full MCP authentication (OAuth 2.1) is not yet supported on Edge Functions. For basic protection, you can omit the `--no-verify-jwt` flag to require Supabase JWT tokens.
-
-</Admonition>
 
 ## Examples
 
