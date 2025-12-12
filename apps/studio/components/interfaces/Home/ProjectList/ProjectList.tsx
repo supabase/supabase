@@ -17,16 +17,10 @@ import { isAtBottom } from 'lib/helpers'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import type { Organization } from 'types'
 import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import {
-  LoadingCardView,
-  LoadingTableRow,
-  LoadingTableView,
-  NoFilterResults,
-  NoProjectsState,
-} from './EmptyStates'
+import { LoadingCardView, LoadingTableView, NoFilterResults, NoProjectsState } from './EmptyStates'
+import { LoadMoreRows } from './LoadMoreRow'
 import { ProjectCard } from './ProjectCard'
 import { ProjectTableRow } from './ProjectTableRow'
-import { ShimmeringCard } from './ShimmeringCard'
 
 export interface ProjectListProps {
   organization?: Organization
@@ -55,7 +49,6 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
     isLoading: isLoadingProjects,
     isSuccess: isSuccessProjects,
     isError: isErrorProjects,
-    isFetching,
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
@@ -119,6 +112,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
     .flatMap((integration) => integration.connections)
 
   const handleScroll = (event: UIEvent<HTMLDivElement | HTMLUListElement>) => {
+    console.log('handleScroll')
     if (isLoadingProjects || isFetchingNextPage || !isAtBottom(event)) return
     fetchNextPage()
   }
@@ -199,7 +193,13 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
                     )}
                   />
                 ))}
-                {hasNextPage && <LoadingTableRow />}
+                {hasNextPage && (
+                  <LoadMoreRows
+                    type="table"
+                    isFetchingNextPage={isFetchingNextPage}
+                    fetchNextPage={fetchNextPage}
+                  />
+                )}
               </>
             )}
           </TableBody>
@@ -218,33 +218,41 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
       ) : noResultsFromSearch ? (
         <NoSearchResults searchString={search} />
       ) : (
-        <ul
-          onScroll={handleScroll}
-          className={cn(
-            'min-h-0 w-full mx-auto overflow-y-auto',
-            'grid grid-cols-1 gap-2 md:gap-4',
-            'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 pb-6'
-          )}
-        >
-          {sortedProjects?.map((project) => (
-            <ProjectCard
-              key={project.ref}
-              slug={slug}
-              project={project}
-              rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
-              resourceWarnings={resourceWarnings?.find(
-                (resourceWarning) => resourceWarning.project === project.ref
-              )}
-              githubIntegration={githubConnections?.find(
-                (connection) => connection.supabase_project_ref === project.ref
-              )}
-              vercelIntegration={vercelConnections?.find(
-                (connection) => connection.supabase_project_ref === project.ref
-              )}
+        <div className="flex flex-col gap-y-2 md:gap-y-4 pb-6">
+          <ul
+            onScroll={handleScroll}
+            className={cn(
+              'min-h-0 w-full mx-auto',
+              'grid grid-cols-1 gap-2 md:gap-4',
+              'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3'
+            )}
+          >
+            {sortedProjects?.map((project) => (
+              <ProjectCard
+                key={project.ref}
+                slug={slug}
+                project={project}
+                rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
+                resourceWarnings={resourceWarnings?.find(
+                  (resourceWarning) => resourceWarning.project === project.ref
+                )}
+                githubIntegration={githubConnections?.find(
+                  (connection) => connection.supabase_project_ref === project.ref
+                )}
+                vercelIntegration={vercelConnections?.find(
+                  (connection) => connection.supabase_project_ref === project.ref
+                )}
+              />
+            ))}
+          </ul>
+          {hasNextPage && (
+            <LoadMoreRows
+              type="card"
+              isFetchingNextPage={isFetchingNextPage}
+              fetchNextPage={fetchNextPage}
             />
-          ))}
-          {hasNextPage && [...Array(2)].map((_, i) => <ShimmeringCard key={i} />)}
-        </ul>
+          )}
+        </div>
       )}
     </>
   )

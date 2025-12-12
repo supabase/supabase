@@ -75,7 +75,7 @@ export const NoFilterResults = ({
   )
 }
 
-export const LoadingTableRow = () => (
+const LoadingTableRow = () => (
   <TableRow>
     <TableCell>
       <Skeleton className="bg-surface-400 h-4 w-32"></Skeleton>
