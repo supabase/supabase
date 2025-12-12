@@ -4,7 +4,7 @@ import { Button } from 'ui'
 
 export default function CopyButtonVerbs() {
   return (
-    <div className="flex flex-row gap-12">
+    <div className="flex flex-row gap-16">
       <div className="flex flex-col gap-4">
         <span className="text-xs text-foreground-muted">Bad Example</span>
         <Button type="primary">Table creation</Button>

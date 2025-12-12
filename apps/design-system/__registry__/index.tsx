@@ -2986,5 +2986,27 @@ export const Index: Record<string, any> = {
       subcategory: "Copy Writing",
       chunks: []
     },
+    "copy-form-labels": {
+      name: "copy-form-labels",
+      type: "components:example",
+      registryDependencies: ["form"],
+      component: React.lazy(() => import("@/registry/default/example/copy-form-labels")),
+      source: "",
+      files: ["registry/default/example/copy-form-labels.tsx"],
+      category: "Getting Started",
+      subcategory: "Copy Writing",
+      chunks: []
+    },
+    "copy-error-messages": {
+      name: "copy-error-messages",
+      type: "components:example",
+      registryDependencies: ["form"],
+      component: React.lazy(() => import("@/registry/default/example/copy-error-messages")),
+      source: "",
+      files: ["registry/default/example/copy-error-messages.tsx"],
+      category: "Getting Started",
+      subcategory: "Copy Writing",
+      chunks: []
+    },
   },
 }
