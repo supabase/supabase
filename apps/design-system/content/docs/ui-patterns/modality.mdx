@@ -3,44 +3,287 @@ title: Modality
 description: Present ephemeral information and forms.
 ---
 
+## Overview
+
+Modality components are used to present temporary, focused content that interrupts the user's workflow. We have three main categories: **Sheets** for side panels, **Dialogs** for centered modals, and **Alert Dialogs** for critical confirmations.
+
 ## Sheets
 
-Show temporary information that is larger than a few fields.
+**Purpose**: Show temporary information that is larger than a few fields, typically sliding in from the side.
+
+**When to use**:
+
+- Forms with multiple fields
+- Detailed views or editors
+- Settings panels
+- Content that benefits from more horizontal space
+
+**Components**: `Sheet`, `SheetContent`, `SheetHeader`, `SheetTitle`, `SheetSection`, `SheetFooter` (from `ui`)
+
+**Usage**: Sheets slide in from the right (default) or can be configured to slide from other sides. They're ideal for forms and detailed content that doesn't need to be centered.
 
 ## Dialogs
 
-Show basic information centered.
+**Purpose**: Show basic information centered on the screen.
 
-### Components
+### Shadcn Base Components
 
-Fragment components:
+#### Dialog (Shadcn)
 
-- Confirmation Dialog
+A versatile modal window used for a wider range of interactions, such as displaying a list of options, complex forms, or non-urgent information. Can be dismissed by clicking outside the dialog area or pressing the 'Escape' key.
 
-Shadcn components:
+**When to use**:
 
-- Dialog (Shadcn): A versatile modal window used for a wider range of interactions, such as displaying a list of options, complex forms, or non-urgent information. May allow the user to dismiss it by clicking outside the dialog area or pressing the 'Escape' key, depending on the implementation.
-- Alert Dialog (Shadcn): Interrupts the user's workflow to communicate critical information or warnings and requires an explicit acknowledgment or decision (e.g., "Are you sure you want to delete this?"). Typically cannot be dismissed by clicking outside the modal, forcing the user to interact with one of the provided action buttons.
+- Non-critical information displays
+- Forms that can be cancelled without consequences
+- Content that benefits from being centered
+- Multi-step workflows
 
-Custom components built on those:
+**Components**: `Dialog`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogTrigger`, `DialogFooter`, `DialogSection`, `DialogSectionSeparator` (from `ui`)
 
-- Text Confirm Dialog (Custom): Wraps the Shadcn Dialog component.Requires the user to enter exact an exact string before they can continue with a destructive action, like deletion.
-- Confirmation Modal (custom): Yet another dialog type. Wraps the Shadcn Dialog component. Often used to just show an "are you sure" plain text. Sometimes there are form elements like a dropdown or an an admonition. Advantage is that it's all wrapped up in a neat single component with props. otherwise you're dropping a bunch of things in and importing all the Dialog/AlertDialog components. So perhaps this should stay, but wrap alertdialog instead of dialog?
+#### AlertDialog (Shadcn)
 
-Deprecated:
+Interrupts the user's workflow to communicate critical information or warnings and requires an explicit acknowledgment or decision (e.g., "Are you sure you want to delete this?"). Cannot be dismissed by clicking outside the modal, forcing the user to interact with one of the provided action buttons.
 
-- Modal: use Dialog instead.
+**When to use**:
 
-### Dialog best practices
+- Critical confirmations (delete, destructive actions)
+- Important warnings that require acknowledgment
+- Actions that cannot be undone
+- Situations where accidental dismissal would be problematic
+
+**Components**: `AlertDialog`, `AlertDialogContent`, `AlertDialogHeader`, `AlertDialogTitle`, `AlertDialogDescription`, `AlertDialogFooter`, `AlertDialogCancel`, `AlertDialogAction`, `AlertDialogTrigger` (from `ui`)
+
+**Current usage**: Found in 6 files (135 matches) - primarily for critical confirmations like resetting replication tables, enabling features, and API key management.
+
+### Custom Components Built on Shadcn
+
+#### ConfirmationModal (Custom)
+
+A convenience wrapper that simplifies common confirmation patterns. Currently wraps `Dialog` but semantically should wrap `AlertDialog` for better accessibility and user experience.
+
+**When to use**:
+
+- Simple "are you sure" confirmations
+- Confirmations with optional additional content (admonitions, form elements)
+- When you want a single component with convenient props instead of composing multiple AlertDialog components
+
+**Current usage**: Found in 95 files (378 matches) - the most commonly used confirmation component across the codebase.
+
+**Props**:
+
+- `visible`: Controls open state
+- `title`: Dialog title
+- `description`: Optional description
+- `variant`: 'default' | 'destructive' | 'warning'
+- `loading`: Loading state
+- `onConfirm`: Confirm handler
+- `onCancel`: Cancel handler
+- `alert`: Optional admonition object
+- `children`: Additional content
+
+**Note**: This component currently wraps `Dialog`, which allows dismissal via Escape/click-outside. For true confirmations, this should be migrated to wrap `AlertDialog` instead.
+
+#### TextConfirmModal (Custom)
+
+Requires the user to enter an exact string before they can continue with a destructive action, like deletion. Wraps the Shadcn `Dialog` component.
+
+**When to use**:
+
+- Highly destructive actions (deleting buckets, projects, etc.)
+- When you need extra confirmation beyond a simple button click
+- Actions that are irreversible and need explicit user intent
+
+**Current usage**: Found in 19 files (46 matches) - used for critical deletions like buckets, projects, and queues.
+
+**Props**:
+
+- `confirmString`: The exact string the user must type
+- `confirmPlaceholder`: Placeholder for the input
+- `variant`: 'default' | 'destructive' | 'warning'
+- `alert`: Optional admonition object
+- Other standard modal props
+
+**Note**: This component also wraps `Dialog` but semantically should wrap `AlertDialog` since it's used for critical confirmations.
+
+### Deprecated Components
+
+#### Modal
+
+**Status**: Deprecated - use `Dialog` instead.
+
+**Migration**: Replace `Modal` imports with `Dialog` and update props accordingly. The old `Modal` component has been refactored to use `Dialog` internally but should not be used for new code.
+
+## Component Inventory
+
+### Current State
+
+| Component         | Base   | Usage Count | Status             | Notes                     |
+| ----------------- | ------ | ----------- | ------------------ | ------------------------- |
+| Sheet             | Shadcn | Extensive   | ✅ Active          | Used for side panels      |
+| Dialog            | Shadcn | Moderate    | ✅ Active          | Base component for modals |
+| AlertDialog       | Shadcn | 6 files     | ✅ Active          | Underutilized             |
+| ConfirmationModal | Dialog | 95 files    | ⚠️ Needs migration | Should wrap AlertDialog   |
+| TextConfirmModal  | Dialog | 19 files    | ⚠️ Needs migration | Should wrap AlertDialog   |
+| Modal             | -      | Legacy      | ❌ Deprecated      | Use Dialog instead        |
+
+## Consolidation and Improvement Plan
+
+### Phase 1: Clarify Component Semantics (Immediate)
+
+1. **Update ConfirmationModal to wrap AlertDialog**
+
+   - Change base component from `Dialog` to `AlertDialog`
+   - This ensures confirmations cannot be accidentally dismissed
+   - Better accessibility for critical actions
+   - **Impact**: 95 files using ConfirmationModal will benefit from better UX
+
+2. **Update TextConfirmModal to wrap AlertDialog**
+
+   - Change base component from `Dialog` to `AlertDialog`
+   - These are critical confirmations that shouldn't be dismissible
+   - **Impact**: 19 files using TextConfirmModal will benefit
+
+3. **Document clear decision tree**:
+
+   ```
+   Need to confirm an action?
+   ├─ Simple yes/no confirmation?
+   │  └─ Use ConfirmationModal
+   ├─ Need text input to confirm?
+   │  └─ Use TextConfirmModal
+   └─ Custom confirmation flow?
+      └─ Use AlertDialog directly
+
+   Need to show non-critical content?
+   ├─ Side panel with form?
+   │  └─ Use Sheet
+   └─ Centered modal?
+      └─ Use Dialog
+   ```
+
+### Phase 2: Improve Component APIs (Short-term)
+
+1. **Standardize prop names**
+
+   - `ConfirmationModal` uses `visible` while `AlertDialog` uses `open`
+   - Consider standardizing on `open` for consistency with Shadcn patterns
+   - Or maintain `visible` for backward compatibility but document preference
+
+2. **Simplify ConfirmationModal API**
+
+   - The `alert` prop adds complexity - consider if this should be separate
+   - Evaluate if `children` + `alert` pattern is the best approach
+   - Consider making `variant` more explicit about destructive vs warning
+
+3. **Enhance TextConfirmModal**
+   - The component has many props - consider grouping related props
+   - `enableCopy` feature is useful but could be more discoverable
+
+### Phase 3: Migration and Cleanup (Medium-term)
+
+1. ✅ **Migrate deprecated components**
+
+   - ✅ All uses of `ConfirmDialog` have been migrated to `ConfirmationModal`
+   - ✅ `ConfirmDialog` component has been removed
+
+2. **Audit Dialog vs AlertDialog usage**
+
+   - Review all direct `Dialog` usage
+   - Identify cases that should be `AlertDialog` instead
+   - Create migration guide for common patterns
+
+3. **Remove Modal component**
+   - Ensure all `Modal` usage has been migrated
+   - Remove deprecated component
+   - Update any remaining documentation
+
+### Phase 4: Best Practices Enforcement (Long-term)
+
+1. **Create ESLint rules**
+
+   - Warn when `Dialog` is used for confirmations (should use `AlertDialog`)
+   - Warn when deprecated components are imported
+   - Encourage use of `ConfirmationModal` for simple confirmations
+
+2. **Update component documentation**
+
+   - Add code examples for each component
+   - Document when to use each component
+   - Include accessibility considerations
+
+3. **Design system guidelines**
+   - Document patterns for common use cases
+   - Create component comparison guide
+   - Establish naming conventions
+
+## Best Practices
+
+### Dialog Best Practices
 
 All dialogs should follow this basic advice:
 
-- Text should reiterate what the entry button said
+1. **Text should reiterate what the entry button said**
 
-  - Dialog header
-  - Confirmation button within Dialog
+   - Dialog header should match the action
+   - Confirmation button within Dialog should be clear
 
-- Keep them as simple as possible
-  - No layered elements like subtitles or admonitions
-    - Remove `description` from TextConfirmDialog
-    - Sweep full-width Admonition uses in dialog components
+2. **Keep them as simple as possible**
+
+   - No layered elements like subtitles or admonitions unless necessary
+   - Remove `description` from TextConfirmModal where redundant
+   - Sweep full-width Admonition uses in dialog components
+
+3. **Use appropriate component for the use case**
+
+   - Critical confirmations → `AlertDialog` or `ConfirmationModal`
+   - Destructive actions requiring text → `TextConfirmModal`
+   - Non-critical content → `Dialog`
+   - Forms and detailed views → `Sheet`
+
+4. **Accessibility**
+   - Always provide clear labels and descriptions
+   - Ensure keyboard navigation works correctly
+   - Use semantic HTML and ARIA attributes
+   - For critical actions, prevent accidental dismissal
+
+### Sheet Best Practices
+
+1. **Use for side panels**
+
+   - Forms with multiple fields
+   - Settings panels
+   - Detailed editors
+
+2. **Consider screen size**
+
+   - Sheets work well on desktop
+   - On mobile, consider full-screen or bottom sheet variants
+
+3. **Structure content clearly**
+   - Use `SheetHeader` and `SheetTitle` for context
+   - Use `SheetSection` to group related fields
+   - Use `SheetFooter` for actions
+
+## Recommendations
+
+### Immediate Actions
+
+1. ✅ **Document current state** - This document now captures all components and their usage
+2. ⚠️ **Migrate ConfirmationModal to AlertDialog** - High impact, improves UX for 95 files
+3. ⚠️ **Migrate TextConfirmModal to AlertDialog** - High impact, improves UX for 19 files
+4. 📋 **Create decision tree** - Help developers choose the right component
+
+### Short-term Improvements
+
+1. Standardize prop naming conventions
+2. Simplify component APIs where possible
+3. Add more code examples and documentation
+4. Create migration guides for deprecated components
+
+### Long-term Vision
+
+1. Consolidate to fewer, more focused components
+2. Improve accessibility across all modal components
+3. Establish clear patterns and conventions
+4. Automate best practices through tooling

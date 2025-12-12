@@ -146,6 +146,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Confirmation Modal',
+          href: '/docs/fragments/confirmation-modal',
+          items: [],
+        },
+        {
           title: 'Info Tooltip',
           href: '/docs/fragments/info-tooltip',
           items: [],
