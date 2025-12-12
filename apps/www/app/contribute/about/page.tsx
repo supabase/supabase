@@ -185,7 +185,7 @@ export default function AboutPage() {
           <ApplyToSupaSquadForm
             className="mt-12"
             title="Apply to join"
-            description="Apply to join our community of helpers and contributors. Before you apply, you should have a solid list of contributions already under your belt. If you haven't contributed yet, spend some time engaging with the community and apply once you've built up a few contributions."
+            description="Apply to join our community of helpers and contributors. Before you apply, you should have a solid list of contributions already under your belt. If you haven't contributed yet, browse the Unresolved Threads to get started."
           />
         </div>
       </main>

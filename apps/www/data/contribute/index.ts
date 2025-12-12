@@ -62,9 +62,9 @@ export async function getUnansweredThreads(
 ): Promise<ThreadRow[]> {
   const supabase = createClient(supabaseUrl, supabasePublishableKey)
 
-  const twentyFourHoursAgo = new Date()
-  twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24)
-  const since = twentyFourHoursAgo.toISOString()
+  const sevenDaysAgo = new Date()
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 30)
+  const since = sevenDaysAgo.toISOString()
 
   let query = supabase
     .from('contribute_threads')

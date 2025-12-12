@@ -13,8 +13,8 @@ export function Hero() {
         Contributor Community
       </h2>
       <p className="text-sm md:text-base text-foreground-lighter max-w-sm sm:max-w-md md:max-w-xl mx-auto">
-        Browse unresolved threads and share your knowledge with fellow builders. Every question
-        answered helps someone build something amazing.
+        Jump in to these unresolved threads and share your knowledge with fellow builders. Every
+        question answered helps someone build something amazing.
       </p>
       <div className="grid gap-2 justify-center mt-4">
         Want to get involved?

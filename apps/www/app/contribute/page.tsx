@@ -14,11 +14,7 @@ export default async function ContributePage({
     search?: string
   }>
 }) {
-  const params = await searchParams
-  const product_area = params.product_area
-  const channel = params.channel
-  const stack = params.stack
-  const search = params.search
+  const { product_area, channel, stack, search } = await searchParams
 
   return (
     <DefaultLayout>
@@ -27,7 +23,6 @@ export default async function ContributePage({
           <div className="flex-1 flex flex-col gap-8 w-full">
             <div className="max-w-5xl mx-auto px-5 w-full">
               <Hero />
-              {/* <GetStarted /> */}
             </div>
             <UnansweredThreads
               product_area={product_area}

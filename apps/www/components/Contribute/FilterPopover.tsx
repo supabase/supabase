@@ -3,7 +3,14 @@
 import { useState } from 'react'
 import { X, Check } from 'lucide-react'
 import { useQueryState, parseAsString } from 'nuqs'
-import { Button, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, cn } from 'ui'
+import {
+  Button,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  cn,
+  ScrollArea,
+} from 'ui'
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 
 interface FilterPopoverProps {
@@ -70,73 +77,75 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
           </div>
           <PopoverSeparator />
 
-          <div className="grid gap-8 pb-4 mt-4">
-            {/* Product Area Section */}
-            <div className="grid gap-3">
-              <h3 className="text-sm  text-muted-foreground">Product Area</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                {allProductAreas
-                  .filter((area) => area !== 'Other')
-                  .map((area) => {
-                    const isSelected = productArea === area
-                    return (
-                      <button
-                        key={area}
-                        type="button"
-                        onClick={() => handleProductAreaClick(area)}
-                        className={cn(
-                          'flex items-center gap-1.5 px-2 py-1 rounded-md text-sm text-foreground transition-colors',
-                          isSelected
-                            ? 'bg-brand-200 text-brand-foreground border border-brand-300'
-                            : 'bg-surface-200 hover:bg-surface-300'
-                        )}
-                      >
-                        <Check
+          <ScrollArea className="h-[430px]">
+            <div className="grid gap-8 pb-4 mt-4 pr-4">
+              {/* Product Area Section */}
+              <div className="grid gap-3">
+                <h3 className="text-sm  text-muted-foreground">Product Area</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                  {allProductAreas
+                    .filter((area) => area !== 'Other')
+                    .map((area) => {
+                      const isSelected = productArea === area
+                      return (
+                        <button
+                          key={area}
+                          type="button"
+                          onClick={() => handleProductAreaClick(area)}
                           className={cn(
-                            'h-3.5 w-3.5 shrink-0',
-                            isSelected ? 'opacity-100' : 'opacity-0'
+                            'flex items-center gap-1.5 px-2 py-1 rounded-md text-sm text-foreground transition-colors',
+                            isSelected
+                              ? 'bg-brand-200 text-brand-foreground border border-brand-300'
+                              : 'bg-surface-200 hover:bg-surface-300'
                           )}
-                        />
-                        <span className="text-left">{area}</span>
-                      </button>
-                    )
-                  })}
+                        >
+                          <Check
+                            className={cn(
+                              'h-3.5 w-3.5 shrink-0',
+                              isSelected ? 'opacity-100' : 'opacity-0'
+                            )}
+                          />
+                          <span className="text-left">{area}</span>
+                        </button>
+                      )
+                    })}
+                </div>
               </div>
-            </div>
 
-            {/* Tech Stack Section */}
-            <div className="grid gap-3">
-              <h3 className="text-sm  text-muted-foreground">Tech Stack</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                {allStacks
-                  .filter((tech) => tech !== 'Other')
-                  .map((tech) => {
-                    const isSelected = stack === tech
-                    return (
-                      <button
-                        key={tech}
-                        type="button"
-                        onClick={() => handleStackClick(tech)}
-                        className={cn(
-                          'flex items-center gap-1.5 px-2 py-1 rounded-md text-sm text-foreground transition-colors',
-                          isSelected
-                            ? 'bg-brand-200 text-brand-foreground border border-brand-300'
-                            : 'bg-surface-200 hover:bg-surface-300'
-                        )}
-                      >
-                        <Check
+              {/* Tech Stack Section */}
+              <div className="grid gap-3">
+                <h3 className="text-sm  text-muted-foreground">Tech Stack</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                  {allStacks
+                    .filter((tech) => tech !== 'Other')
+                    .map((tech) => {
+                      const isSelected = stack === tech
+                      return (
+                        <button
+                          key={tech}
+                          type="button"
+                          onClick={() => handleStackClick(tech)}
                           className={cn(
-                            'h-3.5 w-3.5 shrink-0',
-                            isSelected ? 'opacity-100' : 'opacity-0'
+                            'flex items-center gap-1.5 px-2 py-1 rounded-md text-sm text-foreground transition-colors',
+                            isSelected
+                              ? 'bg-brand-200 text-brand-foreground border border-brand-300'
+                              : 'bg-surface-200 hover:bg-surface-300'
                           )}
-                        />
-                        <span className="text-left">{tech}</span>
-                      </button>
-                    )
-                  })}
+                        >
+                          <Check
+                            className={cn(
+                              'h-3.5 w-3.5 shrink-0',
+                              isSelected ? 'opacity-100' : 'opacity-0'
+                            )}
+                          />
+                          <span className="text-left">{tech}</span>
+                        </button>
+                      )
+                    })}
+                </div>
               </div>
             </div>
-          </div>
+          </ScrollArea>
         </div>
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>

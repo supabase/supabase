@@ -5,7 +5,15 @@ import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
 import type { ReactNode } from 'react'
 import { useEffect, useMemo, useState } from 'react'
-import { Badge, Button, cn, Input_Shadcn_ } from 'ui'
+import {
+  Badge,
+  Button,
+  cn,
+  Input_Shadcn_,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+} from 'ui'
 
 import type { ThreadRow } from '~/types/contribute'
 import { FilterPopover } from './FilterPopover'
@@ -29,33 +37,43 @@ function ThreadsTable({
   }
 
   return (
-    <div className="overflow-hidden">
-      <table className="w-full table-fixed">
-        <thead className="border-b border-border">
-          <tr>
-            <th className="text-left py-3 px-6 text-sm text-foreground min-w-[350px] w-[45%]">
-              Thread
-            </th>
-            <th className="text-left py-3 px-6 text-sm text-foreground min-w-[150px] w-[20%]">
-              Area
-            </th>
-            <th className="text-left py-3 px-6 text-sm text-foreground min-w-[150px] w-[20%]">
-              Stack
-            </th>
-            <th className="text-left py-3 px-6 text-sm text-foreground min-w-[100px] w-[10%]">
-              Replies
-            </th>
-            <th className="text-left py-3 px-6 text-sm text-foreground min-w-[100px] w-[15%]">
-              Posted
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {threads.map((thread) => (
-            <ThreadRow key={thread.id} thread={thread} productArea={productArea} search={search} />
-          ))}
-        </tbody>
-      </table>
+    <div className="grid gap-4">
+      <div className="overflow-hidden">
+        <table className="w-full table-fixed">
+          <thead className="border-b border-border">
+            <tr>
+              <th className="text-left py-3 px-6 text-sm text-foreground min-w-[350px] w-[45%]">
+                Thread
+              </th>
+              <th className="text-left py-3 px-6 text-sm text-foreground min-w-[150px] w-[20%]">
+                Area
+              </th>
+              <th className="text-left py-3 px-6 text-sm text-foreground min-w-[150px] w-[20%]">
+                Stack
+              </th>
+              <th className="text-left py-3 px-6 text-sm text-foreground min-w-[100px] w-[10%]">
+                Replies
+              </th>
+              <th className="text-left py-3 px-6 text-sm text-foreground min-w-[100px] w-[15%]">
+                Posted
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {threads.map((thread) => (
+              <ThreadRow
+                key={thread.id}
+                thread={thread}
+                productArea={productArea}
+                search={search}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="text-sm text-muted-foreground px-6">
+        Showing {threads.length} {threads.length === 1 ? 'result' : 'results'}
+      </div>
     </div>
   )
 }
@@ -153,7 +171,7 @@ export function UnansweredThreadsTable({
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-8">
         <div className="flex flex-col gap-2">
           <h2 className="text-xl text-foreground">Unresolved Threads</h2>
-          <p className="text-foreground-lighter">From the last 24 hours</p>
+          <p className="text-foreground-lighter">From the last 30 days</p>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Clock className="h-4 w-4" />
@@ -252,17 +270,11 @@ export function UnansweredThreadsTable({
             allProductAreas={allProductAreas}
             allStacks={allStacks}
             trigger={
-              <Button
-                type="default"
-                icon={<Filter className="h-4 w-4" />}
-                className={cn('h-8', activeFilterCount > 0 ? 'bg-surface-200' : '')}
-              >
+              <Button type="primary" icon={<Filter className="h-4 w-4" />} className={cn('h-8')}>
                 <span className="flex items-center gap-2">
                   Filters
                   {activeFilterCount > 0 && (
-                    <Badge className="bg-brand-200 text-brand-foreground">
-                      {activeFilterCount}
-                    </Badge>
+                    <Badge className="bg-black text-white">{activeFilterCount}</Badge>
                   )}
                 </span>
               </Button>
@@ -372,16 +384,56 @@ function ThreadRow({
       <td className="py-4 px-6 w-[20%] min-w-[150px]">
         <div className="flex flex-wrap gap-2 overflow-hidden">
           {thread.stack.length > 0 ? (
-            thread.stack
-              .filter((tech: string) => tech !== 'Other')
-              .map((tech: string) => {
-                const isActive = currentStack === tech
-                return (
-                  <button key={tech} onClick={() => handleStackClick(tech)} type="button">
-                    <Badge variant={isActive ? 'success' : 'default'}>{tech}</Badge>
-                  </button>
-                )
-              })
+            (() => {
+              const filteredStack = thread.stack.filter((tech: string) => tech !== 'Other')
+
+              // Check if active stack is in the overflow section
+              const overflowStacks = filteredStack.slice(5)
+              const hasActiveInOverflow = currentStack && overflowStacks.includes(currentStack)
+
+              return (
+                <>
+                  {filteredStack.slice(0, 5).map((tech: string) => {
+                    const isActive = currentStack === tech
+                    return (
+                      <button key={tech} onClick={() => handleStackClick(tech)} type="button">
+                        <Badge variant={isActive ? 'success' : 'default'}>{tech}</Badge>
+                      </button>
+                    )
+                  })}
+                  {filteredStack.length > 5 && (
+                    <Popover_Shadcn_>
+                      <PopoverTrigger_Shadcn_ asChild>
+                        <button type="button">
+                          <Badge
+                            variant={hasActiveInOverflow ? 'success' : 'default'}
+                            className="cursor-pointer hover:bg-surface-300"
+                          >
+                            +{filteredStack.length - 5}
+                          </Badge>
+                        </button>
+                      </PopoverTrigger_Shadcn_>
+                      <PopoverContent_Shadcn_ className="max-w-[300px] p-3">
+                        <div className="flex flex-wrap gap-2">
+                          {overflowStacks.map((tech: string) => {
+                            const isActive = currentStack === tech
+                            return (
+                              <button
+                                key={tech}
+                                onClick={() => handleStackClick(tech)}
+                                type="button"
+                              >
+                                <Badge variant={isActive ? 'success' : 'default'}>{tech}</Badge>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </PopoverContent_Shadcn_>
+                    </Popover_Shadcn_>
+                  )}
+                </>
+              )
+            })()
           ) : (
             <span className="text-xs text-muted-foreground">—</span>
           )}
