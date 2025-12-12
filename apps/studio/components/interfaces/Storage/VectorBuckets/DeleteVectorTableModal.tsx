@@ -25,22 +25,28 @@ export const DeleteVectorTableModal = ({
   const { data: wrapperInstance } = useS3VectorsWrapperInstance({ bucketId })
   const foreignTable = wrapperInstance?.tables?.find((x) => x.name === table?.indexName)
 
-  const { mutate: deleteForeignTable } = useFDWDropForeignTableMutation({
+  const { mutateAsync: deleteForeignTable } = useFDWDropForeignTableMutation({
     onError: () => {},
   })
 
   const { mutate: deleteIndex, isPending: isDeleting } = useVectorBucketIndexDeleteMutation({
     onSuccess: (_, vars) => {
-      if (!!foreignTable) {
-        deleteForeignTable({
-          projectRef: project?.ref,
-          connectionString: project?.connectionString,
-          schemaName: foreignTable.schema,
-          tableName: foreignTable.name,
-        })
+      try {
+        if (!!foreignTable) {
+          deleteForeignTable({
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            schemaName: foreignTable.schema,
+            tableName: foreignTable.name,
+          })
+        }
+        toast.success(`Table "${vars.indexName}" deleted successfully`)
+        onClose()
+      } catch (error: any) {
+        toast.success(
+          `Table "${vars.indexName}" deleted successfully, but its corresponding foreign table failed to clean up: ${error.message}`
+        )
       }
-      toast.success(`Table "${vars.indexName}" deleted successfully`)
-      onClose()
     },
   })
 

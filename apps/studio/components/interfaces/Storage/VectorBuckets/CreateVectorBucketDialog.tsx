@@ -186,7 +186,7 @@ export const CreateVectorBucketDialog = ({
                     label="Bucket name"
                     className="px-5 py-5"
                     labelOptional="Cannot be changed after creation"
-                    description="A target schema will be created that matches this name."
+                    description="Must be between 3–63 characters. Only lowercase letters, numbers, and hyphens are allowed"
                   >
                     <FormControl_Shadcn_>
                       <Input_Shadcn_

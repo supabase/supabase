@@ -263,7 +263,7 @@ export const VectorBucketDetails = () => {
                                           asChild
                                         >
                                           <Link
-                                            href={`/project/${projectRef}/editor/${foreignTable.id}?schema=${foreignTable.schema}}`}
+                                            href={`/project/${projectRef}/editor/${foreignTable.id}?schema=${foreignTable.schema}`}
                                             onClick={(e) => e.stopPropagation()}
                                           >
                                             <TableEditor
