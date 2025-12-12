@@ -16,7 +16,7 @@ export const MANAGED_BY = {
   VERCEL_MARKETPLACE: 'vercel-marketplace',
   AWS_MARKETPLACE: 'aws-marketplace',
   SUPABASE: 'supabase',
-}
+} as const
 
 export type ManagedBy = (typeof MANAGED_BY)[keyof typeof MANAGED_BY]
 
