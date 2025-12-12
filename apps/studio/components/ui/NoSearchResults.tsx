@@ -1,10 +1,12 @@
 import { Button, cn } from 'ui'
 
 export interface NoSearchResultsProps {
-  searchString: string
+  searchString?: string
   withinTableCell?: boolean
   onResetFilter?: () => void
   className?: string
+  label?: string
+  description?: string
 }
 
 export const NoSearchResults = ({
@@ -12,6 +14,8 @@ export const NoSearchResults = ({
   withinTableCell = false,
   onResetFilter,
   className,
+  label,
+  description,
 }: NoSearchResultsProps) => {
   return (
     <div
@@ -22,9 +26,9 @@ export const NoSearchResults = ({
       )}
     >
       <div className="text-sm flex flex-col gap-y-0.5">
-        <p className="text-foreground">No results found</p>
+        <p className="text-foreground">{label ?? 'No results found'}</p>
         <p className="text-foreground-lighter">
-          Your search for “{searchString}” did not return any results
+          {description ?? `Your search for “${searchString}” did not return any results`}
         </p>
       </div>
       {onResetFilter !== undefined && (

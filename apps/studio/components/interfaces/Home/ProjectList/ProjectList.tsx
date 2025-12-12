@@ -16,7 +16,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import type { Organization } from 'types'
 import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import { LoadingCardView, LoadingTableView, NoFilterResults, NoProjectsState } from './EmptyStates'
+import { LoadingCardView, LoadingTableView, NoProjectsState } from './EmptyStates'
 import { LoadMoreRows } from './LoadMoreRow'
 import { ProjectCard } from './ProjectCard'
 import { ProjectTableRow } from './ProjectTableRow'
@@ -154,10 +154,15 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
             {noResultsFromStatusFilter ? (
               <TableRow className="[&>td]:hover:bg-inherit">
                 <TableCell colSpan={5}>
-                  <NoFilterResults
-                    filterStatus={filterStatus}
-                    resetFilterStatus={() => setFilterStatus([])}
+                  <NoSearchResults
                     withinTableCell
+                    label={
+                      filterStatus.length === 0
+                        ? `No projects found`
+                        : `No ${filterStatus[0] === 'INACTIVE' ? 'paused' : 'active'} projects found`
+                    }
+                    description="Your search for projects with the specified status did not return any results"
+                    onResetFilter={() => setFilterStatus([])}
                   />
                 </TableCell>
               </TableRow>
@@ -204,9 +209,14 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
   return (
     <>
       {noResultsFromStatusFilter ? (
-        <NoFilterResults
-          filterStatus={filterStatus}
-          resetFilterStatus={() => setFilterStatus([])}
+        <NoSearchResults
+          label={
+            filterStatus.length === 0
+              ? `No projects found`
+              : `No ${filterStatus[0] === 'INACTIVE' ? 'paused' : 'active'} projects found`
+          }
+          description="Your search for projects with the specified status did not return any results"
+          onResetFilter={() => setFilterStatus([])}
         />
       ) : noResultsFromSearch ? (
         <NoSearchResults searchString={search} />
