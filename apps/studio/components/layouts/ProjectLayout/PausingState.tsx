@@ -12,7 +12,7 @@ export interface PausingStateProps {
   project: Project
 }
 
-export const PausingState = ({ project }: PausingStateProps) => {
+const PausingState = ({ project }: PausingStateProps) => {
   const { ref } = useParams()
   const [startPolling, setStartPolling] = useState(false)
 
@@ -83,3 +83,5 @@ export const PausingState = ({ project }: PausingStateProps) => {
     </div>
   )
 }
+
+export default PausingState
