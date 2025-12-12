@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
 
-import { useFlag, useParams } from 'common'
+import { mergeRefs, useFlag, useParams } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
@@ -17,6 +17,7 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, LogoLoader, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
+import { useSetMainScrollContainer } from '../MainScrollContainerContext'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import { LoadingState } from './LoadingState'
@@ -86,6 +87,9 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
     const { mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
+
+    const setMainScrollContainer = useSetMainScrollContainer()
+    const combinedRef = mergeRefs(ref, setMainScrollContainer)
 
     const { appTitle } = useCustomContent(['app:title'])
     const titleSuffix = appTitle || 'Supabase'
@@ -189,7 +193,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
             >
               <main
                 className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden @container"
-                ref={ref}
+                ref={combinedRef}
               >
                 {showPausedState ? (
                   <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">

@@ -441,7 +441,7 @@ export function DiskManagementForm() {
                   open={advancedSettingsOpen}
                   onOpenChange={() => setAdvancedSettingsOpenState((prev) => !prev)}
                 >
-                  <CollapsibleTrigger_Shadcn_ className="px-8 py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">
+                  <CollapsibleTrigger_Shadcn_ className="px-[var(--card-padding-x)] py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">
                     <div className="flex flex-col items-start">
                       <span className="text-sm text-foreground">Advanced disk settings</span>
                       <span className="text-sm text-foreground-light text-left">
@@ -462,11 +462,11 @@ export function DiskManagementForm() {
                     )}
                   >
                     <div className="flex flex-col gap-y-8 py-8">
-                      <div className="px-8 flex flex-col gap-y-8">
+                      <div className="px-[var(--card-padding-x)] flex flex-col gap-y-8">
                         <AutoScaleFields form={form} />
                       </div>
                       <Separator />
-                      <div className="px-8 flex flex-col gap-y-8">
+                      <div className="px-[var(--card-padding-x)] flex flex-col gap-y-8">
                         <NoticeBar
                           type="default"
                           visible={disableIopsThroughputConfig}

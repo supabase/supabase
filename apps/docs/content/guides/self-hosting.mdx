@@ -1,19 +1,29 @@
 ---
 title: 'Self-Hosting'
 description: 'Host Supabase on your own infrastructure.'
-subtitle: 'Host Supabase on your own infrastructure.'
+subtitle: 'Install and run your own Supabase.'
 hideToc: true
 ---
 
-There are several ways to host Supabase on your own computer, server, or cloud.
+Self-hosted Supabase lets you run the entire Supabase stack on your own computer, server, or cloud infrastructure. This is different from:
+
+- **Supabase CLI / Local Development**: A lightweight [local environment](/docs/guides/local-development) for development and testing only.
+- **Managed Supabase** platform: If you want to try managed Supabase for free, visit [supabase.com/dashboard](/dashboard).
+
+Self-hosting is a good fit if you need full control over your data, have compliance requirements that prevent using managed services, or want to run Supabase in an isolated environment.
+
+## No telemetry
+
+Self-hosted Supabase does not phone home or collect any telemetry.
+
+## Enterprise
+
+If you're an enterprise using self-hosted Supabase, we'd love to hear from you. Reach out to our [Growth Team](https://forms.supabase.com/enterprise) to discuss your use case, share feedback, or explore design partnership opportunities.
 
 ## Officially supported
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
   <div className="md:col-span-6 xl:col-span-3 relative" key="/guides/self-hosting/docker">
-    <span className=" absolute left-28 top-[34px] uppercase text-xs whitespace-nowrap text-foreground-lighter font-mono z-10 border rounded-full px-2 py-0.5">
-      Most common
-    </span>
     <Link href="/guides/self-hosting/docker" passHref>
       <GlassPanel title="Docker">
 
@@ -22,24 +32,29 @@ There are several ways to host Supabase on your own computer, server, or cloud.
     </Link>
 
   </div>
-  <div className="md:col-span-6 xl:col-span-3" key="/pricing">
-    <Link href="https://supabase.com/pricing" passHref>
-      <GlassPanel title="BYO Cloud">Contact our Enterprise sales team if you need Supabase managed in your own cloud.</GlassPanel>
-    </Link>
-  </div>
 </div>
-
-Supabase is also a hosted platform. If you want to get started for free, visit [supabase.com/dashboard](/dashboard).
 
 ## Community supported
 
-There are several community-driven projects to help you deploy Supabase. We encourage you to try them out and contribute back to the community.
+{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
+There are several community-driven projects to help you deploy Supabase. These projects may be outdated and are seeking active maintainers. If you're interested in maintaining one of these projects, [contact the community team](/open-source/contributing/supasquad).
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
   {community.map((x) => (
     <div className="md:col-span-6 xl:col-span-3" key={x.href}>
       <Link href={x.href} passHref>
-        <GlassPanel title={x.name}>{x.description}</GlassPanel>
+        <GlassPanel
+          title={
+            <span className="flex items-center gap-2">
+              {x.name}
+              <span className="uppercase text-xs whitespace-nowrap text-foreground-lighter font-mono border rounded-full px-2 py-0.5">
+                Maintainer needed
+              </span>
+            </span>
+          }
+        >
+          {x.description}
+        </GlassPanel>
       </Link>
     </div>
   ))}
@@ -56,34 +71,13 @@ export const community = [
     description: 'A self-hosted Supabase setup with Traefik as a reverse proxy.',
     href: 'https://github.com/supabase-community/supabase-traefik',
   },
-  {
-    name: 'AWS',
-    description: 'A CloudFormation template for Supabase.',
-    href: 'https://github.com/supabase-community/supabase-on-aws',
-  },
 ]
 
-## Third-party guides
+## Responsibility model
 
-The following third-party providers have shown consistent support for the self-hosted version of Supabase:.
+When you self-host, **you are responsible for**:
 
-<div className="grid md:grid-cols-12 gap-4 not-prose">
-  {[
-    {
-      name: 'StackGres',
-      description: 'Deploys using Kubernetes.',
-      href: 'https://stackgres.io/blog/running-supabase-on-top-of-stackgres/',
-    },
-    {
-      name: 'Pigsty',
-      description: 'Deploys using Ansible.',
-      href: 'https://pigsty.io/blog/db/supabase/',
-    },
-  ].map((x) => (
-    <div className="md:col-span-6" key={x.href}>
-      <Link href={x.href} passHref>
-        <GlassPanel title={x.name}>{x.description}</GlassPanel>
-      </Link>
-    </div>
-  ))}
-</div>
+- Server provisioning and maintenance
+- Security hardening and keeping OS and services updated
+- Backups and disaster recovery
+- Monitoring and uptime
