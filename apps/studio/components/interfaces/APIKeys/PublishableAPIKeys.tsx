@@ -95,7 +95,7 @@ export const PublishableAPIKeys = () => {
       ) : isLoadingApiKeys || isLoadingPermissions ? (
         <GenericSkeletonLoader />
       ) : isErrorApiKeys ? (
-        <AlertError error={error} subject="Failed to load secret API keys" />
+        <AlertError error={error} subject="Failed to load API keys" />
       ) : (
         <Card className="bg-surface-100">
           <Table>
@@ -132,7 +132,7 @@ export const PublishableAPIKeys = () => {
 
             <TableFooter className="border-t">
               <TableRow className="border-b-0">
-                <TableCell colSpan={4} className="py-2">
+                <TableCell colSpan={3} className="py-2">
                   <p className="text-xs text-foreground-lighter font-normal">
                     Publishable keys can be safely shared publicly
                   </p>

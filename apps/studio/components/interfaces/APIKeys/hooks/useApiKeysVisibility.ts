@@ -36,22 +36,19 @@ export function useApiKeysVisibility(): ApiKeysVisibilityState {
   )
 
   const newApiKeys = useMemo(
-    () => apiKeysData.filter(({ type }) => type === 'publishable' || type === 'secret') ?? [],
+    () => apiKeysData.filter(({ type }) => type === 'publishable' || type === 'secret'),
     [apiKeysData]
   )
-
-  // Check if there are any publishable API keys
-  // we don't check for secret keys because they can be optionally deleted
-  const hasApiKeys = newApiKeys.length > 0
+  const hasNewApiKeys = newApiKeys.length > 0
 
   // Can initialize API keys when in rollout, has permissions, not loading, and no API keys yet
-  const canInitApiKeys = canReadAPIKeys && !isLoadingApiKeys && !hasApiKeys
+  const canInitApiKeys = canReadAPIKeys && !isLoadingApiKeys && !hasNewApiKeys
 
   // Disable UI for publishable keys and secrets keys if flag is not enabled OR no API keys created yet
-  const shouldDisableUI = !hasApiKeys
+  const shouldDisableUI = !hasNewApiKeys
 
   return {
-    hasApiKeys,
+    hasApiKeys: hasNewApiKeys,
     isLoading: isLoadingPermissions || (canReadAPIKeys && isLoadingApiKeys),
     canReadAPIKeys,
     canInitApiKeys,
