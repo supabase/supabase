@@ -80,6 +80,9 @@ export const StoragePolicies = () => {
         toast.success('Successfully deleted policy!')
         setSelectedPolicyToDelete(undefined)
       },
+      onError: (error: any) => {
+        toast.error(`Failed to delete policy: ${error.message}`)
+      },
     })
 
   // Only use storage policy editor when creating new policies for buckets
