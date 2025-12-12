@@ -3008,5 +3008,71 @@ export const Index: Record<string, any> = {
       subcategory: "Copy Writing",
       chunks: []
     },
+    "copy-success-messages": {
+      name: "copy-success-messages",
+      type: "components:example",
+      registryDependencies: ["form"],
+      component: React.lazy(() => import("@/registry/default/example/copy-success-messages")),
+      source: "",
+      files: ["registry/default/example/copy-success-messages.tsx"],
+      category: "Getting Started",
+      subcategory: "Copy Writing",
+      chunks: []
+    },
+    "copy-tooltips": {
+      name: "copy-tooltips",
+      type: "components:example",
+      registryDependencies: ["tooltip"],
+      component: React.lazy(() => import("@/registry/default/example/copy-tooltips")),
+      source: "",
+      files: ["registry/default/example/copy-tooltips.tsx"],
+      category: "Getting Started",
+      subcategory: "Copy Writing",
+      chunks: []
+    },
+    "copy-loading-states": {
+      name: "copy-loading-states",
+      type: "components:example",
+      registryDependencies: ["loading-state"],
+      component: React.lazy(() => import("@/registry/default/example/copy-loading-states")),
+      source: "",
+      files: ["registry/default/example/copy-loading-states.tsx"],
+      category: "Getting Started",
+      subcategory: "Copy Writing",
+      chunks: []
+    },
+    "copy-empty-states": {
+      name: "copy-empty-states",
+      type: "components:example",
+      registryDependencies: ["empty-state"],
+      component: React.lazy(() => import("@/registry/default/example/copy-empty-states")),
+      source: "",
+      files: ["registry/default/example/copy-empty-states.tsx"],
+      category: "Getting Started",
+      subcategory: "Copy Writing",
+      chunks: []
+    },
+    "copy-confirmations": {
+      name: "copy-confirmations",
+      type: "components:example",
+      registryDependencies: ["confirmation"],
+      component: React.lazy(() => import("@/registry/default/example/copy-confirmations")),
+      source: "",
+      files: ["registry/default/example/copy-confirmations.tsx"],
+      category: "Getting Started",
+      subcategory: "Copy Writing",
+      chunks: []
+    },
+    "copy-success-messages": {
+      name: "copy-success-messages",
+      type: "components:example",
+      registryDependencies: ["form"],
+      component: React.lazy(() => import("@/registry/default/example/copy-success-messages")),
+      source: "",
+      files: ["registry/default/example/copy-success-messages.tsx"],
+      category: "Getting Started",
+      subcategory: "Copy Writing",
+      chunks: []
+    },
   },
 }
