@@ -31,15 +31,7 @@ export function ExplainVisualizer({ rows, onShowRaw }: ExplainVisualizerProps) {
       {/* Tree visualization */}
       <div className="p-4 mb-10 overflow-auto flex-1">
         {parsedTree.map((node, idx) => (
-          <ExplainNodeRenderer
-            key={idx}
-            node={node}
-            isLast={idx === parsedTree.length - 1}
-            depth={0}
-            maxCost={maxCost}
-            parentHasMore={[]}
-            isRoot={true}
-          />
+          <ExplainNodeRenderer key={idx} node={node} depth={0} maxCost={maxCost} isRoot={true} />
         ))}
       </div>
     </div>

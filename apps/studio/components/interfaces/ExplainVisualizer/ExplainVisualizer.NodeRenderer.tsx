@@ -12,19 +12,15 @@ import type { ExplainNode } from './ExplainVisualizer.types'
 
 export interface ExplainNodeRendererProps {
   node: ExplainNode
-  isLast: boolean
   depth: number
   maxCost: number
-  parentHasMore: boolean[]
   isRoot?: boolean
 }
 
 export function ExplainNodeRenderer({
   node,
-  isLast,
   depth,
   maxCost,
-  parentHasMore,
   isRoot = false,
 }: ExplainNodeRendererProps) {
   const Icon = getOperationIcon(node.operation)
@@ -46,23 +42,21 @@ export function ExplainNodeRenderer({
         style={{ marginLeft: `${depth * 32}px` }}
       >
         {/* Pipeline flow indicator */}
-        <div className="flex flex-col items-center gap-1">
-          <div
-            className={cn(
-              'flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center',
-              isRoot
-                ? 'bg-brand/20 text-brand'
-                : isLeaf
-                  ? 'bg-surface-300 text-foreground-light'
-                  : 'bg-surface-200 text-foreground-muted'
-            )}
-          >
-            {isRoot ? (
-              <ArrowRight size={14} className={'text-brand'} />
-            ) : (
-              <ArrowUp size={14} className={'text-foreground-light'} />
-            )}
-          </div>
+        <div
+          className={cn(
+            'flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center',
+            isRoot
+              ? 'bg-brand/20 text-brand'
+              : isLeaf
+                ? 'bg-surface-300 text-foreground-light'
+                : 'bg-surface-200 text-foreground-muted'
+          )}
+        >
+          {isRoot ? (
+            <ArrowRight size={14} className={'text-brand'} />
+          ) : (
+            <ArrowUp size={14} className={'text-foreground-light'} />
+          )}
         </div>
 
         {/* Icon */}
@@ -136,14 +130,7 @@ export function ExplainNodeRenderer({
       {node.children.length > 0 && (
         <div className="relative">
           {node.children.map((child, idx) => (
-            <ExplainNodeRenderer
-              key={idx}
-              node={child}
-              isLast={idx === node.children.length - 1}
-              depth={depth + 1}
-              maxCost={maxCost}
-              parentHasMore={[...parentHasMore, !isLast]}
-            />
+            <ExplainNodeRenderer key={idx} node={child} depth={depth + 1} maxCost={maxCost} />
           ))}
         </div>
       )}

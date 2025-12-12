@@ -31,7 +31,7 @@ export function ExplainHeader({ mode, onToggleMode, summary }: ExplainHeaderProp
           className="font-mono text-xs text-foreground-lighter hover:text-foreground transition-colors"
           aria-label={isVisual ? 'Switch to raw explain output' : 'Switch to visual explain output'}
         >
-          {isVisual ? '[RAW]' : '[VISUAL]'}
+          {isVisual ? '[VISUAL]' : '[RAW]'}
         </button>
       </div>
 
