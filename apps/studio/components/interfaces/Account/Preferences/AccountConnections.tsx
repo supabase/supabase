@@ -16,6 +16,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -113,7 +114,7 @@ export const AccountConnections = () => {
                           <span>Manage</span>
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent side="bottom" align="end">
+                      <DropdownMenuContent side="bottom" align="end" className="w-44">
                         <DropdownMenuItem
                           className="space-x-2"
                           onSelect={(event) => {
@@ -124,6 +125,7 @@ export const AccountConnections = () => {
                           <RefreshCw size={14} />
                           <p>Re-authenticate</p>
                         </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="space-x-2"
                           onSelect={() => setIsRemoveModalOpen(true)}

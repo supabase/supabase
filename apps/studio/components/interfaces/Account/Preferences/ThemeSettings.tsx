@@ -50,27 +50,25 @@ export const ThemeSettings = () => {
 
   function SingleThemeSelection() {
     return (
-      <form>
-        <RadioGroup_Shadcn_
-          name="theme"
-          onValueChange={setTheme}
-          aria-label="Choose a theme"
-          defaultValue={theme}
-          value={theme}
-          className="grid grid-cols-2 gap-4"
-        >
-          {singleThemes.map((theme: Theme) => (
-            <RadioGroupLargeItem_Shadcn_
-              className="p-3 w-full"
-              key={theme.value}
-              value={theme.value}
-              label={theme.name}
-            >
-              <SVG src={`${BASE_PATH}/img/themes/${theme.value}.svg?v=2`} />
-            </RadioGroupLargeItem_Shadcn_>
-          ))}
-        </RadioGroup_Shadcn_>
-      </form>
+      <RadioGroup_Shadcn_
+        name="theme"
+        onValueChange={setTheme}
+        aria-label="Choose a theme"
+        defaultValue={theme}
+        value={theme}
+        className="grid grid-cols-2 gap-4"
+      >
+        {singleThemes.map((theme: Theme) => (
+          <RadioGroupLargeItem_Shadcn_
+            className="p-3 w-full"
+            key={theme.value}
+            value={theme.value}
+            label={theme.name}
+          >
+            <SVG src={`${BASE_PATH}/img/themes/${theme.value}.svg?v=2`} />
+          </RadioGroupLargeItem_Shadcn_>
+        ))}
+      </RadioGroup_Shadcn_>
     )
   }
 
