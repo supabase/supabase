@@ -1,10 +1,10 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence } from 'framer-motion'
 import { AlertCircle, RotateCw, Timer } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useFlag, useParams } from 'common'
-import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
@@ -13,6 +13,7 @@ import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signin
 import { JWTSigningKey, useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDialog,
@@ -58,7 +59,10 @@ export const JWTSecretKeysTable = () => {
   const [selectedKeyToUpdate, setSelectedKeyToUpdate] = useState<string>()
   const [shownDialog, setShownDialog] = useState<DialogType>()
 
-  const { canReadAPIKeys, isLoading: isLoadingCanReadAPIKeys } = useApiKeysVisibility()
+  const { can: canReadAPIKeys, isLoading: isLoadingCanReadAPIKeys } = useAsyncCheckPermissions(
+    PermissionAction.SECRETS_READ,
+    '*'
+  )
   const { data: signingKeys, isPending: isLoadingSigningKeys } = useJWTSigningKeysQuery(
     {
       projectRef,

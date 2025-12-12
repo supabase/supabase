@@ -2,7 +2,11 @@ import { PostgresPolicy } from '@supabase/postgres-meta'
 import { difference } from 'lodash'
 import { useRouter } from 'next/router'
 
+import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
+import { convertKVStringArrayToJson } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { FDW } from 'data/fdw/fdws-query'
 import { Bucket } from 'data/storage/buckets-query'
+import { getDecryptedValues } from 'data/vault/vault-secret-decrypted-value-query'
 import { createWrappedSymbol } from 'lib/helpers'
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from './Storage.constants'
 import type { StoragePolicyFormField } from './Storage.types'
@@ -212,4 +216,48 @@ export const applyBucketIdToTemplateDefinition = (definition: string, bucketId: 
 export const useStorageV2Page = () => {
   const router = useRouter()
   return router.pathname.split('/')[4] as undefined | 'files' | 'analytics' | 'vectors' | 's3'
+}
+
+export const getDecryptedParameters = async ({
+  ref,
+  connectionString,
+  wrapper,
+  wrapperMeta,
+}: {
+  ref?: string
+  connectionString?: string
+  wrapper: FDW
+  wrapperMeta: WrapperMeta
+}) => {
+  const wrapperServerOptions = wrapperMeta.server.options
+
+  const serverOptions = convertKVStringArrayToJson(wrapper?.server_options ?? [])
+
+  const paramsToBeDecrypted = Object.fromEntries(
+    new Map(
+      Object.entries(serverOptions).filter(([key, value]) => {
+        return wrapperServerOptions.find((option) => option.name === key)?.encrypted
+      })
+    )
+  )
+
+  const decryptedValues = await getDecryptedValues({
+    projectRef: ref,
+    connectionString: connectionString,
+    ids: Object.values(paramsToBeDecrypted),
+  })
+
+  const paramsWithDecryptedValues = Object.fromEntries(
+    new Map(
+      Object.entries(paramsToBeDecrypted).map(([name, id]) => {
+        const decryptedValue = decryptedValues[id]
+        return [name, decryptedValue]
+      })
+    )
+  )
+
+  return {
+    ...serverOptions,
+    ...paramsWithDecryptedValues,
+  }
 }

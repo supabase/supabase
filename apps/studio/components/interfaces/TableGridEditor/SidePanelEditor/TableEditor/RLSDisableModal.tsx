@@ -5,7 +5,7 @@ import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { DOCS_URL } from 'lib/constants'
 import { Alert } from 'ui'
 
-export default function RLSDisableModalContent() {
+export function RLSDisableModalContent() {
   const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
 
   return (

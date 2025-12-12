@@ -1,85 +1,59 @@
 import { HomepageSvgHandler } from '@/components/homepage-svg-handler'
 import Link from 'next/link'
+import { Paintbrush } from 'lucide-react'
+import { Realtime, Database, Auth } from 'icons/src/icons'
 
 export default function Home() {
   return (
-    <main className="relative lg:gap-10 pr-6 lg:py-20">
-      <div className="mx-auto w-full min-w-0 max-w-6xl flex flex-col gap-20">
-        <div className="flex flex-col gap-8 justify-start">
-          {/* <div>
-            <DesignSystemMarks />
-          </div> */}
-          <div>
-            <h1 className="text-4xl text-foreground mb-3">Supabase Design System</h1>
-            <h2 className="text-xl text-foreground-light font-light">
-              Design resources for building consistent user experiences
-            </h2>
-          </div>
+    <div className="relative gap-4 px-6 py-6 lg:py-8">
+      <div className="mx-auto w-full min-w-0 max-w-4xl flex-1">
+        <div className="flex flex-col gap-2 justify-start my-8 w-full">
+          <h1 className="text-2xl lg:text-4xl text-foreground">Supabase Design System</h1>
+          <h2 className="md:text-xl text-base text-foreground-light font-light">
+            Design resources for building consistent user experiences
+          </h2>
         </div>
 
-        {/* Homepage items */}
-
-        <div className="grid grid-cols-2 gap-10">
-          <Link href="/docs/components/atom-components">
-            <div className="px-10 py-8 min-h-[18rem] flex flex-col justify-between bg-surface-75/50 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
-              <HomepageSvgHandler name="atoms-illustration" />
+        <div className="grid md:grid-cols-2 grid-cols-1 gap-4 w-full">
+          <Link href="/docs/components/atom-components" className="h-full flex">
+            <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
+              <div className="flex items-center justify-start min-h-[24px]">
+                <HomepageSvgHandler name="atoms" className="w-6 h-6" />
+              </div>
               <div>
                 <h3 className="font-medium text-foreground">Atom components</h3>
                 <p className="text-sm text-foreground-light">Building blocks of User interfaces</p>
               </div>
             </div>
           </Link>
-          <Link href="/docs/components/fragment-components">
-            <div className="px-10 py-8 min-h-[18rem] flex flex-col justify-between bg-surface-75/50 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
-              <HomepageSvgHandler name="fragments-illustration" />
+          <Link href="/docs/fragments/fragment-components" className="h-full flex">
+            <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
+              <div className="flex items-center justify-start min-h-[24px]">
+                <HomepageSvgHandler name="fragments" className="w-6 h-6" />
+              </div>
               <div>
                 <h3 className="font-medium text-foreground">Fragment components</h3>
                 <p className="text-sm text-foreground-light">Components assembled from Atoms</p>
               </div>
             </div>
           </Link>
-          <Link href="/docs/color-usage">
-            <div className="px-10 py-8 min-h-[18rem] flex flex-col justify-between bg-surface-75/50 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
-              <div className="flex flex-col gap-1">
-                <div className="flex flex-row gap-0.5">
-                  <div className="w-3 h-16 rounded border bg-foreground"></div>
-                  <div className="w-3 h-16 rounded border bg-foreground-light"></div>
-                  <div className="w-3 h-16 rounded border bg-foreground-lighter"></div>
-                  <div className="w-3 h-16 rounded border bg-foreground-muted"></div>
-                  <div className="w-3 h-16 rounded border"></div>
-
-                  <div className="w-3 h-16 rounded border bg"></div>
-                  <div className="w-3 h-16 rounded border bg-200"></div>
-                  <div className="w-3 h-16 rounded border bg-surface-75"></div>
-                  <div className="w-3 h-16 rounded border bg-surface-100"></div>
-                  <div className="w-3 h-16 rounded border bg-surface-200"></div>
-                  <div className="w-3 h-16 rounded border bg-surface-300"></div>
-                  <div className="w-3 h-16 rounded border"></div>
-
-                  <div className="w-3 h-16 rounded border bg-brand-200"></div>
-                  <div className="w-3 h-16 rounded border bg-brand-300"></div>
-                  <div className="w-3 h-16 rounded border bg-brand-400"></div>
-                  <div className="w-3 h-16 rounded border bg-brand-500"></div>
-                  <div className="w-3 h-16 rounded border bg-brand"></div>
-                  <div className="w-3 h-16 rounded border bg-brand-600"></div>
-                  <div className="w-3 h-16 rounded border"></div>
-
-                  <div className="w-3 h-16 rounded border bg-warning-200"></div>
-                  <div className="w-3 h-16 rounded border bg-warning-300"></div>
-                  <div className="w-3 h-16 rounded border bg-warning-400"></div>
-                  <div className="w-3 h-16 rounded border bg-warning-500"></div>
-                  <div className="w-3 h-16 rounded border bg-warning"></div>
-                  <div className="w-3 h-16 rounded border bg-warning-600"></div>
-                  <div className="w-3 h-16 rounded border"></div>
-
-                  <div className="w-3 h-16 rounded border bg-destructive-200"></div>
-                  <div className="w-3 h-16 rounded border bg-destructive-300"></div>
-                  <div className="w-3 h-16 rounded border bg-destructive-400"></div>
-                  <div className="w-3 h-16 rounded border bg-destructive-500"></div>
-                  <div className="w-3 h-16 rounded border bg-destructive"></div>
-                  <div className="w-3 h-16 rounded border bg-destructive-600"></div>
-                  <div className="w-3 h-16 rounded border"></div>
-                </div>
+          <Link href="/docs/components/ui-patterns" className="h-full flex">
+            <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
+              <div className="flex items-center justify-start min-h-[24px]">
+                <HomepageSvgHandler name="ui-patterns" className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-medium text-foreground">UI Patterns components</h3>
+                <p className="text-sm text-foreground-light">
+                  Components assembled from Atoms &amp; Fragments
+                </p>
+              </div>
+            </div>
+          </Link>
+          <Link href="/docs/color-usage" className="h-full flex">
+            <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
+              <div className="flex flex-col gap-2 min-h-[24px]">
+                <HomepageSvgHandler name="colours" className="w-6 h-6" />
               </div>
               <div>
                 <h3 className="font-medium text-foreground">Colors</h3>
@@ -88,27 +62,33 @@ export default function Home() {
             </div>
           </Link>
 
-          <Link href="/docs/theming">
-            <div className="px-10 py-8 min-h-[18rem] flex flex-col justify-between bg-surface-75/50 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
-              <HomepageSvgHandler name="fragments-illustration" />
+          <Link href="/docs/theming" className="h-full flex">
+            <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
+              <div className="flex items-center justify-start min-h-[24px] text-brand">
+                <Paintbrush className="w-6 h-6" strokeWidth={1.5} stroke="currentColor" />
+              </div>
               <div>
                 <h3 className="font-medium text-foreground">Theming</h3>
-                <p className="text-sm text-foreground-light">Components assembled from Atoms</p>
+                <p className="text-sm text-foreground-light">Simple extensible theming system</p>
               </div>
             </div>
           </Link>
 
-          <Link href="/docs/icons">
-            <div className="px-10 py-8 min-h-[18rem] flex flex-col justify-between bg-surface-75/50 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
-              <HomepageSvgHandler name="fragments-illustration" />
+          <Link href="/docs/icons" className="h-full flex">
+            <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
+              <div className="flex items-center justify-start min-h-[24px] gap-3 text-brand">
+                <Realtime className="w-5 h-5" strokeWidth={1.5} stroke="currentColor" />
+                <Database className="w-5 h-5 opacity-60" strokeWidth={1.5} stroke="currentColor" />
+                <Auth className="w-5 h-5 opacity-30" strokeWidth={1.5} stroke="currentColor" />
+              </div>
               <div>
                 <h3 className="font-medium text-foreground">Icons</h3>
-                <p className="text-sm text-foreground-light">Components assembled from Atoms</p>
+                <p className="text-sm text-foreground-light">Custom icons for Supabase</p>
               </div>
             </div>
           </Link>
         </div>
       </div>
-    </main>
+    </div>
   )
 }
