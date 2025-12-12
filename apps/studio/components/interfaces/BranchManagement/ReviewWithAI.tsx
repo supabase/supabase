@@ -1,10 +1,14 @@
-import { AiIconAnimation } from 'ui'
-import { useProjectByRef } from 'hooks/misc/useSelectedProject'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { Branch } from 'data/branches/branches-query'
-import { tablesToSQL } from 'lib/helpers'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { Branch } from 'data/branches/branches-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { tablesToSQL } from 'lib/helpers'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { AiIconAnimation } from 'ui'
 
 interface ReviewWithAIProps {
   currentBranch?: Branch
@@ -22,9 +26,12 @@ export const ReviewWithAI = ({
   disabled = false,
 }: ReviewWithAIProps) => {
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   // Get parent project for production schema
-  const parentProject = useProjectByRef(parentProjectRef)
+  const { data: parentProject } = useProjectDetailQuery({ ref: parentProjectRef })
 
   // Fetch production schema tables
   const { data: productionTables } = useTablesQuery(
@@ -40,6 +47,15 @@ export const ReviewWithAI = ({
   const handleReviewWithAssistant = () => {
     if (!currentBranch || !mainBranch) return
 
+    // Track review with assistant button pressed
+    sendEvent({
+      action: 'branch_review_with_assistant_clicked',
+      groups: {
+        project: parentProjectRef ?? 'Unknown',
+        organization: selectedOrg?.slug ?? 'Unknown',
+      },
+    })
+
     // Prepare diff content for the assistant
     const sqlSnippets = []
 
@@ -49,7 +65,7 @@ export const ReviewWithAI = ({
       if (productionSQL.trim()) {
         sqlSnippets.push({
           label: 'Production Schema',
-          content: productionSQL,
+          content: 'CURRENT PRODUCTION SCHEMA:\n' + productionSQL,
         })
       }
     }
@@ -58,26 +74,15 @@ export const ReviewWithAI = ({
     if (diffContent && diffContent.trim()) {
       sqlSnippets.push({
         label: 'Database Changes',
-        content: '-- DATABASE CHANGES:\n' + diffContent,
+        content: '-- DATABASE CHANGES TO BE MERGED IN:\n' + diffContent,
       })
     }
 
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     aiSnap.newChat({
       name: `Review merge: ${currentBranch.name} → ${mainBranch.name}`,
-      open: true,
       sqlSnippets: sqlSnippets.length > 0 ? sqlSnippets : undefined,
-      initialInput: `Please review this merge request from branch "${currentBranch.name}" into "${mainBranch.name || 'main'}". 
-
-I've included the current production schema as context, along with the proposed database changes.
-
-Analyze the changes and provide feedback on:
-- Database schema changes and potential impacts on the production schema
-- Migration safety and rollback considerations
-- Overall code quality and best practices
-- Potential breaking changes or compatibility issues
-- Data integrity and constraint implications
-
-Please be concise with your response.`,
+      initialInput: `I want to run the attached database changes on my production database branch as part of a branch merge from "${currentBranch.name}" into "${mainBranch.name || 'main'}". I've included the current production database schema as extra context. Please analyze the proposed schema changes and provide concise feedback on their impact on the production schema including any migration concerns and potential conflicts.`,
       suggestions: {
         title: `I can help you review the database schema changes from "${currentBranch.name}" to "${mainBranch.name}", here are some specific areas I can focus on:`,
         prompts: [

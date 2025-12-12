@@ -2,15 +2,15 @@ import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, noop, partition } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { Dictionary } from 'types'
 import { SidePanel } from 'ui'
-import ActionBar from '../ActionBar'
+import { ActionBar } from '../ActionBar'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
-import ForeignRowSelector from './ForeignRowSelector/ForeignRowSelector'
-import HeaderTitle from './HeaderTitle'
-import InputField from './InputField'
+import { ForeignRowSelector } from './ForeignRowSelector/ForeignRowSelector'
+import { HeaderTitle } from './HeaderTitle'
+import { InputField } from './InputField'
 import { JsonEditor } from './JsonEditor'
 import type { EditValue, RowField } from './RowEditor.types'
 import {
@@ -32,7 +32,9 @@ export interface RowEditorProps {
   updateEditorDirty: () => void
 }
 
-const RowEditor = ({
+const formId = 'row-editor-panel'
+
+export const RowEditor = ({
   row,
   selectedTable,
   visible = false,
@@ -61,7 +63,7 @@ const RowEditor = ({
     (rowField: any) => !rowField.isNullable
   )
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -157,7 +159,8 @@ const RowEditor = ({
 
   return (
     <SidePanel
-      hideFooter
+      data-testid="side-panel-row-editor"
+      // hideFooter
       size="large"
       key="RowEditor"
       visible={visible}
@@ -166,8 +169,18 @@ const RowEditor = ({
         isEditingText || isEditingJson || isSelectingForeignKey ? ' mr-32' : ''
       }`}
       onCancel={closePanel}
+      customFooter={
+        <ActionBar
+          loading={loading}
+          formId={formId}
+          backButtonLabel="Cancel"
+          applyButtonLabel="Save"
+          closePanel={closePanel}
+          hideApply={!editable}
+        />
+      }
     >
-      <form onSubmit={(e) => onSaveChanges(e)} className="h-full">
+      <form id={formId} onSubmit={(e) => onSaveChanges(e)} className="h-full">
         <div className="flex h-full flex-col">
           <div className="flex flex-grow flex-col">
             {requiredFields.length > 0 && (
@@ -243,15 +256,6 @@ const RowEditor = ({
               readOnly={!editable}
             />
           </div>
-          <div className="flex-shrink">
-            <ActionBar
-              loading={loading}
-              backButtonLabel="Cancel"
-              applyButtonLabel="Save"
-              closePanel={closePanel}
-              hideApply={!editable}
-            />
-          </div>
         </div>
       </form>
 
@@ -268,5 +272,3 @@ const RowEditor = ({
     </SidePanel>
   )
 }
-
-export default RowEditor

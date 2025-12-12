@@ -5,15 +5,22 @@ import { cn } from 'ui/src/lib/utils/cn'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import React from 'react'
+import { useMobileSidebar } from '@/hooks/use-mobile-sidebar'
 
-const NavigationItem: React.FC<{ item: SidebarNavItem }> = React.memo(({ item }) => {
+export const NavigationItem: React.FC<{ item: SidebarNavItem }> = React.memo(({ item }) => {
   const pathname = usePathname()
+  const { setOpen } = useMobileSidebar()
 
   const isActive = pathname === item.href
+
+  const handleClick = () => {
+    setOpen(false)
+  }
 
   return (
     <Link
       href={`${item.href}`}
+      onClick={handleClick}
       className={cn(
         'relative',
         'flex',
@@ -40,5 +47,3 @@ const NavigationItem: React.FC<{ item: SidebarNavItem }> = React.memo(({ item })
 })
 
 NavigationItem.displayName = 'NavigationItem'
-
-export default NavigationItem

@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Input, SidePanel } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 interface SchemaEditorProps {
   visible: boolean
@@ -11,13 +11,13 @@ interface SchemaEditorProps {
   closePanel: () => void
 }
 
-const SchemaEditor = ({ visible, onSuccess, closePanel }: SchemaEditorProps) => {
-  const { project } = useProjectContext()
+export const SchemaEditor = ({ visible, onSuccess, closePanel }: SchemaEditorProps) => {
+  const { data: project } = useSelectedProjectQuery()
 
   const [errors, setErrors] = useState<{ name?: string }>({ name: undefined })
   const [name, setName] = useState('')
 
-  const { mutateAsync: createSchema, isLoading } = useSchemaCreateMutation()
+  const { mutateAsync: createSchema, isPending } = useSchemaCreateMutation()
 
   useEffect(() => {
     if (visible) {
@@ -56,7 +56,7 @@ const SchemaEditor = ({ visible, onSuccess, closePanel }: SchemaEditorProps) => 
       className="transition-all duration-100 ease-in"
       onCancel={closePanel}
       onConfirm={onSaveChanges}
-      loading={isLoading}
+      loading={isPending}
       cancelText="Cancel"
       confirmText="Save"
     >
@@ -77,5 +77,3 @@ const SchemaEditor = ({ visible, onSuccess, closePanel }: SchemaEditorProps) => 
     </SidePanel>
   )
 }
-
-export default SchemaEditor

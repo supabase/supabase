@@ -34,9 +34,9 @@ const { data, error } = await supabase
   .not('id', 'in', '(5,6,7,8,9,...10,000)')
 ```
 
-To circumvent this issue, you must use [RPCs](https://supabase.com/docs/reference/javascript/explain?queryGroups=example&example=call-a-postgres-function-with-arguments). They are database functions that you can call from the API. Instead of including a query's structure within the URL or header, they move it into the request's payload.
+To circumvent this issue, you must use [RPCs](/docs/reference/javascript/explain?queryGroups=example&example=call-a-postgres-function-with-arguments). They are database functions that you can call from the API. Instead of including a query's structure within the URL or header, they move it into the request's payload.
 
-Here is a basic example of a [database function](https://supabase.com/docs/guides/database/functions)
+Here is a basic example of a [database function](/docs/guides/database/functions)
 
 ```sql
 create or replace function example(id uuid[])
@@ -50,7 +50,7 @@ end;
 $$;
 ```
 
-The [RPC](https://supabase.com/docs/reference/javascript/explain?queryGroups=example&example=call-a-postgres-function-with-arguments) can then call the function with an array that contains more than 16KB of data
+The [RPC](/docs/reference/javascript/explain?queryGroups=example&example=call-a-postgres-function-with-arguments) can then call the function with an array that contains more than 16KB of data
 
 ```javascript
 const { data, error } = await supabase.rpc('example', { id: ['e2f34fb9-bbf9-4649-9b2f-09ec56e67a42', ...900 more UUIDs] })

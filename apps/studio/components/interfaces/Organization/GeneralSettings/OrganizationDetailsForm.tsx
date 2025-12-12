@@ -11,8 +11,8 @@ import CopyButton from 'components/ui/CopyButton'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import type { ResponseError } from 'types'
 import {
   Card,
@@ -33,10 +33,14 @@ const OrgDetailsSchema = z.object({
 export const OrganizationDetailsForm = () => {
   const { slug } = useParams()
   const queryClient = useQueryClient()
-  const selectedOrganization = useSelectedOrganization()
-  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const { mutate: updateOrganization, isLoading: isUpdatingDetails } =
+  const { can: canUpdateOrganization } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'organizations'
+  )
+
+  const { mutate: updateOrganization, isPending: isUpdatingDetails } =
     useOrganizationUpdateMutation()
 
   const orgDetailsForm = useForm<z.infer<typeof OrgDetailsSchema>>({
@@ -81,18 +85,14 @@ export const OrganizationDetailsForm = () => {
         onSubmit={orgDetailsForm.handleSubmit(onUpdateOrganizationDetails)}
       >
         <Card>
-          <CardContent className="pt-6">
+          <CardContent>
             <FormField_Shadcn_
               control={orgDetailsForm.control}
               name="name"
               render={({ field }) => (
                 <FormItemLayout label="Organization name" layout="flex-row-reverse">
                   <FormControl_Shadcn_>
-                    <Input
-                      {...field}
-                      className="w-96 max-w-full"
-                      disabled={!canUpdateOrganization || isUpdatingDetails}
-                    />
+                    <Input {...field} disabled={!canUpdateOrganization || isUpdatingDetails} />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
@@ -101,16 +101,12 @@ export const OrganizationDetailsForm = () => {
           <CardContent>
             <FormItemLayout label="Organization slug" layout="flex-row-reverse">
               <PrePostTab
+                className="w-full [&>div:first-child]:flex-grow [&>div:last-child]:px-1.5"
                 postTab={
                   <CopyButton type="text" iconOnly text={selectedOrganization?.slug ?? ''} />
                 }
               >
-                <Input
-                  disabled
-                  className="w-64 max-w-full"
-                  id="slug"
-                  value={selectedOrganization?.slug ?? ''}
-                />
+                <Input disabled id="slug" value={selectedOrganization?.slug ?? ''} />
               </PrePostTab>
             </FormItemLayout>
           </CardContent>

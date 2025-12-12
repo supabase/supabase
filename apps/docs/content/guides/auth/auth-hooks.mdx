@@ -313,23 +313,37 @@ Hooks return status codes based on the nature of the response. These status code
 | HTTP Status Code | Description                                                   | Example Usage                                  |
 | ---------------- | ------------------------------------------------------------- | ---------------------------------------------- |
 | 200, 202, 204    | Valid response, proceed                                       | Successful processing of the request           |
-| 429, 503         | Retry-able errors with Retry-after header supported           | Temporary server overload or maintenance       |
 | 403, 400         | Treated as Internal Server Errors and return a 500 Error Code | Malformed requests or insufficient permissions |
+| 429, 503         | Retry-able errors                                             | Temporary server overload or maintenance       |
 
-Errors are responses which contain status codes 400 and above. On a retry-able error, such as an error with a `429` or `503` status code, HTTP Hooks will attempt up to three retries with a back-off of two seconds.
+<Admonition type="note">
+
+`204` Status is not supported by the following hooks which require a response body:
+
+- [Custom Access Token](/docs/guides/auth/auth-hooks/custom-access-token-hook)
+- [MFA Verification Attempt](/docs/guides/auth/auth-hooks/mfa-verification-hook)
+- [Password Verification Attempt](/docs/guides/auth/auth-hooks/password-verification-hook)
+
+</Admonition>
+
+Errors are responses which contain status codes 400 and above. On a retry-able error, such as an error with a `429` or `503` status code, HTTP Hooks will attempt up to three retries with a back-off of two seconds. We have a time budget of 5s for the entire webhook invocation, including retry requests.
 
 Here's a sample HTTP retry schedule:
 
-| Time Since Start (HH:MM:SS) | Event                   | Notes                                             |
-| --------------------------- | ----------------------- | ------------------------------------------------- |
-| 00:00:00                    | Initial Attempt         | Initial invocation begins.                        |
-| 00:00:05                    | Initial Attempt Timeout | Initial invocation must complete.                 |
-| 00:00:07                    | Retry Start #1          | After 2 sec delay, first retry begins.            |
-| 00:00:12                    | Retry Timeout #1        | First retry timeout.                              |
-| 00:00:14                    | Retry Start #2          | After 2 sec delay, second retry begins.           |
-| 00:00:19                    | Retry Timeout #2        | Second retry timeout. Returns an error on failure |
+| Time Since Start (HH:MM:SS) | Event                 | Notes                                                                            |
+| --------------------------- | --------------------- | -------------------------------------------------------------------------------- |
+| 00:00:00                    | Initial Attempt       | Initial invocation begins.                                                       |
+| 00:00:02                    | Initial Attempt Fails | Initial invocation returns `429` or `503` with non-empty `retry-after` header.   |
+| 00:00:04                    | Retry Start #1        | After 2 sec delay, first retry begins.                                           |
+| 00:00:05                    | Retry Timeout #1      | First retry times out, exceeded 5 second budget and invocation returns an error. |
 
-Return a retry-able error by attaching a appropriate status code (`429`, `503` ) and a non-empty `retry-after` header
+Return a retry-able error by attaching a appropriate status code (`429`, `503`) and a non-empty `retry-after` header
+
+<Admonition type="note">
+
+`Retry-After` Supabase Auth does not fully support the `Retry-After` header as described in RFC7231, we only check if it is a non-empty value such as `true` or `10`. Setting this to your preferred value is fine as a future update may address this.
+
+</Admonition>
 
 ```jsx
 return new Response(

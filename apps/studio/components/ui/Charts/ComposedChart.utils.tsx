@@ -1,11 +1,11 @@
 'use client'
 
 import dayjs from 'dayjs'
+import { formatBytes } from 'lib/helpers'
 import { useState } from 'react'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
 import { numberFormatter } from './Charts.utils'
-import { formatBytes } from 'lib/helpers'
 
 export interface ReportAttributes {
   id?: string
@@ -37,7 +37,7 @@ export type Provider = 'infra-monitoring' | 'daily-stats' | 'mock' | 'reference-
 
 export type MultiAttribute = {
   attribute: string
-  provider: Provider
+  provider?: Provider
   label?: string
   color?: {
     light: string
@@ -55,6 +55,7 @@ export type MultiAttribute = {
   omitFromTotal?: boolean
   tooltip?: string
   customValue?: number
+  [key: string]: any
   /**
    * Manipulate the value of the attribute before it is displayed on the chart.
    * @param value - The value of the attribute.
@@ -128,7 +129,7 @@ export const calculateTotalChartAggregate = (
     ?.filter((p) => !ignoreAttributes?.includes(p.dataKey))
     .reduce((acc, curr) => acc + curr.value, 0)
 
-const CustomTooltip = ({
+export const CustomTooltip = ({
   active,
   payload,
   label,
@@ -140,16 +141,26 @@ const CustomTooltip = ({
   isActiveHoveredChart,
 }: TooltipProps) => {
   if (active && payload && payload.length) {
+    /**
+     * Depending on the data source, the timestamp key could be 'timestamp' or 'period_start'
+     */
+    const firstItem = payload[0].payload
+    const timestampKey = firstItem?.hasOwnProperty('timestamp') ? 'timestamp' : 'period_start'
+    const timestamp = payload[0].payload[timestampKey]
     const maxValueAttribute = isMaxAttribute(attributes)
     const maxValueData =
       maxValueAttribute && payload?.find((p: any) => p.dataKey === maxValueAttribute.attribute)
     const maxValue = maxValueData?.value
-    const isRamChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
+    const isRamChart =
+      !payload?.some((p: any) => p.dataKey.toLowerCase() === 'ram_usage') &&
+      payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
     const isDBSizeChart =
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_fs_')) ||
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('pg_database_size'))
     const isNetworkChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('network_'))
-    const shouldFormatBytes = isRamChart || isDBSizeChart || isNetworkChart
+    const isBytesFormat = format === 'bytes' || format === 'bytes-per-second'
+    const shouldFormatBytes = isBytesFormat || isRamChart || isDBSizeChart || isNetworkChart
+    const byteUnitSuffix = format === 'bytes-per-second' ? '/s' : ''
 
     const attributesToIgnore =
       attributes?.filter((a) => a.omitFromTotal)?.map((a) => a.attribute) ?? []
@@ -164,10 +175,19 @@ const CustomTooltip = ({
       ...(maxValueAttribute?.attribute ? [maxValueAttribute.attribute] : []),
     ]
 
+    const localTimeZone = dayjs.tz.guess()
+
     const total = showTotal && calculateTotalChartAggregate(payload, attributesToIgnoreFromTotal)
 
     const getIcon = (color: string, isMax: boolean) =>
       isMax ? <MaxConnectionsIcon /> : <CustomIcon color={color} />
+
+    const formatNumeric = (value: number) => {
+      if (!shouldFormatBytes && valuePrecision === 0 && value > 0 && value < 1) return '<1'
+      return shouldFormatBytes
+        ? formatBytes(isNetworkChart ? Math.abs(value) : value, valuePrecision)
+        : numberFormatter(value, valuePrecision)
+    }
 
     const LabelItem = ({ entry }: { entry: any }) => {
       const attribute = attributes?.find((a: MultiAttribute) => a?.attribute === entry.name)
@@ -181,9 +201,7 @@ const CustomTooltip = ({
             {attribute?.label || entry.name}
           </span>
           <span className="ml-3.5 flex items-end gap-1">
-            {shouldFormatBytes
-              ? formatBytes(isNetworkChart ? Math.abs(entry.value) : entry.value, valuePrecision)
-              : numberFormatter(entry.value, valuePrecision)}
+            {formatNumeric(entry.value) + (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
             {isPercentage ? '%' : ''}
             {format === 'ms' ? 'ms' : ''}
 
@@ -203,22 +221,19 @@ const CustomTooltip = ({
           !isActiveHoveredChart && 'opacity-0'
         )}
       >
-        <p className="font-medium">{label}</p>
+        <p className="text-foreground-light text-xs">{localTimeZone}</p>
+        <p className="font-medium">{dayjs(timestamp).format(DateTimeFormats.FULL_SECONDS)}</p>
         <div className="grid gap-0">
-          {payload
-            .reverse()
-            .filter((entry: any) => entry.value !== 0)
-            .map((entry: any, index: number) => (
-              <LabelItem key={`${entry.name}-${index}`} entry={entry} />
-            ))}
+          {payload.reverse().map((entry: any, index: number) => (
+            <LabelItem key={`${entry.name}-${index}`} entry={entry} />
+          ))}
           {active && showTotal && (
             <div className="flex md:flex-col gap-1 md:gap-0 text-foreground mt-1">
               <span className="flex-grow text-foreground-lighter">Total</span>
               <div className="flex items-end gap-1">
                 <span className="text-base">
-                  {shouldFormatBytes
-                    ? formatBytes(total as number, valuePrecision)
-                    : numberFormatter(total as number, valuePrecision)}
+                  {formatNumeric(total as number) +
+                    (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
                   {isPercentage ? '%' : ''}
                   {format === 'ms' ? 'ms' : ''}
                 </span>
@@ -246,9 +261,18 @@ interface CustomLabelProps {
   attributes?: MultiAttribute[]
   showMaxValue?: boolean
   onLabelHover?: (label: string | null) => void
+  onToggleAttribute?: (attribute: string, options?: { exclusive?: boolean }) => void
+  hiddenAttributes?: Set<string>
 }
 
-const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: CustomLabelProps) => {
+export const CustomLabel = ({
+  payload,
+  attributes,
+  showMaxValue,
+  onLabelHover,
+  onToggleAttribute,
+  hiddenAttributes,
+}: CustomLabelProps) => {
   const items = payload ?? []
   const maxValueAttribute = isMaxAttribute(attributes)
   const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
@@ -275,17 +299,13 @@ const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: Custom
   const LabelItem = ({ entry }: { entry: any }) => {
     const attribute = attributes?.find((a) => a.attribute === entry.name)
     const isMax = entry.name === maxValueAttribute?.attribute
-    const isHovered = hoveredLabel === entry.name
+    const isHidden = hiddenAttributes?.has(entry.name)
+    const color = isHidden ? 'gray' : entry.color
 
     const Label = () => (
-      <div className="flex items-center gap-1 p-1">
-        {getIcon(entry.name, entry.color)}
-        <span
-          className={cn(
-            'text-nowrap text-foreground-lighter cursor-default select-none',
-            hoveredLabel && !isHovered && 'opacity-50'
-          )}
-        >
+      <div className="flex items-center gap-1">
+        {getIcon(entry.name, color)}
+        <span className={cn('text-nowrap text-foreground-lighter', isHidden && 'opacity-50')}>
           {attribute?.label || entry.name}
         </span>
       </div>
@@ -294,35 +314,36 @@ const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: Custom
     if (!showMaxValue && isMax) return null
 
     return (
-      <div
+      <button
         key={entry.name}
-        className="inline-flex md:flex-col gap-1 md:gap-0 w-fit text-foreground"
+        className="flex md:flex-col gap-1 md:gap-0 w-fit text-foreground rounded-lg  hover:bg-background-overlay-hover"
         onMouseOver={() => handleMouseEnter(entry.name)}
         onMouseOutCapture={handleMouseLeave}
+        onClick={(e) => onToggleAttribute?.(entry.name, { exclusive: e.metaKey || e.ctrlKey })}
       >
         {!!attribute?.tooltip ? (
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger className="p-1.5">
               <Label />
             </TooltipTrigger>
-            <TooltipContent side="bottom" align="center" className="max-w-[250px]">
+            <TooltipContent sideOffset={6} side="bottom" align="center" className="max-w-[250px]">
               {attribute.tooltip}
             </TooltipContent>
           </Tooltip>
         ) : (
           <Label />
         )}
-      </div>
+      </button>
     )
   }
 
   return (
-    <div className="relative z-0 mx-auto flex flex-col items-center gap-1 text-xs w-full">
+    <div className="relative z-10 mx-auto flex flex-col items-center gap-1 text-xs w-full">
       <div className="flex flex-wrap items-center justify-center gap-2">
-        {items?.map((entry, index) => <LabelItem key={`${entry.name}-${index}`} entry={entry} />)}
+        <TooltipProvider delayDuration={800}>
+          {items?.map((entry, index) => <LabelItem key={`${entry.name}-${index}`} entry={entry} />)}
+        </TooltipProvider>
       </div>
     </div>
   )
 }
-
-export { CustomLabel, CustomTooltip }

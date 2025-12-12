@@ -1,4 +1,3 @@
-import AlertError from 'components/ui/AlertError'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { Skeleton } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -8,26 +7,34 @@ export const OrgNotFound = ({ slug }: { slug?: string }) => {
   const {
     data: organizations,
     isSuccess: isOrganizationsSuccess,
-    isLoading: isOrganizationsLoading,
+    isPending: isOrganizationsLoading,
     isError: isOrganizationsError,
     error: organizationsError,
   } = useOrganizationsQuery()
 
   return (
     <>
-      <Admonition type="danger">
-        The selected organization does not exist or you don't have permission to access it.{' '}
-        {slug ? (
-          <>
-            Contact the owner or administrator to create a new project in the <code>{slug}</code>{' '}
-            organization.
-          </>
-        ) : (
-          <>Contact the owner or administrator to create a new project.</>
-        )}
-      </Admonition>
+      {slug !== '_' && (
+        <Admonition
+          type="destructive"
+          title="Organization not found"
+          description={
+            <>
+              {slug ? (
+                <>
+                  The organization <code className="text-code-inline">{slug}</code>{' '}
+                </>
+              ) : (
+                <>This organization </>
+              )}
+              does not exist or you do not have permission to access to it. Contact the the owner if
+              you believe this is a mistake.
+            </>
+          }
+        />
+      )}
 
-      <h3 className="text-sm">Select an organization to create your new project from</h3>
+      <h3 className="text-sm">Select a different organization to create your new project in</h3>
 
       <div className="grid gap-2 grid-cols-2">
         {isOrganizationsLoading && (
@@ -38,7 +45,11 @@ export const OrgNotFound = ({ slug }: { slug?: string }) => {
           </>
         )}
         {isOrganizationsError && (
-          <AlertError error={organizationsError} subject="Failed to load organizations" />
+          <Admonition
+            type="destructive"
+            title="Failed to load organizations"
+            description={organizationsError?.message}
+          />
         )}
         {isOrganizationsSuccess &&
           organizations?.map((org) => (

@@ -1,9 +1,9 @@
-import { useConstant } from 'common'
+import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { partition } from 'lodash'
 import { NextRouter } from 'next/router'
-import { createContext, PropsWithChildren, ReactNode, useContext, useEffect } from 'react'
+import { createContext, PropsWithChildren, ReactNode, useContext, useEffect, useState } from 'react'
 import { proxy, subscribe, useSnapshot } from 'valtio'
 
 export const editorEntityTypes = {
@@ -78,6 +78,7 @@ const DEFAULT_TABS_STATE = {
   openTabs: [] as string[],
   tabsMap: {} as { [key: string]: Tab },
   previewTabId: undefined as string | undefined,
+  recentItems: [],
 }
 const TABS_STORAGE_KEY = 'supabase_studio_tabs'
 const getTabsStorageKey = (ref: string) => `${TABS_STORAGE_KEY}_${ref}`
@@ -168,6 +169,9 @@ function createTabsState(projectRef: string) {
     tabsMap,
     previewTabId,
 
+    hasTab: (id: string) => {
+      return !!store.tabsMap[id]
+    },
     addTab: (tab: Tab) => {
       // If tab exists and is active, don't do anything
       if (store.tabsMap[tab.id] && store.activeTab === tab.id) {
@@ -286,7 +290,7 @@ function createTabsState(projectRef: string) {
         case 'f':
         case 'p':
           router.push(
-            `/project/${router.query.ref}/editor/${tab.metadata?.tableId}?schema=${tab.metadata?.schema}`
+            `/project/${router.query.ref}/editor/${tab.metadata?.tableId}?schema=${tab.metadata?.schema}&${LOAD_TAB_FROM_CACHE_PARAM}=true`
           )
           break
       }
@@ -305,13 +309,22 @@ function createTabsState(projectRef: string) {
       onClearDashboardHistory: () => void
     }) => {
       const tabBeingClosed = store.tabsMap[id]
-      const tabsAfterClosing = Object.values(store.tabsMap).filter((tab) => tab.id !== id)
 
-      const nextTabId = !editor
-        ? undefined
-        : tabsAfterClosing.filter((tab) => {
-            return editorEntityTypes[editor]?.includes(tab.type)
-          })[0]?.id
+      const editorTabIds = (
+        editor
+          ? Object.values(store.tabsMap).filter((tab) =>
+              editorEntityTypes[editor]?.includes(tab.type)
+            )
+          : []
+      ).map((tab) => tab.id)
+      const tabIndexBeingClosed = editorTabIds.indexOf(id)
+      const isLastTabBeingClosed = tabIndexBeingClosed === editorTabIds.length - 1
+      const nextTabId =
+        editorTabIds.length === 1
+          ? undefined
+          : isLastTabBeingClosed
+            ? editorTabIds[tabIndexBeingClosed - 1]
+            : editorTabIds[tabIndexBeingClosed + 1]
 
       const { [id]: value, ...otherTabs } = store.tabsMap
       store.tabsMap = otherTabs
@@ -347,7 +360,7 @@ function createTabsState(projectRef: string) {
               router.push(`/project/${router.query.ref}/editor`)
               break
             default:
-              router.push(`/project/${router.query.ref}/${editor}`)
+              router.push(`/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}`)
           }
         }
       }
@@ -399,8 +412,14 @@ export type TabsState = ReturnType<typeof createTabsState>
 export const TabsStateContext = createContext<TabsState>(createTabsState(''))
 
 export const TabsStateContextProvider = ({ children }: PropsWithChildren) => {
-  const project = useSelectedProject()
-  const state = useConstant(() => createTabsState(project?.ref ?? ''))
+  const { data: project } = useSelectedProjectQuery()
+  const [state, setState] = useState(createTabsState(project?.ref ?? ''))
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !!project?.ref) {
+      setState(createTabsState(project?.ref ?? ''))
+    }
+  }, [project?.ref])
 
   useEffect(() => {
     if (typeof window !== 'undefined' && project?.ref) {
@@ -422,8 +441,7 @@ export const TabsStateContextProvider = ({ children }: PropsWithChildren) => {
         )
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [project?.ref, state])
 
   return <TabsStateContext.Provider value={state}>{children}</TabsStateContext.Provider>
 }

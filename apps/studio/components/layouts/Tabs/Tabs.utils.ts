@@ -31,7 +31,7 @@ export function useTableEditorTabsCleanUp() {
       tabsFilteredToSchemas.push(
         ...openTabsRef.current.filter((tabId) => {
           const tab = tabMapRef.current[tabId]
-          return tab.metadata?.schema === schema
+          return tab?.metadata?.schema === schema
         })
       )
     }
@@ -50,7 +50,7 @@ export function useTableEditorTabsCleanUp() {
     // e.g Using the SQL editor to rename the entity
     const openTabs = openTabsRef.current
       .map((id) => tabMapRef.current[id])
-      .filter((tab) => editorEntityTypes['table']?.includes(tab.type))
+      .filter((tab) => !!tab && editorEntityTypes['table']?.includes(tab.type))
 
     openTabs.forEach((tab) => {
       const entity = entities?.find((x) => tab.metadata?.tableId === x.id)
@@ -97,7 +97,7 @@ export function useSqlEditorTabsCleanup() {
     // e.g for a shared snippet, the owner could've updated the name of the snippet
     const openSqlTabs = openTabsRef.current
       .map((id) => tabMapRef.current[id])
-      .filter((tab) => editorEntityTypes['sql']?.includes(tab.type))
+      .filter((tab) => !!tab && editorEntityTypes['sql']?.includes(tab.type))
 
     openSqlTabs.forEach((tab) => {
       const snippet = snippets?.find((x) => tab.metadata?.sqlId === x.id)

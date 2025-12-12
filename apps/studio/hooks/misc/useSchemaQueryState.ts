@@ -12,7 +12,12 @@ const useIsomorphicUseQueryState = (defaultSchema: string) => {
     return [defaultSchema, () => {}] as const
   } else {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    return useQueryState('schema', parseAsString.withDefault(defaultSchema))
+    return useQueryState(
+      'schema',
+      parseAsString.withDefault(defaultSchema).withOptions({
+        clearOnDefault: false,
+      })
+    )
   }
 }
 

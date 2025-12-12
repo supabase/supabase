@@ -1,30 +1,53 @@
-import dayjs from 'dayjs'
-import Link from 'next/link'
+import { Search } from 'lucide-react'
 import { useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Table from 'components/to-be-cleaned/Table'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
+import { InlineLink } from 'components/ui/InlineLink'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
-import { Search } from 'lucide-react'
-import { Button, Input, SidePanel } from 'ui'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
+import { parseMigrationVersion } from 'lib/migration-utils'
+import {
+  Button,
+  Card,
+  cn,
+  SidePanel,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { Admonition } from 'ui-patterns'
-import MigrationsEmptyState from './MigrationsEmptyState'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { MigrationsEmptyState } from './MigrationsEmptyState'
 
 const Migrations = () => {
   const [search, setSearch] = useState('')
   const [selectedMigration, setSelectedMigration] = useState<DatabaseMigration>()
 
-  const { project } = useProjectContext()
-  const { data, isLoading, isSuccess, isError, error } = useMigrationsQuery({
+  const { data: project } = useSelectedProjectQuery()
+  const {
+    data = [],
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    error,
+  } = useMigrationsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   const migrations =
     search.length === 0
-      ? data ?? []
-      : data?.filter(
+      ? data
+      : data.filter(
           (migration) => migration.version.includes(search) || migration.name?.includes(search)
         ) ?? []
 
@@ -54,11 +77,15 @@ const Migrations = () => {
             }
           >
             <Button key="contact-support" asChild type="default">
-              <Link
-                href={`/support/new?projectRef=${project?.ref}&category=dashboard_bug&subject=Unable%20to%20view%20database%20migrations`}
+              <SupportLink
+                queryParams={{
+                  projectRef: project?.ref,
+                  category: SupportCategories.DASHBOARD_BUG,
+                  subject: 'Unable to view database migrations',
+                }}
               >
                 Contact support
-              </Link>
+              </SupportLink>
             </Button>
           </Admonition>
         )}
@@ -67,70 +94,87 @@ const Migrations = () => {
             {data.length <= 0 && <MigrationsEmptyState />}
 
             {data.length > 0 && (
-              <>
-                <div className="w-80 mb-4">
-                  <Input
-                    size="small"
-                    placeholder="Search for a migration"
-                    value={search}
-                    onChange={(e: any) => setSearch(e.target.value)}
-                    icon={<Search size="14" />}
-                  />
-                </div>
-                <Table
-                  head={[
-                    <Table.th key="version" style={{ width: '180px' }}>
-                      Version
-                    </Table.th>,
-                    <Table.th key="version">Name</Table.th>,
-                    <Table.th key="version">Inserted at (UTC)</Table.th>,
-                    <Table.th key="buttons"></Table.th>,
-                  ]}
-                  body={
-                    migrations.length > 0 ? (
-                      migrations.map((migration) => {
-                        // [Joshen] LEFT OFF HERE
-                        const insertedAt = dayjs(migration.version, 'YYYYMMDDHHmmss').format(
-                          'DD MMM YYYY, HH:mm:ss'
-                        )
-
-                        return (
-                          <Table.tr key={migration.version}>
-                            <Table.td>{migration.version}</Table.td>
-                            <Table.td
-                              className={
-                                (migration?.name ?? '').length === 0
-                                  ? '!text-foreground-lighter'
-                                  : ''
-                              }
-                            >
-                              {migration?.name ?? 'Name not available'}
-                            </Table.td>
-                            <Table.td>{insertedAt}</Table.td>
-                            <Table.td align="right">
-                              <Button
-                                type="default"
-                                onClick={() => setSelectedMigration(migration)}
-                              >
-                                View migration SQL
-                              </Button>
-                            </Table.td>
-                          </Table.tr>
-                        )
-                      })
-                    ) : (
-                      <Table.tr>
-                        <Table.td colSpan={3}>
-                          <p className="text-sm text-foreground">No results found</p>
-                          <p className="text-sm text-foreground-light">
-                            Your search for "{search}" did not return any results
-                          </p>
-                        </Table.td>
-                      </Table.tr>
-                    )
-                  }
+              <div className="flex flex-col gap-y-4">
+                <Input
+                  size="tiny"
+                  placeholder="Search for a migration"
+                  value={search}
+                  className="w-full lg:w-52"
+                  onChange={(e: any) => setSearch(e.target.value)}
+                  icon={<Search />}
                 />
-              </>
+                <Card>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead key="version" style={{ width: '180px' }}>
+                          Version
+                        </TableHead>
+                        <TableHead key="name">Name</TableHead>
+                        <TableHead key="insertedAt">Inserted at (UTC)</TableHead>
+                        <TableHead key="buttons" />
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {migrations.length > 0 ? (
+                        migrations.map((migration) => {
+                          const versionDayjs = parseMigrationVersion(migration.version)
+                          const insertedAt = versionDayjs
+                            ? versionDayjs.format('DD MMM YYYY, HH:mm:ss')
+                            : undefined
+
+                          return (
+                            <TableRow key={migration.version}>
+                              <TableCell>{migration.version}</TableCell>
+                              <TableCell
+                                className={cn(
+                                  (migration?.name ?? '').length === 0 && '!text-foreground-lighter'
+                                )}
+                              >
+                                {migration?.name ?? 'Name not available'}
+                              </TableCell>
+                              <TableCell className={cn(!insertedAt && 'text-foreground-lighter')}>
+                                <Tooltip>
+                                  <TooltipTrigger>{insertedAt ?? 'Unknown'}</TooltipTrigger>
+                                  {!insertedAt && (
+                                    <TooltipContent side="right" className="w-64 text-center">
+                                      This migration was not generated via the{' '}
+                                      <InlineLink
+                                        href={`${DOCS_URL}/guides/deployment/database-migrations`}
+                                      >
+                                        Supabase CLI
+                                      </InlineLink>{' '}
+                                      and hence we're unable to parse when this migration was
+                                      inserted at.
+                                    </TooltipContent>
+                                  )}
+                                </Tooltip>
+                              </TableCell>
+                              <TableCell align="right">
+                                <Button
+                                  type="default"
+                                  onClick={() => setSelectedMigration(migration)}
+                                >
+                                  View migration SQL
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          )
+                        })
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={3}>
+                            <p className="text-sm text-foreground">No results found</p>
+                            <p className="text-sm text-foreground-light">
+                              Your search for "{search}" did not return any results
+                            </p>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </Card>
+              </div>
             )}
           </div>
         )}

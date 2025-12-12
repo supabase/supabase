@@ -2,6 +2,7 @@ import { PostgresTable } from '@supabase/postgres-meta'
 import { Key } from 'lucide-react'
 import DataGrid, { Column } from 'react-data-grid'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
 import {
@@ -9,11 +10,11 @@ import {
   getColumnDefaultWidth,
 } from 'components/grid/utils/gridColumns'
 import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 interface ReferenceRecordPeekProps {
   table: PostgresTable
@@ -23,9 +24,15 @@ interface ReferenceRecordPeekProps {
 
 export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPeekProps) => {
   const { ref } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
-  const { data, error, isSuccess, isError, isLoading } = useTableRowsQuery(
+  const {
+    data,
+    error,
+    isSuccess,
+    isError,
+    isPending: isLoading,
+  } = useTableRowsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -34,7 +41,7 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
       page: 1,
       limit: 10,
     },
-    { keepPreviousData: true }
+    { placeholderData: keepPreviousData }
   )
 
   const primaryKeys = table.primary_keys.map((x) => x.name)

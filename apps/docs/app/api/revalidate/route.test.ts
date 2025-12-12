@@ -6,7 +6,7 @@ import { headers } from 'next/headers'
 import { NextRequest } from 'next/server'
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest'
 
-import { _handleRevalidateRequest } from './route'
+import { _handleRevalidateRequest } from './route.utils'
 
 // Mock Next.js modules
 vi.mock('next/cache', () => ({

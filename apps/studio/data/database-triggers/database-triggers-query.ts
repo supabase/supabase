@@ -1,6 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
+import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseTriggerKeys } from './keys'
 
 export type DatabaseTriggersVariables = {
@@ -19,7 +20,10 @@ export async function getDatabaseTriggers(
 
   const { data, error } = await get('/platform/pg-meta/{ref}/triggers', {
     params: {
-      header: { 'x-connection-encrypted': connectionString! },
+      header: {
+        'x-connection-encrypted': connectionString!,
+        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
+      },
       path: { ref: projectRef },
       query: undefined as any,
     },
@@ -39,37 +43,33 @@ export const useDatabaseHooksQuery = <TData = DatabaseTriggersData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<DatabaseTriggersData, DatabaseTriggersError, TData> = {}
+  }: UseCustomQueryOptions<DatabaseTriggersData, DatabaseTriggersError, TData> = {}
 ) =>
-  useQuery<DatabaseTriggersData, DatabaseTriggersError, TData>(
-    databaseTriggerKeys.list(projectRef),
-    ({ signal }) => getDatabaseTriggers({ projectRef, connectionString }, signal),
-    {
-      select: (data) => {
-        return data.filter((trigger) => {
-          return (
-            trigger.function_schema === 'supabase_functions' &&
-            (trigger.schema !== 'net' || trigger.function_args.length === 0)
-          )
-        }) as any
-      },
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabaseTriggersData, DatabaseTriggersError, TData>({
+    queryKey: databaseTriggerKeys.list(projectRef),
+    queryFn: ({ signal }) => getDatabaseTriggers({ projectRef, connectionString }, signal),
+    select: (data) => {
+      return data.filter((trigger) => {
+        return (
+          trigger.function_schema === 'supabase_functions' &&
+          (trigger.schema !== 'net' || trigger.function_args.length === 0)
+        )
+      }) as any
+    },
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 
 export const useDatabaseTriggersQuery = <TData = DatabaseTriggersData>(
   { projectRef, connectionString }: DatabaseTriggersVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<DatabaseTriggersData, DatabaseTriggersError, TData> = {}
+  }: UseCustomQueryOptions<DatabaseTriggersData, DatabaseTriggersError, TData> = {}
 ) =>
-  useQuery<DatabaseTriggersData, DatabaseTriggersError, TData>(
-    databaseTriggerKeys.list(projectRef),
-    ({ signal }) => getDatabaseTriggers({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabaseTriggersData, DatabaseTriggersError, TData>({
+    queryKey: databaseTriggerKeys.list(projectRef),
+    queryFn: ({ signal }) => getDatabaseTriggers({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

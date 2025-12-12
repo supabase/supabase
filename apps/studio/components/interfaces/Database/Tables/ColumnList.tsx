@@ -4,17 +4,18 @@ import { Check, ChevronLeft, Edit, MoreVertical, Plus, Search, Trash, X } from '
 import Link from 'next/link'
 import { useState } from 'react'
 
+import { PostgresColumn } from '@supabase/postgres-meta'
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
   DropdownMenu,
@@ -26,15 +27,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
+import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 
 interface ColumnListProps {
   onAddColumn: () => void
-  onEditColumn: (column: any) => void
-  onDeleteColumn: (column: any) => void
+  onEditColumn: (column: PostgresColumn) => void
+  onDeleteColumn: (column: PostgresColumn) => void
 }
 
-const ColumnList = ({
+export const ColumnList = ({
   onAddColumn = noop,
   onEditColumn = noop,
   onDeleteColumn = noop,
@@ -42,12 +43,12 @@ const ColumnList = ({
   const { id: _id, ref } = useParams()
   const id = _id ? Number(_id) : undefined
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const {
     data: selectedTable,
     error,
     isError,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
   } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -63,8 +64,11 @@ const ColumnList = ({
       ? selectedTable?.columns ?? []
       : selectedTable?.columns?.filter((column) => column.name.includes(filterString))) ?? []
 
-  const isLocked = PROTECTED_SCHEMAS.includes(selectedTable?.schema ?? '')
-  const canUpdateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedTable?.schema ?? '' })
+  const { can: canUpdateColumns } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'columns'
+  )
 
   return (
     <div className="space-y-4">
@@ -78,10 +82,10 @@ const ColumnList = ({
             placeholder="Filter columns"
             value={filterString}
             onChange={(e: any) => setFilterString(e.target.value)}
-            icon={<Search size={12} />}
+            icon={<Search />}
           />
         </div>
-        {!isLocked && isTableEntity && (
+        {!isSchemaLocked && isTableEntity && (
           <ButtonTooltip
             icon={<Plus />}
             disabled={!canUpdateColumns}
@@ -100,7 +104,9 @@ const ColumnList = ({
         )}
       </div>
 
-      {isLocked && <ProtectedSchemaWarning schema={selectedTable?.schema ?? ''} entity="columns" />}
+      {isSchemaLocked && (
+        <ProtectedSchemaWarning schema={selectedTable?.schema ?? ''} entity="columns" />
+      )}
 
       {isLoading && <GenericSkeletonLoader />}
 
@@ -114,7 +120,10 @@ const ColumnList = ({
       {isSuccess && (
         <>
           {columns.length === 0 ? (
-            <NoSearchResults />
+            <NoSearchResults
+              searchString={filterString}
+              onResetFilter={() => setFilterString('')}
+            />
           ) : (
             <div>
               <Table
@@ -143,10 +152,10 @@ const ColumnList = ({
                       )}
                     </Table.td>
                     <Table.td>
-                      <code className="text-xs">{x.data_type}</code>
+                      <code className="text-code-inline">{x.data_type}</code>
                     </Table.td>
                     <Table.td className="font-mono text-xs">
-                      <code className="text-xs">{x.format}</code>
+                      <code className="text-code-inline">{x.format}</code>
                     </Table.td>
                     <Table.td className="font-mono text-xs">
                       {x.is_nullable ? (
@@ -156,7 +165,7 @@ const ColumnList = ({
                       )}
                     </Table.td>
                     <Table.td className="text-right">
-                      {!isLocked && isTableEntity && (
+                      {!isSchemaLocked && isTableEntity && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button type="default" className="px-1" icon={<MoreVertical />} />
@@ -183,7 +192,7 @@ const ColumnList = ({
                             <Tooltip>
                               <TooltipTrigger>
                                 <DropdownMenuItem
-                                  disabled={!canUpdateColumns || isLocked}
+                                  disabled={!canUpdateColumns || isSchemaLocked}
                                   onClick={() => onDeleteColumn(x)}
                                   className="space-x-2"
                                 >
@@ -211,5 +220,3 @@ const ColumnList = ({
     </div>
   )
 }
-
-export default ColumnList

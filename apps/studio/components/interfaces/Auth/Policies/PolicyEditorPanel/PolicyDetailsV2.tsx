@@ -1,12 +1,12 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -60,9 +60,12 @@ export const PolicyDetailsV2 = ({
   onUpdateCommand,
   authContext,
 }: PolicyDetailsV2Props) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
-  const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const { can: canUpdatePolicies } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
 
   const { data: tables, isSuccess: isSuccessTables } = useTablesQuery({
     projectRef: project?.ref,
@@ -130,11 +133,9 @@ export const PolicyDetailsV2 = ({
             name="table"
             render={({ field }) => (
               <FormItem_Shadcn_ className="col-span-6 flex flex-col gap-y-1">
-                <FormLabel_Shadcn_ className="flex items-center gap-x-4">
-                  <p className="text-foreground-light text-sm">Table</p>
-                  <p className="text-foreground-light text-sm">
-                    <code className="text-xs">on</code> clause
-                  </p>
+                <FormLabel_Shadcn_>
+                  Table
+                  <code className="text-code-inline">on</code> clause
                 </FormLabel_Shadcn_>
                 {authContext === 'database' && (
                   <FormControl_Shadcn_>
@@ -219,11 +220,8 @@ export const PolicyDetailsV2 = ({
             name="behavior"
             render={({ field }) => (
               <FormItem_Shadcn_ className="col-span-6 flex flex-col gap-y-1">
-                <FormLabel_Shadcn_ className="flex items-center gap-x-4">
-                  <p className="text-foreground-light text-sm">Policy Behavior</p>
-                  <p className="text-foreground-light text-sm">
-                    <code className="text-xs">as</code> clause
-                  </p>
+                <FormLabel_Shadcn_>
+                  Policy Behavior <code className="text-code-inline">as</code> clause
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
                   <Select_Shadcn_
@@ -261,11 +259,8 @@ export const PolicyDetailsV2 = ({
             name="command"
             render={({ field }) => (
               <FormItem_Shadcn_ className="col-span-12 flex flex-col gap-y-1">
-                <FormLabel_Shadcn_ className="flex items-center gap-x-4">
-                  <p className="text-foreground-light text-sm">Policy Command</p>
-                  <p className="text-foreground-light text-sm">
-                    <code className="text-xs">for</code> clause
-                  </p>
+                <FormLabel_Shadcn_>
+                  Policy Command <code className="text-code-inline">for</code> clause
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
                   <RadioGroup_Shadcn_
@@ -302,11 +297,8 @@ export const PolicyDetailsV2 = ({
             name="roles"
             render={({ field }) => (
               <FormItem_Shadcn_ className="col-span-12 flex flex-col gap-y-1">
-                <FormLabel_Shadcn_ className="flex items-center gap-x-4">
-                  <p className="text-foreground-light text-sm">Target Roles</p>
-                  <p className="text-foreground-light text-sm">
-                    <code className="text-xs">to</code> clause
-                  </p>
+                <FormLabel_Shadcn_>
+                  Target Roles <code className="text-code-inline">to</code> clause
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
                   <MultiSelectV2

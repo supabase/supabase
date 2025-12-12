@@ -4,35 +4,33 @@ import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsMFAEnabled, useParams } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
 import useLatest from 'hooks/misc/useLatest'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
 
 // Ideally these could all be within a _middleware when we use Next 12
-const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
+export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const { ref, slug, id } = useParams()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const isLoggedIn = useIsLoggedIn()
-  const snap = useAppStateSnapshot()
   const isUserMFAEnabled = useIsMFAEnabled()
 
-  const organization = useSelectedOrganization()
-
-  const [dashboardHistory, _, { isSuccess: isSuccessStorage }] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.DASHBOARD_HISTORY(ref ?? ''),
-    { editor: undefined, sql: undefined }
-  )
-
-  const [__, setLastVisitedOrganization] = useLocalStorageQuery(
+  const { setLastVisitedSnippet, setLastVisitedTable } = useDashboardHistory()
+  const [lastVisitedOrganization, setLastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''
   )
 
-  const DEFAULT_HOME = IS_PLATFORM ? '/organizations' : '/project/default'
+  const DEFAULT_HOME = IS_PLATFORM
+    ? !!lastVisitedOrganization
+      ? `/org/${lastVisitedOrganization}`
+      : '/organizations'
+    : '/project/default'
 
   /**
    * Array of urls/routes that should be ignored
@@ -54,6 +52,8 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   function isExceptUrl() {
     return excemptUrls.includes(router?.pathname)
   }
+
+  const { isError: isErrorProject } = useProjectDetailQuery({ ref })
 
   const { data: organizations, isSuccess: orgsInitialized } = useOrganizationsQuery({
     enabled: isLoggedIn,
@@ -77,50 +77,28 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     }
   }, [orgsInitialized])
 
-  const { data: projects, isSuccess: projectsInitialized } = useProjectsQuery({
-    enabled: isLoggedIn,
-  })
-  const projectsRef = useLatest(projects)
-
   useEffect(() => {
     // check if current route is excempted from route validation check
     if (isExceptUrl() || !isLoggedIn) return
 
-    if (projectsInitialized && ref) {
-      // Check validity of project that the user is trying to access
-      const projects = projectsRef.current ?? []
-      const isValidProject = projects.some((project) => project.ref === ref)
-      const isValidBranch = IS_PLATFORM
-        ? projects.some((project) => project.preview_branch_refs.includes(ref))
-        : true
-
-      if (!isValidProject && !isValidBranch) {
-        toast.error('This project does not exist')
-        router.push(DEFAULT_HOME)
-        return
-      }
+    // A successful request to project details will validate access to both project and branches
+    if (!!ref && isErrorProject) {
+      toast.error('This project does not exist')
+      router.push(DEFAULT_HOME)
+      return
     }
-  }, [projectsInitialized])
+  }, [isErrorProject])
 
   useEffect(() => {
     if (ref !== undefined && id !== undefined) {
       if (router.pathname.endsWith('/sql/[id]') && id !== 'new') {
-        snap.setDashboardHistory(ref, 'sql', id)
+        setLastVisitedSnippet(id)
+      } else if (router.pathname.endsWith('/editor/[id]')) {
+        setLastVisitedTable(id)
       }
-      if (router.pathname.endsWith('/editor/[id]')) {
-        snap.setDashboardHistory(ref, 'editor', id)
-      }
-    }
-  }, [ref, id])
-
-  useEffect(() => {
-    // Load dashboard history into app state
-    if (isSuccessStorage && ref) {
-      snap.setDashboardHistory(ref, 'editor', dashboardHistory.editor)
-      snap.setDashboardHistory(ref, 'sql', dashboardHistory.sql)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccessStorage, ref])
+  }, [ref, id])
 
   useEffect(() => {
     if (organization) {
@@ -139,5 +117,3 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
   return <>{children}</>
 }
-
-export default RouteValidationWrapper

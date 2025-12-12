@@ -1,32 +1,42 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { AlertCircle } from 'lucide-react'
-import { useEffect, useRef } from 'react'
-import { toast } from 'sonner'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ScaffoldSection } from 'components/layouts/Scaffold'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import Panel from 'components/ui/Panel'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { configKeys } from 'data/config/keys'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { Badge, Input } from 'ui'
-import { ApiKeysMoved } from './ApiKeysMoved'
+import { Alert_Shadcn_, AlertTitle_Shadcn_, Badge, Card, CardContent, CardHeader } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { PostgrestConfig } from './PostgrestConfig'
 
-const ServiceList = () => {
-  const client = useQueryClient()
-  const { project, isLoading } = useProjectContext()
-  const { ref: projectRef, source } = useParams()
+export const ServiceList = () => {
+  const { data: project, isPending: isLoading } = useSelectedProjectQuery()
+  const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
+  const [querySource, setQuerySource] = useQueryState('source', parseAsString)
+
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
-  const { data: databases, isError } = useReadReplicasQuery({ projectRef })
+  const {
+    data: databases,
+    isError,
+    isPending: isLoadingDatabases,
+  } = useReadReplicasQuery({ projectRef })
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef })
+
+  useEffect(() => {
+    if (querySource && querySource !== state.selectedDatabaseId) {
+      state.setSelectedDatabaseId(querySource)
+    }
+  }, [querySource, state, projectRef])
 
   // Get the API service
   const isCustomDomainActive = customDomainData?.customDomain?.status === 'active'
@@ -42,81 +52,71 @@ const ServiceList = () => {
         : selectedDatabase?.restUrl
 
   return (
-    <div>
-      {isLoading ? (
-        <GenericSkeletonLoader />
-      ) : project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY ? (
-        <div className="flex items-center justify-center rounded border border-overlay bg-surface-100 p-8">
+    <ScaffoldSection isFullWidth id="api-settings" className="gap-6">
+      {!isLoading && project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY ? (
+        <Alert_Shadcn_ variant="destructive">
           <AlertCircle size={16} />
-          <p className="text-sm text-foreground-light ml-2">
+          <AlertTitle_Shadcn_>
             API settings are unavailable as the project is not active
-          </p>
-        </div>
+          </AlertTitle_Shadcn_>
+        </Alert_Shadcn_>
       ) : (
         <>
-          <section>
-            <Panel
-              title={
-                <div className="w-full flex items-center justify-between">
-                  <h5 className="mb-0">Project URL</h5>
-                  <DatabaseSelector
-                    additionalOptions={
-                      (loadBalancers ?? []).length > 0
-                        ? [{ id: 'load-balancer', name: 'API Load Balancer' }]
-                        : []
-                    }
-                  />
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              Project URL
+              <DatabaseSelector
+                additionalOptions={
+                  (loadBalancers ?? []).length > 0
+                    ? [{ id: 'load-balancer', name: 'API Load Balancer' }]
+                    : []
+                }
+                onSelectId={() => {
+                  setQuerySource(null)
+                }}
+              />
+            </CardHeader>
+            <CardContent>
+              {isLoading || isLoadingDatabases ? (
+                <div className="space-y-2">
+                  <ShimmeringLoader className="py-3.5" />
+                  <ShimmeringLoader className="py-3.5 w-3/4" delayIndex={1} />
                 </div>
-              }
-            >
-              <Panel.Content>
-                {isError ? (
-                  <div className="flex items-center justify-center py-4 space-x-2">
-                    <AlertCircle size={16} />
-                    <p className="text-sm text-foreground-light">Failed to retrieve project URL</p>
-                  </div>
-                ) : (
-                  <Input
-                    copy
-                    label={
-                      isCustomDomainActive ? (
-                        <div className="flex items-center space-x-2">
-                          <p>URL</p>
-                          <Badge>Custom domain active</Badge>
-                        </div>
-                      ) : (
-                        'URL'
-                      )
-                    }
-                    readOnly
-                    disabled
-                    className="input-mono"
-                    value={endpoint}
-                    descriptionText={
-                      loadBalancerSelected
-                        ? 'RESTful endpoint for querying and managing your databases through your load balancer'
-                        : replicaSelected
-                          ? 'RESTful endpoint for querying your read replica'
-                          : 'RESTful endpoint for querying and managing your database'
-                    }
-                    layout="horizontal"
-                  />
-                )}
-              </Panel.Content>
-            </Panel>
-          </section>
+              ) : isError ? (
+                <Alert_Shadcn_ variant="destructive">
+                  <AlertCircle size={16} />
+                  <AlertTitle_Shadcn_>Failed to retrieve project URL</AlertTitle_Shadcn_>
+                </Alert_Shadcn_>
+              ) : (
+                <FormLayout
+                  layout="horizontal"
+                  label={
+                    isCustomDomainActive ? (
+                      <div className="flex items-center space-x-2">
+                        <p>URL</p>
+                        <Badge>Custom domain active</Badge>
+                      </div>
+                    ) : (
+                      'URL'
+                    )
+                  }
+                  description={
+                    loadBalancerSelected
+                      ? 'RESTful endpoint for querying and managing your databases through your load balancer'
+                      : replicaSelected
+                        ? 'RESTful endpoint for querying your read replica'
+                        : 'RESTful endpoint for querying and managing your database'
+                  }
+                >
+                  <Input copy readOnly className="font-mono" value={endpoint} />
+                </FormLayout>
+              )}
+            </CardContent>
+          </Card>
 
-          <section className="mb-8">
-            <ApiKeysMoved />
-          </section>
-
-          <section id="postgrest-config">
-            <PostgrestConfig />
-          </section>
+          <PostgrestConfig />
         </>
       )}
-    </div>
+    </ScaffoldSection>
   )
 }
-
-export default ServiceList

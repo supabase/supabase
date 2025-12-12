@@ -5,7 +5,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import { createPortal } from 'react-dom'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import { EMPTY_ARR } from 'lib/void'
@@ -14,14 +14,17 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 
 import { Shortcuts } from './components/common/Shortcuts'
-import Footer from './components/footer/Footer'
+import { Footer } from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
-import Header, { HeaderProps } from './components/header/Header'
-import { RowContextMenu } from './components/menu'
+import { Header, HeaderProps } from './components/header/Header'
+import { RowContextMenu } from './components/menu/RowContextMenu'
 import { GridProps } from './types'
 
+import { keepPreviousData } from '@tanstack/react-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
+import { validateMsSqlSorting } from './MsSqlValidation'
 
 export const SupabaseGrid = ({
   customHeader,
@@ -35,20 +38,31 @@ export const SupabaseGrid = ({
   const { id: _id } = useParams()
   const tableId = _id ? Number(_id) : undefined
 
-  const { project } = useProjectContext()
-
+  const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
 
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
 
-  const { filters, onApplyFilters } = useTableFilter()
+  const { filters } = useTableFilter()
   const { sorts, onApplySorts } = useTableSort()
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
-  const { data, error, isSuccess, isError, isLoading, isRefetching } = useTableRowsQuery(
+  const msSqlWarning = isMsSqlForeignTable(snap.originalTable)
+    ? validateMsSqlSorting({ filters, sorts, table: snap.originalTable })
+    : { warning: null }
+  const tableQueriesEnabled = msSqlWarning.warning === null
+
+  const {
+    data,
+    error,
+    isSuccess,
+    isError,
+    isPending: isLoading,
+    isRefetching,
+  } = useTableRowsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -60,18 +74,12 @@ export const SupabaseGrid = ({
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
-      keepPreviousData: true,
-      retryDelay: (retryAttempt, error: any) => {
+      placeholderData: keepPreviousData,
+      enabled: tableQueriesEnabled,
+      retry: (_, error: any) => {
         const doesNotExistError = error && error.message?.includes('does not exist')
-        const tooManyRequestsError = error.message?.includes('Too Many Requests')
-        const vaultError = error.message?.includes('query vault failed')
-
         if (doesNotExistError) onApplySorts([])
-
-        if (retryAttempt > 3 || doesNotExistError || tooManyRequestsError || vaultError) {
-          return Infinity
-        }
-        return 5000
+        return false
       },
     }
   )
@@ -85,7 +93,13 @@ export const SupabaseGrid = ({
   return (
     <DndProvider backend={HTML5Backend} context={window}>
       <div className="sb-grid h-full flex flex-col">
-        <Header customHeader={customHeader} />
+        <Header
+          customHeader={customHeader}
+          isRefetching={isRefetching}
+          tableQueriesEnabled={tableQueriesEnabled}
+        />
+
+        {msSqlWarning.warning !== null && <msSqlWarning.Component />}
 
         {children || (
           <>
@@ -94,13 +108,12 @@ export const SupabaseGrid = ({
               {...gridProps}
               rows={rows}
               error={error}
+              isDisabled={!tableQueriesEnabled}
               isLoading={isLoading}
               isSuccess={isSuccess}
               isError={isError}
-              filters={filters}
-              onApplyFilters={onApplyFilters}
             />
-            <Footer isRefetching={isRefetching} />
+            <Footer enableForeignRowsQuery={tableQueriesEnabled} />
             <Shortcuts gridRef={gridRef} rows={rows} />
           </>
         )}

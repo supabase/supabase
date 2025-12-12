@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { getContentById } from 'data/content/content-id-query'
@@ -12,8 +14,8 @@ import {
 import { Snippet } from 'data/content/sql-folders-query'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useRouter } from 'next/router'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
@@ -33,8 +35,8 @@ const RenameQueryModal = ({
   onComplete,
 }: RenameQueryModalProps) => {
   const { ref } = useParams()
-  const organization = useSelectedOrganization()
-  const useBedrockAssistant = useFlag('useBedrockAssistant')
+  const router = useRouter()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
@@ -53,7 +55,7 @@ const RenameQueryModal = ({
   const [nameInput, setNameInput] = useState(name)
   const [descriptionInput, setDescriptionInput] = useState(description)
 
-  const { mutate: titleSql, isLoading: isTitleGenerationLoading } = useSqlTitleGenerateMutation({
+  const { mutate: titleSql, isPending: isTitleGenerationLoading } = useSqlTitleGenerateMutation({
     onSuccess: (data) => {
       const { title, description } = data
       setNameInput(title)
@@ -63,16 +65,16 @@ const RenameQueryModal = ({
       toast.error(`Failed to rename query: ${error.message}`)
     },
   })
+  const { data: check } = useCheckOpenAIKeyQuery()
+  const isApiKeySet = !!check?.hasKey
 
   const generateTitle = async () => {
     if ('content' in snippet && isSQLSnippet) {
-      titleSql({ sql: snippet.content.sql, useBedrockAssistant })
+      titleSql({ sql: snippet.content.sql })
     } else {
       try {
         const { content } = await getContentById({ projectRef: ref, id: snippet.id })
-        if ('sql' in content) {
-          titleSql({ sql: content.sql, useBedrockAssistant })
-        }
+        if ('sql' in content) titleSql({ sql: content.sql })
       } catch (error) {
         toast.error('Unable to generate title based on query contents')
       }
@@ -153,11 +155,19 @@ const RenameQueryModal = ({
               />
               <div className="flex w-full justify-end mt-2">
                 {!hasHipaaAddon && (
-                  <Button
+                  <ButtonTooltip
                     type="default"
                     onClick={() => generateTitle()}
                     size="tiny"
-                    disabled={isTitleGenerationLoading}
+                    disabled={isTitleGenerationLoading || !isApiKeySet}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: isApiKeySet
+                          ? undefined
+                          : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
+                      },
+                    }}
                   >
                     <div className="flex items-center gap-1">
                       <div className="scale-75">
@@ -165,7 +175,7 @@ const RenameQueryModal = ({
                       </div>
                       <span>Rename with Supabase AI</span>
                     </div>
-                  </Button>
+                  </ButtonTooltip>
                 )}
               </div>
               <Input.TextArea

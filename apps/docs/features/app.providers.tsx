@@ -1,17 +1,15 @@
-import { type PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 
 import { FeatureFlagProvider, IS_PLATFORM, ThemeProvider } from 'common'
 import { SonnerToaster, TooltipProvider } from 'ui'
-import { CommandProvider } from 'ui-patterns/CommandMenu'
 import SiteLayout from '~/layouts/SiteLayout'
 import { API_URL } from '~/lib/constants'
 import { AuthContainer } from './auth/auth.client'
-import { DocsCommandMenu } from './command'
+import { DocsCommandMenu, DocsCommandProvider } from './command'
 import { QueryClientProvider } from './data/queryClient.client'
 import { PageTelemetry } from './telemetry/telemetry.client'
 import { ScrollRestoration } from './ui/helpers.scroll.client'
 import { ThemeSandbox } from './ui/theme.client'
-import { PromoToast } from 'ui-patterns'
 
 /**
  * Global providers that wrap the entire app
@@ -25,16 +23,15 @@ function GlobalProviders({ children }: PropsWithChildren) {
           <ScrollRestoration />
           <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
             <TooltipProvider delayDuration={0}>
-              <CommandProvider>
+              <DocsCommandProvider>
                 <div className="flex flex-col">
                   <SiteLayout>
-                    <PromoToast />
                     {children}
                     <DocsCommandMenu />
                   </SiteLayout>
                   <ThemeSandbox />
                 </div>
-              </CommandProvider>
+              </DocsCommandProvider>
               <SonnerToaster position="top-right" />
             </TooltipProvider>
           </ThemeProvider>

@@ -73,7 +73,7 @@ When a user signs in, call `signInWithOAuth` with `workos` as the provider.
 
 ```javascript
 import { createClient } from '@supabase/supabase-js';
-const supabase = createClient('<your-project-url>', '<your-anon-key>');
+const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>');
 const redirect = (url: string) => {}
 
 // ---cut---

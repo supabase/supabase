@@ -13,12 +13,7 @@ test('run and clear', async () => {
       onSelectSource={() => {}}
       onSelectTemplate={() => {}}
       warnings={[]}
-      warehouseCollections={[]}
-      dataSource="logs"
-      onDataSourceChange={() => {}}
       templates={[]}
-      warehouseTemplates={[]}
-      onSelectWarehouseTemplate={() => {}}
     />
   )
   await expect(screen.findByPlaceholderText(/Search/)).rejects.toThrow()

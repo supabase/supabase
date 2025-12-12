@@ -1,6 +1,5 @@
 import dayjs from 'dayjs'
-import { Clipboard, Trash, UserIcon } from 'lucide-react'
-import { UIEvent } from 'react'
+import { Copy, Trash, UserIcon } from 'lucide-react'
 import { Column, useRowSelection } from 'react-data-grid'
 
 import { User } from 'data/auth/users-infinite-query'
@@ -16,15 +15,11 @@ import {
   copyToClipboard,
 } from 'ui'
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
-import { ColumnConfiguration, USERS_TABLE_COLUMNS } from './Users.constants'
+import { ColumnConfiguration, UsersTableColumn } from './Users.constants'
 import { HeaderCell } from './UsersGridComponents'
 
 const GITHUB_AVATAR_URL = 'https://avatars.githubusercontent.com'
 const SUPPORTED_CSP_AVATAR_URLS = [GITHUB_AVATAR_URL, 'https://lh3.googleusercontent.com']
-
-export const isAtBottom = ({ currentTarget }: UIEvent<HTMLDivElement>): boolean => {
-  return currentTarget.scrollTop + 10 >= currentTarget.scrollHeight - currentTarget.clientHeight
-}
 
 export const formatUsersData = (users: User[]) => {
   return users.map((user) => {
@@ -255,21 +250,25 @@ export function getAvatarUrl(user: User): string | undefined {
 }
 
 export const formatUserColumns = ({
+  specificFilterColumn,
+  columns,
   config,
   users,
   visibleColumns = [],
   setSortByValue,
   onSelectDeleteUser,
 }: {
+  specificFilterColumn: string
+  columns: UsersTableColumn[]
   config: ColumnConfiguration[]
   users: User[]
   visibleColumns?: string[]
   setSortByValue: (val: string) => void
   onSelectDeleteUser: (user: User) => void
 }) => {
-  const columnOrder = config.map((c) => c.id) ?? USERS_TABLE_COLUMNS.map((c) => c.id)
+  const columnOrder = config.map((c) => c.id) ?? columns.map((c) => c.id)
 
-  let gridColumns = USERS_TABLE_COLUMNS.map((col) => {
+  let gridColumns = columns.map((col) => {
     const savedConfig = config.find((c) => c.id === col.id)
     const res: Column<any> = {
       key: col.id,
@@ -286,7 +285,13 @@ export const formatUserColumns = ({
         // to support - the component is ready as such: Just pass selectedUsers and allRowsSelected as props from parent
         // <SelectHeaderCell selectedUsers={selectedUsers} allRowsSelected={allRowsSelected} />
         if (col.id === 'img') return undefined
-        return <HeaderCell col={col} setSortByValue={setSortByValue} />
+        return (
+          <HeaderCell
+            col={col}
+            specificFilterColumn={specificFilterColumn}
+            setSortByValue={setSortByValue}
+          />
+        )
       },
       renderCell: ({ row }) => {
         // This is actually a valid React component, so we can use hooks here
@@ -389,7 +394,7 @@ export const formatUserColumns = ({
                   copyToClipboard(value)
                 }}
               >
-                <Clipboard size={12} />
+                <Copy size={12} />
                 <span>Copy {col.id === 'id' ? col.name : col.name.toLowerCase()}</span>
               </ContextMenuItem_Shadcn_>
               <ContextMenuSeparator_Shadcn_ />

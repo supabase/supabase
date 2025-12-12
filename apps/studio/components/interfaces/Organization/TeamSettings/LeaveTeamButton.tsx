@@ -10,7 +10,7 @@ import { useOrganizationMembersQuery } from 'data/organizations/organization-mem
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { hasMultipleOwners } from './TeamSettings.utils'
@@ -19,7 +19,7 @@ export const LeaveTeamButton = () => {
   const router = useRouter()
   const { slug } = useParams()
   const { profile } = useProfile()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   // if organizationMembersDeletionEnabled is false, you also can't delete yourself
   const { organizationMembersDelete: organizationMembersDeletionEnabled } = useIsFeatureEnabled([

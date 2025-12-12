@@ -10,9 +10,28 @@ Let's explore how to implement Realtime Presence to track state between multiple
 
 You can use the Supabase client libraries to track Presence state between users.
 
+### How Presence works
+
+Presence lets each connected client publish a small piece of state—called a “presence payload”—to a shared channel. Supabase stores each client’s payload under a unique presence key and keeps a merged view of all connected clients.
+
+When any client subscribes, disconnects, or updates their presence payload, Supabase triggers one of three events:
+
+- **`sync`** — the full presence state has been updated
+- **`join`** — a new client has started tracking presence
+- **`leave`** — a client has stopped tracking presence
+
+The complete presence state returned by `presenceState()` looks like this:
+
+```json
+{
+  "client_key_1": [{ "userId": 1, "typing": false }],
+  "client_key_2": [{ "userId": 2, "typing": true }]
+}
+```
+
 ### Initialize the client
 
-Go to your Supabase project's [API Settings](https://supabase.com/dashboard/project/_/settings/api) and grab the `URL` and `anon` public API key.
+Go to your Supabase project's [API Settings](/dashboard/project/_/settings/api) and grab the `URL` and `anon` public API key.
 
 <Tabs
   scrollable
@@ -27,19 +46,20 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
 import { createClient } from '@supabase/supabase-js'
 
 const SUPABASE_URL = 'https://<project>.supabase.co'
-const SUPABASE_KEY = '<your-anon-key>'
+const SUPABASE_KEY = '<sb_publishable_... or anon key>'
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
 void main() {
   Supabase.initialize(
     url: 'https://<project>.supabase.co',
-    anonKey: '<your-anon-key>',
+    anonKey: '<sb_publishable_... or anon key>',
   );
 
   runApp(MyApp());
@@ -49,40 +69,47 @@ final supabase = Supabase.instance.client;
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
 let supabaseURL = "https://<project>.supabase.co"
-let supabaseKey = "<your-anon-key>"
+let supabaseKey = "<sb_publishable_... or anon key>"
 let supabase = SupabaseClient(supabaseURL: URL(string: supabaseURL)!, supabaseKey: supabaseKey)
 
 let realtime = supabase.realtime
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
 val supabaseUrl = "https://<project>.supabase.co"
-val supabaseKey = "<your-anon-key>"
+val supabaseKey = "<sb_publishable_... or anon key>"
 val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
     install(Realtime)
 }
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
 from supabase import create_client
 
 SUPABASE_URL = 'https://<project>.supabase.co'
-SUPABASE_KEY = '<your-anon-key>'
+SUPABASE_KEY = '<sb_publishable_... or anon key>'
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ### Sync and track state
@@ -120,6 +147,7 @@ roomOne
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -138,6 +166,8 @@ roomOne.onPresenceSync((_) {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 Listen to the presence change stream, emitting a new `PresenceAction` whenever someone joins or leaves:
@@ -155,6 +185,8 @@ for await presence in presenceStream {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 Listen to the presence change flow, emitting new a new `PresenceAction` whenever someone joins or leaves:
@@ -173,6 +205,8 @@ roomOne.subscribe()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 Listen to the `sync`, `join`, and `leave` events triggered whenever any client joins or leaves the channel or changes their slice of state:
@@ -188,6 +222,7 @@ room_one
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ### Sending state
@@ -225,6 +260,7 @@ roomOne.subscribe(async (status) => {
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -244,6 +280,8 @@ roomOne.subscribe((status, error) async {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -269,6 +307,8 @@ await roomOne.track(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -285,6 +325,8 @@ roomOne.track(userStatus)
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -305,6 +347,7 @@ room_one.subscribe(on_subscribe)
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 A client will receive state from any other client that is subscribed to the same topic (in this case `room_01`). It will also automatically trigger its own `sync` and `join` event handlers.
@@ -337,6 +380,7 @@ untrackPresence()
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -351,6 +395,8 @@ untrackPresence();
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -358,6 +404,8 @@ await roomOne.untrack()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -369,6 +417,8 @@ untrackPresence()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -376,6 +426,7 @@ room_one.untrack()
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Presence options
@@ -397,7 +448,7 @@ By default, Presence will generate a unique `UUIDv1` key on the server to track 
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('SUPABASE_URL', 'SUPABASE_ANON_KEY')
+const supabase = createClient('SUPABASE_URL', 'SUPABASE_PUBLISHABLE_KEY')
 
 const channelC = supabase.channel('test', {
   config: {
@@ -409,6 +460,7 @@ const channelC = supabase.channel('test', {
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -419,6 +471,8 @@ final channelC = supabase.channel(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -428,6 +482,8 @@ let channelC = await supabase.channel("test") {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -439,6 +495,8 @@ val channelC = supabase.channel("test") {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -452,4 +510,5 @@ channel_c = supabase.channel('test', {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>

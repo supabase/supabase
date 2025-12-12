@@ -152,6 +152,12 @@ export function DataTableFilterCommand({
         filter={(value, search, keywords) =>
           getFilterValue({ value, search, keywords, currentWord })
         }
+        onKeyDown={(e) => {
+          // Stop arrow key navigation from propagating to parent components
+          if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+            e.stopPropagation()
+          }
+        }}
       >
         <CommandInput
           ref={inputRef}

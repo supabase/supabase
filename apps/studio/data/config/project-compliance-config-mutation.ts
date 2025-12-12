@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { configKeys } from './keys'
 
 export type ComplianceConfigUpdateVariables = {
@@ -32,27 +32,29 @@ export const useComplianceConfigUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ComplianceConfigUpdateData, ResponseError, ComplianceConfigUpdateVariables>,
+  UseCustomMutationOptions<
+    ComplianceConfigUpdateData,
+    ResponseError,
+    ComplianceConfigUpdateVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ComplianceConfigUpdateData, ResponseError, ComplianceConfigUpdateVariables>(
-    (vars) => updateComplianceConfig(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(configKeys.settingsV2(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update project compliance configuration: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ComplianceConfigUpdateData, ResponseError, ComplianceConfigUpdateVariables>({
+    mutationFn: (vars) => updateComplianceConfig(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: configKeys.settingsV2(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update project compliance configuration: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

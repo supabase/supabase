@@ -4,14 +4,14 @@ import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { useProjectDeleteMutation } from 'data/projects/project-delete-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Input } from 'ui'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 export const DeleteProjectModal = ({
   visible,
@@ -21,8 +21,8 @@ export const DeleteProjectModal = ({
   onClose: () => void
 }) => {
   const router = useRouter()
-  const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
@@ -55,7 +55,7 @@ export const DeleteProjectModal = ({
     { value: 'None of the above' },
   ])
 
-  const { mutate: deleteProject, isLoading: isDeleting } = useProjectDeleteMutation({
+  const { mutate: deleteProject, isPending: isDeleting } = useProjectDeleteMutation({
     onSuccess: async () => {
       if (!isFree) {
         try {
@@ -77,7 +77,7 @@ export const DeleteProjectModal = ({
       else router.push('/organizations')
     },
   })
-  const { mutateAsync: sendExitSurvey, isLoading: isSending } = useSendDowngradeFeedbackMutation()
+  const { mutateAsync: sendExitSurvey, isPending: isSending } = useSendDowngradeFeedbackMutation()
   const isSubmitting = isDeleting || isSending
 
   async function handleDeleteProject() {

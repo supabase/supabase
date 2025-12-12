@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type SetupIntentVariables = {
   hcaptchaToken: string
@@ -26,23 +26,21 @@ export const useSetupIntent = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<SetupIntentData, ResponseError, SetupIntentVariables>,
+  UseCustomMutationOptions<SetupIntentData, ResponseError, SetupIntentVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SetupIntentData, ResponseError, SetupIntentVariables>(
-    (vars) => setupIntent(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to setup intent: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SetupIntentData, ResponseError, SetupIntentVariables>({
+    mutationFn: (vars) => setupIntent(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to setup intent: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

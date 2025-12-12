@@ -1,11 +1,9 @@
+import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import InformationBox from 'components/ui/InformationBox'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useVaultSecretCreateMutation } from 'data/vault/vault-secret-create-mutation'
-import { Eye, EyeOff, HelpCircle } from 'lucide-react'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Form, Input, Modal } from 'ui'
 
 interface AddNewSecretModalProps {
@@ -14,8 +12,8 @@ interface AddNewSecretModalProps {
 }
 
 const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
+  const { data: project } = useSelectedProjectQuery()
   const [showSecretValue, setShowSecretValue] = useState(false)
-  const { project } = useProjectContext()
 
   const { mutateAsync: addSecret } = useVaultSecretCreateMutation()
 

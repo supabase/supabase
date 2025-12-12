@@ -5,8 +5,11 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
+// Note: This is a build-time script, so we use the fallback URL directly
+const DOCS_URL = process.env.NEXT_PUBLIC_DOCS_URL || 'https://supabase.com/docs'
+
 async function downloadGraphQLSchema() {
-  const schemaEndpoint = 'https://supabase.com/docs/api/graphql'
+  const schemaEndpoint = `${DOCS_URL}/api/graphql`
   const outputPath = path.join(__dirname, './schema.graphql')
 
   const schemaQuery = stripIndent`
@@ -17,7 +20,7 @@ async function downloadGraphQLSchema() {
 
   try {
     const response = await fetch(schemaEndpoint, {
-	  method: 'POST',
+      method: 'POST',
       body: JSON.stringify({
         query: schemaQuery.trim(),
       }),

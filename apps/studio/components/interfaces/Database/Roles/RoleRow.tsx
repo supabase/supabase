@@ -15,23 +15,23 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseRoleUpdateMutation } from 'data/database-roles/database-role-update-mutation'
 import { PgRole } from 'data/database-roles/database-roles-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { ChevronUp, HelpCircle, MoreVertical, Trash } from 'lucide-react'
 import { ROLE_PERMISSIONS } from './Roles.constants'
 
 interface RoleRowProps {
   role: PgRole
   disabled?: boolean
-  onSelectDelete: (role: PgRole) => void
+  onSelectDelete: (role: string) => void
 }
 
-const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
-  const { project } = useProjectContext()
+export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
+  const { data: project } = useSelectedProjectQuery()
   const [isExpanded, setIsExpanded] = useState(false)
 
-  const { mutate: updateDatabaseRole, isLoading: isUpdating } = useDatabaseRoleUpdateMutation()
+  const { mutate: updateDatabaseRole, isPending: isUpdating } = useDatabaseRoleUpdateMutation()
 
   const { isSuperuser, canLogin, canCreateRole, canCreateDb, isReplicationRole, canBypassRls } =
     role
@@ -93,7 +93,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
               <button
                 id="collapsible-trigger"
                 type="button"
-                className="group flex w-full items-center justify-between rounded py-3 px-4 md:px-6 text-foreground"
+                className="group flex w-full items-center justify-between rounded py-3 px-[var(--card-padding-x)] text-foreground"
                 onClick={(event: any) => {
                   if (event.target.id === 'collapsible-trigger') setIsExpanded(!isExpanded)
                 }}
@@ -141,7 +141,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                           className="space-x-2"
                           onClick={(event) => {
                             event.stopPropagation()
-                            onSelectDelete(role)
+                            onSelectDelete(role.id.toString())
                           }}
                         >
                           <Trash className="text-red-800" size="14" strokeWidth={2} />
@@ -219,5 +219,3 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
     </Form>
   )
 }
-
-export default RoleRow

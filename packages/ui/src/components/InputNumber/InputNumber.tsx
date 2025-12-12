@@ -27,7 +27,7 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLInputElement>,
 }
 
 /**
- * @deprecated Use ./Input_shadcn_ with type="number" instead or ./ui-patterns/data-inputs/input with type="number"
+ * @deprecated Use `import { Input_shadcn_ } from "ui"` with `type="number"` instead or ./ui-patterns/data-inputs/input with `type="number"`
  */
 function InputNumber({
   defaultValue,
@@ -103,7 +103,7 @@ function InputNumber({
 
   if (error) inputClasses.push(__styles.variants.error)
   if (!error) inputClasses.push(__styles.variants.standard)
-  if (icon) inputClasses.push(__styles.with_icon)
+  if (icon) inputClasses.push(__styles.with_icon[size])
   if (size) inputClasses.push(__styles.size[size])
   if (props.disabled) inputClasses.push(__styles.disabled)
   // if (borderless)

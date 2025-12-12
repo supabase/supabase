@@ -1,15 +1,19 @@
-import { Wrench } from 'lucide-react'
 import Link from 'next/link'
-import { type PropsWithChildren, useCallback } from 'react'
+import { Fragment } from 'react'
 
+import { cn } from 'ui'
+import { TroubleshootingFilter } from './Troubleshooting.ui.client'
 import {
   type ITroubleshootingEntry,
+  type ITroubleshootingMetadata,
   getArticleSlug,
   getTroubleshootingUpdatedDates,
 } from './Troubleshooting.utils'
-import { TroubleshootingFilter } from './Troubleshooting.ui.client'
-import { formatError, TROUBLESHOOTING_DATA_ATTRIBUTES } from './Troubleshooting.utils.shared'
-import { cn } from 'ui'
+import {
+  formatError,
+  TROUBLESHOOTING_DATA_ATTRIBUTES,
+  TROUBLESHOOTING_CONTAINER_ID,
+} from './Troubleshooting.utils.shared'
 
 export async function TroubleshootingPreview({ entry }: { entry: ITroubleshootingEntry }) {
   const dateUpdated = entry.data.database_id.startsWith('pseudo-')
@@ -55,10 +59,10 @@ export async function TroubleshootingPreview({ entry }: { entry: ITroubleshootin
               .map(formatError)
               .filter(Boolean)
               .map((error, index) => (
-                <>
-                  <code key={index}>{error}</code>
+                <Fragment key={error}>
+                  <code>{error}</code>
                   {index < (entry.data.errors?.length || 0) - 1 ? ', ' : ''}
-                </>
+                </Fragment>
               ))}
           </span>
         )}
@@ -80,6 +84,68 @@ export async function TroubleshootingPreview({ entry }: { entry: ITroubleshootin
             return dateUpdated.toLocaleDateString(undefined, options)
           })()}
       </div>
+    </div>
+  )
+}
+
+export function TroubleshootingHeader({
+  title,
+  description,
+  keywords,
+  products,
+  errors,
+}: {
+  title: string
+  description: string
+  keywords: Array<string>
+  products?: Array<string>
+  errors: ITroubleshootingMetadata['errors']
+}) {
+  return (
+    <div className="lg:sticky lg:top-[var(--header-height)] lg:z-10 bg-background">
+      <div className="pt-8 pb-6 px-5">
+        <h1 className="text-4xl tracking-tight mb-7">{title}</h1>
+        <p className="text-lg text-foreground-light">{description}</p>
+        <hr className="my-7" aria-hidden />
+        <TroubleshootingFilter
+          keywords={keywords}
+          products={products}
+          errors={errors}
+          className="mb-0"
+        />
+      </div>
+    </div>
+  )
+}
+
+export function TroubleshootingEntries({
+  name,
+  entries,
+}: {
+  name: string
+  entries: Array<ITroubleshootingEntry>
+}) {
+  return (
+    <div id={TROUBLESHOOTING_CONTAINER_ID} className="@container/troubleshooting">
+      <h2 className="sr-only">Matching troubleshooting entries</h2>
+      {entries.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-foreground-light text-lg">
+            No troubleshooting guides available for {name} yet.
+          </p>
+        </div>
+      ) : (
+        <ul className="grid @4xl/troubleshooting:grid-cols-[78%_15%_7%]">
+          {entries.map((entry) => (
+            <li
+              key={entry.data.database_id}
+              className="grid grid-cols-subgrid @4xl/troubleshooting:col-span-3"
+            >
+              <TroubleshootingPreview entry={entry} />
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }

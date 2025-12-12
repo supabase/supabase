@@ -19,7 +19,7 @@ import {
   useTablePrivilegesRevokeMutation,
 } from 'data/privileges/table-privileges-revoke-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Sheet,
@@ -53,7 +53,7 @@ interface QueueSettingsProps {}
 
 export const QueueSettings = ({}: QueueSettingsProps) => {
   const { childId: name } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const [open, setOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -64,7 +64,13 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
     connectionString: project?.connectionString,
   })
 
-  const { data, error, isLoading, isSuccess, isError } = useDatabaseRolesQuery({
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+  } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -243,7 +249,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
             {isExposed && (
               <>
                 These will also determine access to each function available from the{' '}
-                <code className="text-xs">pgmq_public</code> schema.
+                <code className="text-code-inline">pgmq_public</code> schema.
               </>
             )}
           </SheetDescription>

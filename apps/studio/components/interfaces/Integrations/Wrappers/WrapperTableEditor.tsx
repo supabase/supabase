@@ -1,10 +1,10 @@
 import { Check, ChevronsUpDown, Database, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ActionBar } from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   cn,
@@ -216,10 +216,10 @@ const TableForm = ({
   onSubmit: OnSubmitFn
   initialData: any
 }) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const {
     data: schemas,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
   } = useSchemasQuery({
     projectRef: project?.ref,

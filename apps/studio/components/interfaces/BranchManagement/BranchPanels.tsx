@@ -6,6 +6,7 @@ import { PropsWithChildren, ReactNode } from 'react'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import type { Branch } from 'data/branches/branches-query'
+import Link from 'next/link'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { WorkflowLogs } from './WorkflowLogs'
 
@@ -61,6 +62,7 @@ interface BranchRowProps {
   repo: string
   label?: string | ReactNode
   branch: Branch
+  isGithubConnected: boolean
   rowLink?: string
   external?: boolean
   rowActions?: ReactNode
@@ -68,6 +70,7 @@ interface BranchRowProps {
 
 export const BranchRow = ({
   branch,
+  isGithubConnected,
   label,
   repo,
   rowLink,
@@ -83,18 +86,10 @@ export const BranchRow = ({
 
   const navigateUrl = rowLink ?? `/project/${branch.project_ref}`
 
-  const handleRowClick = () => {
-    if (external) {
-      window.open(navigateUrl, '_blank', 'noopener noreferrer')
-    } else {
-      router.push(navigateUrl)
-    }
-  }
-
   return (
     <div className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-surface-100">
       <div className="flex items-center gap-x-3">
-        {branch.git_branch && (
+        {branch.git_branch && isGithubConnected && (
           <ButtonTooltip
             asChild
             type="default"
@@ -111,10 +106,15 @@ export const BranchRow = ({
           </ButtonTooltip>
         )}
         <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex items-center cursor-pointer" onClick={handleRowClick}>
+          <TooltipTrigger>
+            <Link
+              target={external ? '_blank' : '_self'}
+              rel={external ? 'noopener noreferrer' : undefined}
+              href={navigateUrl}
+              className="flex items-center"
+            >
               {label || branch.name}
-            </div>
+            </Link>
           </TooltipTrigger>
           {((page === 'branches' && !branch.is_default) || page === 'merge-requests') && (
             <TooltipContent side="bottom">

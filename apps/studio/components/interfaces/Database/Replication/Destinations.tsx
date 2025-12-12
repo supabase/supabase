@@ -1,37 +1,51 @@
+import { useQueryClient } from '@tanstack/react-query'
+import { Plus, Search } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
-import AlertError from 'components/ui/AlertError'
+import { AlertError } from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { useReplicationDestinationsQuery } from 'data/replication/destinations-query'
-import { Plus } from 'lucide-react'
-import { Button, cn } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
-import DestinationRow from './DestinationRow'
+import { replicationKeys } from 'data/replication/keys'
+import { fetchReplicationPipelineVersion } from 'data/replication/pipeline-version-query'
 import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
-import { useState } from 'react'
-import NewDestinationPanel from './DestinationPanel'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
+import { Button, cn, Input } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
+import { DestinationPanel } from './DestinationPanel/DestinationPanel'
+import { DestinationRow } from './DestinationRow'
+import { EnableReplicationModal } from './EnableReplicationModal'
+import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 
-const Destinations = () => {
+export const Destinations = () => {
+  const { data: organization } = useSelectedOrganizationQuery()
+  const isPaidPlan = organization?.plan.id !== 'free'
+
   const [showNewDestinationPanel, setShowNewDestinationPanel] = useState(false)
+  const [filterString, setFilterString] = useState<string>('')
   const { ref: projectRef } = useParams()
 
   const {
     data: sourcesData,
     error: sourcesError,
-    isLoading: isSourcesLoading,
+    isPending: isSourcesLoading,
     isError: isSourcesError,
     isSuccess: isSourcesSuccess,
   } = useReplicationSourcesQuery({
     projectRef,
   })
 
-  let sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
+  const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
+  const replicationNotEnabled = isSourcesSuccess && !sourceId
 
   const {
     data: destinationsData,
     error: destinationsError,
-    isLoading: isDestinationsLoading,
+    isPending: isDestinationsLoading,
     isError: isDestinationsError,
     isSuccess: isDestinationsSuccess,
   } = useReplicationDestinationsQuery({
@@ -41,34 +55,104 @@ const Destinations = () => {
   const {
     data: pipelinesData,
     error: pipelinesError,
-    isLoading: isPipelinesLoading,
+    isPending: isPipelinesLoading,
     isError: isPipelinesError,
     isSuccess: isPipelinesSuccess,
   } = useReplicationPipelinesQuery({
     projectRef,
   })
 
-  const anyDestinations = isDestinationsSuccess && destinationsData.destinations.length > 0
+  const hasDestinations = isDestinationsSuccess && destinationsData.destinations.length > 0
+
+  const filteredDestinations =
+    filterString.length === 0
+      ? destinationsData?.destinations ?? []
+      : (destinationsData?.destinations ?? []).filter((destination) =>
+          destination.name.toLowerCase().includes(filterString.toLowerCase())
+        )
+
+  // Prefetch pipeline version info for all destinations on first load only
+  const queryClient = useQueryClient()
+  const prefetchedRef = useRef(false)
+  useEffect(() => {
+    if (
+      projectRef &&
+      !prefetchedRef.current &&
+      pipelinesData?.pipelines &&
+      pipelinesData.pipelines.length > 0 &&
+      isPipelinesSuccess
+    ) {
+      prefetchedRef.current = true
+      pipelinesData.pipelines.forEach((p) => {
+        if (!p?.id) return
+        queryClient.prefetchQuery({
+          queryKey: replicationKeys.pipelinesVersion(projectRef, p.id),
+          queryFn: ({ signal }) =>
+            fetchReplicationPipelineVersion({ projectRef, pipelineId: p.id }, signal),
+          staleTime: Infinity,
+        })
+      })
+    }
+  }, [projectRef, pipelinesData?.pipelines, isPipelinesSuccess, queryClient])
 
   return (
     <>
-      <ScaffoldSection isFullWidth>
-        <div className="flex justify-between items-center mb-4">
-          <ScaffoldSectionTitle>Destinations</ScaffoldSectionTitle>
-          <Button type="default" icon={<Plus />} onClick={() => setShowNewDestinationPanel(true)}>
-            Add destination
-          </Button>
+      <div className="mb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <Input
+              placeholder="Filter destinations"
+              size="tiny"
+              icon={<Search />}
+              value={filterString}
+              className="w-full lg:w-52"
+              onChange={(e) => setFilterString(e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-x-2">
+            {!!sourceId && (
+              <Button
+                type="default"
+                icon={<Plus />}
+                onClick={() => setShowNewDestinationPanel(true)}
+              >
+                Add destination
+              </Button>
+            )}
+            <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
+          </div>
         </div>
-        {(isSourcesLoading || isDestinationsLoading) && <GenericSkeletonLoader />}
+      </div>
 
+      <div className="w-full overflow-hidden overflow-x-auto">
         {(isSourcesError || isDestinationsError) && (
           <AlertError
             error={sourcesError || destinationsError}
-            subject="Failed to retrieve destinations"
+            subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_DESTINATIONS}
           />
         )}
 
-        {anyDestinations ? (
+        {isSourcesLoading || isDestinationsLoading ? (
+          <GenericSkeletonLoader />
+        ) : replicationNotEnabled ? (
+          <div className="border rounded-md p-4 md:p-12 flex flex-col gap-y-4">
+            <div className="flex flex-col gap-y-1">
+              <h3>Replicate data to external destinations in real-time</h3>
+              <p className="text-sm text-foreground-light">
+                {isPaidPlan ? 'Enable replication' : 'Upgrade to the Pro plan'} to start replicating
+                your database changes to data warehouses and analytics platforms
+              </p>
+            </div>
+            <div className="flex gap-x-2">
+              {isPaidPlan ? (
+                <EnableReplicationModal />
+              ) : (
+                <UpgradePlanButton source="replication" featureProposition="use replication" />
+              )}
+              <DocsButton href={`${DOCS_URL}/guides/database/replication#replication`} />
+            </div>
+          </div>
+        ) : hasDestinations ? (
           <Table
             head={[
               <Table.th key="name">Name</Table.th>,
@@ -77,26 +161,34 @@ const Destinations = () => {
               <Table.th key="publication">Publication</Table.th>,
               <Table.th key="actions"></Table.th>,
             ]}
-            body={destinationsData.destinations.map((destination) => {
+            body={filteredDestinations.map((destination) => {
               const pipeline = pipelinesData?.pipelines.find(
                 (p) => p.destination_id === destination.id
               )
+
+              const type =
+                'big_query' in destination.config
+                  ? 'BigQuery'
+                  : 'iceberg' in destination.config
+                    ? 'Analytics Bucket'
+                    : 'Other'
+
               return (
                 <DestinationRow
                   key={destination.id}
                   sourceId={sourceId}
                   destinationId={destination.id}
                   destinationName={destination.name}
-                  type={destination.config.big_query ? 'BigQuery' : 'Other'}
+                  type={type}
                   pipeline={pipeline}
                   error={pipelinesError}
                   isLoading={isPipelinesLoading}
                   isError={isPipelinesError}
                   isSuccess={isPipelinesSuccess}
-                ></DestinationRow>
+                />
               )
             })}
-          ></Table>
+          />
         ) : (
           !isSourcesLoading &&
           !isDestinationsLoading &&
@@ -109,30 +201,38 @@ const Destinations = () => {
                 'flex flex-col px-10 rounded-lg justify-center items-center py-8 mt-4'
               )}
             >
-              <h4 className="text-lg">Send data to your first destination</h4>
-              <p className="prose text-sm text-center mt-2">
-                Use destinations to improve performance or run analysis on your data via
-                integrations like BigQuery
+              <h4>Create your first destination</h4>
+              <p className="prose text-sm text-center mt-1 max-w-[70ch]">
+                Destinations are external platforms where your database changes are automatically
+                sent. Connect to various data warehouses and analytics platforms to enable real-time
+                data pipelines.
               </p>
               <Button
                 icon={<Plus />}
                 onClick={() => setShowNewDestinationPanel(true)}
-                className="mt-6"
+                className="mt-4"
               >
                 Add destination
               </Button>
             </div>
           )
         )}
-      </ScaffoldSection>
+      </div>
 
-      <NewDestinationPanel
+      {!isSourcesLoading &&
+        !isDestinationsLoading &&
+        filteredDestinations.length === 0 &&
+        hasDestinations && (
+          <div className="text-center py-8 text-foreground-light">
+            <p>No destinations match "{filterString}"</p>
+          </div>
+        )}
+
+      <DestinationPanel
         visible={showNewDestinationPanel}
         sourceId={sourceId}
         onClose={() => setShowNewDestinationPanel(false)}
-      ></NewDestinationPanel>
+      />
     </>
   )
 }
-
-export default Destinations

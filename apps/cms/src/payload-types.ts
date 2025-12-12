@@ -140,11 +140,24 @@ export interface UserAuthOperations {
 export interface Author {
   id: number;
   author: string;
-  author_id?: string | null;
+  /**
+   * Unique identifier for the author
+   */
+  author_id: string;
+  /**
+   * GitHub/social username
+   */
+  username?: string | null;
   position?: string | null;
+  /**
+   * Company name (for external/guest authors)
+   */
+  company?: string | null;
+  /**
+   * Link to GitHub, Twitter, LinkedIn, etc.
+   */
   author_url?: string | null;
   author_image_url?: (number | null) | Media;
-  username?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -920,6 +933,10 @@ export interface Post {
   title: string;
   slug?: string | null;
   slugLock?: boolean | null;
+  /**
+   * Appears as subheading in the blog post preview.
+   */
+  description?: string | null;
   content: {
     root: {
       type: string;
@@ -935,28 +952,47 @@ export interface Post {
     };
     [k: string]: unknown;
   };
-  thumb?: (number | null) | Media;
-  image?: (number | null) | Media;
-  categories?: (number | Category)[] | null;
   /**
-   * Select a launch week to show launch week summary at the bottom of the blog post.
+   * Will show up as the blog post cover. Required.
+   */
+  thumb?: (number | null) | Media;
+  /**
+   * Authors must be one or more. Required.
+   */
+  authors?: (number | Author)[] | null;
+  /**
+   * Select only one category. Required.
+   */
+  categories?: (number | Category)[] | null;
+  readingTime?: number | null;
+  /**
+   * Tags can be one or more. Optional.
+   */
+  tags?: (number | Tag)[] | null;
+  toc_depth?: number | null;
+  /**
+   * Select a launch week to show launch week summary at the bottom of the blog post. Optional.
    */
   launchweek?: ('6' | '7' | '8' | 'x' | 'ga' | '12' | '13' | '14' | '15') | null;
-  readingTime?: number | null;
-  date?: string | null;
-  toc_depth?: number | null;
-  description?: string | null;
-  authors?: (number | Author)[] | null;
-  tags?: (number | Tag)[] | null;
   meta?: {
+    /**
+     * Defaults to the title of the post, if not set.
+     */
     title?: string | null;
     /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     * Defaults to the "thumb" image, if not set.
      */
     image?: (number | null) | Media;
+    /**
+     * Defaults to the description of the post, if not set.
+     */
     description?: string | null;
   };
   publishedAt?: string | null;
+  /**
+   * This date will determine the chronological order of the blog post. Required.
+   */
+  date?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -987,6 +1023,13 @@ export interface User {
   hash?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
   password?: string | null;
 }
 /**
@@ -1173,10 +1216,11 @@ export interface PayloadMigration {
 export interface AuthorsSelect<T extends boolean = true> {
   author?: T;
   author_id?: T;
+  username?: T;
   position?: T;
+  company?: T;
   author_url?: T;
   author_image_url?: T;
-  username?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1407,17 +1451,15 @@ export interface PostsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   slugLock?: T;
+  description?: T;
   content?: T;
   thumb?: T;
-  image?: T;
-  categories?: T;
-  launchweek?: T;
-  readingTime?: T;
-  date?: T;
-  toc_depth?: T;
-  description?: T;
   authors?: T;
+  categories?: T;
+  readingTime?: T;
   tags?: T;
+  toc_depth?: T;
+  launchweek?: T;
   meta?:
     | T
     | {
@@ -1426,6 +1468,7 @@ export interface PostsSelect<T extends boolean = true> {
         description?: T;
       };
   publishedAt?: T;
+  date?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -1454,6 +1497,13 @@ export interface UsersSelect<T extends boolean = true> {
   hash?: T;
   loginAttempts?: T;
   lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1534,10 +1584,6 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'events';
           value: number | Event;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: number | Post;
         } | null);
     global?: string | null;
     user?: (number | null) | User;
@@ -1574,7 +1620,7 @@ export interface BannerBlock {
  * via the `definition` "CodeBlock".
  */
 export interface CodeBlock {
-  language?: ('typescript' | 'javascript' | 'css') | null;
+  language?: ('sql' | 'json' | 'bash' | 'js' | 'ts' | 'tsx' | 'py' | 'kotlin' | 'yaml') | null;
   code: string;
   id?: string | null;
   blockName?: string | null;

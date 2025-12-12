@@ -4,12 +4,13 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useToggleLegacyAPIKeysMutation } from 'data/api-keys/legacy-api-key-toggle-mutation'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,23 +21,28 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from 'ui'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import Panel from '../Panel'
 
 export const ToggleLegacyApiKeysPanel = () => {
   const { ref: projectRef } = useParams()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const [isAppsWarningOpen, setIsAppsWarningOpen] = useState(false)
 
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canUpdateAPIKeys, isSuccess: isPermissionsSuccess } = useAsyncCheckPermissions(
+    PermissionAction.SECRETS_WRITE,
+    '*'
+  )
+
   const { data: legacyAPIKeysStatusData, isSuccess: isLegacyAPIKeysStatusSuccess } =
-    useLegacyAPIKeysStatusQuery({ projectRef })
+    useLegacyAPIKeysStatusQuery({ projectRef }, { enabled: canReadAPIKeys })
 
-  const { data: legacyJWTSecret } = useLegacyJWTSigningKeyQuery({ projectRef })
-
-  const { can: canUpdateAPIKeys, isSuccess: isPermissionsSuccess } =
-    useAsyncCheckProjectPermissions(PermissionAction.SECRETS_WRITE, '*')
+  const { data: legacyJWTSecret } = useLegacyJWTSigningKeyQuery(
+    { projectRef },
+    { enabled: canReadAPIKeys }
+  )
 
   const { data: authorizedApps = [], isSuccess: isAuthorizedAppsSuccess } = useAuthorizedAppsQuery({
     slug: org?.slug,
@@ -135,7 +141,7 @@ const ToggleApiKeysModal = ({
   const { ref: projectRef } = useParams()
   const { enabled: isLegacyKeysEnabled } = legacyAPIKeysStatusData || {}
 
-  const { mutate: toggleLegacyAPIKey, isLoading: isTogglingLegacyAPIKey } =
+  const { mutate: toggleLegacyAPIKey, isPending: isTogglingLegacyAPIKey } =
     useToggleLegacyAPIKeysMutation()
 
   const onToggleLegacyAPIKeysEnabled = () => {

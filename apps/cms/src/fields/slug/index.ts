@@ -1,6 +1,6 @@
 import type { CheckboxField, TextField } from 'payload'
 
-import { formatSlugHook } from './formatSlug'
+import { formatSlugHook } from './formatSlug.ts'
 
 type Overrides = {
   slugOverrides?: Partial<TextField>

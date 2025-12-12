@@ -3,9 +3,12 @@
 	import { enhance } from '$app/forms'
 	import type { ActionData, SubmitFunction } from './$types.js'
 
-	export let form: ActionData;
-	
-	let loading = false
+	interface Props {
+		form: ActionData
+	}
+	let { form }: Props = $props()
+
+	let loading = $state(false)
 
 	const handleSubmit: SubmitFunction = () => {
 		loading = true

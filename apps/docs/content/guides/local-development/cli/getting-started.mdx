@@ -66,6 +66,12 @@ Run the CLI by prefixing each command with `npx` or `bunx`:
 npx supabase --help
 ```
 
+<Admonition type="caution">
+
+The Supabase CLI requires **Node.js 20 or later** when run via `npx` or `npm`. Older Node.js versions, such as 16, are not supported and fail to start the CLI.
+
+</Admonition>
+
 You can also install the CLI as dev dependency via [npm](https://www.npmjs.com/package/supabase):
 
 ```sh
@@ -142,6 +148,12 @@ supabase stop --no-backup
 
 </Admonition>
 
+<$Show if="!docs:hide_cli_profiles">
+
+<$Partial path="cli_profiles.mdx" />
+
+</$Show>
+
 ## Running Supabase locally
 
 The Supabase CLI uses Docker containers to manage the local development stack. Follow the official guide to install and configure [Docker Desktop](https://docs.docker.com/desktop):
@@ -217,7 +229,7 @@ Started supabase local development setup.
          API URL: http://localhost:54321
           DB URL: postgresql://postgres:postgres@localhost:54322/postgres
       Studio URL: http://localhost:54323
-    Inbucket URL: http://localhost:54324
+     Mailpit URL: http://localhost:54324
         anon key: eyJh......
 service_role key: eyJh......
 

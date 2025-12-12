@@ -2,7 +2,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import * as yup from 'yup'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DocsButton } from 'components/ui/DocsButton'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
@@ -10,7 +9,9 @@ import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { Form, Input } from 'ui'
 
 const schema = yup.object({
@@ -19,19 +20,23 @@ const schema = yup.object({
 
 const CustomDomainsConfigureHostname = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
-  const { mutate: checkCNAMERecord, isLoading: isCheckingRecord } = useCheckCNAMERecordMutation()
-  const { mutate: createCustomDomain, isLoading: isCreating } = useCustomDomainCreateMutation()
+  const { mutate: checkCNAMERecord, isPending: isCheckingRecord } = useCheckCNAMERecordMutation()
+  const { mutate: createCustomDomain, isPending: isCreating } = useCustomDomainCreateMutation()
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
 
   const FORM_ID = 'custom-domains-form'
   const endpoint = settings?.app_config?.endpoint
-  const canConfigureCustomDomain = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { can: canConfigureCustomDomain } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
 
   const onCreateCustomDomain = async (values: yup.InferType<typeof schema>) => {
     if (!ref) return console.error('Project ref is required')
@@ -61,7 +66,7 @@ const CustomDomainsConfigureHostname = () => {
             <FormPanel
               disabled={!canConfigureCustomDomain}
               footer={
-                <div className="flex py-4 px-8">
+                <div className="flex py-4 px-[var(--card-padding-x)]">
                   <FormActions
                     form={FORM_ID}
                     isSubmitting={isCheckingRecord || isCreating}
@@ -73,7 +78,7 @@ const CustomDomainsConfigureHostname = () => {
                       !canConfigureCustomDomain ? (
                         "You need additional permissions to update your project's custom domain settings"
                       ) : (
-                        <DocsButton href="https://supabase.com/docs/guides/platform/custom-domains" />
+                        <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
                       )
                     }
                   />
@@ -96,13 +101,13 @@ const CustomDomainsConfigureHostname = () => {
                 <p className="col-span-12 text-sm lg:col-span-7 leading-6">
                   Set up a CNAME record for{' '}
                   {values.domain ? (
-                    <code className="text-xs">{values.domain}</code>
+                    <code className="text-code-inline">{values.domain}</code>
                   ) : (
                     'your custom domain'
                   )}{' '}
                   resolving to{' '}
                   {endpoint ? (
-                    <code className="text-xs">{endpoint}</code>
+                    <code className="text-code-inline">{endpoint}</code>
                   ) : (
                     "your project's API URL"
                   )}{' '}

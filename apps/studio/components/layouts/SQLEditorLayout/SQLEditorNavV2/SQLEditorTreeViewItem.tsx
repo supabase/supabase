@@ -1,15 +1,32 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM } from 'common'
-import { useParams } from 'common/hooks/useParams'
-import { useSQLSnippetFolderContentsQuery } from 'data/content/sql-folder-contents-query'
-import { Snippet } from 'data/content/sql-folders-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import useLatest from 'hooks/misc/useLatest'
-import { useProfile } from 'lib/profile'
-import { Copy, Download, Edit, ExternalLink, Lock, Move, Plus, Share, Trash } from 'lucide-react'
+import {
+  Copy,
+  Download,
+  Edit,
+  ExternalLink,
+  Heart,
+  Lock,
+  Move,
+  Plus,
+  Share,
+  Trash,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, useEffect } from 'react'
+
+import { keepPreviousData } from '@tanstack/react-query'
+import { IS_PLATFORM } from 'common'
+import { useParams } from 'common/hooks/useParams'
+import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import { getContentById } from 'data/content/content-id-query'
+import { useSQLSnippetFolderContentsQuery } from 'data/content/sql-folder-contents-query'
+import { Snippet } from 'data/content/sql-folders-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import useLatest from 'hooks/misc/useLatest'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
@@ -19,6 +36,7 @@ import {
   ContextMenuTrigger_Shadcn_,
   ContextMenu_Shadcn_,
   TreeViewItem,
+  cn,
 } from 'ui'
 
 interface SQLEditorTreeViewItemProps
@@ -34,7 +52,6 @@ interface SQLEditorTreeViewItemProps
   onSelectShare?: () => void
   onSelectUnshare?: () => void
   onSelectDownload?: () => void
-  onSelectDuplicate?: () => void
   onSelectDeleteFolder?: () => void
   onEditSave?: (name: string) => void
   onMultiSelect?: (id: string) => void
@@ -65,7 +82,6 @@ export const SQLEditorTreeViewItem = ({
   onSelectShare,
   onSelectUnshare,
   onSelectDownload,
-  onSelectDuplicate,
   onEditSave,
   onMultiSelect,
   isLastItem,
@@ -80,19 +96,25 @@ export const SQLEditorTreeViewItem = ({
   const router = useRouter()
   const { id, ref: projectRef } = useParams()
   const { profile } = useProfile()
+  const { data: project } = useSelectedProjectQuery()
   const { className, onClick } = getNodeProps()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const isOwner = profile?.id === element?.metadata.owner_id
   const isSharedSnippet = element.metadata.visibility === 'project'
+  const isFavorite = element.metadata.favorite
 
   const isEditing = status === 'editing'
   const isSaving = status === 'saving'
 
-  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'sql', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
 
   const parentId = element.parent === 0 ? undefined : element.parent
 
@@ -105,7 +127,7 @@ export const SQLEditorTreeViewItem = ({
     isFetchingNextPage: isFetchingNextPageInFolder,
     hasNextPage: hasNextPageInFolder,
     fetchNextPage: fetchNestPageInFolder,
-    isPreviousData,
+    isPlaceholderData,
     isFetching,
   } = useSQLSnippetFolderContentsQuery(
     {
@@ -116,7 +138,7 @@ export const SQLEditorTreeViewItem = ({
     },
     {
       enabled: isEnabled,
-      keepPreviousData: true,
+      placeholderData: keepPreviousData,
     }
   )
   useEffect(() => {
@@ -136,11 +158,11 @@ export const SQLEditorTreeViewItem = ({
   useEffect(() => {
     if (isEnabled) {
       onFolderContentsChangeRef.current?.({
-        isLoading: isLoading || (isPreviousData && isFetching),
+        isLoading: isLoading || (isPlaceholderData && isFetching),
         snippets: data?.pages.flatMap((page) => page.contents ?? []),
       })
     }
-  }, [data?.pages, isFetching, isLoading, isPreviousData, isEnabled])
+  }, [data?.pages, isFetching, isLoading, isPlaceholderData, isEnabled])
 
   const isInFolder = parentId !== undefined
 
@@ -152,6 +174,46 @@ export const SQLEditorTreeViewItem = ({
     } else if (typeof _fetchNextPage === 'function') {
       _fetchNextPage()
     }
+  }
+
+  const onToggleFavorite = () => {
+    const snippetId = element.metadata.id
+    if (snippetId) {
+      if (isFavorite) snapV2.removeFavorite(snippetId)
+      else snapV2.addFavorite(snippetId)
+    }
+  }
+
+  const onSelectDuplicate = async () => {
+    if (!profile) return console.error('Profile is required')
+    if (!project) return console.error('Project is required')
+    if (!projectRef) return console.error('Project ref is required')
+    if (!id) return console.error('Snippet ID is required')
+
+    const snippet = element.metadata
+    let sql: string = ''
+
+    if (snippet.content && snippet.content.sql) {
+      sql = snippet.content.sql
+    } else {
+      // Fetch the content first
+      const { content } = await getContentById({ projectRef, id: snippet.id })
+      if ('sql' in content) {
+        sql = content.sql
+      }
+    }
+
+    const snippetCopy = createSqlSnippetSkeletonV2({
+      id: uuidv4(),
+      name: `${snippet.name} (Duplicate)`,
+      sql,
+      owner_id: profile?.id,
+      project_id: project?.id,
+    })
+
+    snapV2.addSnippet({ projectRef, snippet: snippetCopy })
+    snapV2.addNeedsSaving(snippetCopy.id!)
+    router.push(`/project/${projectRef}/sql/${snippetCopy.id}`)
   }
 
   return (
@@ -292,16 +354,19 @@ export const SQLEditorTreeViewItem = ({
                   Move query
                 </ContextMenuItem_Shadcn_>
               )}
-              {onSelectShare !== undefined && !isSharedSnippet && canCreateSQLSnippet && (
-                <ContextMenuItem_Shadcn_
-                  className="gap-x-2"
-                  onSelect={() => onSelectShare()}
-                  onFocusCapture={(e) => e.stopPropagation()}
-                >
-                  <Share size={14} />
-                  Share query with team
-                </ContextMenuItem_Shadcn_>
-              )}
+              {onSelectShare !== undefined &&
+                !isSharedSnippet &&
+                canCreateSQLSnippet &&
+                IS_PLATFORM && (
+                  <ContextMenuItem_Shadcn_
+                    className="gap-x-2"
+                    onSelect={() => onSelectShare()}
+                    onFocusCapture={(e) => e.stopPropagation()}
+                  >
+                    <Share size={14} />
+                    Share query with team
+                  </ContextMenuItem_Shadcn_>
+                )}
               {onSelectUnshare !== undefined && isSharedSnippet && isOwner && (
                 <ContextMenuItem_Shadcn_
                   className="gap-x-2"
@@ -320,6 +385,21 @@ export const SQLEditorTreeViewItem = ({
                 >
                   <Copy size={14} />
                   Duplicate query
+                </ContextMenuItem_Shadcn_>
+              )}
+              {IS_PLATFORM && (
+                <ContextMenuItem_Shadcn_
+                  className="gap-x-2"
+                  onSelect={() => onToggleFavorite()}
+                  onFocusCapture={(e) => e.stopPropagation()}
+                >
+                  <Heart
+                    size={14}
+                    className={cn(
+                      isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
+                    )}
+                  />
+                  {isFavorite ? 'Remove from' : 'Add to'} favorites
                 </ContextMenuItem_Shadcn_>
               )}
               {onSelectDownload !== undefined && IS_PLATFORM && (

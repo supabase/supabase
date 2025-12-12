@@ -5,15 +5,15 @@ import Link from 'next/link'
 import { useParams } from 'common'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 
 export const GitHubStatus = () => {
   const { ref: projectRef } = useParams()
-  const selectedProject = useSelectedProject()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedProject } = useSelectedProjectQuery()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const parentProjectRef = selectedProject?.parent_project_ref || projectRef
 
   const { data: connections } = useGitHubConnectionsQuery(
@@ -86,7 +86,7 @@ export const GitHubStatus = () => {
               {hasGitBranchSync ? (
                 <CheckCircle2 size={12} className="text-brand-600" />
               ) : (
-                <AlertCircle size={12} className="text-warning-600" />
+                <AlertCircle size={12} className="text-warning" />
               )}
               <span>
                 {hasGitBranchSync
@@ -98,7 +98,7 @@ export const GitHubStatus = () => {
               {hasAutomaticBranching ? (
                 <CheckCircle2 size={12} className="text-brand-600" />
               ) : (
-                <AlertCircle size={12} className="text-warning-600" />
+                <AlertCircle size={12} className="text-warning" />
               )}
               <span>
                 {hasAutomaticBranching

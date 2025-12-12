@@ -4,6 +4,7 @@ export const getStripeElementsAppearanceOptions = (
   resolvedTheme: string | undefined
 ): Appearance => {
   return {
+    labels: 'floating',
     theme: (resolvedTheme?.includes('dark') ? 'night' : 'flat') as 'night' | 'flat',
     variables: {
       fontSizeBase: '14px',
@@ -12,17 +13,26 @@ export const getStripeElementsAppearanceOptions = (
         : 'hsl(0deg 0% 95.3%)',
       fontFamily:
         'var(--font-custom, Circular, custom-font, Helvetica Neue, Helvetica, Arial, sans-serif)',
-      spacingUnit: '4px',
-      borderRadius: '.375rem',
-      gridRowSpacing: '4px',
     },
     rules: {
-      '.Label': {
-        // Hide labels - it is obvious enough what the fields are for
-        fontSize: '0',
-      },
       '.TermsText': {
         fontSize: '12px',
+      },
+      '.Label--floating': {
+        fontSize: '14px',
+      },
+      '.Label--resting': {
+        fontSize: '14px',
+        color: 'rgb(137, 137, 137)',
+      },
+      '.Input': {
+        boxShadow: 'none',
+        height: '34px',
+        lineHeight: '16px',
+        padding: '8px 12px',
+      },
+      '.AccordionItem': {
+        boxShadow: 'none',
       },
     },
   }

@@ -1,25 +1,27 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, Book, Check } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { EdgeFunctionFile } from 'components/interfaces/EdgeFunctions/EdgeFunction.types'
 import { EDGE_FUNCTION_TEMPLATES } from 'components/interfaces/Functions/Functions.templates'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { FileExplorerAndEditor } from 'components/ui/FileExplorerAndEditor'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
@@ -100,17 +102,14 @@ type FormValues = z.infer<typeof FormSchema>
 const NewFunctionPage = () => {
   const router = useRouter()
   const { ref, template } = useParams()
-  const project = useSelectedProject()
-  const { includeSchemaMetadata } = useOrgAiOptInLevel()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const snap = useAiAssistantStateSnapshot()
   const { mutate: sendEvent } = useSendEventMutation()
-  const org = useSelectedOrganization()
+  const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
+  const { openSidebar } = useSidebarManagerSnapshot()
 
-  const useBedrockAssistant = useFlag('useBedrockAssistant')
-
-  const [files, setFiles] = useState<
-    { id: number; name: string; content: string; selected?: boolean }[]
-  >([
+  const [files, setFiles] = useState<EdgeFunctionFile[]>([
     {
       id: 1,
       name: 'index.ts',
@@ -122,6 +121,14 @@ const NewFunctionPage = () => {
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
   const [savedCode, setSavedCode] = useState<string>('')
 
+  const templates = useMemo(() => {
+    if (showStripeExample) {
+      return EDGE_FUNCTION_TEMPLATES
+    }
+    // Filter out Stripe template
+    return EDGE_FUNCTION_TEMPLATES.filter((template) => template.value !== 'stripe-webhook')
+  }, [showStripeExample])
+
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -129,7 +136,7 @@ const NewFunctionPage = () => {
     },
   })
 
-  const { mutate: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
+  const { mutate: deployFunction, isPending: isDeploying } = useEdgeFunctionDeployMutation({
     // [Joshen] To investigate: For some reason, the invalidation for list of edge functions isn't triggering
     onSuccess: () => {
       toast.success('Successfully deployed edge function')
@@ -146,13 +153,10 @@ const NewFunctionPage = () => {
     deployFunction({
       projectRef: ref,
       slug: values.functionName,
-      metadata: {
-        entrypoint_path: 'index.ts',
-        name: values.functionName,
-        verify_jwt: true,
-      },
+      metadata: { name: values.functionName, verify_jwt: true },
       files: files.map(({ name, content }) => ({ name, content })),
     })
+
     sendEvent({
       action: 'edge_function_deploy_button_clicked',
       properties: { origin: 'functions_editor' },
@@ -162,9 +166,9 @@ const NewFunctionPage = () => {
 
   const handleChat = () => {
     const selectedFile = files.find((f) => f.selected) ?? files[0]
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     snap.newChat({
       name: 'Explain edge function',
-      open: true,
       sqlSnippets: [selectedFile.content],
       initialInput: 'Help me understand and improve this edge function...',
       suggestions: {
@@ -292,7 +296,7 @@ const NewFunctionPage = () => {
                 <CommandList_Shadcn_>
                   <CommandEmpty_Shadcn_>No templates found.</CommandEmpty_Shadcn_>
                   <CommandGroup_Shadcn_>
-                    {EDGE_FUNCTION_TEMPLATES.map((template) => (
+                    {templates.map((template) => (
                       <CommandItem_Shadcn_
                         key={template.value}
                         value={template.value}
@@ -338,15 +342,11 @@ const NewFunctionPage = () => {
       <FileExplorerAndEditor
         files={files}
         onFilesChange={setFiles}
-        aiEndpoint={
-          useBedrockAssistant
-            ? `${BASE_PATH}/api/ai/edge-function/complete-v2`
-            : `${BASE_PATH}/api/ai/edge-function/complete`
-        }
+        aiEndpoint={`${BASE_PATH}/api/ai/code/complete`}
         aiMetadata={{
           projectRef: project?.ref,
           connectionString: project?.connectionString,
-          includeSchemaMetadata,
+          orgSlug: org?.slug,
         }}
       />
 

@@ -46,7 +46,7 @@ export const generateRowFields = (
   table: PostgresTable,
   foreignKeys: ForeignKey[]
 ): RowField[] => {
-  const { primary_keys } = table
+  const { primary_keys = [] } = table
   const primaryKeyColumns = primary_keys.map((key) => key.name)
 
   return (table.columns ?? []).map((column) => {
@@ -275,7 +275,11 @@ export const isValueTruncated = (value: string | null | undefined) => {
       (value.match(/","/g) || []).length === MAX_ARRAY_SIZE) ||
     // if the string represent a multi-dimentional array we always consider it as possibly truncated
     // so user load the whole value before edition
-    (typeof value === 'string' && value.startsWith('[["'))
+    (typeof value === 'string' && value.startsWith('[["')) ||
+    // [Joshen] For json arrays, refer to getTableRowsSql from table-row-query
+    // for array types, we're adding {"truncated": true} as the last item of the JSON to
+    // maintain the JSON array structure
+    (typeof value === 'string' && value.endsWith(',{"truncated":true}]'))
   )
 }
 
