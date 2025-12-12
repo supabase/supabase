@@ -47,7 +47,8 @@ function getCostDescription(level: CostLevel): { label: string; description: str
 }
 
 export function CostIndicator({ cost, maxCost }: CostIndicatorProps) {
-  const costWidth = maxCost > 0 ? (cost / maxCost) * 100 : 0
+  const rawWidth = maxCost > 0 ? (cost / maxCost) * 100 : 0
+  const costWidth = Number.isFinite(rawWidth) ? Math.min(Math.max(rawWidth, 0), 100) : 0
   const costLevel = getCostLevel(cost)
   const colorClass = getCostColorClass(costLevel)
   const { label, description } = getCostDescription(costLevel)
@@ -59,7 +60,7 @@ export function CostIndicator({ cost, maxCost }: CostIndicatorProps) {
           <div className="w-16 h-1.5 bg-surface-300 rounded-full overflow-hidden">
             <div
               className={cn('h-full rounded-full transition-all', colorClass)}
-              style={{ width: `${Math.min(costWidth, 100)}%` }}
+              style={{ width: `${costWidth}%` }}
             />
           </div>
           <span className="text-xs text-foreground-lighter">
