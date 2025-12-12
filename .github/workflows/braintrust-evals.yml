@@ -15,6 +15,7 @@ jobs:
   eval:
     name: Run evals
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     env:
       BRAINTRUST_PROJECT_ID: "ec4bfca4-0f06-4659-8007-9b638e3fdddc" # Hardcoded for testing, not sensitive
