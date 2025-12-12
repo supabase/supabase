@@ -69,7 +69,7 @@ export default function Home() {
               </div>
               <div>
                 <h3 className="font-medium text-foreground">Theming</h3>
-                <p className="text-sm text-foreground-light">Components assembled from Atoms</p>
+                <p className="text-sm text-foreground-light">Simple extensible theming system</p>
               </div>
             </div>
           </Link>
@@ -83,7 +83,7 @@ export default function Home() {
               </div>
               <div>
                 <h3 className="font-medium text-foreground">Icons</h3>
-                <p className="text-sm text-foreground-light">Components assembled from Atoms</p>
+                <p className="text-sm text-foreground-light">Custom icons for Supabase</p>
               </div>
             </div>
           </Link>

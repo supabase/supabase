@@ -4,7 +4,7 @@ import { SourcePanel } from '@/components/source-panel'
 import { DashboardTableOfContents } from '@/components/toc'
 import { siteConfig } from '@/config/site'
 import { getTableOfContents } from '@/lib/toc'
-import { absoluteUrl, cn } from '@/lib/utils'
+import { absoluteUrl } from '@/lib/utils'
 import '@/styles/code-block-variables.css'
 import '@/styles/mdx.css'
 import { allDocs } from 'contentlayer/generated'
@@ -91,7 +91,7 @@ export default async function DocPage(props: DocPageProps) {
           <div className="text-foreground-lighter">{doc.title}</div>
         </div>
         <div className="space-y-2 mb-5">
-          <h1 className={cn('scroll-m-20 text-4xl tracking-tight')}>{doc.title}</h1>
+          <h1 className="scroll-m-20 text-4xl tracking-tight">{doc.title}</h1>
           {doc.description && (
             <p className="text-lg text-foreground-light">
               <Balancer>{doc.description}</Balancer>
