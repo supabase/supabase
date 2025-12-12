@@ -5,8 +5,11 @@ import {
   calculateMaxCost,
   calculateSummary,
   type ExplainSummary,
-} from 'components/interfaces/ExplainVisualizer/parser'
-import type { QueryPlanRow, ExplainNode } from 'components/interfaces/ExplainVisualizer/types'
+} from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.parser'
+import type {
+  QueryPlanRow,
+  ExplainNode,
+} from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
 
 // Helper to create QueryPlanRow array from strings
 const toQueryPlanRows = (lines: string[]): QueryPlanRow[] =>

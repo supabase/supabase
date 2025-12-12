@@ -1,9 +1,14 @@
 import { Activity, ArrowUp, Clock, Database, GitMerge, Hash, Zap } from 'lucide-react'
 import { useMemo } from 'react'
 import { Badge, Button } from 'ui'
-import { ExplainNodeRenderer } from './ExplainNodeRenderer'
-import { calculateMaxCost, calculateSummary, parseExplainOutput, parseNodeDetails } from './parser'
-import type { ExplainNode, QueryPlanRow } from './types'
+import { ExplainNodeRenderer } from './ExplainVisualizer.NodeRenderer'
+import {
+  calculateMaxCost,
+  calculateSummary,
+  parseExplainOutput,
+  parseNodeDetails,
+} from './ExplainVisualizer.parser'
+import type { ExplainNode, QueryPlanRow } from './ExplainVisualizer.types'
 
 export interface ExplainVisualizerProps {
   rows: readonly QueryPlanRow[]

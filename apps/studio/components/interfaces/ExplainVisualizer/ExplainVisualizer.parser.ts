@@ -1,4 +1,4 @@
-import type { ExplainNode, QueryPlanRow } from './types'
+import type { ExplainNode, QueryPlanRow } from './ExplainVisualizer.types'
 
 export interface ExplainSummary {
   totalTime: number

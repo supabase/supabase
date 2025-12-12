@@ -9,7 +9,7 @@ import {
   Layers,
   type LucideIcon,
 } from 'lucide-react'
-import type { ExplainNode } from './types'
+import type { ExplainNode } from './ExplainVisualizer.types'
 
 // Get human-readable description for an operation
 export function getOperationDescription(operation: string, node: ExplainNode): string {

@@ -1,8 +1,12 @@
 import { ArrowLeft, ArrowLeftRight, ArrowRight, ArrowUp, Clock } from 'lucide-react'
 import { cn } from 'ui'
-import { getOperationColor, getOperationDescription, getOperationIcon } from './utils'
+import {
+  getOperationColor,
+  getOperationDescription,
+  getOperationIcon,
+} from './ExplainVisualizer.utils'
 
-import type { ExplainNode } from './types'
+import type { ExplainNode } from './ExplainVisualizer.types'
 
 export interface ExplainNodeRendererProps {
   node: ExplainNode
