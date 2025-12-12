@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { BarChart2 } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -26,9 +25,9 @@ import {
   FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  Input as Input_Ui,
   WarningIcon,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -63,20 +62,14 @@ export const General = () => {
     name: z.string().trim().min(3, 'Project name must be at least 3 characters long'),
   })
 
+  const defaultValues = { name: project?.name ?? '' }
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: project?.name ?? '',
-    },
+    defaultValues,
+    values: defaultValues,
     mode: 'onSubmit',
     reValidateMode: 'onBlur',
   })
-
-  useEffect(() => {
-    if (project?.name) {
-      form.reset({ name: project.name })
-    }
-  }, [project?.name])
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!project?.ref) return console.error('Ref is required')
@@ -158,7 +151,7 @@ export const General = () => {
                       className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
                     >
                       <FormControl_Shadcn_>
-                        <Input_Ui copy disabled size="small" value={project?.ref ?? ''} />
+                        <Input copy readOnly size="small" value={project?.ref ?? ''} />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   </CardContent>
@@ -176,7 +169,9 @@ export const General = () => {
                     <Button
                       type="primary"
                       htmlType="submit"
-                      disabled={!form.formState.isDirty || isUpdating || !canUpdateProject}
+                      disabled={
+                        !form.formState.isDirty || isUpdating || !canUpdateProject || isBranch
+                      }
                       loading={isUpdating}
                     >
                       Save changes
@@ -258,13 +253,14 @@ export const General = () => {
                       </p>
                     </div>
                   </div>
-                  <div>
+
+                  {!!organization && !!project && (
                     <Button asChild type="default">
-                      <Link href={`/org/${organization?.slug}/usage?projectRef=${project?.ref}`}>
+                      <Link href={`/org/${organization.slug}/usage?projectRef=${project.ref}`}>
                         View project usage
                       </Link>
                     </Button>
-                  </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
