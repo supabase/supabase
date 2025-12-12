@@ -1089,8 +1089,20 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
  * @source studio
  * @page /observability/*
  */
-export interface ObservabilityBannerCtaButtonClickedEvent {
-  action: 'observability_banner_cta_button_clicked'
+export interface MetricsAPIBannerCtaButtonClickedEvent {
+  action: 'metrics_api_banner_cta_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the dismiss button on a banner in studio Observability pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/*
+ */
+export interface MetricsAPIBannerDismissButtonClickedEvent {
+  action: 'metrics_api_banner_dismiss_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -1155,18 +1167,6 @@ export interface IndexAdvisorTabClickedEvent {
  */
 export interface IndexAdvisorCreateIndexesButtonClickedEvent {
   action: 'index_advisor_create_indexes_button_clicked'
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked the dismiss button on a banner in studio Observability pages.
- *
- * @group Events
- * @source studio
- * @page /observability/*
- */
-export interface ObservabilityBannerDismissButtonClickedEvent {
-  action: 'observability_banner_dismiss_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -2661,8 +2661,8 @@ export type TelemetryEvent =
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
-  | ObservabilityBannerCtaButtonClickedEvent
-  | ObservabilityBannerDismissButtonClickedEvent
+  | MetricsAPIBannerCtaButtonClickedEvent
+  | MetricsAPIBannerDismissButtonClickedEvent
   | IndexAdvisorBannerEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorDialogEnableButtonClickedEvent
