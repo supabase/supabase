@@ -16,7 +16,7 @@
   grid-template-areas:
     'postgres            mgmt-api'
     'pricing             branching'
-    'project-claim-flow  platform-kit'
+    'claim-flow  platform-kit'
     'pico-instances      pico-instances';
 }
 
@@ -24,7 +24,7 @@
   .features-grid-extended {
     grid-template-areas:
       'postgres     mgmt-api            mgmt-api'
-      'pricing      branching           project-claim-flow'
+      'pricing      branching           claim-flow'
       'platform-kit pico-instances      pico-instances';
   }
 }

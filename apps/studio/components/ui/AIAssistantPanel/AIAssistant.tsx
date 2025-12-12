@@ -51,11 +51,12 @@ interface AIAssistantProps {
 
 export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
-  const { data: project } = useSelectedProjectQuery()
-  const { data: selectedOrganization, isLoading: isLoadingOrganization } =
-    useSelectedOrganizationQuery()
   const { ref, id: entityId } = useParams()
+  const { data: project } = useSelectedProjectQuery()
   const searchParams = useSearchParamsShallow()
+
+  const { data: selectedOrganization, isPending: isLoadingOrganization } =
+    useSelectedOrganizationQuery()
 
   useHotKey(() => cancelEdit(), 'Escape')
 
@@ -63,7 +64,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { snippets } = useSqlEditorV2StateSnapshot()
   const snap = useAiAssistantStateSnapshot()
   const state = useAiAssistantState()
-  const { closeSidebar, activeSidebar } = useSidebarManagerSnapshot()
+  const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
 
   // Avoid hammering the API when project ref is unavailable or if previous calls failed
   const shouldFetchSessions = IS_PLATFORM && !!project?.ref && !disablePrompts
@@ -165,7 +166,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const [messageRatings, setMessageRatings] = useState<Record<string, 'positive' | 'negative'>>({})
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
-  const isApiKeySet = IS_PLATFORM || !!check?.hasKey
+  const isApiKeySet = !!check?.hasKey
 
   const { mutateAsync: rateMessage } = useRateMessageMutation()
 

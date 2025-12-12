@@ -18,7 +18,7 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { PostgrestConfig } from './PostgrestConfig'
 
 export const ServiceList = () => {
-  const { data: project, isLoading } = useSelectedProjectQuery()
+  const { data: project, isPending: isLoading } = useSelectedProjectQuery()
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
@@ -28,7 +28,7 @@ export const ServiceList = () => {
   const {
     data: databases,
     isError,
-    isLoading: isLoadingDatabases,
+    isPending: isLoadingDatabases,
   } = useReadReplicasQuery({ projectRef })
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef })
 

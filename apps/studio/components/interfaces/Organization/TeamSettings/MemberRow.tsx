@@ -38,7 +38,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
   const { profile } = useProfile()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const { data: roles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
+  const { data: roles, isPending: isLoadingRoles } = useOrganizationRolesV2Query({
     slug: selectedOrganization?.slug,
   })
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0

@@ -58,8 +58,8 @@ export const EditorPanel = () => {
     setResults,
     setError,
   } = useEditorPanelStateSnapshot()
-  const { closeSidebar } = useSidebarManagerSnapshot()
   const { profile } = useProfile()
+  const { closeSidebar } = useSidebarManagerSnapshot()
   const sqlEditorSnap = useSqlEditorV2StateSnapshot()
 
   const label = 'SQL Editor'
@@ -306,7 +306,7 @@ export const EditorPanel = () => {
           <div className="shrink-0">
             <Admonition
               type="warning"
-              className="m-0 rounded-none border-x-0 border-b-0 [&>div>div>pre]:text-sm [&>div]:flex [&>div]:flex-col [&>div]:gap-y-2"
+              className="rounded-none border-x-0 border-b-0 [&>div>div>pre]:text-sm [&>div]:flex [&>div]:flex-col [&>div]:gap-y-2"
               title={errorHeader || 'Error running SQL query'}
               description={
                 <div>

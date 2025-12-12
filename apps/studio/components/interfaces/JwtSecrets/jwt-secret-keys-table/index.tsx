@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { useFlag, useParams } from 'common'
 import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
 import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
@@ -37,7 +38,6 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { SigningKeysComingSoonBanner } from '../signing-keys-coming-soon'
 import { StartUsingJwtSigningKeysBanner } from '../start-using-keys-banner'
 import { ActionPanel } from './action-panel'
@@ -50,7 +50,7 @@ type DialogType = 'legacy' | 'create' | 'rotate' | 'key-details' | 'revoke' | 'd
 
 export const JWTSecretKeysTable = () => {
   const { ref: projectRef } = useParams()
-  const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
+  const { data: project, isPending: isProjectLoading } = useSelectedProjectQuery()
 
   const newJwtSecrets = useFlag('newJwtSecrets')
 
@@ -59,19 +59,19 @@ export const JWTSecretKeysTable = () => {
   const [shownDialog, setShownDialog] = useState<DialogType>()
 
   const { canReadAPIKeys, isLoading: isLoadingCanReadAPIKeys } = useApiKeysVisibility()
-  const { data: signingKeys, isLoading: isLoadingSigningKeys } = useJWTSigningKeysQuery(
+  const { data: signingKeys, isPending: isLoadingSigningKeys } = useJWTSigningKeysQuery(
     {
       projectRef,
     },
     { enabled: canReadAPIKeys }
   )
-  const { data: legacyKey, isLoading: isLoadingLegacyKey } = useLegacyJWTSigningKeyQuery(
+  const { data: legacyKey, isPending: isLoadingLegacyKey } = useLegacyJWTSigningKeyQuery(
     {
       projectRef,
     },
     { enabled: canReadAPIKeys }
   )
-  const { data: legacyAPIKeysStatus, isLoading: isLoadingLegacyAPIKeysStatus } =
+  const { data: legacyAPIKeysStatus, isPending: isLoadingLegacyAPIKeysStatus } =
     useLegacyAPIKeysStatusQuery({ projectRef }, { enabled: canReadAPIKeys })
 
   const { mutate: migrateJWTSecret, isPending: isMigrating } = useLegacyJWTSigningKeyCreateMutation(

@@ -27,19 +27,20 @@ export const CustomDomainConfig = () => {
 
   const plan = organization?.plan?.id
 
-  const { data: addons, isLoading: isLoadingAddons } = useProjectAddonsQuery({ projectRef: ref })
+  const { data: addons, isPending: isLoadingAddons } = useProjectAddonsQuery({ projectRef: ref })
   const hasCustomDomainAddon = !!addons?.selected_addons.find((x) => x.type === 'custom_domain')
 
   const {
     data: customDomainData,
-    isLoading: isCustomDomainsLoading,
+    isPending: isCustomDomainsLoading,
     isError,
     isSuccess,
     status: customDomainStatus,
   } = useCustomDomainsQuery(
     { projectRef: ref },
     {
-      refetchInterval: (data) => {
+      refetchInterval: (query) => {
+        const data = query.state.data
         // while setting up the ssl certificate, we want to poll every 5 seconds
         if (data?.customDomain?.ssl.status) {
           return 10000 // 10 seconds

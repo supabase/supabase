@@ -45,7 +45,7 @@ export const AnalyticsBuckets = () => {
     data: buckets = [],
     error: bucketsError,
     isError: isErrorBuckets,
-    isLoading: isLoadingBuckets,
+    isPending: isLoadingBuckets,
     isSuccess: isSuccessBuckets,
   } = useAnalyticsBucketsQuery({
     projectRef: ref,
@@ -74,7 +74,7 @@ export const AnalyticsBuckets = () => {
     <>
       <PageContainer>
         <PageSection>
-          <PageSectionContent>
+          <PageSectionContent className="flex flex-col gap-y-8">
             <AlphaNotice
               entity="Analytics buckets"
               feedbackUrl="https://github.com/orgs/supabase/discussions/40116"
