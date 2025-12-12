@@ -269,7 +269,8 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
         onCancel={() => setShowConfirmRestore(false)}
         onConfirm={() => form.handleSubmit(onConfirmRestore)()}
         loading={isRestoring}
-        confirmLabel="Resume project"
+        confirmLabel="Resume"
+        confirmLabelLoading="Resuming"
         cancelLabel="Cancel"
       >
         <div className={cn(showPostgresVersionSelector && 'flex flex-col gap-y-5')}>
