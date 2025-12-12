@@ -27,9 +27,10 @@ export function ExplainNodeRenderer({
 }: ExplainNodeRendererProps) {
   const Icon = getOperationIcon(node.operation)
   const colorClass = getOperationColor(node.operation)
+  const description = getOperationDescription(node.operation, node)
+
   const costValue = node.cost?.end || node.actualTime?.end || 0
   const costWidth = maxCost > 0 ? (costValue / maxCost) * 100 : 0
-  const description = getOperationDescription(node.operation, node)
   const isLeaf = node.children.length === 0
 
   const detailLines = node.details ? node.details.split('\n').filter(Boolean) : []
