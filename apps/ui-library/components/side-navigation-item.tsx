@@ -108,7 +108,11 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props
         )}
       />
       {item.title}
-      {item.new && <Badge variant="success">New</Badge>}
+      {item.new && (
+        <Badge variant="success" className="capitalize">
+          New
+        </Badge>
+      )}
     </Link>
   )
 }
