@@ -50,7 +50,7 @@ export const TotalUsage = ({
   const {
     data: usage,
     error: usageError,
-    isLoading: isLoadingUsage,
+    isPending: isLoadingUsage,
     isError: isErrorUsage,
     isSuccess: isSuccessUsage,
   } = useOrgUsageQuery({
