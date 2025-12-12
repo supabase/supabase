@@ -571,7 +571,7 @@ describe('parseExplainOutput', () => {
       expect(result[0].rowsRemovedByFilter).toBeUndefined()
     })
 
-    test('ensures all numeric values are finite after parsing', () => {
+    test('parsed numeric fields are finite for valid input', () => {
       const input = toQueryPlanRows([
         'Seq Scan on users  (cost=0.00..10.50 rows=100 width=36) (actual time=0.015..0.123 rows=85 loops=1)',
         "  Filter: (status = 'active')",
