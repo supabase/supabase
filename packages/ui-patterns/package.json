@@ -278,10 +278,6 @@
       "import": "./src/DataInputs/Input.tsx",
       "types": "./src/DataInputs/Input.tsx"
     },
-    "./Dialogs/ConfirmDialog": {
-      "import": "./src/Dialogs/ConfirmDialog.tsx",
-      "types": "./src/Dialogs/ConfirmDialog.tsx"
-    },
     "./Dialogs/ConfirmationModal": {
       "import": "./src/Dialogs/ConfirmationModal.tsx",
       "types": "./src/Dialogs/ConfirmationModal.tsx"
