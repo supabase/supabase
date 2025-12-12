@@ -2,8 +2,8 @@ import { ArrowRight } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface RowCountIndicatorProps {
-  actualRows: number | null
-  estimatedRows: number | null
+  actualRows?: number
+  estimatedRows?: number
   rowsRemovedByFilter?: number
 }
 
@@ -12,20 +12,23 @@ export function RowCountIndicator({
   estimatedRows,
   rowsRemovedByFilter,
 }: RowCountIndicatorProps) {
-  const hasData = actualRows !== null || estimatedRows !== null
+  const hasData = actualRows !== undefined || estimatedRows !== undefined
   if (!hasData) return null
 
   const totalRowsScanned =
-    rowsRemovedByFilter && actualRows !== null ? actualRows + rowsRemovedByFilter : null
+    rowsRemovedByFilter && actualRows !== undefined ? actualRows + rowsRemovedByFilter : undefined
 
-  const showFilterFlow = totalRowsScanned !== null && rowsRemovedByFilter
+  const showFilterFlow = totalRowsScanned !== undefined && rowsRemovedByFilter
   const showSimpleCount =
-    !showFilterFlow && actualRows !== null && estimatedRows !== null && actualRows === estimatedRows
+    !showFilterFlow &&
+    actualRows !== undefined &&
+    estimatedRows !== undefined &&
+    actualRows === estimatedRows
   const showComparison = !showFilterFlow && !showSimpleCount
 
   // Calculate estimation accuracy for tooltip
   const getEstimationAccuracy = () => {
-    if (actualRows === null || estimatedRows === null || estimatedRows === 0) return null
+    if (actualRows === undefined || estimatedRows === undefined || estimatedRows === 0) return null
     const ratio = actualRows / estimatedRows
     if (ratio > 10) return 'severely underestimated'
     if (ratio > 2) return 'underestimated'
@@ -86,10 +89,10 @@ export function RowCountIndicator({
       <Tooltip>
         <TooltipTrigger asChild>
           <div className="flex items-center gap-1.5 text-xs text-foreground-lighter cursor-help">
-            {estimatedRows !== null && <span>est. {estimatedRows.toLocaleString()}</span>}
-            {actualRows !== null && (
+            {estimatedRows !== undefined && <span>est. {estimatedRows.toLocaleString()}</span>}
+            {actualRows !== undefined && (
               <>
-                {estimatedRows !== null && (
+                {estimatedRows !== undefined && (
                   <ArrowRight size={10} className="text-foreground-muted" />
                 )}
                 <span className="text-foreground-light font-medium">
@@ -101,14 +104,14 @@ export function RowCountIndicator({
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs">
           <p className="font-medium">
-            {actualRows !== null && estimatedRows !== null
+            {actualRows !== undefined && estimatedRows !== undefined
               ? 'Estimated vs actual rows'
-              : actualRows !== null
+              : actualRows !== undefined
                 ? 'Actual rows'
                 : 'Estimated rows'}
           </p>
           <p className="text-foreground-lighter text-xs mt-1">
-            {actualRows !== null && estimatedRows !== null ? (
+            {actualRows !== undefined && estimatedRows !== undefined ? (
               hasEstimationIssue ? (
                 <>
                   The planner {accuracy} the row count (estimated {estimatedRows.toLocaleString()},
@@ -121,7 +124,7 @@ export function RowCountIndicator({
                   {actualRows.toLocaleString()} were returned. The estimate was reasonably accurate.
                 </>
               )
-            ) : actualRows !== null ? (
+            ) : actualRows !== undefined ? (
               <>The operation returned {actualRows.toLocaleString()} rows.</>
             ) : (
               <>

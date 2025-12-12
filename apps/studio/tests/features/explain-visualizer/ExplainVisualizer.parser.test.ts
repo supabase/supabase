@@ -28,8 +28,8 @@ describe('parseExplainOutput', () => {
       expect(result[0].cost).toEqual({ start: 0, end: 10.5 })
       expect(result[0].rows).toBe(100)
       expect(result[0].width).toBe(36)
-      expect(result[0].actualTime).toBeNull()
-      expect(result[0].actualRows).toBeNull()
+      expect(result[0].actualTime).toBeUndefined()
+      expect(result[0].actualRows).toBeUndefined()
       expect(result[0].level).toBe(0)
       expect(result[0].children).toHaveLength(0)
     })
@@ -458,7 +458,7 @@ describe('parseExplainOutput', () => {
 
       expect(result).toHaveLength(1)
       expect(result[0].operation).toBe('Seq Scan')
-      expect(result[0].cost).toBeNull()
+      expect(result[0].cost).toBeUndefined()
     })
 
     test('handles operation without metrics', () => {
@@ -468,7 +468,7 @@ describe('parseExplainOutput', () => {
       expect(result).toHaveLength(1)
       expect(result[0].operation).toBe('Seq Scan')
       expect(result[0].details).toBe('on users')
-      expect(result[0].cost).toBeNull()
+      expect(result[0].cost).toBeUndefined()
     })
 
     test('handles deeply nested query plans', () => {
@@ -516,6 +516,95 @@ describe('parseExplainOutput', () => {
 
       expect(result).toHaveLength(1)
       expect(result[0].details).toContain('Output: id, name, email')
+    })
+
+    test('handles invalid cost values gracefully', () => {
+      const input = toQueryPlanRows([
+        'Seq Scan on users  (cost=invalid..notanumber rows=100 width=36)',
+      ])
+
+      const result = parseExplainOutput(input)
+
+      expect(result).toHaveLength(1)
+      expect(result[0].operation).toBe('Seq Scan')
+      // Should not parse invalid cost at all
+      expect(result[0].cost).toBeUndefined()
+    })
+
+    test('handles invalid rows value gracefully', () => {
+      const input = toQueryPlanRows([
+        'Seq Scan on users  (cost=0.00..10.50 rows=notanumber width=36)',
+      ])
+
+      const result = parseExplainOutput(input)
+
+      expect(result).toHaveLength(1)
+      expect(result[0].operation).toBe('Seq Scan')
+      // Should not parse invalid rows at all (regex won't match)
+      expect(result[0].rows).toBeUndefined()
+    })
+
+    test('handles invalid actual time values gracefully', () => {
+      const input = toQueryPlanRows([
+        'Seq Scan on users  (cost=0.00..10.50 rows=100 width=36) (actual time=invalid..notanumber rows=85 loops=1)',
+      ])
+
+      const result = parseExplainOutput(input)
+
+      expect(result).toHaveLength(1)
+      // Should not parse invalid actual time at all
+      expect(result[0].actualTime).toBeUndefined()
+    })
+
+    test('handles invalid rowsRemovedByFilter value gracefully', () => {
+      const input = toQueryPlanRows([
+        'Seq Scan on users  (cost=0.00..10.50 rows=100 width=36)',
+        "  Filter: (status = 'active')",
+        '  Rows Removed by Filter: notanumber',
+      ])
+
+      const result = parseExplainOutput(input)
+      parseNodeDetails(result[0])
+
+      expect(result).toHaveLength(1)
+      // Should not parse invalid value at all (regex won't match)
+      expect(result[0].rowsRemovedByFilter).toBeUndefined()
+    })
+
+    test('ensures all numeric values are finite after parsing', () => {
+      const input = toQueryPlanRows([
+        'Seq Scan on users  (cost=0.00..10.50 rows=100 width=36) (actual time=0.015..0.123 rows=85 loops=1)',
+        "  Filter: (status = 'active')",
+        '  Rows Removed by Filter: 15',
+      ])
+
+      const result = parseExplainOutput(input)
+      parseNodeDetails(result[0])
+
+      expect(result).toHaveLength(1)
+      const node = result[0]
+
+      // Verify all numeric values are finite
+      if (node.cost) {
+        expect(Number.isFinite(node.cost.start)).toBe(true)
+        expect(Number.isFinite(node.cost.end)).toBe(true)
+      }
+      if (node.actualTime) {
+        expect(Number.isFinite(node.actualTime.start)).toBe(true)
+        expect(Number.isFinite(node.actualTime.end)).toBe(true)
+      }
+      if (node.rows !== undefined) {
+        expect(Number.isFinite(node.rows)).toBe(true)
+      }
+      if (node.actualRows !== undefined) {
+        expect(Number.isFinite(node.actualRows)).toBe(true)
+      }
+      if (node.width !== undefined) {
+        expect(Number.isFinite(node.width)).toBe(true)
+      }
+      if (node.rowsRemovedByFilter !== undefined) {
+        expect(Number.isFinite(node.rowsRemovedByFilter)).toBe(true)
+      }
     })
   })
 
@@ -567,8 +656,7 @@ describe('parseNodeDetails', () => {
       cost: { start: 0, end: 10.5 },
       rows: 100,
       width: 36,
-      actualTime: null,
-      actualRows: null,
+
       level: 0,
       children: [],
       raw: '',
@@ -586,8 +674,6 @@ describe('parseNodeDetails', () => {
       cost: { start: 0, end: 10.5 },
       rows: 100,
       width: 36,
-      actualTime: null,
-      actualRows: null,
       level: 0,
       children: [],
       raw: '',
@@ -605,8 +691,6 @@ describe('parseNodeDetails', () => {
       cost: { start: 0, end: 50 },
       rows: 100,
       width: 72,
-      actualTime: null,
-      actualRows: null,
       level: 0,
       children: [
         {
@@ -615,8 +699,7 @@ describe('parseNodeDetails', () => {
           cost: { start: 0, end: 20 },
           rows: 50,
           width: 36,
-          actualTime: null,
-          actualRows: null,
+
           level: 1,
           children: [],
           raw: '',
@@ -627,8 +710,7 @@ describe('parseNodeDetails', () => {
           cost: { start: 0, end: 15 },
           rows: 25,
           width: 36,
-          actualTime: null,
-          actualRows: null,
+
           level: 1,
           children: [],
           raw: '',
@@ -658,8 +740,6 @@ describe('calculateMaxCost', () => {
         cost: { start: 0, end: 25.5 },
         rows: 100,
         width: 36,
-        actualTime: null,
-        actualRows: null,
         level: 0,
         children: [],
         raw: '',
@@ -694,7 +774,7 @@ describe('calculateMaxCost', () => {
       {
         operation: 'Seq Scan',
         details: 'on users',
-        cost: null,
+
         rows: 100,
         width: 36,
         actualTime: { start: 0.01, end: 50.123 },
@@ -716,8 +796,6 @@ describe('calculateMaxCost', () => {
         cost: { start: 0, end: 100 },
         rows: 10,
         width: 36,
-        actualTime: null,
-        actualRows: null,
         level: 0,
         children: [
           {
@@ -726,8 +804,6 @@ describe('calculateMaxCost', () => {
             cost: { start: 0, end: 250 }, // This is the maximum
             rows: 1000,
             width: 36,
-            actualTime: null,
-            actualRows: null,
             level: 1,
             children: [
               {
@@ -736,8 +812,6 @@ describe('calculateMaxCost', () => {
                 cost: { start: 0, end: 150 },
                 rows: 1000,
                 width: 36,
-                actualTime: null,
-                actualRows: null,
                 level: 2,
                 children: [],
                 raw: '',
@@ -762,8 +836,6 @@ describe('calculateMaxCost', () => {
         cost: { start: 0, end: 30 },
         rows: 100,
         width: 36,
-        actualTime: null,
-        actualRows: null,
         level: 0,
         children: [],
         raw: '',
@@ -774,8 +846,6 @@ describe('calculateMaxCost', () => {
         cost: { start: 0, end: 75 },
         rows: 200,
         width: 36,
-        actualTime: null,
-        actualRows: null,
         level: 0,
         children: [],
         raw: '',
@@ -791,11 +861,6 @@ describe('calculateMaxCost', () => {
       {
         operation: 'Result',
         details: '',
-        cost: null,
-        rows: null,
-        width: null,
-        actualTime: null,
-        actualRows: null,
         level: 0,
         children: [],
         raw: '',
@@ -828,8 +893,6 @@ describe('calculateSummary', () => {
         cost: { start: 0, end: 45.5 },
         rows: 100,
         width: 36,
-        actualTime: null,
-        actualRows: null,
         level: 0,
         children: [],
         raw: '',
@@ -868,8 +931,6 @@ describe('calculateSummary', () => {
         cost: { start: 0, end: 10.5 },
         rows: 100,
         width: 36,
-        actualTime: null,
-        actualRows: null,
         level: 0,
         children: [],
         raw: '',
@@ -889,8 +950,6 @@ describe('calculateSummary', () => {
         cost: { start: 0, end: 50 },
         rows: 100,
         width: 72,
-        actualTime: null,
-        actualRows: null,
         level: 0,
         children: [
           {
@@ -899,8 +958,6 @@ describe('calculateSummary', () => {
             cost: { start: 0, end: 20 },
             rows: 100,
             width: 36,
-            actualTime: null,
-            actualRows: null,
             level: 1,
             children: [],
             raw: '',
@@ -911,8 +968,6 @@ describe('calculateSummary', () => {
             cost: { start: 0, end: 15 },
             rows: 50,
             width: 36,
-            actualTime: null,
-            actualRows: null,
             level: 1,
             children: [],
             raw: '',
@@ -935,8 +990,6 @@ describe('calculateSummary', () => {
         cost: { start: 0.29, end: 8.3 },
         rows: 1,
         width: 48,
-        actualTime: null,
-        actualRows: null,
         level: 0,
         children: [],
         raw: '',
@@ -956,8 +1009,6 @@ describe('calculateSummary', () => {
         cost: { start: 0.15, end: 4.17 },
         rows: 1,
         width: 32,
-        actualTime: null,
-        actualRows: null,
         level: 0,
         children: [],
         raw: '',
@@ -976,8 +1027,6 @@ describe('calculateSummary', () => {
         cost: { start: 4.18, end: 13.65 },
         rows: 3,
         width: 36,
-        actualTime: null,
-        actualRows: null,
         level: 0,
         children: [
           {
@@ -986,8 +1035,6 @@ describe('calculateSummary', () => {
             cost: { start: 0, end: 4.18 },
             rows: 3,
             width: 0,
-            actualTime: null,
-            actualRows: null,
             level: 1,
             children: [],
             raw: '',

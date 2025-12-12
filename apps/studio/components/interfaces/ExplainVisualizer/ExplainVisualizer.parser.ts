@@ -8,6 +8,16 @@ export interface ExplainSummary {
   hasIndexScan: boolean
 }
 
+function safeParseFloat(value: string): number | undefined {
+  const parsed = parseFloat(value)
+  return Number.isFinite(parsed) ? parsed : undefined
+}
+
+function safeParseInt(value: string): number | undefined {
+  const parsed = parseInt(value, 10)
+  return Number.isNaN(parsed) ? undefined : parsed
+}
+
 // Parse the QUERY PLAN text into a tree structure
 export function parseExplainOutput(rows: readonly QueryPlanRow[]): ExplainNode[] {
   const lines = rows.map((row) => row['QUERY PLAN'] || '').filter(Boolean)
@@ -124,11 +134,6 @@ function createNode(
   const node: ExplainNode = {
     operation: operation.trim(),
     details: details?.trim() || '',
-    cost: null,
-    rows: null,
-    width: null,
-    actualTime: null,
-    actualRows: null,
     level,
     children: [],
     raw,
@@ -138,34 +143,41 @@ function createNode(
     // Parse cost=start..end
     const costMatch = metrics.match(/cost=([\d.]+)\.\.([\d.]+)/)
     if (costMatch) {
-      node.cost = { start: parseFloat(costMatch[1]), end: parseFloat(costMatch[2]) }
+      const start = safeParseFloat(costMatch[1])
+      const end = safeParseFloat(costMatch[2])
+      // Only set cost if both values are valid numbers
+      if (start !== undefined && end !== undefined) {
+        node.cost = { start, end }
+      }
     }
 
     // Parse rows=N (estimated rows, always the first occurrence)
     const rowsMatch = metrics.match(/rows=(\d+)/)
     if (rowsMatch) {
-      node.rows = parseInt(rowsMatch[1], 10)
+      node.rows = safeParseInt(rowsMatch[1])
     }
 
     // Parse width=N
     const widthMatch = metrics.match(/width=(\d+)/)
     if (widthMatch) {
-      node.width = parseInt(widthMatch[1], 10)
+      node.width = safeParseInt(widthMatch[1])
     }
 
     // Parse actual time=start..end
     const actualTimeMatch = metrics.match(/actual time=([\d.]+)\.\.([\d.]+)/)
     if (actualTimeMatch) {
-      node.actualTime = {
-        start: parseFloat(actualTimeMatch[1]),
-        end: parseFloat(actualTimeMatch[2]),
+      const start = safeParseFloat(actualTimeMatch[1])
+      const end = safeParseFloat(actualTimeMatch[2])
+      // Only set actualTime if both values are valid numbers
+      if (start !== undefined && end !== undefined) {
+        node.actualTime = { start, end }
       }
 
       // When EXPLAIN ANALYZE is used, the second rows= value (after actual time) is the actual rows
       const actualTimePart = metrics.substring(metrics.indexOf('actual time='))
       const actualRowsMatch = actualTimePart.match(/rows=(\d+)/)
       if (actualRowsMatch) {
-        node.actualRows = parseInt(actualRowsMatch[1], 10)
+        node.actualRows = safeParseInt(actualRowsMatch[1])
       }
     }
   }
@@ -178,7 +190,7 @@ export function parseNodeDetails(node: ExplainNode): void {
   if (node.details) {
     const rowsRemovedMatch = node.details.match(/Rows Removed by Filter:\s*(\d+)/)
     if (rowsRemovedMatch) {
-      node.rowsRemovedByFilter = parseInt(rowsRemovedMatch[1], 10)
+      node.rowsRemovedByFilter = safeParseInt(rowsRemovedMatch[1])
     }
   }
   node.children.forEach(parseNodeDetails)

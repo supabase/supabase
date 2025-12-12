@@ -95,7 +95,7 @@ export function ExplainNodeRenderer({
             )}
 
             {/* Row count */}
-            {(node.actualRows !== null || node.rows !== null) && (
+            {(node.actualRows !== undefined || node.rows !== undefined) && (
               <>
                 <span className="text-foreground-muted text-xs">|</span>
                 <RowCountIndicator

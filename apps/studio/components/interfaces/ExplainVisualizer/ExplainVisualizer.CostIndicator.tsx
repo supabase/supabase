@@ -48,7 +48,7 @@ function getCostDescription(level: CostLevel): { label: string; description: str
 
 export function CostIndicator({ cost, maxCost }: CostIndicatorProps) {
   const rawWidth = maxCost > 0 ? (cost / maxCost) * 100 : 0
-  const costWidth = Number.isFinite(rawWidth) ? Math.min(Math.max(rawWidth, 0), 100) : 0
+  const costWidth = Math.min(Math.max(rawWidth, 0), 100)
   const costLevel = getCostLevel(cost)
   const colorClass = getCostColorClass(costLevel)
   const { label, description } = getCostDescription(costLevel)
