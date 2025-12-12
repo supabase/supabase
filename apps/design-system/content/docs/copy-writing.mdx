@@ -1,6 +1,308 @@
 ---
 title: Copy writing
-description: A concise guide for writing copy for Supabase.
+description: A concise guide for writing UI copy in Supabase.
 ---
 
-Write it good.
+Write UI copy that helps developers complete tasks quickly. Be direct, action-oriented, and respectful of developer time.
+
+## Voice and tone
+
+Supabase UI copy is:
+
+- **Direct**: Say what something does, not what it "enables" you to do.
+- **Action-oriented**: Focus on what happens, not what we built.
+- **Technical without jargon**: Use precise terms but explain when necessary.
+- **Pragmatic**: Acknowledge tradeoffs and limitations when relevant.
+
+## Buttons and actions
+
+### Use verbs, not nouns
+
+**Good:**
+- "Create table"
+- "Save changes"
+- "Delete bucket"
+
+**Bad:**
+- "Table creation"
+- "Save action"
+- "Bucket deletion"
+
+### Be specific about outcomes
+
+**Good:**
+- "Delete project"
+- "Revoke access"
+- "Enable RLS"
+
+**Bad:**
+- "Remove"
+- "Change"
+- "Configure"
+
+### Match button text to the action
+
+**Good:**
+- Primary action: "Create table"
+- Secondary action: "Cancel"
+
+**Bad:**
+- Primary action: "Submit"
+- Secondary action: "Go back"
+
+## Form labels and descriptions
+
+### Labels describe the field, not the feature
+
+**Good:**
+- Label: "Table name"
+- Description: "Letters, numbers, and underscores only"
+
+**Bad:**
+- Label: "Name your table"
+- Description: "This field allows you to specify a name for your table using letters, numbers, and underscores"
+
+### Descriptions explain constraints, not concepts
+
+**Good:**
+- "Must be unique within the schema"
+- "Maximum 255 characters"
+- "Required for RLS policies"
+
+**Bad:**
+- "This ensures your table name is unique"
+- "You can enter up to 255 characters here"
+- "This field is required when using Row Level Security policies"
+
+### Use present tense
+
+**Good:**
+- "Stores connection pool settings"
+- "Limits query execution time"
+
+**Bad:**
+- "Will store connection pool settings"
+- "This will limit query execution time"
+
+## Error messages
+
+### State what went wrong, then how to fix it
+
+**Good:**
+- "Table name already exists. Choose a different name."
+- "Invalid API key. Check your project settings."
+
+**Bad:**
+- "An error occurred"
+- "Something went wrong. Please try again."
+
+### Be specific about the problem
+
+**Good:**
+- "Password must be at least 8 characters"
+- "Connection failed: timeout after 30 seconds"
+
+**Bad:**
+- "Invalid input"
+- "Connection error"
+
+### Avoid blame or apology
+
+**Good:**
+- "Unable to connect to database"
+- "Table creation failed: column name is reserved"
+
+**Bad:**
+- "Sorry, we couldn't connect"
+- "Oops! Something went wrong"
+
+## Success messages
+
+### Confirm what happened
+
+**Good:**
+- "Table created successfully"
+- "API key revoked"
+- "Changes saved"
+
+**Bad:**
+- "Success!"
+- "Done"
+- "Operation completed"
+
+### Keep it brief
+
+**Good:**
+- "Backup restored"
+- "Migration applied"
+
+**Bad:**
+- "Your backup has been successfully restored to your database"
+- "The migration has been applied successfully to your project"
+
+## Tooltips and help text
+
+### Explain why, not what
+
+**Good:**
+- "Enables real-time subscriptions for this table"
+- "Prevents accidental deletions"
+
+**Bad:**
+- "This is a toggle switch"
+- "Click to delete"
+
+### One sentence maximum
+
+**Good:**
+- "Restricts access based on user policies"
+- "Maximum number of concurrent connections"
+
+**Bad:**
+- "Row Level Security restricts access based on user policies. When enabled, users can only access rows that match their policy conditions."
+- "This setting controls the maximum number of concurrent connections that can be established to your database at any given time."
+
+## Navigation and headings
+
+### Use sentence case
+
+**Good:**
+- "Set up authentication"
+- "Database settings"
+- "Create new project"
+
+**Bad:**
+- "Set Up Authentication"
+- "Database Settings"
+- "Create New Project"
+
+### Headings describe the page, not the feature
+
+**Good:**
+- "API keys"
+- "Connection pooling"
+- "Table editor"
+
+**Bad:**
+- "Manage your API keys"
+- "Configure connection pooling"
+- "Edit your tables"
+
+## Empty states
+
+### Explain what's missing, then how to add it
+
+**Good:**
+- "No tables yet. Create your first table to get started."
+- "No API keys. Generate a key to connect your application."
+
+**Bad:**
+- "You don't have any tables"
+- "There are no API keys available"
+
+### Include the action
+
+**Good:**
+- "No buckets yet. [Create bucket] button"
+- "No functions deployed. [Deploy function] button"
+
+**Bad:**
+- "No buckets found"
+- "No functions available"
+
+## Loading states
+
+### Describe what's happening
+
+**Good:**
+- "Creating table..."
+- "Loading schema..."
+- "Applying migration..."
+
+**Bad:**
+- "Please wait..."
+- "Loading..."
+- "Processing..."
+
+### Match the action verb
+
+**Good:**
+- Action: "Delete project" → Loading: "Deleting project..."
+- Action: "Save changes" → Loading: "Saving changes..."
+
+**Bad:**
+- Action: "Delete project" → Loading: "Processing..."
+- Action: "Save changes" → Loading: "Please wait..."
+
+## Confirmations and dialogs
+
+### State consequences clearly
+
+**Good:**
+- "Delete this project? This action cannot be undone and will permanently delete all data."
+- "Revoke this API key? Applications using this key will stop working immediately."
+
+**Bad:**
+- "Are you sure?"
+- "This action is permanent. Continue?"
+
+### Use active voice
+
+**Good:**
+- "Deleting this project will remove all data"
+- "Revoking this key will break existing connections"
+
+**Bad:**
+- "All data will be removed if this project is deleted"
+- "Existing connections will be broken if this key is revoked"
+
+## Words to avoid
+
+### Marketing language
+
+**Bad:**
+- "Easily create tables"
+- "Simply configure settings"
+- "Powerful database features"
+
+**Good:**
+- "Create tables"
+- "Configure settings"
+- "Database features"
+
+### Vague verbs
+
+**Bad:**
+- "Manage tables"
+- "Handle errors"
+- "Work with data"
+
+**Good:**
+- "Create, edit, or delete tables"
+- "View and resolve errors"
+- "Query and update data"
+
+## Capitalization
+
+- **Sentence case** for all UI text (buttons, labels, headings)
+- **Product names:** Database, Auth, Storage, Edge Functions, Realtime, Vector
+- **Postgres**, not PostgreSQL
+- **Supabase** (capitalize except in code)
+
+## Formatting
+
+- **Bold for emphasis** only when necessary
+- **Inline code** for technical terms: `RLS`, `API key`, `supabase init`
+- **No italics** for emphasis
+- **No exclamation marks** unless critical (e.g., destructive actions)
+
+## Quick checklist
+
+Before publishing UI copy, ask:
+
+- [ ] Does it use an action verb?
+- [ ] Is it specific about what happens?
+- [ ] Can a developer complete the task without reading more?
+- [ ] Does it avoid marketing language?
+- [ ] Is it in sentence case?
+- [ ] Is it one sentence or less (for labels, buttons, tooltips)?
