@@ -317,7 +317,7 @@ export const MfaAuthSettingsForm = () => {
           <Form_Shadcn_ {...totpForm}>
             <form onSubmit={totpForm.handleSubmit(onSubmitTotpForm)} className="space-y-4">
               <Card>
-                <CardContent className="pt-6">
+                <CardContent>
                   <FormField_Shadcn_
                     control={totpForm.control}
                     name="MFA_TOTP"
@@ -410,10 +410,9 @@ export const MfaAuthSettingsForm = () => {
                 e.preventDefault()
                 maybeConfirmPhoneMFAOrSubmit()
               }}
-              className="space-y-4"
             >
               <Card>
-                <CardContent className="pt-6">
+                <CardContent>
                   <FormField_Shadcn_
                     control={phoneForm.control}
                     name="MFA_PHONE"
@@ -565,9 +564,9 @@ export const MfaAuthSettingsForm = () => {
         </PageSectionMeta>
         <PageSectionContent>
           <Form_Shadcn_ {...securityForm}>
-            <form onSubmit={securityForm.handleSubmit(onSubmitSecurityForm)} className="space-y-4">
+            <form onSubmit={securityForm.handleSubmit(onSubmitSecurityForm)}>
               <Card>
-                <CardContent className="pt-6">
+                <CardContent>
                   <FormField_Shadcn_
                     control={securityForm.control}
                     name="MFA_ALLOW_LOW_AAL"
