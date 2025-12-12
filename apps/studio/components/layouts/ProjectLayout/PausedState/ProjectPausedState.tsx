@@ -93,7 +93,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const { mutate: restoreProject, isPending: isRestoring } = useProjectRestoreMutation({
     onSuccess: (_, variables) => {
       setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.RESTORING })
-      toast.success('Restoring project')
+      toast.success('Restoring project, project will be ready in a few minutes')
     },
   })
 
@@ -185,11 +185,21 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                         ). After that, this project will not be resumable, but data will still be
                         available for download.
                       </p>
-                      <p className="text-sm text-foreground-lighter mt-4">
+                      <p className="text-sm mt-4">
                         {enableProBenefitWording === 'variant-a'
                           ? 'Upgrade to Pro to prevent pauses and unlock features like branching, compute upgrades, and daily backups.'
                           : 'To prevent future pauses, consider upgrading to Pro.'}
                       </p>
+                      {!!pauseStatus.last_paused_on && (
+                        <p className="text-foreground-lighter text-sm">
+                          Project last paused on{' '}
+                          <TimestampInfo
+                            className="text-sm"
+                            labelFormat="DD MMM YYYY"
+                            utcTimestamp={pauseStatus.last_paused_on}
+                          />
+                        </p>
+                      )}
                     </>
                   ) : (
                     <p className="text-sm">
@@ -264,43 +274,46 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
       <ConfirmationModal
         visible={showConfirmRestore}
-        size="medium"
+        size="small"
         title="Resume this project"
-        description={
-          isFreePlan
-            ? "Your project's data will be restored to when it was initially paused."
-            : "Your project's data will be restored and billing will resume based on compute size and hours active."
-        }
         onCancel={() => setShowConfirmRestore(false)}
         onConfirm={() => form.handleSubmit(onConfirmRestore)()}
         loading={isRestoring}
-        confirmLabel="Confirm resume"
+        confirmLabel="Resume"
+        confirmLabelLoading="Resuming"
         cancelLabel="Cancel"
       >
-        <Form_Shadcn_ {...form}>
-          <form onSubmit={form.handleSubmit(onConfirmRestore)}>
-            {showPostgresVersionSelector && (
-              <div className="space-y-2">
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="postgresVersionSelection"
-                  render={({ field }) => (
-                    <PostgresVersionSelector
-                      field={field}
-                      form={form}
-                      type="unpause"
-                      label="Select the version of Postgres to resume to"
-                      layout="vertical"
-                      dbRegion={region?.displayName ?? ''}
-                      cloudProvider={(project?.cloud_provider ?? 'AWS') as CloudProvider}
-                      organizationSlug={selectedOrganization?.slug}
-                    />
-                  )}
-                />
-              </div>
-            )}
-          </form>
-        </Form_Shadcn_>
+        <div className={cn(showPostgresVersionSelector && 'flex flex-col gap-y-4')}>
+          <p className="text-sm">
+            {isFreePlan
+              ? 'Your project’s data will be restored to when it was initially paused.'
+              : 'Your project’s data will be restored and billing will resume based on compute size and hours active.'}
+          </p>
+          <Form_Shadcn_ {...form}>
+            <form onSubmit={form.handleSubmit(onConfirmRestore)}>
+              {showPostgresVersionSelector && (
+                <div className="space-y-2">
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="postgresVersionSelection"
+                    render={({ field }) => (
+                      <PostgresVersionSelector
+                        field={field}
+                        form={form}
+                        type="unpause"
+                        label="Postgres version"
+                        layout="vertical"
+                        dbRegion={region?.displayName ?? ''}
+                        cloudProvider={(project?.cloud_provider ?? 'AWS') as CloudProvider}
+                        organizationSlug={selectedOrganization?.slug}
+                      />
+                    )}
+                  />
+                </div>
+              )}
+            </form>
+          </Form_Shadcn_>
+        </div>
       </ConfirmationModal>
 
       <Dialog
