@@ -191,7 +191,7 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="emails/h" className="uppercase">
+                            <PrePostTab postTab="emails/h">
                               <Input_Shadcn_
                                 type="number"
                                 min={0}
@@ -259,7 +259,7 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="sms/h" className="uppercase">
+                            <PrePostTab postTab="sms/h">
                               <Input_Shadcn_
                                 type="number"
                                 min={0}
@@ -305,7 +305,7 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="requests/5 min" className="uppercase">
+                            <PrePostTab postTab="requests/5 min">
                               <Input_Shadcn_
                                 type="number"
                                 min={0}
@@ -349,7 +349,7 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="requests/5 min" className="uppercase">
+                            <PrePostTab postTab="requests/5 min">
                               <Input_Shadcn_
                                 type="number"
                                 min={0}
@@ -393,7 +393,7 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="requests/h" className="uppercase">
+                            <PrePostTab postTab="requests/h">
                               <Input_Shadcn_
                                 type="number"
                                 min={0}
@@ -437,7 +437,7 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="requests/5 min" className="uppercase">
+                            <PrePostTab postTab="requests/5 min">
                               <Input_Shadcn_
                                 type="number"
                                 min={0}
@@ -481,7 +481,7 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="requests/5 min" className="uppercase">
+                            <PrePostTab postTab="requests/5 min">
                               <Input_Shadcn_
                                 type="number"
                                 min={0}
