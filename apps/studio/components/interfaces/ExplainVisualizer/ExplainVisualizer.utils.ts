@@ -12,7 +12,7 @@ import {
 import type { ExplainNode } from './ExplainVisualizer.types'
 
 // Get human-readable description for an operation
-export function getOperationDescription(operation: string, node: ExplainNode): string {
+export function getOperationDescription(operation: string): string {
   const op = operation.toLowerCase()
 
   if (op.includes('seq scan')) {
