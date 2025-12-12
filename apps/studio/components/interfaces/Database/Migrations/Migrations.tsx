@@ -36,7 +36,7 @@ const Migrations = () => {
   const { data: project } = useSelectedProjectQuery()
   const {
     data = [],
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
     error,

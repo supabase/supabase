@@ -80,7 +80,7 @@ export const ProtectionAuthSettingsForm = () => {
     data: authConfig,
     error: authConfigError,
     isError,
-    isLoading,
+    isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
     onError: (error) => {
@@ -310,7 +310,7 @@ export const ProtectionAuthSettingsForm = () => {
                       label="Prevent use of leaked passwords"
                       description="Rejects the use of known or easy to guess passwords on sign up or password change. "
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-end gap-2">
                         <Badge variant={field.value ? 'success' : 'default'}>
                           {field.value ? 'Enabled' : 'Disabled'}
                         </Badge>

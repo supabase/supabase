@@ -84,7 +84,7 @@ export const BranchDropdown = () => {
 
   const {
     data: branches,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useBranchesQuery({ projectRef }, { enabled: Boolean(projectDetails) })
