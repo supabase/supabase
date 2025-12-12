@@ -275,7 +275,7 @@ export const RealtimeSettings = () => {
                             description="Realtime Authorization uses this database pool to check client access"
                           >
                             <FormControl_Shadcn_>
-                              <PrePostTab postTab="connections" className="uppercase">
+                              <PrePostTab postTab="connections">
                                 <Input_Shadcn_
                                   {...field}
                                   type="number"
@@ -308,7 +308,7 @@ export const RealtimeSettings = () => {
                           description="Sets maximum number of concurrent clients that can connect to your Realtime service"
                         >
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="clients" className="uppercase">
+                            <PrePostTab postTab="clients">
                               <Input_Shadcn_
                                 {...field}
                                 type="number"
@@ -332,7 +332,7 @@ export const RealtimeSettings = () => {
                           description="Sets maximum number of events per second that can be sent to your Realtime service"
                         >
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="events/s" className="uppercase">
+                            <PrePostTab postTab="events/s">
                               <Input_Shadcn_
                                 {...field}
                                 type="number"
@@ -383,7 +383,7 @@ export const RealtimeSettings = () => {
                           description="Sets maximum number of presence events per second that can be sent to your Realtime service"
                         >
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="events/s" className="uppercase">
+                            <PrePostTab postTab="events/s">
                               <Input_Shadcn_
                                 {...field}
                                 type="number"
@@ -434,7 +434,7 @@ export const RealtimeSettings = () => {
                           description="Sets maximum number of payload size in KB that can be sent to your Realtime service"
                         >
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="KB" className="uppercase">
+                            <PrePostTab postTab="KB">
                               <Input_Shadcn_
                                 {...field}
                                 type="number"
