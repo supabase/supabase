@@ -17,23 +17,19 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Tailwind Classes',
-          href: '/docs/tailwind-classes',
+          title: 'Accessibility',
+          href: '/docs/accessibility',
           items: [],
         },
+
         {
           title: 'Color Usage',
           href: '/docs/color-usage',
           items: [],
         },
         {
-          title: 'Typography',
-          href: '/docs/typography',
-          items: [],
-        },
-        {
-          title: 'Theming',
-          href: '/docs/theming',
+          title: 'Copy Writing',
+          href: '/docs/copy-writing',
           items: [],
         },
         {
@@ -42,13 +38,18 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Accessibility',
-          href: '/docs/accessibility',
+          title: 'Tailwind Classes',
+          href: '/docs/tailwind-classes',
           items: [],
         },
         {
-          title: 'Copy Writing',
-          href: '/docs/copy-writing',
+          title: 'Theming',
+          href: '/docs/theming',
+          items: [],
+        },
+        {
+          title: 'Typography',
+          href: '/docs/typography',
           items: [],
         },
       ],
