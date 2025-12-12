@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { snakeCase } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -6,7 +7,6 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useFlag, useParams } from 'common'
-import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPrimaryKeysExists } from 'data/database/primary-keys-exists-query'
@@ -19,6 +19,7 @@ import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutati
 import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
 import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
 import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   PipelineStatusRequestStatus,
@@ -130,7 +131,7 @@ export const DestinationPanel = ({
     pipelineId: existingDestination?.pipelineId,
   })
 
-  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: apiKeys } = useAPIKeysQuery(
     { projectRef, reveal: true },
     { enabled: canReadAPIKeys }
