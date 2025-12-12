@@ -26,7 +26,7 @@ export const SecurityQuestionnaire = () => {
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
-  const { hasAccess: hasAccessToSecurityQuestionnaire, isLoading: isLoadingEntitlement } =
+  const { hasAccess: hasAccessToQuestionnaire, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('security.questionnaire')
 
   const fetchQuestionnaire = async (orgSlug: string) => {
@@ -60,7 +60,7 @@ export const SecurityQuestionnaire = () => {
             </div>
           ) : !canReadSubscriptions ? (
             <NoPermission resourceText="access our security questionnaire" />
-          ) : !hasAccessToSecurityQuestionnaire ? (
+          ) : !hasAccessToQuestionnaire ? (
             <div className="flex items-center justify-center h-full">
               <Link
                 href={`/org/${slug}/billing?panel=subscriptionPlan&source=securityQuestionnaire`}
