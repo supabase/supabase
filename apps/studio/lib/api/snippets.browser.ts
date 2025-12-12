@@ -1,5 +1,13 @@
+import { IS_PLATFORM } from 'common'
 import { compact } from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
+
+/**
+ * Generates a UUID v4. If the platform is self-hosted, it will generate a deterministic UUID v4 from the inputs.
+ */
+export const generateUuid = (inputs: (string | undefined | null)[] = []) => {
+  return IS_PLATFORM ? uuidv4() : generateDeterministicUuid(inputs)
+}
 
 /**
  * Generates a deterministic UUID v4 from a string input

@@ -22,7 +22,6 @@ import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { generateDeterministicUuid } from 'lib/api/snippets.browser'
 import { BASE_PATH } from 'lib/constants'
 import { formatSql } from 'lib/formatSql'
 import { detectOS } from 'lib/helpers'
@@ -70,6 +69,7 @@ import {
 } from './SQLEditor.utils'
 import { useAddDefinitions } from './useAddDefinitions'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { generateUuid } from 'lib/api/snippets.browser'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -129,7 +129,7 @@ export const SQLEditor = () => {
   // generate an id to be used for new snippets. The dependency on urlId is to avoid a bug which
   // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
   const generatedId = useMemo(
-    () => generateDeterministicUuid([generatedNewSnippetName]),
+    () => generateUuid([generatedNewSnippetName]),
     [generatedNewSnippetName]
   )
 

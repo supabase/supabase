@@ -1,6 +1,5 @@
-import { IS_PLATFORM } from 'common'
-import { generateDeterministicUuid } from 'lib/api/snippets.browser'
-import { removeCommentsFromSql, uuidv4 } from 'lib/helpers'
+import { generateUuid } from 'lib/api/snippets.browser'
+import { removeCommentsFromSql } from 'lib/helpers'
 import type { SnippetWithContent } from 'state/sql-editor-v2'
 import {
   NEW_SQL_SNIPPET_SKELETON,
@@ -15,14 +14,20 @@ export const createSqlSnippetSkeletonV2 = ({
   owner_id,
   project_id,
   folder_id,
+  idOverride,
 }: {
   name: string
   sql: string
   owner_id: number
   project_id: number
   folder_id?: string
+  /**
+   * Optionally, provide a specific snippetId to use for the snippet. This is used to ensure the snippet is created
+   * with a known id, such as to prevent flicker in the SQL editor when adding new unsaved snippets.
+   */
+  idOverride?: string
 }): SnippetWithContent => {
-  const id = IS_PLATFORM ? uuidv4() : generateDeterministicUuid([folder_id, name])
+  const id = idOverride ?? generateUuid([folder_id, name])
 
   return {
     ...NEW_SQL_SNIPPET_SKELETON,
