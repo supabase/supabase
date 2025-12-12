@@ -58,16 +58,20 @@ export const useInstalledIntegrations = () => {
 
   const installedIntegrations = useMemo(() => {
     return allIntegrations
-      .filter((i) => {
+      .filter((integration) => {
         // special handling for supabase webhooks
-        if (i.id === 'webhooks') {
+        if (integration.id === 'webhooks') {
           return isHooksEnabled
         }
-        if (i.type === 'wrapper') {
-          return wrappers.find((w) => wrapperMetaComparator(i.meta, w))
+        if (integration.id === 'stripe_sync_engine') {
+          // TODO check schema description/comment to verify it's official stripe sync engine installation
+          return schemas?.some(({ name }) => name === 'stripe')
         }
-        if (i.type === 'postgres_extension') {
-          return i.requiredExtensions.every((extName) => {
+        if (integration.type === 'wrapper') {
+          return wrappers.find((w) => wrapperMetaComparator(integration.meta, w))
+        }
+        if (integration.type === 'postgres_extension') {
+          return integration.requiredExtensions.every((extName) => {
             const foundExtension = (extensions ?? []).find((ext) => ext.name === extName)
             return !!foundExtension?.installed_version
           })

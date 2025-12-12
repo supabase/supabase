@@ -18,13 +18,13 @@ import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
-const FEATURED_INTEGRATIONS = ['cron', 'queues', 'stripe_wrapper']
+const FEATURED_INTEGRATIONS = ['cron', 'queues', 'stripe_sync_engine']
 
 // Featured integration images
 const FEATURED_INTEGRATION_IMAGES: Record<string, string> = {
   cron: 'img/integrations/covers/cron-cover.webp',
   queues: 'img/integrations/covers/queues-cover.png',
-  stripe_wrapper: 'img/integrations/covers/stripe-cover.png',
+  stripe_sync_engine: 'img/integrations/covers/stripe-cover.png',
 }
 
 const IntegrationsPage: NextPageWithLayout = () => {

@@ -1,4 +1,4 @@
-import { Clock5, Layers, Timer, Vault, Webhook } from 'lucide-react'
+import { Clock5, Layers, Timer, Vault, Webhook, Receipt } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { ComponentType, ReactNode } from 'react'
@@ -51,7 +51,7 @@ const authorSupabase = {
   websiteUrl: 'https://supabase.com',
 }
 
-const supabaseIntegrations: IntegrationDefinition[] = [
+const SUPABASE_INTEGRATIONS: IntegrationDefinition[] = [
   {
     id: 'queues',
     type: 'postgres_extension' as const,
@@ -315,7 +315,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
   },
 ] as const
 
-const wrapperIntegrations: IntegrationDefinition[] = WRAPPERS.map((w) => {
+const WRAPPER_INTEGRATIONS: IntegrationDefinition[] = WRAPPERS.map((w) => {
   return {
     id: w.name,
     type: 'wrapper' as const,
@@ -366,7 +366,52 @@ const wrapperIntegrations: IntegrationDefinition[] = WRAPPERS.map((w) => {
   }
 })
 
+const TEMPLATE_INTEGRATIONS: IntegrationDefinition[] = [
+  {
+    id: 'stripe_sync_engine',
+    type: 'custom' as const,
+    requiredExtensions: ['pgmq', 'pg_cron', 'pg_net'],
+    missingExtensionsAlert: <UpgradeDatabaseAlert minimumVersion="15.6.1.143" />,
+    name: `Stripe Sync Engine`,
+    icon: ({ className, ...props } = {}) => (
+      <Receipt className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+    ),
+    description:
+      'Continously sync your payments, customer, and other data from Stripe to your Postgres database',
+    docsUrl: 'https://github.com/tembo-io/pgmq',
+    author: {
+      name: 'Stripe',
+      websiteUrl: 'https://www.stripe.com',
+    },
+    navigation: [
+      {
+        route: 'overview',
+        label: 'Overview',
+      },
+    ],
+    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+      if (childId) {
+        return dynamic(() => import('../Queues/QueuePage').then((mod) => mod.QueuePage), {
+          loading: Loading,
+        })
+      }
+      switch (pageId) {
+        case 'overview':
+          return dynamic(
+            () =>
+              import(
+                'components/interfaces/Integrations/templates/StripeSyncEngine/InstallationOverview'
+              ).then((mod) => mod.StripeSyncInstallationPage),
+            { loading: Loading }
+          )
+      }
+      return null
+    },
+  },
+]
+
 export const INTEGRATIONS: IntegrationDefinition[] = [
-  ...wrapperIntegrations,
-  ...supabaseIntegrations,
+  ...WRAPPER_INTEGRATIONS,
+  ...SUPABASE_INTEGRATIONS,
+  ...TEMPLATE_INTEGRATIONS,
 ]

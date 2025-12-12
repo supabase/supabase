@@ -23,6 +23,7 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/edge-functions/test',
   '/edge-functions/body',
   '/generate-attachment-url',
+  '/api/integrations/setup-stripe-sync',
 ]
 
 export function middleware(request: NextRequest) {
