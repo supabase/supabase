@@ -141,7 +141,7 @@ export const ConfirmationModal = forwardRef<
               onClick={onSubmit}
               className="truncate"
             >
-              {confirmLabel}
+              {loading && confirmLabelLoading ? confirmLabelLoading : confirmLabel}
             </Button>
           </div>
         </DialogContent>
