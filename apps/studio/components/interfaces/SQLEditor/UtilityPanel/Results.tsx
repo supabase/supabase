@@ -10,9 +10,9 @@ import {
   ContextMenuItem_Shadcn_,
   ContextMenuTrigger_Shadcn_,
   copyToClipboard,
-  Button,
 } from 'ui'
 import { CellDetailPanel } from './CellDetailPanel'
+import { ExplainHeader } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.Header'
 import { ExplainVisualizer } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer'
 
 function formatClipboardValue(value: any) {
@@ -117,12 +117,8 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
   if (isExplainQuery) {
     if (showRaw) {
       return (
-        <div className="h-full flex flex-col">
-          <div className="border-b px-4 py-2 flex justify-end">
-            <Button type="default" size="tiny" onClick={() => setShowRaw(false)}>
-              Show Visual
-            </Button>
-          </div>
+        <div className="bg-studio border-t h-full flex flex-col">
+          <ExplainHeader mode="raw" onToggleMode={() => setShowRaw(false)} />
           <div className="flex-grow overflow-auto">
             <DataGrid
               columns={columns}
