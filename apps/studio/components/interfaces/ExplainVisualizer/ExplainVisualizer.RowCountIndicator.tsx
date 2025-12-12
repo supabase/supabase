@@ -15,8 +15,13 @@ type EstimationAccuracy =
   | 'severely overestimated'
   | 'overestimated'
   | 'accurate'
+  | 'unknown'
 
 function getEstimationAccuracy(actualRows: number, estimatedRows: number): EstimationAccuracy {
+  if (!estimatedRows || estimatedRows === 0) {
+    // If estimatedRows is zero or falsy, we can't compute a ratio—treat as severely underestimated
+    return 'unknown'
+  }
   const ratio = actualRows / estimatedRows
   if (ratio > 10) return 'severely underestimated'
   if (ratio > 2) return 'underestimated'
