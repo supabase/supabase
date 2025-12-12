@@ -199,9 +199,9 @@ export const Policies = ({
         title={`${selectedTableToToggleRLS?.rls_enabled ? 'Disable' : 'Enable'} Row Level Security`}
         description={`Are you sure you want to ${
           selectedTableToToggleRLS?.rls_enabled ? 'disable' : 'enable'
-        } Row Level Security for the table “${selectedTableToToggleRLS?.name}”?`}
-        confirmLabel="Confirm"
-        confirmLabelLoading="Saving"
+        } Row Level Security (RLS) for the table “${selectedTableToToggleRLS?.name}”?`}
+        confirmLabel={`${selectedTableToToggleRLS?.rls_enabled ? 'Disable' : 'Enable'} RLS`}
+        confirmLabelLoading={`${selectedTableToToggleRLS?.rls_enabled ? 'Disabling' : 'Enabling'} RLS`}
         loading={isUpdatingTable}
         onCancel={closeConfirmModal}
         onConfirm={onToggleRLS}
