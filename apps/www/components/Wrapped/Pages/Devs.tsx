@@ -62,6 +62,7 @@ const gridStats = [
     headline: 'paid to fund open source',
     number: 662_357.71,
     increment: 0,
+    prefix: '$',
     suffix: 'USD',
   },
   {
@@ -148,19 +149,26 @@ export const Devs = () => {
                         >
                           {stat.suffix ? (
                             <>
+                              {(stat as any).prefix}
                               {new Intl.NumberFormat('en-US', {
                                 notation: 'compact',
                                 maximumFractionDigits: stat.number % 1 !== 0 ? 2 : 0,
                                 minimumFractionDigits: stat.number % 1 !== 0 ? 1 : 0,
-                              }).format(stat.number)}
-                              <span className="text-lg ml-1.5 font-medium tracking-tight">{stat.suffix}</span>
+                              })
+                                .format(stat.number)
+                                .toLowerCase()}
+                              <span className="text-lg ml-1.5 font-medium tracking-tight">
+                                {stat.suffix}
+                              </span>
                             </>
-                          ) 
-                          : (
-                            <AnimatedCounter value={stat.number} increment={stat.increment} compact />
+                          ) : (
+                            <AnimatedCounter
+                              value={stat.number}
+                              increment={stat.increment}
+                              compact
+                            />
                           )}
                         </p>
-                       
                       </div>
                       <p className="text-sm text-foreground-lighter">{stat.headline}</p>
                     </div>

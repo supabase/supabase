@@ -8,7 +8,7 @@ import { Devs } from '~/components/Wrapped/Pages/Devs'
 import { SupabaseSelect } from '~/components/Wrapped/Pages/SupabaseSelect'
 import { CustomerStories } from '~/components/Wrapped/Pages/CustomerStories'
 import { ProductAnnouncements } from '~/components/Wrapped/Pages/ProductAnnouncements'
-import { AnnouncementsTimeline } from '~/components/Wrapped/Pages/AnnouncementsTimeline'
+import ProductsCta from '~/components/Sections/ProductsCta2'
 
 export default function SupabaseWrappedPage() {
   return (
@@ -20,6 +20,10 @@ export default function SupabaseWrappedPage() {
       <ProductAnnouncements />
       <SupabaseSelect />
       <CustomerStories />
+      <ProductsCta
+        currentProduct="functions"
+        className="max-w-[60rem] mx-auto px-6 w-full !py-24 xl:!gap-24 lg:!py-44"
+      />
     </DefaultLayout>
   )
 }
