@@ -15,7 +15,6 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
@@ -44,6 +43,7 @@ import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/A
 import AIEditor from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
+import { generateSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 
 export const EditorPanel = () => {
   const {
@@ -236,8 +236,7 @@ export const EditorPanel = () => {
               }
 
               const snippet = createSqlSnippetSkeletonV2({
-                id: uuidv4(),
-                name: 'New query',
+                name: generateSnippetTitle(),
                 sql: currentValue,
                 owner_id: profile.id,
                 project_id: project.id,
