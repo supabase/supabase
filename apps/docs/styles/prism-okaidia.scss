@@ -117,3 +117,7 @@ pre[class*='language-'] {
 .token.entity {
   cursor: help;
 }
+.dark pre {
+  background-color: #111827 !important;
+  border: 1px solid #1f2937 !important;
+}

@@ -36,8 +36,9 @@ const ButtonCard: FC<Props> = ({
       ) : (
         <div
           className={[
-            'px-6 py-4 gap-x-4 gap-y-2 flex',
-            `${layout === 'vertical' ? 'flex-col' : 'items-center'}`,
+            // UPDATED SPACING BELOW
+            'px-7 py-5 md:px-10 md:py-7 gap-x-4 gap-y-3 flex',
+            layout === 'vertical' ? 'flex-col' : 'items-center',
           ].join(' ')}
         >
           {icon && typeof icon == 'string' ? (
