@@ -26,8 +26,10 @@ export function ExplainHeader({ mode, onToggleMode, summary }: ExplainHeaderProp
         <Activity size={16} className="text-foreground-light" />
         <h3 className="text-sm font-medium text-foreground">Query Execution Plan</h3>
         <button
+          type="button"
           onClick={onToggleMode}
           className="font-mono text-xs text-foreground-lighter hover:text-foreground transition-colors"
+          aria-label={isVisual ? 'Switch to raw explain output' : 'Switch to visual explain output'}
         >
           {isVisual ? '[RAW]' : '[VISUAL]'}
         </button>
