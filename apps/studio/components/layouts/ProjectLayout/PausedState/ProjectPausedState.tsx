@@ -93,7 +93,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const { mutate: restoreProject, isPending: isRestoring } = useProjectRestoreMutation({
     onSuccess: (_, variables) => {
       setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.RESTORING })
-      toast.success('Restoring project')
+      toast.success('Restoring project, project will be ready in a few minutes')
     },
   })
 
@@ -190,6 +190,16 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                           ? 'Upgrade to Pro to prevent pauses and unlock features like branching, compute upgrades, and daily backups.'
                           : 'To prevent future pauses, consider upgrading to Pro.'}
                       </p>
+                      {!!pauseStatus.last_paused_on && (
+                        <p className="text-foreground-lighter text-sm">
+                          Project last paused on{' '}
+                          <TimestampInfo
+                            className="text-sm"
+                            labelFormat="DD MMM YYYY"
+                            utcTimestamp={pauseStatus.last_paused_on}
+                          />
+                        </p>
+                      )}
                     </>
                   ) : (
                     <p className="text-sm">
@@ -274,13 +284,11 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
         cancelLabel="Cancel"
       >
         <div className={cn(showPostgresVersionSelector && 'flex flex-col gap-y-4')}>
-          <div className={cn(showPostgresVersionSelector && 'border-b border-border-muted pb-5')}>
-            <p className="text-sm">
-              {isFreePlan
-                ? 'Your project’s data will be restored to when it was initially paused.'
-                : 'Your project’s data will be restored and billing will resume based on compute size and hours active.'}
-            </p>
-          </div>
+          <p className="text-sm">
+            {isFreePlan
+              ? 'Your project’s data will be restored to when it was initially paused.'
+              : 'Your project’s data will be restored and billing will resume based on compute size and hours active.'}
+          </p>
           <Form_Shadcn_ {...form}>
             <form onSubmit={form.handleSubmit(onConfirmRestore)}>
               {showPostgresVersionSelector && (
