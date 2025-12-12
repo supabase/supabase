@@ -1360,24 +1360,9 @@ export const examples: Registry = [
     files: ['example/tree-view-multi-select.tsx'],
   },
   {
-    name: 'modal-demo',
+    name: 'confirmation-modal-demo',
     type: 'components:example',
-    files: ['example/modal-demo.tsx'],
-  },
-  {
-    name: 'modal-aligned-footer',
-    type: 'components:example',
-    files: ['example/modal-aligned-footer.tsx'],
-  },
-  {
-    name: 'modal-custom-footer',
-    type: 'components:example',
-    files: ['example/modal-custom-footer.tsx'],
-  },
-  {
-    name: 'modal-hide-footer',
-    type: 'components:example',
-    files: ['example/modal-hide-footer.tsx'],
+    files: ['example/confirmation-modal-demo.tsx'],
   },
   {
     name: 'assistant-chat-demo',

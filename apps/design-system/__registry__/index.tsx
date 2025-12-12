@@ -2469,46 +2469,13 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "modal-demo": {
-      name: "modal-demo",
+    "confirmation-modal-demo": {
+      name: "confirmation-modal-demo",
       type: "components:example",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/modal-demo")),
+      component: React.lazy(() => import("@/registry/default/example/confirmation-modal-demo")),
       source: "",
-      files: ["registry/default/example/modal-demo.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "modal-aligned-footer": {
-      name: "modal-aligned-footer",
-      type: "components:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/modal-aligned-footer")),
-      source: "",
-      files: ["registry/default/example/modal-aligned-footer.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "modal-custom-footer": {
-      name: "modal-custom-footer",
-      type: "components:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/modal-custom-footer")),
-      source: "",
-      files: ["registry/default/example/modal-custom-footer.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "modal-hide-footer": {
-      name: "modal-hide-footer",
-      type: "components:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/modal-hide-footer")),
-      source: "",
-      files: ["registry/default/example/modal-hide-footer.tsx"],
+      files: ["registry/default/example/confirmation-modal-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
