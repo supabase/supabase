@@ -1,29 +1,35 @@
-'use client'
+import { Metadata } from 'next'
+import WrappedClient from './WrappedClient'
 
-import DefaultLayout from '~/components/Layouts/Default'
-import { Home } from '~/components/Wrapped/Pages/Home'
-import { Intro } from '~/components/Wrapped/Pages/Intro'
-import { YearOfAI } from '~/components/Wrapped/Pages/YearOfAI'
-import { Devs } from '~/components/Wrapped/Pages/Devs'
-import { SupabaseSelect } from '~/components/Wrapped/Pages/SupabaseSelect'
-import { CustomerStories } from '~/components/Wrapped/Pages/CustomerStories'
-import { ProductAnnouncements } from '~/components/Wrapped/Pages/ProductAnnouncements'
-import ProductsCta from '~/components/Sections/ProductsCta2'
+export const metadata: Metadata = {
+  title: 'Supabase Wrapped 2025',
+  description:
+    'In 2025, developers around the world shipped faster, scaled further, and built things we never imagined. Here is what you accomplished on Supabase.',
+  openGraph: {
+    title: 'Supabase Wrapped 2025',
+    description:
+      'In 2025, developers around the world shipped faster, scaled further, and built things we never imagined. Here is what you accomplished on Supabase.',
+    url: 'https://supabase.com/wrapped',
+    siteName: 'Supabase',
+    images: [
+      {
+        url: '/images/wrapped/wrapped-og.png',
+        width: 1200,
+        height: 630,
+        alt: 'Supabase Wrapped 2025',
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Supabase Wrapped 2025',
+    description:
+      'In 2025, developers around the world shipped faster, scaled further, and built things we never imagined. Here is what you accomplished on Supabase.',
+    images: ['/images/wrapped/wrapped-og.png'],
+  },
+}
 
 export default function SupabaseWrappedPage() {
-  return (
-    <DefaultLayout className="bg-alternative relative">
-      <Home />
-      <Intro />
-      <YearOfAI />
-      <Devs />
-      <ProductAnnouncements />
-      <SupabaseSelect />
-      <CustomerStories />
-      <ProductsCta
-        currentProduct="functions"
-        className="max-w-[60rem] mx-auto px-6 w-full !py-24 xl:!gap-24 lg:!py-44"
-      />
-    </DefaultLayout>
-  )
+  return <WrappedClient />
 }
