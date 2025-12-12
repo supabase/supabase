@@ -26,7 +26,9 @@ import {
   FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  Radio,
+  Label_Shadcn_,
+  RadioGroupItem_Shadcn_,
+  RadioGroup_Shadcn_,
   ScrollArea,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -342,42 +344,58 @@ export const CreateFunction = ({
                           render={({ field }) => (
                             <FormItem_Shadcn_>
                               <FormControl_Shadcn_ className="col-span-8">
-                                {/* TODO: This RadioGroup imports Formik state, replace it with a clean component */}
-                                <Radio.Group
-                                  type="cards"
-                                  layout="vertical"
-                                  onChange={(event) =>
-                                    field.onChange(event.target.value == 'SECURITY_DEFINER')
+                                <RadioGroup_Shadcn_
+                                  className="gap-0"
+                                  onValueChange={(value) =>
+                                    field.onChange(value === 'SECURITY_DEFINER')
                                   }
                                   value={field.value ? 'SECURITY_DEFINER' : 'SECURITY_INVOKER'}
                                 >
-                                  <Radio
-                                    id="SECURITY_INVOKER"
-                                    label="SECURITY INVOKER"
-                                    value="SECURITY_INVOKER"
-                                    checked={!field.value}
-                                    description={
-                                      <>
+                                  <Label_Shadcn_
+                                    className={cn(
+                                      'relative cursor-pointer transition border rounded-tl-md rounded-tr-md px-6 py-4',
+                                      !field.value
+                                        ? 'bg-selection z-10 border-stronger'
+                                        : 'bg-surface-200 border-alternative hover:border-strong hover:bg-surface-300'
+                                    )}
+                                  >
+                                    <RadioGroupItem_Shadcn_
+                                      value="SECURITY_INVOKER"
+                                      checked={!field.value}
+                                      className="absolute h-4 w-4 opacity-0"
+                                    />
+                                    <div className="text-foreground-light cursor-pointer text-sm flex flex-col space-y-1">
+                                      <div>SECURITY INVOKER</div>
+                                      <div className="text-foreground-lighter text-sm">
                                         Function is to be executed with the privileges of the user
                                         that <span className="text-foreground">calls it</span>.
-                                      </>
-                                    }
-                                  />
-                                  <Radio
-                                    id="SECURITY_DEFINER"
-                                    label="SECURITY DEFINER"
-                                    value="SECURITY_DEFINER"
-                                    checked={field.value}
-                                    description={
-                                      <>
+                                      </div>
+                                    </div>
+                                  </Label_Shadcn_>
+
+                                  <Label_Shadcn_
+                                    className={cn(
+                                      'relative cursor-pointer transition border rounded-bl-md rounded-br-md px-6 py-4',
+                                      field.value
+                                        ? 'bg-selection z-10 border-stronger'
+                                        : 'bg-surface-200 border-alternative hover:border-strong hover:bg-surface-300'
+                                    )}
+                                  >
+                                    <RadioGroupItem_Shadcn_
+                                      value="SECURITY_DEFINER"
+                                      checked={field.value}
+                                      className="absolute h-4 w-4 opacity-0"
+                                    />
+                                    <div className="text-foreground-light cursor-pointer text-sm flex flex-col space-y-1">
+                                      <div>SECURITY DEFINER</div>
+                                      <div className="text-foreground-lighter text-sm">
                                         Function is to be executed with the privileges of the user
                                         that <span className="text-foreground">created it</span>.
-                                      </>
-                                    }
-                                  />
-                                </Radio.Group>
+                                      </div>
+                                    </div>
+                                  </Label_Shadcn_>
+                                </RadioGroup_Shadcn_>
                               </FormControl_Shadcn_>
-                              <FormMessage_Shadcn_ />
                             </FormItem_Shadcn_>
                           )}
                         />
