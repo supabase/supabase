@@ -26,6 +26,10 @@ export const StripeSyncInstallationPage = () => {
     connectionString: project?.connectionString,
   })
 
+  const canInstall = true
+  const isInstalled = schemas ? schemas.some(({ name }) => name === 'stripe') : false
+  const [installing, setInstalling] = useState(false)
+
   const { data: syncState } = useStripeSyncingState(
     {
       projectRef: project?.ref!,
@@ -33,15 +37,11 @@ export const StripeSyncInstallationPage = () => {
     },
     {
       refetchInterval: 4000,
-      enabled: !!project?.ref,
+      enabled: !!project?.ref && isInstalled,
     }
   )
 
   const isSyncing = !!syncState && !syncState.closed_at
-
-  const canInstall = true
-  const isInstalled = schemas ? schemas.some(({ name }) => name === 'stripe') : false
-  const [installing, setInstalling] = useState(false)
 
   return (
     <IntegrationOverviewTab
