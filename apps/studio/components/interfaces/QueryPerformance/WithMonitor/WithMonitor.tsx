@@ -2,7 +2,7 @@ import { QueryPerformanceGrid } from '../QueryPerformanceGrid'
 import { LoadingLine } from 'ui'
 import { QueryPerformanceChart } from '../QueryPerformanceChart'
 import { QueryPerformanceFilterBar } from '../QueryPerformanceFilterBar'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
@@ -14,6 +14,10 @@ import {
 } from './WithMonitor.utils'
 import { useParams } from 'common'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
+import { captureQueryPerformanceError } from '../QueryPerformance.utils'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { getErrorMessage } from 'lib/get-error-message'
 
 dayjs.extend(utc)
 
@@ -28,6 +32,8 @@ interface WithMonitorProps {
 
 export const WithMonitor = ({ dateRange, onDateRangeChange }: WithMonitorProps) => {
   const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const state = useDatabaseSelectorStateSnapshot()
   const [selectedQuery, setSelectedQuery] = useState<string | null>(null)
 
   // [kemal]: Fetch pg_stat_monitor logs. This will need to change when we move to the actual extension.
@@ -79,6 +85,26 @@ export const WithMonitor = ({ dateRange, onDateRangeChange }: WithMonitorProps) 
     setSelectedQuery((prev) => (prev === query ? null : query))
   }
 
+  const handleRetry = () => {
+    pgStatMonitorLogs.runQuery()
+  }
+
+  useEffect(() => {
+    if (logsError) {
+      const errorMessage = getErrorMessage(logsError)
+      captureQueryPerformanceError(logsError, {
+        projectRef: ref,
+        databaseIdentifier: state.selectedDatabaseId,
+        queryPreset: 'pg_stat_monitor',
+        queryType: 'monitor',
+        postgresVersion: project?.dbVersion,
+        databaseType: state.selectedDatabaseId === ref ? 'primary' : 'read-replica',
+        sql: queryWithTimeRange,
+        errorMessage: errorMessage || undefined,
+      })
+    }
+  }, [logsError, ref, state.selectedDatabaseId, project?.dbVersion, queryWithTimeRange])
+
   return (
     <>
       <QueryPerformanceChart
@@ -103,8 +129,12 @@ export const WithMonitor = ({ dateRange, onDateRangeChange }: WithMonitorProps) 
       <QueryPerformanceGrid
         aggregatedData={aggregatedGridData}
         isLoading={isLogsLoading}
+        error={
+          logsError ? getErrorMessage(logsError) || 'Failed to load query performance data' : null
+        }
         currentSelectedQuery={selectedQuery}
         onCurrentSelectQuery={handleSelectQuery}
+        onRetry={handleRetry}
       />
     </>
   )

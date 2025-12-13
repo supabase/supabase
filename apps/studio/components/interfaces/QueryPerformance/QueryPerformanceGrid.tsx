@@ -23,6 +23,7 @@ import {
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { Admonition } from 'ui-patterns'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 import { hasIndexRecommendations } from './IndexAdvisor/index-advisor.utils'
 import { IndexSuggestionIcon } from './IndexAdvisor/IndexSuggestionIcon'
@@ -41,8 +42,10 @@ import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFi
 interface QueryPerformanceGridProps {
   aggregatedData: QueryPerformanceRow[]
   isLoading: boolean
+  error?: string | null
   currentSelectedQuery?: string | null
   onCurrentSelectQuery?: (query: string) => void
+  onRetry?: () => void
 }
 
 const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
@@ -70,8 +73,10 @@ const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
 export const QueryPerformanceGrid = ({
   aggregatedData,
   isLoading,
+  error,
   currentSelectedQuery,
   onCurrentSelectQuery,
+  onRetry,
 }: QueryPerformanceGridProps) => {
   const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
@@ -456,6 +461,28 @@ export const QueryPerformanceGrid = ({
       }
     }
   }, [selectedRow, view, reportData])
+
+  if (error) {
+    return (
+      <div className="relative flex flex-grow bg-alternative min-h-0">
+        <div className="flex-1 min-w-0 p-6">
+          <Admonition
+            type="destructive"
+            title="Failed to load query performance data"
+            description={error}
+          >
+            {onRetry && (
+              <div className="mt-4">
+                <Button type="default" onClick={onRetry}>
+                  Try again
+                </Button>
+              </div>
+            )}
+          </Admonition>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="relative flex flex-grow bg-alternative min-h-0">
