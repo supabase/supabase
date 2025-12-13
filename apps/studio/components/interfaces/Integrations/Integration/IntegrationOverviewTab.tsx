@@ -82,9 +82,9 @@ export const IntegrationOverviewTab = ({
         </div>
       )}
       {!!actions && !hasToInstallExtensions && <div className="px-10 max-w-4xl">{actions}</div>}
-      <MarkdownContent key={integration.id} integrationId={integration.id} />
-      <Separator />
       {children}
+      <Separator />
+      <MarkdownContent key={integration.id} integrationId={integration.id} initiallyExpanded />
     </div>
   )
 }
