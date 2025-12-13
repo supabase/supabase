@@ -32986,7 +32986,7 @@
     },
     {
       "kind": "code",
-      "text": "`infra/docker-compose.yml`"
+      "text": "`infra/compose.yaml`"
     },
     {
       "kind": "text",
