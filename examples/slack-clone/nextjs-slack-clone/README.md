@@ -30,7 +30,7 @@ Sign up to Supabase - [https://supabase.com/dashboard](https://supabase.com/dash
 
 Once your database has started, run the "Slack Clone" quickstart.
 
-![Slack Clone Quick Start](https://user-images.githubusercontent.com/1811651/101558751-73fecc80-3974-11eb-80be-423fa2789877.png)
+![Slack Clone Quick Start](https://github.com/user-attachments/assets/6ddcfdbd-cf4f-43cc-89a4-38e3098baa6c)
 
 ### 3. Get the URL and Key
 
