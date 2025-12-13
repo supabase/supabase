@@ -176,10 +176,9 @@ export const CreateAnalyticsBucketModal = ({
           schema: wrappersExtension.schema ?? 'extensions',
           version: wrappersExtension.default_version,
         })
-        await createIcebergWrapper({ bucketName: values.name })
-      } else if (wrappersExtensionState === 'installed') {
-        await createIcebergWrapper({ bucketName: values.name })
       }
+
+      await createIcebergWrapper({ bucketName: values.name })
 
       sendEvent({
         action: 'storage_bucket_created',
@@ -207,7 +206,7 @@ export const CreateAnalyticsBucketModal = ({
         if (!open) handleClose()
       }}
     >
-      <DialogContent size="large" aria-describedby={undefined}>
+      <DialogContent size="medium" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Create {config.singularName} bucket</DialogTitle>
         </DialogHeader>
@@ -216,7 +215,7 @@ export const CreateAnalyticsBucketModal = ({
 
         <Form_Shadcn_ {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection className="flex flex-col gap-y-4">
+            <DialogSection className="flex flex-col !p-0">
               <FormField_Shadcn_
                 key="name"
                 name="name"
@@ -224,6 +223,7 @@ export const CreateAnalyticsBucketModal = ({
                 render={({ field }) => (
                   <FormItemLayout
                     name="name"
+                    className="p-5"
                     label="Bucket name"
                     labelOptional="Cannot be changed after creation"
                     description="Must be between 3–63 characters. Only lowercase letters, numbers, and hyphens are allowed."
@@ -246,6 +246,7 @@ export const CreateAnalyticsBucketModal = ({
               {wrappersExtenstionNeedsUpgrading ? (
                 <Admonition
                   type="warning"
+                  className="border-x-0 border-b-0 rounded-none"
                   title="Wrappers extension must be updated for Iceberg Wrapper support"
                 >
                   <p className="prose max-w-full text-sm !leading-normal">
@@ -262,7 +263,7 @@ export const CreateAnalyticsBucketModal = ({
                   </p>
                 </Admonition>
               ) : (
-                <Admonition type="default">
+                <Admonition type="default" className="border-x-0 border-b-0 rounded-none">
                   <p className="!leading-normal">
                     Supabase will install the{' '}
                     {wrappersExtensionState !== 'installed' ? 'Wrappers extension and ' : ''}

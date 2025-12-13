@@ -147,18 +147,16 @@ export const SecuritySettings = () => {
                             <FormControl_Shadcn_>
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <div>
-                                    <Switch
-                                      checked={field.value}
-                                      onCheckedChange={field.onChange}
-                                      disabled={
-                                        !isPaidPlan ||
-                                        !canUpdateMfaConfig ||
-                                        !hasMFAEnabled ||
-                                        isUpdatingMfa
-                                      }
-                                    />
-                                  </div>
+                                  <Switch
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                    disabled={
+                                      !isPaidPlan ||
+                                      !canUpdateMfaConfig ||
+                                      !hasMFAEnabled ||
+                                      isUpdatingMfa
+                                    }
+                                  />
                                 </TooltipTrigger>
                                 {(!canUpdateMfaConfig || !hasMFAEnabled) && (
                                   <TooltipContent side="bottom">

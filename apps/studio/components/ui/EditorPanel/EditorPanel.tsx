@@ -58,8 +58,8 @@ export const EditorPanel = () => {
     setResults,
     setError,
   } = useEditorPanelStateSnapshot()
-  const { closeSidebar } = useSidebarManagerSnapshot()
   const { profile } = useProfile()
+  const { closeSidebar } = useSidebarManagerSnapshot()
   const sqlEditorSnap = useSqlEditorV2StateSnapshot()
 
   const label = 'SQL Editor'
