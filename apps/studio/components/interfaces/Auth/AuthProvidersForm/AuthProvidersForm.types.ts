@@ -29,6 +29,7 @@ export interface Provider {
   validationSchema: any // todo: use Yup type
   misc: {
     iconKey: 'gitlab-icon'
+    hasLightIcon: boolean
     requiresRedirect: true
     helper: string
     alert: {
