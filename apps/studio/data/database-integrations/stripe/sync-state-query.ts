@@ -2,6 +2,7 @@ import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { stripeSyncKeys } from './keys'
 
 export type DbConnection = {
   projectRef: string
@@ -20,8 +21,6 @@ export type StripeSyncState = z.infer<typeof StripeSyncStateSchema>
 export type StripeSyncStateData = z.infer<typeof StripeSyncStateSchema>
 export type StypeSyncStateError = ExecuteSqlError
 
-const QUERY_KEY = ['stripe-sync', 'sync-state']
-
 export async function getStripeSyncState(
   { projectRef, connectionString }: DbConnection,
   signal?: AbortSignal
@@ -33,7 +32,7 @@ export async function getStripeSyncState(
       sql: `
        SELECT started_at, closed_at FROM stripe._sync_run ORDER BY started_at DESC LIMIT 1;
       `,
-      queryKey: QUERY_KEY.concat(projectRef),
+      queryKey: stripeSyncKeys.syncState(projectRef),
     },
     signal
   )
@@ -48,17 +47,14 @@ export const useStripeSyncingState = <TData = StripeSyncStateData>(
     ...options
   }: UseQueryOptions<StripeSyncStateData, StypeSyncStateError, TData> = {}
 ) => {
-  console.log('stripe sync enabled', enabled, typeof projectRef !== 'undefined')
-  return useQuery<StripeSyncStateData, StypeSyncStateError, TData>(
-    QUERY_KEY.concat(projectRef),
-    ({ signal }) => getStripeSyncState({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  return useQuery<StripeSyncStateData, StypeSyncStateError, TData>({
+    queryKey: stripeSyncKeys.syncState(projectRef),
+    queryFn: ({ signal }) => getStripeSyncState({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 }
 
 export function invalidateStripeSyncStateQuery(client: QueryClient, projectRef: string) {
-  return client.invalidateQueries(QUERY_KEY.concat(projectRef))
+  return client.invalidateQueries({ queryKey: stripeSyncKeys.syncState(projectRef) })
 }
