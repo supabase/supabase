@@ -1,7 +1,6 @@
 import { Plus, Search } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useParams } from 'common'
 import { NoOrganizationsState } from 'components/interfaces/Home/ProjectList/EmptyStates'
@@ -21,7 +20,6 @@ import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 const OrganizationsPage: NextPageWithLayout = () => {
-  const router = useRouter()
   const [search, setSearch] = useState('')
   const { error: orgNotFoundError, org: orgSlug } = useParams()
   const orgNotFound = orgNotFoundError === 'org_not_found'
@@ -41,14 +39,6 @@ const OrganizationsPage: NextPageWithLayout = () => {
       : organizations?.filter(
           (x) => x.name.toLowerCase().includes(search) || x.slug.toLowerCase().includes(search)
         )
-
-  useEffect(() => {
-    // If there are no organizations, force the user to create one
-    // unless the user is on the not found page
-    if (isSuccess && organizations.length <= 0 && !orgNotFound) {
-      router.push('/new')
-    }
-  }, [isSuccess, organizations])
 
   return (
     <ScaffoldContainer>
