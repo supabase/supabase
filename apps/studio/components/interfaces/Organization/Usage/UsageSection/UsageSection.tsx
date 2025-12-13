@@ -73,7 +73,7 @@ const UsageSection = ({
             currentBillingCycleSelected={currentBillingCycleSelected}
             usage={usage}
           />
-        ) : attribute.key === PricingMetric.DATABASE_SIZE ? (
+        ) : attribute.key === PricingMetric.DATABASE_SIZE && subscription?.plan.id === 'free' ? (
           <DatabaseSizeUsage
             key={attribute.name}
             slug={orgSlug}

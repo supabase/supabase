@@ -83,16 +83,18 @@ const Subscription = () => {
                   </div>
 
                   <div>
-                    <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
-                      <Button
-                        type="default"
-                        className="pointer-events-auto"
-                        disabled={!canChangeTier}
-                        onClick={() => snap.setPanelKey('subscriptionPlan')}
-                      >
-                        Change subscription plan
-                      </Button>
-                    </ProjectUpdateDisabledTooltip>
+                    {canChangeTier && (
+                      <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
+                        <Button
+                          type="default"
+                          className="pointer-events-auto"
+                          disabled={!canChangeTier}
+                          onClick={() => snap.setPanelKey('subscriptionPlan')}
+                        >
+                          Change subscription plan
+                        </Button>
+                      </ProjectUpdateDisabledTooltip>
+                    )}
                     {!canChangeTier &&
                       (projectUpdateDisabled ? (
                         <Alert
