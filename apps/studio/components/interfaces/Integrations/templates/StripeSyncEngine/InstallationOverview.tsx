@@ -13,23 +13,48 @@ import { Label } from '@ui/components/shadcn/ui/label'
 import { BadgeCheck, ExternalLink, HelpCircle, RefreshCwIcon } from 'lucide-react'
 import { useStripeSyncingState } from 'data/database-integrations/stripe/sync-state-query'
 import { formatRelative } from 'date-fns'
+import {
+  STRIPE_SCHEMA_COMMENT_PREFIX,
+  INSTALLATION_INSTALLED_SUFFIX,
+  INSTALLATION_STARTED_SUFFIX,
+  INSTALLATION_ERROR_SUFFIX,
+} from 'stripe-experiment-sync/supabase'
 
 export const StripeSyncInstallationPage = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [shouldShowInstallSheet, setShouldShowInstallSheet] = useState(false)
-  const [isClosingInstallSheet, setIsClosingInstallSheet] = useState(false)
   const [stripeKey, setStripeKey] = useState('')
 
-  const { data: schemas } = useSchemasQuery({
+  const { data: schemas, refetch: refetchSchemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
   const canInstall = true
-  const isInstalled = schemas ? schemas.some(({ name }) => name === 'stripe') : false
-  const [installing, setInstalling] = useState(false)
+  const stripeSchema = schemas?.find((s) => s.name === 'stripe')
+  const isInstalled =
+    stripeSchema &&
+    stripeSchema.description?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
+    stripeSchema.description.includes(INSTALLATION_INSTALLED_SUFFIX)
 
+  const setupInProgress =
+    stripeSchema &&
+    stripeSchema.description?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
+    stripeSchema.description?.startsWith(INSTALLATION_STARTED_SUFFIX)
+
+  const setupError =
+    stripeSchema &&
+    stripeSchema.description?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
+    stripeSchema.description?.includes(INSTALLATION_ERROR_SUFFIX)
+
+  const [isStartingInstall, setIsStartingInstall] = useState(false)
+  console.log({
+    canInstall,
+    isInstalled,
+    setupInProgress,
+    setupError,
+  })
   const { data: syncState } = useStripeSyncingState(
     {
       projectRef: project?.ref!,
@@ -37,7 +62,7 @@ export const StripeSyncInstallationPage = () => {
     },
     {
       refetchInterval: 4000,
-      enabled: !!project?.ref && isInstalled,
+      enabled: !!isInstalled,
     }
   )
 
@@ -46,7 +71,7 @@ export const StripeSyncInstallationPage = () => {
   return (
     <IntegrationOverviewTab
       actions={
-        !isInstalled ? (
+        !isInstalled && !setupInProgress && !setupError ? (
           <Admonition
             type="default"
             title="Installing Stripe Sync Engine will make the following changes to your Supabase project:"
@@ -88,6 +113,38 @@ export const StripeSyncInstallationPage = () => {
         null
       }
     >
+      {setupError && (
+        <div className="px-10 max-w-4xl">
+          <Admonition type="destructive" showIcon={true} title="Installation Error">
+            <div>
+              There was an error during the installation of the Stripe Sync Engine. Please try
+              reinstalling the integration. If the problem persists, contact support.
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => {
+                  setShouldShowInstallSheet(true)
+                }}
+              >
+                Try Again
+              </Button>
+              <Button type="warning">Uninstall</Button>
+            </div>
+          </Admonition>
+        </div>
+      )}
+      {setupInProgress && (
+        <div className="px-10 max-w-4xl">
+          <Admonition type="default" showIcon={false}>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 animate-pulse">
+                <RefreshCwIcon size={14} />
+                <div>Installation in progress...</div>
+              </div>
+            </div>
+          </Admonition>
+        </div>
+      )}
       {syncState && (
         <div className="px-10 max-w-4xl">
           <Admonition type="default" showIcon={false}>
@@ -128,8 +185,8 @@ export const StripeSyncInstallationPage = () => {
               <form
                 onSubmit={async (e) => {
                   e.preventDefault()
-                  setInstalling(true)
-                  await fetch('/api/integrations/setup-stripe-sync', {
+                  setIsStartingInstall(true)
+                  const resp = await fetch('/api/integrations/stripe-sync-integration', {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
@@ -140,7 +197,14 @@ export const StripeSyncInstallationPage = () => {
                       stripeSecretKey: stripeKey,
                     }),
                   })
-                  setInstalling(false)
+                  if (resp.ok) {
+                    setIsStartingInstall(false)
+                    setShouldShowInstallSheet(false)
+                    refetchSchemas()
+                  } else {
+                    setIsStartingInstall(false)
+                    // TODO setError state
+                  }
                 }}
               >
                 <FormSection
@@ -177,7 +241,12 @@ export const StripeSyncInstallationPage = () => {
                       </Link>
                     </p>
 
-                    <Button asChild loading={installing} disabled={installing} type="primary">
+                    <Button
+                      asChild
+                      loading={isStartingInstall}
+                      disabled={!stripeKey || isStartingInstall}
+                      type="primary"
+                    >
                       <button type="submit">Start Installation</button>
                     </Button>
                   </FormSectionContent>
