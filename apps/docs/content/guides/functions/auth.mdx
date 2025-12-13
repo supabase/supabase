@@ -22,10 +22,63 @@ When a HTTP request is sent to Edge Functions we can levarage to Supabase Auth t
 
 But unfortunely this method is not compatible with the new [JWT Signing Keys](docs/guides/auth/signing-keys) and also caused a lot of trouble when trying to [third party integration](https://github.com/orgs/supabase/discussions/34988#discussion-8199151).
 
-That's why we decided to not implicit force JWT verification but suggest patterns and templates to handle this task. It allow users to own and control the auth code, instead of hidding it internally under Edge Runtime infrastructure.
+That's why we decided to not implicit force JWT verification anymore, but instead suggest patterns and templates to handle this task. It allow users to own and control the auth code, instead of hidding it internally under Edge Runtime infrastructure.
 
 <Admonition type="warning">
 
 Following the [Upcoming changes](https://github.com/orgs/supabase/discussions/29260) timetable, the `verify_jwt` flag will be still suported and enabled by default. In order to move to new [JWT Signing Keys](docs/guides/auth/signing-keys) you need to manually [skip the authorization checks](http://localhost:3001/docs/guides/functions/function-configuration#skipping-authorization-checks) and follow the steps bellow.
 
 </Admonition>
+
+## Verifying JWT
+
+manually.....
+
+```ts
+import { createRemoteJWKSet, jwtVerify } from 'jose'
+
+const SUPABASE_JWT_ISSUER = SUPABASE_URL + '/auth/v1'
+const SUPABASE_JWT_KEYS = createRemoteJWKSet(
+  new URL(SUPABASE_JWT_ISSUER + '/.well-known/jwks.json')
+)
+
+function getAuthToken(req: Request) {
+  const authHeader = req.headers.get('authorization')
+  if (!authHeader) {
+    throw new Error('Missing authorization header')
+  }
+  const [bearer, token] = authHeader.split(' ')
+  if (bearer !== 'Bearer') {
+    throw new Error(`Auth header is not 'Bearer {token}'`)
+  }
+  return token
+}
+
+function verifySupabaseJWT(jwt: string) {
+  return jwtVerify(token, SUPABASE_JWT_KEYS, { issuer: SUPABASE_JWT_ISSUER })
+}
+
+Deno.serve(async (req: Request) => {
+  if (req.method !== 'OPTIONS') {
+    try {
+      const token = getAuthToken(req)
+      const isValidJWT = await verifySupabaseJWT(token)
+
+      if (!isValidJWT) {
+        return new Response(JSON.stringify({ msg: 'Invalid JWT' }), {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      }
+    } catch (e) {
+      console.error(e)
+      return new Response(JSON.stringify({ msg: e.toString() }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+  }
+}
+```
+
+Using the Supabase Template.....
