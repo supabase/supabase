@@ -39,7 +39,7 @@ Instead, we'll rely on the Supabase client to do some of the work on the **`web`
 That means you will want to refrain from running any `yarn rw prisma migrate` commands and also double check your build commands on deployment to ensure Prisma won't reset your database. Prisma currently doesn't support cross-schema foreign keys, so introspecting the schema fails due
 to how your Supabase `public` schema references the `auth.users`.
 
-<$Partial path="project_setup.mdx" />
+<$Partial path="project_setup.mdx" variables={{ "framework": "", "tab": "frameworks" }} />
 
 ## Building the app
 
