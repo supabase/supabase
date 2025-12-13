@@ -7125,6 +7125,7 @@ export interface components {
             | 'instances.compute_update_available_sizes'
             | 'storage.max_file_size'
             | 'security.audit_logs_days'
+            | 'security.soc2_report'
             | 'log.retention_days'
             | 'custom_domain'
             | 'vanity_subdomain'
