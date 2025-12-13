@@ -1,20 +1,7 @@
 import { getAccessToken, useParams } from 'common'
-import { NavigationItem, PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { useQueuesQuery } from 'data/database-queues/database-queues-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IntegrationOverviewTab } from '../../Integration/IntegrationOverviewTab'
-import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
-import {
-  Button,
-  Form_Shadcn_ as Form,
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { Button, Sheet, SheetContent, SheetHeader, SheetTitle } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useState } from 'react'
@@ -23,9 +10,9 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { Label } from '@ui/components/shadcn/ui/label'
-import { BadgeCheck, ExternalLink, HelpCircle } from 'lucide-react'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { deployEdgeFunction } from 'data/edge-functions/edge-functions-deploy-mutation'
+import { BadgeCheck, ExternalLink, HelpCircle, RefreshCwIcon } from 'lucide-react'
+import { useStripeSyncingState } from 'data/database-integrations/stripe/sync-state-query'
+import { formatRelative } from 'date-fns'
 
 export const StripeSyncInstallationPage = () => {
   const { ref } = useParams()
@@ -38,6 +25,20 @@ export const StripeSyncInstallationPage = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const { data: syncState } = useStripeSyncingState(
+    {
+      projectRef: project?.ref!,
+      connectionString: project?.connectionString,
+    },
+    {
+      refetchInterval: 4000,
+      enabled: !!project?.ref,
+    }
+  )
+
+  const isSyncing = !!syncState && !syncState.closed_at
+
   const canInstall = true
   const isInstalled = schemas ? schemas.some(({ name }) => name === 'stripe') : false
   const [installing, setInstalling] = useState(false)
@@ -80,14 +81,42 @@ export const StripeSyncInstallationPage = () => {
               Install
             </ButtonTooltip>
           </Admonition>
-        ) : (
-          <div className="flex items-center gap-x-1">
-            <BadgeCheck size={14} className="text-brand" />
-            <span className=" text-brand text-xs">Installed</span>
-          </div>
-        )
+        ) : // <div className="flex items-center gap-x-1">
+        //   <BadgeCheck size={14} className="text-brand" />
+        //   <span className=" text-brand text-xs">Installed</span>
+        // </div>
+        null
       }
     >
+      {syncState && (
+        <div className="px-10 max-w-4xl">
+          <Admonition type="default" showIcon={false}>
+            <div className="flex items-center justify-between gap-2">
+              {isSyncing ? (
+                <>
+                  <div className="flex items-center gap-2 animate-pulse">
+                    <RefreshCwIcon size={14} />
+                    <div>Sync in progress...</div>
+                  </div>
+                  <div className="text-foreground-light text-sm">
+                    Started {formatRelative(new Date(syncState.started_at!), new Date())}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2">
+                    <BadgeCheck size={14} className="text-brand" />
+                    <div>All up to date</div>
+                  </div>
+                  <div className="text-foreground-light text-sm">
+                    Last synced {formatRelative(new Date(syncState.closed_at!), new Date())}
+                  </div>
+                </>
+              )}
+            </div>
+          </Admonition>
+        </div>
+      )}
       <Sheet
         open={!!shouldShowInstallSheet}
         onOpenChange={(isOpen) => setShouldShowInstallSheet(isOpen)}
