@@ -1,4 +1,3 @@
-import pgMeta from '@supabase/pg-meta'
 import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 
@@ -9,10 +8,12 @@ export type DbConnection = {
   connectionString?: string | null
 }
 
-const StripeSyncStateSchema = z.object({
-  started_at: z.string().nullable(),
-  closed_at: z.string().nullable(),
-})
+const StripeSyncStateSchema = z
+  .object({
+    started_at: z.string().nullable(),
+    closed_at: z.string().nullable(),
+  })
+  .nullable()
 
 export type StripeSyncState = z.infer<typeof StripeSyncStateSchema>
 
@@ -46,13 +47,17 @@ export const useStripeSyncingState = <TData = StripeSyncStateData>(
     enabled = true,
     ...options
   }: UseQueryOptions<StripeSyncStateData, StypeSyncStateError, TData> = {}
-) =>
-  useQuery<StripeSyncStateData, StypeSyncStateError, TData>({
-    queryKey: QUERY_KEY.concat(projectRef),
-    queryFn: ({ signal }) => getStripeSyncState({ projectRef, connectionString }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined',
-    ...options,
-  })
+) => {
+  console.log('stripe sync enabled', enabled, typeof projectRef !== 'undefined')
+  return useQuery<StripeSyncStateData, StypeSyncStateError, TData>(
+    QUERY_KEY.concat(projectRef),
+    ({ signal }) => getStripeSyncState({ projectRef, connectionString }, signal),
+    {
+      enabled: enabled && typeof projectRef !== 'undefined',
+      ...options,
+    }
+  )
+}
 
 export function invalidateStripeSyncStateQuery(client: QueryClient, projectRef: string) {
   return client.invalidateQueries(QUERY_KEY.concat(projectRef))
