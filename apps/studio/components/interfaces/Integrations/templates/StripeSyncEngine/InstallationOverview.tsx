@@ -1,4 +1,4 @@
-import { getAccessToken, useParams } from 'common'
+import { useParams } from 'common'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IntegrationOverviewTab } from '../../Integration/IntegrationOverviewTab'
 import { Button, Sheet, SheetContent, SheetHeader, SheetTitle } from 'ui'
@@ -10,9 +10,12 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { Label } from '@ui/components/shadcn/ui/label'
-import { BadgeCheck, ExternalLink, HelpCircle, RefreshCwIcon } from 'lucide-react'
+import { AlertCircle, BadgeCheck, ExternalLink, HelpCircle, RefreshCwIcon } from 'lucide-react'
 import { useStripeSyncingState } from 'data/database-integrations/stripe/sync-state-query'
+import { useStripeSyncInstallMutation } from 'data/database-integrations/stripe/stripe-sync-install-mutation'
+import { useStripeSyncUninstallMutation } from 'data/database-integrations/stripe/stripe-sync-uninstall-mutation'
 import { formatRelative } from 'date-fns'
+import { toast } from 'sonner'
 import {
   STRIPE_SCHEMA_COMMENT_PREFIX,
   INSTALLATION_INSTALLED_SUFFIX,
@@ -25,36 +28,75 @@ export const StripeSyncInstallationPage = () => {
   const { data: project } = useSelectedProjectQuery()
   const [shouldShowInstallSheet, setShouldShowInstallSheet] = useState(false)
   const [stripeKey, setStripeKey] = useState('')
+  const [isInstallInitiated, setIsInstallInitiated] = useState(false)
 
-  const { data: schemas, refetch: refetchSchemas } = useSchemasQuery({
+  const {
+    data: schemas,
+    isLoading: isSchemasLoading,
+    refetch: refetchSchemas,
+  } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  const canInstall = true
+  // Install mutation
+  const {
+    mutate: installStripeSync,
+    isLoading: isInstalling,
+    error: installError,
+    reset: resetInstallError,
+  } = useStripeSyncInstallMutation({
+    onSuccess: () => {
+      toast.success('Stripe Sync installation started')
+      setShouldShowInstallSheet(false)
+      setStripeKey('')
+      setIsInstallInitiated(true)
+    },
+  })
+
+  // Uninstall mutation
+  const {
+    mutate: uninstallStripeSync,
+    isLoading: isUninstalling,
+    error: uninstallError,
+  } = useStripeSyncUninstallMutation({
+    onSuccess: () => {
+      toast.success('Stripe Sync uninstallation started')
+    },
+  })
+
   const stripeSchema = schemas?.find((s) => s.name === 'stripe')
+
+  // Determine installation status from schema description
   const isInstalled =
     stripeSchema &&
     stripeSchema.description?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
     stripeSchema.description.includes(INSTALLATION_INSTALLED_SUFFIX)
 
-  const setupInProgress =
+  const schemaShowsInProgress =
     stripeSchema &&
     stripeSchema.description?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
-    stripeSchema.description?.startsWith(INSTALLATION_STARTED_SUFFIX)
+    stripeSchema.description?.includes(INSTALLATION_STARTED_SUFFIX)
+
+  const setupInProgress = schemaShowsInProgress || isInstalling || isInstallInitiated
 
   const setupError =
     stripeSchema &&
     stripeSchema.description?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
     stripeSchema.description?.includes(INSTALLATION_ERROR_SUFFIX)
 
-  const [isStartingInstall, setIsStartingInstall] = useState(false)
-  console.log({
-    canInstall,
-    isInstalled,
-    setupInProgress,
-    setupError,
-  })
+  // Clear the install initiated flag once we detect completion or error from the schema
+  if (isInstallInitiated && (isInstalled || setupError)) {
+    setIsInstallInitiated(false)
+  }
+
+  // Check if there's an existing stripe schema that wasn't created by this integration
+  const hasConflictingSchema =
+    stripeSchema && !stripeSchema.description?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX)
+
+  const canInstall = !hasConflictingSchema && !isInstalled && !setupInProgress
+
+  // Sync state query - only enabled when installed
   const { data: syncState } = useStripeSyncingState(
     {
       projectRef: project?.ref!,
@@ -66,7 +108,40 @@ export const StripeSyncInstallationPage = () => {
     }
   )
 
+  // Poll for schema changes during installation
+  useSchemasQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      refetchInterval: setupInProgress ? 5000 : false,
+    }
+  )
+
   const isSyncing = !!syncState && !syncState.closed_at
+
+  const handleInstall = () => {
+    if (!project?.ref || !stripeKey) return
+
+    installStripeSync({
+      projectRef: project.ref,
+      stripeSecretKey: stripeKey,
+    })
+  }
+
+  const handleUninstall = () => {
+    if (!project?.ref) return
+
+    uninstallStripeSync({
+      projectRef: project.ref,
+    })
+  }
+
+  const handleOpenInstallSheet = () => {
+    resetInstallError()
+    setShouldShowInstallSheet(true)
+  }
 
   return (
     <IntegrationOverviewTab
@@ -121,26 +196,24 @@ export const StripeSyncInstallationPage = () => {
               reinstalling the integration. If the problem persists, contact support.
             </div>
             <div className="flex gap-2">
+              <Button onClick={handleOpenInstallSheet}>Try Again</Button>
               <Button
-                onClick={() => {
-                  setShouldShowInstallSheet(true)
-                }}
+                type="warning"
+                onClick={handleUninstall}
+                loading={isUninstalling}
+                disabled={isUninstalling}
               >
-                Try Again
+                Uninstall
               </Button>
-              <Button type="warning">Uninstall</Button>
             </div>
           </Admonition>
         </div>
       )}
       {setupInProgress && (
         <div className="px-10 max-w-4xl">
-          <Admonition type="default" showIcon={false}>
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 animate-pulse">
-                <RefreshCwIcon size={14} />
-                <div>Installation in progress...</div>
-              </div>
+          <Admonition type="caution" showIcon={true}>
+            <div className="animate-pulse">
+              <div>Installation in progress...</div>
             </div>
           </Admonition>
         </div>
@@ -176,41 +249,41 @@ export const StripeSyncInstallationPage = () => {
       )}
       <Sheet
         open={!!shouldShowInstallSheet}
-        onOpenChange={(isOpen) => setShouldShowInstallSheet(isOpen)}
+        onOpenChange={(isOpen) => {
+          if (!isInstalling) {
+            setShouldShowInstallSheet(isOpen)
+            if (!isOpen) {
+              setStripeKey('')
+              resetInstallError()
+            }
+          }
+        }}
       >
         <SheetContent size="lg" tabIndex={undefined}>
           <SheetHeader>
             <SheetTitle>Install Stripe Sync Engine</SheetTitle>
             <div className="flex-grow overflow-y-auto">
               <form
-                onSubmit={async (e) => {
+                onSubmit={(e) => {
                   e.preventDefault()
-                  setIsStartingInstall(true)
-                  const resp = await fetch('/api/integrations/stripe-sync-integration', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      Authorization: `Bearer ${await getAccessToken()}`,
-                    },
-                    body: JSON.stringify({
-                      projectRef: project?.ref,
-                      stripeSecretKey: stripeKey,
-                    }),
-                  })
-                  if (resp.ok) {
-                    setIsStartingInstall(false)
-                    setShouldShowInstallSheet(false)
-                    refetchSchemas()
-                  } else {
-                    setIsStartingInstall(false)
-                    // TODO setError state
-                  }
+                  handleInstall()
                 }}
               >
                 <FormSection
                   header={<FormSectionLabel>Stripe Syncing Configuration</FormSectionLabel>}
                 >
                   <FormSectionContent loading={false}>
+                    {installError && (
+                      <Admonition type="destructive" className="mb-4">
+                        <div className="flex items-start gap-2">
+                          <AlertCircle size={16} className="mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="font-medium">Installation failed</p>
+                            <p className="text-sm">{installError.message}</p>
+                          </div>
+                        </div>
+                      </Admonition>
+                    )}
                     <Label htmlFor="stripe_api_key">Stripe API Key</Label>
                     <Input
                       id="stripe_api_key"
@@ -218,6 +291,7 @@ export const StripeSyncInstallationPage = () => {
                       reveal={false}
                       value={stripeKey}
                       onChange={(e) => setStripeKey(e.target.value)}
+                      disabled={isInstalling}
                     />
                     <p>
                       <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
@@ -226,7 +300,7 @@ export const StripeSyncInstallationPage = () => {
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          Get Stripe API
+                          Get Stripe API Key
                         </Link>
                       </Button>
                     </p>
@@ -242,12 +316,12 @@ export const StripeSyncInstallationPage = () => {
                     </p>
 
                     <Button
-                      asChild
-                      loading={isStartingInstall}
-                      disabled={!stripeKey || isStartingInstall}
+                      htmlType="submit"
+                      loading={isInstalling}
+                      disabled={!stripeKey || isInstalling}
                       type="primary"
                     >
-                      <button type="submit">Start Installation</button>
+                      {isInstalling ? 'Starting Installation...' : 'Start Installation'}
                     </Button>
                   </FormSectionContent>
                 </FormSection>
@@ -259,5 +333,3 @@ export const StripeSyncInstallationPage = () => {
     </IntegrationOverviewTab>
   )
 }
-
-async function installStripeSyncIntegration() {}
