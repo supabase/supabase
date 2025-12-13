@@ -1034,6 +1034,9 @@ importers:
       streamdown:
         specifier: ^1.3.0
         version: 1.3.0(@types/react@18.3.3)(react@18.3.1)(supports-color@8.1.1)
+      stripe-experiment-sync:
+        specifier: ^1.0.6
+        version: 1.0.6(stripe@20.0.0(@types/node@22.13.14))
       supabase-management-js:
         specifier: ^1.0.0
         version: 1.0.0
@@ -15810,6 +15813,11 @@ packages:
     resolution: {integrity: sha512-NoSsPqXxbkD8RIe+peQCqiea4QzXgosdTKY8p7PsbbGsh2F8TifDj/vJxfuR8qJwNYrijdSs7uf0tAe6WOyCsQ==}
     engines: {node: '>=12.0.0'}
 
+  pg-node-migrations@0.0.8:
+    resolution: {integrity: sha512-44cMl9umOmCv0hzZyEcvjEq8Bm8u7mrzggZ06qXTJVSsMMB4j2OsjG+rSp+uzeKWyP2Vu0K9Ye2wKtjFUJwrdw==}
+    engines: {node: '>10.17.0'}
+    hasBin: true
+
   pg-numeric@1.0.2:
     resolution: {integrity: sha512-BM/Thnrw5jm2kKLE5uJkXqqExRUY/toLHda65XgFTBTFYZyopbKjBe29Ii3RbkvlsMoFwD+tHeGaCjjv0gHlyw==}
     engines: {node: '>=4'}
@@ -17657,6 +17665,10 @@ packages:
   sql-parser-cst@0.24.0:
     resolution: {integrity: sha512-38NNWamo0PKv80Zn8r1iXgatkWEB04CPhun8nEQhEJlYBMSIV4OOt4g3diynjVHJSunNSQqAjKcwmhM0EeLCtg==}
 
+  sql-template-strings@2.2.2:
+    resolution: {integrity: sha512-UXhXR2869FQaD+GMly8jAMCRZ94nU5KcrFetZfWEMd+LVVG6y0ExgHAhatEcKZ/wk8YcKPdi+hiD2wm75lq3/Q==}
+    engines: {node: '>=4.0.0'}
+
   sqlstring@2.3.3:
     resolution: {integrity: sha512-qC9iz2FlN7DQl3+wjwn3802RTyjCx7sDvfQEXchwa6CWOx07/WVfh91gBmQ9fahw8snwGEWU3xGzOt4tFyHLxg==}
     engines: {node: '>= 0.6'}
@@ -17852,6 +17864,21 @@ packages:
   strip-literal@3.1.0:
     resolution: {integrity: sha512-8r3mkIM/2+PpjHoOtiAW8Rg3jJLHaV7xPwG+YRGrv6FP0wwk/toTpATxWYOW0BKdWwl82VT2tFYi5DlROa0Mxg==}
 
+  stripe-experiment-sync@1.0.6:
+    resolution: {integrity: sha512-WP2Ed1CZgflZmOVXlGh5cb5jPitpq+JUHmzY6k1UgwYfl6JWE63wHHJRO4b9GnecbmyYGtjDHkd7z23J1BX81A==}
+    hasBin: true
+    peerDependencies:
+      stripe: '> 11'
+
+  stripe@20.0.0:
+    resolution: {integrity: sha512-EaZeWpbJOCcDytdjKSwdrL5BxzbDGNueiCfHjHXlPdBQvLqoxl6AAivC35SPzTmVXJb5duXQlXFGS45H0+e6Gg==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      '@types/node': '>=16'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
   strnum@1.1.2:
     resolution: {integrity: sha512-vrN+B7DBIoTTZjnPNewwhx6cBA/H+IS7rfW68n7XxC1y7uoiGQBxaKzqucGUgavX15dJgiGztLJ8vxuEzwqBdA==}
 
@@ -17924,6 +17951,10 @@ packages:
     resolution: {integrity: sha512-70/LQEZ07TEcxiU2dz51FKaE6hCTWC6vr7FOk3Gr0U60C3shtAN+H+BFr9XlYe5xqf3RA8nrc+VIwzCfnxuXJw==}
     engines: {node: '>=8'}
     hasBin: true
+
+  supabase-management-js@0.1.6:
+    resolution: {integrity: sha512-TDQg6Nh7e2DaLmMjqpJt7Wwh2Au5loVPH2gwKMkD89e3pb5F/zMQGWt22asEXme031jEmhjazixFH0lwMgbRJA==}
+    engines: {node: '>=18.0.0'}
 
   supabase-management-js@1.0.0:
     resolution: {integrity: sha512-CjtUcT1i3lsIyRwS3/HG6BUB8EaJTEdAPP0GQu8dRDi61HvJeBrswCfG/GRxebC0ZZFov+oHqFIWPe1ztyUqYA==}
@@ -19369,6 +19400,9 @@ packages:
   yargs@17.7.2:
     resolution: {integrity: sha512-7dSzzRQ++CKnNI/krKnYRV7JKKPUXMEh61soaHKg9mrWEhzFWhFnxPxGl+69cD1Ou63C13NUPCnmIcrvqCuM6w==}
     engines: {node: '>=12'}
+
+  yesql@7.0.0:
+    resolution: {integrity: sha512-sosfr7agy4ibLM7BvXBkM6BpBmKMGuBO8DUYQEuey+QqaqrgW+2bsSg6D050ocBYIz0PuHxUyehyzEztZTU4pw==}
 
   yjs@13.6.27:
     resolution: {integrity: sha512-OIDwaflOaq4wC6YlPBy2L6ceKeKuF7DeTxx+jPzv1FHn9tCZ0ZwSRnUBxD05E3yed46fv/FWJbvR+Ud7x0L7zw==}
@@ -36690,6 +36724,13 @@ snapshots:
 
   pg-minify@1.6.3: {}
 
+  pg-node-migrations@0.0.8:
+    dependencies:
+      pg: 8.16.3
+      sql-template-strings: 2.2.2
+    transitivePeerDependencies:
+      - pg-native
+
   pg-numeric@1.0.2: {}
 
   pg-pool@3.10.1(pg@8.16.3):
@@ -38987,6 +39028,8 @@ snapshots:
 
   sql-parser-cst@0.24.0: {}
 
+  sql-template-strings@2.2.2: {}
+
   sqlstring@2.3.3: {}
 
   sse.js@2.2.0: {}
@@ -39219,6 +39262,25 @@ snapshots:
     dependencies:
       js-tokens: 9.0.1
 
+  stripe-experiment-sync@1.0.6(stripe@20.0.0(@types/node@22.13.14)):
+    dependencies:
+      pg: 8.16.3
+      pg-node-migrations: 0.0.8
+      stripe: 20.0.0(@types/node@22.13.14)
+      supabase-management-js: 0.1.6
+      ws: 8.18.3
+      yesql: 7.0.0
+    transitivePeerDependencies:
+      - bufferutil
+      - pg-native
+      - utf-8-validate
+
+  stripe@20.0.0(@types/node@22.13.14):
+    dependencies:
+      qs: 6.14.0
+    optionalDependencies:
+      '@types/node': 22.13.14
+
   strnum@1.1.2: {}
 
   strtok3@8.1.0:
@@ -39306,6 +39368,10 @@ snapshots:
       mz: 2.7.0
       pirates: 4.0.6
       ts-interface-checker: 0.1.13
+
+  supabase-management-js@0.1.6:
+    dependencies:
+      openapi-fetch: 0.6.2
 
   supabase-management-js@1.0.0:
     dependencies:
@@ -40953,6 +41019,8 @@ snapshots:
       string-width: 4.2.3
       y18n: 5.0.8
       yargs-parser: 21.1.1
+
+  yesql@7.0.0: {}
 
   yjs@13.6.27:
     dependencies:
