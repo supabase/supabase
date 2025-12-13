@@ -6,9 +6,15 @@ import { cn } from 'ui'
 
 const CHAR_LIMIT = 500 // Adjust this number as needed
 
-export const MarkdownContent = ({ integrationId }: { integrationId: string }) => {
+export const MarkdownContent = ({
+  integrationId,
+  initiallyExpanded,
+}: {
+  integrationId: string
+  initiallyExpanded?: boolean
+}) => {
   const [content, setContent] = useState<string>('')
-  const [isExpanded, setIsExpanded] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(initiallyExpanded ?? false)
 
   useEffect(() => {
     import(`static-data/integrations/${integrationId}/overview.md`)
