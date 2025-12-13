@@ -149,6 +149,7 @@ export function getDisplayName(user: User, fallback = '-'): string {
     last_name,
     firstName,
     first_name,
+    name,
   } = user.raw_user_meta_data ?? {}
 
   const {
@@ -193,7 +194,8 @@ export function getDisplayName(user: User, fallback = '-'): string {
 
   return (
     toPrettyJsonString(
-      displayName ||
+      name ||
+        displayName ||
         display_name ||
         ccDisplayName ||
         cc_display_name ||
