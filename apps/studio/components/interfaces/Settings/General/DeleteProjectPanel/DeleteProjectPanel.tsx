@@ -1,7 +1,14 @@
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, CriticalIcon } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, CriticalIcon } from 'ui'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { DeleteProjectButton } from './DeleteProjectButton'
 
 export const DeleteProjectPanel = () => {
@@ -20,17 +27,26 @@ export const DeleteProjectPanel = () => {
       : 'Make sure you have made a backup if you want to keep your data.'
 
   return (
-    <section id="delete-project">
-      <FormHeader title="Delete Project" description="" />
+    <PageSection id="delete-project">
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Delete Project</PageSectionTitle>
+          <PageSectionDescription>
+            Permanently remove your project and its database.
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
 
-      <Alert_Shadcn_ variant="destructive">
-        <CriticalIcon />
-        <AlertTitle_Shadcn_>{title}</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
-        <div className="mt-2">
-          <DeleteProjectButton />
-        </div>
-      </Alert_Shadcn_>
-    </section>
+      <PageSectionContent>
+        <Alert_Shadcn_ variant="destructive">
+          <CriticalIcon />
+          <AlertTitle_Shadcn_>{title}</AlertTitle_Shadcn_>
+          <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
+          <div className="mt-2">
+            <DeleteProjectButton />
+          </div>
+        </Alert_Shadcn_>
+      </PageSectionContent>
+    </PageSection>
   )
 }
