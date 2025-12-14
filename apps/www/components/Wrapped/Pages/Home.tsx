@@ -1,7 +1,7 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 import { AnimatedGridBackground } from '../AnimatedGridBackground'
 
@@ -184,7 +184,7 @@ function FloatingStatBubbles() {
             },
           }}
         >
-          <p className="text-sm font-mono font-medium text-brand whitespace-nowrap">
+          <p className="text-sm font-mono font-medium text-brand-link dark:text-brand whitespace-nowrap">
             {bubble.stat.value}
           </p>
           <p className="text-xs text-foreground-light whitespace-nowrap">{bubble.stat.label}</p>

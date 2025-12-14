@@ -258,7 +258,7 @@ function MonthSection({ month }: { month: Month }) {
       <div className="px-6 lg:px-8 py-2.5 md:py-4 flex items-center gap-3">
         <span className="text-base font-medium">{month.name}</span>
         {month.isLaunchWeek && (
-          <span className="text-xs bg-brand/10 text-brand px-2 py-0.5 rounded-full">
+          <span className="text-xs bg-brand/10 text-brand-link dark:text-brand px-2 py-0.5 rounded-full">
             Launch Week
           </span>
         )}
