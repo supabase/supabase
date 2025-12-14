@@ -45,7 +45,10 @@ export const useStripeSyncingState = <TData = StripeSyncStateData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<StripeSyncStateData, StypeSyncStateError, TData> = {}
+  }: Omit<
+    UseQueryOptions<StripeSyncStateData, StypeSyncStateError, TData>,
+    'queryKey' | 'queryFn'
+  > = {}
 ) => {
   return useQuery<StripeSyncStateData, StypeSyncStateError, TData>({
     queryKey: stripeSyncKeys.syncState(projectRef),

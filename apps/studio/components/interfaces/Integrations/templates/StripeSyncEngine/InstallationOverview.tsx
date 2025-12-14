@@ -39,10 +39,9 @@ export const StripeSyncInstallationPage = () => {
     connectionString: project?.connectionString,
   })
 
-  // Install mutation
   const {
     mutate: installStripeSync,
-    isLoading: isInstalling,
+    isPending: isInstalling,
     error: installError,
     reset: resetInstallError,
   } = useStripeSyncInstallMutation({
@@ -54,10 +53,9 @@ export const StripeSyncInstallationPage = () => {
     },
   })
 
-  // Uninstall mutation
   const {
     mutate: uninstallStripeSync,
-    isLoading: isUninstalling,
+    isPending: isUninstalling,
     error: uninstallError,
   } = useStripeSyncUninstallMutation({
     onSuccess: () => {
