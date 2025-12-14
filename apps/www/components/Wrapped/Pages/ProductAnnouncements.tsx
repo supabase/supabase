@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { AnimatedGridBackground } from '../AnimatedGridBackground'
 import { cn } from 'ui'
+import { AnimatedGridBackground } from '../AnimatedGridBackground'
 
 type Announcement = {
   title: string
@@ -320,21 +320,33 @@ export const ProductAnnouncements = () => {
       {/* Months accordion - 2 columns, top-to-bottom flow */}
       <div className="relative max-w-[60rem] mx-auto border-x border-b">
         <div className="grid grid-cols-1 lg:grid-cols-2">
+          {/* Smaller breakpoint: chronological order for one column */}
+          {months.map((month, index) => (
+            <div
+              key={`mobile-${month.name}`}
+              className={cn(
+                'border-b border-muted lg:hidden',
+                index === months.length - 1 && 'border-b-0'
+              )}
+            >
+              <MonthSection month={month} />
+            </div>
+          ))}
+          {/* Larger breakpoint: zig-zag/top-to-bottom flow for two columns */}
           {(() => {
-            // Reorder for top-to-bottom flow in 2 columns
             const half = Math.ceil(months.length / 2)
-            const reordered: { month: Month; originalIndex: number }[] = []
+            const reordered: Month[] = []
             for (let i = 0; i < half; i++) {
-              reordered.push({ month: months[i], originalIndex: i })
+              reordered.push(months[i])
               if (i + half < months.length) {
-                reordered.push({ month: months[i + half], originalIndex: i + half })
+                reordered.push(months[i + half])
               }
             }
-            return reordered.map(({ month, originalIndex }, index) => (
+            return reordered.map((month, index) => (
               <div
-                key={month.name}
+                key={`desktop-${month.name}`}
                 className={cn(
-                  'border-b border-muted lg:border-r',
+                  'hidden lg:block border-b border-muted lg:border-r',
                   'lg:[&:nth-child(2n)]:border-r-0',
                   index >= reordered.length - 2 && 'lg:border-b-0',
                   index === reordered.length - 1 && 'border-b-0'
