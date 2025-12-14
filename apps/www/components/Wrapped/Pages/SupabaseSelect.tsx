@@ -1,25 +1,25 @@
 'use client'
 
+import { AnimatePresence, motion, useInView } from 'framer-motion'
 import Image from 'next/image'
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { motion, AnimatePresence, useInView } from 'framer-motion'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatedGridBackground } from '../AnimatedGridBackground'
 
 // All available images from Supabase Select event
 const allImages = [
-  '/images/wrapped/rachelzphotographyllc-21.jpeg',
-  '/images/wrapped/rachelzphotographyllc-91.jpeg',
-  '/images/wrapped/rachelzphotographyllc1-143.JPG',
-  '/images/wrapped/rachelzphotographyllc1-163.jpg',
-  '/images/wrapped/rachelzphotographyllc1-190.jpg',
-  '/images/wrapped/rachelzphotographyllc1-202.jpg',
-  '/images/wrapped/rachelzphotographyllc1-216.JPG',
-  '/images/wrapped/rachelzphotographyllc1-229.JPG',
-  '/images/wrapped/rachelzphotographyllc1-247.JPG',
-  '/images/wrapped/rachelzphotographyllc1-250.JPG',
-  '/images/wrapped/rachelzphotographyllc1-252.JPG',
-  '/images/wrapped/rachelzphotographyllc1-3.jpg',
-  '/images/wrapped/rachelzphotographyllc1-99.jpg',
+  '/images/wrapped/select-2025-021.jpg',
+  '/images/wrapped/select-2025-091.jpg',
+  '/images/wrapped/select-2025-143.jpg',
+  '/images/wrapped/select-2025-163.jpg',
+  '/images/wrapped/select-2025-190.jpg',
+  '/images/wrapped/select-2025-202.jpg',
+  '/images/wrapped/select-2025-216.jpg',
+  '/images/wrapped/select-2025-229.jpg',
+  '/images/wrapped/select-2025-247.jpg',
+  '/images/wrapped/select-2025-250.jpg',
+  '/images/wrapped/select-2025-252.jpg',
+  '/images/wrapped/select-2025-003.jpg',
+  '/images/wrapped/select-2025-099.jpg',
 ]
 
 // Gallery layout configuration
@@ -34,10 +34,12 @@ function RotatingImage({
   currentImage,
   span,
   imageKey,
+  priority = false,
 }: {
   currentImage: string
   span: string
   imageKey: number
+  priority?: boolean
 }) {
   return (
     <div className={`${span} relative`}>
@@ -55,6 +57,7 @@ function RotatingImage({
             alt="Supabase Select event photo"
             fill
             className="object-cover"
+            priority={priority}
           />
         </motion.div>
       </AnimatePresence>
@@ -115,18 +118,6 @@ export const SupabaseSelect = () => {
 function GalleryGrid() {
   const ref = useRef(null)
   const isInView = useInView(ref, { amount: 0.3 })
-  const [preloaded, setPreloaded] = useState(false)
-
-  // Preload all images when section comes into view
-  useEffect(() => {
-    if (!isInView || preloaded) return
-
-    allImages.forEach((src) => {
-      const img = new window.Image()
-      img.src = src
-    })
-    setPreloaded(true)
-  }, [isInView, preloaded])
 
   // Track which image index each slot is showing
   const [slotImages, setSlotImages] = useState<number[]>(() => {
@@ -218,6 +209,7 @@ function GalleryGrid() {
             currentImage={allImages[slotImages[index]]}
             span={slot.span}
             imageKey={imageKeys[index]}
+            priority={index === 0 && isInView}
           />
         ))}
       </div>
