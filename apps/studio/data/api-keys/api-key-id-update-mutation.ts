@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { handleError, patch } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
-import { apiKeysKeys } from '../keys'
+import { apiKeysKeys } from './keys'
 
 export interface UpdateAPIKeybyIdVariables {
   projectRef?: string

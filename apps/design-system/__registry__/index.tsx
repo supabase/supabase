@@ -38,17 +38,6 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "ConfirmDialog": {
-      name: "ConfirmDialog",
-      type: "components:fragment",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/../../packages/ui-patterns/src/Dialogs/ConfirmDialog")),
-      source: "",
-      files: ["registry/default//Dialogs/ConfirmDialog.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
     "PageContainer": {
       name: "PageContainer",
       type: "components:fragment",

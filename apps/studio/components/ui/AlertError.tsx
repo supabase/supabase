@@ -42,7 +42,6 @@ const ContactSupportButton = ({
 }
 
 // [Joshen] To standardize the language for all error UIs
-
 export const AlertError = ({
   projectRef,
   subject,

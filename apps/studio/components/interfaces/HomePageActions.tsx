@@ -1,3 +1,4 @@
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { Filter, Grid, List, Loader2, Plus, Search, X } from 'lucide-react'
 import Link from 'next/link'
@@ -19,7 +20,6 @@ import {
   ToggleGroupItem,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { keepPreviousData } from '@tanstack/react-query'
 
 interface HomePageActionsProps {
   slug?: string
