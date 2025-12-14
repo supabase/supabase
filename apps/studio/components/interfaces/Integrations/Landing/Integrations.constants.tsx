@@ -373,6 +373,7 @@ const TEMPLATE_INTEGRATIONS: IntegrationDefinition[] = [
     requiredExtensions: ['pgmq', 'supabase_vault', 'pg_cron', 'pg_net'],
     missingExtensionsAlert: <UpgradeDatabaseAlert minimumVersion="15.6.1.143" />,
     name: `Stripe Sync Engine`,
+    status: 'alpha',
     icon: ({ className, ...props } = {}) => (
       <Image
         fill
