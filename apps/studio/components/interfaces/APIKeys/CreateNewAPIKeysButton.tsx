@@ -5,11 +5,11 @@ import { useParams } from 'common'
 import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
 import {
   AlertDialog,
+  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogAction,
   AlertDialogHeader,
   AlertDialogTitle,
   Button,
@@ -57,7 +57,7 @@ export const CreateNewAPIKeysButton = () => {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleCreateNewApiKeys} loading={isCreatingKeys}>
+          <AlertDialogAction onClick={handleCreateNewApiKeys} disabled={isCreatingKeys}>
             {isCreatingKeys ? 'Creating...' : 'Create keys'}
           </AlertDialogAction>
         </AlertDialogFooter>
