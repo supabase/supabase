@@ -89,7 +89,7 @@ export const useEnumeratedTypeUpdateMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to add value to enumerated type: ${data.message}`)
+        toast.error(`Failed to update enumerated type: ${data.message}`)
       } else {
         onError(data, variables, context)
       }
