@@ -138,8 +138,11 @@ export const CreateDiskStorageSchema = ({
 
     if (validateDiskConfiguration && storageType === 'gp3') {
       const maxIopsAllowedForDiskSizeWithGp3 = calculateMaxIopsAllowedForDiskSizeWithGp3(totalSize)
-      const computeMaxThroughput =
-        COMPUTE_MAX_THROUGHPUT[computeSize ?? 'ci_micro'] ?? DISK_LIMITS[DiskType.GP3].maxThroughput
+      const computeMaxThroughput = (() => {
+        const parsedCompute = computeInstanceAddonVariantIdSchema.safeParse(computeSize)
+        if (!parsedCompute.success) return DISK_LIMITS[DiskType.GP3].maxThroughput
+        return COMPUTE_MAX_THROUGHPUT[parsedCompute.data] ?? DISK_LIMITS[DiskType.GP3].maxThroughput
+      })()
 
       if (provisionedIOPS > DISK_LIMITS[DiskType.GP3].maxIops) {
         ctx.addIssue({

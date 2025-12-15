@@ -255,13 +255,15 @@ export const calculateIopsRequiredForThroughput = (throughput: number) => {
 export const calculateMaxIopsAllowedForComputeSize = (computeSize: string): number => {
   const parsed = computeInstanceAddonVariantIdSchema.safeParse(computeSize)
   if (!parsed.success) return 0
-  return COMPUTE_MAX_IOPS[parsed.data] ?? 0
+  return COMPUTE_BASELINE_IOPS[parsed.data] ?? 0
 }
 
 export const calculateComputeSizeRequiredForIops = (
   iops: number
 ): ComputeInstanceAddonVariantId | undefined => {
-  const computeSizes: [ComputeInstanceAddonVariantId, number][] = Object.entries(COMPUTE_MAX_IOPS)
+  const computeSizes: [ComputeInstanceAddonVariantId, number][] = Object.entries(
+    COMPUTE_BASELINE_IOPS
+  )
     .map(([size, baselineIops]) => {
       const parsedSize = computeInstanceAddonVariantIdSchema.safeParse(size)
       return parsedSize.success ? ([parsedSize.data, baselineIops] as const) : undefined
