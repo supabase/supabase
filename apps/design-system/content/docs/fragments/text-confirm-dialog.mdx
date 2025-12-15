@@ -4,6 +4,24 @@ description: A modal dialog that interrupts the user with important content and 
 component: true
 ---
 
+Requires the user to enter an exact string before they can continue with a destructive action, like deletion. Wraps the Shadcn `Dialog` component.
+
+**When to use**:
+
+- Highly destructive actions (deleting buckets, projects, etc.)
+- When you need extra confirmation beyond a simple button click
+- Actions that are irreversible and need explicit user intent
+
+**Note**: This component also wraps `Dialog` but semantically should wrap `AlertDialog` since it's used for critical confirmations.
+
+**Props**:
+
+- `confirmString`: The exact string the user must type
+- `confirmPlaceholder`: Placeholder for the input
+- `variant`: 'default' | 'destructive' | 'warning'
+- `alert`: Optional admonition object
+- Other standard modal props
+
 <ComponentPreview
   name="text-confirm-dialog-demo"
   description="An alert with an icon, title and description. The title says 'Heads up!' and the description is 'You can add components to your app using the cli.'."

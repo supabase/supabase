@@ -756,6 +756,12 @@ export const examples: Registry = [
     files: ['example/sheet-demo.tsx'],
   },
   {
+    name: 'sheet-nonmodal',
+    type: 'components:example',
+    registryDependencies: ['sheet'],
+    files: ['example/sheet-demo.tsx'],
+  },
+  {
     name: 'sheet-side',
     type: 'components:example',
     registryDependencies: ['sheet'],

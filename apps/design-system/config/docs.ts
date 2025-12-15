@@ -95,7 +95,7 @@ export const docsConfig: DocsConfig = {
         },
       ],
     },
-    
+
     {
       title: 'Atom Components',
       sortOrder: 'alphabetical',
@@ -479,6 +479,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Table of Contents (TOC)',
           href: '/docs/fragments/toc',
+          items: [],
+        },
+        {
+          title: 'Confirmation Modal',
+          href: '/docs/fragments/confirmation-modal',
           items: [],
         },
       ],

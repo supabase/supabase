@@ -4,6 +4,26 @@ description: A modal dialog that interrupts the user with important content and 
 component: true
 ---
 
-TK.
+A convenience wrapper that simplifies common confirmation patterns. Currently wraps `Dialog` but semantically should wrap `AlertDialog` for better accessibility and user experience.
+
+**When to use**:
+
+- Simple "are you sure" confirmations
+- Confirmations with optional additional content (admonitions, form elements)
+- When you want a single component with convenient props instead of composing multiple AlertDialog components
+
+**Note**: This component currently wraps `Dialog`, which allows dismissal via Escape/click-outside. For true confirmations, this should be migrated to wrap `AlertDialog` instead.
 
 <ComponentPreview name="confirmation-modal-demo" peekCode wide />
+
+**Props**:
+
+- `visible`: Controls open state
+- `title`: Dialog title
+- `description`: Optional description
+- `variant`: 'default' | 'destructive' | 'warning'
+- `loading`: Loading state
+- `onConfirm`: Confirm handler
+- `onCancel`: Cancel handler
+- `alert`: Optional admonition object
+- `children`: Additional content

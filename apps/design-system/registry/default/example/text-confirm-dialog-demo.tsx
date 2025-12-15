@@ -26,7 +26,7 @@ const TextConfirmModalPrimary = () => {
   return (
     <>
       <Button type="default" onClick={onVisibleChange}>
-        Open text confirm dialog
+        Show Text Confirm Dialog
       </Button>
       <TextConfirmModal
         key="primary"

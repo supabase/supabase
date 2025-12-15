@@ -10,11 +10,11 @@ import {
   Button,
 } from 'ui'
 
-export default function AlertDialogDemo() {
+export default function AlertDialogCloseOnly() {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button type="outline">Show dialog</Button>
+        <Button type="outline">Show Alert Dialog</Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

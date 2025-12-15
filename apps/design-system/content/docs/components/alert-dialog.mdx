@@ -1,7 +1,6 @@
 ---
 title: Alert Dialog
-description: A modal dialog that interrupts the user with important content and expects a response.
-featured: true
+description: A modal dialog that interrupts the user with concise, important content and expects a response.
 component: true
 links:
   doc: https://www.radix-ui.com/docs/primitives/components/alert-dialog
@@ -12,14 +11,37 @@ source:
   radix: true
 ---
 
+Interrupts the user's workflow to communicate critical information or warnings and requires an explicit acknowledgment or decision (e.g., "Are you sure you want to delete this?"). Cannot be dismissed by clicking outside the modal, forcing the user to interact with one of the provided action buttons.
+
+**When to use**:
+
+- Critical confirmations (delete, destructive actions)
+- Important warnings that require acknowledgment
+- Actions that cannot be undone
+- Situations where accidental dismissal would be problematic
+
+**Components**: `AlertDialog`, `AlertDialogContent`, `AlertDialogHeader`, `AlertDialogTitle`, `AlertDialogDescription`, `AlertDialogFooter`, `AlertDialogCancel`, `AlertDialogAction`, `AlertDialogTrigger` (from `ui`)
+
+---
+
+Alert Dialog is strictly limited to confirming or acknowliging an action. It traps focus and requires interaction to close. Its `AlertDialogDescription` child is a paragraph element and therefore cannot contain multiple children.
+
+Alert DIalog is suitable for scenarios where you require a user to confirm (or cancel) an action with a single button press.
+
+- [Confirmation Modal](../fragments/confirmation-modal) is mroe appropriate if you need to use form elements or other more complex children.
+- [Text Confirm Dialog](../fragments/text-confirm-dialog) is more appropriate if you need the user to type back an answer
+
+See [Modality](../ui-patterns/modality) for other patterns and components.
+
+, try your best to bring it down to a single paragraph
+
 Blocks interaction to confirm something. Therefore not appropriate to show form elements. Use [Dialog](../components/dialog) for that.
 
-**Simple descriptions only**: `AlertDialogDescription` renders as a `<p>` tag and cannot contain block-level elements (like `<ul>`, `<div>`, etc.). Keep descriptions concise and text-only. For complex content with lists, multiple paragraphs, or other block elements, use [Dialog](../components/dialog) with `DialogSection` instead.
+Keep it short and sweet. **Simple descriptions only**: `AlertDialogDescription` renders as a `<p>` tag and cannot contain block-level elements (like `<ul>`, `<div>`, etc.). Keep descriptions concise and text-only. For complex content with lists, multiple paragraphs, or other block elements, use [Dialog](../components/dialog) with `DialogSection` instead.
+
+Always include a `AlertDialogCancel` action in the `AlertDialogFooter`. The component is blocking and doesn’t have a close button in the `AlertDialogHeader`, so without this button, there is no way for a user to exit. Aside from the Esc keyboard key.
 
 <ComponentPreview name="alert-dialog-demo" peekCode wide />
-<ComponentPreview name="alert-dialog-close-only" wide />
-<ComponentPreview name="alert-dialog-destructive" wide />
-<ComponentPreview name="alert-dialog-warning" wide />
 
 ## Installation
 
@@ -93,3 +115,17 @@ import {
   </AlertDialogContent>
 </AlertDialog>
 ```
+
+## Examples
+
+### Close action only
+
+<ComponentPreview name="alert-dialog-close-only" wide />
+
+### Warning
+
+<ComponentPreview name="alert-dialog-warning" wide />
+
+### Destructive
+
+<ComponentPreview name="alert-dialog-destructive" wide />

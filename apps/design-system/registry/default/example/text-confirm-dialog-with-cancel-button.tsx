@@ -26,7 +26,7 @@ const TextConfirmModalWithCancelButton = () => {
   return (
     <>
       <Button type="default" onClick={onVisibleChange}>
-        Open warning text confirm dialog
+        Show Text Confirm Dialog
       </Button>
       <TextConfirmModal
         key="withCancelButton"

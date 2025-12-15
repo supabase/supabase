@@ -1281,6 +1281,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "sheet-nonmodal": {
+      name: "sheet-nonmodal",
+      type: "components:example",
+      registryDependencies: ["sheet"],
+      component: React.lazy(() => import("@/registry/default/example/sheet-nonmodal")),
+      source: "",
+      files: ["registry/default/example/sheet-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "sheet-side": {
       name: "sheet-side",
       type: "components:example",
