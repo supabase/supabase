@@ -140,7 +140,7 @@ type AlertDialogActionProps = Omit<
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action>,
   'type'
 > & {
-  type?: ButtonVariantProps['type']
+  type?: NonNullable<ButtonVariantProps['type']>
 }
 
 const AlertDialogAction = React.forwardRef<
@@ -149,10 +149,7 @@ const AlertDialogAction = React.forwardRef<
 >(({ className, type = 'primary', ...props }, ref) => (
   <AlertDialogPrimitive.Action
     ref={ref}
-    className={cn(
-      buttonVariants({ type: type as NonNullable<ButtonVariantProps['type']>, size: 'tiny' }),
-      className
-    )}
+    className={cn(buttonVariants({ type, size: 'tiny' }), className)}
     {...props}
   />
 ))
