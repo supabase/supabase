@@ -32,7 +32,7 @@ export const HooksList = ({
   const { data: project } = useSelectedProjectQuery()
   const {
     data: hooks,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
     error,

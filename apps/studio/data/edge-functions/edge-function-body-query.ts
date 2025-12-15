@@ -33,16 +33,29 @@ export async function getEdgeFunctionBody(
 
   if (!data || !boundary) return { files: [] }
 
-  for await (let part of parseMultipartStream(data, { boundary })) {
+  let metadata: {
+    deno2_entrypoint_path?: string | null
+  } = {}
+
+  for await (let part of parseMultipartStream(data, {
+    boundary,
+    maxFileSize: 20 * 1024 * 1024,
+  })) {
     if (part.isFile) {
       files.push({
         name: part.filename,
         content: part.text,
       })
+    } else {
+      // treat it as metadata
+      metadata = JSON.parse(part.text)
     }
   }
 
-  return { files: files as Omit<EdgeFunctionFile, 'id' | 'selected'>[] }
+  return {
+    metadata,
+    files: files as Omit<EdgeFunctionFile, 'id' | 'selected'>[],
+  }
 }
 
 export type EdgeFunctionBodyData = Awaited<ReturnType<typeof getEdgeFunctionBody>>

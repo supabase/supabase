@@ -14,6 +14,12 @@ export const examples: Registry = [
     files: ['example/admonition-demo.tsx'],
   },
   {
+    name: 'admonition-button',
+    type: 'components:example',
+    registryDependencies: ['admonition'],
+    files: ['example/admonition-button.tsx'],
+  },
+  {
     name: 'admonition-warning',
     type: 'components:example',
     registryDependencies: ['admonition'],
@@ -30,12 +36,6 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['alert'],
     files: ['example/alert-demo.tsx'],
-  },
-  {
-    name: 'alert-destructive',
-    type: 'components:example',
-    registryDependencies: ['alert'],
-    files: ['example/alert-destructive.tsx'],
   },
   {
     name: 'alert-dialog-demo',
@@ -756,6 +756,12 @@ export const examples: Registry = [
     files: ['example/slider-demo.tsx'],
   },
   {
+    name: 'slider-minMax-range',
+    type: 'components:example',
+    registryDependencies: ['slider'],
+    files: ['example/slider-minMax-range.tsx'],
+  },
+  {
     name: 'sonner-demo',
     type: 'components:example',
     registryDependencies: ['sonner'],
@@ -786,10 +792,46 @@ export const examples: Registry = [
     files: ['example/switch-form.tsx'],
   },
   {
+    name: 'table-cross-link',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-cross-link.tsx'],
+  },
+  {
     name: 'table-demo',
     type: 'components:example',
     registryDependencies: ['table'],
     files: ['example/table-demo.tsx'],
+  },
+  {
+    name: 'table-actions',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-actions.tsx'],
+  },
+  {
+    name: 'table-icons',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-icons.tsx'],
+  },
+  {
+    name: 'table-row-link',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-row-link.tsx'],
+  },
+  {
+    name: 'table-row-link-actions',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-row-link-actions.tsx'],
+  },
+  {
+    name: 'table-sort',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/table-sort.tsx'],
   },
   {
     name: 'tabs-demo',
@@ -1031,6 +1073,66 @@ export const examples: Registry = [
     name: 'form-item-layout-demo',
     type: 'components:example',
     files: ['example/form-item-layout-demo.tsx'],
+  },
+  {
+    name: 'field-choice-card',
+    type: 'components:example',
+    files: ['example/field-choice-card.tsx'],
+  },
+  {
+    name: 'field-checkbox',
+    type: 'components:example',
+    files: ['example/field-checkbox.tsx'],
+  },
+  {
+    name: 'field-demo',
+    type: 'components:example',
+    files: ['example/field-demo.tsx'],
+  },
+  {
+    name: 'field-fieldset',
+    type: 'components:example',
+    files: ['example/field-fieldset.tsx'],
+  },
+  {
+    name: 'field-input',
+    type: 'components:example',
+    files: ['example/field-input.tsx'],
+  },
+  {
+    name: 'field-group',
+    type: 'components:example',
+    files: ['example/field-group.tsx'],
+  },
+  {
+    name: 'field-radio',
+    type: 'components:example',
+    files: ['example/field-radio.tsx'],
+  },
+  {
+    name: 'field-responsive',
+    type: 'components:example',
+    files: ['example/field-responsive.tsx'],
+  },
+  {
+    name: 'field-select',
+    type: 'components:example',
+    files: ['example/field-select.tsx'],
+  },
+  {
+    name: 'field-slider',
+    type: 'components:example',
+    files: ['example/field-slider.tsx'],
+  },
+  {
+    name: 'field-switch',
+    type: 'components:example',
+    files: ['example/field-switch.tsx'],
+  },
+  {
+    name: 'field-textarea',
+    type: 'components:example',
+    files: ['example/field-textarea.tsx'],
   },
   {
     name: 'form-patterns-pagelayout',
@@ -1373,9 +1475,20 @@ export const examples: Registry = [
     files: ['example/empty-state-initial-state-informational.tsx'],
   },
   {
-    name: 'empty-state-zero-items-data-grid',
+    name: 'data-grid-demo',
     type: 'components:example',
-    files: ['example/empty-state-zero-items-data-grid.tsx'],
+    files: ['example/data-grid-demo.tsx'],
+  },
+  {
+    name: 'data-grid-empty-state',
+    type: 'components:example',
+    files: ['example/data-grid-empty-state.tsx'],
+  },
+  {
+    name: 'data-table-demo',
+    type: 'components:example',
+    registryDependencies: ['table'],
+    files: ['example/data-table-demo.tsx'],
   },
   {
     name: 'metric-card',
@@ -1396,5 +1509,65 @@ export const examples: Registry = [
     name: 'metric-card-with-icon-link-tooltip',
     type: 'components:example',
     files: ['example/metric-card-with-icon-link-tooltip.tsx'],
+  },
+  {
+    name: 'mermaid-demo',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-demo.tsx'],
+  },
+  {
+    name: 'mermaid-flowchart',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-flowchart.tsx'],
+  },
+  {
+    name: 'mermaid-er-diagram',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-er-diagram.tsx'],
+  },
+  {
+    name: 'mermaid-sequence-async',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-sequence-async.tsx'],
+  },
+  {
+    name: 'mermaid-sequence-sync',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-sequence-sync.tsx'],
+  },
+  {
+    name: 'mermaid-oauth-flow',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-oauth-flow.tsx'],
+  },
+  {
+    name: 'mermaid-flowchart-subgraph',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-flowchart-subgraph.tsx'],
+  },
+  {
+    name: 'mermaid-sequence-api',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-sequence-api.tsx'],
+  },
+  {
+    name: 'mermaid-er-simple',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-er-simple.tsx'],
+  },
+  {
+    name: 'mermaid-basic',
+    type: 'components:example',
+    registryDependencies: ['mermaid'],
+    files: ['example/mermaid-basic.tsx'],
   },
 ]

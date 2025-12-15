@@ -31,7 +31,7 @@ export const PublicationSelection = ({
 
   const {
     data: publications = [],
-    isLoading: isLoadingPublications,
+    isPending: isLoadingPublications,
     isSuccess: isSuccessPublications,
   } = useReplicationPublicationsQuery({ projectRef, sourceId })
 
@@ -40,7 +40,7 @@ export const PublicationSelection = ({
   const isSelectedPublicationMissing =
     isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
 
-  const { data: checkPrimaryKeysExistsData, isLoading: isLoadingCheck } = useCheckPrimaryKeysExists(
+  const { data: checkPrimaryKeysExistsData, isPending: isLoadingCheck } = useCheckPrimaryKeysExists(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -71,14 +71,14 @@ export const PublicationSelection = ({
               />
             </FormControl_Shadcn_>
             {isSelectedPublicationMissing ? (
-              <Admonition type="warning" className="mt-2 mb-0">
+              <Admonition type="warning" className="mt-2">
                 <p className="!leading-normal">
                   The publication <strong className="text-foreground">{publicationName}</strong> was
                   not found, it may have been renamed or deleted, please select another one.
                 </p>
               </Admonition>
             ) : hasTablesWithNoPrimaryKeys ? (
-              <Admonition type="warning" className="mt-2 mb-0">
+              <Admonition type="warning" className="mt-2">
                 <p className="!leading-normal">
                   Replication requires every table in the publication to have a primary key to work,
                   which these tables are missing:

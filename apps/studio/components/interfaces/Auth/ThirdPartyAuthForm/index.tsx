@@ -43,7 +43,7 @@ export const ThirdPartyAuthForm = () => {
   const { ref: projectRef } = useParams()
   const {
     data: integrationsData,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
     error,

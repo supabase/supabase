@@ -1,4 +1,6 @@
 import {
+  ApiKey,
+  ApiKeyType,
   ApplyMigrationOptions,
   DatabaseOperations,
   DebuggingOperations,
@@ -69,7 +71,7 @@ export function getDevelopmentOperations({
       const settings = getProjectSettings()
       return `${settings.app_config.protocol}://${settings.app_config.endpoint}`
     },
-    async getAnonKey(_projectRef) {
+    async getPublishableKeys(_projectRef) {
       const settings = getProjectSettings()
       const anonKey = settings.service_api_keys.find((key) => key.name === 'anon key')
 
@@ -77,7 +79,18 @@ export function getDevelopmentOperations({
         throw new Error('Anon key not found in project settings')
       }
 
-      return anonKey.api_key
+      // For self-hosted, only the legacy anon key is available and returned here.
+      // There is currently no publishable key variable in self-hosted configuration,
+      // and the migration to new publishable keys requires additional Auth and service setup.
+      const publishableKeysArray: ApiKey[] = [
+        {
+          api_key: anonKey.api_key,
+          name: anonKey.name,
+          type: 'anon' as ApiKeyType,
+        },
+      ]
+
+      return publishableKeysArray
     },
     async generateTypescriptTypes(_projectRef) {
       const response = await generateTypescriptTypes({ headers })

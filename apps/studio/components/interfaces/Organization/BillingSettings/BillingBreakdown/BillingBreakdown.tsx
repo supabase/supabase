@@ -32,7 +32,7 @@ const BillingBreakdown = () => {
   const {
     data: subscription,
     error: subscriptionError,
-    isLoading: isLoadingSubscription,
+    isPending: isLoadingSubscription,
     isError: isErrorSubscription,
   } = useOrgSubscriptionQuery({ orgSlug }, { enabled: canReadSubscriptions })
 
