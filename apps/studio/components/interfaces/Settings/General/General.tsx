@@ -120,7 +120,7 @@ export const General = () => {
             <Form_Shadcn_ {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <Card>
-                  <CardContent className="space-y-6 pt-6">
+                  <CardContent>
                     <FormField_Shadcn_
                       control={form.control}
                       name="name"
