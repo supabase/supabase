@@ -1,3 +1,4 @@
+import { ident } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -18,7 +19,7 @@ export async function deleteEnumeratedType({
   name,
   schema,
 }: EnumeratedTypeDeleteVariables) {
-  const sql = `drop type if exists ${schema}."${name}"`
+  const sql = `drop type if exists ${ident(schema)}.${ident(name)}`
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }
