@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useTrack } from 'lib/telemetry/track'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,11 +15,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-  Badge,
   Button,
 } from 'ui'
 import { getIndexAdvisorExtensions } from './index-advisor.utils'
-import { useTrack } from 'lib/telemetry/track'
 
 export const EnableIndexAdvisorButton = () => {
   const track = useTrack()
@@ -84,12 +83,11 @@ export const EnableIndexAdvisorButton = () => {
             extensions:
             <ul className="list-disc pl-6 py-4 flex flex-col gap-2">
               <li>
-                <Badge className="font-mono text-foreground">index_advisor</Badge> - Recommends
-                database indexes
+                <code className="text-code-inline">index_advisor</code>: Recommends database indexes
               </li>
               <li>
-                <Badge className="font-mono text-foreground">hypopg</Badge> - For hypothetical
-                indexes simulation
+                <code className="text-code-inline">hypopg</code>: For hypothetical indexes
+                simulation
               </li>
             </ul>
             These extensions help identify and simulate indexes that can improve query performance
@@ -106,7 +104,7 @@ export const EnableIndexAdvisorButton = () => {
             }}
             disabled={isEnablingExtension}
           >
-            {isEnablingExtension ? 'Enabling...' : 'Enable Extensions'}
+            {isEnablingExtension ? 'Enabling...' : 'Enable extensions'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
