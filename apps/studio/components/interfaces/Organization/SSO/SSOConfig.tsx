@@ -11,6 +11,7 @@ import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useSSOConfigCreateMutation } from 'data/sso/sso-config-create-mutation'
 import { useOrgSSOConfigQuery } from 'data/sso/sso-config-query'
 import { useSSOConfigUpdateMutation } from 'data/sso/sso-config-update-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
 import {
@@ -64,8 +65,8 @@ export const SSOConfig = () => {
   const FORM_ID = 'sso-config-form'
 
   const { data: organization } = useSelectedOrganizationQuery()
-  const plan = organization?.plan.id
-  const canSetupSSOConfig = ['team', 'enterprise', 'platform'].includes(plan ?? '')
+  const { hasAccess: hasAccessToSso, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('auth.platform.sso')
 
   const {
     data: ssoConfig,
@@ -154,7 +155,15 @@ export const SSOConfig = () => {
   return (
     <ScaffoldContainer>
       <ScaffoldSection isFullWidth>
-        {!!plan && !canSetupSSOConfig ? (
+        {isLoadingEntitlement || (hasAccessToSso && isLoadingSSOConfig) ? (
+          <Card>
+            <CardContent>
+              <GenericSkeletonLoader />
+            </CardContent>
+          </Card>
+        ) : isError && !isSSOProviderNotFound ? (
+          <AlertError error={configError} subject="Failed to retrieve SSO configuration" />
+        ) : !hasAccessToSso ? (
           <UpgradeToPro
             plan="Team"
             source="organizationSso"
@@ -162,108 +171,92 @@ export const SSOConfig = () => {
             secondaryText="SSO as a login option provides additional acccount security for your team by enforcing the use of an identity provider when logging into Supabase. Upgrade to Team or above to set up SSO for your organization."
             featureProposition="enable Single Sign-on (SSO)"
           />
-        ) : (
-          <>
-            {isLoadingSSOConfig && (
+        ) : isSuccess || isSSOProviderNotFound ? (
+          <Form_Shadcn_ {...form}>
+            <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
               <Card>
                 <CardContent>
-                  <GenericSkeletonLoader />
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="enabled"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex"
+                        label="Enable Single Sign-On"
+                        description={
+                          <>
+                            Enable and configure SSO for your organization. Learn more about SSO{' '}
+                            <InlineLink
+                              className="text-foreground-lighter hover:text-foreground"
+                              href={`${DOCS_URL}/guides/platform/sso`}
+                            >
+                              here
+                            </InlineLink>
+                            .
+                          </>
+                        }
+                      >
+                        <FormControl_Shadcn_>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            size="large"
+                          />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
                 </CardContent>
-              </Card>
-            )}
 
-            {isError && !isSSOProviderNotFound && (
-              <AlertError error={configError} subject="Failed to retrieve SSO configuration" />
-            )}
-
-            {(isSuccess || isSSOProviderNotFound) && (
-              <Form_Shadcn_ {...form}>
-                <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
-                  <Card>
+                {(isSSOEnabled || ssoConfig) && (
+                  <>
                     <CardContent>
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="enabled"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            layout="flex"
-                            label="Enable Single Sign-On"
-                            description={
-                              <>
-                                Enable and configure SSO for your organization. Learn more about SSO{' '}
-                                <InlineLink
-                                  className="text-foreground-lighter hover:text-foreground"
-                                  href={`${DOCS_URL}/guides/platform/sso`}
-                                >
-                                  here
-                                </InlineLink>
-                                .
-                              </>
-                            }
-                          >
-                            <FormControl_Shadcn_>
-                              <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                                size="large"
-                              />
-                            </FormControl_Shadcn_>
-                          </FormItemLayout>
-                        )}
+                      <SSODomains form={form} />
+                    </CardContent>
+
+                    <CardContent>
+                      <SSOMetadata form={form} />
+                    </CardContent>
+
+                    <CardContent>
+                      <AttributeMapping
+                        form={form}
+                        emailField="emailMapping"
+                        userNameField="userNameMapping"
+                        firstNameField="firstNameMapping"
+                        lastNameField="lastNameMapping"
                       />
                     </CardContent>
 
-                    {(isSSOEnabled || ssoConfig) && (
-                      <>
-                        <CardContent>
-                          <SSODomains form={form} />
-                        </CardContent>
+                    <CardContent>
+                      <JoinOrganizationOnSignup form={form} />
+                    </CardContent>
+                  </>
+                )}
 
-                        <CardContent>
-                          <SSOMetadata form={form} />
-                        </CardContent>
-
-                        <CardContent>
-                          <AttributeMapping
-                            form={form}
-                            emailField="emailMapping"
-                            userNameField="userNameMapping"
-                            firstNameField="firstNameMapping"
-                            lastNameField="lastNameMapping"
-                          />
-                        </CardContent>
-
-                        <CardContent>
-                          <JoinOrganizationOnSignup form={form} />
-                        </CardContent>
-                      </>
-                    )}
-
-                    <CardFooter className="justify-end space-x-2">
-                      {form.formState.isDirty && (
-                        <Button
-                          type="default"
-                          disabled={isCreating || isUpdating}
-                          onClick={() => form.reset()}
-                        >
-                          Cancel
-                        </Button>
-                      )}
-                      <Button
-                        type="primary"
-                        htmlType="submit"
-                        loading={isCreating || isUpdating}
-                        disabled={!form.formState.isDirty || isCreating || isUpdating}
-                      >
-                        Save changes
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                </form>
-              </Form_Shadcn_>
-            )}
-          </>
-        )}
+                <CardFooter className="justify-end space-x-2">
+                  {form.formState.isDirty && (
+                    <Button
+                      type="default"
+                      disabled={isCreating || isUpdating}
+                      onClick={() => form.reset()}
+                    >
+                      Cancel
+                    </Button>
+                  )}
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={isCreating || isUpdating}
+                    disabled={!form.formState.isDirty || isCreating || isUpdating}
+                  >
+                    Save changes
+                  </Button>
+                </CardFooter>
+              </Card>
+            </form>
+          </Form_Shadcn_>
+        ) : null}
       </ScaffoldSection>
     </ScaffoldContainer>
   )
