@@ -93,7 +93,7 @@ export const General = () => {
             <PageSectionTitle>General settings</PageSectionTitle>
           </PageSectionSummary>
         </PageSectionMeta>
-        <PageSectionContent className="space-y-4">
+        <PageSectionContent>
           {isBranch && (
             <Alert_Shadcn_ variant="default">
               <WarningIcon />
