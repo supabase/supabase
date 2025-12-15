@@ -2,20 +2,12 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
 import { IS_PLATFORM } from 'common'
-
-class InternalServerError extends Error {
-  constructor(
-    message: string,
-    public details?: Record<string, unknown>
-  ) {
-    super(message)
-    this.name = 'InternalServerError'
-  }
-}
+import { InternalServerError } from 'lib/api/apiHelpers'
 
 type IncidentInfo = {
   id: string
   name: string
+  status: string
   active_since: string
 }
 
@@ -109,6 +101,7 @@ const getActiveIncidents = async (): Promise<IncidentInfo[]> => {
   return activeIncidents.map((incident) => ({
     id: incident.id,
     name: incident.name,
+    status: incident.status,
     active_since: incident.scheduled_for ?? incident.created_at,
   }))
 }
