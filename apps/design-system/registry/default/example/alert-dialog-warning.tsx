@@ -11,7 +11,7 @@ import {
   Button,
 } from 'ui'
 
-export default function AlertDialogDemo() {
+export default function AlertDialogWarning() {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -19,16 +19,16 @@ export default function AlertDialogDemo() {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Create new API keys</AlertDialogTitle>
+          <AlertDialogTitle>Update branch with modified functions</AlertDialogTitle>
           <AlertDialogDescription>
-            This will create a default publishable key and a default secret key both named{' '}
-            <code className="text-code-inline">default</code>. These keys are required to connect
-            your application to your Supabase project.
+            This branch has 3 modified edge functions that will be overwritten when updating with
+            the latest functions from the production branch. This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Create keys</AlertDialogAction>
+          {/* [Danny] Add type="warning" to this AlertDialogAction once supported with #41336  */}
+          <AlertDialogAction>Update branch</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

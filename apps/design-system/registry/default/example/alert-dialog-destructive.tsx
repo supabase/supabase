@@ -11,7 +11,7 @@ import {
   Button,
 } from 'ui'
 
-export default function AlertDialogDemo() {
+export default function AlertDialogDestructive() {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -19,16 +19,16 @@ export default function AlertDialogDemo() {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Create new API keys</AlertDialogTitle>
+          <AlertDialogTitle>Delete account</AlertDialogTitle>
           <AlertDialogDescription>
-            This will create a default publishable key and a default secret key both named{' '}
-            <code className="text-code-inline">default</code>. These keys are required to connect
-            your application to your Supabase project.
+            This action cannot be undone. This will permanently delete your account and remove your
+            data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Create keys</AlertDialogAction>
+          {/* [Danny] Add type="danger" to this AlertDialogAction once supported with #41336  */}
+          <AlertDialogAction>Delete account</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

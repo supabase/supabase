@@ -12,7 +12,14 @@ source:
   radix: true
 ---
 
+Blocks interaction to confirm something. Therefore not appropriate to show form elements. Use [Dialog](../components/dialog) for that.
+
+**Simple descriptions only**: `AlertDialogDescription` renders as a `<p>` tag and cannot contain block-level elements (like `<ul>`, `<div>`, etc.). Keep descriptions concise and text-only. For complex content with lists, multiple paragraphs, or other block elements, use [Dialog](../components/dialog) with `DialogSection` instead.
+
 <ComponentPreview name="alert-dialog-demo" peekCode wide />
+<ComponentPreview name="alert-dialog-close-only" wide />
+<ComponentPreview name="alert-dialog-destructive" wide />
+<ComponentPreview name="alert-dialog-warning" wide />
 
 ## Installation
 

@@ -148,6 +148,28 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "alert-dialog-demo": {
+      name: "alert-dialog-demo",
+      type: "components:example",
+      registryDependencies: ["alert-dialog","button"],
+      component: React.lazy(() => import("@/registry/default/example/alert-dialog-demo")),
+      source: "",
+      files: ["registry/default/example/alert-dialog-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "alert-dialog-close-only": {
+      name: "alert-dialog-close-only",
+      type: "components:example",
+      registryDependencies: ["alert-dialog","button"],
+      component: React.lazy(() => import("@/registry/default/example/alert-dialog-close-only")),
+      source: "",
+      files: ["registry/default/example/alert-dialog-close-only.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "aspect-ratio-demo": {
       name: "aspect-ratio-demo",
       type: "components:example",
@@ -155,6 +177,28 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/aspect-ratio-demo")),
       source: "",
       files: ["registry/default/example/aspect-ratio-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "alert-dialog-destructive": {
+      name: "alert-dialog-destructive",
+      type: "components:example",
+      registryDependencies: ["alert-dialog","button"],
+      component: React.lazy(() => import("@/registry/default/example/alert-dialog-destructive")),
+      source: "",
+      files: ["registry/default/example/alert-dialog-destructive.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "alert-dialog-warning": {
+      name: "alert-dialog-warning",
+      type: "components:example",
+      registryDependencies: ["alert-dialog","button"],
+      component: React.lazy(() => import("@/registry/default/example/alert-dialog-warning")),
+      source: "",
+      files: ["registry/default/example/alert-dialog-warning.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
