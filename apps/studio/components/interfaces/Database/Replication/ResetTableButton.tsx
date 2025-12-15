@@ -63,17 +63,10 @@ export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) 
         <AlertDialogHeader>
           <AlertDialogTitle>Reset and restart table</AlertDialogTitle>
           <AlertDialogDescription>
-            <p>
-              This will reset and restart replication for{' '}
-              <code className="text-code-inline">{tableName}</code> only. This table will start
-              copying from scratch, and any existing data for it downstream will be deleted.
-            </p>
-            <p>
-              Other tables in the pipeline will not be affected. Only this table will be restarted
-              and go through the full replication process again, starting with the initial copy
-              phase.
-            </p>
-            <p>The pipeline will be restarted to apply the table reset.</p>
+            This will reset replication for <code className="text-code-inline">{tableName}</code>{' '}
+            only. The table will be copied again from scratch, and any existing downstream data for
+            it will be deleted. Other tables in the pipeline are not affected, but the pipeline will
+            restart to apply this reset.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

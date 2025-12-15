@@ -78,20 +78,9 @@ export const EnableIndexAdvisorButton = () => {
         <AlertDialogHeader>
           <AlertDialogTitle>Enable Index Advisor</AlertDialogTitle>
           <AlertDialogDescription>
-            Index Advisor is a tool that helps you identify and simulate indexes that can improve
-            query performance. To use Index Advisor, you need to enable the following Postgres
-            extensions:
-            <ul className="list-disc pl-6 py-1 flex flex-col gap-2">
-              <li>
-                <code className="text-code-inline">index_advisor</code>: Recommends database indexes
-              </li>
-              <li>
-                <code className="text-code-inline">hypopg</code>: For hypothetical indexes
-                simulation
-              </li>
-            </ul>
-            These extensions help identify and simulate indexes that can improve query performance
-            without having to create actual indexes.
+            This will enable the <code className="text-code-inline">index_advisor</code> and{' '}
+            <code className="text-code-inline">hypopg</code> Postgres extensions so Index Advisor
+            can analyse queries and suggest performance-improving indexes.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -104,7 +93,7 @@ export const EnableIndexAdvisorButton = () => {
             }}
             disabled={isEnablingExtension}
           >
-            {isEnablingExtension ? 'Enabling...' : 'Enable extensions'}
+            {isEnablingExtension ? 'Enabling...' : 'Enable'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
