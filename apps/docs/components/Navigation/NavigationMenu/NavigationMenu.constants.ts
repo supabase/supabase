@@ -2869,7 +2869,7 @@ export const self_hosting: NavMenuConstant = {
 }
 
 export const deployment: NavMenuConstant = {
-  title: 'Deployment',
+  title: 'Deployment & Branching',
   url: '/guides/deployment',
   icon: 'deployment',
   items: [
