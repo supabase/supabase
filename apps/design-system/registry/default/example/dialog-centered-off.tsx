@@ -1,21 +1,23 @@
-import { Button, DialogSection, DialogSectionSeparator } from 'ui'
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
+  Input_Shadcn_,
+  Label_Shadcn_,
 } from 'ui'
-import { Input_Shadcn_ } from 'ui'
-import { Label_Shadcn_ } from 'ui'
 
 export default function DialogDemo() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="default">Edit Profile</Button>
+        <Button type="default">Edit profile</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]" centered={false}>
         <DialogHeader padding={'small'}>
