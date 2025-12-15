@@ -81,8 +81,10 @@ export const BranchRow = ({
   const page = router.pathname.split('/').pop()
 
   const daysFromNow = dayjs().diff(dayjs(branch.updated_at), 'day')
-  // Deletion scheduled at is 1 hour from the deletion_scheduled_at time
-  const willBeDeletedIn = dayjs(branch.deletion_scheduled_at).diff(dayjs(), 'minutes')
+  const willBeDeletedIn = branch.deletion_scheduled_at
+    ? dayjs(branch.deletion_scheduled_at).diff(dayjs(), 'minutes')
+    : null
+  const isDeletionPending = willBeDeletedIn !== null && willBeDeletedIn < 0
   const formattedTimeFromNow = dayjs(branch.updated_at).fromNow()
   const formattedUpdatedAt = dayjs(branch.updated_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
@@ -129,7 +131,9 @@ export const BranchRow = ({
       <div className="flex items-center gap-x-4">
         {branch.deletion_scheduled_at ? (
           <p className="text-xs text-foreground-lighter">
-            {`Will be deleted in ${willBeDeletedIn} minutes`}
+            {isDeletionPending
+              ? 'Deletion pending...'
+              : `Will be deleted in ${willBeDeletedIn} minutes`}
           </p>
         ) : (
           <p className="text-xs text-foreground-lighter">
