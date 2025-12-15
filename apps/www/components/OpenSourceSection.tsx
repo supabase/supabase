@@ -2,28 +2,11 @@ import Link from 'next/link'
 import { Button } from 'ui'
 import SectionContainer from './Layouts/SectionContainer'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { kFormatter } from '~/lib/helpers'
 import staticContent from '.generated/staticContent/_index.json'
 
 const OpenSourceSection = () => {
   const sendTelemetryEvent = useSendTelemetryEvent()
-  const githubStars = staticContent.githubStars
-
-  const kFormatter = (num: number) => {
-    const kFormat = Math.floor(num / 1000)
-    const lastTwoDigits = num % 1000
-
-    const decimalPart = Math.floor((lastTwoDigits % 100) / 10)
-    const hundreds = Math.floor(lastTwoDigits / 100)
-
-    const isAlmostNextThousand = decimalPart >= 8 && hundreds >= 9
-
-    const showDecimals =
-      (!isAlmostNextThousand && hundreds >= 1) || (hundreds === 0 && decimalPart >= 8)
-
-    return showDecimals
-      ? `${kFormat}.${decimalPart >= 8 ? hundreds + 1 : hundreds}K`
-      : `${isAlmostNextThousand ? kFormat + 1 : kFormat}K`
-  }
 
   return (
     <SectionContainer className="w-full text-center flex flex-col items-center">
@@ -48,6 +31,7 @@ const OpenSourceSection = () => {
           asChild
           size="small"
           type="default"
+          className="!pl-2.5"
         >
           <Link
             href="https://github.com/supabase"
@@ -56,9 +40,12 @@ const OpenSourceSection = () => {
             onClick={() => sendTelemetryEvent({ action: 'homepage_github_button_clicked' })}
           >
             <span className="font-medium">@supabase</span>
-            <span className="border-l border-foreground-muted mx-2"></span>
-
-            <span className="font-medium text-sm">{kFormatter(githubStars)}</span>
+            {staticContent.githubStars != null && (
+              <>
+                <span className="border-l border-foreground-muted mx-2"></span>
+                <span className="font-medium text-sm">{kFormatter(staticContent.githubStars)}</span>
+              </>
+            )}
           </Link>
         </Button>
         <span className="text-foreground-lighter text-xs">Top 100 GitHub repos</span>
