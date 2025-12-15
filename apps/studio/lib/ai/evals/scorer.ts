@@ -1,6 +1,8 @@
 import { EvalCase, EvalScorer } from 'braintrust'
 import { ClosedQA, Sql } from 'autoevals'
 
+const LLM_AS_A_JUDGE_MODEL = 'gpt-5'
+
 type Input = string
 
 type Output = {
@@ -68,6 +70,7 @@ export const sqlSimilarityScorer: EvalScorer<Input, Output, Expected> = async ({
     input,
     output: sqlQuery,
     expected: expected.sqlQuery,
+    model: LLM_AS_A_JUDGE_MODEL,
   })
 
   return {
@@ -86,6 +89,7 @@ export const criteriaMetScorer: EvalScorer<Input, Output, Expected> = async ({
     input: 'According to the provided criterion is the submission correct?',
     output: output.text,
     criteria: expected.criteria,
+    model: LLM_AS_A_JUDGE_MODEL,
   })
 
   return {
