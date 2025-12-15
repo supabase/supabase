@@ -16,7 +16,22 @@ export type Expected = {
   textIncludes?: string
 }
 
-export type AssistantEvalCase = EvalCase<Input, Expected, void>
+// Based on categories in the AssistantMessageRatingSubmittedEvent
+export type AssistantEvalCaseCategory =
+  | 'sql_generation'
+  | 'schema_design'
+  | 'rls_policies'
+  | 'edge_functions'
+  | 'database_optimization'
+  | 'debugging'
+  | 'general_help'
+  | 'other'
+
+export type AssistantEvalCaseMetadata = {
+  category?: AssistantEvalCaseCategory[]
+}
+
+export type AssistantEvalCase = EvalCase<Input, Expected, AssistantEvalCaseMetadata>
 
 export const toolUsageScorer: EvalScorer<Input, Output, Expected> = async ({
   output,
