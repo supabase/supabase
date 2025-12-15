@@ -59,12 +59,8 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   // For non-platform customers, compute is broken down per project and contains a breakdown array
   const computeItems =
-    upcomingInvoice?.lines?.filter(
-      (item) =>
-        item.description?.toLowerCase().includes('compute') &&
-        item.breakdown &&
-        item.breakdown?.length > 0
-    ) || []
+    upcomingInvoice?.lines?.filter((item) => item.description?.toLowerCase().includes('compute')) ||
+    []
 
   const computeCreditsItem =
     upcomingInvoice?.lines?.find((item) => item.description.startsWith('Compute Credits')) ?? null
@@ -80,12 +76,14 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   const replicaComputeItems = computeItems.filter((it) => it.metadata?.is_read_replica)
 
   const otherItems =
-    upcomingInvoice?.lines?.filter(
-      (item) =>
-        // In case we have no per-project breakdown for compute, we treat it as a regular item for display purposes
-        (!item.usage_metric?.toString()?.startsWith('COMPUTE_HOURS') || !item.breakdown?.length) &&
-        !item.description?.toLowerCase().includes('plan')
-    ) || []
+    upcomingInvoice?.lines
+      ?.filter(
+        (item) =>
+          !item.description?.toLowerCase().includes('compute') &&
+          !item.description?.toLowerCase().includes('plan') &&
+          item.amount_before_discount > 0
+      )
+      .sort((a, b) => b.amount_before_discount - a.amount_before_discount) || []
 
   return (
     <>
@@ -357,6 +355,10 @@ function ComputeLineItem({
     // descending by cost
     .sort((a, b) => b.computeCosts - a.computeCosts)
 
+  const computeItemsSortedByCost = computeItems
+    // descending by cost
+    .sort((a, b) => b.amount - a.amount)
+
   const computeCosts = Math.max(
     0,
     computeItems.reduce((prev, cur) => prev + cur.amount_before_discount, 0)
@@ -394,6 +396,23 @@ function ComputeLineItem({
           </TableCell>
         </TableRow>
       ))}
+
+      {/* Fallback to breakdown by instance size if project breakdown not available  */}
+      {!computeProjects.length &&
+        computeItemsSortedByCost.map((computeItem) => (
+          <TableRow
+            key={title + computeItem.usage_metric}
+            className="text-foreground-light text-xs"
+          >
+            <TableCell className="!py-2 px-0 pl-6">
+              {computeItem.description} - {computeItem.usage_original} Hours
+            </TableCell>
+
+            <TableCell className="!py-2 px-0 text-right" translate="no">
+              {formatCurrency(computeItem.amount)}
+            </TableCell>
+          </TableRow>
+        ))}
 
       {computeCredits && (
         <TableRow className="text-foreground-light text-xs">
