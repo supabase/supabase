@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
@@ -25,7 +25,7 @@ import ChartHandler from 'components/ui/Charts/ChartHandler'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { LazyComposedChartHandler } from 'components/ui/Charts/ComposedChartHandler'
 import { ReportSettings } from 'components/ui/Charts/ReportSettings'
-import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
+import { ObservabilityLink } from 'components/ui/ObservabilityLink'
 import Panel from 'components/ui/Panel'
 import { analyticsKeys } from 'data/analytics/keys'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
@@ -37,7 +37,7 @@ import { getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
+import { useRefreshHandler, useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
@@ -67,6 +67,7 @@ const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
+  const reportGranularityV2 = useFlag('reportGranularityV2')
 
   const {
     selectedDateRange,
@@ -78,7 +79,7 @@ const DatabaseUsage = () => {
     showUpgradePrompt,
     setShowUpgradePrompt,
     handleDatePickerChange,
-  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES, reportGranularityV2)
 
   const state = useDatabaseSelectorStateSnapshot()
   const queryClient = useQueryClient()
@@ -89,7 +90,7 @@ const DatabaseUsage = () => {
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
 
   const report = useDatabaseReport()
-  const { data, params, largeObjectsSql, isLoading, refresh } = report
+  const { data, params, largeObjectsSql, isPending: isLoading, refresh } = report
 
   const { data: databaseSizeData } = useDatabaseSizeQuery({
     projectRef: project?.ref,
@@ -204,7 +205,6 @@ const DatabaseUsage = () => {
   return (
     <>
       <ReportHeader showDatabaseSelector title="Database" />
-      <GrafanaPromoBanner />
       <ReportStickyNav
         content={
           <>
@@ -414,6 +414,9 @@ const DatabaseUsage = () => {
           hideModal={setshowIncreaseDiskSizeModal}
         />
       </section>
+      <div className="py-8">
+        <ObservabilityLink />
+      </div>
     </>
   )
 }

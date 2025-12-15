@@ -38,7 +38,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       className="cursor-pointer"
     >
       <TableCell>
-        <p className="text-sm text-foreground whitespace-nowrap">{item.name}</p>
+        <p className="text-sm text-foreground whitespace-nowrap py-2">{item.name}</p>
       </TableCell>
       <TableCell>
         <div className="text-xs text-foreground-light flex gap-2 items-center truncate">
@@ -72,14 +72,14 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
           </button>
         </div>
       </TableCell>
-      <TableCell className="hidden 2xl:table-cell">
+      <TableCell className="hidden 2xl:table-cell whitespace-nowrap">
         <p className="text-foreground-light">
           {dayjs(item.created_at).format('DD MMM, YYYY HH:mm')}
         </p>
       </TableCell>
       <TableCell className="lg:table-cell">
         <TimestampInfo
-          className="text-sm text-foreground-light"
+          className="text-sm text-foreground-light whitespace-nowrap"
           utcTimestamp={item.updated_at}
           label={dayjs(item.updated_at).fromNow()}
         />

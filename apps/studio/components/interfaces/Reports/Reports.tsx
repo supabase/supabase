@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 import NoPermission from 'components/ui/NoPermission'
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
@@ -61,7 +61,7 @@ const Reports = () => {
 
   const {
     data: userContents,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
   } = useContentQuery({
     projectRef: ref,

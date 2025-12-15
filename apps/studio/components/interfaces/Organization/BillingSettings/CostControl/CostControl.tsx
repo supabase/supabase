@@ -42,7 +42,7 @@ const CostControl = ({}: CostControlProps) => {
   const {
     data: subscription,
     error,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
   } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: canReadSubscriptions })
@@ -158,10 +158,10 @@ const CostControl = ({}: CostControlProps) => {
                             isUsageBillingEnabled
                               ? `${BASE_PATH}/img/spend-cap-off${
                                   resolvedTheme?.includes('dark') ? '' : '--light'
-                                }.png?v=3`
+                                }.png`
                               : `${BASE_PATH}/img/spend-cap-on${
                                   resolvedTheme?.includes('dark') ? '' : '--light'
-                                }.png?v=3`
+                                }.png`
                           }
                         />
                       </div>

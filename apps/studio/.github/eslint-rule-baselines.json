@@ -3,7 +3,6 @@
     "react-hooks/exhaustive-deps": 226,
     "import/no-anonymous-default-export": 62,
     "@tanstack/query/exhaustive-deps": 18,
-    "@tanstack/query/no-deprecated-options": 0,
     "@typescript-eslint/no-explicit-any": 1452
   },
   "ruleFiles": {
@@ -255,7 +254,6 @@
       "hooks/analytics/useProjectUsageStats.tsx": 1,
       "hooks/analytics/useSingleLog.tsx": 1
     },
-    "@tanstack/query/no-deprecated-options": {},
     "@typescript-eslint/no-explicit-any": {
       "components/grid/SupabaseGrid.tsx": 1,
       "components/grid/SupabaseGrid.utils.ts": 4,
