@@ -129,4 +129,3 @@ export class InternalServerError extends Error {
     this.name = 'InternalServerError'
   }
 }
-
