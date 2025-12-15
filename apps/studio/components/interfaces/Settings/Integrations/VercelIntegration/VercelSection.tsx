@@ -23,6 +23,7 @@ import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-or
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import type {
+  Integration,
   IntegrationName,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
