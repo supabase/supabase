@@ -61,6 +61,19 @@ export interface RecentItem {
 const RECENT_ITEMS_STORAGE_KEY = 'supabase_recent_items'
 const getRecentItemsStorageKey = (ref: string) => `${RECENT_ITEMS_STORAGE_KEY}_${ref}`
 
+const PREVIEW_TABS_ENABLED_KEY = 'supabase_preview_tabs_enabled'
+
+function getPreviewTabsEnabled(): boolean {
+  if (typeof window === 'undefined') return true // default to enabled
+  const stored = localStorage.getItem(PREVIEW_TABS_ENABLED_KEY)
+  return stored === null ? true : stored === 'true' // default to true for existing users
+}
+
+function setPreviewTabsEnabled(enabled: boolean) {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(PREVIEW_TABS_ENABLED_KEY, String(enabled))
+}
+
 function getSavedRecentItems(ref: string): RecentItem[] {
   if (typeof window === 'undefined' || !ref) return []
 
@@ -117,6 +130,14 @@ function createTabsState(projectRef: string) {
   const store = proxy({
     // RECENT ITEMS
     recentItems,
+
+    // PREVIEW TABS PREFERENCE
+    previewTabsEnabled: getPreviewTabsEnabled(),
+
+    togglePreviewTabs: () => {
+      store.previewTabsEnabled = !store.previewTabsEnabled
+      setPreviewTabsEnabled(store.previewTabsEnabled)
+    },
 
     addRecentItem: (tab: Tab) => {
       // Check if an item with the same ID already exists
@@ -185,8 +206,11 @@ function createTabsState(projectRef: string) {
         return
       }
 
+      // Check user preference: if preview tabs are disabled, always create permanent tabs
+      const shouldBePreview = store.previewTabsEnabled && (tab.isPreview ?? true)
+
       // If this tab should be permanent, add it normally
-      if (tab.isPreview === false) {
+      if (!shouldBePreview) {
         store.openTabs = [...store.openTabs, tab.id]
         store.tabsMap[tab.id] = tab
         store.activeTab = tab.id

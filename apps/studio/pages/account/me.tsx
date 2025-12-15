@@ -4,6 +4,7 @@ import { AccountIdentities } from 'components/interfaces/Account/Preferences/Acc
 import { AnalyticsSettings } from 'components/interfaces/Account/Preferences/AnalyticsSettings'
 import { HotkeySettings } from 'components/interfaces/Account/Preferences/HotkeySettings'
 import { InlineEditorSettings } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
+import { PreviewTabsSettings } from 'components/interfaces/Account/Preferences/PreviewTabsSettings'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
@@ -93,6 +94,8 @@ const ProfileCard = () => {
         <HotkeySettings />
 
         <InlineEditorSettings />
+
+        <PreviewTabsSettings />
 
         {profileShowAnalyticsAndMarketing && <AnalyticsSettings />}
 
