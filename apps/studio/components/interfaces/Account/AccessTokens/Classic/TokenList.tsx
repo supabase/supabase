@@ -26,7 +26,7 @@ export const TokenList = ({ searchString = '', onDeleteSuccess }: AccessTokenLis
     {
       key: 'token',
       label: 'Token',
-      className: 'max-w-48 lg:max-w-80 truncate',
+      className: 'max-w-36 truncate',
       render: (token) => (
         <code
           className="font-mono text-foreground-light truncate text-xs"
@@ -39,7 +39,7 @@ export const TokenList = ({ searchString = '', onDeleteSuccess }: AccessTokenLis
     {
       key: 'lastUsed',
       label: 'Last used',
-      className: 'min-w-32',
+      className: 'min-w-24',
       render: (token) => (
         <p className="text-foreground-light">
           {token.last_used_at ? (
@@ -62,7 +62,7 @@ export const TokenList = ({ searchString = '', onDeleteSuccess }: AccessTokenLis
     {
       key: 'expires',
       label: 'Expires',
-      className: 'min-w-32',
+      className: 'min-w-24',
       render: (token) => (
         <>
           {token.expires_at ? (

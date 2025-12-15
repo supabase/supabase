@@ -157,7 +157,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
                   {x.name}
                 </p>
               </TableCell>
-              <TableCell className="max-w-36 lg:max-w-80">
+              <TableCell className="max-w-28 lg:max-w-80">
                 <p className="font-mono text-foreground-light truncate">{x.token_alias}</p>
               </TableCell>
               <TableCell className="min-w-32">
