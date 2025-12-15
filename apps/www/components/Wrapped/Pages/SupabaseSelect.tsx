@@ -58,6 +58,7 @@ function RotatingImage({
             fill
             className="object-cover"
             priority={priority}
+            sizes="(max-width: 1600px) 100vw, 20vw"
           />
         </motion.div>
       </AnimatePresence>
