@@ -959,6 +959,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["projects_read"]
           }
         ],
         "summary": "List all projects",
@@ -1230,6 +1233,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
           }
         ],
         "summary": "Create a project",
@@ -1421,6 +1427,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["available_regions_read"]
           }
         ],
         "summary": "[Beta] Gets the list of available regions that can be used for a new project",
@@ -1469,6 +1478,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organizations_read"]
           }
         ],
         "summary": "List all organizations",
@@ -1535,6 +1547,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["organizations_write"]
           }
         ],
         "summary": "Create an organization",
@@ -2027,6 +2042,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["snippets_read"]
           }
         ],
         "summary": "Lists SQL snippets for the logged in user",
@@ -2168,6 +2186,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["snippets_read"]
           }
         ],
         "summary": "Gets a specific SQL snippet",
