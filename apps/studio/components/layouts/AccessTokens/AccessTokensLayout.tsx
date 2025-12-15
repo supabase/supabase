@@ -2,10 +2,10 @@ import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import { PropsWithChildren } from 'react'
 
-// import { useParams } from 'common'
+import { useFlag } from 'common'
 
 const AccessTokensLayout = ({ children }: PropsWithChildren) => {
-  // const { ref: projectRef } = useParams()
+  const scopedTokensEnabled = useFlag('scopedPAT')
 
   const navigationItems = [
     {
@@ -13,11 +13,15 @@ const AccessTokensLayout = ({ children }: PropsWithChildren) => {
       href: `/account/tokens`,
       id: 'classic-tokens',
     },
-    {
-      label: 'Scoped Tokens',
-      href: `/account/tokens/scoped`,
-      id: 'scoped-tokens',
-    },
+    ...(scopedTokensEnabled
+      ? [
+          {
+            label: 'Scoped Tokens',
+            href: `/account/tokens/scoped`,
+            id: 'scoped-tokens',
+          },
+        ]
+      : []),
   ]
 
   return (
