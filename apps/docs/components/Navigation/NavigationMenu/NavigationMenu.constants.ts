@@ -1237,10 +1237,6 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pg_cron' as `/${string}`,
         },
         {
-          name: 'pg_partman: Partition management',
-          url: '/guides/database/extensions/pg_partman' as `/${string}`,
-        },
-        {
           name: 'pg_graphql: GraphQL Support',
           url: '/guides/database/extensions/pg_graphql' as `/${string}`,
         },
@@ -1255,6 +1251,10 @@ export const database: NavMenuConstant = {
         {
           name: 'pg_net: Async Networking',
           url: '/guides/database/extensions/pg_net' as `/${string}`,
+        },
+        {
+          name: 'pg_partman: Partition management',
+          url: '/guides/database/extensions/pg_partman' as `/${string}`,
         },
         {
           name: 'pg_plan_filter: Restrict Total Cost',

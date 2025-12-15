@@ -4,8 +4,7 @@ title: 'Migrate from TimescaleDB to pg_partman'
 description: 'Convert TimescaleDB hypertables to Postgres native partitions managed by pg_partman.'
 ---
 
-
-Starting from Postgres 17, Supabase projects will not have the `timescaledb` extension available. If your project relies on TimescaleDB hypertables, you will need to migrate to standard Postgres tables before upgrading.
+Starting from Postgres 17, Supabase projects do not have the `timescaledb` extension available. If your project relies on TimescaleDB hypertables, you will need to migrate to standard Postgres tables before upgrading.
 
 This guide shows one approach to migrate a hypertable to a native Postgres partitioned table and optionally configure `pg_partman` to automate ongoing partition maintenance.
 The approach outlined in this guide can also be used for traditional partitioned tables.
@@ -91,7 +90,7 @@ select partman.create_parent(
 
 ## Keep partitions up to date
 
-`pg_partman` requires running maintenance to premake partitions and apply retention policies.
+`pg_partman` requires running maintenance to pre-make partitions and apply retention policies.
 
 {/* prettier-ignore */}
 ```sql
@@ -110,6 +109,5 @@ select cron.schedule('@daily', $$call partman.run_maintenance_proc()$$);
 ## Additional resources
 
 - [Partitioning your tables](/docs/guides/database/partitions).
-- [pg_partman documentation](/docs/guides/database/extensions/pg_partman)
-- [pg_partman migration guides](https://github.com/pgpartman/pg_partman/blob/development/doc/migrate_to_partman.md)
-
+- [`pg_partman` documentation](/docs/guides/database/extensions/pg_partman)
+- [`pg_partman` migration guides](https://github.com/pgpartman/pg_partman/blob/development/doc/migrate_to_partman.md)
