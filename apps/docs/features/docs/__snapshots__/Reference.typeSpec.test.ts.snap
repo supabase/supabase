@@ -239,6 +239,16 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         }
       },
+      "@supabase/supabase-js.AuthPKCECodeVerifierMissingError.constructor": {
+        "name": "@supabase/supabase-js.AuthPKCECodeVerifierMissingError.constructor",
+        "params": [],
+        "ret": {
+          "type": {
+            "type": "nameOnly",
+            "name": "AuthPKCECodeVerifierMissingError"
+          }
+        }
+      },
       "@supabase/supabase-js.AuthPKCEGrantCodeExchangeError.constructor": {
         "name": "@supabase/supabase-js.AuthPKCEGrantCodeExchangeError.constructor",
         "params": [
@@ -39786,6 +39796,16 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           "type": {
             "type": "nameOnly",
             "name": "AuthInvalidTokenResponseError"
+          }
+        }
+      },
+      "@supabase/auth-js.AuthPKCECodeVerifierMissingError.constructor": {
+        "name": "@supabase/auth-js.AuthPKCECodeVerifierMissingError.constructor",
+        "params": [],
+        "ret": {
+          "type": {
+            "type": "nameOnly",
+            "name": "AuthPKCECodeVerifierMissingError"
           }
         }
       },

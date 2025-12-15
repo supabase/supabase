@@ -382,7 +382,7 @@
             }
           }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["projects_read"] }],
         "summary": "List all projects",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
@@ -405,7 +405,7 @@
             }
           }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_write"] }],
         "summary": "Create a project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
@@ -475,7 +475,7 @@
             }
           }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["available_regions_read"] }],
         "summary": "[Beta] Gets the list of available regions that can be used for a new project",
         "tags": ["Projects"]
       }
@@ -499,7 +499,7 @@
           },
           "500": { "description": "Unexpected error listing organizations" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["organizations_read"] }],
         "summary": "List all organizations",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
@@ -527,7 +527,7 @@
           },
           "500": { "description": "Unexpected error creating an organization" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["organizations_write"] }],
         "summary": "Create an organization",
         "tags": ["Organizations"]
       }
@@ -736,7 +736,7 @@
           },
           "500": { "description": "Failed to list user's SQL snippets" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["snippets_read"] }],
         "summary": "Lists SQL snippets for the logged in user",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
@@ -763,7 +763,7 @@
           },
           "500": { "description": "Failed to retrieve SQL snippet" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["snippets_read"] }],
         "summary": "Gets a specific SQL snippet",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
