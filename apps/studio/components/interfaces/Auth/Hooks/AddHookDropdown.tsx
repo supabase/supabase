@@ -98,7 +98,8 @@ export const AddHookDropdown = ({
         </div>
         {nonAvailableHooks.length > 0 && (
           <>
-            <DropdownMenuSeparator />
+            {availableHooks.length > 0 && <DropdownMenuSeparator />}
+
             <DropdownMenuLabel className="grid gap-1 bg-surface-200">
               <p className="text-foreground-light">Team or Enterprise Plan required</p>
               <p className="text-foreground-lighter text-xs">
@@ -111,7 +112,7 @@ export const AddHookDropdown = ({
             </DropdownMenuLabel>
 
             {nonAvailableHooks.map((h) => (
-              <DropdownMenuItem key={h.title} disabled={true} onClick={() => onSelectHook(h.title)}>
+              <DropdownMenuItem key={h.title} disabled={true}>
                 {h.title}
               </DropdownMenuItem>
             ))}
