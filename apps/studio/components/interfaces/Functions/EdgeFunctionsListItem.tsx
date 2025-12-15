@@ -3,12 +3,15 @@ import { Check, Copy } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
+import { BASE_PATH } from 'lib/constants'
 import { useParams } from 'common/hooks'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
 import { copyToClipboard, TableCell, TableRow } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+
+const MIDDLE_MOUSE_BUTTON = 1
 
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
@@ -29,12 +32,34 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       ? `https://${customDomainData.customDomain.hostname}/functions/v1/${item.slug}`
       : `${protocol}://${endpoint}/functions/v1/${item.slug}`
 
+  const handleNavigation = (event: React.MouseEvent | React.KeyboardEvent) => {
+    const url = `/project/${ref}/functions/${item.slug}`
+
+    const isModifierClick =
+      'button' in event && event.button === 0 && (event.metaKey || event.ctrlKey)
+    if (window && isModifierClick) {
+      event.preventDefault()
+      window.open(`${BASE_PATH}${url}`, '_blank')
+      return
+    }
+
+    const isMiddleClick = 'button' in event && event.button === MIDDLE_MOUSE_BUTTON
+    if (window && isMiddleClick) {
+      event.preventDefault()
+      window.open(`${BASE_PATH}${url}`, '_blank')
+      return
+    }
+
+    router.push(url)
+  }
+
   return (
     <TableRow
       key={item.id}
-      onClick={() => {
-        router.push(`/project/${ref}/functions/${item.slug}`)
-      }}
+      onClick={handleNavigation}
+      onAuxClick={handleNavigation}
+      onKeyDown={handleNavigation}
+      tabIndex={0}
       className="cursor-pointer"
     >
       <TableCell>
