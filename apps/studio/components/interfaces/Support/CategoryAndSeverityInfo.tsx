@@ -54,7 +54,7 @@ export function CategoryAndSeverityInfo({
       {(severity === 'Urgent' || severity === 'High') && (
         <Admonition
           type="default"
-          className="mb-0 sm:col-span-2"
+          className="sm:col-span-2"
           title="We do our best to respond to everyone as quickly as possible"
           description="Prioritization will be based on production status. We ask that you reserve High and Urgent severity for production-impacting issues only."
         />

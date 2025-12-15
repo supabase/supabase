@@ -1,17 +1,15 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 
 import { useParams } from 'common'
-import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
-import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   FormControl_Shadcn_,
@@ -124,9 +122,8 @@ export const AnalyticsBucketFields = ({
   const [showSecretAccessKey, setShowSecretAccessKey] = useState(false)
 
   const { ref: projectRef } = useParams()
-  const { data: project } = useSelectedProjectQuery()
 
-  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: apiKeys } = useAPIKeysQuery(
     { projectRef, reveal: true },
     { enabled: canReadAPIKeys }
@@ -134,12 +131,10 @@ export const AnalyticsBucketFields = ({
   const { serviceKey } = getKeys(apiKeys)
   const serviceApiKey = serviceKey?.api_key ?? ''
 
-  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
-
   const {
     data: keysData,
     isSuccess: isSuccessKeys,
-    isLoading: isLoadingKeys,
+    isPending: isLoadingKeys,
     isError: isErrorKeys,
   } = useStorageCredentialsQuery({ projectRef })
   const s3Keys = keysData?.data ?? []
@@ -150,34 +145,23 @@ export const AnalyticsBucketFields = ({
 
   const {
     data: analyticsBuckets = [],
-    isLoading: isLoadingBuckets,
+    isPending: isLoadingBuckets,
     isError: isErrorBuckets,
   } = useAnalyticsBucketsQuery({ projectRef })
-
-  // Construct catalog URI for iceberg namespaces query
-  const catalogUri = useMemo(() => {
-    if (!project?.ref || !projectSettings) return ''
-    const protocol = projectSettings.app_config?.protocol ?? 'https'
-    const endpoint =
-      projectSettings.app_config?.storage_endpoint || projectSettings.app_config?.endpoint
-    return getCatalogURI(project.ref, protocol, endpoint)
-  }, [project?.ref, projectSettings])
 
   const canSelectNamespace = !!warehouseName && !!serviceApiKey
 
   const {
     data: namespaces = [],
-    isLoading: isLoadingNamespaces,
+    isPending: isLoadingNamespaces,
     isError: isErrorNamespaces,
-    refetch: refetchNamespaces,
   } = useIcebergNamespacesQuery(
     {
       projectRef,
-      catalogUri,
-      warehouse: warehouseName || '',
+      warehouse: warehouseName,
     },
     {
-      enabled: type === 'Analytics Bucket' && !!catalogUri && !!warehouseName && !!serviceApiKey,
+      enabled: type === 'Analytics Bucket' && !!serviceApiKey,
     }
   )
 

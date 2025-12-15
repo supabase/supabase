@@ -57,7 +57,7 @@ export function ServiceFlowPanel({
   // Query the logs API directly
   const {
     data: serviceFlowData,
-    isLoading,
+    isPending: isLoading,
     error,
   } = useUnifiedLogInspectionQuery(
     {

@@ -137,7 +137,7 @@ export const NewTokenDialog = ({
         {tokenScope === 'V0' ? (
           <Admonition
             type="warning"
-            className="rounded-none border-t-0 border-x-0 mb-0"
+            className="rounded-none border-t-0 border-x-0"
             title="The experimental API provides additional endpoints which allows you to manage your organizations and projects."
             description={
               <>
@@ -158,7 +158,7 @@ export const NewTokenDialog = ({
         ) : (
           <Admonition
             type="warning"
-            className="rounded-none border-t-0 border-x-0 mb-0"
+            className="rounded-none border-t-0 border-x-0"
             title="Access tokens can be used to control your whole account"
             description="Be careful when sharing your tokens"
           />

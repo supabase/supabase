@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { snakeCase } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -6,8 +7,6 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useFlag, useParams } from 'common'
-import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
-import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPrimaryKeysExists } from 'data/database/primary-keys-exists-query'
@@ -20,6 +19,7 @@ import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutati
 import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
 import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
 import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   PipelineStatusRequestStatus,
@@ -131,7 +131,7 @@ export const DestinationPanel = ({
     pipelineId: existingDestination?.pipelineId,
   })
 
-  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: apiKeys } = useAPIKeysQuery(
     { projectRef, reveal: true },
     { enabled: canReadAPIKeys }
@@ -201,7 +201,7 @@ export const DestinationPanel = ({
     isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
 
   const selectedPublication = publications.find((pub) => pub.name === publicationName)
-  const { data: checkPrimaryKeysExistsData, isLoading: isLoadingCheck } = useCheckPrimaryKeysExists(
+  const { data: checkPrimaryKeysExistsData, isPending: isLoadingCheck } = useCheckPrimaryKeysExists(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -221,19 +221,10 @@ export const DestinationPanel = ({
   // Helper function to handle namespace creation if needed
   const resolveNamespace = async (data: z.infer<typeof FormSchema>) => {
     if (data.namespace === CREATE_NEW_NAMESPACE) {
-      if (!data.newNamespaceName) {
-        throw new Error('New namespace name is required')
-      }
-
-      // Construct catalog URI for namespace creation
-      const protocol = projectSettings?.app_config?.protocol ?? 'https'
-      const endpoint =
-        projectSettings?.app_config?.storage_endpoint || projectSettings?.app_config?.endpoint
-      const catalogUri = getCatalogURI(project?.ref ?? '', protocol, endpoint)
+      if (!data.newNamespaceName) throw new Error('New namespace name is required')
 
       await createNamespace({
         projectRef,
-        catalogUri,
         warehouse: data.warehouseName!,
         namespace: data.newNamespaceName,
       })

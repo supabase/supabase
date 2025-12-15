@@ -8,10 +8,12 @@ import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { waitForApiResponseWithTimeout } from '../utils/wait-for-response-with-timeout.js'
 import {
+  createApiResponseWaiter,
   waitForApiResponse,
   waitForGridDataToLoad,
   waitForTableToLoad,
 } from '../utils/wait-for-response.js'
+import { env } from '../env.config.js'
 
 const tableNamePrefix = 'pw_table'
 const columnName = 'pw_column'
@@ -71,7 +73,7 @@ const createTable = async (page: Page, ref: string, tableName: string) => {
   await expect(
     page.getByRole('button', { name: `View ${tableName}`, exact: true }),
     'Table should be visible after creation'
-  ).toBeVisible({ timeout: 15_000 })
+  ).toBeVisible()
 }
 
 const deleteTable = async (page: Page, ref: string, tableName: string) => {
@@ -107,7 +109,9 @@ const deleteEnumIfExist = async (page: Page, ref: string, enumName: string) => {
   await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
 }
 
-test.describe('table editor', () => {
+// Due to rate API rate limits run this test in serial mode on platform.
+const testRunner = env.IS_PLATFORM ? test.describe.serial : test.describe
+testRunner('table editor', () => {
   test.beforeAll(async ({ browser, ref }) => {
     await withFileOnceSetup(import.meta.url, async () => {
       const ctx = await browser.newContext()
@@ -490,8 +494,14 @@ test.describe('table editor', () => {
     await page.getByRole('button', { name: 'id', exact: true }).click()
     await page.getByRole('menuitem', { name: colName }).click()
     await page.getByRole('textbox', { name: 'Enter a value' }).fill('789')
+    const waitForFilterApply = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=table-rows-'
+    )
     await page.getByRole('button', { name: 'Apply filter' }).click()
-    await waitForGridDataToLoad(page, ref)
+    await waitForFilterApply
     await page.waitForTimeout(500)
     await page.getByRole('button', { name: 'Filtered by 1 rule' }).click({ force: true })
     await expect(page.getByRole('gridcell', { name: '789' })).toBeVisible()
@@ -548,8 +558,14 @@ test.describe('table editor', () => {
     await page.getByRole('button', { name: 'Sort', exact: true }).click()
     await page.getByRole('button', { name: 'Pick a column to sort by' }).click()
     await page.getByRole('menuitem', { name: colName }).click()
+    const waitForSortingApply = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=table-rows-'
+    )
     await page.getByRole('button', { name: 'Apply sorting' }).click()
-    await waitForGridDataToLoad(page, ref)
+    await waitForSortingApply
     await page.getByRole('button', { name: 'Sorted by 1 rule' }).click()
 
     // Verify sorted row content asc lexicographically for strings
@@ -577,8 +593,11 @@ test.describe('table editor', () => {
     await page.getByRole('tab', { name: 'Upload CSV' }).click()
     await page.setInputFiles('input[type="file"]', csvFilePath)
     await expect(page.getByText('A total of 50 rows will be')).toBeVisible()
+    const waitForCsvInsert = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
     await page.getByRole('button', { name: 'Import data' }).click()
-    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' }) // insert data
+    await waitForCsvInsert // insert data
     await waitForGridDataToLoad(page, ref) // retrieve updated data
     await expect(page.getByText('50 records')).toBeVisible()
 
@@ -590,29 +609,33 @@ test.describe('table editor', () => {
     await page.getByRole('tab', { name: 'Paste text' }).click()
     await page.getByRole('textbox').fill(fileContent)
     await expect(page.getByText('A total of 51 rows will be')).toBeVisible()
+    const waitForPasteInsert = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
     await page.getByRole('button', { name: 'Import data' }).click()
-    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' }) // insert data
+    await waitForPasteInsert // insert data
     await waitForGridDataToLoad(page, ref) // retrieve updated data
     await expect(page.getByText('101 records')).toBeVisible()
 
     // test pagination (page 1 -> page 2)
     await expect(page.getByRole('gridcell', { name: 'value 7', exact: true })).toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'value 101', exact: true })).not.toBeVisible()
-    let footer: Locator
-    if (isCLI()) {
-      footer = page.getByLabel('Table grid footer')
-    } else {
-      footer = page.locator('[data-sentry-component="GridFooter"]')
-    }
-    await footer.getByRole('button').nth(1).click()
-    await waitForGridDataToLoad(page, ref) // retrieve next page data
+    const waitForPageChange = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=table-rows-')
+    await page.getByLabel('Table grid footer').getByRole('button').nth(1).click()
+    await waitForPageChange // retrieve next page data
     await expect(page.getByRole('gridcell', { name: 'value 7', exact: true })).not.toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'value 101', exact: true })).toBeVisible()
 
     // change pagination size (100 -> 500)
     await page.getByRole('button', { name: 'rows' }).click()
+    const waitForPaginationChange = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=table-rows-'
+    )
     await page.getByRole('menuitem', { name: '500 rows' }).click()
-    await waitForGridDataToLoad(page, ref) // retrieve updated pagination size data
+    await waitForPaginationChange // retrieve updated pagination size data
     await expect(page.getByRole('gridcell', { name: 'value 7', exact: true })).toBeVisible()
     await page.getByRole('grid').evaluate((element) => {
       element.scrollTop = element.scrollHeight
@@ -628,8 +651,11 @@ test.describe('table editor', () => {
     await page.getByRole('row', { name: 'value 3 to delete' }).getByRole('checkbox').click()
     await page.getByRole('button', { name: 'Delete 3 rows' }).click()
     await expect(page.getByText('delete the selected 3 rows')).toBeVisible()
+    const waitForDeleteRows = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
     await page.getByRole('button', { name: 'Delete' }).click()
-    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' }) // delete selected rows
+    await waitForDeleteRows // delete selected rows
     await waitForGridDataToLoad(page, ref) // retrieve row data
 
     // export selected rows when multiple rows action is selected
@@ -665,7 +691,7 @@ test.describe('table editor', () => {
     const downloadJsonPath = await downloadJson.path()
     const jsonContent = fs.readFileSync(downloadJsonPath, 'utf-8')
     expect(jsonContent).toBe(
-      `[{"idx":0,"id":4,"created_at":"2025-01-01 12:00:00+00","pw_column":"value 4 to export"},{"idx":1,"id":5,"created_at":"2025-01-01 12:00:00+00","pw_column":"value 5 to export"},{"idx":2,"id":6,"created_at":"2025-01-01 12:00:00+00","pw_column":"value 6 to export"}]`
+      `[{"id":4,"created_at":"2025-01-01 12:00:00+00","pw_column":"value 4 to export"},{"id":5,"created_at":"2025-01-01 12:00:00+00","pw_column":"value 5 to export"},{"id":6,"created_at":"2025-01-01 12:00:00+00","pw_column":"value 6 to export"}]`
     )
     await page.waitForTimeout(1000) // wait for event processing to complete
     fs.unlinkSync(downloadJsonPath)
@@ -708,9 +734,12 @@ test.describe('table editor', () => {
     // select all actions works (delete action)
     await page.getByRole('checkbox', { name: 'Select All' }).click()
     await page.getByRole('button', { name: 'Delete 98 rows' }).click()
+    const waitForDeleteAllRows = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
     await page.getByRole('button', { name: 'Delete' }).click()
     await expect(page.getByText('delete the selected 98 rows')).toBeVisible()
-    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' }) // delete all rows
+    await waitForDeleteAllRows // delete all rows
     await waitForGridDataToLoad(page, ref) // retrieve rows data
     await expect(page.getByRole('gridcell', { name: 'value 7' })).not.toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'value 101' })).not.toBeVisible()
@@ -775,6 +804,225 @@ test.describe('table editor', () => {
     // Verify second row value was copied
     const secondCopiedValue = await page.evaluate(() => navigator.clipboard.readText())
     expect(secondCopiedValue).toBe('second_row_value')
+
+    // Cleanup
+    await deleteTable(page, ref, tableName)
+  })
+
+  test('boolean fields can be edited correctly', async ({ page, ref }) => {
+    const tableName = 'pw_table_boolean_edits'
+    const boolColName = 'is_active'
+
+    if (!page.url().includes('/editor')) {
+      await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+      await waitForTableToLoad(page, ref)
+    }
+
+    await dismissToastsIfAny(page)
+
+    // Create a simple table with a boolean column
+    await page.getByRole('button', { name: 'New table', exact: true }).click()
+    await page.getByTestId('table-name-input').fill(tableName)
+    await page.getByTestId('created_at-extra-options').click()
+    await page.getByRole('checkbox', { name: 'Is Nullable' }).click()
+    await page.getByTestId('created_at-extra-options').click({ force: true })
+
+    // Add boolean column
+    await page.getByRole('button', { name: 'Add column' }).click()
+    await page.getByRole('textbox', { name: 'column_name' }).fill(boolColName)
+    await page.getByText('Choose a column type...').click()
+    await page.getByPlaceholder('Search types...').fill('bool')
+    await page.getByRole('option', { name: 'bool' }).first().click()
+
+    await page.getByRole('button', { name: 'Save' }).click()
+    await expect(
+      page.getByText(`Table ${tableName} is good to go!`),
+      'Success toast should be visible after table creation'
+    ).toBeVisible({ timeout: 50000 })
+
+    await expect(
+      page.getByRole('button', { name: `View ${tableName}`, exact: true }),
+      'Table should be visible after creation'
+    ).toBeVisible()
+
+    // Navigate to the table
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    // Insert a row with TRUE value via side panel
+    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('combobox').click()
+    await page.getByRole('option', { name: 'TRUE' }).click()
+    await page.getByTestId('action-bar-save-row').click()
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
+
+    await expect(
+      page.getByRole('gridcell', { name: 'TRUE' }),
+      'TRUE value should be displayed'
+    ).toBeVisible()
+
+    // Insert a row with FALSE value via side panel
+    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('combobox').click()
+    await page.getByRole('option', { name: 'FALSE' }).click()
+    await page.getByTestId('action-bar-save-row').click()
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
+
+    // Verify FALSE value is preserved
+    await expect(
+      page.getByRole('gridcell', { name: 'FALSE' }),
+      'FALSE value should be displayed and preserved'
+    ).toBeVisible()
+
+    // Edit the FALSE value to TRUE using inline editor
+    const falseCell = page.getByRole('gridcell', { name: 'FALSE' }).first()
+    await falseCell.dblclick()
+
+    // Wait for boolean editor dropdown to appear
+    const booleanEditor = page.locator('#boolean-editor')
+    await expect(booleanEditor, 'Boolean editor should be visible').toBeVisible()
+
+    // Change from false to true
+    await booleanEditor.selectOption('true')
+    const updateTrueResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
+    await page.getByRole('columnheader', { name: 'id' }).click()
+    await updateTrueResponse
+
+    // Verify the value changed to TRUE (now there should be 2 TRUE values in the table)
+    await expect(
+      page.getByRole('gridcell', { name: 'TRUE' }),
+      'Value should change to TRUE after inline edit'
+    ).toHaveCount(2)
+
+    // Edit TRUE value back to FALSE using inline editor
+    // Use the second TRUE cell (the one we just edited from FALSE to TRUE)
+    const trueCell = page.getByRole('gridcell', { name: 'TRUE' }).nth(1)
+    await trueCell.dblclick()
+
+    await expect(booleanEditor, 'Boolean editor should be visible for second edit').toBeVisible()
+    await booleanEditor.selectOption('false')
+    const updateFalseResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
+    await page.getByRole('columnheader', { name: 'id' }).click()
+    await updateFalseResponse
+
+    // Verify FALSE value is preserved and not converted to NULL (this is the critical regression test)
+    const falseCells = page.getByRole('gridcell', { name: 'FALSE' })
+    await expect(
+      falseCells.first(),
+      'FALSE value should be preserved and not become NULL after inline edit'
+    ).toBeVisible()
+
+    // Cleanup
+    await deleteTable(page, ref, tableName)
+  })
+
+  test('nullable boolean fields support NULL values', async ({ page, ref }) => {
+    const tableName = 'pw_table_boolean_nullable'
+    const boolColName = 'is_enabled'
+
+    if (!page.url().includes('/editor')) {
+      await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+      await waitForTableToLoad(page, ref)
+    }
+
+    await dismissToastsIfAny(page)
+
+    // Create a table with a nullable boolean column
+    await page.getByRole('button', { name: 'New table', exact: true }).click()
+    await page.getByTestId('table-name-input').fill(tableName)
+    await page.getByTestId('created_at-extra-options').click()
+    await page.getByRole('checkbox', { name: 'Is Nullable' }).click()
+    await page.getByTestId('created_at-extra-options').click({ force: true })
+
+    // Add nullable boolean column
+    await page.getByRole('button', { name: 'Add column' }).click()
+    await page.getByRole('textbox', { name: 'column_name' }).fill(boolColName)
+    await page.getByText('Choose a column type...').click()
+    await page.getByPlaceholder('Search types...').fill('bool')
+    await page.getByRole('option', { name: 'bool' }).first().click()
+
+    await page.getByRole('button', { name: 'Save' }).click()
+    await expect(
+      page.getByText(`Table ${tableName} is good to go!`),
+      'Success toast should be visible after table creation'
+    ).toBeVisible({ timeout: 50000 })
+
+    await expect(
+      page.getByRole('button', { name: `View ${tableName}`, exact: true }),
+      'Table should be visible after creation'
+    ).toBeVisible()
+
+    // Navigate to the table
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    // Insert a row with TRUE value
+    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('combobox').click()
+    await page.getByRole('option', { name: 'TRUE' }).click()
+    await page.getByTestId('action-bar-save-row').click()
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
+
+    await expect(
+      page.getByRole('gridcell', { name: 'TRUE' }),
+      'TRUE value should be displayed'
+    ).toBeVisible()
+
+    // Insert a row with FALSE value
+    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('combobox').click()
+    await page.getByRole('option', { name: 'FALSE' }).click()
+    await page.getByTestId('action-bar-save-row').click()
+    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
+
+    await expect(
+      page.getByRole('gridcell', { name: 'FALSE' }),
+      'FALSE value should be displayed'
+    ).toBeVisible()
+
+    // Edit FALSE to NULL using inline editor
+    const falseCellToNull = page.getByRole('gridcell', { name: 'FALSE' })
+    await falseCellToNull.dblclick()
+
+    const booleanEditor = page.locator('#boolean-editor')
+    await expect(booleanEditor, 'Boolean editor should be visible').toBeVisible()
+
+    await booleanEditor.selectOption('null')
+
+    const updateNullResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
+    await page.getByRole('columnheader', { name: 'id' }).click()
+    await updateNullResponse
+
+    // Verify value changed to NULL on the second row
+    const nullCells = page.getByRole('gridcell', { name: 'NULL' })
+    await expect(nullCells, 'FALSE should change to NULL after inline edit').toBeVisible()
+
+    // Edit NULL to FALSE using inline editor
+    const nullCellToFalse = page.getByRole('gridcell', { name: 'NULL' })
+    await nullCellToFalse.dblclick()
+
+    await booleanEditor.selectOption('false')
+
+    const updateFalseResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
+    await page.getByRole('columnheader', { name: 'id' }).click()
+    await updateFalseResponse
+
+    await expect(
+      page.getByRole('gridcell', { name: 'FALSE' }),
+      'NULL should change to FALSE after inline edit'
+    ).toBeVisible()
 
     // Cleanup
     await deleteTable(page, ref, tableName)

@@ -1,8 +1,9 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Key } from 'lucide-react'
 import { useMemo } from 'react'
 
-import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, copyToClipboard } from 'ui'
 import type { ICommand } from 'ui-patterns/CommandMenu'
@@ -25,7 +26,11 @@ export function useApiKeysCommands() {
   const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref || '_'
 
-  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.SECRETS_READ,
+    '*'
+  )
+
   const { data: apiKeys } = useAPIKeysQuery(
     { projectRef: project?.ref, reveal: true },
     { enabled: canReadAPIKeys }
@@ -47,7 +52,7 @@ export function useApiKeysCommands() {
           badge: () => (
             <span className="flex items-center gap-x-1">
               <Badge>Project: {project?.name}</Badge>
-              <Badge className="capitalize">{publishableKey.type}</Badge>
+              <Badge>{publishableKey.type}</Badge>
             </span>
           ),
           icon: () => <Key />,
@@ -63,7 +68,7 @@ export function useApiKeysCommands() {
             badge: () => (
               <span className="flex items-center gap-x-1">
                 <Badge>Project: {project?.name}</Badge>
-                <Badge className="capitalize">{key.type}</Badge>
+                <Badge>{key.type}</Badge>
               </span>
             ),
             icon: () => <Key />,
@@ -81,7 +86,7 @@ export function useApiKeysCommands() {
             <span className="flex items-center gap-x-1">
               <Badge>Project: {project?.name}</Badge>
               <Badge>Public</Badge>
-              <Badge className="capitalize">{anonKey.type}</Badge>
+              <Badge>{anonKey.type}</Badge>
             </span>
           ),
           icon: () => <Key />,
@@ -98,7 +103,7 @@ export function useApiKeysCommands() {
             <span className="flex items-center gap-x-1">
               <Badge>Project: {project?.name}</Badge>
               <Badge variant="destructive">Secret</Badge>
-              <Badge className="capitalize">{serviceKey.type}</Badge>
+              <Badge>{serviceKey.type}</Badge>
             </span>
           ),
           icon: () => <Key />,

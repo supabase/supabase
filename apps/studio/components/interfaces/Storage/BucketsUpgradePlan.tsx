@@ -10,7 +10,7 @@ export const BucketsUpgradePlan = ({ type }: { type: 'analytics' | 'vector' }) =
   return (
     <PageContainer>
       <PageSection>
-        <PageSectionContent>
+        <PageSectionContent className="flex flex-col gap-y-8">
           <AlphaNotice
             entity={type === 'analytics' ? 'Analytics buckets' : 'Vector buckets'}
             feedbackUrl={
@@ -29,7 +29,10 @@ export const BucketsUpgradePlan = ({ type }: { type: 'analytics' | 'vector' }) =
             description={`Upgrade to Pro to use ${type} buckets for your project`}
           >
             <div className="flex items-center gap-x-2">
-              <UpgradePlanButton type="primary" plan="Pro" />
+              <UpgradePlanButton
+                source={`${type}Buckets`}
+                featureProposition={`use ${type} buckets`}
+              />
             </div>
           </EmptyStatePresentational>
         </PageSectionContent>
