@@ -1,5 +1,5 @@
 ---
-description: "Studio: page layout patterns (PageContainer/PageHeader/PageSection) and sizing guidance"
+description: 'Studio: page layout patterns (PageContainer/PageHeader/PageSection) and sizing guidance. Use to learn how to create or update existing pages in Studio.'
 globs:
   - apps/studio/**/*.{ts,tsx}
 alwaysApply: false
@@ -26,4 +26,3 @@ Use the Design System UI pattern docs as the source of truth:
 - For list pages:
   - If filters/search exist, align table actions with filters (avoid `PageHeaderAside`/`PageSectionAside` for those actions).
   - If no filters/search, actions can go in `PageHeaderAside` or `PageSectionAside` depending on context.
-
