@@ -96,7 +96,9 @@ export function useCheckEntitlements(
     }
   }, [entitlementsData, featureKey, finalOrgSlug])
 
-  const isLoading = shouldGetSelectedOrg ? isLoadingSelectedOrg : isLoadingEntitlements
+  const isLoading = shouldGetSelectedOrg
+    ? isLoadingSelectedOrg || isLoadingEntitlements
+    : isLoadingEntitlements
   const isSuccess = shouldGetSelectedOrg
     ? isSuccessSelectedOrg && isSuccessEntitlements
     : isSuccessEntitlements
