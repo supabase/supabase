@@ -188,9 +188,7 @@ const MonacoEditor = ({
   function handleEditorChange(value: string | undefined) {
     tabsSnap.makeActiveTabPermanent()
     if (id && value) {
-      if (!!snippet) {
-        setValue(value)
-      } else if (ref && profile !== undefined && project !== undefined) {
+      if (ref && profile !== undefined && project !== undefined) {
         const snippet = createSqlSnippetSkeletonV2({
           idOverride: id,
           name: snippetName,
@@ -199,9 +197,9 @@ const MonacoEditor = ({
           project_id: project?.id,
         })
         snapV2.addSnippet({ projectRef: ref, snippet })
-        snapV2.addNeedsSaving(snippet.id)
         router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
       }
+      setValue(value)
     }
   }
 
