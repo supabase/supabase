@@ -236,8 +236,8 @@ export const UsersV2 = () => {
 
   const { setValue: setSelectedUser, value: selectedUser } = useQueryStateWithSelect({
     urlKey: 'show',
+    enabled: users.length > 0 && isSuccess,
     select: (id: string) => (id ? users?.find((u) => u.id === id)?.id : undefined),
-    enabled: !!users && !isLoading,
     onError: () => toast.error(`User not found`),
   })
 

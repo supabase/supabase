@@ -9,31 +9,28 @@ export const docsConfig: DocsConfig = {
   sidebarNav: [
     {
       title: 'Getting Started',
-      sortOrder: 'manual',
+      sortOrder: 'alphabetical',
       items: [
         {
           title: 'Introduction',
           href: '/docs',
+          priority: true,
           items: [],
         },
         {
-          title: 'Tailwind Classes',
-          href: '/docs/tailwind-classes',
+          title: 'Accessibility',
+          href: '/docs/accessibility',
           items: [],
         },
+
         {
           title: 'Color Usage',
           href: '/docs/color-usage',
           items: [],
         },
         {
-          title: 'Typography',
-          href: '/docs/typography',
-          items: [],
-        },
-        {
-          title: 'Theming',
-          href: '/docs/theming',
+          title: 'Copywriting',
+          href: '/docs/copywriting',
           items: [],
         },
         {
@@ -42,8 +39,18 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Accessibility',
-          href: '/docs/accessibility',
+          title: 'Tailwind Classes',
+          href: '/docs/tailwind-classes',
+          items: [],
+        },
+        {
+          title: 'Theming',
+          href: '/docs/theming',
+          items: [],
+        },
+        {
+          title: 'Typography',
+          href: '/docs/typography',
           items: [],
         },
       ],

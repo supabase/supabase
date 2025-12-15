@@ -23,6 +23,7 @@ interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {
   showGrid?: boolean
   showDottedGrid?: boolean
   wide?: boolean
+  hideCode?: boolean
 }
 
 export function ComponentPreview({
@@ -36,6 +37,7 @@ export function ComponentPreview({
   showGrid = false,
   showDottedGrid = true,
   wide = false,
+  hideCode = false,
   ...props
 }: ComponentPreviewProps) {
   const [config] = useConfig()
@@ -136,7 +138,10 @@ export function ComponentPreview({
   return (
     <div className={cn('mt-4 mb-12', wideClasses)}>
       <div
-        className={cn('relative rounded-tl-md rounded-tr-md border-t border-l border-r bg-studio')}
+        className={cn('relative bg-studio', {
+          'rounded-tl-md rounded-tr-md border-t border-l border-r': !hideCode,
+          'rounded-md border': hideCode,
+        })}
       >
         {showGrid && (
           <div className="pointer-events-none absolute h-full w-full bg-[linear-gradient(to_right,hsla(var(--foreground-default)/0.02)_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
@@ -146,42 +151,44 @@ export function ComponentPreview({
         )}
         <div className="z-10 relative">{ComponentPreview}</div>
       </div>
-      <Collapsible_Shadcn_>
-        <CollapsibleTrigger_Shadcn_
-          className={`
-            flex 
-            gap-3 items-center 
-            w-full
-            font-mono
-            text-xs 
-            text-foreground-light
-            px-4 py-4 
-            border border-r 
-            group
-            data-[state=closed]:rounded-bl-md data-[state=closed]:rounded-br-md
-            
-        `}
-        >
-          <ChevronRight
-            className="transition-all group-data-[state=open]:rotate-90 text-foreground-lighter"
-            size={14}
-          />
-          View code
-        </CollapsibleTrigger_Shadcn_>
-        <CollapsibleContent_Shadcn_ className="transition-all">
-          <div
-            className={cn(
-              'relative',
-              'w-full rounded-md [&_pre]:my-0',
-              '[&_pre]:overflow-auto',
-              '[&_pre]:max-h-[320px]',
-              '[&_pre]:rounded-tr-none [&_pre]:rounded-tl-none [&_pre]:border-t-transparent'
-            )}
+      {!hideCode && (
+        <Collapsible_Shadcn_>
+          <CollapsibleTrigger_Shadcn_
+            className={`
+              flex 
+              gap-3 items-center 
+              w-full
+              font-mono
+              text-xs 
+              text-foreground-light
+              px-4 py-4 
+              border border-r 
+              group
+              data-[state=closed]:rounded-bl-md data-[state=closed]:rounded-br-md
+              
+          `}
           >
-            {Code}
-          </div>
-        </CollapsibleContent_Shadcn_>
-      </Collapsible_Shadcn_>
+            <ChevronRight
+              className="transition-all group-data-[state=open]:rotate-90 text-foreground-lighter"
+              size={14}
+            />
+            View code
+          </CollapsibleTrigger_Shadcn_>
+          <CollapsibleContent_Shadcn_ className="transition-all">
+            <div
+              className={cn(
+                'relative',
+                'w-full rounded-md [&_pre]:my-0',
+                '[&_pre]:overflow-auto',
+                '[&_pre]:max-h-[320px]',
+                '[&_pre]:rounded-tr-none [&_pre]:rounded-tl-none [&_pre]:border-t-transparent'
+              )}
+            >
+              {Code}
+            </div>
+          </CollapsibleContent_Shadcn_>
+        </Collapsible_Shadcn_>
+      )}
     </div>
   )
 }
