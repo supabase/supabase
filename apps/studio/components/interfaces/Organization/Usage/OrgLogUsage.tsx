@@ -1,52 +1,51 @@
 import { DataPoint } from 'data/analytics/constants'
-import {
-  PricingMetric,
-  useOrgDailyStatsQuery,
-  type OrgDailyUsageResponse,
-} from 'data/analytics/org-daily-stats-query'
+import { PricingMetric, type OrgDailyUsageResponse } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import UsageSection from './UsageSection/UsageSection'
 import { dailyUsageToDataPoints } from './Usage.utils'
 
-export interface SizeAndCountsProps {
+export interface OrgLogUsageProps {
   orgSlug: string
   projectRef?: string | null
+  startDate: string | undefined
+  endDate: string | undefined
   subscription: OrgSubscription | undefined
   currentBillingCycleSelected: boolean
   orgDailyStats: OrgDailyUsageResponse | undefined
   isLoadingOrgDailyStats: boolean
-  startDate: string | undefined
-  endDate: string | undefined
 }
 
-const SizeAndCounts = ({
+const OrgLogUsage = ({
   orgSlug,
   projectRef,
   subscription,
   currentBillingCycleSelected,
   orgDailyStats,
   isLoadingOrgDailyStats,
-  startDate,
-  endDate,
-}: SizeAndCountsProps) => {
+}: OrgLogUsageProps) => {
   const chartMeta: {
     [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
   } = {
-    [PricingMetric.STORAGE_SIZE]: {
-      isLoading: isLoadingOrgDailyStats,
-      margin: 14,
+    [PricingMetric.LOG_INGESTION]: {
       data: dailyUsageToDataPoints(
         orgDailyStats,
-        (metric) => metric === PricingMetric.STORAGE_SIZE
+        (metric) => metric === PricingMetric.LOG_INGESTION
       ),
+      margin: 18,
+      isLoading: isLoadingOrgDailyStats,
     },
-    [PricingMetric.DATABASE_SIZE]: {
-      isLoading: isLoadingOrgDailyStats,
-      margin: 14,
+    [PricingMetric.LOG_QUERYING]: {
       data: dailyUsageToDataPoints(
         orgDailyStats,
-        (metric) => metric === PricingMetric.DATABASE_SIZE
+        (metric) => metric === PricingMetric.LOG_QUERYING
       ),
+      margin: 20,
+      isLoading: isLoadingOrgDailyStats,
+    },
+    [PricingMetric.LOG_STORAGE]: {
+      data: dailyUsageToDataPoints(orgDailyStats, (metric) => metric === PricingMetric.LOG_STORAGE),
+      margin: 0,
+      isLoading: isLoadingOrgDailyStats,
     },
   }
 
@@ -54,14 +53,12 @@ const SizeAndCounts = ({
     <UsageSection
       orgSlug={orgSlug}
       projectRef={projectRef}
-      categoryKey="sizeCount"
+      categoryKey="logs"
       chartMeta={chartMeta}
       subscription={subscription}
       currentBillingCycleSelected={currentBillingCycleSelected}
-      startDate={startDate}
-      endDate={endDate}
     />
   )
 }
 
-export default SizeAndCounts
+export default OrgLogUsage
