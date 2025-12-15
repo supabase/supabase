@@ -17,6 +17,12 @@ export type ComputeDiskLimit = {
 const toMBps = (throughputMbps: number) => Math.round(throughputMbps / 8)
 
 export const COMPUTE_DISK_LIMITS: Record<string, ComputeDiskLimit> = {
+  ci_pico: {
+    baselineIops: 0,
+    maxIops: 0,
+    baselineThroughputMBps: 0,
+    maxThroughputMBps: 0,
+  },
   ci_nano: {
     baselineIops: 250,
     maxIops: 11800,
@@ -150,6 +156,7 @@ export const COMPUTE_MAX_THROUGHPUT = Object.fromEntries(
 )
 
 export const computeInstanceAddonVariantIdSchema = z.enum([
+  'ci_pico',
   'ci_nano',
   'ci_micro',
   'ci_small',

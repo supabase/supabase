@@ -9,11 +9,8 @@ import {
   calculateMaxIopsAllowedForComputeSize,
   mapAddOnVariantIdToComputeSize,
 } from '../DiskManagement.utils'
-import {
-  COMPUTE_BASELINE_IOPS,
-  COMPUTE_MAX_IOPS,
-  RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
-} from './DiskManagement.constants'
+import { COMPUTE_BASELINE_IOPS, COMPUTE_MAX_IOPS } from 'shared-data'
+import { RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3 } from './DiskManagement.constants'
 
 interface ComputeSizeRecommendationSectionProps {
   actions?: ReactNode
