@@ -142,8 +142,8 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'local_development',
           },
           {
-            label: 'Deployment',
-            icon: 'deployment',
+            label: 'Deployment & Branching',
+            icon: 'git-branch',
             href: '/guides/deployment' as `/${string}`,
             level: 'deployment',
           },
@@ -2869,9 +2869,9 @@ export const self_hosting: NavMenuConstant = {
 }
 
 export const deployment: NavMenuConstant = {
-  title: 'Deployment',
+  title: 'Deployment & Branching',
   url: '/guides/deployment',
-  icon: 'deployment',
+  icon: 'git-branch',
   items: [
     { name: 'Overview', url: '/guides/deployment' },
     {
