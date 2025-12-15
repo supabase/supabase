@@ -9,6 +9,7 @@ import {
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
+  AlertDialogAction,
   AlertDialogHeader,
   AlertDialogTitle,
   Button,
@@ -56,9 +57,9 @@ export const CreateNewAPIKeysButton = () => {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <Button onClick={handleCreateNewApiKeys} loading={isCreatingKeys}>
+          <AlertDialogAction onClick={handleCreateNewApiKeys} loading={isCreatingKeys}>
             {isCreatingKeys ? 'Creating...' : 'Create keys'}
-          </Button>
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
