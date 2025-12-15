@@ -119,7 +119,7 @@ export const OutOfDateNotice = ({
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => handleUpdate(true)}>
+                <AlertDialogAction type="warning" onClick={() => handleUpdate(true)}>
                   Update anyway
                 </AlertDialogAction>
               </AlertDialogFooter>

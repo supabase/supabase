@@ -81,7 +81,7 @@ export const EnableIndexAdvisorButton = () => {
             Index Advisor is a tool that helps you identify and simulate indexes that can improve
             query performance. To use Index Advisor, you need to enable the following Postgres
             extensions:
-            <ul className="list-disc pl-6 py-4 flex flex-col gap-2">
+            <ul className="list-disc pl-6 py-1 flex flex-col gap-2">
               <li>
                 <code className="text-code-inline">index_advisor</code>: Recommends database indexes
               </li>
