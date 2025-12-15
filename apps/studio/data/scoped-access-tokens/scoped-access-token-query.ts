@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { scopedAccessTokenKeys } from './keys'
 
 export async function getScopedAccessTokens(signal?: AbortSignal) {
@@ -37,7 +37,7 @@ export type ScopedAccessTokenData = Awaited<ReturnType<typeof getScopedAccessTok
 export const useScopedAccessTokensQuery = <TData = ScopedAccessTokensData>({
   enabled = true,
   ...options
-}: UseQueryOptions<ScopedAccessTokensData, ScopedAccessTokensError, TData> = {}) =>
+}: UseCustomQueryOptions<ScopedAccessTokensData, ScopedAccessTokensError, TData> = {}) =>
   useQuery<ScopedAccessTokensData, ScopedAccessTokensError, TData>({
     queryKey: scopedAccessTokenKeys.list(),
     queryFn: ({ signal }) => getScopedAccessTokens(signal),
@@ -50,7 +50,7 @@ export const useScopedAccessTokenQuery = <TData = ScopedAccessTokenData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ScopedAccessTokenData, ScopedAccessTokensError, TData> = {}
+  }: UseCustomQueryOptions<ScopedAccessTokenData, ScopedAccessTokensError, TData> = {}
 ) =>
   useQuery<ScopedAccessTokenData, ScopedAccessTokensError, TData>({
     queryKey: scopedAccessTokenKeys.detail(id),

@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { scopedAccessTokenKeys } from './keys'
 
 export type ScopedAccessTokenCreateVariables = components['schemas']['CreateScopedAccessTokenBody']
@@ -31,7 +31,7 @@ export const useAccessTokenCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<NewScopedAccessToken, ResponseError, ScopedAccessTokenCreateVariables>,
+  UseCustomMutationOptions<NewScopedAccessToken, ResponseError, ScopedAccessTokenCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

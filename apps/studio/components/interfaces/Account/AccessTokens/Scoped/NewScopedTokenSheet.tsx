@@ -86,7 +86,7 @@ export const NewScopedTokenSheet = ({
     },
     mode: 'onChange',
   })
-  const { mutate: createAccessToken, isLoading } = useAccessTokenCreateMutation()
+  const { mutate: createAccessToken, isPending } = useAccessTokenCreateMutation()
 
   const resourceAccess = form.watch('resourceAccess')
   const expiresAt = form.watch('expiresAt')
@@ -334,10 +334,10 @@ export const NewScopedTokenSheet = ({
         </ScrollArea>
         <SheetFooter className="!justify-end w-full mt-auto py-4 border-t">
           <div className="flex gap-2">
-            <Button type="default" disabled={isLoading} onClick={handleClose}>
+            <Button type="default" disabled={isPending} onClick={handleClose}>
               Cancel
             </Button>
-            <Button onClick={form.handleSubmit(onSubmit)} loading={isLoading}>
+            <Button onClick={form.handleSubmit(onSubmit)} loading={isPending}>
               Generate token
             </Button>
           </div>
