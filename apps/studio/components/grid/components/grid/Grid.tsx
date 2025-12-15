@@ -196,7 +196,7 @@ export const Grid = memo(
                   ) : (filters ?? []).length === 0 ? (
                     <>
                       {!canImportData ? (
-                        <div className="absolute inset-0 p-2 z-[1] flex justify-center items-center">
+                        <div className="absolute inset-0 p-2 z-[1] flex justify-center items-center pointer-events-auto">
                           <div className="max-w-xl">
                             {!isSelectedTable ? (
                               <Admonition
