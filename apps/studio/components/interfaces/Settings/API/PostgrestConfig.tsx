@@ -205,9 +205,13 @@ export const PostgrestConfig = () => {
       <Form_Shadcn_ {...form}>
         <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
           {isLoading ? (
-            <GenericSkeletonLoader />
+            <CardContent>
+              <GenericSkeletonLoader />
+            </CardContent>
           ) : isError ? (
-            <Admonition type="destructive" title="Failed to retrieve API settings" />
+            <CardContent>
+              <Admonition type="destructive" title="Failed to retrieve API settings" />
+            </CardContent>
           ) : (
             <>
               <CardContent>
@@ -345,7 +349,6 @@ export const PostgrestConfig = () => {
                       )}
                     />
                   </CardContent>
-
                   <CardContent>
                     <FormField_Shadcn_
                       control={form.control}
