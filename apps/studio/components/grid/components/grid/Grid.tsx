@@ -106,7 +106,7 @@ export const Grid = memo(
         onDragOver,
         onFileDrop,
       } = useCsvFileDrop({
-        enabled: isTableEmpty && !isForeignTable,
+        enabled: isTableEmpty && canImportData,
         onFileDropped: (file) => tableEditorSnap.onImportData(valtioRef(file)),
         onTelemetryEvent: (eventName) => {
           sendEvent({
