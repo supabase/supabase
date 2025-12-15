@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { DataPoint } from 'data/analytics/constants'
-import { type OrgDailyUsageResponse } from 'data/analytics/org-daily-stats-query'
+import { PricingMetric, type OrgDailyUsageResponse } from 'data/analytics/org-daily-stats-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from 'lib/constants'
 import { SectionContent } from './SectionContent'
@@ -21,7 +21,7 @@ const ActiveCompute = ({ orgDailyStats, isLoadingOrgDailyStats }: ComputeProps) 
 
   const chartData: DataPoint[] = dailyUsageToDataPoints(
     orgDailyStats,
-    (metric) => metric === 'ACTIVE_COMPUTE_HOURS'
+    (metric) => metric === PricingMetric.ACTIVE_COMPUTE_HOURS
   )
 
   const notAllValuesZero = useMemo(() => {

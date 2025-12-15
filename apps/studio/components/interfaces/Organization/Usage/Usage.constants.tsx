@@ -205,7 +205,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       chartPrefix: 'Cumulative',
       unit: 'bytes',
       description:
-        'Sum of all objects in your storage buckets.\nBilling is prorated down to the hour and will be displayed GB-Hrs.',
+        'Database size refers to the actual amount of space used by all your database objects, as reported by Postgres.\nBilling is prorated down to the hour and will be displayed GB-Hrs.',
       chartDescription: 'The data refreshes every hour.',
     })
   }
