@@ -56,14 +56,14 @@ export const RegionSelector = ({
 
   const smartRegionEnabled = useFlag('enableSmartRegion')
 
-  const { isLoading: isLoadingDefaultRegion } = useDefaultRegionQuery(
+  const { isPending: isLoadingDefaultRegion } = useDefaultRegionQuery(
     { cloudProvider },
     { enabled: !smartRegionEnabled }
   )
 
   const {
     data: availableRegionsData,
-    isLoading: isLoadingAvailableRegions,
+    isPending: isLoadingAvailableRegions,
     isError: isErrorAvailableRegions,
     error: errorAvailableRegions,
   } = useOrganizationAvailableRegionsQuery(

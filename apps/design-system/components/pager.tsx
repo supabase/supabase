@@ -4,7 +4,6 @@ import { NavItem, NavItemWithChildren } from '@/types/nav'
 
 import { docsConfig } from '@/config/docs'
 import { cn } from '@/lib/utils'
-import { buttonVariants } from 'ui'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface DocsPagerProps {
@@ -18,8 +17,10 @@ export function DocsPager({ doc }: DocsPagerProps) {
     return null
   }
 
+  const hasBoth = pager?.prev?.href && pager?.next?.href
+
   return (
-    <div className="flex flex-row items-center justify-between">
+    <div className={cn('flex flex-row items-center', hasBoth ? 'justify-between' : 'justify-end')}>
       {pager?.prev?.href && (
         <Link
           href={pager.prev.href}

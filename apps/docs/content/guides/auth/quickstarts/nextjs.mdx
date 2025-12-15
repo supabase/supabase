@@ -52,9 +52,11 @@ hideToc: true
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Declare Supabase Environment Variables">
 
-    Rename `.env.example` to `.env.local` and populate with [your project's URL and Key](/dashboard/project/_/settings/api).
+        Rename `.env.example` to `.env.local` and populate with your Supabase connection variables:
 
-    <$Partial path="api_settings_steps.mdx" />
+        <ProjectConfigVariables variable="url" />
+        <ProjectConfigVariables variable="publishable" />
+        <ProjectConfigVariables variable="anon" />
 
     </StepHikeCompact.Details>
 
@@ -64,6 +66,8 @@ hideToc: true
       NEXT_PUBLIC_SUPABASE_URL=your-project-url
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_... or anon key
       ```
+
+      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "nextjs", "tab": "frameworks" }} />
 
     </StepHikeCompact.Code>
 

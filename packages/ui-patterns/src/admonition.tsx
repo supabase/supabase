@@ -23,6 +23,7 @@ export interface AdmonitionProps {
   layout?: 'horizontal' | 'vertical'
   actions?: ReactNode
   icon?: ReactNode
+  className?: string
 }
 
 const admonitionToAlertMapping: Record<
@@ -79,16 +80,6 @@ const admonitionSVG = cva('', {
   },
 })
 
-const admonitionBase = cva('', {
-  variants: {
-    type: {
-      default: `bg-surface-200/25 border border-default`,
-      warning: `bg-alternative border border-default`,
-      destructive: `bg-alternative border border-default`,
-    },
-  },
-})
-
 export const Admonition = forwardRef<
   React.ElementRef<typeof Alert_Shadcn_>,
   React.ComponentPropsWithoutRef<typeof Alert_Shadcn_> & AdmonitionProps
@@ -118,9 +109,10 @@ export const Admonition = forwardRef<
         variant={typeMapped}
         {...props}
         className={cn(
-          'mb-2',
+          // Handle occasional background elements
+          'overflow-hidden',
+          // SVG icon
           admonitionSVG({ type: typeMapped }),
-          admonitionBase({ type: typeMapped }),
           props.className
         )}
       >
@@ -134,7 +126,9 @@ export const Admonition = forwardRef<
         <div
           className={cn(
             'flex',
-            layout === 'vertical' ? 'flex-col' : 'flex-row items-center justify-between gap-x-6'
+            layout === 'vertical'
+              ? 'flex-col'
+              : 'flex-row items-center justify-between gap-x-6 lg:gap-x-8'
           )}
         >
           {label || title ? (
@@ -142,7 +136,7 @@ export const Admonition = forwardRef<
               <AlertTitle_Shadcn_
                 {...childProps.title}
                 className={cn(
-                  'text mt-0.5 flex gap-3 text-sm [&_p]:mb-1.5 [&_p]:mt-0',
+                  'text mt-0.5 flex gap-3 text-sm',
                   !label && 'flex-col',
                   childProps.title?.className
                 )}
@@ -158,18 +152,27 @@ export const Admonition = forwardRef<
               {children && (
                 <AlertDescription_Shadcn_
                   {...childProps.description}
-                  className={cn('[&_p]:mb-1.5 [&_p]:mt-0', childProps?.description?.className)}
+                  className={cn('', childProps?.description?.className)}
                 >
                   {children}
                 </AlertDescription_Shadcn_>
               )}
             </div>
           ) : (
-            <div className="text mt [&_p]:mb-1.5 [&_p]:mt-0 mt-0.5 [&_p:last-child]:mb-0">
+            <div className="text my-0.5 [&_p]:mt-0 [&_p]:mb-1.5 [&_p:last-child]:mb-0">
               {children}
             </div>
           )}
-          {actions}
+          {actions && (
+            <div
+              className={cn(
+                'flex flex-row gap-3',
+                layout === 'vertical' ? 'mt-3 items-start' : 'items-center'
+              )}
+            >
+              {actions}
+            </div>
+          )}
         </div>
       </Alert_Shadcn_>
     )

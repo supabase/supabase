@@ -3245,7 +3245,7 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets realtime configuration",
-        "tags": ["Realtime Config"]
+        "tags": ["Realtime"]
       },
       "patch": {
         "operationId": "v1-update-realtime-config",
@@ -3274,7 +3274,7 @@
         },
         "security": [{ "bearer": [] }],
         "summary": "Updates realtime configuration",
-        "tags": ["Realtime Config"]
+        "tags": ["Realtime"]
       }
     },
     "/v1/projects/{ref}/config/auth/third-party-auth": {
@@ -7424,7 +7424,7 @@
                 "required": ["enabled", "maxBuckets", "maxIndexes"]
               }
             },
-            "required": ["imageTransformation", "s3Protocol"]
+            "required": ["imageTransformation", "s3Protocol", "icebergCatalog", "vectorBuckets"]
           },
           "capabilities": {
             "type": "object",
@@ -7492,8 +7492,7 @@
                 },
                 "required": ["enabled", "maxBuckets", "maxIndexes"]
               }
-            },
-            "required": ["imageTransformation", "s3Protocol"]
+            }
           },
           "external": {
             "type": "object",
@@ -10096,7 +10095,7 @@
         "properties": {
           "id": { "type": "string" },
           "name": { "type": "string" },
-          "plan": { "type": "string", "enum": ["free", "pro", "team", "enterprise"] },
+          "plan": { "type": "string", "enum": ["free", "pro", "team", "enterprise", "platform"] },
           "opt_in_tags": {
             "type": "array",
             "items": {
@@ -10164,11 +10163,11 @@
               },
               "source_subscription_plan": {
                 "type": "string",
-                "enum": ["free", "pro", "team", "enterprise"]
+                "enum": ["free", "pro", "team", "enterprise", "platform"]
               },
               "target_subscription_plan": {
                 "type": "string",
-                "enum": ["free", "pro", "team", "enterprise"],
+                "enum": ["free", "pro", "team", "enterprise", "platform"],
                 "nullable": true
               }
             },

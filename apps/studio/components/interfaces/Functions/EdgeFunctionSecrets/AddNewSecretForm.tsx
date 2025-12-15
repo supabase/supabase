@@ -224,6 +224,7 @@ const AddNewSecretForm = () => {
                     type="default"
                     className="h-[34px] mt-6"
                     icon={<MinusCircle />}
+                    disabled={fields.length <= 1}
                     onClick={() => (fields.length > 1 ? remove(index) : form.reset(defaultValues))}
                   />
                 </div>
