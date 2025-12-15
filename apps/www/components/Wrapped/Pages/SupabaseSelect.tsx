@@ -176,7 +176,7 @@ function GalleryGrid() {
     const scheduleRotation = (slotIndex: number) => {
       if (isCancelled) return
 
-      const delay = 5000 + Math.random() * 5000 // 5-10 seconds
+      const delay = 3000 + Math.random() * 2000 // 3-5 seconds
       const timeoutId = setTimeout(() => {
         if (isCancelled) return
         rotateSlot(slotIndex)
