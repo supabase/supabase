@@ -76,7 +76,7 @@ const CustomDomainsConfigureHostname = () => {
 
   return (
     <Form_Shadcn_ {...form}>
-      <form onSubmit={form.handleSubmit(onCreateCustomDomain)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onCreateCustomDomain)}>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 gap-4">
             <CardTitle>Add a custom domain</CardTitle>
