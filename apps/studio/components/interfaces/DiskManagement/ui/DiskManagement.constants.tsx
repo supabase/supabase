@@ -1,16 +1,4 @@
 import { PlanId } from 'data/subscriptions/types'
-import {
-  COMPUTE_BASELINE_IOPS,
-  COMPUTE_BASELINE_THROUGHPUT,
-  COMPUTE_MAX_IOPS,
-  COMPUTE_MAX_THROUGHPUT,
-} from 'shared-data'
-export {
-  COMPUTE_BASELINE_IOPS,
-  COMPUTE_BASELINE_THROUGHPUT,
-  COMPUTE_MAX_IOPS,
-  COMPUTE_MAX_THROUGHPUT,
-} from 'shared-data'
 
 // Disk Storage expands automatically when the database reaches 90% of the disk size
 export const AUTOSCALING_THRESHOLD = 0.9

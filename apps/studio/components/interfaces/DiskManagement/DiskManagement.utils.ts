@@ -7,14 +7,9 @@ import {
   ComputeInstanceSize,
   InfraInstanceSize,
 } from './DiskManagement.types'
-import {
-  COMPUTE_BASELINE_IOPS,
-  COMPUTE_MAX_IOPS,
-  DISK_LIMITS,
-  DISK_PRICING,
-  DiskType,
-  PLAN_DETAILS,
-} from './ui/DiskManagement.constants'
+import { DISK_LIMITS, DISK_PRICING, DiskType, PLAN_DETAILS } from './ui/DiskManagement.constants'
+
+import { COMPUTE_BASELINE_IOPS } from 'shared-data'
 
 // Included disk size only applies to primary, not replicas
 export const calculateDiskSizePrice = ({

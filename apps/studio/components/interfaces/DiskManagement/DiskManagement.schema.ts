@@ -8,14 +8,15 @@ import {
   calculateMaxIopsAllowedForDiskSizeWithio2,
   formatNumber,
 } from './DiskManagement.utils'
-import { COMPUTE_MAX_THROUGHPUT, DISK_LIMITS, DiskType } from './ui/DiskManagement.constants'
+import { DISK_LIMITS, DiskType } from './ui/DiskManagement.constants'
+import { COMPUTE_MAX_THROUGHPUT } from 'shared-data'
 
 const baseSchema = z.object({
   storageType: z.enum(['io2', 'gp3']).describe('Type of storage: io2 or gp3'),
   totalSize: z.number().int('Value must be an integer').describe('Allocated disk size in GB'),
   provisionedIOPS: z.number().describe('Provisioned IOPS for storage type'),
   throughput: z.number().optional().describe('Throughput in MB/s for gp3'),
-  computeSize: computeInstanceAddonVariantIdSchema.optional().describe('Compute size'),
+  computeSize: computeInstanceAddonVariantIdSchema.describe('Compute size'),
   growthPercent: z
     .number()
     .int('Value must be an integer')

@@ -212,7 +212,9 @@ export function DiskManagementForm() {
   const usedPercentage = (usedSize / totalSize) * 100
 
   const disableIopsThroughputConfig =
-    !isSpendCapEnabled && RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)
+    modifiedComputeSize &&
+    !isSpendCapEnabled &&
+    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)
 
   const isBranch = project?.parent_project_ref !== undefined
 
@@ -469,7 +471,7 @@ export function DiskManagementForm() {
                       <div className="px-8 flex flex-col gap-y-8">
                         <NoticeBar
                           type="default"
-                          visible={disableIopsThroughputConfig}
+                          visible={!!disableIopsThroughputConfig}
                           title="Adjusting disk configuration requires LARGE Compute size or above"
                           description={`Increase your compute size to adjust your disk's storage type, ${form.getValues('storageType') === 'gp3' ? 'IOPS, ' : ''} and throughput`}
                           actions={
