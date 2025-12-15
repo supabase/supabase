@@ -45,7 +45,7 @@ export function ComputeSizeRecommendationSection({
         >
           <Admonition
             type="default"
-            title={`Your compute size supports up to ${COMPUTE_MAX_IOPS[computeSize ?? 'ci_micro'] ?? maxIopsForComputeSize} IOPS`}
+            title={`Your compute size baseline is ${COMPUTE_BASELINE_IOPS[computeSize ?? 'ci_micro']} IOPS (max ${COMPUTE_MAX_IOPS[computeSize ?? 'ci_micro'] ?? maxIopsForComputeSize} IOPS)`}
           >
             <div className="flex flex-col gap-2">
               <div>
