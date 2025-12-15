@@ -885,11 +885,8 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /**
-     * Get entitlements for an organization
-     * @description Returns the entitlements available to the organization based on their plan and any overrides.
-     */
-    get: operations['OrganizationEntitlementsController_getEntitlements']
+    /** Gets a specific organization that belongs to the authenticated user */
+    get: operations['OrganizationSlugController_getOrganization']
     put?: never
     post?: never
     /** Deletes organization */
@@ -1210,6 +1207,26 @@ export interface paths {
     trace?: never
   }
   '/platform/organizations/{slug}/entitlements': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get entitlements for an organization
+     * @description Returns the entitlements available to the organization based on their plan and any overrides.
+     */
+    get: operations['OrganizationEntitlementsController_getEntitlements']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/entitlements/entitlements': {
     parameters: {
       query?: never
       header?: never
@@ -6939,6 +6956,7 @@ export interface components {
             | 'instances.compute_update_available_sizes'
             | 'storage.max_file_size'
             | 'security.audit_logs_days'
+            | 'security.questionnaire'
             | 'log.retention_days'
             | 'custom_domain'
             | 'vanity_subdomain'
@@ -12786,7 +12804,7 @@ export interface operations {
       }
     }
   }
-  OrganizationEntitlementsController_getEntitlements: {
+  OrganizationSlugController_getOrganization: {
     parameters: {
       query?: never
       header?: never
@@ -12803,7 +12821,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ListEntitlementsResponse']
+          'application/json': components['schemas']['OrganizationSlugResponse']
         }
       }
       /** @description Unauthorized */
@@ -13980,6 +13998,49 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['OrgDocumentUrlResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrganizationEntitlementsController_getEntitlements: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListEntitlementsResponse']
         }
       }
       /** @description Unauthorized */
