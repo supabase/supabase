@@ -109,7 +109,7 @@ export const OutOfDateNotice = ({
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Update branch with modified functions?</AlertDialogTitle>
+                <AlertDialogTitle>Update branch with modified functions</AlertDialogTitle>
                 <AlertDialogDescription>
                   This branch has {modifiedFunctionsCount} modified edge function
                   {modifiedFunctionsCount !== 1 ? 's' : ''} that will be overwritten when updating
