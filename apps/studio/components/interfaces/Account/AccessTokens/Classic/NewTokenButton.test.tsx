@@ -5,9 +5,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { render } from 'tests/helpers'
 import { addAPIMock } from 'tests/lib/msw'
-import { NewAccessTokenButton } from './NewAccessTokenButton'
+import { NewTokenButton } from './NewTokenButton'
 
-describe(`NewAccessTokenButton`, () => {
+describe(`NewTokenButton`, () => {
   beforeEach(() => {
     addAPIMock({
       method: `post`,
@@ -27,7 +27,7 @@ describe(`NewAccessTokenButton`, () => {
 
   it(`generates regular tokens`, async () => {
     const onCreateToken = vi.fn()
-    render(<NewAccessTokenButton onCreateToken={onCreateToken} />)
+    render(<NewTokenButton onCreateToken={onCreateToken} />)
 
     const dialogTrigger = screen.getByRole(`button`, { name: `Generate new token` })
     await userEvent.click(dialogTrigger)
@@ -43,7 +43,7 @@ describe(`NewAccessTokenButton`, () => {
 
   it(`generates experimental tokens`, async () => {
     const onCreateToken = vi.fn()
-    render(<NewAccessTokenButton onCreateToken={onCreateToken} />)
+    render(<NewTokenButton onCreateToken={onCreateToken} />)
 
     const dropdownTrigger = screen.getByTitle(`Choose token scope`)
     await userEvent.click(dropdownTrigger)
@@ -74,7 +74,7 @@ describe(`NewAccessTokenButton`, () => {
   })
 
   it(`resets the form on close/cancel`, async () => {
-    render(<NewAccessTokenButton onCreateToken={vi.fn()} />)
+    render(<NewTokenButton onCreateToken={vi.fn()} />)
 
     // pass 1: open dialog and fill form
     const dialogTrigger = screen.getByRole(`button`, { name: `Generate new token` })
@@ -106,27 +106,4 @@ describe(`NewAccessTokenButton`, () => {
     nameInput = screen.getByLabelText(`Name`)
     expect(nameInput).not.toHaveValue(`close modal test`)
   })
-
-  // it(`shows validation error when no permissions are configured`, async () => {
-  //   const onCreateToken = vi.fn()
-  //   render(<NewAccessTokenButton onCreateToken={onCreateToken} />)
-
-  //   const dialogTrigger = screen.getByRole(`button`, { name: `Generate new token` })
-  //   await userEvent.click(dialogTrigger)
-
-  //   // Fill in the token name
-  //   const nameInput = screen.getByLabelText(`Name`)
-  //   await userEvent.type(nameInput, `test`)
-
-  //   // Try to submit without adding permissions
-  //   const generateButton = screen.getByRole(`button`, { name: `Generate token` })
-  //   await userEvent.click(generateButton)
-
-  //   // The form should not submit and onCreateToken should not be called
-  //   // because validation prevents submission when no permissions are configured
-  //   expect(onCreateToken).not.toHaveBeenCalled()
-
-  //   // The form should still be open and the button should still be enabled
-  //   expect(screen.getByRole(`button`, { name: `Generate token` })).toBeInTheDocument()
-  // })
 })
