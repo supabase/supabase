@@ -1,6 +1,5 @@
-import { CloudProvider } from 'shared-data'
+import { CloudProvider, computeInstanceAddonVariantIdSchema } from 'shared-data'
 import { z } from 'zod'
-import { ComputeInstanceAddonVariantId } from './DiskManagement.types'
 import {
   calculateDiskSizeRequiredForIopsWithGp3,
   calculateDiskSizeRequiredForIopsWithIo2,
@@ -16,9 +15,7 @@ const baseSchema = z.object({
   totalSize: z.number().int('Value must be an integer').describe('Allocated disk size in GB'),
   provisionedIOPS: z.number().describe('Provisioned IOPS for storage type'),
   throughput: z.number().optional().describe('Throughput in MB/s for gp3'),
-  computeSize: z
-    .custom<ComputeInstanceAddonVariantId>((val): val is ComputeInstanceAddonVariantId => true)
-    .describe('Compute size'),
+  computeSize: computeInstanceAddonVariantIdSchema.optional().describe('Compute size'),
   growthPercent: z
     .number()
     .int('Value must be an integer')

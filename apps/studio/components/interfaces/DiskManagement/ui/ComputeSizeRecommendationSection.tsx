@@ -9,7 +9,11 @@ import {
   calculateMaxIopsAllowedForComputeSize,
   mapAddOnVariantIdToComputeSize,
 } from '../DiskManagement.utils'
-import { COMPUTE_MAX_IOPS, RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3 } from './DiskManagement.constants'
+import {
+  COMPUTE_BASELINE_IOPS,
+  COMPUTE_MAX_IOPS,
+  RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
+} from './DiskManagement.constants'
 
 interface ComputeSizeRecommendationSectionProps {
   actions?: ReactNode
@@ -25,11 +29,10 @@ export function ComputeSizeRecommendationSection({
   const iops = watch('provisionedIOPS')
 
   const computeSizeRecommendedForIops = calculateComputeSizeRequiredForIops(iops)
-  const maxIOPSforComputeSize = calculateMaxIopsAllowedForComputeSize(computeSize ?? 'ci_micro')
+  const maxIopsForComputeSize = calculateMaxIopsAllowedForComputeSize(computeSize ?? 'ci_micro')
   const isVisible =
-    iops > maxIOPSforComputeSize && !RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3.includes(computeSize)
-
-  const hasComputeSize = !!computeSize
+    iops > maxIopsForComputeSize &&
+    !RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3.includes(computeSize ?? 'ci_micro')
 
   return (
     <AnimatePresence initial={false}>
@@ -42,16 +45,12 @@ export function ComputeSizeRecommendationSection({
         >
           <Admonition
             type="default"
-            title={
-              hasComputeSize
-                ? `Your compute size supports up to ${COMPUTE_MAX_IOPS[computeSize] ?? maxIOPSforComputeSize} IOPS`
-                : 'Could not determine your compute size. Please contact support if this persists.'
-            }
+            title={`Your compute size supports up to ${COMPUTE_MAX_IOPS[computeSize ?? 'ci_micro'] ?? maxIopsForComputeSize} IOPS`}
           >
             <div className="flex flex-col gap-2">
               <div>
                 <p className="text-sm text-foreground-light">
-                  To achieve sustained IOPS performance we recommend using the{' '}
+                  To achieve higher IOPS performance we recommend using the{' '}
                   <span className="text-foreground">
                     {mapAddOnVariantIdToComputeSize(computeSizeRecommendedForIops)}
                   </span>{' '}

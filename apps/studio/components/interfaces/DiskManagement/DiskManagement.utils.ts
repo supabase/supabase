@@ -2,7 +2,6 @@ import { ProjectDetail } from 'data/projects/project-detail-query'
 import { PlanId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { computeInstanceAddonVariantIdSchema } from 'shared-data'
-import { z } from 'zod'
 import {
   ComputeInstanceAddonVariantId,
   ComputeInstanceSize,
@@ -162,9 +161,6 @@ export const calculateThroughputPrice = ({
   return { oldPrice: '0.00', newPrice: '0.00' }
 }
 
-const computeSizeSchema = z.enum(Object.keys(COMPUTE_MAX_IOPS) as [string, ...string[]])
-type ComputeSizeKey = z.infer<typeof computeSizeSchema>
-
 export function getAvailableComputeOptions(availableAddons: any[], projectCloudProvider?: string) {
   const computeOptions =
     availableAddons
@@ -257,19 +253,20 @@ export const calculateIopsRequiredForThroughput = (throughput: number) => {
 }
 
 export const calculateMaxIopsAllowedForComputeSize = (computeSize: string): number => {
-  const parsed = computeSizeSchema.safeParse(computeSize)
+  const parsed = computeInstanceAddonVariantIdSchema.safeParse(computeSize)
   if (!parsed.success) return 0
-  return COMPUTE_MAX_IOPS[parsed.data]
+  return COMPUTE_MAX_IOPS[parsed.data] ?? 0
 }
 
 export const calculateComputeSizeRequiredForIops = (
   iops: number
 ): ComputeInstanceAddonVariantId | undefined => {
-  const computeSizes: [ComputeSizeKey, number][] = Object.entries(COMPUTE_MAX_IOPS)
-    .map(([size, baselineIops]): [ComputeSizeKey, number] => [
-      computeSizeSchema.parse(size),
-      baselineIops,
-    ])
+  const computeSizes: [ComputeInstanceAddonVariantId, number][] = Object.entries(COMPUTE_MAX_IOPS)
+    .map(([size, baselineIops]) => {
+      const parsedSize = computeInstanceAddonVariantIdSchema.safeParse(size)
+      return parsedSize.success ? ([parsedSize.data, baselineIops] as const) : undefined
+    })
+    .filter((value): value is [ComputeInstanceAddonVariantId, number] => value !== undefined)
     .sort((a, b) => a[1] - b[1])
 
   for (const [size, baselineIops] of computeSizes) {
