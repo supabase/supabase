@@ -9,11 +9,12 @@ export const docsConfig: DocsConfig = {
   sidebarNav: [
     {
       title: 'Getting Started',
-      sortOrder: 'manual',
+      sortOrder: 'alphabetical',
       items: [
         {
           title: 'Introduction',
           href: '/docs',
+          priority: true,
           items: [],
         },
         {
@@ -28,8 +29,8 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Copy Writing',
-          href: '/docs/copy-writing',
+          title: 'Copywriting',
+          href: '/docs/copywriting',
           items: [],
         },
         {

@@ -2983,7 +2983,7 @@ export const Index: Record<string, any> = {
       source: "",
       files: ["registry/default/example/copy-button-verbs.tsx"],
       category: "Getting Started",
-      subcategory: "Copy Writing",
+      subcategory: "Copywriting",
       chunks: []
     },
     "copy-form-labels": {
@@ -2994,7 +2994,7 @@ export const Index: Record<string, any> = {
       source: "",
       files: ["registry/default/example/copy-form-labels.tsx"],
       category: "Getting Started",
-      subcategory: "Copy Writing",
+      subcategory: "Copywriting",
       chunks: []
     },
     "copy-error-messages": {
@@ -3005,7 +3005,7 @@ export const Index: Record<string, any> = {
       source: "",
       files: ["registry/default/example/copy-error-messages.tsx"],
       category: "Getting Started",
-      subcategory: "Copy Writing",
+        subcategory: "Copywriting",
       chunks: []
     },
     "copy-success-messages": {
@@ -3016,7 +3016,7 @@ export const Index: Record<string, any> = {
       source: "",
       files: ["registry/default/example/copy-success-messages.tsx"],
       category: "Getting Started",
-      subcategory: "Copy Writing",
+      subcategory: "Copywriting",
       chunks: []
     },
     "copy-tooltips": {
@@ -3027,7 +3027,7 @@ export const Index: Record<string, any> = {
       source: "",
       files: ["registry/default/example/copy-tooltips.tsx"],
       category: "Getting Started",
-      subcategory: "Copy Writing",
+      subcategory: "Copywriting",
       chunks: []
     },
     "copy-loading-states": {
@@ -3038,7 +3038,7 @@ export const Index: Record<string, any> = {
       source: "",
       files: ["registry/default/example/copy-loading-states.tsx"],
       category: "Getting Started",
-      subcategory: "Copy Writing",
+      subcategory: "Copywriting",
       chunks: []
     },
     "copy-empty-states": {
@@ -3049,7 +3049,7 @@ export const Index: Record<string, any> = {
       source: "",
       files: ["registry/default/example/copy-empty-states.tsx"],
       category: "Getting Started",
-      subcategory: "Copy Writing",
+      subcategory: "Copywriting",
       chunks: []
     },
     "copy-confirmations": {
@@ -3060,7 +3060,7 @@ export const Index: Record<string, any> = {
       source: "",
       files: ["registry/default/example/copy-confirmations.tsx"],
       category: "Getting Started",
-      subcategory: "Copy Writing",
+        subcategory: "Copywriting",
       chunks: []
     },
   },

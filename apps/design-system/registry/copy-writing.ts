@@ -7,7 +7,7 @@ export const copyWriting: Registry = [
     files: ['example/copy-button-verbs.tsx'],
     registryDependencies: ['button'],
     category: 'Getting Started',
-    subcategory: 'Copy Writing',
+    subcategory: 'Copywriting',
   },
   {
     name: 'copy-form-labels',
@@ -15,7 +15,7 @@ export const copyWriting: Registry = [
     files: ['example/copy-form-labels.tsx'],
     registryDependencies: ['form'],
     category: 'Getting Started',
-    subcategory: 'Copy Writing',
+    subcategory: 'Copywriting',
   },
   {
     name: 'copy-error-messages',
@@ -23,7 +23,7 @@ export const copyWriting: Registry = [
     files: ['example/copy-error-messages.tsx'],
     registryDependencies: ['form'],
     category: 'Getting Started',
-    subcategory: 'Copy Writing',
+    subcategory: 'Copywriting',
   },
   {
     name: 'copy-success-messages',
@@ -31,7 +31,7 @@ export const copyWriting: Registry = [
     files: ['example/copy-success-messages.tsx'],
     registryDependencies: ['form'],
     category: 'Getting Started',
-    subcategory: 'Copy Writing',
+    subcategory: 'Copywriting',
   },
   {
     name: 'copy-tooltips',
@@ -39,7 +39,7 @@ export const copyWriting: Registry = [
     files: ['example/copy-tooltips.tsx'],
     registryDependencies: ['tooltip'],
     category: 'Getting Started',
-    subcategory: 'Copy Writing',
+    subcategory: 'Copywriting',
   },
   {
     name: 'copy-loading-states',
@@ -47,7 +47,7 @@ export const copyWriting: Registry = [
     files: ['example/copy-loading-states.tsx'],
     registryDependencies: ['loading-state'],
     category: 'Getting Started',
-    subcategory: 'Copy Writing',
+    subcategory: 'Copywriting',
   },
   {
     name: 'copy-empty-states',
@@ -55,7 +55,7 @@ export const copyWriting: Registry = [
     files: ['example/copy-empty-states.tsx'],
     registryDependencies: ['empty-state'],
     category: 'Getting Started',
-    subcategory: 'Copy Writing',
+    subcategory: 'Copywriting',
   },
   {
     name: 'copy-confirmations',
@@ -63,6 +63,6 @@ export const copyWriting: Registry = [
     files: ['example/copy-confirmations.tsx'],
     registryDependencies: ['confirmation'],
     category: 'Getting Started',
-    subcategory: 'Copy Writing',
+    subcategory: 'Copywriting',
   },
 ]
