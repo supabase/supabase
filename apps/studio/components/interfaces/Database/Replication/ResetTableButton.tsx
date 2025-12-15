@@ -78,16 +78,12 @@ export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) 
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            disabled={isResetting}
-            onClick={handleReset}
-            type="danger"
-          >
+          <AlertDialogAction disabled={isResetting} onClick={handleReset} type="danger">
             {isRollingBack
               ? 'Resetting table...'
               : isRestartingPipeline
                 ? 'Restarting pipeline...'
-                : 'Confirm reset and restart'}
+                : 'Reset and restart'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
