@@ -1,5 +1,37 @@
 import { Badge } from 'ui'
 import { getThreadRepliesById } from '~/data/contribute'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import type { Components } from 'react-markdown'
+
+const markdownComponents: Components = {
+  code: ({ node, inline, ...props }) =>
+    inline ? (
+      <code
+        {...props}
+        className="bg-surface-200 text-foreground px-1.5 py-0.5 rounded text-sm font-mono"
+      />
+    ) : (
+      <code {...props} className="font-mono text-sm" />
+    ),
+  pre: ({ node, ...props }) => (
+    <pre
+      {...props}
+      className="bg-surface-200 text-foreground p-4 rounded-lg overflow-x-auto mb-3 max-w-full"
+    />
+  ),
+  a: ({ node, ...props }) => (
+    <a
+      {...props}
+      className="text-brand hover:underline"
+      target="_blank"
+      rel="noopener noreferrer"
+    />
+  ),
+  p: ({ node, ...props }) => <p {...props} className="mb-3 last:mb-0" />,
+  ul: ({ node, ...props }) => <ul {...props} className="list-disc pl-5 space-y-1 mb-3" />,
+  ol: ({ node, ...props }) => <ol {...props} className="list-decimal pl-5 space-y-1 mb-3" />,
+}
 
 export async function Conversation({ thread_key }: { thread_key: string | null }) {
   const { question, replies } = await getThreadRepliesById(thread_key)
@@ -12,8 +44,12 @@ export async function Conversation({ thread_key }: { thread_key: string | null }
     <div className="mb-6">
       <div className="grid gap-4">
         {question && question.content && (
-          <div className="border border-border rounded-lg p-4 bg-surface-100">
-            <p className="text-foreground mb-3 w-full">{question.content}</p>
+          <div className="border border-border rounded-lg p-4 bg-surface-100 min-w-0">
+            <div className="text-foreground mb-3 min-w-0">
+              <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
+                {question.content}
+              </ReactMarkdown>
+            </div>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               {question.author && (
                 <>
@@ -51,10 +87,15 @@ export async function Conversation({ thread_key }: { thread_key: string | null }
               const isOP = reply.author === question?.author
 
               return (
-                <div key={reply.id} className="border border-border rounded-lg p-4 bg-surface-100">
-                  <p className="text-foreground mb-3 w-full wrap-break-word break-all">
-                    {reply.content}
-                  </p>
+                <div
+                  key={reply.id}
+                  className="border border-border rounded-lg p-4 bg-surface-100 min-w-0"
+                >
+                  <div className="text-foreground mb-3 min-w-0">
+                    <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
+                      {reply.content || ''}
+                    </ReactMarkdown>
+                  </div>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     {reply.author && (
                       <>
