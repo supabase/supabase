@@ -32,10 +32,62 @@ Following the [Upcoming changes](https://github.com/orgs/supabase/discussions/29
 
 ## Verifying JWT
 
-manually.....
+### Using Supabase template
+
+We've prepared some [JWT verification](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/custom-jwt-validation) templates, that can be found [here](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/_shared/jwt).
+
+In order to simple verify incoming requests you can download the specified template and start to using it:
+
+```bash
+curl -O https://raw.githubusercontent.com/supabase/supabase/refs/heads/master/examples/edge-functions/supabase/functions/_shared/jwt/default.ts
+```
 
 ```ts
-import { createRemoteJWKSet, jwtVerify } from 'jose'
+import { AuthMiddleware } from '../_shared/jwt/default.ts'
+
+Deno.serve((r) =>
+  AuthMiddleware(r, async (req) => {
+    const { name } = await req.json()
+
+    return Response.json({ message: `hello ${name}` })
+  })
+)
+```
+
+### Integrating with Supabase Auth
+
+You can also use the Supabase Auth to verify users
+
+```ts
+import { createClient } from 'supabase/supabase-js'
+import { JWKS, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from 'your-environment'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+
+Deno.serve((req) => {
+  const authHeader = req.headers.get('Authorization')!
+  const token = authHeader.replace('Bearer ', '')
+
+  const { data, error } = await supabase.auth.getClaims(token)
+  if (!data || error) {
+    return Response.json(
+      { msg: 'Invalid JWT' },
+      {
+        status: 401,
+      }
+    )
+  }
+
+  return Response.json({ message: `hello ${data}` })
+})
+```
+
+### Using JWT library
+
+The popular `jose` library can be used to verify received JWTs, like the following example:
+
+```ts
+import { createRemoteJWKSet, jwtVerify } from 'https://deno.land/x/jose@v4.14.4/index.ts'
 
 const SUPABASE_JWT_ISSUER = SUPABASE_URL + '/auth/v1'
 const SUPABASE_JWT_KEYS = createRemoteJWKSet(
@@ -65,20 +117,20 @@ Deno.serve(async (req: Request) => {
       const isValidJWT = await verifySupabaseJWT(token)
 
       if (!isValidJWT) {
-        return new Response(JSON.stringify({ msg: 'Invalid JWT' }), {
+        return Response.json({ msg: 'Invalid JWT' }, {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
         })
       }
     } catch (e) {
       console.error(e)
-      return new Response(JSON.stringify({ msg: e.toString() }), {
+      return Response.json({ msg: e.toString() }, {
         status: 401,
-        headers: { 'Content-Type': 'application/json' },
       })
     }
   }
 }
 ```
 
-Using the Supabase Template.....
+```
+
+```
