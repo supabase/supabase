@@ -81,7 +81,7 @@ const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
                 avatar: avatarSrc,
               },
             },
-          }
+          } as Integration
         }
 
         return integration
