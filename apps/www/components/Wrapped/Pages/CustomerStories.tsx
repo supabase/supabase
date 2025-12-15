@@ -2,16 +2,16 @@
 
 import Link from 'next/link'
 import { cn } from 'ui'
+import { AnimatedGridBackground } from '../AnimatedGridBackground'
 import {
-  PhoenixEnergyLogo,
-  RallyLogo,
-  SoshiLogo,
-  KayhanSpaceLogo,
-  ResendLogo,
   DerivLogo,
   JuniverLogo,
+  KayhanSpaceLogo,
+  PhoenixEnergyLogo,
+  RallyLogo,
+  ResendLogo,
+  SoshiLogo,
 } from '../Logos'
-import { AnimatedGridBackground } from '../AnimatedGridBackground'
 
 const testimonials = [
   {
@@ -99,7 +99,7 @@ export const CustomerStories = () => {
         </div>
       </section>
 
-      {/* NOTE (Alan): extra padding here to optically align subheading wuth header.*/}
+      {/* NOTE (Alan): extra padding here to optically align subheading with header */}
       <div className="relative max-w-[60rem] mx-auto border-x border-b px-6 lg:px-10 py-12">
         <h3 className="text-lg">Customers count on Supabase.</h3>
       </div>

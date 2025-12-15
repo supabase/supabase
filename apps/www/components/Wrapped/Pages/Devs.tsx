@@ -24,7 +24,15 @@ const heroStats = [
   },
 ]
 
-const gridStats = [
+type GridStat = {
+  headline: string
+  number: number
+  increment: number
+  suffix?: string
+  prefix?: string
+}
+
+const gridStats: GridStat[] = [
   {
     headline: 'Peak concurrent Realtime connections',
     number: 193_942,
@@ -149,7 +157,7 @@ export const Devs = () => {
                         >
                           {stat.suffix ? (
                             <>
-                              {(stat as any).prefix}
+                              {stat.prefix}
                               {new Intl.NumberFormat('en-US', {
                                 notation: 'compact',
                                 maximumFractionDigits: stat.number % 1 !== 0 ? 2 : 0,
