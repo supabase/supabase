@@ -9218,6 +9218,8 @@ export interface components {
       reset_project?: boolean
     }
     TelemetryIdentifyBodyV2: {
+      /** PostHog JS SDK's distinct_id - used for aliasing anonymous → authenticated users */
+      anonymous_id?: string
       organization_slug?: string
       project_ref?: string
       user_id: string
