@@ -107,7 +107,7 @@ create extension if not exists pg_cron;
 select cron.schedule('@daily', $$call partman.run_maintenance_proc()$$);
 ```
 
-## Additional Resources
+## Additional resources
 
 - [Partitioning your tables](/docs/guides/database/partitions).
 - [pg_partman documentation](/docs/guides/database/extensions/pg_partman)
