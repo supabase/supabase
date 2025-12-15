@@ -418,9 +418,7 @@ export const PostgrestConfig = () => {
                                   disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
                                   {...field}
                                   type="number"
-                                  {...form.register('maxRows', {
-                                    valueAsNumber: true, // Ensure the value is handled as a number
-                                  })}
+                                  onChange={(e) => field.onChange(Number(e.target.value))}
                                 />
                               </PrePostTab>
                             </FormControl_Shadcn_>
