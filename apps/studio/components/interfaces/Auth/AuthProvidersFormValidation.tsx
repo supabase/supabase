@@ -1248,7 +1248,7 @@ const EXTERNAL_PROVIDER_X = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'X / Twitter (OAuth 2.0)',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-x`,
+  link: `${DOCS_URL}/guides/auth/social-login/auth-twitter`,
   properties: {
     EXTERNAL_X_ENABLED: {
       title: 'X / Twitter enabled',
