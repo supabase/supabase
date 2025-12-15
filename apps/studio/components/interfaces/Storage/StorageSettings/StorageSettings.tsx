@@ -78,7 +78,7 @@ export const StorageSettings = () => {
   const {
     data: config,
     error,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
   } = useProjectStorageConfigQuery({ projectRef })
@@ -94,7 +94,7 @@ export const StorageSettings = () => {
   const isSpendCapOn =
     organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
 
-  const { data: buckets = [], isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef })
+  const { data: buckets = [], isPending: isLoadingBuckets } = useBucketsQuery({ projectRef })
 
   // Calculate the minimum file size limit from existing buckets
   const minBucketFileSizeLimit = useMemo(() => {
@@ -221,7 +221,7 @@ export const StorageSettings = () => {
   return (
     <PageContainer>
       <PageSection>
-        <PageSectionContent>
+        <PageSectionContent className="flex flex-col gap-y-8">
           <Form_Shadcn_ {...form}>
             {isLoading || isLoadingPermissions ? (
               <GenericSkeletonLoader />

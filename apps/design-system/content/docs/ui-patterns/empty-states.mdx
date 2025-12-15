@@ -14,7 +14,7 @@ There are two ways an empty state may be displayed in cases where there is no da
 
 ### Initial state
 
-Perhaps the user has not yet created any data. The presentation of this empty state depends on the context of the list and the type of data it contains.
+Perhaps the user has not yet created any data. The presentation of this empty state depends on the context of the list and the type of data it contains. Be mindful of the journey to rendering an empty state and any possible layout shift along the way.
 
 #### Presentational
 
@@ -22,7 +22,7 @@ The user may be learning about a feature for the first time, and could benefit f
 
 <ComponentPreview name="empty-state-presentational-icon" peekCode wide />
 
-Remember to use active language in these cases. For example: “Create a vector bucket” instead of “No vector buckets found”. The latter is more appropriate in table-based presentations, as described below.
+Remember to use active language in presentational empty states. For example: “Create a vector bucket” instead of “No vector buckets found”. The latter is more appropriate in table-based presentations, as described below.
 
 #### Informational
 

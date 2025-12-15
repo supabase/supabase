@@ -59,7 +59,7 @@ import { getConnectionURL } from './StorageSettings.utils'
 export const S3Connection = () => {
   const { ref: projectRef } = useParams()
   const isProjectActive = useIsProjectActive()
-  const { data: project, isLoading: projectIsLoading } = useSelectedProjectQuery()
+  const { data: project, isPending: projectIsLoading } = useSelectedProjectQuery()
 
   const [openCreateCred, setOpenCreateCred] = useState(false)
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
@@ -81,7 +81,7 @@ export const S3Connection = () => {
     isSuccess: isSuccessStorageConfig,
     isError: isErrorStorageConfig,
   } = useProjectStorageConfigQuery({ projectRef })
-  const { data: storageCreds, isLoading: isLoadingStorageCreds } = useStorageCredentialsQuery(
+  const { data: storageCreds, isPending: isLoadingStorageCreds } = useStorageCredentialsQuery(
     { projectRef },
     { enabled: canReadS3Credentials }
   )

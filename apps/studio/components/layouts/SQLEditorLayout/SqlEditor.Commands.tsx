@@ -93,7 +93,7 @@ function RunSnippetPage() {
   const { ref } = useParams()
   const {
     data: snippetPages,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useSqlSnippetsQuery({
@@ -302,7 +302,7 @@ function TableSelector() {
   const { data: protectedSchemas } = useProtectedSchemas()
   const {
     data: tablesData,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useTablesQuery({

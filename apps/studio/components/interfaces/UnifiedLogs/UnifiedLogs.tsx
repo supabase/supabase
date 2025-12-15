@@ -125,7 +125,7 @@ export const UnifiedLogs = () => {
   } = useUnifiedLogsInfiniteQuery({ projectRef, search: searchParameters })
   const {
     data: counts,
-    isLoading: isLoadingCounts,
+    isPending: isLoadingCounts,
     isFetching: isFetchingCounts,
     refetch: refetchCounts,
   } = useUnifiedLogsCountQuery({
