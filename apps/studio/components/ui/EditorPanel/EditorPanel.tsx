@@ -150,7 +150,7 @@ export const EditorPanel = () => {
 
   return (
     <div className="flex h-full flex-col bg-background">
-      <div className="border-b border-b-muted flex items-center justify-between gap-x-4 px-4 h-[46px]">
+      <div className="border-b border-b-muted flex items-center justify-between gap-x-4 pl-4 pr-3 h-[46px]">
         <div className="text-xs">{label}</div>
         <div className="flex items-center">
           {templates.length > 0 && (

@@ -5,7 +5,6 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { FormattedWrapperTable } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { ImportForeignSchemaDialog } from 'components/interfaces/Storage/ImportForeignSchemaDialog'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useFDWDropForeignTableMutation } from 'data/fdw/fdw-drop-foreign-table-mutation'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
 import { useIcebergNamespaceDeleteMutation } from 'data/storage/iceberg-namespace-delete-mutation'
@@ -66,7 +65,6 @@ export const NamespaceWithTables = ({
   const [showConfirmDeleteNamespace, setShowConfirmDeleteNamespace] = useState(false)
   const [isDeletingNamespace, setIsDeletingNamespace] = useState(false)
 
-  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
   const { publication, icebergWrapper } = useAnalyticsBucketAssociatedEntities({
     projectRef,
     bucketId,

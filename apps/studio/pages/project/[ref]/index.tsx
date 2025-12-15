@@ -1,4 +1,3 @@
-import { useFlag } from 'common'
 import { Home } from 'components/interfaces/Home/Home'
 import { HomeV2 } from 'components/interfaces/HomeNew/Home'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -7,10 +6,9 @@ import { usePHFlag } from 'hooks/ui/useFlag'
 import type { NextPageWithLayout } from 'types'
 
 const HomePage: NextPageWithLayout = () => {
-  const isHomeNew = useFlag('homeNew')
   const isHomeNewPH = usePHFlag('homeNew')
 
-  if (isHomeNew && isHomeNewPH) {
+  if (isHomeNewPH) {
     return <HomeV2 />
   }
   return <Home />
