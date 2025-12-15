@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { getAccessToken } from 'common'
 import { databaseKeys } from 'data/database/keys'
+import { BASE_PATH } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { stripeSyncKeys } from './keys'
 
@@ -22,7 +23,7 @@ export async function installStripeSync({
 }: StripeSyncInstallVariables): Promise<StripeSyncInstallResponse> {
   const accessToken = await getAccessToken()
 
-  const response = await fetch('/api/integrations/stripe-sync-integration', {
+  const response = await fetch(`${BASE_PATH}/api/integrations/stripe-sync`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
