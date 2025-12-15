@@ -61,7 +61,7 @@ export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) 
       </Button>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Reset and restart table</AlertDialogTitle>
+          <AlertDialogTitle>Reset table and restart</AlertDialogTitle>
           <AlertDialogDescription>
             This will reset replication for <code className="text-code-inline">{tableName}</code>{' '}
             only. The table will be copied again from scratch, and any existing downstream data for
