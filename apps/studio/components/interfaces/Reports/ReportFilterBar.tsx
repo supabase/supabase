@@ -1,10 +1,11 @@
-import { ChevronDown, Database, Plus, RefreshCw, X } from 'lucide-react'
+import { ChevronDown, Database, Network, Plus, RefreshCw, X } from 'lucide-react'
 import { ComponentProps, useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
 
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Auth, Realtime, Storage } from 'icons'
 import { BASE_PATH } from 'lib/constants'
@@ -22,8 +23,6 @@ import {
 import { DatePickerValue, LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
 import type { ReportFilterItem } from './Reports.types'
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
-import { Network } from 'lucide-react'
 
 interface ReportFilterBarProps {
   filters: ReportFilterItem[]

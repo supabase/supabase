@@ -1,13 +1,16 @@
 ---
-id: 'ai-tools-byom'
+id: 'ai-tools-byo-mcp'
 title: 'Deploy MCP servers'
 description: 'Build and deploy remote MCP servers on Supabase Edge Functions'
-subtitle: 'Deploy custom MCP servers on Supabase Edge Functions'
 ---
 
-Deploy your [Model Context Protocol](https://modelcontextprotocol.io/specification/2025-11-25) (MCP) servers on Supabase take advantage of features like [Edge Functions](/docs/guides/functions), [OAuth](/docs/guides/auth/oauth-server), and scaling for AI applications.
+Build and deploy [Model Context Protocol](https://modelcontextprotocol.io/specification/2025-11-25) (MCP) servers on Supabase using [Edge Functions](/docs/guides/functions).
 
-- Get started with [deploying](#deploy-your-mcp-server) MCP servers on Supabase
+<Admonition type="note">
+
+This guide covers MCP servers that do not require authentication. Auth support for MCP on Edge Functions is coming soon.
+
+</Admonition>
 
 ## Deploy your MCP server
 
@@ -34,17 +37,16 @@ supabase init
 Create a new Edge Function for your MCP server:
 
 ```bash
-supabase functions new simple-mcp-server
+supabase functions new mcp
 ```
 
-Create a `deno.json` file in `supabase/functions/simple-mcp-server/` with the required dependencies:
+Create a `deno.json` file in `supabase/functions/mcp/` with the required dependencies:
 
 ```json
 {
   "imports": {
     "@hono/mcp": "npm:@hono/mcp@^0.1.1",
     "@modelcontextprotocol/sdk": "npm:@modelcontextprotocol/sdk@^1.24.3",
-    "@modelcontextprotocol/sdk/": "npm:/@modelcontextprotocol/sdk@^1.24.3/",
     "hono": "npm:hono@^4.9.2",
     "zod": "npm:zod@^4.1.13"
   }
@@ -57,7 +59,7 @@ This tutorial uses the [official MCP TypeScript SDK](https://github.com/modelcon
 
 </Admonition>
 
-Replace the contents of `supabase/functions/simple-mcp-server/index.ts` with:
+Replace the contents of `supabase/functions/mcp/index.ts` with:
 
 ```ts
 // Setup type definitions for built-in Supabase Runtime APIs
@@ -68,14 +70,13 @@ import { StreamableHTTPTransport } from '@hono/mcp'
 import { Hono } from 'hono'
 import { z } from 'zod'
 
-// Change this to your function name
-const functionName = 'simple-mcp-server'
-const app = new Hono().basePath(`/${functionName}`)
+// Create Hono app
+const app = new Hono()
 
 // Create your MCP server
 const server = new McpServer({
-  name: 'simple-mcp-server',
-  version: '1.0.0',
+  name: 'mcp',
+  version: '0.1.0',
 })
 
 // Register a simple addition tool
@@ -91,60 +92,14 @@ server.registerTool(
   })
 )
 
-// Handle MCP requests
-app.all('/mcp', async (c) => {
+// Handle MCP requests at the root path
+app.all('/', async (c) => {
   const transport = new StreamableHTTPTransport()
   await server.connect(transport)
   return transport.handleRequest(c)
 })
 
 Deno.serve(app.fetch)
-```
-
-### Understanding the code
-
-The MCP server implementation uses several key components:
-
-**Hono routing**: Supabase Edge Functions route all requests to `/<function-name>/*`. The Hono app uses `basePath` to handle this:
-
-```ts
-const functionName = 'simple-mcp-server'
-const app = new Hono().basePath(`/${functionName}`)
-```
-
-**MCP server setup**: The `McpServer` class from the official SDK handles the MCP protocol:
-
-```ts
-const server = new McpServer({
-  name: 'simple-mcp-server',
-  version: '1.0.0',
-})
-```
-
-**Tool registration**: Tools are registered with a name, metadata, input schema (using Zod), and a handler function:
-
-```ts
-server.registerTool(
-  'add',
-  {
-    title: 'Addition Tool',
-    description: 'Add two numbers together',
-    inputSchema: { a: z.number(), b: z.number() },
-  },
-  ({ a, b }) => ({
-    content: [{ type: 'text', text: String(a + b) }],
-  })
-)
-```
-
-**HTTP transport**: The `StreamableHTTPTransport` from `@hono/mcp` connects your MCP server to HTTP requests:
-
-```ts
-app.all('/mcp', async (c) => {
-  const transport = new StreamableHTTPTransport()
-  await server.connect(transport)
-  return transport.handleRequest(c)
-})
 ```
 
 ### Local development
@@ -158,18 +113,18 @@ supabase start
 In a separate terminal, serve your function:
 
 ```bash
-supabase functions serve --no-verify-jwt simple-mcp-server
+supabase functions serve --no-verify-jwt mcp
 ```
 
 Your MCP server is now running at:
 
 ```
-http://localhost:54321/functions/v1/simple-mcp-server/mcp
+http://localhost:54321/functions/v1/mcp
 ```
 
 <Admonition type="note">
 
-The `--no-verify-jwt` flag disables JWT verification at the Edge Function layer. This is required because MCP authentication is handled by the MCP server itself, not by Supabase's standard JWT validation.
+The `--no-verify-jwt` flag disables JWT verification at the Edge Function layer so your MCP server can accept unauthenticated requests. Authenticated MCP support is coming soon.
 
 </Admonition>
 
@@ -181,7 +136,7 @@ Test your server with the official [MCP Inspector](https://github.com/modelconte
 npx -y @modelcontextprotocol/inspector
 ```
 
-Enter your MCP endpoint URL in the inspector UI to explore available tools and test them interactively.
+Use the local endpoint `http://localhost:54321/functions/v1/mcp` in the inspector UI to explore available tools and test them interactively.
 
 ### Deploy to production
 
@@ -189,13 +144,13 @@ When you're ready to deploy, link your project and deploy the function:
 
 ```bash
 supabase link --project-ref <your-project-ref>
-supabase functions deploy --no-verify-jwt simple-mcp-server
+supabase functions deploy --no-verify-jwt mcp
 ```
 
 Your MCP server will be available at:
 
 ```
-https://<your-project-ref>.supabase.co/functions/v1/simple-mcp-server/mcp
+https://<your-project-ref>.supabase.co/functions/v1/mcp
 ```
 
 Update your MCP client configuration to use the production URL.
@@ -239,14 +194,6 @@ server.registerTool(
   }
 )
 ```
-
-## Add authentication
-
-<Admonition type="caution">
-
-MCP authentication is not yet supported on Edge Functions. For now, MCP servers deployed on Supabase Edge Functions are publicly accessible.
-
-</Admonition>
 
 ## Examples
 

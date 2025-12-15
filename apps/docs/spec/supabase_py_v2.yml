@@ -2815,6 +2815,215 @@ functions:
               }
           )
           ```
+
+  - id: oauth-admin-api
+    title: 'Overview'
+    notes: |
+      - OAuth 2.1 client administration endpoints are available via the `supabase.auth.admin.oauth` namespace.
+      - These methods require a `service_role` key and should only be called server-side.
+      - Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+      - This is an alpha feature and may change in the future.
+
+  - id: auth-js-gotrueadminoauthapi-listclients
+    title: 'admin.oauth.list_clients()'
+    description: |
+      Lists OAuth clients with optional pagination.
+    notes: |
+      - Requires `service_role` key.
+      - Only available when OAuth 2.1 server is enabled.
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: params
+        isOptional: true
+        type: PageParams
+        description: Optional pagination parameters.
+        subContent:
+          - name: page
+            isOptional: true
+            type: number
+            description: Page number (1-indexed).
+          - name: per_page
+            isOptional: true
+            type: number
+            description: Number of items per page.
+    examples:
+      - id: list-oauth-clients
+        name: List OAuth clients
+        code: |
+          ```python
+          response = supabase.auth.admin.oauth.list_clients()
+          ```
+      - id: list-oauth-clients-paginated
+        name: List OAuth clients with pagination
+        code: |
+          ```python
+          response = supabase.auth.admin.oauth.list_clients(
+              params={"page": 1, "per_page": 10}
+          )
+          ```
+
+  - id: auth-js-gotrueadminoauthapi-createclient
+    title: 'admin.oauth.create_client()'
+    description: |
+      Creates a new OAuth client.
+    notes: |
+      - Requires `service_role` key.
+      - Only available when OAuth 2.1 server is enabled.
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: params
+        isOptional: false
+        type: CreateOAuthClientParams
+        description: Parameters for creating a new OAuth client.
+        subContent:
+          - name: name
+            isOptional: false
+            type: string
+            description: The name of the OAuth client.
+          - name: redirect_uris
+            isOptional: false
+            type: list[string]
+            description: List of allowed redirect URIs.
+          - name: grant_types
+            isOptional: true
+            type: list[string]
+            description: List of allowed grant types.
+          - name: response_types
+            isOptional: true
+            type: list[string]
+            description: List of allowed response types.
+          - name: client_type
+            isOptional: true
+            type: string
+            description: The client type.
+          - name: registration_type
+            isOptional: true
+            type: string
+            description: The registration type.
+    examples:
+      - id: create-oauth-client
+        name: Create OAuth client
+        code: |
+          ```python
+          response = supabase.auth.admin.oauth.create_client(
+              {
+                  "name": "My OAuth Client",
+                  "redirect_uris": ["https://example.com/callback"]
+              }
+          )
+          ```
+
+  - id: auth-js-gotrueadminoauthapi-updateclient
+    title: 'admin.oauth.update_client()'
+    description: |
+      Updates an existing OAuth client.
+    notes: |
+      - Requires `service_role` key.
+      - Only available when OAuth 2.1 server is enabled.
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: client_id
+        isOptional: false
+        type: string
+        description: The ID of the OAuth client to update.
+      - name: params
+        isOptional: false
+        type: UpdateOAuthClientParams
+        description: Parameters for updating the OAuth client.
+        subContent:
+          - name: name
+            isOptional: true
+            type: string
+            description: The name of the OAuth client.
+          - name: redirect_uris
+            isOptional: true
+            type: list[string]
+            description: List of allowed redirect URIs.
+          - name: grant_types
+            isOptional: true
+            type: list[string]
+            description: List of allowed grant types.
+          - name: response_types
+            isOptional: true
+            type: list[string]
+            description: List of allowed response types.
+    examples:
+      - id: update-oauth-client
+        name: Update OAuth client
+        code: |
+          ```python
+          response = supabase.auth.admin.oauth.update_client(
+              "client-id",
+              {
+                  "name": "Updated OAuth Client",
+                  "redirect_uris": ["https://example.com/callback", "https://example.com/callback2"]
+              }
+          )
+          ```
+
+  - id: auth-js-gotrueadminoauthapi-getclient
+    title: 'admin.oauth.get_client()'
+    description: |
+      Retrieves details of an OAuth client by ID.
+    notes: |
+      - Requires `service_role` key.
+      - Only available when OAuth 2.1 server is enabled.
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: client_id
+        isOptional: false
+        type: string
+        description: The ID of the OAuth client to retrieve.
+    examples:
+      - id: get-oauth-client
+        name: Get OAuth client
+        code: |
+          ```python
+          response = supabase.auth.admin.oauth.get_client("client-id")
+          ```
+
+  - id: auth-js-gotrueadminoauthapi-deleteclient
+    title: 'admin.oauth.delete_client()'
+    description: |
+      Deletes an OAuth client.
+    notes: |
+      - Requires `service_role` key.
+      - Only available when OAuth 2.1 server is enabled.
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: client_id
+        isOptional: false
+        type: string
+        description: The ID of the OAuth client to delete.
+    examples:
+      - id: delete-oauth-client
+        name: Delete OAuth client
+        code: |
+          ```python
+          supabase.auth.admin.oauth.delete_client("client-id")
+          ```
+
+  - id: auth-js-gotrueadminoauthapi-regenerateclientsecret
+    title: 'admin.oauth.regenerate_client_secret()'
+    description: |
+      Regenerates the client secret for an OAuth client.
+    notes: |
+      - Requires `service_role` key.
+      - Only available when OAuth 2.1 server is enabled.
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: client_id
+        isOptional: false
+        type: string
+        description: The ID of the OAuth client.
+    examples:
+      - id: regenerate-oauth-client-secret
+        name: Regenerate OAuth client secret
+        code: |
+          ```python
+          response = supabase.auth.admin.oauth.regenerate_client_secret("client-id")
+          ```
+
   - id: mfa-delete-factor
     title: 'mfa.delete_factor()'
     params:
@@ -7150,14 +7359,6 @@ functions:
     title: 'Overview'
     notes: |
       This section contains methods for working with File Buckets.
-  # - id: analytics-buckets
-  #   title: 'Overview'
-  #   notes: |
-  #     This section contains methods for working with Analytics Buckets.
-  # - id: vector-buckets
-  #   title: 'Overview'
-  #   notes: |
-  #     This section contains methods for working with Vector Buckets.
 
   - id: list-buckets
     title: 'list_buckets()'
@@ -7765,6 +7966,7 @@ functions:
       - name: options
         isOptional: true
         type: CreateSignedUploadUrlOptions
+        description: Additional options for the upload URL creation.
         subContent:
           - name: upsert
             isOptional: true
@@ -7789,14 +7991,17 @@ functions:
               "token": "<TOKEN>"
           }
           ```
-      - id: create-signed-url-upsert
-        name: Create Signed URL with upsert
+      - id: create-signed-url-with-upsert
+        name: Create Signed URL with upsert option
         code: |
           ```python
           response = (
               supabase.storage
               .from_("avatars")
-              .create_signed_upload_url("folder/avatar1.png", {"upsert": "true"})
+              .create_signed_upload_url(
+                  "folder/avatar1.png",
+                  options={"upsert": "true"}
+              )
           )
           ```
         response: |
@@ -8186,4 +8391,531 @@ functions:
                   }
               )
           )
+          ```
+
+  - id: analytics-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with Analytics Buckets.
+      - Analytics buckets are accessed via the `supabase.storage.analytics()` namespace.
+      - Analytics buckets are used for storing and querying analytics data.
+
+  - id: storageanalytics-createbucket
+    title: 'analytics().create()'
+    description: |
+      Creates a new Analytics bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+      - Analytics buckets are used for storing and querying analytics data.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the analytics bucket to create.
+    examples:
+      - id: create-analytics-bucket
+        name: Create analytics bucket
+        code: |
+          ```python
+          response = supabase.storage.analytics().create("analytics-bucket")
+          ```
+        response: |
+          ```json
+          {
+            "name": "analytics-bucket",
+            "type": "ANALYTICS",
+            "created_at": "2024-12-03T18:00:00.000Z",
+            "updated_at": "2024-12-03T18:00:00.000Z"
+          }
+          ```
+
+  - id: storageanalytics-listbuckets
+    title: 'analytics().list()'
+    description: |
+      Lists all Analytics buckets with optional filtering and sorting.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: limit
+        isOptional: true
+        type: number
+        description: Maximum number of buckets to return.
+      - name: offset
+        isOptional: true
+        type: number
+        description: Number of buckets to skip.
+      - name: sort_column
+        isOptional: true
+        type: string
+        description: 'Column to sort by. Options: `id`, `name`, `created_at`, `updated_at`.'
+      - name: sort_order
+        isOptional: true
+        type: string
+        description: 'Sort order. Options: `asc`, `desc`.'
+      - name: search
+        isOptional: true
+        type: string
+        description: Search term to filter buckets by name.
+    examples:
+      - id: list-analytics-buckets
+        name: List analytics buckets
+        code: |
+          ```python
+          response = supabase.storage.analytics().list()
+          ```
+        response: |
+          ```json
+          [
+            {
+              "name": "analytics-bucket",
+              "type": "ANALYTICS",
+              "created_at": "2024-12-03T18:00:00.000Z",
+              "updated_at": "2024-12-03T18:00:00.000Z"
+            }
+          ]
+          ```
+
+  - id: storageanalytics-deletebucket
+    title: 'analytics().delete()'
+    description: |
+      Deletes an Analytics bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the analytics bucket to delete.
+    examples:
+      - id: delete-analytics-bucket
+        name: Delete analytics bucket
+        code: |
+          ```python
+          response = supabase.storage.analytics().delete("analytics-bucket")
+          ```
+        response: |
+          ```json
+          {
+            "message": "Successfully deleted"
+          }
+          ```
+
+  - id: vector-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with Vector Buckets.
+
+  - id: storagevectors-create-bucket
+    title: 'vectors().create_bucket()'
+    description: |
+      Creates a new Vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+      - Vector buckets are used for storing and querying vector embeddings.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket to create.
+    examples:
+      - id: create-vector-bucket
+        name: Create vector bucket
+        code: |
+          ```python
+          supabase.storage.vectors().create_bucket("vectors-bucket")
+          ```
+
+  - id: storagevectors-get-bucket
+    title: 'vectors().get_bucket()'
+    description: |
+      Retrieves details of a Vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket to retrieve.
+    examples:
+      - id: get-vector-bucket
+        name: Get vector bucket
+        code: |
+          ```python
+          response = supabase.storage.vectors().get_bucket("vectors-bucket")
+          ```
+        response: |
+          ```json
+          {
+            "vectorBucket": {
+              "vectorBucketName": "vectors-bucket",
+              "creationTime": "2024-12-03T18:00:00.000Z"
+            }
+          }
+          ```
+
+  - id: storagevectors-list-buckets
+    title: 'vectors().list_buckets()'
+    description: |
+      Lists all Vector buckets with optional pagination.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: prefix
+        isOptional: true
+        type: string
+        description: Filter buckets by name prefix.
+      - name: max_results
+        isOptional: true
+        type: number
+        description: Maximum number of buckets to return.
+      - name: next_token
+        isOptional: true
+        type: string
+        description: Token for pagination.
+    examples:
+      - id: list-vector-buckets
+        name: List vector buckets
+        code: |
+          ```python
+          response = supabase.storage.vectors().list_buckets()
+          ```
+        response: |
+          ```json
+          {
+            "vectorBuckets": [
+              {
+                "vectorBucketName": "vectors-bucket"
+              }
+            ],
+            "nextToken": null
+          }
+          ```
+
+  - id: storagevectors-delete-bucket
+    title: 'vectors().delete_bucket()'
+    description: |
+      Deletes a Vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket to delete.
+    examples:
+      - id: delete-vector-bucket
+        name: Delete vector bucket
+        code: |
+          ```python
+          supabase.storage.vectors().delete_bucket("vectors-bucket")
+          ```
+
+  - id: vectorbucket-createindex
+    title: 'vectors().from_().create_index()'
+    description: |
+      Creates a new vector index in a vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket.
+      - name: index_name
+        isOptional: false
+        type: string
+        description: The name of the index to create.
+      - name: dimension
+        isOptional: false
+        type: number
+        description: The dimension of the vectors in this index.
+      - name: distance_metric
+        isOptional: false
+        type: string
+        description: 'The distance metric to use. Options: `cosine`, `euclidean`.'
+      - name: data_type
+        isOptional: false
+        type: string
+        description: The data type of the vectors.
+      - name: metadata
+        isOptional: true
+        type: MetadataConfiguration
+        description: Optional metadata configuration for the index.
+    examples:
+      - id: create-vector-index
+        name: Create vector index
+        code: |
+          ```python
+          supabase.storage.vectors().from_("vectors-bucket").create_index(
+              index_name="my-index",
+              dimension=128,
+              distance_metric="cosine",
+              data_type="float32"
+          )
+          ```
+
+  - id: vectorbucket-getindex
+    title: 'vectors().from_().get_index()'
+    description: |
+      Retrieves details of a vector index.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket.
+      - name: index_name
+        isOptional: false
+        type: string
+        description: The name of the index to retrieve.
+    examples:
+      - id: get-vector-index
+        name: Get vector index
+        code: |
+          ```python
+          response = supabase.storage.vectors().from_("vectors-bucket").get_index("my-index")
+          ```
+
+  - id: vectorbucket-listindexes
+    title: 'vectors().from_().list_indexes()'
+    description: |
+      Lists all indexes in a vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket.
+      - name: next_token
+        isOptional: true
+        type: string
+        description: Token for pagination.
+      - name: max_results
+        isOptional: true
+        type: number
+        description: Maximum number of indexes to return.
+      - name: prefix
+        isOptional: true
+        type: string
+        description: Filter indexes by name prefix.
+    examples:
+      - id: list-vector-indexes
+        name: List vector indexes
+        code: |
+          ```python
+          response = supabase.storage.vectors().from_("vectors-bucket").list_indexes()
+          ```
+
+  - id: vectorbucket-deleteindex
+    title: 'vectors().from_().delete_index()'
+    description: |
+      Deletes a vector index.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket.
+      - name: index_name
+        isOptional: false
+        type: string
+        description: The name of the index to delete.
+    examples:
+      - id: delete-vector-index
+        name: Delete vector index
+        code: |
+          ```python
+          supabase.storage.vectors().from_("vectors-bucket").delete_index("my-index")
+          ```
+
+  - id: vectorindex-putvectors
+    title: 'vectors().from_().index().put()'
+    description: |
+      Inserts or updates vectors in an index.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket.
+      - name: index_name
+        isOptional: false
+        type: string
+        description: The name of the index.
+      - name: vectors
+        isOptional: false
+        type: list[VectorObject]
+        description: List of vector objects to insert or update.
+    examples:
+      - id: put-vectors
+        name: Put vectors
+        code: |
+          ```python
+          supabase.storage.vectors().from_("vectors-bucket").index("my-index").put([
+              {
+                  "key": "vector-1",
+                  "data": {"float32": [0.1, 0.2, 0.3]},
+                  "metadata": {"category": "example"}
+              }
+          ])
+          ```
+
+  - id: vectorindex-getvectors
+    title: 'vectors().from_().index().get()'
+    description: |
+      Retrieves vectors by their keys.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket.
+      - name: index_name
+        isOptional: false
+        type: string
+        description: The name of the index.
+      - name: keys
+        isOptional: false
+        type: list[string]
+        description: List of vector keys to retrieve.
+      - name: return_data
+        isOptional: true
+        type: bool
+        description: Whether to return vector data. Defaults to `true`.
+      - name: return_metadata
+        isOptional: true
+        type: bool
+        description: Whether to return metadata. Defaults to `true`.
+    examples:
+      - id: get-vectors
+        name: Get vectors
+        code: |
+          ```python
+          response = supabase.storage.vectors().from_("vectors-bucket").index("my-index").get("vector-1")
+          ```
+
+  - id: vectorindex-listvectors
+    title: 'vectors().from_().index().list()'
+    description: |
+      Lists vectors in an index with optional pagination.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket.
+      - name: index_name
+        isOptional: false
+        type: string
+        description: The name of the index.
+      - name: max_results
+        isOptional: true
+        type: number
+        description: Maximum number of vectors to return.
+      - name: next_token
+        isOptional: true
+        type: string
+        description: Token for pagination.
+      - name: return_data
+        isOptional: true
+        type: bool
+        description: Whether to return vector data. Defaults to `true`.
+      - name: return_metadata
+        isOptional: true
+        type: bool
+        description: Whether to return metadata. Defaults to `true`.
+      - name: segment_count
+        isOptional: true
+        type: number
+        description: Number of segments for distributed queries.
+      - name: segment_index
+        isOptional: true
+        type: number
+        description: Segment index for distributed queries.
+    examples:
+      - id: list-vectors
+        name: List vectors
+        code: |
+          ```python
+          response = supabase.storage.vectors().from_("vectors-bucket").index("my-index").list()
+          ```
+
+  - id: vectorindex-queryvectors
+    title: 'vectors().from_().index().query()'
+    description: |
+      Queries vectors using a query vector to find similar vectors.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket.
+      - name: index_name
+        isOptional: false
+        type: string
+        description: The name of the index.
+      - name: query_vector
+        isOptional: false
+        type: VectorData
+        description: The query vector to search with.
+      - name: topK
+        isOptional: true
+        type: number
+        description: Number of results to return.
+      - name: filter
+        isOptional: true
+        type: VectorFilter
+        description: Optional filter to apply to the query.
+      - name: return_distance
+        isOptional: true
+        type: bool
+        description: Whether to return distance scores. Defaults to `true`.
+      - name: return_metadata
+        isOptional: true
+        type: bool
+        description: Whether to return metadata. Defaults to `true`.
+    examples:
+      - id: query-vectors
+        name: Query vectors
+        code: |
+          ```python
+          response = supabase.storage.vectors().from_("vectors-bucket").index("my-index").query(
+              query_vector={"float32": [0.1, 0.2, 0.3]},
+              topK=10
+          )
+          ```
+
+  - id: vectorindex-deletevectors
+    title: 'vectors().from_().index().delete()'
+    description: |
+      Deletes vectors by their keys.
+    notes: |
+      - This is an alpha feature and may change in the future.
+      - Keys batch size must be between 1 and 500.
+    params:
+      - name: bucket_name
+        isOptional: false
+        type: string
+        description: The name of the vector bucket.
+      - name: index_name
+        isOptional: false
+        type: string
+        description: The name of the index.
+      - name: keys
+        isOptional: false
+        type: list[string]
+        description: List of vector keys to delete. Must contain between 1 and 500 keys.
+    examples:
+      - id: delete-vectors
+        name: Delete vectors
+        code: |
+          ```python
+          supabase.storage.vectors().from_("vectors-bucket").index("my-index").delete(["vector-1", "vector-2"])
           ```

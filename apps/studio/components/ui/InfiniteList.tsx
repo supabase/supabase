@@ -89,6 +89,7 @@ type InfiniteListWrapperProps<Item, Component extends ElementType = 'div'> = {
   items: Item[]
   getItemKey?: (index: number) => string
   getItemSize: (index: number) => number
+  gap?: number
   hasNextPage?: boolean
   isLoadingNextPage?: boolean
   onLoadNextPage?: () => void
@@ -100,6 +101,7 @@ export const InfiniteListScrollWrapper = <Item, Wrapper extends ElementType = 'd
   items,
   getItemKey,
   getItemSize,
+  gap,
   hasNextPage = false,
   isLoadingNextPage = false,
   onLoadNextPage = () => {},
@@ -114,6 +116,7 @@ export const InfiniteListScrollWrapper = <Item, Wrapper extends ElementType = 'd
     getItemKey,
     estimateSize: getItemSize,
     overscan: 5,
+    gap,
   })
 
   const virtualItems = rowVirtualizer.getVirtualItems()
@@ -304,6 +307,7 @@ type InfiniteListDefaultProps<Item, ItemComponentProps extends object = Record<s
   itemProps?: ItemComponentProps
   getItemKey?: (index: number) => string
   getItemSize: (index: number) => number
+  gap?: number
   hasNextPage?: boolean
   isLoadingNextPage?: boolean
   onLoadNextPage?: () => void
@@ -320,6 +324,7 @@ export const InfiniteListDefault = <
   itemProps,
   getItemKey,
   getItemSize,
+  gap,
   hasNextPage = false,
   isLoadingNextPage = false,
   onLoadNextPage = () => {},
@@ -332,6 +337,7 @@ export const InfiniteListDefault = <
       items={items}
       getItemKey={getItemKey}
       getItemSize={getItemSize}
+      gap={gap}
       hasNextPage={hasNextPage}
       isLoadingNextPage={isLoadingNextPage}
       onLoadNextPage={onLoadNextPage}

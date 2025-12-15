@@ -1,11 +1,12 @@
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import { useFDWDropForeignTableMutation } from 'data/fdw/fdw-drop-foreign-table-mutation'
 import { useVectorBucketIndexDeleteMutation } from 'data/storage/vector-bucket-index-delete-mutation'
 import { VectorBucketIndex } from 'data/storage/vector-buckets-indexes-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { getVectorBucketFDWSchemaName } from './VectorBuckets.utils'
+import { useS3VectorsWrapperInstance } from './useS3VectorsWrapperInstance'
 
 interface DeleteVectorTableModalProps {
   visible: boolean
@@ -18,22 +19,34 @@ export const DeleteVectorTableModal = ({
   table,
   onClose,
 }: DeleteVectorTableModalProps) => {
+  const { bucketId } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { mutate: deleteForeignTable } = useFDWDropForeignTableMutation({
+  const { data: wrapperInstance } = useS3VectorsWrapperInstance({ bucketId })
+  const foreignTable = wrapperInstance?.tables?.find((x) => x.name === table?.indexName)
+
+  const { mutateAsync: deleteForeignTable } = useFDWDropForeignTableMutation({
     onError: () => {},
   })
 
   const { mutate: deleteIndex, isPending: isDeleting } = useVectorBucketIndexDeleteMutation({
     onSuccess: (_, vars) => {
-      deleteForeignTable({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        schemaName: getVectorBucketFDWSchemaName(vars.bucketName),
-        tableName: vars.indexName,
-      })
-      toast.success(`Table "${vars.indexName}" deleted successfully`)
-      onClose()
+      try {
+        if (!!foreignTable) {
+          deleteForeignTable({
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            schemaName: foreignTable.schema,
+            tableName: foreignTable.name,
+          })
+        }
+        toast.success(`Table "${vars.indexName}" deleted successfully`)
+        onClose()
+      } catch (error: any) {
+        toast.success(
+          `Table "${vars.indexName}" deleted successfully, but its corresponding foreign table failed to clean up: ${error.message}`
+        )
+      }
     },
   })
 
