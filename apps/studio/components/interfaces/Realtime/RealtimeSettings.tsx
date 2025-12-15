@@ -155,7 +155,7 @@ export const RealtimeSettings = () => {
             <AlertError error={error} subject="Failed to retrieve realtime settings" />
           ) : (
             <Card>
-              <CardContent>
+              <CardContent className="space-y-4">
                 <FormField_Shadcn_
                   control={form.control}
                   name="suspend"
@@ -175,38 +175,38 @@ export const RealtimeSettings = () => {
                         </FormControl_Shadcn_>
                       </FormItemLayout>
                       <FormMessage_Shadcn_ />
-                      {(isRealtimeDisabled || isDisablingRealtime || isEnablingRealtime) && (
-                        <Admonition
-                          showIcon={false}
-                          type={isDisablingRealtime || isEnablingRealtime ? 'warning' : 'default'}
-                        >
-                          <div className="flex items-center gap-x-2">
-                            <div>
-                              <h5 className="text-foreground mb-1">
-                                {isDisablingRealtime
-                                  ? 'Realtime service will be disabled'
-                                  : isEnablingRealtime
-                                    ? 'Realtime service will be re-enabled'
-                                    : isRealtimeDisabled
-                                      ? 'Realtime service is disabled'
-                                      : null}
-                              </h5>
-                              <p className="text-foreground-light">
-                                {isDisablingRealtime
-                                  ? 'Clients will no longer be able to connect to your project’s realtime service once saved'
-                                  : isEnablingRealtime
-                                    ? "Clients will be able to connect to your project's realtime service again once saved"
-                                    : isRealtimeDisabled
-                                      ? 'You will need to enable it to continue using Realtime'
-                                      : null}
-                              </p>
-                            </div>
-                          </div>
-                        </Admonition>
-                      )}
                     </>
                   )}
                 />
+                {(isRealtimeDisabled || isDisablingRealtime || isEnablingRealtime) && (
+                  <Admonition
+                    showIcon={false}
+                    type={isDisablingRealtime || isEnablingRealtime ? 'warning' : 'default'}
+                  >
+                    <div className="flex items-center gap-x-2">
+                      <div>
+                        <h5 className="text-foreground mb-1">
+                          {isDisablingRealtime
+                            ? 'Realtime service will be disabled'
+                            : isEnablingRealtime
+                              ? 'Realtime service will be re-enabled'
+                              : isRealtimeDisabled
+                                ? 'Realtime service is disabled'
+                                : null}
+                        </h5>
+                        <p className="text-foreground-light">
+                          {isDisablingRealtime
+                            ? 'Clients will no longer be able to connect to your project’s realtime service once saved'
+                            : isEnablingRealtime
+                              ? "Clients will be able to connect to your project's realtime service again once saved"
+                              : isRealtimeDisabled
+                                ? 'You will need to enable it to continue using Realtime'
+                                : null}
+                        </p>
+                      </div>
+                    </div>
+                  </Admonition>
+                )}
               </CardContent>
 
               {!suspend && (
