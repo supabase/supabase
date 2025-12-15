@@ -1,9 +1,8 @@
 {
   "imports": {
     "@hono/mcp": "npm:@hono/mcp@^0.1.1",
-    "@modelcontextprotocol/sdk": "npm:/@modelcontextprotocol/sdk@^1.17.3",
-    "@modelcontextprotocol/sdk/": "npm:/@modelcontextprotocol/sdk@^1.17.3/",
+    "@modelcontextprotocol/sdk": "npm:/@modelcontextprotocol/sdk@^1.24.3",
     "hono": "npm:hono@^4.9.2",
-    "zod": "npm:zod@^3.25.76"
+    "zod": "npm:zod@^4.1.13"
   }
 }

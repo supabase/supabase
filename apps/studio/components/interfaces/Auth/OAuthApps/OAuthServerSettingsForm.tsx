@@ -186,9 +186,9 @@ export const OAuthServerSettingsForm = () => {
   return (
     <>
       <Form_Shadcn_ {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="pb-10">
+        <form onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
-            <CardContent className="flex flex-col py-6 gap-y-4">
+            <CardContent>
               <FormField_Shadcn_
                 control={form.control}
                 name="OAUTH_SERVER_ENABLED"
@@ -220,9 +220,10 @@ export const OAuthServerSettingsForm = () => {
             {/* Site URL and Authorization Path - Only show when OAuth Server is enabled */}
             {form.watch('OAUTH_SERVER_ENABLED') && (
               <>
-                <CardContent className="flex flex-col py-6 gap-y-4">
+                <CardContent>
                   <FormItemLayout
                     label="Site URL"
+                    layout="flex-row-reverse"
                     description={
                       <>
                         The base URL of your application, configured in{' '}
@@ -243,13 +244,15 @@ export const OAuthServerSettingsForm = () => {
                       placeholder="https://example.com"
                     />
                   </FormItemLayout>
-
+                </CardContent>
+                <CardContent className="space-y-4">
                   <FormField_Shadcn_
                     control={form.control}
                     name="OAUTH_SERVER_AUTHORIZATION_PATH"
                     render={({ field }) => (
                       <FormItemLayout
                         label="Authorization Path"
+                        layout="flex-row-reverse"
                         description="Path where you'll implement the OAuth authorization UI (consent screens)."
                       >
                         <FormControl_Shadcn_>
@@ -281,7 +284,7 @@ export const OAuthServerSettingsForm = () => {
                     )
                   })()}
                 </CardContent>
-                <CardContent className="py-6">
+                <CardContent>
                   <FormField_Shadcn_
                     control={form.control}
                     name="OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION"
