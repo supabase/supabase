@@ -126,8 +126,9 @@ const AlertDialogDescription = React.forwardRef<
       'text-sm text-foreground-light px-5',
       // Optically align text
       ' pt-3.5 pb-4',
-      // Handle paragraphs and other contents
-      'flex flex-col gap-y-3',
+      // Handle paragraphs and other block-level contents without breaking inline flow
+      // This adds spacing between block-level siblings (p, ul, div, etc.) but preserves inline text flow
+      '[&>*+*]:mt-3',
       className
     )}
     {...props}
