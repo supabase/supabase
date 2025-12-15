@@ -118,7 +118,7 @@ export const General = () => {
             <GenericSkeletonLoader />
           ) : (
             <Form_Shadcn_ {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(onSubmit)}>
                 <Card>
                   <CardContent>
                     <FormField_Shadcn_
