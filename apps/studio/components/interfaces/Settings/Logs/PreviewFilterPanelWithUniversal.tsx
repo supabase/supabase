@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { Button, Calendar, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
