@@ -102,7 +102,7 @@ function FloatingStatBubbles() {
   const [bubbles, setBubbles] = useState<FloatingStatBubble[]>([])
   const bubbleIdRef = useRef(0)
   const usedStatIndicesRef = useRef<Set<number>>(new Set())
-  const lifetimeTimersRef = useRef<Set<NodeJS.Timeout>>(new Set())
+  const lifetimeTimersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set())
 
   useEffect(() => {
     const spawnBubble = () => {
@@ -139,7 +139,7 @@ function FloatingStatBubbles() {
 
     const initialTimers = BUBBLE_CONFIG.initialDelays.map((delay) => setTimeout(spawnBubble, delay))
 
-    let intervalId: NodeJS.Timeout
+    let intervalId: ReturnType<typeof setTimeout>
     const scheduleNextSpawn = () => {
       intervalId = setTimeout(
         () => {
@@ -196,7 +196,7 @@ function FloatingStatBubbles() {
 
 export function Home() {
   return (
-    <div className="h-[calc(100vh-64px)] flex flex-col max-w-[60rem] mx-auto w-full">
+    <div className="h-[calc(100dvh-64px)] flex flex-col max-w-[60rem] mx-auto w-full">
       <section className="relative border-x border-b h-full">
         {/* Grid background */}
         <AnimatedGridBackground

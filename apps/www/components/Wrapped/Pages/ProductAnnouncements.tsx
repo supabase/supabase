@@ -255,7 +255,7 @@ const months: Month[] = [
 function MonthSection({ month }: { month: Month }) {
   return (
     <div>
-      <div className="px-6 lg:px-8 py-2.5 md:py-4 flex items-center gap-3">
+      <div className="px-6 lg:px-8 py-2.5 md:py-4 flex flex-wrap items-center gap-1 [&>*]:whitespace-nowrap [&>*]:mr-2">
         <span className="text-base font-medium">{month.name}</span>
         {month.isLaunchWeek && (
           <span className="text-xs bg-brand/10 text-brand-link dark:text-brand px-2 py-0.5 rounded-full">
@@ -342,13 +342,14 @@ export const ProductAnnouncements = () => {
                 reordered.push(months[i + half])
               }
             }
+            const lastRow = Math.floor((reordered.length - 1) / 2)
             return reordered.map((month, index) => (
               <div
                 key={`desktop-${month.name}`}
                 className={cn(
                   'hidden lg:block border-b border-muted lg:border-r',
                   'lg:[&:nth-child(2n)]:border-r-0',
-                  index >= reordered.length - 2 && 'lg:border-b-0',
+                  Math.floor(index / 2) === lastRow && 'lg:border-b-0',
                   index === reordered.length - 1 && 'border-b-0'
                 )}
               >
