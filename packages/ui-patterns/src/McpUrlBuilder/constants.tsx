@@ -248,7 +248,8 @@ export const MCP_CLIENTS: McpClient[] = [
       return (
         <div className="space-y-2">
           <p className="text-xs text-foreground-light">
-            After installation, authenticate the server:
+            After installation, start the Gemini CLI and run the following command to authenticate
+            the server:
           </p>
           <CodeBlock
             value="/mcp auth supabase"

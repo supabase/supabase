@@ -156,6 +156,14 @@ export function isCodexMcpConfig(config: McpClientConfig): config is CodexMcpCon
   return 'mcp_servers' in config && 'supabase' in config.mcp_servers
 }
 
+export function isGeminiMcpConfig(config: McpClientConfig): config is GeminiMcpConfig {
+  return (
+    'mcpServers' in config &&
+    'supabase' in config.mcpServers &&
+    'httpUrl' in config.mcpServers.supabase
+  )
+}
+
 export function isMcpServersConfig(
   config: McpClientConfig
 ): config is McpClientBaseConfig | ClaudeCodeMcpConfig | FactoryMcpConfig {
@@ -172,6 +180,9 @@ export function getMcpUrl(config: McpClientConfig): string {
   }
   if (isCodexMcpConfig(config)) {
     return config.mcp_servers.supabase.url
+  }
+  if (isGeminiMcpConfig(config)) {
+    return config.mcpServers.supabase.httpUrl
   }
   if (isMcpServersConfig(config)) {
     return config.mcpServers.supabase.url
