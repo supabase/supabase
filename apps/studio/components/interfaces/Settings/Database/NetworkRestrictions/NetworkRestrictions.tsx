@@ -5,9 +5,6 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -16,6 +13,10 @@ import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -28,6 +29,14 @@ import AddRestrictionModal from './AddRestrictionModal'
 import AllowAllModal from './AllowAllModal'
 import DisallowAllModal from './DisallowAllModal'
 import RemoveRestrictionModal from './RemoveRestrictionModal'
+import {
+  PageSection,
+  PageSectionAside,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns'
 
 interface AccessButtonProps {
   disabled: boolean
@@ -102,14 +111,12 @@ export const NetworkRestrictions = () => {
 
   return (
     <>
-      <section id="network-restrictions">
-        <div className="flex items-center justify-between mb-6">
-          <FormHeader
-            className="mb-0"
-            title="Network Restrictions"
-            description="Allow specific IP ranges to have access to your database."
-          />
-          <div className="flex items-center gap-x-2">
+      <PageSection id="network-restrictions">
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Network Restrictions</PageSectionTitle>
+          </PageSectionSummary>
+          <PageSectionAside className="flex items-center gap-x-2">
             <DocsButton href={`${DOCS_URL}/guides/platform/network-restrictions`} />
             {!canUpdateNetworkRestrictions ? (
               <ButtonTooltip
@@ -153,104 +160,32 @@ export const NetworkRestrictions = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-          </div>
-        </div>
-        {isLoading ? (
-          <Panel>
-            <Panel.Content>
-              <div className="space-y-2">
-                <ShimmeringLoader />
-                <ShimmeringLoader className="w-[70%]" />
-                <ShimmeringLoader className="w-[50%]" />
-              </div>
-            </Panel.Content>
-          </Panel>
-        ) : hasApplyError ? (
-          <Panel>
-            <Panel.Content>
-              <div className="flex items-center justify-between">
+          </PageSectionAside>
+        </PageSectionMeta>
+        <PageSectionContent>
+          {isLoading ? (
+            <Card>
+              <CardContent>
                 <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <AlertCircle size={20} strokeWidth={1.5} className="text-foreground-light" />
-                    <p className="text-sm">Your network restrictions were not applied correctly</p>
-                  </div>
-                  <p className="text-sm text-foreground-light">
-                    Please try to add your network restrictions again
-                  </p>
+                  <ShimmeringLoader />
+                  <ShimmeringLoader className="w-[70%]" />
+                  <ShimmeringLoader className="w-[50%]" />
                 </div>
-                <div className="flex items-center space-x-2">
-                  <AllowAllAccessButton
-                    disabled={!canUpdateNetworkRestrictions}
-                    onClick={setIsAllowingAll}
-                  />
-                  <DisallowAllAccessButton
-                    disabled={!canUpdateNetworkRestrictions}
-                    onClick={setIsDisallowingAll}
-                  />
-                </div>
-              </div>
-            </Panel.Content>
-          </Panel>
-        ) : (
-          <FormPanel>
-            {isUninitialized || isAllowedAll ? (
-              <div className="px-8 py-8 flex items-center justify-between">
-                <div className="flex items-start space-x-4">
-                  <div className="space-y-1">
-                    <p className="text-foreground-light text-sm">
-                      Your database can be accessed by all IP addresses
-                    </p>
-                    <p className="text-foreground-light text-sm">
-                      You may start limiting access to your database by adding a network
-                      restriction.
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <DisallowAllAccessButton
-                    disabled={!canUpdateNetworkRestrictions}
-                    onClick={setIsDisallowingAll}
-                  />
-                </div>
-              </div>
-            ) : isDisallowedAll ? (
-              <div className="px-8 py-8 flex items-center justify-between">
-                <div className="flex items-start space-x-4">
-                  <Lock size={20} className="text-foreground-light" strokeWidth={1.5} />
-                  <div className="space-y-1">
-                    <p className="text-foreground-light text-sm">
-                      Your database <span className="text-amber-900 opacity-80">cannot</span> be
-                      accessed externally
-                    </p>
-                    <p className="text-foreground-light text-sm">
-                      All external IP addresses have been disallowed from accessing your project's
-                      database.
-                    </p>
-                    <p className="text-foreground-light text-sm">
-                      Note: Restrictions only apply to your database, and not to Supabase services
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <AllowAllAccessButton
-                    disabled={!canUpdateNetworkRestrictions}
-                    onClick={setIsAllowingAll}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="divide-y">
-                <div className="px-8 py-3 flex items-center justify-between">
-                  <div>
-                    <p className="text-foreground-light text-sm">
-                      Only the following IP addresses have access to your database
-                    </p>
-                    <p className="text-foreground-light text-sm">
-                      You may remove all of them to allow all IP addresses to have access to your
-                      database
-                    </p>
-                    <p className="text-foreground-light text-sm">
-                      Note: Restrictions only apply to your database, and not to Supabase services
+              </CardContent>
+            </Card>
+          ) : hasApplyError ? (
+            <Card>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <AlertCircle size={20} strokeWidth={1.5} className="text-foreground-light" />
+                      <p className="text-sm">
+                        Your network restrictions were not applied correctly
+                      </p>
+                    </div>
+                    <p className="text-sm text-foreground-light">
+                      Please try to add your network restrictions again
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -264,25 +199,106 @@ export const NetworkRestrictions = () => {
                     />
                   </div>
                 </div>
-                {restrictedIps.map((ip) => {
-                  return (
-                    <div key={ip} className="px-8 py-4 flex items-center justify-between">
-                      <div className="flex items-center space-x-5">
-                        <Globe size={16} className="text-foreground-light" />
-                        <Badge>{ipv4Restrictions.includes(ip) ? 'IPv4' : 'IPv6'}</Badge>
-                        <p className="text-sm font-mono">{ip}</p>
-                      </div>
-                      <Button type="default" onClick={() => setSelectedRestrictionToRemove(ip)}>
-                        Remove
-                      </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              {isUninitialized || isAllowedAll ? (
+                <CardContent className="flex items-center justify-between">
+                  <div className="flex items-start space-x-4">
+                    <div className="space-y-1">
+                      <p className="text-foreground-light text-sm">
+                        Your database can be accessed by all IP addresses
+                      </p>
+                      <p className="text-foreground-light text-sm">
+                        You may start limiting access to your database by adding a network
+                        restriction.
+                      </p>
                     </div>
-                  )
-                })}
-              </div>
-            )}
-          </FormPanel>
-        )}
-      </section>
+                  </div>
+                  <div>
+                    <DisallowAllAccessButton
+                      disabled={!canUpdateNetworkRestrictions}
+                      onClick={setIsDisallowingAll}
+                    />
+                  </div>
+                </CardContent>
+              ) : isDisallowedAll ? (
+                <CardContent className="flex items-center justify-between">
+                  <div className="flex items-start space-x-4">
+                    <Lock size={20} className="text-foreground-light" strokeWidth={1.5} />
+                    <div className="space-y-1">
+                      <p className="text-foreground-light text-sm">
+                        Your database <span className="text-amber-900 opacity-80">cannot</span> be
+                        accessed externally
+                      </p>
+                      <p className="text-foreground-light text-sm">
+                        All external IP addresses have been disallowed from accessing your project's
+                        database.
+                      </p>
+                      <p className="text-foreground-light text-sm">
+                        Note: Restrictions only apply to your database, and not to Supabase services
+                      </p>
+                    </div>
+                  </div>
+                  <div>
+                    <AllowAllAccessButton
+                      disabled={!canUpdateNetworkRestrictions}
+                      onClick={setIsAllowingAll}
+                    />
+                  </div>
+                </CardContent>
+              ) : (
+                <>
+                  <CardHeader className="md:flex-row md:items-center justify-between">
+                    <CardDescription className="text-foreground-light">
+                      <p>Only the following IP addresses have access to your database.</p>
+                      <p>
+                        You may remove all of them to allow all IP addresses to have access to your
+                        database.
+                      </p>
+                      <p>
+                        Note: Restrictions only apply to your database, and not to Supabase services
+                      </p>
+                    </CardDescription>
+                    <div className="flex items-center space-x-2">
+                      <AllowAllAccessButton
+                        disabled={!canUpdateNetworkRestrictions}
+                        onClick={setIsAllowingAll}
+                      />
+                      <DisallowAllAccessButton
+                        disabled={!canUpdateNetworkRestrictions}
+                        onClick={setIsDisallowingAll}
+                      />
+                    </div>
+                  </CardHeader>
+                  <CardContent className="py-0">
+                    <div className="divide-y">
+                      {restrictedIps.map((ip) => {
+                        return (
+                          <div key={ip} className="py-4 flex items-center justify-between">
+                            <div className="flex items-center space-x-5">
+                              <Globe size={16} className="text-foreground-lighter" />
+                              <Badge>{ipv4Restrictions.includes(ip) ? 'IPv4' : 'IPv6'}</Badge>
+                              <p className="text-sm font-mono">{ip}</p>
+                            </div>
+                            <Button
+                              type="default"
+                              onClick={() => setSelectedRestrictionToRemove(ip)}
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </CardContent>
+                </>
+              )}
+            </Card>
+          )}
+        </PageSectionContent>
+      </PageSection>
 
       <AllowAllModal visible={isAllowingAll} onClose={() => setIsAllowingAll(false)} />
       <DisallowAllModal visible={isDisallowingAll} onClose={() => setIsDisallowingAll(false)} />

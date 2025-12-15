@@ -344,6 +344,7 @@ allow_list = [
     "Xcode",
     "Yang",
     "Zapier",
+    "Zod",
     "ZeptoMail",
     "asyncpg",
     "bcrypt",

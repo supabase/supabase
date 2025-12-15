@@ -159,7 +159,7 @@ const AttributeUsage = ({
                     )}
 
                     <div>
-                      {usageMeta && (
+                      {usageMeta && usageMeta.pricing_free_units !== 0 && (
                         <div className="flex items-center justify-between border-b py-1">
                           <p className="text-xs text-foreground-light">
                             Included in {subscription?.plan?.name} Plan

@@ -48,6 +48,7 @@ import { FeaturePreviewContextProvider } from 'components/interfaces/App/Feature
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from 'components/interfaces/App/RouteValidationWrapper'
+import { MainScrollContainerProvider } from 'components/layouts/MainScrollContainerContext'
 import { GlobalErrorBoundaryState } from 'components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { useRootQueryClient } from 'data/query-client'
 import { customFont, sourceCodePro } from 'fonts'
@@ -160,7 +161,9 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         <AppBannerContextProvider>
                           <CommandProvider>
                             <FeaturePreviewContextProvider>
-                              {getLayout(<Component {...pageProps} />)}
+                              <MainScrollContainerProvider>
+                                {getLayout(<Component {...pageProps} />)}
+                              </MainScrollContainerProvider>
                               <StudioCommandMenu />
                               <FeaturePreviewModal />
                             </FeaturePreviewContextProvider>

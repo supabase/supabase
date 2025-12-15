@@ -112,7 +112,17 @@ export const PostgrestConfig = () => {
     })
 
   const formId = 'project-postgres-config'
-  const hiddenSchema = ['auth', 'pgbouncer', 'hooks', 'extensions']
+  const hiddenSchema = [
+    'auth',
+    'pgbouncer',
+    'hooks',
+    'extensions',
+    'vault',
+    'storage',
+    'realtime',
+    'pgsodium',
+    'pgsodium_masks',
+  ]
   const { can: canUpdatePostgrestConfig, isSuccess: isPermissionsLoaded } =
     useAsyncCheckPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
 
@@ -206,7 +216,7 @@ export const PostgrestConfig = () => {
                   render={({ field }) => (
                     <FormItem_Shadcn_ className="w-full">
                       <FormItemLayout
-                        className="w-full px-8 py-8"
+                        className="w-full px-[var(--card-padding-x)] py-4"
                         layout="flex"
                         label="Enable Data API"
                         description="When enabled you will be able to use any Supabase client library and PostgREST endpoints with any schema configured below."
@@ -269,7 +279,7 @@ export const PostgrestConfig = () => {
                             description="The schemas to expose in your API. Tables, views and stored procedures in
                           these schemas will get API endpoints."
                             layout="horizontal"
-                            className="px-8 py-8"
+                            className="px-[var(--card-padding-x)] py-4"
                           >
                             {isLoadingSchemas ? (
                               <div className="col-span-12 flex flex-col gap-2 lg:col-span-7">
@@ -348,7 +358,7 @@ export const PostgrestConfig = () => {
                       render={({ field }) => (
                         <FormItem_Shadcn_ className="w-full">
                           <FormItemLayout
-                            className="w-full px-8 py-8"
+                            className="w-full px-[var(--card-padding-x)] py-4"
                             layout="horizontal"
                             label="Extra search path"
                             description="Extra schemas to add to the search path of every request."
@@ -399,7 +409,7 @@ export const PostgrestConfig = () => {
                       render={({ field }) => (
                         <FormItem_Shadcn_ className="w-full">
                           <FormItemLayout
-                            className="w-full px-8 py-8"
+                            className="w-full px-[var(--card-padding-x)] py-4"
                             layout="horizontal"
                             label="Max rows"
                             description="The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests."
@@ -426,7 +436,7 @@ export const PostgrestConfig = () => {
                       render={({ field }) => (
                         <FormItem_Shadcn_ className="w-full">
                           <FormItemLayout
-                            className="w-full px-8 py-8"
+                            className="w-full px-[var(--card-padding-x)] py-4"
                             layout="horizontal"
                             label="Pool size"
                             description="Number of maximum connections to keep open in the Data API server's database pool. Unset to let it be configured automatically based on compute size."
