@@ -72,7 +72,16 @@ const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
               ? `https://vercel.com/api/www/avatar?teamId=${integration.metadata.account.team_id}&s=48`
               : `https://vercel.com/api/www/avatar/${integration.metadata.account.avatar}?s=48`
 
-          integration['metadata']['account']['avatar'] = avatarSrc
+          return {
+            ...integration,
+            metadata: {
+              ...integration.metadata,
+              account: {
+                ...integration.metadata.account,
+                avatar: avatarSrc,
+              },
+            },
+          }
         }
 
         return integration
