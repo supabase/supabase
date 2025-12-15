@@ -61,20 +61,19 @@ export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) 
       </Button>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Reset and restart table "{tableName}"?</AlertDialogTitle>
-          <AlertDialogDescription className="flex flex-col gap-y-3 py-4 !mt-0">
+          <AlertDialogTitle>Reset and restart table</AlertDialogTitle>
+          <AlertDialogDescription>
             <p>
-              This will reset and restart replication for this table only. The table will start
-              copying from scratch, and any existing data for this table downstream will be deleted.
+              This will reset and restart replication for{' '}
+              <code className="text-code-inline">{tableName}</code> only. This table will start
+              copying from scratch, and any existing data for it downstream will be deleted.
             </p>
-            <p className="text-foreground-light">
+            <p>
               Other tables in the pipeline will not be affected. Only this table will be restarted
               and go through the full replication process again, starting with the initial copy
               phase.
             </p>
-            <p className="text-foreground-light">
-              The pipeline will be restarted to apply the table reset.
-            </p>
+            <p>The pipeline will be restarted to apply the table reset.</p>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -82,7 +81,7 @@ export const ResetTableButton = ({ tableId, tableName }: ResetTableButtonProps) 
           <AlertDialogAction
             disabled={isResetting}
             onClick={handleReset}
-            className="bg-destructive hover:bg-destructive/90"
+            type="danger"
           >
             {isRollingBack
               ? 'Resetting table...'

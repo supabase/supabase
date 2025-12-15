@@ -113,7 +113,7 @@ export const ToggleLegacyApiKeysPanel = () => {
             <AlertDialogTitle>Apps using Supabase may break</AlertDialogTitle>
             <AlertDialogDescription>
               Your project uses apps that integrate with Supabase. Disabling the legacy API keys is
-              a brand new feature and the apps you're using may not have added support for this yet.
+              a brand new feature and the apps you’re using may not have added support for this yet.
               It can cause them to stop functioning. Check before continuing.
             </AlertDialogDescription>
           </AlertDialogHeader>
