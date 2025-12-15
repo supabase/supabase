@@ -94,8 +94,9 @@ export const Grid = memo(
         'columns'
       )
 
-      const hasPermissionToImportData = canEditTables && canEditColumns
       const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema ?? '' })
+
+      const hasPermissionToImportData = canEditTables && canEditColumns
       const canImportData = !isSchemaLocked && isSelectedTable && hasPermissionToImportData
 
       const { mutate: sendEvent } = useSendEventMutation()
