@@ -9,8 +9,7 @@ import { ProtectedSchemaWarning } from 'components/interfaces/Database/Protected
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
 import NoPermission from 'components/ui/NoPermission'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { isTableLike } from 'data/table-editor/table-editor-types'
+import { isTableLike, isForeignTable } from 'data/table-editor/table-editor-types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -81,9 +80,8 @@ export const Grid = memo(
 
       const page = snap.page
       const table = snap.table
-      const tableEntityType = snap.originalTable?.entity_type
       const isSelectedTable = isTableLike(snap.originalTable)
-      const isForeignTable = tableEntityType === ENTITY_TYPE.FOREIGN_TABLE
+      const isSelectedForeignTable = isForeignTable(snap.originalTable)
       const isTableEmpty = (rows ?? []).length === 0
 
       const { can: canEditTables } = useAsyncCheckPermissions(
@@ -228,7 +226,7 @@ export const Grid = memo(
                               'This table is empty'
                             )}
                           </p>
-                          {tableEntityType === ENTITY_TYPE.FOREIGN_TABLE ? (
+                          {isSelectedForeignTable ? (
                             <div className="flex items-center space-x-2 mt-4">
                               <p className="text-sm text-light pointer-events-auto">
                                 This table is a foreign table. Add data to the connected source to
