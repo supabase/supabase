@@ -124,11 +124,8 @@ const AlertDialogDescription = React.forwardRef<
     ref={ref}
     className={cn(
       'text-sm text-foreground-light px-5',
-      // Optically align text
+      // Optically align text vertically
       ' pt-3.5 pb-4',
-      // Handle paragraphs and other block-level contents without breaking inline flow
-      // This adds spacing between block-level siblings (p, ul, div, etc.) but preserves inline text flow
-      '[&>*+*]:mt-3',
       className
     )}
     {...props}
