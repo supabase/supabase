@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react'
+import type { PropsWithChildren, ReactElement } from 'react'
 
 import {
   cn,
@@ -9,8 +9,8 @@ import {
 
 type ToolProps = PropsWithChildren<{
   className?: string
-  label: string | JSX.Element
-  icon?: JSX.Element
+  label: string | ReactElement
+  icon?: ReactElement
 }>
 
 export function Tool({ className, label, icon, children }: ToolProps) {

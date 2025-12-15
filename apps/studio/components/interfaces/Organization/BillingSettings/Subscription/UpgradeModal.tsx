@@ -10,7 +10,7 @@ import { generateUpgradeReasons } from '../helpers'
 
 export interface UpgradeSurveyModalProps {
   visible: boolean
-  originalPlan?: string
+  originalPlan?: string | null
   subscription?: OrgSubscription
   onClose: (success?: boolean) => void
 }

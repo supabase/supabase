@@ -1,7 +1,7 @@
-import { ReactText } from 'react'
+import type { ReactElement, ReactText } from 'react'
 
 interface Props {
-  icon: JSX.Element
+  icon: ReactElement
   text: ReactText
 }
 

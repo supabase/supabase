@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import { FC, ReactElement } from 'react'
 
 import { cn } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -7,8 +7,8 @@ import type { LucideIcon } from 'lucide-react'
 
 interface Props {
   id: string
-  label?: string | JSX.Element
-  heading: string | JSX.Element
+  label?: string | ReactElement
+  heading: string | ReactElement
   features: Feature[]
 }
 

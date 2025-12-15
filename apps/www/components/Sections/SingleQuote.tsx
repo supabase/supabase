@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import React, { FC } from 'react'
+import { FC, ReactElement } from 'react'
 import { cn } from 'ui'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -17,9 +17,9 @@ interface Props {
 type Quote = {
   text: string
   author: string
-  logo?: string | JSX.Element
+  logo?: string | ReactElement
   role: string
-  avatar?: string | JSX.Element
+  avatar?: string | ReactElement
   link?: string
 }
 

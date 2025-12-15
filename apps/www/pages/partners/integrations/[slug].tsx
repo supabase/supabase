@@ -30,7 +30,7 @@ import Error404 from '../../404'
  */
 function mdxComponents(callback: Dispatch<SetStateAction<string | null>>) {
   const components = {
-    CH,
+    ...CH,
     Admonition,
     /**
      * Returns a custom img element which has a bound onClick listener. When the image is clicked, it will open a modal showing that particular image.
@@ -38,7 +38,7 @@ function mdxComponents(callback: Dispatch<SetStateAction<string | null>>) {
     img: (
       props: React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>
     ) => {
-      return <img {...props} onClick={() => callback(props.src!)} />
+      return <img {...props} onClick={() => callback(props.src! as string)} />
     },
   }
 

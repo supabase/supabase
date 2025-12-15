@@ -17,7 +17,6 @@ import {
   cn,
   CodeBlock,
   CodeBlockLang,
-  markdownComponents,
   Dialog,
   DialogClose,
   DialogContent,
@@ -26,6 +25,7 @@ import {
   DialogSection,
   DialogTitle,
   DialogTrigger,
+  markdownComponents,
 } from 'ui'
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { AssistantSnippetProps } from './AIAssistant.types'
@@ -124,7 +124,7 @@ const baseMarkdownComponents = {
   h3: Heading3,
   code: InlineCode,
   a: Hyperlink,
-  img: ({ src }: JSX.IntrinsicElements['img']) => (
+  img: ({ src }: { src: string }) => (
     <span className="text-foreground-light font-mono">[Image: {src}]</span>
   ),
 }

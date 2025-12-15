@@ -11,11 +11,11 @@ catalog:
   '@supabase/realtime-js': 2.87.0
   '@supabase/supabase-js': 2.87.0
   '@types/node': ^22.0.0
-  '@types/react': ^18.3.0
-  '@types/react-dom': ^18.3.0
+  '@types/react': ^19.0.0
+  '@types/react-dom': ^19.0.0
   next: ^15.5.9
-  react: ^18.3.0
-  react-dom: ^18.3.0
+  react: ^19.0.0
+  react-dom: ^19.0.0
   recharts: ^2.15.4
   tailwindcss: 3.4.1
   tsx: 4.20.3
@@ -55,6 +55,8 @@ onlyBuiltDependencies:
   - supabase
 
 overrides:
+  'react': ^19.0.0
+  'react-dom': ^19.0.0
   '@eslint/eslintrc>js-yaml': ^4.1.1
   '@react-router/dev>vite-node': 3.2.4
   '@redocly/respect-core>form-data': ^4.0.4

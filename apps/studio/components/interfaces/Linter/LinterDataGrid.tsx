@@ -16,8 +16,8 @@ import { useRouter } from 'next/router'
 import { useTrack } from 'lib/telemetry/track'
 import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { EntityTypeIcon } from './Linter.utils'
 import LintDetail from './LintDetail'
+import { EntityTypeIcon } from './Linter.utils'
 
 interface LinterDataGridProps {
   isLoading: boolean
@@ -71,7 +71,8 @@ const LinterDataGrid = ({
       name: 'Description',
       description: undefined,
       minWidth: 400,
-      value: (row: any) => <ReactMarkdown className="text-xs">{row.description}</ReactMarkdown>,
+      className: 'text-xs',
+      value: (row: any) => <ReactMarkdown>{row.description}</ReactMarkdown>,
     },
   ]
 

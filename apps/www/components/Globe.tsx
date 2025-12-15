@@ -1,11 +1,11 @@
 import createGlobe from 'cobe'
-import { useCallback, useEffect, useRef } from 'react'
-import { useTheme } from 'next-themes'
 import { debounce } from 'lib/helpers'
+import { useTheme } from 'next-themes'
+import { useCallback, useEffect, useRef } from 'react'
 
 const Globe = () => {
   const { resolvedTheme } = useTheme()
-  const canvasRef = useRef<any>()
+  const canvasRef = useRef<any>(null)
 
   let rotation: number = 0
   let width: number = 0

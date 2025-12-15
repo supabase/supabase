@@ -1,13 +1,13 @@
-import React, { FC } from 'react'
+import { FC, ReactElement } from 'react'
 
 import { cn, TextLink } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
 interface Props {
   id: string
-  label: string | JSX.Element
-  heading: string | JSX.Element
-  subheading: string | JSX.Element
+  label: string | ReactElement
+  heading: string | ReactElement
+  subheading: string | ReactElement
   image?: any
   className?: string
   cta?: {

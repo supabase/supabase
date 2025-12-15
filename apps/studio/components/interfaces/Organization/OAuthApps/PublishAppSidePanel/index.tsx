@@ -45,7 +45,7 @@ export const PublishAppSidePanel = ({
   onCreateSuccess,
 }: PublishAppSidePanelProps) => {
   const { slug } = useParams()
-  const uploadButtonRef = useRef<any>()
+  const uploadButtonRef = useRef<any>(null)
 
   const { mutate: createOAuthApp } = useOAuthAppCreateMutation({
     onSuccess: (res, variables) => {

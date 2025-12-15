@@ -62,10 +62,10 @@ const CodeEditor = ({
   const monaco = useMonaco()
   const { data: project } = useSelectedProjectQuery()
 
-  const hasValue = useRef<any>()
-  const ref = useRef<editor.IStandaloneCodeEditor>()
+  const hasValue = useRef<any>(null)
+  const ref = useRef<editor.IStandaloneCodeEditor>(null)
   const editorRef = editorRefProps || ref
-  const monacoRef = useRef<Monaco>()
+  const monacoRef = useRef<Monaco>(null)
 
   const { runQuery, placeholderFill, formatDocument, explainCode, closeAssistant } = {
     ...DEFAULT_ACTIONS,
@@ -192,7 +192,8 @@ const CodeEditor = ({
       const editor = editorRef.current
       const monaco = monacoRef.current
 
-      editor.addCommand(
+      if (!editor || !monaco) return
+      editor?.addCommand(
         monaco.KeyCode.Tab,
         () => {
           editor.executeEdits('source', [

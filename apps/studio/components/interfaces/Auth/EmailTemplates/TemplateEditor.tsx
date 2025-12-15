@@ -40,7 +40,9 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
-  const editorRef = useRef<editor.IStandaloneCodeEditor>()
+
+  // Add a ref to the code editor
+  const editorRef = useRef<editor.IStandaloneCodeEditor>(null)
 
   // [Joshen] Error state is handled in the parent
   const { data: authConfig, isSuccess } = useAuthConfigQuery({ projectRef })

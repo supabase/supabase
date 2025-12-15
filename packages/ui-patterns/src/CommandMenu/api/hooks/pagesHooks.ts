@@ -63,7 +63,7 @@ const useRegisterPage = (
   const prevDeps = useRef(deps)
   const prevEnabled = useRef(enabled)
 
-  const unsubscribe = useRef<() => void>()
+  const unsubscribe = useRef<() => void>(null)
 
   /**
    * useEffect handles the registration on first render, since React runs the
@@ -79,7 +79,7 @@ const useRegisterPage = (
     if (!isEqual(prevDeps.current, deps) || prevEnabled.current !== enabled) {
       unsubscribe.current?.()
 
-      unsubscribe.current = enabled ? registerNewPage(name, definition) : undefined
+      unsubscribe.current = enabled ? registerNewPage(name, definition) : null
 
       prevDeps.current = deps
       prevEnabled.current = enabled
@@ -87,10 +87,10 @@ const useRegisterPage = (
   }, [registerNewPage, name, definition, deps, enabled])
 
   useEffect(() => {
-    unsubscribe.current = enabled ? registerNewPage(name, definition) : undefined
+    unsubscribe.current = enabled ? registerNewPage(name, definition) : null
 
     return () => unsubscribe.current?.()
   }, [])
 }
 
-export { useCurrentPage, useRegisterPage, useSetPage, usePopPage, usePageComponent }
+export { useCurrentPage, usePageComponent, usePopPage, useRegisterPage, useSetPage }

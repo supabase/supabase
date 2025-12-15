@@ -1,14 +1,14 @@
-import React, { FC } from 'react'
-import { TextLink } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-
 import type { LucideIcon } from 'lucide-react'
+import { FC, ReactElement } from 'react'
+import { TextLink } from 'ui'
+
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 export interface SecuritySectionProps {
   id: string
-  label: string | JSX.Element
-  heading: string | JSX.Element
-  subheading: string | JSX.Element
+  label: string | ReactElement
+  heading: string | ReactElement
+  subheading: string | ReactElement
   features: FeatureProps[]
   cta: {
     label: string
@@ -19,7 +19,7 @@ export interface SecuritySectionProps {
 export type Story = {
   url: string
   heading: string
-  subheading: string | JSX.Element
+  subheading: string | ReactElement
 }
 
 type FeatureProps = {

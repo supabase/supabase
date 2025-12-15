@@ -10,7 +10,7 @@ import { ConsentToast } from './ConsentToast'
 const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 
 export const useConsentToast = () => {
-  const consentToastId = useRef<string | number>()
+  const consentToastId = useRef<string | number>(null)
   const snap = useSnapshot(consentState)
 
   const acceptAll = useCallback(() => {

@@ -1,51 +1,43 @@
 'use client'
 
-import * as React from 'react'
+import { useMDXComponent } from 'next-contentlayer2/hooks'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useMDXComponent } from 'next-contentlayer2/hooks'
+import * as React from 'react'
 // import { NpmCommands } from 'types/unist'
 // import { Event } from '@/lib/events'
-import { cn } from 'ui'
-import { useConfig } from '@/hooks/use-config'
 import { Callout } from '@/components/callout'
 import { CodeBlockWrapper } from '@/components/code-block-wrapper'
-import { ComponentExample } from '@/components/component-example'
 import { ComponentPreview } from '@/components/component-preview'
 import { ComponentSource } from '@/components/component-source'
-import {
-  CopyButton,
-  // CopyNpmCommandButton
-} from '@/components/copy-button'
+import { CopyButton } from '@/components/copy-button'
+import { useConfig } from '@/hooks/use-config'
+import { cn } from 'ui'
 // import { FrameworkDocs } from '@/components/framework-docs'
-import { StyleWrapper } from './style-wrapper'
+import { CodeFragment } from '@/components/code-fragment'
+import { Colors } from '@/components/colors'
+import { Icons } from '@/components/icons'
+import { ThemeSettings } from '@/components/theme-settings'
+import { Style } from '@/registry/styles'
 import {
   Accordion_Shadcn_ as Accordion,
   AccordionContent_Shadcn_ as AccordionContent,
   AccordionItem_Shadcn_ as AccordionItem,
   AccordionTrigger_Shadcn_ as AccordionTrigger,
-} from 'ui'
-import {
   Alert_Shadcn_ as Alert,
   AlertDescription_Shadcn_ as AlertDescription,
   AlertTitle_Shadcn_ as AlertTitle,
-} from 'ui'
-import { AspectRatio } from 'ui'
-import {
+  AspectRatio,
   Tabs_Shadcn_ as Tabs,
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
-import { ComponentProps } from './component-props'
-import { Style } from '@/registry/styles'
-import { Colors } from '@/components/colors'
-import { Icons } from '@/components/icons'
-import { ThemeSettings } from '@/components/theme-settings'
-import { CodeFragment } from '@/components/code-fragment'
 import { Admonition } from 'ui-patterns/admonition'
+import { ComponentProps } from './component-props'
 import { SonnerExpandConfig } from './sonner-expand-config'
 import { SonnerPositionConfig } from './sonner-expand-position'
+import { StyleWrapper } from './style-wrapper'
 
 const components = {
   Accordion,
@@ -211,7 +203,6 @@ const components = {
   Image,
   Callout,
   ComponentPreview,
-  ComponentExample,
   ComponentSource,
   ComponentProps,
   AspectRatio,

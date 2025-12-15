@@ -47,7 +47,7 @@ export const RLSCodeEditor = ({
   editorRef,
   monacoRef,
 }: RLSCodeEditorProps) => {
-  const hasValue = useRef<any>()
+  const hasValue = useRef<any>(null)
   const monaco = useMonaco()
 
   const placeholderId = `monaco-placeholder-${id}`
