@@ -415,23 +415,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/database/{ref}/hook-logs': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets hook logs with the given ID */
-    get: operations['HooksController_getHookLogs']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/feedback/conversations/{conversation_id}/custom-fields': {
     parameters: {
       query?: never
@@ -576,40 +559,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/integrations/github/branches/{connection_id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** List GitHub connection branches */
-    get: operations['GitHubBranchesController_listConnectionBranches']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/integrations/github/branches/{connection_id}/{branch_name}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get GitHub connection branch */
-    get: operations['GitHubBranchesController_getConnectionBranch']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/integrations/github/connections': {
     parameters: {
       query?: never
@@ -739,23 +688,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/integrations/vercel/{organization_integration_id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post?: never
-    /** Removes Vercel organization integration with the given id */
-    delete: operations['VercelIntegrationController_removeVercelIntegration']
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/integrations/vercel/connections': {
     parameters: {
       query?: never
@@ -802,23 +734,6 @@ export interface paths {
     put?: never
     /** Syncs supabase project envs with given connection id */
     post: operations['VercelConnectionsController_syncVercelConnectionEnvironments']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/integrations/vercel/connections/{organization_integration_id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets installed vercel project connections for the given organization integration */
-    get: operations['VercelConnectionsController_getVercelConnections']
-    put?: never
-    post?: never
     delete?: never
     options?: never
     head?: never
@@ -1992,8 +1907,7 @@ export interface paths {
     put?: never
     /** Creates user's profile */
     post: operations['ProfileController_createProfile']
-    /** Deletes user's profile */
-    delete: operations['ProfileController_deleteProfile']
+    delete?: never
     options?: never
     head?: never
     /** Updates user's profile */
@@ -2658,24 +2572,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/projects/{ref}/config/postgres': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets project's Postgres config */
-    get: operations['PostgresConfigController_getConfig']
-    /** Updates project's Postgres config */
-    put: operations['PostgresConfigController_updateConfig']
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/projects/{ref}/config/postgrest': {
     parameters: {
       query?: never
@@ -2778,8 +2674,7 @@ export interface paths {
     delete?: never
     options?: never
     head?: never
-    /** Updates project's supavisor config */
-    patch: operations['SupavisorConfigController_updateSupavisorConfig']
+    patch?: never
     trace?: never
   }
   '/platform/projects/{ref}/content': {
@@ -2793,8 +2688,7 @@ export interface paths {
     get: operations['ContentController_getContent']
     /** Updates project's content */
     put: operations['ContentController_updateWholeContent']
-    /** Creates project's content */
-    post: operations['ContentController_createContent']
+    post?: never
     /** Deletes project's contents */
     delete: operations['ContentController_deleteContents']
     options?: never
@@ -3003,23 +2897,6 @@ export interface paths {
     }
     /** Gets project's usage metrics */
     get: operations['InfraMonitoringController_getUsageMetrics']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/projects/{ref}/live': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets project health check */
-    get: operations['HealthCheckController_projectHealthCheck']
     put?: never
     post?: never
     delete?: never
@@ -3251,23 +3128,6 @@ export interface paths {
     put?: never
     /** Unpauses project */
     post: operations['UnpauseController_unpauseProject']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/projects/{ref}/restore/cancel': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Cancels a failed restoration */
-    post: operations['UnpauseController_cancelProjectRestoration']
     delete?: never
     options?: never
     head?: never
@@ -3973,10 +3833,10 @@ export interface paths {
       cookie?: never
     }
     /** Gets list of namespaces from a bucket */
-    get: operations['StorageAnalyticsBucketNamespacesController_getBuckets']
+    get: operations['StorageAnalyticsBucketNamespacesController_getNamespaces']
     put?: never
     /** Create a namespace within a bucket */
-    post: operations['StorageAnalyticsBucketNamespacesController_createBucket']
+    post: operations['StorageAnalyticsBucketNamespacesController_createNamespace']
     delete?: never
     options?: never
     head?: never
@@ -3994,7 +3854,7 @@ export interface paths {
     put?: never
     post?: never
     /** Drop a namespace within an analytics bucket */
-    delete: operations['StorageAnalyticsBucketNamespaceController_deleteBucket']
+    delete: operations['StorageAnalyticsBucketNamespaceController_deleteNamespace']
     options?: never
     head?: never
     patch?: never
@@ -4008,7 +3868,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets list of tables from a namespace */
-    get: operations['StorageAnalyticsBucketNamespaceTablesController_getBuckets']
+    get: operations['StorageAnalyticsBucketNamespaceTablesController_getTables']
     put?: never
     /** Create a table within a namespace */
     post: operations['StorageAnalyticsBucketNamespaceTablesController_createTable']
@@ -4600,8 +4460,7 @@ export interface paths {
     post?: never
     delete?: never
     options?: never
-    /** Count the number of workflow runs for the given branch */
-    head: operations['WorkflowRunController_countWorkflowRuns']
+    head?: never
     patch?: never
     trace?: never
   }
@@ -4944,23 +4803,6 @@ export interface components {
     CreateCollectionBody: {
       name: string
       retention_days: number
-    }
-    CreateContentBody: {
-      content?: {
-        [key: string]: unknown
-      }
-      description?: string
-      /** @default false */
-      favorite?: boolean
-      /** Format: uuid */
-      folder_id?: (null | (string | null)) | null
-      id?: string
-      name: string
-      owner_id?: number
-      /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
-      /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
     }
     CreateContentFolderBody: {
       name: string
@@ -5631,8 +5473,8 @@ export interface components {
         | 'edge_functions_write'
         | 'edge_functions_secrets_read'
         | 'edge_functions_secrets_write'
-        | 'infra_add-ons_read'
-        | 'infra_add-ons_write'
+        | 'infra_add_ons_read'
+        | 'infra_add_ons_write'
         | 'infra_read_replicas_read'
         | 'infra_read_replicas_write'
         | 'project_snippets_read'
@@ -6676,17 +6518,6 @@ export interface components {
       }
       updated_at: string
     }
-    GetVercelConnectionsResponse: {
-      foreign_project_id: string
-      id: string
-      inserted_at: string
-      metadata: {
-        [key: string]: unknown
-      }
-      organization_integration_id: string
-      supabase_project_ref: string
-      updated_at: string
-    }[]
     GetVercelProjectsResponse: {
       pagination: {
         count: number
@@ -7125,6 +6956,7 @@ export interface components {
             | 'instances.compute_update_available_sizes'
             | 'storage.max_file_size'
             | 'security.audit_logs_days'
+            | 'security.questionnaire'
             | 'log.retention_days'
             | 'custom_domain'
             | 'vanity_subdomain'
@@ -7791,37 +7623,6 @@ export interface components {
       }[]
       relation_name: string
       relation_schema: string
-    }
-    PostgresConfigResponse: {
-      /** @description Default unit: s */
-      checkpoint_timeout?: string
-      effective_cache_size?: string
-      hot_standby_feedback?: boolean
-      logical_decoding_work_mem?: string
-      maintenance_work_mem?: string
-      max_connections?: number
-      max_locks_per_transaction?: number
-      max_parallel_maintenance_workers?: number
-      max_parallel_workers?: number
-      max_parallel_workers_per_gather?: number
-      max_replication_slots?: number
-      max_slot_wal_keep_size?: string
-      max_standby_archive_delay?: string
-      max_standby_streaming_delay?: string
-      max_wal_senders?: number
-      max_wal_size?: string
-      max_worker_processes?: number
-      /** @enum {string} */
-      session_replication_role?: 'origin' | 'replica' | 'local'
-      shared_buffers?: string
-      /** @description Default unit: ms */
-      statement_timeout?: string
-      track_activity_query_size?: string
-      track_commit_timestamp?: boolean
-      wal_keep_size?: string
-      /** @description Default unit: ms */
-      wal_sender_timeout?: string
-      work_mem?: string
     }
     PostgresExtension: {
       comment: string | null
@@ -9003,7 +8804,6 @@ export interface components {
         source_notification_id?: string
       }
     }
-    RestoreCancellation: Record<string, never>
     RestoreLogicalBackupBody: {
       id: number
     }
@@ -10109,38 +9909,6 @@ export interface components {
       server_idle_timeout?: number
       server_lifetime?: number
     }
-    UpdatePostgresConfigBody: {
-      /** @description Default unit: s */
-      checkpoint_timeout?: string
-      effective_cache_size?: string
-      hot_standby_feedback?: boolean
-      logical_decoding_work_mem?: string
-      maintenance_work_mem?: string
-      max_connections?: number
-      max_locks_per_transaction?: number
-      max_parallel_maintenance_workers?: number
-      max_parallel_workers?: number
-      max_parallel_workers_per_gather?: number
-      max_replication_slots?: number
-      max_slot_wal_keep_size?: string
-      max_standby_archive_delay?: string
-      max_standby_streaming_delay?: string
-      max_wal_senders?: number
-      max_wal_size?: string
-      max_worker_processes?: number
-      restart_database?: boolean
-      /** @enum {string} */
-      session_replication_role?: 'origin' | 'replica' | 'local'
-      shared_buffers?: string
-      /** @description Default unit: ms */
-      statement_timeout?: string
-      track_activity_query_size?: string
-      track_commit_timestamp?: boolean
-      wal_keep_size?: string
-      /** @description Default unit: ms */
-      wal_sender_timeout?: string
-      work_mem?: string
-    }
     UpdatePostgrestConfigBody: {
       db_extra_search_path?: string
       db_pool?: number
@@ -10547,18 +10315,6 @@ export interface components {
     UpdateSubscriptionResponse: {
       pending_payment_intent_secret: string | null
     }
-    UpdateSupavisorConfigBody: {
-      default_pool_size?: number | null
-      /**
-       * @description Dedicated pooler mode for the project
-       * @enum {string}
-       */
-      pool_mode?: 'transaction' | 'session'
-    }
-    UpdateSupavisorConfigResponse: {
-      default_pool_size: number | null
-      pool_mode: string
-    }
     UpdateUserBody: {
       ban_duration?: string
     }
@@ -10614,11 +10370,14 @@ export interface components {
         [key: string]: unknown
       }
       description?: string
-      /** @description A missing `favorite` value means that the value will remained unchanged for updates. Defaults to `false` for inserts. */
+      /**
+       * @description A missing `favorite` value means that the value will remained unchanged for updates. Defaults to `false` for inserts.
+       * @default false
+       */
       favorite?: boolean
       /** Format: uuid */
       folder_id?: (null | (string | null)) | null
-      id: string
+      id?: string
       name: string
       owner_id?: number
       project_id?: number
@@ -10673,25 +10432,6 @@ export interface components {
       recovery_token?: string
       role?: string
       updated_at?: string
-    }
-    UserContentObject: {
-      content: {
-        [key: string]: unknown
-      }
-      description?: string
-      favorite: boolean
-      folder_id?: string | null
-      id: string
-      inserted_at: string
-      last_updated_by?: number
-      name: string
-      owner_id: number
-      project_id: number
-      /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
-      updated_at: string
-      /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
     }
     ValidateSpamBody: {
       content: string
@@ -12044,60 +11784,6 @@ export interface operations {
       }
     }
   }
-  HooksController_getHookLogs: {
-    parameters: {
-      query: {
-        id: number
-        limit?: number
-        offset?: number
-      }
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get hook logs with the given ID */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   LinkConversationController_updateConversationCustomFields: {
     parameters: {
       query?: never
@@ -12402,66 +12088,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to remove GitHub authorization */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  GitHubBranchesController_listConnectionBranches: {
-    parameters: {
-      query?: {
-        page?: number
-        per_page?: number
-      }
-      header?: never
-      path: {
-        connection_id: number
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['GitHubBranchResponse'][]
-        }
-      }
-      /** @description Failed to list GitHub connection branches */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  GitHubBranchesController_getConnectionBranch: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        branch_name: string
-        connection_id: number
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['GitHubBranchResponse']
-        }
-      }
-      /** @description Failed to get GitHub connection branch */
       500: {
         headers: {
           [name: string]: unknown
@@ -12797,32 +12423,6 @@ export interface operations {
       }
     }
   }
-  VercelIntegrationController_removeVercelIntegration: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        organization_integration_id: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to remove Vercel organization integration with the given id */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   VercelConnectionsController_createVercelConnection: {
     parameters: {
       query?: never
@@ -12929,34 +12529,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to sync supabase project envs with given connection id */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  VercelConnectionsController_getVercelConnections: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        organization_integration_id: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['GetVercelConnectionsResponse']
-        }
-      }
-      /** @description Failed to get installed vercel connections for the given organization integration */
       500: {
         headers: {
           [name: string]: unknown
@@ -17097,36 +16669,6 @@ export interface operations {
       }
     }
   }
-  ProfileController_deleteProfile: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete user's profile */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   ProfileController_updateProfile: {
     parameters: {
       query?: never
@@ -19622,110 +19164,6 @@ export interface operations {
       }
     }
   }
-  PostgresConfigController_getConfig: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresConfigResponse']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to retrieve project's Postgres config */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  PostgresConfigController_updateConfig: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdatePostgresConfigBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresConfigResponse']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update project's Postgres config */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   PostgrestConfigController_getPostgRESTConfig: {
     parameters: {
       query?: never
@@ -20177,60 +19615,6 @@ export interface operations {
       }
     }
   }
-  SupavisorConfigController_updateSupavisorConfig: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateSupavisorConfigBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['UpdateSupavisorConfigResponse']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update project's supavisor config */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   ContentController_getContent: {
     parameters: {
       query?: {
@@ -20335,60 +19719,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to update project's content */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ContentController_createContent: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateContentBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['UserContentObject']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create project's content */
       500: {
         headers: {
           [name: string]: unknown
@@ -21463,54 +20793,6 @@ export interface operations {
       }
     }
   }
-  HealthCheckController_projectHealthCheck: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get project health check */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   LoadBalancersController_getLoadBalancers: {
     parameters: {
       query?: never
@@ -22264,56 +21546,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to unpause project */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  UnpauseController_cancelProjectRestoration: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['RestoreCancellation']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to cancel project restoration */
       500: {
         headers: {
           [name: string]: unknown
@@ -24671,7 +23903,7 @@ export interface operations {
       }
     }
   }
-  StorageAnalyticsBucketNamespacesController_getBuckets: {
+  StorageAnalyticsBucketNamespacesController_getNamespaces: {
     parameters: {
       query?: never
       header?: never
@@ -24723,7 +23955,7 @@ export interface operations {
       }
     }
   }
-  StorageAnalyticsBucketNamespacesController_createBucket: {
+  StorageAnalyticsBucketNamespacesController_createNamespace: {
     parameters: {
       query?: never
       header?: never
@@ -24777,7 +24009,7 @@ export interface operations {
       }
     }
   }
-  StorageAnalyticsBucketNamespaceController_deleteBucket: {
+  StorageAnalyticsBucketNamespaceController_deleteNamespace: {
     parameters: {
       query?: never
       header?: never
@@ -24828,7 +24060,7 @@ export interface operations {
       }
     }
   }
-  StorageAnalyticsBucketNamespaceTablesController_getBuckets: {
+  StorageAnalyticsBucketNamespaceTablesController_getTables: {
     parameters: {
       query?: never
       header?: never
@@ -26754,37 +25986,6 @@ export interface operations {
         }
       }
       /** @description Failed to list workflow runs */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  WorkflowRunController_countWorkflowRuns: {
-    parameters: {
-      query?: {
-        /** @description Branch ID */
-        branch_id?: string
-        /** @description Project ref */
-        project_ref?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          /** @description total count value */
-          'X-Total-Count'?: number
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to count workflow runs */
       500: {
         headers: {
           [name: string]: unknown
