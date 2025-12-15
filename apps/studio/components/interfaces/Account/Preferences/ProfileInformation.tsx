@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   CardFooter,
-  CardHeader,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
@@ -25,6 +24,13 @@ import { useProfile } from 'lib/profile'
 import { groupBy } from 'lodash'
 import type { FormSchema } from 'types'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 const FormSchema = z.object({
   first_name: z.string().optional(),
@@ -59,7 +65,7 @@ export const ProfileInformation = () => {
     values: defaultValues,
   })
 
-  const { mutate: updateProfile, isPending } = useProfileUpdateMutation({
+  const { mutate: updateProfile, isPending: isUpdatingProfile } = useProfileUpdateMutation({
     onSuccess: (data) => {
       toast.success('Successfully saved profile')
       const { first_name, last_name, username, primary_email } = data
@@ -78,111 +84,128 @@ export const ProfileInformation = () => {
   }
 
   return (
-    <Form_Shadcn_ {...form}>
-      <form id={formId} className="space-y-6 w-full" onSubmit={form.handleSubmit(onSubmit)}>
-        <Card className="mb-8">
-          <CardHeader>Profile Information</CardHeader>
-          <CardContent className="flex flex-col gap-y-2">
-            <FormField_Shadcn_
-              control={form.control}
-              name="first_name"
-              render={({ field }) => (
-                <FormItemLayout label="First name" layout="horizontal">
-                  <FormControl_Shadcn_ className="col-span-8">
-                    <Input_Shadcn_ {...field} className="w-72" />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-            <FormField_Shadcn_
-              control={form.control}
-              name="last_name"
-              render={({ field }) => (
-                <FormItemLayout label="Last name" layout="horizontal">
-                  <FormControl_Shadcn_ className="col-span-8">
-                    <Input_Shadcn_ {...field} className="w-72" />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-            <FormField_Shadcn_
-              control={form.control}
-              name="primary_email"
-              render={({ field }) => (
-                <FormItemLayout label="Primary email" layout="horizontal">
-                  <FormControl_Shadcn_ className="col-span-8">
-                    <div className="flex flex-col gap-1">
-                      <Select_Shadcn_
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={profile?.is_sso_user}
-                      >
-                        <SelectTrigger_Shadcn_ className="col-span-8 w-72">
-                          <SelectValue_Shadcn_ placeholder="Select primary email" />
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_ className="col-span-8">
-                          {isIdentitiesSuccess &&
-                            dedupedIdentityEmails.map((email) => (
-                              <SelectItem_Shadcn_ key={email} value={email}>
-                                {email}
-                              </SelectItem_Shadcn_>
-                            ))}
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
-                      {(profile?.is_sso_user && (
-                        <p className="text-xs text-foreground-light">
-                          Primary email is managed by your SSO provider and cannot be changed here.
-                        </p>
-                      )) || (
-                        <p className="text-xs text-foreground-light">
-                          Primary email is used for account notifications.
-                        </p>
-                      )}
-                    </div>
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-            <FormField_Shadcn_
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItemLayout label="Username" layout="horizontal">
-                  <FormControl_Shadcn_ className="col-span-8">
-                    <div className="flex flex-col gap-1">
-                      <Input_Shadcn_ {...field} className="w-72" disabled={profile?.is_sso_user} />
-                      {(profile?.is_sso_user && (
-                        <p className="text-xs text-foreground-light">
-                          Username is managed by your SSO provider and cannot be changed here.
-                        </p>
-                      )) || (
-                        <p className="text-xs text-foreground-light">
-                          Username appears as a display name throughout the dashboard.
-                        </p>
-                      )}
-                    </div>
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-          </CardContent>
-          <CardFooter className="justify-end space-x-2">
-            {form.formState.isDirty && (
-              <Button type="default" onClick={() => form.reset()}>
-                Cancel
-              </Button>
-            )}
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={isPending || isIdentitiesLoading}
-              disabled={!form.formState.isDirty}
-            >
-              Save
-            </Button>
-          </CardFooter>
-        </Card>
-      </form>
-    </Form_Shadcn_>
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Profile information</PageSectionTitle>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
+        <Form_Shadcn_ {...form}>
+          <form id={formId} className="space-y-6 w-full" onSubmit={form.handleSubmit(onSubmit)}>
+            <Card>
+              <CardContent>
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="first_name"
+                  render={({ field }) => (
+                    <FormItemLayout label="First name" layout="flex-row-reverse">
+                      <FormControl_Shadcn_ className="col-span-8">
+                        <Input_Shadcn_ {...field} placeholder="First name" className="w-full" />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </CardContent>
+              <CardContent>
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="last_name"
+                  render={({ field }) => (
+                    <FormItemLayout label="Last name" layout="flex-row-reverse">
+                      <FormControl_Shadcn_ className="col-span-8">
+                        <Input_Shadcn_ {...field} placeholder="Last name" className="w-full" />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </CardContent>
+              <CardContent>
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="primary_email"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Primary email"
+                      description={
+                        profile?.is_sso_user
+                          ? 'Primary email is managed by your SSO provider and cannot be changed here.'
+                          : 'Primary email is used for account notifications.'
+                      }
+                      layout="flex-row-reverse"
+                    >
+                      <FormControl_Shadcn_ className="col-span-8">
+                        <div className="flex flex-col gap-1">
+                          <Select_Shadcn_
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            disabled={profile?.is_sso_user}
+                          >
+                            <SelectTrigger_Shadcn_ className="col-span-8 w-full">
+                              <SelectValue_Shadcn_ placeholder="Select primary email" />
+                            </SelectTrigger_Shadcn_>
+                            <SelectContent_Shadcn_ className="col-span-8">
+                              {isIdentitiesSuccess &&
+                                dedupedIdentityEmails.map((email) => (
+                                  <SelectItem_Shadcn_ key={email} value={email}>
+                                    {email}
+                                  </SelectItem_Shadcn_>
+                                ))}
+                            </SelectContent_Shadcn_>
+                          </Select_Shadcn_>
+                        </div>
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </CardContent>
+              <CardContent>
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="username"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Username"
+                      description={
+                        profile?.is_sso_user
+                          ? 'Username is managed by your SSO provider and cannot be changed here.'
+                          : 'Username appears as a display name throughout the dashboard.'
+                      }
+                      layout="flex-row-reverse"
+                    >
+                      <FormControl_Shadcn_ className="col-span-8">
+                        <div className="flex flex-col gap-1">
+                          <Input_Shadcn_
+                            {...field}
+                            className="w-full"
+                            placeholder="Username"
+                            disabled={profile?.is_sso_user}
+                          />
+                        </div>
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </CardContent>
+              <CardFooter className="justify-end space-x-2">
+                {form.formState.isDirty && (
+                  <Button type="default" onClick={() => form.reset()}>
+                    Cancel
+                  </Button>
+                )}
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={isUpdatingProfile || isIdentitiesLoading}
+                  disabled={!form.formState.isDirty}
+                >
+                  Save
+                </Button>
+              </CardFooter>
+            </Card>
+          </form>
+        </Form_Shadcn_>
+      </PageSectionContent>
+    </PageSection>
   )
 }

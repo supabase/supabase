@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useToggleLegacyAPIKeysMutation } from 'data/api-keys/legacy-api-key-toggle-mutation'
@@ -31,7 +30,7 @@ export const ToggleLegacyApiKeysPanel = () => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const [isAppsWarningOpen, setIsAppsWarningOpen] = useState(false)
 
-  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { can: canUpdateAPIKeys, isSuccess: isPermissionsSuccess } = useAsyncCheckPermissions(
     PermissionAction.SECRETS_WRITE,
     '*'

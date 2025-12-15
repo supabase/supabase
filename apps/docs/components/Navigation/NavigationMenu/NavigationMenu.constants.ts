@@ -496,7 +496,7 @@ export const gettingstarted: NavMenuConstant = {
         },
         {
           name: 'Deploy MCP servers',
-          url: '/guides/getting-started/byom' as `/${string}`,
+          url: '/guides/getting-started/byo-mcp' as `/${string}`,
         },
       ],
     },
