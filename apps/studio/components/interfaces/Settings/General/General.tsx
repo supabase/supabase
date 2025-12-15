@@ -195,7 +195,7 @@ export const General = () => {
         </PageSectionMeta>
         <PageSectionContent>
           <Card>
-            <CardContent className="flex flex-col space-y-6">
+            <CardContent>
               <div className="flex flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4">
                 <div>
                   <p className="text-sm">
