@@ -10,23 +10,23 @@ export const CLIENT_LIBRARIES = [
       },
       {
         name: 'postgrest-js',
-        url: 'https://github.com/supabase/postgrest-js',
+        url: 'https://github.com/supabase/supabase-js/tree/master/packages/core/postgrest-js',
       },
       {
-        name: 'gotrue-js',
-        url: 'https://github.com/supabase/gotrue-js',
+        name: 'auth-js',
+        url: 'https://github.com/supabase/supabase-js/tree/master/packages/core/auth-js',
       },
       {
         name: 'realtime-js',
-        url: 'https://github.com/supabase/realtime-js',
+        url: 'https://github.com/supabase/supabase-js/tree/master/packages/core/realtime-js',
       },
       {
         name: 'storage-js',
-        url: 'https://github.com/supabase/storage-js',
+        url: 'https://github.com/supabase/supabase-js/tree/master/packages/core/storage-js',
       },
       {
         name: 'functions-js',
-        url: 'https://github.com/supabase/functions-js',
+        url: 'https://github.com/supabase/supabase-js/tree/master/packages/core/functions-js',
       },
     ],
   },
