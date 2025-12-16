@@ -68,7 +68,7 @@ export const AWSPrivateLinkAccountItem = ({
         <DropdownMenuContent align="end" className="w-40">
           <DropdownMenuItem onClick={onEdit} className="gap-x-2">
             <Edit size={14} />
-            <span>Edit account</span>
+            <span>View account</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={onDelete} className="gap-x-2">
