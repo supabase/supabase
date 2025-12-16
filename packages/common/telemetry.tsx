@@ -50,8 +50,7 @@ export function handlePageTelemetry(
     [key: string]: unknown
   },
   slug?: string,
-  ref?: string,
-  telemetryDataOverride?: components['schemas']['TelemetryPageBodyV2']
+  ref?: string
 ) {
   // Send to PostHog client-side (only in browser)
   if (typeof window !== 'undefined') {
@@ -194,25 +193,11 @@ export const PageTelemetry = ({
     ) {
       const cookies = document.cookie.split(';')
       const telemetryCookie = cookies.find((cookie) => cookie.trim().startsWith(TELEMETRY_DATA))
+      handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current, slug, ref)
+
+      // Delete legacy telemetry cookie (old method of passing data to backend endpoint)
       if (telemetryCookie) {
-        try {
-          const encodedData = telemetryCookie.split('=')[1]
-          const telemetryData = JSON.parse(decodeURIComponent(encodedData))
-          handlePageTelemetry(
-            API_URL,
-            pathnameRef.current,
-            featureFlagsRef.current,
-            slug,
-            ref,
-            telemetryData
-          )
-          // remove the telemetry cookie
-          document.cookie = `${TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
-        } catch (error) {
-          console.error('Invalid telemetry data:', error)
-        }
-      } else {
-        handlePageTelemetry(API_URL, pathnameRef.current, featureFlagsRef.current, slug, ref)
+        document.cookie = `${TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
       }
 
       hasSentInitialPageTelemetryRef.current = true
