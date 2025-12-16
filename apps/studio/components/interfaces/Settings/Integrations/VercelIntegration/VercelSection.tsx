@@ -23,6 +23,7 @@ import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-or
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import type {
+  Integration,
   IntegrationName,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
@@ -69,10 +70,19 @@ const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
         if (integration.metadata && integration.integration.name === 'Vercel') {
           const avatarSrc =
             !integration.metadata.account.avatar && integration.metadata.account.type === 'Team'
-              ? `https://vercel.com/api/www/avatar?teamId=${integration.metadata.account.team_id}&s=48`
+              ? `https://vercel.com/api/www/avatar?teamId=${integration.metadata.account.team_id}&s=48&format=png`
               : `https://vercel.com/api/www/avatar/${integration.metadata.account.avatar}?s=48`
 
-          integration['metadata']['account']['avatar'] = avatarSrc
+          return {
+            ...integration,
+            metadata: {
+              ...integration.metadata,
+              account: {
+                ...integration.metadata.account,
+                avatar: avatarSrc,
+              },
+            },
+          } as Integration
         }
 
         return integration

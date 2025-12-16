@@ -16,11 +16,13 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { BackupItem } from './BackupItem'
 import { BackupsEmpty } from './BackupsEmpty'
 import { BackupsStorageAlert } from './BackupsStorageAlert'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 export const BackupsList = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const [selectedBackup, setSelectedBackup] = useState<DatabaseBackup>()
+  const { hasAccess: hasAccessToBackups } = useCheckEntitlements('backup.retention_days')
 
   const { setProjectStatus } = useSetProjectStatus()
   const { data: selectedProject } = useSelectedProjectQuery()
@@ -53,7 +55,7 @@ export const BackupsList = () => {
   )
   const isPitrEnabled = backups?.pitr_enabled
 
-  if (planKey === 'FREE') {
+  if (!hasAccessToBackups) {
     return (
       <UpgradeToPro
         addon="pitr"
@@ -62,6 +64,7 @@ export const BackupsList = () => {
         icon={<Clock size={20} strokeWidth={1.5} />}
         primaryText="Free Plan does not include project backups."
         secondaryText="Upgrade to the Pro Plan for up to 7 days of scheduled backups."
+        buttonText="Upgrade"
       />
     )
   }

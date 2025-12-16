@@ -9,31 +9,28 @@ export const docsConfig: DocsConfig = {
   sidebarNav: [
     {
       title: 'Getting Started',
-      sortOrder: 'manual',
+      sortOrder: 'alphabetical',
       items: [
         {
           title: 'Introduction',
           href: '/docs',
+          priority: true,
           items: [],
         },
         {
-          title: 'Tailwind Classes',
-          href: '/docs/tailwind-classes',
+          title: 'Accessibility',
+          href: '/docs/accessibility',
           items: [],
         },
+
         {
           title: 'Color Usage',
           href: '/docs/color-usage',
           items: [],
         },
         {
-          title: 'Typography',
-          href: '/docs/typography',
-          items: [],
-        },
-        {
-          title: 'Theming',
-          href: '/docs/theming',
+          title: 'Copywriting',
+          href: '/docs/copywriting',
           items: [],
         },
         {
@@ -42,142 +39,18 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Accessibility',
-          href: '/docs/accessibility',
-          items: [],
-        },
-      ],
-    },
-    {
-      title: 'UI Patterns',
-      sortOrder: 'alphabetical',
-      items: [
-        {
-          title: 'Introduction',
-          href: '/docs/ui-patterns/ui-patterns',
-          items: [],
-          priority: true,
-        },
-        {
-          title: 'Charts',
-          href: '/docs/ui-patterns/charts',
+          title: 'Tailwind Classes',
+          href: '/docs/tailwind-classes',
           items: [],
         },
         {
-          title: 'Empty States',
-          href: '/docs/ui-patterns/empty-states',
+          title: 'Theming',
+          href: '/docs/theming',
           items: [],
         },
         {
-          title: 'Forms',
-          href: '/docs/ui-patterns/forms',
-          items: [],
-        },
-        {
-          title: 'Layout',
-          href: '/docs/ui-patterns/layout',
-          items: [],
-        },
-        {
-          title: 'Navigation',
-          href: '/docs/ui-patterns/navigation',
-          items: [],
-        },
-      ],
-    },
-    {
-      title: 'Fragment Components',
-      sortOrder: 'alphabetical',
-      items: [
-        {
-          title: 'Introduction',
-          href: '/docs/fragments/fragment-components',
-          items: [],
-          priority: true,
-        },
-        {
-          title: 'Admonition',
-          href: '/docs/fragments/admonition',
-          items: [],
-        },
-        {
-          title: 'Assistant Chat',
-          href: '/docs/fragments/assistant-chat',
-          items: [],
-        },
-        {
-          title: 'EmptyStatePresentational',
-          href: '/docs/fragments/empty-state-presentational',
-          items: [],
-        },
-        {
-          title: 'Modal',
-          href: '/docs/fragments/modal',
-          items: [],
-        },
-        {
-          title: 'Page Container',
-          href: '/docs/fragments/page-container',
-          items: [],
-        },
-        {
-          title: 'Page Header',
-          href: '/docs/fragments/page-header',
-          items: [],
-        },
-        {
-          title: 'Page Section',
-          href: '/docs/fragments/page-section',
-          items: [],
-        },
-        {
-          title: 'Text Confirm Dialog',
-          href: '/docs/fragments/text-confirm-dialog',
-          items: [],
-        },
-        {
-          title: 'Info Tooltip',
-          href: '/docs/fragments/info-tooltip',
-          items: [],
-        },
-        {
-          title: 'Inner Side Menu',
-          href: '/docs/fragments/inner-side-menu',
-          items: [],
-        },
-        {
-          title: 'Data Input',
-          href: '/docs/fragments/data-input',
-          items: [],
-        },
-        {
-          title: 'Form Item Layout',
-          href: '/docs/fragments/form-item-layout',
-          items: [],
-        },
-        {
-          title: 'Multi Select',
-          href: '/docs/fragments/multi-select',
-          items: [],
-        },
-        {
-          title: 'Filter Bar',
-          href: '/docs/fragments/filter-bar',
-          items: [],
-        },
-        {
-          title: 'Logs Bar Chart',
-          href: '/docs/fragments/logs-bar-chart',
-          items: [],
-        },
-        {
-          title: 'Metric Card',
-          href: '/docs/fragments/metric-card',
-          items: [],
-        },
-        {
-          title: 'Table of Contents (TOC)',
-          href: '/docs/fragments/toc',
+          title: 'Typography',
+          href: '/docs/typography',
           items: [],
         },
       ],
@@ -276,11 +149,6 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Context Menu',
           href: '/docs/components/context-menu',
-          items: [],
-        },
-        {
-          title: 'Data Table',
-          href: '/docs/components/data-table',
           items: [],
         },
         {
@@ -473,6 +341,145 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Expanding Textarea',
           href: '/docs/components/expanding-textarea',
+          items: [],
+        },
+      ],
+    },
+    {
+      title: 'Fragment Components',
+      sortOrder: 'alphabetical',
+      items: [
+        {
+          title: 'Introduction',
+          href: '/docs/fragments/fragment-components',
+          items: [],
+          priority: true,
+        },
+        {
+          title: 'Admonition',
+          href: '/docs/fragments/admonition',
+          items: [],
+        },
+        {
+          title: 'Assistant Chat',
+          href: '/docs/fragments/assistant-chat',
+          items: [],
+        },
+        {
+          title: 'EmptyStatePresentational',
+          href: '/docs/fragments/empty-state-presentational',
+          items: [],
+        },
+        {
+          title: 'Modal',
+          href: '/docs/fragments/modal',
+          items: [],
+        },
+        {
+          title: 'Page Container',
+          href: '/docs/fragments/page-container',
+          items: [],
+        },
+        {
+          title: 'Page Header',
+          href: '/docs/fragments/page-header',
+          items: [],
+        },
+        {
+          title: 'Page Section',
+          href: '/docs/fragments/page-section',
+          items: [],
+        },
+        {
+          title: 'Text Confirm Dialog',
+          href: '/docs/fragments/text-confirm-dialog',
+          items: [],
+        },
+        {
+          title: 'Info Tooltip',
+          href: '/docs/fragments/info-tooltip',
+          items: [],
+        },
+        {
+          title: 'Inner Side Menu',
+          href: '/docs/fragments/inner-side-menu',
+          items: [],
+        },
+        {
+          title: 'Data Input',
+          href: '/docs/fragments/data-input',
+          items: [],
+        },
+        {
+          title: 'Form Item Layout',
+          href: '/docs/fragments/form-item-layout',
+          items: [],
+        },
+        {
+          title: 'Multi Select',
+          href: '/docs/fragments/multi-select',
+          items: [],
+        },
+        {
+          title: 'Filter Bar',
+          href: '/docs/fragments/filter-bar',
+          items: [],
+        },
+        {
+          title: 'Logs Bar Chart',
+          href: '/docs/fragments/logs-bar-chart',
+          items: [],
+        },
+        {
+          title: 'Metric Card',
+          href: '/docs/fragments/metric-card',
+          items: [],
+        },
+        {
+          title: 'Table of Contents (TOC)',
+          href: '/docs/fragments/toc',
+          items: [],
+        },
+      ],
+    },
+    {
+      title: 'UI Patterns',
+      sortOrder: 'alphabetical',
+      items: [
+        {
+          title: 'Introduction',
+          href: '/docs/ui-patterns/ui-patterns',
+          items: [],
+          priority: true,
+        },
+        {
+          title: 'Charts',
+          href: '/docs/ui-patterns/charts',
+          items: [],
+        },
+        {
+          title: 'Empty States',
+          href: '/docs/ui-patterns/empty-states',
+          items: [],
+        },
+        {
+          title: 'Forms',
+          href: '/docs/ui-patterns/forms',
+          items: [],
+        },
+        {
+          title: 'Layout',
+          href: '/docs/ui-patterns/layout',
+          items: [],
+        },
+        {
+          title: 'Navigation',
+          href: '/docs/ui-patterns/navigation',
+          items: [],
+        },
+        {
+          title: 'Tables',
+          href: '/docs/ui-patterns/tables',
           items: [],
         },
       ],
