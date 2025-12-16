@@ -399,15 +399,15 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   }, [id])
 
   useEffect(() => {
-    if (projectRef && privateSnippetsPages) {
+    if (projectRef && privateSnippetsPages?.pages) {
       privateSnippetsPages.pages.forEach((page) => {
         page.contents?.forEach((snippet: Snippet) => {
           snapV2.addSnippet({ projectRef, snippet })
         })
-        page.folders?.forEach((folder: SnippetFolder) => snapV2.addFolder({ projectRef, folder }))
+        page.folders?.forEach((folder) => snapV2.addFolder({ projectRef, folder }))
       })
     }
-  }, [projectRef, privateSnippetsPages?.pages])
+  }, [projectRef, privateSnippetsPages?.pages, snapV2])
 
   useEffect(() => {
     if (projectRef === undefined || !isFavoriteSnippetsSuccess) return
