@@ -84,6 +84,8 @@
         "NEXT_PUBLIC_VERCEL_ENV",
         "NEXT_PUBLIC_USERCENTRICS_RULESET_ID",
         "NEXT_PUBLIC_MCP_URL",
+        "NEXT_PUBLIC_IS_NIMBUS",
+        "NEXT_PUBLIC_ONGOING_INCIDENT",
         // These envs are technically passthrough env vars because they're only used on the server side of Nextjs
         "PLATFORM_PG_META_URL",
         "STUDIO_PG_META_URL",
@@ -123,8 +125,8 @@
         "AI_PRO_MODEL",
         "AI_NORMAL_MODEL",
         "SUPPORT_SUPABASE_SECRET_KEY",
-        "NEXT_PUBLIC_IS_NIMBUS",
-        "NEXT_PUBLIC_ONGOING_INCIDENT"
+		"STATUSPAGE_API_KEY",
+		"STATUSPAGE_PAGE_ID"
       ],
       "passThroughEnv": ["CURRENT_CLI_VERSION", "VERCEL_GIT_COMMIT_SHA"],
       "outputs": [".next/**", "!.next/cache/**"]
