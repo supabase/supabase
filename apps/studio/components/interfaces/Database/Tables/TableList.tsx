@@ -25,7 +25,6 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useForeignTablesQuery } from 'data/foreign-tables/foreign-tables-query'
@@ -61,6 +60,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
 

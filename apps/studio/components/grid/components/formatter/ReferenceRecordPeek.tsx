@@ -10,11 +10,11 @@ import {
   getColumnDefaultWidth,
 } from 'components/grid/utils/gridColumns'
 import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface ReferenceRecordPeekProps {
   table: PostgresTable
