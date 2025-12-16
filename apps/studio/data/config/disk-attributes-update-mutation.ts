@@ -11,7 +11,7 @@ export type UpdateDiskAttributesVariables = {
   ref?: string
   storageType: 'gp3' | 'io2'
   provisionedIOPS: number
-  throughput?: number
+  throughput?: number // MB/s
   totalSize: number
 }
 
@@ -25,6 +25,7 @@ export async function updateDiskAttributes(updates: UpdateDiskAttributesVariable
     updates.storageType === 'gp3'
       ? {
           iops: updates.provisionedIOPS,
+          // API field name is throughput_mbps but value is MB/s
           throughput_mbps: updates.throughput!,
           size_gb: updates.totalSize,
           type: updates.storageType,
