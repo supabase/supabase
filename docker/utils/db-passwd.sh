@@ -8,6 +8,8 @@
 # - POSIX shell compatibility
 # - No hardcoded values for database service and admin user
 # - Use .env for the admin user and database service port
+# - Print all values and confirm before updating
+# - Stop on any errors
 #
 
 set -e
@@ -80,7 +82,7 @@ esac
 echo "Updating passwords..."
 echo "Connecting to the database service container..."
 
-docker compose exec -T $db_srv_name psql -U $db_admin_user -d "_supabase" <<EOF
+docker compose exec -T $db_srv_name psql -U $db_admin_user -d "_supabase" -v ON_ERROR_STOP=1 <<EOF
 alter user anon with password '${new_passwd}';
 alter user authenticated with password '${new_passwd}';
 alter user authenticator with password '${new_passwd}';
@@ -120,9 +122,10 @@ END
 \$\$;
 EOF
 
-echo "Updating .env..."
+echo "Updating POSTGRES_PASSWORD in .env..."
 sed -i.old "s|^POSTGRES_PASSWORD=.*$|POSTGRES_PASSWORD=$new_passwd|" .env
 
+echo ""
 echo "Success. To restart containers use:"
 echo ""
 echo "docker compose up -d --force-recreate"
