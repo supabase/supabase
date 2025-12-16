@@ -109,6 +109,7 @@ export const StorageSettings = () => {
   const isSpendCapOn =
     organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
 
+  const [isUpdating, setIsUpdating] = useState(false)
   const [initialValues, setInitialValues] = useState<StorageSettingsState>({
     fileSizeLimit: 0,
     unit: StorageSizeUnits.MB,
@@ -149,19 +150,21 @@ export const StorageSettings = () => {
     reValidateMode: 'onSubmit',
   })
 
-  const { unit: storageUnit, fileSizeLimit } = form.watch()
+  const { unit: storageUnit } = form.watch()
   const fileSizeLimitError = form.formState.errors.fileSizeLimit
 
-  const { mutate: updateStorageConfig, isPending: isUpdating } =
-    useProjectStorageConfigUpdateUpdateMutation({
-      onSuccess: () => {
-        toast.success('Successfully updated storage settings')
-      },
-    })
+  const { mutate: updateStorageConfig } = useProjectStorageConfigUpdateUpdateMutation({
+    onSuccess: () => {
+      toast.success('Successfully updated storage settings')
+      setIsUpdating(false)
+    },
+  })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!config) return console.error('Storage config is required')
+
+    setIsUpdating(true)
 
     if (shouldAutoValidateBucketLimits) {
       try {
@@ -172,6 +175,7 @@ export const StorageSettings = () => {
         )
 
         if (failingBuckets.length > 0) {
+          setIsUpdating(false)
           form.setError('fileSizeLimit', {
             type: 'manual',
             message: encodeBucketLimitErrorMessage(
@@ -186,6 +190,7 @@ export const StorageSettings = () => {
 
         form.clearErrors('fileSizeLimit')
       } catch (error) {
+        setIsUpdating(false)
         const message =
           error instanceof Error && error.message.length > 0 ? error.message : 'Unexpected error'
 
@@ -226,6 +231,7 @@ export const StorageSettings = () => {
         imageTransformationEnabled,
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess, config])
 
   return (
