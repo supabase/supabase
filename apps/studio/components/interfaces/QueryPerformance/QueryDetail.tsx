@@ -72,7 +72,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
       initialInput: prompt,
     })
 
-    // Close the query detail panel
+    // Close the query detail panel since we need to see the AI assistant panel
     onClose?.()
   }
 
