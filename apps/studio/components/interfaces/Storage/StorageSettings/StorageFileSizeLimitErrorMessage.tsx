@@ -37,7 +37,7 @@ export const StorageFileSizeLimitErrorMessage = ({
   const primaryBucketLink =
     projectRef !== undefined ? (
       <InlineLink
-        href={`/project/${projectRef}/storage/files/buckets/${primaryBucket.name}`}
+        href={`/project/${projectRef}/storage/files/buckets/${primaryBucket.name}?edit=true`}
         className={cn(
           'text-destructive decoration-destructive-500',
           'hover:text-destructive hover:decoration-destructive transition'
@@ -70,7 +70,8 @@ export const StorageFileSizeLimitErrorMessage = ({
                     'cursor-default'
                   )}
                 >
-                  {showOtherCount && `+${otherBuckets.length} `}other buckets
+                  {showOtherCount && `+${otherBuckets.length} `}other bucket
+                  {otherBuckets.length > 1 ? 's' : ''}
                 </span>
               </TooltipTrigger>
               <TooltipContent side="bottom">
@@ -80,7 +81,9 @@ export const StorageFileSizeLimitErrorMessage = ({
                     return (
                       <li key={name} className="hover:underline underline-offset-2">
                         {projectRef !== undefined ? (
-                          <Link href={`/project/${projectRef}/storage/files/buckets/${name}`}>
+                          <Link
+                            href={`/project/${projectRef}/storage/files/buckets/${name}?edit=true`}
+                          >
                             {name} ({formattedLimit})
                           </Link>
                         ) : (
