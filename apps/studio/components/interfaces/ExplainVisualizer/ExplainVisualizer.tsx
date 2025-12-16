@@ -29,7 +29,7 @@ export function ExplainVisualizer({ rows, onShowRaw }: ExplainVisualizerProps) {
       {onShowRaw && <ExplainHeader mode="visual" onToggleMode={onShowRaw} summary={summary} />}
 
       {/* Tree visualization */}
-      <div className="p-4 mb-10 overflow-auto flex-1">
+      <div className="p-4 pb-10 overflow-auto flex-1">
         {parsedTree.map((node, idx) => (
           <ExplainNodeRenderer key={idx} node={node} depth={0} maxCost={maxCost} isRoot={true} />
         ))}
