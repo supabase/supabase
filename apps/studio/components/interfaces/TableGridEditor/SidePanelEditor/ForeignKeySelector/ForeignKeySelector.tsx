@@ -62,14 +62,20 @@ export const ForeignKeySelector = ({
   const { selectedSchema } = useQuerySchemaState()
 
   const [fk, setFk] = useState(EMPTY_STATE)
-  const [errors, setErrors] = useState<{ columns?: string; types?: any[]; typeNotice?: any[] }>({})
-  const hasTypeErrors = (errors?.types ?? []).filter((x: any) => x !== undefined).length > 0
-  const hasTypeNotices = (errors?.typeNotice ?? []).filter((x: any) => x !== undefined).length > 0
+  const [errors, setErrors] = useState<{
+    columns?: string
+    types?: { sourceType: string; targetType: string }[]
+    typeNotice?: { sourceType: string; targetType: string }[]
+  }>({})
+  const hasTypeErrors = (errors?.types ?? []).filter((x) => x !== undefined).length > 0
+  const hasTypeNotices = (errors?.typeNotice ?? []).filter((x) => x !== undefined).length > 0
 
-  const { data: schemas } = useSchemasQuery({
+  const { data: schemas = [] } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const sortedSchemas = schemas.sort((a, b) => a.name.localeCompare(b.name))
+
   const { data: tables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -145,8 +151,8 @@ export const ForeignKeySelector = ({
     setFk({ ...fk, [action]: value })
   }
 
-  const validateSelection = (resolve: any) => {
-    const errors: any = {}
+  const validateSelection = (resolve: () => void) => {
+    const errors: Record<string, string> = {}
     const incompleteColumns = fk.columns.filter(
       (column) => column.source === '' || column.target === ''
     )
@@ -164,8 +170,8 @@ export const ForeignKeySelector = ({
   }
 
   const validateType = () => {
-    const typeNotice: any = []
-    const typeErrors: any = []
+    const typeNotice: { sourceType: string; targetType: string }[] = []
+    const typeErrors: { sourceType: string; targetType: string }[] = []
 
     fk.columns.forEach((column) => {
       const { source, target, sourceType: sType, targetType: tType } = column
@@ -205,10 +211,12 @@ export const ForeignKeySelector = ({
       if (foreignKey !== undefined) setFk(foreignKey)
       else setFk({ ...EMPTY_STATE, id: uuidv4() })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
 
   useEffect(() => {
     if (visible) validateType()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fk])
 
   return (
@@ -223,7 +231,7 @@ export const ForeignKeySelector = ({
           disableApply={disableApply}
           applyButtonLabel="Save"
           closePanel={onClose}
-          applyFunction={(resolve: any) => validateSelection(resolve)}
+          applyFunction={(resolve) => validateSelection(resolve)}
         />
       }
     >
@@ -245,7 +253,7 @@ export const ForeignKeySelector = ({
             value={fk.schema}
             onChange={(value: string) => updateSelectedSchema(value)}
           >
-            {schemas?.map((schema) => {
+            {sortedSchemas.map((schema) => {
               return (
                 <Listbox.Option
                   key={schema.id}
