@@ -3,132 +3,74 @@ title: Modality
 description: Present ephemeral information and demand action.
 ---
 
-Modal elements interrupt users from their current task and demand an action. They appear at the top of the visual stack, rendering everything beneath them inactive.
+Modal elements interrupt the user’s current task to ask for input, a decision, or focused attention. They appear at the top of the visual stack and (by default) render everything beneath them inactive.
 
-Given their highly interruptive nature, modal elements should be used sparingly. Some examples of their use include:
+Given their highly interruptive nature, modal elements should be used sparingly. Common use cases include:
 
-- Requiring confirmation from a user
-- Alerting the user of or slowing them down before a destructive action
-- Present temporary forms before an action can be completed
+- Requiring confirmation from the user
+- Requiring an ephemeral form submission from the user before an action can be completed
+- Alerting or slowing the user down before a destructive action
 
 We have two main ways of handling modality:
 
 - [Dialogs](#dialogs)
 - [Sheets](#sheets)
 
-The choice between the two simply comes down to the length of the content that needs to be displayed modally.
+As a general rule: use a dialogs for short, focused tasks and use sheets for longer forms or more detailed views.
 
 ## Dialogs
 
-For showing basic interruptive information centered on the viewport.
+Dialogs are centered overlays used for short, focused tasks. All dialogs should follow these best practices:
 
-### Best practices
-
-All dialogs should follow this basic advice:
-
-1. **Text should reiterate what the entry button said**
-
-   - Dialog header should match the action
-   - Confirmation button within Dialog should be clear
-
-2. **Keep them as simple as possible**
-
-   - No layered elements like subtitles or admonitions unless necessary
-   - Put all the focus on the actions to get out of the dialog
-
-3. **Accessibility**
-   - Always provide clear labels and descriptions
-   - Ensure keyboard navigation works correctly
-   - Use semantic HTML and ARIA attributes
-   - For critical actions, prevent accidental dismissal
-
-Use appropriate component for the use case. Here's a shorthand:
-
-- Confirmations → [Alert Dialog](#alert-dialog) or [Text Confirm Dialog](#text-confirm-dialog) depending on how much of a speedbump is needed
-- Interruptions or confirmations that require more than single paragraph → [Confirmation Modal](#confirmation-modal)
-- Anything else bespoke: [Dialog](#dialog)
-
-Use [Sheet](#sheets) for ephemeral forms and detailed views.
+- **Reiterative:** Dialog header and confirmation button text and should match the action and flow on from the entry point.
+- **Simple:** No layered elements like subtitles or admonitions unless necessary. Put all the focus on the actions to get out of the dialog.
+- **Accessibile:** Always provide clear labels and descriptions via semantic HTML and the correct ARIA attributes. Ensure keyboard navigation works correctly.
 
 ### Components
 
-#### [Alert Dialog](../components/alert-dialog)
+There are quite a few dialog components, each suited to a different task or context:
 
-Use this when a single paragraph is enough.
+- [Alert Dialog](../components/alert-dialog) contains a single, short paragraph and an explicit action.
+- [Text Confirm Dialog](../fragments/text-confirm-dialog) requires a textual response before the action is enabled.
+- [Confirmation Modal](../fragments/confirmation-modal) provides more flexible dialog body contents.
+- [Dialog](../components/dialog) is a generalized component for bespoke purposes.
+
+#### Alert Dialog
+
+[Alert Dialog](../components/alert-dialog) is used to confirm or acknowledge a critical action with a single, short paragraph and a clear decision.
 
 <ComponentPreview name="alert-dialog-demo" />
 
-Interrupts the user's workflow to communicate critical information or warnings and requires an explicit acknowledgment or decision (e.g., "Are you sure you want to delete this?"). Cannot be dismissed by clicking outside the modal, forcing the user to interact with one of the provided action buttons.
+#### Text Confirm Dialog
 
-**When to use**:
-
-- Critical confirmations (delete, destructive actions)
-- Important warnings that require acknowledgment
-- Actions that cannot be undone
-- Situations where accidental dismissal would be problematic
-
-**Note**: This component is too unweildy to use in all use cases. We should wrap this in a component that just exposes the title, description, and actions with props.
-
-#### [Text Confirm Dialog](../fragments/text-confirm-dialog)
-
-Use a Text Confirm Dialog to slow folks down and force consideration:
+[Text Confirm Dialog](../fragments/text-confirm-dialog) adds a deliberate speed bump for highly destructive actions by requiring the user to type an exact confirmation string before proceeding.
 
 <ComponentPreview name="text-confirm-dialog-demo" />
 
-Requires the user to enter an exact string before they can continue with a destructive action, like deletion.
+#### Confirmation Modal
 
-**When to use**:
-
-- Highly destructive actions (deleting buckets, projects, etc.)
-- When you need extra confirmation beyond a simple button click
-- Actions that are irreversible and need explicit user intent
-
-**Note**: This component currently wraps `Dialog`, which allows dismissal via Escape/click-outside. For true confirmations, this should be migrated to wrap `AlertDialog` instead.
-
-#### [Confirmation Modal](../fragments/confirmation-modal)
-
-A convenience wrapper that simplifies common confirmation patterns. Use when you need the user to make a selection or the contents are more than a single paragraph.
+[Confirmation Modal](../fragments/confirmation-modal) is a convenience wrapper for less-critical confirmations that require more than a single paragraph, such as additional context, callouts, or simple form elements.
 
 <ComponentPreview name="confirmation-modal-demo" />
 
-**When to use**:
+#### Dialog
 
-- Confirmations with optional additional content (form elements)
-
-**Note**: This component currently wraps `Dialog`, which allows dismissal via Escape/click-outside. For true confirmations, this should be migrated to wrap `AlertDialog` instead.
-
-#### [Dialog](../components/dialog)
+[Dialog](../components/dialog) is a general-purpose modal for bespoke flows such as forms, pickers, or non-critical interactions where dismissal is acceptable.
 
 <ComponentPreview name="dialog-demo" />
 
-A versatile modal window used for a wider range of interactions, such as displaying a list of options, complex forms, or non-urgent information. Can be dismissed by clicking outside the dialog area or pressing the 'Escape' key.
-
-**When to use**:
-
-- Non-critical information displays
-- Forms that can be cancelled without consequences
-- Content that benefits from being centered
-- Multi-step workflows
-
 ## Sheets
 
-**Purpose**: Show temporary information that is larger than a few fields, typically sliding in from the side.
+Sheets are dialogs presented as side panels. Use them for content that is larger than a few fields, or when a centered dialog would feel cramped.
 
-### Best practices
-
-**When to use**:
-
-- Forms with multiple fields
-- Detailed views or editors
-- Settings panels
-- Content that benefits from more horizontal space
-
-**Usage**: Sheets slide in from the right (default) or can be configured to slide from other sides. They're ideal for forms and detailed content that doesn't need to be centered.
+- **Use for**: multi-field forms, editors, settings panels, and detailed views.
+- **Prefer the default**: sheets slide in from the right unless you have a strong reason to use another side.
+- **Group content**: use header/sections/footer so the user can scan and act quickly.
 
 ### Components
 
-#### [Sheet](../components/sheet)
+#### Sheet
 
-Note: Sheets block underlying content by design, since action on their contents is required for a user to proceed. If you want a sheet-like element to accompany page-level elements (such as a list of logs), you need to set `modal={false}` like [this example](../components/sheet#nonmodal).
+[Sheet](../components/sheet) is modal by default, blocking interaction with the underlying page.
 
 <ComponentPreview name="sheet-demo" />

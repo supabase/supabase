@@ -14,13 +14,9 @@ Use Text Confirm Dialog:
 - When you need extra confirmation beyond a simple button click
 - Actions that are irreversible and need explicit user intent
 
-If you only need a short confirm/cancel choice (no typed input) or a dialog for non-destructive action, use [Alert Dialog](../components/alert-dialog). See [Modality](../ui-patterns/modality) for broader guidance on choosing between dialog patterns.
+For dialogs with non-destructive actions, use either [Alert Dialog](../components/alert-dialog) or [Confirmation Modal](../fragments/confirmation-modal). See [Modality](../ui-patterns/modality) for broader guidance on choosing between dialog patterns.
 
 ## Usage
-
-```tsx
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
-```
 
 ```tsx
 'use client'
@@ -28,7 +24,9 @@ import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { useState } from 'react'
 import { Button } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+```
 
+```tsx
 export default function TextConfirmDialogDemo() {
   const [visible, setVisible] = useState(false)
   const bucketName = 'profile-pictures'

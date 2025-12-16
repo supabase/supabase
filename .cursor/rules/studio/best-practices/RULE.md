@@ -1,9 +1,8 @@
 ---
-description: React best practices and coding standards for Studio
+description: "Studio: React and TypeScript best practices for maintainable Studio code"
 globs:
-  - apps/studio/**/*.tsx
-  - apps/studio/**/*.ts
-alwaysApply: true
+  - apps/studio/**/*.{ts,tsx}
+alwaysApply: false
 ---
 
 # Studio Best Practices
@@ -307,15 +306,15 @@ const Component = ({ onClose, onSave }: Props) => {
 
 ```tsx
 // ❌ Bad - creates new function every render
-<ExpensiveList
-  items={items}
-  onItemClick={(item) => handleItemClick(item)}
-/>
+<ExpensiveList items={items} onItemClick={(item) => handleItemClick(item)} />
 
 // ✅ Good - stable reference with useCallback
-const handleItemClick = useCallback((item: Item) => {
-  // handle click
-}, [dependencies])
+const handleItemClick = useCallback(
+  (item: Item) => {
+    // handle click
+  },
+  [dependencies]
+)
 
 <ExpensiveList items={items} onItemClick={handleItemClick} />
 ```

@@ -1,9 +1,9 @@
 ---
-description: E2E testing best practices for Playwright tests in Studio
+description: "Testing: Playwright E2E best practices for Studio tests (avoid flake + race conditions)"
 globs:
   - e2e/studio/**/*.ts
   - e2e/studio/**/*.spec.ts
-alwaysApply: true
+alwaysApply: false
 ---
 
 # E2E Testing Best Practices

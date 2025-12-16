@@ -11,37 +11,27 @@ source:
   radix: true
 ---
 
-Interrupts the user's workflow to communicate critical information or warnings and requires an explicit acknowledgment or decision (e.g., "Are you sure you want to delete this?"). Cannot be dismissed by clicking outside the modal, forcing the user to interact with one of the provided action buttons.
+Alert Dialog interrupts the user’s workflow to communicate critical information or require an explicit decision (for example, “Are you sure you want to delete this?”).
+
+<ComponentPreview name="alert-dialog-demo" peekCode wide />
+
+Unlike a generic [Dialog](../components/dialog), it **cannot be dismissed by clicking outside** — the user must take an action (cancel, confirm, or press Escape).
 
 **When to use**:
 
 - Critical confirmations (delete, destructive actions)
 - Important warnings that require acknowledgment
 - Actions that cannot be undone
-- Situations where accidental dismissal would be problematic
+- Situations where you want a clear, explicit confirm/cancel choice
 
 **Components**: `AlertDialog`, `AlertDialogContent`, `AlertDialogHeader`, `AlertDialogTitle`, `AlertDialogDescription`, `AlertDialogFooter`, `AlertDialogCancel`, `AlertDialogAction`, `AlertDialogTrigger` (from `ui`)
 
----
+## Notes
 
-Alert Dialog is strictly limited to confirming or acknowliging an action. It traps focus and requires interaction to close. Its `AlertDialogDescription` child is a paragraph element and therefore cannot contain multiple children.
+- **Keep the description simple**: `AlertDialogDescription` renders as a `<p>` and cannot contain block-level children (like `<ul>`, `<div>`, multiple paragraphs, etc.). If you need richer content, use [Dialog](../components/dialog) or [Confirmation Modal](../fragments/confirmation-modal).
+- **Always provide a cancel action**: include `AlertDialogCancel` in the footer so users can back out with a clear button (in addition to Escape).
 
-Alert DIalog is suitable for scenarios where you require a user to confirm (or cancel) an action with a single button press.
-
-- [Confirmation Modal](../fragments/confirmation-modal) is mroe appropriate if you need to use form elements or other more complex children.
-- [Text Confirm Dialog](../fragments/text-confirm-dialog) is more appropriate if you need the user to type back an answer
-
-See [Modality](../ui-patterns/modality) for other patterns and components.
-
-, try your best to bring it down to a single paragraph
-
-Blocks interaction to confirm something. Therefore not appropriate to show form elements. Use [Dialog](../components/dialog) for that.
-
-Keep it short and sweet. **Simple descriptions only**: `AlertDialogDescription` renders as a `<p>` tag and cannot contain block-level elements (like `<ul>`, `<div>`, etc.). Keep descriptions concise and text-only. For complex content with lists, multiple paragraphs, or other block elements, use [Dialog](../components/dialog) with `DialogSection` instead.
-
-Always include a `AlertDialogCancel` action in the `AlertDialogFooter`. The component is blocking and doesn’t have a close button in the `AlertDialogHeader`, so without this button, there is no way for a user to exit. Aside from the Esc keyboard key.
-
-<ComponentPreview name="alert-dialog-demo" peekCode wide />
+See [Modality](../ui-patterns/modality) for guidance on choosing between dialog patterns.
 
 ## Installation
 

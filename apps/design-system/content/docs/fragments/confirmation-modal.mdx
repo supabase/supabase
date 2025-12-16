@@ -4,19 +4,55 @@ description: A modal dialog that interrupts the user with important content and 
 component: true
 ---
 
-A convenience wrapper that simplifies common confirmation patterns. Currently wraps `Dialog` but semantically should wrap `AlertDialog` for better accessibility and user experience.
+Confirmation Modal is a convenience wrapper for confirmation flows. It is built on top of [Dialog](../components/dialog) but provides a simpler prop-based API for consistent confirmations.
 
-**When to use**:
+Use Confirmation Modal in these scenarios:
 
-- Simple "are you sure" confirmations
-- Confirmations with optional additional content (admonitions, form elements)
-- When you want a single component with convenient props instead of composing multiple AlertDialog components
-
-**Note**: This component currently wraps `Dialog`, which allows dismissal via Escape/click-outside. For true confirmations, this should be migrated to wrap `AlertDialog` instead.
+- Confirmations where the body needs more than a single short paragraph (for example, additional context, callouts, or small form elements)
+- When you want a single component with convenient props instead of composing a dialog manually
 
 <ComponentPreview name="confirmation-modal-demo" peekCode wide />
 
-**Props**:
+If your confirmation can be expressed as a single short paragraph, use [Alert Dialog](../components/alert-dialog). If you need typed intent or are performing a destructive action, consider [Text Confirm Dialog](../fragments/text-confirm-dialog).
+
+See [Modality](../ui-patterns/modality) for broader guidance on choosing between dialog patterns.
+
+## Usage
+
+```tsx
+import { useState } from 'react'
+import { Button } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+```
+
+```tsx
+export default function ModalDemo() {
+  const [visible, setVisible] = useState(false)
+
+  return (
+    <>
+      <Button type="default" onClick={() => setVisible(!visible)}>
+        Show Confirmation Modal
+      </Button>
+      <ConfirmationModal
+        visible={visible}
+        size="small"
+        title="Resume this project"
+        onCancel={() => setVisible(false)}
+        onConfirm={() => {}}
+        loading={false}
+        confirmLabel="Resume"
+        confirmLabelLoading="Resuming"
+        cancelLabel="Cancel"
+      >
+        {/* Dialog contents */}
+      </ConfirmationModal>
+    </>
+  )
+}
+```
+
+## Props
 
 - `visible`: Controls open state
 - `title`: Dialog title
@@ -25,5 +61,5 @@ A convenience wrapper that simplifies common confirmation patterns. Currently wr
 - `loading`: Loading state
 - `onConfirm`: Confirm handler
 - `onCancel`: Cancel handler
-- `alert`: Optional admonition object
+- `alert`: Optional callout (see [Admonition](../fragments/admonition))
 - `children`: Additional content
