@@ -3,8 +3,8 @@ import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
 import {
@@ -93,11 +93,12 @@ export const ServiceStatus = () => {
   const isBranch = project?.parentRef !== project?.ref
 
   // Get branches data when on a branch
-  const { data: branches, isLoading: isBranchesLoading } = useBranchesQuery(
+  const { data: branches, isPending: isBranchesLoading } = useBranchesQuery(
     { projectRef: isBranch ? project?.parentRef : undefined },
     {
       enabled: isBranch,
-      refetchInterval: (data) => {
+      refetchInterval: (query) => {
+        const data = query.state.data
         if (!data) return false
         const currentBranch = data.find((branch) => branch.project_ref === ref)
         return ['FUNCTIONS_DEPLOYED', 'MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(
@@ -116,14 +117,17 @@ export const ServiceStatus = () => {
   // [Joshen] Need pooler service check eventually
   const {
     data: status,
-    isLoading,
+    isPending: isLoading,
     refetch: refetchServiceStatus,
   } = useProjectServiceStatusQuery(
     {
       projectRef: ref,
     },
     {
-      refetchInterval: (data) => (data?.some((service) => !service.healthy) ? 5000 : false),
+      refetchInterval: (query) => {
+        const data = query.state.data
+        return data?.some((service) => !service.healthy) ? 5000 : false
+      },
     }
   )
   const { data: edgeFunctionsStatus, refetch: refetchEdgeFunctionServiceStatus } =
@@ -132,7 +136,10 @@ export const ServiceStatus = () => {
         projectRef: ref,
       },
       {
-        refetchInterval: (data) => (!data?.healthy ? 5000 : false),
+        refetchInterval: (query) => {
+          const data = query.state.data
+          return !data?.healthy ? 5000 : false
+        },
       }
     )
 
@@ -331,16 +338,27 @@ export const ServiceStatus = () => {
             </div>
           </Link>
         ))}
-        {allServicesOperational ? null : (
-          <>
-            <PopoverSeparator />
-            <div className="flex gap-2 text-xs text-foreground-light px-3 py-2">
-              <div className="mt-0.5">
-                <InfoIcon />
-              </div>
-              Recently restored projects can take up to 5 minutes to become fully operational.
+        {!allServicesOperational && (
+          <div className="flex gap-2 text-xs text-foreground-light px-3 py-2">
+            <div className="mt-0.5">
+              <InfoIcon />
             </div>
-          </>
+            <div className="flex flex-col gap-y-1">
+              <p>
+                {isProjectNew ? 'New' : 'Recently restored'} projects can take up to{' '}
+                {SERVICE_STATUS_THRESHOLD} minutes to become fully operational.
+              </p>
+              <p>
+                If services stay unhealthy, refer to our{' '}
+                <InlineLink
+                  href={`${DOCS_URL}/guides/troubleshooting/project-status-reports-unhealthy-services`}
+                >
+                  docs
+                </InlineLink>{' '}
+                for more information.
+              </p>
+            </div>
+          </div>
         )}
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>

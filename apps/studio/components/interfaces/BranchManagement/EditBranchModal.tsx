@@ -61,7 +61,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   const {
     data: connections,
     error: connectionsError,
-    isLoading: isLoadingConnections,
+    isPending: isLoadingConnections,
     isSuccess: isSuccessConnections,
     isError: isErrorConnections,
   } = useGitHubConnectionsQuery({
@@ -69,12 +69,12 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   })
 
   const { data: branches } = useBranchesQuery({ projectRef })
-  const { mutateAsync: checkGithubBranchValidity, isLoading: isChecking } =
+  const { mutateAsync: checkGithubBranchValidity, isPending: isChecking } =
     useCheckGithubBranchValidity({
       onError: () => {},
     })
 
-  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
+  const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onSuccess: (data) => {
       toast.success(`Successfully updated branch "${data.name}"`)
       onClose()
@@ -299,11 +299,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
                       <Label>Sync with a GitHub branch</Label>
-                      {!gitlessBranching && (
-                        <Badge variant="warning" size="small">
-                          Required
-                        </Badge>
-                      )}
+                      {!gitlessBranching && <Badge variant="warning">Required</Badge>}
                     </div>
                     <p className="text-sm text-foreground-light">
                       {gitlessBranching

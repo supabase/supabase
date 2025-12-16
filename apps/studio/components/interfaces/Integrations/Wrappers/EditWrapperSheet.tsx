@@ -44,12 +44,12 @@ export const EditWrapperSheet = ({
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
 
-  const { data: secrets, isLoading: isSecretsLoading } = useVaultSecretsQuery({
+  const { data: secrets, isPending: isSecretsLoading } = useVaultSecretsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  const { mutate: updateFDW, isLoading: isSaving } = useFDWUpdateMutation({
+  const { mutate: updateFDW, isPending: isSaving } = useFDWUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully updated ${wrapperMeta?.label} foreign data wrapper`)
       setWrapperTables([])
@@ -215,12 +215,12 @@ export const EditWrapperSheet = ({
                           values.wrapper_name !== initialValues.wrapper_name ? (
                             <>
                               Your wrapper's server name will be updated to{' '}
-                              <code className="text-xs">{values.wrapper_name}_server</code>
+                              <code className="text-code-inline">{values.wrapper_name}_server</code>
                             </>
                           ) : (
                             <>
                               Your wrapper's server name is{' '}
-                              <code className="text-xs">{values.wrapper_name}_server</code>
+                              <code className="text-code-inline">{values.wrapper_name}_server</code>
                             </>
                           )
                         }

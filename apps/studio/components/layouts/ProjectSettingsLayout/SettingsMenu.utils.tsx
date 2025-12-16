@@ -84,7 +84,7 @@ export const generateSettingsMenu = (
         {
           name: 'API Keys',
           key: 'api-keys',
-          url: `/project/${ref}/settings/api-keys`,
+          url: `/project/${ref}/settings/api-keys/new`,
           items: [],
         },
         {
@@ -114,7 +114,7 @@ export const generateSettingsMenu = (
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/vault/overview`,
           items: [],
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-          label: 'BETA',
+          label: 'Beta',
         },
       ],
     },

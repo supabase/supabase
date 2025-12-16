@@ -1,5 +1,28 @@
 export const storageKeys = {
+  bucket: (projectRef: string | undefined, bucketId: string | undefined) =>
+    ['projects', projectRef, 'buckets', bucketId] as const,
   buckets: (projectRef: string | undefined) => ['projects', projectRef, 'buckets'] as const,
+  bucketsList: (
+    projectRef: string | undefined,
+    params: {
+      limit?: number
+      search?: string
+      sortColumn?: string
+      sortOrder?: string
+    } = {}
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'buckets',
+      'list',
+      {
+        limit: params.limit,
+        search: params.search,
+        sortColumn: params.sortColumn,
+        sortOrder: params.sortOrder,
+      },
+    ] as const,
   analyticsBuckets: (projectRef: string | undefined) =>
     ['projects', projectRef, 'analytics-buckets'] as const,
   vectorBuckets: (projectRef: string | undefined) =>
@@ -9,10 +32,24 @@ export const storageKeys = {
   vectorBucketsIndexes: (projectRef: string | undefined, vectorBucketName: string | undefined) =>
     ['projects', projectRef, 'vector-buckets', vectorBucketName, 'indexes'] as const,
   archive: (projectRef: string | undefined) => ['projects', projectRef, 'archive'] as const,
-  icebergNamespaces: (catalog: string, warehouse: string) =>
-    ['catalog', catalog, 'warehouse', warehouse, 'namespaces'] as const,
-  icebergNamespace: (catalog: string, warehouse: string, namespace: string) =>
-    ['catalog', catalog, 'warehouse', warehouse, 'namespaces', namespace] as const,
-  icebergNamespaceTables: (catalog: string, warehouse: string, namespace: string) =>
-    ['catalog', catalog, 'warehouse', warehouse, 'namespaces', namespace, 'tables'] as const,
+  icebergNamespaces: ({ projectRef, warehouse }: { projectRef?: string; warehouse?: string }) =>
+    [projectRef, 'warehouse', warehouse, 'namespaces'] as const,
+  icebergNamespace: ({
+    projectRef,
+    warehouse,
+    namespace,
+  }: {
+    projectRef?: string
+    warehouse: string
+    namespace: string
+  }) => [projectRef, 'warehouse', warehouse, 'namespaces', namespace] as const,
+  icebergNamespaceTables: ({
+    projectRef,
+    warehouse,
+    namespace,
+  }: {
+    projectRef?: string
+    warehouse?: string
+    namespace?: string
+  }) => [projectRef, 'warehouse', warehouse, 'namespaces', namespace, 'tables'] as const,
 }

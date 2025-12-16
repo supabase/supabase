@@ -60,7 +60,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data: entities, isLoading: isLoadingEntities } = useEntityTypesQuery({
+  const { data: entities, isPending: isLoadingEntities } = useEntityTypesQuery({
     schemas: [selectedSchema],
     sort: 'alphabetical',
     search: searchTerm,
@@ -69,7 +69,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
   })
   const {
     data: tableColumns,
-    isLoading: isLoadingTableColumns,
+    isPending: isLoadingTableColumns,
     isSuccess: isSuccessTableColumns,
   } = useTableColumnsQuery({
     schema: selectedSchema,
@@ -78,7 +78,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     connectionString: project?.connectionString,
   })
 
-  const { mutate: createIndex, isLoading: isExecuting } = useDatabaseIndexCreateMutation({
+  const { mutate: createIndex, isPending: isExecuting } = useDatabaseIndexCreateMutation({
     onSuccess: () => {
       onClose()
       toast.success(`Successfully created index`)

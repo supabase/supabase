@@ -70,7 +70,7 @@ export const CreateWrapperSheet = ({
 
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
-  const { mutateAsync: createFDW, isLoading: isCreatingWrapper } = useFDWCreateMutation({
+  const { mutateAsync: createFDW, isPending: isCreatingWrapper } = useFDWCreateMutation({
     onSuccess: () => {
       toast.success(`Successfully created ${wrapperMeta?.label} foreign data wrapper`)
       setNewTables([])
@@ -97,7 +97,7 @@ export const CreateWrapperSheet = ({
     ),
   }
 
-  const { mutateAsync: createSchema, isLoading: isCreatingSchema } = useSchemaCreateMutation()
+  const { mutateAsync: createSchema, isPending: isCreatingSchema } = useSchemaCreateMutation()
 
   const onUpdateTable = (values: any) => {
     setNewTables((prev) => {
@@ -129,7 +129,7 @@ export const CreateWrapperSheet = ({
       }
     }
     if (selectedMode === 'schema') {
-      if (values.source_schema.length === 0) {
+      if (wrapperMeta.sourceSchemaOption && values.source_schema.length === 0) {
         errors.source_schema = 'Please provide a source schema'
       }
       if (values.target_schema.length === 0) {
@@ -162,7 +162,12 @@ export const CreateWrapperSheet = ({
           server_name: `${values.wrapper_name}_server`,
           supabase_target_schema: selectedMode === 'schema' ? values.target_schema : undefined,
         },
-        mode: selectedMode,
+        mode:
+          selectedMode === 'schema'
+            ? wrapperMeta.sourceSchemaOption
+              ? 'schema'
+              : 'skip'
+            : 'tables',
         tables: newTables,
         sourceSchema: values.source_schema,
         targetSchema: values.target_schema,
@@ -215,7 +220,7 @@ export const CreateWrapperSheet = ({
                           (values?.wrapper_name ?? '').length > 0 ? (
                             <>
                               Your wrapper's server name will be{' '}
-                              <code className="text-xs">{values.wrapper_name}_server</code>
+                              <code className="text-code-inline">{values.wrapper_name}_server</code>
                             </>
                           ) : (
                             ''

@@ -3,9 +3,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useIsLoggedIn, useParams } from 'common'
 import { useOrganizationAcceptInvitationMutation } from 'data/organization-members/organization-invitation-accept-mutation'
 import { useOrganizationInvitationTokenQuery } from 'data/organization-members/organization-invitation-token-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
 import { Button, cn } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
@@ -13,15 +14,18 @@ import { OrganizationInviteError } from './OrganizationInviteError'
 
 export const OrganizationInvite = () => {
   const router = useRouter()
-  const { profile } = useProfile()
+  const isLoggedIn = useIsLoggedIn()
+  const { profile, isLoading: isLoadingProfile } = useProfile()
   const { slug, token } = useParams()
+
+  const isSignUpEnabled = useIsFeatureEnabled('dashboard_auth:sign_up')
 
   const {
     data,
     error,
     isSuccess: isSuccessInvitation,
     isError: isErrorInvitation,
-    isLoading: isLoadingInvitation,
+    isPending: isLoadingInvitation,
   } = useOrganizationInvitationTokenQuery(
     { slug, token },
     {
@@ -38,8 +42,9 @@ export const OrganizationInvite = () => {
 
   const organizationName = isSuccessInvitation ? data?.organization_name : 'An organization'
   const loginRedirectLink = `/sign-in?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
+  const signupRedirectLink = `/sign-up?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
 
-  const { mutate: joinOrganization, isLoading: isJoining } =
+  const { mutate: joinOrganization, isPending: isJoining } =
     useOrganizationAcceptInvitationMutation({
       onSuccess: () => {
         router.push('/organizations')
@@ -63,24 +68,26 @@ export const OrganizationInvite = () => {
         'md:w-[400px]'
       )}
     >
-      {!profile ? (
+      {!isLoggedIn || (!profile && !isLoadingProfile) ? (
         <>
           <Admonition
             showIcon={false}
             type="default"
-            title="Sign in or create an account first to view this invitation"
-            className="mb-0 border-0 rounded-none text-left"
+            title={`Sign in${isSignUpEnabled ? ' or create an account' : ''} first to view this invitation`}
+            className="border-0 rounded-none text-left"
           />
           <div className="p-4 border-muted border-t flex gap-x-3 justify-center">
             <Button asChild type="default">
               <Link href={loginRedirectLink}>Sign in</Link>
             </Button>
-            <Button asChild type="default">
-              <Link href={loginRedirectLink}>Create an account</Link>
-            </Button>
+            {isSignUpEnabled && (
+              <Button asChild type="default">
+                <Link href={signupRedirectLink}>Create an account</Link>
+              </Button>
+            )}
           </div>
         </>
-      ) : isLoadingInvitation ? (
+      ) : isLoadingProfile || isLoadingInvitation ? (
         <div className="p-5">
           <GenericSkeletonLoader />
         </div>
@@ -90,7 +97,7 @@ export const OrganizationInvite = () => {
             type="default"
             title="Invalid invitation"
             description="This organization invite is no longer valid as it has either been accepted or declined"
-            className="mb-0 border-0 rounded-none text-left"
+            className="border-0 rounded-none text-left"
           />
           <div className="p-4 border-muted border-t">
             <Button type="default" asChild>
