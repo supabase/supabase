@@ -1,9 +1,17 @@
 import { paths } from 'api-types'
-import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
-import type { UserContent } from 'types'
 
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+import apiWrapper from 'lib/api/apiWrapper'
+import {
+  deleteSnippet,
+  getSnippet,
+  getSnippets,
+  saveSnippet,
+  SnippetSchema,
+  updateSnippet,
+} from 'lib/api/snippets.utils'
+
+const wrappedHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -11,72 +19,117 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (method) {
     case 'GET':
       return handleGetAll(req, res)
-    case 'POST':
-      return handlePost(req, res)
-    case 'PATCH':
-      return handlePatch(req, res)
     case 'PUT':
       return handlePut(req, res)
+    case 'POST':
+      return handlePost(req, res)
+    case 'DELETE':
+      return handleDelete(req, res)
     default:
-      res.setHeader('Allow', ['GET', 'POST', 'PATCH', 'PUT'])
+      res.setHeader('Allow', ['GET', 'PUT', 'POST', 'DELETE'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
 
+type GetRequestData = paths['/platform/projects/{ref}/content']['get']['parameters']['query']
 type GetResponseData =
   paths['/platform/projects/{ref}/content']['get']['responses']['200']['content']['application/json']
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetResponseData>) => {
+  const params = req.query as GetRequestData
+
   // Platform specific endpoint
-  const { favorite, visibility } = req.query
-  if (favorite || visibility === 'project') {
+  if (params?.visibility === 'project') {
     return res.status(200).json({ data: [] })
   }
 
-  const snippets = [
-    {
-      id: '1',
-      owner_id: 1,
-      name: 'SQL Query',
-      description: '',
-      type: 'sql' as const,
-      visibility: 'user' as const,
-      content: {
-        content_id: '1.0',
-        sql: `select * from
-  (select version()) as version,
-  (select current_setting('server_version_num')) as version_number;`,
-        schema_version: '1',
-      } as any,
-      favorite: false,
-      inserted_at: '',
-      project_id: 0,
-      updated_at: '',
-      owner: {
-        id: 1,
-        username: 'default',
-      },
-      updated_by: {
-        id: 1,
-        username: 'default',
-      },
-    },
-  ]
-  return res.status(200).json({ data: snippets })
-}
+  try {
+    const { cursor, snippets } = await getSnippets({
+      searchTerm: params?.name,
+      limit: params?.limit ? Number(params.limit) : undefined,
+      cursor: params?.cursor,
+      sort: params?.sort_by,
+      sortOrder: params?.sort_order,
+    })
 
-const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Platform specific endpoint
-  return res.status(200).json({})
-}
-
-const handlePatch = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Platform specific endpoint
-  return res.status(200).json({})
+    return res.status(200).json({ data: snippets, cursor })
+  } catch (error) {
+    console.error('Error fetching snippets:', error)
+    return res.status(500).json({ data: [] })
+  }
 }
 
 const handlePut = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Platform specific endpoint
-  const snippet: UserContent = req.body
-  return res.status(200).json({ data: snippet })
+  try {
+    const updates = req.body
+    // try to get the snippet first, if the snippet doesn't exist, it will throw an error
+    await getSnippet(updates.id)
+    const updatedSnippet = await updateSnippet(updates.id, updates)
+    return res.status(200).json(updatedSnippet)
+  } catch (error: any) {
+    if (error instanceof Error && error.message.includes('not found')) {
+      const body = req.body
+      const { data, error } = SnippetSchema.safeParse(body)
+
+      if (error) {
+        console.error('Validation error:', error)
+        return res.status(400).json({ error: error.message })
+      }
+
+      try {
+        const savedSnippet = await saveSnippet(data)
+        return res.status(200).json(savedSnippet)
+      } catch (error) {
+        console.error('Error creating snippet:', error)
+        return res.status(500).json({ error: 'Failed to create snippet' })
+      }
+    }
+    return res.status(500).json({ message: error?.message ?? 'Failed to update snippet' })
+  }
 }
+
+type PostRequestData =
+  paths['/platform/projects/{ref}/content']['post']['requestBody']['content']['application/json']
+
+const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
+  const body = req.body as PostRequestData
+
+  const { data, error } = SnippetSchema.safeParse(body)
+
+  if (error) {
+    console.error('Validation error:', error)
+    return res.status(400).json({ error: error.message })
+  }
+
+  try {
+    const savedSnippet = await saveSnippet(data)
+    return res.status(200).json(savedSnippet)
+  } catch (error) {
+    console.error('Error creating snippet:', error)
+    return res.status(500).json({ error: 'Failed to create snippet' })
+  }
+}
+
+const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
+  const { ids } = req.query
+
+  if (!ids || typeof ids !== 'string') {
+    return res.status(400).json({ error: 'Snippet IDs are required' })
+  }
+  const snippetIds = ids.split(',').map((id) => id.trim())
+  if (snippetIds.length === 0) {
+    return res.status(400).json({ error: 'No snippet IDs provided' })
+  }
+
+  try {
+    for (const id of snippetIds) {
+      await deleteSnippet(id)
+    }
+    return res.status(200).send(snippetIds.map((id) => ({ id })))
+  } catch (error) {
+    console.error('Error deleting snippets:', error)
+    return res.status(500).json({ error: 'Failed to delete snippets' })
+  }
+}
+
+export default wrappedHandler
