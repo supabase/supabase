@@ -80,7 +80,7 @@ import supabase
 movies = supabase.table("movies")
 
 # Select
-selected = [PublicMovies(m) for m in .select("*").execute().data]
+selected = [PublicMovies(m) for m in movies.select("*").execute().data]
 
 # Insert
 inserted = [PublicMovies(m) for m in movies.insert(PublicMoviesInsert(name="foo", data="bar")) \
