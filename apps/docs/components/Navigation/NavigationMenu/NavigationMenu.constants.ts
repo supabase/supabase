@@ -140,11 +140,10 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'dev-cli',
             href: '/guides/local-development' as `/${string}`,
             level: 'local_development',
-            enabled: localDevelopmentEnabled,
           },
           {
-            label: 'Deployment',
-            icon: 'deployment',
+            label: 'Deployment & Branching',
+            icon: 'git-branch',
             href: '/guides/deployment' as `/${string}`,
             level: 'deployment',
           },
@@ -491,8 +490,12 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/ai-prompts' as `/${string}`,
         },
         {
-          name: 'Model context protocol (MCP)',
+          name: 'Supabase MCP server',
           url: '/guides/getting-started/mcp' as `/${string}`,
+        },
+        {
+          name: 'Deploy MCP servers',
+          url: '/guides/getting-started/byo-mcp' as `/${string}`,
         },
       ],
     },
@@ -2250,7 +2253,6 @@ export const ai: NavMenuConstant = {
 export const local_development: NavMenuConstant = {
   icon: 'dev-cli',
   title: 'Local Dev / CLI',
-  enabled: localDevelopmentEnabled,
   url: '/guides/local-development',
   items: [
     { name: 'Overview', url: '/guides/local-development' },
@@ -2259,7 +2261,11 @@ export const local_development: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Getting started', url: '/guides/local-development/cli/getting-started' },
-        { name: 'Configuration', url: '/guides/local-development/cli/config' },
+        {
+          name: 'Configuration',
+          url: '/guides/local-development/cli/config',
+          enabled: localDevelopmentEnabled,
+        },
         { name: 'CLI commands', url: '/reference/cli' },
       ],
     },
@@ -2283,16 +2289,19 @@ export const local_development: NavMenuConstant = {
         {
           name: 'Restoring downloaded backup',
           url: '/guides/local-development/restoring-downloaded-backup' as `/${string}`,
+          enabled: localDevelopmentEnabled,
         },
         {
           name: 'Customizing email templates',
           url: '/guides/local-development/customizing-email-templates' as `/${string}`,
+          enabled: localDevelopmentEnabled,
         },
       ],
     },
     {
       name: 'Testing',
       url: undefined,
+      enabled: localDevelopmentEnabled,
       items: [
         { name: 'Getting started', url: '/guides/local-development/testing/overview' },
         {
@@ -2757,7 +2766,7 @@ export const telemetry: NavMenuConstant = {
             },
             {
               name: 'Datadog',
-              url: '/guides/telemetry/metrics/datadog' as `/${string}`,
+              url: 'https://docs.datadoghq.com/integrations/supabase/' as `/${string}`,
             },
             {
               name: 'Vendor-agnostic setup',
@@ -2848,9 +2857,9 @@ export const self_hosting: NavMenuConstant = {
 }
 
 export const deployment: NavMenuConstant = {
-  title: 'Deployment',
+  title: 'Deployment & Branching',
   url: '/guides/deployment',
-  icon: 'deployment',
+  icon: 'git-branch',
   items: [
     { name: 'Overview', url: '/guides/deployment' },
     {

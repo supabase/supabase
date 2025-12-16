@@ -17,7 +17,7 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
@@ -212,11 +212,7 @@ export const InfrastructureActivity = () => {
       </ScaffoldContainer>
       <ScaffoldContainer className="sticky top-0 py-6 border-b bg-studio z-10">
         <div className="flex items-center gap-x-4">
-          <DatabaseSelector
-            onCreateReplicaClick={() => {
-              setShowNewReplicaPanel(true)
-            }}
-          />
+          <DatabaseSelector />
           {!isLoadingSubscription && (
             <>
               <DateRangePicker
