@@ -14,12 +14,12 @@ import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { useTabsStateSnapshot } from 'state/tabs'
 import { cn } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { untitledSnippetTitle } from './SQLEditor.constants'
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
 
 export type MonacoEditorProps = {
   id: string
+  snippetName: string
   className?: string
   editorRef: MutableRefObject<IStandaloneCodeEditor | null>
   monacoRef: MutableRefObject<Monaco | null>
@@ -39,6 +39,7 @@ export type MonacoEditorProps = {
 
 const MonacoEditor = ({
   id,
+  snippetName,
   editorRef,
   monacoRef,
   autoFocus = true,
@@ -187,12 +188,10 @@ const MonacoEditor = ({
   function handleEditorChange(value: string | undefined) {
     tabsSnap.makeActiveTabPermanent()
     if (id && value) {
-      if (!!snippet) {
-        setValue(value)
-      } else if (ref && !!profile && !!project) {
+      if (ref && profile !== undefined && project !== undefined) {
         const snippet = createSqlSnippetSkeletonV2({
-          id,
-          name: untitledSnippetTitle,
+          idOverride: id,
+          name: snippetName,
           sql: value,
           owner_id: profile?.id,
           project_id: project?.id,
@@ -200,6 +199,7 @@ const MonacoEditor = ({
         snapV2.addSnippet({ projectRef: ref, snippet })
         router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
       }
+      setValue(value)
     }
   }
 
