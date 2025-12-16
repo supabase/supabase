@@ -215,7 +215,7 @@ export const MCP_CLIENTS: McpClient[] = [
     key: 'gemini-cli',
     label: 'Gemini CLI',
     icon: 'gemini-cli',
-    configFile: 'settings.json',
+    configFile: '.gemini/settings.json',
     externalDocsUrl: 'https://geminicli.com/docs/tools/mcp-server/',
     transformConfig: (config): GeminiMcpConfig => {
       return {
