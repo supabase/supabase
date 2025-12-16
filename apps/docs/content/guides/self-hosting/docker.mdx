@@ -48,7 +48,7 @@ Minimum requirements for running all Supabase components, suitable for developme
 | CPU | 2 cores | 4 cores+ |
 | Disk | 50 GB SSD | 80 GB+ SSD |
 
-If you don't need specific services, such as Analytics (Logflare), Realtime, Storage, Auth, or PostgREST, you can exclude them from `docker-compose.yml` to reduce resource requirements.
+If you don't need specific services, such as Logflare (Analytics), Realtime, Storage, imgproxy, or Edge Runtime (Functions), you can remove the corresponding sections and dependencies from `docker-compose.yml` to reduce resource requirements.
 
 ## Installing Supabase
 
@@ -159,7 +159,7 @@ Use the key generator below to obtain and configure the following secure keys in
 2. Copy the generated value and update `ANON_KEY` in the `.env` file.
 3. Copy the generated value and update `SERVICE_ROLE_KEY` in the `.env` file.
 
-The generated keys expire in 5 years. You can verify them at [jwt.io](https://jwt.io) using the saved value of JWT_SECRET.
+The generated keys expire in 5 years. You can verify them at [jwt.io](https://jwt.io) using the saved value of `JWT_SECRET`.
 
 ### Configure other keys, and important URLs
 
@@ -349,7 +349,7 @@ If the tools and communities already exist, with an MIT, Apache 2, or equivalent
 - **[Realtime](https://github.com/supabase/realtime)** - Elixir server that listens to Postgres database changes and broadcasts them to subscribed clients
 - **[Storage](https://github.com/supabase/storage)** - RESTful API for managing files in S3, with Postgres handling permissions
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-- **[ImgProxy](https://github.com/imgproxy/imgproxy)** - Fast and secure image processing server
+- **[imgproxy](https://github.com/imgproxy/imgproxy)** - Fast and secure image processing server
 - **[postgres-meta](https://github.com/supabase/postgres-meta)** - RESTful API for managing Postgres (fetch tables, add roles, run queries)
 {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 - **[PostgreSQL](https://github.com/supabase/postgres)** - Object-relational database with over 30 years of active development
@@ -464,12 +464,13 @@ By default, Postgres is only accessible through Supavisor. If you need direct ac
 Edit `docker-compose.yml`:
 
 1. **Disable Supavisor** - Comment out or remove the entire `supavisor` service section
-2. **Expose Postgres port** - Add the port mapping to the `db` service:
+2. **Expose Postgres port** - Add the port mapping to the `db` service, it should look like the example below:
 
 ```yaml docker-compose.yml
 db:
   ports:
     - ${POSTGRES_PORT}:${POSTGRES_PORT}
+  container_name: supabase-db
 ```
 
 After restarting, you can connect to the database directly using a standard Postgres connection string:

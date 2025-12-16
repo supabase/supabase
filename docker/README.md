@@ -23,7 +23,7 @@ This Docker Compose configuration includes the following services:
 - **[PostgREST](https://github.com/PostgREST/postgrest)** - Web server that turns your PostgreSQL database directly into a RESTful API
 - **[Realtime](https://github.com/supabase/realtime)** - Elixir server that listens to PostgreSQL database changes and broadcasts them over websockets
 - **[Storage](https://github.com/supabase/storage)** - RESTful API for managing files in S3, with Postgres handling permissions
-- **[ImgProxy](https://github.com/imgproxy/imgproxy)** - Fast and secure image processing server
+- **[imgproxy](https://github.com/imgproxy/imgproxy)** - Fast and secure image processing server
 - **[postgres-meta](https://github.com/supabase/postgres-meta)** - RESTful API for managing Postgres (fetch tables, add roles, run queries)
 - **[PostgreSQL](https://github.com/supabase/postgres)** - Object-relational database with over 30 years of active development
 - **[Edge Runtime](https://github.com/supabase/edge-runtime)** - Web server based on Deno runtime for running JavaScript, TypeScript, and WASM services
