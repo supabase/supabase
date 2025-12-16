@@ -158,6 +158,10 @@ export const StorageSettings = () => {
       toast.success('Successfully updated storage settings')
       setIsUpdating(false)
     },
+    onError: (error) => {
+      toast.error(`Failed to update storage settings: ${error.message}`)
+      setIsUpdating(false)
+    },
   })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
