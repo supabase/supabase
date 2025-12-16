@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Filter, Plus } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import { ExportDialog } from 'components/grid/components/header/ExportDialog'
@@ -38,9 +39,8 @@ import {
   InnerSideBarFilters,
 } from 'ui-patterns/InnerSideMenu'
 import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
-import EntityListItem from './EntityListItem'
+import { EntityListItem } from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
-import { keepPreviousData } from '@tanstack/react-query'
 
 export const TableEditorMenu = () => {
   const { id: _id, ref: projectRef } = useParams()
