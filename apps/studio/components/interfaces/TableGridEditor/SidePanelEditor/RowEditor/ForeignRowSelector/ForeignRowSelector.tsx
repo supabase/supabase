@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import {
   formatSortURLParams,
@@ -23,7 +24,7 @@ import {
 } from 'state/role-impersonation-state'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { Button, SidePanel } from 'ui'
-import ActionBar from '../../ActionBar'
+import { ActionBar } from '../../ActionBar'
 import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 import { convertByteaToHex } from '../RowEditor.utils'
 import Pagination from './Pagination'
@@ -38,7 +39,7 @@ export interface ForeignRowSelectorProps {
   closePanel: () => void
 }
 
-const ForeignRowSelector = ({
+export const ForeignRowSelector = ({
   visible,
   foreignKey,
   onSelect,
@@ -99,7 +100,13 @@ const ForeignRowSelector = ({
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
-  const { data, isLoading, isSuccess, isError, isRefetching } = useTableRowsQuery(
+  const {
+    data,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    isRefetching,
+  } = useTableRowsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -111,7 +118,7 @@ const ForeignRowSelector = ({
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
-      keepPreviousData: true,
+      placeholderData: keepPreviousData,
     }
   )
 
@@ -269,5 +276,3 @@ const ForeignRowSelector = ({
     </SidePanel>
   )
 }
-
-export default ForeignRowSelector

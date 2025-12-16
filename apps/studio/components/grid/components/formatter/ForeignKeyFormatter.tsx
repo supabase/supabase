@@ -8,7 +8,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useTablesQuery as useTableRetrieveQuery } from 'data/tables/table-retrieve-query'
+import { useTableQuery } from 'data/tables/table-retrieve-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
 import type { SupaRow } from '../../types'
@@ -23,7 +23,7 @@ export const ForeignKeyFormatter = (props: Props) => {
   const { tableId, row, column } = props
   const { data: project } = useSelectedProjectQuery()
 
-  const { data, isLoading } = useTableEditorQuery({
+  const { data, isPending: isLoading } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id: tableId,
@@ -38,21 +38,18 @@ export const ForeignKeyFormatter = (props: Props) => {
       r.source_column_name === column.name
   )
 
-  const { data: targetTable, isLoading: isLoadingTargetTable } =
-    useTableRetrieveQuery<PostgresTable>(
-      {
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        schema: relationship?.target_table_schema ?? '',
-        name: relationship?.target_table_name ?? '',
-      },
-      {
-        enabled:
-          !!project?.ref &&
-          !!relationship?.target_table_schema &&
-          !!relationship?.target_table_name,
-      }
-    )
+  const { data: targetTable, isPending: isLoadingTargetTable } = useTableQuery<PostgresTable>(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: relationship?.target_table_schema ?? '',
+      name: relationship?.target_table_name ?? '',
+    },
+    {
+      enabled:
+        !!project?.ref && !!relationship?.target_table_schema && !!relationship?.target_table_name,
+    }
+  )
 
   const value = row[column.key]
   const formattedValue =
