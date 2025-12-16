@@ -251,7 +251,7 @@ export const calculateIopsRequiredForThroughput = (throughput: number) => {
   return Math.max(125, Math.ceil(throughput / 0.256))
 }
 
-export const calculateMaxIopsAllowedForComputeSize = (computeSize: string): number => {
+export const calculateBaselineIopsForComputeSize = (computeSize: string): number => {
   const parsed = computeInstanceAddonVariantIdSchema.safeParse(computeSize)
   if (!parsed.success || !isSupportedComputeVariant(parsed.data)) return 0
   return COMPUTE_BASELINE_IOPS[parsed.data] ?? 0
