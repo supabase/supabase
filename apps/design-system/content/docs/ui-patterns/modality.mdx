@@ -67,6 +67,8 @@ Interrupts the user's workflow to communicate critical information or warnings a
 - Actions that cannot be undone
 - Situations where accidental dismissal would be problematic
 
+**Note**: This component is too unweildy to use in all use cases. We should wrap this in a component that just exposes the title, description, and actions with props.
+
 #### [Text Confirm Dialog](../fragments/text-confirm-dialog)
 
 Use a Text Confirm Dialog to slow folks down and force consideration:
@@ -81,6 +83,8 @@ Requires the user to enter an exact string before they can continue with a destr
 - When you need extra confirmation beyond a simple button click
 - Actions that are irreversible and need explicit user intent
 
+**Note**: This component currently wraps `Dialog`, which allows dismissal via Escape/click-outside. For true confirmations, this should be migrated to wrap `AlertDialog` instead.
+
 #### [Confirmation Modal](../fragments/confirmation-modal)
 
 A convenience wrapper that simplifies common confirmation patterns. Use when you need the user to make a selection or the contents are more than a single paragraph.
@@ -89,9 +93,7 @@ A convenience wrapper that simplifies common confirmation patterns. Use when you
 
 **When to use**:
 
-- Simple "are you sure" confirmations
-- Confirmations with optional additional content (admonitions, form elements)
-- When you want a single component with convenient props instead of composing multiple AlertDialog components
+- Confirmations with optional additional content (form elements)
 
 **Note**: This component currently wraps `Dialog`, which allows dismissal via Escape/click-outside. For true confirmations, this should be migrated to wrap `AlertDialog` instead.
 
@@ -127,6 +129,6 @@ A versatile modal window used for a wider range of interactions, such as display
 
 #### [Sheet](../components/sheet)
 
-Note: Sheets block underlying content by design, since action on their contents is required for a user to proceed. If you want a sheet-like element to accompany page-level elements (such as a list of logs), you need to set ``modal={false}` like [this example](../components/sheet#nonmodal).
+Note: Sheets block underlying content by design, since action on their contents is required for a user to proceed. If you want a sheet-like element to accompany page-level elements (such as a list of logs), you need to set `modal={false}` like [this example](../components/sheet#nonmodal).
 
 <ComponentPreview name="sheet-demo" />
