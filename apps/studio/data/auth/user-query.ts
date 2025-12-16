@@ -6,6 +6,8 @@ import { UseCustomQueryOptions } from 'types'
 import { authKeys } from './keys'
 import { User } from './users-infinite-query'
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 type UserVariables = {
   projectRef?: string
   connectionString?: string | null
@@ -17,6 +19,7 @@ export async function getUser(
   signal?: AbortSignal
 ) {
   if (!userId) throw new Error('UserID is required')
+  if (!UUID_REGEX.test(userId)) throw new Error('Invalid user ID format')
 
   const sql = getUserSQL(userId)
   const { result } = await executeSql(
