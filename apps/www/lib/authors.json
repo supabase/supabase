@@ -785,5 +785,13 @@
     "position": "Engineering",
     "author_url": "https://github.com/edgurgel",
     "author_image_url": "https://github.com/edgurgel.png"
+  },
+  {
+    "author_id": "steven_eubank",
+    "author": "Steven Eubank",
+    "username": "smeubank",
+    "position": "Product Manager",
+    "author_url": "https://github.com/smeubank",
+    "author_image_url": "https://github.com/smeubank.png"
   }
 ]
