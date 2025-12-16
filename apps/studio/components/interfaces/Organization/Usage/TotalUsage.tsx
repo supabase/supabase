@@ -33,6 +33,10 @@ const METRICS_TO_HIDE_WITH_NO_USAGE: PricingMetric[] = [
   PricingMetric.DISK_SIZE_GB_HOURS_GP3,
   PricingMetric.DISK_SIZE_GB_HOURS_IO2,
   PricingMetric.DISK_THROUGHPUT_GP3,
+  PricingMetric.LOG_INGESTION,
+  PricingMetric.LOG_STORAGE,
+  PricingMetric.LOG_QUERYING,
+  PricingMetric.ACTIVE_COMPUTE_HOURS,
 ]
 
 export const TotalUsage = ({
@@ -50,7 +54,7 @@ export const TotalUsage = ({
   const {
     data: usage,
     error: usageError,
-    isLoading: isLoadingUsage,
+    isPending: isLoadingUsage,
     isError: isErrorUsage,
     isSuccess: isSuccessUsage,
   } = useOrgUsageQuery({
@@ -62,6 +66,8 @@ export const TotalUsage = ({
 
   // When the user filters by project ref or selects a custom timeframe, we only display usage+project breakdown, but no costs/limits
   const showRelationToSubscription = currentBillingCycleSelected && !projectRef
+
+  const isOnHigherPlan = ['team', 'enterprise', 'platform'].includes(subscription?.plan.id ?? '')
 
   const hasExceededAnyLimits =
     showRelationToSubscription &&
@@ -148,7 +154,7 @@ export const TotalUsage = ({
 
         {isSuccessUsage && subscription && (
           <div>
-            {showRelationToSubscription && (
+            {showRelationToSubscription && !isOnHigherPlan && (
               <p className="text-sm">
                 {!hasExceededAnyLimits ? (
                   <span>

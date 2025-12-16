@@ -87,7 +87,7 @@ export const PostgrestConfig = () => {
   const {
     data: config,
     isError,
-    isLoading: isLoadingConfig,
+    isPending: isLoadingConfig,
   } = useProjectPostgrestConfigQuery({ projectRef })
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -95,7 +95,7 @@ export const PostgrestConfig = () => {
   })
   const {
     data: allSchemas = [],
-    isLoading: isLoadingSchemas,
+    isPending: isLoadingSchemas,
     isSuccess: isSuccessSchemas,
   } = useSchemasQuery({
     projectRef: project?.ref,
@@ -104,7 +104,7 @@ export const PostgrestConfig = () => {
 
   const isLoading = isLoadingConfig || isLoadingSchemas
 
-  const { mutate: updatePostgrestConfig, isLoading: isUpdating } =
+  const { mutate: updatePostgrestConfig, isPending: isUpdating } =
     useProjectPostgrestConfigUpdateMutation({
       onSuccess: () => {
         toast.success('Successfully saved settings')
@@ -112,7 +112,17 @@ export const PostgrestConfig = () => {
     })
 
   const formId = 'project-postgres-config'
-  const hiddenSchema = ['auth', 'pgbouncer', 'hooks', 'extensions']
+  const hiddenSchema = [
+    'auth',
+    'pgbouncer',
+    'hooks',
+    'extensions',
+    'vault',
+    'storage',
+    'realtime',
+    'pgsodium',
+    'pgsodium_masks',
+  ]
   const { can: canUpdatePostgrestConfig, isSuccess: isPermissionsLoaded } =
     useAsyncCheckPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
 
@@ -206,7 +216,7 @@ export const PostgrestConfig = () => {
                   render={({ field }) => (
                     <FormItem_Shadcn_ className="w-full">
                       <FormItemLayout
-                        className="w-full px-8 py-8"
+                        className="w-full px-[var(--card-padding-x)] py-4"
                         layout="flex"
                         label="Enable Data API"
                         description="When enabled you will be able to use any Supabase client library and PostgREST endpoints with any schema configured below."
@@ -248,7 +258,7 @@ export const PostgrestConfig = () => {
                               </p>
                               <p>
                                 You will see errors from the Postgrest endpoint
-                                <code className="text-xs">/rest/v1/</code>.
+                                <code className="text-code-inline">/rest/v1/</code>.
                               </p>
                             </AlertDescription_Shadcn_>
                           </Alert_Shadcn_>
@@ -269,7 +279,7 @@ export const PostgrestConfig = () => {
                             description="The schemas to expose in your API. Tables, views and stored procedures in
                           these schemas will get API endpoints."
                             layout="horizontal"
-                            className="px-8 py-8"
+                            className="px-[var(--card-padding-x)] py-4"
                           >
                             {isLoadingSchemas ? (
                               <div className="col-span-12 flex flex-col gap-2 lg:col-span-7">
@@ -316,14 +326,15 @@ export const PostgrestConfig = () => {
                                   <>
                                     <p className="prose text-sm">
                                       You will not be able to query tables and views in the{' '}
-                                      <code className="text-xs">public</code> schema via supabase-js
-                                      or HTTP clients.
+                                      <code className="text-code-inline">public</code> schema via
+                                      supabase-js or HTTP clients.
                                     </p>
                                     {isGraphqlExtensionEnabled && (
                                       <>
                                         <p className="prose text-sm mt-2">
-                                          Tables in the <code className="text-xs">public</code>{' '}
-                                          schema are still exposed over our GraphQL endpoints.
+                                          Tables in the{' '}
+                                          <code className="text-code-inline">public</code> schema
+                                          are still exposed over our GraphQL endpoints.
                                         </p>
                                         <Button asChild type="default" className="mt-2">
                                           <Link href={`/project/${projectRef}/database/extensions`}>
@@ -347,7 +358,7 @@ export const PostgrestConfig = () => {
                       render={({ field }) => (
                         <FormItem_Shadcn_ className="w-full">
                           <FormItemLayout
-                            className="w-full px-8 py-8"
+                            className="w-full px-[var(--card-padding-x)] py-4"
                             layout="horizontal"
                             label="Extra search path"
                             description="Extra schemas to add to the search path of every request."
@@ -398,7 +409,7 @@ export const PostgrestConfig = () => {
                       render={({ field }) => (
                         <FormItem_Shadcn_ className="w-full">
                           <FormItemLayout
-                            className="w-full px-8 py-8"
+                            className="w-full px-[var(--card-padding-x)] py-4"
                             layout="horizontal"
                             label="Max rows"
                             description="The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests."
@@ -425,7 +436,7 @@ export const PostgrestConfig = () => {
                       render={({ field }) => (
                         <FormItem_Shadcn_ className="w-full">
                           <FormItemLayout
-                            className="w-full px-8 py-8"
+                            className="w-full px-[var(--card-padding-x)] py-4"
                             layout="horizontal"
                             label="Pool size"
                             description="Number of maximum connections to keep open in the Data API server's database pool. Unset to let it be configured automatically based on compute size."

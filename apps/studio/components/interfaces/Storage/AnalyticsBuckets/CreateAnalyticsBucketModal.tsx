@@ -1,28 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
-import { useIsAnalyticsBucketsEnabled } from 'data/config/project-storage-config-query'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useAnalyticsBucketCreateMutation } from 'data/storage/analytics-bucket-create-mutation'
 import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import {
   Button,
-  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -30,7 +23,6 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  DialogTrigger,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -38,17 +30,21 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { inverseValidBucketNameRegex, validBucketNameRegex } from '../CreateBucketModal.utils'
 import { BUCKET_TYPES } from '../Storage.constants'
 import { useIcebergWrapperExtension } from './AnalyticsBucketDetails/useIcebergWrapper'
+import {
+  reservedPrefixes,
+  reservedSuffixes,
+  validBucketNameRegex,
+} from './CreateAnalyticsBucketModal.utils'
 
 const FormSchema = z
   .object({
     name: z
       .string()
       .trim()
-      .min(1, 'Please provide a name for your bucket')
-      .max(100, 'Bucket name should be below 100 characters')
+      .min(3, 'Bucket name should be at least 3 characters')
+      .max(63, 'Bucket name should be up to 63 characters')
       .refine(
         (value) => !value.endsWith(' '),
         'The name of the bucket cannot end with a whitespace'
@@ -59,9 +55,51 @@ const FormSchema = z
       ),
   })
   .superRefine((data, ctx) => {
+    if (reservedPrefixes.test(data.name)) {
+      const [match] = data.name.match(reservedPrefixes) ?? []
+      return ctx.addIssue({
+        path: ['name'],
+        code: z.ZodIssueCode.custom,
+        message: `Bucket name cannot start with "${match}"`,
+      })
+    }
+
+    if (reservedSuffixes.test(data.name)) {
+      const [match] = data.name.match(reservedSuffixes) ?? []
+      return ctx.addIssue({
+        path: ['name'],
+        code: z.ZodIssueCode.custom,
+        message: `Bucket name cannot end with "${match}"`,
+      })
+    }
+
+    if (/[A-Z]/.test(data.name)) {
+      return ctx.addIssue({
+        path: ['name'],
+        code: z.ZodIssueCode.custom,
+        message: 'Bucket name can only be lowercase characters',
+      })
+    }
+
     if (!validBucketNameRegex.test(data.name)) {
-      const [match] = data.name.match(inverseValidBucketNameRegex) ?? []
-      ctx.addIssue({
+      if (!/^[a-z0-9]/.test(data.name)) {
+        return ctx.addIssue({
+          path: ['name'],
+          code: z.ZodIssueCode.custom,
+          message: 'Bucket name must start with a lowercase letter or number.',
+        })
+      }
+
+      if (!/[a-z0-9]$/.test(data.name)) {
+        return ctx.addIssue({
+          path: ['name'],
+          code: z.ZodIssueCode.custom,
+          message: 'Bucket name must end with a lowercase letter or number.',
+        })
+      }
+
+      const [match] = data.name.match(/[^a-z0-9-]/) ?? []
+      return ctx.addIssue({
         path: ['name'],
         code: z.ZodIssueCode.custom,
         message: !!match
@@ -76,57 +114,40 @@ const formId = 'create-analytics-storage-bucket-form'
 export type CreateAnalyticsBucketForm = z.infer<typeof FormSchema>
 
 interface CreateAnalyticsBucketModalProps {
-  buttonSize?: 'tiny' | 'small'
-  buttonType?: 'default' | 'primary'
-  buttonClassName?: string
-  disabled?: boolean
-  tooltip?: {
-    content: {
-      side?: 'top' | 'bottom' | 'left' | 'right'
-      text?: string
-    }
-  }
+  open: boolean
+  onOpenChange: (value: boolean) => void
 }
 
 export const CreateAnalyticsBucketModal = ({
-  buttonSize = 'tiny',
-  buttonType = 'default',
-  buttonClassName,
-  disabled = false,
-  tooltip,
+  open,
+  onOpenChange,
 }: CreateAnalyticsBucketModalProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
-  const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
   const { extension: wrappersExtension, state: wrappersExtensionState } =
     useIcebergWrapperExtension()
 
-  const [visible, setVisible] = useState(false)
-
-  const { data: buckets = [], isLoading } = useAnalyticsBucketsQuery({ projectRef: ref })
-  const icebergCatalogEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
+  const { data: buckets = [] } = useAnalyticsBucketsQuery({ projectRef: ref })
   const wrappersExtenstionNeedsUpgrading = wrappersExtensionState === 'needs-upgrade'
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { mutateAsync: createAnalyticsBucket, isLoading: isCreatingAnalyticsBucket } =
+  const { mutateAsync: createAnalyticsBucket, isPending: isCreatingAnalyticsBucket } =
     useAnalyticsBucketCreateMutation({
       // [Joshen] Silencing the error here as it's being handled in onSubmit
       onError: () => {},
     })
 
-  const { mutateAsync: createIcebergWrapper, isLoading: isCreatingIcebergWrapper } =
+  const { mutateAsync: createIcebergWrapper, isPending: isCreatingIcebergWrapper } =
     useIcebergWrapperCreateMutation()
 
-  const { mutateAsync: enableExtension, isLoading: isEnablingExtension } =
+  const { mutateAsync: enableExtension, isPending: isEnablingExtension } =
     useDatabaseExtensionEnableMutation()
 
   const config = BUCKET_TYPES['analytics']
   const isCreating = isEnablingExtension || isCreatingIcebergWrapper || isCreatingAnalyticsBucket
-  const isDisabled =
-    !canCreateBuckets || !icebergCatalogEnabled || isLoading || buckets.length >= 2 || disabled
 
   const form = useForm<CreateAnalyticsBucketForm>({
     resolver: zodResolver(FormSchema),
@@ -138,7 +159,7 @@ export const CreateAnalyticsBucketModal = ({
     if (!project) return console.error('Project details is required')
     if (!wrappersExtension) return console.error('Unable to find wrappers extension')
 
-    const hasExistingBucket = buckets.some((x) => x.id === values.name)
+    const hasExistingBucket = buckets.some((x) => x.name === values.name)
     if (hasExistingBucket) return toast.error('Bucket name already exists')
 
     try {
@@ -155,10 +176,9 @@ export const CreateAnalyticsBucketModal = ({
           schema: wrappersExtension.schema ?? 'extensions',
           version: wrappersExtension.default_version,
         })
-        await createIcebergWrapper({ bucketName: values.name })
-      } else if (wrappersExtensionState === 'installed') {
-        await createIcebergWrapper({ bucketName: values.name })
       }
+
+      await createIcebergWrapper({ bucketName: values.name })
 
       sendEvent({
         action: 'storage_bucket_created',
@@ -168,8 +188,7 @@ export const CreateAnalyticsBucketModal = ({
 
       form.reset()
       toast.success(`Created bucket “${values.name}”`)
-      setVisible(false)
-      router.push(`/project/${ref}/storage/analytics/buckets/${values.name}`)
+      onOpenChange(false)
     } catch (error: any) {
       toast.error(`Failed to create bucket: ${error.message}`)
     }
@@ -177,46 +196,17 @@ export const CreateAnalyticsBucketModal = ({
 
   const handleClose = () => {
     form.reset()
-    setVisible(false)
+    onOpenChange(false)
   }
 
   return (
     <Dialog
-      open={visible}
+      open={open}
       onOpenChange={(open) => {
         if (!open) handleClose()
       }}
     >
-      <DialogTrigger asChild>
-        <ButtonTooltip
-          block
-          size={buttonSize}
-          type={buttonType}
-          className={buttonClassName}
-          icon={<Plus size={14} />}
-          disabled={isDisabled}
-          tabIndex={isDisabled ? -1 : 0}
-          style={{ justifyContent: 'start' }}
-          onClick={() => setVisible(true)}
-          tooltip={{
-            content: {
-              side: tooltip?.content?.side || 'bottom',
-              className: cn(!icebergCatalogEnabled ? 'w-72 text-center' : ''),
-              text: !icebergCatalogEnabled
-                ? 'Analytics buckets are not enabled for your project. Please contact support to enable it.'
-                : !canCreateBuckets
-                  ? 'You need additional permissions to create buckets'
-                  : buckets.length >= 2
-                    ? 'Bucket limit reached'
-                    : tooltip?.content?.text,
-            },
-          }}
-        >
-          New bucket
-        </ButtonTooltip>
-      </DialogTrigger>
-
-      <DialogContent size="large" aria-describedby={undefined}>
+      <DialogContent size="medium" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Create {config.singularName} bucket</DialogTitle>
         </DialogHeader>
@@ -225,7 +215,7 @@ export const CreateAnalyticsBucketModal = ({
 
         <Form_Shadcn_ {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection className="flex flex-col gap-y-4">
+            <DialogSection className="flex flex-col !p-0">
               <FormField_Shadcn_
                 key="name"
                 name="name"
@@ -233,9 +223,10 @@ export const CreateAnalyticsBucketModal = ({
                 render={({ field }) => (
                   <FormItemLayout
                     name="name"
+                    className="p-5"
                     label="Bucket name"
                     labelOptional="Cannot be changed after creation"
-                    description="Must be between 3–63 characters. Only lowercase letters, numbers, dots, and hyphens are allowed."
+                    description="Must be between 3–63 characters. Only lowercase letters, numbers, and hyphens are allowed."
                   >
                     <FormControl_Shadcn_>
                       <Input_Shadcn_
@@ -255,13 +246,14 @@ export const CreateAnalyticsBucketModal = ({
               {wrappersExtenstionNeedsUpgrading ? (
                 <Admonition
                   type="warning"
+                  className="border-x-0 border-b-0 rounded-none"
                   title="Wrappers extension must be updated for Iceberg Wrapper support"
                 >
                   <p className="prose max-w-full text-sm !leading-normal">
-                    Update the <code className="text-xs">wrappers</code> extension by disabling and
-                    enabling it in{' '}
-                    <InlineLink href={`/project/${ref}/database/extensions?filter=wrappers`}>
-                      database extensions
+                    Update the <code className="text-code-inline">wrappers</code> extension by
+                    upgrading your project from your{' '}
+                    <InlineLink href={`/project/${ref}/settings/infrastructure`}>
+                      project settings
                     </InlineLink>{' '}
                     before creating an Analytics bucket.{' '}
                     <InlineLink href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}>
@@ -271,7 +263,7 @@ export const CreateAnalyticsBucketModal = ({
                   </p>
                 </Admonition>
               ) : (
-                <Admonition type="default">
+                <Admonition type="default" className="border-x-0 border-b-0 rounded-none">
                   <p className="!leading-normal">
                     Supabase will install the{' '}
                     {wrappersExtensionState !== 'installed' ? 'Wrappers extension and ' : ''}
@@ -288,7 +280,7 @@ export const CreateAnalyticsBucketModal = ({
         </Form_Shadcn_>
 
         <DialogFooter>
-          <Button type="default" disabled={isCreating} onClick={() => setVisible(false)}>
+          <Button type="default" disabled={isCreating} onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button

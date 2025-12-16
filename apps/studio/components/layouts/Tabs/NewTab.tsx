@@ -15,16 +15,18 @@ import { QuickstartTemplatesWidget } from 'components/interfaces/TableGridEditor
 import { QuickstartVariant } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableQuickstart/types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { usePHFlag } from 'hooks/ui/useFlag'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useTrack } from 'lib/telemetry/track'
 import { AssistantMessageType, useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   AiIconAnimation,
@@ -37,11 +39,9 @@ import {
   cn,
 } from 'ui'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
+import { SIDEBAR_KEYS } from '../ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ActionCard } from './ActionCard'
 import { RecentItems } from './RecentItems'
-import { SIDEBAR_KEYS } from '../ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 
 const NEW_PROJECT_THRESHOLD_DAYS = 7
 const TABLE_QUICKSTART_FLAG = 'tableQuickstart'
@@ -202,7 +202,6 @@ export function NewTab() {
 
     try {
       const snippet = createSqlSnippetSkeletonV2({
-        id: uuidv4(),
         name,
         sql,
         owner_id: profile?.id,

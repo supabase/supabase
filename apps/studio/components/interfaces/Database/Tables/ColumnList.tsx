@@ -48,7 +48,7 @@ export const ColumnList = ({
     data: selectedTable,
     error,
     isError,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
   } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -82,7 +82,7 @@ export const ColumnList = ({
             placeholder="Filter columns"
             value={filterString}
             onChange={(e: any) => setFilterString(e.target.value)}
-            icon={<Search size={12} />}
+            icon={<Search />}
           />
         </div>
         {!isSchemaLocked && isTableEntity && (
@@ -152,10 +152,10 @@ export const ColumnList = ({
                       )}
                     </Table.td>
                     <Table.td>
-                      <code className="text-xs">{x.data_type}</code>
+                      <code className="text-code-inline">{x.data_type}</code>
                     </Table.td>
                     <Table.td className="font-mono text-xs">
-                      <code className="text-xs">{x.format}</code>
+                      <code className="text-code-inline">{x.format}</code>
                     </Table.td>
                     <Table.td className="font-mono text-xs">
                       {x.is_nullable ? (
