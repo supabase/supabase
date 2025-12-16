@@ -42,6 +42,9 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Setup Evals
+        run: cd apps/studio && pnpm evals:setup
+
       - name: Run Evals
         uses: braintrustdata/eval-action@v1
         with:
