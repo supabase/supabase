@@ -17,7 +17,7 @@ export type ComputeDiskLimit = {
 
 const toMBps = (throughputMbps: number) => Math.round(throughputMbps / 8)
 
-export const COMPUTE_DISK: Record<string, ComputeDiskLimit> = {
+export const COMPUTE_DISK = {
   ci_nano: {
     name: 'Nano (free)',
     baselineIops: 250,
@@ -151,7 +151,9 @@ export const COMPUTE_DISK: Record<string, ComputeDiskLimit> = {
     baselineThroughputMBps: toMBps(40000),
     maxThroughputMBps: toMBps(40000),
   },
-}
+} as const satisfies Record<string, ComputeDiskLimit>
+
+export type ComputeDiskKey = keyof typeof COMPUTE_DISK
 
 export const COMPUTE_BASELINE_IOPS = Object.fromEntries(
   Object.entries(COMPUTE_DISK).map(([key, value]) => [key, value.baselineIops])
@@ -169,24 +171,8 @@ export const COMPUTE_MAX_THROUGHPUT = Object.fromEntries(
   Object.entries(COMPUTE_DISK).map(([key, value]) => [key, value.maxThroughputMBps])
 )
 
-export const computeInstanceAddonVariantIdSchema = z.enum([
-  'ci_nano',
-  'ci_micro',
-  'ci_small',
-  'ci_medium',
-  'ci_large',
-  'ci_xlarge',
-  'ci_2xlarge',
-  'ci_4xlarge',
-  'ci_8xlarge',
-  'ci_12xlarge',
-  'ci_16xlarge',
-  'ci_24xlarge',
-  'ci_24xlarge_optimized_cpu',
-  'ci_24xlarge_optimized_memory',
-  'ci_24xlarge_high_memory',
-  'ci_48xlarge',
-  'ci_48xlarge_optimized_cpu',
-  'ci_48xlarge_optimized_memory',
-  'ci_48xlarge_high_memory',
-])
+const computeInstanceAddonVariantIds = Object.keys(COMPUTE_DISK) as ComputeDiskKey[]
+
+export const computeInstanceAddonVariantIdSchema = z.enum(
+  computeInstanceAddonVariantIds as [ComputeDiskKey, ...ComputeDiskKey[]]
+)
