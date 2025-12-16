@@ -13,7 +13,7 @@ export const CLIENT_LIBRARIES = [
         url: 'https://github.com/supabase/supabase-js/tree/master/packages/core/postgrest-js',
       },
       {
-        name: 'gotrue-js',
+        name: 'auth-js',
         url: 'https://github.com/supabase/supabase-js/tree/master/packages/core/auth-js',
       },
       {
