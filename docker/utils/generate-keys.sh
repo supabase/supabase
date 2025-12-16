@@ -28,11 +28,6 @@ gen_token() {
     printf '%s' "${signed_content}.${signature}"
 }
 
-if ! command -v jq >/dev/null 2>&1; then
-    echo "jq not found."
-    exit 1
-fi
-
 jwt_secret="$(gen_base64 30)"
 
 # Used in get_token()
@@ -84,6 +79,11 @@ echo "POSTGRES_PASSWORD=${postgres_password}"
 echo "DASHBOARD_PASSWORD=${dashboard_password}"
 echo ""
 
+if ! test -t 0 > /dev/null 2>&1; then
+    echo "Running non-interactively. Skipping .env update."
+    exit 0
+fi
+
 printf "Update .env file? (y/N) "
 read -r REPLY
 case "$REPLY" in
@@ -95,18 +95,20 @@ case "$REPLY" in
         ;;
 esac
 
+echo "Updating .env..."
+
 sed \
     -i.old \
-    -e "s|JWT_SECRET.*$|JWT_SECRET=${jwt_secret}|" \
-    -e "s|ANON_KEY.*$|ANON_KEY=${anon_key}|" \
-    -e "s|SERVICE_ROLE_KEY.*$|SERVICE_ROLE_KEY=${service_role_key}|" \
-    -e "s|SECRET_KEY_BASE.*$|SECRET_KEY_BASE=${secret_key_base}|" \
-    -e "s|VAULT_ENC_KEY.*|VAULT_ENC_KEY=${vault_enc_key}|" \
-    -e "s|PG_META_CRYPTO_KEY.*|PG_META_CRYPTO_KEY=${pg_meta_crypto_key}|" \
-    -e "s|LOGFLARE_PUBLIC_ACCESS_TOKEN.*|LOGFLARE_PUBLIC_ACCESS_TOKEN=${logflare_public_access_token}|" \
-    -e "s|LOGFLARE_PRIVATE_ACCESS_TOKEN.*|LOGFLARE_PRIVATE_ACCESS_TOKEN=${logflare_private_access_token}|" \
-    -e "s|S3_PROTOCOL_ACCESS_KEY_ID.*|S3_PROTOCOL_ACCESS_KEY_ID=${s3_protocol_access_key_id}|" \
-    -e "s|S3_PROTOCOL_ACCESS_KEY_SECRET.*|S3_PROTOCOL_ACCESS_KEY_SECRET=${s3_protocol_access_key_secret}|" \
-    -e "s|POSTGRES_PASSWORD.*|POSTGRES_PASSWORD=${postgres_password}|" \
-    -e "s|DASHBOARD_PASSWORD.*|DASHBOARD_PASSWORD=${dashboard_password}|" \
+    -e "s|^JWT_SECRET=.*$|JWT_SECRET=${jwt_secret}|" \
+    -e "s|^ANON_KEY=.*$|ANON_KEY=${anon_key}|" \
+    -e "s|^SERVICE_ROLE_KEY=.*$|SERVICE_ROLE_KEY=${service_role_key}|" \
+    -e "s|^SECRET_KEY_BASE=.*$|SECRET_KEY_BASE=${secret_key_base}|" \
+    -e "s|^VAULT_ENC_KEY=.*$|VAULT_ENC_KEY=${vault_enc_key}|" \
+    -e "s|^PG_META_CRYPTO_KEY=.*$|PG_META_CRYPTO_KEY=${pg_meta_crypto_key}|" \
+    -e "s|^LOGFLARE_PUBLIC_ACCESS_TOKEN=.*$|LOGFLARE_PUBLIC_ACCESS_TOKEN=${logflare_public_access_token}|" \
+    -e "s|^LOGFLARE_PRIVATE_ACCESS_TOKEN=.*$|LOGFLARE_PRIVATE_ACCESS_TOKEN=${logflare_private_access_token}|" \
+    -e "s|^S3_PROTOCOL_ACCESS_KEY_ID=.*$|S3_PROTOCOL_ACCESS_KEY_ID=${s3_protocol_access_key_id}|" \
+    -e "s|^S3_PROTOCOL_ACCESS_KEY_SECRET=.*$|S3_PROTOCOL_ACCESS_KEY_SECRET=${s3_protocol_access_key_secret}|" \
+    -e "s|^POSTGRES_PASSWORD=.*$|POSTGRES_PASSWORD=${postgres_password}|" \
+    -e "s|^DASHBOARD_PASSWORD=.*$|DASHBOARD_PASSWORD=${dashboard_password}|" \
     .env
