@@ -1300,8 +1300,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/auth-helpers/:path*',
-    destination: '/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
+    source: '/docs/guides/auth/auth-helpers/auth-ui-overview',
+    destination: '/docs/guides/auth/auth-helpers/auth-ui',
   },
   {
     permanent: false,
@@ -2157,7 +2157,11 @@ module.exports = [
     source: '/customers/mendableai',
     destination: '/customers/firecrawl',
   },
-
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-helpers/nextjs-server-components',
+    destination: '/docs/guides/auth/auth-helpers/nextjs',
+  },
   {
     permanent: true,
     source: '/docs/guides/getting-started/openai/vector-search',
