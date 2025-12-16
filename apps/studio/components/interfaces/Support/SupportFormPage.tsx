@@ -11,6 +11,7 @@ import CopyButton from 'components/ui/CopyButton'
 import InformationBox from 'components/ui/InformationBox'
 import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useIncidentStatusQuery } from 'data/platform/incident-status-query'
 import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useStateTransition } from 'hooks/misc/useStateTransition'
@@ -19,6 +20,7 @@ import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { AIAssistantOption } from './AIAssistantOption'
 import { DiscordCTACard } from './DiscordCTACard'
 import { HighlightProjectRefProvider, useHighlightProjectRefContext } from './HighlightContext'
+import { IncidentCallout } from './IncidentCallout'
 import { Success } from './Success'
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
@@ -74,6 +76,9 @@ function SupportFormPageContent() {
   const selectedOrg = organizations?.find((org) => org.slug === orgSlug)
   const isFreePlan = selectedOrg?.plan.id === 'free'
 
+  const { data: incidents } = useIncidentStatusQuery()
+  const hasActiveIncidents = incidents && incidents.length > 0
+
   const sendTelemetry = useSupportFormTelemetry()
   useStateTransition(state, 'submitting', 'success', (_, curr) => {
     toast.success('Support request sent. Thank you!')
@@ -95,8 +100,14 @@ function SupportFormPageContent() {
       <SupportFormHeader />
 
       <div className="flex flex-col gap-y-4">
-        <AIAssistantOption projectRef={projectRef} organizationSlug={orgSlug} />
-        <DiscordCTACard organizationSlug={orgSlug} />
+        {hasActiveIncidents ? (
+          <IncidentCallout />
+        ) : (
+          <>
+            <AIAssistantOption projectRef={projectRef} organizationSlug={orgSlug} />
+            <DiscordCTACard organizationSlug={orgSlug} />
+          </>
+        )}
       </div>
 
       <SupportFormBody
