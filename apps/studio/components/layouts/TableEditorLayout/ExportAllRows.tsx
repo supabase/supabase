@@ -125,8 +125,6 @@ const fetchAllRows = async ({
     }
   }
 
-  console.log({ totalRows })
-
   if (totalRows !== undefined) {
     if (totalRows > MAX_EXPORT_ROW_COUNT) {
       return {
