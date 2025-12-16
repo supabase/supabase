@@ -158,7 +158,7 @@ export const calculateThroughputPrice = ({
   return { oldPrice: '0.00', newPrice: '0.00' }
 }
 
-type ComputeAddonVariant = {
+export type ComputeAddonVariant = {
   identifier: ComputeInstanceAddonVariantId
   name: string
   price_description: string
@@ -168,28 +168,47 @@ type ComputeAddonVariant = {
   meta?: ProjectAddonVariantMeta
 }
 
-type ComputeAddon = {
+type AvailableAddon = {
   type: string
-  variants: ComputeAddonVariant[]
+  variants: Array<{
+    identifier: string
+    name: string
+    price_description: string
+    price: number
+    price_interval: 'hourly' | 'monthly'
+    price_type: string
+    meta?: unknown
+  }>
+}
+
+const isProjectAddonVariantMeta = (meta: unknown): meta is ProjectAddonVariantMeta => {
+  return typeof meta === 'object' && meta !== null
 }
 
 export function getAvailableComputeOptions(
-  availableAddons: ComputeAddon[],
+  availableAddons: AvailableAddon[],
   projectCloudProvider?: string
 ) {
   const computeAddon = availableAddons.find((addon) => addon.type === 'compute_instance')
-  const computeOptions =
-    computeAddon?.variants.filter((option) => {
-      if (!projectCloudProvider) {
-        return true
+  const computeOptions: ComputeAddonVariant[] =
+    computeAddon?.variants.flatMap((option) => {
+      const parsedId = computeInstanceAddonVariantIdSchema.safeParse(option.identifier)
+      if (!parsedId.success) return []
+
+      if (projectCloudProvider && isProjectAddonVariantMeta(option.meta)) {
+        const isSupported =
+          !option.meta.supported_cloud_providers ||
+          option.meta.supported_cloud_providers.includes(projectCloudProvider)
+        if (!isSupported) return []
       }
 
-      const meta = option.meta
-
-      return (
-        !meta?.supported_cloud_providers ||
-        meta.supported_cloud_providers.includes(projectCloudProvider)
-      )
+      return [
+        {
+          ...option,
+          identifier: parsedId.data,
+          meta: isProjectAddonVariantMeta(option.meta) ? option.meta : undefined,
+        },
+      ]
     }) ?? []
 
   function hasMicroOptionFromApi() {
