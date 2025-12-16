@@ -74,6 +74,8 @@ hideToc: true
 
       </$CodeTabs>
 
+      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "", "tab": "" }} />
+
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
@@ -81,13 +83,13 @@ hideToc: true
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Query data from the app">
 
-    Create an `app.py` file and add a route that fetches data from your `instruments` table using the Supabase client.
-
     Install the `python-dotenv` package to load environment variables:
 
     ```bash
     pip install python-dotenv
     ```
+
+    Create an `app.py` file and add a route that fetches data from your `instruments` table using the Supabase client.
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
