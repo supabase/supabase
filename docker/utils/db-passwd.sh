@@ -1,28 +1,86 @@
 #!/bin/sh
 #
+# Portions of this code are derived from Inder Singh's update-db-pass.sh shell script.
 # Copyright 2025 Inder Singh. Licensed under Apache License 2.0.
 # Original source: https://github.com/singh-inder/supabase-automated-self-host/blob/main/docker/update-db-pass.sh
-# This version modifies original for POSIX shell compatibility [...]
+#
+# Changed:
+# - POSIX shell compatibility
+# - No hardcoded values for database service and admin user
+# - Use .env for the admin user and database service port
 #
 
 set -e
 
-# Generate password with hex characters only (safe for SQL/shell)
-# To use a custom password, use only letters and numbers
+if [ ! -f .env ]; then
+    echo "Missing .env file. Exiting."
+    exit 1
+fi
+
+# Generate random hex-only password to avoid issues with SQL/shell
 new_passwd="$(openssl rand -hex 16)"
+# If replacing with a custom password, avoid using @/?#:&
+# https://supabase.com/docs/guides/database/postgres/roles#passwords
+# new_passwd="d0notUseSpecialSymbolsForPq123-"
 
-if [ ! -w ".env" ]; then
-    echo ".env file must exist and be writable by the current user"
+# Check Postgres service status
+db_image_prefix="supabase.postgres:"
+db_srv_status=$(docker compose ps 2>/dev/null | grep "$db_image_prefix" | awk '{print $8}')
+
+if [ "$db_srv_status" != "Up" ]; then
+    echo "Postgres container is not running. Exiting."
     exit 1
 fi
 
-# Check if db container is running
-if ! docker compose ps db 2>/dev/null | grep -q "Up"; then
-    echo "Database container is not running. Start it with: docker compose up -d db"
-    exit 1
+# Get Postgres service name
+db_srv_name=$(docker compose ps 2>/dev/null | grep "$db_image_prefix" | awk '{print $4}')
+
+db_admin_user=$(grep -i "^POSTGRES_USER_READ_WRITE=" .env | cut -d '=' -f 2)
+user_source=" (.env):"
+if [ -z "$db_admin_user" ]; then
+    db_admin_user="supabase_admin"
+    user_source=" (default):"
 fi
 
-docker compose exec -T db psql -U supabase_admin -d "_supabase" <<EOF
+db_srv_port=$(grep -i "^POSTGRES_PORT=" .env | cut -d '=' -f 2)
+port_source=" (.env):"
+if [ -z "$db_srv_port" ]; then
+    db_srv_port="5432"
+    port_source=" (default):"
+fi
+
+echo ""
+echo "*** Check configuration below before updating database passwords! ***"
+echo ""
+echo "Service name (docker compose): $db_srv_name"
+echo "Service status: $db_srv_status"
+echo "Service port${port_source} $db_srv_port"
+echo "Admin user${user_source} $db_admin_user"
+
+if ! test -t 0; then
+    echo ""
+    echo "Running non-interactively. Not updating passwords."
+    exit 0
+fi
+
+echo "New database password: $new_passwd"
+echo ""
+
+printf "Update database passwords? (y/N) "
+read -r REPLY
+case "$REPLY" in
+    [Yy])
+        ;;
+    *)
+        echo "Canceled. Not updating passwords."
+        exit 0
+        ;;
+esac
+
+echo "Updating passwords..."
+echo "Connecting to the database service container..."
+
+docker compose exec -T $db_srv_name psql -U $db_admin_user -d "_supabase" <<EOF
 alter user anon with password '${new_passwd}';
 alter user authenticated with password '${new_passwd}';
 alter user authenticator with password '${new_passwd}';
@@ -53,7 +111,7 @@ BEGIN
     SET config = jsonb_set(
       config,
       '{url}',
-      '"postgresql://supabase_admin:${new_passwd}@db:5432/postgres"',
+      '"postgresql://${db_admin_user}:${new_passwd}@${db_srv_name}:${db_srv_port}/postgres"',
       false
     )
     WHERE type = 'postgres';
@@ -62,6 +120,10 @@ END
 \$\$;
 EOF
 
-sed -i.old "s|POSTGRES_PASSWORD.*|POSTGRES_PASSWORD=$new_passwd|" .env
+echo "Updating .env..."
+sed -i.old "s|^POSTGRES_PASSWORD=.*$|POSTGRES_PASSWORD=$new_passwd|" .env
 
-docker compose up -d --force-recreate
+echo "Success. To restart containers use:"
+echo ""
+echo "docker compose up -d --force-recreate"
+echo ""
