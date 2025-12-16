@@ -25,7 +25,7 @@ const TextConfirmModalWithCancelButton = () => {
 
   return (
     <>
-      <Button type="default" onClick={onVisibleChange}>
+      <Button type="danger" onClick={onVisibleChange}>
         Show Text Confirm Dialog
       </Button>
       <TextConfirmModal

@@ -1070,21 +1070,6 @@ export const examples: Registry = [
     files: ['example/text-confirm-dialog-demo.tsx'],
   },
   {
-    name: 'text-confirm-dialog-with-info-alert',
-    type: 'components:example',
-    files: ['example/text-confirm-dialog-with-info-alert.tsx'],
-  },
-  {
-    name: 'text-confirm-dialog-with-warning-alert',
-    type: 'components:example',
-    files: ['example/text-confirm-dialog-with-warning-alert.tsx'],
-  },
-  {
-    name: 'text-confirm-dialog-with-destructive-alert',
-    type: 'components:example',
-    files: ['example/text-confirm-dialog-with-destructive-alert.tsx'],
-  },
-  {
     name: 'text-confirm-dialog-with-size',
     type: 'components:example',
     files: ['example/text-confirm-dialog-with-size.tsx'],

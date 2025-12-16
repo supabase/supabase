@@ -4,72 +4,77 @@ description: A modal dialog that interrupts the user with important content and 
 component: true
 ---
 
-Requires the user to enter an exact string before they can continue with a destructive action, like deletion. Wraps the Shadcn `Dialog` component.
+Text Confirm Dialog adds a “speed bump” before a destructive action by requiring the user to type an exact string before the confirm action is enabled. It wraps the Shadcn [Dialog](../components/dialog) component.
 
-**When to use**:
+<ComponentPreview name="text-confirm-dialog-demo" peekCode showDottedGrid wide />
+
+Use Text Confirm Dialog:
 
 - Highly destructive actions (deleting buckets, projects, etc.)
 - When you need extra confirmation beyond a simple button click
 - Actions that are irreversible and need explicit user intent
 
-**Note**: This component also wraps `Dialog` but semantically should wrap `AlertDialog` since it's used for critical confirmations.
+If you only need a short confirm/cancel choice (no typed input) or a dialog for non-destructive action, use [Alert Dialog](../components/alert-dialog). See [Modality](../ui-patterns/modality) for broader guidance on choosing between dialog patterns.
 
-**Props**:
+## Usage
+
+```tsx
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+```
+
+```tsx
+'use client'
+
+import { useState } from 'react'
+import { Button } from 'ui'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+
+export default function TextConfirmDialogDemo() {
+  const [visible, setVisible] = useState(false)
+  const bucketName = 'profile-pictures'
+
+  return (
+    <>
+      <Button type="danger" onClick={() => setVisible(true)}>
+        Show Text Confirm Dialog
+      </Button>
+
+      <TextConfirmModal
+        visible={visible}
+        size="small"
+        variant="destructive"
+        title="Delete bucket"
+        confirmPlaceholder={bucketName}
+        confirmString={bucketName}
+        confirmLabel="Delete bucket"
+        onConfirm={() => setVisible(false)}
+        onCancel={() => setVisible(false)}
+      >
+        {* Optional body content *}
+      </TextConfirmModal>
+    </>
+  )
+}
+
+```
+
+## Props
 
 - `confirmString`: The exact string the user must type
 - `confirmPlaceholder`: Placeholder for the input
-- `variant`: 'default' | 'destructive' | 'warning'
-- `alert`: Optional admonition object
+- `variant`: `default` | `destructive` | `warning`
 - Other standard modal props
-
-<ComponentPreview
-  name="text-confirm-dialog-demo"
-  description="An alert with an icon, title and description. The title says 'Heads up!' and the description is 'You can add components to your app using the cli.'."
-  peekCode
-  showDottedGrid
-  wide
-/>
 
 ## Examples
 
-### With Info Alert
+### Cancel button
 
-<ComponentPreview
-  name="text-confirm-dialog-with-info-alert"
-  description="An alert with an icon, title and description. The title says 'Heads up!' and the description is 'You can add components to your app using the cli.'."
-/>
+<ComponentPreview name="text-confirm-dialog-with-cancel-button" />
 
-### With warning Alert
+### Children
 
-<ComponentPreview
-  name="text-confirm-dialog-with-warning-alert"
-  description="An alert with a destructive variant. The title says 'Delete this item?' and the description is 'This action cannot be undone.'."
-/>
+<ComponentPreview name="text-confirm-dialog-with-children" />
 
-### With destructive Alert
+### Size
 
-<ComponentPreview
-  name="text-confirm-dialog-with-destructive-alert"
-  description="An alert with a destructive variant. The title says 'Delete this item?' and the description is 'This action cannot be undone.'."
-/>
-
-### With cancel button
-
-<ComponentPreview
-  name="text-confirm-dialog-with-cancel-button"
-  description="An alert with a destructive variant. The title says 'Delete this item?' and the description is 'This action cannot be undone.'."
-/>
-
-### With children
-
-<ComponentPreview
-  name="text-confirm-dialog-with-children"
-  description="An alert with a destructive variant. The title says 'Delete this item?' and the description is 'This action cannot be undone.'."
-/>
-
-### With size
-
-<ComponentPreview
-  name="text-confirm-dialog-with-size"
-  description="An alert with a destructive variant. The title says 'Delete this item?' and the description is 'This action cannot be undone.'."
-/>
+<ComponentPreview name="text-confirm-dialog-with-size" />

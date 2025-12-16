@@ -1875,39 +1875,6 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "text-confirm-dialog-with-info-alert": {
-      name: "text-confirm-dialog-with-info-alert",
-      type: "components:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/text-confirm-dialog-with-info-alert")),
-      source: "",
-      files: ["registry/default/example/text-confirm-dialog-with-info-alert.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "text-confirm-dialog-with-warning-alert": {
-      name: "text-confirm-dialog-with-warning-alert",
-      type: "components:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/text-confirm-dialog-with-warning-alert")),
-      source: "",
-      files: ["registry/default/example/text-confirm-dialog-with-warning-alert.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "text-confirm-dialog-with-destructive-alert": {
-      name: "text-confirm-dialog-with-destructive-alert",
-      type: "components:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/text-confirm-dialog-with-destructive-alert")),
-      source: "",
-      files: ["registry/default/example/text-confirm-dialog-with-destructive-alert.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
     "text-confirm-dialog-with-size": {
       name: "text-confirm-dialog-with-size",
       type: "components:example",
@@ -3027,7 +2994,7 @@ export const Index: Record<string, any> = {
       source: "",
       files: ["registry/default/example/copy-error-messages.tsx"],
       category: "Getting Started",
-        subcategory: "Copywriting",
+      subcategory: "Copywriting",
       chunks: []
     },
     "copy-success-messages": {
@@ -3082,7 +3049,7 @@ export const Index: Record<string, any> = {
       source: "",
       files: ["registry/default/example/copy-confirmations.tsx"],
       category: "Getting Started",
-        subcategory: "Copywriting",
+      subcategory: "Copywriting",
       chunks: []
     },
   },
