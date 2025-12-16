@@ -132,7 +132,7 @@ export const sqlSyntaxScorer: EvalScorer<Input, Output, Expected> = async ({ out
   const score = totalQueries === 0 ? 1 : validQueries / totalQueries
 
   return {
-    name: 'SQL Syntax',
+    name: 'SQL Validity',
     score,
     metadata: errors.length > 0 ? { errors } : undefined,
   }
