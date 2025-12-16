@@ -262,7 +262,8 @@ export const useSnippetFolders = (projectRef: string) => {
     () =>
       Object.values(snapshot.folders)
         .filter((x) => x.projectRef === projectRef)
-        .map((x) => x.folder),
+        .map((x) => x.folder)
+        .sort((a, b) => a.name.localeCompare(b.name)),
     [projectRef, snapshot.folders]
   )
 }
