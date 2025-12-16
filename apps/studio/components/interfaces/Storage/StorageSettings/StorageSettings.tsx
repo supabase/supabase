@@ -78,7 +78,7 @@ export const StorageSettings = () => {
   const {
     data: config,
     error,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
   } = useProjectStorageConfigQuery({ projectRef })
@@ -94,7 +94,7 @@ export const StorageSettings = () => {
   const isSpendCapOn =
     organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
 
-  const { data: buckets = [], isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef })
+  const { data: buckets = [], isPending: isLoadingBuckets } = useBucketsQuery({ projectRef })
 
   // Calculate the minimum file size limit from existing buckets
   const minBucketFileSizeLimit = useMemo(() => {
@@ -221,7 +221,7 @@ export const StorageSettings = () => {
   return (
     <PageContainer>
       <PageSection>
-        <PageSectionContent>
+        <PageSectionContent className="flex flex-col gap-y-8">
           <Form_Shadcn_ {...form}>
             {isLoading || isLoadingPermissions ? (
               <GenericSkeletonLoader />
@@ -244,9 +244,9 @@ export const StorageSettings = () => {
                         {isListV2Upgrading && <StorageListV2MigratingCallout />}
                       </>
                     )}
-                    <form id={formId} className="" onSubmit={form.handleSubmit(onSubmit)}>
+                    <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
                       <Card>
-                        <CardContent className="pt-6">
+                        <CardContent>
                           <FormField_Shadcn_
                             control={form.control}
                             name="imageTransformationEnabled"
@@ -288,6 +288,7 @@ export const StorageSettings = () => {
                                 hideMessage
                                 layout="flex-row-reverse"
                                 label="Global file size limit"
+                                className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full [&>div]:min-w-100"
                                 description={
                                   <>
                                     Restrict the size of files uploaded across all buckets.{' '}
@@ -301,11 +302,11 @@ export const StorageSettings = () => {
                                 }
                               >
                                 <FormControl_Shadcn_>
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex items-center">
                                     <Input_Shadcn_
                                       type="number"
                                       {...field}
-                                      className="w-full"
+                                      className="w-full rounded-r-none border-r-0"
                                       disabled={isFreeTier || !canUpdateStorageSettings}
                                     />
                                     <FormField_Shadcn_
@@ -317,7 +318,7 @@ export const StorageSettings = () => {
                                           onValueChange={unitField.onChange}
                                           disabled={isFreeTier || !canUpdateStorageSettings}
                                         >
-                                          <SelectTrigger_Shadcn_ className="w-[180px]">
+                                          <SelectTrigger_Shadcn_ className="w-[180px] text-xs font-mono rounded-l-none bg-surface-300">
                                             <SelectValue_Shadcn_ placeholder="Choose a prefix">
                                               {storageUnit}
                                             </SelectValue_Shadcn_>
@@ -351,7 +352,7 @@ export const StorageSettings = () => {
                                   <p>
                                     Remove or decrease the limit on{' '}
                                     <InlineLink
-                                      href={`/project/${projectRef}/storage/buckets/${affectedBuckets[0]}`}
+                                      href={`/project/${projectRef}/storage/files/buckets/${affectedBuckets[0]}`}
                                       className="text-destructive decoration-destructive-500 hover:decoration-destructive"
                                     >
                                       {affectedBuckets[0]}
@@ -382,7 +383,7 @@ export const StorageSettings = () => {
                                                     className="hover:underline underline-offset-2"
                                                   >
                                                     <Link
-                                                      href={`/project/${projectRef}/storage/buckets/${name}`}
+                                                      href={`/project/${projectRef}/storage/files/buckets/${name}`}
                                                     >
                                                       {bucket?.name} ({formattedLimit.value}
                                                       {formattedLimit.unit})

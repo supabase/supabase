@@ -92,11 +92,7 @@ export const OrganizationDetailsForm = () => {
               render={({ field }) => (
                 <FormItemLayout label="Organization name" layout="flex-row-reverse">
                   <FormControl_Shadcn_>
-                    <Input
-                      {...field}
-                      className="w-full max-w-full md:w-96"
-                      disabled={!canUpdateOrganization || isUpdatingDetails}
-                    />
+                    <Input {...field} disabled={!canUpdateOrganization || isUpdatingDetails} />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
@@ -110,12 +106,7 @@ export const OrganizationDetailsForm = () => {
                   <CopyButton type="text" iconOnly text={selectedOrganization?.slug ?? ''} />
                 }
               >
-                <Input
-                  disabled
-                  className="w-full max-w-full md:w-64"
-                  id="slug"
-                  value={selectedOrganization?.slug ?? ''}
-                />
+                <Input disabled id="slug" value={selectedOrganization?.slug ?? ''} />
               </PrePostTab>
             </FormItemLayout>
           </CardContent>

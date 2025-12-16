@@ -10,7 +10,6 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import {
   Card,
   Input,
@@ -30,7 +29,7 @@ export const Extensions = () => {
   const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
 
-  const { data, isLoading } = useDatabaseExtensionsQuery({
+  const { data, isPending: isLoading } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

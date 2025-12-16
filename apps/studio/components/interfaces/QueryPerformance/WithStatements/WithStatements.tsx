@@ -5,6 +5,7 @@ import { Button } from 'ui'
 import { X, RefreshCw, RotateCcw } from 'lucide-react'
 import { Markdown } from '../../Markdown'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { Admonition } from 'ui-patterns'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -22,6 +23,8 @@ import { QueryPerformanceGrid } from '../QueryPerformanceGrid'
 import { transformStatementDataToRows } from './WithStatements.utils'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { captureQueryPerformanceError } from '../QueryPerformance.utils'
+import { getErrorMessage } from 'lib/get-error-message'
 
 interface WithStatementsProps {
   queryHitRate: PresetHookResult
@@ -37,9 +40,13 @@ export const WithStatements = ({
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const state = useDatabaseSelectorStateSnapshot()
-  const { data, isLoading, isRefetching } = queryPerformanceQuery
+  const { data, isLoading, isRefetching, error: queryError } = queryPerformanceQuery
   const isPrimaryDatabase = state.selectedDatabaseId === ref
   const formattedDatabaseId = formatDatabaseID(state.selectedDatabaseId ?? '')
+
+  const hitRateError = 'error' in queryHitRate ? queryHitRate.error : null
+  const metricsError = 'error' in queryMetrics ? queryMetrics.error : null
+  const mainQueryError = queryError || null
 
   const [showResetgPgStatStatements, setShowResetgPgStatStatements] = useState(false)
 
@@ -65,8 +72,82 @@ export const WithStatements = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref])
 
+  useEffect(() => {
+    if (mainQueryError) {
+      const errorMessage = getErrorMessage(mainQueryError)
+      captureQueryPerformanceError(mainQueryError, {
+        projectRef: ref,
+        databaseIdentifier: state.selectedDatabaseId,
+        queryPreset: 'unified',
+        queryType: 'mainQuery',
+        postgresVersion: project?.dbVersion,
+        databaseType: isPrimaryDatabase ? 'primary' : 'read-replica',
+        sql: queryPerformanceQuery.resolvedSql,
+        errorMessage: errorMessage || undefined,
+      })
+    }
+  }, [
+    mainQueryError,
+    ref,
+    state.selectedDatabaseId,
+    project?.dbVersion,
+    isPrimaryDatabase,
+    queryPerformanceQuery.resolvedSql,
+  ])
+
+  useEffect(() => {
+    if (hitRateError) {
+      const errorMessage = getErrorMessage(hitRateError)
+      captureQueryPerformanceError(hitRateError, {
+        projectRef: ref,
+        databaseIdentifier: state.selectedDatabaseId,
+        queryPreset: 'queryHitRate',
+        queryType: 'hitRate',
+        postgresVersion: project?.dbVersion,
+        databaseType: isPrimaryDatabase ? 'primary' : 'read-replica',
+        errorMessage: errorMessage || undefined,
+      })
+    }
+  }, [hitRateError, ref, state.selectedDatabaseId, project?.dbVersion, isPrimaryDatabase])
+
+  useEffect(() => {
+    if (metricsError) {
+      const errorMessage = getErrorMessage(metricsError)
+      captureQueryPerformanceError(metricsError, {
+        projectRef: ref,
+        databaseIdentifier: state.selectedDatabaseId,
+        queryPreset: 'queryMetrics',
+        queryType: 'metrics',
+        postgresVersion: project?.dbVersion,
+        databaseType: isPrimaryDatabase ? 'primary' : 'read-replica',
+        errorMessage: errorMessage || undefined,
+      })
+    }
+  }, [metricsError, ref, state.selectedDatabaseId, project?.dbVersion, isPrimaryDatabase])
+
+  const hasError = mainQueryError || hitRateError || metricsError
+  const errorMessage = mainQueryError
+    ? getErrorMessage(mainQueryError) || 'Failed to load query performance data'
+    : hitRateError
+      ? getErrorMessage(hitRateError) || 'Failed to load cache hit rate data'
+      : metricsError
+        ? getErrorMessage(metricsError) || 'Failed to load query metrics'
+        : null
+
   return (
     <>
+      {hasError && (
+        <div className="px-6 pt-4">
+          <Admonition
+            type="destructive"
+            title="Error loading query performance data"
+            description={
+              errorMessage ||
+              'An error occurred while loading query performance data. Please try refreshing the page.'
+            }
+          />
+        </div>
+      )}
       <QueryPerformanceMetrics />
       <QueryPerformanceFilterBar
         showRolesFilter={true}
@@ -98,7 +179,16 @@ export const WithStatements = ({
         }
       />
       <LoadingLine loading={isLoading || isRefetching} />
-      <QueryPerformanceGrid aggregatedData={processedData} isLoading={isLoading} />
+      <QueryPerformanceGrid
+        aggregatedData={processedData}
+        isLoading={isLoading}
+        error={
+          mainQueryError
+            ? getErrorMessage(mainQueryError) || 'Failed to load query performance data'
+            : null
+        }
+        onRetry={handleRefresh}
+      />
       <div
         className={cn('px-6 py-6 flex gap-x-4 border-t relative', {
           hidden: showBottomSection === false,

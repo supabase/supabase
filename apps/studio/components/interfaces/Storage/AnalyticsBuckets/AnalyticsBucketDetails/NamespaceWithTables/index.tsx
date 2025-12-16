@@ -5,7 +5,6 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { FormattedWrapperTable } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { ImportForeignSchemaDialog } from 'components/interfaces/Storage/ImportForeignSchemaDialog'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useFDWDropForeignTableMutation } from 'data/fdw/fdw-drop-foreign-table-mutation'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
 import { useIcebergNamespaceDeleteMutation } from 'data/storage/iceberg-namespace-delete-mutation'
@@ -66,7 +65,6 @@ export const NamespaceWithTables = ({
   const [showConfirmDeleteNamespace, setShowConfirmDeleteNamespace] = useState(false)
   const [isDeletingNamespace, setIsDeletingNamespace] = useState(false)
 
-  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
   const { publication, icebergWrapper } = useAnalyticsBucketAssociatedEntities({
     projectRef,
     bucketId,
@@ -74,7 +72,7 @@ export const NamespaceWithTables = ({
 
   const {
     data: tablesData = [],
-    isLoading: isLoadingNamespaceTables,
+    isPending: isLoadingNamespaceTables,
     isSuccess: isSuccessNamespaceTables,
   } = useIcebergNamespaceTablesQuery(
     {
@@ -83,8 +81,8 @@ export const NamespaceWithTables = ({
       projectRef,
     },
     {
-      refetchInterval: (_data) => {
-        const data = _data ?? []
+      refetchInterval: (query) => {
+        const data = query.state.data ?? []
         if (pollIntervalNamespaceTables === 0) return false
 
         const publicationTables = publication?.tables ?? []

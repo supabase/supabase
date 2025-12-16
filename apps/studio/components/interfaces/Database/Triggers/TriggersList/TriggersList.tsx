@@ -65,7 +65,7 @@ export const TriggersList = () => {
   const {
     data: triggers,
     error,
-    isLoading,
+    isPending,
     isError,
   } = useDatabaseTriggersQuery({
     projectRef: project?.ref,
@@ -165,7 +165,7 @@ execute function function_name();`)
     setTriggerToDelete(trigger.id.toString())
   }
 
-  if (isLoading) {
+  if (isPending) {
     return <GenericSkeletonLoader />
   }
 

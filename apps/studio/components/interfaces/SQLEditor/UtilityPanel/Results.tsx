@@ -12,6 +12,9 @@ import {
   copyToClipboard,
 } from 'ui'
 import { CellDetailPanel } from './CellDetailPanel'
+import { ExplainHeader } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.Header'
+import { ExplainVisualizer } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer'
+import { useFeatureFlags, useFlag } from 'common'
 
 function formatClipboardValue(value: any) {
   if (value === null) return ''
@@ -24,6 +27,13 @@ function formatClipboardValue(value: any) {
 const Results = ({ rows }: { rows: readonly any[] }) => {
   const [expandCell, setExpandCell] = useState(false)
   const [cellPosition, setCellPosition] = useState<{ column: any; row: any; rowIdx: number }>()
+  const [showRaw, setShowRaw] = useState(false)
+
+  const showPrettyExplain = useFlag('ShowPrettyExplain')
+
+  // Check if this is an EXPLAIN query result
+  const isExplainQuery =
+    rows.length > 0 && rows[0].hasOwnProperty('QUERY PLAN') && Object.keys(rows[0]).length === 1
 
   const formatter = (column: any, row: any) => {
     const cellValue = row[column]
@@ -105,6 +115,39 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
       renderHeaderCell: () => columnRender(key),
     }
   })
+
+  // Show pretty explain query results as diagram
+  if (showPrettyExplain && isExplainQuery) {
+    if (showRaw) {
+      return (
+        <div className="bg-studio border-t h-full flex flex-col">
+          <ExplainHeader mode="raw" onToggleMode={() => setShowRaw(false)} />
+          <div className="flex-grow overflow-auto">
+            <DataGrid
+              columns={columns}
+              rows={rows}
+              className="h-full flex-grow border-t-0"
+              rowClass={() => '[&>.rdg-cell]:items-center'}
+              onSelectedCellChange={setCellPosition}
+              onCellKeyDown={handleCopyCell}
+            />
+            <CellDetailPanel
+              column={cellPosition?.column.name ?? ''}
+              value={cellPosition?.row?.[cellPosition.column.name]}
+              visible={expandCell}
+              onClose={() => setExpandCell(false)}
+            />
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <div className="h-full flex flex-col">
+        <ExplainVisualizer rows={rows} onShowRaw={() => setShowRaw(true)} />
+      </div>
+    )
+  }
 
   return (
     <>

@@ -1,3 +1,4 @@
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -90,7 +91,7 @@ export const OrganizationProjectSelector = ({
     fetchNextPage,
   } = useOrgProjectsInfiniteQuery(
     { slug, search: search.length === 0 ? search : debouncedSearch },
-    { enabled: fetchOnMount || open, keepPreviousData: true }
+    { enabled: fetchOnMount || open, placeholderData: keepPreviousData }
   )
 
   const projects = useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
