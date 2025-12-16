@@ -1,9 +1,11 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Key } from 'lucide-react'
 import { useMemo } from 'react'
 
 import { useParams } from 'common'
 import type { showApiKey } from 'components/interfaces/Docs/Docs.types'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   DropdownMenu,
@@ -15,7 +17,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-import { useApiKeysVisibility } from '../APIKeys/hooks/useApiKeysVisibility'
 
 const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
@@ -34,7 +35,7 @@ export const LangSelector = ({
 }: LangSelectorProps) => {
   const { ref: projectRef } = useParams()
 
-  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: apiKeys = [], isPending: isLoadingAPIKeys } = useAPIKeysQuery(
     {
       projectRef,
