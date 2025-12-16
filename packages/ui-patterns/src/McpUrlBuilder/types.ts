@@ -121,6 +121,10 @@ export interface CodexMcpConfig {
   }
 }
 
+/**
+ * Configuration format for Gemini CLI MCP client.
+ * Uses httpUrl instead of url to match Gemini CLI's expected format.
+ */
 export interface GeminiMcpConfig {
   mcpServers: {
     supabase: {
