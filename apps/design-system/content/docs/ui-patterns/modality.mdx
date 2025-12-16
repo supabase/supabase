@@ -20,7 +20,7 @@ The choice between the two simply comes down to the length of the content that n
 
 ## Dialogs
 
-**Purpose**: Show basic information centered on the screen.
+For showing basic interruptive information centered on the viewport.
 
 ### Best practices
 
@@ -34,79 +34,27 @@ All dialogs should follow this basic advice:
 2. **Keep them as simple as possible**
 
    - No layered elements like subtitles or admonitions unless necessary
-   - Remove `description` from TextConfirmModal where redundant
-   - Sweep full-width Admonition uses in dialog components
+   - Put all the focus on the actions to get out of the dialog
 
-3. **Use appropriate component for the use case**
-
-   - Critical confirmations → `AlertDialog` or `ConfirmationModal`
-   - Destructive actions requiring text → `TextConfirmModal`
-   - Non-critical content → `Dialog`
-   - Forms and detailed views → `Sheet`
-
-4. **Accessibility**
+3. **Accessibility**
    - Always provide clear labels and descriptions
    - Ensure keyboard navigation works correctly
    - Use semantic HTML and ARIA attributes
    - For critical actions, prevent accidental dismissal
 
-#### Speedbump
+Use appropriate component for the use case. Here's a shorthand:
 
-Use [Alert Dialog](#alert-dialog) when a single paragraph is enough.
+- Confirmations → [Alert Dialog](#alert-dialog) or [Text Confirm Dialog](#text-confirm-dialog) depending on how much of a speedbump is needed
+- Interruptions or confirmations that require more than single paragraph → [Confirmation Modal](#confirmation-modal)
+- Anything else bespoke: [Dialog](#dialog)
 
-<ComponentPreview name="alert-dialog-demo" />
-
-#### Selection
-
-Use [Confirmation Modal](#confirmation-modal) when you need the user to make a selection or the contents are more than a single paragraph.
-
-<ComponentPreview name="confirmation-modal-demo" />
-
-#### Destructive action
-
-Destructive actions should require the user to slow down and confirm their action. Therefore only use the Alert Dialog scenarios where a `warning` is required but the action after dialog confirmation isn't destructive:
-
-<ComponentPreview name="alert-dialog-warning" />
-
-Use destructive only for file deletions:
-
-<ComponentPreview name="alert-dialog-destructive" />
-
-A `destructive` pattern here is too easy to skip over.
-
-Use a Text Confirm Dialog to slow folks down and force consideration:
-
-<ComponentPreview name="text-confirm-dialog-demo" />
+Use [Sheet](#sheets) for ephemeral forms and detailed views.
 
 ### Components
 
-#### [Confirmation Modal](../fragments/confirmation-modal)
-
-A convenience wrapper that simplifies common confirmation patterns.
-
-<ComponentPreview name="confirmation-modal-demo" />
-
-**When to use**:
-
-- Simple "are you sure" confirmations
-- Confirmations with optional additional content (admonitions, form elements)
-- When you want a single component with convenient props instead of composing multiple AlertDialog components
-
-**Note**: This component currently wraps `Dialog`, which allows dismissal via Escape/click-outside. For true confirmations, this should be migrated to wrap `AlertDialog` instead.
-
-#### [Text Confirm Modal](../fragments/text-confirm-dialog)
-
-<ComponentPreview name="text-confirm-dialog-demo" />
-
-Requires the user to enter an exact string before they can continue with a destructive action, like deletion.
-
-**When to use**:
-
-- Highly destructive actions (deleting buckets, projects, etc.)
-- When you need extra confirmation beyond a simple button click
-- Actions that are irreversible and need explicit user intent
-
 #### [Alert Dialog](../components/alert-dialog)
+
+Use this when a single paragraph is enough.
 
 <ComponentPreview name="alert-dialog-demo" />
 
@@ -118,6 +66,34 @@ Interrupts the user's workflow to communicate critical information or warnings a
 - Important warnings that require acknowledgment
 - Actions that cannot be undone
 - Situations where accidental dismissal would be problematic
+
+#### [Text Confirm Dialog](../fragments/text-confirm-dialog)
+
+Use a Text Confirm Dialog to slow folks down and force consideration:
+
+<ComponentPreview name="text-confirm-dialog-demo" />
+
+Requires the user to enter an exact string before they can continue with a destructive action, like deletion.
+
+**When to use**:
+
+- Highly destructive actions (deleting buckets, projects, etc.)
+- When you need extra confirmation beyond a simple button click
+- Actions that are irreversible and need explicit user intent
+
+#### [Confirmation Modal](../fragments/confirmation-modal)
+
+A convenience wrapper that simplifies common confirmation patterns. Use when you need the user to make a selection or the contents are more than a single paragraph.
+
+<ComponentPreview name="confirmation-modal-demo" />
+
+**When to use**:
+
+- Simple "are you sure" confirmations
+- Confirmations with optional additional content (admonitions, form elements)
+- When you want a single component with convenient props instead of composing multiple AlertDialog components
+
+**Note**: This component currently wraps `Dialog`, which allows dismissal via Escape/click-outside. For true confirmations, this should be migrated to wrap `AlertDialog` instead.
 
 #### [Dialog](../components/dialog)
 
