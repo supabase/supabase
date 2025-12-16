@@ -232,7 +232,7 @@ export const MCP_CLIENTS: McpClient[] = [
       return (
         <div className="space-y-2">
           <p className="text-xs text-warning">
-            Please ensure you are running Gemini CLI version <code>0.20.2</code> or higher.
+            Ensure you are running Gemini CLI version <code>0.20.2</code> or higher.
           </p>
           <p className="text-xs text-foreground-light">
             Add the Supabase MCP server to Gemini CLI:
