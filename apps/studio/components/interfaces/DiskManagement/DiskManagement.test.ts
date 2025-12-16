@@ -1,3 +1,66 @@
+import { describe, expect, it } from 'vitest'
+
+import {
+  calculateBaselineIopsForComputeSize,
+  calculateComputeSizeRequiredForIops,
+  calculateMaxIopsForComputeSize,
+  mapAddOnVariantIdToComputeSize,
+  mapComputeSizeNameToAddonVariantId,
+} from './DiskManagement.utils'
+
+describe('DiskManagement utils', () => {
+  describe('mapComputeSizeNameToAddonVariantId', () => {
+    it('maps known infra sizes to addon variant ids', () => {
+      expect(mapComputeSizeNameToAddonVariantId('4xlarge')).toBe('ci_4xlarge')
+    })
+
+    it('falls back to nano for unknown infra sizes', () => {
+      // @ts-expect-error intentional invalid value for runtime guard
+      expect(mapComputeSizeNameToAddonVariantId('unknown-size')).toBe('ci_nano')
+    })
+  })
+
+  describe('mapAddOnVariantIdToComputeSize', () => {
+    it('maps known addon ids to display names', () => {
+      expect(mapAddOnVariantIdToComputeSize('ci_4xlarge')).toBe('4XL')
+    })
+
+    it('falls back to Nano on invalid addon id', () => {
+      // @ts-expect-error intentional invalid value for runtime guard
+      expect(mapAddOnVariantIdToComputeSize('ci_invalid')).toBe('Nano')
+    })
+  })
+
+  describe('calculateBaselineIopsForComputeSize / calculateMaxIopsForComputeSize', () => {
+    it('returns 0 for invalid compute ids', () => {
+      expect(calculateBaselineIopsForComputeSize('invalid')).toBe(0)
+      expect(calculateMaxIopsForComputeSize('invalid')).toBe(0)
+    })
+
+    it('returns baseline and max for valid compute ids', () => {
+      expect(calculateBaselineIopsForComputeSize('ci_2xlarge')).toBe(12000)
+      expect(calculateMaxIopsForComputeSize('ci_2xlarge')).toBe(20000)
+    })
+  })
+
+  describe('calculateComputeSizeRequiredForIops', () => {
+    it('returns smallest size that satisfies requested IOPS', () => {
+      expect(calculateComputeSizeRequiredForIops(500)).toBe('ci_nano')
+      expect(calculateComputeSizeRequiredForIops(19000)).toBe('ci_large')
+      expect(calculateComputeSizeRequiredForIops(45000)).toBe('ci_12xlarge')
+    })
+
+    it('falls back to largest size when exceeding known max', () => {
+      const fallback = calculateComputeSizeRequiredForIops(500000)
+      expect([
+        'ci_48xlarge',
+        'ci_48xlarge_optimized_cpu',
+        'ci_48xlarge_optimized_memory',
+        'ci_48xlarge_high_memory',
+      ]).toContain(fallback)
+    })
+  })
+})
 import { describe, test, expect } from 'vitest'
 import { DiskType } from './ui/DiskManagement.constants'
 import {
