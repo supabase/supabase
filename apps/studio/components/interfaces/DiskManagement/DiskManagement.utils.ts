@@ -1,14 +1,17 @@
 import { ProjectDetail } from 'data/projects/project-detail-query'
 import { PlanId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
-import { computeInstanceAddonVariantIdSchema } from 'shared-data'
+import {
+  COMPUTE_BASELINE_IOPS,
+  COMPUTE_MAX_IOPS,
+  computeInstanceAddonVariantIdSchema,
+} from 'shared-data'
 import {
   ComputeInstanceAddonVariantId,
   ComputeInstanceSize,
   InfraInstanceSize,
 } from './DiskManagement.types'
 import { DISK_LIMITS, DISK_PRICING, DiskType, PLAN_DETAILS } from './ui/DiskManagement.constants'
-import { COMPUTE_BASELINE_IOPS } from 'shared-data'
 
 // Included disk size only applies to primary, not replicas
 export const calculateDiskSizePrice = ({
@@ -155,31 +158,46 @@ export const calculateThroughputPrice = ({
   return { oldPrice: '0.00', newPrice: '0.00' }
 }
 
-export function getAvailableComputeOptions(availableAddons: any[], projectCloudProvider?: string) {
+type ComputeAddonVariant = {
+  identifier: ComputeInstanceAddonVariantId
+  name: string
+  price_description: string
+  price: number
+  price_interval: 'hourly' | 'monthly'
+  price_type: string
+  meta?: ProjectAddonVariantMeta
+}
+
+type ComputeAddon = {
+  type: string
+  variants: ComputeAddonVariant[]
+}
+
+export function getAvailableComputeOptions(
+  availableAddons: ComputeAddon[],
+  projectCloudProvider?: string
+) {
+  const computeAddon = availableAddons.find((addon) => addon.type === 'compute_instance')
   const computeOptions =
-    availableAddons
-      .find((addon) => addon.type === 'compute_instance')
-      ?.variants.filter((option: { [key: string]: any }) => {
-        if (!projectCloudProvider) {
-          return true
-        }
+    computeAddon?.variants.filter((option) => {
+      if (!projectCloudProvider) {
+        return true
+      }
 
-        const meta = option.meta as ProjectAddonVariantMeta
+      const meta = option.meta
 
-        return (
-          !meta.supported_cloud_providers ||
-          meta.supported_cloud_providers.includes(projectCloudProvider)
-        )
-      }) ?? []
+      return (
+        !meta?.supported_cloud_providers ||
+        meta.supported_cloud_providers.includes(projectCloudProvider)
+      )
+    }) ?? []
 
   function hasMicroOptionFromApi() {
-    return (
-      availableAddons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
-    ).some((variant: any) => variant.identifier === 'ci_micro')
+    return (computeAddon?.variants ?? []).some((variant) => variant.identifier === 'ci_micro')
   }
 
   // Backwards comp until API is deployed
-  if (!hasMicroOptionFromApi) {
+  if (!hasMicroOptionFromApi()) {
     // Unshift to push to start of array
     computeOptions.unshift({
       identifier: 'ci_micro',
@@ -252,27 +270,34 @@ export const calculateBaselineIopsForComputeSize = (computeSize: string): number
   return COMPUTE_BASELINE_IOPS[parsed.data] ?? 0
 }
 
+export const calculateMaxIopsForComputeSize = (computeSize: string): number => {
+  const parsed = computeInstanceAddonVariantIdSchema.safeParse(computeSize)
+  if (!parsed.success) return 0
+  return COMPUTE_MAX_IOPS[parsed.data] ?? 0
+}
+
 export const calculateComputeSizeRequiredForIops = (
   iops: number
 ): ComputeInstanceAddonVariantId | undefined => {
-  const computeSizes: [ComputeInstanceAddonVariantId, number][] = Object.entries(
-    COMPUTE_BASELINE_IOPS
-  )
-    .map(([size, baselineIops]) => {
-      const parsedSize = computeInstanceAddonVariantIdSchema.safeParse(size)
-      return parsedSize.success ? [parsedSize.data, baselineIops] : undefined
-    })
-    .filter((value): value is [ComputeInstanceAddonVariantId, number] => value !== undefined)
-    .sort((a, b) => a[1] - b[1])
+  type ComputeSizeMax = { size: ComputeInstanceAddonVariantId; maxIops: number }
 
-  for (const [size, baselineIops] of computeSizes) {
-    if (iops <= baselineIops) {
+  const computeSizes: ComputeSizeMax[] = Object.entries(COMPUTE_MAX_IOPS)
+    .map((entry) => {
+      const [size, maxIops] = entry
+      const parsedSize = computeInstanceAddonVariantIdSchema.safeParse(size)
+      if (!parsedSize.success) return undefined
+      return { size: parsedSize.data, maxIops: Number(maxIops) }
+    })
+    .filter((value): value is ComputeSizeMax => value !== undefined)
+    .sort((a, b) => a.maxIops - b.maxIops)
+
+  for (const { size, maxIops } of computeSizes) {
+    if (iops <= maxIops) {
       return size
     }
   }
 
-  // fallback to largest compute size - this should never happen though :-/
-  const fallbackSize = computeSizes[computeSizes.length - 1]?.[0]
+  const fallbackSize = computeSizes[computeSizes.length - 1]?.size
   if (!fallbackSize) return undefined
   return fallbackSize
 }
@@ -300,57 +325,69 @@ export const formatComputeName = (compute: string) => {
   return compute.toUpperCase().replace('CI_', '')
 }
 
+const infraToAddonVariant: Record<InfraInstanceSize, ComputeInstanceAddonVariantId> = {
+  pico: 'ci_nano',
+  nano: 'ci_nano',
+  micro: 'ci_micro',
+  small: 'ci_small',
+  medium: 'ci_medium',
+  large: 'ci_large',
+  xlarge: 'ci_xlarge',
+  '2xlarge': 'ci_2xlarge',
+  '4xlarge': 'ci_4xlarge',
+  '8xlarge': 'ci_8xlarge',
+  '12xlarge': 'ci_12xlarge',
+  '16xlarge': 'ci_16xlarge',
+  '24xlarge': 'ci_24xlarge',
+  '24xlarge_optimized_memory': 'ci_24xlarge_optimized_memory',
+  '24xlarge_optimized_cpu': 'ci_24xlarge_optimized_cpu',
+  '24xlarge_high_memory': 'ci_24xlarge_high_memory',
+  '48xlarge': 'ci_48xlarge',
+  '48xlarge_optimized_memory': 'ci_48xlarge_optimized_memory',
+  '48xlarge_optimized_cpu': 'ci_48xlarge_optimized_cpu',
+  '48xlarge_high_memory': 'ci_48xlarge_high_memory',
+}
+
+const isInfraInstanceSize = (value: string): value is InfraInstanceSize =>
+  Object.prototype.hasOwnProperty.call(infraToAddonVariant, value)
+
 export const mapComputeSizeNameToAddonVariantId = (
   computeSize: ProjectDetail['infra_compute_size']
 ): ComputeInstanceAddonVariantId => {
-  return {
-    pico: 'ci_nano',
-    nano: 'ci_nano',
-    micro: 'ci_micro',
-    small: 'ci_small',
-    medium: 'ci_medium',
-    large: 'ci_large',
-    xlarge: 'ci_xlarge',
-    '2xlarge': 'ci_2xlarge',
-    '4xlarge': 'ci_4xlarge',
-    '8xlarge': 'ci_8xlarge',
-    '12xlarge': 'ci_12xlarge',
-    '16xlarge': 'ci_16xlarge',
-    '24xlarge': 'ci_24xlarge',
-    '24xlarge_optimized_memory': 'ci_24xlarge_optimized_memory',
-    '24xlarge_optimized_cpu': 'ci_24xlarge_optimized_cpu',
-    '24xlarge_high_memory': 'ci_24xlarge_high_memory',
-    '48xlarge': 'ci_48xlarge',
-    '48xlarge_optimized_memory': 'ci_48xlarge_optimized_memory',
-    '48xlarge_optimized_cpu': 'ci_48xlarge_optimized_cpu',
-    '48xlarge_high_memory': 'ci_48xlarge_high_memory',
-  }[computeSize ?? 'nano'] as ComputeInstanceAddonVariantId
+  const fallback: InfraInstanceSize = 'nano'
+  const matchedSize = computeSize && isInfraInstanceSize(computeSize) ? computeSize : undefined
+  const sizeKey = matchedSize ?? fallback
+  return infraToAddonVariant[sizeKey]
+}
+
+const addonVariantToComputeSize: Record<ComputeInstanceAddonVariantId, ComputeInstanceSize> = {
+  ci_nano: 'Nano',
+  ci_micro: 'Micro',
+  ci_small: 'Small',
+  ci_medium: 'Medium',
+  ci_large: 'Large',
+  ci_xlarge: 'XL',
+  ci_2xlarge: '2XL',
+  ci_4xlarge: '4XL',
+  ci_8xlarge: '8XL',
+  ci_12xlarge: '12XL',
+  ci_16xlarge: '16XL',
+  ci_24xlarge: '24XL',
+  ci_24xlarge_optimized_memory: '24XL - Optimized Memory',
+  ci_24xlarge_optimized_cpu: '24XL - Optimized CPU',
+  ci_24xlarge_high_memory: '24XL - High Memory',
+  ci_48xlarge: '48XL',
+  ci_48xlarge_optimized_memory: '48XL - Optimized Memory',
+  ci_48xlarge_optimized_cpu: '48XL - Optimized CPU',
+  ci_48xlarge_high_memory: '48XL - High Memory',
 }
 
 export const mapAddOnVariantIdToComputeSize = (
   addonVariantId: ComputeInstanceAddonVariantId = 'ci_nano'
 ): ComputeInstanceSize => {
-  return {
-    ci_nano: 'Nano',
-    ci_micro: 'Micro',
-    ci_small: 'Small',
-    ci_medium: 'Medium',
-    ci_large: 'Large',
-    ci_xlarge: 'XL',
-    ci_2xlarge: '2XL',
-    ci_4xlarge: '4XL',
-    ci_8xlarge: '8XL',
-    ci_12xlarge: '12XL',
-    ci_16xlarge: '16XL',
-    ci_24xlarge: '24XL',
-    ci_24xlarge_optimized_memory: '24XL - Optimized Memory',
-    ci_24xlarge_optimized_cpu: '24XL - Optimized CPU',
-    ci_24xlarge_high_memory: '24XL - High Memory',
-    ci_48xlarge: '48XL',
-    ci_48xlarge_optimized_memory: '48XL - Optimized Memory',
-    ci_48xlarge_optimized_cpu: '48XL - Optimized CPU',
-    ci_48xlarge_high_memory: '48XL - High Memory',
-  }[addonVariantId] as ComputeInstanceSize
+  const parsed = computeInstanceAddonVariantIdSchema.safeParse(addonVariantId)
+  if (!parsed.success) return addonVariantToComputeSize.ci_nano
+  return addonVariantToComputeSize[parsed.data]
 }
 
 export const formatNumber = (num: number): string => {

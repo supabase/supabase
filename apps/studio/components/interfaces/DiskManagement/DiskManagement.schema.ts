@@ -1,4 +1,4 @@
-import { CloudProvider, computeInstanceAddonVariantIdSchema } from 'shared-data'
+import { CloudProvider, COMPUTE_MAX_IOPS, computeInstanceAddonVariantIdSchema } from 'shared-data'
 import { z } from 'zod'
 import {
   calculateDiskSizeRequiredForIopsWithGp3,
@@ -57,6 +57,11 @@ export const CreateDiskStorageSchema = ({
 
   const schema = baseSchema.superRefine((data, ctx) => {
     const { storageType, totalSize, provisionedIOPS, throughput, maxSizeGb, computeSize } = data
+    const computeMaxIops = (() => {
+      const parsedCompute = computeInstanceAddonVariantIdSchema.safeParse(computeSize)
+      if (!parsedCompute.success) return Number.POSITIVE_INFINITY
+      return COMPUTE_MAX_IOPS[parsedCompute.data] ?? Number.POSITIVE_INFINITY
+    })()
 
     if (validateDiskConfiguration && totalSize < 8) {
       ctx.addIssue({
@@ -86,10 +91,11 @@ export const CreateDiskStorageSchema = ({
     if (validateDiskConfiguration && storageType === 'io2') {
       // Validation rules for io2
 
-      if (provisionedIOPS > DISK_LIMITS[DiskType.IO2].maxIops) {
+      const maxIopsForIo2 = Math.min(DISK_LIMITS[DiskType.IO2].maxIops, computeMaxIops)
+      if (provisionedIOPS > maxIopsForIo2) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `IOPS can not exceed ${formatNumber(DISK_LIMITS[DiskType.IO2].maxIops)} for io2 Disk type. Please reach out to support if you need higher IOPS than this.`,
+          message: `IOPS cannot exceed ${formatNumber(maxIopsForIo2)} for io2 Disk type and the selected compute size.`,
           path: ['provisionedIOPS'],
         })
       }
@@ -142,16 +148,17 @@ export const CreateDiskStorageSchema = ({
 
     if (validateDiskConfiguration && storageType === 'gp3') {
       const maxIopsAllowedForDiskSizeWithGp3 = calculateMaxIopsAllowedForDiskSizeWithGp3(totalSize)
+      const maxIopsForGp3 = Math.min(DISK_LIMITS[DiskType.GP3].maxIops, computeMaxIops)
       const computeMaxThroughput = (() => {
         const parsedCompute = computeInstanceAddonVariantIdSchema.safeParse(computeSize)
         if (!parsedCompute.success) return DISK_LIMITS[DiskType.GP3].maxThroughput
         return COMPUTE_MAX_THROUGHPUT[parsedCompute.data] ?? DISK_LIMITS[DiskType.GP3].maxThroughput
       })()
 
-      if (provisionedIOPS > DISK_LIMITS[DiskType.GP3].maxIops) {
+      if (provisionedIOPS > maxIopsForGp3) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `IOPS can not exceed ${formatNumber(DISK_LIMITS[DiskType.GP3].maxIops)} for GP3 Disk. Change the Disk type to io2 for higher IOPS support.`,
+          message: `IOPS cannot exceed ${formatNumber(maxIopsForGp3)} for GP3 Disk and the selected compute size.`,
           path: ['provisionedIOPS'],
         })
       }

@@ -6,7 +6,7 @@ import { Admonition } from 'ui-patterns/admonition'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import {
   calculateComputeSizeRequiredForIops,
-  calculateBaselineIopsForComputeSize,
+  calculateMaxIopsForComputeSize,
   mapAddOnVariantIdToComputeSize,
 } from '../DiskManagement.utils'
 import { COMPUTE_BASELINE_IOPS, COMPUTE_MAX_IOPS } from 'shared-data'
@@ -26,7 +26,7 @@ export function ComputeSizeRecommendationSection({
   const iops = watch('provisionedIOPS')
 
   const computeSizeRecommendedForIops = calculateComputeSizeRequiredForIops(iops)
-  const maxIopsForComputeSize = calculateBaselineIopsForComputeSize(computeSize ?? 'ci_micro')
+  const maxIopsForComputeSize = calculateMaxIopsForComputeSize(computeSize ?? 'ci_micro')
   const isVisible =
     iops > maxIopsForComputeSize &&
     !RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3.includes(computeSize ?? 'ci_micro')
