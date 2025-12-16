@@ -2,7 +2,7 @@
 
 import * as Scrollytelling from '@bsmnt/scrollytelling'
 import { useRef, useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useInView } from 'framer-motion'
 import { Dots, Stripes } from '../Visuals'
 import { cn } from 'ui'
 
@@ -84,8 +84,20 @@ function FloatingBoxes() {
   const [floatingBoxes, setFloatingBoxes] = useState<FloatingBox[]>([])
   const boxIdRef = useRef(0)
   const lifetimeTimersRef = useRef<Set<NodeJS.Timeout>>(new Set())
+  const containerRef = useRef(null)
+  const isInView = useInView(containerRef, { once: false, amount: 0.3 })
 
   useEffect(() => {
+    if (!isInView) {
+      // Clear all boxes when section goes out of view
+      setFloatingBoxes([])
+      lifetimeTimersRef.current.forEach(clearTimeout)
+      lifetimeTimersRef.current.clear()
+      return
+    }
+
+    const lifetimeTimers = lifetimeTimersRef.current
+
     const spawnBox = () => {
       setFloatingBoxes((prev) => {
         const id = boxIdRef.current++
@@ -98,9 +110,9 @@ function FloatingBoxes() {
         const lifetime = Math.random() * 2000 + 2000
         const timerId = setTimeout(() => {
           setFloatingBoxes((current) => current.filter((box) => box.id !== id))
-          lifetimeTimersRef.current.delete(timerId)
+          lifetimeTimers.delete(timerId)
         }, lifetime)
-        lifetimeTimersRef.current.add(timerId)
+        lifetimeTimers.add(timerId)
 
         return [...prev, newBox]
       })
@@ -124,37 +136,39 @@ function FloatingBoxes() {
     return () => {
       initialTimers.forEach(clearTimeout)
       clearTimeout(intervalId)
-      lifetimeTimersRef.current.forEach(clearTimeout)
-      lifetimeTimersRef.current.clear()
+      lifetimeTimers.forEach(clearTimeout)
+      lifetimeTimers.clear()
     }
-  }, [])
+  }, [isInView])
 
   return (
-    <AnimatePresence>
-      {floatingBoxes.map((box) => (
-        <motion.div
-          key={box.id}
-          className={cn('absolute pointer-events-none border')}
-          style={{
-            top: `${box.top}%`,
-            left: `${box.left}%`,
-            width: box.size,
-            height: box.size,
-          }}
-          initial={{ opacity: 0, scale: 0.95, x: 0, y: 0 }}
-          animate={{ opacity: 0.6, scale: 1, x: box.drift.x, y: box.drift.y }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{
-            opacity: { duration: 0.45 },
-            scale: { type: 'spring', duration: 0.45, bounce: 0.2 },
-            x: { type: 'spring', stiffness: 100, damping: 10 },
-            y: { type: 'spring', stiffness: 100, damping: 10 },
-          }}
-        >
-          {box.type === 'dots' ? <Dots /> : <Stripes />}
-        </motion.div>
-      ))}
-    </AnimatePresence>
+    <div ref={containerRef} className="absolute inset-0">
+      <AnimatePresence>
+        {floatingBoxes.map((box) => (
+          <motion.div
+            key={box.id}
+            className={cn('absolute pointer-events-none border')}
+            style={{
+              top: `${box.top}%`,
+              left: `${box.left}%`,
+              width: box.size,
+              height: box.size,
+            }}
+            initial={{ opacity: 0, scale: 0.95, x: 0, y: 0 }}
+            animate={{ opacity: 0.6, scale: 1, x: box.drift.x, y: box.drift.y }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{
+              opacity: { duration: 0.45 },
+              scale: { type: 'spring', duration: 0.45, bounce: 0.2 },
+              x: { type: 'spring', stiffness: 100, damping: 10 },
+              y: { type: 'spring', stiffness: 100, damping: 10 },
+            }}
+          >
+            {box.type === 'dots' ? <Dots /> : <Stripes />}
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
   )
 }
 

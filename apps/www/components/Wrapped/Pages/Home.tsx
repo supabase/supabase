@@ -197,7 +197,7 @@ function FloatingStatBubbles() {
 export function Home() {
   return (
     <div className="h-[calc(100dvh-64px)] flex flex-col max-w-[60rem] mx-auto w-full">
-      <section className="relative border-x border-b h-full">
+      <section className="relative border-x border-b h-full overflow-hidden">
         {/* Grid background */}
         <AnimatedGridBackground
           cols={5}
