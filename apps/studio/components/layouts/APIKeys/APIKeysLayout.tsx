@@ -3,6 +3,8 @@ import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
+import { DOCS_URL } from 'lib/constants'
 
 const ApiKeysLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef } = useParams()
@@ -25,6 +27,7 @@ const ApiKeysLayout = ({ children }: PropsWithChildren) => {
       title="API Keys"
       subtitle="Configure API keys to securely control access to your project"
       navigationItems={navigationItems}
+      secondaryActions={<DocsButton href={`${DOCS_URL}/guides/api/api-keys`} />}
     >
       <ScaffoldContainer className="flex flex-col py-8 gap-8" bottomPadding>
         {children}

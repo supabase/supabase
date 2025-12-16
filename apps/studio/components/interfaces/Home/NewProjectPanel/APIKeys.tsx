@@ -1,14 +1,15 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { AlertCircle, Loader } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import Panel from 'components/ui/Panel'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Input, SimpleCodeBlock } from 'ui'
 
@@ -55,7 +56,7 @@ export const APIKeys = () => {
     isPending: isProjectSettingsLoading,
   } = useProjectSettingsV2Query({ projectRef })
 
-  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
   const { anonKey, serviceKey } = getKeys(apiKeys)
 

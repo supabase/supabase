@@ -33,6 +33,10 @@ const METRICS_TO_HIDE_WITH_NO_USAGE: PricingMetric[] = [
   PricingMetric.DISK_SIZE_GB_HOURS_GP3,
   PricingMetric.DISK_SIZE_GB_HOURS_IO2,
   PricingMetric.DISK_THROUGHPUT_GP3,
+  PricingMetric.LOG_INGESTION,
+  PricingMetric.LOG_STORAGE,
+  PricingMetric.LOG_QUERYING,
+  PricingMetric.ACTIVE_COMPUTE_HOURS,
 ]
 
 export const TotalUsage = ({
