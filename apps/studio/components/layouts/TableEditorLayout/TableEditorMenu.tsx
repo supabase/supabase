@@ -16,6 +16,7 @@ import { InfiniteListDefault, LoaderForIconMenuItems } from 'components/ui/Infin
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useTableApiAccessQuery } from 'data/privileges/table-api-access-query'
 import { getTableEditor, useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
@@ -85,6 +86,17 @@ export const TableEditorMenu = () => {
     () => data?.pages.flatMap((page) => page.data.entities),
     [data?.pages]
   )
+  const entityNames = useMemo(() => entityTypes?.map((entity) => entity.name) ?? [], [entityTypes])
+
+  const { data: apiAccessByTableName } = useTableApiAccessQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString ?? undefined,
+      schemaName: selectedSchema,
+      tableNames: entityNames,
+    },
+    { enabled: Boolean(selectedSchema && entityNames.length > 0) }
+  )
 
   const { can: canCreateTables } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -132,8 +144,9 @@ export const TableEditorMenu = () => {
       id: Number(id),
       isLocked: isSchemaLocked,
       onExportCLI: () => onSelectExportCLI(Number(id)),
+      apiAccessMap: apiAccessByTableName,
     }),
-    [project?.ref, id, isSchemaLocked, onSelectExportCLI]
+    [project?.ref, id, isSchemaLocked, onSelectExportCLI, apiAccessByTableName]
   )
 
   useEffect(() => {

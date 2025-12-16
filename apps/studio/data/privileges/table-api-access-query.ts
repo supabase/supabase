@@ -11,27 +11,11 @@ import {
   type TablePrivilegesError,
 } from './table-privileges-query'
 
-type TableIdentifierById = {
-  identifier: 'id'
-  relationId: number
-}
-type TableIdentifierByName = {
-  identifier: 'name'
-  schemaName: string
-  tableName: string
-}
-type TableIdentifier = TableIdentifierById | TableIdentifierByName
-
-/**
- * Create a cache key from a table identifier
- */
-const createTableIdentifierCacheKey = (tableIdentifier: TableIdentifier): string => {
-  if (tableIdentifier.identifier === 'id') {
-    return `id:${tableIdentifier.relationId}`
-  } else {
-    return `name:${tableIdentifier.schemaName}.${tableIdentifier.tableName}`
-  }
-}
+// The contents of this array are never used, so any will allow
+// it to be used anywhere an array of any type is required.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const STABLE_EMPTY_ARRAY: any[] = []
+const STABLE_EMPTY_OBJECT = {}
 
 /**
  * Parses the exposed schema string returned from PostgREST config.
@@ -45,26 +29,9 @@ const parseDbSchemaString = (schemaString: string): string[] => {
     .filter((s) => s.length > 0)
 }
 
-type MapPrivilegesToApiAccessReturn = {
-  privileges: ApiPrivilegesByRole
-  foundSchemaName?: string
-}
-
-/**
- * Maps overall table privileges data as returned from database query to API
- * privileges for a specific table.
- */
-const mapPrivilegesToApiAccess = (
-  allPrivileges: TablePrivilegesData,
-  tableIdentifier: TableIdentifier
-): MapPrivilegesToApiAccessReturn => {
-  const target = allPrivileges.find((entry) =>
-    tableIdentifier.identifier === 'id'
-      ? entry.relation_id === tableIdentifier.relationId
-      : entry.schema === tableIdentifier.schemaName && entry.name === tableIdentifier.tableName
-  )
-  const privileges = target?.privileges ?? []
-
+const getApiPrivilegesByRole = (
+  privileges: TablePrivilegesData[number]['privileges']
+): ApiPrivilegesByRole => {
   const privilegesByRole: ApiPrivilegesByRole = {
     anon: [],
     authenticated: [],
@@ -72,23 +39,38 @@ const mapPrivilegesToApiAccess = (
 
   privileges.forEach((privilege) => {
     const { grantee, privilege_type } = privilege
-    if (isApiAccessRole(grantee)) {
-      if (isApiPrivilegeType(privilege_type)) {
-        privilegesByRole[grantee].push(privilege_type)
-      }
+    if (isApiAccessRole(grantee) && isApiPrivilegeType(privilege_type)) {
+      privilegesByRole[grantee].push(privilege_type)
     }
   })
 
-  const result: MapPrivilegesToApiAccessReturn = { privileges: privilegesByRole }
-  const foundSchemaName = target ? target.schema : undefined
-  if (foundSchemaName) {
-    result.foundSchemaName = foundSchemaName
-  }
+  return privilegesByRole
+}
+
+const mapPrivilegesByTableName = (
+  privileges: TablePrivilegesData | undefined,
+  schemaName: string,
+  tableNames: Set<string>
+): Record<string, ApiPrivilegesByRole> => {
+  if (!privileges) return {}
+
+  const result: Record<string, ApiPrivilegesByRole> = {}
+
+  privileges.forEach((entry) => {
+    if (entry.schema !== schemaName) return
+    if (!tableNames.has(entry.name)) return
+    result[entry.name] = getApiPrivilegesByRole(entry.privileges)
+  })
 
   return result
 }
 
-export type UseTableApiAccessQueryParams = Prettify<TableIdentifier & ConnectionVars>
+export type UseTableApiAccessQueryParams = Prettify<
+  ConnectionVars & {
+    schemaName: string
+    tableNames: string[]
+  }
+>
 
 export type TableApiAccessData =
   | {
@@ -99,38 +81,35 @@ export type TableApiAccessData =
       hasApiAccess: false
     }
 
+export type TableApiAccessMap = Record<string, TableApiAccessData>
+
 export type UseTableApiAccessQueryReturn =
   | {
-      data: TableApiAccessData
+      data: TableApiAccessMap
       isSuccess: true
       isPending: false
-      isMissingSchemaData: false
       isError: false
     }
   | {
       data: undefined
       isSuccess: false
       isPending: true
-      isMissingSchemaData: false
       isError: false
     }
   | {
       data: undefined
       isSuccess: false
       isPending: false
-      isMissingSchemaData: true
-      isError: false
-    }
-  | {
-      data: undefined
-      isSuccess: false
-      isPending: false
-      isMissingSchemaData: false
       isError: true
     }
 
 export const useTableApiAccessQuery = (
-  { projectRef, connectionString, ...tableIdentifier }: UseTableApiAccessQueryParams,
+  {
+    projectRef,
+    connectionString,
+    schemaName,
+    tableNames = STABLE_EMPTY_ARRAY,
+  }: UseTableApiAccessQueryParams,
   {
     enabled = true,
     ...options
@@ -147,15 +126,19 @@ export const useTableApiAccessQuery = (
     { projectRef },
     { enabled, select: ({ db_schema }) => db_schema }
   )
-  const exposedSchemas = useMemo((): string[] | undefined => {
-    if (!dbSchemaString) return undefined
+  const exposedSchemas = useMemo((): string[] => {
+    if (!dbSchemaString) return []
     return parseDbSchemaString(dbSchemaString)
   }, [dbSchemaString])
 
-  const isSchemaUnknown = tableIdentifier.identifier === 'id'
-  const isKnownSchemaExposed =
-    tableIdentifier.identifier === 'name' && exposedSchemas?.includes(tableIdentifier.schemaName)
-  const enablePrivilegesQuery = enabled && (isSchemaUnknown || isKnownSchemaExposed)
+  const uniqueTableNames = useMemo(() => {
+    return new Set(
+      tableNames.filter((tableName) => typeof tableName === 'string' && tableName.length > 0)
+    )
+  }, [tableNames])
+  const hasTables = uniqueTableNames.size > 0
+  const isSchemaExposed = exposedSchemas.includes(schemaName)
+  const enablePrivilegesQuery = enabled && isSchemaExposed && hasTables
 
   const {
     data: privileges,
@@ -166,70 +149,77 @@ export const useTableApiAccessQuery = (
     { enabled: enablePrivilegesQuery, ...options }
   )
 
-  const derivedPrivilegeData = useMemo(() => {
-    if (!privileges) return undefined
-    return mapPrivilegesToApiAccess(privileges, tableIdentifier)
-    // For reference stability purposes, we compute a stringified cache key
-    // rather than keying on the tableIdentifier object directly.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [privileges, createTableIdentifierCacheKey(tableIdentifier)])
-
-  const isPending = isConfigPending || (enablePrivilegesQuery && isPrivilegesPending)
-  if (isPending) {
-    return {
-      data: undefined,
-      isSuccess: false,
-      isPending: true,
-      isMissingSchemaData: false,
-      isError: false,
-    }
-  }
-
-  const isError = isConfigError || isPrivilegesError
-  if (isError) {
-    return {
-      data: undefined,
-      isSuccess: false,
-      isPending: false,
-      isMissingSchemaData: false,
-      isError: true,
-    }
-  }
-
-  const schema =
-    tableIdentifier.identifier === 'name'
-      ? tableIdentifier.schemaName
-      : derivedPrivilegeData?.foundSchemaName
-  if (!schema || !exposedSchemas) {
-    return {
-      data: undefined,
-      isSuccess: false,
-      isPending: false,
-      isMissingSchemaData: true,
-      isError: false,
-    }
-  }
-
-  const isExposedSchema = exposedSchemas.includes(schema)
-  const finalPrivileges = derivedPrivilegeData?.privileges ?? { anon: [], authenticated: [] }
-  const hasAnonOrAuthenticatedPrivileges =
-    finalPrivileges.anon.length > 0 || finalPrivileges.authenticated.length > 0
-
-  const hasApiAccess = isExposedSchema && hasAnonOrAuthenticatedPrivileges
-  const resultData: TableApiAccessData = hasApiAccess
-    ? {
-        hasApiAccess: true,
-        privileges: finalPrivileges,
+  const result: UseTableApiAccessQueryReturn = useMemo(() => {
+    const isPending = isConfigPending || (enablePrivilegesQuery && isPrivilegesPending)
+    if (isPending) {
+      return {
+        data: undefined,
+        isSuccess: false,
+        isPending: true,
+        isError: false,
       }
-    : {
-        hasApiAccess: false,
+    }
+
+    const isError = isConfigError || (enablePrivilegesQuery && isPrivilegesError)
+    if (isError) {
+      return {
+        data: undefined,
+        isSuccess: false,
+        isPending: false,
+        isError: true,
+      }
+    }
+
+    if (!hasTables) {
+      return {
+        data: STABLE_EMPTY_OBJECT,
+        isSuccess: true,
+        isPending: false,
+        isError: false,
+      }
+    }
+
+    const resultData: TableApiAccessMap = {}
+    const tablePrivilegesByName = isSchemaExposed
+      ? mapPrivilegesByTableName(privileges, schemaName, uniqueTableNames)
+      : {}
+
+    uniqueTableNames.forEach((tableName) => {
+      if (!isSchemaExposed) {
+        resultData[tableName] = { hasApiAccess: false }
+        return
       }
 
-  return {
-    data: resultData,
-    isSuccess: true,
-    isPending: false,
-    isMissingSchemaData: false,
-    isError: false,
-  }
+      const tablePrivileges = tablePrivilegesByName[tableName] ?? { anon: [], authenticated: [] }
+      const hasAnonOrAuthenticatedPrivileges =
+        tablePrivileges.anon.length > 0 || tablePrivileges.authenticated.length > 0
+
+      resultData[tableName] = hasAnonOrAuthenticatedPrivileges
+        ? {
+            hasApiAccess: true,
+            privileges: tablePrivileges,
+          }
+        : { hasApiAccess: false }
+    })
+
+    return {
+      data: resultData,
+      isSuccess: true,
+      isPending: false,
+      isError: false,
+    }
+  }, [
+    enablePrivilegesQuery,
+    hasTables,
+    isConfigError,
+    isConfigPending,
+    isPrivilegesError,
+    isPrivilegesPending,
+    isSchemaExposed,
+    privileges,
+    schemaName,
+    uniqueTableNames,
+  ])
+
+  return result
 }

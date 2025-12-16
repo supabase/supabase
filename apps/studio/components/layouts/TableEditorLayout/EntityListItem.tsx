@@ -14,7 +14,7 @@ import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-types-infinite-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
-import { useTableApiAccessQuery } from 'data/privileges/table-api-access-query'
+import type { TableApiAccessData, TableApiAccessMap } from 'data/privileges/table-api-access-query'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -53,6 +53,7 @@ export interface EntityListItemProps {
   isActive?: boolean
   style?: CSSProperties
   onExportCLI: () => void
+  apiAccessMap?: TableApiAccessMap
 }
 
 // [jordi] Used to determine the entity is a table and not a view or other unsupported entity type
@@ -68,6 +69,7 @@ export const EntityListItem = ({
   isActive: _isActive,
   style,
   onExportCLI,
+  apiAccessMap,
 }: EntityListItemProps) => {
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
@@ -133,6 +135,8 @@ export const EntityListItem = ({
     lints,
     selectedSchema
   ).hasLint
+
+  const apiAccessData = apiAccessMap?.[entity.name]
 
   const formatTooltipText = (entityType: string) => {
     const text =
@@ -213,6 +217,7 @@ export const EntityListItem = ({
             viewHasLints={viewHasLints}
             materializedViewHasLints={materializedViewHasLints}
             foreignTableHasLints={foreignTableHasLints}
+            apiAccessData={apiAccessData}
           />
         </div>
 
@@ -380,23 +385,16 @@ const EntityTooltipTrigger = ({
   viewHasLints,
   materializedViewHasLints,
   foreignTableHasLints,
+  apiAccessData,
 }: {
   entity: Entity
   tableHasLints: boolean
   viewHasLints: boolean
   materializedViewHasLints: boolean
   foreignTableHasLints: boolean
+  apiAccessData?: TableApiAccessData
 }) => {
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
-
-  const { data: apiAccessData } = useTableApiAccessQuery({
-    identifier: 'name',
-    schemaName: entity.schema,
-    tableName: entity.name,
-    projectRef: project?.ref,
-    connectionString: project?.connectionString ?? undefined,
-  })
 
   let tooltipContent = null
   const accessWarning = 'Data is publicly accessible via API'
