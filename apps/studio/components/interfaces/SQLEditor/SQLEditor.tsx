@@ -22,9 +22,10 @@ import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { generateUuid } from 'lib/api/snippets.browser'
 import { BASE_PATH } from 'lib/constants'
 import { formatSql } from 'lib/formatSql'
-import { detectOS, uuidv4 } from 'lib/helpers'
+import { detectOS } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
@@ -54,6 +55,7 @@ import {
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
 import {
+  generateSnippetTitle,
   ROWS_PER_PAGE_OPTIONS,
   sqlAiDisclaimerComment,
   untitledSnippetTitle,
@@ -121,10 +123,13 @@ export const SQLEditor = () => {
   const [queryHasUpdateWithoutWhere, setQueryHasUpdateWithoutWhere] = useState(false)
   const [showWidget, setShowWidget] = useState(false)
 
-  // generate an id to be used for new snippets. The dependency on urlId is to avoid a bug which
+  // generate a new snippet title and an id to be used for new snippets. The dependency on urlId is to avoid a bug which
   // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const generatedId = useMemo(() => uuidv4(), [urlId])
+  const [generatedNewSnippetName, generatedId] = useMemo(() => {
+    const name = generateSnippetTitle()
+    return [name, generateUuid([name])]
+  }, [urlId])
+
   // the id is stable across renders - it depends either on the url or on the memoized generated id
   const id = !urlId || urlId === 'new' ? generatedId : urlId
 
@@ -353,7 +358,6 @@ export const SQLEditor = () => {
 
       try {
         const snippet = createSqlSnippetSkeletonV2({
-          id: uuidv4(),
           name,
           sql,
           owner_id: profile.id,
@@ -753,6 +757,11 @@ export const SQLEditor = () => {
                           : ''
                       }
                       id={id}
+                      snippetName={
+                        urlId === 'new'
+                          ? generatedNewSnippetName
+                          : snapV2.snippets[id]?.snippet.name ?? generatedNewSnippetName
+                      }
                       className={cn(isDiffOpen && 'hidden')}
                       editorRef={editorRef}
                       monacoRef={monacoRef}
