@@ -3,6 +3,7 @@ import { Eval } from 'braintrust'
 import {
   criteriaMetScorer,
   sqlSimilarityScorer,
+  sqlSyntaxScorer,
   textIncludesScorer,
   toolUsageScorer,
 } from './scorer'
@@ -48,5 +49,11 @@ Eval('Assistant', {
       sqlQueries,
     }
   },
-  scores: [toolUsageScorer, sqlSimilarityScorer, criteriaMetScorer, textIncludesScorer],
+  scores: [
+    toolUsageScorer,
+    sqlSimilarityScorer,
+    sqlSyntaxScorer,
+    criteriaMetScorer,
+    textIncludesScorer,
+  ],
 })

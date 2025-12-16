@@ -1,5 +1,6 @@
 import { EvalCase, EvalScorer } from 'braintrust'
 import { ClosedQA, Sql } from 'autoevals'
+import { parse } from 'libpg-query'
 
 const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2-2025-12-11'
 
@@ -108,5 +109,33 @@ export const textIncludesScorer: EvalScorer<Input, Output, Expected> = async ({
   return {
     name: 'text_includes',
     score: includes ? 1 : 0,
+  }
+}
+
+export const sqlSyntaxScorer: EvalScorer<Input, Output, Expected> = async ({ output }) => {
+  if (output.sqlQueries === undefined || output.sqlQueries.length === 0) {
+    return null
+  }
+
+  const totalQueries = output.sqlQueries.length
+  const errors: string[] = []
+  let validQueries = 0
+
+  for (const sql of output.sqlQueries) {
+    try {
+      await parse(sql)
+      validQueries++
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      errors.push(`SQL syntax error: ${errorMessage}`)
+    }
+  }
+
+  const score = totalQueries === 0 ? 1 : validQueries / totalQueries
+
+  return {
+    name: 'sql_syntax',
+    score,
+    metadata: errors.length > 0 ? { errors } : undefined,
   }
 }
