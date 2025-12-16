@@ -28,6 +28,11 @@ gen_token() {
     printf '%s' "${signed_content}.${signature}"
 }
 
+if ! command -v openssl >/dev/null 2>&1; then
+    echo "Error: openssl is required but not found."
+    exit 1
+fi
+
 jwt_secret="$(gen_base64 30)"
 
 # Used in get_token()
@@ -72,8 +77,8 @@ echo "S3_PROTOCOL_ACCESS_KEY_ID=${s3_protocol_access_key_id}"
 echo "S3_PROTOCOL_ACCESS_KEY_SECRET=${s3_protocol_access_key_secret}"
 echo ""
 
-postgres_password=$(gen_hex 8)
-dashboard_password=$(gen_hex 8)
+postgres_password=$(gen_hex 16)
+dashboard_password=$(gen_hex 16)
 
 echo "POSTGRES_PASSWORD=${postgres_password}"
 echo "DASHBOARD_PASSWORD=${dashboard_password}"
@@ -91,7 +96,7 @@ case "$REPLY" in
         ;;
     *)
         echo "Not updating .env"
-        exit 1
+        exit 0
         ;;
 esac
 
