@@ -159,7 +159,7 @@ const months: Month[] = [
       { title: 'JWT Signing Keys', url: 'https://supabase.com/blog/jwt-signing-keys' },
       { title: 'Automatic Embeddings', url: 'https://supabase.com/blog/automatic-embeddings' },
       { title: 'Storage v4', url: 'https://supabase.com/blog/storage-v4' },
-      { title: 'Realtime 3.0', url: 'https://supabase.com/blog/realtime-broadcast-authorization' },
+      { title: 'Realtime 3.0', url: 'https://supabase.com/blog/supabase-realtime-broadcast-and-presence-authorization' },
       {
         title: 'pg_replicate: Build Postgres Replicas',
         url: 'https://supabase.com/blog/pg-replicate',
