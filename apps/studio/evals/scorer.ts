@@ -47,7 +47,7 @@ export const toolUsageScorer: EvalScorer<Input, Output, Expected> = async ({
   const ratio = totalCount === 0 ? 1 : presentCount / totalCount
 
   return {
-    name: 'tool_usage',
+    name: 'Tool Usage',
     score: ratio,
   }
 }
@@ -60,23 +60,21 @@ export const sqlSimilarityScorer: EvalScorer<Input, Output, Expected> = async ({
   if (!expected.sqlQuery) return null
 
   const sqlQuery = output.sqlQueries?.[0]
-  if (!sqlQuery) {
-    return {
-      name: 'sql_similarity',
-      score: 0,
-    }
+  let score = 0
+
+  if (sqlQuery) {
+    const sqlResult = await Sql({
+      input,
+      output: sqlQuery,
+      expected: expected.sqlQuery,
+      model: LLM_AS_A_JUDGE_MODEL,
+    })
+    score = sqlResult.score ?? 0
   }
 
-  const sqlResult = await Sql({
-    input,
-    output: sqlQuery,
-    expected: expected.sqlQuery,
-    model: LLM_AS_A_JUDGE_MODEL,
-  })
-
   return {
-    name: 'sql_similarity',
-    score: sqlResult.score ?? 0,
+    name: 'SQL Similarity',
+    score,
   }
 }
 
@@ -94,7 +92,7 @@ export const criteriaMetScorer: EvalScorer<Input, Output, Expected> = async ({
   })
 
   return {
-    name: 'criteria_met',
+    name: 'Criteria Met',
     score: qaResult.score ?? 0,
   }
 }
@@ -107,7 +105,7 @@ export const textIncludesScorer: EvalScorer<Input, Output, Expected> = async ({
 
   const includes = output.text.includes(expected.textIncludes)
   return {
-    name: 'text_includes',
+    name: 'Text Includes',
     score: includes ? 1 : 0,
   }
 }
@@ -134,7 +132,7 @@ export const sqlSyntaxScorer: EvalScorer<Input, Output, Expected> = async ({ out
   const score = totalQueries === 0 ? 1 : validQueries / totalQueries
 
   return {
-    name: 'sql_syntax',
+    name: 'SQL Syntax',
     score,
     metadata: errors.length > 0 ? { errors } : undefined,
   }
