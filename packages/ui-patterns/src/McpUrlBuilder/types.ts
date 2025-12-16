@@ -1,0 +1,195 @@
+export interface McpFeatureGroup {
+  id: string
+  name: string
+  description: string
+}
+
+export type McpOnCopyCallback = 'url' | 'config' | 'command'
+
+export interface McpClient {
+  key: string
+  label: string
+  icon?: string
+  docsUrl?: string
+  externalDocsUrl?: string
+  configFile?: string
+  generateDeepLink?: (config: McpClientConfig) => string | null
+  transformConfig?: (config: McpClientBaseConfig) => McpClientConfig
+  primaryInstructions?: (
+    config: McpClientConfig,
+    onCopy: (type?: McpOnCopyCallback) => void
+  ) => React.ReactNode
+  alternateInstructions?: (
+    config: McpClientConfig,
+    onCopy: (type?: McpOnCopyCallback) => void
+  ) => React.ReactNode
+}
+
+export interface McpUrlBuilderConfig {
+  projectRef: string
+  readonly?: boolean
+  features?: string[]
+}
+
+export interface McpClientBaseConfig {
+  mcpServers: {
+    supabase: {
+      url: string
+    }
+  }
+}
+
+export interface CursorMcpConfig extends McpClientBaseConfig {}
+
+export interface VSCodeMcpConfig {
+  servers: {
+    supabase: {
+      type: 'http'
+      url: string
+    }
+  }
+}
+
+export interface WindsurfMcpConfig {
+  mcpServers: {
+    supabase: {
+      command: 'npx'
+      args: ['-y', 'mcp-remote', string]
+    }
+  }
+}
+
+export interface ClaudeCodeMcpConfig extends McpClientBaseConfig {
+  mcpServers: {
+    supabase: {
+      type: 'http'
+      url: string
+    }
+  }
+}
+
+export interface ClaudeDesktopMcpConfig extends McpClientBaseConfig {
+  mcpServers: {
+    supabase: {
+      type: 'http'
+      url: string
+    }
+  }
+}
+
+export interface OtherMcpConfig extends McpClientBaseConfig {
+  mcpServers: {
+    supabase: {
+      type: 'http'
+      url: string
+    }
+  }
+}
+
+export interface GooseMcpConfig {
+  extensions: {
+    supabase: {
+      available_tools: string[]
+      bundled: null
+      description: string
+      enabled: boolean
+      env_keys: string[]
+      envs: Record<string, string>
+      headers: Record<string, string>
+      name: string
+      timeout: number
+      type: 'streamable_http'
+      uri: string
+    }
+  }
+}
+
+export interface FactoryMcpConfig extends McpClientBaseConfig {
+  mcpServers: {
+    supabase: {
+      type: 'http'
+      url: string
+    }
+  }
+}
+
+export interface CodexMcpConfig {
+  mcp_servers: {
+    supabase: {
+      url: string
+    }
+  }
+}
+
+/**
+ * Configuration format for Gemini CLI MCP client.
+ * Uses httpUrl instead of url to match Gemini CLI's expected format.
+ */
+export interface GeminiMcpConfig {
+  mcpServers: {
+    supabase: {
+      httpUrl: string
+    }
+  }
+}
+
+// Union of all possible config types
+export type McpClientConfig =
+  | ClaudeCodeMcpConfig
+  | ClaudeDesktopMcpConfig
+  | CodexMcpConfig
+  | CursorMcpConfig
+  | FactoryMcpConfig
+  | GeminiMcpConfig
+  | GooseMcpConfig
+  | McpClientBaseConfig
+  | OtherMcpConfig
+  | VSCodeMcpConfig
+  | WindsurfMcpConfig
+
+// Type guards
+export function isVSCodeMcpConfig(config: McpClientConfig): config is VSCodeMcpConfig {
+  return 'servers' in config && 'supabase' in config.servers
+}
+
+export function isGooseMcpConfig(config: McpClientConfig): config is GooseMcpConfig {
+  return 'extensions' in config && 'supabase' in config.extensions
+}
+
+export function isCodexMcpConfig(config: McpClientConfig): config is CodexMcpConfig {
+  return 'mcp_servers' in config && 'supabase' in config.mcp_servers
+}
+
+export function isGeminiMcpConfig(config: McpClientConfig): config is GeminiMcpConfig {
+  return (
+    'mcpServers' in config &&
+    'supabase' in config.mcpServers &&
+    'httpUrl' in config.mcpServers.supabase
+  )
+}
+
+export function isMcpServersConfig(
+  config: McpClientConfig
+): config is McpClientBaseConfig | ClaudeCodeMcpConfig | FactoryMcpConfig {
+  return 'mcpServers' in config && 'supabase' in config.mcpServers
+}
+
+// Helper to extract MCP URL from any config type
+export function getMcpUrl(config: McpClientConfig): string {
+  if (isVSCodeMcpConfig(config)) {
+    return config.servers.supabase.url
+  }
+  if (isGooseMcpConfig(config)) {
+    return config.extensions.supabase.uri
+  }
+  if (isCodexMcpConfig(config)) {
+    return config.mcp_servers.supabase.url
+  }
+  if (isGeminiMcpConfig(config)) {
+    return config.mcpServers.supabase.httpUrl
+  }
+  if (isMcpServersConfig(config)) {
+    return config.mcpServers.supabase.url
+  }
+  throw new Error('Invalid MCP config type')
+}

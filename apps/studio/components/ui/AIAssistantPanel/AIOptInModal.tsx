@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 
 import { AIOptInLevelSelector } from 'components/interfaces/Organization/GeneralSettings/AIOptInLevelSelector'
 import { useAIOptInForm } from 'hooks/forms/useAIOptInForm'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   cn,
@@ -24,7 +24,10 @@ interface AIOptInModalProps {
 
 export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
   const { form, onSubmit, isUpdating, currentOptInLevel } = useAIOptInForm(onCancel)
-  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const { can: canUpdateOrganization } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'organizations'
+  )
 
   const onOpenChange = (open: boolean) => {
     if (!open) {
@@ -40,7 +43,7 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
 
   return (
     <Dialog open={visible} onOpenChange={onOpenChange}>
-      <DialogContent size="large">
+      <DialogContent size="large" aria-describedby={undefined}>
         <Form_Shadcn_ {...form}>
           <form id="ai-opt-in-form" onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader padding="small">

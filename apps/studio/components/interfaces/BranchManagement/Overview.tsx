@@ -18,12 +18,16 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
 import { useBranchQuery } from 'data/branches/branch-query'
 import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import type { Branch } from 'data/branches/branches-query'
 import { branchKeys } from 'data/branches/keys'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   DropdownMenu,
@@ -31,13 +35,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { EditBranchModal } from './EditBranchModal'
 import { PreviewBranchesEmptyState } from './EmptyStates'
 
 interface OverviewProps {
+  isGithubConnected: boolean
   isLoading: boolean
   isSuccess: boolean
   repo: string
@@ -49,6 +53,7 @@ interface OverviewProps {
 }
 
 export const Overview = ({
+  isGithubConnected,
   isLoading,
   isSuccess,
   repo,
@@ -63,6 +68,10 @@ export const Overview = ({
     (branch) => branch.persistent
   )
   const { ref: projectRef } = useParams()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
+
+  const { hasAccess: hasAccessToPersistentBranching, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('branching_persistent')
 
   return (
     <>
@@ -71,6 +80,7 @@ export const Overview = ({
         {isSuccess && mainBranch !== undefined && (
           <BranchRow
             branch={mainBranch}
+            isGithubConnected={isGithubConnected}
             label={
               <div className="flex items-center gap-x-2">
                 <Shield size={14} strokeWidth={1.5} className="text-warning" />
@@ -95,20 +105,45 @@ export const Overview = ({
 
       {/* Persistent Branches Section */}
       <BranchManagementSection header="Persistent branches">
-        {isLoading && <BranchLoader />}
-        {isSuccess && persistentBranches.length === 0 && (
-          <div className="flex items-center flex-col justify-center w-full py-10">
-            <p>No persistent branches</p>
-            <p className="text-foreground-light text-center">
-              Persistent branches are long-lived, cannot be reset, and are ideal for staging
-              environments.
-            </p>
-          </div>
-        )}
+        {(isLoading || isLoadingEntitlement) && <BranchLoader />}
         {isSuccess &&
+          !isLoadingEntitlement &&
+          !hasAccessToPersistentBranching &&
+          IS_PLATFORM &&
+          persistentBranches.length === 0 && (
+            <div className="px-6 py-10 flex items-center justify-between">
+              <div className="flex flex-col gap-1">
+                <p className="text-sm">Upgrade to unlock persistent branches</p>
+                <p className="text-sm text-foreground-light">
+                  Persistent branches are long-lived, cannot be reset, and are ideal for staging
+                  environments.
+                </p>
+              </div>
+              <Button type="primary" asChild>
+                <Link href={`/org/${selectedOrg?.slug}/billing?panel=subscriptionPlan`}>
+                  Upgrade
+                </Link>
+              </Button>
+            </div>
+          )}
+        {isSuccess &&
+          !isLoadingEntitlement &&
+          hasAccessToPersistentBranching &&
+          persistentBranches.length === 0 && (
+            <div className="flex items-center flex-col justify-center w-full py-10">
+              <p>No persistent branches</p>
+              <p className="text-foreground-light text-center">
+                Persistent branches are long-lived, cannot be reset, and are ideal for staging
+                environments.
+              </p>
+            </div>
+          )}
+        {isSuccess &&
+          !isLoadingEntitlement &&
           persistentBranches.map((branch) => {
             return (
               <BranchRow
+                isGithubConnected={isGithubConnected}
                 key={branch.id}
                 repo={repo}
                 branch={branch}
@@ -135,6 +170,7 @@ export const Overview = ({
           ephemeralBranches.map((branch) => {
             return (
               <BranchRow
+                isGithubConnected={isGithubConnected}
                 key={branch.id}
                 repo={repo}
                 branch={branch}
@@ -167,26 +203,40 @@ const PreviewBranchActions = ({
 }) => {
   const gitlessBranching = useIsBranching2Enabled()
   const queryClient = useQueryClient()
-  const projectRef = branch.parent_project_ref ?? branch.project_ref
+  const { project_ref: branchRef, parent_project_ref: projectRef } = branch
 
-  const canDeleteBranches = useCheckPermissions(PermissionAction.DELETE, 'preview_branches')
-  const canUpdateBranches = useCheckPermissions(PermissionAction.UPDATE, 'preview_branches')
+  const { can: canDeleteBranches } = useAsyncCheckPermissions(
+    PermissionAction.DELETE,
+    'preview_branches'
+  )
+  const { can: canUpdateBranches } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'preview_branches'
+  )
 
-  const { data } = useBranchQuery({ projectRef, id: branch.id })
+  const { data } = useBranchQuery({ projectRef, branchRef })
   const isBranchActiveHealthy = data?.status === 'ACTIVE_HEALTHY'
+  const isPersistentBranch = branch.persistent
+
+  const { hasAccess: hasAccessToPersistentBranching, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('branching_persistent')
 
   const [showConfirmResetModal, setShowConfirmResetModal] = useState(false)
   const [showBranchModeSwitch, setShowBranchModeSwitch] = useState(false)
+  const [
+    showPersistentBranchDeleteConfirmationModal,
+    setShowPersistentBranchDeleteConfirmationModal,
+  ] = useState(false)
   const [showEditBranchModal, setShowEditBranchModal] = useState(false)
 
-  const { mutate: resetBranch, isLoading: isResetting } = useBranchResetMutation({
+  const { mutate: resetBranch, isPending: isResetting } = useBranchResetMutation({
     onSuccess() {
       toast.success('Success! Please allow a few seconds for the branch to reset.')
       setShowConfirmResetModal(false)
     },
   })
 
-  const { mutate: updateBranch, isLoading: isUpdatingBranch } = useBranchUpdateMutation({
+  const { mutate: updateBranch, isPending: isUpdatingBranch } = useBranchUpdateMutation({
     onSuccess() {
       toast.success('Successfully updated branch')
       setShowBranchModeSwitch(false)
@@ -197,13 +247,20 @@ const PreviewBranchActions = ({
   })
 
   const onConfirmReset = () => {
-    if (!projectRef) return
-    resetBranch({ id: branch.id, projectRef })
+    resetBranch({ branchRef, projectRef })
   }
 
   const onTogglePersistent = () => {
-    if (!projectRef) return
-    updateBranch({ id: branch.id, projectRef, persistent: !branch.persistent })
+    updateBranch({ branchRef, projectRef, persistent: !branch.persistent })
+  }
+
+  const onDeleteBranch = (e: Event | React.MouseEvent<HTMLDivElement>) => {
+    if (isPersistentBranch) {
+      setShowPersistentBranchDeleteConfirmationModal(true)
+    } else {
+      e.stopPropagation()
+      onSelectDeleteBranch()
+    }
   }
 
   return (
@@ -243,7 +300,9 @@ const PreviewBranchActions = ({
 
           <DropdownMenuItemTooltip
             className="gap-x-2"
-            disabled={!isBranchActiveHealthy}
+            disabled={
+              !isBranchActiveHealthy || (!branch.persistent && !hasAccessToPersistentBranching)
+            }
             onSelect={(e) => {
               e.stopPropagation()
               setShowBranchModeSwitch(true)
@@ -257,7 +316,9 @@ const PreviewBranchActions = ({
                 side: 'left',
                 text: !isBranchActiveHealthy
                   ? 'Branch is still initializing. Please wait for it to become healthy before switching.'
-                  : undefined,
+                  : !branch.persistent && !hasAccessToPersistentBranching
+                    ? 'Upgrade your plan to access persistent branches'
+                    : undefined,
               },
             }}
           >
@@ -303,14 +364,8 @@ const PreviewBranchActions = ({
           <DropdownMenuItemTooltip
             className="gap-x-2"
             disabled={!canDeleteBranches}
-            onSelect={(e) => {
-              e.stopPropagation()
-              onSelectDeleteBranch()
-            }}
-            onClick={(e) => {
-              e.stopPropagation()
-              onSelectDeleteBranch()
-            }}
+            onSelect={onDeleteBranch}
+            onClick={onDeleteBranch}
             tooltip={{
               content: {
                 side: 'left',
@@ -369,6 +424,20 @@ const PreviewBranchActions = ({
         </p>
       </ConfirmationModal>
 
+      <ConfirmationModal
+        variant="warning"
+        visible={showPersistentBranchDeleteConfirmationModal}
+        confirmLabel={'Switch to preview'}
+        title="Branch must be switched to preview before deletion"
+        loading={isUpdatingBranch}
+        onCancel={() => setShowPersistentBranchDeleteConfirmationModal(false)}
+        onConfirm={onTogglePersistent}
+      >
+        <p className="text-sm text-foreground-light">
+          You must switch the branch "{branch.name}" to preview before deleting it.
+        </p>
+      </ConfirmationModal>
+
       <EditBranchModal
         branch={branch}
         visible={showEditBranchModal}
@@ -381,7 +450,10 @@ const PreviewBranchActions = ({
 // Actions for main (production) branch
 const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) => {
   const { ref: projectRef } = useParams()
-  const canUpdateBranches = useCheckPermissions(PermissionAction.UPDATE, 'preview_branches')
+  const { can: canUpdateBranches } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'preview_branches'
+  )
   const [showEditBranchModal, setShowEditBranchModal] = useState(false)
 
   return (

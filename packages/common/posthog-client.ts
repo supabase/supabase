@@ -1,16 +1,25 @@
 import posthog from 'posthog-js'
 import { PostHogConfig } from 'posthog-js'
 
+// Limit the max number of queued events
+// (e.g. if a user navigates around a lot before accepting consent)
+const MAX_PENDING_EVENTS = 20
+
 interface PostHogClientConfig {
   apiKey?: string
   apiHost?: string
 }
 
 class PostHogClient {
+  /** True after posthog.init() is called (prevents double-init) */
+  private initStarted = false
+  /** True after the `loaded` callback fires, meaning PostHog has fully bootstrapped */
   private initialized = false
   private pendingGroups: Record<string, string> = {}
   private pendingIdentification: { userId: string; properties?: Record<string, any> } | null = null
+  private pendingEvents: Array<{ event: string; properties: Record<string, any> }> = []
   private config: PostHogClientConfig
+  private readonly maxPendingEvents = MAX_PENDING_EVENTS
 
   constructor(config: PostHogClientConfig = {}) {
     this.config = {
@@ -21,7 +30,7 @@ class PostHogClient {
   }
 
   init(hasConsent: boolean = true) {
-    if (this.initialized || typeof window === 'undefined' || !hasConsent) return
+    if (this.initStarted || typeof window === 'undefined' || !hasConsent) return
 
     if (!this.config.apiKey) {
       console.warn('PostHog API key not found. Skipping initialization.')
@@ -34,6 +43,10 @@ class PostHogClient {
       capture_pageview: false, // We'll manually track pageviews
       capture_pageleave: false, // We'll manually track page leaves
       loaded: (posthog) => {
+        // Apply pending properties that were set before PostHog
+        // initialized due to poor connection or user not accepting
+        // consent right away
+
         // Apply any pending groups
         Object.entries(this.pendingGroups).forEach(([type, id]) => {
           posthog.group(type, id)
@@ -42,32 +55,81 @@ class PostHogClient {
 
         // Apply any pending identification
         if (this.pendingIdentification) {
-          posthog.identify(this.pendingIdentification.userId, this.pendingIdentification.properties)
+          try {
+            posthog.identify(
+              this.pendingIdentification.userId,
+              this.pendingIdentification.properties
+            )
+          } catch (error) {
+            console.error('PostHog identify failed:', error)
+          }
           this.pendingIdentification = null
         }
+
+        // Flush any pending events
+        this.pendingEvents.forEach(({ event, properties }) => {
+          try {
+            posthog.capture(event, properties, { transport: 'sendBeacon' })
+          } catch (error) {
+            console.error('PostHog capture failed:', error)
+          }
+        })
+        this.pendingEvents = []
+
+        this.initialized = true
       },
     }
 
+    this.initStarted = true
     posthog.init(this.config.apiKey, config)
-    this.initialized = true
   }
 
   capturePageView(properties: Record<string, any>, hasConsent: boolean = true) {
-    if (!hasConsent || !this.initialized) return
+    if (!hasConsent) return
 
-    // Store groups from properties if present (for later group() calls)
-    if (properties.$groups) {
-      Object.entries(properties.$groups).forEach(([type, id]) => {
-        if (id) posthog.group(type, id as string)
-      })
+    if (!this.initialized) {
+      // Queue the event for when PostHog initializes (up to cap)
+      // (e.g. poor connection or user not accepting consent right away)
+      if (this.pendingEvents.length >= this.maxPendingEvents) {
+        this.pendingEvents.shift() // Remove oldest event
+      }
+      this.pendingEvents.push({ event: '$pageview', properties })
+      return
     }
 
-    posthog.capture('$pageview', properties)
+    try {
+      // Store groups from properties if present (for later group() calls)
+      if (properties.$groups) {
+        Object.entries(properties.$groups).forEach(([type, id]) => {
+          if (id) posthog.group(type, id as string)
+        })
+      }
+
+      posthog.capture('$pageview', properties, { transport: 'sendBeacon' })
+    } catch (error) {
+      console.error('PostHog pageview capture failed:', error)
+    }
   }
 
   capturePageLeave(properties: Record<string, any>, hasConsent: boolean = true) {
-    if (!hasConsent || !this.initialized) return
-    posthog.capture('$pageleave', properties)
+    if (!hasConsent) return
+
+    if (!this.initialized) {
+      // Queue the event for when PostHog initializes (up to cap)
+      // (e.g. poor connection or user not accepting consent right away)
+      if (this.pendingEvents.length >= this.maxPendingEvents) {
+        this.pendingEvents.shift() // Remove oldest event
+      }
+      this.pendingEvents.push({ event: '$pageleave', properties })
+      return
+    }
+
+    try {
+      // Use sendBeacon for page leave to survive tab close
+      posthog.capture('$pageleave', properties, { transport: 'sendBeacon' })
+    } catch (error) {
+      console.error('PostHog pageleave capture failed:', error)
+    }
   }
 
   identify(userId: string, properties?: Record<string, any>, hasConsent: boolean = true) {
@@ -79,7 +141,40 @@ class PostHogClient {
       return
     }
 
-    posthog.identify(userId, properties)
+    try {
+      posthog.identify(userId, properties)
+    } catch (error) {
+      console.error('PostHog identify failed:', error)
+    }
+  }
+
+  reset() {
+    this.pendingIdentification = null
+    this.pendingGroups = {}
+    this.pendingEvents = []
+
+    if (!this.initStarted) return
+
+    try {
+      posthog.reset()
+    } catch (error) {
+      console.error('PostHog reset failed:', error)
+    }
+  }
+
+  /**
+   * Returns PostHog's distinct_id, which holds first-touch attribution data.
+   * Returns undefined until PostHog's `loaded` callback fires.
+   */
+  getDistinctId(): string | undefined {
+    if (!this.initialized) return undefined
+
+    try {
+      return posthog.get_distinct_id()
+    } catch (error) {
+      console.error('PostHog getDistinctId failed:', error)
+      return undefined
+    }
   }
 }
 

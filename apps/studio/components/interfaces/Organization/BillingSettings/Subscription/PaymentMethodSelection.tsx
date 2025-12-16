@@ -22,14 +22,13 @@ import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organizat
 import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
 import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { Checkbox_Shadcn_, Listbox } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import {
   NewPaymentMethodElement,
   type PaymentMethodElementRef,
-} from '../PaymentMethods/NewPaymentMethodElement'
+} from '../../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -58,15 +57,15 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   const { resolvedTheme } = useTheme()
   const paymentRef = useRef<PaymentMethodElementRef | null>(null)
   const [setupNewPaymentMethod, setSetupNewPaymentMethod] = useState<boolean | null>(null)
-  const { data: customerProfile, isLoading: isCustomerProfileLoading } =
+  const { data: customerProfile, isPending: isCustomerProfileLoading } =
     useOrganizationCustomerProfileQuery({
       slug,
     })
-  const { data: taxId, isLoading: isCustomerTaxIdLoading } = useOrganizationTaxIdQuery({ slug })
+  const { data: taxId, isPending: isCustomerTaxIdLoading } = useOrganizationTaxIdQuery({ slug })
 
-  const hidePaymentMethodsWithoutAddress = useFlag('hidePaymentMethodsWithoutAddress')
-
-  const { data: allPaymentMethods, isLoading } = useOrganizationPaymentMethodsQuery({ slug })
+  const { data: allPaymentMethods, isPending: isLoading } = useOrganizationPaymentMethodsQuery({
+    slug,
+  })
 
   const paymentMethods = useMemo(() => {
     if (!allPaymentMethods)
@@ -75,24 +74,22 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
         defaultPaymentMethodId: null,
       }
 
-    const filtered = allPaymentMethods.data.filter(
-      (pm) => !hidePaymentMethodsWithoutAddress || pm.has_address
-    )
     return {
-      data: filtered,
+      // force customer to put down address via payment method creation flow if they don't have an address set
+      data: customerProfile?.address == null ? [] : allPaymentMethods.data,
       defaultPaymentMethodId: allPaymentMethods.data.some(
         (pm) => pm.id === allPaymentMethods.defaultPaymentMethodId
       )
         ? allPaymentMethods.defaultPaymentMethodId
         : null,
     }
-  }, [allPaymentMethods])
+  }, [allPaymentMethods, customerProfile])
 
   const captchaRefCallback = useCallback((node: any) => {
     setCaptchaRef(node)
   }, [])
 
-  const { mutate: initSetupIntent, isLoading: setupIntentLoading } =
+  const { mutate: initSetupIntent, isPending: setupIntentLoading } =
     useOrganizationPaymentMethodSetupIntent({
       onSuccess: (intent) => {
         setSetupIntent(intent)
@@ -224,7 +221,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
       />
 
       <div>
-        {isLoading ? (
+        {isLoading || isCustomerProfileLoading ? (
           <div className="flex items-center px-4 py-2 space-x-4 border rounded-md border-strong bg-surface-200">
             <Loader className="animate-spin" size={14} />
             <p className="text-sm text-foreground-light">Retrieving payment methods</p>

@@ -7,10 +7,9 @@ import { useParams } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { ActionCard } from 'components/layouts/Tabs/ActionCard'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { cn, SQL_ICON } from 'ui'
@@ -26,10 +25,14 @@ const SQLQuickstarts = () => {
 
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'sql', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -44,7 +47,6 @@ const SQLQuickstarts = () => {
 
     try {
       const snippet = createSqlSnippetSkeletonV2({
-        id: uuidv4(),
         name,
         sql,
         owner_id: profile?.id,

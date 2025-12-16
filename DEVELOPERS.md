@@ -192,7 +192,7 @@ We support "federating" docs, meaning doc content can come directly from externa
 
 Federated docs work using Next.js's build pipeline. We use `getStaticProps()` to fetch remote documentation (ie. markdown) at build time which is processed and passed to the respective page within the docs.
 
-See the [Vecs Python source code](https://github.com/supabase/supabase/blob/master/apps/docs/pages/guides/ai/python/%5Bslug%5D.tsx) to see how we do this for [`supabase/vecs`](https://github.com/supabase/vecs). Use this as a starting point for federating other docs.
+See the [Vecs Python source code](https://github.com/supabase/supabase/tree/master/apps/docs/app/guides/ai/python/%5Bslug%5D to see how we do this for [`supabase/vecs`](https://github.com/supabase/vecs). Use this as a starting point for federating other docs.
 
 Some things to consider:
 
@@ -203,7 +203,7 @@ Some things to consider:
 
 ## Community channels
 
-If you get stuck somewhere or have any questions, join our [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
+If you get stuck somewhere or have any questions, join our [Discord Community Server](https://discord.supabase.com/) or the [GitHub Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
 
 ## Contributors
 

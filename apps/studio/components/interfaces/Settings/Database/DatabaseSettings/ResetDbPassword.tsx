@@ -1,30 +1,34 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { debounce } from 'lodash'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useDatabasePasswordResetMutation } from 'data/database/database-password-reset-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
-import passwordStrength from 'lib/password-strength'
+import { passwordStrength } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
-import { Button, Input, Modal } from 'ui'
+import { Button, Card, CardContent, Input, Modal } from 'ui'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
 const ResetDbPassword = ({ disabled = false }) => {
   const { ref } = useParams()
   const isProjectActive = useIsProjectActive()
   const { data: project } = useSelectedProjectQuery()
-  const canResetDbPassword = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+
+  const { can: canResetDbPassword } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
 
@@ -33,7 +37,7 @@ const ResetDbPassword = ({ disabled = false }) => {
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState<string>('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState<number>(0)
 
-  const { mutate: resetDatabasePassword, isLoading: isUpdatingPassword } =
+  const { mutate: resetDatabasePassword, isPending: isUpdatingPassword } =
     useDatabasePasswordResetMutation({
       onSuccess: async () => {
         toast.success('Successfully updated database password')
@@ -57,17 +61,13 @@ const ResetDbPassword = ({ disabled = false }) => {
     setPasswordStrengthMessage(message)
   }
 
-  const delayedCheckPasswordStrength = useRef(
-    debounce((value) => checkPasswordStrength(value), 300)
-  ).current
-
   const onDbPassChange = (e: any) => {
     const value = e.target.value
     setPassword(value)
     if (value == '') {
       setPasswordStrengthScore(-1)
       setPasswordStrengthMessage('')
-    } else delayedCheckPasswordStrength(value)
+    } else checkPasswordStrength(value)
   }
 
   const confirmResetDbPass = async () => {
@@ -81,23 +81,18 @@ const ResetDbPassword = ({ disabled = false }) => {
   function generatePassword() {
     const password = generateStrongPassword()
     setPassword(password)
-    delayedCheckPasswordStrength(password)
+    checkPasswordStrength(password)
   }
 
   return (
     <>
-      <Panel className="!m-0">
-        <Panel.Content>
-          <div
-            className="grid grid-cols-1 items-center lg:grid-cols-3 scroll-mt-6"
-            id="database-password"
+      <Card id="database-password">
+        <CardContent>
+          <FormLayout
+            layout="flex-row-reverse"
+            label="Database password"
+            description="You can use this password to connect directly to your Postgres database."
           >
-            <div className="col-span-2 space-y-1">
-              <p className="block">Database password</p>
-              <p className="text-sm opacity-50">
-                You can use this password to connect directly to your Postgres database.
-              </p>
-            </div>
             <div className="flex items-end justify-end">
               <ButtonTooltip
                 type="default"
@@ -117,9 +112,9 @@ const ResetDbPassword = ({ disabled = false }) => {
                 Reset database password
               </ButtonTooltip>
             </div>
-          </div>
-        </Panel.Content>
-      </Panel>
+          </FormLayout>
+        </CardContent>
+      </Card>
       <Modal
         hideFooter
         header={<h5 className="text-foreground">Reset database password</h5>}

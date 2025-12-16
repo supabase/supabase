@@ -15,13 +15,11 @@ import { CodeBlock, CodeBlockProps } from '@/blocks/Code/Component'
 
 import type {
   BannerBlock as BannerBlockProps,
-  CallToActionBlock as CTABlockProps,
   MediaBlock as MediaBlockProps,
   QuoteBlock as QuoteBlockProps,
   YouTubeBlock as YouTubeBlockProps,
 } from '@/payload-types'
 import { BannerBlock } from '@/blocks/Banner/Component'
-import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { QuoteBlock } from '@/blocks/Quote/Component'
 import { YouTubeBlock } from '@/blocks/YouTube/Component'
 import { cn } from '@/utilities/ui'
@@ -29,12 +27,7 @@ import { cn } from '@/utilities/ui'
 type NodeTypes =
   | DefaultNodeTypes
   | SerializedBlockNode<
-      | CTABlockProps
-      | MediaBlockProps
-      | BannerBlockProps
-      | CodeBlockProps
-      | QuoteBlockProps
-      | YouTubeBlockProps
+      MediaBlockProps | BannerBlockProps | CodeBlockProps | QuoteBlockProps | YouTubeBlockProps
     >
 
 const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
@@ -62,7 +55,6 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) 
       />
     ),
     code: ({ node }) => <CodeBlock className="col-start-2" {...node.fields} />,
-    cta: ({ node }) => <CallToActionBlock {...node.fields} />,
     quote: ({ node }) => <QuoteBlock className="col-start-2" {...node.fields} />,
     youtube: ({ node }) => <YouTubeBlock className="col-start-2" {...node.fields} />,
   },

@@ -1,12 +1,13 @@
 import { ArrowUp, Loader2, Square } from 'lucide-react'
-import React, { ChangeEvent, memo, useRef } from 'react'
+import { ChangeEvent, FormEvent, forwardRef, KeyboardEvent, memo, useRef } from 'react'
 
 import { useBreakpoint } from 'common'
 import { ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { type SqlSnippet } from './AIAssistant.types'
-import { SnippetRow, getSnippetContent } from './SnippetRow'
+import { ModelSelector } from './ModelSelector'
+import { getSnippetContent, SnippetRow } from './SnippetRow'
 
 export interface FormProps {
   /* The ref for the textarea, optional. Exposed for the CommandsPopover to attach events. */
@@ -41,9 +42,15 @@ export interface FormProps {
   snippetsClassName?: string
   /* Additional class name for the form wrapper */
   className?: string
+  /* If currently editing an existing message */
+  isEditing?: boolean
+  /* The currently selected AI model */
+  selectedModel: 'gpt-5' | 'gpt-5-mini'
+  /* Callback when a model is chosen */
+  onSelectModel: (model: 'gpt-5' | 'gpt-5-mini') => void
 }
 
-const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
+const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
   (
     {
       loading = false,
@@ -59,6 +66,9 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
       snippetsClassName,
       includeSnippetsInMessage = false,
       className,
+      isEditing = false,
+      selectedModel,
+      onSelectModel,
       ...props
     },
     ref
@@ -66,9 +76,9 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
     const formRef = useRef<HTMLFormElement>(null)
     const isMobile = useBreakpoint('md')
 
-    const handleSubmit = (event?: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (event?: FormEvent<HTMLFormElement>) => {
       if (event) event.preventDefault()
-      if (!value || loading) return
+      if (!value || (loading && !isEditing)) return
 
       let finalMessage = value
       if (includeSnippetsInMessage && sqlSnippets && sqlSnippets.length > 0) {
@@ -81,7 +91,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
       onSubmit(finalMessage)
     }
 
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
       if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault()
         handleSubmit()
@@ -97,7 +107,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
           ref={formRef}
           {...props}
           onSubmit={handleSubmit}
-          className={cn('relative overflow-hidden', className)}
+          className={cn('relative', className)}
         >
           {sqlSnippets && sqlSnippets.length > 0 && (
             <SnippetRow
@@ -107,11 +117,11 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
             />
           )}
           <ExpandingTextArea
+            autoFocus={!isMobile}
             ref={textAreaRef}
-            autoFocus={isMobile}
             disabled={disabled}
             className={cn(
-              'text-sm pr-10 max-h-64',
+              'text-sm pr-10 pb-9 max-h-64',
               sqlSnippets && sqlSnippets.length > 0 && 'pt-10'
             )}
             placeholder={placeholder}
@@ -121,33 +131,39 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
             onChange={(event) => onValueChange(event)}
             onKeyDown={handleKeyDown}
           />
-          <div className="absolute right-1.5 bottom-1.5 flex gap-3 items-center">
-            {loading ? (
-              onStop ? (
-                <ButtonTooltip
-                  type="outline"
-                  aria-label="Stop response"
-                  icon={<Square fill="currentColor" className="scale-75" />}
-                  onClick={onStop}
-                  className="w-7 h-7 rounded-full p-0 text-center flex items-center justify-center"
-                  tooltip={{ content: { side: 'top', text: 'Stop response' } }}
-                />
+          <div className="absolute inset-x-1.5 bottom-1.5 flex items-center justify-between pointer-events-none">
+            <div className="pointer-events-auto">
+              <ModelSelector selectedModel={selectedModel} onSelectModel={onSelectModel} />
+            </div>
+
+            <div className="flex gap-3 items-center pointer-events-auto">
+              {loading ? (
+                onStop ? (
+                  <ButtonTooltip
+                    type="outline"
+                    aria-label="Stop response"
+                    icon={<Square fill="currentColor" className="scale-75" />}
+                    onClick={onStop}
+                    className="w-7 h-7 rounded-full p-0 text-center flex items-center justify-center"
+                    tooltip={{ content: { side: 'top', text: 'Stop response' } }}
+                  />
+                ) : (
+                  <Loader2 size={22} className="animate-spin size-7 text-muted" strokeWidth={1} />
+                )
               ) : (
-                <Loader2 size={22} className="animate-spin size-7 text-muted" strokeWidth={1} />
-              )
-            ) : (
-              <ButtonTooltip
-                htmlType="submit"
-                aria-label="Send message"
-                icon={<ArrowUp />}
-                disabled={!canSubmit}
-                className={cn(
-                  'w-7 h-7 rounded-full p-0 text-center flex items-center justify-center',
-                  !canSubmit ? 'opacity-50' : 'opacity-100'
-                )}
-                tooltip={{ content: { side: 'top', text: 'Send message' } }}
-              />
-            )}
+                <ButtonTooltip
+                  htmlType="submit"
+                  aria-label="Send message"
+                  icon={<ArrowUp />}
+                  disabled={!canSubmit}
+                  className={cn(
+                    'w-7 h-7 rounded-full p-0 text-center flex items-center justify-center',
+                    !canSubmit ? 'opacity-50' : 'opacity-100'
+                  )}
+                  tooltip={{ content: { side: 'top', text: 'Send message' } }}
+                />
+              )}
+            </div>
           </div>
         </form>
       </div>

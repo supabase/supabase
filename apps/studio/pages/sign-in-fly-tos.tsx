@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 import { useIsLoggedIn } from 'common'
 import { useOrganizationByFlyOrgIdMutation } from 'data/organizations/organization-by-fly-organization-id-mutation'
 import { useProjectByFlyExtensionIdMutation } from 'data/projects/project-by-fly-extension-id-mutation'
-import { API_URL } from 'lib/constants'
+import { API_URL, BASE_PATH } from 'lib/constants'
 import { Button } from 'ui'
 
 const SignInFlyTos = () => {
@@ -78,8 +78,8 @@ const SignInFlyTos = () => {
                   <Image
                     src={
                       resolvedTheme?.includes('dark')
-                        ? `${router.basePath}/img/supabase-dark.svg`
-                        : `${router.basePath}/img/supabase-light.svg`
+                        ? `${BASE_PATH}/img/supabase-dark.svg`
+                        : `${BASE_PATH}/img/supabase-light.svg`
                     }
                     alt=""
                     height={24}
@@ -112,9 +112,9 @@ const SignInFlyTos = () => {
           )}
         </div>
       )}
-      <div className="sm:text-center">
+      <div className="text-center text-balance">
         <p className="text-xs text-foreground-lighter sm:mx-auto sm:max-w-sm">
-          By continuing, you agree to Supabase's{' '}
+          By continuing, you agree to Supabase’s{' '}
           <Link href="https://supabase.com/terms" className="underline hover:text-foreground-light">
             Terms of Service
           </Link>{' '}

@@ -1,12 +1,13 @@
-import { ArrowRight, Check, Minus, User, X } from 'lucide-react'
+import { ArrowRight, Check, User, X } from 'lucide-react'
 import Link from 'next/link'
+import { useMemo } from 'react'
 
-import Table from 'components/to-be-cleaned/Table'
+import { useParams } from 'common'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { ProfileImage } from 'components/ui/ProfileImage'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { getGitHubProfileImgUrl } from 'lib/github'
 import { useProfile } from 'lib/profile'
@@ -16,6 +17,8 @@ import {
   HoverCardTrigger_Shadcn_,
   HoverCard_Shadcn_,
   ScrollArea,
+  TableCell,
+  TableRow,
   cn,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
@@ -31,16 +34,19 @@ const MEMBER_ORIGIN_TO_MANAGED_BY = {
 } as const
 
 export const MemberRow = ({ member }: MemberRowProps) => {
+  const { slug } = useParams()
   const { profile } = useProfile()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const { data: projects } = useProjectsQuery()
-  const { data: roles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
+  const { data: roles, isPending: isLoadingRoles } = useOrganizationRolesV2Query({
     slug: selectedOrganization?.slug,
   })
-
-  const orgProjects = projects?.filter((p) => p.organization_id === selectedOrganization?.id)
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
+
+  const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
+  const orgProjects =
+    useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
+
   const isInvitedUser = Boolean(member.invited_id)
   const isEmailUser = member.username === member.primary_email
   const isFlyUser = Boolean(member.primary_email?.endsWith('customer.fly.io'))
@@ -48,28 +54,9 @@ export const MemberRow = ({ member }: MemberRowProps) => {
   const profileImageUrl =
     isInvitedUser || isEmailUser || isFlyUser ? undefined : getGitHubProfileImgUrl(member.username)
 
-  // [Joshen] From project role POV, mask any roles for other projects
-  const isObfuscated =
-    member.role_ids.filter((id) => {
-      const role = [
-        ...(roles?.org_scoped_roles ?? []),
-        ...(roles?.project_scoped_roles ?? []),
-      ].find((role) => role.id === id)
-      const isOrgScope = role?.project_ids === null
-      if (isOrgScope) return false
-
-      const appliedProjects = (role?.project_ids ?? [])
-        .map((id) => {
-          return projects?.find((p) => p.id === id)?.name ?? ''
-        })
-        .filter((x) => x.length > 0)
-
-      return appliedProjects.length === 0
-    }).length > 0
-
   return (
-    <Table.tr>
-      <Table.td>
+    <TableRow>
+      <TableCell>
         <div className="flex items-center gap-x-4">
           <ProfileImage
             alt={member.primary_email ?? member.username ?? ''}
@@ -88,7 +75,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
           />
           <div className="flex item-center gap-x-2">
             <p className="text-foreground-light truncate">{member.primary_email}</p>
-            {member.gotrue_id === profile?.gotrue_id && <Badge color="scale">You</Badge>}
+            {member.gotrue_id === profile?.gotrue_id && <Badge>You</Badge>}
           </div>
 
           {(member.metadata as any)?.origin && (
@@ -103,18 +90,18 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             />
           )}
         </div>
-      </Table.td>
+      </TableCell>
 
-      <Table.td>
+      <TableCell>
         {isInvitedUser && member.invited_at && (
           <Badge variant={isInviteExpired(member.invited_at) ? 'destructive' : 'warning'}>
             {isInviteExpired(member.invited_at) ? 'Expired' : 'Invited'}
           </Badge>
         )}
         {member.is_sso_user && <Badge variant="default">SSO</Badge>}
-      </Table.td>
+      </TableCell>
 
-      <Table.td>
+      <TableCell>
         <div className="flex items-center justify-center">
           {member.mfa_enabled ? (
             <Check className="text-brand" strokeWidth={2} size={20} />
@@ -122,13 +109,11 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             <X className="text-foreground-light" strokeWidth={1.5} size={20} />
           )}
         </div>
-      </Table.td>
+      </TableCell>
 
-      <Table.td className="max-w-64">
+      <TableCell className="max-w-64">
         {isLoadingRoles ? (
           <ShimmeringLoader className="w-32" />
-        ) : isObfuscated ? (
-          <Minus strokeWidth={1.5} size={20} />
         ) : (
           member.role_ids.map((id) => {
             const orgScopedRole = (roles?.org_scoped_roles ?? []).find((role) => role.id === id)
@@ -138,12 +123,10 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             const role = orgScopedRole || projectScopedRole
             const roleName = (role?.name ?? '').split('_')[0]
             const projectsApplied =
-              role?.project_ids === null
+              role?.projects.length === 0
                 ? orgProjects?.map((p) => p.name) ?? []
-                : (role?.project_ids ?? [])
-                    .map((id) => {
-                      return orgProjects?.find((p) => p.id === id)?.name ?? ''
-                    })
+                : (role?.projects ?? [])
+                    .map(({ ref }) => orgProjects?.find((p) => p.ref === ref)?.name ?? '')
                     .filter((x) => x.length > 0)
 
             return (
@@ -160,7 +143,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
                       <HoverCard_Shadcn_ openDelay={200}>
                         <HoverCardTrigger_Shadcn_ asChild>
                           <span className="text-foreground">
-                            {role?.project_ids === null
+                            {role?.projects.length === 0
                               ? 'Organization'
                               : `${projectsApplied.length} project${projectsApplied.length > 1 ? 's' : ''}`}
                           </span>
@@ -201,11 +184,11 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             )
           })
         )}
-      </Table.td>
+      </TableCell>
 
-      <Table.td>
+      <TableCell>
         <MemberActions member={member} />
-      </Table.td>
-    </Table.tr>
+      </TableCell>
+    </TableRow>
   )
 }

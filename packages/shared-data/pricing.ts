@@ -36,7 +36,8 @@ export type FeatureKey =
   | 'database.pitr'
   | 'database.pausing'
   | 'database.branching'
-  | 'database.bandwidth'
+  | 'database.egress'
+  | 'database.cachedEgress'
   | 'auth.totalUsers'
   | 'auth.maus'
   | 'auth.userDataOwnership'
@@ -44,7 +45,7 @@ export type FeatureKey =
   | 'auth.socialOAuthProviders'
   | 'auth.customSMTPServer'
   | 'auth.removeSupabaseBranding'
-  | 'auth.auditTrails'
+  | 'auth.auditLogs'
   | 'auth.basicMFA'
   | 'auth.advancedMFAPhone'
   | 'auth.thirdPartyMAUs'
@@ -68,7 +69,7 @@ export type FeatureKey =
   | 'realtime.messagesPerMonth'
   | 'realtime.maxMessageSize'
   | 'dashboard.teamMembers'
-  | 'dashboard.auditTrails'
+  | 'security.platformAuditLogs'
   | 'security.byoc'
   | 'security.logRetention'
   | 'security.logDrain'
@@ -182,12 +183,23 @@ export const pricing: Pricing = {
         usage_based: true,
       },
       {
-        key: 'database.bandwidth',
-        title: 'Bandwidth',
+        key: 'database.egress',
+        title: 'Egress',
         plans: {
           free: '5 GB included',
           pro: ['250 GB included', 'then $0.09 per GB'],
           team: ['250 GB included', 'then $0.09 per GB'],
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
+      {
+        key: 'database.cachedEgress',
+        title: 'Cached Egress',
+        plans: {
+          free: '5 GB included',
+          pro: ['250 GB included', 'then $0.03 per GB'],
+          team: ['250 GB included', 'then $0.03 per GB'],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -277,8 +289,8 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        key: 'auth.auditTrails',
-        title: 'Audit trails',
+        key: 'auth.auditLogs',
+        title: 'Auth Audit Logs',
         plans: {
           free: '1 hour',
           pro: '7 days',
@@ -544,17 +556,6 @@ export const pricing: Pricing = {
         },
         usage_based: false,
       },
-      {
-        key: 'dashboard.auditTrails',
-        title: 'Audit trails',
-        plans: {
-          free: false,
-          pro: false,
-          team: true,
-          enterprise: true,
-        },
-        usage_based: false,
-      },
     ],
   },
   security: {
@@ -589,14 +590,21 @@ export const pricing: Pricing = {
         plans: {
           free: false,
           pro: false,
-          team: [
-            '$60 per drain per month',
-            '+ $0.20 per million events',
-            '+ $0.09 per GB bandwidth',
-          ],
+          team: ['$60 per drain per month', '+ $0.20 per million events', '+ $0.09 per GB egress'],
           enterprise: 'Custom',
         },
         usage_based: true,
+      },
+      {
+        key: 'security.platformAuditLogs',
+        title: 'Platform Audit Logs',
+        plans: {
+          free: false,
+          pro: false,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
       },
       {
         key: 'security.metricsEndpoint',

@@ -10,10 +10,11 @@ import { useResetPasswordMutation } from 'data/misc/reset-password-mutation'
 import { BASE_PATH } from 'lib/constants'
 import { auth } from 'lib/gotrue'
 import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email('Must be a valid email').min(1, 'Email is required'),
+  email: z.string().min(1, 'Please provide an email address').email('Must be a valid email'),
 })
 
 const codeSchema = z.object({
@@ -78,6 +79,11 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
         className="flex flex-col pt-4 space-y-4"
         onSubmit={codeForm.handleSubmit(onCodeEntered)}
       >
+        <Admonition
+          type="default"
+          title="Check your email for a reset code"
+          description="You'll receive an email if an account associated with the email address exists"
+        />
         <FormField_Shadcn_
           control={codeForm.control}
           name="code"
@@ -114,7 +120,7 @@ const ForgotPasswordForm = ({ onSuccess }: { onSuccess: (email: string) => void 
     defaultValues: { email: '' },
   })
 
-  const { mutate: resetPassword, isLoading } = useResetPasswordMutation({
+  const { mutate: resetPassword, isPending } = useResetPasswordMutation({
     onSuccess: () => {
       onSuccess(forgotPasswordForm.getValues('email'))
     },
@@ -160,7 +166,7 @@ const ForgotPasswordForm = ({ onSuccess }: { onSuccess: (email: string) => void 
                   {...field}
                   type="email"
                   placeholder="you@example.com"
-                  disabled={isLoading}
+                  disabled={isPending}
                   autoComplete="email"
                 />
               </FormControl_Shadcn_>
@@ -189,8 +195,8 @@ const ForgotPasswordForm = ({ onSuccess }: { onSuccess: (email: string) => void 
           form="forgot-password-form"
           htmlType="submit"
           size="medium"
-          disabled={isLoading}
-          loading={isLoading}
+          disabled={isPending}
+          loading={isPending}
         >
           Send reset code
         </Button>

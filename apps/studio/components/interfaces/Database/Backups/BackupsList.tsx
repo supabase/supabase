@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Clock } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -7,37 +6,38 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useBackupRestoreMutation } from 'data/database/backup-restore-mutation'
 import { DatabaseBackup, useBackupsQuery } from 'data/database/backups-query'
-import { setProjectStatus } from 'data/projects/projects-query'
+import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import BackupItem from './BackupItem'
-import BackupsEmpty from './BackupsEmpty'
-import BackupsStorageAlert from './BackupsStorageAlert'
+import { BackupItem } from './BackupItem'
+import { BackupsEmpty } from './BackupsEmpty'
+import { BackupsStorageAlert } from './BackupsStorageAlert'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
-const BackupsList = () => {
+export const BackupsList = () => {
   const router = useRouter()
-  const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
+  const [selectedBackup, setSelectedBackup] = useState<DatabaseBackup>()
+  const { hasAccess: hasAccessToBackups } = useCheckEntitlements('backup.retention_days')
 
+  const { setProjectStatus } = useSetProjectStatus()
   const { data: selectedProject } = useSelectedProjectQuery()
   const isHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
-
-  const [selectedBackup, setSelectedBackup] = useState<DatabaseBackup>()
 
   const { data: backups } = useBackupsQuery({ projectRef })
   const {
     mutate: restoreFromBackup,
-    isLoading: isRestoring,
+    isPending: isRestoring,
     isSuccess: isSuccessBackup,
   } = useBackupRestoreMutation({
     onSuccess: () => {
       if (projectRef) {
         setTimeout(() => {
-          setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
+          setProjectStatus({ ref: projectRef, status: PROJECT_STATUS.RESTORING })
           toast.success(
             `Restoring database back to ${dayjs(selectedBackup?.inserted_at).format(
               'DD MMM YYYY HH:mm:ss'
@@ -55,14 +55,16 @@ const BackupsList = () => {
   )
   const isPitrEnabled = backups?.pitr_enabled
 
-  if (planKey === 'FREE') {
+  if (!hasAccessToBackups) {
     return (
       <UpgradeToPro
         addon="pitr"
-        icon={<Clock size={20} />}
+        source="backups"
+        featureProposition="have up to 7 days of scheduled backups"
+        icon={<Clock size={20} strokeWidth={1.5} />}
         primaryText="Free Plan does not include project backups."
         secondaryText="Upgrade to the Pro Plan for up to 7 days of scheduled backups."
-        source="backups"
+        buttonText="Upgrade"
       />
     )
   }
@@ -122,5 +124,3 @@ const BackupsList = () => {
     </>
   )
 }
-
-export default BackupsList

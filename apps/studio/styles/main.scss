@@ -1,6 +1,4 @@
-@tailwind base;
 @tailwind components;
-@tailwind utilities;
 
 @import './../../../packages/ui/build/css/source/global.css';
 @import './../../../packages/ui/build/css/themes/dark.css';
@@ -44,21 +42,6 @@
   --sidebar-accent-foreground: var(--foreground-default);
   --sidebar-border: var(--border-default);
   --sidebar-ring: 217.2 91.2% 59.8%;
-}
-
-@layer utilities {
-  .btn-primary {
-    @apply inline-block rounded border border-green-500 bg-green-500 py-1 px-3 text-sm;
-    color: #fff !important;
-    font-weight: 600;
-    line-height: 20px;
-    text-align: center;
-  }
-
-  .btn-primary-hover {
-    @apply bg-green-600;
-    cursor: pointer;
-  }
 }
 
 html,
@@ -159,14 +142,6 @@ input.is-invalid {
   @apply border border-red-700;
   @apply focus:ring-red-500;
   @apply placeholder:text-red-600;
-}
-
-input[type='submit'] {
-  @apply btn-primary;
-}
-
-input[type='submit']:hover {
-  @apply btn-primary-hover;
 }
 
 input::placeholder {

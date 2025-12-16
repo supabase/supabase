@@ -17,7 +17,7 @@ export interface HeroSection {
   title: string
   h1: JSX.Element
   subheader: JSX.Element[]
-  image: JSX.Element
+  image: JSX.Element | undefined
   className?: string
   sectionContainerClassName?: string
   icon?: string
@@ -101,6 +101,11 @@ export interface FrameworkLinkProps {
   name: string
   icon: string | React.ReactNode
   docs: string
+}
+
+export interface PostGridProps {
+  header: React.ReactNode
+  subheader: React.ReactNode
 }
 
 export const FrameworkLink = ({ framework }: { framework: FrameworkLinkProps }) => {

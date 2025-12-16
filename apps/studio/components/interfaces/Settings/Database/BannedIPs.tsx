@@ -12,10 +12,19 @@ import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mutations'
 import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
 import { useUserIPAddressQuery } from 'data/misc/user-ip-address-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Badge, Skeleton } from 'ui'
+import { DOCS_URL } from 'lib/constants'
+import { Badge, Card, CardContent, Skeleton } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import {
+  PageSection,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+  PageSectionContent,
+  PageSectionDescription,
+} from 'ui-patterns'
 
 const BannedIPs = () => {
   const { ref } = useParams()
@@ -24,7 +33,7 @@ const BannedIPs = () => {
   const [selectedIPToUnban, setSelectedIPToUnban] = useState<string | null>(null) // Track the selected IP for unban
 
   const {
-    isLoading: isLoadingIPList,
+    isPending: isLoadingIPList,
     isFetching: isFetchingIPList,
     data: ipList,
     error: ipListError,
@@ -39,13 +48,13 @@ const BannedIPs = () => {
   const [showUnban, setShowUnban] = useState(false)
   const [confirmingIP, setConfirmingIP] = useState<string | null>(null) // Track the IP being confirmed for unban
 
-  const canUnbanNetworks = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+  const { can: canUnbanNetworks } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: {
       project_id: project?.id,
     },
   })
 
-  const { mutate: unbanIPs, isLoading: isUnbanning } = useBannedIPsDeleteMutation({
+  const { mutate: unbanIPs, isPending: isUnbanning } = useBannedIPsDeleteMutation({
     onSuccess: () => {
       toast.success('IP address successfully unbanned')
       setSelectedIPToUnban(null) // Reset the selected IP for unban
@@ -71,60 +80,68 @@ const BannedIPs = () => {
   }
 
   return (
-    <div id="banned-ips">
-      <div className="flex items-center justify-between mb-6">
-        <FormHeader
-          className="mb-0"
-          title="Network Bans"
-          description="List of IP addresses that are temporarily blocked if their traffic pattern looks abusive"
+    <>
+      <PageSection id="banned-ips">
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Network Bans</PageSectionTitle>
+            <PageSectionDescription>
+              List of IP addresses that are temporarily blocked if their traffic pattern looks
+              abusive
+            </PageSectionDescription>
+          </PageSectionSummary>
+          <DocsButton href={`${DOCS_URL}/reference/cli/supabase-network-bans`} />
+        </PageSectionMeta>
+        <PageSectionContent></PageSectionContent>
+      </PageSection>
+      {/* TODO: Remove mockIpList usage - using mock data for UI testing */}
+      {ipListLoading ? (
+        <Card>
+          <CardContent className="space-y-4">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+          </CardContent>
+        </Card>
+      ) : ipListError ? (
+        <AlertError
+          className="border-0 rounded-none"
+          error={ipListError}
+          subject="Failed to retrieve banned IP addresses"
         />
-        <DocsButton href="https://supabase.com/docs/reference/cli/supabase-network-bans" />
-      </div>
-      <FormPanel>
-        {ipListLoading ? (
-          <div className="px-8 py-4 space-y-4">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-full" />
-          </div>
-        ) : ipListError ? (
-          <AlertError
-            className="border-0 rounded-none"
-            error={ipListError}
-            subject="Failed to retrieve banned IP addresses"
-          />
-        ) : ipList && ipList.banned_ipv4_addresses.length > 0 ? (
-          ipList.banned_ipv4_addresses.map((ip) => (
-            <div key={ip} className="px-8 py-4 flex items-center justify-between">
+      ) : ipList.banned_ipv4_addresses.length > 0 ? (
+        <Card>
+          {ipList.banned_ipv4_addresses.map((ip) => (
+            <CardContent key={ip} className="flex items-center justify-between">
               <div className="flex items-center space-x-5">
                 <Globe size={16} className="text-foreground-lighter" />
                 <p className="text-sm font-mono">{ip}</p>
                 {ip === userIPAddress && <Badge>Your IP address</Badge>}
               </div>
-              <div>
-                <ButtonTooltip
-                  type="default"
-                  disabled={!canUnbanNetworks}
-                  onClick={() => openConfirmationModal(ip)}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: !canUnbanNetworks
-                        ? 'You need additional permissions to unban networks'
-                        : undefined,
-                    },
-                  }}
-                >
-                  Unban IP
-                </ButtonTooltip>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className="text-foreground-light text-sm px-8 py-4">
+              <ButtonTooltip
+                type="default"
+                disabled={!canUnbanNetworks}
+                onClick={() => openConfirmationModal(ip)}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: !canUnbanNetworks
+                      ? 'You need additional permissions to unban networks'
+                      : undefined,
+                  },
+                }}
+              >
+                Unban IP
+              </ButtonTooltip>
+            </CardContent>
+          ))}
+        </Card>
+      ) : (
+        <Card>
+          <CardContent className="text-foreground-light text-sm">
             There are no banned IP addresses for your project.
-          </p>
-        )}
-      </FormPanel>
+          </CardContent>
+        </Card>
+      )}
 
       <ConfirmationModal
         variant="destructive"
@@ -141,7 +158,7 @@ const BannedIPs = () => {
           description: `Are you sure you want to unban this IP address ${selectedIPToUnban}?`,
         }}
       />
-    </div>
+    </>
   )
 }
 

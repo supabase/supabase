@@ -44,7 +44,7 @@ const initialValues = {
   canBypassRls: false,
 }
 
-const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
+export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   const formId = 'create-new-role'
 
   const { data: project } = useSelectedProjectQuery()
@@ -53,7 +53,7 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
     resolver: zodResolver(FormSchema),
   })
 
-  const { mutate: createDatabaseRole, isLoading: isCreating } = useDatabaseRoleCreateMutation({
+  const { mutate: createDatabaseRole, isPending: isCreating } = useDatabaseRoleCreateMutation({
     onSuccess: (_, vars) => {
       toast.success(`Successfully created new role: ${vars.payload.name}`)
       handleClose()
@@ -187,5 +187,3 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
     </SidePanel>
   )
 }
-
-export default CreateRolePanel

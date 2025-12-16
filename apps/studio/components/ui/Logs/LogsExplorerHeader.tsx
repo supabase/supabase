@@ -1,9 +1,10 @@
-import { BookOpen, Check, Clipboard, ExternalLink, List, X } from 'lucide-react'
+import { BookOpen, Check, Copy, ExternalLink, List, X } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
 import { LOGS_EXPLORER_DOCS_URL } from 'components/interfaces/Settings/Logs/Logs.constants'
 import Table from 'components/to-be-cleaned/Table'
+import { DOCS_URL } from 'lib/constants'
 import { logConstants } from 'shared-data'
 import {
   Button,
@@ -61,7 +62,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
               onClick={() => setShowReference(true)}
               icon={<BookOpen strokeWidth={1.5} />}
             >
-              Field Reference
+              <span>Field Reference</span>
             </Button>
           }
         >
@@ -72,7 +73,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                 respective source. Do note that to access nested keys, you would need to perform the
                 necessary{' '}
                 <Link
-                  href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays"
+                  href={`${DOCS_URL}/guides/platform/logs#unnesting-arrays`}
                   target="_blank"
                   rel="noreferrer"
                   className="text-brand"
@@ -162,7 +163,7 @@ const Field = ({
         ) : (
           <Tooltip>
             <TooltipTrigger>
-              <Clipboard size={14} strokeWidth={1.5} />
+              <Copy size={14} />
             </TooltipTrigger>
             <TooltipContent side="bottom" className="font-sans">
               Copy value

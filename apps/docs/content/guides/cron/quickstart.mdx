@@ -22,7 +22,7 @@ Attempting to create a second Job with the same name (and case) will overwrite t
 <TabPanel id="dashboard-schedule-job" label="Dashboard">
 
 1. Go to the [Jobs](/dashboard/project/_/integrations/cron/jobs) section to schedule your first Job.
-2. Click on `Create job` button or navigate to the new Cron Job form [here](/dashboard/project/_/integrations/cron/jobs?dialog-shown=true).
+2. Click on `Create job` button or navigate to the new Cron Job form [here](/dashboard/project/_/integrations/cron/jobs?new=true).
 3. Name your Cron Job.
 4. Choose a schedule for your Job by inputting cron syntax (refer to the syntax chart in the form) or natural language.
 5. Input SQL snippet or select a Database function, HTTP request, or Supabase Edge Function.
@@ -299,4 +299,4 @@ Be extremely careful when setting up Jobs for system maintenance tasks as they c
 
 For instance, scheduling a command to terminate idle connections with `pg_terminate_backend(pid)` can disrupt critical background processes like nightly backups. Often, there is an existing Postgres setting, such as `idle_session_timeout`, that can perform these common maintenance tasks without the risk.
 
-Reach out to [Supabase Support](https://supabase.com/support) if you're unsure if that applies to your use case.
+Reach out to [Supabase Support](/support) if you're unsure if that applies to your use case.

@@ -57,6 +57,7 @@ const { data, error } = await supabase.auth.signInWithOtp({
 ```
 
 </TabPanel>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -66,6 +67,8 @@ try await supabase.auth.signInWithOTP(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -75,6 +78,8 @@ supabase.auth.signInWith(OTP) {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -84,6 +89,7 @@ response = supabase.auth.sign_in_with_otp({
 ```
 
 </TabPanel>
+</$Show>
 <TabPanel id="http" label="HTTP">
 
 ```bash
@@ -131,6 +137,7 @@ const {
 ```
 
 </TabPanel>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyOTP`:
@@ -144,6 +151,8 @@ try await supabase.auth.verifyOTP(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyPhoneOtp`:
@@ -157,6 +166,8 @@ supabase.auth.verifyPhoneOtp(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verify_otp`:
@@ -170,6 +181,7 @@ response = supabase.auth.verify_otp({
 ```
 
 </TabPanel>
+</$Show>
 <TabPanel id="http" label="HTTP">
 
 ```bash
@@ -223,6 +235,7 @@ const { data, error } = await supabase.auth.updateUser({
 ```
 
 </TabPanel>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -234,6 +247,8 @@ try await supabase.auth.updateUser(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -243,6 +258,8 @@ supabase.auth.updateUser {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -252,6 +269,7 @@ response = supabase.auth.update_user({
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 The user receives an SMS with a 6-digit pin that you must [verify](#verifying-a-phone-otp) within 60 seconds.

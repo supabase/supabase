@@ -64,7 +64,13 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
     connectionString: project?.connectionString,
   })
 
-  const { data, error, isLoading, isSuccess, isError } = useDatabaseRolesQuery({
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+  } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -243,7 +249,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
             {isExposed && (
               <>
                 These will also determine access to each function available from the{' '}
-                <code className="text-xs">pgmq_public</code> schema.
+                <code className="text-code-inline">pgmq_public</code> schema.
               </>
             )}
           </SheetDescription>

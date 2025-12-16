@@ -4,23 +4,16 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
-import SignInMfaForm from 'components/interfaces/SignIn/SignInMfaForm'
+import { getAccessToken } from 'common'
+import { SignInMfaForm } from 'components/interfaces/SignIn/SignInMfaForm'
 import ForgotPasswordLayout from 'components/layouts/SignInLayout/ForgotPasswordLayout'
-import { Loading } from 'components/ui/Loading'
-import useLatest from 'hooks/misc/useLatest'
-import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
+import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
 import type { NextPageWithLayout } from 'types'
+import { LogoLoader } from 'ui'
 
 const ForgotPasswordMfa: NextPageWithLayout = () => {
   const router = useRouter()
-
   const queryClient = useQueryClient()
-  const {
-    // current methods for mfa are github and sso
-    method: signInMethod = 'unknown',
-  } = useParams()
-  const signInMethodRef = useLatest(signInMethod)
 
   const [loading, setLoading] = useState(true)
 
@@ -76,7 +69,7 @@ const ForgotPasswordMfa: NextPageWithLayout = () => {
   if (loading) {
     return (
       <div className="flex flex-col flex-1 bg-alternative h-screen items-center justify-center">
-        <Loading />
+        <LogoLoader />
       </div>
     )
   }

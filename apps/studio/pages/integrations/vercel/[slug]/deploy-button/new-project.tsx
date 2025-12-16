@@ -1,7 +1,5 @@
 import { useParams } from 'common'
-import { debounce } from 'lodash'
-import { useRouter } from 'next/router'
-import { ChangeEvent, useRef, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
 
@@ -17,9 +15,9 @@ import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-pr
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { PROVIDERS } from 'lib/constants'
+import { BASE_PATH, PROVIDERS } from 'lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
-import passwordStrength from 'lib/password-strength'
+import { passwordStrength } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import { AWS_REGIONS } from 'shared-data'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
@@ -54,7 +52,6 @@ VercelIntegration.getLayout = (page) => (
 )
 
 const CreateProject = () => {
-  const router = useRouter()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
@@ -65,9 +62,11 @@ const CreateProject = () => {
 
   const snapshot = useIntegrationInstallationSnapshot()
 
-  const delayedCheckPasswordStrength = useRef(
-    debounce((value: string) => checkPasswordStrength(value), 300)
-  ).current
+  async function checkPasswordStrength(value: string) {
+    const { message, strength } = await passwordStrength(value)
+    setPasswordStrengthScore(strength)
+    setPasswordStrengthMessage(message)
+  }
 
   const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
 
@@ -107,19 +106,13 @@ const CreateProject = () => {
     if (value == '') {
       setPasswordStrengthScore(-1)
       setPasswordStrengthMessage('')
-    } else delayedCheckPasswordStrength(value)
-  }
-
-  async function checkPasswordStrength(value: string) {
-    const { message, strength } = await passwordStrength(value)
-    setPasswordStrengthScore(strength)
-    setPasswordStrengthMessage(message)
+    } else checkPasswordStrength(value)
   }
 
   function generatePassword() {
     const password = generateStrongPassword()
     setDbPass(password)
-    delayedCheckPasswordStrength(password)
+    checkPasswordStrength(password)
   }
 
   const [newProjectRef, setNewProjectRef] = useState<string | undefined>(undefined)
@@ -159,54 +152,59 @@ const CreateProject = () => {
   }
 
   // Wait for the new project to be created before creating the connection
-  useProjectSettingsV2Query(
+  const { data, isSuccess } = useProjectSettingsV2Query(
     { projectRef: newProjectRef },
     {
       enabled: newProjectRef !== undefined,
       // refetch until the project is created
-      refetchInterval: (data) => {
+      refetchInterval: (query) => {
+        const data = query.state.data
         return ((data?.service_api_keys ?? []).length ?? 0) > 0 ? false : 1000
-      },
-      async onSuccess(data) {
-        const isReady = (data?.service_api_keys ?? []).length > 0
-
-        if (!isReady || !organizationIntegration || !foreignProjectId || !newProjectRef) {
-          return
-        }
-
-        const projectDetails = vercelProjects?.find((x: any) => x.id === foreignProjectId)
-
-        try {
-          const { id: connectionId } = await createConnections({
-            organizationIntegrationId: organizationIntegration?.id,
-            connection: {
-              foreign_project_id: foreignProjectId,
-              supabase_project_ref: newProjectRef,
-              integration_id: '0',
-              metadata: {
-                ...projectDetails,
-                supabaseConfig: {
-                  projectEnvVars: {
-                    write: true,
-                  },
-                },
-              },
-            },
-            orgSlug: selectedOrganization?.slug,
-          })
-        } catch (error) {
-          console.error('An error occurred during createConnections:', error)
-          return
-        }
-
-        snapshot.setLoading(false)
-
-        if (next && isVercelUrl(next)) {
-          window.location.href = next
-        }
       },
     }
   )
+  useEffect(() => {
+    if (!isSuccess) return
+    const onSuccessFunc = async () => {
+      const isReady = (data.service_api_keys ?? []).length > 0
+
+      if (!isReady || !organizationIntegration || !foreignProjectId || !newProjectRef) {
+        return
+      }
+
+      const projectDetails = vercelProjects?.find((x: any) => x.id === foreignProjectId)
+
+      try {
+        await createConnections({
+          organizationIntegrationId: organizationIntegration?.id,
+          connection: {
+            foreign_project_id: foreignProjectId,
+            supabase_project_ref: newProjectRef,
+            integration_id: '0',
+            metadata: {
+              ...projectDetails,
+              supabaseConfig: {
+                projectEnvVars: {
+                  write: true,
+                },
+              },
+            },
+          },
+          orgSlug: selectedOrganization?.slug,
+        })
+      } catch (error) {
+        console.error('An error occurred during createConnections:', error)
+        return
+      }
+
+      snapshot.setLoading(false)
+
+      if (next && isVercelUrl(next)) {
+        window.location.href = next
+      }
+    }
+    onSuccessFunc()
+  }, [data, isSuccess])
 
   return (
     <div>
@@ -226,7 +224,7 @@ const CreateProject = () => {
       <div className="py-2">
         <Input
           id="dbPass"
-          label="Database Password"
+          label="Database password"
           type="password"
           placeholder="Type in a strong password"
           value={dbPass}
@@ -258,11 +256,11 @@ const CreateProject = () => {
                   key={option}
                   label={label}
                   value={label}
-                  addOnBefore={({ active, selected }: any) => (
+                  addOnBefore={() => (
                     <img
                       alt="region icon"
                       className="w-5 rounded-sm"
-                      src={`${router.basePath}/img/regions/${Object.keys(AWS_REGIONS)[i]}.svg`}
+                      src={`${BASE_PATH}/img/regions/${Object.values(AWS_REGIONS)[i].code}.svg`}
                     />
                   )}
                 >

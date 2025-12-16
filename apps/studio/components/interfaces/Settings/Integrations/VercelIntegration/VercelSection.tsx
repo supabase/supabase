@@ -18,14 +18,16 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import type {
+  Integration,
   IntegrationName,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { pluralize } from 'lib/helpers'
@@ -42,15 +44,13 @@ const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
   const isBranch = project?.parent_project_ref !== undefined
 
-  const canReadVercelConnection = useCheckPermissions(
-    PermissionAction.READ,
-    'integrations.vercel_connections'
-  )
-  const canCreateVercelConnection = useCheckPermissions(
+  const { can: canReadVercelConnection, isLoading: isLoadingPermissions } =
+    useAsyncCheckPermissions(PermissionAction.READ, 'integrations.vercel_connections')
+  const { can: canCreateVercelConnection } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'integrations.vercel_connections'
   )
-  const canUpdateVercelConnection = useCheckPermissions(
+  const { can: canUpdateVercelConnection } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'integrations.vercel_connections'
   )
@@ -70,10 +70,19 @@ const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
         if (integration.metadata && integration.integration.name === 'Vercel') {
           const avatarSrc =
             !integration.metadata.account.avatar && integration.metadata.account.type === 'Team'
-              ? `https://vercel.com/api/www/avatar?teamId=${integration.metadata.account.team_id}&s=48`
+              ? `https://vercel.com/api/www/avatar?teamId=${integration.metadata.account.team_id}&s=48&format=png`
               : `https://vercel.com/api/www/avatar/${integration.metadata.account.avatar}?s=48`
 
-          integration['metadata']['account']['avatar'] = avatarSrc
+          return {
+            ...integration,
+            metadata: {
+              ...integration.metadata,
+              account: {
+                ...integration.metadata.account,
+                avatar: avatarSrc,
+              },
+            },
+          } as Integration
         }
 
         return integration
@@ -162,7 +171,9 @@ You can change the scope of the access for Supabase by configuring
           <IntegrationImageHandler title="vercel" />
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {!canReadVercelConnection ? (
+          {isLoadingPermissions ? (
+            <GenericSkeletonLoader />
+          ) : !canReadVercelConnection ? (
             <NoPermission resourceText="view this organization's Vercel connections" />
           ) : (
             <>

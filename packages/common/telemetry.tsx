@@ -17,6 +17,8 @@ import { TelemetryEvent } from './telemetry-constants'
 import { getSharedTelemetryData } from './telemetry-utils'
 import { posthogClient } from './posthog-client'
 
+export { posthogClient }
+
 const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 
 // Reexports GoogleTagManager with the right API key set
@@ -54,6 +56,12 @@ export function handlePageTelemetry(
   // Send to PostHog client-side (only in browser)
   if (typeof window !== 'undefined') {
     const pageData = getSharedTelemetryData(pathname)
+
+    // Align frontend and backend session IDs for correlation
+    if (pageData.session_id) {
+      document.cookie = `session_id=${pageData.session_id}; path=/; SameSite=Lax`
+    }
+
     posthogClient.capturePageView({
       $current_url: pageData.page_url,
       $pathname: pageData.pathname,
@@ -63,6 +71,7 @@ export function handlePageTelemetry(
         ...(ref ? { project: ref } : {}),
       },
       page_title: pageData.page_title,
+      ...(pageData.session_id && { $session_id: pageData.session_id }),
       ...pageData.ph,
       ...Object.fromEntries(
         Object.entries(featureFlags || {}).map(([k, v]) => [`$feature/${k}`, v])
@@ -70,26 +79,7 @@ export function handlePageTelemetry(
     })
   }
 
-  // Send to backend
-  // TODO: Remove this once migration to client-side page telemetry is complete
-  return post(
-    `${ensurePlatformSuffix(API_URL)}/telemetry/page`,
-    telemetryDataOverride !== undefined
-      ? { feature_flags: featureFlags, ...telemetryDataOverride }
-      : {
-          ...getSharedTelemetryData(pathname),
-          ...(slug || ref
-            ? {
-                groups: {
-                  ...(slug ? { organization: slug } : {}),
-                  ...(ref ? { project: ref } : {}),
-                },
-              }
-            : {}),
-          feature_flags: featureFlags,
-        },
-    { headers: { Version: '2' } }
-  )
+  return Promise.resolve()
 }
 
 export function handlePageLeaveTelemetry(
@@ -108,25 +98,11 @@ export function handlePageLeaveTelemetry(
       $current_url: pageData.page_url,
       $pathname: pageData.pathname,
       page_title: pageData.page_title,
+      ...(pageData.session_id && { $session_id: pageData.session_id }),
     })
   }
 
-  // Send to backend
-  // TODO: Remove this once migration to client-side page telemetry is complete
-  return post(`${ensurePlatformSuffix(API_URL)}/telemetry/page-leave`, {
-    pathname,
-    page_url: isBrowser ? window.location.href : '',
-    page_title: isBrowser ? document?.title : '',
-    feature_flags: featureFlags,
-    ...(slug || ref
-      ? {
-          groups: {
-            ...(slug ? { organization: slug } : {}),
-            ...(ref ? { project: ref } : {}),
-          },
-        }
-      : {}),
-  })
+  return Promise.resolve()
 }
 
 export const PageTelemetry = ({
@@ -196,6 +172,9 @@ export const PageTelemetry = ({
   // Handle initial page telemetry event
   const hasSentInitialPageTelemetryRef = useRef(false)
 
+  // Track previous pathname for App Router to detect actual changes
+  const previousAppPathnameRef = useRef<string | null>(null)
+
   // Initialize PostHog client when consent is accepted
   useEffect(() => {
     if (hasAcceptedConsent && IS_PLATFORM) {
@@ -263,10 +242,17 @@ export const PageTelemetry = ({
     // For app router
     if (router !== null) return
 
-    // Wait until we've sent the initial page telemetry event
-    if (appPathname && !hasSentInitialPageTelemetryRef.current) {
+    // Only track if pathname actually changed (not initial mount)
+    if (
+      appPathname &&
+      previousAppPathnameRef.current !== null &&
+      previousAppPathnameRef.current !== appPathname
+    ) {
       sendPageTelemetry()
     }
+
+    // Update previous pathname
+    previousAppPathnameRef.current = appPathname
   }, [appPathname, router, sendPageTelemetry])
 
   useEffect(() => {
@@ -334,12 +320,13 @@ export function useTelemetryIdentify(API_URL: string) {
 
   useEffect(() => {
     if (user?.id) {
-      // Send to backend
+      const anonymousId = posthogClient.getDistinctId()
+
       sendTelemetryIdentify(API_URL, {
         user_id: user.id,
+        ...(anonymousId && { anonymous_id: anonymousId }),
       })
 
-      // Also identify in PostHog client-side
       posthogClient.identify(user.id)
     }
   }, [API_URL, user?.id])

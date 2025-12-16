@@ -4,9 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { ContentDiff, DiffType } from './SQLEditor.types'
@@ -16,6 +13,8 @@ import {
   compareAsNewSnippet,
   createSqlSnippetSkeletonV2,
 } from './SQLEditor.utils'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 export const useNewQuery = () => {
   const router = useRouter()
@@ -24,10 +23,14 @@ export const useNewQuery = () => {
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'sql', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
 
   const newQuery = async (sql: string, name: string, shouldRedirect: boolean = true) => {
     if (!ref) return console.error('Project ref is required')
@@ -41,7 +44,6 @@ export const useNewQuery = () => {
 
     try {
       const snippet = createSqlSnippetSkeletonV2({
-        id: uuidv4(),
         name,
         sql,
         owner_id: profile?.id,

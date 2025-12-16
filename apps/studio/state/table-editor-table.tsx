@@ -3,11 +3,13 @@ import { CalculatedColumn } from 'react-data-grid'
 import { proxy, ref, subscribe, useSnapshot } from 'valtio'
 import { proxySet } from 'valtio/utils'
 
+import { useFlag } from 'common'
 import {
   loadTableEditorStateFromLocalStorage,
   parseSupaTable,
   saveTableEditorStateToLocalStorageDebounced,
 } from 'components/grid/SupabaseGrid.utils'
+import { TableIndexAdvisorProvider } from 'components/grid/context/TableIndexAdvisorContext'
 import { SupaRow } from 'components/grid/types'
 import { getInitialGridColumns } from 'components/grid/utils/column'
 import { getGridColumns } from 'components/grid/utils/gridColumns'
@@ -61,8 +63,8 @@ export const createTableEditorTableState = ({
       const gridColumns = getInitialGridColumns(
         getGridColumns(supaTable, {
           tableId: table.id,
-          editable,
-          onAddColumn: editable ? onAddColumn : undefined,
+          editable: state.editable,
+          onAddColumn: state.editable ? onAddColumn : undefined,
           onExpandJSONEditor,
           onExpandTextEditor,
         }),
@@ -143,6 +145,18 @@ export const createTableEditorTableState = ({
     editable,
     setEditable: (editable: boolean) => {
       state.editable = editable
+
+      // When changing the editable flag, all grid columns need to be recreated for the editable flag to be propagated.
+      state.gridColumns = getInitialGridColumns(
+        getGridColumns(state.table, {
+          tableId: table.id,
+          editable,
+          onAddColumn: editable ? onAddColumn : undefined,
+          onExpandJSONEditor,
+          onExpandTextEditor,
+        }),
+        { gridColumns: state.gridColumns }
+      )
     },
   })
 
@@ -164,6 +178,7 @@ export const TableEditorTableStateContextProvider = ({
   table,
   ...props
 }: PropsWithChildren<TableEditorTableStateContextProviderProps>) => {
+  const showIndexAdvisor = useFlag('ShowIndexAdvisorOnTableEditor')
   const tableEditorSnap = useTableEditorStateSnapshot()
   const state = useRef(
     createTableEditorTableState({
@@ -214,7 +229,13 @@ export const TableEditorTableStateContextProvider = ({
 
   return (
     <TableEditorTableStateContext.Provider value={state}>
-      {children}
+      {showIndexAdvisor && state.table.schema ? (
+        <TableIndexAdvisorProvider schema={state.table.schema ?? 'public'} table={state.table.name}>
+          {children}
+        </TableIndexAdvisorProvider>
+      ) : (
+        children
+      )}
     </TableEditorTableStateContext.Provider>
   )
 }
