@@ -11,7 +11,7 @@ database_id = "ba593989-12b5-464f-8ede-a525e1ca2ffb"
 
 Egress (also known as bandwidth) is any amount of network packets/bytes being streamed back to a connected client. Means, the data that is leaving the Supabase platform. Egress in Supabase includes any calls through PostgREST, to Storage, Realtime, Auth, Edge Functions, Database and Supavisor.
 
-You can read about Unified egress, included quota, and how to check the egress usage here: https://supabase.com/docs/guides/platform/manage-your-usage/egress. Additionally, the [project reports](/dashboard/project/_/reports) have a few egress related stats. You can create a custom report to look into daily egress.
+You can read about Unified egress, included quota, and how to check the egress usage here: https://supabase.com/docs/guides/platform/manage-your-usage/egress. Additionally, the [project reports](/dashboard/project/_/observability) have a few egress related stats. You can create a custom report to look into daily egress.
 
 - Example: Log Explorer -> Custom Reports -> Add/Remove charts -> Database API -> API Egress.
 
@@ -35,6 +35,6 @@ While pointing out the exact cause for egress may not be straightforward, there 
 
 **Cached vs uncached egress**
 
-We differentiate between cached and uncached egress. Cached egress refers to egress that is served via our CDN and hits the cache. Uncached egress, on the other hand, refers to egress that is not served from the cache and requires a fresh request to the origin server.
+We differentiate between cached and uncached egress. Cached egress, which only applies to Supabase Storage, refers to egress that is served via our CDN and hits the cache. Uncached egress, on the other hand, refers to egress that is not served from the cache and requires a fresh request to the origin server.
 
 Your plan includes a quota for both cached and uncached egress and these are independent. Cached egress is also cheaper in case you exceed your quota.

@@ -38,4 +38,5 @@ export type NavMenuConstant = Readonly<{
   icon: string
   url?: `/${string}`
   items: ReadonlyArray<Partial<NavMenuSection>>
+  enabled?: boolean
 }>

@@ -1,21 +1,22 @@
 import { useParams } from 'common'
 import { Badge } from 'ui'
 
-import { useBucketsQuery } from 'data/storage/buckets-query'
+import { useQueryClient } from '@tanstack/react-query'
+import { useBucketInfoQueryPreferCached } from 'data/storage/buckets-query'
 import { formatBytes } from 'lib/helpers'
 import { useAppStateSnapshot } from 'state/app-state'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import type { ContentProps } from './Content.types'
 
-const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
+export const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
+  const queryClient = useQueryClient()
   const { ref } = useParams()
-  const snap = useAppStateSnapshot()
-  const { data } = useBucketsQuery({ projectRef: ref })
 
+  const snap = useAppStateSnapshot()
   const resource = snap.activeDocsSection[1]
-  const buckets = data ?? []
-  const bucket = buckets.find((b) => b.name === resource)
+
+  const bucket = useBucketInfoQueryPreferCached(resource, ref)
   const allowedMimeTypes = bucket?.allowed_mime_types
   const maxFileSizeLimit = bucket?.file_size_limit
 
@@ -106,5 +107,3 @@ const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
     </div>
   )
 }
-
-export default Bucket

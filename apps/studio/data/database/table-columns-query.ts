@@ -1,4 +1,5 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { UseCustomQueryOptions } from 'types'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseKeys } from './keys'
 
@@ -111,13 +112,15 @@ export type TableColumnsError = ExecuteSqlError
 
 export const useTableColumnsQuery = <TData = TableColumnsData>(
   { projectRef, connectionString, schema, table }: TableColumnsVariables,
-  { enabled = true, ...options }: UseQueryOptions<TableColumnsData, TableColumnsError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<TableColumnsData, TableColumnsError, TData> = {}
 ) =>
-  useQuery<TableColumnsData, TableColumnsError, TData>(
-    databaseKeys.tableColumns(projectRef, schema, table),
-    ({ signal }) => getTableColumns({ projectRef, connectionString, schema, table }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<TableColumnsData, TableColumnsError, TData>({
+    queryKey: databaseKeys.tableColumns(projectRef, schema, table),
+    queryFn: ({ signal }) =>
+      getTableColumns({ projectRef, connectionString, schema, table }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

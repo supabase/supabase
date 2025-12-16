@@ -1,15 +1,12 @@
-import { motion } from 'framer-motion'
-import { ArrowUpRight, Circle, Database, MoreVertical, Plus, Search } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Circle, Database, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import ReactFlow, { Background, Handle, Position, ReactFlowProvider } from 'reactflow'
 import 'reactflow/dist/style.css'
 
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import Table from 'components/to-be-cleaned/Table'
 import { BASE_PATH } from 'lib/constants'
-import { Button, Input_Shadcn_ } from 'ui'
+import { Button, Card, CardContent } from 'ui'
 import { NODE_WIDTH } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 
 const STATIC_NODES = [
@@ -64,15 +61,15 @@ const STATIC_EDGES = [
   { id: 'e1-4', source: '1', target: '4', type: 'smoothstep', animated: true },
 ]
 
-export const ReplicationComingSoon = () => {
+export const ReplicationComingSoon = ({ projectRef }: { projectRef: string }) => {
   return (
     <ReactFlowProvider>
-      <ReplicationStaticMockup />
+      <ReplicationStaticMockup projectRef={projectRef} />
     </ReactFlowProvider>
   )
 }
 
-const ReplicationStaticMockup = () => {
+const ReplicationStaticMockup = ({ projectRef }: { projectRef: string }) => {
   const nodes = useMemo(() => STATIC_NODES, [])
   const edges = useMemo(() => STATIC_EDGES, [])
 
@@ -86,34 +83,31 @@ const ReplicationStaticMockup = () => {
       primary: PrimaryNode,
       replica: ReplicaNode,
       blank: BlankNode,
-      cta: CTANode,
+      cta: () => CTANode({ projectRef }),
     }),
-    []
+    [projectRef]
   )
 
   return (
-    <div className="relative border-t">
-      <div className="h-[500px] w-full relative">
-        <ReactFlow
-          fitView
-          fitViewOptions={{ minZoom: 0.9, maxZoom: 0.9 }}
-          className="instance-configuration"
-          zoomOnPinch={false}
-          zoomOnScroll={false}
-          nodesDraggable={true}
-          nodesConnectable={false}
-          zoomOnDoubleClick={false}
-          edgesFocusable={false}
-          edgesUpdatable={false}
-          nodes={nodes}
-          edges={edges}
-          nodeTypes={nodeTypes}
-          proOptions={{ hideAttribution: true }}
-        >
-          <Background color={backgroundPatternColor} />
-        </ReactFlow>
-      </div>
-      <StaticDestinations />
+    <div className="relative border-t h-full w-full">
+      <ReactFlow
+        fitView
+        fitViewOptions={{ minZoom: 0.9, maxZoom: 0.9 }}
+        className="instance-configuration"
+        zoomOnPinch={false}
+        zoomOnScroll={false}
+        nodesDraggable={true}
+        nodesConnectable={false}
+        zoomOnDoubleClick={false}
+        edgesFocusable={false}
+        edgesUpdatable={false}
+        nodes={nodes}
+        edges={edges}
+        nodeTypes={nodeTypes}
+        proOptions={{ hideAttribution: true }}
+      >
+        <Background color={backgroundPatternColor} />
+      </ReactFlow>
     </div>
   )
 }
@@ -163,7 +157,7 @@ const ReplicaNode = ({
       <div className="flex items-start justify-between p-3" style={{ width: NODE_WIDTH / 2 - 10 }}>
         <div className="flex gap-x-3">
           <div className="flex flex-col gap-y-0.5">
-            <p className="">{data.label}</p>
+            <p>{data.label}</p>
             <p className="flex items-center gap-x-1">
               <span className="text-sm text-foreground-light">{data.details}</span>
             </p>
@@ -200,120 +194,33 @@ const BlankNode = () => {
   )
 }
 
-const CTANode = () => {
+const CTANode = ({ projectRef }: { projectRef: string }) => {
   return (
-    <motion.div
-      className="bg-surface-100 rounded-lg p-8 shadow-lg"
-      style={{
-        border: '1px solid',
-        borderColor: 'hsl(var(--foreground-default) / var(--border-opacity, 0.6))',
-      }}
-      animate={{
-        '--border-opacity': [0.6, 0.4, 0.2, 0.1, 0.2, 0.4, 0.6],
-      }}
-      transition={{
-        duration: 4,
-        ease: 'linear',
-        repeat: Number.POSITIVE_INFINITY,
-      }}
-    >
-      <div className="grid gap-4  w-[425px] relative">
-        <span className="text-xs uppercase text-foreground-light">Early Access</span>
-        <h2 className="text-lg">Replicate Your Data in Real Time</h2>
-        <p>
-          Stream changes from your Postgres database into your data warehouse—no manual exports, no
-          lag.
+    <Card className="w-[570px] p-6">
+      <CardContent>
+        <h2 className="text-lg mb-2">Stream database changes to external destinations</h2>
+        <p className="text-foreground-light mb-2">
+          Automatically replicate your data to external data warehouses and analytics platforms in
+          real-time. No manual exports, no lag.
         </p>
-        <p>
-          We're rolling this out to a limited group of early adopters. Sign up to get early access.
+        <p className="text-foreground-light">
+          We are currently in <span className="text-foreground">private alpha</span> and slowly
+          onboarding new customers to ensure stable data pipelines. Request access below to join the
+          waitlist. Read replicas are available now.
         </p>
-        <p>
-          <Button asChild type="secondary">
+        <div className="flex items-center gap-x-2 mt-6">
+          <Button asChild type="secondary" iconRight={<ArrowUpRight size={16} strokeWidth={1.5} />}>
             <Link href="https://forms.supabase.com/pg_replicate" target="_blank" rel="noreferrer">
-              <span className="flex items-center gap-x-1">
-                Request Early Access
-                <ArrowUpRight size={16} />
-              </span>
+              Request alpha access
             </Link>
           </Button>
-        </p>
-      </div>
-    </motion.div>
-  )
-}
-
-const StaticDestinations = () => {
-  const mockRows = [
-    { name: 'BigQuery', tables: 4, lag: '55ms', status: 'Enabled' },
-    { name: 'Iceberg', tables: 4, lag: '85ms', status: 'Enabled' },
-    { name: 'US East', tables: 4, lag: '125ms', status: 'Enabled' },
-  ]
-
-  return (
-    <>
-      <div className="flex flex-col bg-surface-100 px-6 py-6 border-t relative ">
-        <div className="z-10 bg-surface-300 w-full h-full absolute top-0 left-0 opacity-30" />
-
-        <ScaffoldContainer>
-          <ScaffoldSection className="!py-0">
-            <div className="col-span-12">
-              <div className="flex items-center justify-between">
-                <div className="relative w-52">
-                  <Search
-                    size={14}
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
-                  />
-                  <Input_Shadcn_
-                    className="pl-9 bg-transparent h-8 pointer-events-none"
-                    placeholder="Search..."
-                  />
-                </div>
-                <Button
-                  disabled
-                  type="primary"
-                  icon={<Plus size={16} />}
-                  className="flex items-center pointer-events-none"
-                >
-                  New destination
-                </Button>
-              </div>
-              <Table
-                head={[
-                  <Table.th key="name">Name</Table.th>,
-                  <Table.th key="publication">Publication</Table.th>,
-                  <Table.th key="lag">Lag</Table.th>,
-                  <Table.th key="status">Status</Table.th>,
-                  <Table.th key="actions"></Table.th>,
-                ]}
-                className="mt-4"
-                body={mockRows.map((row, i) => (
-                  <Table.tr key={i}>
-                    <Table.td>{row.name}</Table.td>
-                    <Table.td>
-                      <span className="flex items-center gap-2">
-                        <span className="font-bold">All</span>
-                        <span className="text-sm text-foreground-lighter">{row.tables} tables</span>
-                      </span>
-                    </Table.td>
-                    <Table.td>{row.lag}</Table.td>
-                    <Table.td>
-                      <span className="flex items-center gap-3">
-                        <Circle size={10} className="bg-brand-500 stroke-none rounded-full" />
-                        {row.status}
-                      </span>
-                    </Table.td>
-                    <Table.td className="text-right">
-                      <button className="p-1">
-                        <MoreVertical size={18} />
-                      </button>
-                    </Table.td>
-                  </Table.tr>
-                ))}
-              />
-            </div>
-          </ScaffoldSection>
-        </ScaffoldContainer>
-      </div>
-    </>
+          <Button asChild type="default" iconRight={<ArrowRight size={16} strokeWidth={1.5} />}>
+            <Link href={`/project/${projectRef}/settings/infrastructure?createReplica=true`}>
+              Create a read replica
+            </Link>
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   )
 }

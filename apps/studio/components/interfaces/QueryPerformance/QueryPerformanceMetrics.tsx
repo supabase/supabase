@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import React, { useMemo } from 'react'
 
 import { Skeleton } from 'ui'
 import { useQueryPerformanceQuery } from '../Reports/Reports.queries'
@@ -11,7 +11,7 @@ export const QueryPerformanceMetrics = () => {
   const stats = useMemo(() => {
     return [
       {
-        title: queryMetrics?.[0]?.slow_queries === '1' ? 'Slow Query' : 'Slow Queries',
+        title: queryMetrics?.[0]?.slow_queries === 1 ? 'Slow Query' : 'Slow Queries',
         value: queryMetrics?.[0]?.slow_queries || '0',
       },
       {
@@ -28,11 +28,8 @@ export const QueryPerformanceMetrics = () => {
   return (
     <section className="px-6 pt-2 pb-4 flex flex-wrap gap-x-6 gap-y-2 w-full">
       {stats.map((card, i) => (
-        <>
-          <div
-            key={i}
-            className="flex items-baseline gap-2 heading-subSection text-foreground-light"
-          >
+        <React.Fragment key={i}>
+          <div className="flex items-baseline gap-2 heading-subSection text-foreground-light">
             {isLoading ? (
               <Skeleton className="h-5 w-24" />
             ) : (
@@ -43,7 +40,7 @@ export const QueryPerformanceMetrics = () => {
             )}
           </div>
           {i < stats.length - 1 && <span className="text-foreground-muted">/</span>}
-        </>
+        </React.Fragment>
       ))}
     </section>
   )

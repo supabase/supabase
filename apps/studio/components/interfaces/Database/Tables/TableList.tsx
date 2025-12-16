@@ -11,7 +11,6 @@ import {
   MoreVertical,
   Plus,
   Search,
-  Table2,
   Trash,
   X,
 } from 'lucide-react'
@@ -20,9 +19,11 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
+import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
@@ -59,7 +60,6 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
@@ -97,7 +97,7 @@ export const TableList = ({
     data: tables,
     error: tablesError,
     isError: isErrorTables,
-    isLoading: isLoadingTables,
+    isPending: isLoadingTables,
     isSuccess: isSuccessTables,
   } = useTablesQuery(
     {
@@ -120,7 +120,7 @@ export const TableList = ({
     data: views,
     error: viewsError,
     isError: isErrorViews,
-    isLoading: isLoadingViews,
+    isPending: isLoadingViews,
     isSuccess: isSuccessViews,
   } = useViewsQuery(
     {
@@ -141,7 +141,7 @@ export const TableList = ({
     data: materializedViews,
     error: materializedViewsError,
     isError: isErrorMaterializedViews,
-    isLoading: isLoadingMaterializedViews,
+    isPending: isLoadingMaterializedViews,
     isSuccess: isSuccessMaterializedViews,
   } = useMaterializedViewsQuery(
     {
@@ -164,7 +164,7 @@ export const TableList = ({
     data: foreignTables,
     error: foreignTablesError,
     isError: isErrorForeignTables,
-    isLoading: isLoadingForeignTables,
+    isPending: isLoadingForeignTables,
     isSuccess: isSuccessForeignTables,
   } = useForeignTablesQuery(
     {
@@ -205,11 +205,14 @@ export const TableList = ({
     isSuccessTables && isSuccessViews && isSuccessMaterializedViews && isSuccessForeignTables
 
   const formatTooltipText = (entityType: string) => {
-    return Object.entries(ENTITY_TYPE)
-      .find(([, value]) => value === entityType)?.[0]
-      ?.toLowerCase()
-      ?.split('_')
-      ?.join(' ')
+    const text =
+      Object.entries(ENTITY_TYPE)
+        .find(([, value]) => value === entityType)?.[0]
+        ?.toLowerCase()
+        ?.split('_')
+        ?.join(' ') || ''
+    // Return sentence case (capitalize first letter only)
+    return text.charAt(0).toUpperCase() + text.slice(1)
   }
 
   return (
@@ -277,7 +280,7 @@ export const TableList = ({
             placeholder="Search for a table"
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}
-            icon={<Search size={12} />}
+            icon={<Search />}
           />
 
           {!isSchemaLocked && (
@@ -324,7 +327,7 @@ export const TableList = ({
                   <TableHead key="size" className="hidden text-right xl:table-cell">
                     Size (Estimated)
                   </TableHead>
-                  <TableHead key="realtime" className="hidden xl:table-cell text-center">
+                  <TableHead key="realtime" className="hidden xl:table-cell text-right">
                     Realtime Enabled
                   </TableHead>
                   <TableHead key="buttons"></TableHead>
@@ -382,40 +385,14 @@ export const TableList = ({
                       <TableRow key={x.id}>
                         <TableCell className="!pl-5 !pr-1">
                           <Tooltip>
-                            <TooltipTrigger asChild>
-                              {x.type === ENTITY_TYPE.TABLE ? (
-                                <Table2
-                                  size={15}
-                                  strokeWidth={1.5}
-                                  className="text-foreground-lighter"
-                                />
-                              ) : x.type === ENTITY_TYPE.VIEW ? (
-                                <Eye
-                                  size={15}
-                                  strokeWidth={1.5}
-                                  className="text-foreground-lighter"
-                                />
-                              ) : (
-                                <div
-                                  className={cn(
-                                    'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
-                                    x.type === ENTITY_TYPE.FOREIGN_TABLE &&
-                                      'text-yellow-900 bg-yellow-500',
-                                    x.type === ENTITY_TYPE.MATERIALIZED_VIEW &&
-                                      'text-purple-1000 bg-purple-500'
-                                    // [Alaister]: tables endpoint doesn't distinguish between tables and partitioned tables
-                                    // once we update the endpoint to include partitioned tables, we can uncomment this
-                                    // x.type === ENTITY_TYPE.PARTITIONED_TABLE &&
-                                    //   'text-foreground-light bg-border-stronger'
-                                  )}
-                                >
-                                  {Object.entries(ENTITY_TYPE)
-                                    .find(([, value]) => value === x.type)?.[0]?.[0]
-                                    ?.toUpperCase()}
-                                </div>
-                              )}
+                            <TooltipTrigger className="cursor-default">
+                              {/* [Alaister]: EntityTypeIcon supports PARTITIONED_TABLE, but formatAllEntities
+                                  doesn't distinguish between tables and partitioned tables yet.
+                                  Once the endpoint/formatAllEntities is updated to include partitioned tables,
+                                  EntityTypeIcon will automatically style them correctly. */}
+                              <EntityTypeIcon type={x.type} />
                             </TooltipTrigger>
-                            <TooltipContent side="bottom" className="capitalize">
+                            <TooltipContent side="bottom">
                               {formatTooltipText(x.type)}
                             </TooltipContent>
                           </Tooltip>
@@ -450,17 +427,21 @@ export const TableList = ({
                           {x.rows !== undefined ? x.rows.toLocaleString() : '-'}
                         </TableCell>
                         <TableCell className="hidden text-right xl:table-cell">
-                          {x.size !== undefined ? <code className="text-xs">{x.size}</code> : '-'}
+                          {x.size !== undefined ? (
+                            <code className="text-code-inline">{x.size}</code>
+                          ) : (
+                            '-'
+                          )}
                         </TableCell>
                         <TableCell className="hidden xl:table-cell text-center">
                           {(realtimePublication?.tables ?? []).find(
                             (table) => table.id === x.id
                           ) ? (
-                            <div className="flex justify-center">
+                            <div className="flex justify-end">
                               <Check size={18} strokeWidth={2} className="text-brand" />
                             </div>
                           ) : (
-                            <div className="flex justify-center">
+                            <div className="flex justify-end">
                               <X size={18} strokeWidth={2} className="text-foreground-lighter" />
                             </div>
                           )}
@@ -488,7 +469,9 @@ export const TableList = ({
                                   <DropdownMenuItem
                                     className="flex items-center space-x-2"
                                     onClick={() =>
-                                      router.push(`/project/${project?.ref}/editor/${x.id}`)
+                                      router.push(
+                                        `/project/${project?.ref}/editor/${x.id}?${LOAD_TAB_FROM_CACHE_PARAM}=true`
+                                      )
                                     }
                                     onMouseEnter={() =>
                                       prefetchEditorTablePage({

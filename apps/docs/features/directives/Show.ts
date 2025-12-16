@@ -38,13 +38,24 @@ export function showRemark() {
       if (node.name !== '$Show') return
 
       const parent = ancestors[ancestors.length - 1]
-      const featureName = getAttributeValue(node, 'if')
+      const rawFeatureName = getAttributeValue(node, 'if')
 
-      if (typeof featureName !== 'string') {
+      if (typeof rawFeatureName !== 'string') {
         throw new Error('$Show directive requires a string value for the "if" attribute')
       }
 
-      const shouldShow = isFeatureEnabled(featureName as Feature)
+      const trimmedFeatureName = rawFeatureName.trim()
+      const isNegated = trimmedFeatureName.startsWith('!')
+      const normalizedFeatureName = (
+        isNegated ? trimmedFeatureName.slice(1) : trimmedFeatureName
+      ).trim()
+
+      if (!normalizedFeatureName) {
+        throw new Error('$Show directive requires a non-empty feature name for the "if" attribute')
+      }
+
+      const isEnabled = isFeatureEnabled(normalizedFeatureName as Feature)
+      const shouldShow = isNegated ? !isEnabled : isEnabled
 
       nodesToProcess.push({
         node,

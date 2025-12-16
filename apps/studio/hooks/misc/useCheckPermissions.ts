@@ -1,6 +1,7 @@
-import { useIsLoggedIn, useParams } from 'common'
 import jsonLogic from 'json-logic-js'
+import { useMemo } from 'react'
 
+import { useIsLoggedIn, useParams } from 'common'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { IS_PLATFORM } from 'lib/constants'
 import type { Permission } from 'types'
@@ -80,7 +81,7 @@ function useGetProjectPermissions(
 ) {
   const {
     data,
-    isLoading: isLoadingPermissions,
+    isPending: isLoadingPermissions,
     isSuccess: isSuccessPermissions,
   } = usePermissionsQuery({
     enabled: permissionsOverride === undefined && enabled,
@@ -90,7 +91,7 @@ function useGetProjectPermissions(
   const getOrganizationDataFromParamsSlug = organizationSlugOverride === undefined && enabled
   const {
     data: organizationData,
-    isLoading: isLoadingOrganization,
+    isPending: isLoadingOrganization,
     isSuccess: isSuccessOrganization,
   } = useSelectedOrganizationQuery({
     enabled: getOrganizationDataFromParamsSlug,
@@ -103,7 +104,7 @@ function useGetProjectPermissions(
   const getProjectDataFromParamsRef = !!urlProjectRef && projectRefOverride === undefined && enabled
   const {
     data: projectData,
-    isLoading: isLoadingProject,
+    isPending: isLoadingProject,
     isSuccess: isSuccessProject,
   } = useSelectedProjectQuery({
     enabled: getProjectDataFromParamsRef,
@@ -156,33 +157,34 @@ export function useAsyncCheckPermissions(
     isSuccess: isPermissionsSuccess,
   } = useGetProjectPermissions(permissions, organizationSlug, projectRef, isLoggedIn)
 
-  if (!isLoggedIn) {
-    return {
-      isLoading: true,
-      isSuccess: false,
-      can: false,
-    }
-  }
-  if (!IS_PLATFORM) {
-    return {
-      isLoading: false,
-      isSuccess: true,
-      can: true,
-    }
-  }
+  const can = useMemo(() => {
+    if (!IS_PLATFORM) return true
+    if (!isLoggedIn) return false
+    if (!isPermissionsSuccess || !allPermissions) return false
 
-  const can = doPermissionsCheck(
+    return doPermissionsCheck(
+      allPermissions,
+      action,
+      resource,
+      data,
+      _organizationSlug,
+      _projectRef
+    )
+  }, [
+    isLoggedIn,
+    isPermissionsSuccess,
     allPermissions,
     action,
     resource,
     data,
     _organizationSlug,
-    _projectRef
-  )
+    _projectRef,
+  ])
 
-  return {
-    isLoading: isPermissionsLoading,
-    isSuccess: isPermissionsSuccess,
-    can,
-  }
+  // Derive loading/success consistently from the same branches
+  const isLoading = !IS_PLATFORM ? false : !isLoggedIn ? true : isPermissionsLoading
+
+  const isSuccess = !IS_PLATFORM ? true : !isLoggedIn ? false : isPermissionsSuccess
+
+  return { isLoading, isSuccess, can }
 }

@@ -47,7 +47,6 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetRespons
   (select version()) as version,
   (select current_setting('server_version_num')) as version_number;`,
         schema_version: '1',
-        favorite: false,
       } as any,
       favorite: false,
       inserted_at: '',

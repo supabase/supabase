@@ -1,13 +1,15 @@
 import { ChevronRight, CircleHelpIcon, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import {
   useFeaturePreviewModal,
   useUnifiedLogsPreview,
 } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsETLPrivateAlpha } from 'components/interfaces/Database/Replication/useIsETLPrivateAlpha'
+import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
 import SavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from 'components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -98,8 +100,8 @@ export function LogsSidebarMenuV2() {
     'logs:collections',
   ])
 
-  const enablePgReplicate = useFlag('enablePgReplicate')
-  const { data: etlData, isLoading: isETLLoading } = useReplicationSourcesQuery(
+  const enablePgReplicate = useIsETLPrivateAlpha()
+  const { data: etlData, isPending: isETLLoading } = useReplicationSourcesQuery(
     {
       projectRef: ref,
     },
@@ -117,7 +119,7 @@ export function LogsSidebarMenuV2() {
   const { plan: orgPlan } = useCurrentOrgPlan()
   const isFreePlan = orgPlan?.id === 'free'
 
-  const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery({
+  const { data: savedQueriesRes, isPending: savedQueriesLoading } = useContentQuery({
     projectRef: ref,
     type: 'log_sql',
   })
@@ -203,9 +205,9 @@ export function LogsSidebarMenuV2() {
     },
     showETLLogs
       ? {
-          name: 'ETL Replication',
-          key: 'etl_replication_logs',
-          url: `/project/${ref}/logs/etl-replication-logs`,
+          name: 'Replication',
+          key: 'replication_logs',
+          url: `/project/${ref}/logs/replication-logs`,
           items: [],
         }
       : null,
@@ -230,7 +232,7 @@ export function LogsSidebarMenuV2() {
   })
 
   return (
-    <div className="pb-12 relative">
+    <div className="pb-4 relative">
       {IS_PLATFORM && !unifiedLogsFlagEnabled && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"
@@ -249,9 +251,9 @@ export function LogsSidebarMenuV2() {
       {unifiedLogsFlagEnabled && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"
-          title="New Logs Interface"
-          description="Unified view across all services with improved filtering and real-time updates"
-          illustration={<Badge variant="brand">Feature Preview</Badge>}
+          title="Introducing unified logs"
+          description="A unified view across all services with improved filtering and real-time updates."
+          illustration={<Badge variant="success">New</Badge>}
           actions={
             <>
               <Button
@@ -316,14 +318,14 @@ export function LogsSidebarMenuV2() {
         <>
           <SidebarCollapsible title="Collections" defaultOpen={true}>
             {filteredLogs.map((collection) => {
-              const isItemActive = isActive(collection.url)
+              const isItemActive = isActive(collection?.url ?? '')
               return (
                 <LogsSidebarItem
-                  key={collection.key}
+                  key={collection?.key ?? ''}
                   isActive={isItemActive}
-                  href={collection.url}
+                  href={collection?.url ?? ''}
                   icon={<SupaIcon className="text-foreground-light" />}
-                  label={collection.name}
+                  label={collection?.name ?? ''}
                 />
               )
             })}
@@ -366,9 +368,29 @@ export function LogsSidebarMenuV2() {
           />
         )}
         {savedQueries.map((query) => (
-          <SavedQueriesItem item={query} key={query.id} />
+          <SavedQueriesItem item={query as any} key={query.id} /> // kemal: i know, i know, temp any fix.
         ))}
       </SidebarCollapsible>
+
+      <Separator className="my-4" />
+
+      <FeaturePreviewSidebarPanel
+        className="mx-4 mt-4"
+        title="Capture your logs"
+        description="Send logs to your preferred observability or storage platform."
+        illustration={
+          <div className="flex items-center gap-4">
+            {LOG_DRAIN_TYPES.map((type) =>
+              React.cloneElement(type.icon, { height: 20, width: 20 })
+            )}
+          </div>
+        }
+        actions={
+          <Button asChild type="default">
+            <Link href={`/project/${ref}/settings/log-drains`}>Go to Log Drains</Link>
+          </Button>
+        }
+      />
     </div>
   )
 }

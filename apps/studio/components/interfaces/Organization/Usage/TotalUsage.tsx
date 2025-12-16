@@ -11,6 +11,7 @@ import {
 import type { OrgSubscription } from 'data/subscriptions/types'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from 'lib/constants'
 import { cn } from 'ui'
 import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/BillingBreakdown.constants'
 import { BillingMetric } from '../BillingSettings/BillingBreakdown/BillingMetric'
@@ -19,7 +20,7 @@ import { SectionContent } from './SectionContent'
 
 export interface ComputeProps {
   orgSlug: string
-  projectRef?: string
+  projectRef?: string | null
   startDate: string | undefined
   endDate: string | undefined
   subscription: OrgSubscription | undefined
@@ -32,6 +33,10 @@ const METRICS_TO_HIDE_WITH_NO_USAGE: PricingMetric[] = [
   PricingMetric.DISK_SIZE_GB_HOURS_GP3,
   PricingMetric.DISK_SIZE_GB_HOURS_IO2,
   PricingMetric.DISK_THROUGHPUT_GP3,
+  PricingMetric.LOG_INGESTION,
+  PricingMetric.LOG_STORAGE,
+  PricingMetric.LOG_QUERYING,
+  PricingMetric.ACTIVE_COMPUTE_HOURS,
 ]
 
 export const TotalUsage = ({
@@ -49,7 +54,7 @@ export const TotalUsage = ({
   const {
     data: usage,
     error: usageError,
-    isLoading: isLoadingUsage,
+    isPending: isLoadingUsage,
     isError: isErrorUsage,
     isSuccess: isSuccessUsage,
   } = useOrgUsageQuery({
@@ -61,6 +66,8 @@ export const TotalUsage = ({
 
   // When the user filters by project ref or selects a custom timeframe, we only display usage+project breakdown, but no costs/limits
   const showRelationToSubscription = currentBillingCycleSelected && !projectRef
+
+  const isOnHigherPlan = ['team', 'enterprise', 'platform'].includes(subscription?.plan.id ?? '')
 
   const hasExceededAnyLimits =
     showRelationToSubscription &&
@@ -125,7 +132,7 @@ export const TotalUsage = ({
             ? [
                 {
                   name: 'How billing works',
-                  url: 'https://supabase.com/docs/guides/platform/billing-on-supabase',
+                  url: `${DOCS_URL}/guides/platform/billing-on-supabase`,
                 },
                 {
                   name: 'Supabase Plans',
@@ -147,7 +154,7 @@ export const TotalUsage = ({
 
         {isSuccessUsage && subscription && (
           <div>
-            {showRelationToSubscription && (
+            {showRelationToSubscription && !isOnHigherPlan && (
               <p className="text-sm">
                 {!hasExceededAnyLimits ? (
                   <span>

@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Archive, ChevronDown, Code, Database, Key, Zap } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
@@ -7,7 +7,7 @@ import { useMemo, useState } from 'react'
 import { useParams } from 'common'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import { InlineLink } from 'components/ui/InlineLink'
-import useProjectUsageStats from 'hooks/analytics/useProjectUsageStats'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -27,12 +27,23 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  cn,
 } from 'ui'
 import { Row } from 'ui-patterns'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 import { useServiceStats } from './ProjectUsageSection.utils'
+import type { StatsLike } from './ProjectUsageSection.utils'
+import type { LogsBarChartDatum } from './ProjectUsage.metrics'
+import {
+  sumTotal,
+  sumWarnings,
+  sumErrors,
+  computeSuccessAndNonSuccessRates,
+  computeChangePercent,
+  formatDelta,
+} from './ProjectUsage.metrics'
 
-const LOG_RETENTION = { free: 1, pro: 7, team: 28, enterprise: 90 }
+const LOG_RETENTION = { free: 1, pro: 7, team: 28, enterprise: 90, platform: 1 }
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -41,7 +52,7 @@ const CHART_INTERVALS: ChartIntervals[] = [
     startValue: 1,
     startUnit: 'hour',
     format: 'MMM D, h:mma',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
   },
   {
     key: '1day',
@@ -49,33 +60,25 @@ const CHART_INTERVALS: ChartIntervals[] = [
     startValue: 24,
     startUnit: 'hour',
     format: 'MMM D, ha',
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
   },
   {
     key: '7day',
     label: 'Last 7 days',
     startValue: 7,
     startUnit: 'day',
-    format: 'MMM D',
+    format: 'MMM D, ha',
     availableIn: ['pro', 'team', 'enterprise'],
   },
 ]
 
 type ChartIntervalKey = '1hr' | '1day' | '7day'
 
-type LogsBarChartDatum = {
-  timestamp: string
-  error_count: number
-  ok_count: number
-  warning_count: number
-}
-
 type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
 
 type ServiceEntry = {
   key: ServiceKey
   title: string
-  icon: React.ReactNode
   href?: string
   route: string
   enabled: boolean
@@ -86,13 +89,14 @@ type ServiceComputed = ServiceEntry & {
   total: number
   warn: number
   err: number
-  stats: ReturnType<typeof useProjectUsageStats>
+  stats: StatsLike
 }
 
 export const ProjectUsageSection = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
     'project_auth:all',
     'project_storage:all',
@@ -104,59 +108,19 @@ export const ProjectUsageSection = () => {
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
 
-  const { timestampStart, timestampEnd, datetimeFormat } = useMemo(() => {
-    const startDateLocal = dayjs().subtract(
-      selectedInterval.startValue,
-      selectedInterval.startUnit as dayjs.ManipulateType
-    )
-    const endDateLocal = dayjs()
+  const { datetimeFormat } = useMemo(() => {
     const format = selectedInterval.format || 'MMM D, ha'
+    return { datetimeFormat: format }
+  }, [selectedInterval])
 
-    return {
-      timestampStart: startDateLocal.toISOString(),
-      timestampEnd: endDateLocal.toISOString(),
-      datetimeFormat: format,
-    }
-  }, [selectedInterval]) // Only recalculate when interval changes
-
-  const { previousStart, previousEnd } = useMemo(() => {
-    const currentStart = dayjs(timestampStart)
-    const currentEnd = dayjs(timestampEnd)
-    const durationMs = currentEnd.diff(currentStart)
-    const prevEnd = currentStart
-    const prevStart = currentStart.subtract(durationMs, 'millisecond')
-    return { previousStart: prevStart.toISOString(), previousEnd: prevEnd.toISOString() }
-  }, [timestampStart, timestampEnd])
-
-  const statsByService = useServiceStats(
-    projectRef as string,
-    timestampStart,
-    timestampEnd,
-    previousStart,
-    previousEnd
-  )
-
-  const toLogsBarChartData = (rows: any[] = []): LogsBarChartDatum[] => {
-    return rows.map((r) => ({
-      timestamp: String(r.timestamp),
-      ok_count: Number(r.ok_count || 0),
-      warning_count: Number(r.warning_count || 0),
-      error_count: Number(r.error_count || 0),
-    }))
-  }
-
-  const sumTotal = (data: LogsBarChartDatum[]) =>
-    data.reduce((acc, r) => acc + r.ok_count + r.warning_count + r.error_count, 0)
-  const sumWarnings = (data: LogsBarChartDatum[]) =>
-    data.reduce((acc, r) => acc + r.warning_count, 0)
-  const sumErrors = (data: LogsBarChartDatum[]) => data.reduce((acc, r) => acc + r.error_count, 0)
+  const statsByService = useServiceStats(projectRef!, interval)
 
   const serviceBase: ServiceEntry[] = useMemo(
     () => [
       {
         key: 'db',
         title: 'Database requests',
-        icon: <Database strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
+
         href: `/project/${projectRef}/editor`,
         route: '/logs/postgres-logs',
         enabled: true,
@@ -164,14 +128,12 @@ export const ProjectUsageSection = () => {
       {
         key: 'functions',
         title: 'Functions requests',
-        icon: <Code strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
         route: '/logs/edge-functions-logs',
         enabled: true,
       },
       {
         key: 'auth',
         title: 'Auth requests',
-        icon: <Key strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
         href: `/project/${projectRef}/auth/users`,
         route: '/logs/auth-logs',
         enabled: authEnabled,
@@ -179,7 +141,6 @@ export const ProjectUsageSection = () => {
       {
         key: 'storage',
         title: 'Storage requests',
-        icon: <Archive strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
         href: `/project/${projectRef}/storage/buckets`,
         route: '/logs/storage-logs',
         enabled: storageEnabled,
@@ -187,7 +148,6 @@ export const ProjectUsageSection = () => {
       {
         key: 'realtime',
         title: 'Realtime requests',
-        icon: <Zap strokeWidth={1.5} size={16} className="text-foreground-lighter" />,
         route: '/logs/realtime-logs',
         enabled: true,
       },
@@ -199,7 +159,7 @@ export const ProjectUsageSection = () => {
     () =>
       serviceBase.map((s) => {
         const currentStats = statsByService[s.key].current
-        const data = toLogsBarChartData(currentStats.eventChartData)
+        const data = currentStats.eventChartData
         const total = sumTotal(data)
         const warn = sumWarnings(data)
         const err = sumErrors(data)
@@ -210,7 +170,7 @@ export const ProjectUsageSection = () => {
 
   const isLoading = services.some((s) => s.stats.isLoading)
 
-  const handleBarClick = (logRoute: string) => (datum: any) => {
+  const handleBarClick = (logRoute: string, serviceKey: ServiceKey) => (datum: any) => {
     if (!datum?.timestamp) return
 
     const datumTimestamp = dayjs(datum.timestamp).toISOString()
@@ -223,22 +183,40 @@ export const ProjectUsageSection = () => {
     })
 
     router.push(`/project/${projectRef}${logRoute}?${queryParams.toString()}`)
+
+    if (projectRef && organization?.slug) {
+      sendEvent({
+        action: 'home_project_usage_chart_clicked',
+        properties: {
+          service_type: serviceKey,
+          bar_timestamp: datum.timestamp,
+        },
+        groups: {
+          project: projectRef,
+          organization: organization.slug,
+        },
+      })
+    }
   }
 
   const enabledServices = services.filter((s) => s.enabled)
   const totalRequests = enabledServices.reduce((sum, s) => sum + (s.total || 0), 0)
   const totalErrors = enabledServices.reduce((sum, s) => sum + (s.err || 0), 0)
-  const errorRate = totalRequests > 0 ? (totalErrors / totalRequests) * 100 : 0
+  const totalWarnings = enabledServices.reduce((sum, s) => sum + (s.warn || 0), 0)
+  const { successRate, nonSuccessRate } = computeSuccessAndNonSuccessRates(
+    totalRequests,
+    totalWarnings,
+    totalErrors
+  )
 
   const prevServiceTotals = useMemo(
     () =>
       serviceBase.map((s) => {
         const previousStats = statsByService[s.key].previous
-        const data = toLogsBarChartData(previousStats.eventChartData)
+        const data = previousStats.eventChartData
         return {
           enabled: s.enabled,
           total: sumTotal(data),
-          err: sumErrors(data),
         }
       }),
     [serviceBase, statsByService]
@@ -246,39 +224,26 @@ export const ProjectUsageSection = () => {
 
   const enabledPrev = prevServiceTotals.filter((s) => s.enabled)
   const prevTotalRequests = enabledPrev.reduce((sum, s) => sum + (s.total || 0), 0)
-  const prevTotalErrors = enabledPrev.reduce((sum, s) => sum + (s.err || 0), 0)
-  const prevErrorRate = prevTotalRequests > 0 ? (prevTotalErrors / prevTotalRequests) * 100 : 0
 
-  const totalRequestsChangePct =
-    prevTotalRequests === 0
-      ? totalRequests > 0
-        ? 100
-        : 0
-      : ((totalRequests - prevTotalRequests) / prevTotalRequests) * 100
-  const errorRateChangePct =
-    prevErrorRate === 0
-      ? errorRate > 0
-        ? 100
-        : 0
-      : ((errorRate - prevErrorRate) / prevErrorRate) * 100
-  const formatDelta = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(1)}%`
-  const totalDeltaClass = totalRequestsChangePct >= 0 ? 'text-brand' : 'text-destructive'
-  const errorDeltaClass = errorRateChangePct <= 0 ? 'text-brand' : 'text-destructive'
+  const totalRequestsChangePct = computeChangePercent(totalRequests, prevTotalRequests)
+  const totalDeltaClass = totalRequestsChangePct >= 0 ? 'text-brand-link' : 'text-destructive'
+  const nonSuccessClass = nonSuccessRate > 0 ? 'text-destructive' : 'text-brand-link'
 
   return (
     <div className="space-y-6">
       <div className="flex flex-row justify-between items-center gap-x-2">
-        <div className="flex items-center gap-6">
-          <div className="flex items-baseline gap-2 heading-section text-foreground-light">
+        <div className="flex flex-col md:flex-row md:items-center md:gap-6">
+          <div className="flex items-start gap-2 heading-section text-foreground-light">
             <span className="text-foreground">{totalRequests.toLocaleString()}</span>
             <span>Total Requests</span>
-            <span className={`${totalDeltaClass}`}>{formatDelta(totalRequestsChangePct)}</span>
+            <span className={cn('text-sm', totalDeltaClass)}>
+              {formatDelta(totalRequestsChangePct)}
+            </span>
           </div>
-          <span className="text-foreground-muted">/</span>
-          <div className="flex items-baseline gap-2 heading-section text-foreground-light">
-            <span className="text-foreground">{errorRate.toFixed(1)}%</span>
-            <span>Error Rate</span>
-            <span className={`${errorDeltaClass}`}>{formatDelta(errorRateChangePct)}</span>
+          <div className="flex items-start gap-2 heading-section text-foreground-light">
+            <span className="text-foreground">{successRate.toFixed(1)}%</span>
+            <span>Success Rate</span>
+            <span className={cn('text-sm', nonSuccessClass)}>{formatDelta(nonSuccessRate)}</span>
           </div>
         </div>
         <DropdownMenu>
@@ -340,13 +305,37 @@ export const ProjectUsageSection = () => {
       </div>
       <Row columns={[3, 2, 1]}>
         {enabledServices.map((s) => (
-          <Card key={s.key} className="mb-0 md:mb-0 h-full flex flex-col">
+          <Card key={s.key} className="mb-0 md:mb-0 h-full flex flex-col h-64">
             <CardHeader className="flex flex-row items-end justify-between gap-2 space-y-0 pb-0 border-b-0">
               <div className="flex items-center gap-2">
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
                     <CardTitle className="text-foreground-light">
-                      {s.href ? <Link href={s.href}>{s.title}</Link> : s.title}
+                      {s.href ? (
+                        <Link
+                          href={s.href}
+                          onClick={() => {
+                            if (projectRef && organization?.slug) {
+                              sendEvent({
+                                action: 'home_project_usage_service_clicked',
+                                properties: {
+                                  service_type: s.key,
+                                  total_requests: s.total || 0,
+                                  error_count: s.err || 0,
+                                },
+                                groups: {
+                                  project: projectRef,
+                                  organization: organization.slug,
+                                },
+                              })
+                            }
+                          }}
+                        >
+                          {s.title}
+                        </Link>
+                      ) : (
+                        s.title
+                      )}
                     </CardTitle>
                   </div>
                   <span className="text-foreground text-xl">{(s.total || 0).toLocaleString()}</span>
@@ -369,15 +358,19 @@ export const ProjectUsageSection = () => {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-6 pt-4 flex-1">
-              <Loading active={isLoading}>
+            <CardContent className="p-6 pt-4 flex-1 h-full overflow-hidden">
+              <Loading isFullHeight active={isLoading}>
                 <LogsBarChart
+                  isFullHeight
                   data={s.data}
-                  height="120px"
                   DateTimeFormat={datetimeFormat}
-                  onBarClick={handleBarClick(s.route)}
+                  onBarClick={handleBarClick(s.route, s.key)}
                   EmptyState={
-                    <NoDataPlaceholder size="small" message="No data for selected period" />
+                    <NoDataPlaceholder
+                      size="small"
+                      message="No data for selected period"
+                      isFullHeight
+                    />
                   }
                 />
               </Loading>

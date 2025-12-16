@@ -1,5 +1,5 @@
 import { X } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import ReactMarkdown from 'react-markdown'
 
@@ -13,6 +13,7 @@ import {
 } from 'components/interfaces/Linter/Linter.utils'
 import { Lint } from 'data/lint/lint-query'
 import { useRouter } from 'next/router'
+import { useTrack } from 'lib/telemetry/track'
 import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { EntityTypeIcon } from './Linter.utils'
@@ -34,6 +35,7 @@ const LinterDataGrid = ({
   const gridRef = useRef<DataGridHandle>(null)
   const { ref } = useParams()
   const router = useRouter()
+  const track = useTrack()
 
   const lintCols = [
     {
@@ -148,6 +150,14 @@ const LinterDataGrid = ({
                       gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                       const { id, ...rest } = router.query
                       router.push({ ...router, query: { ...rest, id: props.row.cache_key } })
+
+                      track('advisor_detail_opened', {
+                        origin: 'advisors_page',
+                        advisorSource: 'lint',
+                        advisorCategory: props.row.categories[0],
+                        advisorType: props.row.name,
+                        advisorLevel: props.row.level,
+                      })
                     }
                   }}
                 />
@@ -166,7 +176,12 @@ const LinterDataGrid = ({
       {selectedLint !== null && (
         <>
           <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={30} maxSize={45} minSize={30} className="bg-studio border-t">
+          <ResizablePanel
+            defaultSize={30}
+            maxSize={45}
+            minSize={30}
+            className="bg-studio border-t flex flex-col h-full"
+          >
             <div className="flex items-center justify-between w-full border-b py-3 px-6">
               <div className="flex items-center gap-2">
                 <h3 className="text-sm m-0">
@@ -176,7 +191,7 @@ const LinterDataGrid = ({
               </div>
               <Button type="text" icon={<X />} onClick={handleSidepanelClose} />
             </div>
-            <div className="p-6">
+            <div className="p-6 flex-grow min-h-0 overflow-y-auto">
               <LintDetail lint={selectedLint} projectRef={ref!} />
             </div>
           </ResizablePanel>

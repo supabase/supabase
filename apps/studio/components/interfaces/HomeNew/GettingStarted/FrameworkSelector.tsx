@@ -45,7 +45,7 @@ export const FrameworkSelector = ({
           <Button
             size="tiny"
             type="default"
-            className="gap-0 rounded-l-none"
+            className="gap-0"
             iconRight={<ChevronDown strokeWidth={1.5} />}
           >
             <div className="flex items-center gap-2">
@@ -55,7 +55,14 @@ export const FrameworkSelector = ({
           </Button>
         </PopoverTrigger_Shadcn_>
       </div>
-      <PopoverContent_Shadcn_ className="p-0 max-w-48" side="bottom" align="start">
+      {/* Render in a portal to avoid layout/stacking shifts; prevent auto-focus to stop scroll jump */}
+      <PopoverContent_Shadcn_
+        className="p-0 max-w-48"
+        side="bottom"
+        align="start"
+        portal
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Search..." />
           <CommandList_Shadcn_>

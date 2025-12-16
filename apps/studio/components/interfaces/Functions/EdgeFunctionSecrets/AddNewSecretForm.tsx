@@ -5,11 +5,9 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
-import Panel from 'components/ui/Panel'
 import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
 import { useSecretsQuery } from 'data/secrets/secrets-query'
 import { Eye, EyeOff, MinusCircle } from 'lucide-react'
-import { DuplicateSecretWarningModal } from './DuplicateSecretWarningModal'
 import {
   Button,
   Card,
@@ -25,6 +23,7 @@ import {
   FormMessage_Shadcn_,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { DuplicateSecretWarningModal } from './DuplicateSecretWarningModal'
 
 type SecretPair = {
   name: string
@@ -48,6 +47,14 @@ const FormSchema = z.object({
 const defaultValues = {
   secrets: [{ name: '', value: '' }],
 }
+
+const removeWrappingQuotes = (str: string): string => {
+  if ((str.startsWith('"') && str.endsWith('"')) || (str.startsWith("'") && str.endsWith("'"))) {
+    return str.slice(1, -1)
+  }
+  return str
+}
+
 const AddNewSecretForm = () => {
   const { ref: projectRef } = useParams()
   const [showSecretValue, setShowSecretValue] = useState(false)
@@ -102,9 +109,10 @@ const AddNewSecretForm = () => {
       lines.forEach((line) => {
         const [key, ...valueParts] = line.split('=')
         if (key && valueParts.length) {
+          const valueStr = valueParts.join('=').trim()
           pairs.push({
             name: key.trim(),
-            value: valueParts.join('=').trim(),
+            value: removeWrappingQuotes(valueStr),
           })
         }
       })
@@ -118,7 +126,7 @@ const AddNewSecretForm = () => {
     }
   }
 
-  const { mutate: createSecret, isLoading: isCreating } = useSecretsCreateMutation({
+  const { mutate: createSecret, isPending: isCreating } = useSecretsCreateMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully created new secret "${variables.secrets[0].name}"`)
       // RHF recommends using setTimeout/useEffect to reset the form
@@ -159,7 +167,7 @@ const AddNewSecretForm = () => {
         <form className="w-full" onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
             <CardHeader>
-              <CardTitle>Add new secrets</CardTitle>
+              <CardTitle>Add or replace secrets</CardTitle>
             </CardHeader>
             <CardContent>
               {fields.map((fieldItem, index) => (
@@ -169,7 +177,7 @@ const AddNewSecretForm = () => {
                     name={`secrets.${index}.name`}
                     render={({ field }) => (
                       <FormItem_Shadcn_ className="w-full">
-                        <FormLabel_Shadcn_>Key</FormLabel_Shadcn_>
+                        <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
                         <FormControl_Shadcn_>
                           <Input
                             {...field}
@@ -191,6 +199,10 @@ const AddNewSecretForm = () => {
                           <Input
                             {...field}
                             type={showSecretValue ? 'text' : 'password'}
+                            data-1p-ignore
+                            data-lpignore="true"
+                            data-form-type="other"
+                            data-bwignore
                             actions={
                               <div className="mr-1">
                                 <Button
@@ -212,6 +224,7 @@ const AddNewSecretForm = () => {
                     type="default"
                     className="h-[34px] mt-6"
                     icon={<MinusCircle />}
+                    disabled={fields.length <= 1}
                     onClick={() => (fields.length > 1 ? remove(index) : form.reset(defaultValues))}
                   />
                 </div>
@@ -233,9 +246,13 @@ const AddNewSecretForm = () => {
                 Add another
               </Button>
             </CardContent>
-            <CardFooter className="justify-end space-x-2">
+            <CardFooter className="justify-between space-x-2">
+              <p className="text-sm text-foreground-lighter">
+                Insert or update multiple secrets at once by pasting key-value pairs
+              </p>
+
               <Button type="primary" htmlType="submit" disabled={isCreating} loading={isCreating}>
-                {isCreating ? 'Saving...' : 'Save'}
+                {isCreating ? 'Saving...' : fields.length > 1 ? 'Bulk save' : 'Save'}
               </Button>
             </CardFooter>
           </Card>

@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseCronJobsKeys } from './keys'
 
 export type DatabaseCronJobRunVariables = {
@@ -44,23 +44,21 @@ export const useDatabaseCronJobRunCommandMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseCronJobRunData, ResponseError, DatabaseCronJobRunVariables>,
+  UseCustomMutationOptions<DatabaseCronJobRunData, ResponseError, DatabaseCronJobRunVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<DatabaseCronJobRunData, ResponseError, DatabaseCronJobRunVariables>(
-    (vars) => runDatabaseCronJobCommand(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to run cron job command: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseCronJobRunData, ResponseError, DatabaseCronJobRunVariables>({
+    mutationFn: (vars) => runDatabaseCronJobCommand(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to run cron job command: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

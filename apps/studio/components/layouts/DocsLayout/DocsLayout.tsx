@@ -10,7 +10,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { PROJECT_STATUS } from 'lib/constants'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { ProjectLayout } from '../ProjectLayout'
 import { generateDocsMenu } from './DocsLayout.utils'
 
 function DocsLayout({ title, children }: { title: string; children: ReactElement }) {
@@ -19,10 +19,11 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
   const { data: selectedProject } = useSelectedProjectQuery()
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
 
-  const { data, isLoading, error } = useOpenAPISpecQuery(
-    { projectRef: ref },
-    { enabled: !isPaused }
-  )
+  const {
+    data,
+    isPending: isLoading,
+    error,
+  } = useOpenAPISpecQuery({ projectRef: ref }, { enabled: !isPaused })
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const hideMenu = isNewAPIDocsEnabled && router.pathname.endsWith('/graphiql')

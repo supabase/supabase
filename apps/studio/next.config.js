@@ -33,9 +33,6 @@ const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   assetPrefix: getAssetPrefix(),
   output: 'standalone',
-  experimental: {
-    webpackBuildWorker: true,
-  },
   async rewrites() {
     return [
       {
@@ -130,6 +127,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/project/:ref/auth/advanced',
+        destination: '/project/:ref/auth/performance',
+        permanent: true,
+      },
+      {
         source: '/project/:ref/database',
         destination: '/project/:ref/database/tables',
         permanent: true,
@@ -141,12 +143,37 @@ const nextConfig = {
       },
       {
         source: '/project/:ref/storage',
-        destination: '/project/:ref/storage/buckets',
+        destination: '/project/:ref/storage/files',
         permanent: true,
       },
       {
+        source: '/project/:ref/storage/buckets',
+        destination: '/project/:ref/storage/files',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage/policies',
+        destination: '/project/:ref/storage/files/policies',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage/buckets/:bucketId',
+        destination: '/project/:ref/storage/files/buckets/:bucketId',
+        permanent: true,
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/api-keys/new',
+        destination: '/project/:ref/settings/api-keys',
+      },
+      {
         source: '/project/:ref/settings/storage',
-        destination: '/project/:ref/storage/settings',
+        destination: '/project/:ref/storage/files/settings',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage/settings',
+        destination: '/project/:ref/storage/files/settings',
         permanent: true,
       },
       {
@@ -216,6 +243,11 @@ const nextConfig = {
         source: '/project/:ref/settings/billing/subscription',
         destination: '/org/_/billing',
         permanent: true,
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/jwt/signing-keys',
+        destination: '/project/:ref/settings/jwt',
       },
       {
         source: '/project/:ref/database/api-logs',
@@ -304,13 +336,28 @@ const nextConfig = {
       },
       {
         permanent: true,
+        source: '/project/:ref/reports',
+        destination: '/project/:ref/observability',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/reports/:path*',
+        destination: '/project/:ref/observability/:path*',
+      },
+      {
+        permanent: true,
         source: '/project/:ref/query-performance',
-        destination: '/project/:ref/advisors/query-performance',
+        destination: '/project/:ref/observability/query-performance',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/advisors/query-performance',
+        destination: '/project/:ref/observability/query-performance',
       },
       {
         permanent: true,
         source: '/project/:ref/database/query-performance',
-        destination: '/project/:ref/advisors/query-performance',
+        destination: '/project/:ref/observability/query-performance',
       },
       {
         permanent: true,
@@ -387,6 +434,11 @@ const nextConfig = {
         destination: '/organizations',
         permanent: false,
       },
+      {
+        source: '/project/:ref/settings/auth',
+        destination: '/project/:ref/auth',
+        permanent: false,
+      },
 
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
@@ -398,6 +450,22 @@ const nextConfig = {
             },
           ]
         : []),
+
+      ...(process.env.MAINTENANCE_MODE === 'true'
+        ? [
+            {
+              source: '/((?!maintenance|img).*)', // Redirect all paths except /maintenance and /img
+              destination: '/maintenance',
+              permanent: false,
+            },
+          ]
+        : [
+            {
+              source: '/maintenance',
+              destination: '/',
+              permanent: false,
+            },
+          ]),
     ]
   },
   async headers() {
@@ -455,7 +523,6 @@ const nextConfig = {
     ]
   },
   images: {
-    // to make Vercel avatars work without issue. Vercel uses SVGs for users who don't have set avatars.
     dangerouslyAllowSVG: false,
     remotePatterns: [
       {
@@ -501,43 +568,17 @@ const nextConfig = {
       },
     },
   },
-  // Both configs for turbopack and webpack need to exist (and sync) because Nextjs still uses webpack for production building
-  webpack(config) {
-    config.module?.rules
-      .find((rule) => rule.oneOf)
-      .oneOf.forEach((rule) => {
-        if (rule.issuer?.and?.[0]?.toString().includes('_app')) {
-          const and = rule.issuer.and
-          rule.issuer.or = [/[\\/]node_modules[\\/]monaco-editor[\\/]/, { and }]
-          delete rule.issuer.and
-        }
-      })
-
-    // .md files to be loaded as raw text
-    config.module.rules.push({
-      test: /\.md$/,
-      type: 'asset/source',
-    })
-
-    return config
-  },
   onDemandEntries: {
     maxInactiveAge: 24 * 60 * 60 * 1000,
     pagesBufferLength: 100,
   },
   typescript: {
-    // On previews, typechecking is run via GitHub Action only for efficiency
-    // On production, we turn it on to prevent errors from conflicting PRs getting into
-    // prod
-    ignoreBuildErrors: process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? false : true,
-  },
-  eslint: {
-    // We are already running linting via GH action, this will skip linting during production build on Vercel
-    ignoreDuringBuilds: true,
+    // Typechecking is run via GitHub Action only for efficiency
+    // For production, we run typechecks separate from the build command (pnpm typecheck && pnpm build)
+    ignoreBuildErrors: true,
   },
 }
 
-// module.exports = withBundleAnalyzer(nextConfig)
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
 module.exports =

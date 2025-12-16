@@ -57,11 +57,11 @@ const ReportsMenu = () => {
     return queryString ? `?${queryString}` : ''
   }, [router.query])
 
-  const { data: content, isLoading } = useContentQuery({
+  const { data: content, isPending: isLoading } = useContentQuery({
     projectRef: ref,
     type: 'report',
   })
-  const { mutate: deleteReport, isLoading: isDeleting } = useContentDeleteMutation({
+  const { mutate: deleteReport, isPending: isDeleting } = useContentDeleteMutation({
     onSuccess: () => {
       setDeleteModalOpen(false)
       toast.success('Successfully deleted report')
@@ -146,6 +146,11 @@ const ReportsMenu = () => {
               },
             ]
           : []),
+        {
+          name: 'Query Performance',
+          key: 'query-performance',
+          url: `/project/${ref}/reports/query-performance${preservedQueryParams}`,
+        },
         ...(postgrestReportEnabled
           ? [
               {
@@ -250,8 +255,11 @@ const ReportsMenu = () => {
                             : 'hover:bg-surface-200'
                         )}
                       >
-                        <Link href={subItem.url} className="flex-grow h-7 flex items-center pl-3">
-                          {subItem.name}
+                        <Link
+                          href={subItem.url}
+                          className="flex-grow h-7 flex justify-between items-center pl-3"
+                        >
+                          <span>{subItem.name}</span>
                         </Link>
                       </li>
                     ))}

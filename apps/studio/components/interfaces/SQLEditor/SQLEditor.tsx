@@ -6,7 +6,8 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import ResizableAIWidget from 'components/ui/AIEditor/ResizableAIWidget'
 import { GridFooter } from 'components/ui/GridFooter'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
@@ -21,9 +22,10 @@ import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { generateUuid } from 'lib/api/snippets.browser'
 import { BASE_PATH } from 'lib/constants'
 import { formatSql } from 'lib/formatSql'
-import { detectOS, uuidv4 } from 'lib/helpers'
+import { detectOS } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
@@ -32,10 +34,12 @@ import {
   isRoleImpersonationEnabled,
   useGetImpersonatedRoleState,
 } from 'state/role-impersonation-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
@@ -47,11 +51,11 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
 import {
+  generateSnippetTitle,
   ROWS_PER_PAGE_OPTIONS,
   sqlAiDisclaimerComment,
   untitledSnippetTitle,
@@ -86,6 +90,7 @@ export const SQLEditor = () => {
   const queryClient = useQueryClient()
   const tabs = useTabsStateSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
@@ -118,10 +123,13 @@ export const SQLEditor = () => {
   const [queryHasUpdateWithoutWhere, setQueryHasUpdateWithoutWhere] = useState(false)
   const [showWidget, setShowWidget] = useState(false)
 
-  // generate an id to be used for new snippets. The dependency on urlId is to avoid a bug which
+  // generate a new snippet title and an id to be used for new snippets. The dependency on urlId is to avoid a bug which
   // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const generatedId = useMemo(() => uuidv4(), [urlId])
+  const [generatedNewSnippetName, generatedId] = useMemo(() => {
+    const name = generateSnippetTitle()
+    return [name, generateUuid([name])]
+  }, [urlId])
+
   // the id is stable across renders - it depends either on the url or on the memoized generated id
   const id = !urlId || urlId === 'new' ? generatedId : urlId
 
@@ -154,7 +162,7 @@ export const SQLEditor = () => {
   /* React query mutations */
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
+  const { mutate: execute, isPending: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
       if (id) snapV2.addResult(id, data.result, vars.autoLimit)
 
@@ -162,7 +170,7 @@ export const SQLEditor = () => {
       refetchEntityDefinitions()
 
       // revalidate lint query
-      queryClient.invalidateQueries(lintKeys.lint(ref))
+      queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
     },
     onError(error: any, vars) {
       if (id) {
@@ -282,7 +290,11 @@ export const SQLEditor = () => {
           return
         }
 
-        if (!isHipaaProjectDisallowed && snippet?.snippet.name === untitledSnippetTitle) {
+        if (
+          !isHipaaProjectDisallowed &&
+          snippet?.snippet.name.startsWith(untitledSnippetTitle) &&
+          IS_PLATFORM
+        ) {
           // Intentionally don't await title gen (lazy)
           setAiTitle(id, sql)
         }
@@ -346,7 +358,6 @@ export const SQLEditor = () => {
 
       try {
         const snippet = createSqlSnippetSkeletonV2({
-          id: uuidv4(),
           name,
           sql,
           owner_id: profile.id,
@@ -380,9 +391,9 @@ export const SQLEditor = () => {
     try {
       const snippet = snapV2.snippets[id]
       const result = snapV2.results[id]?.[0]
+      openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
       aiSnap.newChat({
         name: 'Debug SQL snippet',
-        open: true,
         sqlSnippets: [
           (snippet.snippet.content?.sql ?? '').replace(sqlAiDisclaimerComment, '').trim(),
         ],
@@ -705,6 +716,11 @@ export const SQLEditor = () => {
                           padding: { top: 4 },
                           lineNumbersMinChars: 3,
                         }}
+                        // [Joshen] These ones are meant to solve a UI issue that seems to only be happening locally
+                        // Happens when you use the inline assistant in the SQL Editor and accept the suggestion
+                        // Error: TextModel got disposed before DiffEditorWidget model got reset
+                        keepCurrentModifiedModel={true}
+                        keepCurrentOriginalModel={true}
                       />
                       {showWidget && (
                         <ResizableAIWidget
@@ -741,6 +757,11 @@ export const SQLEditor = () => {
                           : ''
                       }
                       id={id}
+                      snippetName={
+                        urlId === 'new'
+                          ? generatedNewSnippetName
+                          : snapV2.snippets[id]?.snippet.name ?? generatedNewSnippetName
+                      }
                       className={cn(isDiffOpen && 'hidden')}
                       editorRef={editorRef}
                       monacoRef={monacoRef}
