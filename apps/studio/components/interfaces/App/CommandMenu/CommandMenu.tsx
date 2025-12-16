@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { IS_PLATFORM } from 'common'
 import { useBranchCommands } from 'components/interfaces/BranchManagement/Branch.Commands'
 import { useConnectCommands } from 'components/interfaces/Connect/Connect.Commands'
@@ -17,8 +18,15 @@ import { useApiUrlCommand } from './ApiUrl'
 import { useProjectSwitchCommand, useConfigureOrganizationCommand } from './OrgProjectSwitcher'
 import { useSupportCommands } from './Support'
 import { orderCommandSectionsByPriority } from './ordering'
+import {
+  SearchContextSelector,
+  getSearchContextPlaceholder,
+  type SearchContextValue,
+} from './SearchContextSelector'
 
 export default function StudioCommandMenu() {
+  const [searchContext, setSearchContext] = useState<SearchContextValue>('actions')
+
   useApiKeysCommands()
   useApiUrlCommand()
   useConnectCommands()
@@ -42,7 +50,10 @@ export default function StudioCommandMenu() {
   return (
     <CommandMenu>
       <CommandHeader>
-        <CommandInput />
+        <CommandInput
+          leftIcon={<SearchContextSelector value={searchContext} onChange={setSearchContext} />}
+          placeholder={getSearchContextPlaceholder(searchContext)}
+        />
       </CommandHeader>
       <CommandList />
     </CommandMenu>
