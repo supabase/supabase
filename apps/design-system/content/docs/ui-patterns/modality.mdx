@@ -22,6 +22,8 @@ The choice between the two simply comes down to the length of the content that n
 
 **Purpose**: Show basic information centered on the screen.
 
+### Best practices
+
 All dialogs should follow this basic advice:
 
 1. **Text should reiterate what the entry button said**
@@ -48,37 +50,41 @@ All dialogs should follow this basic advice:
    - Use semantic HTML and ARIA attributes
    - For critical actions, prevent accidental dismissal
 
+#### Speedbump
+
+Use [Alert Dialog](#alert-dialog) when a single paragraph is enough.
+
+<ComponentPreview name="alert-dialog-demo" />
+
+#### Selection
+
+Use [Confirmation Modal](#confirmation-modal) when you need the user to make a selection or the contents are more than a single paragraph.
+
+<ComponentPreview name="confirmation-modal-demo" />
+
+#### Destructive action
+
+Destructive actions should require the user to slow down and confirm their action. Therefore only use the Alert Dialog scenarios where a `warning` is required but the action after dialog confirmation isn't destructive:
+
+<ComponentPreview name="alert-dialog-warning" />
+
+Use destructive only for file deletions:
+
+<ComponentPreview name="alert-dialog-destructive" />
+
+A `destructive` pattern here is too easy to skip over.
+
+Use a Text Confirm Dialog to slow folks down and force consideration:
+
+<ComponentPreview name="text-confirm-dialog-demo" />
+
 ### Components
-
-#### [Dialog](../components/dialog)
-
-<ComponentPreview name="dialog-demo" wide />
-
-A versatile modal window used for a wider range of interactions, such as displaying a list of options, complex forms, or non-urgent information. Can be dismissed by clicking outside the dialog area or pressing the 'Escape' key.
-
-**When to use**:
-
-- Non-critical information displays
-- Forms that can be cancelled without consequences
-- Content that benefits from being centered
-- Multi-step workflows
-
-#### [AlertDialog](../components/alert-dialog)
-
-<ComponentPreview name="alert-dialog-demo" peekCode wide />
-
-Interrupts the user's workflow to communicate critical information or warnings and requires an explicit acknowledgment or decision (e.g., "Are you sure you want to delete this?"). Cannot be dismissed by clicking outside the modal, forcing the user to interact with one of the provided action buttons.
-
-**When to use**:
-
-- Critical confirmations (delete, destructive actions)
-- Important warnings that require acknowledgment
-- Actions that cannot be undone
-- Situations where accidental dismissal would be problematic
 
 #### [Confirmation Modal](../fragments/confirmation-modal)
 
 A convenience wrapper that simplifies common confirmation patterns.
+
+<ComponentPreview name="confirmation-modal-demo" />
 
 **When to use**:
 
@@ -90,6 +96,8 @@ A convenience wrapper that simplifies common confirmation patterns.
 
 #### [Text Confirm Modal](../fragments/text-confirm-dialog)
 
+<ComponentPreview name="text-confirm-dialog-demo" />
+
 Requires the user to enter an exact string before they can continue with a destructive action, like deletion.
 
 **When to use**:
@@ -98,9 +106,37 @@ Requires the user to enter an exact string before they can continue with a destr
 - When you need extra confirmation beyond a simple button click
 - Actions that are irreversible and need explicit user intent
 
+#### [Alert Dialog](../components/alert-dialog)
+
+<ComponentPreview name="alert-dialog-demo" />
+
+Interrupts the user's workflow to communicate critical information or warnings and requires an explicit acknowledgment or decision (e.g., "Are you sure you want to delete this?"). Cannot be dismissed by clicking outside the modal, forcing the user to interact with one of the provided action buttons.
+
+**When to use**:
+
+- Critical confirmations (delete, destructive actions)
+- Important warnings that require acknowledgment
+- Actions that cannot be undone
+- Situations where accidental dismissal would be problematic
+
+#### [Dialog](../components/dialog)
+
+<ComponentPreview name="dialog-demo" />
+
+A versatile modal window used for a wider range of interactions, such as displaying a list of options, complex forms, or non-urgent information. Can be dismissed by clicking outside the dialog area or pressing the 'Escape' key.
+
+**When to use**:
+
+- Non-critical information displays
+- Forms that can be cancelled without consequences
+- Content that benefits from being centered
+- Multi-step workflows
+
 ## Sheets
 
 **Purpose**: Show temporary information that is larger than a few fields, typically sliding in from the side.
+
+### Best practices
 
 **When to use**:
 
@@ -117,4 +153,4 @@ Requires the user to enter an exact string before they can continue with a destr
 
 Note: Sheets block underlying content by design, since action on their contents is required for a user to proceed. If you want a sheet-like element to accompany page-level elements (such as a list of logs), you need to set ``modal={false}` like [this example](../components/sheet#nonmodal).
 
-<ComponentPreview name="sheet-demo" wide />
+<ComponentPreview name="sheet-demo" />

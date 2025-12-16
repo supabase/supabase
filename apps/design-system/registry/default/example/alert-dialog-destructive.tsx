@@ -15,20 +15,22 @@ export default function AlertDialogDestructive() {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button type="outline">Show Alert Dialog</Button>
+        <Button type="danger">Show Alert Dialog</Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete account</AlertDialogTitle>
+          <AlertDialogTitle>
+            Delete <code className="text-code-inline">hello-world</code>
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your account and remove your
-            data from our servers.
+            This action cannot be undone. Ensure that you have a backup in case you want to restore
+            this edge function.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           {/* [Danny] Add type="danger" to this AlertDialogAction once supported with #41336  */}
-          <AlertDialogAction>Delete account</AlertDialogAction>
+          <AlertDialogAction>Delete</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

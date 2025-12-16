@@ -15,11 +15,11 @@ export default function AlertDialogWarning() {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button type="outline">Show Alert Dialog</Button>
+        <Button type="warning">Show Alert Dialog</Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Update branch with modified functions</AlertDialogTitle>
+          <AlertDialogTitle>Update branch</AlertDialogTitle>
           <AlertDialogDescription>
             This branch has 3 modified edge functions that will be overwritten when updating with
             the latest functions from the production branch. This action cannot be undone.
@@ -28,7 +28,7 @@ export default function AlertDialogWarning() {
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           {/* [Danny] Add type="warning" to this AlertDialogAction once supported with #41336  */}
-          <AlertDialogAction>Update branch</AlertDialogAction>
+          <AlertDialogAction>Update</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
