@@ -44,12 +44,6 @@ export const examples: Registry = [
     files: ['example/alert-dialog-demo.tsx'],
   },
   {
-    name: 'alert-dialog-demo',
-    type: 'components:example',
-    registryDependencies: ['alert-dialog', 'button'],
-    files: ['example/alert-dialog-demo.tsx'],
-  },
-  {
     name: 'alert-dialog-close-only',
     type: 'components:example',
     registryDependencies: ['alert-dialog', 'button'],

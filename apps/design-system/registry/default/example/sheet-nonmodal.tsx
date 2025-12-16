@@ -29,9 +29,7 @@ export default function SheetNonmodal() {
         </div>
         <SheetFooter>
           <SheetClose asChild>
-            <Button htmlType="submit" type="outline">
-              Close
-            </Button>
+            <Button type="outline">Close</Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>

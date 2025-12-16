@@ -14,7 +14,7 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-export default function ModalDemo() {
+export default function ConfirmationModalDemo() {
   const [visible, setVisible] = useState(false)
   const form = useForm({
     defaultValues: {

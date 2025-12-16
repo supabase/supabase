@@ -148,17 +148,6 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "alert-dialog-demo": {
-      name: "alert-dialog-demo",
-      type: "components:example",
-      registryDependencies: ["alert-dialog","button"],
-      component: React.lazy(() => import("@/registry/default/example/alert-dialog-demo")),
-      source: "",
-      files: ["registry/default/example/alert-dialog-demo.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
     "alert-dialog-close-only": {
       name: "alert-dialog-close-only",
       type: "components:example",
@@ -1287,7 +1276,7 @@ export const Index: Record<string, any> = {
       registryDependencies: ["sheet"],
       component: React.lazy(() => import("@/registry/default/example/sheet-nonmodal")),
       source: "",
-      files: ["registry/default/example/sheet-demo.tsx"],
+      files: ["registry/default/example/sheet-nonmodal.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
