@@ -85,20 +85,7 @@ The following sections explain how these attributes affect disk performance.
 
 The compute size of your project affects the effective disk throughput and IOPS. The table below shows both the baseline (sustained) limits and the burst (maximum) limits for each instance size. For instance, an 8XL compute instance has a throughput of 1,188 MB/s and IOPS of 40,000.
 
-<table>
-  <thead>
-    <tr>
-      <th>Compute Instance</th>
-      <th>Baseline Throughput (MB/s)</th>
-      <th>Max Throughput (MB/s)</th>
-      <th>Baseline IOPS</th>
-      <th>Max IOPS</th>
-    </tr>
-  </thead>
-  <tbody>
-    <ComputeDiskLimitsTableRows />
-  </tbody>
-</table>
+<ComputeDiskLimitsTable />
 
 Smaller compute instances like Nano, Micro, Small, and Medium can burst above baseline for short periods of time. Once burst capacity is exhausted, performance returns to baseline. If you need consistent disk performance, consider upgrading your compute size.
 
