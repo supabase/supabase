@@ -42,15 +42,18 @@ type AWSAccountsError = ResponseError
 
 export const useAWSAccountsQuery = <TData = AWSAccountsData>(
   { projectRef }: AWSAccountsVariables,
-  { enabled = true, ...options }: UseQueryOptions<AWSAccountsData, AWSAccountsError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: Omit<UseQueryOptions<AWSAccountsData, AWSAccountsError, TData>, 'queryKey' | 'queryFn'> = {}
 ) => {
   return useQuery<AWSAccountsData, AWSAccountsError, TData>({
     queryKey: awsAccountKeys.list(projectRef),
     queryFn: ({ signal }) => getAWSAccounts({ projectRef }, signal),
     enabled: IS_PLATFORM && enabled && typeof projectRef !== 'undefined',
-    refetchInterval: (data) => {
+    refetchInterval: (query) => {
       // Poll every 5 seconds if any accounts are in transitional states
-      const accounts = data as unknown as AWSAccount[]
+      const accounts = query.state.data
       const hasTransitionalStates = accounts?.some(
         (account: AWSAccount) => account.status === 'CREATING' || account.status === 'DELETING'
       )
