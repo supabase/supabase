@@ -1,7 +1,6 @@
 import { ProjectDetail } from 'data/projects/project-detail-query'
 import { PlanId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
-import { z } from 'zod'
 import { computeInstanceAddonVariantIdSchema } from 'shared-data'
 import {
   ComputeInstanceAddonVariantId,
@@ -10,10 +9,6 @@ import {
 } from './DiskManagement.types'
 import { DISK_LIMITS, DISK_PRICING, DiskType, PLAN_DETAILS } from './ui/DiskManagement.constants'
 import { COMPUTE_BASELINE_IOPS } from 'shared-data'
-
-const isSupportedComputeVariant = (
-  variant: z.infer<typeof computeInstanceAddonVariantIdSchema>
-): variant is ComputeInstanceAddonVariantId => variant !== 'ci_pico'
 
 // Included disk size only applies to primary, not replicas
 export const calculateDiskSizePrice = ({
@@ -253,7 +248,7 @@ export const calculateIopsRequiredForThroughput = (throughput: number) => {
 
 export const calculateBaselineIopsForComputeSize = (computeSize: string): number => {
   const parsed = computeInstanceAddonVariantIdSchema.safeParse(computeSize)
-  if (!parsed.success || !isSupportedComputeVariant(parsed.data)) return 0
+  if (!parsed.success) return 0
   return COMPUTE_BASELINE_IOPS[parsed.data] ?? 0
 }
 
@@ -265,9 +260,7 @@ export const calculateComputeSizeRequiredForIops = (
   )
     .map(([size, baselineIops]) => {
       const parsedSize = computeInstanceAddonVariantIdSchema.safeParse(size)
-      return parsedSize.success && isSupportedComputeVariant(parsedSize.data)
-        ? [parsedSize.data, baselineIops]
-        : undefined
+      return parsedSize.success ? [parsedSize.data, baselineIops] : undefined
     })
     .filter((value): value is [ComputeInstanceAddonVariantId, number] => value !== undefined)
     .sort((a, b) => a[1] - b[1])
@@ -311,7 +304,7 @@ export const mapComputeSizeNameToAddonVariantId = (
   computeSize: ProjectDetail['infra_compute_size']
 ): ComputeInstanceAddonVariantId => {
   return {
-    pico: 'ci_pico',
+    pico: 'ci_nano',
     nano: 'ci_nano',
     micro: 'ci_micro',
     small: 'ci_small',
