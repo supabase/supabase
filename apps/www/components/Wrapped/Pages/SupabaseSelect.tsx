@@ -69,7 +69,7 @@ function RotatingImage({
 export const SupabaseSelect = () => {
   return (
     <>
-      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x border-b">
+      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x border-b w-[95%] md:w-full">
         {/* Grid background */}
         <AnimatedGridBackground
           cols={5}
@@ -91,14 +91,14 @@ export const SupabaseSelect = () => {
         </div>
       </section>
 
-      <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 lg:px-8 py-12">
+      <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 lg:px-8 py-12 w-[95%] md:w-full">
         <h3 className="text-lg">
           Our first user conference was a blast — Thank you for being part of it.
         </h3>
       </div>
 
       {/* Grid separator top */}
-      <div className="relative max-w-[60rem] h-[100px] mx-auto border-x border-b">
+      <div className="relative max-w-[60rem] h-[100px] mx-auto border-x border-b w-[95%] md:w-full">
         <AnimatedGridBackground
           cols={5}
           rows={1}
@@ -202,7 +202,10 @@ function GalleryGrid() {
   }, [isInView, rotateSlot])
 
   return (
-    <div ref={ref} className="relative max-w-[60rem] mx-auto border-x border-b p-3">
+    <div
+      ref={ref}
+      className="relative max-w-[60rem] mx-auto border-x border-b p-3 w-[95%] md:w-full"
+    >
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-2 auto-rows-[200px]">
         {gallerySlots.map((slot, index) => (
           <RotatingImage

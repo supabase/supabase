@@ -179,7 +179,7 @@ export const Intro = () => {
   return (
     <Scrollytelling.Root>
       <Scrollytelling.Pin childHeight={'100vh'} pinSpacerHeight={`${titles.length * 60}vh`} top={0}>
-        <section className="h-screen border-x border-b max-w-[60rem] mx-auto">
+        <section className="h-screen border-x border-b max-w-[60rem] mx-auto w-[95%] md:w-full">
           <div className="h-full grid place-items-center px-4 relative overflow-hidden">
             {/* Floating boxes */}
             <FloatingBoxes />

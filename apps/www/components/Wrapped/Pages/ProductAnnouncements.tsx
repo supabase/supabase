@@ -295,7 +295,7 @@ function MonthSection({ month }: { month: Month }) {
 export const ProductAnnouncements = () => {
   return (
     <>
-      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x border-b">
+      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x border-b w-[95%] md:w-full">
         {/* Grid background */}
         <AnimatedGridBackground
           cols={5}
@@ -317,12 +317,12 @@ export const ProductAnnouncements = () => {
         </div>
       </section>
 
-      <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 lg:px-8 py-12">
+      <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 lg:px-8 py-12 w-[95%] md:w-full">
         <h3 className="text-lg">Product Announcements — Everything we shipped in 2025.</h3>
       </div>
 
       {/* Months accordion - 2 columns, top-to-bottom flow */}
-      <div className="relative max-w-[60rem] mx-auto border-x border-b">
+      <div className="relative max-w-[60rem] mx-auto border-x border-b w-[95%] md:w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           {/* Smaller breakpoint: chronological order for one column */}
           {months.map((month, index) => (

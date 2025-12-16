@@ -77,7 +77,7 @@ export const CustomerStories = () => {
 
   return (
     <>
-      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x border-b">
+      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x border-b w-[95%] md:w-full">
         {/* Grid background */}
         <AnimatedGridBackground
           cols={5}
@@ -100,12 +100,12 @@ export const CustomerStories = () => {
       </section>
 
       {/* NOTE (Alan): extra padding here to optically align subheading with header */}
-      <div className="relative max-w-[60rem] mx-auto border-x border-b px-6 lg:px-10 py-12">
+      <div className="relative max-w-[60rem] mx-auto border-x border-b px-6 lg:px-10 py-12 w-[95%] md:w-full">
         <h3 className="text-lg">Customers count on Supabase.</h3>
       </div>
 
       {/* Testimonials grid */}
-      <div className="relative max-w-[60rem] mx-auto border-x border-b">
+      <div className="relative max-w-[60rem] mx-auto border-x border-b w-[95%] md:w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           {(() => {
             const remainder = testimonials.length % cols
@@ -119,7 +119,7 @@ export const CustomerStories = () => {
                     key={testimonial.company}
                     href={testimonial.url}
                     className={cn(
-                      'group px-6 py-8 border-r border-muted lg:[&:nth-child(2n)]:border-r-0 hover:bg-surface-75 transition-colors',
+                      'group px-6 py-8 lg:border-r border-muted lg:[&:nth-child(2n)]:border-r-0 hover:bg-surface-75 transition-colors',
                       index < totalItems - 2 ? 'border-b' : 'lg:border-b-0',
                       index < totalItems - 1 ? 'border-b' : 'border-b-0'
                     )}
@@ -148,6 +148,7 @@ export const CustomerStories = () => {
                     </div>
                   </Link>
                 ))}
+
                 {Array.from({ length: emptyCells }).map((_, i) => (
                   <div
                     key={`empty-${i}`}
