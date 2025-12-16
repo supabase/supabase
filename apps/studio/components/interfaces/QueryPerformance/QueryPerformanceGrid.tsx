@@ -614,6 +614,7 @@ export const QueryPerformanceGrid = ({
                   reportType={reportType}
                   selectedRow={reportData[selectedRow]}
                   onClickViewSuggestion={() => setView('suggestion')}
+                  onClose={() => setSelectedRow(undefined)}
                 />
               )}
             </TabsContent_Shadcn_>
