@@ -90,7 +90,7 @@ You can control whether the dialog is centered by passing `centered={false}` to 
 To activate the `Dialog` component from within a `Context Menu` or `Dropdown Menu`, you must encase the `Context Menu` or
 `Dropdown Menu` component in the `Dialog` component. For more information, refer to the linked issue [here](https://github.com/radix-ui/primitives/issues/1836).
 
-```tsx {7-11, 14-24}
+```tsx {7-11, 14-23}
 <Dialog>
   <ContextMenu>
     <ContextMenuTrigger>Show Menu</ContextMenuTrigger>
@@ -108,7 +108,6 @@ To activate the `Dialog` component from within a `Context Menu` or `Dropdown Men
     <DialogHeader>
       <DialogTitle>Edit profile</DialogTitle>
       <DialogDescription>Make changes to your profile here.</DialogDescription>
-      </DialogDescription>
     </DialogHeader>
     <DialogFooter>
       <Button>Save changes</Button>

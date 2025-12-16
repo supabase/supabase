@@ -50,12 +50,6 @@ export const examples: Registry = [
     files: ['example/alert-dialog-close-only.tsx'],
   },
   {
-    name: 'aspect-ratio-demo',
-    type: 'components:example',
-    registryDependencies: ['aspect-ratio'],
-    files: ['example/aspect-ratio-demo.tsx'],
-  },
-  {
     name: 'alert-dialog-destructive',
     type: 'components:example',
     registryDependencies: ['alert-dialog', 'button'],
@@ -66,6 +60,12 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['alert-dialog', 'button'],
     files: ['example/alert-dialog-warning.tsx'],
+  },
+  {
+    name: 'aspect-ratio-demo',
+    type: 'components:example',
+    registryDependencies: ['aspect-ratio'],
+    files: ['example/aspect-ratio-demo.tsx'],
   },
   {
     name: 'avatar-demo',
