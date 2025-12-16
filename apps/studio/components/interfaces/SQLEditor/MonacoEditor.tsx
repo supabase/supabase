@@ -188,7 +188,7 @@ const MonacoEditor = ({
   function handleEditorChange(value: string | undefined) {
     tabsSnap.makeActiveTabPermanent()
     if (id && value) {
-      if (ref && profile !== undefined && project !== undefined) {
+      if (!snippet && ref && profile !== undefined && project !== undefined) {
         const snippet = createSqlSnippetSkeletonV2({
           idOverride: id,
           name: snippetName,
@@ -198,6 +198,8 @@ const MonacoEditor = ({
         })
         snapV2.addSnippet({ projectRef: ref, snippet })
         router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
+        // needed to invalidate all data in the snippets list so that the new snippet is shown in the list.
+        snapV2.addNeedsSaving(snippet.id)
       }
       setValue(value)
     }
