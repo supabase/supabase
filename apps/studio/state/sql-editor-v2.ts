@@ -263,6 +263,7 @@ export const useSnippetFolders = (projectRef: string) => {
       Object.values(snapshot.folders)
         .filter((x) => x.projectRef === projectRef)
         .map((x) => x.folder)
+        // folders don't have created_at or inserted_at, so we always sort by name
         .sort((a, b) => a.name.localeCompare(b.name)),
     [projectRef, snapshot.folders]
   )

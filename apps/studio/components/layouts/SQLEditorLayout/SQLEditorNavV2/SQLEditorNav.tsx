@@ -145,7 +145,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         }) ?? [],
     [filteredSnippets.snippets, sort]
   )
-  const folders = useSnippetFolders(projectRef as string)
+  const folders = useSnippetFolders(projectRef!)
 
   const { data: snippetCountData } = useContentCountQuery({
     projectRef,
