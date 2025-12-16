@@ -83,11 +83,11 @@ movies = supabase.table("movies")
 selected = [PublicMovies(m) for m in .select("*").execute().data]
 
 # Insert
-inserted = [PublicMovies(m) for m in users.insert(PublicMoviesInsert(name="foo", status="bar")) \
+inserted = [PublicMovies(m) for m in movies.insert(PublicMoviesInsert(name="foo", data="bar")) \
                                           .execute().data]
 
 # Update
-updated  = [PublicMovies(m) for m in users.update(PublicMoviesUpdate(name="bar")) \
+updated  = [PublicMovies(m) for m in movies.update(PublicMoviesUpdate(name="bar")) \
                                         .eq("id", 5) \
                                         .execute().data]
 ```
