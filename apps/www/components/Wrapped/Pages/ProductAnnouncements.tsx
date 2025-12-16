@@ -248,6 +248,10 @@ const months: Month[] = [
         title: 'Async Streaming for Postgres Foreign Data Wrappers',
         url: 'https://supabase.com/blog/async-postgres-fdws',
       },
+      {
+        title: 'Own Your Observability: Supabase Metrics API',
+        url: 'https://supabase.com/blog/metrics-api-observability',
+      },
     ],
   },
 ]
