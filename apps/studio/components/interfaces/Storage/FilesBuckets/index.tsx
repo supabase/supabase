@@ -52,7 +52,7 @@ export const FilesBuckets = () => {
     data: bucketsData,
     error: bucketsError,
     isError: isErrorBuckets,
-    isLoading: isLoadingBuckets,
+    isPending: isLoadingBuckets,
     isSuccess: isSuccessBuckets,
     isFetching: isFetchingBuckets,
     fetchNextPage,

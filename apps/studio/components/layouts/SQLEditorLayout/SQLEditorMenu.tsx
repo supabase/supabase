@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { getAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -148,10 +149,12 @@ export const SQLEditorMenu = () => {
                 <FilePlus size={14} />
                 Create a new snippet
               </DropdownMenuItem>
-              <DropdownMenuItem className="gap-x-2" onClick={() => createNewFolder()}>
-                <FolderPlus size={14} />
-                Create a new folder
-              </DropdownMenuItem>
+              {IS_PLATFORM && (
+                <DropdownMenuItem className="gap-x-2" onClick={() => createNewFolder()}>
+                  <FolderPlus size={14} />
+                  Create a new folder
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

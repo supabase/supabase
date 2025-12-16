@@ -793,5 +793,12 @@
     "position": "Product Manager",
     "author_url": "https://github.com/smeubank",
     "author_image_url": "https://github.com/smeubank.png"
+  },
+  {
+    "author_id": "katerina_skroumpelou",
+    "author": "Katerina Skroumpelou",
+    "position": "Engineering",
+    "author_url": "https://github.com/mandarini",
+    "author_image_url": "https://github.com/mandarini.png"
   }
 ]

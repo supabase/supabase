@@ -114,6 +114,7 @@ Laurence Isla
 Leigh Anne Applewhite
 Lenny Urbanowski
 Leonardo Santiago
+Liam Cloud Hogan
 Long Hoang
 Luca Forstner
 Łukasz Niemier
@@ -121,9 +122,11 @@ Maksym Ionutsa
 Manan Gupta
 Margarita Sandomirskaia
 Mark Burggraf
+Marouane Souda
 Matthew Hambright
 Matt Johnston
 Matt Rossman
+Matthias Luft
 Miles Thomas
 Monica Khoury
 Mykhailo Mischa Lieibenson
@@ -136,6 +139,7 @@ Pamela Chia
 Paul Caselton
 Paul Cioanca
 Paul Copplestone
+Paul Ibeabuchi
 Pavel Borisov
 Paweł Gulbinowicz
 Pedro Rodrigues

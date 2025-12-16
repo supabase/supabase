@@ -53,6 +53,9 @@ const NestedProperties = defineNestedType(() => ({
     reactAccessibleTreeview: {
       type: 'boolean',
     },
+    recharts: {
+      type: 'boolean',
+    },
   },
 }))
 

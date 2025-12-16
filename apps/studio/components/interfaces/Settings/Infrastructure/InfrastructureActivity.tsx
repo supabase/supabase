@@ -17,17 +17,17 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DataPoint } from 'data/analytics/constants'
+import { mapMultiResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
 import {
   InfraMonitoringAttribute,
   useInfraMonitoringAttributesQuery,
 } from 'data/analytics/infra-monitoring-query'
-import { mapMultiResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
@@ -62,7 +62,7 @@ export const InfrastructureActivity = () => {
   const state = useDatabaseSelectorStateSnapshot()
   const [dateRange, setDateRange] = useState<any>()
 
-  const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
+  const { data: subscription, isPending: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: organization?.slug,
   })
   const isFreePlan = organization?.plan?.id === 'free'
@@ -153,7 +153,7 @@ export const InfrastructureActivity = () => {
     }
   }
 
-  const { data: infraMonitoringData, isLoading: isLoadingInfraData } =
+  const { data: infraMonitoringData, isPending: isLoadingInfraData } =
     useInfraMonitoringAttributesQuery({
       projectRef,
       attributes: INFRA_ATTRIBUTES,
@@ -212,11 +212,7 @@ export const InfrastructureActivity = () => {
       </ScaffoldContainer>
       <ScaffoldContainer className="sticky top-0 py-6 border-b bg-studio z-10">
         <div className="flex items-center gap-x-4">
-          <DatabaseSelector
-            onCreateReplicaClick={() => {
-              setShowNewReplicaPanel(true)
-            }}
-          />
+          <DatabaseSelector />
           {!isLoadingSubscription && (
             <>
               <DateRangePicker

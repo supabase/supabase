@@ -7,7 +7,6 @@ import { BASE_PATH } from 'lib/constants'
 import {
   Button,
   Card,
-  cn,
   Skeleton,
   Table,
   TableBody,
@@ -36,62 +35,6 @@ export const Header = () => {
   )
 }
 
-export const NoFilterResults = ({
-  filterStatus,
-  resetFilterStatus,
-  className,
-}: {
-  filterStatus: string[]
-  resetFilterStatus?: () => void
-  className?: string
-}) => {
-  return (
-    <div
-      className={cn(
-        'bg-surface-100 px-4 md:px-6 py-4 rounded flex items-center justify-between border border-default',
-        className
-      )}
-    >
-      <div className="space-y-1">
-        {/* [Joshen] Just keeping it simple for now unless we decide to extend this to other statuses */}
-        <p className="text-sm text-foreground">
-          {filterStatus.length === 0
-            ? `No projects found`
-            : `No ${filterStatus[0] === 'INACTIVE' ? 'paused' : 'active'} projects found`}
-        </p>
-        <p className="text-sm text-foreground-light">
-          Your search for projects with the specified status did not return any results
-        </p>
-      </div>
-      {resetFilterStatus !== undefined && (
-        <Button type="default" onClick={() => resetFilterStatus()}>
-          Reset filter
-        </Button>
-      )}
-    </div>
-  )
-}
-
-export const LoadingTableRow = () => (
-  <TableRow>
-    <TableCell>
-      <Skeleton className="bg-surface-400 h-4 w-32"></Skeleton>
-    </TableCell>
-    <TableCell>
-      <Skeleton className="bg-surface-400 h-4 w-16"></Skeleton>
-    </TableCell>
-    <TableCell>
-      <Skeleton className="bg-surface-400 h-4 w-20"></Skeleton>
-    </TableCell>
-    <TableCell>
-      <Skeleton className="bg-surface-400 h-4 w-20"></Skeleton>
-    </TableCell>
-    <TableCell>
-      <Skeleton className="bg-surface-400 h-4 w-24"></Skeleton>
-    </TableCell>
-  </TableRow>
-)
-
 export const LoadingTableView = () => {
   return (
     <Card>
@@ -107,7 +50,23 @@ export const LoadingTableView = () => {
         </TableHeader>
         <TableBody>
           {[...Array(3)].map((_, i) => (
-            <LoadingTableRow key={i} />
+            <TableRow key={i}>
+              <TableCell>
+                <Skeleton className="bg-surface-400 h-4 w-32"></Skeleton>
+              </TableCell>
+              <TableCell>
+                <Skeleton className="bg-surface-400 h-4 w-16"></Skeleton>
+              </TableCell>
+              <TableCell>
+                <Skeleton className="bg-surface-400 h-4 w-20"></Skeleton>
+              </TableCell>
+              <TableCell>
+                <Skeleton className="bg-surface-400 h-4 w-20"></Skeleton>
+              </TableCell>
+              <TableCell>
+                <Skeleton className="bg-surface-400 h-4 w-24"></Skeleton>
+              </TableCell>
+            </TableRow>
           ))}
         </TableBody>
       </Table>
@@ -142,7 +101,7 @@ export const NoProjectsState = ({ slug }: { slug: string }) => {
   )
 }
 
-export const NoOrganizationsState = ({}) => {
+export const NoOrganizationsState = () => {
   return (
     <EmptyStatePresentational
       title="Create an organization"
