@@ -169,7 +169,7 @@ Follow the same configuration guide as if your app was a Web application when bu
   </TabPanel>
   </$Show>
 
-  <TabPanel id="android" label="Android (Kotlin)">
+  <TabPanel id="android" label="Kotlin (Android and iOS)">
 
 1. [Create a new OAuth client ID](https://console.cloud.google.com/auth/clients/create) and choose **Android** or **iOS** if also building an iOS app with Kotlin Multiplatform.
    - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
@@ -597,7 +597,7 @@ This call takes the user to Google's consent screen. Once the flow ends, the use
 
 </TabPanel>
 
-<TabPanel id="android" label="Android (Kotlin)">
+<TabPanel id="android" label="Kotlin (Android)">
 
 ### Using Google sign-in on Android
 
@@ -696,13 +696,20 @@ fun GoogleSignInButton() {
 }
 ```
 
+</TabPanel>
+
+<TabPanel id="kotlin-mp" label="Kotlin (Multiplatform)">
+
 ### Using Google sign-in with Kotlin Multiplatform
 
-When using [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/), you can use the [compose-auth](/docs/reference/kotlin/installing) plugin. On Android it uses the Credential Manager automatically and on other platforms it uses `auth.signInWith(Google)`.
+When using [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/), you can use the [compose-auth](https://github.com/supabase-community/supabase-kt-plugins/tree/main/ComposeAuth) plugin.
+- On Android it uses the system's [Credential Manager](https://developer.android.com/identity/sign-in/credential-manager-siwg). [Setup guide](https://github.com/supabase-community/supabase-kt-plugins/blob/main/ComposeAuth/README.md#native-google-auth-on-android)
+- On iOS it uses the [GoogleSignIn-iOS library](https://github.com/google/GoogleSignIn-iOS). [Setup guide](https://github.com/supabase-community/supabase-kt-plugins/blob/main/ComposeAuth/README.md#native-google-auth-on-ios)
+- On other platforms it uses normal OAuth via `supabase.auth.signInWith(Google)`
 
 **Initialize the Supabase Client**
 
-**Note:** You have to create OAuth credentials for both a Web and Android application. [Learn more](https://developer.android.com/identity/legacy/one-tap/legacy-get-started)
+**Note:** You have to create OAuth credentials for both a Web and Android application. [Learn more](https://developer.android.com/identity/sign-in/credential-manager-siwg#set-google)
 
 ```kotlin
 val supabaseClient = createSupabaseClient(
