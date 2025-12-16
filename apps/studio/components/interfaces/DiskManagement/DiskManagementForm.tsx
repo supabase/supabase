@@ -140,7 +140,7 @@ export function DiskManagementForm() {
     provisionedIOPS: iops,
     throughput: throughput_mbps,
     totalSize: size_gb,
-    computeSize,
+    computeSize: computeSize ?? 'ci_micro',
     growthPercent: growth_percent,
     minIncrementGb: min_increment_gb,
     maxSizeGb: max_size_gb,
