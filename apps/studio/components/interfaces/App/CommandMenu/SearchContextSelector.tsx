@@ -67,7 +67,10 @@ export function SearchContextSelector({ value, onChange }: SearchContextSelector
           className="group flex items-center gap-0.5 shrink-0 text-foreground-muted hover:text-foreground-light transition-colors"
           aria-label="Select search context"
         >
-          <CurrentIcon className="h-4 w-4 text-foreground-lighter group-hover:text-foreground-light transition-colors" />
+          <CurrentIcon
+            className="h-4 w-4 text-foreground-lighter group-hover:text-foreground-light transition-colors"
+            strokeWidth={1.5}
+          />
           <ChevronDown className="h-3 w-3" />
         </button>
       </PopoverTrigger_Shadcn_>
@@ -84,12 +87,15 @@ export function SearchContextSelector({ value, onChange }: SearchContextSelector
                 setOpen(false)
               }}
               className={cn(
-                'flex items-center gap-2 w-full px-2 py-1.5 text-sm rounded-sm transition-colors',
+                'flex group items-center gap-2 w-full px-2 py-1.5 text-sm rounded-sm transition-colors hover:text-foreground',
                 'hover:bg-surface-200',
                 isSelected && 'bg-surface-200 text-foreground'
               )}
             >
-              <Icon className="!h-4 !w-4" strokeWidth={1} />
+              <Icon
+                className="!h-4 !w-4 text-foreground-lighter group-hover:text-foreground transition-colors"
+                strokeWidth={1.5}
+              />
               <span>{option.label}</span>
             </button>
           )
