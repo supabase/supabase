@@ -124,8 +124,8 @@ export const ValidateSizeLimit = ({
             <button
               type="button"
               className={cn(
-                'mt-2 ml-auto underline text-foreground-light',
-                '!w-fit',
+                'mt-2 ml-auto text-foreground-lighter',
+                '!w-fit text-xs',
                 isValidating ? 'cursor-wait' : 'hover:text-foreground'
               )}
               onClick={() => setShowModal(true)}
@@ -134,26 +134,26 @@ export const ValidateSizeLimit = ({
               {isValidating ? 'Validating...' : 'Validate size limit'}
             </button>
           </TooltipTrigger>
-          <TooltipContent>
+          <TooltipContent side="bottom">
             <p>Check that all existing buckets fit within this limit</p>
           </TooltipContent>
         </Tooltip>
       )}
 
       {hasUnsuccessfulValidation && (
-        <div className="mt-2 text-sm text-right text-destructive">
+        <div className="mt-2 text-xs text-right text-destructive">
           <StorageFileSizeLimitErrorMessage error={bucketLimitError} projectRef={projectRef} />
         </div>
       )}
 
       {hasSuccessfulValidation && (
-        <p className="mt-2 text-sm text-right text-foreground-light">
+        <p className="mt-2 text-xs text-right text-foreground-light">
           All buckets fit within this limit.
         </p>
       )}
 
       {validationError && (
-        <p className="mt-2 text-sm text-right text-destructive">
+        <p className="mt-2 text-xs text-right text-destructive">
           Failed to validate bucket limits: {validationError}
         </p>
       )}
@@ -161,6 +161,7 @@ export const ValidateSizeLimit = ({
       <ConfirmationModal
         visible={showModal}
         loading={isValidating}
+        size="medium"
         title="Validate bucket size limits"
         description="Make sure no bucket-specific limit exceeds the new global limit."
         confirmLabel="Run validation"
@@ -168,8 +169,8 @@ export const ValidateSizeLimit = ({
         onConfirm={handleValidate}
       >
         <p className="text-sm text-foreground-light">
-          Running this queries your <code>storage.buckets</code> table, which may cause load on your
-          database because you have &gt;{' '}
+          Running this queries the <code className="text-code-inline">storage.buckets</code> table,
+          which may cause load on your database because you have more than{' '}
           {THRESHOLD_FOR_AUTO_QUERYING_BUCKET_LIMITS.toLocaleString()} buckets.
         </p>
       </ConfirmationModal>
