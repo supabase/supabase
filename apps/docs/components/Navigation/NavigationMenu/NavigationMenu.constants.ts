@@ -356,6 +356,10 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/hono',
         },
         {
+          name: 'Expo React Native',
+          url: '/guides/getting-started/quickstarts/expo-react-native',
+        },
+        {
           name: 'Flutter',
           url: '/guides/getting-started/quickstarts/flutter',
         },
@@ -375,6 +379,10 @@ export const gettingstarted: NavMenuConstant = {
           name: 'Flask (Python)',
           url: '/guides/getting-started/quickstarts/flask' as `/${string}`,
           enabled: !jsOnly,
+        },
+        {
+          name: 'TanStack Start',
+          url: '/guides/getting-started/quickstarts/tanstack' as `/${string}`,
         },
         {
           name: 'Laravel PHP',
