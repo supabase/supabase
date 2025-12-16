@@ -19,6 +19,8 @@ hideToc: true
 
     Create a minimal Expo app using the `create-expo-app` command with the blank TypeScript template.
 
+    <$Partial path="uiLibCta.mdx" />
+
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -69,6 +71,7 @@ hideToc: true
       EXPO_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
       EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
       ```
+      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "", "tab": "" }} />
 
     </StepHikeCompact.Code>
 
@@ -77,9 +80,9 @@ hideToc: true
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Initialize the Supabase client">
 
-    Create a helper file to initialize the Supabase client using the environment variables.
+    Create a helper file at `lib/supabase.ts` to initialize the Supabase client using the environment variables.
 
-    The code below uses AsyncStorage to persist the user session in your app.
+    The code below uses [AsyncStorage](https://www.npmjs.com/package/@react-native-async-storage/async-storage) to persist the user session in your app.
 
     </StepHikeCompact.Details>
 
