@@ -25,7 +25,8 @@ export async function updateDiskAttributes(updates: UpdateDiskAttributesVariable
     updates.storageType === 'gp3'
       ? {
           iops: updates.provisionedIOPS,
-          // API field name is throughput_mbps but value is MB/s
+          // API field name is throughput_mbps but backend expects MiB/s; UI stores MB/s (decimal).
+          // If backend tightens to true MiB/s, convert here before sending.
           throughput_mbps: updates.throughput!,
           size_gb: updates.totalSize,
           type: updates.storageType,
