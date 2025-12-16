@@ -1,7 +1,7 @@
 import Editor, { DiffEditor, Monaco, OnMount } from '@monaco-editor/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Command } from 'lucide-react'
-import { editor as monacoEditor } from 'monaco-editor'
+import type { editor as monacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 

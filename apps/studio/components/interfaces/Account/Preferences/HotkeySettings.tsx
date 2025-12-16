@@ -4,10 +4,25 @@ import * as z from 'zod'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import Panel from 'components/ui/Panel'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, KeyboardShortcut, Switch } from 'ui'
+import {
+  Card,
+  CardContent,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Form_Shadcn_,
+  KeyboardShortcut,
+  Switch,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 const HotkeySchema = z.object({
   commandMenuEnabled: z.boolean(),
@@ -39,99 +54,102 @@ export const HotkeySettings = () => {
   })
 
   return (
-    <Panel
-      title={
-        <div>
-          <h5 id="keyboard-shortcuts">Keyboard shortcuts</h5>
-          <p className="text-sm text-foreground-lighter">
-            Choose which shortcuts stay active while working in the dashboard
-          </p>
-        </div>
-      }
-    >
-      <Form_Shadcn_ {...form}>
-        <Panel.Content className="border-b">
-          <FormField_Shadcn_
-            control={form.control}
-            name="commandMenuEnabled"
-            render={({ field }) => (
-              <FormItemLayout
-                layout="flex-row-reverse"
-                label={
-                  <div className="flex items-center gap-x-3">
-                    <KeyboardShortcut keys={['Meta', 'k']} />
-                    <span>Command menu</span>
-                  </div>
-                }
-              >
-                <FormControl_Shadcn_>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={(value) => {
-                      field.onChange(value)
-                      setCommandMenuEnabled(value)
-                    }}
-                  />
-                </FormControl_Shadcn_>
-              </FormItemLayout>
-            )}
-          />
-        </Panel.Content>
-        <Panel.Content className="border-b">
-          <FormField_Shadcn_
-            control={form.control}
-            name="aiAssistantEnabled"
-            render={({ field }) => (
-              <FormItemLayout
-                layout="flex-row-reverse"
-                label={
-                  <div className="flex items-center gap-x-3">
-                    <KeyboardShortcut keys={['Meta', 'i']} />
-                    <span>AI Assistant Panel</span>
-                  </div>
-                }
-              >
-                <FormControl_Shadcn_>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={(value) => {
-                      field.onChange(value)
-                      setAiAssistantEnabled(value)
-                    }}
-                  />
-                </FormControl_Shadcn_>
-              </FormItemLayout>
-            )}
-          />
-        </Panel.Content>
-        <Panel.Content>
-          <FormField_Shadcn_
-            control={form.control}
-            name="inlineEditorEnabled"
-            render={({ field }) => (
-              <FormItemLayout
-                layout="flex-row-reverse"
-                label={
-                  <div className="flex items-center gap-x-3">
-                    <KeyboardShortcut keys={['Meta', 'e']} />
-                    <span>Inline SQL Editor Panel</span>
-                  </div>
-                }
-              >
-                <FormControl_Shadcn_>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={(value) => {
-                      field.onChange(value)
-                      setInlineEditorEnabled(value)
-                    }}
-                  />
-                </FormControl_Shadcn_>
-              </FormItemLayout>
-            )}
-          />
-        </Panel.Content>
-      </Form_Shadcn_>
-    </Panel>
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle id="keyboard-shortcuts">Keyboard shortcuts</PageSectionTitle>
+          <PageSectionDescription>
+            Choose which shortcuts stay active while working in the dashboard.
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
+        <Form_Shadcn_ {...form}>
+          <Card>
+            <CardContent className="border-b">
+              <FormField_Shadcn_
+                control={form.control}
+                name="commandMenuEnabled"
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label={
+                      <div className="flex items-center gap-x-3">
+                        <KeyboardShortcut keys={['Meta', 'k']} />
+                        <span>Command menu</span>
+                      </div>
+                    }
+                  >
+                    <FormControl_Shadcn_>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={(value) => {
+                          field.onChange(value)
+                          setCommandMenuEnabled(value)
+                        }}
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            </CardContent>
+            <CardContent className="border-b">
+              <FormField_Shadcn_
+                control={form.control}
+                name="aiAssistantEnabled"
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label={
+                      <div className="flex items-center gap-x-3">
+                        <KeyboardShortcut keys={['Meta', 'i']} />
+                        <span>AI Assistant Panel</span>
+                      </div>
+                    }
+                  >
+                    <FormControl_Shadcn_>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={(value) => {
+                          field.onChange(value)
+                          setAiAssistantEnabled(value)
+                        }}
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            </CardContent>
+            <CardContent>
+              <FormField_Shadcn_
+                control={form.control}
+                name="inlineEditorEnabled"
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label={
+                      <div className="flex items-center gap-x-3">
+                        <KeyboardShortcut keys={['Meta', 'e']} />
+                        <span>Inline SQL Editor Panel</span>
+                      </div>
+                    }
+                  >
+                    <FormControl_Shadcn_>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={(value) => {
+                          field.onChange(value)
+                          setInlineEditorEnabled(value)
+                        }}
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            </CardContent>
+          </Card>
+        </Form_Shadcn_>
+      </PageSectionContent>
+    </PageSection>
   )
 }

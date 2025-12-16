@@ -144,9 +144,10 @@ type TableCreateParams = {
 
 function create({ name, schema = 'public', comment }: TableCreateParams): { sql: string } {
   const tableSql = `CREATE TABLE ${ident(schema)}.${ident(name)} ();`
-  const commentSql = comment
-    ? `COMMENT ON TABLE ${ident(schema)}.${ident(name)} IS ${literal(comment)};`
-    : ''
+  const commentSql =
+    comment != undefined
+      ? `COMMENT ON TABLE ${ident(schema)}.${ident(name)} IS ${literal(comment)};`
+      : ''
   const sql = `BEGIN; ${tableSql} ${commentSql} COMMIT;`
   return { sql }
 }
@@ -230,9 +231,11 @@ $$;
         .join(',')});`
     }
   }
-  const commentSql = !!comment
-    ? `COMMENT ON TABLE ${ident(old.schema)}.${ident(old.name)} IS ${literal(comment)};`
-    : ''
+  const commentSql =
+    comment == undefined
+      ? ''
+      : `COMMENT ON TABLE ${ident(old.schema)}.${ident(old.name)} IS ${literal(comment)};`
+
   // nameSql must be last, right below schemaSql
   const sql = `
 BEGIN;

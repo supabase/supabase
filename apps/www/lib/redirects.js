@@ -55,6 +55,11 @@ module.exports = [
     destination: '/storage',
   },
   {
+    permanent: true,
+    source: '/docs/guides/reports/:match*',
+    destination: '/docs/guides/observability/:match*',
+  },
+  {
     permanent: false,
     source: '/blog/2021/03/08/toad-a-link-shorterner-with-simple-apis-for-low-coders',
     destination: '/blog/2021/03/08/toad-a-link-shortener-with-simple-apis-for-low-coders',
@@ -1299,6 +1304,18 @@ module.exports = [
     destination: '/docs/guides/auth/auth-helpers/auth-ui',
   },
   {
+    permanent: false,
+    source: '/docs/guides/auth/server-side/nextjs',
+    destination:
+      '/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=nextjs',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/auth/server-side/sveltekit',
+    destination:
+      '/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=sveltekit',
+  },
+  {
     permanent: true,
     source: '/docs/guides/client-libraries',
     destination: '/docs#reference-documentation',
@@ -2416,6 +2433,11 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/platform/oauth-apps/authorize-an-oauth-app',
     destination: '/docs/guides/platform/oauth-apps/build-a-supabase-integration',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/build-a-supabase-integration',
+    destination: '/docs/guides/integrations/build-a-supabase-oauth-integration',
   },
   { permanent: true, source: '/docs/reference/cli/config', destination: '/docs/guides/cli/config' },
   {

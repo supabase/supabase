@@ -32,7 +32,7 @@ export const SecretRow = ({ secret, appId }: SecretRowProps) => {
   const generatedBy = members.find((x) => x.gotrue_id === secret.created_by)
   const generatedByName = generatedBy?.username ?? generatedBy?.primary_email ?? secret.created_by
 
-  const { mutate: deleteSecret, isLoading: isDeleting } = useClientSecretDeleteMutation({
+  const { mutate: deleteSecret, isPending: isDeleting } = useClientSecretDeleteMutation({
     onSuccess: () => {
       // Show success toast and close modal after successful deletion
       toast.success('Successfully deleted client secret')

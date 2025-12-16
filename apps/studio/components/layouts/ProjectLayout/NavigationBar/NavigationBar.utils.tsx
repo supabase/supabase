@@ -1,4 +1,4 @@
-import { Blocks, FileText, Lightbulb, List, Settings } from 'lucide-react'
+import { Blocks, FileText, Lightbulb, List, Settings, Telescope } from 'lucide-react'
 
 import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
 import { generateAuthMenu } from 'components/layouts/AuthLayout/AuthLayout.utils'
@@ -7,16 +7,7 @@ import { generateSettingsMenu } from 'components/layouts/ProjectSettingsLayout/S
 import type { Route } from 'components/ui/ui.types'
 import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import type { Project } from 'data/projects/project-detail-query'
-import {
-  Auth,
-  Database,
-  EdgeFunctions,
-  Realtime,
-  Reports,
-  SqlEditor,
-  Storage,
-  TableEditor,
-} from 'icons'
+import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
 export const generateToolRoutes = (ref?: string, project?: Project, features?: {}): Route[] => {
@@ -152,10 +143,10 @@ export const generateOtherRoutes = (
     ...(IS_PLATFORM && reportsEnabled
       ? [
           {
-            key: 'reports',
-            label: 'Reports',
-            icon: <Reports size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/reports`),
+            key: 'observability',
+            label: 'Observability',
+            icon: <Telescope size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/observability`),
           },
         ]
       : []),
@@ -193,7 +184,9 @@ export const generateSettingsRoutes = (ref?: string, project?: Project): Route[]
       key: 'settings',
       label: 'Project Settings',
       icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && `/project/${ref}/settings/general`,
+      link:
+        ref &&
+        (IS_PLATFORM ? `/project/${ref}/settings/general` : `/project/${ref}/settings/log-drains`),
       items: settingsMenu,
     },
   ]

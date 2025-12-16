@@ -32,6 +32,7 @@ interface ProjectAndPlanProps {
   projectRef: string | null
   category: ExtendedSupportCategories
   subscriptionPlanId: string | undefined
+  showPlanExpectationInfo?: boolean
 }
 
 export function ProjectAndPlanInfo({
@@ -40,6 +41,7 @@ export function ProjectAndPlanInfo({
   projectRef,
   category,
   subscriptionPlanId,
+  showPlanExpectationInfo = true,
 }: ProjectAndPlanProps) {
   const { ref } = useHighlightProjectRefContext()
   const hasProjectSelected = projectRef && projectRef !== NO_PROJECT_MARKER
@@ -53,9 +55,13 @@ export function ProjectAndPlanInfo({
         <Admonition type="default" title="Please note that no project has been selected" />
       )}
 
-      {orgSlug && subscriptionPlanId !== 'enterprise' && category !== 'Login_issues' && (
-        <PlanExpectationInfoBox orgSlug={orgSlug} planId={subscriptionPlanId} />
-      )}
+      {showPlanExpectationInfo &&
+        orgSlug &&
+        subscriptionPlanId !== 'enterprise' &&
+        subscriptionPlanId !== 'platform' &&
+        category !== 'Login_issues' && (
+          <PlanExpectationInfoBox orgSlug={orgSlug} planId={subscriptionPlanId} />
+        )}
     </div>
   )
 }

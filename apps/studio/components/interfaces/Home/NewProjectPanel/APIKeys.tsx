@@ -53,19 +53,19 @@ export const APIKeys = () => {
   const {
     data: settings,
     isError: isProjectSettingsError,
-    isLoading: isProjectSettingsLoading,
+    isPending: isProjectSettingsLoading,
   } = useProjectSettingsV2Query({ projectRef })
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef })
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
   const { anonKey, serviceKey } = getKeys(apiKeys)
 
-  // API keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = !anonKey && !serviceKey
 
   const {
     data,
     isError: isJwtSecretUpdateStatusError,
-    isLoading: isJwtSecretUpdateStatusLoading,
+    isPending: isJwtSecretUpdateStatusLoading,
   } = useJwtSecretUpdatingStatusQuery(
     { projectRef },
     { enabled: !isProjectSettingsLoading && isApiKeysEmpty }
@@ -76,11 +76,6 @@ export const APIKeys = () => {
     isJwtSecretUpdateStatusLoading && !isProjectSettingsLoading && isApiKeysEmpty
 
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
-
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys'
-  )
 
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
@@ -158,8 +153,8 @@ export const APIKeys = () => {
                 <div className="space-y-2">
                   <p className="text-sm">API Key</p>
                   <div className="flex items-center space-x-1 -ml-1">
-                    <code className="text-xs">{anonKey?.name}</code>
-                    <code className="text-xs">public</code>
+                    <code className="text-code-inline">{anonKey?.name}</code>
+                    <code className="text-code-inline">public</code>
                   </div>
                 </div>
               }

@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 import { HeaderBanner } from 'components/interfaces/Organization/HeaderBanner'
 
-const IncidentBanner = () => {
+export const IncidentBanner = () => {
   return (
     <Link href="https://status.supabase.com" target="_blank" rel="noopener noreferrer">
       <HeaderBanner
@@ -13,5 +13,3 @@ const IncidentBanner = () => {
     </Link>
   )
 }
-
-export default IncidentBanner

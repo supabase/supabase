@@ -390,3 +390,10 @@ th code {
   --code-token-property: #15593b;
   --code-highlight-color: #1c1c1c;
 }
+
+/* Word wrap styles for code blocks */
+.shiki[data-wrapped='true'] .code-content {
+  overflow-x: hidden !important;
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+}

@@ -3,7 +3,9 @@ import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { UIEvent, useMemo, useRef, useState } from 'react'
 import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
+import { toast } from 'sonner'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet/CreateCronJobSheet'
 import AlertError from 'components/ui/AlertError'
@@ -15,12 +17,15 @@ import {
 } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { BASE_PATH } from 'lib/constants'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import { Button, cn, LoadingLine, Sheet, SheetContent } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { formatCronJobColumns } from './CronJobs.utils'
 import { DeleteCronJob } from './DeleteCronJob'
 
@@ -35,19 +40,15 @@ export const CronjobsTab = () => {
   const xScroll = useRef<number>(0)
   const gridRef = useRef<DataGridHandle>(null)
 
+  // Track the ID being deleted to exclude it from error checking
+  const deletingCronJobIdRef = useRef<string | null>(null)
+
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
   const [search, setSearch] = useState(searchQuery)
   const [createCronJobSheetShown, setCreateCronJobSheetShown] = useQueryState(
-    'dialog-shown',
+    'new',
     parseAsBoolean.withDefault(false).withOptions({ clearOnDefault: true })
   )
-
-  // used for confirmation prompt in the Create Cron Job Sheet
-  const [isClosingCreateCronJobSheet, setIsClosingCreateCronJobSheet] = useState(false)
-  const [cronJobForEditing, setCronJobForEditing] = useState<
-    Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'> | undefined
-  >()
-  const [cronJobForDeletion, setCronJobForDeletion] = useState<CronJob | undefined>()
 
   const {
     data,
@@ -65,11 +66,33 @@ export const CronjobsTab = () => {
       connectionString: project?.connectionString,
       searchTerm: searchQuery,
     },
-    { keepPreviousData: Boolean(searchQuery), staleTime: Infinity }
+    { placeholderData: Boolean(searchQuery) ? keepPreviousData : undefined, staleTime: Infinity }
   )
   const cronJobs = useMemo(() => data?.pages.flatMap((p) => p) || [], [data?.pages])
 
-  const { data: count, isLoading: isLoadingCount } = useCronJobsCountQuery({
+  const { setValue: setCronJobForEditing, value: cronJobForEditing } = useQueryStateWithSelect({
+    urlKey: 'edit',
+    select: (jobid: string) => {
+      if (!jobid) return undefined
+      const job = cronJobs?.find((j) => j.jobid.toString() === jobid)
+      return job
+        ? { jobname: job.jobname, schedule: job.schedule, active: job.active, command: job.command }
+        : undefined
+    },
+    enabled: !!cronJobs && cronJobs.length > 0 && !isLoading,
+    onError: () => toast.error(`Cron job not found`),
+  })
+
+  const { setValue: setCronJobForDeletion, value: cronJobForDeletion } = useQueryStateWithSelect({
+    urlKey: 'delete',
+    select: (jobid: string) =>
+      jobid ? cronJobs?.find((j) => j.jobid.toString() === jobid) : undefined,
+    enabled: !!cronJobs && cronJobs.length > 0 && !isLoading,
+    onError: (_error, selectedId) =>
+      handleErrorOnDelete(deletingCronJobIdRef, selectedId, `Cron job not found`),
+  })
+
+  const { data: count, isPending: isLoadingCount } = useCronJobsCountQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -88,18 +111,17 @@ export const CronjobsTab = () => {
           action: 'cron_job_update_clicked',
           groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
         })
-        setCreateCronJobSheetShown(true)
-        setCronJobForEditing(job)
+        setCronJobForEditing(job.jobid.toString())
       },
       onSelectDelete: (job: CronJob) => {
         sendEvent({
           action: 'cron_job_delete_clicked',
           groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
         })
-        setCronJobForDeletion(job)
+        setCronJobForDeletion(job.jobid.toString())
       },
     })
-  }, [org?.slug, ref, sendEvent, setCreateCronJobSheetShown])
+  }, [org?.slug, ref, sendEvent, setCronJobForEditing, setCronJobForDeletion])
 
   // check pg_cron version to see if it supports seconds
   const pgCronExtension = extensions.find((ext) => ext.name === 'pg_cron')
@@ -131,6 +153,20 @@ export const CronjobsTab = () => {
     setCreateCronJobSheetShown(true)
   }
 
+  const [isDirty, setIsDirty] = useState(false)
+  const onClose = () => {
+    setCronJobForEditing(null)
+    setCreateCronJobSheetShown(false)
+    cleanPointerEventsNoneOnBody(500)
+  }
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+    checkIsDirty: () => isDirty,
+    onClose: () => {
+      setIsDirty(false)
+      onClose()
+    },
+  })
+
   return (
     <>
       <div className="h-full w-full space-y-4">
@@ -140,7 +176,7 @@ export const CronjobsTab = () => {
               size="tiny"
               className="w-52"
               placeholder="Search for a job"
-              icon={<Search size={14} />}
+              icon={<Search />}
               value={search ?? ''}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
@@ -261,31 +297,47 @@ export const CronjobsTab = () => {
         </div>
       </div>
 
-      <DeleteCronJob
-        visible={!!cronJobForDeletion}
-        onClose={() => setCronJobForDeletion(undefined)}
-        cronJob={cronJobForDeletion!}
-      />
+      {cronJobForDeletion && (
+        <DeleteCronJob
+          visible={!!cronJobForDeletion}
+          onClose={() => {
+            deletingCronJobIdRef.current = null
+            setCronJobForDeletion(null)
+          }}
+          onDeleteStart={(jobId) => {
+            deletingCronJobIdRef.current = jobId
+          }}
+          cronJob={cronJobForDeletion}
+        />
+      )}
 
-      <Sheet
-        open={!!createCronJobSheetShown}
-        onOpenChange={() => setIsClosingCreateCronJobSheet(true)}
-      >
+      <Sheet open={!!createCronJobSheetShown || !!cronJobForEditing} onOpenChange={confirmOnClose}>
         <SheetContent size="default" tabIndex={undefined}>
           <CreateCronJobSheet
             selectedCronJob={cronJobForEditing ?? EMPTY_CRON_JOB}
             supportsSeconds={supportsSeconds}
-            onClose={() => {
-              setIsClosingCreateCronJobSheet(false)
-              setCronJobForEditing(undefined)
-              setCreateCronJobSheetShown(false)
-              cleanPointerEventsNoneOnBody(500)
-            }}
-            isClosing={isClosingCreateCronJobSheet}
-            setIsClosing={setIsClosingCreateCronJobSheet}
+            onDirty={setIsDirty}
+            onClose={onClose}
+            onCloseWithConfirmation={confirmOnClose}
           />
         </SheetContent>
       </Sheet>
+      <CloseConfirmationModal {...closeConfirmationModalProps} />
     </>
   )
 }
+
+const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
+  <ConfirmationModal
+    visible={visible}
+    title="Discard changes"
+    confirmLabel="Discard"
+    onCancel={onCancel}
+    onConfirm={onClose}
+  >
+    <p className="text-sm text-foreground-light">
+      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
+      lost.
+    </p>
+  </ConfirmationModal>
+)
