@@ -407,7 +407,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         page.folders?.forEach((folder) => snapV2.addFolder({ projectRef, folder }))
       })
     }
-  }, [projectRef, privateSnippetsPages?.pages, snapV2])
+  }, [projectRef, privateSnippetsPages?.pages])
 
   useEffect(() => {
     if (projectRef === undefined || !isFavoriteSnippetsSuccess) return
