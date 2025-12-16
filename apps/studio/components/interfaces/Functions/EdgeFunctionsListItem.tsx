@@ -35,16 +35,24 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
   const handleNavigation = (event: React.MouseEvent | React.KeyboardEvent) => {
     const url = `/project/${ref}/functions/${item.slug}`
 
+    if ('key' in event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        router.push(url)
+      }
+      return
+    }
+
     const isModifierClick =
       'button' in event && event.button === 0 && (event.metaKey || event.ctrlKey)
-    if (window && isModifierClick) {
+    if (isModifierClick) {
       event.preventDefault()
       window.open(`${BASE_PATH}${url}`, '_blank')
       return
     }
 
     const isMiddleClick = 'button' in event && event.button === MIDDLE_MOUSE_BUTTON
-    if (window && isMiddleClick) {
+    if (isMiddleClick) {
       event.preventDefault()
       window.open(`${BASE_PATH}${url}`, '_blank')
       return
