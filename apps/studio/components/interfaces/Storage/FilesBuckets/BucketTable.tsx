@@ -1,3 +1,4 @@
+import { useBucketPolicyCount } from 'components/interfaces/Storage/useBucketPolicyCount'
 import {
   VirtualizedTableCell,
   VirtualizedTableHead,
@@ -5,7 +6,8 @@ import {
   VirtualizedTableRow,
 } from 'components/ui/VirtualizedTable'
 import { Bucket } from 'data/storage/buckets-query'
-import { Bucket as BucketIcon } from 'icons'
+import { FilesBucket as FilesBucketIcon } from 'icons'
+import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -72,7 +74,6 @@ type BucketTableRowProps = {
   bucket: Bucket
   projectRef: string
   formattedGlobalUploadLimit: string
-  getPolicyCount: (bucketName: string) => number
 }
 
 export const BucketTableRow = ({
@@ -80,12 +81,12 @@ export const BucketTableRow = ({
   bucket,
   projectRef,
   formattedGlobalUploadLimit,
-  getPolicyCount,
 }: BucketTableRowProps) => {
+  const router = useRouter()
+  const { getPolicyCount } = useBucketPolicyCount()
+
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
-
-  const router = useRouter()
 
   const handleBucketNavigation = (
     bucketId: string,
@@ -93,7 +94,7 @@ export const BucketTableRow = ({
   ) => {
     const url = `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucketId)}`
     if (event.metaKey || event.ctrlKey) {
-      window.open(url, '_blank')
+      window.open(`${BASE_PATH}${url}`, '_blank')
     } else {
       router.push(url)
     }
@@ -114,7 +115,7 @@ export const BucketTableRow = ({
       tabIndex={0}
     >
       <BucketTableCell className="w-2 pr-1">
-        <BucketIcon aria-label="bucket icon" size={16} className="text-foreground-muted" />
+        <FilesBucketIcon aria-label="bucket icon" size={16} className="text-foreground-muted" />
       </BucketTableCell>
       <BucketTableCell className="flex-1">
         <div className="flex items-center gap-2.5">

@@ -15,7 +15,6 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
@@ -44,6 +43,7 @@ import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/A
 import AIEditor from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
+import { generateSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 
 export const EditorPanel = () => {
   const {
@@ -58,8 +58,8 @@ export const EditorPanel = () => {
     setResults,
     setError,
   } = useEditorPanelStateSnapshot()
-  const { closeSidebar } = useSidebarManagerSnapshot()
   const { profile } = useProfile()
+  const { closeSidebar } = useSidebarManagerSnapshot()
   const sqlEditorSnap = useSqlEditorV2StateSnapshot()
 
   const label = 'SQL Editor'
@@ -150,7 +150,7 @@ export const EditorPanel = () => {
 
   return (
     <div className="flex h-full flex-col bg-background">
-      <div className="border-b border-b-muted flex items-center justify-between gap-x-4 px-4 h-[46px]">
+      <div className="border-b border-b-muted flex items-center justify-between gap-x-4 pl-4 pr-3 h-[46px]">
         <div className="text-xs">{label}</div>
         <div className="flex items-center">
           {templates.length > 0 && (
@@ -236,8 +236,7 @@ export const EditorPanel = () => {
               }
 
               const snippet = createSqlSnippetSkeletonV2({
-                id: uuidv4(),
-                name: 'New query',
+                name: generateSnippetTitle(),
                 sql: currentValue,
                 owner_id: profile.id,
                 project_id: project.id,
@@ -306,7 +305,7 @@ export const EditorPanel = () => {
           <div className="shrink-0">
             <Admonition
               type="warning"
-              className="m-0 rounded-none border-x-0 border-b-0 [&>div>div>pre]:text-sm [&>div]:flex [&>div]:flex-col [&>div]:gap-y-2"
+              className="rounded-none border-x-0 border-b-0 [&>div>div>pre]:text-sm [&>div]:flex [&>div]:flex-col [&>div]:gap-y-2"
               title={errorHeader || 'Error running SQL query'}
               description={
                 <div>

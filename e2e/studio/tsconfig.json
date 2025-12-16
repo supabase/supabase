@@ -4,6 +4,7 @@
     "module": "nodenext",
     "jsx": "react",
     "skipLibCheck": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "strict": true
   }
 }

@@ -17,7 +17,7 @@ import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
@@ -27,6 +27,7 @@ import { projectKeys } from 'data/projects/keys'
 import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -77,8 +78,9 @@ export const CreateBranchModal = () => {
     'preview_branches'
   )
 
-  const isProPlanAndUp = selectedOrg?.plan?.id !== 'free'
-  const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
+  const { hasAccess: hasAccessToBranching, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('branching_limit')
+  const promptPlanUpgrade = IS_PLATFORM && !hasAccessToBranching
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const projectRef =
@@ -135,7 +137,7 @@ export const CreateBranchModal = () => {
   const {
     data: connections,
     error: connectionsError,
-    isLoading: isLoadingConnections,
+    isPending: isLoadingConnections,
     isSuccess: isSuccessConnections,
     isError: isErrorConnections,
   } = useGitHubConnectionsQuery(
@@ -157,7 +159,7 @@ export const CreateBranchModal = () => {
 
   const {
     data: disk,
-    isLoading: isLoadingDiskAttr,
+    isPending: isLoadingDiskAttr,
     isError: isErrorDiskAttr,
   } = useDiskAttributesQuery({ projectRef }, { enabled: showCreateBranchModal && withData })
   const projectDiskAttributes = disk?.attributes ?? {
@@ -219,7 +221,8 @@ export const CreateBranchModal = () => {
     !canCreateBranch ||
     !isSuccessAddons ||
     !isSuccessConnections ||
-    promptProPlanUpgrade ||
+    isLoadingEntitlement ||
+    !hasAccessToBranching ||
     (!gitlessBranching && !githubConnection) ||
     isCreatingBranch ||
     isCheckingGHBranchValidity
@@ -253,7 +256,7 @@ export const CreateBranchModal = () => {
         size="large"
         hideClose
         onOpenAutoFocus={(e) => {
-          if (promptProPlanUpgrade) e.preventDefault()
+          if (promptPlanUpgrade) e.preventDefault()
         }}
         aria-describedby={undefined}
       >
@@ -264,20 +267,20 @@ export const CreateBranchModal = () => {
 
         <Form_Shadcn_ {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            {promptProPlanUpgrade && (
-              <>
-                <UpgradeToPro
-                  primaryText="Upgrade to unlock branching"
-                  secondaryText="Create and test schema changes, functions, and more in a separate, temporary instance without affecting production"
-                  source="create-branch"
-                />
-                <DialogSectionSeparator />
-              </>
+            {promptPlanUpgrade && (
+              <UpgradeToPro
+                fullWidth
+                layout="vertical"
+                source="create-branch"
+                featureProposition="enable branching"
+                primaryText="Upgrade to unlock branching"
+                secondaryText="Create and test schema changes, functions, and more in a separate, temporary instance without affecting production"
+              />
             )}
 
             <DialogSection
               padding="medium"
-              className={cn('space-y-4', promptProPlanUpgrade && 'opacity-25 pointer-events-none')}
+              className={cn('space-y-4', promptPlanUpgrade && 'opacity-25 pointer-events-none')}
             >
               <FormField_Shadcn_
                 control={form.control}
@@ -360,11 +363,7 @@ export const CreateBranchModal = () => {
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
                           <Label>Sync with a GitHub branch</Label>
-                          {!gitlessBranching && (
-                            <Badge variant="warning" size="small">
-                              Required
-                            </Badge>
-                          )}
+                          {!gitlessBranching && <Badge variant="warning">Required</Badge>}
                         </div>
                         <p className="text-sm text-foreground-lighter">
                           Keep this preview branch in sync with a chosen GitHub branch
@@ -386,11 +385,7 @@ export const CreateBranchModal = () => {
                       label={
                         <>
                           <Label className="mr-2">Include data</Label>
-                          {!hasPitrEnabled && (
-                            <Badge variant="warning" size="small">
-                              Requires PITR
-                            </Badge>
-                          )}
+                          {!hasPitrEnabled && <Badge variant="warning">Requires PITR</Badge>}
                         </>
                       }
                       layout="flex-row-reverse"
@@ -416,7 +411,7 @@ export const CreateBranchModal = () => {
               padding="medium"
               className={cn(
                 'flex flex-col gap-4',
-                promptProPlanUpgrade && 'opacity-25 pointer-events-none'
+                promptPlanUpgrade && 'opacity-25 pointer-events-none'
               )}
             >
               {withData && (

@@ -106,7 +106,7 @@ export const EdgeFunctionBlock = ({
       {showReplaceWarning && (
         <Admonition
           type="warning"
-          className="mb-0 rounded-none border-0 border-b shrink-0 bg-background-100"
+          className="rounded-none border-0 border-b shrink-0 bg-background-100"
         >
           <p>An edge function with the name "{functionName}" already exists.</p>
           <p className="text-foreground-light">

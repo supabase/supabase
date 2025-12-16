@@ -46,7 +46,7 @@ export const OAuthApps = () => {
   const {
     data: publishedApps,
     error: publishedAppsError,
-    isLoading: isLoadingPublishedApps,
+    isPending: isLoadingPublishedApps,
     isSuccess: isSuccessPublishedApps,
     isError: isErrorPublishedApps,
   } = useOAuthAppsQuery({ slug }, { enabled: canReadOAuthApps })
@@ -57,7 +57,7 @@ export const OAuthApps = () => {
 
   const {
     data: authorizedApps,
-    isLoading: isLoadingAuthorizedApps,
+    isPending: isLoadingAuthorizedApps,
     isSuccess: isSuccessAuthorizedApps,
     isError: isErrorAuthorizedApps,
   } = useAuthorizedAppsQuery({ slug })

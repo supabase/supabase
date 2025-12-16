@@ -9,6 +9,7 @@ import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
@@ -24,7 +25,6 @@ import {
   SidePanel,
   cn,
 } from 'ui'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 const CustomDomainSidePanel = () => {
   const { ref: projectRef } = useParams()
@@ -41,7 +41,7 @@ const CustomDomainSidePanel = () => {
   const { panel, closePanel } = useAddonsPagePanel()
   const visible = panel === 'customDomain'
 
-  const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
+  const { data: addons, isPending: isLoading } = useProjectAddonsQuery({ projectRef })
   const { mutate: updateAddon, isPending: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully enabled custom domain`)

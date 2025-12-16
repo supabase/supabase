@@ -11,7 +11,7 @@ import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -23,8 +23,8 @@ import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
-  PageHeaderFooter,
   PageHeaderMeta,
+  PageHeaderNavigationTabs,
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
@@ -39,9 +39,9 @@ const DatabasePhysicalBackups: NextPageWithLayout = () => {
             <PageHeaderTitle>Database Backups</PageHeaderTitle>
           </PageHeaderSummary>
         </PageHeaderMeta>
-        <PageHeaderFooter>
+        <PageHeaderNavigationTabs>
           <DatabaseBackupsNav active="pitr" />
-        </PageHeaderFooter>
+        </PageHeaderNavigationTabs>
       </PageHeader>
       <PageContainer>
         <PageSection>
@@ -67,7 +67,13 @@ const PITR = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const isOrioleDbInAws = useIsOrioleDbInAws()
-  const { data: backups, error, isLoading, isError, isSuccess } = useBackupsQuery({ projectRef })
+  const {
+    data: backups,
+    error,
+    isPending: isLoading,
+    isError,
+    isSuccess,
+  } = useBackupsQuery({ projectRef })
 
   const plan = organization?.plan?.id
   const isEnabled = backups?.pitr_enabled
@@ -104,6 +110,7 @@ const PITR = () => {
             <UpgradeToPro
               addon="pitr"
               source="pitr"
+              featureProposition="enable Point in Time Recovery"
               primaryText="Point in Time Recovery is a Pro Plan add-on."
               secondaryText={
                 plan === 'free'
