@@ -167,6 +167,7 @@ export function DiskManagementForm() {
       provisionedIOPS: iops,
       throughput: throughput_mbps,
       totalSize: size_gb,
+      computeSize: form.getValues('computeSize'),
     }
 
     if (!('requested_modification' in data)) {

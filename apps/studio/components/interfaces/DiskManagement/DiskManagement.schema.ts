@@ -16,7 +16,10 @@ const baseSchema = z.object({
   totalSize: z.number().int('Value must be an integer').describe('Allocated disk size in GB'),
   provisionedIOPS: z.number().describe('Provisioned IOPS for storage type'),
   throughput: z.number().optional().describe('Throughput in MB/s for gp3'),
-  computeSize: computeInstanceAddonVariantIdSchema.describe('Compute size'),
+  computeSize: computeInstanceAddonVariantIdSchema
+    .describe('Compute size')
+    .optional()
+    .default('ci_micro'),
   growthPercent: z
     .number()
     .int('Value must be an integer')
