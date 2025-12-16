@@ -79,7 +79,7 @@ echo "POSTGRES_PASSWORD=${postgres_password}"
 echo "DASHBOARD_PASSWORD=${dashboard_password}"
 echo ""
 
-if ! test -t 0 > /dev/null 2>&1; then
+if ! test -t 0; then
     echo "Running non-interactively. Skipping .env update."
     exit 0
 fi
