@@ -38,7 +38,7 @@ npx supabase gen types --lang=python --project-id "$PROJECT_REF" --schema public
 or in case of local development:
 
 ```bash
-npx supabase gen types --lang=python --local > database.types.ts
+npx supabase gen types --lang=python --local > database_types.py
 ```
 
 These types are generated from your database schema. Given a table `public.movies`, the generated types will look like:
