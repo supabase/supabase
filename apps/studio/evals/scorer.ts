@@ -1,7 +1,7 @@
 import { EvalCase, EvalScorer } from 'braintrust'
 import { ClosedQA, Sql } from 'autoevals'
 
-const LLM_AS_A_JUDGE_MODEL = 'gpt-5'
+const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2-2025-12-11'
 
 type Input = string
 
@@ -110,4 +110,3 @@ export const textIncludesScorer: EvalScorer<Input, Output, Expected> = async ({
     score: includes ? 1 : 0,
   }
 }
-
