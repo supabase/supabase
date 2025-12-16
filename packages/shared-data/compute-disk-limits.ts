@@ -4,7 +4,9 @@ import { z } from 'zod'
  * [Jordi] Use instances.vantage.sh as source of truth for compute disk limits.
  * Eg: https://instances.vantage.sh/aws/ec2/t4g.nano?currency=USD
  *
- * All compute from medium down are t4g and the bigger ones are m6g
+ * All compute from medium down are t4g and the bigger ones are m6g.
+ *
+ * Throughput values are stored in MB/s (AWS lists Mbps, so we convert with toMBps).
  */
 
 export type ComputeDiskLimit = {
