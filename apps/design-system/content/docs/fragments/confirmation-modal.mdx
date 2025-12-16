@@ -1,56 +1,62 @@
 ---
 title: Confirmation Modal
-description: A modal dialog that interrupts the user with important content and expects a response.
+description: A modal dialog for confirmations that require additional context or simple interaction.
 component: true
 ---
 
-Confirmation Modal is a convenience wrapper for confirmation flows. It is built on top of [Dialog](../components/dialog) but provides a simpler prop-based API for consistent confirmations.
+Confirmation Modal is a convenience wrapper for confirmation flows that are more complex than a single paragraph but do not warrant a full custom dialog. It is built on top of [Dialog](../components/dialog) and provides a prop-based API for consistent confirmation patterns.
 
-Use Confirmation Modal in these scenarios:
+Use Confirmation Modal when the user needs extra context to make a decision, such as explanatory copy, callouts, or small form elements, and the action is not so destructive that it requires typed confirmation.
 
-- Confirmations where the body needs more than a single short paragraph (for example, additional context, callouts, or small form elements)
-- When you want a single component with convenient props instead of composing a dialog manually
+If the confirmation can be expressed as a single short paragraph, use [Alert Dialog](../components/alert-dialog). If the action is highly destructive and requires explicit typed intent, use [Text Confirm Dialog](../fragments/text-confirm-dialog). See [Modality](../ui-patterns/modality) for broader guidance on choosing the appropriate pattern.
 
 <ComponentPreview name="confirmation-modal-demo" peekCode wide />
-
-If your confirmation can be expressed as a single short paragraph, use [Alert Dialog](../components/alert-dialog). If you need typed intent or are performing a destructive action, consider [Text Confirm Dialog](../fragments/text-confirm-dialog).
-
-See [Modality](../ui-patterns/modality) for broader guidance on choosing between dialog patterns.
 
 ## Usage
 
 ```tsx
+'use client'
+
 import { useState } from 'react'
 import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 ```
 
 ```tsx
-export default function ModalDemo() {
+export default function ConfirmationModalDemo() {
   const [visible, setVisible] = useState(false)
 
   return (
     <>
-      <Button type="default" onClick={() => setVisible(!visible)}>
-        Show Confirmation Modal
-      </Button>
+      <Button onClick={() => setVisible(true)}>Show Confirmation Modal</Button>
+
       <ConfirmationModal
         visible={visible}
         size="small"
         title="Resume this project"
-        onCancel={() => setVisible(false)}
-        onConfirm={() => {}}
-        loading={false}
         confirmLabel="Resume"
         confirmLabelLoading="Resuming"
         cancelLabel="Cancel"
+        onConfirm={() => {
+          setVisible(false)
+        }}
+        onCancel={() => {
+          setVisible(false)
+        }}
       >
-        {/* Dialog contents */}
+        This will resume the project and restart any paused processes.
       </ConfirmationModal>
     </>
   )
 }
 ```
+
+## Guidelines
+
+- **Use for moderate complexity:** Suitable when the confirmation requires more than a single sentence but does not need typed intent.
+- **Avoid critical destruction:** Do not use for irreversible or high-risk actions that could benefit from stronger safeguards.
+- **Keep content focused:** Include only the context needed to make the decision. If the dialog becomes a full flow, use a custom [Dialog](../components/dialog) instead.
+- **Provide clear actions:** Ensure confirm and cancel labels clearly describe the outcome of each choice.
 
 ## Props
 

@@ -1,20 +1,16 @@
 ---
 title: Text Confirm Dialog
-description: A modal dialog that interrupts the user with important content and expects a response.
+description: A modal dialog that adds a deliberate confirmation step for highly destructive actions.
 component: true
 ---
 
-Text Confirm Dialog adds a “speed bump” before a destructive action by requiring the user to type an exact string before the confirm action is enabled. It wraps the Shadcn [Dialog](../components/dialog) component.
+Text Confirm Dialog adds a deliberate “speed bump” before a highly destructive action by requiring the user to type an exact confirmation string before the confirm action is enabled. It wraps the Shadcn [Dialog](../components/dialog) component and is intended for actions that must not be triggered accidentally.
+
+Use Text Confirm Dialog for irreversible operations such as deleting buckets, projects, or other critical resources where an explicit signal of user intent is required beyond a button click.
+
+For non-destructive or less critical confirmations, use [Alert Dialog](../components/alert-dialog) or [Confirmation Modal](../fragments/confirmation-modal) instead. See [Modality](../ui-patterns/modality) for guidance on choosing the appropriate dialog pattern.
 
 <ComponentPreview name="text-confirm-dialog-demo" peekCode showDottedGrid wide />
-
-Use Text Confirm Dialog:
-
-- Highly destructive actions (deleting buckets, projects, etc.)
-- When you need extra confirmation beyond a simple button click
-- Actions that are irreversible and need explicit user intent
-
-For dialogs with non-destructive actions, use either [Alert Dialog](../components/alert-dialog) or [Confirmation Modal](../fragments/confirmation-modal). See [Modality](../ui-patterns/modality) for broader guidance on choosing between dialog patterns.
 
 ## Usage
 
@@ -58,10 +54,10 @@ export default function TextConfirmDialogDemo() {
 
 ## Props
 
-- `confirmString`: The exact string the user must type
-- `confirmPlaceholder`: Placeholder for the input
-- `variant`: `default` | `destructive` | `warning`
-- Other standard modal props
+- `confirmString`: The exact string the user must type to enable the confirm action
+- `confirmPlaceholder`: Placeholder text shown in the confirmation input
+- `variant`: Visual intent of the dialog (`default`, `destructive`, or `warning`)
+- Other standard modal props inherited from the underlying [Dialog](../components/dialog) component
 
 ## Examples
 

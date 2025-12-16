@@ -1,6 +1,6 @@
 ---
 title: Dialog
-description: A window overlaid on either the primary window or another dialog window, rendering the content underneath inert.
+description: A general-purpose modal for non-critical flows, forms, and custom interactions.
 component: true
 links:
   doc: https://www.radix-ui.com/docs/primitives/components/dialog
@@ -11,16 +11,19 @@ source:
   shadcn: true
 ---
 
-A versatile modal window used for a wider range of interactions, such as displaying a list of options, complex forms, or non-urgent information. Can be dismissed by clicking outside the dialog area or pressing the 'Escape' key.
+Dialog is a flexible, general-purpose modal used for bespoke interactions such as forms, pickers, multi-step flows, or displaying non-urgent information. Unlike confirmation-focused dialogs, it is designed to be safely dismissible and does not force an explicit decision.
 
-**When to use**:
+Dialog can be closed by clicking outside the modal or pressing the Escape key, making it suitable for workflows where cancellation is expected and low-risk.
 
-- Non-critical information displays
-- Forms that can be cancelled without consequences
-- Content that benefits from being centered
-- Multi-step workflows
+Use Dialog when you need full control over layout, content, and behavior, and the interaction does not involve a critical or destructive action.
 
-**Components**: `Dialog`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogTrigger`, `DialogFooter`, `DialogSection`, `DialogSectionSeparator` (from `ui`)
+For confirmations or warnings, try to use an existing component:
+
+- Use [Alert Dialog](../components/alert-dialog) for critical confirmations that require an explicit decision
+- Use [Confirmation Modal](../fragments/confirmation-modal) when additional context is needed for a confirmation
+- Use [Text Confirm Dialog](../fragments/text-confirm-dialog) for highly destructive actions that require typed intent
+
+See [Modality](../ui-patterns/modality) for guidance on choosing the appropriate dialog pattern.
 
 <ComponentPreview name="dialog-demo" peekCode wide />
 
@@ -42,15 +45,23 @@ import {
   <DialogTrigger>Open</DialogTrigger>
   <DialogContent>
     <DialogHeader>
-      <DialogTitle>Are you absolutely sure?</DialogTitle>
+      <DialogTitle>Project settings</DialogTitle>
       <DialogDescription>
-        This action cannot be undone. This will permanently delete your account and remove your data
-        from our servers.
+        Update configuration options for this project. Changes can be discarded at any time.
       </DialogDescription>
     </DialogHeader>
+    {/* Custom content goes here */}
   </DialogContent>
 </Dialog>
 ```
+
+## Guidelines
+
+- **Use for non-critical interactions:** Dialog is appropriate when dismissal has no serious consequences.
+- **Design for cancellation**: Assume users may close the dialog without completing the action.
+- **Keep focus contained**: Dialog content should remain scoped to a single task or flow.
+- **Avoid destructive confirmations**: If the dialog’s primary purpose is to confirm a risky action, use a confirmation-focused pattern instead.
+- **Compose freely**: Dialog is intentionally unopinionated. Build custom layouts, forms, or step-based flows as needed.
 
 ## Examples
 

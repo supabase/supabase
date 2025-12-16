@@ -1,6 +1,6 @@
 ---
 title: Alert Dialog
-description: A modal dialog that interrupts the user with concise, important content and expects a response.
+description: A modal dialog for critical confirmations and acknowledgements that require an explicit user decision.
 component: true
 links:
   doc: https://www.radix-ui.com/docs/primitives/components/alert-dialog
@@ -11,27 +11,11 @@ source:
   radix: true
 ---
 
-Alert Dialog interrupts the user’s workflow to communicate critical information or require an explicit decision (for example, “Are you sure you want to delete this?”).
+Alert Dialog interrupts the user’s workflow to communicate critical information or confirm an action that cannot be taken lightly. It presents a short, focused message and requires the user to explicitly confirm or cancel before proceeding.
+
+Use Alert Dialog for actions such as deleting data, performing irreversible changes, or acknowledging important warnings where dismissal without a decision would be unsafe.
 
 <ComponentPreview name="alert-dialog-demo" peekCode wide />
-
-Unlike a generic [Dialog](../components/dialog), it **cannot be dismissed by clicking outside** — the user must take an action (cancel, confirm, or press Escape).
-
-**When to use**:
-
-- Critical confirmations (delete, destructive actions)
-- Important warnings that require acknowledgment
-- Actions that cannot be undone
-- Situations where you want a clear, explicit confirm/cancel choice
-
-**Components**: `AlertDialog`, `AlertDialogContent`, `AlertDialogHeader`, `AlertDialogTitle`, `AlertDialogDescription`, `AlertDialogFooter`, `AlertDialogCancel`, `AlertDialogAction`, `AlertDialogTrigger` (from `ui`)
-
-## Notes
-
-- **Keep the description simple**: `AlertDialogDescription` renders as a `<p>` and cannot contain block-level children (like `<ul>`, `<div>`, multiple paragraphs, etc.). If you need richer content, use [Dialog](../components/dialog) or [Confirmation Modal](../fragments/confirmation-modal).
-- **Always provide a cancel action**: include `AlertDialogCancel` in the footer so users can back out with a clear button (in addition to Escape).
-
-See [Modality](../ui-patterns/modality) for guidance on choosing between dialog patterns.
 
 ## Installation
 
@@ -106,9 +90,24 @@ import {
 </AlertDialog>
 ```
 
+## Behavior
+
+Unlike a generic [Dialog](../components/dialog), an Alert Dialog cannot be dismissed by clicking outside the modal. The user must take an explicit action by confirming, cancelling, or pressing Escape.
+
+This enforced decision helps prevent accidental dismissal of critical warnings or destructive actions.
+
+## Guidelines
+
+- **Keep content concise:** AlertDialogDescription renders as a single paragraph and must not contain block-level elements such as lists, multiple paragraphs, or complex layouts.
+- **Use for critical decisions only:** Reserve Alert Dialog for destructive or irreversible actions, or for warnings that require explicit acknowledgement.
+- **Always provide a cancel action:** Include AlertDialogCancel so users can safely back out, in addition to supporting the Escape key.
+- **Avoid rich content:** If the dialog requires detailed explanations, callouts, or form inputs, use [Confirmation Modal](../fragments/confirmation-modal) or [Dialog](../components/dialog) instead.
+
+See [Modality](../ui-patterns/modality) for guidance on choosing the appropriate dialog pattern.
+
 ## Examples
 
-### Close action only
+### Close only
 
 <ComponentPreview name="alert-dialog-close-only" wide />
 
