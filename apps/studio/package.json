@@ -23,7 +23,9 @@
     "prettier:write": "prettier --cache --write .",
     "build:deno-types": "tsx scripts/deno-types.ts",
     "build:graphql-types": "tsx scripts/download-graphql-schema.mts && pnpm graphql-codegen --config scripts/codegen.ts",
-    "build:graphql-types:watch": "pnpm graphql-codegen --config scripts/codegen.ts --watch"
+    "build:graphql-types:watch": "pnpm graphql-codegen --config scripts/codegen.ts --watch",
+    "evals:setup": "cp node_modules/libpg-query/wasm/libpg-query.wasm evals/libpg-query.wasm",
+    "evals:run": "braintrust eval evals/assistant.eval.ts"
   },
   "dependencies": {
     "@ai-sdk/amazon-bedrock": "^3.0.0",
