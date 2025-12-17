@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { AlertCircle, Check, ChevronsUpDown, ExternalLink } from 'lucide-react'
+import { Check, ChevronsUpDown, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -7,7 +7,6 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
-import InformationBox from 'components/ui/InformationBox'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
@@ -49,9 +48,7 @@ export function ProjectAndPlanInfo({
       <ProjectSelector form={form} orgSlug={orgSlug} projectRef={projectRef} />
       <ProjectRefHighlighted projectRef={projectRef} />
 
-      {!hasProjectSelected && (
-        <Admonition type="default" title="Please note that no project has been selected" />
-      )}
+      {!hasProjectSelected && <Admonition type="default" title="No project has been selected" />}
 
       {showPlanExpectationInfo &&
         orgSlug &&
@@ -175,65 +172,62 @@ interface PlanExpectationInfoBoxProps {
   planId?: string
 }
 
+const planIdToShow = 'enterprise'
+
 const PlanExpectationInfoBox = ({ orgSlug, planId }: PlanExpectationInfoBoxProps) => {
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
 
   return (
-    <InformationBox
-      icon={<AlertCircle size={18} strokeWidth={2} />}
-      defaultVisibility={true}
-      hideCollapse={true}
-      title="Expected response times are based on your organization's plan"
+    <Admonition
+      type="default"
+      title="Expected response times are based on your organization’s plan"
       description={
-        <div className="flex flex-col gap-y-4 mb-1">
+        <>
           {planId === 'free' && (
             <p>
-              Free Plan support is available within the community and officially by the team on a
-              best efforts basis. For a guaranteed response we recommend upgrading to the Pro Plan.
-              Enhanced SLAs for support are available on our Enterprise Plan.
+              Support on the Free plan is provided through the community and by the team on a
+              best-effort basis. For a guaranteed response time, we recommend upgrading to the Pro
+              plan. Enhanced support SLAs are available on the Enterprise plan.
             </p>
           )}
 
           {planId === 'pro' && (
             <p>
-              Pro Plan includes email-based support. You can expect an answer within 1 business day
-              in most situations for all severities. We recommend upgrading to the Team Plan for
-              prioritized ticketing on all issues and prioritized escalation to product engineering
-              teams. Enhanced SLAs for support are available on our Enterprise Plan.
+              The Pro plan includes email support. In most cases, you can expect a response within 1
+              business day for all severities. For prioritised ticketing on all issues and
+              prioritised escalation to product engineering, we recommend upgrading to the Team
+              plan. Enhanced support SLAs are available on the Enterprise plan.
             </p>
           )}
 
           {planId === 'team' && (
             <p>
-              Team Plan includes email-based support. You get prioritized ticketing on all issues
-              and prioritized escalation to product engineering teams. Low, Normal, and High
-              severity tickets will generally be handled within 1 business day, while Urgent issues,
-              we respond within 1 day, 365 days a year. Enhanced SLAs for support are available on
-              our Enterprise Plan.
+              The Team plan includes email support with prioritized ticketing and escalation to
+              product engineering. Low, normal, and high-severity tickets are typically handled
+              within 1 business day. Urgent issues are handled within 1 day, 365 days a year.
+              Enhanced support SLAs are available on the Enterprise plan.
             </p>
           )}
-
-          {billingAll && planId !== 'enterprise' && (
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-y-2 sm:gap-x-2">
-              <Button asChild>
-                <Link
-                  href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=planSupportExpectationInfoBox`}
-                >
-                  Upgrade project
-                </Link>
-              </Button>
-              <Button asChild type="default" icon={<ExternalLink />}>
-                <Link
-                  href="https://supabase.com/contact/enterprise"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Enquire about Enterprise
-                </Link>
-              </Button>
-            </div>
-          )}
-        </div>
+        </>
+      }
+      actions={
+        billingAll &&
+        planId !== 'enterprise' && (
+          <>
+            <Button asChild>
+              <Link
+                href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=planSupportExpectationInfoBox`}
+              >
+                Upgrade plan
+              </Link>
+            </Button>
+            <Button asChild type="default" icon={<ExternalLink />}>
+              <Link href="https://supabase.com/contact/enterprise" target="_blank" rel="noreferrer">
+                Enquire about Enterprise
+              </Link>
+            </Button>
+          </>
+        )
       }
     />
   )
