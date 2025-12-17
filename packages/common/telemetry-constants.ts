@@ -2599,10 +2599,6 @@ export interface DashboardErrorDisplayedEvent {
   action: 'dashboard_error_displayed'
   properties: {
     /**
-     * The type of error Admonition displayed
-     */
-    errorType: 'warning' | 'destructive' | 'danger'
-    /**
      * Optional title of the error Admonition
      */
     title?: string
