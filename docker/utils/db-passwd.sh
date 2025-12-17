@@ -1,18 +1,33 @@
 #!/bin/sh
 #
-# Portions of this code are derived from Inder Singh's update-db-pass.sh shell script.
+# Portions of this code are derived from Inder Singh's update-db-pass.sh
 # Copyright 2025 Inder Singh. Licensed under Apache License 2.0.
-# Original source: https://github.com/singh-inder/supabase-automated-self-host/blob/main/docker/update-db-pass.sh
+# Original source:
+# https://github.com/singh-inder/supabase-automated-self-host/blob/main/docker/update-db-pass.sh
+#
+# GitHub discussion here:
+# https://github.com/supabase/supabase/issues/22605#issuecomment-3323382144
 #
 # Changed:
 # - POSIX shell compatibility
 # - No hardcoded values for database service and admin user
 # - Use .env for the admin user and database service port
+# - Does _not_ set password for supabase_read_only_user (this role is not
+#   supposed to have a password)
 # - Print all values and confirm before updating
 # - Stop on any errors
 #
+# Heads up:
+# - Updating _analytics.source_backends is not needed after PR logflare#2069
+# - Newer Logflare versions use a different table and update connection string
+#
 
 set -e
+
+if ! docker compose version > /dev/null 2>&1; then
+    echo "Docker Compose not found."
+    exit 1
+fi
 
 if [ ! -f .env ]; then
     echo "Missing .env file. Exiting."
@@ -37,13 +52,6 @@ fi
 # Get Postgres service name
 db_srv_name=$(docker compose ps 2>/dev/null | grep "$db_image_prefix" | awk '{print $4}')
 
-db_admin_user=$(grep -i "^POSTGRES_USER_READ_WRITE=" .env | cut -d '=' -f 2)
-user_source=" (.env):"
-if [ -z "$db_admin_user" ]; then
-    db_admin_user="supabase_admin"
-    user_source=" (default):"
-fi
-
 db_srv_port=$(grep -i "^POSTGRES_PORT=" .env | cut -d '=' -f 2)
 port_source=" (.env):"
 if [ -z "$db_srv_port" ]; then
@@ -51,13 +59,15 @@ if [ -z "$db_srv_port" ]; then
     port_source=" (default):"
 fi
 
+db_admin_user="supabase_admin"
+
 echo ""
 echo "*** Check configuration below before updating database passwords! ***"
 echo ""
-echo "Service name (docker compose): $db_srv_name"
+echo "Service name: $db_srv_name"
 echo "Service status: $db_srv_status"
 echo "Service port${port_source} $db_srv_port"
-echo "Admin user${user_source} $db_admin_user"
+echo "Admin user: $db_admin_user"
 
 if ! test -t 0; then
     echo ""
@@ -93,7 +103,6 @@ alter user service_role with password '${new_passwd}';
 alter user supabase_admin with password '${new_passwd}';
 alter user supabase_auth_admin with password '${new_passwd}';
 alter user supabase_functions_admin with password '${new_passwd}';
-alter user supabase_read_only_user with password '${new_passwd}';
 alter user supabase_replication_admin with password '${new_passwd}';
 alter user supabase_storage_admin with password '${new_passwd}';
 
