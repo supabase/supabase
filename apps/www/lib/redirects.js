@@ -2157,11 +2157,7 @@ module.exports = [
     source: '/customers/mendableai',
     destination: '/customers/firecrawl',
   },
-  {
-    permanent: true,
-    source: '/docs/guides/auth/auth-helpers/nextjs-server-components',
-    destination: '/docs/guides/auth/auth-helpers/nextjs',
-  },
+
   {
     permanent: true,
     source: '/docs/guides/getting-started/openai/vector-search',

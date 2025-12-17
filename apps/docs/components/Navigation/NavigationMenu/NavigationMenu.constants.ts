@@ -925,18 +925,6 @@ export const auth: NavMenuConstant = {
         },
       ],
     },
-    {
-      name: 'Auth UI',
-      url: undefined,
-      enabled: allAuthProvidersEnabled,
-      items: [
-        { name: 'Auth UI (Deprecated)', url: '/guides/auth/auth-helpers/auth-ui' },
-        {
-          name: 'Flutter Auth UI',
-          url: '/guides/auth/auth-helpers/flutter-auth-ui' as `/${string}`,
-        },
-      ],
-    },
   ],
 }
 
