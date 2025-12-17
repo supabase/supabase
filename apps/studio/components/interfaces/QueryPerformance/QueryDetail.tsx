@@ -2,6 +2,9 @@ import { Lightbulb, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 
+import { useParams } from 'common'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { formatSql } from 'lib/formatSql'
 import {
   AlertDescription_Shadcn_,
@@ -44,6 +47,9 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
   const report = QUERY_PERFORMANCE_COLUMNS
   const [query, setQuery] = useState(selectedRow?.['query'])
 
+  const { ref } = useParams()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
 
@@ -70,6 +76,14 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
         },
       ],
       initialMessage: prompt,
+    })
+
+    sendEvent({
+      action: 'query_performance_ai_explanation_clicked',
+      groups: {
+        project: ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
     })
 
     // Close the query detail panel since we need to see the AI assistant panel

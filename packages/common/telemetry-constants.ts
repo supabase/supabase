@@ -2550,6 +2550,18 @@ export interface AdvisorAssistantButtonClickedEvent {
 }
 
 /**
+ * User clicked on "Explain with AI" button in Query Performance detail panel
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/query-performance
+ */
+export interface QueryPerformanceAIExplanationClickedEvent {
+  action: 'query_performance_ai_explanation_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User opened the request upgrade modal (for users without billing permissions).
  *
  * @group Events
@@ -2731,5 +2743,6 @@ export type TelemetryEvent =
   | LogDrainConfirmButtonSubmittedEvent
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
+  | QueryPerformanceAIExplanationClickedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
