@@ -28,6 +28,7 @@ import {
 } from 'state/replication-pipeline-request-status'
 import {
   Button,
+  cn,
   DialogSectionSeparator,
   Form_Shadcn_,
   Sheet,
@@ -440,9 +441,12 @@ export const DestinationPanel = ({
     <>
       <Sheet open={visible} onOpenChange={onClose}>
         <SheetContent
-          size="lg"
+          size="default"
           showClose={false}
-          className={publicationPanelVisible || newBucketSheetVisible ? 'right-20' : 'right-0'}
+          className={cn(
+            'md:!w-[700px]',
+            publicationPanelVisible || newBucketSheetVisible ? 'right-20' : 'right-0'
+          )}
         >
           <div className="flex flex-col h-full" tabIndex={-1}>
             <SheetHeader>

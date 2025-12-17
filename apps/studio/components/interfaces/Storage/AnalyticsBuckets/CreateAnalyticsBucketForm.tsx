@@ -112,7 +112,6 @@ export type CreateAnalyticsBucketForm = z.infer<typeof FormSchema>
 interface CreateAnalyticsBucketFormProps {
   type?: 'dialog' | 'sheet'
   onOpenChange: (value: boolean) => void
-  onSuccess?: () => void
 }
 
 export const CreateAnalyticsBucketForm = ({
@@ -126,7 +125,7 @@ export const CreateAnalyticsBucketForm = ({
     useIcebergWrapperExtension()
 
   const { data: buckets = [] } = useAnalyticsBucketsQuery({ projectRef: ref })
-  const wrappersExtenstionNeedsUpgrading = wrappersExtensionState === 'needs-upgrade'
+  const wrappersExtensionNeedsUpgrading = wrappersExtensionState === 'needs-upgrade'
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -224,7 +223,7 @@ export const CreateAnalyticsBucketForm = ({
               )}
             />
 
-            {wrappersExtenstionNeedsUpgrading ? (
+            {wrappersExtensionNeedsUpgrading ? (
               <Admonition
                 type="warning"
                 className={cn('border-x-0 rounded-none', type === 'dialog' && 'border-b-0')}
@@ -271,7 +270,7 @@ export const CreateAnalyticsBucketForm = ({
           form={formId}
           htmlType="submit"
           loading={isCreating}
-          disabled={wrappersExtenstionNeedsUpgrading || isCreating}
+          disabled={wrappersExtensionNeedsUpgrading || isCreating}
         >
           Create bucket
         </Button>
