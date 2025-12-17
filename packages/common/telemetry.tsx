@@ -43,7 +43,7 @@ export const TelemetryTagManager = () => {
 //---
 // PAGE TELEMETRY
 //---
-export function handlePageTelemetry(
+function handlePageTelemetry(
   API_URL: string,
   pathname?: string,
   featureFlags?: {
