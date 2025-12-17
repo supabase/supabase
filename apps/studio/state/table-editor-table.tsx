@@ -205,8 +205,7 @@ export const TableEditorTableStateContextProvider = ({
         saveTableEditorStateToLocalStorageDebounced({
           gridColumns: state.gridColumns,
           projectRef,
-          tableName: state.table.name,
-          schema: state.table.schema,
+          tableId: state.table.id,
         })
       })
     }

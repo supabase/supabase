@@ -159,14 +159,13 @@ export function buildTableEditorUrl(projectRef: string, tableId: number) {
 
 export function saveTableEditorStateToLocalStorage({
   projectRef,
-  tableName,
-  schema,
+  tableId,
   gridColumns,
   sorts,
   filters,
 }: {
   projectRef: string
-  tableName: string
+  tableId: number
   schema?: string | null
   gridColumns?: CalculatedColumn<any, any>[]
   sorts?: string[]
@@ -174,7 +173,6 @@ export function saveTableEditorStateToLocalStorage({
 }) {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
   const savedStr = sessionStorage.getItem(storageKey) ?? localStorage.getItem(storageKey)
-  const tableKey = !schema || schema == 'public' ? tableName : `${schema}.${tableName}`
 
   const config = {
     ...(gridColumns !== undefined && { gridColumns }),
@@ -185,10 +183,10 @@ export function saveTableEditorStateToLocalStorage({
   let savedJson
   if (savedStr) {
     savedJson = JSON.parse(savedStr)
-    const previousConfig = savedJson[tableKey]
-    savedJson = { ...savedJson, [tableKey]: { ...previousConfig, ...config } }
+    const previousConfig = savedJson[tableId]
+    savedJson = { ...savedJson, [tableId]: { ...previousConfig, ...config } }
   } else {
-    savedJson = { [tableKey]: config }
+    savedJson = { [tableId]: config }
   }
   // Save to both localStorage and sessionStorage so it's consistent to current tab
   localStorage.setItem(storageKey, JSON.stringify(savedJson))
@@ -242,8 +240,7 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
 
     saveTableEditorStateToLocalStorage({
       projectRef,
-      tableName: table.name,
-      schema: table.schema,
+      tableId: table.id,
       sorts: latestUrlParams.sort,
       filters: latestUrlParams.filter,
     })
