@@ -51,56 +51,54 @@ export const PublicationSelection = ({
   const hasTablesWithNoPrimaryKeys = (checkPrimaryKeysExistsData?.offendingTables ?? []).length > 0
 
   return (
-    <>
-      <FormField_Shadcn_
-        control={form.control}
-        name="publicationName"
-        render={({ field }) => (
-          <FormItemLayout
-            label="Publication"
-            layout="vertical"
-            description="Choose which tables to replicate to this destination"
-          >
-            <FormControl_Shadcn_>
-              <PublicationsComboBox
-                publications={publicationNames}
-                isLoadingPublications={isLoadingPublications}
-                isLoadingCheck={!!selectedPublication && isLoadingCheck}
-                field={field}
-                onNewPublicationClick={() => onSelectNewPublication()}
-              />
-            </FormControl_Shadcn_>
-            {isSelectedPublicationMissing ? (
-              <Admonition type="warning" className="mt-2">
-                <p className="!leading-normal">
-                  The publication <strong className="text-foreground">{publicationName}</strong> was
-                  not found, it may have been renamed or deleted, please select another one.
-                </p>
-              </Admonition>
-            ) : hasTablesWithNoPrimaryKeys ? (
-              <Admonition type="warning" className="mt-2">
-                <p className="!leading-normal">
-                  Replication requires every table in the publication to have a primary key to work,
-                  which these tables are missing:
-                </p>
-                <ul className="list-disc pl-6 mb-2">
-                  {(checkPrimaryKeysExistsData?.offendingTables ?? []).map((x) => {
-                    const value = `${x.schema}.${x.name}`
-                    return (
-                      <li key={value} className="!leading-normal">
-                        <InlineLink href={`/project/${projectRef}/editor/${x.id}`}>
-                          {value}
-                        </InlineLink>
-                      </li>
-                    )
-                  })}
-                </ul>
-                <p className="!leading-normal">Ensure that these tables have primary keys first.</p>
-              </Admonition>
-            ) : null}
-          </FormItemLayout>
-        )}
-      />
-    </>
+    <FormField_Shadcn_
+      control={form.control}
+      name="publicationName"
+      render={({ field }) => (
+        <FormItemLayout
+          layout="horizontal"
+          label="Publication"
+          description="Choose which tables to replicate to this destination"
+        >
+          <FormControl_Shadcn_>
+            <PublicationsComboBox
+              publications={publicationNames}
+              isLoadingPublications={isLoadingPublications}
+              isLoadingCheck={!!selectedPublication && isLoadingCheck}
+              field={field}
+              onNewPublicationClick={() => onSelectNewPublication()}
+            />
+          </FormControl_Shadcn_>
+          {isSelectedPublicationMissing ? (
+            <Admonition type="warning" className="mt-2">
+              <p className="!leading-normal">
+                The publication <strong className="text-foreground">{publicationName}</strong> was
+                not found, it may have been renamed or deleted, please select another one.
+              </p>
+            </Admonition>
+          ) : hasTablesWithNoPrimaryKeys ? (
+            <Admonition type="warning" className="mt-2">
+              <p className="!leading-normal">
+                Replication requires every table in the publication to have a primary key to work,
+                which these tables are missing:
+              </p>
+              <ul className="list-disc pl-6 mb-2">
+                {(checkPrimaryKeysExistsData?.offendingTables ?? []).map((x) => {
+                  const value = `${x.schema}.${x.name}`
+                  return (
+                    <li key={value} className="!leading-normal">
+                      <InlineLink href={`/project/${projectRef}/editor/${x.id}`}>
+                        {value}
+                      </InlineLink>
+                    </li>
+                  )
+                })}
+              </ul>
+              <p className="!leading-normal">Ensure that these tables have primary keys first.</p>
+            </Admonition>
+          ) : null}
+        </FormItemLayout>
+      )}
+    />
   )
 }
