@@ -1,6 +1,5 @@
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -11,7 +10,7 @@ import {
   Button,
 } from 'ui'
 
-export default function AlertDialogDemo() {
+export default function AlertDialogCloseOnly() {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -19,16 +18,14 @@ export default function AlertDialogDemo() {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Create new API keys</AlertDialogTitle>
+          <AlertDialogTitle>Application submitted</AlertDialogTitle>
           <AlertDialogDescription>
-            This will create a default publishable key and a default secret key both named{' '}
-            <code className="text-code-inline">default</code>. These keys are required to connect
-            your application to your Supabase project.
+            Thank you for your submission! Please check your email for a confirmation link to
+            complete your application.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Create keys</AlertDialogAction>
+          <AlertDialogCancel>Close</AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
