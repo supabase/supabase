@@ -5,7 +5,6 @@ import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -25,6 +24,7 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface EditSecretModalProps {
   visible: boolean
