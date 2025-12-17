@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
@@ -15,7 +16,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import {
   AuditLog,
@@ -24,6 +25,7 @@ import {
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
@@ -32,7 +34,6 @@ import {
   Button,
   WarningIcon,
 } from 'ui'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 const logsUpgradeError = 'upgrade to Team or Enterprise Plan to access audit logs.'
 
@@ -68,21 +69,28 @@ export const AuditLogs = () => {
   const { hasAccess: hasAccessToAuditLogs, isLoading: isLoadingEntitlements } =
     useCheckEntitlements('security.audit_logs_days')
 
-  const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
-    useOrganizationAuditLogsQuery(
-      {
-        slug,
-        iso_timestamp_start: dateRange.from,
-        iso_timestamp_end: dateRange.to,
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    isRefetching,
+    refetch,
+  } = useOrganizationAuditLogsQuery(
+    {
+      slug,
+      iso_timestamp_start: dateRange.from,
+      iso_timestamp_end: dateRange.to,
+    },
+    {
+      enabled: canReadAuditLogs,
+      retry: false,
+      refetchOnWindowFocus: (query) => {
+        return !query.state.error?.message.endsWith(logsUpgradeError)
       },
-      {
-        enabled: canReadAuditLogs,
-        retry: false,
-        refetchOnWindowFocus: (query) => {
-          return !query.state.error?.message.endsWith(logsUpgradeError)
-        },
-      }
-    )
+    }
+  )
 
   const isLogsNotAvailableBasedOnPlan = isError && !hasAccessToAuditLogs
   const isRangeExceededError = isError && error.message.includes('range exceeded')
@@ -97,7 +105,7 @@ export const AuditLogs = () => {
     fetchNextPage,
   } = useOrgProjectsInfiniteQuery(
     { slug, search: search.length === 0 ? search : debouncedSearch },
-    { keepPreviousData: true, enabled: showFilters }
+    { placeholderData: keepPreviousData, enabled: showFilters }
   )
   const { data: organizations } = useOrganizationsQuery({
     enabled: showFilters,
@@ -153,31 +161,13 @@ export const AuditLogs = () => {
     return (
       <ScaffoldContainer>
         <ScaffoldSection isFullWidth>
-          <Alert_Shadcn_
-            variant="default"
-            title="Organization Audit Logs are not available on Free or Pro plans"
-          >
-            <WarningIcon />
-            <div className="flex flex-col md:flex-row pt-1 gap-4">
-              <div className="grow">
-                <AlertTitle_Shadcn_>
-                  Organization Audit Logs are not available on Free or Pro plans
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
-                  <p>
-                    Upgrade to Team or Enterprise to view up to 62 days of Audit Logs for your
-                    organization.
-                  </p>
-                </AlertDescription_Shadcn_>
-              </div>
-
-              <div className="flex items-center">
-                <UpgradePlanButton source="auditLogs" plan="Team" type="primary">
-                  Upgrade subscription
-                </UpgradePlanButton>
-              </div>
-            </div>
-          </Alert_Shadcn_>
+          <UpgradeToPro
+            plan="Team"
+            source="organizationAuditLogs"
+            primaryText="Organization Audit Logs are not available on Free or Pro plans"
+            secondaryText="Upgrade to Team or Enterprise to view up to 62 days of Audit Logs for your organization."
+            featureProposition="enable audit logs"
+          />
         </ScaffoldSection>
       </ScaffoldContainer>
     )
@@ -348,12 +338,12 @@ export const AuditLogs = () => {
                           (member) => member.gotrue_id === log.actor.id
                         )
                         const role = roles.find((role) => user?.role_ids?.[0] === role.id)
-                        const project = projects?.find(
-                          (project) => project.ref === log.target.metadata.project_ref
-                        )
-                        const organization = organizations?.find(
-                          (org) => org.slug === log.target.metadata.org_slug
-                        )
+                        const logProjectRef =
+                          log.target.metadata.project_ref ?? log.target.metadata.ref
+                        const logOrgSlug = log.target.metadata.org_slug ?? log.target.metadata.slug
+
+                        const project = projects?.find((project) => project.ref === logProjectRef)
+                        const organization = organizations?.find((org) => logOrgSlug)
 
                         const hasStatusCode = log.action.metadata[0]?.status !== undefined
                         const userIcon =
@@ -420,16 +410,10 @@ export const AuditLogs = () => {
                               </p>
                               <p
                                 className="text-foreground-light text-xs mt-0.5 truncate"
-                                title={
-                                  log.target.metadata.project_ref ?? log.target.metadata.org_slug
-                                }
+                                title={logProjectRef ?? logOrgSlug ?? ''}
                               >
-                                {log.target.metadata.project_ref
-                                  ? 'Ref: '
-                                  : log.target.metadata.org_slug
-                                    ? 'Slug: '
-                                    : null}
-                                {log.target.metadata.project_ref ?? log.target.metadata.org_slug}
+                                {logProjectRef ? 'Ref: ' : logOrgSlug ? 'Slug: ' : null}
+                                {logProjectRef ?? logOrgSlug}
                               </p>
                             </Table.td>
                             <Table.td>

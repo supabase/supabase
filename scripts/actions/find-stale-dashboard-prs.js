@@ -177,6 +177,18 @@ module.exports = async ({ github, context, core }) => {
           )
         }
 
+        // Skip PRs that have already been actioned (reviewed)
+        if (reviewStatus !== 'no-reviews') {
+          console.log(`PR #${pr.number} has already been reviewed (${reviewStatus}), skipping...`)
+          continue
+        }
+
+        // Skip PRs with merge conflicts
+        if (mergeableStatus === 'conflicts') {
+          console.log(`PR #${pr.number} has merge conflicts, skipping...`)
+          continue
+        }
+
         stalePRs.push({
           number: pr.number,
           title: pr.title,

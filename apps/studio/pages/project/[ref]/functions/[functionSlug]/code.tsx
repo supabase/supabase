@@ -37,7 +37,7 @@ const CodePage = () => {
   })
   const {
     data: functionBody,
-    isLoading: isLoadingFiles,
+    isPending: isLoadingFiles,
     isError: isErrorLoadingFiles,
     isSuccess: isSuccessLoadingFiles,
     error: filesError,
@@ -61,19 +61,28 @@ const CodePage = () => {
   )
   const [files, setFiles] = useState<EdgeFunctionFile[]>([])
 
-  const { mutate: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
+  const { mutate: deployFunction, isPending: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
       toast.success('Successfully updated edge function')
       setShowDeployWarning(false)
     },
   })
 
+  const fileExists = (filePath: string | undefined): boolean => {
+    return filePath ? files.some((file) => file.name === filePath) : false
+  }
+
   const onUpdate = async () => {
     if (isDeploying || !ref || !functionSlug || !selectedFunction || files.length === 0) return
 
     try {
-      const newEntrypointPath = selectedFunction.entrypoint_path?.split('/').pop()
+      const entrypoint_path =
+        functionBody?.metadata?.deno2_entrypoint_path ?? selectedFunction.entrypoint_path
+      const newEntrypointPath = entrypoint_path?.split('/').pop()
       const newImportMapPath = selectedFunction.import_map_path?.split('/').pop()
+
+      const entrypointExists = fileExists(newEntrypointPath)
+      const importMapExists = fileExists(newImportMapPath)
 
       deployFunction({
         projectRef: ref,
@@ -81,8 +90,8 @@ const CodePage = () => {
         metadata: {
           name: selectedFunction.name,
           verify_jwt: selectedFunction.verify_jwt,
-          entrypoint_path: newEntrypointPath,
-          import_map_path: newImportMapPath,
+          ...(entrypointExists && { entrypoint_path: newEntrypointPath }),
+          ...(importMapExists && { import_map_path: newImportMapPath }),
         },
         files: files.map(({ name, content }) => ({ name, content })),
       })
@@ -136,10 +145,17 @@ const CodePage = () => {
   }
 
   useEffect(() => {
+    if (!functionBody) {
+      return
+    }
+
+    const entrypoint_path =
+      functionBody.metadata?.deno2_entrypoint_path ?? selectedFunction?.entrypoint_path
+
     // Set files from API response when available
-    if (selectedFunction?.entrypoint_path && functionBody) {
+    if (entrypoint_path) {
       const base_path = getBasePath(
-        selectedFunction?.entrypoint_path,
+        entrypoint_path,
         functionBody.files.map((file) => file.name)
       )
       const filesWithRelPath = functionBody.files

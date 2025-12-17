@@ -47,7 +47,7 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
     },
   })
 
-  const { isLoading, mutate } = useDatabaseQueueMessageSendMutation({
+  const { isPending, mutate } = useDatabaseQueueMessageSendMutation({
     onSuccess: () => {
       toast.success(`Successfully added a message to the queue.`)
       onClose()
@@ -76,7 +76,7 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
       alignFooter="right"
       header="Add a message to the queue"
       visible={visible}
-      loading={isLoading}
+      loading={isPending}
       onCancel={onClose}
       confirmText="Add"
       onConfirm={() => {

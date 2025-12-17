@@ -97,7 +97,7 @@ export const TableList = ({
     data: tables,
     error: tablesError,
     isError: isErrorTables,
-    isLoading: isLoadingTables,
+    isPending: isLoadingTables,
     isSuccess: isSuccessTables,
   } = useTablesQuery(
     {
@@ -120,7 +120,7 @@ export const TableList = ({
     data: views,
     error: viewsError,
     isError: isErrorViews,
-    isLoading: isLoadingViews,
+    isPending: isLoadingViews,
     isSuccess: isSuccessViews,
   } = useViewsQuery(
     {
@@ -141,7 +141,7 @@ export const TableList = ({
     data: materializedViews,
     error: materializedViewsError,
     isError: isErrorMaterializedViews,
-    isLoading: isLoadingMaterializedViews,
+    isPending: isLoadingMaterializedViews,
     isSuccess: isSuccessMaterializedViews,
   } = useMaterializedViewsQuery(
     {
@@ -164,7 +164,7 @@ export const TableList = ({
     data: foreignTables,
     error: foreignTablesError,
     isError: isErrorForeignTables,
-    isLoading: isLoadingForeignTables,
+    isPending: isLoadingForeignTables,
     isSuccess: isSuccessForeignTables,
   } = useForeignTablesQuery(
     {
@@ -280,7 +280,7 @@ export const TableList = ({
             placeholder="Search for a table"
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}
-            icon={<Search size={12} />}
+            icon={<Search />}
           />
 
           {!isSchemaLocked && (
@@ -427,7 +427,11 @@ export const TableList = ({
                           {x.rows !== undefined ? x.rows.toLocaleString() : '-'}
                         </TableCell>
                         <TableCell className="hidden text-right xl:table-cell">
-                          {x.size !== undefined ? <code className="text-xs">{x.size}</code> : '-'}
+                          {x.size !== undefined ? (
+                            <code className="text-code-inline">{x.size}</code>
+                          ) : (
+                            '-'
+                          )}
                         </TableCell>
                         <TableCell className="hidden xl:table-cell text-center">
                           {(realtimePublication?.tables ?? []).find(
