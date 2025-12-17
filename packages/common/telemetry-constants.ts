@@ -2590,6 +2590,27 @@ export interface RequestUpgradeSubmittedEvent {
 }
 
 /**
+ * Triggered when a Studio error Admonition is displayed (mounted).
+ *
+ * @group Events
+ * @source studio
+ */
+export interface DashboardErrorDisplayedEvent {
+  action: 'dashboard_error_displayed'
+  properties: {
+    /**
+     * The type of error Admonition displayed
+     */
+    errorType: 'warning' | 'destructive' | 'danger'
+    /**
+     * Optional title of the error Admonition
+     */
+    title?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2733,3 +2754,4 @@ export type TelemetryEvent =
   | AdvisorAssistantButtonClickedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
+  | DashboardErrorDisplayedEvent
