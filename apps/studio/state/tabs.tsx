@@ -288,7 +288,13 @@ function createTabsState(projectRef: string) {
         case 'm':
         case 'f':
         case 'p':
-          router.push(buildTableEditorUrl(router.query.ref as string, tab.metadata?.tableId!))
+          router.push(
+            buildTableEditorUrl(
+              router.query.ref as string,
+              tab.metadata?.tableId!,
+              tab.metadata?.schema
+            )
+          )
           break
       }
     },

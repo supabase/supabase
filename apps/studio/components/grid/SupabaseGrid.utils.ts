@@ -144,8 +144,17 @@ export function loadTableEditorStateFromLocalStorage(
   return json[tableId]
 }
 
-export function buildTableEditorUrl(projectRef: string, tableId: number) {
+/**
+ * Builds a table editor URL with the given project reference, table ID. It will load the saved state from local storage
+ * and add the sort and filter parameters to the URL.
+ */
+export function buildTableEditorUrl(projectRef: string, tableId: number, schema?: string) {
   const url = new URL(`/project/${projectRef}/editor/${tableId}`, location.origin)
+
+  // If the schema is provided, add it to the URL so that the left sidebar is opened to the correct schema
+  if (schema) {
+    url.searchParams.set('schema', schema)
+  }
 
   const savedState = loadTableEditorStateFromLocalStorage(projectRef, tableId)
   if (savedState?.sorts) {

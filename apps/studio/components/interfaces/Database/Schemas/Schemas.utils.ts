@@ -41,6 +41,7 @@ export async function getGraphDataFromTables(
       id: table.id,
       ref: ref!,
       name: table.name,
+      schema: table.schema,
       isForeign: false,
       columns,
     }
@@ -71,6 +72,7 @@ export async function getGraphDataFromTables(
       const data: TableNodeData = {
         id: rel.id,
         ref: ref!,
+        schema: rel.target_table_schema,
         name: `${rel.target_table_schema}.${rel.target_table_name}.${rel.target_column_name}`,
         isForeign: true,
         columns: [],
