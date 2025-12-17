@@ -28,18 +28,19 @@ export function buildQueryExplanationPrompt(
     }
   }
 
-  const prompt = `Explain this query from my database performance metrics:
+  const prompt = `Analyze this database query and provide a brief, concise explanation:
 
-1. What does it do?
-2. Should I be concerned about its performance?
-3. What can I do to optimize it, if anything?
-
-Performance Metrics:
+**Performance Metrics:**
 ${metadata}
 
 ${additionalContext}
 
-Be specific about whether this is within my control to optimize.`
+Provide a short response covering:
+1. What the query does (1-2 sentences)
+2. Performance assessment (good/concerning and why)
+3. Actionable optimization suggestions (if any)
+
+Keep your response concise and focused on actionable insights. We can continue the conversation if needed to get more details.`
 
   return {
     query: selectedRow.query,
