@@ -3,6 +3,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import Link from 'next/link'
 
 import { useIncidentStatusQuery } from 'data/platform/incident-status-query'
+import { ExternalLink } from 'lucide-react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
@@ -56,36 +57,44 @@ export function IncidentAdmonition() {
     }
   }
 
+  // Create title
+  const statusTitle =
+    primaryIncident.name +
+    (hasMultipleIncidents && incidents.length > 1
+      ? ` and ${incidents.length - 1} other issue${incidents.length > 2 ? 's' : ''}`
+      : '')
+
+  // Create descriptions
+  const statusDescriptionSignOff = 'Please check back soon or follow the status page for updates.'
+  const investigatingStatusDescription = `We are investigating ${hasMultipleIncidents ? 'these issues' : 'this issue'}. ${statusDescriptionSignOff}`
+
+  const getStatusDescription = (status: string): string => {
+    switch (status) {
+      case 'investigating':
+        return investigatingStatusDescription
+      case 'identified':
+        return `We have identified the cause of ${hasMultipleIncidents ? 'these issues' : 'this issue'} and are working on a fix. ${statusDescriptionSignOff}`
+      case 'monitoring':
+        return `A fix has been deployed and we are monitoring the results. ${statusDescriptionSignOff}`
+      case 'resolved':
+        return `${hasMultipleIncidents ? 'These issues' : 'This issue'} have just been resolved but may take some time to fully recover. ${statusDescriptionSignOff}`
+      default:
+        return investigatingStatusDescription
+    }
+  }
+
   return (
     <Admonition
       type="warning"
-      title={hasMultipleIncidents ? 'Active incidents ongoing' : 'Active incident ongoing'}
-      description={
-        <div className="flex flex-col gap-y-3">
-          <div className="flex flex-col gap-y-2">
-            <p className="text-sm leading-normal">
-              <strong>{primaryIncident.name}</strong>
-            </p>
-            {primaryIncident.status && (
-              <p className="text-sm text-foreground-light">Status: {primaryIncident.status}</p>
-            )}
-            <p className="text-sm text-foreground-light">
-              Active since: {formatActiveSince(primaryIncident.active_since)}
-            </p>
-            {hasMultipleIncidents && (
-              <p className="text-sm text-foreground-light">
-                {incidents.length - 1} other incident{incidents.length - 1 > 1 ? 's' : ''} ongoing
-              </p>
-            )}
-          </div>
-          <div>
-            <Button asChild type="default">
-              <Link href="https://status.supabase.com/" target="_blank" rel="noreferrer">
-                View status page
-              </Link>
-            </Button>
-          </div>
-        </div>
+      layout="horizontal"
+      title={statusTitle}
+      description={getStatusDescription(primaryIncident.status)}
+      actions={
+        <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+          <Link href="https://status.supabase.com/" target="_blank" rel="noreferrer">
+            Status page
+          </Link>
+        </Button>
       }
     />
   )

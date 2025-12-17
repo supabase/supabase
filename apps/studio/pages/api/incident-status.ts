@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
-import { IS_PLATFORM } from 'common'
 import { InternalServerError } from 'lib/api/apiHelpers'
 
 type IncidentInfo = {
@@ -46,42 +45,61 @@ const getMockIncidents = (count: number = 2): IncidentInfo[] => {
 
   const allMockIncidents: IncidentInfo[] = [
     {
-      id: 'mock-incident-1',
-      name: 'Database connection issues affecting some regions',
-      status: 'investigating',
-      active_since: twoHoursAgo.toISOString(),
+      id: 'abc123',
+      name: 'Elevated error rates for Postgres connections',
+      status: 'investigating | identified | monitoring | resolved',
+      active_since: '2025-12-16T10:54:46Z',
     },
     {
-      id: 'mock-incident-2',
-      name: 'Increased latency in API responses',
-      status: 'monitoring',
-      active_since: threeDaysAgo.toISOString(),
-    },
-    {
-      id: 'mock-incident-3',
-      name: 'Authentication service experiencing intermittent failures',
+      id: '456',
+      name: 'Partial outage affecting Auth and Realtime',
       status: 'identified',
-      active_since: thirtyMinutesAgo.toISOString(),
+      impact: 'major',
+      created_at: '2025-12-16T10:54:46Z',
+      incident_updates: [
+        {
+          status: 'identified',
+          body: 'The root cause has been identified and a fix is being deployed.',
+          created_at: '2025-12-16T11:20:00Z',
+        },
+      ],
+      shortlink: 'https://stspg.io/xyz',
     },
   ]
 
   return allMockIncidents.slice(0, Math.max(1, Math.min(count, allMockIncidents.length)))
 }
 
-const getActiveIncidents = async (useMock: boolean = false, useRealApi: boolean = false, mockCount?: number): Promise<IncidentInfo[]> => {
+const getActiveIncidents = async (
+  useMock: boolean = false,
+  useRealApi: boolean = false,
+  mockCount?: number
+): Promise<IncidentInfo[]> => {
   // Return mock data if explicitly requested or if environment variables are not configured
   // This allows for local development and design testing
-  const hasEnvVars = STATUSPAGE_PAGE_ID && STATUSPAGE_PAGE_ID.trim() !== '' && STATUSPAGE_API_KEY && STATUSPAGE_API_KEY.trim() !== ''
+  const hasEnvVars =
+    STATUSPAGE_PAGE_ID &&
+    STATUSPAGE_PAGE_ID.trim() !== '' &&
+    STATUSPAGE_API_KEY &&
+    STATUSPAGE_API_KEY.trim() !== ''
   const isDevelopment = process.env.NODE_ENV === 'development'
-  
+
   // Use mock data if:
   // 1. Explicitly requested via useMock
   // 2. Env vars are not configured
   // 3. In development mode UNLESS explicitly requesting real API
   const shouldUseMock = useMock || !hasEnvVars || (isDevelopment && !useRealApi)
-  
+
   if (shouldUseMock) {
-    console.log('[incident-status] Using mock data', { useMock, useRealApi, mockCount, hasEnvVars, isDevelopment, STATUSPAGE_PAGE_ID: !!STATUSPAGE_PAGE_ID, STATUSPAGE_API_KEY: !!STATUSPAGE_API_KEY })
+    console.log('[incident-status] Using mock data', {
+      useMock,
+      useRealApi,
+      mockCount,
+      hasEnvVars,
+      isDevelopment,
+      STATUSPAGE_PAGE_ID: !!STATUSPAGE_PAGE_ID,
+      STATUSPAGE_API_KEY: !!STATUSPAGE_API_KEY,
+    })
     const mockData = getMockIncidents(mockCount)
     console.log('[incident-status] Mock data generated:', mockData.length, 'incidents')
     return mockData
@@ -185,7 +203,14 @@ export default async function handler(
       '[incident-status] STATUSPAGE_API_KEY:',
       STATUSPAGE_API_KEY ? '***SET***' : 'NOT SET'
     )
-    console.log('[incident-status] useMock:', useMock, 'useRealApi:', useRealApi, 'mockCount:', mockCount)
+    console.log(
+      '[incident-status] useMock:',
+      useMock,
+      'useRealApi:',
+      useRealApi,
+      'mockCount:',
+      mockCount
+    )
 
     const incidents = await getActiveIncidents(useMock, useRealApi, mockCount)
 
