@@ -400,7 +400,7 @@ const TEMPLATE_INTEGRATIONS: IntegrationDefinition[] = [
         label: 'Settings',
       },
     ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+    navigate: (_id: string, pageId: string = 'overview', _childId: string | undefined) => {
       switch (pageId) {
         case 'overview':
           return dynamic(

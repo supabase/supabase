@@ -20,7 +20,7 @@ const StripeSyncStateSchema = z
 export type StripeSyncState = z.infer<typeof StripeSyncStateSchema>
 
 export type StripeSyncStateData = z.infer<typeof StripeSyncStateSchema>
-export type StypeSyncStateError = ExecuteSqlError
+export type StripeSyncStateError = ExecuteSqlError
 
 export async function getStripeSyncState(
   { projectRef, connectionString }: DbConnection,
@@ -47,11 +47,11 @@ export const useStripeSyncingState = <TData = StripeSyncStateData>(
     enabled = true,
     ...options
   }: Omit<
-    UseQueryOptions<StripeSyncStateData, StypeSyncStateError, TData>,
+    UseQueryOptions<StripeSyncStateData, StripeSyncStateError, TData>,
     'queryKey' | 'queryFn'
   > = {}
 ) => {
-  return useQuery<StripeSyncStateData, StypeSyncStateError, TData>({
+  return useQuery<StripeSyncStateData, StripeSyncStateError, TData>({
     queryKey: stripeSyncKeys.syncState(projectRef),
     queryFn: ({ signal }) => getStripeSyncState({ projectRef, connectionString }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
