@@ -115,11 +115,19 @@ export const sqlEditorState = proxy({
     }
   },
 
-  setSql: (id: string, sql: string) => {
+  setSql: ({
+    id,
+    sql,
+    shouldInvalidate = false,
+  }: {
+    id: string
+    sql: string
+    shouldInvalidate?: boolean
+  }) => {
     let snippet = sqlEditorState.snippets[id]?.snippet
     if (snippet?.content) {
       snippet.content.sql = sql
-      sqlEditorState.needsSaving.set(id, false)
+      sqlEditorState.needsSaving.set(id, shouldInvalidate)
     }
   },
 
