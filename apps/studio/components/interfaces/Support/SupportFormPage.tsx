@@ -200,10 +200,7 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
                 className="hover:text-foreground transition-colors duration-100"
               >
                 <code
-                  className={cn(
-                    'text-code-inline !text-foreground-light underline decoration-foreground-lighter/50 hover:decoration-foreground-lighter/80 transition-colors duration-100'
-                  )}
-                >
+                  className="text-code-inline !text-foreground-light underline decoration-foreground-lighter/50 hover:decoration-foreground-lighter/80 transition-colors duration-100">
                   support@supabase.com
                 </code>
               </a>
@@ -219,7 +216,7 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
             <p className="flex items-center gap-x-1.5 flex-wrap">
               Project ID:{' '}
               <span className="inline-flex items-center gap-x-1">
-                <code className={cn('text-code-inline !text-foreground-light')}>{projectRef}</code>
+                <code className="text-code-inline !text-foreground-light">{projectRef}</code>
                 <CopyButton
                   iconOnly
                   type="text"
