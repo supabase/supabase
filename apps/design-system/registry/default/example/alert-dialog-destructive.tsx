@@ -29,8 +29,7 @@ export default function AlertDialogDestructive() {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          {/* [Danny] Add type="danger" to this AlertDialogAction once supported with #41336  */}
-          <AlertDialogAction>Delete</AlertDialogAction>
+          <AlertDialogAction variant="danger">Delete</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

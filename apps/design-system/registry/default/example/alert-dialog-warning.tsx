@@ -27,8 +27,7 @@ export default function AlertDialogWarning() {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          {/* [Danny] Add type="warning" to this AlertDialogAction once supported with #41336  */}
-          <AlertDialogAction>Update</AlertDialogAction>
+          <AlertDialogAction variant="warning">Update</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
