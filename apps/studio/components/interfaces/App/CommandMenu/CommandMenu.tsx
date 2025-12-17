@@ -8,7 +8,13 @@ import {
 } from 'components/layouts/SQLEditorLayout/SqlEditor.Commands'
 import { useProjectLevelTableEditorCommands } from 'components/layouts/TableEditorLayout/TableEditor.Commands'
 import { useLayoutNavCommands } from 'components/layouts/useLayoutNavCommands'
-import { CommandHeader, CommandInput, CommandList, CommandMenu } from 'ui-patterns/CommandMenu'
+import {
+  CommandHeader,
+  CommandInput,
+  CommandList,
+  CommandMenu,
+  useQuery,
+} from 'ui-patterns/CommandMenu'
 import { useChangelogCommand } from 'ui-patterns/CommandMenu/prepackaged/Changelog'
 import { useDocsAiCommands } from 'ui-patterns/CommandMenu/prepackaged/DocsAi'
 import { useDocsSearchCommands } from 'ui-patterns/CommandMenu/prepackaged/DocsSearch'
@@ -23,9 +29,16 @@ import {
   getSearchContextPlaceholder,
   type SearchContextValue,
 } from './SearchContextSelector'
+import { ContextSearchResults } from './ContextSearchResults'
 
-export default function StudioCommandMenu() {
-  const [searchContext, setSearchContext] = useState<SearchContextValue>('actions')
+function StudioCommandMenuContent({
+  searchContext,
+  setSearchContext,
+}: {
+  searchContext: SearchContextValue
+  setSearchContext: (value: SearchContextValue) => void
+}) {
+  const query = useQuery()
 
   useApiKeysCommands()
   useApiUrlCommand()
@@ -47,15 +60,31 @@ export default function StudioCommandMenu() {
   useChangelogCommand({ enabled: IS_PLATFORM })
   useThemeSwitcherCommands()
 
+  const isCommandsContext = searchContext === 'commands'
+
   return (
-    <CommandMenu>
+    <>
       <CommandHeader>
         <CommandInput
           leftIcon={<SearchContextSelector value={searchContext} onChange={setSearchContext} />}
           placeholder={getSearchContextPlaceholder(searchContext)}
         />
       </CommandHeader>
-      <CommandList />
+      {isCommandsContext ? (
+        <CommandList />
+      ) : (
+        <ContextSearchResults context={searchContext} query={query} />
+      )}
+    </>
+  )
+}
+
+export default function StudioCommandMenu() {
+  const [searchContext, setSearchContext] = useState<SearchContextValue>('commands')
+
+  return (
+    <CommandMenu>
+      <StudioCommandMenuContent searchContext={searchContext} setSearchContext={setSearchContext} />
     </CommandMenu>
   )
 }

@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronDown, Database, Search, Shield, Users } from 'lucide-react'
-import { EdgeFunctions, Storage } from 'icons'
+import { ChevronDown, Database, Search, Users } from 'lucide-react'
+import { Auth, EdgeFunctions, Storage } from 'icons'
 import { cn, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
 
 export type SearchContextValue =
@@ -31,22 +31,22 @@ const SEARCH_CONTEXT_OPTIONS: SearchContextOption[] = [
   {
     value: 'database-tables',
     label: 'Database Tables',
-    placeholder: 'Search database tables...',
+    placeholder: 'Search in database tables...',
     icon: Database,
   },
   {
     value: 'auth-policies',
     label: 'Auth Policies',
-    placeholder: 'Search auth policies...',
-    icon: Shield,
+    placeholder: 'Search in auth policies...',
+    icon: Auth,
   },
   {
     value: 'edge-functions',
     label: 'Edge Functions',
-    placeholder: 'Search edge functions...',
+    placeholder: 'Search in edge functions...',
     icon: EdgeFunctions,
   },
-  { value: 'storage', label: 'Storage', placeholder: 'Search storage...', icon: Storage },
+  { value: 'storage', label: 'Storage', placeholder: 'Search in storage...', icon: Storage },
 ]
 
 interface SearchContextSelectorProps {
@@ -75,6 +75,9 @@ export function SearchContextSelector({ value, onChange }: SearchContextSelector
         </button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="w-48 p-1" align="start">
+        <div className="font-mono uppercase text-foreground-lighter w-full px-2 py-1.5 text-xs border-b mb-1.5">
+          Context:
+        </div>
         {SEARCH_CONTEXT_OPTIONS.map((option) => {
           const Icon = option.icon
           const isSelected = value === option.value
