@@ -90,6 +90,33 @@ async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiRes
       error: { message: 'Bad Request: Missing stripeSecretKey in request body' },
     })
   }
+
+  // Validate the Stripe API key before proceeding with installation
+  try {
+    const stripeResponse = await fetch('https://api.stripe.com/v1/account', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${stripeSecretKey}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    })
+
+    if (!stripeResponse.ok) {
+      const errorData = await stripeResponse.json()
+      const errorMessage =
+        errorData.error?.message || `Invalid Stripe API key (HTTP ${stripeResponse.status})`
+      return res.status(400).json({
+        data: null,
+        error: { message: `Invalid Stripe API key: ${errorMessage}` },
+      })
+    }
+  } catch (error: any) {
+    return res.status(400).json({
+      data: null,
+      error: { message: `Failed to validate Stripe API key: ${error.message}` },
+    })
+  }
+
   try {
     waitUntil(
       install({
