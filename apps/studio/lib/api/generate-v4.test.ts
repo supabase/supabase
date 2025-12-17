@@ -84,41 +84,13 @@ test('generateV4 calls the tool sanitizer', async () => {
   }))
 
   vi.mock('ai', () => ({
-    createUIMessageStream: vi.fn().mockImplementation(({ execute, onFinish }) => {
-      const mockWriter = {
-        write: vi.fn(),
-        merge: vi.fn(),
-      }
-      // Execute the stream handler
-      execute({ writer: mockWriter })
-      // Call onFinish with mock response message
-      onFinish?.({ messages: [], responseMessage: null })
-      // Return a mock ReadableStream
-      return new ReadableStream({
-        start(controller) {
-          controller.close()
-        },
-      })
-    }),
-    createUIMessageStreamResponse: vi.fn().mockReturnValue({
-      status: 200,
-      headers: new Headers(),
-      body: null,
-    }),
     streamText: vi.fn().mockReturnValue({
-      toUIMessageStream: vi.fn().mockReturnValue(
-        new ReadableStream({
-          start(controller) {
-            controller.close()
-          },
-        })
-      ),
+      pipeUIMessageStreamToResponse: vi.fn(),
       consumeStream: vi.fn(),
     }),
     convertToModelMessages: vi.fn((msgs) => msgs),
     stepCountIs: vi.fn(),
-    generateId: vi.fn(() => 'msg-test'),
-    TypeValidationError: class TypeValidationError extends Error {},
+    createIdGenerator: vi.fn(() => () => 'msg-test'),
   }))
 
   await generateV4(mockReq as any, mockRes as any)
