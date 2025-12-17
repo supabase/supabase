@@ -9,7 +9,6 @@ import {
   Layers,
   type LucideIcon,
 } from 'lucide-react'
-import type { ExplainNode } from './ExplainVisualizer.types'
 
 // Get human-readable description for an operation
 export function getOperationDescription(operation: string): string {
@@ -125,4 +124,10 @@ export function getOperationColor(operation: string): string {
   if (op.includes('join')) return 'text-foreground-light'
   if (op.includes('sort') || op.includes('aggregate')) return 'text-foreground-light'
   return 'text-foreground-light'
+}
+
+export function isExplainQuery(rows: readonly any[]): boolean {
+  return (
+    rows.length > 0 && rows[0].hasOwnProperty('QUERY PLAN') && Object.keys(rows[0]).length === 1
+  )
 }

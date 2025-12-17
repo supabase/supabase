@@ -16,6 +16,7 @@ import {
 } from 'ui-patterns/CommandMenu'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
+import { toast } from 'sonner'
 
 const API_KEYS_PAGE_NAME = 'API Keys'
 
@@ -46,7 +47,9 @@ export function useApiKeysCommands() {
           id: 'publishable-key',
           name: `Copy publishable key`,
           action: () => {
-            copyToClipboard(publishableKey.api_key ?? '')
+            copyToClipboard(publishableKey.api_key ?? '', () => {
+              toast.success('Publishable key copied to clipboard')
+            })
             setIsOpen(false)
           },
           badge: () => (
@@ -62,7 +65,9 @@ export function useApiKeysCommands() {
             id: key.id,
             name: `Copy secret key (${key.name})`,
             action: () => {
-              copyToClipboard(key.api_key ?? '')
+              copyToClipboard(key.api_key ?? '', () => {
+                toast.success('Secret key copied to clipboard')
+              })
               setIsOpen(false)
             },
             badge: () => (
@@ -79,7 +84,9 @@ export function useApiKeysCommands() {
           id: 'anon-key',
           name: `Copy anonymous API key`,
           action: () => {
-            copyToClipboard(anonKey.api_key ?? '')
+            copyToClipboard(anonKey.api_key ?? '', () => {
+              toast.success('Anonymous API key copied to clipboard')
+            })
             setIsOpen(false)
           },
           badge: () => (
@@ -96,7 +103,9 @@ export function useApiKeysCommands() {
           id: 'service-key',
           name: `Copy service API key`,
           action: () => {
-            copyToClipboard(serviceKey.api_key ?? '')
+            copyToClipboard(serviceKey.api_key ?? '', () => {
+              toast.success('Service key copied to clipboard')
+            })
             setIsOpen(false)
           },
           badge: () => (
