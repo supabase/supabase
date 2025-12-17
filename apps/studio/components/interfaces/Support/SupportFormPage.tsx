@@ -20,7 +20,7 @@ import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { AIAssistantOption } from './AIAssistantOption'
 import { DiscordCTACard } from './DiscordCTACard'
 import { HighlightProjectRefProvider, useHighlightProjectRefContext } from './HighlightContext'
-import { IncidentCallout } from './IncidentCallout'
+import { IncidentAdmonition } from './IncidentAdmonition'
 import { Success } from './Success'
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
@@ -101,7 +101,7 @@ function SupportFormPageContent() {
 
       <div className="flex flex-col gap-y-4">
         {hasActiveIncidents ? (
-          <IncidentCallout />
+          <IncidentAdmonition />
         ) : (
           <>
             <AIAssistantOption projectRef={projectRef} organizationSlug={orgSlug} />
@@ -180,7 +180,7 @@ function SupportFormHeader() {
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom" align="center">
-            Check Supabase status page
+            Check the Supabase status page
           </TooltipContent>
         </Tooltip>
       </div>

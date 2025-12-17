@@ -11,19 +11,32 @@ export type IncidentInfo = {
 }
 
 export async function getIncidentStatus(signal?: AbortSignal): Promise<IncidentInfo[]> {
-  const response = await fetch('/api/incident-status', {
+  // Add cache-busting in development to avoid stale empty responses
+  const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+  const url = isDevelopment 
+    ? `/api/incident-status?_t=${Date.now()}` 
+    : '/api/incident-status'
+  
+  const response = await fetch(url, {
     signal,
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
+    cache: 'no-store', // Prevent caching
   })
 
   if (!response.ok) {
+    const errorText = await response.text()
+    console.error('[getIncidentStatus] Failed:', response.status, errorText)
     throw new Error(`Failed to fetch incident status: ${response.statusText}`)
   }
 
   const data = await response.json()
+  console.log('[getIncidentStatus] Received data:', Array.isArray(data) ? `${data.length} incidents` : data)
+  if (Array.isArray(data) && data.length === 0) {
+    console.warn('[getIncidentStatus] Received empty array - this should not happen in development!')
+  }
   return data as IncidentInfo[]
 }
 

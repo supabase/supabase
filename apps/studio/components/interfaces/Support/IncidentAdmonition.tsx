@@ -8,11 +8,30 @@ import { Admonition } from 'ui-patterns/admonition'
 
 dayjs.extend(relativeTime)
 
-export function IncidentCallout() {
-  const { data: incidents, isPending, isError } = useIncidentStatusQuery()
+export function IncidentAdmonition() {
+  const { data: incidents, isPending, isError, error } = useIncidentStatusQuery()
+
+  // Debug logging
+  if (typeof window !== 'undefined') {
+    console.log('[IncidentAdmonition] State:', {
+      isPending,
+      isError,
+      incidents,
+      incidentsLength: incidents?.length,
+      error,
+    })
+  }
 
   // Don't show anything while loading or on error
   if (isPending || isError || !incidents || incidents.length === 0) {
+    if (typeof window !== 'undefined' && !isPending) {
+      console.warn('[IncidentAdmonition] Not rendering:', {
+        isPending,
+        isError,
+        hasIncidents: !!incidents,
+        incidentsLength: incidents?.length,
+      })
+    }
     return null
   }
 
@@ -24,12 +43,12 @@ export function IncidentCallout() {
     try {
       const date = dayjs(activeSince)
       const daysDiff = dayjs().diff(date, 'day')
-      
+
       // If less than 1 day, show relative time (e.g., "2 hours ago")
       if (daysDiff < 1) {
         return date.fromNow()
       }
-      
+
       // Otherwise show formatted date (e.g., "Jan 15, 2024 at 2:30 PM")
       return date.format('MMM D, YYYY [at] h:mm A')
     } catch {
@@ -48,9 +67,7 @@ export function IncidentCallout() {
               <strong>{primaryIncident.name}</strong>
             </p>
             {primaryIncident.status && (
-              <p className="text-sm text-foreground-light">
-                Status: {primaryIncident.status}
-              </p>
+              <p className="text-sm text-foreground-light">Status: {primaryIncident.status}</p>
             )}
             <p className="text-sm text-foreground-light">
               Active since: {formatActiveSince(primaryIncident.active_since)}
@@ -73,4 +90,3 @@ export function IncidentCallout() {
     />
   )
 }
-

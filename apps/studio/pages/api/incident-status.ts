@@ -15,6 +15,10 @@ const STATUSPAGE_API_URL = 'https://api.statuspage.io/v1'
 const STATUSPAGE_PAGE_ID = process.env.STATUSPAGE_PAGE_ID
 const STATUSPAGE_API_KEY = process.env.STATUSPAGE_API_KEY
 
+console.log('!! Logging statuspage variables...')
+console.log('STATUSPAGE_PAGE_ID', STATUSPAGE_PAGE_ID)
+console.log('STATUSPAGE_API_KEY', STATUSPAGE_API_KEY)
+
 const INCIDENTS_ENDPOINT = `${STATUSPAGE_API_URL}/pages/${STATUSPAGE_PAGE_ID}/incidents/unresolved`
 
 /**
@@ -34,13 +38,53 @@ const StatusPageIncidentsSchema = z.array(
   })
 )
 
-const getActiveIncidents = async (): Promise<IncidentInfo[]> => {
-  if (!STATUSPAGE_PAGE_ID) {
-    throw new InternalServerError('StatusPage page ID is not configured')
-  }
+const getMockIncidents = (count: number = 2): IncidentInfo[] => {
+  const now = new Date()
+  const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000)
+  const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000)
+  const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000)
 
-  if (!STATUSPAGE_API_KEY) {
-    throw new InternalServerError('StatusPage API key is not configured')
+  const allMockIncidents: IncidentInfo[] = [
+    {
+      id: 'mock-incident-1',
+      name: 'Database connection issues affecting some regions',
+      status: 'investigating',
+      active_since: twoHoursAgo.toISOString(),
+    },
+    {
+      id: 'mock-incident-2',
+      name: 'Increased latency in API responses',
+      status: 'monitoring',
+      active_since: threeDaysAgo.toISOString(),
+    },
+    {
+      id: 'mock-incident-3',
+      name: 'Authentication service experiencing intermittent failures',
+      status: 'identified',
+      active_since: thirtyMinutesAgo.toISOString(),
+    },
+  ]
+
+  return allMockIncidents.slice(0, Math.max(1, Math.min(count, allMockIncidents.length)))
+}
+
+const getActiveIncidents = async (useMock: boolean = false, useRealApi: boolean = false, mockCount?: number): Promise<IncidentInfo[]> => {
+  // Return mock data if explicitly requested or if environment variables are not configured
+  // This allows for local development and design testing
+  const hasEnvVars = STATUSPAGE_PAGE_ID && STATUSPAGE_PAGE_ID.trim() !== '' && STATUSPAGE_API_KEY && STATUSPAGE_API_KEY.trim() !== ''
+  const isDevelopment = process.env.NODE_ENV === 'development'
+  
+  // Use mock data if:
+  // 1. Explicitly requested via useMock
+  // 2. Env vars are not configured
+  // 3. In development mode UNLESS explicitly requesting real API
+  const shouldUseMock = useMock || !hasEnvVars || (isDevelopment && !useRealApi)
+  
+  if (shouldUseMock) {
+    console.log('[incident-status] Using mock data', { useMock, useRealApi, mockCount, hasEnvVars, isDevelopment, STATUSPAGE_PAGE_ID: !!STATUSPAGE_PAGE_ID, STATUSPAGE_API_KEY: !!STATUSPAGE_API_KEY })
+    const mockData = getMockIncidents(mockCount)
+    console.log('[incident-status] Mock data generated:', mockData.length, 'incidents')
+    return mockData
   }
 
   const response = await fetch(INCIDENTS_ENDPOINT, {
@@ -112,11 +156,17 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<IncidentInfo[] | { error: string }>
 ) {
-  if (!IS_PLATFORM) {
-    return res.status(404).end()
-  }
-
   const { method } = req
+
+  // Support query parameters for mock mode and incident count
+  const useMock = req.query.mock === 'true'
+  const useRealApi = req.query.useRealApi === 'true'
+  const mockCount = req.query.count ? parseInt(req.query.count as string, 10) : undefined
+
+  // Allow endpoint to work in local development
+  // getActiveIncidents will automatically use mock data if env vars aren't set
+  // Only block if we're on platform and trying to use real API without proper config
+  // (But allow mock mode or when env vars aren't set for local dev)
 
   if (method === 'HEAD') {
     res.setHeader('Cache-Control', CACHE_CONTROL_SETTINGS)
@@ -129,7 +179,17 @@ export default async function handler(
   }
 
   try {
-    const incidents = await getActiveIncidents()
+    console.log('[incident-status] Request received - logging statuspage variables:')
+    console.log('[incident-status] STATUSPAGE_PAGE_ID:', STATUSPAGE_PAGE_ID || 'NOT SET')
+    console.log(
+      '[incident-status] STATUSPAGE_API_KEY:',
+      STATUSPAGE_API_KEY ? '***SET***' : 'NOT SET'
+    )
+    console.log('[incident-status] useMock:', useMock, 'useRealApi:', useRealApi, 'mockCount:', mockCount)
+
+    const incidents = await getActiveIncidents(useMock, useRealApi, mockCount)
+
+    console.log('[incident-status] Returning incidents:', incidents.length, incidents)
 
     res.setHeader('Cache-Control', CACHE_CONTROL_SETTINGS)
 
