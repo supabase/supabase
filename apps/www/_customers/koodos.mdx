@@ -33,7 +33,8 @@ supabase_products: ['database', 'auth', 'storage']
 ---
 
 <Quote img="apurva-chitnis.jpg" caption="Apurva Chitnis, Co-Founder & CTO, Koodos">
-  We grew from zero to a million users in a short period and Supabase has kept up every step of the way. The combination of Postgres performance and developer support has been incredible.
+  We grew from zero to a million users in a short period and Supabase has kept up every step of the
+  way. The combination of Postgres performance and developer support has been incredible.
 </Quote>
 
 [Koodos](https://shelf.im/) is the company behind Shelf, a social app that helps users understand themselves better by connecting their media platforms into one place. Users can link Spotify, Apple Music, Netflix, Letterboxd, Goodreads, and more to build a personalized shelf of their interests, track how their tastes change over time, and discover connections with others based on shared media preferences.
@@ -52,7 +53,8 @@ As the app scaled, the engineering team faced mounting infrastructure pressure:
 - Strict reliability requirements during viral growth surges
 
 <Quote img="apurva-chitnis.jpg" caption="Apurva Chitnis, Co-Founder & CTO, Koodos">
-  We're syncing Spotify and other platforms for millions of users. Each sync job touches Postgres thousands of times per user, so efficiency matters at this scale.
+  We're syncing Spotify and other platforms for millions of users. Each sync job touches Postgres
+  thousands of times per user, so efficiency matters at this scale.
 </Quote>
 
 ## Choosing Supabase
@@ -60,7 +62,9 @@ As the app scaled, the engineering team faced mounting infrastructure pressure:
 Koodos chose Supabase from day one. The team evaluated alternatives like PlanetScale and Amazon RDS, but found they lacked the complete picture that Supabase offered.
 
 <Quote img="apurva-chitnis.jpg" caption="Apurva Chitnis, Co-Founder & CTO, Koodos">
-  We started from day zero with Supabase. Supabase helped us get started really quickly, helped us build a prototype very easily, had really strong integrations with Web SDKs and frontend SDKs that we needed, has really good backend support.
+  We started from day zero with Supabase. Supabase helped us get started really quickly, helped us
+  build a prototype very easily, had really strong integrations with Web SDKs and frontend SDKs that
+  we needed, has really good backend support.
 </Quote>
 
 Key reasons for choosing Supabase:
@@ -72,13 +76,16 @@ Key reasons for choosing Supabase:
 - Enterprise support with direct access to Supabase engineers
 
 <Quote img="apurva-chitnis.jpg" caption="Apurva Chitnis, Co-Founder & CTO, Koodos">
-  Many of the alternatives kind of work, but they don't complete the whole picture. They don't offer object storage hosting. They don't offer user management. So we'd have to think about other solutions to answer those for us. Supabase handles a lot of these core features out of the box.
+  Many of the alternatives kind of work, but they don't complete the whole picture. They don't offer
+  object storage hosting. They don't offer user management. So we'd have to think about other
+  solutions to answer those for us. Supabase handles a lot of these core features out of the box.
 </Quote>
 
 Supabase's combination of observability and hands-on support set it apart from the competition.
 
 <Quote img="apurva-chitnis.jpg" caption="Apurva Chitnis, Co-Founder & CTO, Koodos">
-  We looked at other hosted databases, but Supabase gave us full visibility. We can inspect queries, benchmark IOPS, and actually talk to the engineers helping us optimize. That's rare.
+  We looked at other hosted databases, but Supabase gave us full visibility. We can inspect queries,
+  benchmark IOPS, and actually talk to the engineers helping us optimize. That's rare.
 </Quote>
 
 ## The approach
@@ -96,7 +103,8 @@ Koodos uses Supabase as the backbone of Shelf's entire backend, powering authent
 - **Observability.** Using Supabase's Performance Advisor, Grafana metrics, and direct SQL inspection, the team tracks slow queries, vacuum activity, and connection spikes in real time.
 
 <Quote img="apurva-chitnis.jpg" caption="Apurva Chitnis, Co-Founder & CTO, Koodos">
-  Supabase's database reviews feel like health check-ups for our app. Their engineers spot issues before they become production problems.
+  Supabase's database reviews feel like health check-ups for our app. Their engineers spot issues
+  before they become production problems.
 </Quote>
 
 The team is also evolving their architecture to optimize how data flows through the system. They plan to send event data directly to Snowflake for heavy computation, then push aggregated results back into Postgres for fast reads. This lets Supabase do what it does best: fast, reliable reads with strong data integrity.
@@ -112,7 +120,8 @@ Supabase enabled Koodos to scale Shelf's backend in lockstep with explosive user
 - **No dedicated database staff** required despite massive scale
 
 <Quote img="apurva-chitnis.jpg" caption="Apurva Chitnis, Co-Founder & CTO, Koodos">
-  We're able to run an app with millions of users and syncing huge amounts of data without a lot of thought on our Postgres instance. We don't have anybody dedicated to our Postgres instance.
+  We're able to run an app with millions of users and syncing huge amounts of data without a lot of
+  thought on our Postgres instance. We don't have anybody dedicated to our Postgres instance.
 </Quote>
 
 ## What's next
@@ -120,6 +129,6 @@ Supabase enabled Koodos to scale Shelf's backend in lockstep with explosive user
 Koodos is preparing for its next phase of growth. The team is excited about Supabase's new [analytics and Iceberg capabilities](https://supabase.com/blog/introducing-analytics-buckets) for handling their large-scale data needs. They are also optimizing their architecture to leverage Postgres for what it does best while offloading heavy computation to Snowflake.
 
 <Quote img="apurva-chitnis.jpg" caption="Apurva Chitnis, Co-Founder & CTO, Koodos">
-  We know Supabase can take us from one million to ten million users. The roadmap, from Iceberg to Multigres, aligns perfectly with how we want to grow.
+  We know Supabase can take us from one million to ten million users. The roadmap, from Iceberg to
+  Multigres, aligns perfectly with how we want to grow.
 </Quote>
-

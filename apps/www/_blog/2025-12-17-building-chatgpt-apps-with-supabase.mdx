@@ -99,12 +99,12 @@ Open `index.ts` and set up your MCP server:
 
 ```tsx
 //index.ts
-import { MCPServer, object, text, widget, error } from "mcp-use/server";
+import { MCPServer, object, text, widget, error } from 'mcp-use/server'
 
 const server = new MCPServer({
   name: 'supabase-explorer',
-  version: "1.0.0",
-  description: "A Supabase MCP server with Apps SDK widgets"
+  version: '1.0.0',
+  description: 'A Supabase MCP server with Apps SDK widgets',
 })
 ```
 
@@ -228,47 +228,47 @@ Here is the **list-tables** tool that returns the `schema-explorer` widget:
 // index.ts
 server.tool(
   {
-    name: "list-tables",
-    description: "List all tables in your Supabase database",
+    name: 'list-tables',
+    description: 'List all tables in your Supabase database',
     schema: z.object({
-      schemas: z.array(z.string()).optional().describe("Schemas to include (default: all)"),
+      schemas: z.array(z.string()).optional().describe('Schemas to include (default: all)'),
     }),
     widget: {
-      name: "schema-explorer",
-      invoking: "Loading database tables...",
-      invoked: "Tables loaded successfully",
+      name: 'schema-explorer',
+      invoking: 'Loading database tables...',
+      invoked: 'Tables loaded successfully',
     },
-    annotations: { readOnlyHint: true }
+    annotations: { readOnlyHint: true },
   },
   async ({ schemas }) => {
     try {
-      const result = await supabaseClient?.callTool("list_tables", {schemas: ["public"]});
-      const content = result?.content[0];
-      let tables: any[] = [];
+      const result = await supabaseClient?.callTool('list_tables', { schemas: ['public'] })
+      const content = result?.content[0]
+      let tables: any[] = []
 
-      if (content?.type === "text") {
-        const data = extractJsonFromResponse(content?.text ?? "");
-        tables = Array.isArray(data) ? data : [];
+      if (content?.type === 'text') {
+        const data = extractJsonFromResponse(content?.text ?? '')
+        tables = Array.isArray(data) ? data : []
       }
 
       return widget({
         // Props passed to the React component in /resources folder
         props: {
           tables,
-          schemas: schemas || ["public"],
+          schemas: schemas || ['public'],
         },
         // Output returned by the MCP tool to the LLM (what the LLM sees)
         output: object({
           tables: tables.map((table) => ({
             name: table.name,
           })),
-        })
-      });
+        }),
+      })
     } catch (err) {
       return error(`Error listing tables: ${err instanceof Error ? err.message : String(err)}`)
     }
   }
-);
+)
 ```
 
 The tool queries your database for table information. It returns both text content for the LLM and widget metadata for the UI. ChatGPT uses the text content to understand the data. The widget renders in the chat for the user.
@@ -337,4 +337,3 @@ You now have a working ChatGPT app powered by Supabase Edge Functions. Here are 
 For more details on mcp-use, see the [mcp-use documentation](https://mcp-use.com/docs/typescript/server/deployment-supabase) or the [mcp-use GitHub repository](https://github.com/mcp-use/mcp-use). For more on Supabase Edge Functions, see the [Edge Functions guide](https://supabase.com/docs/guides/functions).
 
 For the full implementation, please visit or clone the repository: [github.com/mcp-use/supabase-mcp-server](https://github.com/mcp-use/supabase-mcp-server)
-
