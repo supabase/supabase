@@ -136,9 +136,8 @@ const HomePageCover = (props) => {
             {frameworks
               .filter((framework) => framework.enabled !== false)
               .map((framework, i) => {
-                const iconToUse = framework.hasLightIcon && isLightMode
-                  ? `${framework.icon}-light`
-                  : framework.icon
+                const iconToUse =
+                  framework.hasLightIcon && isLightMode ? `${framework.icon}-light` : framework.icon
 
                 return (
                   <Link key={i} href={framework.href} passHref className="no-underline">
