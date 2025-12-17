@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { z } from 'zod'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
@@ -11,14 +12,16 @@ export type GetIndexAdvisorResultVariables = {
   query: string
 }
 
-export type GetIndexAdvisorResultResponse = {
-  errors: string[]
-  index_statements: string[]
-  startup_cost_before: number
-  startup_cost_after: number
-  total_cost_before: number
-  total_cost_after: number
-}
+const IndexAdvisorResultSchema = z.object({
+  errors: z.array(z.string()),
+  index_statements: z.array(z.string()),
+  startup_cost_before: z.number(),
+  startup_cost_after: z.number(),
+  total_cost_before: z.number(),
+  total_cost_after: z.number(),
+})
+
+export type GetIndexAdvisorResultResponse = z.infer<typeof IndexAdvisorResultSchema>
 
 export async function getIndexAdvisorResult({
   projectRef,
@@ -27,7 +30,6 @@ export async function getIndexAdvisorResult({
 }: GetIndexAdvisorResultVariables) {
   if (!projectRef) throw new Error('Project ref is required')
 
-  // swap single quotes for double to prevent syntax errors
   const escapedQuery = query.replace(/'/g, "''")
 
   const { result: results } = await executeSql({
@@ -35,9 +37,21 @@ export async function getIndexAdvisorResult({
     connectionString,
     sql: `select * from index_advisor('${escapedQuery}');`,
   })
-  const result = results[0] as GetIndexAdvisorResultResponse
 
-  return filterProtectedSchemaIndexAdvisorResult(result)
+  if (!results || results.length === 0) {
+    throw new Error('Index advisor returned no results')
+  }
+
+  const parsed = IndexAdvisorResultSchema.safeParse(results[0])
+  if (!parsed.success) {
+    const firstError = parsed.error.errors[0]
+    const errorPath = firstError.path.length > 0 ? ` at path: ${firstError.path.join('.')}` : ''
+    throw new Error(
+      `Invalid index advisor response${errorPath}: ${firstError.message}. Received: ${JSON.stringify(results[0])}`
+    )
+  }
+
+  return filterProtectedSchemaIndexAdvisorResult(parsed.data)
 }
 
 export type GetIndexAdvisorResultData = Awaited<ReturnType<typeof getIndexAdvisorResult>>
