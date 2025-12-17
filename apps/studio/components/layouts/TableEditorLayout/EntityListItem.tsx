@@ -403,7 +403,7 @@ const EntityTooltipTrigger = ({
 
   let tooltipContent = null
   let showUnrestrictedBadge = false
-  const accessWarning = 'Data is publicly accessible via API'
+  const accessWarning = 'This table can be accessed by anyone via the Data API'
   const learnMoreCTA = (
     <InlineLink
       href={`/project/${ref}/editor/${entity.id}?schema=${entity.schema}&showWarning=true`}
@@ -448,22 +448,13 @@ const EntityTooltipTrigger = ({
       break
   }
 
-  // Handle tables with API access
-  if (entity.type === ENTITY_TYPE.TABLE && apiAccessData?.hasApiAccess) {
-    if (!entity.rls_enabled) {
-      // Case 3: API access + RLS disabled → Show "Unrestricted" badge
-      tooltipContent = <>This table can be accessed by anyone via the Data API as RLS is disabled</>
-      showUnrestrictedBadge = true
-    } else if (policyCount === 0) {
-      // Case 2: API access + RLS enabled + no policies → Show Globe with warning message
-      tooltipContent = (
-        <>This table can be accessed via the Data API but no RLS policies exist so no data will be returned</>
-      )
-      showUnrestrictedBadge = false
-    }
-    // Case 1: API access + RLS enabled + has policies → Show regular Globe icon (handled below)
+  // Handle tables with API access and RLS enabled but no policies
+  if (entity.type === ENTITY_TYPE.TABLE && apiAccessData?.hasApiAccess && entity.rls_enabled && policyCount === 0) {
+    tooltipContent = (
+      <>This table can be accessed via the Data API but no RLS policies exist so no data will be returned</>
+    )
+    showUnrestrictedBadge = false
   } else if (entity.type === ENTITY_TYPE.TABLE && tableHasLints) {
-    // Legacy lint-based detection for tables without API access info
     tooltipContent = (
       <>
         {accessWarning} as RLS is disabled. {learnMoreCTA}.
