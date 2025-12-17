@@ -7,7 +7,7 @@ import { formatRelative } from 'date-fns'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { AlertCircle, BadgeCheck, Check, ExternalLink, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -125,10 +125,12 @@ export const StripeSyncInstallationPage = () => {
     stripeSchema.description?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
     stripeSchema.description?.includes(INSTALLATION_ERROR_SUFFIX)
 
-  // Clear the install initiated flag once we detect completion or error from the schema
-  if (isInstallInitiated && (isInstalled || setupError)) {
-    setIsInstallInitiated(false)
-  }
+  useEffect(() => {
+    // Clear the install initiated flag once we detect completion or error from the schema
+    if (isInstallInitiated && (isInstalled || setupError)) {
+      setIsInstallInitiated(false)
+    }
+  }, [isInstallInitiated, isInstalled, setupError])
 
   // Check if there's an existing stripe schema that wasn't created by this integration
   const hasConflictingSchema =
