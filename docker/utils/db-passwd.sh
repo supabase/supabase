@@ -40,19 +40,33 @@ new_passwd="$(openssl rand -hex 16)"
 # https://supabase.com/docs/guides/database/postgres/roles#passwords
 # new_passwd="d0notUseSpecialSymbolsForPq123-"
 
-# Check Postgres service status
+# Check Postgres service
 db_image_prefix="supabase.postgres:"
-db_srv_status=$(docker compose ps 2>/dev/null | grep "$db_image_prefix" | awk '{print $8}')
 
-if [ "$db_srv_status" != "Up" ]; then
-    echo "Postgres container is not running. Exiting."
+compose_output=$(docker compose ps \
+  --format '{{.Image}}\t{{.Service}}\t{{.Status}}' 2>/dev/null | \
+  grep -m1 "^$db_image_prefix" || true)
+
+if [ -z "$compose_output" ]; then
+    echo "Postgres container not found. Exiting."
     exit 1
 fi
 
-# Get Postgres service name
-db_srv_name=$(docker compose ps 2>/dev/null | grep "$db_image_prefix" | awk '{print $4}')
+db_image=$(echo "$compose_output" | cut -f1)
+db_srv_name=$(echo "$compose_output" | cut -f2)
+db_srv_status=$(echo "$compose_output" | cut -f3)
 
-db_srv_port=$(grep -i "^POSTGRES_PORT=" .env | cut -d '=' -f 2)
+case "$db_srv_status" in
+    Up*)
+        ;;
+    *)
+        echo "Postgres container status: $db_srv_status"
+        echo "Exiting."
+        exit 1
+        ;;
+esac
+
+db_srv_port=$(grep "^POSTGRES_PORT=" .env | cut -d '=' -f 2)
 port_source=" (.env):"
 if [ -z "$db_srv_port" ]; then
     db_srv_port="5432"
@@ -67,6 +81,8 @@ echo ""
 echo "Service name: $db_srv_name"
 echo "Service status: $db_srv_status"
 echo "Service port${port_source} $db_srv_port"
+echo "Image: $db_image"
+echo ""
 echo "Admin user: $db_admin_user"
 
 if ! test -t 0; then
@@ -92,7 +108,7 @@ esac
 echo "Updating passwords..."
 echo "Connecting to the database service container..."
 
-docker compose exec -T $db_srv_name psql -U $db_admin_user -d "_supabase" -v ON_ERROR_STOP=1 <<EOF
+docker compose exec -T "$db_srv_name" psql -U "$db_admin_user" -d "_supabase" -v ON_ERROR_STOP=1 <<EOF
 alter user anon with password '${new_passwd}';
 alter user authenticated with password '${new_passwd}';
 alter user authenticator with password '${new_passwd}';
@@ -135,7 +151,7 @@ echo "Updating POSTGRES_PASSWORD in .env..."
 sed -i.old "s|^POSTGRES_PASSWORD=.*$|POSTGRES_PASSWORD=$new_passwd|" .env
 
 echo ""
-echo "Success. To restart containers use:"
+echo "Success. To update and restart containers use:"
 echo ""
 echo "docker compose up -d --force-recreate"
 echo ""
