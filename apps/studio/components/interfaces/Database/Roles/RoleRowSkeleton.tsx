@@ -1,6 +1,6 @@
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { ChevronUp } from 'lucide-react'
 import { cn } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export interface RoleRowSkeletonProps {
   index?: number

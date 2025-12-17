@@ -205,7 +205,8 @@ const MonacoEditor = ({
 
   useEffect(() => {
     if (debouncedValue.length > 0 && snippet) {
-      snapV2.setSql(id, value)
+      const shouldInvalidate = snippet.snippet.isNotSavedInDatabaseYet
+      snapV2.setSql({ id, sql: value, shouldInvalidate })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedValue])
