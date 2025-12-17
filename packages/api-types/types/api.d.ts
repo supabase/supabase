@@ -464,6 +464,78 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/agents': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List agents for project */
+    get: operations['v1-list-agents']
+    put?: never
+    /** Create new agent */
+    post: operations['v1-create-agent']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/agents/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Delete agent (soft delete) */
+    delete: operations['v1-delete-agent']
+    options?: never
+    head?: never
+    /** Update agent */
+    patch: operations['v1-update-agent']
+    trace?: never
+  }
+  '/v1/projects/{ref}/agents/{id}/messages': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get messages for agent */
+    get: operations['v1-get-agent-messages']
+    put?: never
+    /** Append messages to an agent */
+    post: operations['v1-save-agent-messages']
+    /** Delete messages from an agent */
+    delete: operations['v1-delete-agent-messages']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/agents/{id}/messages/{message_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Delete a message from an agent */
+    delete: operations['v1-delete-agent-message']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/analytics/endpoints/functions.combined-stats': {
     parameters: {
       query?: never
@@ -683,60 +755,6 @@ export interface paths {
     get: operations['v1-get-a-branch']
     put?: never
     post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/v1/projects/{ref}/chat-sessions': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** List chat sessions for project */
-    get: operations['ChatSessionsController_listChatSessions']
-    put?: never
-    /** Create new chat session */
-    post: operations['ChatSessionsController_createChatSession']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/v1/projects/{ref}/chat-sessions/{id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post?: never
-    /** Delete chat session (soft delete) */
-    delete: operations['ChatSessionsController_deleteChatSession']
-    options?: never
-    head?: never
-    /** Update chat session */
-    patch: operations['ChatSessionsController_updateChatSession']
-    trace?: never
-  }
-  '/v1/projects/{ref}/chat-sessions/{id}/messages': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get messages for chat session */
-    get: operations['ChatSessionsController_getMessages']
-    put?: never
-    /** Save messages (called from generate-v4 onFinish) */
-    post: operations['ChatSessionsController_saveMessages']
     delete?: never
     options?: never
     head?: never
@@ -1986,6 +2004,218 @@ export interface components {
     ActivateVanitySubdomainResponse: {
       custom_domain: string
     }
+    Agent: {
+      created_at: string
+      deleted_at?: string | null
+      /** Format: uuid */
+      id: string
+      name: string
+      project_ref: string
+      updated_at: string
+      user_id: number
+    }
+    AgentList: {
+      data: {
+        created_at: string
+        deleted_at?: string | null
+        /** Format: uuid */
+        id: string
+        name: string
+        project_ref: string
+        updated_at: string
+        user_id: number
+      }[]
+    }
+    AgentMessageList: {
+      data: {
+        id: string
+        metadata?: unknown
+        parts: (
+          | ({
+              providerMetadata?: unknown
+              /** @enum {string} */
+              state?: 'streaming' | 'done'
+              text: string
+              /** @enum {string} */
+              type: 'text'
+            } & {
+              [key: string]: unknown
+            })
+          | ({
+              providerMetadata?: unknown
+              /** @enum {string} */
+              state?: 'streaming' | 'done'
+              text: string
+              /** @enum {string} */
+              type: 'reasoning'
+            } & {
+              [key: string]: unknown
+            })
+          | (({
+              toolCallId: string
+              type: string
+            } & {
+              [key: string]: unknown
+            }) &
+              Omit<
+                | ({
+                    input?: unknown
+                    providerExecuted?: boolean
+                    /** @enum {string} */
+                    state: 'input-streaming'
+                  } & {
+                    [key: string]: unknown
+                  })
+                | ({
+                    callProviderMetadata?: unknown
+                    input?: unknown
+                    providerExecuted?: boolean
+                    /** @enum {string} */
+                    state: 'input-available'
+                  } & {
+                    [key: string]: unknown
+                  })
+                | ({
+                    callProviderMetadata?: unknown
+                    input?: unknown
+                    output?: unknown
+                    preliminary?: boolean
+                    providerExecuted?: boolean
+                    /** @enum {string} */
+                    state: 'output-available'
+                  } & {
+                    [key: string]: unknown
+                  })
+                | ({
+                    callProviderMetadata?: unknown
+                    errorText: string
+                    input?: unknown
+                    providerExecuted?: boolean
+                    rawInput?: unknown
+                    /** @enum {string} */
+                    state: 'output-error'
+                  } & {
+                    [key: string]: unknown
+                  }),
+                'state'
+              >)
+          | (({
+              toolCallId: string
+              toolName: string
+              /** @enum {string} */
+              type: 'dynamic-tool'
+            } & {
+              [key: string]: unknown
+            }) &
+              Omit<
+                | ({
+                    input?: unknown
+                    /** @enum {string} */
+                    state: 'input-streaming'
+                  } & {
+                    [key: string]: unknown
+                  })
+                | ({
+                    callProviderMetadata?: unknown
+                    input?: unknown
+                    /** @enum {string} */
+                    state: 'input-available'
+                  } & {
+                    [key: string]: unknown
+                  })
+                | ({
+                    callProviderMetadata?: unknown
+                    input?: unknown
+                    output?: unknown
+                    preliminary?: boolean
+                    /** @enum {string} */
+                    state: 'output-available'
+                  } & {
+                    [key: string]: unknown
+                  })
+                | ({
+                    callProviderMetadata?: unknown
+                    errorText: string
+                    input?: unknown
+                    /** @enum {string} */
+                    state: 'output-error'
+                  } & {
+                    [key: string]: unknown
+                  }),
+                'state'
+              >)
+          | ({
+              providerMetadata?: unknown
+              sourceId: string
+              title?: string
+              /** @enum {string} */
+              type: 'source-url'
+              url: string
+            } & {
+              [key: string]: unknown
+            })
+          | ({
+              filename?: string
+              mediaType: string
+              providerMetadata?: unknown
+              sourceId: string
+              title: string
+              /** @enum {string} */
+              type: 'source-document'
+            } & {
+              [key: string]: unknown
+            })
+          | ({
+              filename?: string
+              mediaType: string
+              providerMetadata?: unknown
+              /** @enum {string} */
+              type: 'file'
+              url: string
+            } & {
+              [key: string]: unknown
+            })
+          | ({
+              data?: unknown
+              id?: string
+              type: string
+            } & {
+              [key: string]: unknown
+            })
+          | ({
+              /** @enum {string} */
+              type: 'step-start'
+            } & {
+              [key: string]: unknown
+            })
+          | ({
+              args?: unknown
+              toolCallId: string
+              toolName: string
+              /** @enum {string} */
+              type: 'tool-call'
+            } & {
+              [key: string]: unknown
+            })
+          | ({
+              result?: unknown
+              toolCallId: string
+              toolName: string
+              /** @enum {string} */
+              type: 'tool-result'
+            } & {
+              [key: string]: unknown
+            })
+          | ({
+              type: string
+            } & {
+              [key: string]: unknown
+            })
+        )[]
+        /** @enum {string} */
+        role: 'user' | 'assistant' | 'system'
+      }[]
+    }
     AnalyticsResponse: {
       error?:
         | string
@@ -2148,6 +2378,10 @@ export interface components {
       external_workos_enabled: boolean | null
       external_workos_secret: string | null
       external_workos_url: string | null
+      external_x_client_id: string | null
+      external_x_email_optional: boolean | null
+      external_x_enabled: boolean | null
+      external_x_secret: string | null
       external_zoom_client_id: string | null
       external_zoom_email_optional: boolean | null
       external_zoom_enabled: boolean | null
@@ -2426,49 +2660,8 @@ export interface components {
         version: number
       }[]
     }
-    ChatMessage: {
-      id: string
-      metadata?: {
-        [key: string]: unknown
-      }
-      parts: (
-        | {
-            text: string
-            /** @enum {string} */
-            type: 'text'
-          }
-        | {
-            args?: unknown
-            toolCallId: string
-            toolName: string
-            /** @enum {string} */
-            type: 'tool-call'
-          }
-        | {
-            result?: unknown
-            toolCallId: string
-            toolName: string
-            /** @enum {string} */
-            type: 'tool-result'
-          }
-        | {
-            data?: unknown
-            type: string
-          }
-      )[]
-      /** @enum {string} */
-      role: 'user' | 'assistant' | 'system'
-    }
-    ChatSession: {
-      created_at: string
-      deleted_at?: string | null
-      /** Format: uuid */
-      id: string
-      name: string
-      project_ref: string
-      updated_at: string
-      /** Format: uuid */
-      user_id: string
+    CreateAgentBody: {
+      name?: string
     }
     CreateApiKeyBody: {
       description?: string | null
@@ -2526,9 +2719,6 @@ export interface components {
         [key: string]: string
       }
       with_data?: boolean
-    }
-    CreateChatSessionBody: {
-      name?: string
     }
     CreateOrganizationV1: {
       name: string
@@ -3481,33 +3671,188 @@ export interface components {
     SaveMessagesBody: {
       messages: {
         id: string
-        metadata?: {
-          [key: string]: unknown
-        }
+        metadata?: unknown
         parts: (
-          | {
+          | ({
+              providerMetadata?: unknown
+              /** @enum {string} */
+              state?: 'streaming' | 'done'
               text: string
               /** @enum {string} */
               type: 'text'
-            }
-          | {
+            } & {
+              [key: string]: unknown
+            })
+          | ({
+              providerMetadata?: unknown
+              /** @enum {string} */
+              state?: 'streaming' | 'done'
+              text: string
+              /** @enum {string} */
+              type: 'reasoning'
+            } & {
+              [key: string]: unknown
+            })
+          | (({
+              toolCallId: string
+              type: string
+            } & {
+              [key: string]: unknown
+            }) &
+              Omit<
+                | ({
+                    input?: unknown
+                    providerExecuted?: boolean
+                    /** @enum {string} */
+                    state: 'input-streaming'
+                  } & {
+                    [key: string]: unknown
+                  })
+                | ({
+                    callProviderMetadata?: unknown
+                    input?: unknown
+                    providerExecuted?: boolean
+                    /** @enum {string} */
+                    state: 'input-available'
+                  } & {
+                    [key: string]: unknown
+                  })
+                | ({
+                    callProviderMetadata?: unknown
+                    input?: unknown
+                    output?: unknown
+                    preliminary?: boolean
+                    providerExecuted?: boolean
+                    /** @enum {string} */
+                    state: 'output-available'
+                  } & {
+                    [key: string]: unknown
+                  })
+                | ({
+                    callProviderMetadata?: unknown
+                    errorText: string
+                    input?: unknown
+                    providerExecuted?: boolean
+                    rawInput?: unknown
+                    /** @enum {string} */
+                    state: 'output-error'
+                  } & {
+                    [key: string]: unknown
+                  }),
+                'state'
+              >)
+          | (({
+              toolCallId: string
+              toolName: string
+              /** @enum {string} */
+              type: 'dynamic-tool'
+            } & {
+              [key: string]: unknown
+            }) &
+              Omit<
+                | ({
+                    input?: unknown
+                    /** @enum {string} */
+                    state: 'input-streaming'
+                  } & {
+                    [key: string]: unknown
+                  })
+                | ({
+                    callProviderMetadata?: unknown
+                    input?: unknown
+                    /** @enum {string} */
+                    state: 'input-available'
+                  } & {
+                    [key: string]: unknown
+                  })
+                | ({
+                    callProviderMetadata?: unknown
+                    input?: unknown
+                    output?: unknown
+                    preliminary?: boolean
+                    /** @enum {string} */
+                    state: 'output-available'
+                  } & {
+                    [key: string]: unknown
+                  })
+                | ({
+                    callProviderMetadata?: unknown
+                    errorText: string
+                    input?: unknown
+                    /** @enum {string} */
+                    state: 'output-error'
+                  } & {
+                    [key: string]: unknown
+                  }),
+                'state'
+              >)
+          | ({
+              providerMetadata?: unknown
+              sourceId: string
+              title?: string
+              /** @enum {string} */
+              type: 'source-url'
+              url: string
+            } & {
+              [key: string]: unknown
+            })
+          | ({
+              filename?: string
+              mediaType: string
+              providerMetadata?: unknown
+              sourceId: string
+              title: string
+              /** @enum {string} */
+              type: 'source-document'
+            } & {
+              [key: string]: unknown
+            })
+          | ({
+              filename?: string
+              mediaType: string
+              providerMetadata?: unknown
+              /** @enum {string} */
+              type: 'file'
+              url: string
+            } & {
+              [key: string]: unknown
+            })
+          | ({
+              data?: unknown
+              id?: string
+              type: string
+            } & {
+              [key: string]: unknown
+            })
+          | ({
+              /** @enum {string} */
+              type: 'step-start'
+            } & {
+              [key: string]: unknown
+            })
+          | ({
               args?: unknown
               toolCallId: string
               toolName: string
               /** @enum {string} */
               type: 'tool-call'
-            }
-          | {
+            } & {
+              [key: string]: unknown
+            })
+          | ({
               result?: unknown
               toolCallId: string
               toolName: string
               /** @enum {string} */
               type: 'tool-result'
-            }
-          | {
-              data?: unknown
+            } & {
+              [key: string]: unknown
+            })
+          | ({
               type: string
-            }
+            } & {
+              [key: string]: unknown
+            })
         )[]
         /** @enum {string} */
         role: 'user' | 'assistant' | 'system'
@@ -3712,6 +4057,9 @@ export interface components {
     TypescriptResponse: {
       types: string
     }
+    UpdateAgentBody: {
+      name?: string
+    }
     UpdateApiKeyBody: {
       description?: string | null
       name?: string
@@ -3812,6 +4160,10 @@ export interface components {
       external_workos_enabled?: boolean | null
       external_workos_secret?: string | null
       external_workos_url?: string | null
+      external_x_client_id?: string | null
+      external_x_email_optional?: boolean | null
+      external_x_enabled?: boolean | null
+      external_x_secret?: string | null
       external_zoom_client_id?: string | null
       external_zoom_email_optional?: boolean | null
       external_zoom_enabled?: boolean | null
@@ -3976,9 +4328,6 @@ export interface components {
         | 'MIGRATIONS_FAILED'
         | 'FUNCTIONS_DEPLOYED'
         | 'FUNCTIONS_FAILED'
-    }
-    UpdateChatSessionBody: {
-      name?: string
     }
     UpdateCustomHostnameBody: {
       custom_hostname: string
@@ -5944,6 +6293,359 @@ export interface operations {
       }
     }
   }
+  'v1-list-agents': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AgentList']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-create-agent': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateAgentBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Agent']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-delete-agent': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-update-agent': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateAgentBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Agent']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-agent-messages': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AgentMessageList']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-save-agent-messages': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveMessagesBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-delete-agent-messages': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-delete-agent-message': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-get-project-function-combined-stats': {
     parameters: {
       query: {
@@ -6850,276 +7552,6 @@ export interface operations {
       }
       /** @description Failed to fetch database branch */
       500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ChatSessionsController_listChatSessions: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ChatSession'][]
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ChatSessionsController_createChatSession: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateChatSessionBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ChatSession']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ChatSessionsController_deleteChatSession: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ChatSessionsController_updateChatSession: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateChatSessionBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ChatSession']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ChatSessionsController_getMessages: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ChatMessage'][]
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ChatSessionsController_saveMessages: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SaveMessagesBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
         headers: {
           [name: string]: unknown
         }
