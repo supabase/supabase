@@ -412,8 +412,17 @@ const EntityTooltipTrigger = ({
     </InlineLink>
   )
 
-  // Handle non-table entities (views, materialized views, foreign tables)
   switch (entity.type) {
+    case ENTITY_TYPE.TABLE:
+      if (tableHasLints) {
+        tooltipContent = (
+          <>
+            {accessWarning} as RLS is disabled. {learnMoreCTA}.
+          </>
+        )
+        showUnrestrictedBadge = true
+      }
+      break
     case ENTITY_TYPE.VIEW:
       if (viewHasLints) {
         tooltipContent = (
@@ -454,13 +463,6 @@ const EntityTooltipTrigger = ({
       <>This table can be accessed via the Data API but no RLS policies exist so no data will be returned</>
     )
     showUnrestrictedBadge = false
-  } else if (entity.type === ENTITY_TYPE.TABLE && tableHasLints) {
-    tooltipContent = (
-      <>
-        {accessWarning} as RLS is disabled. {learnMoreCTA}.
-      </>
-    )
-    showUnrestrictedBadge = true
   }
 
   if (tooltipContent && showUnrestrictedBadge) {
