@@ -196,7 +196,7 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
             Email:{' '}
             <span className="inline-flex items-center gap-x-1">
               <a
-                href={`mailto:support@supabase.com?subject=Support Request${projectRef && ` for Project ID: ${projectRef}`}&body=Here is a detailed description of the problem I am experiencing and any other information that might be helpful...`}
+                href={`mailto:support@supabase.com?subject=${encodeURIComponent('Support Request')}${hasProjectRef ? `${encodeURIComponent(' for Project ID: ')}${encodeURIComponent(projectRef)}` : ''}&body=${encodeURIComponent('Here is a detailed description of the problem I am experiencing and any other information that might be helpful...')}`}
                 className="hover:text-foreground transition-colors duration-100"
               >
                 <code
