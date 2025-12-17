@@ -2590,7 +2590,8 @@ export interface RequestUpgradeSubmittedEvent {
 }
 
 /**
- * Triggered when a Studio error Admonition is displayed (mounted).
+ * Triggered when a Studio error UI element is displayed (mounted).
+ * This includes error Admonitions and Toast notifications.
  *
  * @group Events
  * @source studio
