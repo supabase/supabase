@@ -1,6 +1,7 @@
 import { openai } from '@ai-sdk/openai'
 import { Eval } from 'braintrust'
 import {
+  concisenessScorer,
   criteriaMetScorer,
   sqlSimilarityScorer,
   sqlSyntaxScorer,
@@ -55,5 +56,6 @@ Eval('Assistant', {
     sqlSyntaxScorer,
     criteriaMetScorer,
     textIncludesScorer,
+    concisenessScorer,
   ],
 })

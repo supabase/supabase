@@ -1,5 +1,6 @@
 import { EvalCase, EvalScorer } from 'braintrust'
-import { ClosedQA, Sql } from 'autoevals'
+import { ClosedQA, Sql, LLMClassifierFromTemplate } from 'autoevals'
+import { stripIndent } from 'common-tags'
 import { parse } from 'libpg-query'
 
 const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2-2025-12-11'
@@ -135,5 +136,37 @@ export const sqlSyntaxScorer: EvalScorer<Input, Output, Expected> = async ({ out
     name: 'SQL Validity',
     score,
     metadata: errors.length > 0 ? { errors } : undefined,
+  }
+}
+
+const concisenessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
+  name: 'Conciseness',
+  promptTemplate: stripIndent`
+    Evaluate the conciseness of this response.
+
+    Input: {{input}}
+    Output: {{output}}
+
+    Is the response concise and free of unnecessary words?
+    a) Very concise - no wasted words
+    b) Mostly concise - minor verbosity
+    c) Some verbosity but acceptable
+    d) Contains superfluous wording
+    e) Overly verbose
+  `,
+  choiceScores: { a: 1, b: 0.75, c: 0.5, d: 0.25, e: 0 },
+  useCoT: true,
+  model: LLM_AS_A_JUDGE_MODEL,
+})
+
+export const concisenessScorer: EvalScorer<Input, Output, Expected> = async ({ input, output }) => {
+  const result = await concisenessEvaluator({
+    input,
+    output: output.text,
+  })
+
+  return {
+    name: 'Conciseness',
+    score: result.score ?? 0,
   }
 }
