@@ -1,10 +1,9 @@
-import { Check, ExternalLink, Mail, Search } from 'lucide-react'
-import Link from 'next/link'
-import { useState } from 'react'
-
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useProfile } from 'lib/profile'
-import { Button, Input, Separator } from 'ui'
+import { Check, Mail } from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
+import { Button, IconDiscord, Separator } from 'ui'
 import { CATEGORY_OPTIONS } from './Support.constants'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
 
@@ -32,15 +31,15 @@ export const Success = ({
   const [searchValue, setSearchValue] = useState<string>(selectedCategory?.query ?? '')
 
   return (
-    <div className="mt-10 w-[620px] flex flex-col items-center space-y-4">
+    <div className="mt-10 max-w-[620px] flex flex-col items-center space-y-4">
       <div className="relative">
         <Mail strokeWidth={1.5} size={60} className="text-brand" />
         <div className="h-6 w-6 rounded-full bg-brand absolute bottom-1 -right-1.5 flex items-center justify-center">
-          <Check strokeWidth={4} size={18} />
+          <Check strokeWidth={4} size={16} className="text-contrast" />
         </div>
       </div>
       <div className="flex items-center flex-col space-y-2 text-center p-4">
-        <h3 className="text-xl">Support request successfully sent!</h3>
+        <h3 className="text-xl">Support request sent</h3>
         <p className="text-sm text-foreground-light">
           We will reach out to you at <span className="text-foreground">{respondToEmail}</span>.
         </p>
@@ -52,51 +51,36 @@ export const Success = ({
           </p>
         )}
       </div>
-      {categoriesToShowAdditionalResources.includes(sentCategory) && (
+      {true && (
         <>
           <div className="!my-10 w-full">
             <Separator />
           </div>
           <div className="flex flex-col items-center px-12 space-y-2 text-center">
-            <p>In the meantime, tap into our community</p>
-            <p className="text-sm text-foreground-light">
-              Find the answers you need with fellow developers building with Supabase by joining our
-              GitHub discussions or on Discord - build the next best thing together
+            <h4 className="text-lg font-normal">Tap into our community</h4>
+            <p className="text-sm text-foreground-light text-balance">
+              Our Discord community can help with code-related issues. Many questions are answered
+              in minutes.
             </p>
           </div>
-          <div className="w-full px-12 !mt-8">
-            <Input
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              icon={<Search />}
-              actions={[
-                <Button
-                  asChild
-                  key="search"
-                  className="mr-1"
-                  type="default"
-                  icon={<ExternalLink />}
-                >
-                  <Link
-                    href={`https://github.com/supabase/supabase/discussions?discussions_q=${searchValue}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Search on GitHub discussions
-                  </Link>
-                </Button>,
-              ]}
-            />
-          </div>
+          <Button
+            asChild
+            type="default"
+            icon={<IconDiscord size={16} fill="hsl(var(--background-default))" />}
+          >
+            <Link href={'https://discord.supabase.com/'} target="_blank">
+              Join us on Discord
+            </Link>
+          </Button>
         </>
       )}
       <div className="!mt-10 w-full">
         <Separator />
       </div>
       <div className="w-full pb-4 px-4 flex items-center justify-end">
-        <Link href="/">
-          <Button>Go back</Button>
-        </Link>
+        <Button asChild type="default">
+          <Link href="/">Finish</Link>
+        </Button>
       </div>
     </div>
   )
