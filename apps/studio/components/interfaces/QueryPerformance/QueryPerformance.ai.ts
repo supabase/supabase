@@ -37,8 +37,8 @@ ${additionalContext}
 
 Provide a short response covering:
 1. What the query does (1-2 sentences)
-2. Performance assessment (good/concerning and why)
-3. Actionable optimization suggestions (if any)
+2. Performance assessment (good/concerning and why, keep it brief 2-3 sentences)
+3. Actionable optimization suggestions (if any, keep it brief 2-3 sentences)
 
 Keep your response concise and focused on actionable insights. We can continue the conversation if needed to get more details.`
 
