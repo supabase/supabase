@@ -376,6 +376,11 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/sveltekit' as `/${string}`,
         },
         {
+          name: 'Flask (Python)',
+          url: '/guides/getting-started/quickstarts/flask' as `/${string}`,
+          enabled: !jsOnly,
+        },
+        {
           name: 'TanStack Start',
           url: '/guides/getting-started/quickstarts/tanstack' as `/${string}`,
         },
@@ -389,7 +394,6 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/ruby-on-rails' as `/${string}`,
           enabled: !jsOnly,
         },
-
         {
           name: 'SolidJS',
           url: '/guides/getting-started/quickstarts/solidjs',
