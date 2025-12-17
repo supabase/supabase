@@ -771,7 +771,7 @@ describe('SupportFormPage', () => {
 
     await selectLibraryOption(screen, 'JavaScript')
     await waitFor(() => {
-      expect(getLibrarySelector(screen)).toHaveTextContent('Javascript')
+      expect(getLibrarySelector(screen)).toHaveTextContent('JavaScript')
     })
 
     const summaryField = getSummaryField(screen)
