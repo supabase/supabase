@@ -2599,9 +2599,13 @@ export interface DashboardErrorDisplayedEvent {
   action: 'dashboard_error_displayed'
   properties: {
     /**
+     * Source of the error
+     */
+    source?: 'admonition' | 'toast'
+    /**
      * Optional title of the error Admonition
      */
-    title?: string
+    message?: string
   }
   groups: TelemetryGroups
 }
