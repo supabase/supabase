@@ -184,7 +184,7 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
       type="default"
       title="Having trouble submitting the form?"
       description={
-        <div className="flex flex-col gap-y-1">
+        <>
           <p className="flex items-center gap-x-1 flex-wrap">
             Email us directly at{' '}
             <span className="inline-flex items-center gap-x-1">
@@ -223,7 +223,7 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
             )}{' '}
             and as much information as possible.
           </p>
-        </div>
+        </>
       }
       defaultVisibility={true}
       hideCollapse={true}
