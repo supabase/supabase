@@ -185,7 +185,7 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
       title="Having trouble submitting the form?"
       description={
         <>
-          <p className="flex items-center gap-x-1 flex-wrap">
+          <p className="flex items-center gap-x-1.5 flex-wrap">
             Email us directly at{' '}
             <span className="inline-flex items-center gap-x-1">
               <a
@@ -208,7 +208,7 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
               />
             </span>
           </p>
-          <p>
+          <p className="flex items-center gap-x-1.5 flex-wrap">
             Please make sure to include your project ID{' '}
             {hasProjectRef && (
               <span className="inline-flex items-center gap-x-1">
