@@ -3,7 +3,7 @@ import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { partition } from 'lodash'
 import { NextRouter } from 'next/router'
-import { createContext, PropsWithChildren, ReactNode, useContext, useEffect, useState } from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { proxy, subscribe, useSnapshot } from 'valtio'
 
 export const editorEntityTypes = {
@@ -30,7 +30,6 @@ export interface Tab {
   id: string
   type: TabType
   label?: string
-  icon?: ReactNode
   metadata?: {
     schema?: string
     name?: string
@@ -76,7 +75,7 @@ function getSavedRecentItems(ref: string): RecentItem[] {
 const DEFAULT_TABS_STATE = {
   activeTab: null as string | null,
   openTabs: [] as string[],
-  tabsMap: {} as { [key: string]: Tab },
+  tabsMap: {} as Record<string, Tab>,
   previewTabId: undefined as string | undefined,
   recentItems: [],
 }
@@ -289,14 +288,7 @@ function createTabsState(projectRef: string) {
         case 'm':
         case 'f':
         case 'p':
-          router.push(
-            buildTableEditorUrl(
-              router.query.ref as string,
-              tab.metadata?.name!,
-              tab.metadata?.tableId!,
-              tab.metadata?.schema
-            )
-          )
+          router.push(buildTableEditorUrl(router.query.ref as string, tab.metadata?.tableId!))
           break
       }
     },

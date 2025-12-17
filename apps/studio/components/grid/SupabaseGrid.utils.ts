@@ -6,7 +6,7 @@ import { CalculatedColumn, CellKeyboardEvent } from 'react-data-grid'
 import type { Filter, SavedState } from 'components/grid/types'
 import { Entity, isTableLike } from 'data/table-editor/table-editor-types'
 import { useSearchParams } from 'next/navigation'
-import { parseAsBoolean, parseAsNativeArrayOf, parseAsString, useQueryStates } from 'nuqs'
+import { parseAsNativeArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { copyToClipboard } from 'ui'
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
@@ -134,27 +134,20 @@ export function getStorageKey(prefix: string, ref: string) {
 
 export function loadTableEditorStateFromLocalStorage(
   projectRef: string,
-  tableName: string,
-  schema?: string | null
+  tableId: number
 ): SavedState | undefined {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
   // Prefer sessionStorage (scoped to current tab) over localStorage
   const jsonStr = sessionStorage.getItem(storageKey) ?? localStorage.getItem(storageKey)
   if (!jsonStr) return
   const json = JSON.parse(jsonStr)
-  const tableKey = !schema || schema == 'public' ? tableName : `${schema}.${tableName}`
-  return json[tableKey]
+  return json[tableId]
 }
 
-export function buildTableEditorUrl(
-  projectRef: string,
-  tableName: string,
-  tableId: number,
-  schema?: string | null
-) {
+export function buildTableEditorUrl(projectRef: string, tableId: number) {
   const url = new URL(`/project/${projectRef}/editor/${tableId}`)
 
-  const savedState = loadTableEditorStateFromLocalStorage(projectRef, tableName, schema)
+  const savedState = loadTableEditorStateFromLocalStorage(projectRef, tableId)
   if (savedState?.sorts) {
     url.searchParams.set('sort', savedState.sorts.join(','))
   }

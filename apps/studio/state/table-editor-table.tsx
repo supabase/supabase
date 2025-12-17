@@ -34,7 +34,7 @@ export const createTableEditorTableState = ({
 }) => {
   const table = parseSupaTable(originalTable)
 
-  const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.name, table.schema)
+  const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.id)
   const gridColumns = getInitialGridColumns(
     getGridColumns(table, {
       tableId: table.id,

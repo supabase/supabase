@@ -10,10 +10,7 @@ export const TABLE_NODE_WIDTH = 320
 export const TABLE_NODE_ROW_HEIGHT = 40
 
 export type TableNodeData = {
-  tableSchema: string
-  tableName: string
-  tableId: number
-  id?: number
+  id: number
   name: string
   ref: string
   isForeign: boolean
@@ -71,7 +68,7 @@ export const TableNode = ({
             </div>
             {data.id && !placeholder && (
               <Button asChild type="text" className="px-0 w-[16px] h-[16px] rounded">
-                <Link href={buildTableEditorUrl(data.ref, data.name, data.id, data.schema)}>
+                <Link href={buildTableEditorUrl(data.ref, data.id)}>
                   <ExternalLink size={10} className="text-foreground-light" />
                 </Link>
               </Button>

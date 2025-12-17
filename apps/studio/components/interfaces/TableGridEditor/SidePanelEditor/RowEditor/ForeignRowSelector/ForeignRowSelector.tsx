@@ -130,12 +130,7 @@ export const ForeignRowSelector = ({
     if (!project?.ref || !table?.name || !table?.schema) return
 
     try {
-      const persistenceTableName = table.name + FOREIGN_ROW_SELECTOR_TABLE_NAME_SUFFIX
-      const savedState = loadTableEditorStateFromLocalStorage(
-        project.ref,
-        persistenceTableName,
-        table.schema
-      )
+      const savedState = loadTableEditorStateFromLocalStorage(project.ref, table.id)
       const urlSorts = savedState?.sorts ?? []
       const parsedSorts = formatSortURLParams(table.name, urlSorts)
       if (parsedSorts.length > 0) {

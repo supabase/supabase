@@ -41,25 +41,10 @@ const TableEditorPage: NextPageWithLayout = () => {
 
       // Handle redirect to last opened table tab, or last table tab
       if (lastOpenedTableData) {
-        router.push(
-          buildTableEditorUrl(
-            projectRef!,
-            lastOpenedTableData.metadata.name!,
-            lastOpenedTableData.metadata.tableId!,
-            lastOpenedTableData.metadata.schema
-          )
-        )
+        router.push(buildTableEditorUrl(projectRef!, lastOpenedTableData.metadata?.tableId!))
       } else if (lastTabId) {
         const lastTab = tabStore.tabsMap[lastTabId]
-        if (lastTab)
-          router.push(
-            buildTableEditorUrl(
-              projectRef!,
-              lastTab.metadata?.name!,
-              lastTab.metadata?.tableId!,
-              lastTab.metadata?.schema
-            )
-          )
+        if (lastTab) router.push(buildTableEditorUrl(projectRef!, lastTab.metadata?.tableId!))
       }
     }
   }, [isHistoryLoaded])
