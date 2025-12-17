@@ -70,7 +70,6 @@ class PublicMoviesUpdate(TypedDict):
 
 ## Types for select, insert and update
 
-
 The `PublicMovies` class is used to parse `SELECT` results from the `movies` table, while `PublicMoviesInsert` and `PublicMoviesUpdate` are used to format and provide completion for arguments for `insert` and `update` respectively.
 
 ```py
@@ -91,7 +90,6 @@ updated  = [PublicMovies(m) for m in movies.update(PublicMoviesUpdate(name="bar"
                                         .eq("id", 5) \
                                         .execute().data]
 ```
-
 
 ## Update types automatically with GitHub Actions
 
