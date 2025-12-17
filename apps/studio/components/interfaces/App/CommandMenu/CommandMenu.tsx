@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { IS_PLATFORM } from 'common'
 import { useBranchCommands } from 'components/interfaces/BranchManagement/Branch.Commands'
 import { useConnectCommands } from 'components/interfaces/Connect/Connect.Commands'
@@ -14,6 +14,7 @@ import {
   CommandList,
   CommandMenu,
   useQuery,
+  useSetQuery,
 } from 'ui-patterns/CommandMenu'
 import { useChangelogCommand } from 'ui-patterns/CommandMenu/prepackaged/Changelog'
 import { useDocsAiCommands } from 'ui-patterns/CommandMenu/prepackaged/DocsAi'
@@ -25,10 +26,10 @@ import { useProjectSwitchCommand, useConfigureOrganizationCommand } from './OrgP
 import { useSupportCommands } from './Support'
 import { orderCommandSectionsByPriority } from './ordering'
 import {
-  SearchContextSelector,
+  SearchContextBadges,
   getSearchContextPlaceholder,
   type SearchContextValue,
-} from './SearchContextSelector'
+} from './SearchContextBadges'
 import { ContextSearchResults } from './ContextSearchResults'
 
 function StudioCommandMenuContent({
@@ -39,6 +40,24 @@ function StudioCommandMenuContent({
   setSearchContext: (value: SearchContextValue) => void
 }) {
   const query = useQuery()
+  const setQuery = useSetQuery()
+
+  // Store query values per context to restore when switching back
+  const queryPerContext = useRef<Partial<Record<SearchContextValue, string>>>({})
+
+  const handleContextChange = useCallback(
+    (newContext: SearchContextValue) => {
+      // Save current query for the current context
+      queryPerContext.current[searchContext] = query
+
+      // Restore query for the new context (or empty string if not visited before)
+      const savedQuery = queryPerContext.current[newContext] ?? ''
+      setQuery(savedQuery)
+
+      setSearchContext(newContext)
+    },
+    [searchContext, query, setQuery, setSearchContext]
+  )
 
   useApiKeysCommands()
   useApiUrlCommand()
@@ -66,9 +85,12 @@ function StudioCommandMenuContent({
     <>
       <CommandHeader>
         <CommandInput
-          leftIcon={<SearchContextSelector value={searchContext} onChange={setSearchContext} />}
+          // Commented out: leftIcon dropdown approach
+          // leftIcon={<SearchContextSelector value={searchContext} onChange={handleContextChange} />}
           placeholder={getSearchContextPlaceholder(searchContext)}
+          wrapperClassName="border-none"
         />
+        <SearchContextBadges value={searchContext} onChange={handleContextChange} />
       </CommandHeader>
       {isCommandsContext ? (
         <CommandList />
