@@ -11,7 +11,6 @@ import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSe
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
   Button,
-  cn,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   FormControl_Shadcn_,
@@ -151,9 +150,9 @@ function ProjectRefHighlighted({ projectRef }: ProjectRefHighlightedProps) {
           transition={{ duration: 0.3 }}
           className="flex items-center gap-x-1"
         >
-          <p className={cn('text-sm transition text-foreground-lighter')}>
+          <p className="text-sm transition text-foreground-lighter">
             Project ID:{' '}
-            <code className={cn('text-code-inline !text-foreground-light')}>{projectRef}</code>
+            <code className="text-code-inline !text-foreground-light">{projectRef}</code>
           </p>
           <CopyButton
             iconOnly
@@ -171,8 +170,6 @@ interface PlanExpectationInfoBoxProps {
   orgSlug: string
   planId?: string
 }
-
-const planIdToShow = 'enterprise'
 
 const PlanExpectationInfoBox = ({ orgSlug, planId }: PlanExpectationInfoBoxProps) => {
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
