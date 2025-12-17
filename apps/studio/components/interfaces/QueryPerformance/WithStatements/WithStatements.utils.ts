@@ -14,7 +14,6 @@ export const transformStatementDataToRows = (
 
   return data
     .map((row) => {
-      // Filter out protected schema recommendations from index_advisor_result
       const filteredIndexAdvisorResult = row.index_advisor_result
         ? filterProtectedSchemaIndexAdvisorResult(row.index_advisor_result)
         : null
@@ -35,14 +34,10 @@ export const transformStatementDataToRows = (
       }
     })
     .filter((row) => {
-      // If warnings filter is on, exclude rows that:
-      // 1. Only have protected schema recommendations (filteredIndexAdvisorResult is null)
-      // 2. Or involve protected schemas and have no valid recommendations
       if (filterIndexAdvisor) {
         const hasValidRecommendations = row.index_advisor_result !== null
         const involvesProtectedSchemas = queryInvolvesProtectedSchemas(row.query)
 
-        // Exclude if it involves protected schemas and has no valid recommendations
         if (involvesProtectedSchemas && !hasValidRecommendations) {
           return false
         }

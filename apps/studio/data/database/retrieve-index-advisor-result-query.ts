@@ -37,8 +37,7 @@ export async function getIndexAdvisorResult({
   })
   const result = results[0] as GetIndexAdvisorResultResponse
 
-  // Filter out protected schema recommendations
-  return filterProtectedSchemaIndexAdvisorResult(result) ?? result
+  return filterProtectedSchemaIndexAdvisorResult(result)
 }
 
 export type GetIndexAdvisorResultData = Awaited<ReturnType<typeof getIndexAdvisorResult>>
