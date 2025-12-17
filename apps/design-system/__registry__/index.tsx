@@ -38,17 +38,6 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "ConfirmDialog": {
-      name: "ConfirmDialog",
-      type: "components:fragment",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/../../packages/ui-patterns/src/Dialogs/ConfirmDialog")),
-      source: "",
-      files: ["registry/default//Dialogs/ConfirmDialog.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
     "PageContainer": {
       name: "PageContainer",
       type: "components:fragment",
@@ -159,6 +148,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "alert-dialog-close-only": {
+      name: "alert-dialog-close-only",
+      type: "components:example",
+      registryDependencies: ["alert-dialog","button"],
+      component: React.lazy(() => import("@/registry/default/example/alert-dialog-close-only")),
+      source: "",
+      files: ["registry/default/example/alert-dialog-close-only.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "aspect-ratio-demo": {
       name: "aspect-ratio-demo",
       type: "components:example",
@@ -166,6 +166,28 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/aspect-ratio-demo")),
       source: "",
       files: ["registry/default/example/aspect-ratio-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "alert-dialog-destructive": {
+      name: "alert-dialog-destructive",
+      type: "components:example",
+      registryDependencies: ["alert-dialog","button"],
+      component: React.lazy(() => import("@/registry/default/example/alert-dialog-destructive")),
+      source: "",
+      files: ["registry/default/example/alert-dialog-destructive.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "alert-dialog-warning": {
+      name: "alert-dialog-warning",
+      type: "components:example",
+      registryDependencies: ["alert-dialog","button"],
+      component: React.lazy(() => import("@/registry/default/example/alert-dialog-warning")),
+      source: "",
+      files: ["registry/default/example/alert-dialog-warning.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -1248,6 +1270,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "sheet-nonmodal": {
+      name: "sheet-nonmodal",
+      type: "components:example",
+      registryDependencies: ["sheet"],
+      component: React.lazy(() => import("@/registry/default/example/sheet-nonmodal")),
+      source: "",
+      files: ["registry/default/example/sheet-nonmodal.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "sheet-side": {
       name: "sheet-side",
       type: "components:example",
@@ -1827,39 +1860,6 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/text-confirm-dialog-demo")),
       source: "",
       files: ["registry/default/example/text-confirm-dialog-demo.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "text-confirm-dialog-with-info-alert": {
-      name: "text-confirm-dialog-with-info-alert",
-      type: "components:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/text-confirm-dialog-with-info-alert")),
-      source: "",
-      files: ["registry/default/example/text-confirm-dialog-with-info-alert.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "text-confirm-dialog-with-warning-alert": {
-      name: "text-confirm-dialog-with-warning-alert",
-      type: "components:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/text-confirm-dialog-with-warning-alert")),
-      source: "",
-      files: ["registry/default/example/text-confirm-dialog-with-warning-alert.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "text-confirm-dialog-with-destructive-alert": {
-      name: "text-confirm-dialog-with-destructive-alert",
-      type: "components:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/text-confirm-dialog-with-destructive-alert")),
-      source: "",
-      files: ["registry/default/example/text-confirm-dialog-with-destructive-alert.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -2469,46 +2469,13 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "modal-demo": {
-      name: "modal-demo",
+    "confirmation-modal-demo": {
+      name: "confirmation-modal-demo",
       type: "components:example",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/modal-demo")),
+      component: React.lazy(() => import("@/registry/default/example/confirmation-modal-demo")),
       source: "",
-      files: ["registry/default/example/modal-demo.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "modal-aligned-footer": {
-      name: "modal-aligned-footer",
-      type: "components:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/modal-aligned-footer")),
-      source: "",
-      files: ["registry/default/example/modal-aligned-footer.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "modal-custom-footer": {
-      name: "modal-custom-footer",
-      type: "components:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/modal-custom-footer")),
-      source: "",
-      files: ["registry/default/example/modal-custom-footer.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "modal-hide-footer": {
-      name: "modal-hide-footer",
-      type: "components:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/modal-hide-footer")),
-      source: "",
-      files: ["registry/default/example/modal-hide-footer.tsx"],
+      files: ["registry/default/example/confirmation-modal-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -2984,6 +2951,94 @@ export const Index: Record<string, any> = {
       files: ["registry/default/block/chart-composed-actions.tsx"],
       category: "Charts",
       subcategory: "Composed",
+      chunks: []
+    },
+    "copy-button-verbs": {
+      name: "copy-button-verbs",
+      type: "components:example",
+      registryDependencies: ["button"],
+      component: React.lazy(() => import("@/registry/default/example/copy-button-verbs")),
+      source: "",
+      files: ["registry/default/example/copy-button-verbs.tsx"],
+      category: "Getting Started",
+      subcategory: "Copywriting",
+      chunks: []
+    },
+    "copy-form-labels": {
+      name: "copy-form-labels",
+      type: "components:example",
+      registryDependencies: ["form"],
+      component: React.lazy(() => import("@/registry/default/example/copy-form-labels")),
+      source: "",
+      files: ["registry/default/example/copy-form-labels.tsx"],
+      category: "Getting Started",
+      subcategory: "Copywriting",
+      chunks: []
+    },
+    "copy-error-messages": {
+      name: "copy-error-messages",
+      type: "components:example",
+      registryDependencies: ["form"],
+      component: React.lazy(() => import("@/registry/default/example/copy-error-messages")),
+      source: "",
+      files: ["registry/default/example/copy-error-messages.tsx"],
+      category: "Getting Started",
+      subcategory: "Copywriting",
+      chunks: []
+    },
+    "copy-success-messages": {
+      name: "copy-success-messages",
+      type: "components:example",
+      registryDependencies: ["form"],
+      component: React.lazy(() => import("@/registry/default/example/copy-success-messages")),
+      source: "",
+      files: ["registry/default/example/copy-success-messages.tsx"],
+      category: "Getting Started",
+      subcategory: "Copywriting",
+      chunks: []
+    },
+    "copy-tooltips": {
+      name: "copy-tooltips",
+      type: "components:example",
+      registryDependencies: ["tooltip"],
+      component: React.lazy(() => import("@/registry/default/example/copy-tooltips")),
+      source: "",
+      files: ["registry/default/example/copy-tooltips.tsx"],
+      category: "Getting Started",
+      subcategory: "Copywriting",
+      chunks: []
+    },
+    "copy-loading-states": {
+      name: "copy-loading-states",
+      type: "components:example",
+      registryDependencies: ["loading-state"],
+      component: React.lazy(() => import("@/registry/default/example/copy-loading-states")),
+      source: "",
+      files: ["registry/default/example/copy-loading-states.tsx"],
+      category: "Getting Started",
+      subcategory: "Copywriting",
+      chunks: []
+    },
+    "copy-empty-states": {
+      name: "copy-empty-states",
+      type: "components:example",
+      registryDependencies: ["empty-state"],
+      component: React.lazy(() => import("@/registry/default/example/copy-empty-states")),
+      source: "",
+      files: ["registry/default/example/copy-empty-states.tsx"],
+      category: "Getting Started",
+      subcategory: "Copywriting",
+      chunks: []
+    },
+    "copy-confirmations": {
+      name: "copy-confirmations",
+      type: "components:example",
+      registryDependencies: ["confirmation"],
+      component: React.lazy(() => import("@/registry/default/example/copy-confirmations")),
+      source: "",
+      files: ["registry/default/example/copy-confirmations.tsx"],
+      category: "Getting Started",
+      subcategory: "Copywriting",
       chunks: []
     },
   },

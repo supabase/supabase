@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -9,13 +8,11 @@ import { useCreatePublicationMutation } from 'data/replication/publication-creat
 import { useReplicationTablesQuery } from 'data/replication/tables-query'
 import {
   Button,
-  cn,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -80,27 +77,11 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
   return (
     <>
       <Sheet open={visible} onOpenChange={onClose}>
-        <SheetContent showClose={false} size="default">
+        <SheetContent size="default">
           <div className="flex flex-col h-full">
             <SheetHeader>
-              <div className="flex flex-row justify-between items-center">
-                <div>
-                  <SheetTitle>New Publication</SheetTitle>
-                  <SheetDescription>
-                    Create a new publication to replicate table changes to destinations
-                  </SheetDescription>
-                </div>
-                <SheetClose
-                  className={cn(
-                    'text-muted hover:opacity-100',
-                    'focus:outline-none focus:ring-2',
-                    'disabled:pointer-events-none'
-                  )}
-                >
-                  <X className="h-3 w-3" />
-                  <span className="sr-only">Close</span>
-                </SheetClose>
-              </div>
+              <SheetTitle>Create a new Publication</SheetTitle>
+              <SheetDescription>Replicate table changes to destinations</SheetDescription>
             </SheetHeader>
             <SheetSection className="flex-grow overflow-auto">
               <Form_Shadcn_ {...form}>
@@ -134,9 +115,11 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
                             onValuesChange={field.onChange}
                             disabled={creatingPublication}
                           >
-                            <MultiSelector.Trigger>
-                              <MultiSelector.Input placeholder="Select tables" />
-                            </MultiSelector.Trigger>
+                            <MultiSelector.Trigger
+                              badgeLimit="wrap"
+                              label="Select tables..."
+                              mode="inline-combobox"
+                            />
                             <MultiSelector.Content>
                               <MultiSelector.List>
                                 {tables?.map((table) => (

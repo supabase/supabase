@@ -78,10 +78,11 @@ export const PublicationsComboBox = ({
           {selectedPublication || 'Select publication'}
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0" sameWidthAsTrigger>
+      <PopoverContent_Shadcn_ sameWidthAsTrigger className="p-0" align="start">
         <Command_Shadcn_>
           <CommandInput_Shadcn_
             placeholder="Find publication..."
+            className="text-xs"
             value={searchTerm}
             onValueChange={setSearchTerm}
           />

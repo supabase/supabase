@@ -6,14 +6,13 @@ import { StreamableHTTPTransport } from "@hono/mcp";
 import { Hono } from "hono";
 import { z } from "zod";
 
-// Change this to your function name
-const functionName = "simple-mcp-server";
-const app = new Hono().basePath(`/${functionName}`);
+// Create Hono app
+const app = new Hono();
 
 // Create your MCP server
 const server = new McpServer({
-  name: "simple-mcp-server",
-  version: "1.0.0",
+  name: "mcp",
+  version: "0.1.0",
 });
 
 // Register a simple addition tool
@@ -25,8 +24,8 @@ server.registerTool("add", {
   content: [{ type: "text", text: String(a + b) }],
 }));
 
-// Handle MCP requests
-app.all("/mcp", async (c) => {
+// Handle MCP requests at the root path
+app.all("/", async (c) => {
   const transport = new StreamableHTTPTransport();
   await server.connect(transport);
   return transport.handleRequest(c);

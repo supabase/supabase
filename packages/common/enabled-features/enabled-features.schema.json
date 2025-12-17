@@ -252,6 +252,10 @@
       "type": "boolean",
       "description": "Enable the vercel integration section in the organization and project settings pages"
     },
+    "integrations:aws_private_link": {
+      "type": "boolean",
+      "description": "Enable the AWS PrivateLink integration section in the project settings pages"
+    },
 
     "infrastructure:read_replicas": {
       "type": "boolean",
@@ -482,6 +486,7 @@
     "integrations:partners",
     "integrations:wrappers",
     "integrations:vercel",
+    "integrations:aws_private_link",
     "infrastructure:read_replicas",
     "profile:show_email",
     "profile:show_information",

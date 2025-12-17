@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { snakeCase } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -6,7 +7,7 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useFlag, useParams } from 'common'
-import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
+import { CreateAnalyticsBucketSheet } from 'components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPrimaryKeysExists } from 'data/database/primary-keys-exists-query'
@@ -19,6 +20,7 @@ import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutati
 import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
 import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
 import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   PipelineStatusRequestStatus,
@@ -26,6 +28,7 @@ import {
 } from 'state/replication-pipeline-request-status'
 import {
   Button,
+  cn,
   DialogSectionSeparator,
   Form_Shadcn_,
   Sheet,
@@ -90,6 +93,7 @@ export const DestinationPanel = ({
   const editMode = !!existingDestination
   const [showDisclaimerDialog, setShowDisclaimerDialog] = useState(false)
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
+  const [newBucketSheetVisible, setNewBucketSheetVisible] = useState(false)
   const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
     null
   )
@@ -130,7 +134,7 @@ export const DestinationPanel = ({
     pipelineId: existingDestination?.pipelineId,
   })
 
-  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: apiKeys } = useAPIKeysQuery(
     { projectRef, reveal: true },
     { enabled: canReadAPIKeys }
@@ -437,9 +441,12 @@ export const DestinationPanel = ({
     <>
       <Sheet open={visible} onOpenChange={onClose}>
         <SheetContent
-          showClose={false}
           size="default"
-          className={publicationPanelVisible ? 'right-32' : 'right-0'}
+          showClose={false}
+          className={cn(
+            'md:!w-[700px]',
+            publicationPanelVisible || newBucketSheetVisible ? 'right-20' : 'right-0'
+          )}
         >
           <div className="flex flex-col h-full" tabIndex={-1}>
             <SheetHeader>
@@ -457,13 +464,12 @@ export const DestinationPanel = ({
               ) : (
                 <Form_Shadcn_ {...form}>
                   <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-                    <div className="p-5">
-                      <p className="text-sm font-medium text-foreground mb-1">
-                        Destination details
-                      </p>
-                      <p className="text-sm text-foreground-light mb-4">
-                        Name your destination and choose which data to replicate
-                      </p>
+                    <DestinationTypeSelection form={form} editMode={editMode} />
+
+                    <DialogSectionSeparator />
+
+                    <div className="p-5 flex flex-col gap-y-6">
+                      <p className="text-sm font-medium text-foreground">Destination details</p>
 
                       <div className="space-y-4">
                         <DestinationNameInput form={form} />
@@ -475,23 +481,21 @@ export const DestinationPanel = ({
                         />
                       </div>
                     </div>
+
                     <DialogSectionSeparator />
-                    <DestinationTypeSelection form={form} editMode={editMode} />
+
                     {selectedType === 'BigQuery' && etlEnableBigQuery ? (
-                      <>
-                        <DialogSectionSeparator />
-                        <BigQueryFields form={form} />
-                      </>
+                      <BigQueryFields form={form} />
                     ) : selectedType === 'Analytics Bucket' && etlEnableIceberg ? (
-                      <>
-                        <DialogSectionSeparator />
-                        <AnalyticsBucketFields
-                          form={form}
-                          setIsFormInteracting={setIsFormInteracting}
-                        />
-                      </>
+                      <AnalyticsBucketFields
+                        form={form}
+                        setIsFormInteracting={setIsFormInteracting}
+                        onSelectNewBucket={() => setNewBucketSheetVisible(true)}
+                      />
                     ) : null}
+
                     <DialogSectionSeparator />
+
                     <AdvancedSettings form={form} />
                   </form>
                 </Form_Shadcn_>
@@ -523,6 +527,11 @@ export const DestinationPanel = ({
         sourceId={sourceId}
         visible={publicationPanelVisible}
         onClose={() => setPublicationPanelVisible(false)}
+      />
+
+      <CreateAnalyticsBucketSheet
+        open={newBucketSheetVisible}
+        onOpenChange={setNewBucketSheetVisible}
       />
 
       <ReplicationDisclaimerDialog
