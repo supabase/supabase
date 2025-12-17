@@ -67,7 +67,7 @@ export const AlertError = ({
         source: 'admonition',
       })
     }
-  }, [track, subject])
+  }, [track])
 
   return (
     <Admonition
