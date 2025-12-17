@@ -11,7 +11,7 @@ import { TableEditorMenu } from 'components/layouts/TableEditorLayout/TableEdito
 import { NewTab } from 'components/layouts/Tabs/NewTab'
 import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { editorEntityTypes, Tab, useTabsStateSnapshot } from 'state/tabs'
+import { editorEntityTypes, useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
@@ -29,22 +29,16 @@ const TableEditorPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (isHistoryLoaded) {
-      const lastOpenedTable = history.editor
-      const lastTabId = tabStore.openTabs.find((id) =>
-        editorEntityTypes.table.includes(tabStore.tabsMap[id]?.type)
+      const lastOpenedTableId = Number(history.editor)
+      const lastTabId = Number(
+        tabStore.openTabs.find((id) => editorEntityTypes.table.includes(tabStore.tabsMap[id]?.type))
       )
 
-      let lastOpenedTableData: Tab | undefined
-      if (lastOpenedTable !== undefined) {
-        lastOpenedTableData = tabStore.tabsMap[lastOpenedTable]
-      }
-
       // Handle redirect to last opened table tab, or last table tab
-      if (lastOpenedTableData) {
-        router.push(buildTableEditorUrl(projectRef!, lastOpenedTableData.metadata?.tableId!))
-      } else if (lastTabId) {
-        const lastTab = tabStore.tabsMap[lastTabId]
-        if (lastTab) router.push(buildTableEditorUrl(projectRef!, lastTab.metadata?.tableId!))
+      if (Number.isInteger(lastOpenedTableId)) {
+        router.push(buildTableEditorUrl(projectRef!, lastOpenedTableId))
+      } else if (Number.isInteger(lastTabId)) {
+        router.push(buildTableEditorUrl(projectRef!, lastTabId))
       }
     }
   }, [isHistoryLoaded])

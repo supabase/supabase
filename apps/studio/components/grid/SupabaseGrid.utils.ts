@@ -145,7 +145,7 @@ export function loadTableEditorStateFromLocalStorage(
 }
 
 export function buildTableEditorUrl(projectRef: string, tableId: number) {
-  const url = new URL(`/project/${projectRef}/editor/${tableId}`)
+  const url = new URL(`/project/${projectRef}/editor/${tableId}`, location.origin)
 
   const savedState = loadTableEditorStateFromLocalStorage(projectRef, tableId)
   if (savedState?.sorts) {
